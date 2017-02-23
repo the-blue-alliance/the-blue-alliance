@@ -69,7 +69,6 @@ class ContributionCalculator(object):
 
     def calculate_before_match(self, i):
         # Used for both mean and var
-        # Ao = np.vstack((self._Ar, self._Ab))
         AoT = self._Ao.transpose()
         Aoo = np.dot(AoT, self._Ao)
 
@@ -130,23 +129,43 @@ class ContributionCalculator(object):
 
         ####################################################################
         # Add results for next iter
-        if self._matches[i].has_been_played:
-            red_mean = self._matches[i].alliances['red']['score']
-            blue_mean = self._matches[i].alliances['blue']['score']
+        match = self._matches[i]
+        if match.has_been_played:
+            means = {}
+            for color in ['red', 'blue']:
+                if self._stat == 'score':
+                    means[color] = match.alliances[color]['score']
+                elif self._stat == '2016autoPointsOPR':
+                    means[color] = match.score_breakdown[color]['autoPoints']
+                elif self._stat == '2016bouldersOPR':
+                    means[color] = (
+                        match.score_breakdown[color].get('autoBouldersLow', 0) +
+                        match.score_breakdown[color].get('autoBouldersHigh', 0) +
+                        match.score_breakdown[color].get('teleopBouldersLow', 0) +
+                        match.score_breakdown[color].get('teleopBouldersHigh', 0))
+                elif self._stat == '2016crossingsOPR':
+                    means[color] = (
+                        match.score_breakdown[color].get('position1crossings', 0) +
+                        match.score_breakdown[color].get('position2crossings', 0) +
+                        match.score_breakdown[color].get('position3crossings', 0) +
+                        match.score_breakdown[color].get('position4crossings', 0) +
+                        match.score_breakdown[color].get('position5crossings', 0))
+                else:
+                    raise Exception("Unknown stat: {}".format(self._stat))
 
-            self._Mmean[2*i] = red_mean
-            self._Mmean[2*i+1] = blue_mean
+            self._Mmean[2*i] = means['red']
+            self._Mmean[2*i+1] = means['blue']
 
-            self._mean_sums.append(red_mean)
-            self._mean_sums.append(blue_mean)
+            self._mean_sums.append(means['red'])
+            self._mean_sums.append(means['blue'])
 
             predicted_mean_red = 0
-            for team in self._matches[i].alliances['red']['teams']:
+            for team in match.alliances['red']['teams']:
                 self._Ao[2*i, self._team_id_map[team]] = 1
                 predicted_mean_red += self._means[team]
 
             predicted_mean_blue = 0
-            for team in self._matches[i].alliances['blue']['teams']:
+            for team in match.alliances['blue']['teams']:
                 self._Ao[2*i+1, self._team_id_map[team]] = 1
                 predicted_mean_blue += self._means[team]
 
@@ -156,11 +175,11 @@ class ContributionCalculator(object):
             var_sum = 1.0
             var_sum_step = 2.0**12
             while var_sum > 0 and var_sum_step >= 1:
-                prob = self._normpdf(red_mean, predicted_mean_red, np.sqrt(var_sum))
+                prob = self._normpdf(means['red'], predicted_mean_red, np.sqrt(var_sum))
                 if prob >= best_prob:
                     best_prob = prob
                     best_var_sum = var_sum
-                prob2 = self._normpdf(red_mean, predicted_mean_red, np.sqrt(var_sum+1))
+                prob2 = self._normpdf(means['red'], predicted_mean_red, np.sqrt(var_sum+1))
                 if prob2 >= best_prob:
                     best_prob = prob2
                     best_var_sum = var_sum+1
@@ -178,11 +197,11 @@ class ContributionCalculator(object):
             var_sum = 1.0
             var_sum_step = 2.0**12
             while var_sum > 0 and var_sum_step >= 1:
-                prob = self._normpdf(blue_mean, predicted_mean_blue, np.sqrt(var_sum))
+                prob = self._normpdf(means['blue'], predicted_mean_blue, np.sqrt(var_sum))
                 if prob >= best_prob:
                     best_prob = prob
                     best_var_sum = var_sum
-                prob2 = self._normpdf(blue_mean, predicted_mean_blue, np.sqrt(var_sum+1))
+                prob2 = self._normpdf(means['blue'], predicted_mean_blue, np.sqrt(var_sum+1))
                 if prob2 >= best_prob:
                     best_prob = prob2
                     best_var_sum = var_sum+1
@@ -208,49 +227,61 @@ class PredictionHelper(object):
     @classmethod
     def _predict_match(cls, match, stat_mean_vars, tower_strength):
         # score_var = 40**2  # TODO temporary set variance to be huge
-        boulder_var = 5**2  # TODO get real value
-        crossing_var = 4**2  # TODO get real value
+        # boulder_var = 5**2  # TODO get real value
+        # crossing_var = 4**2  # TODO get real value
 
         red_score = 0
         red_score_var = 0
         red_auto_points = 0  # Used for tiebreaking
         red_boulders = 0
+        red_boulders_var = 0
         red_num_crossings = 0
+        red_num_crossings_var = 0
         for team in match.alliances['red']['teams']:
             red_score += stat_mean_vars['score'][0][team]
             red_score_var += stat_mean_vars['score'][1][team]
-            # red_auto_points += stat_mean_vars['2016autoPointsOPR'][team]
-            # red_boulders += stat_mean_vars['2016bouldersOPR'][team]
+
+            red_auto_points += stat_mean_vars['2016autoPointsOPR'][0][team]
+
+            red_boulders += stat_mean_vars['2016bouldersOPR'][0][team]
+            red_boulders_var += stat_mean_vars['2016bouldersOPR'][1][team]
+
             # Crossing OPR usually underestimates. hacky fix to make numbers more believable
-            # red_num_crossings += max(0, stat_mean_vars['2016crossingsOPR'][team]) * 1.2
+            red_num_crossings += max(0, stat_mean_vars['2016crossingsOPR'][0][team]) * 1.2
+            red_num_crossings_var += stat_mean_vars['2016crossingsOPR'][1][team]
 
         blue_score = 0
         blue_score_var = 0
         blue_auto_points = 0  # Used for tiebreaking
         blue_boulders = 0
+        blue_boulders_var = 0
         blue_num_crossings = 0
+        blue_num_crossings_var = 0
         for team in match.alliances['blue']['teams']:
             blue_score += stat_mean_vars['score'][0][team]
             blue_score_var += stat_mean_vars['score'][1][team]
-            # blue_auto_points += stat_mean_vars['2016autoPointsOPR'][team]
-            # blue_boulders += stat_mean_vars['2016bouldersOPR'][team]
+
+            blue_auto_points += stat_mean_vars['2016autoPointsOPR'][0][team]
+
+            blue_boulders += stat_mean_vars['2016bouldersOPR'][0][team]
+            blue_boulders_var += stat_mean_vars['2016bouldersOPR'][1][team]
+
             # Crossing OPR usually underestimates. hacky fix to make numbers more believable
-            # blue_num_crossings += max(0, stat_mean_vars['2016crossingsOPR'][team]) * 1.2
+            blue_num_crossings += max(0, stat_mean_vars['2016crossingsOPR'][0][team]) * 1.2
+            blue_num_crossings_var += stat_mean_vars['2016crossingsOPR'][1][team]
 
         # Prob win
         mu = abs(red_score - blue_score)
-        # var = 2 * score_var
-        var = red_score_var + blue_score_var
-        prob = 1 - cls._normcdf(-mu / np.sqrt(var))
+        prob = 1 - cls._normcdf(-mu / np.sqrt(red_score_var + blue_score_var))
         if math.isnan(prob):
             prob = 0.5
 
         # Prob capture
         mu = red_boulders - tower_strength
-        red_prob_capture = 1 - cls._normcdf(-mu / np.sqrt(boulder_var))
+        red_prob_capture = 1 - cls._normcdf(-mu / np.sqrt(red_boulders_var))
 
         mu = blue_boulders - tower_strength
-        blue_prob_capture = 1 - cls._normcdf(-mu / np.sqrt(boulder_var))
+        blue_prob_capture = 1 - cls._normcdf(-mu / np.sqrt(blue_boulders_var))
 
         if red_score > blue_score:
             winning_alliance = 'red'
@@ -262,10 +293,10 @@ class PredictionHelper(object):
         # Prob breach
         crossings_to_breach = 8
         mu = red_num_crossings - crossings_to_breach
-        red_prob_breach = 1 - cls._normcdf(-mu / np.sqrt(crossing_var))
+        red_prob_breach = 1 - cls._normcdf(-mu / np.sqrt(red_num_crossings_var))
 
         mu = blue_num_crossings - crossings_to_breach
-        blue_prob_breach = 1 - cls._normcdf(-mu / np.sqrt(crossing_var))
+        blue_prob_breach = 1 - cls._normcdf(-mu / np.sqrt(blue_num_crossings_var))
 
         prediction = {
             'red': {
@@ -343,13 +374,19 @@ class PredictionHelper(object):
         all_team_oprs = {}  # TODO
         all_team_vars = {}  # TODO
 
-        score_cc = ContributionCalculator(matches, 'score', 20, 10**2)
+        relevant_stats = [('score', 20, 10**2)]
+        # TODO: populate based on year
+        relevant_stats += [
+            ('2016autoPointsOPR', 20, 10**2),
+            ('2016crossingsOPR', 0, 1**2),
+            ('2016bouldersOPR', 0, 1**2),
+        ]
+        contribution_calculators = [ContributionCalculator(matches, s, m, v) for s, m, v in relevant_stats]
         for i, match in enumerate(matches):
-            team_means, team_vars = score_cc.calculate_before_match(i)
-
-            stat_mean_vars = {
-                'score': (team_means, team_vars),
-            }
+            mean_vars = [cc.calculate_before_match(i) for cc in contribution_calculators]
+            stat_mean_vars = {}
+            for (stat, _, _), mean_var in zip(relevant_stats, mean_vars):
+                stat_mean_vars[stat] = mean_var
 
             ####################################################################
             # Make prediction
