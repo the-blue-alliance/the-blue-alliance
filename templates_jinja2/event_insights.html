@@ -45,6 +45,7 @@
           {% if match_prediction_stats.wl_accuracy %}<p><strong>Win/Loss prediction accuracy:</strong> {{match_prediction_stats.wl_accuracy|round|int}}%</p>{% endif %}
           {% if match_prediction_stats.wl_accuracy_75 %}<p><strong>Win/Loss prediction accuracy (>75% confidence):</strong> {{match_prediction_stats.wl_accuracy_75|round|int}}%</p>{% endif %}
           {% if match_prediction_stats.err_mean %}<p><strong>Match score prediction average error:</strong> {{match_prediction_stats.err_mean|round(1)}}</p>{% endif %}
+          {% if match_prediction_stats.brier_score %}<p><strong>Brier score:</strong> {{match_prediction_stats.brier_score}}</p>{% endif %}
           {{mtm.qual_match_prediction_table(matches, match_predictions, fake_matches)}}
         </div>
         {% endif %}

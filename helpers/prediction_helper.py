@@ -96,27 +96,23 @@ class PredictionHelper(object):
         mu = blue_num_crossings - crossings_to_breach
         blue_prob_breach = 1 - cls._normcdf(-mu / np.sqrt(crossing_var))
 
-        # Artificially limit prob breach range
-        red_prob_breach = min(max(red_prob_breach, 0.1), 0.95)
-        blue_prob_breach = min(max(blue_prob_breach, 0.1), 0.95)
-
         prediction = {
             'red': {
                 'score': red_score,
                 'auto_points': red_auto_points,
                 'boulders': red_boulders,
-                'prob_capture': red_prob_capture * 100,
-                'prob_breach': red_prob_breach * 100
+                'prob_capture': red_prob_capture,
+                'prob_breach': red_prob_breach
             },
             'blue': {
                 'score': blue_score,
                 'auto_points': blue_auto_points,
                 'boulders': blue_boulders,
-                'prob_capture': blue_prob_capture * 100,
-                'prob_breach': blue_prob_breach * 100
+                'prob_capture': blue_prob_capture,
+                'prob_breach': blue_prob_breach
             },
             'winning_alliance': winning_alliance,
-            'prob': prob * 100,
+            'prob': prob,
         }
         return prediction
 
@@ -159,6 +155,7 @@ class PredictionHelper(object):
         correct_predictions_75 = 0
         score_differences = []
         stats_sum = defaultdict(int)
+        brier_sum = 0
         for i, match in enumerate(matches):
             # Calculate ixOPR
             all_ixoprs = {}
@@ -185,14 +182,17 @@ class PredictionHelper(object):
             # Benchmark prediction
             if match.has_been_played:
                 played_matches += 1
-                if prediction['prob'] > 75:
+                if prediction['prob'] > 0.75:
                     played_matches_75 += 1
                 if match.winning_alliance == prediction['winning_alliance']:
                     correct_predictions += 1
-                    if prediction['prob'] > 75:
+                    if prediction['prob'] > 0.75:
                         correct_predictions_75 += 1
                     for alliance_color in ['red', 'blue']:
                         score_differences.append(abs(match.alliances[alliance_color]['score'] - prediction[alliance_color]['score']))
+                    brier_sum += pow(prediction['prob'] - 1, 2)
+                else:
+                    brier_sum += pow(prediction['prob'] - 0, 2)
 
             # Update init_stats
             if match.has_been_played and match.score_breakdown:
@@ -226,6 +226,7 @@ class PredictionHelper(object):
             'wl_accuracy_75': None if played_matches_75 == 0 else 100 * float(correct_predictions_75) / played_matches_75,
             'err_mean': np.mean(score_differences) if score_differences else None,
             'err_var': np.var(score_differences) if score_differences else None,
+            'brier_score': brier_sum / played_matches,
         }
 
         return predictions, prediction_stats
@@ -278,7 +279,7 @@ class PredictionHelper(object):
                         sampled_tiebreaker[alliance_color] = match.score_breakdown[alliance_color]['autoPoints']
                 else:
                     prediction = match_predictions[match.key.id()]
-                    if np.random.uniform(high=100) < prediction['prob']:
+                    if np.random.uniform(high=1) < prediction['prob']:
                         sampled_winner = prediction['winning_alliance']
                     else:
                         if prediction['winning_alliance'] == 'red':
@@ -287,8 +288,8 @@ class PredictionHelper(object):
                             sampled_winner = 'red'
 
                     for alliance_color in ['red', 'blue']:
-                        sampled_breach[alliance_color] = np.random.uniform(high=100) < prediction[alliance_color]['prob_breach']
-                        sampled_capture[alliance_color] = np.random.uniform(high=100) < prediction[alliance_color]['prob_capture']
+                        sampled_breach[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_breach']
+                        sampled_capture[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_capture']
                         sampled_tiebreaker[alliance_color] = prediction[alliance_color]['auto_points']
 
                 # Using match results, update RP and tiebreaker

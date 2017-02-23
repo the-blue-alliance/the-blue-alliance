@@ -100,15 +100,15 @@
   {% else %}
     ?
   {% endif %}
-  <br><em>{{predictions.get(match.key.id()).get(alliance_color).prob_breach|round|int}}% / {{predictions.get(match.key.id()).get(alliance_color).prob_capture|round|int}}%</em>
+  <br><em>{{(predictions.get(match.key.id()).get(alliance_color).prob_breach*100)|round|int}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_capture*200)|round|int}}%</em>
 </td>
 {% endmacro %}
 
 {% macro prob_td(match, predictions, compact=False) %}
 <td{% if compact %} rowspan="2"{% endif %}>
   <div class="progress" style="margin: 0px;">
-    <div class="progress-bar {% if predictions.get(match.key.id()).prob < 65 %}progress-bar-danger{% elif predictions.get(match.key.id()).prob < 80 %}progress-bar-warning{% else %}progress-bar-success{% endif %}" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{predictions.get(match.key.id()).prob|round|int}}%;">
-      {{predictions.get(match.key.id()).prob|round|int}}%
+    <div class="progress-bar {% if predictions.get(match.key.id()).prob < 0.65 %}progress-bar-danger{% elif predictions.get(match.key.id()).prob < 0.80 %}progress-bar-warning{% else %}progress-bar-success{% endif %}" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{(predictions.get(match.key.id()).prob*100)|round|int}}%;">
+      {{(predictions.get(match.key.id()).prob*100)|round|int}}%
     </div>
   </div>
 </td>
