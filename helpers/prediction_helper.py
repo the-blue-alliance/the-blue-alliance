@@ -326,38 +326,6 @@ class PredictionHelper(object):
         event_key = matches[0].event
         event = event_key.get()
 
-        # # Setup
-        # team_list, team_id_map = cls._build_team_mapping(matches)
-        # # last_event_stats = MatchstatsHelper.get_last_event_stats(team_list, event_key)
-
-        # # Setup matrices
-        # m = len(matches)
-        # t = len(team_list)
-        # Ar = np.zeros((m, t))
-        # Ab = np.zeros((m, t))
-        # Mr_mean = np.zeros((m, 1))
-        # Mb_mean = np.zeros((m, 1))
-        # Mr_var = np.zeros((m, 1))
-        # Mb_var = np.zeros((m, 1))
-
-        # init_stats_sums = defaultdict(int)
-        # init_stats_totals = defaultdict(int)
-        # for _, stats in last_event_stats.items():
-        #     for stat, stat_value in stats.items():
-        #         init_stats_sums[stat] += stat_value
-        #         init_stats_totals[stat] += 1
-
-        # init_stats_default = defaultdict(int)
-        # for stat, stat_sum in init_stats_sums.items():
-        #     init_stats_default[stat] = float(stat_sum) / init_stats_totals[stat]
-
-        # relevant_stats = [
-        #     'oprs',
-        #     '2016autoPointsOPR',
-        #     '2016crossingsOPR',
-        #     '2016bouldersOPR'
-        # ]
-
         # Make predictions before each match
         predictions = {}
         played_matches = 0
@@ -425,33 +393,6 @@ class PredictionHelper(object):
                     brier_scores[stat] = brier_sum / played_matches
                 else:
                     brier_scores[stat] = brier_sum / (2 * played_matches)
-
-            # # Update init_stats
-            # if match.has_been_played and match.score_breakdown:
-            #     for alliance_color in ['red', 'blue']:
-            #         stats_sum['score'] += match.alliances[alliance_color]['score']
-
-            #         for stat in relevant_stats:
-            #             if stat == '2016autoPointsOPR':
-            #                 init_stats_default[stat] += match.score_breakdown[alliance_color]['autoPoints']
-            #             elif stat == '2016bouldersOPR':
-            #                 init_stats_default[stat] += (
-            #                     match.score_breakdown[alliance_color].get('autoBouldersLow', 0) +
-            #                     match.score_breakdown[alliance_color].get('autoBouldersHigh', 0) +
-            #                     match.score_breakdown[alliance_color].get('teleopBouldersLow', 0) +
-            #                     match.score_breakdown[alliance_color].get('teleopBouldersHigh', 0))
-            #             elif stat == '2016crossingsOPR':
-            #                 init_stats_default[stat] += (
-            #                     match.score_breakdown[alliance_color].get('position1crossings', 0) +
-            #                     match.score_breakdown[alliance_color].get('position2crossings', 0) +
-            #                     match.score_breakdown[alliance_color].get('position3crossings', 0) +
-            #                     match.score_breakdown[alliance_color].get('position4crossings', 0) +
-            #                     match.score_breakdown[alliance_color].get('position5crossings', 0))
-
-            # init_stats_default['oprs'] = float(stats_sum['score']) / (i + 1) / 6  # Initialize with 1/3 of average scores (2 alliances per match)
-            # for stat in relevant_stats:
-            #     if stat != 'oprs':
-            #         init_stats_default[stat] = float(stats_sum[stat]) / (i + 1) / 6  # Initialize with 1/3 of average scores (2 alliances per match)
 
         prediction_stats = {
             'wl_accuracy': None if played_matches == 0 else 100 * float(correct_predictions) / played_matches,
