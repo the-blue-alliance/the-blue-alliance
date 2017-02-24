@@ -1,8 +1,12 @@
+import json
+
 from controllers.base_controller import LoggedInHandler
 from database.media_query import EventMediasQuery
 from helpers.media_helper import MediaHelper
 from helpers.suggestions.suggestion_creator import SuggestionCreator
+from helpers.suggestions.suggestion_notifier import SuggestionNotifier
 from models.event import Event
+from models.sitevar import Sitevar
 from template_engine import jinja2_engine
 
 
@@ -43,5 +47,19 @@ class SuggestEventMediaController(LoggedInHandler):
             author_account_key=self.user_bundle.account.key,
             media_url=self.request.get("media_url"),
             event_key=event_key)
+
+        if status == 'success':
+            # Send an update to the FUN slack
+            slack_sitevar = Sitevar.get_or_insert('slack.hookurls')
+            if slack_sitevar:
+                slack_url = slack_sitevar.contents.get('fun', '')
+                if slack_url:
+                    message_body = "{0} ({1}) has suggested a video for <https://thebluealliance.com/event/{2}|{2}>: https://youtu.be/{3}.\nSee all suggestions at https://www.thebluealliance.com/suggest/event/media/review".format(
+                        self.user_bundle.account.display_name,
+                        self.user_bundle.account.email,
+                        event_key,
+                        suggestion.contents['foreign_key'])
+
+                    SuggestionNotifier.send_slack_alert(slack_url, message_body, [])
 
         self.redirect('/suggest/event/media?event_key=%s&status=%s' % (event_key, status))
