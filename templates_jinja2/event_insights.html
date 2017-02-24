@@ -129,13 +129,14 @@
   var predictions = JSON.parse($('#predictionsJson').html());
   Chart.defaults.global.legend.display = false;
   Chart.defaults.global.maintainAspectRatio = false;
+  Chart.defaults.global.tooltips = false;
 
   $('.score_chart').each(function() {
     var ctx = document.getElementById(this.id).getContext('2d');
     var matchKey = $(this).attr('data-match-key');
 
-    var numPoints = 20;
-    var tailScale = 8;
+    var numPoints = 10;
+    var tailScale = 7;
 
     var redMean = predictions[matchKey]['red']['score'];
     var redSig = Math.sqrt(predictions[matchKey]['red']['score_var']);
@@ -159,7 +160,7 @@
       })
     }
 
-    var lineHeight = Math.max(gaussian(redMean, redMean, redSig), gaussian(blueMean, blueMean, blueSig));
+    // var lineHeight = Math.max(gaussian(redMean, redMean, redSig), gaussian(blueMean, blueMean, blueSig));
 
     var scatterChart = new Chart(ctx, {
         type: 'line',
@@ -171,7 +172,7 @@
                   y: 0
                 },{
                   x: predictions[matchKey]['red']['actual_score'],
-                  y: lineHeight
+                  y: 0.06
                 }],
                 borderColor: "rgba(255,0,0,1)"
             },
@@ -181,7 +182,7 @@
                   y: 0
                 },{
                   x: predictions[matchKey]['blue']['actual_score'],
-                  y: lineHeight
+                  y: 0.06
                 }],
                 borderColor: "rgba(0,0,255,1)"
             },
@@ -204,14 +205,23 @@
                     gridLines: {
                         display: false,
                     },
+                    ticks: {
+                      min: 0,
+                      max: 200
+                    }
                 }],
                 yAxes: [{
-                    display: false
+                    display: false,
+                    ticks: {
+                      min: 0,
+                      max: 0.07
+                    }
                 }]
             },
             elements: {
               point: {
-                radius: 0
+                radius: 0,
+                hoverRadius: 0
               }
             }
         }
