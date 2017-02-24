@@ -194,7 +194,6 @@ class EventDetail(CacheableHandler):
         district = district_future.get_result() if district_future else None
 
         medias_by_slugname = MediaHelper.group_by_slugname([media for media in event_medias_future.get_result()])
-        image_medias = MediaHelper.get_images(event_medias_future.get_result())
 
         self.template_values.update({
             "event": event,
@@ -216,7 +215,6 @@ class EventDetail(CacheableHandler):
             "event_insights_playoff": event_insights['playoff'] if event_insights else None,
             "event_insights_template": event_insights_template,
             "medias_by_slugname": medias_by_slugname,
-            "image_medias": image_medias,
         })
 
         if event.within_a_day:
