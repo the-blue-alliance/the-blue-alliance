@@ -19,7 +19,7 @@ class SuggestEventMediaReviewController(SuggestionsReviewBaseController):
 
     def __init__(self, *args, **kw):
         self.preferred_keys = []
-        self.REQUIRED_PERMISSIONS.append(AccountPermissions.REVIEW_MEDIA)
+        self.REQUIRED_PERMISSIONS.append(AccountPermissions.REVIEW_EVENT_MEDIA)
         super(SuggestEventMediaReviewController, self).__init__(*args, **kw)
 
     """
