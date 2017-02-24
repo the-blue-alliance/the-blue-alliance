@@ -121,3 +121,109 @@
   </div>
 </div>
 {% endblock %}
+
+{% block inline_javascript %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+<script id="predictionsJson" type="application/json">{{match_predictions_json|safe}}</script>
+<script>
+  var predictions = JSON.parse($('#predictionsJson').html());
+  Chart.defaults.global.legend.display = false;
+  Chart.defaults.global.maintainAspectRatio = false;
+
+  $('.score_chart').each(function() {
+    var ctx = document.getElementById(this.id).getContext('2d');
+    var matchKey = $(this).attr('data-match-key');
+
+    var numPoints = 20;
+    var tailScale = 8;
+
+    var redMean = predictions[matchKey]['red']['score'];
+    var redSig = Math.sqrt(predictions[matchKey]['red']['score_var']);
+    var redDist = [];
+    for (var i=-numPoints/2; i<=numPoints/2; i++) {
+      x = redMean + redSig * i * tailScale / numPoints;
+      redDist.push({
+        x: x,
+        y: gaussian(x, redMean, redSig)
+      })
+    }
+
+    var blueMean = predictions[matchKey]['blue']['score'];
+    var blueSig = Math.sqrt(predictions[matchKey]['blue']['score_var']);
+    var blueDist = [];
+    for (var i=-numPoints/2; i<=numPoints/2; i++) {
+      x = blueMean + blueSig * i * tailScale / numPoints;
+      blueDist.push({
+        x: x,
+        y: gaussian(x, blueMean, blueSig)
+      })
+    }
+
+    var lineHeight = Math.max(gaussian(redMean, redMean, redSig), gaussian(blueMean, blueMean, blueSig));
+
+    var scatterChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [
+            {
+                data: [{
+                  x: predictions[matchKey]['red']['actual_score'],
+                  y: 0
+                },{
+                  x: predictions[matchKey]['red']['actual_score'],
+                  y: lineHeight
+                }],
+                borderColor: "rgba(255,0,0,1)"
+            },
+            {
+                data: [{
+                  x: predictions[matchKey]['blue']['actual_score'],
+                  y: 0
+                },{
+                  x: predictions[matchKey]['blue']['actual_score'],
+                  y: lineHeight
+                }],
+                borderColor: "rgba(0,0,255,1)"
+            },
+            {
+                data: redDist,
+                backgroundColor: "rgba(255,111,111,0.4)"
+            },
+            {
+                data: blueDist,
+                backgroundColor: "rgba(111,111,255,0.4)"
+            }
+
+            ]
+        },
+        options: {
+            scales: {
+                xAxes: [{
+                    type: 'linear',
+                    position: 'bottom',
+                    gridLines: {
+                        display: false,
+                    },
+                }],
+                yAxes: [{
+                    display: false
+                }]
+            },
+            elements: {
+              point: {
+                radius: 0
+              }
+            }
+        }
+    });
+  });
+
+  //taken from Jason Davies science library
+  // https://github.com/jasondavies/science.js/
+  function gaussian(x, mean, sig) {
+    var gaussianConstant = 1 / Math.sqrt(2 * Math.PI),
+      x = (x - mean) / sig;
+      return gaussianConstant * Math.exp(-.5 * x * x) / sig;
+  };
+</script>
+{% endblock %}

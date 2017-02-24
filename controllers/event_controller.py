@@ -285,6 +285,11 @@ class EventInsights(CacheableHandler):
                     alliances_json=json.dumps(alliances),
                 ))
 
+        # Add actual scores to predictions
+        for match in matches['qm']:
+            match_predictions[match.key.id()]['red']['actual_score'] = match.alliances['red']['score']
+            match_predictions[match.key.id()]['blue']['actual_score'] = match.alliances['blue']['score']
+
         last_played_match_num = None
         if ranking_prediction_stats:
             last_played_match_key = ranking_prediction_stats.get('last_played_match', None)
@@ -296,6 +301,7 @@ class EventInsights(CacheableHandler):
             "matches": matches,
             "fake_matches": fake_matches,
             "match_predictions": match_predictions,
+            "match_predictions_json": json.dumps(match_predictions),
             "match_prediction_stats": match_prediction_stats,
             "ranking_predictions": ranking_predictions,
             "ranking_prediction_stats": ranking_prediction_stats,
