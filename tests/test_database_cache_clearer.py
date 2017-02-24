@@ -9,7 +9,8 @@ from database.district_query import DistrictsInYearQuery, DistrictHistoryQuery, 
 from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
 from database.event_details_query import EventDetailsQuery
 from database.match_query import MatchQuery, EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
-from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery
+from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery, \
+    EventMediasQuery
 from database.robot_query import TeamRobotsQuery
 from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
 
@@ -194,12 +195,13 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
 
     def test_media_updated(self):
         affected_refs = {
-            'references': {ndb.Key(Team, 'frc254'), ndb.Key(Team, 'frc604')},
+            'references': {ndb.Key(Team, 'frc254'), ndb.Key(Team, 'frc604'),
+                           ndb.Key(Event, '2016necmp')},
             'year': {2014, 2015},
         }
         cache_keys = [q.cache_key for q in get_affected_queries.media_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 10)
+        self.assertEqual(len(cache_keys), 11)
         self.assertTrue(TeamYearMediaQuery('frc254', 2014).cache_key in cache_keys)
         self.assertTrue(TeamYearMediaQuery('frc254', 2015).cache_key in cache_keys)
         self.assertTrue(TeamSocialMediaQuery('frc254').cache_key in cache_keys)
@@ -210,6 +212,7 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         self.assertTrue(EventTeamsMediasQuery('2015casj').cache_key in cache_keys)
         self.assertTrue(EventTeamsPreferredMediasQuery('2015cama').cache_key in cache_keys)
         self.assertTrue(EventTeamsPreferredMediasQuery('2015casj').cache_key in cache_keys)
+        self.assertTrue(EventMediasQuery('2016necmp').cache_key in cache_keys)
 
     def test_robot_updated(self):
         affected_refs = {
