@@ -381,8 +381,43 @@
     {% endif %}
 
     <div class="tab-pane" id="media">
-      <div class="row">
-        <a class="btn btn-success pull-right" href="/suggest/event/media?event_key={{event.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add Media!</a>
+        <div class="col-xs-12">
+          <hr>
+          <a class="btn btn-success pull-right" href="/suggest/event/media?event_key={{event.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add Media!</a>
+          <h2 id="media">Media</h2>
+
+          <div class="row">
+            <div class="col-xs-12">
+              <h3 id="photos">Photos</h3>
+              {% if image_medias %}
+                {% for media in image_medias %}
+                  <div class="col-xs-6 col-sm-3">
+                    {% include "media_partials/media_display_partial.html" %}
+                  </div>
+                {% endfor %}
+              {% else %}
+                <p>No photos for this event... <a href="/suggest/event/media?event_key={{event.key_name}}" target="_blank">Why not add one</a>?</p>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-xs-12">
+              <h3 id="videos">Videos</h3>
+              {% if medias_by_slugname.youtube %}
+                {% for media in medias_by_slugname.youtube %}
+                  <div class="col-xs-12 col-md-6 fitvids">
+                  {% include "media_partials/media_display_partial.html" %}
+                  </div>
+                {% endfor %}
+              {% else %}
+                <p>No videos for this event... <a href="/suggest/event/media?event_key={{event.key_name}}" target="_blank">Why not add one</a>?</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
       </div>
     </div>
 </div>
