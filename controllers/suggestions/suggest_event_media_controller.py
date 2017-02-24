@@ -39,10 +39,9 @@ class SuggestEventMediaController(LoggedInHandler):
 
         event_key = self.request.get("event_key")
 
-        status, suggestion = SuggestionCreator.createTeamMediaSuggestion(
+        status, suggestion = SuggestionCreator.createEventMediaSuggestion(
             author_account_key=self.user_bundle.account.key,
             media_url=self.request.get("media_url"),
-            team_key=event_key,
-            year_str=event_key[:4])
+            event_key=event_key)
 
         self.redirect('/suggest/event/media?event_key=%s&status=%s' % (event_key, status))

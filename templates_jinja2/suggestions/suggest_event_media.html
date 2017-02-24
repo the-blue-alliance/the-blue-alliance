@@ -54,16 +54,6 @@
 
           <p><strong>Currently supported formats are:</strong></p>
           <ul>
-            <li>Chief Delphi Images
-              <ul>
-                <li>Example: <code>http://www.chiefdelphi.com/media/photos/36646</code></li>
-              </ul>
-            </li>
-            <li>Imgur Images
-              <ul>
-                <li>Example: <code>http://imgur.com/aF8T5ZE</code></li>
-              </ul>
-            </li>
             <li>YouTube Videos
               <ul>
                 <li>Example: <code>https://www.youtube.com/watch?v=DojyJ9bZ4fk</code></li>
@@ -71,42 +61,27 @@
             </li>
           </ul>
 
+        <div class="alert alert-success">
+          <p><strong>Please submit:</strong></p>
+          <ul>
+            <li>Videos of award ceremonies</li>
+            <li>Opening/Closing ceremony speeches</li>
+            <li>Fun & engaging content created by the community (interviews, interactions, etc.)</li>
+          </ul>
+        </div>
+
+        <div class="alert alert-danger">
           <p><strong>Please do not submit:</strong></p>
           <ul>
             <li>Full match videos</li>
+            <li>Videos of people dancing</li>
             <li>Long, drawn out videos with little to no real content</li>
-            <li>GIFs</li>
           </ul>
+        </div>
 
           <hr>
 
           <h3>{{event.year}} {{event.name}}</h3>
-
-          {% if medias_by_slugname.cdphotothread %}
-          <div class="row">
-            <div class="col-xs-12">
-              <h4>Existing Chief Delphi Images</h4>
-              {% for media in medias_by_slugname.cdphotothread %}
-                <div class="col-xs-6 col-sm-4">
-                {% include "media_partials/cdphotothread_partial.html" %}
-                </div>
-              {% endfor %}
-            </div>
-          </div>
-          {% endif %}
-
-          {% if medias_by_slugname.imgur %}
-          <div class="row">
-            <div class="col-xs-12">
-              <h4>Existing Imgur Images</h4>
-              {% for media in medias_by_slugname.imgur %}
-                <div class="col-xs-6 col-sm-4">
-                {% include "media_partials/imgur_partial.html" %}
-                </div>
-              {% endfor %}
-            </div>
-          </div>
-          {% endif %}
 
           {% if medias_by_slugname.youtube %}
           <div class="row">

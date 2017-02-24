@@ -62,6 +62,43 @@ class SuggestionCreator(object):
             return 'bad_url', None
 
     @classmethod
+    def createEventMediaSuggestion(cls, author_account_key, media_url, event_key, private_details_json=None):
+        """Create an Event Media Suggestion. Returns status (success, suggestion_exists, media_exists, bad_url)"""
+
+        media_dict = MediaParser.partial_media_dict_from_url(media_url)
+        if media_dict is not None:
+            if media_dict['media_type_enum'] != MediaType.YOUTUBE_VIDEO:
+                return 'bad_url', None
+
+            existing_media = Media.get_by_id(Media.render_key_name(media_dict['media_type_enum'], media_dict['foreign_key']))
+            if existing_media is None or event_key not in [reference.id() for reference in existing_media.references]:
+                foreign_type = Media.SLUG_NAMES[media_dict['media_type_enum']]
+                suggestion_id = Suggestion.render_media_key_name(event_key[:4], 'event', event_key, foreign_type, media_dict['foreign_key'])
+                suggestion = Suggestion.get_by_id(suggestion_id)
+                if not suggestion or suggestion.review_state != Suggestion.REVIEW_PENDING:
+                    media_dict['year'] = event_key[:4]
+                    media_dict['reference_type'] = 'event'
+                    media_dict['reference_key'] = event_key
+                    target_model = 'event_media'
+                    if private_details_json is not None:
+                        media_dict['private_details_json'] = private_details_json
+
+                    suggestion = Suggestion(
+                        id=suggestion_id,
+                        author=author_account_key,
+                        target_model=target_model,
+                        )
+                    suggestion.contents = media_dict
+                    suggestion.put()
+                    return 'success', suggestion
+                else:
+                    return 'suggestion_exists', None
+            else:
+                return 'media_exists', None
+        else:
+            return 'bad_url', None
+
+    @classmethod
     def createEventWebcastSuggestion(cls, author_account_key, webcast_url, event_key):
         """Create a Event Webcast Suggestion. Returns status string"""
 
