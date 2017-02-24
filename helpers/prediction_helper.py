@@ -550,6 +550,10 @@ class PredictionHelper(object):
                             continue
                         team_ranking_points[team] += 2
 
+                    sampled_loser = 'red' if sampled_winner == 'blue' else 'blue'
+                    for team in match.alliances[sampled_loser]['teams']:
+                        team_ranking_points[team] += 0
+
             # Compute ranks for this sample
             sample_rankings = sorted(team_ranking_points.items(), key=lambda x: -team_rank_tiebreaker[x[0]])  # Sort by tiebreaker.
             sample_rankings = sorted(sample_rankings, key=lambda x: -x[1])  # Sort by RP. Sort is stable.
