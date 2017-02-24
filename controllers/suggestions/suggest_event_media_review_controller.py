@@ -59,32 +59,13 @@ class SuggestEventMediaReviewController(SuggestionsReviewBaseController):
 
     def create_target_model(self, suggestion):
         # Setup
-        to_replace = None
-        to_replace_id = self.request.POST.get('replace-preferred-{}'.format(suggestion.key.id()), None)
-        year = int(self.request.POST.get('year-{}'.format(suggestion.key.id())))
-
-        # Override year if necessary
-        suggestion.contents['year'] = year
-        suggestion.contents_json = json.dumps(suggestion.contents)
-        suggestion._contents = None
 
         # Remove preferred reference from another Media if specified
-        team_reference = Media.create_reference(
+        event_reference = Media.create_reference(
             suggestion.contents['reference_type'],
             suggestion.contents['reference_key'])
-        if to_replace_id:
-            to_replace = Media.get_by_id(to_replace_id)
-            if team_reference not in to_replace.preferred_references:
-                return  # Preferred reference must have been edited earlier. Skip this Suggestion for now.
-            to_replace.preferred_references.remove(team_reference)
 
-        # Add preferred reference to current Media (images only) if explicitly listed in preferred_keys or if to_replace_id exists
-        media_type_enum = suggestion.contents['media_type_enum']
-        preferred_references = []
-        if media_type_enum in MediaType.image_types and ('preferred::{}'.format(suggestion.key.id()) in self.preferred_keys or to_replace_id):
-            preferred_references = [team_reference]
-
-        media = MediaCreator.create_media_model(suggestion, team_reference, preferred_references)
+        media = MediaCreator.create_media_model(suggestion, event_reference, [])
 
         # Mark Suggestion as accepted
         suggestion.review_state = Suggestion.REVIEW_ACCEPTED
@@ -92,8 +73,6 @@ class SuggestEventMediaReviewController(SuggestionsReviewBaseController):
         suggestion.reviewed_at = datetime.datetime.now()
 
         # Do all DB writes
-        if to_replace:
-            MediaManipulator.createOrUpdate(to_replace, auto_union=False)
         MediaManipulator.createOrUpdate(media)
 
     def post(self):
