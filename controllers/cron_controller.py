@@ -2,6 +2,7 @@ import datetime
 import logging
 import os
 import json
+import pytz
 
 from google.appengine.api import taskqueue
 
@@ -30,6 +31,7 @@ from helpers.event_team_updater import EventTeamUpdater
 from helpers.firebase.firebase_pusher import FirebasePusher
 from helpers.insights_helper import InsightsHelper
 from helpers.match_helper import MatchHelper
+from helpers.match_time_prediction_helper import MatchTimePredictionHelper
 from helpers.matchstats_helper import MatchstatsHelper
 from helpers.notification_helper import NotificationHelper
 from helpers.prediction_helper import PredictionHelper
@@ -593,3 +595,34 @@ class UpdateLiveEventsDo(webapp.RequestHandler):
     """
     def get(self):
         FirebasePusher.update_live_events()
+
+
+class MatchTimePredictionsEnqueue(webapp.RequestHandler):
+    """
+    Enqueue match time predictions for all current events
+    """
+    def get(self):
+        live_events = EventHelper.getEventsWithinADay()
+        for event in live_events:
+            taskqueue.add(url='/tasks/math/do/predict_match_times/{}'.format(event.key_name),
+                          method='GET')
+        self.response.out.write("Enqueued time prediction for {} events".format(len(live_events)))
+
+
+class MatchTimePredictionsDo(webapp.RequestHandler):
+    """
+    Predicts match times for a given live event
+    """
+    def get(self, event_key):
+        event = Event.get_by_id(event_key)
+        if not event:
+            self.abort(404)
+
+        matches = event.matches
+        if not matches:
+            return
+
+        timezone = pytz.timezone(event.timezone_id)
+        played_matches = MatchHelper.recentMatches(matches)
+        unplayed_matches = MatchHelper.upcomingMatches(matches)
+        MatchTimePredictionHelper.predict_future_matches(played_matches, unplayed_matches, timezone)
