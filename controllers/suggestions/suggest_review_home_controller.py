@@ -28,6 +28,7 @@ class SuggestReviewHomeController(SuggestionsReviewBaseController):
         self.template_values['suggestions']['match'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "match")
         self.template_values['suggestions']['event'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "event")
         self.template_values['suggestions']['media'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "media")
+        self.template_values['suggestions']['event_media'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "event_media")
         self.template_values['suggestions']['social'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "social-media")
         self.template_values['suggestions']['offseason'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "offseason-event")
         self.template_values['suggestions']['apiwrite'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "api_auth_access")

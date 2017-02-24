@@ -13,7 +13,8 @@ class Suggestion(ndb.Model):
     the site. The generally store a model, a key, and then a json blob of
     fields to append or ammend in the model.
     """
-    MODELS = {"event", "match", "media", "social-media", "offseason-event", "api_auth_access", "robot"}
+    MODELS = {"event", "match", "media", "social-media", "offseason-event", "api_auth_access",
+              "robot", "event_media"}
     # social-media is a Media with no year
     # offseason-event is for new events (opposed to 'event' for adding webcasts to existing events)
 

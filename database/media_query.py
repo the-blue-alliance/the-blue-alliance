@@ -86,3 +86,15 @@ class EventTeamsPreferredMediasQuery(DatabaseQuery):
             Media.preferred_references.IN(team_keys),
             Media.year == year).fetch_async()
         raise ndb.Return(medias)
+
+
+class EventMediasQuery(DatabaseQuery):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = 'event_medias_{}'  # (event_key)
+    DICT_CONVERTER = None
+
+    @ndb.tasklet
+    def _query_async(self):
+        event_key = ndb.Key(Event, self._query_args[0])
+        medias = yield Media.query(Media.references == event_key).fetch_async()
+        raise ndb.Return(medias)

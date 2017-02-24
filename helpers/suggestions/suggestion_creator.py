@@ -42,6 +42,10 @@ class SuggestionCreator(object):
                     if media_dict.get('media_type', '') in MediaType.robot_types:
                         target_model = "robot"
 
+                    if Event.validate_key_name(team_key):
+                        target_model = 'event_media'
+                        media_dict['reference_type'] = 'event'
+
                     suggestion = Suggestion(
                         id=suggestion_id,
                         author=author_account_key,
