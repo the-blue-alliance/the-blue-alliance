@@ -489,8 +489,8 @@ class PredictionHelper(object):
                     for team in match.alliances[alliance_color]['teams']:
                         num_played[team] += 1
 
-                sampled_breach = {}
-                sampled_capture = {}
+                sampled_rp1 = {}
+                sampled_rp2 = {}
                 sampled_tiebreaker = {}
                 # Get actual results or sampled results, depending if match has been played
                 if match.has_been_played:
@@ -499,9 +499,14 @@ class PredictionHelper(object):
                     last_played_match = match.key.id()
                     sampled_winner = match.winning_alliance
                     for alliance_color in ['red', 'blue']:
-                        sampled_breach[alliance_color] = match.score_breakdown[alliance_color]['teleopDefensesBreached']
-                        sampled_capture[alliance_color] = match.score_breakdown[alliance_color]['teleopTowerCaptured']
-                        sampled_tiebreaker[alliance_color] = match.score_breakdown[alliance_color]['autoPoints']
+                        if match.year == 2016:
+                            sampled_rp1[alliance_color] = match.score_breakdown[alliance_color]['teleopDefensesBreached']
+                            sampled_rp2[alliance_color] = match.score_breakdown[alliance_color]['teleopTowerCaptured']
+                            sampled_tiebreaker[alliance_color] = match.score_breakdown[alliance_color]['autoPoints']
+                        elif match.year == 2017:
+                            sampled_rp1[alliance_color] = match.score_breakdown[alliance_color]['kPaRankingPointAchieved']
+                            sampled_rp2[alliance_color] = match.score_breakdown[alliance_color]['rotorRankingPointAchieved']
+                            sampled_tiebreaker[alliance_color] = match.score_breakdown[alliance_color]['totalPoints']
                 else:
                     prediction = match_predictions[match.key.id()]
                     if np.random.uniform(high=1) < prediction['prob']:
@@ -513,18 +518,23 @@ class PredictionHelper(object):
                             sampled_winner = 'red'
 
                     for alliance_color in ['red', 'blue']:
-                        sampled_breach[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_breach']
-                        sampled_capture[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_capture']
-                        sampled_tiebreaker[alliance_color] = prediction[alliance_color]['auto_points']
+                        if match.year == 2016:
+                            sampled_rp1[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_breach']
+                            sampled_rp2[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_capture']
+                            sampled_tiebreaker[alliance_color] = prediction[alliance_color]['auto_points']
+                        elif match.year == 2017:
+                            sampled_rp1[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_pressure']
+                            sampled_rp2[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_gears']
+                            sampled_tiebreaker[alliance_color] = prediction[alliance_color]['score']
 
                 # Using match results, update RP and tiebreaker
                 for alliance_color in ['red', 'blue']:
                     for team in match.alliances[alliance_color]['teams']:
                         if team in surrogate_teams and num_played[team] == 3:
                             continue
-                        if sampled_breach[alliance_color]:
+                        if sampled_rp1[alliance_color]:
                             team_ranking_points[team] += 1
-                        if sampled_capture[alliance_color]:
+                        if sampled_rp2[alliance_color]:
                             team_ranking_points[team] += 1
                         team_rank_tiebreaker[team] += sampled_tiebreaker[alliance_color]
 
