@@ -4,14 +4,18 @@ import numpy as np
 import time
 
 from consts.event_type import EventType
+from database.event_query import TeamYearEventsQuery
+from helpers.event_helper import EventHelper
 from helpers.matchstats_helper import MatchstatsHelper
+from models.event_details import EventDetails
 
 
 class ContributionCalculator(object):
-    def __init__(self, matches, stat, default_mean, default_var):
+    def __init__(self, event, matches, stat, default_mean, default_var):
         """
         stat: 'score' or a specific breakdown like 'auto_points' or 'boulders'
         """
+        self._event = event
         self._matches = matches
         self._stat = stat
         self._default_mean = default_mean
@@ -25,6 +29,9 @@ class ContributionCalculator(object):
         self._Ao = np.zeros((2*m, t))  # Match teams
         self._Mmean = np.zeros((2*m, 1))  # Means
         self._Mvar = np.zeros((2*m, 1))  # Variances
+
+        # Past event stats for initialization
+        self._past_stats_mean, self._past_stats_var = self._get_past_stats(self._event, self._team_list)
 
         # For finding event averages for initialization
         self._mean_sums = []
@@ -60,6 +67,26 @@ class ContributionCalculator(object):
 
         return team_list, team_id_map
 
+    def _get_past_stats(self, cur_event, team_list):
+        team_events_futures = []
+        for team in team_list:
+            team_events_futures.append((team, TeamYearEventsQuery(team, cur_event.year).fetch_async()))
+
+        past_stats_mean = defaultdict(list)  # team key > values
+        past_stats_var = defaultdict(list)  # team key > values
+        for team, events_future in team_events_futures:
+            events = events_future.get_result()
+            EventHelper.sort_events(events)
+            for event in events:
+                if event.official and event.start_date < cur_event.start_date and event.event_type_enum != EventType.CMP_FINALS:
+                    # event.details is backed by in-context cache
+                    predictions = event.details.predictions
+                    if predictions and 'stat_mean_vars' in predictions:
+                        past_stats_mean[team].append(predictions['stat_mean_vars'][self._stat]['mean'][team])
+                        past_stats_var[team].append(predictions['stat_mean_vars'][self._stat]['var'][team])
+
+        return past_stats_mean, past_stats_var
+
     def _normpdf(self, x, mu, sigma):
         x = float(x)
         mu = float(mu)
@@ -76,21 +103,20 @@ class ContributionCalculator(object):
         ####################################################################
         # Estimate Team Means
         # Populate priors
-        all_team_means = {}  # TODO
         for team in self._team_list:
             mean = self._default_mean
-            if team in all_team_means:
+            if team in self._past_stats_mean:
                 # Use team's past means
                 weight_sum = 0
-                for j, o in enumerate(reversed(all_team_means[team])):
+                for j, o in enumerate(reversed(self._past_stats_mean[team])):
                     weight = pow(0.1, j)
-                    opr += weight * o
+                    mean += weight * o
                     weight_sum += weight
                 mean /= weight_sum
             else:
-                if all_team_means:
+                if self._past_stats_mean:
                     # Use averages from other past teams
-                    mean = np.mean([ato[-1] for ato in all_team_means.values()])
+                    mean = np.mean([ato[-1] for ato in self._past_stats_mean.values()])
                 elif self._mean_sums:
                     # Use averages from this event
                     mean = np.mean(self._mean_sums) / 3
@@ -106,22 +132,21 @@ class ContributionCalculator(object):
         ####################################################################
         # Estimate Team Variances
         # Populate priors
-        all_team_vars = {}  # TODO
         for team in self._team_list:
             var = self._default_var
-            if team in all_team_vars:
+            if team in self._past_stats_var:
                 # Use team's past variances
                 var = 0
                 weight_sum = 0
-                for j, o in enumerate(reversed(all_team_vars[team])):
+                for j, o in enumerate(reversed(self._past_stats_var[team])):
                     weight = pow(0.1, j)
                     var += weight * o
                     weight_sum += weight
                 var /= weight_sum
             else:
-                if all_team_vars:
+                if self._past_stats_var:
                     # Use averages from other past teams
-                    var = np.mean([ato[-1] for ato in all_team_vars.values()])
+                    var = np.mean([ato[-1] for ato in self._past_stats_var.values()])
                 elif self._var_sums:
                     # Use averages from this event
                     var = np.mean(self._var_sums) / 3
@@ -310,19 +335,14 @@ class PredictionHelper(object):
 
         # Make predictions before each match
         predictions = {}
+
+        # For benchmarks
         played_matches = 0
         played_matches_75 = 0
         correct_predictions = 0
         correct_predictions_75 = 0
         score_differences = []
-        stats_sum = defaultdict(float)
         brier_sums = defaultdict(float)
-        scores = []
-        var_sums = []
-        team_oprs = {}
-        team_vars = {}
-        all_team_oprs = {}  # TODO
-        all_team_vars = {}  # TODO
 
         relevant_stats = [('score', 20, 10**2)]
         # TODO: populate based on year
@@ -331,7 +351,7 @@ class PredictionHelper(object):
             ('crossings', 0, 1**2),
             ('boulders', 0, 1**2),
         ]
-        contribution_calculators = [ContributionCalculator(matches, s, m, v) for s, m, v in relevant_stats]
+        contribution_calculators = [ContributionCalculator(event, matches, s, m, v) for s, m, v in relevant_stats]
         for i, match in enumerate(matches):
             mean_vars = [cc.calculate_before_match(i) for cc in contribution_calculators]
             stat_mean_vars = {}
