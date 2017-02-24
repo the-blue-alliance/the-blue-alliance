@@ -56,7 +56,7 @@ class MatchTimePredictionHelper(object):
             # Additionally, discard matches with breaks (like lunch) in between. We find those
             # when we see a scheduled time between matches larger than 15 minutes
             scheduled_cycle = cls.timestamp(played_matches[i].time) - cls.timestamp(played_matches[i - 1].time)
-            if scheduled_cycle < 15 * 60 and cycle <= scheduled_cycle * 1.25:
+            if scheduled_cycle < 15 * 60 and cycle <= scheduled_cycle * 1.5:
                 # Bias the times towards the schedule
                 cycle = (0.7 * cycle) + (0.3 * scheduled_cycle)
                 cycles.append(cycle)
