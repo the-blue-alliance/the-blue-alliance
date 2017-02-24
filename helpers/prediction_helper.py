@@ -78,7 +78,9 @@ class ContributionCalculator(object):
             events = events_future.get_result()
             EventHelper.sort_events(events)
             for event in events:
-                if event.official and event.start_date < cur_event.start_date and event.event_type_enum != EventType.CMP_FINALS:
+                if event.event_type_enum in EventType.SEASON_EVENT_TYPES and \
+                        event.start_date < cur_event.start_date and \
+                        event.event_type_enum != EventType.CMP_FINALS:
                     # event.details is backed by in-context cache
                     predictions = event.details.predictions
                     if predictions and 'stat_mean_vars' in predictions:
@@ -185,6 +187,24 @@ class ContributionCalculator(object):
                         match.score_breakdown[color].get('position3crossings', 0) +
                         match.score_breakdown[color].get('position4crossings', 0) +
                         match.score_breakdown[color].get('position5crossings', 0))
+                elif self._stat == 'pressure':
+                    means[color] = (
+                        float(match.score_breakdown[color].get('autoFuelHigh', 0)) +
+                        float(match.score_breakdown[color].get('autoFuelLow', 0)) / 3 +
+                        float(match.score_breakdown[color].get('teleopFuelHigh', 0)) / 3 +
+                        float(match.score_breakdown[color].get('teleopFuelLow', 0)) / 9)
+                elif self._stat == 'gears':
+                    # Guess gears from rotors
+                    num_gears = 0
+                    if match.score_breakdown[color].get('rotor1Auto') or match.score_breakdown[color].get('rotor1Engaged'):
+                        num_gears += 1
+                    if match.score_breakdown[color].get('rotor2Auto') or match.score_breakdown[color].get('rotor2Engaged'):
+                        num_gears += 2
+                    if match.score_breakdown[color].get('rotor3Engaged'):
+                        num_gears += 4
+                    if match.score_breakdown[color].get('rotor4Engaged'):
+                        num_gears += 6
+                    means[color] = num_gears
                 else:
                     raise Exception("Unknown stat: {}".format(self._stat))
 
@@ -325,6 +345,17 @@ class PredictionHelper(object):
 
                     mu = mean_vars[color][stat]['mean'] - crossings_to_breach
                     prediction[color]['prob_breach'] = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
+                # 2017
+                if stat == 'pressure':
+                    required_pressure = 40
+
+                    mu = mean_vars[color][stat]['mean'] - required_pressure
+                    prediction[color]['prob_pressure'] = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
+                if stat == 'gears':
+                    requried_gears = 13
+
+                    mu = mean_vars[color][stat]['mean'] - requried_gears
+                    prediction[color]['prob_gears'] = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
 
         return prediction
 
@@ -347,13 +378,20 @@ class PredictionHelper(object):
         score_differences = []
         brier_sums = defaultdict(float)
 
-        relevant_stats = [('score', 20, 10**2)]
-        # TODO: populate based on year
-        relevant_stats += [
-            ('auto_points', 20, 10**2),
-            ('crossings', 0, 1**2),
-            ('boulders', 0, 1**2),
-        ]
+        if event.year == 2016:
+            relevant_stats = [
+                ('score', 20, 10**2),
+                ('auto_points', 20, 10**2),
+                ('crossings', 0, 1**2),
+                ('boulders', 0, 1**2),
+            ]
+        elif event.year == 2017:
+            relevant_stats = [
+                ('score', 30, 10**2),
+                ('pressure', 0, 1**2),
+                ('gears', 0, 1**2),
+            ]
+
         contribution_calculators = [ContributionCalculator(event, matches, s, m, v) for s, m, v in relevant_stats]
         for i, match in enumerate(matches):
             mean_vars = [cc.calculate_before_match(i) for cc in contribution_calculators]
@@ -382,14 +420,24 @@ class PredictionHelper(object):
                     brier_sums['score'] += pow(prediction['prob'] - 0, 2)
 
                 for color in ['red', 'blue']:
-                    if match.score_breakdown[color]['teleopDefensesBreached']:
-                        brier_sums['breach'] += pow(prediction[color]['prob_breach'] - 1, 2)
-                    else:
-                        brier_sums['breach'] += pow(prediction[color]['prob_breach'] - 0, 2)
-                    if match.score_breakdown[color]['teleopTowerCaptured']:
-                        brier_sums['capture'] += pow(prediction[color]['prob_capture'] - 1, 2)
-                    else:
-                        brier_sums['capture'] += pow(prediction[color]['prob_capture'] - 0, 2)
+                    if event.year == 2016:
+                        if match.score_breakdown[color]['teleopDefensesBreached']:
+                            brier_sums['breach'] += pow(prediction[color]['prob_breach'] - 1, 2)
+                        else:
+                            brier_sums['breach'] += pow(prediction[color]['prob_breach'] - 0, 2)
+                        if match.score_breakdown[color]['teleopTowerCaptured']:
+                            brier_sums['capture'] += pow(prediction[color]['prob_capture'] - 1, 2)
+                        else:
+                            brier_sums['capture'] += pow(prediction[color]['prob_capture'] - 0, 2)
+                    elif event.year == 2017:
+                        if match.score_breakdown[color]['kPaRankingPointAchieved']:
+                            brier_sums['pressure'] += pow(prediction[color]['prob_pressure'] - 1, 2)
+                        else:
+                            brier_sums['pressure'] += pow(prediction[color]['prob_pressure'] - 0, 2)
+                        if match.score_breakdown[color]['rotorRankingPointAchieved']:
+                            brier_sums['gears'] += pow(prediction[color]['prob_gears'] - 1, 2)
+                        else:
+                            brier_sums['gears'] += pow(prediction[color]['prob_gears'] - 0, 2)
 
             brier_scores = {}
             for stat, brier_sum in brier_sums.items():

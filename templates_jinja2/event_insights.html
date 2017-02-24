@@ -46,11 +46,17 @@
           {% if match_prediction_stats.wl_accuracy_75 %}<p><strong>Win/Loss prediction accuracy (>75% confidence):</strong> {{match_prediction_stats.wl_accuracy_75|round|int}}%</p>{% endif %}
           {% if match_prediction_stats.err_mean %}<p><strong>Match score prediction average error:</strong> {{match_prediction_stats.err_mean|round(1)}}</p>{% endif %}
           {% if match_prediction_stats.brier_scores.win_loss %}<p><strong>Win/Loss Brier Score:</strong> {{match_prediction_stats.brier_scores.win_loss}}</p>{% endif %}
-          {% if match_prediction_stats.brier_scores.breach %}<p><strong>Breach Brier score:</strong> {{match_prediction_stats.brier_scores.breach}}</p>{% endif %}
-          {% if match_prediction_stats.brier_scores.capture %}<p><strong>Capture Brier score:</strong> {{match_prediction_stats.brier_scores.capture}}</p>{% endif %}
+
+          {% if event.year == 2016 %}
+            <p><strong>Breach Brier Score:</strong> {{match_prediction_stats.brier_scores.breach}}</p>
+            <p><strong>Capture Brier Score:</strong> {{match_prediction_stats.brier_scores.capture}}</p>
+          {% elif event.year == 2017 %}
+            <p><strong>Pressure Brier Score:</strong> {{match_prediction_stats.brier_scores.pressure}}</p>
+            <p><strong>Rotors Brier Score:</strong> {{match_prediction_stats.brier_scores.gears}}</p>
+          {% endif %}
 
 
-          {{mtm.qual_match_prediction_table(matches, match_predictions, fake_matches)}}
+          {{mtm.qual_match_prediction_table(matches, match_predictions, fake_matches, event.year)}}
         </div>
         {% endif %}
       </div>
@@ -124,9 +130,8 @@
 
 {% block inline_javascript %}
 <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
-<script id="predictionsJson" type="application/json">{{match_predictions_json|safe}}</script>
 <script>
-  var predictions = JSON.parse($('#predictionsJson').html());
+  var predictions = {{match_predictions_json|safe}};
   Chart.defaults.global.legend.display = false;
   Chart.defaults.global.maintainAspectRatio = false;
   Chart.defaults.global.tooltips = false;
@@ -199,10 +204,22 @@
         },
         options: {
             animation: {
-              duration: 0
+              duration: 0,
+              onComplete: function () {
+                // Draw tiny scale
+                var ctx = this.chart.ctx;
+                ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontFamily, 'normal', Chart.defaults.global.defaultFontFamily);
+                ctx.textBaseline = 'bottom';
+                ctx.fillStyle = '#000';
+                ctx.textAlign = 'left';
+                ctx.fillText("0", 0, 50);
+                ctx.textAlign = 'right';
+                ctx.fillText("200", 150, 50);
+              }
             },
             scales: {
                 xAxes: [{
+                    display: false,
                     type: 'linear',
                     position: 'bottom',
                     gridLines: {
@@ -210,14 +227,14 @@
                     },
                     ticks: {
                       min: 0,
-                      max: 200
+                      max: 200,
                     }
                 }],
                 yAxes: [{
                     display: false,
                     ticks: {
                       min: 0,
-                      max: 0.07
+                      max: 0.07,
                     }
                 }]
             },

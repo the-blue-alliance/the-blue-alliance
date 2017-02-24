@@ -4,7 +4,13 @@
   <th colspan="6">Red Alliance</th>
   <th colspan="6">Blue Alliance</th>
   <th colspan="2">Scores:<br>Actual<br><em>(Predicted)</em></th>
-  <th colspan="2">Breach / Capture:<br>Actual<br><em>(Predicted Probability)</em></th>
+  <th colspan="2">
+    {% if year == 2016 %}
+      Breach / Capture:<br>Actual<br><em>(Predicted Probability)</em>
+    {% elif year == 2017 %}
+      Pressure / Rotors:<br>Actual<br><em>(Predicted Probability)</em>
+    {% endif %}
+  </th>
   <th>Win/Loss<br>Prediction<br>Confidence</th>
   <th>Win/Loss<br>Prediction<br>Correct</th>
 </tr>
@@ -14,7 +20,13 @@
   <th rowspan="2">Match</th>
   <th colspan="12">Red Alliance</th>
   <th rowspan="2" colspan="2">Scores:<br>Actual<br><em>(Predicted)</em></th>
-  <th rowspan="2">Breach / Capture:<br>Actual<br><em>(Predicted Probability)</em></th>
+  <th rowspan="2">
+    {% if year == 2016 %}
+      Breach / Capture:<br>Actual<br><em>(Predicted Probability)</em>
+    {% elif year == 2017 %}
+      Pressure / Rotors:<br>Actual<br><em>(Predicted Probability)</em>
+    {% endif %}
+  </th>
   <th rowspan="2">Win/Loss<br>Prediction<br>Confidence</th>
   <th rowspan="2">Win/Loss<br>Prediction<br>Correct</th>
 </tr>
