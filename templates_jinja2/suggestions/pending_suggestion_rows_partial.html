@@ -12,12 +12,7 @@
             Event Webcast Suggestions
         </a>
     </li>
-    <li>
-        <a href="/suggest/event/media/review">
-            <span class="badge pull-right">{{suggestions.event_media}}</span>
-            Event Media Suggestions
-        </a>
-    </li>
+
     <li>
         <a href="/suggest/team/media/review">
             <span class="badge pull-right">{{suggestions.media}}</span>
@@ -28,6 +23,15 @@
         <a href="/suggest/team/social/review">
             <span class="badge pull-right">{{suggestions.social}}</span>
             Team Social Media Suggestions
+        </a>
+    </li>
+    {% endif %}
+
+    {% if event_media_permission in user_bundle.account.permissions %}
+    <li>
+        <a href="/suggest/event/media/review">
+            <span class="badge pull-right">{{suggestions.event_media}}</span>
+            Event Media Suggestions
         </a>
     </li>
     {% endif %}

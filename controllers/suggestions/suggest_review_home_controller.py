@@ -38,6 +38,7 @@ class SuggestReviewHomeController(SuggestionsReviewBaseController):
         self.template_values['offseason_permission'] = AccountPermissions.REVIEW_OFFSEASON_EVENTS
         self.template_values['apiwrite_permission'] = AccountPermissions.REVIEW_APIWRITE
         self.template_values['cad_permission'] = AccountPermissions.REVIEW_DESIGNS
+        self.template_values['event_media_permission'] = AccountPermissions.REVIEW_EVENT_MEDIA
         self.template_values['status'] = self.request.get('status')
 
         self.response.out.write(jinja2_engine.render('suggestions/suggest_review_home.html', self.template_values))
