@@ -82,8 +82,10 @@ class ContributionCalculator(object):
                     # event.details is backed by in-context cache
                     predictions = event.details.predictions
                     if predictions and 'stat_mean_vars' in predictions:
-                        past_stats_mean[team].append(predictions['stat_mean_vars'][self._stat]['mean'][team])
-                        past_stats_var[team].append(predictions['stat_mean_vars'][self._stat]['var'][team])
+                        if team in predictions['stat_mean_vars'][self._stat]['mean']:
+                            past_stats_mean[team].append(predictions['stat_mean_vars'][self._stat]['mean'][team])
+                        if team in predictions['stat_mean_vars'][self._stat]['var']:
+                            past_stats_var[team].append(predictions['stat_mean_vars'][self._stat]['var'][team])
 
         return past_stats_mean, past_stats_var
 
@@ -107,6 +109,7 @@ class ContributionCalculator(object):
             mean = self._default_mean
             if team in self._past_stats_mean:
                 # Use team's past means
+                mean = 0
                 weight_sum = 0
                 for j, o in enumerate(reversed(self._past_stats_mean[team])):
                     weight = pow(0.1, j)
@@ -328,7 +331,7 @@ class PredictionHelper(object):
     @classmethod
     def get_match_predictions(cls, matches):
         if not matches:
-            return None, None
+            return None, None, None
 
         event_key = matches[0].event
         event = event_key.get()
