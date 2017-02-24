@@ -331,8 +331,8 @@ class myTBAAddHotMatchesController(LoggedInHandler):
             ancestor=self.user_bundle.account.key).fetch_async(projection=[Subscription.model_key])
 
         matches = []
-        if event.matchstats and 'match_predictions' in event.matchstats:
-            match_predictions = event.matchstats['match_predictions']
+        if event.details and event.details.predictions:
+            match_predictions = event.details.predictions['match_predictions']
             max_hotness = 0
             min_hotness = float('inf')
             for match in event.matches:
