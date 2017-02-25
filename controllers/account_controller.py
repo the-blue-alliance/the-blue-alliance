@@ -332,7 +332,9 @@ class myTBAAddHotMatchesController(LoggedInHandler):
 
         matches = []
         if event.details and event.details.predictions:
-            match_predictions = event.details.predictions['match_predictions']
+            match_predictions = dict(
+                event.details.predictions['match_predictions']['qual'].items() +
+                event.details.predictions['match_predictions']['playoff'].items())
             max_hotness = 0
             min_hotness = float('inf')
             for match in event.matches:
