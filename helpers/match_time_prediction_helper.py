@@ -92,8 +92,9 @@ class MatchTimePredictionHelper(object):
                 predicted = match.time
 
             # Never predict a match to happen more than 2 minutes ahead of schedule
+            now = datetime.datetime.now(timezone)
             earliest_possible = match.time + datetime.timedelta(minutes=-2)
-            match.predicted_time = max(predicted, earliest_possible)
+            match.predicted_time = max(predicted, earliest_possible, now)
             last = match
 
         MatchManipulator.createOrUpdate(unplayed_matches)
