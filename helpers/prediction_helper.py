@@ -458,9 +458,6 @@ class PredictionHelper(object):
 
     @classmethod
     def get_ranking_predictions(cls, matches, match_predictions, n=1000):
-        """
-        Only works for 2016
-        """
         if not matches:
             return None, None
 
