@@ -294,6 +294,7 @@ class EventInsights(CacheableHandler):
             level = 'qual' if comp_level == 'qm' else 'playoff'
             for match in matches[comp_level]:
                 distribution_info[match.key.id()] = {
+                    'level': level,
                     'red_actual_score': match.alliances['red']['score'],
                     'blue_actual_score': match.alliances['blue']['score'],
                     'red_mean': match_predictions[level][match.key.id()]['red']['score'],

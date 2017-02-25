@@ -173,24 +173,55 @@
   Chart.defaults.global.maintainAspectRatio = false;
   Chart.defaults.global.tooltips = false;
 
-  var maxScore = 0;
-  var lineHeight = 0;
+  var minQualScore = Infinity;
+  var maxQualScore = 0;
+  var qualLineHeight = 0;
+  var minPlayoffScore = Infinity;
+  var maxPlayoffScore = 0;
+  var playoffLineHeight = 0;
   for (var key in predictions) {
-    maxScore = Math.max(maxScore, predictions[key]['red_actual_score']);
-    maxScore = Math.max(maxScore, predictions[key]['blue_actual_score']);
-    lineHeight = Math.max(lineHeight,
-      Math.max(gaussian(predictions[key]['red_mean'],
-                        predictions[key]['red_mean'],
-                        Math.sqrt(predictions[key]['red_var'])),
-               gaussian(predictions[key]['blue_mean'],
-                        predictions[key]['blue_mean'],
-                        Math.sqrt(predictions[key]['blue_var']))));
+    var redScore = predictions[key]['red_actual_score'];
+    var blueScore = predictions[key]['blue_actual_score'];
+
+    if (predictions[key].level == 'qual') {
+      if (redScore != -1 && blueScore != -1) {
+        minQualScore = Math.min(minQualScore, redScore);
+        minQualScore = Math.min(minQualScore, blueScore);
+        maxQualScore = Math.max(maxQualScore, redScore);
+        maxQualScore = Math.max(maxQualScore, blueScore);
+      }
+      qualLineHeight = Math.max(qualLineHeight,
+        Math.max(gaussian(predictions[key]['red_mean'],
+                          predictions[key]['red_mean'],
+                          Math.sqrt(predictions[key]['red_var'])),
+                 gaussian(predictions[key]['blue_mean'],
+                          predictions[key]['blue_mean'],
+                          Math.sqrt(predictions[key]['blue_var']))));
+    } else {
+      if (redScore != -1 && blueScore != -1) {
+        minPlayoffScore = Math.min(minPlayoffScore, redScore);
+        minPlayoffScore = Math.min(minPlayoffScore, blueScore);
+        maxPlayoffScore = Math.max(maxPlayoffScore, redScore);
+        maxPlayoffScore = Math.max(maxPlayoffScore, blueScore);
+      }
+      playoffLineHeight = Math.max(playoffLineHeight,
+        Math.max(gaussian(predictions[key]['red_mean'],
+                          predictions[key]['red_mean'],
+                          Math.sqrt(predictions[key]['red_var'])),
+                 gaussian(predictions[key]['blue_mean'],
+                          predictions[key]['blue_mean'],
+                          Math.sqrt(predictions[key]['blue_var']))));
+    }
   }
-  var xMax = maxScore - (maxScore % 50) + 50;
+  var xMinQual = minQualScore - (minQualScore % 50);
+  var xMaxQual = maxQualScore - (maxQualScore % 50) + 50;
+  var xMinPlayoff = minPlayoffScore - (minPlayoffScore % 50);
+  var xMaxPlayoff = maxPlayoffScore - (maxPlayoffScore % 50) + 50;
 
   $('.score_chart').each(function() {
     var ctx = document.getElementById(this.id).getContext('2d');
     var matchKey = $(this).attr('data-match-key');
+    var isQual = predictions[matchKey].level == 'qual';
 
     var numPoints = 10;
     var tailScale = 7;
@@ -228,7 +259,7 @@
           y: 0
         },{
           x: redScore,
-          y: lineHeight
+          y: isQual ? qualLineHeight : playoffLineHeight
         }],
         borderColor: "rgba(255,0,0,0.8)",
         borderWidth: 2
@@ -239,7 +270,7 @@
           y: 0
         },{
           x: blueScore,
-          y: lineHeight
+          y: isQual ? qualLineHeight : playoffLineHeight
         }],
         borderColor: "rgba(0,0,255,0.8)",
         borderWidth: 2
@@ -277,15 +308,15 @@
                         display: false,
                     },
                     ticks: {
-                      min: 0,
-                      max: xMax,
+                      min: isQual? xMinQual : xMinPlayoff,
+                      max: isQual? xMaxQual : xMaxPlayoff,
                     }
                 }],
                 yAxes: [{
                     display: false,
                     ticks: {
                       min: 0,
-                      max: lineHeight * 1.1,
+                      max: isQual? qualLineHeight * 1.1 : playoffLineHeight * 1.1,
                     }
                 }]
             },
