@@ -473,12 +473,12 @@ class PredictionHelper(object):
                             else:
                                 brier_sums['gears'] += pow(prediction[color]['prob_gears'] - 0, 2)
 
-                brier_scores = {}
-                for stat, brier_sum in brier_sums.items():
-                    if stat == 'score':
-                        brier_scores['win_loss'] = brier_sum / played_matches
-                    else:
-                        brier_scores[stat] = brier_sum / (2 * played_matches)
+            brier_scores = {}
+            for stat, brier_sum in brier_sums.items():
+                if stat == 'score':
+                    brier_scores['win_loss'] = brier_sum / played_matches
+                else:
+                    brier_scores[stat] = brier_sum / (2 * played_matches)
 
             prediction_stats[level] = {
                 'wl_accuracy': None if played_matches == 0 else 100 * float(correct_predictions) / played_matches,
