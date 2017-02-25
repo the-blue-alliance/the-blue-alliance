@@ -299,6 +299,8 @@ class YearInsightsDo(webapp.RequestHandler):
             insights = InsightsHelper.doMatchInsights(year)
         elif kind == 'awards':
             insights = InsightsHelper.doAwardInsights(year)
+        elif kind == 'predictions':
+            insights = InsightsHelper.doPredictionInsights(year)
 
         if insights != None:
             InsightManipulator.createOrUpdate(insights)

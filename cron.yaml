@@ -49,6 +49,11 @@ cron:
   schedule: every day 01:00
   timezone: America/Los_Angeles
 
+- description: Prediction Insights Calculation
+  url: /backend-tasks-b2/math/enqueue/insights/predictions/2017
+  schedule: every day 01:00
+  timezone: America/Los_Angeles
+
 - description: Match Overall Insights Calculation
   url: /backend-tasks-b2/math/enqueue/overallinsights/matches
   schedule: every day 01:10

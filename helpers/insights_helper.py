@@ -1,6 +1,7 @@
 import itertools
 import json
 import math
+import numpy as np
 
 from collections import defaultdict
 
@@ -11,6 +12,7 @@ from consts.event_type import EventType
 
 from models.insight import Insight
 from models.event import Event
+from models.event_details import EventDetails
 from models.award import Award
 from models.match import Match
 
@@ -82,6 +84,62 @@ class InsightsHelper(object):
         insights += self._calculateSuccessfulElimTeamups(award_futures, year)
 
         return insights
+
+    @classmethod
+    def doPredictionInsights(self, year):
+        """
+        Calculate aggregate prediction stats for all season events for a year.
+        """
+        events = Event.query(
+            Event.event_type_enum.IN(EventType.SEASON_EVENT_TYPES),
+            Event.year==(int(year))).fetch()
+        for event in events:
+            event.prep_details()
+            event.prep_matches()
+
+        correct_matches_count = defaultdict(int)
+        total_matches_count = defaultdict(int)
+        brier_scores = defaultdict(list)
+        correct_matches_count_cmp = defaultdict(int)
+        total_matches_count_cmp = defaultdict(int)
+        brier_scores_cmp = defaultdict(list)
+        for event in events:
+            predictions = event.details.predictions if event.details else None
+            if predictions:
+                is_cmp = event.event_type_enum in EventType.CMP_EVENT_TYPES
+                if 'match_predictions' in predictions:
+                    for match in event.matches:
+                        if match.has_been_played:
+                            level = 'qual' if match.comp_level == 'qm' else 'playoff'
+
+                            total_matches_count[level] += 1
+                            if is_cmp:
+                                total_matches_count_cmp[level] += 1
+
+                            predicted_match = predictions['match_predictions'][level].get(match.key.id())
+                            if predicted_match and match.winning_alliance == predicted_match['winning_alliance']:
+                                correct_matches_count[level] += 1
+                                if is_cmp:
+                                    correct_matches_count_cmp[level] += 1
+
+                for level in ['qual', 'playoff']:
+                    if 'match_prediction_stats' in predictions:
+                        bs = predictions['match_prediction_stats'][level]['brier_scores']
+                        if bs:
+                            brier_scores[level].append(bs['win_loss'])
+                            if is_cmp:
+                                brier_scores_cmp[level].append(bs['win_loss'])
+
+        data = defaultdict(dict)
+        for level in ['qual', 'playoff']:
+            data[level]['mean_brier_score'] = np.mean(brier_scores[level]) if brier_scores[level] else None
+            data[level]['correct_matches_count'] = correct_matches_count[level]
+            data[level]['total_matches_count'] = total_matches_count[level]
+            data[level]['mean_brier_score_cmp'] = np.mean(brier_scores_cmp[level]) if brier_scores_cmp[level] else None
+            data[level]['correct_matches_count_cmp'] = correct_matches_count_cmp[level]
+            data[level]['total_matches_count_cmp'] = total_matches_count_cmp[level]
+
+        return [self._createInsight(data, Insight.INSIGHT_NAMES[Insight.MATCH_PREDICTIONS], year)]
 
     @classmethod
     def _createInsight(self, data, name, year):
