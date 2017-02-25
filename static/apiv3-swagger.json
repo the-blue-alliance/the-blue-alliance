@@ -43,7 +43,7 @@
     "apiKey": {
       "description": "Your TBA API Key can be obtained from your Account Page on the TBA website.",
       "type": "apiKey",
-      "name": "X-TBA-API-Key",
+      "name": "X-TBA-Auth-Key",
       "in": "header"
     }
   },
