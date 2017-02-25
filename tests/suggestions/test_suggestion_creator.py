@@ -123,6 +123,83 @@ class TestTeamMediaSuggestionCreator(unittest2.TestCase):
         self.assertEqual(status, 'bad_url')
 
 
+class TestEventMediaSuggestionCreator(unittest2.TestCase):
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
+        self.account = Account.get_or_insert(
+            "123",
+            email="user@example.com",
+            registered=True)
+        self.account.put()
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def testCreateSuggestion(self):
+        status, _ = SuggestionCreator.createEventMediaSuggestion(
+            self.account.key,
+            "https://www.youtube.com/watch?v=H-54KMwMKY0",
+            "2016nyny")
+        self.assertEqual(status, 'success')
+
+        # Ensure the Suggestion gets created
+        suggestion_id = Suggestion.render_media_key_name('2016', 'event', '2016nyny', 'youtube', 'H-54KMwMKY0')
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        expected_dict = MediaParser.partial_media_dict_from_url("https://www.youtube.com/watch?v=H-54KMwMKY0")
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.review_state, Suggestion.REVIEW_PENDING)
+        self.assertEqual(suggestion.author, self.account.key)
+        self.assertEqual(suggestion.target_model, 'event_media')
+        self.assertDictContainsSubset(expected_dict, suggestion.contents)
+
+    def testCreateNonVideoSuggestion(self):
+        status, _ = SuggestionCreator.createEventMediaSuggestion(
+            self.account.key,
+            "http://imgur.com/ruRAxDm",
+            "2016nyny")
+        self.assertEqual(status, 'bad_url')
+
+    def testDuplicateSuggestion(self):
+        suggestion_id = Suggestion.render_media_key_name('2016', 'event', '2016nyny', 'youtube', 'H-54KMwMKY0')
+        Suggestion(
+            id=suggestion_id,
+            author=self.account.key,
+            review_state=Suggestion.REVIEW_PENDING,
+            target_key="2016nyny",
+            target_model="event_media").put()
+
+        status, _ = SuggestionCreator.createEventMediaSuggestion(
+            self.account.key,
+            "https://www.youtube.com/watch?v=H-54KMwMKY0",
+            "2016nyny")
+        self.assertEqual(status, 'suggestion_exists')
+
+    def testMediaExists(self):
+        media_id = Media.render_key_name(MediaType.YOUTUBE_VIDEO, 'H-54KMwMKY0')
+        Media.get_or_insert(
+            media_id,
+            media_type_enum=MediaType.YOUTUBE_VIDEO,
+            foreign_key='H-54KMwMKY0',
+            references=[ndb.Key(Event, '2016nyny')]).put()
+        status, _ = SuggestionCreator.createEventMediaSuggestion(
+            self.account.key,
+            "https://www.youtube.com/watch?v=H-54KMwMKY0",
+            "2016nyny")
+        self.assertEqual(status, 'media_exists')
+
+    def testCreateBadUrl(self):
+        status, _ = SuggestionCreator.createEventMediaSuggestion(
+            self.account.key,
+            "http://foobar.com/ruRAxDm",
+            "2016nyny")
+        self.assertEqual(status, 'bad_url')
+
+
 class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()

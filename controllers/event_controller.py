@@ -138,6 +138,7 @@ class EventDetail(CacheableHandler):
         event.prep_details()
         medias_future = media_query.EventTeamsPreferredMediasQuery(event_key).fetch_async()
         district_future = DistrictQuery(event.district_key.id()).fetch_async() if event.district_key else None
+        event_medias_future = media_query.EventMediasQuery(event_key).fetch_async()
 
         awards = AwardHelper.organizeAwards(event.awards)
         cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
@@ -192,6 +193,8 @@ class EventDetail(CacheableHandler):
 
         district = district_future.get_result() if district_future else None
 
+        medias_by_slugname = MediaHelper.group_by_slugname([media for media in event_medias_future.get_result()])
+
         self.template_values.update({
             "event": event,
             "district_name": district.display_name if district else None,
@@ -211,6 +214,7 @@ class EventDetail(CacheableHandler):
             "event_insights_qual": event_insights['qual'] if event_insights else None,
             "event_insights_playoff": event_insights['playoff'] if event_insights else None,
             "event_insights_template": event_insights_template,
+            "medias_by_slugname": medias_by_slugname,
         })
 
         if event.within_a_day:
