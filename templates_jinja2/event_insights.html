@@ -234,7 +234,6 @@
             },
             scales: {
                 xAxes: [{
-                    // display: false,
                     type: 'linear',
                     position: 'bottom',
                     gridLines: {
@@ -263,8 +262,7 @@
     });
   });
 
-  //taken from Jason Davies science library
-  // https://github.com/jasondavies/science.js/
+  // taken from https://github.com/jasondavies/science.js/
   function gaussian(x, mean, sig) {
     var gaussianConstant = 1 / Math.sqrt(2 * Math.PI),
       x = (x - mean) / sig;
