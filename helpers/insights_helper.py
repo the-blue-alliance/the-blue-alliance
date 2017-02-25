@@ -97,6 +97,7 @@ class InsightsHelper(object):
             event.prep_details()
             event.prep_matches()
 
+        has_insights = False
         correct_matches_count = defaultdict(int)
         total_matches_count = defaultdict(int)
         brier_scores = defaultdict(list)
@@ -106,6 +107,7 @@ class InsightsHelper(object):
         for event in events:
             predictions = event.details.predictions if event.details else None
             if predictions:
+                has_insights = True
                 is_cmp = event.event_type_enum in EventType.CMP_EVENT_TYPES
                 if 'match_predictions' in predictions:
                     for match in event.matches:
@@ -129,6 +131,9 @@ class InsightsHelper(object):
                             brier_scores[level].append(bs['win_loss'])
                             if is_cmp:
                                 brier_scores_cmp[level].append(bs['win_loss'])
+
+        if not has_insights:
+            data = None
 
         data = defaultdict(dict)
         for level in ['qual', 'playoff']:
