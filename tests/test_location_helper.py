@@ -455,7 +455,7 @@ class TestLocationHelper(unittest2.TestCase):
         if not self.test_google_api_key:
             return
         # self.assertEqual(team.normalized_location.name, 'Leland High School')
-        self.assertEqual(team.nl.name, None)
+        self.assertEqual(team.normalized_location.name, None)
         # self.assertEqual(team.normalized_location.formatted_address, '6677 Camden Avenue, San Jose, CA 95120, USA')
         # self.assertEqual(team.normalized_location.street_number, '6677')
         # self.assertEqual(team.normalized_location.street, 'Camden Avenue')
@@ -481,7 +481,7 @@ class TestLocationHelper(unittest2.TestCase):
         if not self.test_google_api_key:
             return
         # self.assertEqual(team.normalized_location.name, None)
-        self.assertEqual(team.nl.name, None)
+        self.assertEqual(team.normalized_location.name, None)
         # self.assertEqual(team.normalized_location.formatted_address, 'Vicksburg, MS, USA')
         # self.assertEqual(team.normalized_location.street_number, None)
         # self.assertEqual(team.normalized_location.street, None)
@@ -507,7 +507,7 @@ class TestLocationHelper(unittest2.TestCase):
         if not self.test_google_api_key:
             return
         # self.assertEqual(team.normalized_location.name, None)
-        self.assertEqual(team.nl.name, None)
+        self.assertEqual(team.normalized_location.name, None)
         # self.assertEqual(team.normalized_location.formatted_address, 'Mountain View, CA 94035, USA')
         # self.assertEqual(team.normalized_location.street_number, None)
         # self.assertEqual(team.normalized_location.street, None)
@@ -545,7 +545,7 @@ class TestLocationHelper(unittest2.TestCase):
         if not self.test_google_api_key:
             return
         # self.assertEqual(team.normalized_location.name, None)
-        self.assertEqual(team.nl.name, None)
+        self.assertEqual(team.normalized_location.name, None)
         # self.assertEqual(team.normalized_location.formatted_address, 'Pittsburgh, PA 15213, USA')
         # self.assertEqual(team.normalized_location.street_number, None)
         # self.assertEqual(team.normalized_location.street, None)
@@ -583,7 +583,7 @@ class TestLocationHelper(unittest2.TestCase):
         if not self.test_google_api_key:
             return
         # self.assertEqual(team.normalized_location.name, 'Huron Valley Schools')
-        self.assertEqual(team.nl.name, None)
+        self.assertEqual(team.normalized_location.name, None)
         # self.assertEqual(team.normalized_location.formatted_address, '2390 S Milford Rd, Highland, MI 48357, USA')
         # self.assertEqual(team.normalized_location.street_number, '2390')
         # self.assertEqual(team.normalized_location.street, 'South Milford Road')
@@ -609,7 +609,7 @@ class TestLocationHelper(unittest2.TestCase):
         if not self.test_google_api_key:
             return
         # self.assertEqual(team.normalized_location.name, 'High School Attached To Northwest Normal University')
-        self.assertEqual(team.nl.name, None)
+        self.assertEqual(team.normalized_location.name, None)
         # self.assertEqual(team.normalized_location.formatted_address, '21 Shilidian S St, Anning Qu, Lanzhou Shi, Gansu Sheng, China, 730070')
         # self.assertEqual(team.normalized_location.street_number, '21')
         # self.assertEqual(team.normalized_location.street, 'Shilidian South Street')
@@ -635,7 +635,7 @@ class TestLocationHelper(unittest2.TestCase):
         if not self.test_google_api_key:
             return
         # self.assertEqual(team.normalized_location.name, 'Bossley Park High School')
-        self.assertEqual(team.nl.name, None)
+        self.assertEqual(team.normalized_location.name, None)
         # self.assertEqual(team.normalized_location.formatted_address, '36-44 Prairie Vale Rd, Bossley Park NSW 2176, Australia')
         # self.assertEqual(team.normalized_location.street_number, '36-44')
         # self.assertEqual(team.normalized_location.street, 'Prairie Vale Road')
@@ -661,7 +661,7 @@ class TestLocationHelper(unittest2.TestCase):
         if not self.test_google_api_key:
             return
         # self.assertEqual(team.normalized_location.name, None)
-        self.assertEqual(team.nl.name, None)
+        self.assertEqual(team.normalized_location.name, None)
         # self.assertEqual(team.normalized_location.formatted_address, 'Boise, ID 83709, USA')
         # self.assertEqual(team.normalized_location.street_number, None)
         # self.assertEqual(team.normalized_location.street, None)
@@ -699,7 +699,7 @@ class TestLocationHelper(unittest2.TestCase):
         if not self.test_google_api_key:
             return
         # self.assertEqual(team.normalized_location.name, None)
-        self.assertEqual(team.nl.name, None)
+        self.assertEqual(team.normalized_location.name, None)
         # self.assertEqual(team.normalized_location.formatted_address, u'San Pablo, 76130 Santiago de Quer\xe9taro, Qro., Mexico')
         # self.assertEqual(team.normalized_location.street_number, None)
         # self.assertEqual(team.normalized_location.street, None)
@@ -737,7 +737,7 @@ class TestLocationHelper(unittest2.TestCase):
         if not self.test_google_api_key:
             return
         # self.assertEqual(team.normalized_location.name, None)
-        self.assertEqual(team.nl.name, None)
+        self.assertEqual(team.normalized_location.name, None)
         # self.assertEqual(team.normalized_location.formatted_address, 'Mexico City, CDMX, Mexico')
         # self.assertEqual(team.normalized_location.street_number, None)
         # self.assertEqual(team.normalized_location.street, None)
@@ -775,7 +775,7 @@ class TestLocationHelper(unittest2.TestCase):
         if not self.test_google_api_key:
             return
         # self.assertEqual(team.normalized_location.name, None)
-        self.assertEqual(team.nl.name, None)
+        self.assertEqual(team.normalized_location.name, None)
         # self.assertEqual(team.normalized_location.formatted_address, 'Xi\'an, Shaanxi, China')
         # self.assertEqual(team.normalized_location.street_number, None)
         # self.assertEqual(team.normalized_location.street, None)
@@ -813,7 +813,7 @@ class TestLocationHelper(unittest2.TestCase):
         if not self.test_google_api_key:
             return
         # self.assertEqual(team.normalized_location.name, None)
-        self.assertEqual(team.nl.name, None)
+        self.assertEqual(team.normalized_location.name, None)
         # self.assertEqual(team.normalized_location.formatted_address, u'Harbiye, 34367 \u015ei\u015fli/\u0130stanbul, Turkey')
         # self.assertEqual(team.normalized_location.street_number, None)
         # self.assertEqual(team.normalized_location.street, None)
@@ -851,7 +851,7 @@ class TestLocationHelper(unittest2.TestCase):
         if not self.test_google_api_key:
             return
         # self.assertEqual(team.normalized_location.name, u'\u0130MM\u0130B Erkan Avc\u0131 Mesleki ve Teknik Anadolu Lisesi')
-        self.assertEqual(team.nl.name, None)
+        self.assertEqual(team.normalized_location.name, None)
         # self.assertEqual(team.normalized_location.formatted_address, u'Bah\xe7elievler, K\xfclt\xfcr Sk. No:3, . K\xfclt\xfcr Sk. Bah\xe7elievler/\u0130stanbul, Turkey')
         # self.assertEqual(team.normalized_location.street_number, '3')
         # self.assertEqual(team.normalized_location.street, u'K\xfclt\xfcr Sokak')
@@ -877,7 +877,7 @@ class TestLocationHelper(unittest2.TestCase):
         if not self.test_google_api_key:
             return
         # self.assertEqual(team.normalized_location.name, None)
-        self.assertEqual(team.nl.name, None)
+        self.assertEqual(team.normalized_location.name, None)
         # self.assertEqual(team.normalized_location.formatted_address, u'Residencial Campestre la Rosita, 27250 Torre\xf3n, Coah., Mexico')
         # self.assertEqual(team.normalized_location.street_number, None)
         # self.assertEqual(team.normalized_location.street, None)
@@ -915,7 +915,7 @@ class TestLocationHelper(unittest2.TestCase):
         if not self.test_google_api_key:
             return
         # self.assertEqual(team.normalized_location.name, None)
-        self.assertEqual(team.nl.name, None)
+        self.assertEqual(team.normalized_location.name, None)
         # self.assertEqual(team.normalized_location.formatted_address, 'Yeruham, Israel')
         # self.assertEqual(team.normalized_location.street_number, None)
         # self.assertEqual(team.normalized_location.street, None)
@@ -941,7 +941,7 @@ class TestLocationHelper(unittest2.TestCase):
         if not self.test_google_api_key:
             return
         # self.assertEqual(team.normalized_location.name, 'Sequoyah School')
-        self.assertEqual(team.nl.name, None)
+        self.assertEqual(team.normalized_location.name, None)
         # self.assertEqual(team.normalized_location.formatted_address, '17091 S Muskogee Ave, Tahlequah, OK 74464, USA')
         # self.assertEqual(team.normalized_location.street_number, '17091')
         # self.assertEqual(team.normalized_location.street, 'South Muskogee Avenue')
@@ -965,7 +965,7 @@ class TestLocationHelper(unittest2.TestCase):
         if not self.test_google_api_key:
             return
         # self.assertEqual(team.normalized_location.name, None)
-        self.assertEqual(team.nl.name, None)
+        self.assertEqual(team.normalized_location.name, None)
         # self.assertEqual(team.normalized_location.formatted_address, 'San Jose, CA, USA')
         # self.assertEqual(team.normalized_location.street_number, None)
         # self.assertEqual(team.normalized_location.street, None)
