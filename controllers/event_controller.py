@@ -240,13 +240,10 @@ class EventInsights(CacheableHandler):
     def _render(self, event_key):
         event = Event.get_by_id(event_key)
 
-        if not event or event.year < 2016:
+        if not event or event.year < 2016 or not event.details.predictions:
             self.abort(404)
 
         event.get_matches_async()
-
-        if not event.details.predictions:
-            self.abort(404)
 
         match_predictions = event.details.predictions.get('match_predictions', None)
         match_prediction_stats = event.details.predictions.get('match_prediction_stats', None)
