@@ -48,10 +48,10 @@
   <tbody>
     {% if matches.qm %}
       <tr class="key">
-        <th colspan="20">Qualifications</th>
+        <th colspan="19">Qualifications</th>
       </tr>
       {% for match in matches.qm %}
-        {{mtrm.match_row_tr(match, predictions=predictions, fake_matches=fake_matches)}}
+        {{mtrm.match_prediction_row_tr(match, predictions, fake_matches=fake_matches)}}
       {% endfor %}
     {% endif %}
   </tbody>

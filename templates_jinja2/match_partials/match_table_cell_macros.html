@@ -132,11 +132,10 @@
 
 {% macro correct_prediction_td(match, predictions, compact=False) %}
 <td{% if compact %} rowspan="2"{% endif %}>
-  <div style="width: 150px; height: 50px;"><canvas id="chart_{{match.key.id()}}" class="score_chart" data-match-key="{{match.key.id()}}"></canvas></div>
-<!--   {#{% if match.has_been_played %}
+  {% if match.has_been_played %}
     {% if match.winning_alliance == predictions.get(match.key.id()).winning_alliance %}<span class="glyphicon glyphicon-ok"></span>{% endif %}
   {% else %}
     <strong>?</strong>
-  {% endif %}#} -->
+  {% endif %}
 </td>
 {% endmacro %}
