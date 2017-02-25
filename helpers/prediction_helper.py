@@ -6,8 +6,10 @@ import time
 from consts.event_type import EventType
 from database.event_query import TeamYearEventsQuery
 from helpers.event_helper import EventHelper
+from helpers.match_helper import MatchHelper
 from helpers.matchstats_helper import MatchstatsHelper
 from models.event_details import EventDetails
+from models.match import Match
 
 
 class ContributionCalculator(object):
@@ -54,8 +56,6 @@ class ContributionCalculator(object):
         # Build team list
         team_list = set()
         for match in self._matches:
-            if match.comp_level != 'qm':  # only consider quals matches
-                continue
             for alliance_color in ['red', 'blue']:
                 for team in match.alliances[alliance_color]['teams']:
                     team_list.add(team)
@@ -277,7 +277,7 @@ class PredictionHelper(object):
         return (1.0 + math.erf(x / np.sqrt(2.0))) / 2.0
 
     @classmethod
-    def _predict_match(cls, event, match, stat_mean_vars):
+    def _predict_match(cls, event, match, stat_mean_vars, is_playoff):
         mean_vars = {
             'red': defaultdict(lambda: defaultdict(int)),
             'blue': defaultdict(lambda: defaultdict(int)),
@@ -338,46 +338,66 @@ class PredictionHelper(object):
                     tower_strength = 10 if (event.event_type_enum in EventType.CMP_EVENT_TYPES or event.key.id() == '2016cc') else 8
 
                     mu = mean_vars[color][stat]['mean'] - tower_strength
-                    prediction[color]['prob_capture'] = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
+                    prob = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
+                    prediction[color]['prob_capture'] = prob
+
+                    # Playoff Bonus
+                    if is_playoff:
+                        prediction[color]['score'] += prob * 25
+
                 elif stat == 'crossings':
                     # Prob breach
                     crossings_to_breach = 8
 
                     mu = mean_vars[color][stat]['mean'] - crossings_to_breach
-                    prediction[color]['prob_breach'] = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
+                    prob = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
+                    prediction[color]['prob_breach'] = prob
+
+                    # Playoff Bonus
+                    if is_playoff:
+                        prediction[color]['score'] += prob * 20
                 # 2017
                 if stat == 'pressure':
                     required_pressure = 40
 
                     mu = mean_vars[color][stat]['mean'] - required_pressure
-                    prediction[color]['prob_pressure'] = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
+                    prob = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
+                    prediction[color]['prob_pressure'] = prob
+
+                    # Playoff Bonus
+                    if is_playoff:
+                        prediction[color]['score'] += prob * 20
                 if stat == 'gears':
                     requried_gears = 13
 
                     mu = mean_vars[color][stat]['mean'] - requried_gears
-                    prediction[color]['prob_gears'] = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
+                    prob = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
+                    prediction[color]['prob_gears'] = prob
+
+                    # Playoff Bonus
+                    if is_playoff:
+                        prediction[color]['score'] += prob * 100
 
         return prediction
 
     @classmethod
-    def get_match_predictions(cls, matches):
-        if not matches:
+    def get_match_predictions(cls, all_matches):
+        if not all_matches:
             return None, None, None
-
-        event_key = matches[0].event
+        predictions = {
+            'qual': {},
+            'playoff': {},
+        }
+        prediction_stats = {
+            'qual': {},
+            'playoff': {},
+        }
+        stat_mean_vars = {
+            'qual': {},
+            'playoff': {},
+        }
+        event_key = all_matches[0].event
         event = event_key.get()
-
-        # Make predictions before each match
-        predictions = {}
-
-        # For benchmarks
-        played_matches = 0
-        played_matches_75 = 0
-        correct_predictions = 0
-        correct_predictions_75 = 0
-        score_differences = []
-        brier_sums = defaultdict(float)
-
         if event.year == 2016:
             relevant_stats = [
                 ('score', 20, 10**2),
@@ -391,73 +411,88 @@ class PredictionHelper(object):
                 ('pressure', 0, 1**2),
                 ('gears', 0, 1**2),
             ]
+        for level in ['qual', 'playoff']:
+            if level == 'qual':
+                matches = filter(lambda m: m.comp_level == 'qm', all_matches)
+            else:
+                matches = filter(lambda m: m.comp_level != 'qm', all_matches)
 
-        contribution_calculators = [ContributionCalculator(event, matches, s, m, v) for s, m, v in relevant_stats]
-        for i, match in enumerate(matches):
-            mean_vars = [cc.calculate_before_match(i) for cc in contribution_calculators]
-            stat_mean_vars = {}
-            for (stat, _, _), mean_var in zip(relevant_stats, mean_vars):
-                stat_mean_vars[stat] = mean_var
+            # For benchmarks
+            played_matches = 0
+            played_matches_75 = 0
+            correct_predictions = 0
+            correct_predictions_75 = 0
+            score_differences = []
+            brier_sums = defaultdict(float)
+            reset_benchmarks = False
 
-            ####################################################################
-            # Make prediction
-            prediction = cls._predict_match(event, match, stat_mean_vars)
-            predictions[match.key.id()] = prediction
+            contribution_calculators = [ContributionCalculator(event, matches, s, m, v) for s, m, v in relevant_stats]
+            for i, match in enumerate(matches):
+                mean_vars = [cc.calculate_before_match(i) for cc in contribution_calculators]
+                stat_mean_vars[level] = {}
+                for (stat, _, _), mean_var in zip(relevant_stats, mean_vars):
+                    stat_mean_vars[level][stat] = mean_var
 
-            # Benchmark prediction
-            if match.has_been_played:
-                played_matches += 1
-                if prediction['prob'] > 0.75:
-                    played_matches_75 += 1
-                if match.winning_alliance == prediction['winning_alliance']:
-                    correct_predictions += 1
+                ####################################################################
+                # Make prediction
+                prediction = cls._predict_match(event, match, stat_mean_vars[level], level=='playoff')
+                predictions[level][match.key.id()] = prediction
+
+                # Benchmark prediction
+                if match.has_been_played:
+                    played_matches += 1
                     if prediction['prob'] > 0.75:
-                        correct_predictions_75 += 1
-                    for alliance_color in ['red', 'blue']:
-                        score_differences.append(abs(match.alliances[alliance_color]['score'] - prediction[alliance_color]['score']))
-                    brier_sums['score'] += pow(prediction['prob'] - 1, 2)
-                else:
-                    brier_sums['score'] += pow(prediction['prob'] - 0, 2)
+                        played_matches_75 += 1
+                    if match.winning_alliance == prediction['winning_alliance']:
+                        correct_predictions += 1
+                        if prediction['prob'] > 0.75:
+                            correct_predictions_75 += 1
+                        for alliance_color in ['red', 'blue']:
+                            score_differences.append(abs(match.alliances[alliance_color]['score'] - prediction[alliance_color]['score']))
+                        brier_sums['score'] += pow(prediction['prob'] - 1, 2)
+                    else:
+                        brier_sums['score'] += pow(prediction['prob'] - 0, 2)
 
-                for color in ['red', 'blue']:
-                    if event.year == 2016:
-                        if match.score_breakdown[color]['teleopDefensesBreached']:
-                            brier_sums['breach'] += pow(prediction[color]['prob_breach'] - 1, 2)
-                        else:
-                            brier_sums['breach'] += pow(prediction[color]['prob_breach'] - 0, 2)
-                        if match.score_breakdown[color]['teleopTowerCaptured']:
-                            brier_sums['capture'] += pow(prediction[color]['prob_capture'] - 1, 2)
-                        else:
-                            brier_sums['capture'] += pow(prediction[color]['prob_capture'] - 0, 2)
-                    elif event.year == 2017:
-                        if match.score_breakdown[color]['kPaRankingPointAchieved']:
-                            brier_sums['pressure'] += pow(prediction[color]['prob_pressure'] - 1, 2)
-                        else:
-                            brier_sums['pressure'] += pow(prediction[color]['prob_pressure'] - 0, 2)
-                        if match.score_breakdown[color]['rotorRankingPointAchieved']:
-                            brier_sums['gears'] += pow(prediction[color]['prob_gears'] - 1, 2)
-                        else:
-                            brier_sums['gears'] += pow(prediction[color]['prob_gears'] - 0, 2)
+                    for color in ['red', 'blue']:
+                        if event.year == 2016:
+                            if match.score_breakdown[color]['teleopDefensesBreached']:
+                                brier_sums['breach'] += pow(prediction[color]['prob_breach'] - 1, 2)
+                            else:
+                                brier_sums['breach'] += pow(prediction[color]['prob_breach'] - 0, 2)
+                            if match.score_breakdown[color]['teleopTowerCaptured']:
+                                brier_sums['capture'] += pow(prediction[color]['prob_capture'] - 1, 2)
+                            else:
+                                brier_sums['capture'] += pow(prediction[color]['prob_capture'] - 0, 2)
+                        elif event.year == 2017:
+                            if match.score_breakdown[color]['kPaRankingPointAchieved']:
+                                brier_sums['pressure'] += pow(prediction[color]['prob_pressure'] - 1, 2)
+                            else:
+                                brier_sums['pressure'] += pow(prediction[color]['prob_pressure'] - 0, 2)
+                            if match.score_breakdown[color]['rotorRankingPointAchieved']:
+                                brier_sums['gears'] += pow(prediction[color]['prob_gears'] - 1, 2)
+                            else:
+                                brier_sums['gears'] += pow(prediction[color]['prob_gears'] - 0, 2)
 
-            brier_scores = {}
-            for stat, brier_sum in brier_sums.items():
-                if stat == 'score':
-                    brier_scores['win_loss'] = brier_sum / played_matches
-                else:
-                    brier_scores[stat] = brier_sum / (2 * played_matches)
+                brier_scores = {}
+                for stat, brier_sum in brier_sums.items():
+                    if stat == 'score':
+                        brier_scores['win_loss'] = brier_sum / played_matches
+                    else:
+                        brier_scores[stat] = brier_sum / (2 * played_matches)
 
-        prediction_stats = {
-            'wl_accuracy': None if played_matches == 0 else 100 * float(correct_predictions) / played_matches,
-            'wl_accuracy_75': None if played_matches_75 == 0 else 100 * float(correct_predictions_75) / played_matches_75,
-            'err_mean': np.mean(score_differences) if score_differences else None,
-            'err_var': np.var(score_differences) if score_differences else None,
-            'brier_scores': brier_scores,
-        }
+            prediction_stats[level] = {
+                'wl_accuracy': None if played_matches == 0 else 100 * float(correct_predictions) / played_matches,
+                'wl_accuracy_75': None if played_matches_75 == 0 else 100 * float(correct_predictions_75) / played_matches_75,
+                'err_mean': np.mean(score_differences) if score_differences else None,
+                'err_var': np.var(score_differences) if score_differences else None,
+                'brier_scores': brier_scores,
+            }
 
         return predictions, prediction_stats, stat_mean_vars
 
     @classmethod
     def get_ranking_predictions(cls, matches, match_predictions, n=1000):
+        matches = MatchHelper.organizeMatches(matches)['qm']
         if not matches:
             return None, None
 

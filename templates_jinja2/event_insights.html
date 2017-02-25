@@ -25,15 +25,16 @@
   <div class="row">
     <div class="col-sm-12">
       <ul class="nav nav-tabs">
-        <li class="active"><a href="#match-predictions" data-toggle="tab">Qual Match Predictions</a></li>
+        <li class="active"><a href="#qual-match-predictions" data-toggle="tab">Qual Match Predictions</a></li>
         <li><a href="#ranking-predictions" data-toggle="tab">Ranking Predictions</a></li>
+        <li><a href="#playoff-match-predictions" data-toggle="tab">Playoff Match Predictions</a></li>
       </ul>
     </div>
   </div>
 
   <div class="tab-content">
-    <div class="tab-pane active" id="match-predictions">
-      {% if match_predictions %}
+    <div class="tab-pane active" id="qual-match-predictions">
+      {% if match_predictions.qual %}
       <div class="row">
         {% if matches.qm %}
         <div class="col-xs-12">
@@ -42,30 +43,29 @@
           {% if fake_matches %}
           <p>Note: Match teams are not shown because <em>FIRST</em> does not allow the re-hosting of the preliminary match schedule. Sorry for the inconvenience.</p>
           {% endif %}
-          {% if match_prediction_stats.wl_accuracy %}<p><strong>Win/Loss prediction accuracy:</strong> {{match_prediction_stats.wl_accuracy|round|int}}%</p>{% endif %}
-          {% if match_prediction_stats.wl_accuracy_75 %}<p><strong>Win/Loss prediction accuracy (>75% confidence):</strong> {{match_prediction_stats.wl_accuracy_75|round|int}}%</p>{% endif %}
-          {% if match_prediction_stats.err_mean %}<p><strong>Match score prediction average error:</strong> {{match_prediction_stats.err_mean|round(1)}}</p>{% endif %}
+          {% if match_prediction_stats.qual.wl_accuracy %}<p><strong>Win/Loss prediction accuracy:</strong> {{match_prediction_stats.qual.wl_accuracy|round|int}}%</p>{% endif %}
+          {% if match_prediction_stats.qual.wl_accuracy_75 %}<p><strong>Win/Loss prediction accuracy (>75% confidence):</strong> {{match_prediction_stats.qual.wl_accuracy_75|round|int}}%</p>{% endif %}
+          {% if match_prediction_stats.qual.err_mean %}<p><strong>Match score prediction average error:</strong> {{match_prediction_stats.qual.err_mean|round(1)}}</p>{% endif %}
 
           <!--
-          {% if match_prediction_stats.brier_scores.win_loss %}<p><strong>Win/Loss Brier Score:</strong> {{match_prediction_stats.brier_scores.win_loss}}</p>{% endif %}
+          {% if match_prediction_stats.qual.brier_scores.win_loss %}<p><strong>Win/Loss Brier Score:</strong> {{match_prediction_stats.qual.brier_scores.win_loss}}</p>{% endif %}
           {% if event.year == 2016 %}
-            <p><strong>Breach Brier Score:</strong> {{match_prediction_stats.brier_scores.breach}}</p>
-            <p><strong>Capture Brier Score:</strong> {{match_prediction_stats.brier_scores.capture}}</p>
+            <p><strong>Breach Brier Score:</strong> {{match_prediction_stats.qual.brier_scores.breach}}</p>
+            <p><strong>Capture Brier Score:</strong> {{match_prediction_stats.qual.brier_scores.capture}}</p>
           {% elif event.year == 2017 %}
-            <p><strong>Pressure Brier Score:</strong> {{match_prediction_stats.brier_scores.pressure}}</p>
-            <p><strong>Rotors Brier Score:</strong> {{match_prediction_stats.brier_scores.gears}}</p>
+            <p><strong>Pressure Brier Score:</strong> {{match_prediction_stats.qual.brier_scores.pressure}}</p>
+            <p><strong>Rotors Brier Score:</strong> {{match_prediction_stats.qual.brier_scores.gears}}</p>
           {% endif %}
           -->
 
-
-          {{mtm.qual_match_prediction_table(matches, match_predictions, fake_matches, event.year)}}
+          {{mtm.qual_match_prediction_table(matches, match_predictions.qual, fake_matches, event.year)}}
         </div>
         {% endif %}
       </div>
       {% else %}
       <div class="row">
         <div class="col-xs-12">
-          <p>No match predictions available. Check back later!</p>
+          <p>No qual match predictions available. Check back later!</p>
         </div>
       </div>
       {% endif %}
@@ -112,6 +112,7 @@
                   <td>{{avg_rp|round(1)}}</td>
                   <td>{{max_rp}}</td>
                   <td>{{min_rp}}</td>
+                </tr>
                 {% endfor %}
               </tbody>
             </table>
@@ -122,6 +123,44 @@
       <div class="row">
         <div class="col-xs-12">
           <p>No ranking predictions available. Check back later!</p>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="tab-pane" id="playoff-match-predictions">
+      {% if match_predictions.playoff %}
+      <div class="row">
+        {% if matches.qm %}
+        <div class="col-xs-12">
+          <h3>Playoff Match Predictions (<a href="/predictions">?</a>)</h3>
+          <p>Remember, match predictions are JUST FOR FUN! Please do not be discouraged by our predictions -- they are almost certainly wrong.</p>
+          {% if fake_matches %}
+          <p>Note: Match teams are not shown because <em>FIRST</em> does not allow the re-hosting of the preliminary match schedule. Sorry for the inconvenience.</p>
+          {% endif %}
+          {% if match_prediction_stats.playoff.wl_accuracy %}<p><strong>Win/Loss prediction accuracy:</strong> {{match_prediction_stats.playoff.wl_accuracy|round|int}}%</p>{% endif %}
+          {% if match_prediction_stats.playoff.wl_accuracy_75 %}<p><strong>Win/Loss prediction accuracy (>75% confidence):</strong> {{match_prediction_stats.playoff.wl_accuracy_75|round|int}}%</p>{% endif %}
+          {% if match_prediction_stats.playoff.err_mean %}<p><strong>Match score prediction average error:</strong> {{match_prediction_stats.playoff.err_mean|round(1)}}</p>{% endif %}
+
+          <!--
+          {% if match_prediction_stats.playoff.brier_scores.win_loss %}<p><strong>Win/Loss Brier Score:</strong> {{match_prediction_stats.playoff.brier_scores.win_loss}}</p>{% endif %}
+          {% if event.year == 2016 %}
+            <p><strong>Breach Brier Score:</strong> {{match_prediction_stats.playoff.brier_scores.breach}}</p>
+            <p><strong>Capture Brier Score:</strong> {{match_prediction_stats.playoff.brier_scores.capture}}</p>
+          {% elif event.year == 2017 %}
+            <p><strong>Pressure Brier Score:</strong> {{match_prediction_stats.playoff.brier_scores.pressure}}</p>
+            <p><strong>Rotors Brier Score:</strong> {{match_prediction_stats.playoff.brier_scores.gears}}</p>
+          {% endif %}
+          -->
+
+          {{mtm.playoff_match_prediction_table(matches, match_predictions.playoff, fake_matches, event.year)}}
+        </div>
+        {% endif %}
+      </div>
+      {% else %}
+      <div class="row">
+        <div class="col-xs-12">
+          <p>No playoff match predictions available. Check back later!</p>
         </div>
       </div>
       {% endif %}

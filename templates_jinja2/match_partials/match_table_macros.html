@@ -58,6 +58,49 @@
 </table>
 {% endmacro %}
 
+{% macro playoff_match_prediction_table(matches, predictions, fake_matches, year) %}
+<table class="match-table">
+  <thead>
+    {% include "match_partials/match_predictions_table_header.html" %}
+  </thead>
+
+  <tbody>
+    {% if matches.ef %}
+      <tr class="key">
+        <th colspan="19">Eighth-Finals</th>
+      </tr>
+      {% for match in matches.ef %}
+        {{mtrm.match_prediction_row_tr(match, predictions, fake_matches=fake_matches)}}
+      {% endfor %}
+    {% endif %}
+    {% if matches.qf %}
+      <tr class="key">
+        <th colspan="19">Quarterfinals</th>
+      </tr>
+      {% for match in matches.qf %}
+        {{mtrm.match_prediction_row_tr(match, predictions, fake_matches=fake_matches)}}
+      {% endfor %}
+    {% endif %}
+    {% if matches.sf %}
+      <tr class="key">
+        <th colspan="19">Semifinals</th>
+      </tr>
+      {% for match in matches.sf %}
+        {{mtrm.match_prediction_row_tr(match, predictions, fake_matches=fake_matches)}}
+      {% endfor %}
+    {% endif %}
+    {% if matches.f %}
+      <tr class="key">
+        <th colspan="19">Finals</th>
+      </tr>
+      {% for match in matches.f %}
+        {{mtrm.match_prediction_row_tr(match, predictions, fake_matches=fake_matches)}}
+      {% endfor %}
+    {% endif %}
+  </tbody>
+</table>
+{% endmacro %}
+
 {% macro elim_match_table(matches, cur_team_key=None) %}
 <table class="match-table">
   <thead>

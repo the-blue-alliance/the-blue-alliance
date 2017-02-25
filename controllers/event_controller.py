@@ -290,14 +290,16 @@ class EventInsights(CacheableHandler):
 
         # Add actual scores to predictions
         distribution_info = {}
-        for match in matches['qm']:
-            distribution_info[match.key.id()] = {
-                'red_actual_score': match.alliances['red']['score'],
-                'blue_actual_score': match.alliances['blue']['score'],
-                'red_mean': match_predictions[match.key.id()]['red']['score'],
-                'blue_mean': match_predictions[match.key.id()]['blue']['score'],
-                'red_var': match_predictions[match.key.id()]['red']['score_var'],
-                'blue_var': match_predictions[match.key.id()]['blue']['score_var'],
+        for comp_level in Match.COMP_LEVELS:
+            level = 'qual' if comp_level == 'qm' else 'playoff'
+            for match in matches[comp_level]:
+                distribution_info[match.key.id()] = {
+                    'red_actual_score': match.alliances['red']['score'],
+                    'blue_actual_score': match.alliances['blue']['score'],
+                    'red_mean': match_predictions[level][match.key.id()]['red']['score'],
+                    'blue_mean': match_predictions[level][match.key.id()]['blue']['score'],
+                    'red_var': match_predictions[level][match.key.id()]['red']['score_var'],
+                    'blue_var': match_predictions[level][match.key.id()]['blue']['score_var'],
             }
 
         last_played_match_num = None
