@@ -33,7 +33,7 @@
   </div>
   <div class="row">
     <div class="col-sm-12">
-      <a class="btn btn-success pull-right" href="/suggest/event/video?event_key={{event.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add videos!</a>
+      <a class="btn btn-success pull-right" href="/suggest/event/video?event_key={{event.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add match videos!</a>
       <p>
         {% if event.start_date %}
           <span class="glyphicon glyphicon-calendar"></span> <time itemprop="startDate" datetime="{{event.start_date.isoformat()}}">{{ event.start_date|strftime("%B %d") }}{% if event.start_date.date() != event.end_date.date() %}</time> to <time itemprop="endDate" datetime="{{event.end_date.isoformat()}}">{{ event.end_date|strftime("%B %d") }}{% endif %}, {{ event.end_date|strftime("%Y") }}</time>
@@ -110,6 +110,7 @@
         {% if district_points_sorted %}<li><a href="#district-points" data-toggle="tab">District Points</a></li>{% endif %}
         <li class="{% if matches.num == 0 %}active{% endif %}"><a href="#teams" data-toggle="tab">Teams <span class="badge">{{num_teams}}</span></a></li>
         {% if event_insights_qual or event_insights_playoff %}<li><a href="#event-insights" data-toggle="tab">Insights</a></li>{% endif %}
+        <li><a href="#media" data-toggle="tab">Media</a></li>
       </ul>
     </div>
   </div>
@@ -378,5 +379,30 @@
       </div>
     </div>
     {% endif %}
+
+    <div class="tab-pane" id="media">
+        <div class="col-xs-12">
+          <hr>
+          <a class="btn btn-success pull-right" href="/suggest/event/media?event_key={{event.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add Other Media!</a>
+          <h2 id="media">Media</h2>
+
+          <div class="row">
+            <div class="col-xs-12">
+              {% if medias_by_slugname.youtube %}
+                {% for media in medias_by_slugname.youtube %}
+                  <div class="col-xs-12 col-md-6 fitvids">
+                  {% include "media_partials/media_display_partial.html" %}
+                  </div>
+                {% endfor %}
+              {% else %}
+                <p>No videos for this event... <a href="/suggest/event/media?event_key={{event.key_name}}" target="_blank">Why not add one</a>?</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      </div>
+    </div>
 </div>
 {% endblock %}

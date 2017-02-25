@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Pending Suggestions{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <ol class="breadcrumb">
+    <li><a href="/suggest/review">Suggestions</a></li>
+    <li class="active">Event Medias</li>
+  </ol>
+  <h1>{{ suggestions_and_references|length }} Pending Event Media Suggestions</h1>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <h2>Approval Guidelines</h2>
+      <div class="alert col-sm-6 alert-success">
+        <strong>Do approve:</strong>
+        <ul>
+            <li>Videos of award ceremonies</li>
+            <li>Opening/Closing ceremony speeches</li>
+            <li>Fun/engaging content created by the community (interviews, interactions, etc.)</li>
+        </ul>
+      </div>
+      <div class="alert col-sm-6 alert-danger pull-right">
+        <strong>Do NOT approve:</strong>
+        <ul>
+          <li>Full matches (from any PoV)</li>
+          <li>People dancing</li>
+          <li>Long, drawn out videos with little to no real content</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <form action="/suggest/event/media/review" method="post" id="review_media">
+      <div class="col-xs-12">
+
+          <div class="row">
+              <div class="control-group">
+                  <div class="controls">
+                      <a href="#" id="accept_all_button" class="btn btn-success">Select All Accepts</a>
+                      <a href="#" id="reject_all_button" class="btn btn-danger">Select All Rejects</a>
+                      <a href="#" id="deselect_all_button" class="btn btn-default">Deselect All</a>
+                  </div>
+              </div>
+          </div><br>
+
+          {% for suggestion, reference in suggestions_and_references %}
+          <div class="row">
+              <div class="well">
+                  <div class="col-xs-2">
+                    <label class="radio text-success">
+                      <input class="accept" type="radio" name="accept_reject-{{suggestion.key.id()}}" value="accept::{{suggestion.key.id()}}"> Accept
+                    </label>
+                    <label class="radio text-danger">
+                      <input class="reject" type="radio" name="accept_reject-{{suggestion.key.id()}}" value="reject::{{suggestion.key.id()}}"> Reject
+                    </label>
+                  </div>
+                  <div class="col-xs-5 fitvids">
+                      <p><strong><a href="/event/{{reference.key_name}}" target="_blank">{{ reference.year }} {{ reference.name }}</a></strong></p>
+                      {% set media = suggestion.candidate_media -%}
+                      {% include "media_partials/media_display_partial.html" %}
+                  </div>
+                  <div class="col-xs-2">
+                      <ul>
+                          <li>{{ suggestion.key.id() }}</a></li>
+                          <li>{{ suggestion.author.get().email }}</a></li>
+                          <li>{{ suggestion.author.get().nickname }}</a></li>
+                          <li>{{ suggestion.contents_json }}</li>
+                          <li>{{ suggestion.private_details_json }}</li>
+                      </ul>
+                  </div>
+                  <div class="clearfix"></div>
+              </div>
+          </div>
+          {% else %}
+          <div class="row">
+              <div class="well">
+                  <p>No suggestions! Go build more community!</p>
+              </div>
+          </div>
+          {% endfor %}
+
+          <div class="row">
+              <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-pencil"></span> Act On Selected</button>
+          </div>
+      </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block inline_javascript %}
+<script>
+$("#accept_all_button").click(function(e) {
+    e.preventDefault();
+    $('.accept').prop('checked', true);
+    $('.reject').prop('checked', false);
+});
+$("#reject_all_button").click(function(e) {
+    e.preventDefault();
+    $('.accept').prop('checked', false);
+    $('.reject').prop('checked', true);
+});
+$("#deselect_all_button").click(function(e) {
+    e.preventDefault();
+    $('.accept').prop('checked', false);
+    $('.reject').prop('checked', false);
+});
+</script>
+{% endblock %}

@@ -3,6 +3,7 @@ import json
 from google.appengine.ext import ndb
 
 from consts.media_type import MediaType
+from models.event import Event
 from models.team import Team
 
 
@@ -27,7 +28,8 @@ class Media(ndb.Model):
     }
 
     REFERENCE_MAP = {
-        'team': Team
+        'team': Team,
+        'event': Event,
     }
 
     MAX_PREFERRED = 3  # Loosely enforced. Not a big deal.

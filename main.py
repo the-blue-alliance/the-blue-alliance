@@ -31,6 +31,9 @@ from controllers.suggestions.suggest_apiwrite_controller import SuggestApiWriteC
 from controllers.suggestions.suggest_apiwrite_review_controller import \
       SuggestApiWriteReviewController
 from controllers.suggestions.suggest_designs_review_controller import SuggestDesignsReviewController
+from controllers.suggestions.suggest_event_media_controller import SuggestEventMediaController
+from controllers.suggestions.suggest_event_media_review_controller import \
+      SuggestEventMediaReviewController
 from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController, \
       SuggestMatchVideoPlaylistController
 from controllers.suggestions.suggest_match_video_review_controller import SuggestMatchVideoReviewController
@@ -121,10 +124,12 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/suggest/cad/review', SuggestDesignsReviewController, 'suggest-designs-review', strict_slash=True),
       RedirectRoute(r'/suggest/event/webcast', SuggestEventWebcastController, 'suggest-event-webcast', strict_slash=True),
       RedirectRoute(r'/suggest/event/webcast/review', SuggestEventWebcastReviewController, 'suggest-event-webcast-review', strict_slash=True),
+      RedirectRoute(r'/suggest/event/media', SuggestEventMediaController, 'suggest-event-media', strict_slash=True),
       RedirectRoute(r'/suggest/event/video', SuggestMatchVideoPlaylistController, 'suggest-matches-playlist', strict_slash=True),
       RedirectRoute(r'/suggest/match/video', SuggestMatchVideoController, 'suggest-match-video', strict_slash=True),
       RedirectRoute(r'/suggest/match/video/review', SuggestMatchVideoReviewController, 'suggest-match-video-review', strict_slash=True),
       RedirectRoute(r'/suggest/review', SuggestReviewHomeController, 'suggest-review-home', strict_slash=True),
+      RedirectRoute(r'/suggest/event/media/review', SuggestEventMediaReviewController, 'suggest-event-media-review', strict_slash=True),
       RedirectRoute(r'/suggest/team/media', SuggestTeamMediaController, 'suggest-team-media', strict_slash=True),
       RedirectRoute(r'/suggest/team/social_media', SuggestTeamSocialMediaController, 'suggest-team-social-media', strict_slash=True),
       RedirectRoute(r'/suggest/team/social/review', SuggestSocialMediaReviewController, 'suggest-team-social-media-review', strict_slash=True),
