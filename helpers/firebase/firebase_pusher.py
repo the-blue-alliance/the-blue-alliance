@@ -86,6 +86,18 @@ class FirebasePusher(object):
             _queue="firebase")
 
     @classmethod
+    def replace_event_matches(cls, event_key, matches):
+        """
+        Deletes matches from an event and puts these instead
+        """
+        match_data_json = json.dumps(filter_match_properties([MatchConverter.convert(matches, 3)], 'simple')[0])
+        deferred.defer(
+            cls._put_data,
+            'events/{}/matches',
+            match_data_json,
+            _queue="firebase")
+
+    @classmethod
     def update_match(cls, match):
         """
         Updates a match in an event and event/team
@@ -165,4 +177,12 @@ class FirebasePusher(object):
             cls._put_data,
             'live_events',
             live_events_json,
+            _queue="firebase")
+
+    @classmethod
+    def update_event(cls, event):
+        deferred.defer(
+            cls._put_data,
+            'live_events',
+            {event.key_name: event},
             _queue="firebase")
