@@ -131,10 +131,25 @@
 {% block inline_javascript %}
 <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 <script>
-  var predictions = {{match_predictions_json|safe}};
+  var predictions = {{distribution_info_json|safe}};  // Kind of hacky
   Chart.defaults.global.legend.display = false;
   Chart.defaults.global.maintainAspectRatio = false;
   Chart.defaults.global.tooltips = false;
+
+  var maxScore = 0;
+  var lineHeight = 0;
+  for (var key in predictions) {
+    maxScore = Math.max(maxScore, predictions[key]['red_actual_score']);
+    maxScore = Math.max(maxScore, predictions[key]['blue_actual_score']);
+    lineHeight = Math.max(lineHeight,
+      Math.max(gaussian(predictions[key]['red_mean'],
+                        predictions[key]['red_mean'],
+                        Math.sqrt(predictions[key]['red_var'])),
+               gaussian(predictions[key]['blue_mean'],
+                        predictions[key]['blue_mean'],
+                        Math.sqrt(predictions[key]['blue_var']))));
+  }
+  var xMax = maxScore - (maxScore % 50) + 50;
 
   $('.score_chart').each(function() {
     var ctx = document.getElementById(this.id).getContext('2d');
@@ -143,8 +158,8 @@
     var numPoints = 10;
     var tailScale = 7;
 
-    var redMean = predictions[matchKey]['red']['score'];
-    var redSig = Math.sqrt(predictions[matchKey]['red']['score_var']);
+    var redMean = predictions[matchKey]['red_mean'];
+    var redSig = Math.sqrt(predictions[matchKey]['red_var']);
     var redDist = [];
     for (var i=-numPoints/2; i<=numPoints/2; i++) {
       x = redMean + redSig * i * tailScale / numPoints;
@@ -154,8 +169,8 @@
       })
     }
 
-    var blueMean = predictions[matchKey]['blue']['score'];
-    var blueSig = Math.sqrt(predictions[matchKey]['blue']['score_var']);
+    var blueMean = predictions[matchKey]['blue_mean'];
+    var blueSig = Math.sqrt(predictions[matchKey]['blue_var']);
     var blueDist = [];
     for (var i=-numPoints/2; i<=numPoints/2; i++) {
       x = blueMean + blueSig * i * tailScale / numPoints;
@@ -165,63 +180,61 @@
       })
     }
 
-    // var lineHeight = Math.max(gaussian(redMean, redMean, redSig), gaussian(blueMean, blueMean, blueSig));
+    var redScore = predictions[matchKey]['red_actual_score'];
+    var blueScore = predictions[matchKey]['blue_actual_score'];
+
+    var datasets;
+    if (redScore != -1 && blueScore != -1) {
+      datasets = [{
+        data: [{
+          x: redScore,
+          y: 0
+        },{
+          x: redScore,
+          y: lineHeight
+        }],
+        borderColor: "rgba(255,0,0,0.8)",
+        borderWidth: 2
+      },
+      {
+        data: [{
+          x: blueScore,
+          y: 0
+        },{
+          x: blueScore,
+          y: lineHeight
+        }],
+        borderColor: "rgba(0,0,255,0.8)",
+        borderWidth: 2
+      }]
+    } else {
+      datasets = [];
+    }
+    datasets.push({
+      data: redDist,
+      backgroundColor: "rgba(255,111,111,0.4)",
+      borderColor: "rgba(255,0,0,0.4)",
+      borderWidth: 1,
+    });
+    datasets.push({
+      data: blueDist,
+      backgroundColor: "rgba(111,111,255,0.4)",
+      borderColor: "rgba(0,0,255,0.4)",
+      borderWidth: 1,
+    });
 
     var scatterChart = new Chart(ctx, {
         type: 'line',
         data: {
-            datasets: [
-            {
-                data: [{
-                  x: predictions[matchKey]['red']['actual_score'],
-                  y: 0
-                },{
-                  x: predictions[matchKey]['red']['actual_score'],
-                  y: 0.06
-                }],
-                borderColor: "rgba(255,0,0,0.8)",
-                borderWidth: 2
-            },
-            {
-                data: [{
-                  x: predictions[matchKey]['blue']['actual_score'],
-                  y: 0
-                },{
-                  x: predictions[matchKey]['blue']['actual_score'],
-                  y: 0.06
-                }],
-                borderColor: "rgba(0,0,255,0.8)",
-                borderWidth: 2
-            },
-            {
-                data: redDist,
-                backgroundColor: "rgba(255,111,111,0.4)"
-            },
-            {
-                data: blueDist,
-                backgroundColor: "rgba(111,111,255,0.4)"
-            }
-
-            ]
+            datasets: datasets
         },
         options: {
             animation: {
               duration: 0,
-              onComplete: function () {
-                // Draw tiny scale
-                var ctx = this.chart.ctx;
-                ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontFamily, 'normal', Chart.defaults.global.defaultFontFamily);
-                ctx.textBaseline = 'bottom';
-                ctx.fillStyle = '#000';
-                ctx.textAlign = 'left';
-                ctx.fillText("0", 0, 50);
-                ctx.textAlign = 'right';
-                ctx.fillText("200", 150, 50);
-              }
             },
             scales: {
                 xAxes: [{
-                    display: false,
+                    // display: false,
                     type: 'linear',
                     position: 'bottom',
                     gridLines: {
@@ -229,14 +242,14 @@
                     },
                     ticks: {
                       min: 0,
-                      max: 200,
+                      max: xMax,
                     }
                 }],
                 yAxes: [{
                     display: false,
                     ticks: {
                       min: 0,
-                      max: 0.07,
+                      max: lineHeight * 1.1,
                     }
                 }]
             },

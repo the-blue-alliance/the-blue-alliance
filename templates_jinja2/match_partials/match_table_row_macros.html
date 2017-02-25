@@ -60,15 +60,14 @@
   {% endfor %}
 
   {{mtcm.match_score_td(match, 'red', None, compact=True, predictions=predictions)}}
+  {{mtcm.breach_prob_td(match, 'red', predictions)}}
   <td rowspan="2" style="width: 300px;">
     <div style="width: 300px; height: 90px;">
       <canvas id="chart_{{match.key.id()}}" class="score_chart" data-match-key="{{match.key.id()}}"></canvas>
     </div>
   </td>
-
-  {{mtcm.breach_prob_td(match, 'red', predictions)}}
-  {{mtcm.prob_td(match, predictions, compact=True)}}
-  {{mtcm.correct_prediction_td(match, predictions, compact=True)}}
+  {{mtcm.prob_td(match, predictions)}}
+  {{mtcm.correct_prediction_td(match, predictions)}}
 </tr>
 <tr>
   {% for team_key in match.alliances.blue.teams %}
