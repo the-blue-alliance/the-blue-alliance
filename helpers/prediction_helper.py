@@ -84,10 +84,10 @@ class ContributionCalculator(object):
                     # event.details is backed by in-context cache
                     predictions = event.details.predictions
                     if predictions and 'stat_mean_vars' in predictions:
-                        if team in predictions['stat_mean_vars'][self._stat]['mean']:
-                            past_stats_mean[team].append(predictions['stat_mean_vars'][self._stat]['mean'][team])
-                        if team in predictions['stat_mean_vars'][self._stat]['var']:
-                            past_stats_var[team].append(predictions['stat_mean_vars'][self._stat]['var'][team])
+                        if team in predictions['stat_mean_vars']['qual'][self._stat]['mean']:
+                            past_stats_mean[team].append(predictions['stat_mean_vars']['qual'][self._stat]['mean'][team])
+                        if team in predictions['stat_mean_vars']['qual'][self._stat]['var']:
+                            past_stats_var[team].append(predictions['stat_mean_vars']['qual'][self._stat]['var'][team])
 
         return past_stats_mean, past_stats_var
 
