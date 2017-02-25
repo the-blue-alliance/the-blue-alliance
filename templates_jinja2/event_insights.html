@@ -36,7 +36,6 @@
     <div class="tab-pane active" id="qual-match-predictions">
       {% if match_predictions.qual %}
       <div class="row">
-        {% if matches.qm %}
         <div class="col-xs-12">
           <h3>Qualification Match Predictions (<a href="/predictions">?</a>)</h3>
           <p>Remember, match predictions are JUST FOR FUN! Please do not be discouraged by our predictions -- they are almost certainly wrong.</p>
@@ -60,7 +59,6 @@
 
           {{mtm.qual_match_prediction_table(matches, match_predictions.qual, fake_matches, event.year)}}
         </div>
-        {% endif %}
       </div>
       {% else %}
       <div class="row">
@@ -131,7 +129,6 @@
     <div class="tab-pane" id="playoff-match-predictions">
       {% if match_predictions.playoff %}
       <div class="row">
-        {% if matches.qm %}
         <div class="col-xs-12">
           <h3>Playoff Match Predictions (<a href="/predictions">?</a>)</h3>
           <p>Remember, match predictions are JUST FOR FUN! Please do not be discouraged by our predictions -- they are almost certainly wrong.</p>
@@ -155,7 +152,6 @@
 
           {{mtm.playoff_match_prediction_table(matches, match_predictions.playoff, fake_matches, event.year)}}
         </div>
-        {% endif %}
       </div>
       {% else %}
       <div class="row">
