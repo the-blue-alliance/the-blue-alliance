@@ -210,8 +210,10 @@ class EventMatchstatsEnqueue(webapp.RequestHandler):
         else:
             events = Event.query(Event.year == int(when)).fetch(500)
 
+        EventHelper.sort_events(events)
         for event in events:
             taskqueue.add(
+                queue_name='run-in-order',  # Because predictions depend on past events
                 url='/tasks/math/do/event_matchstats/' + event.key_name,
                 method='GET')
 

@@ -31,3 +31,7 @@ queue:
 
 - name: admin
   rate: 5/s
+
+- name: run-in-order
+  max_concurrent_requests: 1
+  rate: 5/s
