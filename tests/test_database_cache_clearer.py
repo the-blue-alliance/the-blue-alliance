@@ -193,15 +193,14 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         self.assertTrue(TeamYearMatchesQuery('frc604', 2014).cache_key in cache_keys)
         self.assertTrue(TeamYearMatchesQuery('frc604', 2015).cache_key in cache_keys)
 
-    def test_media_updated(self):
+    def test_media_updated_team(self):
         affected_refs = {
-            'references': {ndb.Key(Team, 'frc254'), ndb.Key(Team, 'frc604'),
-                           ndb.Key(Event, '2016necmp')},
+            'references': {ndb.Key(Team, 'frc254'), ndb.Key(Team, 'frc604')},
             'year': {2014, 2015},
         }
         cache_keys = [q.cache_key for q in get_affected_queries.media_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 11)
+        self.assertEqual(len(cache_keys), 10)
         self.assertTrue(TeamYearMediaQuery('frc254', 2014).cache_key in cache_keys)
         self.assertTrue(TeamYearMediaQuery('frc254', 2015).cache_key in cache_keys)
         self.assertTrue(TeamSocialMediaQuery('frc254').cache_key in cache_keys)
@@ -212,6 +211,15 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         self.assertTrue(EventTeamsMediasQuery('2015casj').cache_key in cache_keys)
         self.assertTrue(EventTeamsPreferredMediasQuery('2015cama').cache_key in cache_keys)
         self.assertTrue(EventTeamsPreferredMediasQuery('2015casj').cache_key in cache_keys)
+
+    def test_media_updated_event(self):
+        affected_refs = {
+            'references': {ndb.Key(Event, '2016necmp')},
+            'year': {2016},
+        }
+        cache_keys = [q.cache_key for q in get_affected_queries.media_updated(affected_refs)]
+
+        self.assertEqual(len(cache_keys), 1)
         self.assertTrue(EventMediasQuery('2016necmp').cache_key in cache_keys)
 
     def test_robot_updated(self):
