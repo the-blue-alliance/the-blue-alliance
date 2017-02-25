@@ -381,8 +381,8 @@ class PredictionHelper(object):
         return prediction
 
     @classmethod
-    def get_match_predictions(cls, all_matches):
-        if not all_matches:
+    def get_match_predictions(cls, matches):
+        if not matches:
             return None, None, None
         predictions = {
             'qual': {},
@@ -396,7 +396,7 @@ class PredictionHelper(object):
             'qual': {},
             'playoff': {},
         }
-        event_key = all_matches[0].event
+        event_key = matches[0].event
         event = event_key.get()
         if event.year == 2016:
             relevant_stats = [
@@ -411,12 +411,12 @@ class PredictionHelper(object):
                 ('pressure', 0, 1**2),
                 ('gears', 0, 1**2),
             ]
-        for level in ['qual', 'playoff']:
-            if level == 'qual':
-                matches = filter(lambda m: m.comp_level == 'qm', all_matches)
-            else:
-                matches = filter(lambda m: m.comp_level != 'qm', all_matches)
 
+        contribution_calculators = [ContributionCalculator(event, matches, s, m, v) for s, m, v in relevant_stats]
+        qual_matches = filter(lambda m: m.comp_level == 'qm', matches)
+        playoff_matches = filter(lambda m: m.comp_level != 'qm', matches)
+        match_idx = 0
+        for level in ['qual', 'playoff']:
             # For benchmarks
             played_matches = 0
             played_matches_75 = 0
@@ -426,9 +426,9 @@ class PredictionHelper(object):
             brier_sums = defaultdict(float)
             reset_benchmarks = False
 
-            contribution_calculators = [ContributionCalculator(event, matches, s, m, v) for s, m, v in relevant_stats]
-            for i, match in enumerate(matches):
-                mean_vars = [cc.calculate_before_match(i) for cc in contribution_calculators]
+            for match in qual_matches if level == 'qual' else playoff_matches:
+                mean_vars = [cc.calculate_before_match(match_idx) for cc in contribution_calculators]
+                match_idx += 1
                 stat_mean_vars[level] = {}
                 for (stat, _, _), mean_var in zip(relevant_stats, mean_vars):
                     stat_mean_vars[level][stat] = mean_var
