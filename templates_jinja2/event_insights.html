@@ -47,6 +47,7 @@
           {% if match_prediction_stats.err_mean %}<p><strong>Match score prediction average error:</strong> {{match_prediction_stats.err_mean|round(1)}}</p>{% endif %}
           {% if match_prediction_stats.brier_scores.win_loss %}<p><strong>Win/Loss Brier Score:</strong> {{match_prediction_stats.brier_scores.win_loss}}</p>{% endif %}
 
+          <!--
           {% if event.year == 2016 %}
             <p><strong>Breach Brier Score:</strong> {{match_prediction_stats.brier_scores.breach}}</p>
             <p><strong>Capture Brier Score:</strong> {{match_prediction_stats.brier_scores.capture}}</p>
@@ -54,6 +55,7 @@
             <p><strong>Pressure Brier Score:</strong> {{match_prediction_stats.brier_scores.pressure}}</p>
             <p><strong>Rotors Brier Score:</strong> {{match_prediction_stats.brier_scores.gears}}</p>
           {% endif %}
+          -->
 
 
           {{mtm.qual_match_prediction_table(matches, match_predictions, fake_matches, event.year)}}
