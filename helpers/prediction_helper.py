@@ -171,7 +171,15 @@ class ContributionCalculator(object):
             means = {}
             for color in ['red', 'blue']:
                 if self._stat == 'score':
-                    means[color] = match.alliances[color]['score']
+                    score = match.alliances[color]['score']
+                    # Subtract bonus objective scores for playoffs, since they are accounted for explicitly
+                    # 2016; these should be zero for qual matches
+                    score -= match.score_breakdown[color].get('breachPoints', 0)
+                    score -= match.score_breakdown[color].get('capturePoints', 0)
+                    # 2017; these should be zero for qual matches
+                    score -= match.score_breakdown[color].get('kPaBonusPoints', 0)
+                    score -= match.score_breakdown[color].get('rotorBonusPoints', 0)
+                    means[color] = score
                 elif self._stat == 'auto_points':
                     means[color] = match.score_breakdown[color]['autoPoints']
                 elif self._stat == 'boulders':
