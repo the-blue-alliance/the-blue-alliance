@@ -35,7 +35,7 @@ class FirebasePusher(object):
             return
         url = tba_config.CONFIG['firebase-url'].format(key, secret)
         result = urlfetch.fetch(url, method='DELETE', deadline=10)
-        if result.status_code != 204:
+        if result.status_code not in {200, 204}:
             raise Exception("Error with DELETE data from Firebase: {}. ERROR {}: {}".format(url, result.status_code, result.content))
 
     @classmethod
