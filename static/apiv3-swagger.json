@@ -2992,9 +2992,22 @@
           "type": "integer",
           "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2"
         },
-        "event_district_key": {
-          "type": "string",
-          "description": "TBA Key for the District the Event is in, may be null."
+        "district": {
+          "type": "object",
+          "properties": {
+            "abbreviation": {
+              "type": "string"
+            },
+            "display_name": {
+              "type": "string"
+            },
+            "key": {
+              "type": "string"
+            },
+            "year": {
+              "type": "integer"
+            }
+          }
         },
         "city": {
           "type": "string",
@@ -3015,10 +3028,6 @@
         "end_date": {
           "type": "string",
           "description": "Event end date in `yyyy-mm-dd` format."
-        },
-        "timezone": {
-          "type": "string",
-          "description": "Timezone name"
         },
         "year": {
           "type": "integer",
@@ -3102,6 +3111,10 @@
         "location_name": {
           "type": "string",
           "description": "Name of the location at the address for the event, eg. Blue Alliance High School"
+        },
+        "timezone": {
+          "type": "string",
+          "description": "Timezone name"
         },
         "website": {
           "type": "string",
