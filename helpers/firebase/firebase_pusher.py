@@ -90,6 +90,9 @@ class FirebasePusher(object):
         """
         Updates a match in an event and event/team
         """
+        if match.year < 2017:
+            return
+
         match_data_json = json.dumps(filter_match_properties([MatchConverter.convert(match, 3)], 'simple')[0])
 
         deferred.defer(
@@ -110,6 +113,9 @@ class FirebasePusher(object):
         """
         Updates an event_detail in an event
         """
+        if int(event_details.key.id()[:4]) < 2017:
+            return
+
         event_details_json = json.dumps(EventDetailsConverter.convert(event_details, 3))
 
         deferred.defer(
@@ -123,6 +129,9 @@ class FirebasePusher(object):
         """
         Updates an event team status
         """
+        if int(event_key[:4]) < 2017:
+            return
+
         from helpers.event_team_status_helper import EventTeamStatusHelper  # Prevent circular import
 
         if status:
