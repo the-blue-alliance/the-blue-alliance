@@ -39,7 +39,7 @@
 </table>
 {% endmacro %}
 
-{% macro qual_match_prediction_table(matches, predictions, fake_matches) %}
+{% macro qual_match_prediction_table(matches, predictions, fake_matches, year) %}
 <table class="match-table">
   <thead>
     {% include "match_partials/match_predictions_table_header.html" %}
@@ -48,10 +48,53 @@
   <tbody>
     {% if matches.qm %}
       <tr class="key">
-        <th colspan="20">Qualifications</th>
+        <th colspan="19">Qualifications</th>
       </tr>
       {% for match in matches.qm %}
-        {{mtrm.match_row_tr(match, predictions=predictions, fake_matches=fake_matches)}}
+        {{mtrm.match_prediction_row_tr(match, predictions, fake_matches=fake_matches)}}
+      {% endfor %}
+    {% endif %}
+  </tbody>
+</table>
+{% endmacro %}
+
+{% macro playoff_match_prediction_table(matches, predictions, fake_matches, year) %}
+<table class="match-table">
+  <thead>
+    {% include "match_partials/match_predictions_table_header.html" %}
+  </thead>
+
+  <tbody>
+    {% if matches.ef %}
+      <tr class="key">
+        <th colspan="19">Eighth-Finals</th>
+      </tr>
+      {% for match in matches.ef %}
+        {{mtrm.match_prediction_row_tr(match, predictions, fake_matches=fake_matches)}}
+      {% endfor %}
+    {% endif %}
+    {% if matches.qf %}
+      <tr class="key">
+        <th colspan="19">Quarterfinals</th>
+      </tr>
+      {% for match in matches.qf %}
+        {{mtrm.match_prediction_row_tr(match, predictions, fake_matches=fake_matches)}}
+      {% endfor %}
+    {% endif %}
+    {% if matches.sf %}
+      <tr class="key">
+        <th colspan="19">Semifinals</th>
+      </tr>
+      {% for match in matches.sf %}
+        {{mtrm.match_prediction_row_tr(match, predictions, fake_matches=fake_matches)}}
+      {% endfor %}
+    {% endif %}
+    {% if matches.f %}
+      <tr class="key">
+        <th colspan="19">Finals</th>
+      </tr>
+      {% for match in matches.f %}
+        {{mtrm.match_prediction_row_tr(match, predictions, fake_matches=fake_matches)}}
       {% endfor %}
     {% endif %}
   </tbody>

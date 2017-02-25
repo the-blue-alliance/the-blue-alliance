@@ -166,14 +166,15 @@ class EventMatchstatsDo(webapp.RequestHandler):
             matchstats_dict = None
 
         predictions_dict = None
-        if event.year == 2016:
-            organized_matches = MatchHelper.organizeMatches(event.matches)
-            match_predictions, match_prediction_stats = PredictionHelper.get_match_predictions(organized_matches['qm'])
-            ranking_predictions, ranking_prediction_stats = PredictionHelper.get_ranking_predictions(organized_matches['qm'], match_predictions)
+        if event.year >= 2016:
+            sorted_matches = MatchHelper.play_order_sort_matches(event.matches)
+            match_predictions, match_prediction_stats, stat_mean_vars = PredictionHelper.get_match_predictions(sorted_matches)
+            ranking_predictions, ranking_prediction_stats = PredictionHelper.get_ranking_predictions(sorted_matches, match_predictions['qual'])
 
             predictions_dict = {
                 'match_predictions': match_predictions,
                 'match_prediction_stats': match_prediction_stats,
+                'stat_mean_vars': stat_mean_vars,
                 'ranking_predictions': ranking_predictions,
                 'ranking_prediction_stats': ranking_prediction_stats
             }
@@ -209,8 +210,10 @@ class EventMatchstatsEnqueue(webapp.RequestHandler):
         else:
             events = Event.query(Event.year == int(when)).fetch(500)
 
+        EventHelper.sort_events(events)
         for event in events:
             taskqueue.add(
+                queue_name='run-in-order',  # Because predictions depend on past events
                 url='/tasks/math/do/event_matchstats/' + event.key_name,
                 method='GET')
 

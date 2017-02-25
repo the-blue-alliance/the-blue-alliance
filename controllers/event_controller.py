@@ -240,7 +240,7 @@ class EventInsights(CacheableHandler):
     def _render(self, event_key):
         event = Event.get_by_id(event_key)
 
-        if not event or event.year != 2016:
+        if not event or event.year < 2016 or not event.details.predictions:
             self.abort(404)
 
         event.get_matches_async()
@@ -257,7 +257,7 @@ class EventInsights(CacheableHandler):
         # If no matches but there are match predictions, create fake matches
         # For cases where FIRST doesn't allow posting of match schedule
         fake_matches = False
-        if not matches['qm'] and match_predictions:
+        if not matches['qm'] and match_predictions['qual']:
             fake_matches = True
             for i in xrange(len(match_predictions.keys())):
                 match_number = i + 1
@@ -285,6 +285,21 @@ class EventInsights(CacheableHandler):
                     alliances_json=json.dumps(alliances),
                 ))
 
+        # Add actual scores to predictions
+        distribution_info = {}
+        for comp_level in Match.COMP_LEVELS:
+            level = 'qual' if comp_level == 'qm' else 'playoff'
+            for match in matches[comp_level]:
+                distribution_info[match.key.id()] = {
+                    'level': level,
+                    'red_actual_score': match.alliances['red']['score'],
+                    'blue_actual_score': match.alliances['blue']['score'],
+                    'red_mean': match_predictions[level][match.key.id()]['red']['score'],
+                    'blue_mean': match_predictions[level][match.key.id()]['blue']['score'],
+                    'red_var': match_predictions[level][match.key.id()]['red']['score_var'],
+                    'blue_var': match_predictions[level][match.key.id()]['blue']['score_var'],
+            }
+
         last_played_match_num = None
         if ranking_prediction_stats:
             last_played_match_key = ranking_prediction_stats.get('last_played_match', None)
@@ -296,6 +311,7 @@ class EventInsights(CacheableHandler):
             "matches": matches,
             "fake_matches": fake_matches,
             "match_predictions": match_predictions,
+            "distribution_info_json": json.dumps(distribution_info),
             "match_prediction_stats": match_prediction_stats,
             "ranking_predictions": ranking_predictions,
             "ranking_prediction_stats": ranking_prediction_stats,

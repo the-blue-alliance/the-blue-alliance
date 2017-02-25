@@ -15,9 +15,14 @@
       and prove us wrong!</p>
 
       <h2>Match Predictions</h2>
-      <p>Match result predictions use ixOPR, a slight variant of
-      <a href="/opr">OPR</a>, to attempt to extrapolate the final match score
-      based on a team's estimated point contribution to an alliance.</p>
+      <p>Match result predictions attempts to estimate the mean and variance of
+      a team's contribution to the alliance final score. Means are estimated by
+      solving for the minimum mean squared error
+      (<a href="https://en.wikipedia.org/wiki/Minimum_mean_square_error">MMSE</a>)
+      solution to the standard <a href="/opr">OPR</a> equations. Final match
+      score is predicted by summing each team's mean contribution. The actual
+      score is then compared to the predicted score to calculate a team's
+      variance which is used to inform future predictions.</p>
 
       <h2>Event Ranking Predictions</h2>
       <p>Rankings are predicted using the <a href="https://en.wikipedia.org/wiki/Monte_Carlo_method" target="_blank">Monte Carlo</a>
