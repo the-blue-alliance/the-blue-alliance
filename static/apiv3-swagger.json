@@ -3049,10 +3049,12 @@
         },
         "start_date": {
           "type": "string",
+          "format": "date",
           "description": "Event start date in `yyyy-mm-dd` format."
         },
         "end_date": {
           "type": "string",
+          "format": "date",
           "description": "Event end date in `yyyy-mm-dd` format."
         },
         "year": {
@@ -3120,10 +3122,12 @@
         },
         "start_date": {
           "type": "string",
+          "format": "date",
           "description": "Event start date in `yyyy-mm-dd` format."
         },
         "end_date": {
           "type": "string",
+          "format": "date",
           "description": "Event end date in `yyyy-mm-dd` format."
         },
         "year": {
