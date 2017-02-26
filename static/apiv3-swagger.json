@@ -2885,15 +2885,41 @@
     },
     "Team": {
       "type": "object",
-      "allOf": [
-        {
-          "$ref": "#/definitions/Team_Simple"
-        }
-      ],
       "required": [
+        "key",
+        "name",
+        "team_number",
         "rookie_year"
       ],
       "properties": {
+        "key": {
+          "type": "string",
+          "description": "TBA team key with the format frcyyyy"
+        },
+        "team_number": {
+          "type": "integer",
+          "description": "Official team number issued by FIRST"
+        },
+        "nickname": {
+          "type": "string",
+          "description": "Team nickname provided by FIRST"
+        },
+        "name": {
+          "type": "string",
+          "description": "Official long name registered with FIRST"
+        },
+        "city": {
+          "type": "string",
+          "description": "City of team derived from parsing the address registered with FIRST"
+        },
+        "state_prov": {
+          "type": "string",
+          "description": "State of team derived from parsing the address registered with FIRST"
+        },
+        "country": {
+          "type": "string",
+          "description": "Country of team derived from parsing the address registered with FIRST"
+        },
         "address": {
           "type": "string",
           "description": "Address for the team"
@@ -3037,12 +3063,73 @@
     },
     "Event": {
       "type": "object",
-      "allOf": [
-        {
-          "$ref": "#/definitions/Event_Simple"
-        }
+      "required": [
+        "end_date",
+        "event_code",
+        "event_type",
+        "key",
+        "name",
+        "start_date",
+        "year"
       ],
       "properties": {
+        "key": {
+          "type": "string",
+          "description": "TBA event key with the format yyyy[EVENT_CODE], where yyyy is the year, and EVENT_CODE is the event code of the event."
+        },
+        "name": {
+          "type": "string",
+          "description": "Official name of event on record either provided by FIRST or organizers of offseason event."
+        },
+        "event_code": {
+          "type": "string",
+          "description": "Event short code, as provided by FIRST."
+        },
+        "event_type": {
+          "type": "integer",
+          "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2"
+        },
+        "district": {
+          "type": "object",
+          "properties": {
+            "abbreviation": {
+              "type": "string"
+            },
+            "display_name": {
+              "type": "string"
+            },
+            "key": {
+              "type": "string"
+            },
+            "year": {
+              "type": "integer"
+            }
+          }
+        },
+        "city": {
+          "type": "string",
+          "description": "City of event"
+        },
+        "state_prov": {
+          "type": "string",
+          "description": "State of event"
+        },
+        "country": {
+          "type": "string",
+          "description": "Country of event"
+        },
+        "start_date": {
+          "type": "string",
+          "description": "Event start date in `yyyy-mm-dd` format."
+        },
+        "end_date": {
+          "type": "string",
+          "description": "Event end date in `yyyy-mm-dd` format."
+        },
+        "year": {
+          "type": "integer",
+          "description": "Year the event data is for."
+        },
         "short_name": {
           "type": "string",
           "description": "Same as name but doesn't include event specifiers, such as 'Regional' or 'District'. May be null."
@@ -3657,12 +3744,70 @@
     },
     "Match": {
       "type": "object",
-      "allOf": [
-        {
-          "$ref": "#/definitions/Match_Simple"
-        }
+      "required": [
+        "comp_level",
+        "event_key",
+        "key",
+        "match_number",
+        "set_number"
       ],
       "properties": {
+        "key": {
+          "type": "string",
+          "description": "TBA event key with the format yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER], where yyyy is the year, and EVENT_CODE is the event code of the event, COMP_LEVEL is (qm, ef, qf, sf, f), and MATCH_NUMBER is the match number in the competition level. A set number may append the competition level if more than one match in required per set."
+        },
+        "comp_level": {
+          "type": "string",
+          "description": "The competition level the match was played at.",
+          "enum": [
+            "qm",
+            "ef",
+            "qf",
+            "sf",
+            "f"
+          ]
+        },
+        "set_number": {
+          "type": "integer",
+          "description": "The set number in a series of matches where more than one match is required in the match series."
+        },
+        "match_number": {
+          "type": "integer",
+          "description": "The match number of the match in the competition level."
+        },
+        "alliances": {
+          "properties": {
+            "blue": {
+              "$ref": "#/definitions/Match_alliance"
+            },
+            "red": {
+              "$ref": "#/definitions/Match_alliance"
+            }
+          },
+          "description": "A list of alliances, the teams on the alliances, and their score."
+        },
+        "winning_alliance": {
+          "type": "string",
+          "description": "The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie.",
+          "enum": [
+            "red",
+            "blue"
+          ]
+        },
+        "event_key": {
+          "type": "string",
+          "description": "Event key of the event the match was played at."
+        },
+        "time": {
+          "type": "integer",
+          "format": "int64",
+          "description": "UNIX timestamp of match time, as taken from the published schedule"
+        },
+        "actual_time": {
+          "type": "integer",
+          "format": "int64",
+          "description": "UNIX timestamp of actual match start time"
+        },
         "score_breakdown": {
           "type": "object",
           "description": "Score breakdown for auto, teleop, etc. points. Varies from year to year. May be null."
