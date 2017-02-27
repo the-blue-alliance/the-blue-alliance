@@ -104,6 +104,7 @@ class DatafeedFMSAPI(object):
             self.FMS_API_EVENT_ALLIANCES_URL_PATTERN = FMS_API_URL_BASE + '/%s/alliances/%s'  # (year, event_short)
             self.FMS_API_TEAM_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/%s/teams/?teamNumber=%s'  # (year, teamNumber)
             self.FMS_API_EVENT_LIST_URL_PATTERN = FMS_API_URL_BASE + '/%s/events'  # year
+            self.FMS_API_EVENT_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/%s/events?eventCode=%s'  # (year, event_short)
             self.FMS_API_EVENTTEAM_LIST_URL_PATTERN = FMS_API_URL_BASE + '/%s/teams/?eventCode=%s&page=%s'  # (year, eventCode, page)
         else:
             raise Exception("Unknown FMS API version: {}".format(version))
@@ -245,6 +246,12 @@ class DatafeedFMSAPI(object):
     # Returns a tuple: (list(Event), list(District))
     def getEventList(self, year):
         events, districts = self._parse(self.FMS_API_EVENT_LIST_URL_PATTERN % (year), FMSAPIEventListParser(year))
+        return events, districts
+
+    def getEventDetails(self, event_key):
+        year = int(event_key[:4])
+        event_short = event_key[4:]
+        events, districts = self._parse(self.FMS_API_EVENT_DETAILS_URL_PATTERN % (year, event_short), FMSAPIEventListParser(year))
         return events, districts
 
     # Returns list of tuples (team, districtteam, robot)

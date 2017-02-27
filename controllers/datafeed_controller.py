@@ -455,9 +455,14 @@ class EventDetailsGet(webapp.RequestHandler):
         event = Event.get_by_id(event_key)
 
         # Update event
-        updated_event = df2.getEventDetails(event)
+        fmsapi_events, fmsapi_districts = df.getEventDetails(event_key)
+        elasticsearch_events = df2.getEventDetails(event)
+        updated_event = EventManipulator.mergeModels(
+            fmsapi_events,
+            elasticsearch_events)
         if updated_event:
             event = EventManipulator.createOrUpdate(updated_event)
+        DistrictManipulator.createOrUpdate(fmsapi_districts)
 
         models = df.getEventTeams(event_key)
         teams = []
