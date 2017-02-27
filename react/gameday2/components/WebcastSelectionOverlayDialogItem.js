@@ -5,6 +5,8 @@ export default class WebcastSelectionOverlayDialogItem extends React.Component {
   static propTypes = {
     webcast: PropTypes.object.isRequired,
     webcastSelected: PropTypes.func.isRequired,
+    secondaryText: PropTypes.string,
+    rightIcon: PropTypes.any,
   }
 
   handleClick() {
@@ -15,7 +17,9 @@ export default class WebcastSelectionOverlayDialogItem extends React.Component {
     return (
       <ListItem
         primaryText={this.props.webcast.name}
+        secondaryText={this.props.secondaryText}
         onTouchTap={() => this.handleClick()}
+        rightIcon={this.props.rightIcon}
       />
     )
   }

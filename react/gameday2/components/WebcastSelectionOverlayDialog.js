@@ -1,7 +1,11 @@
 import React, { PropTypes } from 'react'
 import Paper from 'material-ui/Paper'
+import { indigo500 } from 'material-ui/styles/colors'
+import Divider from 'material-ui/Divider'
 import FlatButton from 'material-ui/FlatButton'
 import { List, ListItem } from 'material-ui/List'
+import Subheader from 'material-ui/Subheader'
+import ActionGrade from 'material-ui/svg-icons/action/grade'
 import EventListener from 'react-event-listener'
 import WebcastSelectionOverlayDialogItem from './WebcastSelectionOverlayDialogItem'
 import { webcastPropType } from '../utils/webcastUtils'
@@ -12,6 +16,7 @@ export default class VideoCellOverlayDialog extends React.Component {
     open: PropTypes.bool.isRequired,
     webcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
     webcastsById: PropTypes.objectOf(webcastPropType).isRequired,
+    specialWebcastIds: PropTypes.any.isRequired, // Can't figure out how to check for Set()
     displayedWebcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
     onWebcastSelected: PropTypes.func.isRequired,
     onRequestClose: PropTypes.func.isRequired,
@@ -110,25 +115,83 @@ export default class VideoCellOverlayDialog extends React.Component {
       </div>
     )
 
+    const subheaderStyle = {
+      color: indigo500,
+    }
+
     // Construct list of webcasts
+    const bluezoneWebcastItems = []
+    const specialWebcastItems = []
     const webcastItems = []
     // Don't let the user choose a webcast that is already displayed elsewhere
     const availableWebcasts = this.props.webcasts.filter((webcastId) => this.props.displayedWebcasts.indexOf(webcastId) === -1)
     availableWebcasts.forEach((webcastId) => {
       const webcast = this.props.webcastsById[webcastId]
-      webcastItems.push(
-        <WebcastSelectionOverlayDialogItem
-          key={webcast.id}
-          webcast={webcast}
-          webcastSelected={this.props.onWebcastSelected}
-        />
-      )
+
+      if (this.props.specialWebcastIds.has(webcast.id)) {
+        specialWebcastItems.push(
+          <WebcastSelectionOverlayDialogItem
+            key={webcast.id}
+            webcast={webcast}
+            webcastSelected={this.props.onWebcastSelected}
+          />
+        )
+      } else if (webcast.id.startsWith('bluezone')) {
+        bluezoneWebcastItems.push(
+          <WebcastSelectionOverlayDialogItem
+            key={webcast.id}
+            webcast={webcast}
+            webcastSelected={this.props.onWebcastSelected}
+            secondaryText={'The best matches from across FRC'}
+            rightIcon={<ActionGrade color={indigo500} />}
+          />
+        )
+      } else {
+        webcastItems.push(
+          <WebcastSelectionOverlayDialogItem
+            key={webcast.id}
+            webcast={webcast}
+            webcastSelected={this.props.onWebcastSelected}
+          />
+        )
+      }
     })
 
-    if (webcastItems.length === 0) {
+    let allWebcastItems = []
+    if (specialWebcastItems.length !== 0) {
+      allWebcastItems.push(
+        <Subheader
+          key="specialWebcastsHeader"
+          style={subheaderStyle}
+        >
+          Special Webcasts
+        </Subheader>
+      )
+      allWebcastItems = allWebcastItems.concat(bluezoneWebcastItems)
+      allWebcastItems = allWebcastItems.concat(specialWebcastItems)
+    }
+    if (webcastItems.length !== 0) {
+      if (specialWebcastItems.length !== 0) {
+        allWebcastItems.push(
+          <Divider key="eventWebcastsDivider" />
+        )
+      }
+      allWebcastItems.push(
+        <Subheader
+          key="eventWebcastsHeader"
+          style={subheaderStyle}
+        >
+          Event Webcasts
+        </Subheader>
+      )
+      allWebcastItems = allWebcastItems.concat(webcastItems)
+    }
+
+    if (allWebcastItems.length === 0) {
       // No more webcasts, indicate that
-      webcastItems.push(
+      allWebcastItems.push(
         <ListItem
+          key="nullWebcastsListItem"
           primaryText="No more webcasts available"
           disabled
         />
@@ -161,7 +224,7 @@ export default class VideoCellOverlayDialog extends React.Component {
             >
               <div ref={(e) => { this.dialogList = e }}>
                 <List>
-                  {webcastItems}
+                  {allWebcastItems}
                 </List>
               </div>
             </div>

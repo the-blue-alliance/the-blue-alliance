@@ -55,6 +55,7 @@ const VideoCellToolbar = (props) => {
         key={match.key}
         match={match}
         hasFavorite={hasFavorite}
+        isBlueZone={props.isBlueZone}
       />
     )
   })

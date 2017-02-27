@@ -42,6 +42,11 @@ const setChatsFromWebcasts = (webcasts, state) => {
   Object.keys(webcasts).forEach((key) => {
     const webcast = webcasts[key]
 
+    // Don't add BlueZone to chat
+    if (webcast.key === 'bluezone') {
+      return
+    }
+
     if (webcast.type === 'twitch') {
       // We found a twitch webcast!
       newState.chats[webcast.channel] = {

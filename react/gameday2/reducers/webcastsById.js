@@ -4,6 +4,7 @@ import { getWebcastId } from '../utils/webcastUtils'
 const getWebcastsFromRawWebcasts = (webcasts) => {
   const webcastsById = {}
   const specialWebcasts = webcasts.special_webcasts
+  const specialWebcastIds = new Set()
   const eventsWithWebcasts = webcasts.ongoing_events_w_webcasts
 
   // First, deal with special webcasts
@@ -21,6 +22,7 @@ const getWebcastsFromRawWebcasts = (webcasts) => {
         channel: webcast.channel,
         sortOrder: index,
       }
+      specialWebcastIds.add(id)
     })
   }
 
@@ -45,16 +47,28 @@ const getWebcastsFromRawWebcasts = (webcasts) => {
     })
   }
 
-  return webcastsById
+  const allWebcasts = {
+    webcastsById,
+    specialWebcastIds,
+  }
+
+  return allWebcasts
 }
 
-const webcastsById = (state = {}, action) => {
+export const webcastsById = (state = {}, action) => {
   switch (action.type) {
     case SET_WEBCASTS_RAW:
-      return getWebcastsFromRawWebcasts(action.webcasts)
+      return getWebcastsFromRawWebcasts(action.webcasts).webcastsById
     default:
       return state
   }
 }
 
-export default webcastsById
+export const specialWebcastIds = (state = {}, action) => {
+  switch (action.type) {
+    case SET_WEBCASTS_RAW:
+      return getWebcastsFromRawWebcasts(action.webcasts).specialWebcastIds
+    default:
+      return state
+  }
+}
