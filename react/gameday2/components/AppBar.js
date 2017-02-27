@@ -31,7 +31,13 @@ const AppBar = (props) => {
   const appBarTitleStyle = {
     color: props.muiTheme.appBar.textColor,
     fontSize: '24px',
-    paddingRight: 0,
+    overflow: 'visible',
+  }
+
+  const appBarSubtitleStyle = {
+    color: props.muiTheme.appBar.textColor,
+    textDecoration: 'none',
+    fontSize: 12,
   }
 
   const vexProStyle = {
@@ -39,6 +45,8 @@ const AppBar = (props) => {
     textDecoration: 'none',
     marginLeft: 32,
     fontSize: 12,
+    display: 'flex',
+    alignItems: 'center',
   }
 
   const tbaBrandingButton = (
@@ -73,11 +81,9 @@ const AppBar = (props) => {
         <ToolbarGroup firstChild>
           {tbaBrandingButton}
           <ToolbarTitle text="GameDay" style={appBarTitleStyle} />
-          <a
-            style={vexProStyle}
-            href="https://www.vexrobotics.com/vexpro/"
-          >
-            <span>POWERED BY </span>
+          <a style={appBarSubtitleStyle} href="/">by The Blue Alliance</a>
+          <a style={vexProStyle} href="https://www.vexrobotics.com/vexpro/" >
+            <span style={{marginRight: '4px'}}>POWERED BY</span>
             <img
               src="/images/vexpro_horiz.png"
               alt="vexPRO"
