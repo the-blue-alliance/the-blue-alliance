@@ -25,6 +25,10 @@ class AdminMemcacheMain(LoggedInHandler):
             memcache.delete(self.request.get("memcache_key"))
             flushed.append(self.request.get("memcache_key"))
 
+        if self.request.get('return_url') is not "":
+            self.redirect("{}?flushed={}".format(self.request.get('return_url'), flushed))
+            return
+
         self.template_values.update({
             "flushed": flushed,
             "memcache_stats": memcache.get_stats(),

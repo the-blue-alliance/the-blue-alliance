@@ -9,11 +9,19 @@
 <div class="btn-group">
     <a href="/admin/event/edit/{{event.key_name}}" class="btn btn-primary"><span class="glyphicon glyphicon-edit"></span> Edit</a>
     <a href="/event/{{event.key_name}}" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> View on TBA</a>
-    <a href="/tasks/math/do/eventteam_update/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-user"></span> Rebuild EventTeams</a>
-    <a href="/backend-tasks/get/event_details/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Refresh from FIRST</a>
-    <a href="/backend-tasks/do/post_event_tasks/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-play"></span> Run Post-Event Tasks</a>
+    <button class="btn btn-danger" form="event_cache_clear"><span class="glyphicon glyphicon-trash"></span> Clear Cache</button>
 </div>
 
+<form action="/admin/memcache" method="post" id="event_cache_clear">
+  <input name="memcache_key" value="{{cache_key}}" type="hidden" />
+  <input name="return_url" value="/admin/event/{{ event.key_name }}" type="hidden" />
+</form>
+
+{% if flushed %}
+<div class="row">
+  <p>Cleared cache keys {{ flushed }}</p>
+</div>
+{% endif %}
 <hr>
 
 <div class="row">
@@ -132,6 +140,18 @@
 </div>
 
 <div class="tab-pane" id="tasks">
+<div class="row">
+  <h2>Event Tasks</h2>
+  <div class="btn-group">
+    <a href="/tasks/math/do/eventteam_update/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-user"></span> Rebuild EventTeams</a>
+    <a href="/backend-tasks/get/event_details/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Event Info</a>
+    <a href="/tasks/get/fmsapi_matches/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Matches</a>
+    <a href="/tasks/get/fmsapi_event_alliances/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Alliances</a>
+    <a href="/tasks/get/fmsapi_event_rankings/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Rankings</a>
+    <a href="/tasks/get/fmsapi_event_awards/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Awards</a>
+    <a href="/backend-tasks/do/post_event_tasks/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-play"></span> Run Post-Event Tasks</a>
+  </div>
+</div>
 <div class="row">
 <h2>Remap Teams</h2>
 <p>Change all matches, awards and alliance selections for one team to another</p>
