@@ -53,5 +53,10 @@ def local_time(value, timezone_str):
 
 
 @register.filter
+def sort_by(values, prop):
+    return sorted(values, key=lambda item: getattr(item, prop))
+
+
+@register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)

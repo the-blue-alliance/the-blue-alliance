@@ -292,7 +292,7 @@
         <th>Alliances JSON</th>
         <th>Score Breakdown JSON</th>
     </thead>
-    {% for match in event.matches %}
+    {% for match in event.matches|sort_by:"play_order" %}
     <tr>
         <td><a href="/admin/match/{{match.key_name}}">{{ match.verbose_name }}</a></td>
         <td>{{ match.time|local_time:event.timezone_id}}</td>
