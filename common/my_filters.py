@@ -44,7 +44,7 @@ def yt_start(value):
 
 @register.filter
 def local_time(value, timezone_str):
-    if timezone_str:
+    if timezone_str and value:
         tz = timezone(timezone_str)
         local = pytz.utc.localize(value).astimezone(tz)
     else:
