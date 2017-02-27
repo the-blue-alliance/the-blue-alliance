@@ -1,7 +1,6 @@
 import datetime
 import time
 import pytz
-from pytz import timezone
 import numpy as np
 
 from helpers.match_manipulator import MatchManipulator
@@ -11,7 +10,14 @@ class MatchTimePredictionHelper(object):
 
     @classmethod
     def as_local(cls, time, timezone):
-        return pytz.utc.localize(datetime.datetime.utcfromtimestamp(time)).astimezone(timezone)
+        return pytz.utc.localize(time).astimezone(timezone)
+
+    @classmethod
+    def as_utc(cls, time):
+        if time.utcoffset():
+            return (time - time.utcoffset()).replace(tzinfo=None)
+        return time
+
 
     @classmethod
     def timestamp(cls, d):
@@ -30,7 +36,7 @@ class MatchTimePredictionHelper(object):
 
         # Sort matches by when they were actually played
         # This should account for out of order replays messing with the computations
-        played_matches.sort(lambda x: x.actual_time)
+        played_matches.sort(key=lambda x: x.actual_time)
 
         # Next match start time (in local time)
         next_match_start = cls.as_local(next_unplayed.time, timezone)
@@ -71,6 +77,10 @@ class MatchTimePredictionHelper(object):
         last_match = played_matches[-1] if played_matches else None
         next_match = unplayed_matches[0] if unplayed_matches else None
 
+        if not next_match:
+            # Nothing to predict
+            return
+
         last_match_day = cls.as_local(last_match.time, timezone).day if last_match else None
         average_cycle_time = cls.compute_average_cycle_time(played_matches, next_match, timezone)
         last = last_match
@@ -85,7 +95,7 @@ class MatchTimePredictionHelper(object):
 
             # For the first iteration, base the predictions off the newest known actual start time
             # Otherwise, use the predicted start time of the previously processed match
-            last_predicted = last_match.actual_time if i == 0 else last.predicted_time
+            last_predicted = cls.as_local(last_match.actual_time if i == 0 else last.predicted_time, timezone)
             if last_predicted and average_cycle_time:
                 predicted = last_predicted + datetime.timedelta(seconds=average_cycle_time)
             else:
@@ -93,8 +103,8 @@ class MatchTimePredictionHelper(object):
 
             # Never predict a match to happen more than 2 minutes ahead of schedule
             now = datetime.datetime.now(timezone)
-            earliest_possible = match.time + datetime.timedelta(minutes=-2)
-            match.predicted_time = max(predicted, earliest_possible, now)
+            earliest_possible = cls.as_local(match.time + datetime.timedelta(minutes=-2), timezone)
+            match.predicted_time = cls.as_utc(max(predicted, earliest_possible, now))
             last = match
 
         MatchManipulator.createOrUpdate(unplayed_matches)

@@ -628,6 +628,6 @@ class MatchTimePredictionsDo(webapp.RequestHandler):
             return
 
         timezone = pytz.timezone(event.timezone_id)
-        played_matches = MatchHelper.recentMatches(matches)
-        unplayed_matches = MatchHelper.upcomingMatches(matches)
+        played_matches = MatchHelper.recentMatches(matches, num=0)
+        unplayed_matches = MatchHelper.upcomingMatches(matches, num=10)
         MatchTimePredictionHelper.predict_future_matches(played_matches, unplayed_matches, timezone)

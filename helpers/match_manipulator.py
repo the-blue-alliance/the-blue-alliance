@@ -127,6 +127,7 @@ class MatchManipulator(ManipulatorBase):
             "time",
             "time_string",
             "actual_time",
+            "predicted_time",
             "push_sent",
         ]
 
