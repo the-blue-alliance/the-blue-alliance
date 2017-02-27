@@ -10,6 +10,7 @@ from models.sitevar import Sitevar
 
 class BlueZoneHelper(object):
 
+    TIME_PATTERN = "%Y-%m-%dT%H:%M:%S"
     MAX_TIME_PER_MATCH = datetime.timedelta(minutes=7)
     BUFFER_AFTER = datetime.timedelta(minutes=4)
 
@@ -31,7 +32,12 @@ class BlueZoneHelper(object):
         return predictions
 
     @classmethod
-    def should_add_match(cls, matches, candidate_match, current_match, predictions):
+    def should_add_match(cls, matches, candidate_match, current_match, predictions, current_timeout):
+        now = datetime.datetime.now()
+        if candidate_match.key_name == current_match.key_name and now > current_timeout:
+            # We've been on this match for too long, try something else
+            return None
+
         # If this match conflicts with the current match, don't bother trying
         if current_match and candidate_match.predicted_time <= current_match.predicted_time + cls.BUFFER_AFTER:
             return None
@@ -108,7 +114,9 @@ class BlueZoneHelper(object):
         cls.calculate_match_hotness(upcoming_matches, upcoming_predictions)
         upcoming_matches.sort(lambda x: -match.hotness)
 
-        # TODO don't get stuck on a single match if its event gets delayed
+        # After this time, do not include the current match
+        last_added = datetime.datetime.strptime(current_match_added_time, cls.TIME_PATTERN)
+        current_timeout = last_added + cls.MAX_TIME_PER_MATCH
 
         bluezone_matches = []
         now = datetime.datetime.now()
@@ -119,11 +127,11 @@ class BlueZoneHelper(object):
                 continue
 
             possible_index = cls.should_add_match(bluezone_matches, match, current_match,
-                                                  upcoming_predictions)
+                                                  upcoming_predictions, current_timeout)
             if possible_index is not None:
                 bluezone_matches.insert(possible_index, match)
 
-        if current_match.has_been_played and bluezone_matches:
+        if bluezone_matches and bluezone_matches[0].key_name != current_match_key:
             next_match = bluezone_matches[0]
             real_event = filter(lambda x: x.key_name == next_match.event_key_name, live_events)[0]
             if real_event.webcast:
@@ -133,7 +141,7 @@ class BlueZoneHelper(object):
                 FirebasePusher.update_event(fake_event)
                 bluezone_config.contents['current_webcast'] = real_event.webcast[0]
                 bluezone_config.contents['current_match'] = next_match.event_key_name
-                bluezone_config.contents['current_match_added'] = "{}".format(now)
+                bluezone_config.contents['current_match_added'] = now.strftime(cls.TIME_PATTERN)
                 bluezone_config.put()
 
                 # TODO log this change to Cloud Storage
