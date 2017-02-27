@@ -26,6 +26,7 @@
     <li><a href="#alliances" data-toggle="tab">Alliances</a></li>
     <li><a href="#awards" data-toggle="tab">Awards</a></li>
     <li><a href="#matches" data-toggle="tab">Matches</a></li>
+    <li><a href="#media" data-toggle="tab">Media</a></li>
   </ul>
 </div>
 </div>
@@ -314,5 +315,47 @@
 </div>
 </div>
 
+<div class="tab-pane" id="media">
+<div class="row">
+<h2>Event Media</h2>
+  {% for media in medias %}
+    <li>{% include "partials/admin_media_display.html" %}</li>
+  {% empty %}
+    <p>No media found</p>
+  {% endfor %}
+
+<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Confirm media reference removal
+            </div>
+            <div class="modal-body">
+                Are you sure you want to remove this reference to this media? References to other models will persist.
+            </div>
+            <div class="modal-footer">
+                <form id="delete_media_form" method="post">
+                <input name="reference_type" type="hidden" value="event" />
+                <input name="reference_key_name" type="hidden" value="{{event.key_name}}" />
+                <input name="originating_url" type="hidden" value="/admin/event/{{event.key_name}}" />
+
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-danger" type="submit"><span class="glyphicon glyphicon-delete"></span> Remove reference</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
+</div>
+</div>
+
+</div>
+
+<script>
+$(document).ready(function(){
+    $('#confirm-delete').on('show.bs.modal', function(e) {
+        $(this).find('#delete_media_form').attr('action', '/admin/media/delete_reference/' + $(e.relatedTarget).data('key-name'));
+    });
+});
+</script>
 {% endblock %}
