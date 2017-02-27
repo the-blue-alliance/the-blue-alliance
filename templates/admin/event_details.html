@@ -9,8 +9,12 @@
 <div class="btn-group">
     <a href="/admin/event/edit/{{event.key_name}}" class="btn btn-primary"><span class="glyphicon glyphicon-edit"></span> Edit</a>
     <a href="/event/{{event.key_name}}" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> View on TBA</a>
+    <button class="btn btn-danger" form="event_cache_clear"><span class="glyphicon glyphicon-trash"></span> Clear Cache</button>
 </div>
 
+<form action="/admin/memcache" method="post" id="event_cache_clear">
+  <input name="memcache_key" value="{{cache_key}}" type="hidden" />
+</form>
 <hr>
 
 <div class="row">

@@ -6,6 +6,7 @@ import os
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
+from controllers import event_controller
 from controllers.base_controller import LoggedInHandler
 from datafeeds.csv_alliance_selections_parser import CSVAllianceSelectionsParser
 from datafeeds.csv_teams_parser import CSVTeamsParser
@@ -19,7 +20,6 @@ from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.team_manipulator import TeamManipulator
 from helpers.match_manipulator import MatchManipulator
 from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
-from models.award import Award
 from models.district import District
 from models.event import Event
 from models.event_details import EventDetails
@@ -313,6 +313,7 @@ class AdminEventDetail(LoggedInHandler):
         self.template_values.update({
             "event": event,
             "medias": event_medias,
+            "cache_key": event_controller.EventDetail('2016nyny').cache_key.format(event.key_name),
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_details.html')
