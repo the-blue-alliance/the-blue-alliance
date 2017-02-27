@@ -14,7 +14,7 @@ class BlueZoneHelper(object):
     BUFFER_AFTER = datetime.timedelta(minutes=4)
 
     @classmethod
-    def get_upcoming_matches(cls, live_events, n=5):
+    def get_upcoming_matches(cls, live_events, n=1):
         matches = []
         for event in live_events:
             event_matches = event.matches
@@ -91,7 +91,7 @@ class BlueZoneHelper(object):
     def update_bluezone(cls, live_events):
         """
         Find the current best match to watch
-        1. Get the 5 matches to be played for each live event
+        1. Get the next match to be played for each live event
         2. Calculate "hotness" for each match and normalize among themselves
         3. Sort by hotness
         4.
@@ -112,7 +112,7 @@ class BlueZoneHelper(object):
 
         bluezone_matches = []
         now = datetime.datetime.now()
-        while len(bluezone_matches) < 6 and upcoming_matches:
+        while len(bluezone_matches) < 1 and upcoming_matches:
             match = upcoming_matches.pop(0)
             if match.predicted_time < now:
                 # No use switching to this match
