@@ -13,8 +13,26 @@
     <a href="/backend-tasks/get/event_details/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Refresh from FIRST</a>
     <a href="/backend-tasks/do/post_event_tasks/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-play"></span> Run Post-Event Tasks</a>
 </div>
-<br />
 
+<hr>
+
+<div class="row">
+<div class="col-sm-12">
+  <ul class="nav nav-tabs">
+    <li class="active"><a href="#info" data-toggle="tab">Info</a></li>
+    <li><a href="#tasks" data-toggle="tab">Tasks</a></li>
+    <li><a href="#webcasts" data-toggle="tab">Webcasts</a></li>
+    <li><a href="#rankings" data-toggle="tab">Rankings</a></li>
+    <li><a href="#alliances" data-toggle="tab">Alliances</a></li>
+    <li><a href="#awards" data-toggle="tab">Awards</a></li>
+    <li><a href="#matches" data-toggle="tab">Matches</a></li>
+  </ul>
+</div>
+</div>
+
+<div class="tab-content">
+<div class="tab-pane active" id="info">
+<div class="row">
 <table class="table table-striped table-hover">
     <tr>
         <td>Name</td>
@@ -109,6 +127,11 @@
         <td>{{ event.created }} - {{ event.updated }}</td>
     </tr>
 </table>
+</div>
+</div>
+
+<div class="tab-pane" id="tasks">
+<div class="row">
 <h2>Remap Teams</h2>
 <p>Change all matches, awards and alliance selections for one team to another</p>
 <p>Example:</p>
@@ -161,14 +184,23 @@
   <p>Outgoing team that was replaced: <input name="backup_out" placeholder="456"/></p>
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Backup Team</button>
 </form>
+</div>
+</div>
 
+<div class="tab-pane" id="webcasts">
+<div class="row">
 <h2>Add Webcast</h2>
+<p>Current webcast JSON: {{event.webcast_json}}</p>
 {% include "partials/webcast_add_instructions_partial.html" %}
 <form action="/admin/event/add_webcast/{{event.key_name}}" method="post">
     {% include "partials/webcast_add_form_partial.html" %}
     <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Add Webcast</button>
 </form>
+</div>
+</div>
 
+<div class="tab-pane" id="rankings">
+<div class="row">
 <h2>Rankings</h2>
 <table class="table table-striped table-condensed table-center">
   {% for row in event.rankings %}
@@ -183,9 +215,15 @@
         {% endfor %}
     {% endif %}
     </tr>
+  {% empty %}
+      <p>No ranking data yet</p>
   {% endfor %}
 </table>
+</div>
+</div>
 
+<div class="tab-pane" id="alliances">
+<div class="row">
 <h2>Alliances</h2>
 <table class="table table-striped table-condensed">
 {% for alliance in event.alliance_selections %}
@@ -195,9 +233,15 @@
             <td>{{ team }}{% if alliance.backup and alliance.backup.out == team %} ({{alliance.backup.in}}){% endif %}</td>
         {% endfor %}
     </tr>
+{% empty %}
+    <p>No alliance data yet</p>
 {% endfor %}
 </table>
+</div>
+</div>
 
+<div class="tab-pane" id="awards">
+<div class="row">
 <h2>Awards</h2>
 <table class="table table-striped table-condensed">
     <tbody>
@@ -232,7 +276,11 @@
       {% endfor %}
     </tbody>
   </table>
+</div>
+</div>
 
+<div class="tab-pane" id="matches">
+<div class="row">
 <h2>Match Listing</h2>
 
 <table class="table table-striped table-condensed table-center">
@@ -249,5 +297,8 @@
     </tr>
     {% endfor %}
 </table>
+</div>
+</div>
 
+</div>
 {% endblock %}
