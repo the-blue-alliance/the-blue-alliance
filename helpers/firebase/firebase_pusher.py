@@ -171,6 +171,12 @@ class FirebasePusher(object):
         for event in week_events:
             if event.now:
                 events_by_key[event.key.id()] = EventConverter.convert(event, 3)
+
+        # Add in the Fake TBA BlueZone event (watch for circular imports)
+        from helpers.bluezone_helper import BlueZoneHelper
+        bluezone_event = BlueZoneHelper.build_fake_event()
+        events_by_key[bluezone_event.key.id()] = bluezone_event
+
         live_events_json = json.dumps(events_by_key)
 
         deferred.defer(
@@ -183,6 +189,6 @@ class FirebasePusher(object):
     def update_event(cls, event):
         deferred.defer(
             cls._put_data,
-            'live_events',
-            {event.key_name: event},
+            'live_events/{}'.format(event.key_name),
+            json.dumps(event),
             _queue="firebase")
