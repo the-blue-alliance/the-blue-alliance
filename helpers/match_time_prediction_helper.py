@@ -1,7 +1,6 @@
 import datetime
 import time
 import pytz
-from pytz import timezone
 import numpy as np
 
 from helpers.match_manipulator import MatchManipulator
