@@ -1,7 +1,10 @@
 import json
+
+import datetime
 import numpy as np
 import re
 
+import time
 from google.appengine.ext import ndb
 
 from helpers.tbavideo_helper import TBAVideoHelper
@@ -252,11 +255,15 @@ class Match(ndb.Model):
     @property
     def prediction_error_str(self):
         if self.actual_time and self.predicted_time:
-            delta = self.actual_time - self.predicted_time
             if self.actual_time > self.predicted_time:
-                return "{} early".format(delta)
+                delta = self.actual_time - self.predicted_time
+                s = int(delta.total_seconds())
+                return '{:02}:{:02}:{:02} early'.format(s // 3600, s % 3600 // 60, s % 60)
             elif self.predicted_time > self.actual_time:
-                return "{} late".format(delta)
+                diff = time.mktime(self.actual_time.timetuple()) - time.mktime(self.predicted_time.timetuple())
+                delta = datetime.datetime.timedelta(seconds=diff)
+                s = delta.total_seconds()
+                return '{:02}:{:02}:{:02} late'.format(s // 3600, s % 3600 // 60, s % 60)
             else:
                 return "On Time"
 
