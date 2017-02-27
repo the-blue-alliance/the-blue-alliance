@@ -1,4 +1,7 @@
+import pytz
 from google.appengine.ext import webapp
+from pytz import timezone
+
 from helpers.youtube_video_helper import YouTubeVideoHelper
 import re
 
@@ -37,6 +40,16 @@ def yt_start(value):
         value = '%s?start=%i' % (video_id, total_seconds)
 
     return value
+
+
+@register.filter
+def local_time(value, timezone_str):
+    if timezone_str:
+        tz = timezone(timezone_str)
+        local = pytz.utc.localize(value).astimezone(tz)
+    else:
+        local = value
+    return local.strftime("%a %b %d %Y %H:%M:%S %Z") if local else ""
 
 
 @register.filter
