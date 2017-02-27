@@ -260,9 +260,8 @@ class Match(ndb.Model):
                 s = int(delta.total_seconds())
                 return '{:02}:{:02}:{:02} early'.format(s // 3600, s % 3600 // 60, s % 60)
             elif self.predicted_time > self.actual_time:
-                diff = time.mktime(self.actual_time.timetuple()) - time.mktime(self.predicted_time.timetuple())
-                delta = datetime.datetime.timedelta(seconds=diff)
-                s = delta.total_seconds()
+                delta = self.predicted_time - self.actual_time
+                s = int(delta.total_seconds())
                 return '{:02}:{:02}:{:02} late'.format(s // 3600, s % 3600 // 60, s % 60)
             else:
                 return "On Time"
@@ -270,11 +269,14 @@ class Match(ndb.Model):
     @property
     def schedule_error_str(self):
         if self.actual_time and self.time:
-            delta = self.actual_time - self.time
             if self.actual_time > self.time:
-                return "{} behind".format(delta)
+                delta = self.actual_time - self.time
+                s = int(delta.total_seconds())
+                return '{:02}:{:02}:{:02} behind'.format(s // 3600, s % 3600 // 60, s % 60)
             elif self.time > self.actual_time:
-                return "{} ahead".format(delta)
+                delta = self.time - self.actual_time
+                s = int(delta.total_seconds())
+                return '{:02}:{:02}:{:02} ahead'.format(s // 3600, s % 3600 // 60, s % 60)
             else:
                 return "On Time"
 
