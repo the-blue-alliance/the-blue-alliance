@@ -3,8 +3,10 @@
     <p class="navbar-text">Admin logged in as {{ user_bundle.account.display_name }}</p>
     <form class="navbar-form navbar-left" action="/admin/memcache" method="post">
       <input name="memcache_key" value="{{cache_key}}" type="hidden" />
+      <input name="return_url" value="{{return_url}}" type="hidden" />
       <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-trash"></span> Clear Page Cache</button>
     </form>
+    {% if flushed %}<p class="navbar-text">Cleared cache keys: {{ flushed }}</p>{% endif %}
     <button type="button" class="btn btn-default navbar-btn navbar-right" onclick="var c=document.getElementById('admin-bar');c.parentNode.removeChild(c);">
       <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
     </button>

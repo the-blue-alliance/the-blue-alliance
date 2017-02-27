@@ -14,7 +14,14 @@
 
 <form action="/admin/memcache" method="post" id="event_cache_clear">
   <input name="memcache_key" value="{{cache_key}}" type="hidden" />
+  <input name="return_url" value="/admin/event/{{ event.key_name }}" type="hidden" />
 </form>
+
+{% if flushed %}
+<div class="row">
+  <p>Cleared cache keys {{ flushed }}</p>
+</div>
+{% endif %}
 <hr>
 
 <div class="row">

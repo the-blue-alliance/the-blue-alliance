@@ -314,6 +314,7 @@ class AdminEventDetail(LoggedInHandler):
             "event": event,
             "medias": event_medias,
             "cache_key": event_controller.EventDetail('2016nyny').cache_key.format(event.key_name),
+            "flushed": self.request.get("flushed"),
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_details.html')

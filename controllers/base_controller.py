@@ -57,6 +57,8 @@ class CacheableHandler(webapp2.RequestHandler):
     def _add_admin_bar(self, html):
         if self._is_admin:
             self.template_values["cache_key"] = self.cache_key
+            self.template_values["return_url"] = self.request.path
+            self.template_values["flushed"] = self.request.get("flushed")
             self.template_values["user_bundle"] = self._user_bundle
             admin_bar = jinja2_engine.render('admin_bar.html', self.template_values)
             return html.replace('<!-- Admin Bar -->', admin_bar.encode('utf8'))
