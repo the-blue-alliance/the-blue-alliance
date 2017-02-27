@@ -38,6 +38,10 @@ class BlueZoneHelper(object):
             # We've been on this match for too long, try something else
             return None
 
+        if candidate_match.predicted_time > now + cls.MAX_TIME_PER_MATCH:
+            # If this match starts too far in the future, don't include it
+            return None
+
         # If this match conflicts with the current match, don't bother trying
         if current_match and candidate_match.predicted_time <= current_match.predicted_time + cls.BUFFER_AFTER:
             return None
