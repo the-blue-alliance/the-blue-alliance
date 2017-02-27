@@ -85,7 +85,7 @@ class Team(ndb.Model):
 
     @property
     def nl(self):
-        if self.normalized_location.country not in {'United States', 'Canada'}:
+        if self.normalized_location and self.normalized_location.country not in {'United States', 'Canada'}:
             return False
         return self.normalized_location
 
