@@ -83,7 +83,7 @@ const AppBar = (props) => {
           <ToolbarTitle text="GameDay" style={appBarTitleStyle} />
           <a style={appBarSubtitleStyle} href="/">by The Blue Alliance</a>
           <a style={vexProStyle} href="https://www.vexrobotics.com/vexpro/" >
-            <span style={{marginRight: '4px'}}>POWERED BY</span>
+            <span style={{ marginRight: '4px' }}>POWERED BY</span>
             <img
               src="/images/vexpro_horiz.png"
               alt="vexPRO"

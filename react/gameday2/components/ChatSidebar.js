@@ -53,6 +53,7 @@ class ChatSidebar extends React.Component {
       width: this.props.muiTheme.layout.chatPanelWidth,
       background: '#EFEEF1',
       display: this.props.enabled ? null : 'none',
+      zIndex: 1000,
     }
 
     const chatEmbedContainerStyle = {
