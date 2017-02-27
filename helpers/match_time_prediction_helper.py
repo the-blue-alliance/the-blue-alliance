@@ -8,6 +8,8 @@ from helpers.match_manipulator import MatchManipulator
 
 class MatchTimePredictionHelper(object):
 
+    EPOCH = datetime.datetime.fromtimestamp(0)
+
     @classmethod
     def as_local(cls, time, timezone):
         return pytz.utc.localize(time).astimezone(timezone)
@@ -17,7 +19,6 @@ class MatchTimePredictionHelper(object):
         if time.utcoffset():
             return (time - time.utcoffset()).replace(tzinfo=None)
         return time
-
 
     @classmethod
     def timestamp(cls, d):
@@ -70,7 +71,7 @@ class MatchTimePredictionHelper(object):
         return np.percentile(cycles, 30) if cycles else None
 
     @classmethod
-    def predict_future_matches(cls, played_matches, unplayed_matches, timezone):
+    def predict_future_matches(cls, played_matches, unplayed_matches, timezone, is_live):
         """
         Add match time predictions for future matches
         """
@@ -101,8 +102,10 @@ class MatchTimePredictionHelper(object):
             else:
                 predicted = match.time
 
-            # Never predict a match to happen more than 2 minutes ahead of schedule
-            now = datetime.datetime.now(timezone)
+            # Never predict a match to happen more than 2 minutes ahead of schedule or in the past
+            # However, if the event is not live (we're running the job manually for a single event),
+            # then allow predicted times to be in the past.
+            now = datetime.datetime.now(timezone) if is_live else cls.as_local(cls.EPOCH, timezone)
             earliest_possible = cls.as_local(match.time + datetime.timedelta(minutes=-2), timezone)
             match.predicted_time = cls.as_utc(max(predicted, earliest_possible, now))
             last = match
