@@ -1,7 +1,10 @@
 import json
+
+import datetime
 import numpy as np
 import re
 
+import time
 from google.appengine.ext import ndb
 
 from helpers.tbavideo_helper import TBAVideoHelper
@@ -248,6 +251,34 @@ class Match(ndb.Model):
             if tba_path is not None:
                 videos.append({"type": "tba", "key": tba_path})
         return videos
+
+    @property
+    def prediction_error_str(self):
+        if self.actual_time and self.predicted_time:
+            if self.actual_time > self.predicted_time:
+                delta = self.actual_time - self.predicted_time
+                s = int(delta.total_seconds())
+                return '{:02}:{:02}:{:02} early'.format(s // 3600, s % 3600 // 60, s % 60)
+            elif self.predicted_time > self.actual_time:
+                delta = self.predicted_time - self.actual_time
+                s = int(delta.total_seconds())
+                return '{:02}:{:02}:{:02} late'.format(s // 3600, s % 3600 // 60, s % 60)
+            else:
+                return "On Time"
+
+    @property
+    def schedule_error_str(self):
+        if self.actual_time and self.time:
+            if self.actual_time > self.time:
+                delta = self.actual_time - self.time
+                s = int(delta.total_seconds())
+                return '{:02}:{:02}:{:02} behind'.format(s // 3600, s % 3600 // 60, s % 60)
+            elif self.time > self.actual_time:
+                delta = self.time - self.actual_time
+                s = int(delta.total_seconds())
+                return '{:02}:{:02}:{:02} ahead'.format(s // 3600, s % 3600 // 60, s % 60)
+            else:
+                return "On Time"
 
     @classmethod
     def renderKeyName(self, event_key_name, comp_level, set_number, match_number):

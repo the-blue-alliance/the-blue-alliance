@@ -25,6 +25,7 @@ from models.event import Event
 from models.event_details import EventDetails
 from models.event_team import EventTeam
 from models.match import Match
+from models.media import Media
 from models.team import Team
 
 import tba_config
@@ -307,8 +308,11 @@ class AdminEventDetail(LoggedInHandler):
             self.abort(404)
         event.prepAwardsMatchesTeams()
 
+        event_medias = Media.query(Media.references == event.key).fetch(500)
+
         self.template_values.update({
-            "event": event
+            "event": event,
+            "medias": event_medias,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_details.html')
