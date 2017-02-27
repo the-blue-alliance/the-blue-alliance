@@ -74,5 +74,5 @@ cron:
   schedule: every 1 hours
 
 - description: Predict Match Times
-  url: /tasks/enqueue/predict_match_times
+  url: /tasks/math/enqueue/predict_match_times
   schedule: every 1 minutes
