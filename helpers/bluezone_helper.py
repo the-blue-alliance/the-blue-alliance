@@ -118,9 +118,12 @@ class BlueZoneHelper(object):
         """
         now = datetime.datetime.now()
         logging.info("[BLUEZONE] Current time: {}".format(now))
+        to_log = '--------------------------------------------------\n'
+        to_log += "[BLUEZONE] Current time: {}\n".format(now)
 
         bluezone_config = Sitevar.get_or_insert('bluezone')
         logging.info("[BLUEZONE] Config: {}".format(bluezone_config.contents))
+        to_log += "[BLUEZONE] Config: {}\n".format(bluezone_config.contents)
         current_match_key = bluezone_config.contents.get('current_match')
         current_match_added_time = bluezone_config.contents.get('current_match_added')
         if current_match_added_time:
@@ -147,39 +150,48 @@ class BlueZoneHelper(object):
                     potential_matches.append(match)
                 else:
                     break  # Matches are sorted by predicted_time
-        logging.info("[BLUEZONE] potential_matches: {}".format([pm.key.id() for pm in potential_matches]))
+        logging.info("[BLUEZONE] potential_matches sorted by predicted time: {}".format([pm.key.id() for pm in potential_matches]))
+        to_log += "[BLUEZONE] potential_matches sorted by predicted time: {}\n".format([pm.key.id() for pm in potential_matches])
 
         # (3) Choose hottest match that's not blacklisted
         cls.calculate_match_hotness(potential_matches, upcoming_predictions)
         potential_matches.sort(key=lambda match: -match.hotness)
         logging.info("[BLUEZONE] potential_matches sorted by hotness: {}".format([pm.key.id() for pm in potential_matches]))
+        to_log += "[BLUEZONE] potential_matches sorted by hotness: {}\n".format([pm.key.id() for pm in potential_matches])
 
         bluezone_match = None
         new_blacklisted_match_keys = set()
         for match in potential_matches:
             logging.info("[BLUEZONE] Trying potential match: {}".format(match.key.id()))
+            to_log += "[BLUEZONE] Trying potential match: {}\n".format(match.key.id())
             if match.key.id() not in blacklisted_match_keys:
                 if match.key.id() == current_match_key:
                     if current_match_added_time + cls.MAX_TIME_PER_MATCH < now:
                         # We've been on this match too long
                         new_blacklisted_match_keys.add(match.key.id())
                         logging.info("[BLUEZONE] Adding match to blacklist: {}".format(match.key.id()))
+                        to_log += "[BLUEZONE] Adding match to blacklist: {}\n".format(match.key.id())
                         logging.info("[BLUEZONE] added time: {}, now: {}".format(current_match_added_time, now))
+                        to_log += "[BLUEZONE] added time: {}, now: {}\n".format(current_match_added_time, now)
                     else:
                         # We can continue to use this match
                         bluezone_match = match
                         logging.info("[BLUEZONE] Continuing to use match: {}".format(match.key.id()))
+                        to_log += "[BLUEZONE] Continuing to use match: {}\n".format(match.key.id())
                 else:
                     # Found a new good match
                     bluezone_match = match
                     logging.info("[BLUEZONE] Found a good new match: {}".format(match.key.id()))
+                    to_log += "[BLUEZONE] Found a good new match: {}\n".format(match.key.id())
                     break
             else:
                 logging.info("[BLUEZONE] Match already blacklisted: {}".format(match.key.id()))
+                to_log += "[BLUEZONE] Match already blacklisted: {}\n".format(match.key.id())
                 new_blacklisted_match_keys.add(match.key.id())
 
         if not bluezone_match:
             logging.info("[BLUEZONE] No match selected")
+            to_log += "[BLUEZONE] No match selected\n"
 
         # (3) Switch to hottest match
         fake_event = cls.build_fake_event()
@@ -196,6 +208,9 @@ class BlueZoneHelper(object):
                 }
                 bluezone_config.put()
 
+                logging.info("[BLUEZONE] Switching to: {}".format(bluezone_match.key.id()))
+                to_log += "[BLUEZONE] Switching to: {}\n".format(bluezone_match.key.id())
+
                 # Log to cloudstorage
                 log_dir = '/tbatv-prod-hrd.appspot.com/tba-logging/'
                 log_file = 'bluezone_{}.txt'.format(now.date())
@@ -206,9 +221,7 @@ class BlueZoneHelper(object):
                         existing_contents = existing_file.read()
 
                 with cloudstorage.open(log_dir + log_file, 'w') as new_file:
-                    new_contents = '{}: Switching to {}\n'.format(now, bluezone_match.key.id())
-                    new_file.write(existing_contents + new_contents)
-                    logging.info("[BLUEZONE] logging: {}".format(new_contents))
+                    new_file.write(existing_contents + to_log)
 
         if bluezone_match:
             FirebasePusher.replace_event_matches('bluezone', [bluezone_match])
