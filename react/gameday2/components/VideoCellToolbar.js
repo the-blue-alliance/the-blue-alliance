@@ -55,6 +55,7 @@ const VideoCellToolbar = (props) => {
         key={match.key}
         match={match}
         hasFavorite={hasFavorite}
+        isBlueZone={props.isBlueZone}
       />
     )
   })
@@ -105,6 +106,7 @@ const VideoCellToolbar = (props) => {
 VideoCellToolbar.propTypes = {
   matches: PropTypes.arrayOf(PropTypes.object).isRequired,
   webcast: PropTypes.object.isRequired,
+  isBlueZone: PropTypes.bool.isRequired,
   /* eslint-disable react/no-unused-prop-types */
   onRequestOpenSwapPositionDialog: PropTypes.func.isRequired,
   onRequestOpenWebcastSelectionDialog: PropTypes.func.isRequired,

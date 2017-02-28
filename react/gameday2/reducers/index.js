@@ -1,7 +1,7 @@
 import Firebase from 'firebase'
 import Firedux from 'firedux'
 import { combineReducers } from 'redux'
-import webcastsById from './webcastsById'
+import { webcastsById, specialWebcastIds } from './webcastsById'
 import visibility from './visibility'
 import videoGrid from './videoGrid'
 import chats from './chats'
@@ -21,6 +21,7 @@ export const firedux = new Firedux({
 const gamedayReducer = combineReducers({
   firedux: firedux.reducer(),
   webcastsById,
+  specialWebcastIds,
   visibility,
   videoGrid,
   chats,

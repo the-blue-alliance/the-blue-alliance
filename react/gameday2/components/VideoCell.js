@@ -87,6 +87,7 @@ export default class VideoCell extends React.Component {
           <VideoCellToolbarContainer
             style={toolbarStyle}
             webcast={this.props.webcast}
+            isBlueZone={this.props.webcast.key === 'bluezone'}
             onRequestOpenWebcastSelectionDialog={() => this.onRequestOpenWebcastSelectionDialog()}
             onRequestOpenSwapPositionDialog={() => this.onRequestOpenSwapPositionDialog()}
           />
