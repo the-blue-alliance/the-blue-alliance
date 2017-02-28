@@ -1,3 +1,4 @@
+import cloudstorage
 import datetime
 import json
 import logging
@@ -186,7 +187,6 @@ class BlueZoneHelper(object):
             real_event = filter(lambda x: x.key_name == bluezone_match.event_key_name, live_events)[0]
             real_event_webcasts = real_event.current_webcasts
             if real_event_webcasts:
-                # TODO should handle multiple webcasts per event
                 fake_event.webcast_json = json.dumps([real_event_webcasts[0]])
                 FirebasePusher.update_event(fake_event)
                 bluezone_config.contents = {
@@ -196,7 +196,19 @@ class BlueZoneHelper(object):
                 }
                 bluezone_config.put()
 
-                # TODO log this change to Cloud Storage
+                # Log to cloudstorage
+                log_dir = '/tbatv-prod-hrd.appspot.com/tba-logging/'
+                log_file = 'bluezone_{}.txt'.format(now.date())
+
+                existing_contents = ''
+                if log_file in set(cloudstorage.listbucket(log_dir)):
+                    with cloudstorage.open(log_dir + log_file, 'r') as existing_file:
+                        existing_contents = existing_file.read()
+
+                with cloudstorage.open(log_dir + log_file, 'w') as new_file:
+                    new_contents = '{}: Switching to {}\n'.format(now, bluezone_match.key.id())
+                    new_file.write(existing_contents + new_contents)
+                    logging.info("[BLUEZONE] logging: {}".format(new_contents))
 
         if bluezone_match:
             FirebasePusher.replace_event_matches('bluezone', [bluezone_match])
