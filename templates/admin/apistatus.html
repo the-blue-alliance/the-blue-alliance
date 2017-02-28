@@ -22,8 +22,12 @@
 
 <h1>Trusted API Status</h1>
 <p>Here you can enable and disable the Trusted API</p>
-<p>Currently, the Trusted API is <strong>{% if enable_trustedapi %}enabled{% else %}disabled{% endif %}</strong>.</p>
-<p>Enable the trusted API: <input type="checkbox" name="enable_trustedapi" {% if enable_trustedapi %}checked{% endif %} /></p>
+<p>Enable the trusted API for Match Video: <input type="checkbox" name="enable_match_video" {% if enable_trustedapi.1 %}checked{% endif %} /></p>
+<p>Enable the trusted API for Event Teams: <input type="checkbox" name="enable_event_teams" {% if enable_trustedapi.2 %}checked{% endif %} /></p>
+<p>Enable the trusted API for Event Matches: <input type="checkbox" name="enable_event_matches" {% if enable_trustedapi.3 %}checked{% endif %} /></p>
+<p>Enable the trusted API for Event Rankings: <input type="checkbox" name="enable_event_rankings" {% if enable_trustedapi.4 %}checked{% endif %} /></p>
+<p>Enable the trusted API for Event Alliances: <input type="checkbox" name="enable_event_alliances" {% if enable_trustedapi.5 %}checked{% endif %} /></p>
+<p>Enable the trusted API for Event Awards: <input type="checkbox" name="enable_event_awards" {% if enable_trustedapi.6 %}checked{% endif %} /></p>
 
 <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-thumbs-up"></span> Update</button>
 

@@ -195,8 +195,10 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
             return "These keys expired on {}. Contact TBA admin to make changes".format(auth.expiration)
 
         status_sitevar = status_sitevar_future.get_result()
-        if status_sitevar and not status_sitevar.contents.get('enabled', True):  # Fail open
-            return "The trusted API has been temporarily disabled by the TBA admins. Please contact them for more details."
+        if status_sitevar:
+            for auth_type in self.REQUIRED_AUTH_TYPES:
+                if not status_sitevar.contents.get(auth_type, True):  # Fail open
+                    return "The trusted API has been temporarily disabled by the TBA admins. Please contact them for more details."
 
         return None
 
