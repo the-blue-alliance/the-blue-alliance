@@ -68,7 +68,10 @@ const TickerMatch = (props) => {
   let compLevel = match.comp_level.toUpperCase()
   compLevel = (compLevel === 'QM') ? 'Q' : compLevel
   const matchNumber = (compLevel === 'QF' || compLevel === 'SF' || compLevel === 'F') ? `${match.set_number}-${match.match_number}` : match.match_number
-  const matchLabel = `${compLevel}${matchNumber}`
+  let matchLabel = `${compLevel}${matchNumber}`
+  if (props.isBlueZone) {
+    matchLabel = `${match.event_key.substring(4).toUpperCase()} ${matchLabel}`
+  }
 
   let redScore = match.alliances.red.score
   let blueScore = match.alliances.blue.score
@@ -99,6 +102,7 @@ const TickerMatch = (props) => {
 TickerMatch.propTypes = {
   match: PropTypes.object,
   hasFavorite: PropTypes.bool,
+  isBlueZone: PropTypes.bool,
 }
 
 export default TickerMatch
