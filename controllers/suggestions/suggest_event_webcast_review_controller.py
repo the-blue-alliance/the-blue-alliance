@@ -27,6 +27,8 @@ class SuggestEventWebcastReviewController(SuggestionsReviewBaseController):
         webcast["channel"] = self.request.get("webcast_channel")
         if self.request.get("webcast_file"):
             webcast["file"] = self.request.get("webcast_file")
+        if self.request.get('webcast_date'):
+            webcast['date'] = self.request.get('webcast_date')
 
         event = Event.get_by_id(self.request.get("event_key"))
         # Defer because of transactions

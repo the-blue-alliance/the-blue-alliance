@@ -53,7 +53,7 @@
                             <input type="hidden" name="event_key" value="{{suggestion_set.event.key_name}}" />
                             <button type="submit" class="btn btn-xs btn-danger pull-right" name="verdict" value="reject_all"><span class="glyphicon glyphicon-thumbs-down"></span> Reject All</button>
                         </form>
-                        <h3 class="panel-title"><a href="/event/{{suggestion_set.event.key_name}}">{{suggestion_set.event.key_name}}</a></h3>
+                        <h3 class="panel-title"><a href="/event/{{suggestion_set.event.key_name}}">{{suggestion_set.event.name}} ({{suggestion_set.event.start_date|date:"M jS"}} - {{suggestion_set.event.end_date|date:"M jS"}})</a></h3>
                     </div>
                     <div class="panel-body">
                         <ul><strong>Existing Webcasts</strong>
@@ -89,6 +89,10 @@
                                                     <tr>
                                                         <td>File (RTMP and Livestream only)</td>
                                                         <td><input type="text" name="webcast_file" value="{{webcast.file}}" /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Date</td>
+                                                        <td><input type="text" name="webcast_date" value="{% if suggestion.contents.webcast_date%}{{suggestion.contents.webcast_date}}{% endif %}" /></td>
                                                     </tr>
                                                 </table>
                                                 {% endwith %}
