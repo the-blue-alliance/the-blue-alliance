@@ -17,7 +17,7 @@ from consts.event_type import EventType
 from database.district_query import DistrictsInYearQuery
 from database.event_query import DistrictEventsQuery
 from database.team_query import DistrictTeamsQuery
-
+from helpers.bluezone_helper import BlueZoneHelper
 from helpers.district_helper import DistrictHelper
 from helpers.district_manipulator import DistrictManipulator
 from helpers.event_helper import EventHelper
@@ -611,6 +611,7 @@ class MatchTimePredictionsEnqueue(webapp.RequestHandler):
         for event in live_events:
             taskqueue.add(url='/tasks/math/do/predict_match_times/{}'.format(event.key_name),
                           method='GET')
+        taskqueue.add(url='/tasks/do/bluezone_update', method='GET')
         self.response.out.write("Enqueued time prediction for {} events".format(len(live_events)))
 
 
@@ -631,3 +632,12 @@ class MatchTimePredictionsDo(webapp.RequestHandler):
         played_matches = MatchHelper.recentMatches(matches, num=0)
         unplayed_matches = MatchHelper.upcomingMatches(matches, num=10)
         MatchTimePredictionHelper.predict_future_matches(played_matches, unplayed_matches, timezone, event.within_a_day)
+
+
+class BlueZoneUpdateDo(webapp.RequestHandler):
+    """
+    Update the current "best match"
+    """
+    def get(self):
+        live_events = EventHelper.getEventsWithinADay()
+        BlueZoneHelper.update_bluezone(live_events)
