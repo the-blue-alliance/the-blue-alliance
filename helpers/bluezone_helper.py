@@ -148,9 +148,11 @@ class BlueZoneHelper(object):
                 # TODO should handle multiple webcasts per event
                 fake_event.webcast_json = json.dumps([real_event.webcast[0]])
                 FirebasePusher.update_event(fake_event)
-                bluezone_config.contents['current_webcast'] = real_event.webcast[0]
-                bluezone_config.contents['current_match'] = next_match.event_key_name
-                bluezone_config.contents['current_match_added'] = now.strftime(cls.TIME_PATTERN)
+                bluezone_config.contents = {
+                    'current_webcast': real_event.webcast[0],
+                    'current_match': next_match.event_key_name,
+                    'current_match_added': now.strftime(cls.TIME_PATTERN),
+                }
                 bluezone_config.put()
 
                 # TODO log this change to Cloud Storage
