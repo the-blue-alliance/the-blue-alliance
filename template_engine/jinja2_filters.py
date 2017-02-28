@@ -39,6 +39,12 @@ def floatformat(num, num_decimals):
     return "%.{}f".format(num_decimals) % num
 
 
+def limit_prob(prob):
+    prob *= 100
+    prob = min(95, max(prob, 5))
+    return int(round(prob))
+
+
 def strftime(datetime, formatstr):
     """
     Uses Python's strftime with some tweaks

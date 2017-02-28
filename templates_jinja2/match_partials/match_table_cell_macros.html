@@ -113,9 +113,9 @@
   {% endif %}
   <br>
   {% if match.year == 2016 %}
-  <em>{{(predictions.get(match.key.id()).get(alliance_color).prob_breach*100)|round|int}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_capture*100)|round|int}}%</em>
+  <em>{{(predictions.get(match.key.id()).get(alliance_color).prob_breach)|limit_prob}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_capture)|limit_prob}}%</em>
   {% elif match.year == 2017 %}
-  <em>{{(predictions.get(match.key.id()).get(alliance_color).prob_pressure*100)|round|int}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_gears*100)|round|int}}%</em>
+  <em>{{(predictions.get(match.key.id()).get(alliance_color).prob_pressure)|limit_prob}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_gears)|limit_prob}}%</em>
   {% endif %}
 </td>
 {% endmacro %}
@@ -123,8 +123,8 @@
 {% macro prob_td(match, predictions) %}
 <td rowspan="2">
   <div class="progress" style="margin: 0px;">
-    <div class="progress-bar {% if predictions.get(match.key.id()).prob < 0.65 %}progress-bar-danger{% elif predictions.get(match.key.id()).prob < 0.80 %}progress-bar-warning{% else %}progress-bar-success{% endif %}" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{(predictions.get(match.key.id()).prob*100)|round|int}}%;">
-      {{(predictions.get(match.key.id()).prob*100)|round|int}}%
+    <div class="progress-bar {% if predictions.get(match.key.id()).prob < 0.65 %}progress-bar-danger{% elif predictions.get(match.key.id()).prob < 0.80 %}progress-bar-warning{% else %}progress-bar-success{% endif %}" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{(predictions.get(match.key.id()).prob)|limit_prob}}%;">
+      {{(predictions.get(match.key.id()).prob)|limit_prob}}%
     </div>
   </div>
 </td>
