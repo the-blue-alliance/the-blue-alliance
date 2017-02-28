@@ -409,7 +409,7 @@ class Event(ndb.Model):
 
     @property
     def event_type_str(self):
-        return EventType.type_names[self.event_type_enum]
+        return EventType.type_names.get(self.event_type_enum)
 
     @property
     def display_name(self):

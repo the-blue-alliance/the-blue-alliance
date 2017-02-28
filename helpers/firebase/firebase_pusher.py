@@ -86,6 +86,21 @@ class FirebasePusher(object):
             _queue="firebase")
 
     @classmethod
+    def replace_event_matches(cls, event_key, matches):
+        """
+        Deletes matches from an event and puts these instead
+        """
+
+        match_data = {}
+        for match in matches:
+            match_data[match.key.id()] = filter_match_properties([MatchConverter.convert(match, 3)], 'simple')[0]
+        deferred.defer(
+            cls._put_data,
+            'events/{}/matches'.format(event_key),
+            json.dumps(match_data),
+            _queue="firebase")
+
+    @classmethod
     def update_match(cls, match):
         """
         Updates a match in an event and event/team
@@ -159,10 +174,24 @@ class FirebasePusher(object):
         for event in week_events:
             if event.now:
                 events_by_key[event.key.id()] = EventConverter.convert(event, 3)
+
+        # Add in the Fake TBA BlueZone event (watch for circular imports)
+        from helpers.bluezone_helper import BlueZoneHelper
+        bluezone_event = BlueZoneHelper.build_fake_event()
+        events_by_key[bluezone_event.key.id()] = EventConverter.convert(bluezone_event, 3)
+
         live_events_json = json.dumps(events_by_key)
 
         deferred.defer(
             cls._put_data,
             'live_events',
             live_events_json,
+            _queue="firebase")
+
+    @classmethod
+    def update_event(cls, event):
+        deferred.defer(
+            cls._put_data,
+            'live_events/{}'.format(event.key_name),
+            json.dumps(EventConverter.convert(event, 3)),
             _queue="firebase")
