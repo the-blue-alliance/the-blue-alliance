@@ -22,4 +22,8 @@
         <td>File (RTMP, Livestream and DaCast only)</td>
         <td><input type="text" name="webcast_file" value="" /></td>
     </tr>
+    <tr>
+        <td>Date</td>
+        <td><input type="text" name="webcast_date" value="{% if suggestion.contents.webcast_date%}{{suggestion.contents.webcast_date}}{% endif %}" /></td>
+    </tr>
 </table>
