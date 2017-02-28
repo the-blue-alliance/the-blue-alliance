@@ -76,3 +76,7 @@ cron:
 - description: Predict Match Times
   url: /tasks/math/enqueue/predict_match_times
   schedule: every 1 minutes
+
+- description: BlueZone Update
+  url: /tasks/do/bluezone_update
+  schedule: every 1 minutes

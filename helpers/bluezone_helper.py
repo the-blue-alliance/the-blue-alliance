@@ -93,7 +93,7 @@ class BlueZoneHelper(object):
     @classmethod
     def build_fake_event(cls):
         return Event(id='bluezone',
-                     name='TBA BlueZone',
+                     name='TBA BlueZone (BETA)',
                      event_short='bluezone',
                      year=datetime.datetime.now().year)
 
