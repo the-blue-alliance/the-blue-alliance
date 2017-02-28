@@ -174,6 +174,7 @@ class FirebasePusher(object):
         live_events = []
         for event in week_events:
             if event.now:
+                event._webcast = event.current_webcasts  # Only show current webcasts
                 events_by_key[event.key.id()] = EventConverter.convert(event, 3)
             if event.within_a_day:
                 live_events.append(event)

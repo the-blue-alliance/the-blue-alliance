@@ -336,6 +336,22 @@ class Event(ndb.Model):
         return self._webcast
 
     @property
+    def current_webcasts(self):
+        if not self.webcast or not self.within_a_day:
+            return []
+
+        # Filter by date
+        current_webcasts = []
+        for webcast in self.webcast:
+            if 'date' in webcast:
+                webcast_datetime = datetime.datetime.strptime(webcast['date'], "%Y-%m-%d")
+                if self.local_time().date() == webcast_datetime.date():
+                    current_webcasts.append(webcast)
+            else:
+                current_webcasts.append(webcast)
+        return current_webcasts
+
+    @property
     def key_name(self):
         """
         Returns the string of the key_name of the Event object before writing it.
