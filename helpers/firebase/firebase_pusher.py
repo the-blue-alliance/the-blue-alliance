@@ -90,11 +90,14 @@ class FirebasePusher(object):
         """
         Deletes matches from an event and puts these instead
         """
-        match_data_json = json.dumps(filter_match_properties([MatchConverter.convert(matches, 3)], 'simple')[0])
+
+        match_data = {}
+        for match in matches:
+            match_data[match.key.id()] = filter_match_properties([MatchConverter.convert(match, 3)], 'simple')[0]
         deferred.defer(
             cls._put_data,
-            'events/{}/matches',
-            match_data_json,
+            'events/{}/matches'.format(event_key),
+            json.dumps(match_data),
             _queue="firebase")
 
     @classmethod

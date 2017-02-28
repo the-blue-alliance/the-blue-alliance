@@ -34,7 +34,7 @@ class BlueZoneHelper(object):
     @classmethod
     def should_add_match(cls, matches, candidate_match, current_match, predictions, current_timeout):
         now = datetime.datetime.now()
-        if candidate_match.key_name == current_match.key_name and now > current_timeout:
+        if current_match and candidate_match.key_name == current_match.key_name and current_timeout is not None and now > current_timeout:
             # We've been on this match for too long, try something else
             return None
 
@@ -86,6 +86,8 @@ class BlueZoneHelper(object):
                 max_hotness = max(max_hotness, hotness)
                 min_hotness = min(min_hotness, hotness)
                 match.hotness = hotness
+            else:
+                match.hotness = 0
 
         for match in matches:
             match.hotness = 100 * (match.hotness - min_hotness) / (max_hotness - min_hotness)
@@ -116,17 +118,20 @@ class BlueZoneHelper(object):
         upcoming_predictions = cls.get_upcoming_match_predictions(live_events)
 
         cls.calculate_match_hotness(upcoming_matches, upcoming_predictions)
-        upcoming_matches.sort(lambda x: -match.hotness)
+        upcoming_matches.sort(key=lambda match: -match.hotness)
 
         # After this time, do not include the current match
-        last_added = datetime.datetime.strptime(current_match_added_time, cls.TIME_PATTERN)
-        current_timeout = last_added + cls.MAX_TIME_PER_MATCH
+        if current_match_added_time:
+            last_added = datetime.datetime.strptime(current_match_added_time, cls.TIME_PATTERN)
+            current_timeout = last_added + cls.MAX_TIME_PER_MATCH
+        else:
+            current_timeout = None
 
         bluezone_matches = []
         now = datetime.datetime.now()
         while len(bluezone_matches) < 1 and upcoming_matches:
             match = upcoming_matches.pop(0)
-            if match.predicted_time < now:
+            if not match.predicted_time or match.predicted_time < now:
                 # No use switching to this match
                 continue
 
