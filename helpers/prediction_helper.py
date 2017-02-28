@@ -80,7 +80,8 @@ class ContributionCalculator(object):
             for event in events:
                 if event.event_type_enum in EventType.SEASON_EVENT_TYPES and \
                         event.start_date < cur_event.start_date and \
-                        event.event_type_enum != EventType.CMP_FINALS:
+                        event.event_type_enum != EventType.CMP_FINALS and \
+                        event.details:
                     # event.details is backed by in-context cache
                     predictions = event.details.predictions
                     if predictions and 'stat_mean_vars' in predictions:
