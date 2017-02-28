@@ -27,6 +27,12 @@
         <h4>Oops!</h4>
         <p>You have submitted an invalid webcast url. Please submit a valid (with no spaces), non Blue Alliance web address. Thanks!</p>
       </div>
+      {% elif status == 'invalid_date' %}
+      <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Oops!</h4>
+        <p>You have submitted an invalid webcast date. Please submit a valid date in the format YYYY-MM-DD or leave the field blank. Thanks!</p>
+      </div>
       {% elif status == 'webcast_exists' %}
       <div class="alert alert-info">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -70,12 +76,15 @@
           <p>Find a webcast for {{event.name}} and paste it below so we can add it to the site :)</p>
           <form action="/suggest/event/webcast" method="post" id="suggest_webcast">
             <input name="event_key" type="hidden" value="{{event.key.id()}}" />
-            <div class="input-group">
+            <div class="form-group">
+              <label>Webcast Link</label>
               <input class="form-control" type="text" name="webcast_url" placeholder="like http://www.ustream.tv/nasa" value="" />
-              <span class="input-group-btn">
-                <button class="btn btn-success" type="submit"><span class="glyphicon glyphicon-plus-sign"></span> Add Webcast</button>
-              </span>
             </div>
+            <div class="form-group">
+              <label>Webcast Date (Only if the link only applies to one day of the event)</label>
+              <input class="form-control" type="text" name="webcast_date" placeholder="like 2017-02-28 or leave blank" value="" />
+            </div>
+            <button class="btn btn-success" type="submit"><span class="glyphicon glyphicon-plus-sign"></span> Add Webcast</button>
           </form>
         </div>
       </div>

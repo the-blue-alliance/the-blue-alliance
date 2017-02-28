@@ -32,6 +32,7 @@ class SuggestEventWebcastController(LoggedInHandler):
 
         event_key = self.request.get("event_key")
         webcast_url = self.request.get("webcast_url")
+        webcast_date = self.request.get("webcast_date")
 
         if not webcast_url:
             self.redirect('/suggest/event/webcast?event_key={}&status=blank_webcast'.format(event_key), abort=True)
@@ -47,6 +48,7 @@ class SuggestEventWebcastController(LoggedInHandler):
         status = SuggestionCreator.createEventWebcastSuggestion(
             author_account_key=self.user_bundle.account.key,
             webcast_url=self.request.get("webcast_url"),
+            webcast_date=self.request.get("webcast_date"),
             event_key=event_key)
 
         self.redirect('/suggest/event/webcast?event_key={}&status={}'.format(event_key, status))
