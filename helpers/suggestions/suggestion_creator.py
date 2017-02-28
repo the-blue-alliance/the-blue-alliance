@@ -99,12 +99,21 @@ class SuggestionCreator(object):
             return 'bad_url', None
 
     @classmethod
-    def createEventWebcastSuggestion(cls, author_account_key, webcast_url, event_key):
+    def createEventWebcastSuggestion(cls, author_account_key, webcast_url, webcast_date, event_key):
         """Create a Event Webcast Suggestion. Returns status string"""
 
         webcast_url = webcast_url.strip()
         if not webcast_url.startswith('http://') and not webcast_url.startswith('https://'):
             webcast_url = 'http://' + webcast_url
+
+        webcast_date = webcast_date.strip()
+        if webcast_date:
+            try:
+                datetime.strptime(webcast_date, "%Y-%m-%d")
+            except ValueError:
+                return 'invalid_date'
+        else:
+            webcast_date = None
 
         try:
             webcast_dict = WebcastParser.webcast_dict_from_url(webcast_url)
@@ -130,13 +139,13 @@ class SuggestionCreator(object):
                         target_model="event",
                         target_key=event_key,
                         )
-                    suggestion.contents = {"webcast_dict": webcast_dict, "webcast_url": webcast_url}
+                    suggestion.contents = {"webcast_dict": webcast_dict, "webcast_url": webcast_url, "webcast_date": webcast_date}
                     suggestion.put()
                     return 'success'
                 else:
                     return 'suggestion_exists'
         else:  # Can't parse URL -- could be an obscure webcast. Save URL and let a human deal with it.
-            contents = {"webcast_url": webcast_url}
+            contents = {"webcast_url": webcast_url, "webcast_date": webcast_date}
 
             # Check if suggestion exists
             existing_suggestions = Suggestion.query(Suggestion.target_model=='event', Suggestion.target_key==event_key).fetch()

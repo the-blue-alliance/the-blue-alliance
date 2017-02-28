@@ -475,6 +475,7 @@ class TestSuggestEventWebcastCreator(unittest2.TestCase):
         status = SuggestionCreator.createEventWebcastSuggestion(
             self.account.key,
             "http://twitch.tv/frcgamesense",
+            "",
             "2016test")
         self.assertEqual(status, 'bad_event')
 
@@ -485,6 +486,7 @@ class TestSuggestEventWebcastCreator(unittest2.TestCase):
         status = SuggestionCreator.createEventWebcastSuggestion(
             self.account.key,
             "http://twitch.tv/frcgamesense",
+            "",
             "2016test")
         self.assertEqual(status, 'success')
 
@@ -507,6 +509,7 @@ class TestSuggestEventWebcastCreator(unittest2.TestCase):
         status = SuggestionCreator.createEventWebcastSuggestion(
             self.account.key,
             "twitch.tv/frcgamesense",
+            "",
             "2016test")
         self.assertEqual(status, 'success')
         expected_key = "webcast_2016test_twitch_frcgamesense_None"
@@ -524,6 +527,7 @@ class TestSuggestEventWebcastCreator(unittest2.TestCase):
         status = SuggestionCreator.createEventWebcastSuggestion(
             self.account.key,
             "http://myweb.site/somewebcast",
+            "",
             "2016test")
         self.assertEqual(status, 'success')
         suggestions = Suggestion.query().fetch()
@@ -546,6 +550,7 @@ class TestSuggestEventWebcastCreator(unittest2.TestCase):
         status = SuggestionCreator.createEventWebcastSuggestion(
             self.account.key,
             "http://twitch.tv/frcgamesense",
+            "",
             "2016test")
         self.assertEqual(status, 'webcast_exists')
 
@@ -556,11 +561,13 @@ class TestSuggestEventWebcastCreator(unittest2.TestCase):
         status = SuggestionCreator.createEventWebcastSuggestion(
             self.account.key,
             "http://twitch.tv/frcgamesense",
+            "",
             "2016test")
         self.assertEqual(status, 'success')
         status = SuggestionCreator.createEventWebcastSuggestion(
             self.account.key,
             "http://twitch.tv/frcgamesense",
+            "",
             "2016test")
         self.assertEqual(status, 'suggestion_exists')
 
@@ -571,13 +578,54 @@ class TestSuggestEventWebcastCreator(unittest2.TestCase):
         status = SuggestionCreator.createEventWebcastSuggestion(
             self.account.key,
             "http://myweb.site/somewebcast",
+            "",
             "2016test")
         self.assertEqual(status, 'success')
         status = SuggestionCreator.createEventWebcastSuggestion(
             self.account.key,
             "http://myweb.site/somewebcast",
+            "",
             "2016test")
         self.assertEqual(status, 'suggestion_exists')
+
+    def testWebcastBadDate(self):
+        event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016,
+                      event_type_enum=EventType.OFFSEASON,
+                      webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]")
+        event.put()
+
+        status = SuggestionCreator.createEventWebcastSuggestion(
+            self.account.key,
+            "http://twitch.tv/frcgamesense",
+            "BAD DATE",
+            "2016test")
+        self.assertEqual(status, 'invalid_date')
+
+    def testWebcastGoodDate(self):
+        event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
+        event.put()
+
+        status = SuggestionCreator.createEventWebcastSuggestion(
+            self.account.key,
+            "http://twitch.tv/frcgamesense",
+            "2017-02-28",
+            "2016test")
+
+        self.assertEqual(status, 'success')
+        suggestions = Suggestion.query().fetch()
+        self.assertIsNotNone(suggestions)
+        self.assertEqual(len(suggestions), 1)
+
+        suggestion = suggestions[0]
+
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.target_key, "2016test")
+        self.assertEqual(suggestion.author, self.account.key)
+        self.assertEqual(suggestion.review_state, Suggestion.REVIEW_PENDING)
+        self.assertIsNotNone(suggestion.contents)
+        self.assertEqual(suggestion.contents.get('webcast_url'), "http://twitch.tv/frcgamesense")
+        self.assertIsNotNone(suggestion.contents.get('webcast_dict'))
+        self.assertEqual(suggestion.contents.get('webcast_date'), "2017-02-28")
 
 
 class TestSuggestMatchVideoYouTube(unittest2.TestCase):

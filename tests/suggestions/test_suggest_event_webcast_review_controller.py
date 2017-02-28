@@ -43,6 +43,7 @@ class TestSuggestApiWriteController(unittest2.TestCase):
     def createSuggestion(self):
         status = SuggestionCreator.createEventWebcastSuggestion(self.account.key,
                                                                 'https://twitch.tv/frcgamesense',
+                                                                '',
                                                                 '2016necmp')
         self.assertEqual(status, 'success')
         return 'webcast_2016necmp_twitch_frcgamesense_None'

@@ -145,12 +145,13 @@ class BlueZoneHelper(object):
         if bluezone_matches and bluezone_matches[0].key_name != current_match_key:
             next_match = bluezone_matches[0]
             real_event = filter(lambda x: x.key_name == next_match.event_key_name, live_events)[0]
-            if real_event.webcast:
+            real_event_webcasts = real_event.current_webcasts
+            if real_event_webcasts:
                 # TODO should handle multiple webcasts per event
-                fake_event.webcast_json = json.dumps([real_event.webcast[0]])
+                fake_event.webcast_json = json.dumps([real_event_webcasts[0]])
                 FirebasePusher.update_event(fake_event)
                 bluezone_config.contents = {
-                    'current_webcast': real_event.webcast[0],
+                    'current_webcast': real_event_webcasts[0],
                     'current_match': next_match.event_key_name,
                     'current_match_added': now.strftime(cls.TIME_PATTERN),
                 }
