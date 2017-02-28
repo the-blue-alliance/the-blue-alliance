@@ -97,7 +97,8 @@ class BlueZoneHelper(object):
         return Event(id='bluezone',
                      name='TBA BlueZone (BETA)',
                      event_short='bluezone',
-                     year=datetime.datetime.now().year)
+                     year=datetime.datetime.now().year,
+                     webcast_json=json.dumps([{'type': 'twitch', 'channel': 'firstinspires'}]))  # Default to this webcast
 
     @classmethod
     def update_bluezone(cls, live_events):
@@ -140,11 +141,11 @@ class BlueZoneHelper(object):
             if possible_index is not None:
                 bluezone_matches.insert(possible_index, match)
 
+        fake_event = cls.build_fake_event()
         if bluezone_matches and bluezone_matches[0].key_name != current_match_key:
             next_match = bluezone_matches[0]
             real_event = filter(lambda x: x.key_name == next_match.event_key_name, live_events)[0]
             if real_event.webcast:
-                fake_event = cls.build_fake_event()
                 # TODO should handle multiple webcasts per event
                 fake_event.webcast_json = json.dumps([real_event.webcast[0]])
                 FirebasePusher.update_event(fake_event)
@@ -159,3 +160,5 @@ class BlueZoneHelper(object):
 
         if bluezone_matches:
             FirebasePusher.replace_event_matches('bluezone', bluezone_matches)
+
+        return fake_event

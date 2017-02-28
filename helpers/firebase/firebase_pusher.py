@@ -171,14 +171,18 @@ class FirebasePusher(object):
         """
         week_events = EventHelper.getWeekEvents()
         events_by_key = {}
+        live_events = []
         for event in week_events:
             if event.now:
                 events_by_key[event.key.id()] = EventConverter.convert(event, 3)
+            if event.within_a_day:
+                live_events.append(event)
 
         # Add in the Fake TBA BlueZone event (watch for circular imports)
         from helpers.bluezone_helper import BlueZoneHelper
-        bluezone_event = BlueZoneHelper.build_fake_event()
-        events_by_key[bluezone_event.key.id()] = EventConverter.convert(bluezone_event, 3)
+        bluezone_event = BlueZoneHelper.update_bluezone(live_events)
+        if bluezone_event:
+            events_by_key[bluezone_event.key.id()] = EventConverter.convert(bluezone_event, 3)
 
         live_events_json = json.dumps(events_by_key)
 
