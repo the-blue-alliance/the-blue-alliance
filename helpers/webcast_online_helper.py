@@ -10,11 +10,10 @@ from models.sitevar import Sitevar
 class WebcastOnlineHelper(object):
     @classmethod
     @ndb.tasklet
-    def add_online_status_async(cls, event):
-        for webcast in event.webcast:
-            webcast['status'] = 'unknown'
-            if webcast['type'] == 'twitch':
-                cls._add_twitch_status_async(webcast)
+    def add_online_status_async(cls, webcast):
+        webcast['status'] = 'unknown'
+        if webcast['type'] == 'twitch':
+            cls._add_twitch_status_async(webcast)
 
     @classmethod
     @ndb.tasklet
