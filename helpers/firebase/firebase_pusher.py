@@ -11,6 +11,7 @@ from database.dict_converters.match_converter import MatchConverter
 from database.dict_converters.event_converter import EventConverter
 from database.dict_converters.event_details_converter import EventDetailsConverter
 from helpers.event_helper import EventHelper
+from helpers.webcast_online_helper import WebcastOnlineHelper
 from models.sitevar import Sitevar
 
 
@@ -175,6 +176,7 @@ class FirebasePusher(object):
         for event in week_events:
             if event.now:
                 event._webcast = event.current_webcasts  # Only show current webcasts
+                WebcastOnlineHelper.add_online_status(event)
                 events_by_key[event.key.id()] = EventConverter.convert(event, 3)
             if event.within_a_day:
                 live_events.append(event)
@@ -183,6 +185,7 @@ class FirebasePusher(object):
         from helpers.bluezone_helper import BlueZoneHelper
         bluezone_event = BlueZoneHelper.update_bluezone(live_events)
         if bluezone_event:
+            WebcastOnlineHelper.add_online_status(bluezone_event)
             events_by_key[bluezone_event.key.id()] = EventConverter.convert(bluezone_event, 3)
 
         live_events_json = json.dumps(events_by_key)

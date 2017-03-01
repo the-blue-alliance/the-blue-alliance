@@ -29,7 +29,7 @@ if DEBUG:
         "database_query_cache": False,
         "response_cache": False,
         "firebase-url": "https://thebluealliance-dev.firebaseio.com/{}.json?auth={}",
-        "firebase-push": False,
+        "firebase-push": True,
         "use-compiled-templates": False,
         "save-frc-api-response": False,
     }
