@@ -223,7 +223,9 @@ class TestApiTrustedController(unittest2.TestCase):
         # Now, set the disable sitevar
         trusted_sitevar = Sitevar(
             id='trustedapi',
-            values_json='{"enabled": false}'
+            values_json=json.dumps({
+                3: False,
+            })
         )
         trusted_sitevar.put()
 

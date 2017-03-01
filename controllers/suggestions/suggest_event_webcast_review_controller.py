@@ -76,6 +76,7 @@ class SuggestEventWebcastReviewController(SuggestionsReviewBaseController):
 
         elif self.request.get("verdict") == "reject":
             suggestion_key = self.request.get("suggestion_key")
+            suggestion_key = int(suggestion_key) if suggestion_key.isdigit() else suggestion_key
             self._process_rejected(suggestion_key)
             self.redirect("/suggest/event/webcast/review?success=reject")
             return
