@@ -3,7 +3,7 @@ import { webcastPropType } from '../utils/webcastUtils'
 
 const EmbedUstream = (props) => {
   const channel = props.webcast.channel
-  const src = `http://www.ustream.tv/embed/${channel}?html5ui=1`
+  const src = `https://www.ustream.tv/embed/${channel}?html5ui=1`
   return (
     <iframe
       width="100%"
