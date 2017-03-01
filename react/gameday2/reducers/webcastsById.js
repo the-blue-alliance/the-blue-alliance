@@ -42,6 +42,7 @@ const getWebcastsFromRawWebcasts = (webcasts) => {
           name,
           type: webcast.type,
           channel: webcast.channel,
+          status: webcast.status,
         }
       })
     })
