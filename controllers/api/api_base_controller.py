@@ -197,7 +197,7 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
         status_sitevar = status_sitevar_future.get_result()
         if status_sitevar:
             for auth_type in self.REQUIRED_AUTH_TYPES:
-                if not status_sitevar.contents.get(auth_type, True):  # Fail open
+                if not status_sitevar.contents.get(str(auth_type), True):  # Fail open
                     return "The trusted API has been temporarily disabled by the TBA admins. Please contact them for more details."
 
         return None
