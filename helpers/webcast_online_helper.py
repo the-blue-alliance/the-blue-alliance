@@ -17,6 +17,8 @@ class WebcastOnlineHelper(object):
             cls._add_twitch_status_async(webcast)
         elif webcast['type'] == 'ustream':
             cls._add_ustream_status_async(webcast)
+        elif webcast['type'] == 'youtube':
+            cls._add_youtube_status_async(webcast)
 
     @classmethod
     @ndb.tasklet
@@ -70,6 +72,38 @@ class WebcastOnlineHelper(object):
                 webcast['status'] = 'offline'
         else:
             logging.warning("Ustream status failed with code: {}".format(result.status_code))
+            logging.warning(result.content)
+
+        raise ndb.Return(None)
+
+    @classmethod
+    @ndb.tasklet
+    def _add_youtube_status_async(cls, webcast):
+        google_secrets = Sitevar.get_or_insert('google.secrets')
+        api_key = None
+        if google_secrets and google_secrets.contents:
+            api_key = google_secrets.contents.get('api_key')
+        if api_key:
+            try:
+                url = 'https://www.googleapis.com/youtube/v3/videos?part=snippet&id={}&key={}'.format(webcast['channel'], api_key)
+                rpc = urlfetch.create_rpc()
+                result = yield urlfetch.make_fetch_call(rpc, url)
+            except Exception, e:
+                logging.error("URLFetch failed for: {}".format(url))
+                raise ndb.Return(None)
+        else:
+            logging.warning("Must have Google API key")
+            raise ndb.Return(None)
+
+        if result.status_code == 200:
+            response = json.loads(result.content)
+            if response['items']:
+                webcast['status'] = 'online' if response['items'][0]['snippet']['liveBroadcastContent'] == 'live' else 'offline'
+                webcast['stream_title'] = response['items'][0]['snippet']['title']
+            else:
+                webcast['status'] = 'offline'
+        else:
+            logging.warning("YouTube status failed with code: {}".format(result.status_code))
             logging.warning(result.content)
 
         raise ndb.Return(None)
