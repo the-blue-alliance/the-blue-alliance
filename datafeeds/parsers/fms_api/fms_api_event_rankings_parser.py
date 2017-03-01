@@ -9,6 +9,7 @@ class FMSAPIEventRankingsParser(object):
         parsers = {
             2015: self.parse2015,
             2016: self.parse2016,
+            2017: self.parse2017,
         }
         if self.year not in parsers:
             return None
@@ -44,6 +45,24 @@ class FMSAPIEventRankingsParser(object):
                 team['sortOrder3'],
                 team['sortOrder4'],
                 team['sortOrder5'],
+                '{}-{}-{}'.format(team['wins'], team['losses'], team['ties']),
+                team['matchesPlayed']])
+
+        return rankings if len(rankings) > 1 else None
+
+    def parse2017(self, response):
+        rankings = [['Rank', 'Team', 'Ranking Score', 'Match Points', 'Auto', 'Rotor', 'Touchpad', 'Pressure', 'Record (W-L-T)', 'Played']]
+
+        for team in response['Rankings']:
+            rankings.append([
+                team['rank'],
+                team['teamNumber'],
+                team['sortOrder1'],
+                team['sortOrder2'],
+                team['sortOrder3'],
+                team['sortOrder4'],
+                team['sortOrder5'],
+                team['sortOrder6'],
                 '{}-{}-{}'.format(team['wins'], team['losses'], team['ties']),
                 team['matchesPlayed']])
 
