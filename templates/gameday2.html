@@ -3,8 +3,9 @@
 {% block title %}GameDay - The Blue Alliance{% endblock %}
 
 {% block main_style %}
-    <link rel="stylesheet" href="/css/gameday2.min.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+  <link rel="stylesheet" href="/css/gameday2.min.css" type="text/css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+  <link href="http://vjs.zencdn.net/5.8.8/video-js.css" rel="stylesheet">
 {% endblock %}
 {% block font_awesome_css %}{% endblock %}
 {% block featherlight_css %}{% endblock %}
@@ -24,7 +25,7 @@
 
 {% block content %}
   <div id="content"></div>
-  <div style="display: none;" id="webcasts_json">{{ webcasts_json|safe }}</div>
+  <div style="display: none;" id="webcasts_json">{{ webcasts_json }}</div>
 {% endblock %}
 
 {% block admin_bar %}{% endblock %}
@@ -34,7 +35,9 @@
 {% block login_modal %}{% endblock %}
 
 {% block main_javascript %}
-    <script type="text/javascript" src="javascript/gameday2.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/5.10.2/video.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/3.0.2/videojs-contrib-hls.js"></script>
+  <script type="text/javascript" src="javascript/gameday2.min.js"></script>
 {% endblock %}
 
 {% block ganalytics_timer %}

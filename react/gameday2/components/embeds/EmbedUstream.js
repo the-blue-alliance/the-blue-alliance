@@ -1,5 +1,5 @@
 import React from 'react'
-import { webcastPropType } from '../utils/webcastUtils'
+import { webcastPropType } from '../../utils/webcastUtils'
 
 const EmbedUstream = (props) => {
   const channel = props.webcast.channel
