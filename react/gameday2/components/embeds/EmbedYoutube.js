@@ -1,5 +1,5 @@
 import React from 'react'
-import { webcastPropType } from '../utils/webcastUtils'
+import { webcastPropType } from '../../utils/webcastUtils'
 
 const EmbedYoutube = (props) => {
   const src = `//www.youtube.com/embed/${props.webcast.channel}`
