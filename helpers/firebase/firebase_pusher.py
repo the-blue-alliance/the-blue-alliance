@@ -4,6 +4,7 @@ import logging
 import tba_config
 
 from google.appengine.ext import deferred
+from google.appengine.ext import ndb
 from google.appengine.api import urlfetch
 
 from controllers.apiv3.model_properties import filter_match_properties
@@ -11,6 +12,7 @@ from database.dict_converters.match_converter import MatchConverter
 from database.dict_converters.event_converter import EventConverter
 from database.dict_converters.event_details_converter import EventDetailsConverter
 from helpers.event_helper import EventHelper
+from helpers.webcast_online_helper import WebcastOnlineHelper
 from models.sitevar import Sitevar
 
 
@@ -169,12 +171,22 @@ class FirebasePusher(object):
         """
         Updates live_events
         """
+        deferred.defer(
+            cls._put_data,
+            'live_events',
+            cls._update_live_events_helper(),
+            _queue="firebase")
+
+    @classmethod
+    @ndb.toplevel
+    def _update_live_events_helper(cls):
         week_events = EventHelper.getWeekEvents()
         events_by_key = {}
         live_events = []
         for event in week_events:
             if event.now:
                 event._webcast = event.current_webcasts  # Only show current webcasts
+                WebcastOnlineHelper.add_online_status_async(event)
                 events_by_key[event.key.id()] = EventConverter.convert(event, 3)
             if event.within_a_day:
                 live_events.append(event)
@@ -183,15 +195,10 @@ class FirebasePusher(object):
         from helpers.bluezone_helper import BlueZoneHelper
         bluezone_event = BlueZoneHelper.update_bluezone(live_events)
         if bluezone_event:
+            WebcastOnlineHelper.add_online_status_async(bluezone_event)
             events_by_key[bluezone_event.key.id()] = EventConverter.convert(bluezone_event, 3)
 
-        live_events_json = json.dumps(events_by_key)
-
-        deferred.defer(
-            cls._put_data,
-            'live_events',
-            live_events_json,
-            _queue="firebase")
+        return json.dumps(events_by_key)
 
     @classmethod
     def update_event(cls, event):
