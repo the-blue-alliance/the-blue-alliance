@@ -90,7 +90,6 @@ store.subscribe(() => {
 // Load any special webcasts
 store.dispatch(setWebcastsRaw(webcastData))
 
-
 // Restore layout from URL hash.
 const params = queryString.parse(location.hash)
 if (params.layout && Number.isInteger(Number.parseInt(params.layout, 10))) {
@@ -101,10 +100,26 @@ if (params.chat) {
   store.dispatch(setTwitchChat(params.chat))
 }
 
+// Used to store webcast state. Hacky. 2017-03-01 -fangeugene
+// ongoing_events_w_webcasts and special_webcasts should be separate
+let specialWebcasts = webcastData.special_webcasts
+let ongoingEventsWithWebcasts = []
+
+// Subscribe to updates to special webcasts
+firedux.ref.child('special_webcasts').on('value', (snapshot) => {
+  specialWebcasts = snapshot.val()
+
+  const webcasts = {
+    ongoing_events_w_webcasts: ongoingEventsWithWebcasts,
+    special_webcasts: specialWebcasts,
+  }
+  store.dispatch(setWebcastsRaw(webcasts))
+})
+
 // Subscribe to live events for webcasts
 let isLoad = true
 firedux.ref.child('live_events').on('value', (snapshot) => {
-  const ongoingEventsWithWebcasts = []
+  ongoingEventsWithWebcasts = []
   const liveEvents = snapshot.val()
   if (liveEvents != null) {
     Object.values(liveEvents).forEach((event) => {
@@ -115,9 +130,8 @@ firedux.ref.child('live_events').on('value', (snapshot) => {
 
     const webcasts = {
       ongoing_events_w_webcasts: ongoingEventsWithWebcasts,
-      special_webcasts: webcastData.special_webcasts,
+      special_webcasts: specialWebcasts,
     }
-
     store.dispatch(setWebcastsRaw(webcasts))
   }
 

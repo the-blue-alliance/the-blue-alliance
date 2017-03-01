@@ -169,12 +169,22 @@ class FirebasePusher(object):
     @classmethod
     def update_live_events(cls):
         """
-        Updates live_events
+        Updates live_events and special webcasts
         """
+        events_by_key = {}
+        for event_key, event in cls._update_live_events_helper().items():
+            events_by_key[event_key] = EventConverter.convert(event, 3)
+
         deferred.defer(
             cls._put_data,
             'live_events',
-            cls._update_live_events_helper(),
+            json.dumps(events_by_key),
+            _queue="firebase")
+
+        deferred.defer(
+            cls._put_data,
+            'special_webcasts',
+            json.dumps(cls._update_special_webcasts_helper()),
             _queue="firebase")
 
     @classmethod
@@ -186,8 +196,9 @@ class FirebasePusher(object):
         for event in week_events:
             if event.now:
                 event._webcast = event.current_webcasts  # Only show current webcasts
-                WebcastOnlineHelper.add_online_status_async(event)
-                events_by_key[event.key.id()] = EventConverter.convert(event, 3)
+                for webcast in event.webcast:
+                    WebcastOnlineHelper.add_online_status_async(webcast)
+                events_by_key[event.key.id()] = event
             if event.within_a_day:
                 live_events.append(event)
 
@@ -195,10 +206,27 @@ class FirebasePusher(object):
         from helpers.bluezone_helper import BlueZoneHelper
         bluezone_event = BlueZoneHelper.update_bluezone(live_events)
         if bluezone_event:
-            WebcastOnlineHelper.add_online_status_async(bluezone_event)
-            events_by_key[bluezone_event.key.id()] = EventConverter.convert(bluezone_event, 3)
+            for webcast in bluezone_event.webcast:
+                WebcastOnlineHelper.add_online_status_async(webcast)
+            events_by_key[bluezone_event.key.id()] = bluezone_event
 
-        return json.dumps(events_by_key)
+        return events_by_key
+
+    @classmethod
+    @ndb.toplevel
+    def _update_special_webcasts_helper(cls):
+        special_webcasts_temp = Sitevar.get_by_id('gameday.special_webcasts')
+        if special_webcasts_temp:
+            special_webcasts_temp = special_webcasts_temp.contents.get('webcasts', [])
+        else:
+            special_webcasts_temp = []
+
+        special_webcasts = []
+        for webcast in special_webcasts_temp:
+            WebcastOnlineHelper.add_online_status_async(webcast)
+            special_webcasts.append(webcast)
+
+        return special_webcasts
 
     @classmethod
     def update_event(cls, event):
