@@ -22,6 +22,7 @@ const getWebcastsFromRawWebcasts = (webcasts) => {
         channel: webcast.channel,
         sortOrder: index,
         status: webcast.status,
+        streamTitle: webcast.stream_title,
       }
       specialWebcastIds.add(id)
     })
@@ -44,6 +45,7 @@ const getWebcastsFromRawWebcasts = (webcasts) => {
           type: webcast.type,
           channel: webcast.channel,
           status: webcast.status,
+          streamTitle: webcast.stream_title,
         }
       })
     })

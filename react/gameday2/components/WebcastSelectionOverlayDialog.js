@@ -134,8 +134,12 @@ export default class VideoCellOverlayDialog extends React.Component {
       const webcast = this.props.webcastsById[webcastId]
 
       let rightIcon = (<ActionHelp />)
+      let secondaryText = null
       if (webcast.status === 'online') {
         rightIcon = (<VideoCam color={green500} />)
+        if (webcast.streamTitle) {
+          secondaryText = webcast.streamTitle
+        }
       } else if (webcast.status === 'offline') {
         rightIcon = (<VideoCamOff />)
       }
@@ -146,6 +150,7 @@ export default class VideoCellOverlayDialog extends React.Component {
             key={webcast.id}
             webcast={webcast}
             webcastSelected={this.props.onWebcastSelected}
+            secondaryText={secondaryText}
             rightIcon={rightIcon}
           />)
         if (webcast.status === 'offline') {
@@ -169,6 +174,7 @@ export default class VideoCellOverlayDialog extends React.Component {
             key={webcast.id}
             webcast={webcast}
             webcastSelected={this.props.onWebcastSelected}
+            secondaryText={secondaryText}
             rightIcon={rightIcon}
           />
         )

@@ -12,6 +12,7 @@ class WebcastOnlineHelper(object):
     @ndb.tasklet
     def add_online_status_async(cls, webcast):
         webcast['status'] = 'unknown'
+        webcast['stream_title'] = None
         if webcast['type'] == 'twitch':
             cls._add_twitch_status_async(webcast)
 
@@ -38,6 +39,7 @@ class WebcastOnlineHelper(object):
             response = json.loads(result.content)
             if response['stream']:
                 webcast['status'] = 'online'
+                webcast['stream_title'] = response['stream']['channel']['status']
             else:
                 webcast['status'] = 'offline'
 
