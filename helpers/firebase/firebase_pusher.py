@@ -173,7 +173,9 @@ class FirebasePusher(object):
         """
         events_by_key = {}
         for event_key, event in cls._update_live_events_helper().items():
-            events_by_key[event_key] = EventConverter.convert(event, 3)
+            converted_event = EventConverter.convert(event, 3)
+            # Only what's needed to render webcast
+            events_by_key[event_key] = {key: converted_event[key] for key in ['key', 'name', 'short_name', 'webcasts']}
 
         deferred.defer(
             cls._put_data,
