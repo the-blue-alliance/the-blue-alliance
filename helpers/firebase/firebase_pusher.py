@@ -52,7 +52,7 @@ class FirebasePusher(object):
             return
         url = tba_config.CONFIG['firebase-url'].format(key, secret)
         result = urlfetch.fetch(url, payload=data_json, method='PUT', deadline=10)
-        if result.status_code != 200:
+        if result.status_code not in {200, 204}:
             raise Exception("Error with PUT data to Firebase: {}; {}. ERROR {}: {}".format(url, data_json, result.status_code, result.content))
 
     @classmethod
@@ -68,7 +68,7 @@ class FirebasePusher(object):
             return
         url = tba_config.CONFIG['firebase-url'].format(key, secret)
         result = urlfetch.fetch(url, payload=data_json, method='POST', deadline=10)
-        if result.status_code != 200:
+        if result.status_code not in {200, 204}:
             raise Exception("Error with POST data to Firebase: {}; {}. ERROR {}: {}".format(url, data_json, result.status_code, result.content))
 
     @classmethod
