@@ -126,20 +126,33 @@ export default class VideoCellOverlayDialog extends React.Component {
     const bluezoneWebcastItems = []
     const specialWebcastItems = []
     const webcastItems = []
+    const offlineSpecialWebcastItems = []
     const offlineWebcastItems = []
     // Don't let the user choose a webcast that is already displayed elsewhere
     const availableWebcasts = this.props.webcasts.filter((webcastId) => this.props.displayedWebcasts.indexOf(webcastId) === -1)
     availableWebcasts.forEach((webcastId) => {
       const webcast = this.props.webcastsById[webcastId]
 
+      let rightIcon = (<ActionHelp />)
+      if (webcast.status === 'online') {
+        rightIcon = (<VideoCam color={green500} />)
+      } else if (webcast.status === 'offline') {
+        rightIcon = (<VideoCamOff />)
+      }
+
       if (this.props.specialWebcastIds.has(webcast.id)) {
-        specialWebcastItems.push(
+        const item = (
           <WebcastSelectionOverlayDialogItem
             key={webcast.id}
             webcast={webcast}
             webcastSelected={this.props.onWebcastSelected}
-          />
-        )
+            rightIcon={rightIcon}
+          />)
+        if (webcast.status === 'offline') {
+          offlineSpecialWebcastItems.push(item)
+        } else {
+          specialWebcastItems.push(item)
+        }
       } else if (webcast.id.startsWith('bluezone')) {
         bluezoneWebcastItems.push(
           <WebcastSelectionOverlayDialogItem
@@ -150,38 +163,25 @@ export default class VideoCellOverlayDialog extends React.Component {
             rightIcon={<ActionGrade color={indigo500} />}
           />
         )
-      } else if (webcast.status === 'online') {
-        webcastItems.push(
-          <WebcastSelectionOverlayDialogItem
-            key={webcast.id}
-            webcast={webcast}
-            webcastSelected={this.props.onWebcastSelected}
-            rightIcon={<VideoCam color={green500} />}
-          />
-        )
-      } else if (webcast.status === 'offline') {
-        offlineWebcastItems.push(
-          <WebcastSelectionOverlayDialogItem
-            key={webcast.id}
-            webcast={webcast}
-            webcastSelected={this.props.onWebcastSelected}
-            rightIcon={<VideoCamOff />}
-          />
-        )
       } else {
-        webcastItems.push(
+        const item = (
           <WebcastSelectionOverlayDialogItem
             key={webcast.id}
             webcast={webcast}
             webcastSelected={this.props.onWebcastSelected}
-            rightIcon={<ActionHelp />}
+            rightIcon={rightIcon}
           />
         )
+        if (webcast.status === 'offline') {
+          offlineWebcastItems.push(item)
+        } else {
+          webcastItems.push(item)
+        }
       }
     })
 
     let allWebcastItems = []
-    if (specialWebcastItems.length !== 0) {
+    if (specialWebcastItems.length !== 0 || bluezoneWebcastItems.length !== 0) {
       allWebcastItems.push(
         <Subheader
           key="specialWebcastsHeader"
@@ -224,6 +224,22 @@ export default class VideoCellOverlayDialog extends React.Component {
         </Subheader>
       )
       allWebcastItems = allWebcastItems.concat(offlineWebcastItems)
+    }
+    if (offlineSpecialWebcastItems.length !== 0) {
+      if (offlineWebcastItems.length !== 0) {
+        allWebcastItems.push(
+          <Divider key="offlineSpecialWebcastsDivider" />
+        )
+      }
+      allWebcastItems.push(
+        <Subheader
+          key="offlineSpecialWebcastsHeader"
+          style={subheaderStyle}
+        >
+          Offline Special Webcasts
+        </Subheader>
+      )
+      allWebcastItems = allWebcastItems.concat(offlineSpecialWebcastItems)
     }
 
     if (allWebcastItems.length === 0) {

@@ -21,6 +21,7 @@ const getWebcastsFromRawWebcasts = (webcasts) => {
         type: webcast.type,
         channel: webcast.channel,
         sortOrder: index,
+        status: webcast.status,
       }
       specialWebcastIds.add(id)
     })
