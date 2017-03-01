@@ -97,7 +97,7 @@ class ApiBaseController(CacheableHandler):
 
     def _track_call_defer(self, api_action, api_label):
         if random.random() < tba_config.GA_RECORD_FRACTION:
-            deferred.defer(track_call, api_action, api_label, self.auth_owner, _queue="api-track-call")
+            deferred.defer(track_call, api_action, api_label, '{}:{}'.format(self.auth_owner, self.auth_description), _queue="api-track-call")
 
     def _validate_tba_auth_key(self):
         """
@@ -108,6 +108,7 @@ class ApiBaseController(CacheableHandler):
             x_tba_auth_key = self.request.get('X-TBA-Auth-Key')
 
         self.auth_owner = None
+        self.auth_description = None
         if not x_tba_auth_key:
             account = self._user_bundle.account
             if account:
@@ -122,6 +123,7 @@ class ApiBaseController(CacheableHandler):
             auth = ApiAuthAccess.get_by_id(x_tba_auth_key)
             if auth and auth.is_read_key:
                 self.auth_owner = auth.owner.id()
+                self.auth_description = auth.description
                 logging.info("Auth owner: {}, X-TBA-Auth-Key: {}".format(self.auth_owner, x_tba_auth_key))
             else:
                 self._errors = json.dumps({"Error": "X-TBA-Auth-Key is invalid. Please get an access key at http://www.thebluealliance.com/account."})
