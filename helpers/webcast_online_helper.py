@@ -15,6 +15,8 @@ class WebcastOnlineHelper(object):
         webcast['stream_title'] = None
         if webcast['type'] == 'twitch':
             cls._add_twitch_status_async(webcast)
+        elif webcast['type'] == 'ustream':
+            cls._add_ustream_status_async(webcast)
 
     @classmethod
     @ndb.tasklet
@@ -42,5 +44,32 @@ class WebcastOnlineHelper(object):
                 webcast['stream_title'] = response['stream']['channel']['status']
             else:
                 webcast['status'] = 'offline'
+        else:
+            logging.warning("Twitch status failed with code: {}".format(result.status_code))
+            logging.warning(result.content)
+
+        raise ndb.Return(None)
+
+    @classmethod
+    @ndb.tasklet
+    def _add_ustream_status_async(cls, webcast):
+        try:
+            url = 'https://api.ustream.tv/channels/{}.json'.format(webcast['channel'])
+            rpc = urlfetch.create_rpc()
+            result = yield urlfetch.make_fetch_call(rpc, url)
+        except Exception, e:
+            logging.error("URLFetch failed for: {}".format(url))
+            raise ndb.Return(None)
+
+        if result.status_code == 200:
+            response = json.loads(result.content)
+            if response['channel']:
+                webcast['status'] = 'online' if response['channel']['status'] == 'live' else 'offline'
+                webcast['stream_title'] = response['channel']['title']
+            else:
+                webcast['status'] = 'offline'
+        else:
+            logging.warning("Ustream status failed with code: {}".format(result.status_code))
+            logging.warning(result.content)
 
         raise ndb.Return(None)
