@@ -100,7 +100,7 @@ class EventList(CacheableHandler):
             "valid_state_provs": valid_state_provs,
         })
 
-        if year == datetime.datetime.now.year():
+        if year == datetime.datetime.now().year:
             self._cache_expiration = self.SHORT_CACHE_EXPIRATION
 
         return jinja2_engine.render('event_list.html', self.template_values)
