@@ -129,8 +129,9 @@ class DatafeedFMSAPI(object):
 
         old_status = self._is_down_sitevar.contents
         if result.status_code == 200:
-            self._is_down_sitevar.contents = False
-            self._is_down_sitevar.put()
+            if old_status.contents == True:
+                self._is_down_sitevar.contents = False
+                self._is_down_sitevar.put()
             ApiStatusController.clear_cache_if_needed(old_status, self._is_down_sitevar.contents)
 
             # Save raw API response into cloudstorage
@@ -160,8 +161,9 @@ class DatafeedFMSAPI(object):
         elif result.status_code % 100 == 5:
             # 5XX error - something is wrong with the server
             logging.warning('URLFetch for %s failed; Error code %s' % (url, result.status_code))
-            self._is_down_sitevar.contents = True
-            self._is_down_sitevar.put()
+            if old_status.contents == False:
+                self._is_down_sitevar.contents = True
+                self._is_down_sitevar.put()
             ApiStatusController.clear_cache_if_needed(old_status, self._is_down_sitevar.contents)
             raise ndb.Return(None)
         else:
