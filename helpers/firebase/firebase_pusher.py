@@ -186,7 +186,7 @@ class FirebasePusher(object):
         deferred.defer(
             cls._put_data,
             'special_webcasts',
-            json.dumps(cls._update_special_webcasts_helper()),
+            json.dumps(cls.get_special_webcasts()),
             _queue="firebase")
 
     @classmethod
@@ -216,7 +216,7 @@ class FirebasePusher(object):
 
     @classmethod
     @ndb.toplevel
-    def _update_special_webcasts_helper(cls):
+    def get_special_webcasts(cls):  # TODO: Break this out of FirebasePusher 2017-03-01 -fangeugene
         special_webcasts_temp = Sitevar.get_by_id('gameday.special_webcasts')
         if special_webcasts_temp:
             special_webcasts_temp = special_webcasts_temp.contents.get('webcasts', [])

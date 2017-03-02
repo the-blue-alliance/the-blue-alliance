@@ -12,6 +12,7 @@ from base_controller import CacheableHandler
 from consts.event_type import EventType
 from consts.notification_type import NotificationType
 from helpers.event_helper import EventHelper
+from helpers.firebase.firebase_pusher import FirebasePusher
 from models.event import Event
 from models.insight import Insight
 from models.team import Team
@@ -143,13 +144,16 @@ class MainCompetitionseasonHandler(CacheableHandler):
 
     def __init__(self, *args, **kw):
         super(MainCompetitionseasonHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60
+        self._cache_expiration = 60 * 5
 
     def _render(self, *args, **kw):
         week_events = EventHelper.getWeekEvents()
+        special_webcasts = FirebasePusher.get_special_webcasts()
 
         self.template_values.update({
             "events": week_events,
+            "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
+            "special_webcasts": special_webcasts,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/index_competitionseason.html')
