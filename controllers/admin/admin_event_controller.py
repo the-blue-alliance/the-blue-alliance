@@ -230,6 +230,28 @@ class AdminEventAddWebcast(LoggedInHandler):
         self.redirect("/admin/event/" + event.key_name)
 
 
+class AdminEventRemoveWebcast(LoggedInHandler):
+    """
+    Remove a webcast from an event
+    """
+    def post(self, event_key_id):
+        self._require_admin()
+
+        event = Event.get_by_id(event_key_id)
+        if not event:
+            self.abort(404)
+
+        type = self.request.get("type")
+        channel = self.request.get("channel")
+        index = int(self.request.get("index")) - 1
+        if self.request.get("file"):
+            file = self.request.get("file")
+        else:
+            file = None
+        EventWebcastAdder.remove_webcast(event, index, type, channel, file)
+        self.redirect("/admin/event/{}#webcasts".format(event.key_name))
+
+
 class AdminEventCreate(LoggedInHandler):
     """
     Create an Event. POSTs to AdminEventEdit.

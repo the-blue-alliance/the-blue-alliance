@@ -24,3 +24,18 @@ class EventWebcastAdder(object):
         MemcacheWebcastFlusher.flushEvent(event.key_name)
 
         return event
+
+    @classmethod
+    def remove_webcast(cls, event, index, type, channel, file):
+        webcasts = event.webcast
+        if not webcasts or index >= len(webcasts):
+            return
+
+        webcast = webcasts[index]
+        if type != webcast.get("type") or channel != webcast.get("channel") or file != webcast.get("file"):
+            return
+
+        webcasts.pop(index)
+        event.webcast_json = json.dumps(webcasts)
+        EventManipulator.createOrUpdate(event)
+        MemcacheWebcastFlusher.flushEvent(event.key_name)
