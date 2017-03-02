@@ -10,7 +10,7 @@ from controllers.admin.admin_authkeys_controller import AdminAuthKeys
 from controllers.admin.admin_district_controller import AdminDistrictList, AdminDistrictEdit, \
     AdminDistrictCreate
 from controllers.admin.admin_event_controller import AdminEventAddAllianceSelections, AdminEventDeleteTeams, AdminEventAddTeams, AdminEventRemapTeams, AdminEventAddWebcast, AdminEventCreate, AdminEventCreateTest, AdminEventDelete, AdminEventDetail, AdminEventEdit, AdminEventList, \
-    AdminAddAllianceBackup
+    AdminAddAllianceBackup, AdminEventRemoveWebcast
 from controllers.admin.admin_gameday_controller import AdminGamedayDashboard
 from controllers.admin.admin_main_controller import AdminDebugHandler, AdminMain, AdminTasksHandler
 from controllers.admin.admin_award_controller import AdminAwardDashboard, AdminAwardEdit, AdminAwardAdd
@@ -48,6 +48,7 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/event/add_teams/(.*)', AdminEventAddTeams),
                                ('/admin/event/delete_teams/(.*)', AdminEventDeleteTeams),
                                ('/admin/event/add_webcast/(.*)', AdminEventAddWebcast),
+                               ('/admin/event/remove_webcast/(.*)', AdminEventRemoveWebcast),
                                ('/admin/event/remap_teams/(.*)', AdminEventRemapTeams),
                                ('/admin/event/create', AdminEventCreate),
                                ('/admin/event/create/test', AdminEventCreateTest),

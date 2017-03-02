@@ -210,8 +210,22 @@
 
 <div class="tab-pane" id="webcasts">
 <div class="row">
-<h2>Add Webcast</h2>
-<p>Current webcast JSON: {{event.webcast_json}}</p>
+<h2>Event Webcasts</h2>
+<p>Current webcasts:</p>
+<ul>
+  {% for webcast in event.webcast %}
+    <li>{{ webcast }}
+        <button class="btn btn-danger" form="remove_webcast_{{ webcast.type }}_{{ webcast.channel }}_{{ webcast.file }}"><span class="glyphicon glyphicon-trash"></span> Remove</button></li>
+        <form id="remove_webcast_{{ webcast.type }}_{{ webcast.channel }}_{{ webcast.file }}" method="post" action="/admin/event/remove_webcast/{{ event.key_name }}">
+          <input type="hidden" name="type" value="{{ webcast.type }}" />
+          <input type="hidden" name="channel" value="{{ webcast.channel }}" />
+          <input type="hidden" name="file" value="{{ webcast.file }}" />
+          <input type="hidden" name="index" value="{{ forloop.counter }}" />
+        </form>
+  {% empty %}
+    <p>No webcasts found</p>
+  {% endfor %}
+</ul>
 {% include "partials/webcast_add_instructions_partial.html" %}
 <form action="/admin/event/add_webcast/{{event.key_name}}" method="post">
     {% include "partials/webcast_add_form_partial.html" %}
