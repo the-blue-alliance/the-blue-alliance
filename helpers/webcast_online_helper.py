@@ -2,6 +2,7 @@ import base64
 import json
 import logging
 
+from google.appengine.api import memcache
 from google.appengine.ext import ndb
 from google.appengine.api import urlfetch
 
@@ -10,19 +11,36 @@ from models.sitevar import Sitevar
 
 class WebcastOnlineHelper(object):
     @classmethod
+    @ndb.toplevel
+    def add_online_status(cls, webcasts):
+        for webcast in webcasts:
+            cls.add_online_status_async(webcast)
+
+    @classmethod
     @ndb.tasklet
     def add_online_status_async(cls, webcast):
+        memcache_key = 'webcast_status:{}:{}:{}'.format(webcast['type'], webcast.get('channel'), webcast.get('file'))
+        cached_webcast = memcache.get(memcache_key)
+        if cached_webcast:
+            if 'status' in cached_webcast:
+                webcast['status'] = cached_webcast['status']
+            if 'stream_title' in cached_webcast:
+                webcast['stream_title'] = cached_webcast['stream_title']
+            return
+
         webcast['status'] = 'unknown'
         webcast['stream_title'] = None
         if webcast['type'] == 'twitch':
-            cls._add_twitch_status_async(webcast)
+            yield cls._add_twitch_status_async(webcast)
         elif webcast['type'] == 'ustream':
-            cls._add_ustream_status_async(webcast)
+            yield cls._add_ustream_status_async(webcast)
         elif webcast['type'] == 'youtube':
-            cls._add_youtube_status_async(webcast)
+            yield cls._add_youtube_status_async(webcast)
         # Livestream charges for their API. Go figure.
         # elif webcast['type'] == 'livestream':
-        #     cls._add_livestream_status_async(webcast)
+        #     yield cls._add_livestream_status_async(webcast)
+
+        memcache.set(memcache_key, webcast, 60*5)
 
     @classmethod
     @ndb.tasklet

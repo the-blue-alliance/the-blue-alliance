@@ -10,6 +10,7 @@ from consts.district_type import DistrictType
 from consts.event_type import EventType
 from context_cache import context_cache
 from helpers.location_helper import LocationHelper
+from helpers.webcast_online_helper import WebcastOnlineHelper
 from models.district import District
 from models.event_details import EventDetails
 from models.location import Location
@@ -334,6 +335,19 @@ class Event(ndb.Model):
             except Exception, e:
                 self._webcast = None
         return self._webcast
+
+    @property
+    def webcast_status(self):
+        WebcastOnlineHelper.add_online_status(self.webcast)
+        overall_status = 'offline'
+        for webcast in self.webcast:
+            status = webcast.get('status')
+            if status == 'online':
+                overall_status = 'online'
+                break
+            elif status == 'unknown':
+                overall_status = 'unknown'
+        return overall_status
 
     @property
     def current_webcasts(self):

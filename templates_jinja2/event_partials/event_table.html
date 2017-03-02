@@ -19,7 +19,11 @@
         <td class="hidden-xs">
           {% if event.webcast %}
             {% if event.now %}
-              <a class="btn btn-success btn-small" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
+              {% if event.webcast_status == 'offline' %}
+                <a class="btn btn-default btn-small" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Offline</a>
+              {% else %}
+                <a class="btn btn-success btn-small" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
+              {% endif %}
             {% else %}
               <a class="btn btn-default btn-small disabled">Offline</a>
             {% endif %}

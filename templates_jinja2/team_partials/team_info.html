@@ -47,7 +47,11 @@
       <div class="panel-heading">
         {% if current_event.webcast%}
           <div class="hidden-xs pull-right">
-            <a class="btn btn-success" href="{{current_event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch now</a>
+            {% if current_event.webcast_status == 'offline' %}
+              <a class="btn btn-default" href="{{current_event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Offline</a>
+            {% else %}
+              <a class="btn btn-success" href="{{current_event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
+            {% endif %}
           </div>
         {% endif %}
         <h3 class="panel-title">

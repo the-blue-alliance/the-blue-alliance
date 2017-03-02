@@ -74,7 +74,11 @@
         <div class="panel-heading">
           <div class="hidden-xs pull-right">
             {% if event.webcast %}
-              <a class="btn btn-xs btn-success" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch now</a>
+              {% if event.webcast_status == 'offline' %}
+                <a class="btn btn-default btn-xs" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Offline</a>
+              {% else %}
+                <a class="btn btn-success btn-xs" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
+              {% endif %}
             {% else %}
               <a class="btn btn-xs btn-default" href="/suggest/event/webcast?event_key={{event.key_name}}" target="_blank">Add webcast</a>
             {% endif %}
