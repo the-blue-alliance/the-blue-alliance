@@ -95,10 +95,6 @@ const params = queryString.parse(location.hash)
 if (params.layout && Number.isInteger(Number.parseInt(params.layout, 10))) {
   store.dispatch(setLayout(Number.parseInt(params.layout, 10)))
 }
-if (params.chat) {
-  store.dispatch(setChatSidebarVisibility(true))
-  store.dispatch(setTwitchChat(params.chat))
-}
 
 // Used to store webcast state. Hacky. 2017-03-01 -fangeugene
 // ongoing_events_w_webcasts and special_webcasts should be separate
@@ -143,6 +139,10 @@ firedux.ref.child('live_events').on('value', (snapshot) => {
       if (params[key]) {
         store.dispatch(addWebcastAtPosition(params[key], i))
       }
+    }
+    if (params.chat) {
+      store.dispatch(setChatSidebarVisibility(true))
+      store.dispatch(setTwitchChat(params.chat))
     }
     isLoad = false
   }
