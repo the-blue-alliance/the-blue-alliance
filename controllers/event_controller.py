@@ -28,13 +28,15 @@ class EventList(CacheableHandler):
     """
     List all Events.
     """
+    LONG_CACHE_EXPIRATION = 60 * 60 * 24
+    SHORT_CACHE_EXPIRATION = 60 * 5
     VALID_YEARS = list(reversed(range(1992, tba_config.MAX_YEAR + 1)))
     CACHE_VERSION = 4
     CACHE_KEY_FORMAT = "event_list_{}_{}_{}"  # (year, explicit_year, state_prov)
 
     def __init__(self, *args, **kw):
         super(EventList, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24
+        self._cache_expiration = self.LONG_CACHE_EXPIRATION
 
     def get(self, year=None, explicit_year=False):
         if year == '':
@@ -97,6 +99,9 @@ class EventList(CacheableHandler):
             "state_prov": state_prov,
             "valid_state_provs": valid_state_provs,
         })
+
+        if year == datetime.datetime.now.year():
+            self._cache_expiration = self.SHORT_CACHE_EXPIRATION
 
         return jinja2_engine.render('event_list.html', self.template_values)
 
