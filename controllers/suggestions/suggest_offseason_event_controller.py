@@ -1,6 +1,6 @@
 from controllers.base_controller import LoggedInHandler
 from helpers.suggestions.suggestion_creator import SuggestionCreator
-from helpers.suggestions.suggestion_notifier import SuggestionNotifier
+from helpers.outgoing_notification_helper import OutgoingNotificationHelper
 from template_engine import jinja2_engine
 
 
@@ -48,7 +48,7 @@ class SuggestOffseasonEventController(LoggedInHandler):
                 jinja2_engine.render('suggestions/suggest_offseason_event.html', self.template_values))
         else:
             subject, body = self._gen_notification_email(event_name)
-            SuggestionNotifier.send_admin_alert_email(subject, body)
+            OutgoingNotificationHelper.send_admin_alert_email(subject, body)
             self.redirect('/suggest/offseason?status=%s' % status)
 
     @staticmethod

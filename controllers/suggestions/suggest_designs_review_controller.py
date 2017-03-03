@@ -3,7 +3,7 @@ from google.appengine.ext import ndb
 from consts.account_permissions import AccountPermissions
 from controllers.suggestions.suggestions_review_base_controller import SuggestionsReviewBaseController
 from helpers.suggestions.media_creator import MediaCreator
-from helpers.suggestions.suggestion_notifier import SuggestionNotifier
+from helpers.outgoing_notification_helper import OutgoingNotificationHelper
 from models.media import Media
 from models.sitevar import Sitevar
 from models.suggestion import Suggestion
@@ -83,7 +83,7 @@ class SuggestDesignsReviewController(SuggestionsReviewBaseController):
                     slack_sitevar = Sitevar.get_or_insert('slack.hookurls')
                     if slack_sitevar:
                         slack_url = slack_sitevar.contents.get('tbablog', '')
-                        SuggestionNotifier.send_slack_alert(slack_url, slack_message)
+                        OutgoingNotificationHelper.send_slack_alert(slack_url, slack_message)
             else:
                 status = 'already_reviewed'
         else:

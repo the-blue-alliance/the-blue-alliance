@@ -12,7 +12,7 @@ from consts.account_permissions import AccountPermissions
 from consts.auth_type import AuthType
 from controllers.suggestions.suggestions_review_base_controller import \
     SuggestionsReviewBaseController
-from helpers.suggestions.suggestion_notifier import SuggestionNotifier
+from helpers.outgoing_notification_helper import OutgoingNotificationHelper
 from models.api_auth_access import ApiAuthAccess
 from models.event import Event
 from models.suggestion import Suggestion
@@ -134,7 +134,7 @@ TBA Admins
         if admin_email_body:
             # Subject should match the one in suggest_apiwrite_controller
             subject = "Trusted API Key Request for {}".format(event_key)
-            SuggestionNotifier.send_admin_alert_email(subject, admin_email_body)
+            OutgoingNotificationHelper.send_admin_alert_email(subject, admin_email_body)
 
         self.redirect("/suggest/apiwrite/review?success={}".format(status))
 

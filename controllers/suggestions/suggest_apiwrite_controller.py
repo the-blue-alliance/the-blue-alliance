@@ -1,7 +1,7 @@
 from consts.auth_type import AuthType
 from controllers.base_controller import LoggedInHandler
 from helpers.suggestions.suggestion_creator import SuggestionCreator
-from helpers.suggestions.suggestion_notifier import SuggestionNotifier
+from helpers.outgoing_notification_helper import OutgoingNotificationHelper
 from template_engine import jinja2_engine
 
 
@@ -33,7 +33,7 @@ class SuggestApiWriteController(LoggedInHandler):
         )
         if status == 'success':
             subject, body = self._gen_notification_email(event_key, self.user_bundle)
-            SuggestionNotifier.send_admin_alert_email(subject, body)
+            OutgoingNotificationHelper.send_admin_alert_email(subject, body)
         self.redirect('/request/apiwrite?status={}'.format(status), abort=True)
 
     @staticmethod
