@@ -69,7 +69,7 @@ cron:
   schedule: every 2 minutes
   timezone: America/Los_Angeles
 
-- description: Update live events
+- description: Update live events (and bluezone)
   url: /tasks/do/update_live_events
   schedule: every 5 minutes
 
@@ -77,6 +77,6 @@ cron:
   url: /tasks/math/enqueue/predict_match_times
   schedule: every 1 minutes
 
-- description: BlueZone Update
-  url: /tasks/do/bluezone_update
-  schedule: every 1 minutes
+# - description: BlueZone Update
+#   url: /tasks/do/bluezone_update
+#   schedule: every 1 minutes
