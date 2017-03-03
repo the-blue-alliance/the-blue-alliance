@@ -31,7 +31,8 @@ simple_match_properties = [
     'alliances',
     'winning_alliance',
     'time',
-    'actual_time'
+    'actual_time',
+    'predicted_time',
 ]
 
 

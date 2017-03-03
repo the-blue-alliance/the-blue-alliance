@@ -73,7 +73,11 @@ export const getTickerMatches = createSelector(
       f: 5,
     }
     function calculateOrder(match) {
-      return (compLevelsPlayOrder[match.comp_level] * 1000000) + (match.match_number * 1000) + match.set_number
+      let time = 9999999999
+      if (match.predicted_time) {
+        time = match.predicted_time
+      }
+      return (time * 10000000) + (compLevelsPlayOrder[match.comp_level] * 100000) + (match.match_number * 100) + match.set_number
     }
 
     let matches = []
