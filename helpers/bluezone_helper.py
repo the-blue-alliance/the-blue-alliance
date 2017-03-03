@@ -16,7 +16,7 @@ class BlueZoneHelper(object):
     TIME_PATTERN = "%Y-%m-%dT%H:%M:%S"
     MAX_TIME_PER_MATCH = datetime.timedelta(minutes=5)
     # BUFFER_AFTER = datetime.timedelta(minutes=4)
-    TIME_BUCKET = datetime.timedelta(minutes=3)
+    TIME_BUCKET = datetime.timedelta(minutes=5)
 
     @classmethod
     def get_upcoming_matches(cls, live_events, n=1):
