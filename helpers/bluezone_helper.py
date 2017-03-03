@@ -218,7 +218,7 @@ class BlueZoneHelper(object):
 
                 logging.info("[BLUEZONE] Switching to: {}".format(bluezone_match.key.id()))
                 to_log += "[BLUEZONE] Switching to: {}\n".format(bluezone_match.key.id())
-                OutgoingNotificationHelper.send_slack_alert(slack_url, "Switching to {}".format(bluezone_match.key.id()))
+                OutgoingNotificationHelper.send_slack_alert(slack_url, "It is now {}. Switching BlueZone to {}, scheduled for {} and predicted to be at {}.".format(now, bluezone_match.key.id(), bluezone_match.time, bluezone_match.predicted_time))
 
                 # Log to cloudstorage
                 log_dir = '/tbatv-prod-hrd.appspot.com/tba-logging/'
