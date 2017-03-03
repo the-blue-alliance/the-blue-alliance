@@ -137,6 +137,9 @@ class BlueZoneHelper(object):
         blacklisted_match_keys = bluezone_config.contents.get('blacklisted_matches', set())
         if blacklisted_match_keys:
             blacklisted_match_keys = set(blacklisted_match_keys)
+        blacklisted_event_keys = bluezone_config.contents.get('blacklisted_events', set())
+        if blacklisted_event_keys:
+            blacklisted_event_keys = set(blacklisted_event_keys)
 
         current_match = Match.get_by_id(current_match_key) if current_match_key else None
 
@@ -177,6 +180,10 @@ class BlueZoneHelper(object):
         for match in potential_matches:
             logging.info("[BLUEZONE] Trying potential match: {}".format(match.key.id()))
             to_log += "[BLUEZONE] Trying potential match: {}\n".format(match.key.id())
+            if match.event_key_name in blacklisted_event_keys:
+                logging.info("[BLUEZONE] Event {} is blacklisted, skipping...".format(match.event_key_name))
+                to_log += "[BLUEZONE] Event {} is blacklisted, skipping...".format(match.event_key_name)
+                continue
             if match.key.id() not in blacklisted_match_keys:
                 if match.key.id() == current_match_key:
                     if current_match_predicted_time and current_match_predicted_time + cls.MAX_TIME_PER_MATCH < now:
@@ -186,7 +193,7 @@ class BlueZoneHelper(object):
                         to_log += "[BLUEZONE] Adding match to blacklist: {}\n".format(match.key.id())
                         logging.info("[BLUEZONE] scheduled time: {}, now: {}".format(current_match_predicted_time, now))
                         to_log += "[BLUEZONE] scheduled time: {}, now: {}\n".format(current_match_predicted_time, now)
-                        OutgoingNotificationHelper.send_slack_alert(slack_url, "Blacklisting match {}. Scheduled time: {}, now: {}".format(match.key.id(), current_match_predicted_time, now))
+                        OutgoingNotificationHelper.send_slack_alert(slack_url, "Blacklisting match {}. Predicted time: {}, now: {}".format(match.key.id(), current_match_predicted_time, now))
                     else:
                         # We can continue to use this match
                         bluezone_match = match
@@ -222,6 +229,7 @@ class BlueZoneHelper(object):
                     'current_match': bluezone_match.key.id(),
                     'current_match_predicted': bluezone_match.predicted_time.strftime(cls.TIME_PATTERN),
                     'blacklisted_matches': list(new_blacklisted_match_keys),
+                    'blacklisted_events': list(blacklisted_event_keys),
                 }
                 bluezone_config.put()
 
