@@ -81,11 +81,11 @@ class FirebasePusher(object):
             'events/{}/matches/{}'.format(match.event.id(), match.key.id()),
             _queue="firebase")
 
-        for team_key_name in match.team_key_names:
-            deferred.defer(
-            cls._delete_data,
-            'event_teams/{}/{}/matches/{}'.format(match.event.id(), team_key_name, match.key.id()),
-            _queue="firebase")
+        # for team_key_name in match.team_key_names:
+        #     deferred.defer(
+        #     cls._delete_data,
+        #     'event_teams/{}/{}/matches/{}'.format(match.event.id(), team_key_name, match.key.id()),
+        #     _queue="firebase")
 
     @classmethod
     def replace_event_matches(cls, event_key, matches):
@@ -118,12 +118,12 @@ class FirebasePusher(object):
             match_data_json,
             _queue="firebase")
 
-        for team_key_name in match.team_key_names:
-            deferred.defer(
-                cls._put_data,
-                'event_teams/{}/{}/matches/{}'.format(match.event.id(), team_key_name, match.key.id()),
-                match_data_json,
-                _queue="firebase")
+        # for team_key_name in match.team_key_names:
+        #     deferred.defer(
+        #         cls._put_data,
+        #         'event_teams/{}/{}/matches/{}'.format(match.event.id(), team_key_name, match.key.id()),
+        #         match_data_json,
+        #         _queue="firebase")
 
     @classmethod
     def update_event_details(cls, event_details):
@@ -146,25 +146,26 @@ class FirebasePusher(object):
         """
         Updates an event team status
         """
-        if int(event_key[:4]) < 2017:
-            return
+        return
+        # if int(event_key[:4]) < 2017:
+        #     return
 
-        from helpers.event_team_status_helper import EventTeamStatusHelper  # Prevent circular import
+        # from helpers.event_team_status_helper import EventTeamStatusHelper  # Prevent circular import
 
-        if status:
-            status.update({
-                'alliance_status_str': EventTeamStatusHelper.generate_team_at_event_alliance_status_string(team_key, status),
-                'playoff_status_str': EventTeamStatusHelper.generate_team_at_event_playoff_status_string(team_key, status),
-                'overall_status_str': EventTeamStatusHelper.generate_team_at_event_status_string(team_key, status),
-            })
+        # if status:
+        #     status.update({
+        #         'alliance_status_str': EventTeamStatusHelper.generate_team_at_event_alliance_status_string(team_key, status),
+        #         'playoff_status_str': EventTeamStatusHelper.generate_team_at_event_playoff_status_string(team_key, status),
+        #         'overall_status_str': EventTeamStatusHelper.generate_team_at_event_status_string(team_key, status),
+        #     })
 
-        status_json = json.dumps(status)
+        # status_json = json.dumps(status)
 
-        deferred.defer(
-            cls._put_data,
-            'event_teams/{}/{}/status'.format(event_key, team_key),
-            status_json,
-            _queue="firebase")
+        # deferred.defer(
+        #     cls._put_data,
+        #     'event_teams/{}/{}/status'.format(event_key, team_key),
+        #     status_json,
+        #     _queue="firebase")
 
     @classmethod
     def update_live_events(cls):
