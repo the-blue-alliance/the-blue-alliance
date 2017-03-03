@@ -96,7 +96,9 @@ class MatchTimePredictionHelper(object):
 
             # For the first iteration, base the predictions off the newest known actual start time
             # Otherwise, use the predicted start time of the previously processed match
-            last_predicted = cls.as_local(last_match.actual_time if i == 0 else last.predicted_time, timezone)
+            last_predicted = None
+            if last_match:
+                last_predicted = cls.as_local(last_match.actual_time if i == 0 else last.predicted_time, timezone)
             if last_predicted and average_cycle_time:
                 predicted = last_predicted + datetime.timedelta(seconds=average_cycle_time)
             else:
@@ -107,7 +109,7 @@ class MatchTimePredictionHelper(object):
             # then allow predicted times to be in the past.
             now = datetime.datetime.now(timezone) if is_live else cls.as_local(cls.EPOCH, timezone)
             earliest_possible = cls.as_local(match.time + datetime.timedelta(minutes=-2), timezone)
-            match.predicted_time = cls.as_utc(max(predicted, earliest_possible, now))
+            match.predicted_time = max(cls.as_utc(predicted), cls.as_utc(earliest_possible), cls.as_utc(now))
             last = match
 
         MatchManipulator.createOrUpdate(unplayed_matches)
