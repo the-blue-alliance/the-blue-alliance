@@ -179,10 +179,12 @@ class BlueZoneHelper(object):
         new_blacklisted_match_keys = set()
 
         # If the current match hasn't finished yet, don't even bother
-        cutoff_time = current_match_predicted_time + cls.MAX_TIME_PER_MATCH
+        cutoff_time = bluezone_config.updated + cls.MAX_TIME_PER_MATCH
         logging.info("[BLUEZONE] Current match played? {}, now = {}, cutoff = {}".format(current_match.has_been_played if current_match else None, now, cutoff_time))
         to_log += "[BLUEZONE] Current match played? {}, now = {}, cutoff = {}\n".format(current_match.has_been_played if current_match else None, now, cutoff_time)
-        if current_match and not current_match.has_been_played and now < cutoff_time:
+        if current_match and not current_match.has_been_played and now < cutoff_time \
+                and current_match_key not in blacklisted_match_keys \
+                and current_match.event_key_name not in blacklisted_event_keys:
             bluezone_match = current_match
             # Hacky, but whatever
             potential_matches = []
@@ -196,7 +198,7 @@ class BlueZoneHelper(object):
                 continue
             if match.key.id() not in blacklisted_match_keys:
                 if match.key.id() == current_match_key:
-                    if current_match_predicted_time and current_match_predicted_time + cls.MAX_TIME_PER_MATCH < now and len(potential_matches) > 1:
+                    if current_match_predicted_time and bluezone_config.updated + cls.MAX_TIME_PER_MATCH < now and len(potential_matches) > 1:
                         # We've been on this match too long
                         new_blacklisted_match_keys.add(match.key.id())
                         logging.info("[BLUEZONE] Adding match to blacklist: {}".format(match.key.id()))
