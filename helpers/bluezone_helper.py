@@ -177,6 +177,12 @@ class BlueZoneHelper(object):
 
         bluezone_match = None
         new_blacklisted_match_keys = set()
+
+        # If the current match hasn't finished yet, don't even bother
+        if not current_match.has_been_played and current_match_predicted_time + cls.MAX_TIME_PER_MATCH < now:
+            # Hacky, but whatever
+            potential_matches = []
+
         for match in potential_matches:
             logging.info("[BLUEZONE] Trying potential match: {}".format(match.key.id()))
             to_log += "[BLUEZONE] Trying potential match: {}\n".format(match.key.id())
