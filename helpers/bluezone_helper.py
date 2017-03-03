@@ -125,9 +125,9 @@ class BlueZoneHelper(object):
         logging.info("[BLUEZONE] Config: {}".format(bluezone_config.contents))
         to_log += "[BLUEZONE] Config: {}\n".format(bluezone_config.contents)
         current_match_key = bluezone_config.contents.get('current_match')
-        current_match_added_time = bluezone_config.contents.get('current_match_added')
-        if current_match_added_time:
-            current_match_added_time = datetime.datetime.strptime(current_match_added_time, cls.TIME_PATTERN)
+        current_match_predicted_time = bluezone_config.contents.get('current_match_predicted')
+        if current_match_predicted_time:
+            current_match_predicted_time = datetime.datetime.strptime(current_match_predicted_time, cls.TIME_PATTERN)
         blacklisted_match_keys = bluezone_config.contents.get('blacklisted_matches', set())
         if blacklisted_match_keys:
             blacklisted_match_keys = set(blacklisted_match_keys)
@@ -167,13 +167,13 @@ class BlueZoneHelper(object):
             to_log += "[BLUEZONE] Trying potential match: {}\n".format(match.key.id())
             if match.key.id() not in blacklisted_match_keys:
                 if match.key.id() == current_match_key:
-                    if current_match_added_time + cls.MAX_TIME_PER_MATCH < now:
+                    if current_match_predicted_time and current_match_predicted_time + cls.MAX_TIME_PER_MATCH < now:
                         # We've been on this match too long
                         new_blacklisted_match_keys.add(match.key.id())
                         logging.info("[BLUEZONE] Adding match to blacklist: {}".format(match.key.id()))
                         to_log += "[BLUEZONE] Adding match to blacklist: {}\n".format(match.key.id())
-                        logging.info("[BLUEZONE] added time: {}, now: {}".format(current_match_added_time, now))
-                        to_log += "[BLUEZONE] added time: {}, now: {}\n".format(current_match_added_time, now)
+                        logging.info("[BLUEZONE] scheduled time: {}, now: {}".format(current_match_predicted_time, now))
+                        to_log += "[BLUEZONE] scheduled time: {}, now: {}\n".format(current_match_predicted_time, now)
                     else:
                         # We can continue to use this match
                         bluezone_match = match
@@ -204,7 +204,7 @@ class BlueZoneHelper(object):
                 FirebasePusher.update_event(fake_event)
                 bluezone_config.contents = {
                     'current_match': bluezone_match.key.id(),
-                    'current_match_added': now.strftime(cls.TIME_PATTERN),
+                    'current_match_predicted': bluezone_match.predicted_time.strftime(cls.TIME_PATTERN),
                     'blacklisted_matches': list(new_blacklisted_match_keys),
                 }
                 bluezone_config.put()
