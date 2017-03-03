@@ -183,6 +183,7 @@ class BlueZoneHelper(object):
         logging.info("[BLUEZONE] Current match played? {}, now = {}, cutoff = {}".format(current_match.has_been_played if current_match else None, now, cutoff_time))
         to_log += "[BLUEZONE] Current match played? {}, now = {}, cutoff = {}\n".format(current_match.has_been_played if current_match else None, now, cutoff_time)
         if current_match and not current_match.has_been_played and now < cutoff_time:
+            bluezone_match = current_match
             # Hacky, but whatever
             potential_matches = []
 
