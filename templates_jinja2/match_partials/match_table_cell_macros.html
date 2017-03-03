@@ -104,8 +104,8 @@
     match.score_breakdown.get(alliance_color).teleopTowerCaptured %}
     P / R
     {% else %}
-      {% if "rotorRankingPointAchieved" in match.score_breakdown.get(alliance_color) and match.score_breakdown.get(alliance_color).rotorRankingPointAchieved %}P
-      {% elif "teleopTowerCaptured" in match.score_breakdown.get(alliance_color) and match.score_breakdown.get(alliance_color).teleopTowerCaptured %}R
+      {% if "kPaRankingPointAchieved" in match.score_breakdown.get(alliance_color) and match.score_breakdown.get(alliance_color).kPaRankingPointAchieved %}P
+      {% elif "rotorRankingPointAchieved" in match.score_breakdown.get(alliance_color) and match.score_breakdown.get(alliance_color).rotorRankingPointAchieved %}R
       {% else %}--{% endif %}
     {% endif %}
   {% else %}
