@@ -223,13 +223,14 @@ class BlueZoneHelper(object):
                 # Log to cloudstorage
                 log_dir = '/tbatv-prod-hrd.appspot.com/tba-logging/'
                 log_file = 'bluezone_{}.txt'.format(now.date())
+                full_path = log_dir + log_file
 
                 existing_contents = ''
-                if log_file in set(cloudstorage.listbucket(log_dir)):
-                    with cloudstorage.open(log_dir + log_file, 'r') as existing_file:
+                if full_path in set([f.filename for f in cloudstorage.listbucket(log_dir)]):
+                    with cloudstorage.open(full_path, 'r') as existing_file:
                         existing_contents = existing_file.read()
 
-                with cloudstorage.open(log_dir + log_file, 'w') as new_file:
+                with cloudstorage.open(full_path, 'w') as new_file:
                     new_file.write(existing_contents + to_log)
 
         if bluezone_match:
