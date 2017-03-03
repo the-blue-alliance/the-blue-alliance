@@ -68,27 +68,42 @@ class ContributionCalculator(object):
         return team_list, team_id_map
 
     def _get_past_stats(self, cur_event, team_list):
-        team_events_futures = []
-        for team in team_list:
-            team_events_futures.append((team, TeamYearEventsQuery(team, cur_event.year).fetch_async()))
-
         past_stats_mean = defaultdict(list)  # team key > values
         past_stats_var = defaultdict(list)  # team key > values
-        for team, events_future in team_events_futures:
-            events = events_future.get_result()
-            EventHelper.sort_events(events)
-            for event in events:
-                if event.event_type_enum in EventType.SEASON_EVENT_TYPES and \
-                        event.start_date < cur_event.start_date and \
-                        event.event_type_enum != EventType.CMP_FINALS and \
-                        event.details:
-                    # event.details is backed by in-context cache
-                    predictions = event.details.predictions
-                    if predictions and 'stat_mean_vars' in predictions:
-                        if team in predictions['stat_mean_vars']['qual'][self._stat]['mean']:
-                            past_stats_mean[team].append(predictions['stat_mean_vars']['qual'][self._stat]['mean'][team])
-                        if team in predictions['stat_mean_vars']['qual'][self._stat]['var']:
-                            past_stats_var[team].append(predictions['stat_mean_vars']['qual'][self._stat]['var'][team])
+
+        no_priors_team_list = team_list
+
+        for year_diff in xrange(2):
+            team_events_futures = []
+            for team in no_priors_team_list:
+                team_events_futures.append((team, TeamYearEventsQuery(team, cur_event.year - year_diff).fetch_async()))
+
+            no_priors_team_list = []
+            for team, events_future in team_events_futures:
+                events = events_future.get_result()
+                EventHelper.sort_events(events)
+                no_past_mean = True
+                for event in events:
+                    if event.event_type_enum in EventType.SEASON_EVENT_TYPES and \
+                            event.start_date < cur_event.start_date and \
+                            event.event_type_enum != EventType.CMP_FINALS and \
+                            event.details:
+                        # event.details is backed by in-context cache
+                        predictions = event.details.predictions
+                        if predictions and 'stat_mean_vars' in predictions:
+                            if team in predictions['stat_mean_vars']['qual'].get(self._stat, {}).get('mean', []):
+                                team_mean = predictions['stat_mean_vars']['qual'][self._stat]['mean'][team]
+                                if year_diff != 0:
+                                    team_mean *= 1  # TODO: Hacky; scale based on actual data
+                                past_stats_mean[team].append(team_mean)
+                                no_past_mean = False
+                            if team in predictions['stat_mean_vars']['qual'].get(self._stat, {}).get('var', []):
+                                team_var = predictions['stat_mean_vars']['qual'][self._stat]['var'][team]
+                                if year_diff != 0:
+                                    team_var = self._default_var * 3  # TODO: Hacky; scale based on actual data
+                                past_stats_var[team].append(team_var)
+                if no_past_mean:
+                    no_priors_team_list.append(team)
 
         return past_stats_mean, past_stats_var
 
