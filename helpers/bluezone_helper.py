@@ -134,6 +134,7 @@ class BlueZoneHelper(object):
 
         current_match = Match.get_by_id(current_match_key) if current_match_key else None
         upcoming_matches = cls.get_upcoming_matches(live_events)
+        upcoming_matches = filter(lambda m: m.predicted_time is not None, upcoming_matches)
         upcoming_predictions = cls.get_upcoming_match_predictions(live_events)
 
         # (1, 2) Find earliest predicted unplayed match and all other matches
