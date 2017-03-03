@@ -131,6 +131,7 @@ class BlueZoneHelper(object):
         logging.info("[BLUEZONE] Config (updated {}): {}".format(bluezone_config.updated, bluezone_config.contents))
         to_log += "[BLUEZONE] Config (updated {}): {}\n".format(bluezone_config.updated, bluezone_config.contents)
         current_match_key = bluezone_config.contents.get('current_match')
+        last_match_key = bluezone_config.contents.get('last_match')
         current_match_predicted_time = bluezone_config.contents.get('current_match_predicted')
         if current_match_predicted_time:
             current_match_predicted_time = datetime.datetime.strptime(current_match_predicted_time, cls.TIME_PATTERN)
@@ -147,6 +148,7 @@ class BlueZoneHelper(object):
             blacklisted_event_keys = set(blacklisted_event_keys)
 
         current_match = Match.get_by_id(current_match_key) if current_match_key else None
+        last_match = Match.get_by_id(last_match_key) if last_match_key else None
 
         logging.info("[BLUEZONE] live_events: {}".format([le.key.id() for le in live_events]))
         to_log += "[BLUEZONE] live_events: {}\n".format([le.key.id() for le in live_events])
@@ -244,6 +246,7 @@ class BlueZoneHelper(object):
 
             if bluezone_match.key_name != current_match_key:
                 current_match_switch_time = now
+                last_match = current_match
                 logging.info("[BLUEZONE] Switching to: {}".format(bluezone_match.key.id()))
                 to_log += "[BLUEZONE] Switching to: {}\n".format(bluezone_match.key.id())
                 OutgoingNotificationHelper.send_slack_alert(slack_url, "It is now {}. Switching BlueZone to {}, scheduled for {} and predicted to be at {}.".format(now, bluezone_match.key.id(), bluezone_match.time, bluezone_match.predicted_time))
@@ -253,6 +256,7 @@ class BlueZoneHelper(object):
                 FirebasePusher.update_event(fake_event)
                 bluezone_config.contents = {
                     'current_match': bluezone_match.key.id(),
+                    'last_match': last_match.key.id(),
                     'current_match_predicted': bluezone_match.predicted_time.strftime(cls.TIME_PATTERN),
                     'blacklisted_matches': list(new_blacklisted_match_keys),
                     'blacklisted_events': list(blacklisted_event_keys),
@@ -274,6 +278,8 @@ class BlueZoneHelper(object):
                     new_file.write(existing_contents + to_log)
 
         if bluezone_match:
-            FirebasePusher.replace_event_matches('bluezone', [bluezone_match])
+            bluezone_matches = [last_match, bluezone_match]
+            bluezone_matches = filter(lambda m: m is not None, bluezone_matches)
+            FirebasePusher.replace_event_matches('bluezone', bluezone_matches)
 
         return fake_event
