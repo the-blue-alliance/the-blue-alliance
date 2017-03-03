@@ -128,8 +128,8 @@ class BlueZoneHelper(object):
             slack_url = slack_sitevar.contents.get('bluezone', '')
 
         bluezone_config = Sitevar.get_or_insert('bluezone')
-        logging.info("[BLUEZONE] Config: {}".format(bluezone_config.contents))
-        to_log += "[BLUEZONE] Config: {}\n".format(bluezone_config.contents)
+        logging.info("[BLUEZONE] Config (updated {}): {}".format(bluezone_config.updated, bluezone_config.contents))
+        to_log += "[BLUEZONE] Config (updated {}): {}\n".format(bluezone_config.updated, bluezone_config.contents)
         current_match_key = bluezone_config.contents.get('current_match')
         current_match_predicted_time = bluezone_config.contents.get('current_match_predicted')
         if current_match_predicted_time:
