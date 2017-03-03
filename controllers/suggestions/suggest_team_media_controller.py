@@ -9,7 +9,7 @@ from controllers.base_controller import LoggedInHandler
 
 from helpers.media_helper import MediaHelper, MediaParser
 from helpers.suggestions.suggestion_creator import SuggestionCreator
-from helpers.suggestions.suggestion_notifier import SuggestionNotifier
+from helpers.outgoing_notification_helper import OutgoingNotificationHelper
 from models.media import Media
 from models.sitevar import Sitevar
 from models.team import Team
@@ -95,7 +95,7 @@ class SuggestTeamMediaController(LoggedInHandler):
                         ],
                     }
 
-                    SuggestionNotifier.send_slack_alert(slack_url, message_body, [image_attachment])
+                    OutgoingNotificationHelper.send_slack_alert(slack_url, message_body, [image_attachment])
 
         self.redirect('/suggest/team/media?team_key=%s&year=%s&status=%s' % (team_key, year_str, status))
 

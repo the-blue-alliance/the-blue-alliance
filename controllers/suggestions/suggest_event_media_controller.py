@@ -4,7 +4,7 @@ from controllers.base_controller import LoggedInHandler
 from database.media_query import EventMediasQuery
 from helpers.media_helper import MediaHelper
 from helpers.suggestions.suggestion_creator import SuggestionCreator
-from helpers.suggestions.suggestion_notifier import SuggestionNotifier
+from helpers.outgoing_notification_helper import OutgoingNotificationHelper
 from models.event import Event
 from models.sitevar import Sitevar
 from template_engine import jinja2_engine
@@ -60,6 +60,6 @@ class SuggestEventMediaController(LoggedInHandler):
                         event_key,
                         suggestion.contents['foreign_key'])
 
-                    SuggestionNotifier.send_slack_alert(slack_url, message_body, [])
+                    OutgoingNotificationHelper.send_slack_alert(slack_url, message_body, [])
 
         self.redirect('/suggest/event/media?event_key=%s&status=%s' % (event_key, status))

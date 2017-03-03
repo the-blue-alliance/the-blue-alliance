@@ -5,6 +5,7 @@ import logging
 
 from helpers.firebase.firebase_pusher import FirebasePusher
 from helpers.match_helper import MatchHelper
+from helpers.outgoing_notification_helper import OutgoingNotificationHelper
 from models.event import Event
 from models.match import Match
 from models.sitevar import Sitevar
@@ -121,6 +122,11 @@ class BlueZoneHelper(object):
         to_log = '--------------------------------------------------\n'
         to_log += "[BLUEZONE] Current time: {}\n".format(now)
 
+        slack_sitevar = Sitevar.get_or_insert('slack.hookurls')
+        slack_url = None
+        if slack_sitevar:
+            slack_url = slack_sitevar.contents.get('bluezone', '')
+
         bluezone_config = Sitevar.get_or_insert('bluezone')
         logging.info("[BLUEZONE] Config: {}".format(bluezone_config.contents))
         to_log += "[BLUEZONE] Config: {}\n".format(bluezone_config.contents)
@@ -174,6 +180,7 @@ class BlueZoneHelper(object):
                         to_log += "[BLUEZONE] Adding match to blacklist: {}\n".format(match.key.id())
                         logging.info("[BLUEZONE] scheduled time: {}, now: {}".format(current_match_predicted_time, now))
                         to_log += "[BLUEZONE] scheduled time: {}, now: {}\n".format(current_match_predicted_time, now)
+                        OutgoingNotificationHelper.send_slack_alert(slack_url, "Blacklisting match {}. Scheduled time: {}, now: {}".format(match.key.id(), current_match_predicted_time, now))
                     else:
                         # We can continue to use this match
                         bluezone_match = match
@@ -211,6 +218,7 @@ class BlueZoneHelper(object):
 
                 logging.info("[BLUEZONE] Switching to: {}".format(bluezone_match.key.id()))
                 to_log += "[BLUEZONE] Switching to: {}\n".format(bluezone_match.key.id())
+                OutgoingNotificationHelper.send_slack_alert(slack_url, "It is now {}. Switching BlueZone to {}, scheduled for {} and predicted to be at {}.".format(now, bluezone_match.key.id(), bluezone_match.time, bluezone_match.predicted_time))
 
                 # Log to cloudstorage
                 log_dir = '/tbatv-prod-hrd.appspot.com/tba-logging/'

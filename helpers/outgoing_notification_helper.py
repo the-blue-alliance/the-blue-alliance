@@ -8,7 +8,7 @@ from google.appengine.api import mail
 import tba_config
 
 
-class SuggestionNotifier(object):
+class OutgoingNotificationHelper(object):
 
     @classmethod
     def send_admin_alert_email(cls, subject, email_body):
@@ -23,9 +23,9 @@ class SuggestionNotifier(object):
 
     @classmethod
     def send_slack_alert(cls, webhook_url, body_text, attachment_list=None):
-        # Send an alert to a specified slack channel to poke people to review this
+        # Send an alert to a specified slack channel
         # Only do this on prod
-        if tba_config.DEBUG:
+        if tba_config.DEBUG or not webhook_url:
             return
 
         post_dict = {
