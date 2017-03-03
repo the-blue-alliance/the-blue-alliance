@@ -16,7 +16,7 @@ class BlueZoneHelper(object):
     TIME_PATTERN = "%Y-%m-%dT%H:%M:%S"
     MAX_TIME_PER_MATCH = datetime.timedelta(minutes=5)
     # BUFFER_AFTER = datetime.timedelta(minutes=4)
-    TIME_BUCKET = datetime.timedelta(minutes=1)
+    TIME_BUCKET = datetime.timedelta(minutes=3)
 
     @classmethod
     def get_upcoming_matches(cls, live_events, n=1):
@@ -128,12 +128,17 @@ class BlueZoneHelper(object):
             slack_url = slack_sitevar.contents.get('bluezone', '')
 
         bluezone_config = Sitevar.get_or_insert('bluezone')
-        logging.info("[BLUEZONE] Config: {}".format(bluezone_config.contents))
-        to_log += "[BLUEZONE] Config: {}\n".format(bluezone_config.contents)
+        logging.info("[BLUEZONE] Config (updated {}): {}".format(bluezone_config.updated, bluezone_config.contents))
+        to_log += "[BLUEZONE] Config (updated {}): {}\n".format(bluezone_config.updated, bluezone_config.contents)
         current_match_key = bluezone_config.contents.get('current_match')
         current_match_predicted_time = bluezone_config.contents.get('current_match_predicted')
         if current_match_predicted_time:
             current_match_predicted_time = datetime.datetime.strptime(current_match_predicted_time, cls.TIME_PATTERN)
+        current_match_switch_time = bluezone_config.contents.get('current_match_switch_time')
+        if current_match_switch_time:
+            current_match_switch_time = datetime.datetime.strptime(current_match_switch_time, cls.TIME_PATTERN)
+        else:
+            current_match_switch_time = now
         blacklisted_match_keys = bluezone_config.contents.get('blacklisted_matches', set())
         if blacklisted_match_keys:
             blacklisted_match_keys = set(blacklisted_match_keys)
@@ -157,6 +162,8 @@ class BlueZoneHelper(object):
         upcoming_matches.sort(key=lambda match: match.predicted_time)
         potential_matches = []
         time_cutoff = None
+        logging.info("[BLUEZONE] all upcoming matches sorted by predicted time: {}".format([um.key.id() for um in upcoming_matches]))
+        to_log += "[BLUEZONE] all upcoming sorted by predicted time: {}\n".format([um.key.id() for um in upcoming_matches])
         for match in upcoming_matches:
             if match.predicted_time:
                 if time_cutoff is None:
@@ -179,17 +186,17 @@ class BlueZoneHelper(object):
         new_blacklisted_match_keys = set()
 
         # If the current match hasn't finished yet, don't even bother
-        cutoff_time = bluezone_config.updated + cls.MAX_TIME_PER_MATCH
+        cutoff_time = current_match_switch_time + cls.MAX_TIME_PER_MATCH
         logging.info("[BLUEZONE] Current match played? {}, now = {}, cutoff = {}".format(current_match.has_been_played if current_match else None, now, cutoff_time))
         to_log += "[BLUEZONE] Current match played? {}, now = {}, cutoff = {}\n".format(current_match.has_been_played if current_match else None, now, cutoff_time)
         if current_match and not current_match.has_been_played and now < cutoff_time \
                 and current_match_key not in blacklisted_match_keys \
                 and current_match.event_key_name not in blacklisted_event_keys:
             bluezone_match = current_match
-            # Hacky, but whatever
-            potential_matches = []
 
         for match in potential_matches:
+            if bluezone_match:
+                break
             logging.info("[BLUEZONE] Trying potential match: {}".format(match.key.id()))
             to_log += "[BLUEZONE] Trying potential match: {}\n".format(match.key.id())
             if match.event_key_name in blacklisted_event_keys:
@@ -198,7 +205,7 @@ class BlueZoneHelper(object):
                 continue
             if match.key.id() not in blacklisted_match_keys:
                 if match.key.id() == current_match_key:
-                    if current_match_predicted_time and bluezone_config.updated + cls.MAX_TIME_PER_MATCH < now and len(potential_matches) > 1:
+                    if current_match_predicted_time and cutoff_time < now and len(potential_matches) > 1:
                         # We've been on this match too long
                         new_blacklisted_match_keys.add(match.key.id())
                         logging.info("[BLUEZONE] Adding match to blacklist: {}".format(match.key.id()))
@@ -235,6 +242,12 @@ class BlueZoneHelper(object):
             # Create Fake event for return
             fake_event.webcast_json = json.dumps([real_event.current_webcasts[0]])
 
+            if bluezone_match.key_name != current_match_key:
+                current_match_switch_time = now
+                logging.info("[BLUEZONE] Switching to: {}".format(bluezone_match.key.id()))
+                to_log += "[BLUEZONE] Switching to: {}\n".format(bluezone_match.key.id())
+                OutgoingNotificationHelper.send_slack_alert(slack_url, "It is now {}. Switching BlueZone to {}, scheduled for {} and predicted to be at {}.".format(now, bluezone_match.key.id(), bluezone_match.time, bluezone_match.predicted_time))
+
             # Only need to update if things changed
             if bluezone_match.key_name != current_match_key or new_blacklisted_match_keys != blacklisted_match_keys:
                 FirebasePusher.update_event(fake_event)
@@ -243,13 +256,9 @@ class BlueZoneHelper(object):
                     'current_match_predicted': bluezone_match.predicted_time.strftime(cls.TIME_PATTERN),
                     'blacklisted_matches': list(new_blacklisted_match_keys),
                     'blacklisted_events': list(blacklisted_event_keys),
+                    'current_match_switch_time': current_match_switch_time.strftime(cls.TIME_PATTERN),
                 }
                 bluezone_config.put()
-
-            if bluezone_match.key_name != current_match_key:
-                logging.info("[BLUEZONE] Switching to: {}".format(bluezone_match.key.id()))
-                to_log += "[BLUEZONE] Switching to: {}\n".format(bluezone_match.key.id())
-                OutgoingNotificationHelper.send_slack_alert(slack_url, "It is now {}. Switching BlueZone to {}, scheduled for {} and predicted to be at {}.".format(now, bluezone_match.key.id(), bluezone_match.time, bluezone_match.predicted_time))
 
                 # Log to cloudstorage
                 log_dir = '/tbatv-prod-hrd.appspot.com/tba-logging/'
