@@ -252,6 +252,13 @@
     var redScore = predictions[matchKey]['red_actual_score'];
     var blueScore = predictions[matchKey]['blue_actual_score'];
 
+    var lineHeight = Math.max(gaussian(predictions[matchKey]['red_mean'],
+                                       predictions[matchKey]['red_mean'],
+                                       Math.sqrt(predictions[matchKey]['red_var'])),
+                              gaussian(predictions[matchKey]['blue_mean'],
+                                       predictions[matchKey]['blue_mean'],
+                                       Math.sqrt(predictions[matchKey]['blue_var'])));
+
     var datasets;
     if (redScore != -1 && blueScore != -1) {
       datasets = [{
@@ -260,7 +267,7 @@
           y: 0
         },{
           x: redScore,
-          y: isQual ? qualLineHeight : playoffLineHeight
+          y: lineHeight
         }],
         borderColor: "rgba(255,0,0,0.8)",
         borderWidth: 2
@@ -271,7 +278,7 @@
           y: 0
         },{
           x: blueScore,
-          y: isQual ? qualLineHeight : playoffLineHeight
+          y: lineHeight
         }],
         borderColor: "rgba(0,0,255,0.8)",
         borderWidth: 2
@@ -317,7 +324,7 @@
                     display: false,
                     ticks: {
                       min: 0,
-                      max: isQual? qualLineHeight * 1.1 : playoffLineHeight * 1.1,
+                      max: lineHeight * 1.1,
                     }
                 }]
             },
