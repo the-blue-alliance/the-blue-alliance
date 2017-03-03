@@ -73,7 +73,7 @@ class ContributionCalculator(object):
 
         no_priors_team_list = team_list
 
-        for year_diff in xrange(2):
+        for year_diff in xrange(1):
             team_events_futures = []
             for team in no_priors_team_list:
                 team_events_futures.append((team, TeamYearEventsQuery(team, cur_event.year - year_diff).fetch_async()))
