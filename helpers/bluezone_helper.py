@@ -177,16 +177,26 @@ class BlueZoneHelper(object):
 
         bluezone_match = None
         new_blacklisted_match_keys = set()
+
+        # If the current match hasn't finished yet, don't even bother
+        cutoff_time = current_match_predicted_time + cls.MAX_TIME_PER_MATCH
+        logging.info("[BLUEZONE] Current match played? {}, now = {}, cutoff = {}".format(current_match.has_been_played if current_match else None, now, cutoff_time))
+        to_log += "[BLUEZONE] Current match played? {}, now = {}, cutoff = {}\n".format(current_match.has_been_played if current_match else None, now, cutoff_time)
+        if current_match and not current_match.has_been_played and now < cutoff_time:
+            bluezone_match = current_match
+            # Hacky, but whatever
+            potential_matches = []
+
         for match in potential_matches:
             logging.info("[BLUEZONE] Trying potential match: {}".format(match.key.id()))
             to_log += "[BLUEZONE] Trying potential match: {}\n".format(match.key.id())
             if match.event_key_name in blacklisted_event_keys:
                 logging.info("[BLUEZONE] Event {} is blacklisted, skipping...".format(match.event_key_name))
-                to_log += "[BLUEZONE] Event {} is blacklisted, skipping...".format(match.event_key_name)
+                to_log += "[BLUEZONE] Event {} is blacklisted, skipping...\n".format(match.event_key_name)
                 continue
             if match.key.id() not in blacklisted_match_keys:
                 if match.key.id() == current_match_key:
-                    if current_match_predicted_time and current_match_predicted_time + cls.MAX_TIME_PER_MATCH < now:
+                    if current_match_predicted_time and current_match_predicted_time + cls.MAX_TIME_PER_MATCH < now and len(potential_matches) > 1:
                         # We've been on this match too long
                         new_blacklisted_match_keys.add(match.key.id())
                         logging.info("[BLUEZONE] Adding match to blacklist: {}".format(match.key.id()))
@@ -199,6 +209,7 @@ class BlueZoneHelper(object):
                         bluezone_match = match
                         logging.info("[BLUEZONE] Continuing to use match: {}".format(match.key.id()))
                         to_log += "[BLUEZONE] Continuing to use match: {}\n".format(match.key.id())
+                        break
                 else:
                     # Found a new good match
                     bluezone_match = match
@@ -223,7 +234,7 @@ class BlueZoneHelper(object):
             fake_event.webcast_json = json.dumps([real_event.current_webcasts[0]])
 
             # Only need to update if things changed
-            if bluezone_match.key_name != current_match_key:
+            if bluezone_match.key_name != current_match_key or new_blacklisted_match_keys != blacklisted_match_keys:
                 FirebasePusher.update_event(fake_event)
                 bluezone_config.contents = {
                     'current_match': bluezone_match.key.id(),
@@ -233,6 +244,7 @@ class BlueZoneHelper(object):
                 }
                 bluezone_config.put()
 
+            if bluezone_match.key_name != current_match_key:
                 logging.info("[BLUEZONE] Switching to: {}".format(bluezone_match.key.id()))
                 to_log += "[BLUEZONE] Switching to: {}\n".format(bluezone_match.key.id())
                 OutgoingNotificationHelper.send_slack_alert(slack_url, "It is now {}. Switching BlueZone to {}, scheduled for {} and predicted to be at {}.".format(now, bluezone_match.key.id(), bluezone_match.time, bluezone_match.predicted_time))
