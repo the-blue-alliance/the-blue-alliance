@@ -226,7 +226,7 @@ class FirebasePusher(object):
         if bluezone_event:
             for webcast in bluezone_event.webcast:
                 WebcastOnlineHelper.add_online_status_async(webcast)
-            events_by_key[bluezone_event.key.id()] = bluezone_event
+            events_by_key[bluezone_event.key_name] = bluezone_event
 
         return events_by_key
 
@@ -248,8 +248,11 @@ class FirebasePusher(object):
 
     @classmethod
     def update_event(cls, event):
+        WebcastOnlineHelper.add_online_status(event.webcast)
+
+        converted_event = EventConverter.convert(event, 3)
         deferred.defer(
             cls._patch_data,
             'live_events/{}'.format(event.key_name),
-            json.dumps(EventConverter.convert(event, 3)),
+            json.dumps({key: converted_event[key] for key in ['key', 'name', 'short_name', 'webcasts']}),
             _queue="firebase")
