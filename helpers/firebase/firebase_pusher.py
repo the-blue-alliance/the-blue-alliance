@@ -41,6 +41,21 @@ class FirebasePusher(object):
             raise Exception("Error with DELETE data from Firebase: {}. ERROR {}: {}".format(url, result.status_code, result.content))
 
     @classmethod
+    def _patch_data(cls, key, data_json):
+        """
+        Write or replace data to a defined path, like messages/users/user1/<data>
+        """
+        if not tba_config.CONFIG['firebase-push']:
+            return
+        secret = cls._get_secret()
+        if secret is None:
+            return
+        url = tba_config.CONFIG['firebase-url'].format(key, secret)
+        result = urlfetch.fetch(url, payload=data_json, method='PATCH', deadline=10)
+        if result.status_code not in {200, 204}:
+            raise Exception("Error with PATCH data to Firebase: {}; {}. ERROR {}: {}".format(url, data_json, result.status_code, result.content))
+
+    @classmethod
     def _put_data(cls, key, data_json):
         """
         Write or replace data to a defined path, like messages/users/user1/<data>
@@ -113,7 +128,7 @@ class FirebasePusher(object):
         match_data_json = json.dumps(filter_match_properties([MatchConverter.convert(match, 3)], 'simple')[0])
 
         deferred.defer(
-            cls._put_data,
+            cls._patch_data,
             'events/{}/matches/{}'.format(match.event.id(), match.key.id()),
             match_data_json,
             _queue="firebase")
@@ -136,7 +151,7 @@ class FirebasePusher(object):
         event_details_json = json.dumps(EventDetailsConverter.convert(event_details, 3))
 
         deferred.defer(
-            cls._put_data,
+            cls._patch_data,
             'events/{}/details'.format(event_details.key.id()),
             event_details_json,
             _queue="firebase")
@@ -234,7 +249,7 @@ class FirebasePusher(object):
     @classmethod
     def update_event(cls, event):
         deferred.defer(
-            cls._put_data,
+            cls._patch_data,
             'live_events/{}'.format(event.key_name),
             json.dumps(EventConverter.convert(event, 3)),
             _queue="firebase")
