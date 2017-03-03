@@ -194,13 +194,19 @@ class BlueZoneHelper(object):
         if current_match and not current_match.has_been_played and now < cutoff_time \
                 and current_match_key not in blacklisted_match_keys \
                 and current_match.event_key_name not in blacklisted_event_keys:
-            bluezone_match = current_match
+            logging.info("[BLUEZONE] Keeping current match {}".format(current_match.key.id()))
+            to_log += "[BLUEZONE] Keeping current match {}\n".format(current_match.key.id())
+            bluezone_matches.append(current_match)
 
         for match in potential_matches:
             if len(bluezone_matches) >= 2:  # one current, one future
                 break
             logging.info("[BLUEZONE] Trying potential match: {}".format(match.key.id()))
             to_log += "[BLUEZONE] Trying potential match: {}\n".format(match.key.id())
+            if filter(lambda m: m.key.id() == match.key.id(), bluezone_matches):
+                logging.info("[BLUEZONE] Match {} already chosen".format(match.key.id()))
+                to_log += "[BLUEZONE] Match {} already chosen\n".format(match.key.id())
+                continue
             if match.event_key_name in blacklisted_event_keys:
                 logging.info("[BLUEZONE] Event {} is blacklisted, skipping...".format(match.event_key_name))
                 to_log += "[BLUEZONE] Event {} is blacklisted, skipping...\n".format(match.event_key_name)
@@ -233,6 +239,9 @@ class BlueZoneHelper(object):
         if not bluezone_matches:
             logging.info("[BLUEZONE] No match selected")
             to_log += "[BLUEZONE] No match selected\n"
+
+        logging.info("[BLUEZONE] All selected matches: {}".format([m.key.id() for m in bluezone_matches]))
+        to_log += "[BLUEZONE] All selected matches: {}\n".format([m.key.id() for m in bluezone_matches])
 
         # (3) Switch to hottest match
         fake_event = cls.build_fake_event()
