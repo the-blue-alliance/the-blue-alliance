@@ -186,10 +186,10 @@ class BlueZoneHelper(object):
                 and current_match_key not in blacklisted_match_keys \
                 and current_match.event_key_name not in blacklisted_event_keys:
             bluezone_match = current_match
-            # Hacky, but whatever
-            potential_matches = []
 
         for match in potential_matches:
+            if bluezone_match:
+                break
             logging.info("[BLUEZONE] Trying potential match: {}".format(match.key.id()))
             to_log += "[BLUEZONE] Trying potential match: {}\n".format(match.key.id())
             if match.event_key_name in blacklisted_event_keys:
@@ -246,7 +246,6 @@ class BlueZoneHelper(object):
                 }
                 bluezone_config.put()
 
-            if bluezone_match.key_name != current_match_key:
                 logging.info("[BLUEZONE] Switching to: {}".format(bluezone_match.key.id()))
                 to_log += "[BLUEZONE] Switching to: {}\n".format(bluezone_match.key.id())
                 OutgoingNotificationHelper.send_slack_alert(slack_url, "It is now {}. Switching BlueZone to {}, scheduled for {} and predicted to be at {}.".format(now, bluezone_match.key.id(), bluezone_match.time, bluezone_match.predicted_time))
