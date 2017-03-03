@@ -246,17 +246,18 @@ class BlueZoneHelper(object):
 
             if bluezone_match.key_name != current_match_key:
                 current_match_switch_time = now
-                last_match = current_match
                 logging.info("[BLUEZONE] Switching to: {}".format(bluezone_match.key.id()))
                 to_log += "[BLUEZONE] Switching to: {}\n".format(bluezone_match.key.id())
                 OutgoingNotificationHelper.send_slack_alert(slack_url, "It is now {}. Switching BlueZone to {}, scheduled for {} and predicted to be at {}.".format(now, bluezone_match.key.id(), bluezone_match.time, bluezone_match.predicted_time))
+                if current_match.has_been_played:
+                    last_match = current_match
 
             # Only need to update if things changed
             if bluezone_match.key_name != current_match_key or new_blacklisted_match_keys != blacklisted_match_keys:
                 FirebasePusher.update_event(fake_event)
                 bluezone_config.contents = {
                     'current_match': bluezone_match.key.id(),
-                    'last_match': last_match.key.id(),
+                    'last_match': last_match.key.id() if last_match else '',
                     'current_match_predicted': bluezone_match.predicted_time.strftime(cls.TIME_PATTERN),
                     'blacklisted_matches': list(new_blacklisted_match_keys),
                     'blacklisted_events': list(blacklisted_event_keys),
