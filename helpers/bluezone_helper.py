@@ -196,7 +196,7 @@ class BlueZoneHelper(object):
                 continue
             if match.key.id() not in blacklisted_match_keys:
                 if match.key.id() == current_match_key:
-                    if current_match_predicted_time and current_match_predicted_time + cls.MAX_TIME_PER_MATCH < now:
+                    if current_match_predicted_time and current_match_predicted_time + cls.MAX_TIME_PER_MATCH < now and len(potential_matches) > 1:
                         # We've been on this match too long
                         new_blacklisted_match_keys.add(match.key.id())
                         logging.info("[BLUEZONE] Adding match to blacklist: {}".format(match.key.id()))
@@ -234,7 +234,7 @@ class BlueZoneHelper(object):
             fake_event.webcast_json = json.dumps([real_event.current_webcasts[0]])
 
             # Only need to update if things changed
-            if bluezone_match.key_name != current_match_key:
+            if bluezone_match.key_name != current_match_key or new_blacklisted_match_keys != blacklisted_match_keys:
                 FirebasePusher.update_event(fake_event)
                 bluezone_config.contents = {
                     'current_match': bluezone_match.key.id(),
@@ -244,6 +244,7 @@ class BlueZoneHelper(object):
                 }
                 bluezone_config.put()
 
+            if bluezone_match.key_name != current_match_key:
                 logging.info("[BLUEZONE] Switching to: {}".format(bluezone_match.key.id()))
                 to_log += "[BLUEZONE] Switching to: {}\n".format(bluezone_match.key.id())
                 OutgoingNotificationHelper.send_slack_alert(slack_url, "It is now {}. Switching BlueZone to {}, scheduled for {} and predicted to be at {}.".format(now, bluezone_match.key.id(), bluezone_match.time, bluezone_match.predicted_time))
