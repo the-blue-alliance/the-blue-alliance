@@ -9,6 +9,7 @@ from helpers.match_manipulator import MatchManipulator
 class MatchTimePredictionHelper(object):
 
     EPOCH = datetime.datetime.fromtimestamp(0)
+    MAX_IN_PAST = datetime.timedelta(minutes=-3)  # One match length, ish
 
     @classmethod
     def as_local(cls, time, timezone):
@@ -107,7 +108,7 @@ class MatchTimePredictionHelper(object):
             # Never predict a match to happen more than 2 minutes ahead of schedule or in the past
             # However, if the event is not live (we're running the job manually for a single event),
             # then allow predicted times to be in the past.
-            now = datetime.datetime.now(timezone) if is_live else cls.as_local(cls.EPOCH, timezone)
+            now = datetime.datetime.now(timezone) + cls.MAX_IN_PAST if is_live else cls.as_local(cls.EPOCH, timezone)
             earliest_possible = cls.as_local(match.time + datetime.timedelta(minutes=-2), timezone)
             match.predicted_time = max(cls.as_utc(predicted), cls.as_utc(earliest_possible), cls.as_utc(now))
             last = match
