@@ -66,7 +66,7 @@ class EventDetails(ndb.Model):
                 has_record = True
             row.append(rank['dq'])
             row.append(rank['matches_played'])
-            if rank['qual_average'] is None:
+            if rank['qual_average'] is None and self.year != 2017:
                 row.append('%.*f' % (2, round(
                     rank['sort_orders'][0] / rank['matches_played'] if rank['matches_played'] > 0 else 0, 2)))
             else:
@@ -80,7 +80,7 @@ class EventDetails(ndb.Model):
         if has_record:
             title_row += ['Record (W-L-T)']
         title_row += ['DQ', 'Played']
-        if not has_qual_avg:
+        if not has_qual_avg and self.year != 2017:
             title_row.append('{}/Match*'.format(sort_order_info[0]['name']))
 
         rankings_table = [title_row] + rankings_table
