@@ -173,11 +173,11 @@
   Chart.defaults.global.maintainAspectRatio = false;
   Chart.defaults.global.tooltips = false;
 
-  var minQualScore = Infinity;
-  var maxQualScore = 0;
+  var minQualScore = 1;
+  var maxQualScore = 199;
   var qualLineHeight = 0;
-  var minPlayoffScore = Infinity;
-  var maxPlayoffScore = 0;
+  var minPlayoffScore = 1;
+  var maxPlayoffScore = 199;
   var playoffLineHeight = 0;
   for (var key in predictions) {
     var redScore = predictions[key]['red_actual_score'];
@@ -212,15 +212,6 @@
                           predictions[key]['blue_mean'],
                           Math.sqrt(predictions[key]['blue_var']))));
     }
-  }
-
-  if (minQualScore == Infinity || maxQualScore == 0) {
-    minQualScore = 1;
-    maxQualScore = 199;
-  }
-  if (minPlayoffScore == Infinity || maxPlayoffScore == 0) {
-    minPlayoffScore = 1;
-    maxPlayoffScore = 199;
   }
 
   var xMinQual = minQualScore - (minQualScore % 50);
