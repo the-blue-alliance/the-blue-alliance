@@ -262,6 +262,8 @@ class InsightsHelper(object):
             elim_num_matches_by_week = 0
             for _, matches in week_events:
                 for match in matches:
+                    if not match.has_been_played:
+                        continue
                     redScore = int(match.alliances['red']['score'])
                     blueScore = int(match.alliances['blue']['score'])
                     week_match_sum += redScore + blueScore
