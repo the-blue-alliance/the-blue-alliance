@@ -203,35 +203,39 @@ class BlueZoneHelper(object):
 
         # (3) Switch to hottest match
         fake_event = cls.build_fake_event()
-        if bluezone_match and bluezone_match.key_name != current_match_key:
+        if bluezone_match:
             real_event = filter(lambda x: x.key_name == bluezone_match.event_key_name, live_events)[0]
             real_event_webcasts = real_event.current_webcasts
             if real_event_webcasts:
+                # Create Fake event for return
                 fake_event.webcast_json = json.dumps([real_event_webcasts[0]])
-                FirebasePusher.update_event(fake_event)
-                bluezone_config.contents = {
-                    'current_match': bluezone_match.key.id(),
-                    'current_match_predicted': bluezone_match.predicted_time.strftime(cls.TIME_PATTERN),
-                    'blacklisted_matches': list(new_blacklisted_match_keys),
-                }
-                bluezone_config.put()
 
-                logging.info("[BLUEZONE] Switching to: {}".format(bluezone_match.key.id()))
-                to_log += "[BLUEZONE] Switching to: {}\n".format(bluezone_match.key.id())
-                OutgoingNotificationHelper.send_slack_alert(slack_url, "It is now {}. Switching BlueZone to {}, scheduled for {} and predicted to be at {}.".format(now, bluezone_match.key.id(), bluezone_match.time, bluezone_match.predicted_time))
+                # Only need to update if things changed
+                if bluezone_match.key_name != current_match_key:
+                    FirebasePusher.update_event(fake_event)
+                    bluezone_config.contents = {
+                        'current_match': bluezone_match.key.id(),
+                        'current_match_predicted': bluezone_match.predicted_time.strftime(cls.TIME_PATTERN),
+                        'blacklisted_matches': list(new_blacklisted_match_keys),
+                    }
+                    bluezone_config.put()
 
-                # Log to cloudstorage
-                log_dir = '/tbatv-prod-hrd.appspot.com/tba-logging/'
-                log_file = 'bluezone_{}.txt'.format(now.date())
-                full_path = log_dir + log_file
+                    logging.info("[BLUEZONE] Switching to: {}".format(bluezone_match.key.id()))
+                    to_log += "[BLUEZONE] Switching to: {}\n".format(bluezone_match.key.id())
+                    OutgoingNotificationHelper.send_slack_alert(slack_url, "It is now {}. Switching BlueZone to {}, scheduled for {} and predicted to be at {}.".format(now, bluezone_match.key.id(), bluezone_match.time, bluezone_match.predicted_time))
 
-                existing_contents = ''
-                if full_path in set([f.filename for f in cloudstorage.listbucket(log_dir)]):
-                    with cloudstorage.open(full_path, 'r') as existing_file:
-                        existing_contents = existing_file.read()
+                    # Log to cloudstorage
+                    log_dir = '/tbatv-prod-hrd.appspot.com/tba-logging/'
+                    log_file = 'bluezone_{}.txt'.format(now.date())
+                    full_path = log_dir + log_file
 
-                with cloudstorage.open(full_path, 'w') as new_file:
-                    new_file.write(existing_contents + to_log)
+                    existing_contents = ''
+                    if full_path in set([f.filename for f in cloudstorage.listbucket(log_dir)]):
+                        with cloudstorage.open(full_path, 'r') as existing_file:
+                            existing_contents = existing_file.read()
+
+                    with cloudstorage.open(full_path, 'w') as new_file:
+                        new_file.write(existing_contents + to_log)
 
         if bluezone_match:
             FirebasePusher.replace_event_matches('bluezone', [bluezone_match])
