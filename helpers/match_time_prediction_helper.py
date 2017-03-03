@@ -69,7 +69,7 @@ class MatchTimePredictionHelper(object):
                 cycle = (0.7 * cycle) + (0.3 * scheduled_cycle)
                 cycles.append(cycle)
 
-        return np.percentile(cycles, 30) if cycles else None
+        return np.percentile(cycles, 35) if cycles else None
 
     @classmethod
     def predict_future_matches(cls, played_matches, unplayed_matches, timezone, is_live):
