@@ -338,7 +338,7 @@ class Event(ndb.Model):
 
     @property
     def webcast_status(self):
-        WebcastOnlineHelper.add_online_status(self.webcast)
+        WebcastOnlineHelper.add_online_status(self.current_webcasts)
         overall_status = 'offline'
         for webcast in self.webcast:
             status = webcast.get('status')
