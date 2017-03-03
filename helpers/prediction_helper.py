@@ -431,7 +431,7 @@ class PredictionHelper(object):
             ]
         elif event.year == 2017:
             relevant_stats = [
-                ('score', 30, 10**2),
+                ('score', 50, 30**2),
                 ('pressure', 0, 1**2),
                 ('gears', 0, 1**2),
             ]
