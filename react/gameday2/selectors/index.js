@@ -74,7 +74,7 @@ export const getTickerMatches = createSelector(
     }
     function calculateOrder(match) {
       let time = 9999999999
-      if (match.alliances.red.score != -1 && match.alliances.blue.score != -1) {
+      if (match.alliances.red.score !== -1 && match.alliances.blue.score !== -1) {
         time = 0
       }
       if (match.predicted_time) {
