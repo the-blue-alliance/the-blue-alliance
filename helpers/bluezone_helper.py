@@ -179,7 +179,9 @@ class BlueZoneHelper(object):
         new_blacklisted_match_keys = set()
 
         # If the current match hasn't finished yet, don't even bother
-        if not current_match.has_been_played and current_match_predicted_time + cls.MAX_TIME_PER_MATCH < now:
+        logging.info("[BLUEZONE] Current match played? {}".format(current_match.has_been_played if current_match else None))
+        to_log += "[BLUEZONE] Current match played? {}\n".format(current_match.has_been_played if current_match else None)
+        if current_match and not current_match.has_been_played and current_match_predicted_time + cls.MAX_TIME_PER_MATCH < now:
             # Hacky, but whatever
             potential_matches = []
 
@@ -188,7 +190,7 @@ class BlueZoneHelper(object):
             to_log += "[BLUEZONE] Trying potential match: {}\n".format(match.key.id())
             if match.event_key_name in blacklisted_event_keys:
                 logging.info("[BLUEZONE] Event {} is blacklisted, skipping...".format(match.event_key_name))
-                to_log += "[BLUEZONE] Event {} is blacklisted, skipping...".format(match.event_key_name)
+                to_log += "[BLUEZONE] Event {} is blacklisted, skipping...\n".format(match.event_key_name)
                 continue
             if match.key.id() not in blacklisted_match_keys:
                 if match.key.id() == current_match_key:
@@ -205,6 +207,7 @@ class BlueZoneHelper(object):
                         bluezone_match = match
                         logging.info("[BLUEZONE] Continuing to use match: {}".format(match.key.id()))
                         to_log += "[BLUEZONE] Continuing to use match: {}\n".format(match.key.id())
+                        break
                 else:
                     # Found a new good match
                     bluezone_match = match
