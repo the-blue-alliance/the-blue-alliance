@@ -184,7 +184,7 @@ class BlueZoneHelper(object):
         logging.info("[BLUEZONE] potential_matches sorted by hotness: {}".format([pm.key.id() for pm in potential_matches]))
         to_log += "[BLUEZONE] potential_matches sorted by hotness: {}\n".format([pm.key.id() for pm in potential_matches])
 
-        bluezone_match = None
+        bluezone_matches = []
         new_blacklisted_match_keys = set()
 
         # If the current match hasn't finished yet, don't even bother
@@ -197,7 +197,7 @@ class BlueZoneHelper(object):
             bluezone_match = current_match
 
         for match in potential_matches:
-            if bluezone_match:
+            if len(bluezone_matches) >= 2:  # one current, one future
                 break
             logging.info("[BLUEZONE] Trying potential match: {}".format(match.key.id()))
             to_log += "[BLUEZONE] Trying potential match: {}\n".format(match.key.id())
@@ -217,28 +217,27 @@ class BlueZoneHelper(object):
                         OutgoingNotificationHelper.send_slack_alert(slack_url, "Blacklisting match {}. Predicted time: {}, now: {}".format(match.key.id(), current_match_predicted_time, now))
                     else:
                         # We can continue to use this match
-                        bluezone_match = match
+                        bluezone_matches.append(match)
                         logging.info("[BLUEZONE] Continuing to use match: {}".format(match.key.id()))
                         to_log += "[BLUEZONE] Continuing to use match: {}\n".format(match.key.id())
-                        break
                 else:
                     # Found a new good match
-                    bluezone_match = match
+                    bluezone_matches.append(match)
                     logging.info("[BLUEZONE] Found a good new match: {}".format(match.key.id()))
                     to_log += "[BLUEZONE] Found a good new match: {}\n".format(match.key.id())
-                    break
             else:
                 logging.info("[BLUEZONE] Match already blacklisted: {}".format(match.key.id()))
                 to_log += "[BLUEZONE] Match already blacklisted: {}\n".format(match.key.id())
                 new_blacklisted_match_keys.add(match.key.id())
 
-        if not bluezone_match:
+        if not bluezone_matches:
             logging.info("[BLUEZONE] No match selected")
             to_log += "[BLUEZONE] No match selected\n"
 
         # (3) Switch to hottest match
         fake_event = cls.build_fake_event()
-        if bluezone_match:
+        if bluezone_matches:
+            bluezone_match = bluezone_matches[0]
             real_event = filter(lambda x: x.key_name == bluezone_match.event_key_name, live_events)[0]
 
             # Create Fake event for return
@@ -278,8 +277,7 @@ class BlueZoneHelper(object):
                 with cloudstorage.open(full_path, 'w') as new_file:
                     new_file.write(existing_contents + to_log)
 
-        if bluezone_match:
-            bluezone_matches = [last_match, bluezone_match]
+            bluezone_matches.insert(0, last_match)
             bluezone_matches = filter(lambda m: m is not None, bluezone_matches)
             FirebasePusher.replace_event_matches('bluezone', bluezone_matches)
 
