@@ -517,7 +517,7 @@ class PredictionHelper(object):
     @classmethod
     def get_ranking_predictions(cls, matches, match_predictions, n=1000):
         matches = MatchHelper.organizeMatches(matches)['qm']
-        if not matches:
+        if not matches or not match_predictions:
             return None, None
 
         # Calc surrogates
