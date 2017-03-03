@@ -16,7 +16,7 @@ class BlueZoneHelper(object):
     TIME_PATTERN = "%Y-%m-%dT%H:%M:%S"
     MAX_TIME_PER_MATCH = datetime.timedelta(minutes=5)
     # BUFFER_AFTER = datetime.timedelta(minutes=4)
-    TIME_BUCKET = datetime.timedelta(minutes=1)
+    TIME_BUCKET = datetime.timedelta(minutes=3)
 
     @classmethod
     def get_upcoming_matches(cls, live_events, n=1):
@@ -162,6 +162,8 @@ class BlueZoneHelper(object):
         upcoming_matches.sort(key=lambda match: match.predicted_time)
         potential_matches = []
         time_cutoff = None
+        logging.info("[BLUEZONE] all upcoming matches sorted by predicted time: {}".format([um.key.id() for um in upcoming_matches]))
+        to_log += "[BLUEZONE] all upcoming sorted by predicted time: {}\n".format([um.key.id() for um in upcoming_matches])
         for match in upcoming_matches:
             if match.predicted_time:
                 if time_cutoff is None:
