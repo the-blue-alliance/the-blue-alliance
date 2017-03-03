@@ -25,7 +25,7 @@ class OutgoingNotificationHelper(object):
     def send_slack_alert(cls, webhook_url, body_text, attachment_list=None):
         # Send an alert to a specified slack channel
         # Only do this on prod
-        if tba_config.DEBUG:
+        if tba_config.DEBUG or not webhook_url:
             return
 
         post_dict = {
