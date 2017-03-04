@@ -520,6 +520,10 @@ class PredictionHelper(object):
         if not matches or not match_predictions:
             return None, None
 
+        match_predictions = match_predictions.get('qual')
+        if not match_predictions:
+            return None, None
+
         # Calc surrogates
         match_counts = defaultdict(int)
         for match in matches:

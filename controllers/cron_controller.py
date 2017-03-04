@@ -171,7 +171,7 @@ class EventMatchstatsDo(webapp.RequestHandler):
         if event.year >= 2016 and event.event_type_enum in EventType.SEASON_EVENT_TYPES:
             sorted_matches = MatchHelper.play_order_sort_matches(event.matches)
             match_predictions, match_prediction_stats, stat_mean_vars = PredictionHelper.get_match_predictions(sorted_matches)
-            ranking_predictions, ranking_prediction_stats = PredictionHelper.get_ranking_predictions(sorted_matches, match_predictions.get('qual'))
+            ranking_predictions, ranking_prediction_stats = PredictionHelper.get_ranking_predictions(sorted_matches, match_predictions)
 
             predictions_dict = {
                 'match_predictions': match_predictions,
