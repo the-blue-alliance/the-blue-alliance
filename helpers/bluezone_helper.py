@@ -36,7 +36,7 @@ class BlueZoneHelper(object):
                     predictions.update(event.details.predictions.get('match_predictions', {}))
                 except Exception, e:
                     logging.info("get_upcoming_match_predictions failed!")
-                    logging.exception(e)
+                    logging.info(e)
         return predictions
 
     # @classmethod
