@@ -33,9 +33,9 @@ class BlueZoneHelper(object):
         for event in live_events:
             if event.details and event.details.predictions:
                 try:
-                    predictions.update(event.details.predictions['match_predictions'])
+                    predictions.update(event.details.predictions.get('match_predictions', {}))
                 except Exception, e:
-                    logging.error("get_upcoming_match_predictions failed!")
+                    logging.info("get_upcoming_match_predictions failed!")
                     logging.exception(e)
         return predictions
 
