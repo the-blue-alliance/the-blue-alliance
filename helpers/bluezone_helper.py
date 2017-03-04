@@ -32,8 +32,11 @@ class BlueZoneHelper(object):
         predictions = {}
         for event in live_events:
             if event.details and event.details.predictions:
-                if event.details.predictions is not None:
+                try:
                     predictions.update(event.details.predictions['match_predictions'])
+                except Exception, e:
+                    logging.error("get_upcoming_match_predictions failed!")
+                    logging.exception(e)
         return predictions
 
     # @classmethod
