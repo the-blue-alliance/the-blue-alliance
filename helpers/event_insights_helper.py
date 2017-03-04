@@ -125,7 +125,7 @@ class EventInsightsHelper(object):
                     rotor_2_engaged += 1 if alliance_breakdown['rotor2Engaged'] else 0
                     rotor_3_engaged += 1 if alliance_breakdown['rotor3Engaged'] else 0
                     rotor_4_engaged += 1 if alliance_breakdown['rotor4Engaged'] else 0
-                    rotor_points = alliance_breakdown['autoRotorPoints'] + alliance_breakdown['teleopRotorPoints']
+                    rotor_points += alliance_breakdown['autoRotorPoints'] + alliance_breakdown['teleopRotorPoints']
                     high_goals += alliance_breakdown['autoFuelHigh'] + alliance_breakdown['teleopFuelHigh']
                     low_goals += alliance_breakdown['autoFuelLow'] + alliance_breakdown['teleopFuelLow']
                     fuel_points += alliance_breakdown['autoFuelPoints'] + alliance_breakdown['teleopFuelPoints']
