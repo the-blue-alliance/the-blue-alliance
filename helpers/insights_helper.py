@@ -224,19 +224,45 @@ class InsightsHelper(object):
         """
         Returns an Insight where the data is list of highest scoring matches
         """
-        highscore_matches = []  # list of matches (if there are ties)
-        highscore = 0
+        highscore_matches = {
+            'qual': [],
+            'playoff': [],
+            'overall': [],
+        }  # dict of list of matches (if there are ties)
+        highscore = {
+            'qual': 0,
+            'playoff': 0,
+            'overall': 0,
+        }
         for _, week_events in week_event_matches:
             for event, matches in week_events:
                 for match in matches:
+                    comp_level = 'qual' if match.comp_level == 'qm' else 'playoff'
+                    match_data = self._generateMatchData(match, event)
+
                     redScore = int(match.alliances['red']['score'])
                     blueScore = int(match.alliances['blue']['score'])
+
+                    # Overall, including penalties
                     maxScore = max(redScore, blueScore)
-                    if maxScore >= highscore:
-                        if maxScore > highscore:
-                            highscore_matches = []
-                        highscore_matches.append(self._generateMatchData(match, event))
-                        highscore = maxScore
+                    if maxScore >= highscore['overall']:
+                        if maxScore > highscore['overall']:
+                            highscore_matches['overall'] = []
+                        highscore_matches['overall'].append(match_data)
+                        highscore['overall'] = maxScore
+
+                    # Penalty free, if possible
+                    if year >= 2017:
+                        if match.score_breakdown:
+                            redScore -= match.score_breakdown['red'].get('foulPoints', 0)
+                            blueScore -= match.score_breakdown['blue'].get('foulPoints', 0)
+
+                    maxScore = max(redScore, blueScore)
+                    if maxScore >= highscore[comp_level]:
+                        if maxScore > highscore[comp_level]:
+                            highscore_matches[comp_level] = []
+                        highscore_matches[comp_level].append(match_data)
+                        highscore[comp_level] = maxScore
 
         insight = None
         if highscore_matches != []:
