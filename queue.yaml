@@ -1,6 +1,6 @@
 queue:
 - name: default
-  rate: 1/s
+  rate: 10/s
 
 - name: cache-clearing
   rate: 5/s

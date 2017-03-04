@@ -32,7 +32,8 @@ class BlueZoneHelper(object):
         predictions = {}
         for event in live_events:
             if event.details and event.details.predictions:
-                predictions.update(event.details.predictions['match_predictions'])
+                if event.details.predictions is not None:
+                    predictions.update(event.details.predictions['match_predictions'])
         return predictions
 
     # @classmethod
