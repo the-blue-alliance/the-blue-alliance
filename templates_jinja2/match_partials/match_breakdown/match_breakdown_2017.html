@@ -139,16 +139,16 @@
     <!-- Pressure/Rotor -->
     {% if "kPaRankingPointAchieved" in match.score_breakdown.red %}
     <tr>
-      <td class="red" colspan="2">{% if match.score_breakdown.red.kPaRankingPointAchieved %} <span class="glyphicon glyphicon-ok"></span> {% if match.score_breakdown.red.kPaBonusPoints > 0 %} (+{{ match.score_breakdown.red.kPaBonusPoints }}) {% endif %} {% else %} <span class="glyphicon glyphicon-remove"></span> {% endif %}</td>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.kPaRankingPointAchieved or match.score_breakdown.red.kPaBonusPoints > 0 %} <span class="glyphicon glyphicon-ok"></span> {% if match.score_breakdown.red.kPaBonusPoints > 0 %} (+{{ match.score_breakdown.red.kPaBonusPoints }}) {% endif %} {% else %} <span class="glyphicon glyphicon-remove"></span> {% endif %}</td>
       <td>Pressure Reached</td>
-      <td class="blue" colspan="2">{% if match.score_breakdown.blue.kPaRankingPointAchieved %} <span class="glyphicon glyphicon-ok"></span> {% if match.score_breakdown.blue.kPaBonusPoints > 0 %} (+{{ match.score_breakdown.blue.kPaBonusPoints }}) {% endif %} {% else %} <span class="glyphicon glyphicon-remove"></span> {% endif %}</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.kPaRankingPointAchieved or match.score_breakdown.blue.kPaBonusPoints > 0 %} <span class="glyphicon glyphicon-ok"></span> {% if match.score_breakdown.blue.kPaBonusPoints > 0 %} (+{{ match.score_breakdown.blue.kPaBonusPoints }}) {% endif %} {% else %} <span class="glyphicon glyphicon-remove"></span> {% endif %}</td>
     </tr>
     {% endif %}
     {% if "rotorRankingPointAchieved" in match.score_breakdown.red %}
     <tr>
-      <td class="red" colspan="2">{% if match.score_breakdown.red.rotorRankingPointAchieved %} <span class="glyphicon glyphicon-ok"></span> {% if match.score_breakdown.red.rotorBonusPoints > 0 %} (+{{ match.score_breakdown.red.rotorBonusPoints }}) {% endif %}{% else %} <span class="glyphicon glyphicon-remove"></span> {% endif %}</td>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.rotorRankingPointAchieved or match.score_breakdown.red.rotorBonusPoints > 0 %} <span class="glyphicon glyphicon-ok"></span> {% if match.score_breakdown.red.rotorBonusPoints > 0 %} (+{{ match.score_breakdown.red.rotorBonusPoints }}) {% endif %}{% else %} <span class="glyphicon glyphicon-remove"></span> {% endif %}</td>
       <td>All Rotors Engaged</td>
-      <td class="blue" colspan="2">{% if match.score_breakdown.blue.rotorRankingPointAchieved %} <span class="glyphicon glyphicon-ok"></span> {% if match.score_breakdown.blue.rotorBonusPoints > 0 %} (+{{ match.score_breakdown.blue.rotorBonusPoints }}) {% endif %}{% else %} <span class="glyphicon glyphicon-remove"></span> {% endif %}</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.rotorRankingPointAchieved or match.score_breakdown.blue.rotorBonusPoints > 0 %} <span class="glyphicon glyphicon-ok"></span> {% if match.score_breakdown.blue.rotorBonusPoints > 0 %} (+{{ match.score_breakdown.blue.rotorBonusPoints }}) {% endif %}{% else %} <span class="glyphicon glyphicon-remove"></span> {% endif %}</td>
     </tr>
     {% endif %}
 
