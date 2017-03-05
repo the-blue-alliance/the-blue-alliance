@@ -71,15 +71,18 @@ class MatchManipulator(ManipulatorBase):
         '''
         Enqueue firebase push
         '''
-        event_keys = set()
-        for match in matches:
-            event_keys.add(match.event.id())
+        affected_stats_event_keys = set()
+        for (match, updated_attrs) in zip(matches, updated_attr_list):
+            # Only attrs that affect stats
+            if set(['alliances_json', 'score_breakdown_json']).intersection(set(updated_attrs)) != set():
+                affected_stats_event_keys.add(match.event.id())
             try:
                 FirebasePusher.update_match(match)
             except Exception:
                 logging.warning("Firebase update_match failed!")
 
-        for event_key in event_keys:
+        # Enqueue statistics
+        for event_key in affected_stats_event_keys:
             # Enqueue task to calculate matchstats
             try:
                 taskqueue.add(
