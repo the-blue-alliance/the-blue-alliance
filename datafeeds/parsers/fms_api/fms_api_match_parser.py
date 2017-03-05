@@ -45,6 +45,7 @@ ELIM_MAPPING = {
     19: (1, 1),
     20: (1, 2),
     21: (1, 3),
+    22: (1, 4),
 }
 
 OCTO_ELIM_MAPPING = {
