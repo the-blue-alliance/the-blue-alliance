@@ -25,6 +25,7 @@ from controllers.admin.admin_sitevar_controller import AdminSitevarCreate, Admin
 from controllers.admin.admin_suggestion_controller import AdminCreateTestSuggestions
 from controllers.admin.admin_team_controller import AdminTeamCreateTest, AdminTeamDetail, AdminTeamList
 from controllers.admin.admin_user_controller import AdminUserDetail, AdminUserEdit, AdminUserTestSetup, AdminUserList, AdminUserPermissionsList
+from controllers.admin.bluezone_controller import BlueZoneDebugHandler
 
 from google.appengine.ext.webapp import template
 template.register_template_library('common.my_filters')
@@ -36,6 +37,7 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/api_auth/manage', AdminApiAuthManage),
                                ('/admin/apistatus', AdminApiStatus),
                                ('/admin/authkeys', AdminAuthKeys),
+                               ('/admin/bluezone_debug', BlueZoneDebugHandler),
                                ('/admin/debug', AdminDebugHandler),
                                ('/admin/districts', AdminDistrictList),
                                ('/admin/districts/([0-9]*)', AdminDistrictList),
