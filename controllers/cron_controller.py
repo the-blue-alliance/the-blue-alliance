@@ -641,4 +641,8 @@ class BlueZoneUpdateDo(webapp.RequestHandler):
     """
     def get(self):
         live_events = EventHelper.getEventsWithinADay()
-        BlueZoneHelper.update_bluezone(live_events)
+        try:
+            BlueZoneHelper.update_bluezone(live_events)
+        except Exception, e:
+            logging.error("BlueZone update failed")
+            logging.exception(e)

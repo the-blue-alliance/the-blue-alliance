@@ -261,7 +261,7 @@ class BlueZoneHelper(object):
                 logging.info("[BLUEZONE] Switching to: {}".format(bluezone_match.key.id()))
                 to_log += "[BLUEZONE] Switching to: {}\n".format(bluezone_match.key.id())
                 OutgoingNotificationHelper.send_slack_alert(slack_url, "It is now {}. Switching BlueZone to {}, scheduled for {} and predicted to be at {}.".format(now, bluezone_match.key.id(), bluezone_match.time, bluezone_match.predicted_time))
-                if current_match.has_been_played:
+                if not current_match or current_match.has_been_played:
                     last_match = current_match
 
             # Only need to update if things changed
