@@ -157,7 +157,10 @@ class DatafeedFMSAPI(object):
                     logging.error("Error saving API response for: {}".format(url))
                     logging.error(traceback.format_exc())
 
-            raise ndb.Return(parser.parse(json.loads(result.content)))
+            if type(parser) == list:
+                raise ndb.Return([p.parse(json.loads(result.content)) for p in parser])
+            else:
+                raise ndb.Return(parser.parse(json.loads(result.content)))
         elif result.status_code % 100 == 5:
             # 5XX error - something is wrong with the server
             logging.warning('URLFetch for %s failed; Error code %s' % (url, result.status_code))
@@ -232,8 +235,9 @@ class DatafeedFMSAPI(object):
         year = int(event_key[:4])
         event_short = event_key[4:]
 
-        rankings = self._parse(self.FMS_API_EVENT_RANKINGS_URL_PATTERN % (year, self._get_event_short(event_short)), FMSAPIEventRankingsParser(year))
-        rankings2 = self._parse(self.FMS_API_EVENT_RANKINGS_URL_PATTERN % (year, self._get_event_short(event_short)), FMSAPIEventRankings2Parser(year))
+        rankings, rankings2 = self._parse(
+            self.FMS_API_EVENT_RANKINGS_URL_PATTERN % (year, self._get_event_short(event_short)),
+            [FMSAPIEventRankingsParser(year), FMSAPIEventRankings2Parser(year)])
         return rankings, rankings2
 
     def getTeamDetails(self, year, team_key):
