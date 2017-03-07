@@ -6,7 +6,6 @@ import logging
 import tba_config
 import traceback
 
-from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
 
 from consts.event_type import EventType
@@ -130,8 +129,8 @@ class DatafeedFMSAPI(object):
             'Pragma': 'no-cache',
         }
         try:
-            rpc = urlfetch.create_rpc(deadline=10)
-            result = yield urlfetch.make_fetch_call(rpc, url, headers=headers)
+            context = ndb.get_context()
+            result = yield context.urlfetch(url, headers=headers)
         except Exception, e:
             logging.error("URLFetch failed for: {}".format(url))
             logging.info(e)
