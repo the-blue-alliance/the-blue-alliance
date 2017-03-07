@@ -47,6 +47,7 @@ class TestUpcomingMatchNotification(unittest2.TestCase):
         else:
             expected['message_data']['scheduled_time'] = None
             expected['message_data']['predicted_time'] = None
+        expected['message_data']['webcast'] = None
 
         data = self.notification._build_dict()
 
