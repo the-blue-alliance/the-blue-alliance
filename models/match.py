@@ -140,6 +140,31 @@ class Match(ndb.Model):
         if self._score_breakdown is None and self.score_breakdown_json is not None:
             self._score_breakdown = json.loads(self.score_breakdown_json)
 
+            # Add in RP calculations
+            if self.has_been_played:
+                if self.year >= 2016:
+                    for color in ['red', 'blue']:
+                        if self.comp_level == 'qm':
+                            rp_earned = 0
+                            if self.winning_alliance == color:
+                                rp_earned += 2
+                            elif self.winning_alliance == '':
+                                rp_earned += 1
+
+                            if self.year == 2016:
+                                if self._score_breakdown.get(color, {}).get('teleopDefensesBreached'):
+                                    rp_earned += 1
+                                if self._score_breakdown.get(color, {}).get('teleopTowerCaptured'):
+                                    rp_earned += 1
+                            elif self.year == 2017:
+                                if self._score_breakdown.get(color, {}).get('kPaRankingPointAchieved'):
+                                    rp_earned += 1
+                                if self._score_breakdown.get(color, {}).get('rotorRankingPointAchieved'):
+                                    rp_earned += 1
+                            self._score_breakdown[color]['tba_rpEarned'] = rp_earned
+                        else:
+                            self._score_breakdown[color]['tba_rpEarned'] = None
+
         return self._score_breakdown
 
     @property
