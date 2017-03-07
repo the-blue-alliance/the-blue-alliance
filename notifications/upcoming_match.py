@@ -35,7 +35,8 @@ class UpcomingMatchNotification(BaseNotification):
             data['message_data']['scheduled_time'] = None
             data['message_data']['predicted_time'] = None
 
-        current_webcasts = WebcastOnlineHelper.add_online_status(self.event.current_webcasts)
+        current_webcasts = self.event.current_webcasts
+        WebcastOnlineHelper.add_online_status(current_webcasts)
         online_webcasts = filter(lambda x: x.get('status', '') != 'offline', current_webcasts if current_webcasts else [])
         if online_webcasts:
             data['message_data']['webcast'] = online_webcasts[0]
