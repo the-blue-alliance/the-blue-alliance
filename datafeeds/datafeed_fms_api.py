@@ -114,6 +114,16 @@ class DatafeedFMSAPI(object):
 
     @ndb.tasklet
     def _parse_async(self, url, parser):
+        # Prep for saving raw API response into cloudstorage
+        if self._save_response and tba_config.CONFIG['save-frc-api-response']:
+            gcs_dir_name = self.SAVED_RESPONSE_DIR_PATTERN.format(url.replace(self.FMS_API_DOMAIN, ''))
+            try:
+                gcs_dir_contents = cloudstorage.listbucket(gcs_dir_name)  # This is async
+            except Exception, exception:
+                logging.error("Error prepping for saving API response for: {}".format(url))
+                logging.error(traceback.format_exc())
+                gcs_dir_contents = []
+
         headers = {
             'Authorization': 'Basic {}'.format(self._fms_api_authtoken),
             'Cache-Control': 'no-cache, max-age=10',
@@ -138,9 +148,8 @@ class DatafeedFMSAPI(object):
             if self._save_response and tba_config.CONFIG['save-frc-api-response']:
                 try:
                     # Check for last response
-                    dir_name = self.SAVED_RESPONSE_DIR_PATTERN.format(url.replace(self.FMS_API_DOMAIN, ''))
                     last_item = None
-                    for last_item in cloudstorage.listbucket(dir_name):
+                    for last_item in gcs_dir_contents:
                         pass
 
                     write_new = True
@@ -150,7 +159,7 @@ class DatafeedFMSAPI(object):
                                 write_new = False  # Do not write if content didn't change
 
                     if write_new:
-                        file_name = dir_name + '{}.json'.format(datetime.datetime.now())
+                        file_name = gcs_dir_name + '{}.json'.format(datetime.datetime.now())
                         with cloudstorage.open(file_name, 'w') as json_file:
                             json_file.write(result.content)
                 except Exception, exception:
