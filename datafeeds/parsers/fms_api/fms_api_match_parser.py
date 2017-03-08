@@ -176,6 +176,7 @@ class FMSAPIHybridScheduleParser(object):
             event_tz = None
 
         parsed_matches = []
+        remapped_matches = {}  # If a key changes due to a tiebreaker
         is_octofinals = len(matches) > 0 and 'Octofinal' in matches[0]['description']
         for match in matches:
             if 'tournamentLevel' in match:  # 2016+
@@ -263,11 +264,13 @@ class FMSAPIHybridScheduleParser(object):
                     continue
 
                 match_number = match_count + 1
-                key_name = Match.renderKeyName(
+                new_key_name = Match.renderKeyName(
                     event_key,
                     comp_level,
                     set_number,
                     match_number)
+                remapped_matches[key_name] = new_key_name
+                key_name = new_key_name
 
                 logging.warning("Creating new match: {}".format(key_name))
 
@@ -315,7 +318,7 @@ class FMSAPIHybridScheduleParser(object):
                             fixed_matches.append(match)
             parsed_matches = fixed_matches
 
-        return parsed_matches
+        return parsed_matches, remapped_matches
 
 
 class FMSAPIMatchDetailsParser(object):

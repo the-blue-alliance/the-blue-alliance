@@ -268,11 +268,11 @@ class DatafeedFMSAPI(object):
         matches_by_key = {}
         qual_matches = qual_matches_future.get_result()
         if qual_matches is not None:
-            for match in qual_matches:
+            for match in qual_matches[0]:
                 matches_by_key[match.key.id()] = match
         playoff_matches = playoff_matches_future.get_result()
         if playoff_matches is not None:
-            for match in playoff_matches:
+            for match in playoff_matches[0]:
                 matches_by_key[match.key.id()] = match
 
         qual_details = qual_details_future.get_result()
@@ -280,6 +280,7 @@ class DatafeedFMSAPI(object):
         playoff_details = playoff_details_future.get_result()
         playoff_details_items = playoff_details.items() if playoff_details is not None else []
         for match_key, match_details in qual_details_items + playoff_details_items:
+            match_key = playoff_matches[1].get(match_key, match_key)
             if match_key in matches_by_key:
                 matches_by_key[match_key].score_breakdown_json = json.dumps(match_details)
 

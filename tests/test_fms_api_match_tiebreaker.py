@@ -41,6 +41,8 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
         self.assertNotEqual(old_match, None)
         self.assertEqual(old_match.alliances['red']['score'], 255)
         self.assertEqual(old_match.alliances['blue']['score'], 255)
+        self.assertEqual(old_match.score_breakdown['red']['totalPoints'], 255)
+        self.assertEqual(old_match.score_breakdown['blue']['totalPoints'], 255)
 
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
@@ -57,3 +59,5 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
 
         self.assertEqual(tiebreaker_match.alliances['red']['score'], 165)
         self.assertEqual(tiebreaker_match.alliances['blue']['score'], 263)
+        self.assertEqual(tiebreaker_match.score_breakdown['red']['totalPoints'], 165)
+        self.assertEqual(tiebreaker_match.score_breakdown['blue']['totalPoints'], 263)
