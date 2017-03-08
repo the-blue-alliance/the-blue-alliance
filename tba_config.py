@@ -2,8 +2,7 @@ import os
 
 
 DEBUG = os.environ.get('SERVER_SOFTWARE') is not None and os.getenv('APPLICATION_ID') != 's~tbatv-prod-hrd'
-IS_TEST = os.getenv('IS_TBA_TEST') is not None
-DEBUG = DEBUG or IS_TEST or os.getenv('TRAVIS') is not None
+DEBUG = DEBUG or os.getenv('IS_TBA_TEST') is not None or os.getenv('TRAVIS') is not None
 
 MAX_YEAR = 2017
 
