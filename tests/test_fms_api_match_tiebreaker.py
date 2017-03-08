@@ -1,5 +1,6 @@
 import datetime
 import unittest2
+import json
 
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
@@ -24,6 +25,31 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
 
     def tearDown(self):
         self.testbed.deactivate()
+
+    def test_2017flwp_sequence(self):
+        Event(
+            id='2017flwp',
+            event_short='flwp',
+            year=2017,
+            event_type_enum=0,
+            timezone_id='America/New_York'
+        ).put()
+
+        event_code = 'flwp'
+
+        file_prefix = 'frc-api-response/v2.0/2017/scores/{}/playoff/'.format(event_code)
+        context = ndb.get_context()
+        result = context.urlfetch('https://www.googleapis.com/storage/v1/b/bucket/o?bucket=tbatv-prod-hrd.appspot.com&prefix={}'.format(file_prefix)).get_result()
+
+        for item in json.loads(result.content)['items']:
+            filename = item['name']
+            time_str = filename.replace(file_prefix, '').replace('.json', '').strip()
+            file_time = datetime.datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S.%f")
+            query_time = file_time + datetime.timedelta(seconds=1)
+            MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=query_time).getMatches('2017{}'.format(event_code)), run_post_update_hook=False)
+
+        sf_matches = Match.query(Match.event==ndb.Key(Event, '2017flwp'), Match.comp_level=='sf').fetch()
+        self.assertEqual(len(sf_matches), 8)
 
     def test_2017flwp(self):
         Event(

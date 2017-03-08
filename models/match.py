@@ -89,6 +89,7 @@ class Match(ndb.Model):
     youtube_videos = ndb.StringProperty(repeated=True)  # list of Youtube IDs
     tba_videos = ndb.StringProperty(repeated=True)  # list of filetypes a TBA video exists for
     push_sent = ndb.BooleanProperty()  # has an upcoming match notification been sent for this match? None counts as False
+    tiebreak_match_key = ndb.KeyProperty(kind='Match')  # Points to a match that was played to tiebreak this one
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True)
