@@ -360,7 +360,7 @@ class MatchHelper(object):
                 tiebreakers.append((red_crossing, blue_crossing))
             else:
                 tiebreakers.append(None)
-        elif year == 2017 and not (match.comp_level == 'f' and match.match_number <= 3):  # Finals can't be tiebroken. Only overtime
+        elif match.year == 2017 and not (match.comp_level == 'f' and match.match_number <= 3):  # Finals can't be tiebroken. Only overtime
             # Greater number of FOUL points awarded (i.e. the ALLIANCE that played the cleaner MATCH)
             if 'foulPoints' in red_breakdown and 'foulPoints' in blue_breakdown:
                 tiebreakers.append((red_breakdown['foulPoints'], blue_breakdown['foulPoints']))
