@@ -37,7 +37,23 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
         MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 04, 21, 22)).getMatches('2017flwp'))
         sf_matches = Match.query(Match.event==ndb.Key(Event, '2017flwp'), Match.comp_level=='sf').fetch()
         self.assertEqual(len(sf_matches), 5)
+        old_match = Match.get_by_id('2017flwp_sf1m3')
+        self.assertNotEqual(old_match, None)
+        self.assertEqual(old_match.alliances['red']['score'], 255)
+        self.assertEqual(old_match.alliances['blue']['score'], 255)
+
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
         MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 04, 21, 35)).getMatches('2017flwp'))
         sf_matches = Match.query(Match.event==ndb.Key(Event, '2017flwp'), Match.comp_level=='sf').fetch()
         self.assertEqual(len(sf_matches), 6)
+        new_match = Match.get_by_id('2017flwp_sf1m3')
+        self.assertNotEqual(new_match, None)
+
+        self.assertEqual(old_match, new_match)
+
+        tiebreaker_match = Match.get_by_id('2017flwp_sf1m4')
+        self.assertNotEqual(tiebreaker_match, None)
+
+        self.assertEqual(tiebreaker_match.alliances['red']['score'], 165)
+        self.assertEqual(tiebreaker_match.alliances['blue']['score'], 263)
