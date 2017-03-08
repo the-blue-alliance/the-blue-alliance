@@ -46,6 +46,8 @@ ELIM_MAPPING = {
     20: (1, 2),
     21: (1, 3),
     22: (1, 4),
+    23: (1, 5),
+    24: (1, 6),
 }
 
 OCTO_ELIM_MAPPING = {
@@ -101,6 +103,9 @@ OCTO_ELIM_MAPPING = {
     43: (1, 1),
     44: (1, 2),
     45: (1, 3),
+    46: (1, 4),
+    47: (1, 5),
+    48: (1, 6),
 }
 
 
@@ -231,12 +236,43 @@ class FMSAPIHybridScheduleParser(object):
                 if event_tz is not None:
                     actual_time = actual_time - event_tz.utcoffset(actual_time)
 
-            parsed_matches.append(Match(
-                id=Match.renderKeyName(
+            key_name = Match.renderKeyName(
+                event_key,
+                comp_level,
+                set_number,
+                match_number)
+
+            # Check for tiebreaker matches
+            existing_match = Match.get_by_id(key_name)
+            if existing_match and existing_match.comp_level != 'qm' and \
+                    existing_match.has_been_played and \
+                    existing_match.winning_alliance == '' and \
+                    existing_match.actual_time != actual_time:
+                logging.warning("Match {} is tied!".format(key_name))
+
+                # TODO: Only query within set if set_number ever gets indexed
+                match_count = 0
+                for match_key in Match.query(Match.event==event.key, Match.comp_level==comp_level).fetch(keys_only=True):
+                    _, match_key = match_key.id().split('_')
+                    if match_key.startswith('{}{}'.format(comp_level, set_number)):
+                        match_count += 1
+
+                # Tiebreakers must be played after at least 3 matches, or 6 for finals
+                if match_count < 3 or (match_count < 6 and comp_level == 'f'):
+                    logging.warning("Match supposedly tied, but existing count is {}! Skipping match.".format(match_count))
+                    continue
+
+                match_number = match_count + 1
+                key_name = Match.renderKeyName(
                     event_key,
                     comp_level,
                     set_number,
-                    match_number),
+                    match_number)
+
+                logging.warning("Creating new match: {}".format(key_name))
+
+            parsed_matches.append(Match(
+                id=key_name,
                 event=event.key,
                 year=event.year,
                 set_number=set_number,
