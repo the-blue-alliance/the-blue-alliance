@@ -78,7 +78,8 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
         new_match = Match.get_by_id('2017flwp_sf1m3')
         self.assertNotEqual(new_match, None)
 
-        self.assertEqual(old_match, new_match)
+        self.assertEqual(old_match.alliances, new_match.alliances)
+        self.assertEqual(old_match.score_breakdown, new_match.score_breakdown)
 
         tiebreaker_match = Match.get_by_id('2017flwp_sf1m4')
         self.assertNotEqual(tiebreaker_match, None)
@@ -115,7 +116,8 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
         new_match = Match.get_by_id('2017pahat_f1m2')
         self.assertNotEqual(new_match, None)
 
-        self.assertEqual(old_match, new_match)
+        self.assertEqual(old_match.alliances, new_match.alliances)
+        self.assertEqual(old_match.score_breakdown, new_match.score_breakdown)
 
         tiebreaker_match = Match.get_by_id('2017pahat_f1m4')
         self.assertNotEqual(tiebreaker_match, None)
