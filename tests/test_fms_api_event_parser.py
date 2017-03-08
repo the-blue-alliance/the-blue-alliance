@@ -64,7 +64,7 @@ class TestFMSAPIEventParser(unittest2.TestCase):
 
     def test_parseMatches(self):
         with open('test_data/fms_api/2015waamv_staging_matches.json', 'r') as f:
-            matches = FMSAPIHybridScheduleParser(2015, 'waamv').parse(json.loads(f.read()))
+            matches, _ = FMSAPIHybridScheduleParser(2015, 'waamv').parse(json.loads(f.read()))
 
         self.assertEqual(len(matches), 64)
 
