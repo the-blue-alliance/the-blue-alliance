@@ -3,6 +3,7 @@ import cloudstorage
 import datetime
 import json
 import logging
+import os
 import tba_config
 import traceback
 
@@ -67,15 +68,17 @@ class DatafeedFMSAPI(object):
 
     SAVED_RESPONSE_DIR_PATTERN = '/tbatv-prod-hrd.appspot.com/frc-api-response/{}/'  # % (url)
 
-    def __init__(self, version, save_response=False):
+    def __init__(self, version, sim_time=None, save_response=False):
+        self._sim_time = sim_time
         self._save_response = save_response
         fms_api_secrets = Sitevar.get_by_id('fmsapi.secrets')
         if fms_api_secrets is None:
-            raise Exception("Missing sitevar: fmsapi.secrets. Can't access FMS API.")
-
-        fms_api_username = fms_api_secrets.contents['username']
-        fms_api_authkey = fms_api_secrets.contents['authkey']
-        self._fms_api_authtoken = base64.b64encode('{}:{}'.format(fms_api_username, fms_api_authkey))
+            if self._sim_time is None:
+                raise Exception("Missing sitevar: fmsapi.secrets. Can't access FMS API.")
+        else:
+            fms_api_username = fms_api_secrets.contents['username']
+            fms_api_authkey = fms_api_secrets.contents['authkey']
+            self._fms_api_authtoken = base64.b64encode('{}:{}'.format(fms_api_username, fms_api_authkey))
 
         self._is_down_sitevar = Sitevar.get_by_id('apistatus.fmsapi_down')
         if not self._is_down_sitevar:
@@ -113,28 +116,57 @@ class DatafeedFMSAPI(object):
 
     @ndb.tasklet
     def _parse_async(self, url, parser):
-        # Prep for saving raw API response into cloudstorage
-        if self._save_response and tba_config.CONFIG['save-frc-api-response']:
-            gcs_dir_name = self.SAVED_RESPONSE_DIR_PATTERN.format(url.replace(self.FMS_API_DOMAIN, ''))
-            try:
-                gcs_dir_contents = cloudstorage.listbucket(gcs_dir_name)  # This is async
-            except Exception, exception:
-                logging.error("Error prepping for saving API response for: {}".format(url))
-                logging.error(traceback.format_exc())
-                gcs_dir_contents = []
+        gcs_dir_name = self.SAVED_RESPONSE_DIR_PATTERN.format(url.replace(self.FMS_API_DOMAIN, ''))
+        if self._sim_time:
+            """
+            Simulate FRC API response at a given time
+            """
+            content = None
+            if tba_config.IS_TEST:
+                file_prefix = gcs_dir_name.replace('/tbatv-prod-hrd.appspot.com/', '').replace('/', '%2F')
+                last_filename = None
+                for filename in os.listdir('test_data/frc_api_response'):  # Files are already sorted in chronological order by name
+                    if filename.startswith(file_prefix):
+                        time_str = filename.replace(file_prefix, '').replace('.json', '').strip()
+                        file_time = datetime.datetime.strptime(time_str, "%Y-%m-%d %H-%M-%S.%f")
+                        if file_time <= self._sim_time:
+                            last_filename = filename
+                        else:
+                            break
+                if last_filename:
+                    with open('test_data/frc_api_response/' + last_filename, 'r') as f:
+                        content = f.read()
+            else:
+                pass  # TODO: Read from cloudstorage
 
-        headers = {
-            'Authorization': 'Basic {}'.format(self._fms_api_authtoken),
-            'Cache-Control': 'no-cache, max-age=10',
-            'Pragma': 'no-cache',
-        }
-        try:
-            context = ndb.get_context()
-            result = yield context.urlfetch(url, headers=headers)
-        except Exception, e:
-            logging.error("URLFetch failed for: {}".format(url))
-            logging.info(e)
-            raise ndb.Return(None)
+            if content is None:
+                raise ndb.Return(None)
+            result = type('DummyResult', (object,), {"status_code": 200, "content": content})
+        else:
+            """
+            Make fetch to FRC API
+            """
+            # Prep for saving raw API response into cloudstorage
+            if self._save_response and tba_config.CONFIG['save-frc-api-response']:
+                try:
+                    gcs_dir_contents = cloudstorage.listbucket(gcs_dir_name)  # This is async
+                except Exception, exception:
+                    logging.error("Error prepping for saving API response for: {}".format(url))
+                    logging.error(traceback.format_exc())
+                    gcs_dir_contents = []
+
+            headers = {
+                'Authorization': 'Basic {}'.format(self._fms_api_authtoken),
+                'Cache-Control': 'no-cache, max-age=10',
+                'Pragma': 'no-cache',
+            }
+            try:
+                context = ndb.get_context()
+                result = yield context.urlfetch(url, headers=headers)
+            except Exception, e:
+                logging.error("URLFetch failed for: {}".format(url))
+                logging.info(e)
+                raise ndb.Return(None)
 
         old_status = self._is_down_sitevar.contents
         if result.status_code == 200:
