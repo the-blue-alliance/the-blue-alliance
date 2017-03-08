@@ -169,10 +169,10 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
         self.assertEqual(Match.get_by_id('2017scmb_qf4m3').alliances['blue']['score'], 255)
         self.assertEqual(Match.get_by_id('2017scmb_qf4m3').score_breakdown['red']['totalPoints'], 312)
         self.assertEqual(Match.get_by_id('2017scmb_qf4m3').score_breakdown['blue']['totalPoints'], 255)
-        self.assertEqual( Match.get_by_id('2017scmb_qf4m4').alliances['red']['score'], 310)
-        self.assertEqual( Match.get_by_id('2017scmb_qf4m4').alliances['blue']['score'], 306)
-        self.assertEqual( Match.get_by_id('2017scmb_qf4m4').score_breakdown['red']['totalPoints'], 310)
-        self.assertEqual( Match.get_by_id('2017scmb_qf4m4').score_breakdown['blue']['totalPoints'], 306)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m4').alliances['red']['score'], 310)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m4').alliances['blue']['score'], 306)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m4').score_breakdown['red']['totalPoints'], 310)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m4').score_breakdown['blue']['totalPoints'], 306)
 
     def test_2017ncwin(self):
         Event(
