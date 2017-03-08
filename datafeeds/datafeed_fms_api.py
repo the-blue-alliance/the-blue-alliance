@@ -116,13 +116,23 @@ class DatafeedFMSAPI(object):
 
     @ndb.tasklet
     def _parse_async(self, url, parser):
+        # Prep for saving/reading raw API response into/from cloudstorage
         gcs_dir_name = self.SAVED_RESPONSE_DIR_PATTERN.format(url.replace(self.FMS_API_DOMAIN, ''))
+        if self._save_response and tba_config.CONFIG['save-frc-api-response']:
+            try:
+                gcs_dir_contents = cloudstorage.listbucket(gcs_dir_name)  # This is async
+            except Exception, exception:
+                logging.error("Error prepping for saving API response for: {}".format(url))
+                logging.error(traceback.format_exc())
+                gcs_dir_contents = []
+
         if self._sim_time:
             """
             Simulate FRC API response at a given time
             """
             content = None
             if tba_config.IS_TEST:
+                # Use local test data
                 file_prefix = gcs_dir_name.replace('/tbatv-prod-hrd.appspot.com/', '').replace('/', '%2F')
                 last_filename = None
                 for filename in os.listdir('test_data/frc_api_response'):  # Files are already sorted in chronological order by name
@@ -137,7 +147,20 @@ class DatafeedFMSAPI(object):
                     with open('test_data/frc_api_response/' + last_filename, 'r') as f:
                         content = f.read()
             else:
-                pass  # TODO: Read from cloudstorage
+                # Use data from cloudstorage
+                last_filename = None
+                for item in gcs_dir_contents:  # Files are already sorted in chronological order by name
+                    filename = item.filename
+                    if filename.startswith(gcs_dir_name):
+                        time_str = filename.replace(gcs_dir_name, '').replace('.json', '').strip()
+                        file_time = datetime.datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S.%f")
+                        if file_time <= self._sim_time:
+                            last_filename = filename
+                        else:
+                            break
+                if last_filename:
+                    with cloudstorage.open(gcs_dir_name + last_filename, 'r') as f:
+                        content = f.read()
 
             if content is None:
                 raise ndb.Return(None)
@@ -146,15 +169,6 @@ class DatafeedFMSAPI(object):
             """
             Make fetch to FRC API
             """
-            # Prep for saving raw API response into cloudstorage
-            if self._save_response and tba_config.CONFIG['save-frc-api-response']:
-                try:
-                    gcs_dir_contents = cloudstorage.listbucket(gcs_dir_name)  # This is async
-                except Exception, exception:
-                    logging.error("Error prepping for saving API response for: {}".format(url))
-                    logging.error(traceback.format_exc())
-                    gcs_dir_contents = []
-
             headers = {
                 'Authorization': 'Basic {}'.format(self._fms_api_authtoken),
                 'Cache-Control': 'no-cache, max-age=10',
