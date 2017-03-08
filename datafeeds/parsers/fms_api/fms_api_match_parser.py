@@ -166,6 +166,21 @@ class FMSAPIHybridScheduleParser(object):
         self.year = year
         self.event_short = event_short
 
+    @classmethod
+    def is_blank_match(cls, match):
+        """
+        Detect junk playoff matches like in 2017scmb
+        """
+        if match.comp_level == 'qm' or not match.score_breakdown:
+            return False
+        for color in ['red', 'blue']:
+            if match.alliances[color]['score'] != 0:
+                return False
+            for value in match.score_breakdown[color].values():
+                if value and value not in  {'Unknown', 'None'}:  # Nonzero, False, blank, None, etc.
+                    return False
+        return True
+
     def parse(self, response):
         matches = response['Schedule']
 
@@ -255,7 +270,8 @@ class FMSAPIHybridScheduleParser(object):
             if existing_match and existing_match.comp_level != 'qm' and \
                     existing_match.has_been_played and \
                     existing_match.winning_alliance == '' and \
-                    existing_match.actual_time != actual_time:
+                    existing_match.actual_time != actual_time and \
+                    not self.is_blank_match(existing_match):
                 logging.warning("Match {} is tied!".format(existing_match.key.id()))
 
                 # TODO: Only query within set if set_number ever gets indexed
