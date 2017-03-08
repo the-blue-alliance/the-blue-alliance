@@ -4098,6 +4098,143 @@
         }
       }
     },
+    "Match_Score_Breakdown_2017": {
+      "type": "object",
+      "properties": {
+        "blue": {
+          "$ref": "#/definitions/Match_Score_Breakdown_2017_Alliance"
+        },
+        "red": {
+          "$ref": "#/definitions/Match_Score_Breakdown_2017_Alliance"
+        }
+      },
+      "description": "See the 2017 FMS API documentation for a description of each value."
+    },
+    "Match_Score_Breakdown_2017_Alliance": {
+      "type": "object",
+      "properties": {
+        "autoPoints": {
+          "type": "integer"
+        },
+        "teleopPoints": {
+          "type": "integer"
+        },
+        "breechPoints": {
+          "type": "integer"
+        },
+        "foulPoints": {
+          "type": "integer"
+        },
+        "capturePoints": {
+          "type": "integer"
+        },
+        "adjustPoints": {
+          "type": "integer"
+        },
+        "totalPoints": {
+          "type": "integer"
+        },
+        "robot1Auto": {
+          "type": "string",
+          "enum": [
+            "Unknown",
+            "Mobility",
+            "None"
+          ]
+        },
+        "robot2Auto": {
+          "type": "string",
+          "enum": [
+            "Unknown",
+            "Mobility",
+            "None"
+          ]
+        },
+        "robot3Auto": {
+          "type": "string",
+          "enum": [
+            "Unknown",
+            "Mobility",
+            "None"
+          ]
+        },
+        "rotor1Auto": {
+          "type": "boolean"
+        },
+        "rotor2Auto": {
+          "type": "boolean"
+        },
+        "autoFuelLow": {
+          "type": "integer"
+        },
+        "autoFuelHigh": {
+          "type": "integer"
+        },
+        "autoMobilityPoints": {
+          "type": "integer"
+        },
+        "autoRotorPoints": {
+          "type": "integer"
+        },
+        "autoFuelPoints": {
+          "type": "integer"
+        },
+        "teleopFuelPoints": {
+          "type": "integer"
+        },
+        "teleopFuelLow": {
+          "type": "integer"
+        },
+        "teleopFuelHigh": {
+          "type": "integer"
+        },
+        "teleopRotorPoints": {
+          "type": "integer"
+        },
+        "kPaRankingPointAchieved": {
+          "type": "boolean"
+        },
+        "teleopTakeoffPoints": {
+          "type": "integer"
+        },
+        "kPaBonusPoints": {
+          "type": "integer"
+        },
+        "rotorBonusPoints": {
+          "type": "integer"
+        },
+        "rotor1Engaged": {
+          "type": "boolean"
+        },
+        "rotor2Engaged": {
+          "type": "boolean"
+        },
+        "rotor3Engaged": {
+          "type": "boolean"
+        },
+        "rotor4Engaged": {
+          "type": "boolean"
+        },
+        "rotorRankingPointAchieved": {
+          "type": "boolean"
+        },
+        "techFoulCount": {
+          "type": "integer"
+        },
+        "foulCount": {
+          "type": "integer"
+        },
+        "touchpadNear": {
+          "type": "string"
+        },
+        "touchpadMiddle": {
+          "type": "string"
+        },
+        "touchpadFar": {
+          "type": "string"
+        }
+      }
+    },
     "Media": {
       "type": "object",
       "required": [
