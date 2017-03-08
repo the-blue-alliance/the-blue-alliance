@@ -287,7 +287,9 @@ class DatafeedFMSAPI(object):
             if match_key in matches_by_key:
                 matches_by_key[match_key].score_breakdown_json = json.dumps(match_details)
 
-        return filter(lambda m: not FMSAPIHybridScheduleParser.is_blank_match(m), matches_by_key.values())
+        return filter(
+            lambda m: not FMSAPIHybridScheduleParser.is_blank_match(m),
+            matches_by_key.values())
 
     def getEventRankings(self, event_key):
         year = int(event_key[:4])

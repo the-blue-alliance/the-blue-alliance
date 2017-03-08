@@ -144,27 +144,30 @@ class MatchHelper(object):
     @classmethod
     def deleteInvalidMatches(self, match_list):
         """
-        A match is invalid iff it is an elim match where the match number is 3
-        and the same alliance won in match numbers 1 and 2 of the same set.
+        A match is invalid iff it is an elim match that has not been played
+        and the same alliance already won in 2 match numbers in the same set.
         """
-        matches_by_key = {}
+        red_win_counts = defaultdict(int)  # key: <comp_level><set_number>
+        blue_win_counts = defaultdict(int)  # key: <comp_level><set_number>
         for match in match_list:
-            matches_by_key[match.key_name] = match
+            if match.has_been_played and match.comp_level in Match.ELIM_LEVELS:
+                key = '{}{}'.format(match.comp_level, match.set_number)
+                if match.winning_alliance == 'red':
+                    red_win_counts[key] += 1
+                elif match.winning_alliance == 'blue':
+                    blue_win_counts[key] += 1
 
         return_list = []
         for match in match_list:
-            if match.comp_level in Match.ELIM_LEVELS and match.match_number == 3 and (not match.has_been_played):
-                match_1 = matches_by_key.get(Match.renderKeyName(match.event.id(), match.comp_level, match.set_number, 1))
-                match_2 = matches_by_key.get(Match.renderKeyName(match.event.id(), match.comp_level, match.set_number, 2))
-                if match_1 is not None and match_2 is not None and\
-                    match_1.has_been_played and match_2.has_been_played and\
-                    match_1.winning_alliance == match_2.winning_alliance:
-                        try:
-                            MatchManipulator.delete(match)
-                            logging.warning("Deleting invalid match: %s" % match.key_name)
-                        except:
-                            logging.warning("Tried to delete invalid match, but failed: %s" % match.key_name)
-                        continue
+            if match.comp_level in Match.ELIM_LEVELS and not match.has_been_played:
+                key = '{}{}'.format(match.comp_level, match.set_number)
+                if red_win_counts[key] == 2 or blue_win_counts[key] == 2:
+                    try:
+                        MatchManipulator.delete(match)
+                        logging.warning("Deleting invalid match: %s" % match.key_name)
+                    except:
+                        logging.warning("Tried to delete invalid match, but failed: %s" % match.key_name)
+                    continue
             return_list.append(match)
         return return_list
 
