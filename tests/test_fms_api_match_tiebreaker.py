@@ -22,6 +22,10 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
         self.testbed.init_taskqueue_stub(root_path=".")
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def test_2017flwp(self):
         Event(
             id='2017flwp',
             event_short='flwp',
@@ -30,10 +34,6 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
             timezone_id='America/New_York'
         ).put()
 
-    def tearDown(self):
-        self.testbed.deactivate()
-
-    def test(self):
         MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 04, 21, 22)).getMatches('2017flwp'))
         sf_matches = Match.query(Match.event==ndb.Key(Event, '2017flwp'), Match.comp_level=='sf').fetch()
         self.assertEqual(len(sf_matches), 5)
@@ -61,3 +61,190 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
         self.assertEqual(tiebreaker_match.alliances['blue']['score'], 263)
         self.assertEqual(tiebreaker_match.score_breakdown['red']['totalPoints'], 165)
         self.assertEqual(tiebreaker_match.score_breakdown['blue']['totalPoints'], 263)
+
+    def test_2017pahat(self):
+        Event(
+            id='2017pahat',
+            event_short='pahat',
+            year=2017,
+            event_type_enum=0,
+            timezone_id='America/New_York'
+        ).put()
+
+        MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 05, 20, 45)).getMatches('2017pahat'))
+        f_matches = Match.query(Match.event==ndb.Key(Event, '2017pahat'), Match.comp_level=='f').fetch()
+        self.assertEqual(len(f_matches), 3)
+        old_match = Match.get_by_id('2017pahat_f1m2')
+        self.assertNotEqual(old_match, None)
+        self.assertEqual(old_match.alliances['red']['score'], 255)
+        self.assertEqual(old_match.alliances['blue']['score'], 255)
+        self.assertEqual(old_match.score_breakdown['red']['totalPoints'], 255)
+        self.assertEqual(old_match.score_breakdown['blue']['totalPoints'], 255)
+
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
+        MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 05, 21, 02)).getMatches('2017pahat'))
+        f_matches = Match.query(Match.event==ndb.Key(Event, '2017pahat'), Match.comp_level=='f').fetch()
+        self.assertEqual(len(f_matches), 4)
+        new_match = Match.get_by_id('2017pahat_f1m2')
+        self.assertNotEqual(new_match, None)
+
+        self.assertEqual(old_match, new_match)
+
+        tiebreaker_match = Match.get_by_id('2017pahat_f1m4')
+        self.assertNotEqual(tiebreaker_match, None)
+
+        self.assertEqual(tiebreaker_match.alliances['red']['score'], 240)
+        self.assertEqual(tiebreaker_match.alliances['blue']['score'], 235)
+        self.assertEqual(tiebreaker_match.score_breakdown['red']['totalPoints'], 240)
+        self.assertEqual(tiebreaker_match.score_breakdown['blue']['totalPoints'], 235)
+
+    def test_2017scmb(self):
+        Event(
+            id='2017scmb',
+            event_short='scmb',
+            year=2017,
+            event_type_enum=0,
+            timezone_id='America/New_York'
+        ).put()
+
+        MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 04, 19, 17)).getMatches('2017scmb'))
+        qf_matches = Match.query(Match.event==ndb.Key(Event, '2017scmb'), Match.comp_level=='qf').fetch()
+        self.assertEqual(len(qf_matches), 12)
+
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m1').alliances['red']['score'], 305)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m1').alliances['blue']['score'], 305)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m1').score_breakdown['red']['totalPoints'], 305)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m1').score_breakdown['blue']['totalPoints'], 305)
+
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
+        MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 04, 19, 50)).getMatches('2017scmb'))
+        qf_matches = Match.query(Match.event==ndb.Key(Event, '2017scmb'), Match.comp_level=='qf').fetch()
+        self.assertEqual(len(qf_matches), 12)
+
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m1').alliances['red']['score'], 305)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m1').alliances['blue']['score'], 305)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m1').score_breakdown['red']['totalPoints'], 305)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m1').score_breakdown['blue']['totalPoints'], 305)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m2').alliances['red']['score'], 213)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m2').alliances['blue']['score'], 305)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m2').score_breakdown['red']['totalPoints'], 213)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m2').score_breakdown['blue']['totalPoints'], 305)
+
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
+        MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 04, 20, 12)).getMatches('2017scmb'))
+        qf_matches = Match.query(Match.event==ndb.Key(Event, '2017scmb'), Match.comp_level=='qf').fetch()
+        self.assertEqual(len(qf_matches), 12)
+
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m1').alliances['red']['score'], 305)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m1').alliances['blue']['score'], 305)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m1').score_breakdown['red']['totalPoints'], 305)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m1').score_breakdown['blue']['totalPoints'], 305)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m2').alliances['red']['score'], 213)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m2').alliances['blue']['score'], 305)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m2').score_breakdown['red']['totalPoints'], 213)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m2').score_breakdown['blue']['totalPoints'], 305)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m3').alliances['red']['score'], 312)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m3').alliances['blue']['score'], 255)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m3').score_breakdown['red']['totalPoints'], 312)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m3').score_breakdown['blue']['totalPoints'], 255)
+
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
+        MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 04, 20, 48)).getMatches('2017scmb'))
+        qf_matches = Match.query(Match.event==ndb.Key(Event, '2017scmb'), Match.comp_level=='qf').fetch()
+        self.assertEqual(len(qf_matches), 13)
+
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m1').alliances['red']['score'], 305)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m1').alliances['blue']['score'], 305)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m1').score_breakdown['red']['totalPoints'], 305)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m1').score_breakdown['blue']['totalPoints'], 305)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m2').alliances['red']['score'], 213)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m2').alliances['blue']['score'], 305)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m2').score_breakdown['red']['totalPoints'], 213)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m2').score_breakdown['blue']['totalPoints'], 305)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m3').alliances['red']['score'], 312)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m3').alliances['blue']['score'], 255)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m3').score_breakdown['red']['totalPoints'], 312)
+        self.assertEqual(Match.get_by_id('2017scmb_qf4m3').score_breakdown['blue']['totalPoints'], 255)
+        self.assertEqual( Match.get_by_id('2017scmb_qf4m4').alliances['red']['score'], 310)
+        self.assertEqual( Match.get_by_id('2017scmb_qf4m4').alliances['blue']['score'], 306)
+        self.assertEqual( Match.get_by_id('2017scmb_qf4m4').score_breakdown['red']['totalPoints'], 310)
+        self.assertEqual( Match.get_by_id('2017scmb_qf4m4').score_breakdown['blue']['totalPoints'], 306)
+
+    def test_2017ncwin(self):
+        Event(
+            id='2017ncwin',
+            event_short='ncwin',
+            year=2017,
+            event_type_enum=0,
+            timezone_id='America/New_York'
+        ).put()
+
+        MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 05, 21, 2)).getMatches('2017ncwin'))
+        sf_matches = Match.query(Match.event==ndb.Key(Event, '2017ncwin'), Match.comp_level=='sf').fetch()
+        self.assertEqual(len(sf_matches), 6)
+
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m1').alliances['red']['score'], 265)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m1').alliances['blue']['score'], 150)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m1').score_breakdown['red']['totalPoints'], 265)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m1').score_breakdown['blue']['totalPoints'], 150)
+
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
+        MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 05, 21, 30)).getMatches('2017ncwin'))
+        sf_matches = Match.query(Match.event==ndb.Key(Event, '2017ncwin'), Match.comp_level=='sf').fetch()
+        self.assertEqual(len(sf_matches), 6)
+
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m1').alliances['red']['score'], 265)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m1').alliances['blue']['score'], 150)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m1').score_breakdown['red']['totalPoints'], 265)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m1').score_breakdown['blue']['totalPoints'], 150)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m2').alliances['red']['score'], 205)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m2').alliances['blue']['score'], 205)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m2').score_breakdown['red']['totalPoints'], 205)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m2').score_breakdown['blue']['totalPoints'], 205)
+
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
+        MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 05, 21, 35)).getMatches('2017ncwin'))
+        sf_matches = Match.query(Match.event==ndb.Key(Event, '2017ncwin'), Match.comp_level=='sf').fetch()
+        self.assertEqual(len(sf_matches), 6)
+
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m1').alliances['red']['score'], 265)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m1').alliances['blue']['score'], 150)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m1').score_breakdown['red']['totalPoints'], 265)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m1').score_breakdown['blue']['totalPoints'], 150)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m2').alliances['red']['score'], 205)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m2').alliances['blue']['score'], 205)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m2').score_breakdown['red']['totalPoints'], 205)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m2').score_breakdown['blue']['totalPoints'], 205)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m3').alliances['red']['score'], 145)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m3').alliances['blue']['score'], 265)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m3').score_breakdown['red']['totalPoints'], 145)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m3').score_breakdown['blue']['totalPoints'], 265)
+
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
+        MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 05, 21, 51)).getMatches('2017ncwin'))
+        sf_matches = Match.query(Match.event==ndb.Key(Event, '2017ncwin'), Match.comp_level=='sf').fetch()
+        self.assertEqual(len(sf_matches), 7)
+
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m1').alliances['red']['score'], 265)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m1').alliances['blue']['score'], 150)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m1').score_breakdown['red']['totalPoints'], 265)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m1').score_breakdown['blue']['totalPoints'], 150)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m2').alliances['red']['score'], 205)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m2').alliances['blue']['score'], 205)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m2').score_breakdown['red']['totalPoints'], 205)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m2').score_breakdown['blue']['totalPoints'], 205)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m3').alliances['red']['score'], 145)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m3').alliances['blue']['score'], 265)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m3').score_breakdown['red']['totalPoints'], 145)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m3').score_breakdown['blue']['totalPoints'], 265)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m4').alliances['red']['score'], 180)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m4').alliances['blue']['score'], 305)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m4').score_breakdown['red']['totalPoints'], 180)
+        self.assertEqual(Match.get_by_id('2017ncwin_sf2m4').score_breakdown['blue']['totalPoints'], 305)
