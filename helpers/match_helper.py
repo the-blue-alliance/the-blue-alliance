@@ -360,6 +360,42 @@ class MatchHelper(object):
                 tiebreakers.append((red_crossing, blue_crossing))
             else:
                 tiebreakers.append(None)
+        elif year == 2017 and not (match.comp_level == 'f' and match.match_number <= 3):  # Finals can't be tiebroken. Only overtime
+            # Greater number of FOUL points awarded (i.e. the ALLIANCE that played the cleaner MATCH)
+            if 'foulPoints' in red_breakdown and 'foulPoints' in blue_breakdown:
+                tiebreakers.append((red_breakdown['foulPoints'], blue_breakdown['foulPoints']))
+            else:
+                tiebreakers.append(None)
+
+            # Cumulative sum of scored AUTO points
+            if 'autoPoints' in red_breakdown and 'autoPoints' in blue_breakdown:
+                tiebreakers.append((red_breakdown['autoPoints'], blue_breakdown['autoPoints']))
+            else:
+                tiebreakers.append(None)
+
+            # Cumulative ROTOR engagement score (AUTO and TELEOP)
+            if 'autoRotorPoints' in red_breakdown and 'autoRotorPoints' in blue_breakdown and \
+                    'teleopRotorPoints' in red_breakdown and 'teleopRotorPoints' in blue_breakdown:
+                red_rotor = red_breakdown['autoRotorPoints'] + red_breakdown['teleopRotorPoints']
+                blue_rotor = blue_breakdown['autoRotorPoints'] + blue_breakdown['teleopRotorPoints']
+                tiebreakers.append((red_rotor, blue_rotor))
+            else:
+                tiebreakers.append(None)
+
+            # Cumulative TOUCHPAD score
+            if 'teleopTakeoffPoints' in red_breakdown and 'teleopTakeoffPoints' in blue_breakdown:
+                tiebreakers.append((red_breakdown['teleopTakeoffPoints'], blue_breakdown['teleopTakeoffPoints']))
+            else:
+                tiebreakers.append(None)
+
+            # Total accumulated pressure
+            if 'autoFuelPoints' in red_breakdown and 'autoFuelPoints' in blue_breakdown and \
+                    'teleopFuelPoints' in red_breakdown and 'teleopFuelPoints' in blue_breakdown:
+                red_pressure = red_breakdown['autoFuelPoints'] + red_breakdown['teleopFuelPoints']
+                blue_pressure = blue_breakdown['autoFuelPoints'] + blue_breakdown['teleopFuelPoints']
+                tiebreakers.append((red_pressure, blue_pressure))
+            else:
+                tiebreakers.append(None)
 
         for tiebreaker in tiebreakers:
             if tiebreaker is None:
