@@ -284,6 +284,9 @@ class FMSAPIHybridScheduleParser(object):
                 parsed_matches.append(existing_match)
 
                 logging.warning("Creating new match: {}".format(key_name))
+            elif existing_match:
+                key_name = existing_match.key.id()
+                match_number = existing_match.match_number
 
             parsed_matches.append(Match(
                 id=key_name,

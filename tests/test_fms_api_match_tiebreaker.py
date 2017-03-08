@@ -51,6 +51,31 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
         sf_matches = Match.query(Match.event==ndb.Key(Event, '2017flwp'), Match.comp_level=='sf').fetch()
         self.assertEqual(len(sf_matches), 8)
 
+        self.assertEqual(Match.get_by_id('2017flwp_sf1m1').alliances['red']['score'], 305)
+        self.assertEqual(Match.get_by_id('2017flwp_sf1m1').alliances['blue']['score'], 255)
+        self.assertEqual(Match.get_by_id('2017flwp_sf1m1').score_breakdown['red']['totalPoints'], 305)
+        self.assertEqual(Match.get_by_id('2017flwp_sf1m1').score_breakdown['blue']['totalPoints'], 255)
+
+        self.assertEqual(Match.get_by_id('2017flwp_sf1m2').alliances['red']['score'], 165)
+        self.assertEqual(Match.get_by_id('2017flwp_sf1m2').alliances['blue']['score'], 258)
+        self.assertEqual(Match.get_by_id('2017flwp_sf1m2').score_breakdown['red']['totalPoints'], 165)
+        self.assertEqual(Match.get_by_id('2017flwp_sf1m2').score_breakdown['blue']['totalPoints'], 258)
+
+        self.assertEqual(Match.get_by_id('2017flwp_sf1m3').alliances['red']['score'], 255)
+        self.assertEqual(Match.get_by_id('2017flwp_sf1m3').alliances['blue']['score'], 255)
+        self.assertEqual(Match.get_by_id('2017flwp_sf1m3').score_breakdown['red']['totalPoints'], 255)
+        self.assertEqual(Match.get_by_id('2017flwp_sf1m3').score_breakdown['blue']['totalPoints'], 255)
+
+        self.assertEqual(Match.get_by_id('2017flwp_sf1m4').alliances['red']['score'], 255)
+        self.assertEqual(Match.get_by_id('2017flwp_sf1m4').alliances['blue']['score'], 255)
+        self.assertEqual(Match.get_by_id('2017flwp_sf1m4').score_breakdown['red']['totalPoints'], 255)
+        self.assertEqual(Match.get_by_id('2017flwp_sf1m4').score_breakdown['blue']['totalPoints'], 255)
+
+        self.assertEqual(Match.get_by_id('2017flwp_sf1m5').alliances['red']['score'], 165)
+        self.assertEqual(Match.get_by_id('2017flwp_sf1m5').alliances['blue']['score'], 263)
+        self.assertEqual(Match.get_by_id('2017flwp_sf1m5').score_breakdown['red']['totalPoints'], 165)
+        self.assertEqual(Match.get_by_id('2017flwp_sf1m5').score_breakdown['blue']['totalPoints'], 263)
+
     def test_2017flwp(self):
         Event(
             id='2017flwp',
