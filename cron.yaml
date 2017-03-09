@@ -56,12 +56,12 @@ cron:
 
 - description: Match Overall Insights Calculation
   url: /backend-tasks-b2/math/enqueue/overallinsights/matches
-  schedule: every day 01:10
+  schedule: every day 01:01
   timezone: America/Los_Angeles
 
 - description: Award Overall Insights Calculation
   url: /backend-tasks-b2/math/enqueue/overallinsights/awards
-  schedule: every day 01:10
+  schedule: every day 01:01
   timezone: America/Los_Angeles
 
 - description: Upcoming match notification sending
