@@ -125,7 +125,7 @@ class InsightsHelper(object):
                                     correct_matches_count_cmp[level] += 1
 
                 for level in ['qual', 'playoff']:
-                    if 'match_prediction_stats' in predictions:
+                    if predictions.get('match_prediction_stats'):
                         bs = predictions.get('match_prediction_stats', {}).get(level, {}).get('brier_scores', {})
                         if bs:
                             brier_scores[level].append(bs['win_loss'])
