@@ -72,9 +72,9 @@ class MatchManipulator(ManipulatorBase):
         Enqueue firebase push
         '''
         affected_stats_event_keys = set()
-        for (match, updated_attrs) in zip(matches, updated_attr_list):
+        for (match, updated_attrs, is_new) in zip(matches, updated_attr_list):
             # Only attrs that affect stats
-            if set(['alliances_json', 'score_breakdown_json']).intersection(set(updated_attrs)) != set():
+            if is_new or set(['alliances_json', 'score_breakdown_json']).intersection(set(updated_attrs)) != set():
                 affected_stats_event_keys.add(match.event.id())
             try:
                 FirebasePusher.update_match(match)
