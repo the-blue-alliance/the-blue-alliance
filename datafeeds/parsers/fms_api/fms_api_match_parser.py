@@ -301,6 +301,7 @@ class FMSAPIHybridScheduleParser(object):
 
                 logging.warning("Creating new match: {}".format(key_name))
             elif existing_match:
+                remapped_matches[key_name] = existing_match.key.id()
                 key_name = existing_match.key.id()
                 match_number = existing_match.match_number
 
