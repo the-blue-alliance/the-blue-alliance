@@ -22,8 +22,7 @@ class BlueZoneHelper(object):
     def get_upcoming_matches(cls, live_events, n=1):
         matches = []
         for event in live_events:
-            event_matches = event.matches
-            upcoming_matches = MatchHelper.upcomingMatches(event_matches, n)
+            upcoming_matches = MatchHelper.upcomingMatches(event.matches, n)
             matches.extend(upcoming_matches)
         return matches
 
@@ -156,7 +155,10 @@ class BlueZoneHelper(object):
 
         logging.info("[BLUEZONE] live_events: {}".format([le.key.id() for le in live_events]))
         to_log += "[BLUEZONE] live_events: {}\n".format([le.key.id() for le in live_events])
-        live_events = filter(lambda e: e.webcast_status != 'offline', live_events)
+        live_events = filter(lambda e: True, live_events)
+        for event in live_events:  # Fetch all matches and details asynchronously
+            event.prep_matches()
+            event.prep_details()
         logging.info("[BLUEZONE] Online live_events: {}".format([le.key.id() for le in live_events]))
         to_log += "[BLUEZONE] Online live_events: {}\n".format([le.key.id() for le in live_events])
         upcoming_matches = cls.get_upcoming_matches(live_events)

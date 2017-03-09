@@ -3,6 +3,7 @@ import collections
 import datetime
 import re
 
+from google.appengine.api import memcache
 from google.appengine.ext import ndb
 
 from consts.district_type import DistrictType
@@ -170,6 +171,10 @@ class EventHelper(object):
         OR
         b) The event.start_date is on or within 4 days after the closest Wednesday
         """
+        cached_result = memcache.get('EventHelper.getWeekEvents()')
+        if cached_result is not None:
+            return cached_result
+
         today = datetime.datetime.today()
 
         # Make sure all events to be returned are within range
@@ -193,16 +198,18 @@ class EventHelper(object):
                     events.append(event)
 
         EventHelper.sort_events(events)
+        memcache.set('EventHelper.getWeekEvents()', events, 60*60)
         return events
 
     @classmethod
     def getEventsWithinADay(self):
-        week_events = self.getWeekEvents()
-        ret = []
-        for event in week_events:
-            if event.within_a_day:
-                ret.append(event)
-        return ret
+        cached_result = memcache.get('EventHelper.getEventsWithinADay()')
+        if cached_result is not None:
+            return cached_result
+
+        events = filter(lambda e: e.within_a_day, self.getWeekEvents())
+        memcache.set('EventHelper.getEventsWithinADay()', events, 60*60)
+        return events
 
     @classmethod
     def getShortName(self, name_str):
