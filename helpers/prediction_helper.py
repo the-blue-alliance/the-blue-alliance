@@ -218,16 +218,21 @@ class ContributionCalculator(object):
                         float(match.score_breakdown[color].get('teleopFuelHigh', 0)) / 3 +
                         float(match.score_breakdown[color].get('teleopFuelLow', 0)) / 9)
                 elif self._stat == 'gears':
-                    # Guess gears from rotors
-                    num_gears = 0
-                    if match.score_breakdown[color].get('rotor1Auto') or match.score_breakdown[color].get('rotor1Engaged'):
-                        num_gears += 1
-                    if match.score_breakdown[color].get('rotor2Auto') or match.score_breakdown[color].get('rotor2Engaged'):
-                        num_gears += 2
-                    if match.score_breakdown[color].get('rotor3Engaged'):
-                        num_gears += 4
+                    # Guess gears from rotors.
                     if match.score_breakdown[color].get('rotor4Engaged'):
-                        num_gears += 6
+                        num_gears = 12
+                    elif match.score_breakdown[color].get('rotor3Engaged'):
+                        num_gears = 6
+                    elif match.score_breakdown[color].get('rotor2Auto'):
+                        num_gears = 3
+                    elif match.score_breakdown[color].get('rotor2Engaged'):
+                        num_gears = 2
+                    elif match.score_breakdown[color].get('rotor1Auto'):
+                        num_gears = 1
+                    elif match.score_breakdown[color].get('rotor1Engaged'):
+                        num_gears = 0  # Free gear
+                    else:
+                        num_gears = -1  # Failed to place reserve gear
                     means[color] = num_gears
                 else:
                     raise Exception("Unknown stat: {}".format(self._stat))
