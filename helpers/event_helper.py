@@ -161,7 +161,7 @@ class EventHelper(object):
         return self.calculateTeamWLTFromMatches(team_key, ndb.get_multi(match_keys))
 
     @classmethod
-    def getWeekEvents(self):
+    def getWeekEvents(self, today=datetime.datetime.today()):
         """
         Get events this week
         In general, if an event is currently going on, it shows up in this query
@@ -170,7 +170,6 @@ class EventHelper(object):
         OR
         b) The event.start_date is on or within 4 days after the closest Wednesday
         """
-        today = datetime.datetime.today()
 
         # Make sure all events to be returned are within range
         two_weeks_of_events_keys_future = Event.query().filter(

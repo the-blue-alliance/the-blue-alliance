@@ -1,9 +1,10 @@
+import datetime
 from google.appengine.ext import ndb
 
 from controllers.api.api_district_controller import ApiDistrictListController, ApiDistrictEventsController, ApiDistrictRankingsController, ApiDistrictTeamsController
 from controllers.api.api_event_controller import ApiEventController, ApiEventTeamsController, \
                                                  ApiEventMatchesController, ApiEventStatsController, \
-                                                 ApiEventRankingsController, ApiEventAwardsController, ApiEventListController, ApiEventDistrictPointsController
+                                                 ApiEventRankingsController, ApiEventAwardsController, ApiEventListController, ApiEventDistrictPointsController, ApiEventWeekController
 from controllers.api.api_match_controller import ApiMatchController
 from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController, ApiTeamEventAwardsController, \
                                                 ApiTeamEventMatchesController, ApiTeamMediaController, ApiTeamYearsParticipatedController, \
@@ -50,11 +51,22 @@ class CacheClearer(object):
 
         event_team_keys_future = EventTeam.query(EventTeam.event.IN([event_key for event_key in event_keys])).fetch_async(None, keys_only=True)
 
+        events_future = Event.query(Event.key.IN([event_key for event_key in event_keys])).fetch_async(None, projection=[Event.end_date, Event.start_date])
+
         team_keys = set()
         for et_key in event_team_keys_future.get_result():
             team_key_name = et_key.id().split('_')[1]
             team_keys.add(ndb.Key(Team, team_key_name))
 
+        # Clear keys for live events. Normalize event starts to last monday
+        time_indexes = set()
+        for event in events_future.get_result():
+            if event.start_date:
+                dt = event.start_date
+                if dt.weekday() != 0:
+                    # If we're given a datetime for a non-Monday, normalize to that
+                    dt = dt + datetime.timedelta(days=(-1 * dt.weekday()))
+                time_indexes.add(datetime.datetime(dt.year, dt.month, dt.day, 0, 0, 0))
         return cls._get_events_cache_keys_and_controllers(event_keys) + \
             cls._get_event_district_points_cache_keys_and_controllers(event_keys) + \
             cls._get_eventlist_cache_keys_and_controllers(years) + \
@@ -62,6 +74,7 @@ class CacheClearer(object):
             cls._get_districtlist_cache_keys_and_controllers(years) + \
             cls._get_district_events_cache_keys_and_controllers(event_district_abbrevs, years) + \
             cls._get_district_rankings_cache_keys_and_controllers(event_district_abbrevs, years) + \
+            cls._get_live_events_cache_keys_and_controllers(time_indexes) + \
             cls._queries_to_cache_keys_and_controllers(get_affected_queries.event_updated(affected_refs))
 
     @classmethod
@@ -243,6 +256,14 @@ class CacheClearer(object):
             cache_keys_and_controllers.append((ApiEventController.get_cache_key_from_format(event_key.id()), ApiEventController))
             cache_keys_and_controllers.append((ApiEventStatsController.get_cache_key_from_format(event_key.id()), ApiEventStatsController))
             cache_keys_and_controllers.append((ApiEventRankingsController.get_cache_key_from_format(event_key.id()), ApiEventRankingsController))
+        return cache_keys_and_controllers
+
+    @classmethod
+    def _get_live_events_cache_keys_and_controllers(cls, time_indexes):
+        # time_indexes is a list of timestamps of Mondays at 0:00 UTC
+        cache_keys_and_controllers = []
+        for time_index in time_indexes:
+            cache_keys_and_controllers.append((ApiEventWeekController.get_cache_key_from_format(time_index), ApiEventWeekController))
         return cache_keys_and_controllers
 
     @classmethod
