@@ -155,7 +155,7 @@ class BlueZoneHelper(object):
 
         logging.info("[BLUEZONE] live_events: {}".format([le.key.id() for le in live_events]))
         to_log += "[BLUEZONE] live_events: {}\n".format([le.key.id() for le in live_events])
-        live_events = filter(lambda e: True, live_events)
+        live_events = filter(lambda e: e.webcast_status != 'offline', live_events)
         for event in live_events:  # Fetch all matches and details asynchronously
             event.prep_matches()
             event.prep_details()
