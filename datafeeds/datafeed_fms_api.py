@@ -3,7 +3,6 @@ import cloudstorage
 import datetime
 import json
 import logging
-import os
 import tba_config
 import traceback
 
