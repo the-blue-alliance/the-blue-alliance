@@ -132,6 +132,7 @@ class MatchManipulator(ManipulatorBase):
             "actual_time",
             "predicted_time",
             "push_sent",
+            "tiebreak_match_key",
         ]
 
         json_attrs = [
