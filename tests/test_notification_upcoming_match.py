@@ -35,6 +35,7 @@ class TestUpcomingMatchNotification(unittest2.TestCase):
 
     def test_build(self):
         expected = {}
+        self.maxDiff = 1000
         expected['message_type'] = NotificationType.type_names[NotificationType.UPCOMING_MATCH]
         expected['message_data'] = {}
         expected['message_data']['event_key'] = self.event.key_name
@@ -47,6 +48,12 @@ class TestUpcomingMatchNotification(unittest2.TestCase):
         else:
             expected['message_data']['scheduled_time'] = None
             expected['message_data']['predicted_time'] = None
+        expected['message_data']['webcast'] = {
+            'channel': '6540154',
+            'status': 'unknown',
+            'stream_title': None,
+            'type': 'ustream'
+        }
 
         data = self.notification._build_dict()
 
