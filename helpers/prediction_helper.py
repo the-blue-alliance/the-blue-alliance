@@ -164,13 +164,13 @@ class ContributionCalculator(object):
                     var += weight * o
                     weight_sum += weight
                 var /= weight_sum
-            else:
-                if self._past_stats_var:
-                    # Use averages from other past teams
-                    var = np.mean([ato[-1] for ato in self._past_stats_var.values()])
-                elif self._var_sums:
-                    # Use averages from this event
-                    var = np.mean(self._var_sums) / 3
+            # else:
+            #     if self._past_stats_var:
+            #         # Use averages from other past teams
+            #         var = np.mean([ato[-1] for ato in self._past_stats_var.values()])
+            #     elif self._var_sums:
+            #         # Use averages from this event
+            #         var = np.mean(self._var_sums) / 3
 
             self._Oe[self._team_id_map[team]] = var
             self._diags[self._team_id_map[team]] = 3  # TODO
