@@ -109,5 +109,5 @@ class NightbotTeamStatuskHandler(CacheableHandler):
         team_key = 'frc{}'.format(team_number)
         status = EventTeamStatusHelper.generate_team_at_event_status_string(team_key, event_team.status)
         if status:
-            status.replace('<b>', '').replace('</b>', '')
+            statys = status.replace('<b>', '').replace('</b>', '')
         return '{}[{}] {}'.format(user_str, event_code_upper, status)
