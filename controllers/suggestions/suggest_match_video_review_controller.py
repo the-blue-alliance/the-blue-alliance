@@ -1,7 +1,5 @@
-import datetime
 import os
 
-from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from consts.account_permissions import AccountPermissions
@@ -9,6 +7,7 @@ from controllers.suggestions.suggestions_review_base_controller import Suggestio
 from helpers.suggestions.match_suggestion_accepter import MatchSuggestionAccepter
 from models.match import Match
 from models.suggestion import Suggestion
+from template_engine import jinja2_engine
 
 
 class SuggestMatchVideoReviewController(SuggestionsReviewBaseController):
@@ -36,8 +35,7 @@ class SuggestMatchVideoReviewController(SuggestionsReviewBaseController):
             "suggestions": suggestions,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/suggest_match_video_review_list.html')
-        self.response.out.write(template.render(path, self.template_values))
+        self.response.out.write(jinja2_engine.render('suggestions/suggest_match_video_review_list.html', self.template_values))
 
     def post(self):
         accept_keys = map(lambda x: int(x) if x.isdigit() else x, self.request.POST.getall("accept_keys[]"))
