@@ -26,12 +26,13 @@ describe('visibility reducer', () => {
     expect(visibility(initialState, action)).toEqual(expectedState)
   })
 
-  it('toggles chat sidebar from true to false', () => {
+  it('toggles chat sidebar from false to true', () => {
     const initialState = Object.assign({}, defaultState, {
-      chatSidebar: true,
+      chatSidebar: false,
       chatSidebarHasBeenVisible: true,
     })
     const expectedState = Object.assign({}, defaultState, {
+      chatSidebar: true,
       chatSidebarHasBeenVisible: true,
     })
     const action = {
