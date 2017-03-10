@@ -59,11 +59,12 @@ class ApiEventDetailsController(ApiBaseController):
         captain_team_keys = [alliance['picks'][0] for alliance in alliances]
         event_team_keys = [ndb.Key(EventTeam, "{}_{}".format(event_key, team_key)) for team_key in captain_team_keys]
         captain_eventteams_future = ndb.get_multi_async(event_team_keys)
-        for captain_future in captain_eventteams_future:
+        for captain_future, alliance in zip(captain_eventteams_future, alliances):
             captain = captain_future.get_result()
-            if captain.status and 'alliance' in captain.status and 'playoff' in captain.status:
-                alliance_index = captain.status['alliance']['number'] - 1
-                alliances[alliance_index]['status'] = captain.status['playoff']
+            if captain and captain.status and 'alliance' in captain.status and 'playoff' in captain.status:
+                alliance['status'] = captain.status['playoff']
+            else:
+                alliance['status'] = 'unknown'
         return alliances
 
     def _render(self, event_key, detail_type):
