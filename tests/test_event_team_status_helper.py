@@ -806,7 +806,8 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
                     "ties": 0,
                     "wins": 11
                 },
-                "sort_orders": None
+                "sort_orders": None,
+                "team_key": "frc359",
             },
             "sort_order_info": None,
             "status": "completed"
@@ -842,7 +843,8 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
                     "ties": 0,
                     "wins": 9
                 },
-                "sort_orders": None
+                "sort_orders": None,
+                "team_key": "frc5240",
             },
             "sort_order_info": None,
             "status": "completed"
@@ -878,7 +880,8 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
                     "ties": 0,
                     "wins": 6
                 },
-                "sort_orders": None
+                "sort_orders": None,
+                "team_key": "frc229",
             },
             "sort_order_info": None,
             "status": "completed"
@@ -914,7 +917,8 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
                     "ties": 0,
                     "wins": 6
                 },
-                "sort_orders": None
+                "sort_orders": None,
+                "team_key": "frc1665",
             },
             "sort_order_info": None,
             "status": "completed"
@@ -936,7 +940,8 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
                     "ties": 0,
                     "wins": 6
                 },
-                "sort_orders": None
+                "sort_orders": None,
+                "team_key": "frc5964",
             },
             "sort_order_info": None,
             "status": "completed"
@@ -1043,7 +1048,8 @@ class Test2016casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
                     "ties": 0,
                     "wins": 8
                 },
-                "sort_orders": None
+                "sort_orders": None,
+                "team_key": "frc254",
             },
             "sort_order_info": None,
             "status": "completed"
@@ -1335,7 +1341,8 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
                 "qual_average": 200.4,
                 "rank": None,
                 "record": None,
-                "sort_orders": None
+                "sort_orders": None,
+                "team_key": "frc254",
             },
             "sort_order_info": None,
             "status": "completed"
@@ -1359,7 +1366,8 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
                 "qual_average": 97.0,
                 "rank": None,
                 "record": None,
-                "sort_orders": None
+                "sort_orders": None,
+                "team_key": "frc846",
             },
             "sort_order_info": None,
             "status": "completed"
@@ -1377,7 +1385,8 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
                 "qual_average": 42.6,
                 "rank": None,
                 "record": None,
-                "sort_orders": None
+                "sort_orders": None,
+                "team_key": "frc8",
             },
             "sort_order_info": None,
             "status": "completed"
