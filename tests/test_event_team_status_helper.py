@@ -27,10 +27,6 @@ class TestSimulated2016nytrEventTeamStatusHelper(unittest2.TestCase):
     def testSimulatedEvent(self):
         es = EventSimulator()
         event = Event.get_by_id('2016nytr')
-        status = EventTeamStatusHelper.generate_team_at_event_status('frc359', event)
-        self.assertEqual(
-            EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
-            None)
 
         es.step()
         event = Event.get_by_id('2016nytr')
@@ -768,13 +764,6 @@ class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string('frc5964', status),
             'Team 5964 was <b>Rank 23/36</b> with a record of <b>6-6-0</b> in quals.')
 
-    def testTeamNotThere(self):
-        status = EventTeamStatusHelper.generate_team_at_event_status('frc1124', self.event)
-        self.assertDictEqual(status, self.status_1124)
-        self.assertEqual(
-            EventTeamStatusHelper.generate_team_at_event_status_string('frc1124', status),
-            None)
-
 
 class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
     status_359 = {
@@ -1009,13 +998,6 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc5964', status),
             'Team 5964 had a record of <b>6-6-0</b> in quals.')
-
-    def testTeamNotThere(self):
-        status = EventTeamStatusHelper.generate_team_at_event_status('frc1124', self.event)
-        self.assertDictEqual(status, self.status_1124)
-        self.assertEqual(
-            EventTeamStatusHelper.generate_team_at_event_status_string('frc1124', status),
-            None)
 
 
 class Test2016casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
@@ -1311,13 +1293,6 @@ class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string('frc8', status),
             'Team 8 was <b>Rank 53/57</b> with an average score of <b>42.6</b> in quals.')
 
-    def testTeamNotThere(self):
-        status = EventTeamStatusHelper.generate_team_at_event_status('frc1124', self.event)
-        self.assertDictEqual(status, self.status_1124)
-        self.assertEqual(
-            EventTeamStatusHelper.generate_team_at_event_status_string('frc1124', status),
-            None)
-
 
 class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
     status_254 = {
@@ -1440,10 +1415,3 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc8', status),
             'Team 8 had an average score of <b>42.6</b> in quals.')
-
-    def testTeamNotThere(self):
-        status = EventTeamStatusHelper.generate_team_at_event_status('frc1124', self.event)
-        self.assertDictEqual(status, self.status_1124)
-        self.assertEqual(
-            EventTeamStatusHelper.generate_team_at_event_status_string('frc1124', status),
-            None)
