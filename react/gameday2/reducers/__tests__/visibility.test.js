@@ -4,8 +4,8 @@ import * as types from '../../constants/ActionTypes'
 describe('visibility reducer', () => {
   const defaultState = {
     hashtagSidebar: false,
-    chatSidebar: false,
-    chatSidebarHasBeenVisible: false,
+    chatSidebar: true,
+    chatSidebarHasBeenVisible: true,
     tickerSidebar: false,
     layoutDrawer: false,
   }
