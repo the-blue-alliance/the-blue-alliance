@@ -1,7 +1,3 @@
-import os
-
-from google.appengine.ext.webapp import template
-
 from consts.account_permissions import AccountPermissions
 from controllers.suggestions.suggestions_review_base_controller import SuggestionsReviewBaseController
 from helpers.suggestions.match_suggestion_accepter import MatchSuggestionAccepter
@@ -17,7 +13,10 @@ class SuggestMatchVideoReviewController(SuggestionsReviewBaseController):
         super(SuggestMatchVideoReviewController, self).__init__(*args, **kw)
 
     def create_target_model(self, suggestion):
-        match = Match.get_by_id(suggestion.target_key)
+        target_key = self.request.get('key-{}'.format(suggestion.key.id()), suggestion.target_key)
+        match = Match.get_by_id(target_key)
+        if not match:
+            return None
         return MatchSuggestionAccepter.accept_suggestion(match, suggestion)
 
     """

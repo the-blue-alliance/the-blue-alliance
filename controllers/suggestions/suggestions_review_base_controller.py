@@ -43,14 +43,14 @@ class SuggestionsReviewBaseController(LoggedInHandler):
         if suggestion.review_state != Suggestion.REVIEW_PENDING:
             return
 
-        # Mark Suggestion as accepted
-        suggestion.review_state = Suggestion.REVIEW_ACCEPTED
-        suggestion.reviewer = self.user_bundle.account.key
-        suggestion.reviewed_at = datetime.datetime.now()
-
         # Do all DB writes
         ret = self.create_target_model(suggestion)
-        suggestion.put()
+        if ret:
+            # Mark Suggestion as accepted
+            suggestion.review_state = Suggestion.REVIEW_ACCEPTED
+            suggestion.reviewer = self.user_bundle.account.key
+            suggestion.reviewed_at = datetime.datetime.now()
+            suggestion.put()
         return ret
 
     @ndb.transactional(xg=True)
