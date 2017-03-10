@@ -12,6 +12,7 @@ export default class EmbedHtml5 extends React.Component {
       width: '100%',
       height: '100%',
       autoplay: true,
+      crossorigin: "anonymous",
     })
   }
 
@@ -19,7 +20,6 @@ export default class EmbedHtml5 extends React.Component {
     return (
       <video
         controls
-        crossorigin="anonymous"
         id={this.props.webcast.id}
         className="video-js vjs-default-skin"
       >
