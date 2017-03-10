@@ -171,9 +171,9 @@ class EventHelper(object):
         OR
         b) The event.start_date is on or within 4 days after the closest Wednesday
         """
-        cached_result = memcache.get('EventHelper.getWeekEvents()')
-        if cached_result is not None:
-            return cached_result
+        event_keys = memcache.get('EventHelper.getWeekEvents():event_keys')
+        if event_keys is not None:
+            return ndb.get_multi(event_keys)
 
         today = datetime.datetime.today()
 
@@ -198,17 +198,17 @@ class EventHelper(object):
                     events.append(event)
 
         EventHelper.sort_events(events)
-        memcache.set('EventHelper.getWeekEvents()', events, 60*60)
+        memcache.set('EventHelper.getWeekEvents():event_keys', [e.key for e in events], 60*60)
         return events
 
     @classmethod
     def getEventsWithinADay(self):
-        cached_result = memcache.get('EventHelper.getEventsWithinADay()')
-        if cached_result is not None:
-            return cached_result
+        event_keys = memcache.get('EventHelper.getEventsWithinADay():event_keys')
+        if event_keys is not None:
+            return ndb.get_multi(event_keys)
 
         events = filter(lambda e: e.within_a_day, self.getWeekEvents())
-        memcache.set('EventHelper.getEventsWithinADay()', events, 60*60)
+        memcache.set('EventHelper.getEventsWithinADay():event_keys', [e.key for e in events], 60*60)
         return events
 
     @classmethod
