@@ -263,6 +263,7 @@ class EventTeamStatusHelper(object):
                         } if year != 2015 else None,
                         'qual_average': qual_average if year == 2015 else None,
                         'sort_orders': None,
+                        'team_key': team_key,
                     },
                     'num_teams': len(all_teams),
                     'sort_order_info': None
