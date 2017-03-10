@@ -57,7 +57,7 @@ class ApiEventDetailsController(ApiBaseController):
 
     def _add_alliance_status(self, event_key, alliances):
         captain_team_keys = [alliance['picks'][0] for alliance in alliances]
-        event_team_keys = map(lambda x: ndb.Key(EventTeam, "{}_{}".format(event_key, x)), captain_team_keys)
+        event_team_keys = [ndb.Key(EventTeam, "{}_{}".format(event_key, team_key)) for team_key in captain_team_keys]
         captain_eventteams_future = ndb.get_multi_async(event_team_keys)
         for captain_future in captain_eventteams_future:
             captain = captain_future.get_result()
