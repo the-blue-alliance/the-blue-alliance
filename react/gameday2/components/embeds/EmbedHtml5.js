@@ -19,6 +19,7 @@ export default class EmbedHtml5 extends React.Component {
     return (
       <video
         controls
+        crossorigin="anonymous"
         id={this.props.webcast.id}
         className="video-js vjs-default-skin"
       >
