@@ -9,6 +9,7 @@ from database.event_query import EventQuery, EventListQuery
 from database.event_details_query import EventDetailsQuery
 from database.match_query import EventMatchesQuery
 from database.team_query import EventTeamsQuery
+from models.event_team import EventTeam
 
 
 class ApiEventListController(ApiBaseController):
@@ -47,16 +48,32 @@ class ApiEventController(ApiBaseController):
 
 
 class ApiEventDetailsController(ApiBaseController):
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_HEADER_LENGTH = 61
 
     def _track_call(self, event_key, detail_type):
         action = 'event/{}'.format(detail_type)
         self._track_call_defer(action, event_key)
 
+    def _add_alliance_status(self, event_key, alliances):
+        captain_team_keys = [alliance['picks'][0] for alliance in alliances]
+        event_team_keys = [ndb.Key(EventTeam, "{}_{}".format(event_key, team_key)) for team_key in captain_team_keys]
+        captain_eventteams_future = ndb.get_multi_async(event_team_keys)
+        for captain_future in captain_eventteams_future:
+            captain = captain_future.get_result()
+            if captain.status and 'alliance' in captain.status and 'playoff' in captain.status:
+                alliance_index = captain.status['alliance']['number'] - 1
+                alliances[alliance_index]['status'] = captain.status['playoff']
+        return alliances
+
     def _render(self, event_key, detail_type):
         event_details, self._last_modified = EventDetailsQuery(event_key).fetch(dict_version=3, return_updated=True)
-        return json.dumps(event_details[detail_type], ensure_ascii=True, indent=2, sort_keys=True)
+        if detail_type == 'alliances' and event_details[detail_type]:
+            data = self._add_alliance_status(event_key, event_details[detail_type])
+        else:
+            data = event_details[detail_type]
+
+        return json.dumps(data, ensure_ascii=True, indent=2, sort_keys=True)
 
 
 class ApiEventTeamsController(ApiBaseController):
