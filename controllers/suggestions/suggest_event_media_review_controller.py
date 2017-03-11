@@ -67,13 +67,8 @@ class SuggestEventMediaReviewController(SuggestionsReviewBaseController):
 
         media = MediaCreator.create_media_model(suggestion, event_reference, [])
 
-        # Mark Suggestion as accepted
-        suggestion.review_state = Suggestion.REVIEW_ACCEPTED
-        suggestion.reviewer = self.user_bundle.account.key
-        suggestion.reviewed_at = datetime.datetime.now()
-
         # Do all DB writes
-        MediaManipulator.createOrUpdate(media)
+        return MediaManipulator.createOrUpdate(media)
 
     def post(self):
         self.preferred_keys = self.request.POST.getall("preferred_keys[]")
