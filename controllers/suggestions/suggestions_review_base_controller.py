@@ -53,7 +53,6 @@ class SuggestionsReviewBaseController(LoggedInHandler):
             suggestion.put()
         return ret
 
-    @ndb.transactional(xg=True)
     def _process_rejected(self, reject_keys):
         """
         Do everything we need to reject a batch of suggestions
@@ -67,8 +66,11 @@ class SuggestionsReviewBaseController(LoggedInHandler):
 
         for suggestion in rejected_suggestions:
             if suggestion.review_state == Suggestion.REVIEW_PENDING:
-                suggestion.review_state = Suggestion.REVIEW_REJECTED
-                suggestion.reviewer = self.user_bundle.account.key
-                suggestion.reviewed_at = datetime.datetime.now()
+                self._reject_suggestion(suggestion)
 
-        ndb.put_multi(rejected_suggestions)
+    @ndb.transactional(xg=True)
+    def _reject_suggestion(self, suggestion):
+        suggestion.review_state = Suggestion.REVIEW_REJECTED
+        suggestion.reviewer = self.user_bundle.account.key
+        suggestion.reviewed_at = datetime.datetime.now()
+        suggestion.put()
