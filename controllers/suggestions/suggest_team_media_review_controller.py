@@ -90,7 +90,8 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
         if to_replace_id:
             to_replace = Media.get_by_id(to_replace_id)
             if team_reference not in to_replace.preferred_references:
-                return  # Preferred reference must have been edited earlier. Skip this Suggestion for now.
+                # Preferred reference must have been edited earlier. Skip this Suggestion for now.
+                return
             to_replace.preferred_references.remove(team_reference)
 
         # Add preferred reference to current Media (images only) if explicitly listed in preferred_keys or if to_replace_id exists
@@ -101,15 +102,10 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
 
         media = MediaCreator.create_media_model(suggestion, team_reference, preferred_references)
 
-        # Mark Suggestion as accepted
-        suggestion.review_state = Suggestion.REVIEW_ACCEPTED
-        suggestion.reviewer = self.user_bundle.account.key
-        suggestion.reviewed_at = datetime.datetime.now()
-
         # Do all DB writes
         if to_replace:
             MediaManipulator.createOrUpdate(to_replace, auto_union=False)
-        MediaManipulator.createOrUpdate(media)
+        return MediaManipulator.createOrUpdate(media)
 
     def post(self):
         self.preferred_keys = self.request.POST.getall("preferred_keys[]")
