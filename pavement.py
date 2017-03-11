@@ -108,6 +108,13 @@ def test(args):
 
 
 @task
+def setup():
+    sh("pip install -r requirements.txt")
+    install_libs()
+    make()
+
+
+@task
 def test_fast():
     """Run tests that don't require HTTP"""
     print("Running Fast Tests")
