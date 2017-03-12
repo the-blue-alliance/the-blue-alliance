@@ -1,5 +1,5 @@
 {% macro match_time_td(match, compact=False) %}
-<td{% if compact %} rowspan="2"{% endif %}>
+<td colspan="2"{% if compact %} rowspan="2"{% endif %}>
   {% if match.time %}<time class="tba-match-time-utc" datetime="{{match.time.isoformat()}}+00:00">{{match.time|strftime("%a %I:%M%p UTC")}}</time>{% else %}--{% endif %}
 </td>
 {% endmacro %}

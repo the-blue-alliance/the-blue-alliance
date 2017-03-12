@@ -18,8 +18,12 @@
   {% endfor %}
 
   {% if not upcoming %}
-    {{mtcm.match_score_td(match, 'red', cur_team_key)}}
-    {{mtcm.match_score_td(match, 'blue', cur_team_key)}}
+    {% if match.has_been_played or not match.time %}
+      {{mtcm.match_score_td(match, 'red', cur_team_key)}}
+      {{mtcm.match_score_td(match, 'blue', cur_team_key)}}
+    {% else %}
+      {{mtcm.match_time_td(match)}}
+    {% endif %}
   {% endif %}
 </tr>
 
@@ -37,7 +41,11 @@
   {% endfor %}
 
   {% if not upcoming %}
-  {{mtcm.match_score_td(match, 'red', cur_team_key, compact=True)}}
+    {% if match.has_been_played or not match.time %}
+      {{mtcm.match_score_td(match, 'red', cur_team_key, compact=True)}}
+    {% else %}
+      {{mtcm.match_time_td(match, compact=True)}}
+    {% endif %}
   {% endif %}
 </tr>
 <tr class="hidden-lg">
@@ -45,8 +53,8 @@
     {{mtcm.match_team_td(match, 'blue', team_key, cur_team_key, compact=True, fake_matches=fake_matches)}}
   {% endfor %}
 
-  {% if not upcoming %}
-  {{mtcm.match_score_td(match, 'blue', cur_team_key, compact=True)}}
+  {% if not upcoming and match.has_been_played %}
+    {{mtcm.match_score_td(match, 'blue', cur_team_key, compact=True)}}
   {% endif %}
 </tr>
 {% endmacro %}
