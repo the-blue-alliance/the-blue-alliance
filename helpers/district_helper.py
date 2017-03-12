@@ -44,7 +44,6 @@ class DistrictHelper(object):
     def calculate_event_points(cls, event):
         event.get_awards_async()
         event.get_matches_async()
-        district_teams_future = DistrictTeamsQuery(event.district_key.id()).fetch_async()
 
         # Typically 3 for District CMP, 1 otherwise
         POINTS_MULTIPLIER = DistrictPointValues.DISTRICT_CMP_MULTIPLIER.get(event.year, DistrictPointValues.DISTRICT_CMP_MULIPLIER_DEFAULT) if event.event_type_enum == EventType.DISTRICT_CMP else DistrictPointValues.STANDARD_MULTIPLIER
@@ -104,19 +103,11 @@ class DistrictHelper(object):
             for team in award.team_list:
                 district_points['points'][team.id()]['award_points'] += point_value * POINTS_MULTIPLIER
 
-        # Filter out teams not in this district (only keep those with a DistrictTeam present for this district)
-        for team in district_teams_future.get_result():
-            team_key = team.key.id()
-            if team_key in district_points['points']:
-                single_district_points['points'][team_key] = district_points['points'][team_key]
-            if team_key in district_points['tiebreakers']:
-                single_district_points['tiebreakers'][team_key] = district_points['tiebreakers'][team_key]
-
-        for team, point_breakdown in single_district_points['points'].items():
+        for team, point_breakdown in district_points['points'].items():
             for p in point_breakdown.values():
-                single_district_points['points'][team]['total'] += p
+                district_points['points'][team]['total'] += p
 
-        return single_district_points
+        return district_points
 
     @classmethod
     def calculate_rankings(cls, events, teams, year):

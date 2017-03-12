@@ -453,21 +453,17 @@ class TypeaheadCalcDo(webapp.RequestHandler):
 
 class DistrictPointsCalcEnqueue(webapp.RequestHandler):
     """
-    Enqueues calculation of district points for all district events for a given year
+    Enqueues calculation of district points for all season events for a given year
     """
 
     def get(self, year):
-        all_event_keys = []
         year = int(year)
-        districts_in_year = District.query(District.year == year).fetch(keys_only=True)
-        for district_key in districts_in_year:
 
-            event_keys = Event.query(Event.year == year, Event.district_key == district_key).fetch(None, keys_only=True)
-            all_event_keys += event_keys
-            for event_key in event_keys:
-                taskqueue.add(url='/tasks/math/do/district_points_calc/{}'.format(event_key.id()), method='GET')
+        event_keys = Event.query(Event.year == year, Event.event_type_enum.IN(EventType.SEASON_EVENT_TYPES)).fetch(None, keys_only=True)
+        for event_key in event_keys:
+            taskqueue.add(url='/tasks/math/do/district_points_calc/{}'.format(event_key.id()), method='GET')
 
-        self.response.out.write("Enqueued for: {}".format([event_key.id() for event_key in all_event_keys]))
+        self.response.out.write("Enqueued for: {}".format([event_key.id() for event_key in event_keys]))
 
 
 class DistrictPointsCalcDo(webapp.RequestHandler):
@@ -477,9 +473,10 @@ class DistrictPointsCalcDo(webapp.RequestHandler):
 
     def get(self, event_key):
         event = Event.get_by_id(event_key)
-        if event.district_key is None:
-            self.response.out.write("Can't calculate district points for a non-district event {}!"
-                                    .format(event.key_name))
+        if event.event_type_enum not in EventType.SEASON_EVENT_TYPES:
+            if 'X-Appengine-Taskname' not in self.request.headers:
+                self.response.out.write("Can't calculate district points for a non-season event {}!"
+                                        .format(event.key_name))
             return
 
         district_points = DistrictHelper.calculate_event_points(event)
@@ -494,7 +491,8 @@ class DistrictPointsCalcDo(webapp.RequestHandler):
             self.response.out.write(event.district_points)
 
         # Enqueue task to update rankings
-        taskqueue.add(url='/tasks/math/do/district_rankings_calc/{}'.format(event.district_key.id()), method='GET')
+        if event.district_key:
+            taskqueue.add(url='/tasks/math/do/district_rankings_calc/{}'.format(event.district_key.id()), method='GET')
 
 
 class DistrictRankingsCalcEnqueue(webapp.RequestHandler):
