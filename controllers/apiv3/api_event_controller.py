@@ -56,7 +56,11 @@ class ApiEventDetailsController(ApiBaseController):
         self._track_call_defer(action, event_key)
 
     def _add_alliance_status(self, event_key, alliances):
-        captain_team_keys = [alliance['picks'][0] for alliance in alliances]
+        captain_team_keys = []
+        for alliance in alliances:
+            if alliance['picks']:
+                captain_team_keys.append(alliance['picks'][0])
+
         event_team_keys = [ndb.Key(EventTeam, "{}_{}".format(event_key, team_key)) for team_key in captain_team_keys]
         captain_eventteams_future = ndb.get_multi_async(event_team_keys)
         for captain_future, alliance in zip(captain_eventteams_future, alliances):
