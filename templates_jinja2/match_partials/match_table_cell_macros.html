@@ -100,14 +100,11 @@
       {% else %}--{% endif %}
     {% endif %}
   {% elif match.year == 2017 and match.has_been_played and match.score_breakdown %}
-    {% if "kPaRankingPointAchieved" in match.score_breakdown.get(alliance_color) and
-    match.score_breakdown.get(alliance_color).kPaRankingPointAchieved and
-    "teleopTowerCaptured" in match.score_breakdown.get(alliance_color) and
-    match.score_breakdown.get(alliance_color).teleopTowerCaptured %}
+    {% if (match.score_breakdown.get(alliance_color).get('kPaRankingPointAchieved') or match.score_breakdown.get(alliance_color).get('kPaBonusPoints')) and (match.score_breakdown.get(alliance_color).get('rotorRankingPointAchieved') or match.score_breakdown.get(alliance_color).get('rotorBonusPoints')) %}
     P / R
     {% else %}
-      {% if "kPaRankingPointAchieved" in match.score_breakdown.get(alliance_color) and match.score_breakdown.get(alliance_color).kPaRankingPointAchieved %}P
-      {% elif "rotorRankingPointAchieved" in match.score_breakdown.get(alliance_color) and match.score_breakdown.get(alliance_color).rotorRankingPointAchieved %}R
+      {% if match.score_breakdown.get(alliance_color).get('kPaRankingPointAchieved') or match.score_breakdown.get(alliance_color).get('kPaBonusPoints') %}P
+      {% elif match.score_breakdown.get(alliance_color).get('rotorRankingPointAchieved') or match.score_breakdown.get(alliance_color).get('rotorBonusPoints') %}R
       {% else %}--{% endif %}
     {% endif %}
   {% else %}
