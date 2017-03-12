@@ -397,7 +397,7 @@ class PredictionHelper(object):
                     if is_playoff:
                         prediction[color]['score'] += prob * 20
                 if stat == 'gears':
-                    requried_gears = 13
+                    requried_gears = 12
 
                     mu = mean_vars[color][stat]['mean'] - requried_gears
                     prob = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
