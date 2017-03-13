@@ -95,19 +95,19 @@ const LAYOUT_1 = [
 
  */
 const LAYOUT_2 = [
-    {
-        width: '100%',
-        height: '50%',
-        top: 0,
-        left: 0,
-        position: 'absolute',
-    }, {
-        width: '100%',
-        height: '50%',
-        top: '50%',
-        left: 0,
-        position: 'absolute',
-    },
+  {
+    width: '100%',
+    height: '50%',
+    top: 0,
+    left: 0,
+    position: 'absolute',
+  }, {
+    width: '100%',
+    height: '50%',
+    top: '50%',
+    left: 0,
+    position: 'absolute',
+  },
 ]
 
 /* Layout 3
