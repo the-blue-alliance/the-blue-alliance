@@ -14,6 +14,7 @@ from notifications.alliance_selections import AllianceSelectionNotification
 from notifications.level_starting import CompLevelStartingNotification
 from notifications.broadcast import BroadcastNotification
 from notifications.match_score import MatchScoreNotification
+from notifications.match_video import MatchVideoNotification, EventMatchVideoNotification
 from notifications.awards_updated import AwardsUpdatedNotification
 from notifications.schedule_updated import ScheduleUpdatedNotification
 from notifications.upcoming_match import UpcomingMatchNotification
@@ -143,6 +144,23 @@ class NotificationHelper(object):
 
         notification = AwardsUpdatedNotification(event)
         notification.send(keys)
+
+    @classmethod
+    def send_match_video(cls, match):
+        """
+        Sends match_video and event_match_video notifications
+        Dedupes so match_video takes priority over event_match_video
+        """
+        match_users = set(PushHelper.get_users_subscribed_to_match(match, NotificationType.MATCH_VIDEO))
+        match_user_keys = PushHelper.get_client_ids_for_users(match_users)
+        event_users = set(PushHelper.get_users_subscribed_to_event(match.event.get(), NotificationType.EVENT_MATCH_VIDEO)) - match_users
+        event_user_keys = PushHelper.get_client_ids_for_users(event_users)
+
+        n1 = MatchVideoNotification(match)
+        n1.send(match_user_keys)
+
+        n2 = EventMatchVideoNotification(match)
+        n2.send(event_user_keys)
 
     @classmethod
     def send_broadcast(cls, client_types, title, message, url, app_version=''):
