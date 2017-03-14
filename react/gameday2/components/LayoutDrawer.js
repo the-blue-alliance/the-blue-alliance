@@ -9,7 +9,7 @@ import Toggle from 'material-ui/Toggle'
 import { red500, fullWhite } from 'material-ui/styles/colors'
 import CheckmarkIcon from 'material-ui/svg-icons/navigation/check'
 import { getLayoutSvgIcon } from '../utils/layoutUtils'
-import { NUM_LAYOUTS, NAME_FOR_LAYOUT } from '../constants/LayoutConstants'
+import { NUM_LAYOUTS, LAYOUT_DISPLAY_ORDER, NAME_FOR_LAYOUT } from '../constants/LayoutConstants'
 
 class LayoutDrawer extends React.Component {
   static propTypes = {
@@ -37,17 +37,18 @@ class LayoutDrawer extends React.Component {
     const layouts = []
     if (this.props.hasWebcasts) {
       for (let i = 0; i < NUM_LAYOUTS; i++) {
-        const showCheck = (i === this.props.selectedLayout && this.props.layoutSet)
+        const layoutNum = LAYOUT_DISPLAY_ORDER[i]
+        const showCheck = (layoutNum === this.props.selectedLayout && this.props.layoutSet)
         const icon = showCheck ? <CheckmarkIcon /> : null
 
         layouts.push(
           <ListItem
-            primaryText={NAME_FOR_LAYOUT[i]}
+            primaryText={NAME_FOR_LAYOUT[layoutNum]}
             insetChildren
-            onTouchTap={() => this.props.setLayout(i)}
+            onTouchTap={() => this.props.setLayout(layoutNum)}
             key={i.toString()}
             rightIcon={icon}
-            leftIcon={getLayoutSvgIcon(i)}
+            leftIcon={getLayoutSvgIcon(layoutNum)}
           />
         )
       }

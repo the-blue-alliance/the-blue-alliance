@@ -10,6 +10,10 @@ export const MAX_SUPPORTED_VIEWS = 9
 // The layout ID is the index into this array
 export const NUM_VIEWS_FOR_LAYOUT = [1, 2, 3, 4, 4, 5, 6, 8, 9, 2]
 
+// Defines the order layouts are shown in the layout selection list
+// Each element is the number of the layout that should be shown at that index
+export const LAYOUT_DISPLAY_ORDER = [0, 1, 9, 2, 3, 4, 5, 6, 7, 8]
+
 // Maps a layout ID for the appropriate name for that layout
 export const NAME_FOR_LAYOUT = [
   'Single View',
