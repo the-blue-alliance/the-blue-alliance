@@ -5,6 +5,7 @@ import urllib
 import uuid
 
 from google.appengine.ext import deferred
+from google.appengine.api import memcache
 from google.appengine.api import urlfetch
 
 from controllers.gcm.gcm import GCMMessage
@@ -37,12 +38,23 @@ class BaseNotification(object):
     # https://developers.google.com/cloud-messaging/concept-options#setting-the-priority-of-a-message
     _priority = 'normal'
 
+    # If set to (key, timeout_seconds), won't send multiple notifications
+    _timeout = None
+
     """
     Class that acts as a basic notification.
     To send a notification, instantiate one and call this method
     """
 
     def send(self, keys, push_firebase=True, track_call=True):
+        if self._timeout is not None:
+            key, timeout = self._timeout
+            if memcache.get(key):  # Using memcache is a hacky implementation, since it is not guaranteed.
+                logging.info("Notification timeout for: {}".format(key))
+                return  # Currently in timeout. Don't send.
+            else:
+                memcache.set(key, True, timeout)
+
         self.keys = keys  # dict like {ClientType : [ key ] } ... The list for webhooks is a tuple of (key, secret)
         deferred.defer(self.render, self._supported_clients, _queue="push-notifications")
         if self._track_call and track_call:

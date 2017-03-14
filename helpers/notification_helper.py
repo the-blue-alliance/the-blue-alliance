@@ -158,9 +158,9 @@ class NotificationHelper(object):
         if match.within_seconds(60*10):
             match_user_keys = PushHelper.get_client_ids_for_users(match_users)
             MatchVideoNotification(match).send(match_user_keys)
-            event_users -= match_users  # Don't send both notifications
+            event_users = event_users.difference(match_users)  # Don't send both notifications
         else:
-            event_users += match_users  # Didn't sent individual notification
+            event_users = event_users.union(match_users)  # Didn't sent individual notification
 
         event_user_keys = PushHelper.get_client_ids_for_users(event_users)
         EventMatchVideoNotification(match).send(event_user_keys)
