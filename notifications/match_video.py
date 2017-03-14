@@ -29,7 +29,7 @@ class EventMatchVideoNotification(BaseNotification):
 
     @property
     def _timeout(self):
-        return 'EventMatchVideoNotification:{}'.format(self.event.key.id()), 30
+        return 'EventMatchVideoNotification:{}'.format(self.event.key.id()), 60*10
 
     @property
     def _type(self):
