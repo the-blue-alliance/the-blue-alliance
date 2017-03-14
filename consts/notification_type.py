@@ -17,7 +17,7 @@ class NotificationType(object):
     PING = 9  # This type of message is sent when the user hits 'ping device' in their account overview
     BROADCAST = 10  # Gives functionality for admins to send to many devices
     MATCH_VIDEO = 11
-    EVENT_MATCH_VIDEO = 12
+    EVENT_MATCH_VIDEO = 12  # Not user exposed
 
     # These aren't notifications, but used for upstream API calls
     UPDATE_FAVORITES = 100
@@ -58,7 +58,7 @@ class NotificationType(object):
         SCHEDULE_UPDATED: "Event Schedule Updated",
         FINAL_RESULTS: "Final Results",
         MATCH_VIDEO: "Match Video Added",
-        EVENT_MATCH_VIDEO: "Match Videos Added",
+        EVENT_MATCH_VIDEO: "Match Video Added",
     }
 
     types = {
@@ -96,7 +96,7 @@ class NotificationType(object):
         ALLIANCE_SELECTION,
         AWARDS,
         SCHEDULE_UPDATED,
-        EVENT_MATCH_VIDEO,
+        MATCH_VIDEO,
     ]
 
     enabled_team_notifications = [
