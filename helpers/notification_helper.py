@@ -151,19 +151,16 @@ class NotificationHelper(object):
         Sends match_video and event_match_video notifications
         If the match is current, MatchVideoNotification is sent.
         Otherwise, EventMatchVideoNotification is sent
-        The first takes priority if the user is subscribed to both
         """
         match_users = set(PushHelper.get_users_subscribed_to_match(match, NotificationType.MATCH_VIDEO))
         event_users = set(PushHelper.get_users_subscribed_to_event(match.event.get(), NotificationType.MATCH_VIDEO))
+        users = match_users.union(event_users)
         if match.within_seconds(60*10):
-            match_user_keys = PushHelper.get_client_ids_for_users(match_users)
-            MatchVideoNotification(match).send(match_user_keys)
-            event_users = event_users.difference(match_users)  # Don't send both notifications
+            user_keys = PushHelper.get_client_ids_for_users(users)
+            MatchVideoNotification(match).send(user_keys)
         else:
-            event_users = event_users.union(match_users)  # Didn't sent individual notification
-
-        event_user_keys = PushHelper.get_client_ids_for_users(event_users)
-        EventMatchVideoNotification(match).send(event_user_keys)
+            user_keys = PushHelper.get_client_ids_for_users(users)
+            EventMatchVideoNotification(match).send(user_keys)
 
     @classmethod
     def send_broadcast(cls, client_types, title, message, url, app_version=''):
