@@ -95,11 +95,20 @@ class PushHelper(object):
         return output
 
     @classmethod
-    def get_users_subscribed_to_event(cls, event, notification):
+    def get_users_subscribed_to_event(cls, event_key, notification=None):
         keys = []
-        keys.append(event.key_name)
-        keys.append("{}*".format(event.year))
-        users = Subscription.query(Subscription.model_key.IN(keys), Subscription.notification_types == notification).fetch()
+        keys.append(event_key)
+        keys.append("{}*".format(event_key[:4]))
+        if notification:
+            users = Subscription.query(
+                Subscription.model_key.IN(keys),
+                Subscription.notification_types == notification
+            ).fetch()
+        else:
+            users = Subscription.query(
+                Subscription.model_key.IN(keys),
+            ).fetch()
+
         output = []
         for user in users:
             output.append(user.user_id)
@@ -135,7 +144,7 @@ class PushHelper(object):
         output = []
         if client_types == []:
             return output
-        clients = MobileClient.query(MobileClient.client_type.IN(client_types))
+        clients = MobileClient.query(MobileClient.client_type.IN(client_types)).fetch()
         for user in clients:
             output.append(user.user_id)
         return output
