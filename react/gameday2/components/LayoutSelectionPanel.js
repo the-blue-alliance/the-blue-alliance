@@ -3,7 +3,7 @@ import Paper from 'material-ui/Paper'
 import { List, ListItem } from 'material-ui/List'
 import EventListener from 'react-event-listener'
 import { getLayoutSvgIcon } from '../utils/layoutUtils'
-import { NUM_LAYOUTS, NAME_FOR_LAYOUT } from '../constants/LayoutConstants'
+import { NUM_LAYOUTS, LAYOUT_DISPLAY_ORDER, NAME_FOR_LAYOUT } from '../constants/LayoutConstants'
 
 export default class LayoutSelectionPanelMaterial extends React.Component {
   static propTypes = {
@@ -48,12 +48,13 @@ export default class LayoutSelectionPanelMaterial extends React.Component {
   render() {
     const layouts = []
     for (let i = 0; i < NUM_LAYOUTS; i++) {
+      const layoutNum = LAYOUT_DISPLAY_ORDER[i]
       layouts.push(
         <ListItem
-          primaryText={NAME_FOR_LAYOUT[i]}
-          onTouchTap={() => this.props.setLayout(i)}
+          primaryText={NAME_FOR_LAYOUT[layoutNum]}
+          onTouchTap={() => this.props.setLayout(layoutNum)}
           key={i.toString()}
-          rightIcon={getLayoutSvgIcon(i)}
+          rightIcon={getLayoutSvgIcon(layoutNum)}
         />
       )
     }

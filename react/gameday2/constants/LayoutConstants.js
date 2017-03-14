@@ -1,6 +1,6 @@
 // How many layouts are defined
 // Valid layout IDs are in the range [0, NUM_LAYOUTS - 1]
-export const NUM_LAYOUTS = 9
+export const NUM_LAYOUTS = 10
 
 // The maximum number of views any layout can support.
 // Currently 9 for the nona-view
@@ -8,12 +8,16 @@ export const MAX_SUPPORTED_VIEWS = 9
 
 // Maps a layout ID to the number of views that layout supports
 // The layout ID is the index into this array
-export const NUM_VIEWS_FOR_LAYOUT = [1, 2, 3, 4, 4, 5, 6, 8, 9]
+export const NUM_VIEWS_FOR_LAYOUT = [1, 2, 3, 4, 4, 5, 6, 8, 9, 2]
+
+// Defines the order layouts are shown in the layout selection list
+// Each element is the number of the layout that should be shown at that index
+export const LAYOUT_DISPLAY_ORDER = [0, 1, 9, 2, 3, 4, 5, 6, 7, 8]
 
 // Maps a layout ID for the appropriate name for that layout
 export const NAME_FOR_LAYOUT = [
   'Single View',
-  'Split View',
+  'Vertical Split View',
   '"1+2" View',
   'Quad View',
   '"1+3" View',
@@ -21,6 +25,7 @@ export const NAME_FOR_LAYOUT = [
   'Hex View',
   'Octo-View',
   'Nona-View',
+  'Horizontal Split View',
 ]
 
 // Holds SVG path data that can be used to render icons for each layout
@@ -35,6 +40,7 @@ export const LAYOUT_SVG_PATHS = [
   'M0 0h7v7h-7v-7z M8 0h7v7h-7v-7z M16 0h7v7h-7v-7z M8 8h7v7h-7v-7z M16 8h7v7h-7v-7z M0 8h7v7h-7v-7z',
   'M0 0h5v7h-5v-7z M6 0h5v7h-5v-7z M12 0h5v7h-5v-7z M18 0h5v7h-5v-7z M0 8h5v7h-5v-7z M6 8h5v7h-5v-7z M12 8h5v7h-5v-7z M18 8h5v7h-5v-7z',
   'M0 0h7v4.33h-7v-4.33z M8 0h7v4.33h-7v-4.33z M16 0h7v4.33h-7v-4.33z M0 5.33h7v4.33h-7v-4.33z M8 5.33h7v4.33h-7v-4.33z M16 5.33h7v4.33h-7v-4.33z M0 10.67h7v4.33h-7v-4.33z M8 10.67h7v4.33h-7v-4.33z M16 10.67h7v4.33h-7v-4.33z',
+  'M0 0h23v7h-23v-7z M0 8h23v7h-23v-7z',
 ]
 
 // Holds styling information about the various layouts
@@ -416,6 +422,32 @@ const LAYOUT_8 = [
   },
 ]
 
+
+/* Layout 9
+
+ +-------------+
+ |      0      |
+ |-------------|
+ |      1      |
+ +-------------+
+
+ */
+const LAYOUT_9 = [
+  {
+    width: '100%',
+    height: '50%',
+    top: 0,
+    left: 0,
+    position: 'absolute',
+  }, {
+    width: '100%',
+    height: '50%',
+    top: '50%',
+    left: 0,
+    position: 'absolute',
+  },
+]
+
 export const LAYOUT_STYLES = [
   LAYOUT_0,
   LAYOUT_1,
@@ -426,4 +458,5 @@ export const LAYOUT_STYLES = [
   LAYOUT_6,
   LAYOUT_7,
   LAYOUT_8,
+  LAYOUT_9,
 ]
