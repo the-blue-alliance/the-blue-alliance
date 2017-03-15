@@ -331,7 +331,7 @@ class myTBAAddHotMatchesController(LoggedInHandler):
             ancestor=self.user_bundle.account.key).fetch_async(projection=[Subscription.model_key])
 
         matches = []
-        if event.details and event.details.predictions:
+        if event.details and event.details.predictions and event.details.predictions['match_predictions']:
             match_predictions = dict(
                 event.details.predictions['match_predictions']['qual'].items() +
                 event.details.predictions['match_predictions']['playoff'].items())
