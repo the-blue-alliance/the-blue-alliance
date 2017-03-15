@@ -318,3 +318,9 @@ class Match(ndb.Model):
         key_name_regex = re.compile(r'^[1-9]\d{3}[a-z]+[0-9]?\_(?:qm|ef\dm|qf\dm|sf\dm|f\dm)\d+$')
         match = re.match(key_name_regex, match_key)
         return True if match else False
+
+    def within_seconds(self, seconds):
+        """
+        Returns: Boolean whether match started within specified seconds of now
+        """
+        return self.actual_time and abs((datetime.datetime.now() - self.actual_time).total_seconds()) <= seconds

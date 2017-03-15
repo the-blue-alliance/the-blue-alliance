@@ -58,6 +58,14 @@ class MatchManipulator(ManipulatorBase):
                         if event not in unplayed_match_events:
                             unplayed_match_events.append(event)
 
+            # Try to send video notifications
+            if '_video_added' in updated_attrs:
+                try:
+                    NotificationHelper.send_match_video(match)
+                except Exception, exception:
+                    logging.error("Error sending match video updates: {}".format(exception))
+                    logging.error(traceback.format_exc())
+
         '''
         If we have an unplayed match during an event within a day, send out a schedule update notification
         '''
@@ -150,6 +158,10 @@ class MatchManipulator(ManipulatorBase):
         ]
 
         old_match._updated_attrs = []
+
+        # Lets postUpdateHook know if videos went from 0 to >0
+        if not old_match.has_video and new_match.has_video:
+            old_match._updated_attrs.append('_video_added')
 
         # if not auto_union, treat auto_union_attrs as list_attrs
         if not auto_union:

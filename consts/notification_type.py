@@ -16,6 +16,8 @@ class NotificationType(object):
     FINAL_RESULTS = 8
     PING = 9  # This type of message is sent when the user hits 'ping device' in their account overview
     BROADCAST = 10  # Gives functionality for admins to send to many devices
+    MATCH_VIDEO = 11
+    EVENT_MATCH_VIDEO = 12  # Not user exposed
 
     # These aren't notifications, but used for upstream API calls
     UPDATE_FAVORITES = 100
@@ -36,6 +38,8 @@ class NotificationType(object):
         FINAL_RESULTS: "final_results",
         PING: "ping",
         BROADCAST: "broadcast",
+        MATCH_VIDEO: "match_video",
+        EVENT_MATCH_VIDEO: "event_match_video",
 
         UPDATE_FAVORITES: "update_favorites",
         UPDATE_SUBSCRIPTION: "update_subscriptions",
@@ -53,6 +57,8 @@ class NotificationType(object):
         DISTRICT_POINTS_UPDATED: "District Points Updated",
         SCHEDULE_UPDATED: "Event Schedule Updated",
         FINAL_RESULTS: "Final Results",
+        MATCH_VIDEO: "Match Video Added",
+        EVENT_MATCH_VIDEO: "Match Video Added",
     }
 
     types = {
@@ -65,6 +71,8 @@ class NotificationType(object):
         "district_points_updated": DISTRICT_POINTS_UPDATED,
         "schedule_updated": SCHEDULE_UPDATED,
         "final_results": FINAL_RESULTS,
+        "match_video": MATCH_VIDEO,
+        "event_match_video": EVENT_MATCH_VIDEO,
 
         "update_favorites": UPDATE_FAVORITES,
         "update_subscriptions": UPDATE_SUBSCRIPTION,
@@ -87,17 +95,20 @@ class NotificationType(object):
         LEVEL_STARTING,
         ALLIANCE_SELECTION,
         AWARDS,
-        SCHEDULE_UPDATED
+        SCHEDULE_UPDATED,
+        MATCH_VIDEO,
     ]
 
     enabled_team_notifications = [
         UPCOMING_MATCH,
         MATCH_SCORE,
         ALLIANCE_SELECTION,
-        AWARDS
+        AWARDS,
+        MATCH_VIDEO,
     ]
 
     enabled_match_notifications = [
         UPCOMING_MATCH,
-        MATCH_SCORE
+        MATCH_SCORE,
+        MATCH_VIDEO,
     ]
