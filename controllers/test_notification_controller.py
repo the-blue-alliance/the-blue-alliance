@@ -12,6 +12,7 @@ from notifications.awards_updated import AwardsUpdatedNotification
 from notifications.district_points_updated import DistrictPointsUpdatedNotification
 from notifications.level_starting import CompLevelStartingNotification
 from notifications.match_score import MatchScoreNotification
+from notifications.match_video import MatchVideoNotification, EventMatchVideoNotification
 from notifications.schedule_updated import ScheduleUpdatedNotification
 from notifications.upcoming_match import UpcomingMatchNotification
 
@@ -60,6 +61,10 @@ class TestNotificationController(LoggedInHandler):
         elif type == NotificationType.FINAL_RESULTS:
             # Not implemented yet
             pass
+        elif type == NotificationType.MATCH_VIDEO:
+            notification = MatchVideoNotification(match)
+        elif type == NotificationType.EVENT_MATCH_VIDEO:
+            notification = EventMatchVideoNotification(match)
         else:
             # Not passed a valid int, return
             self.redirect('/apidocs/webhooks')
