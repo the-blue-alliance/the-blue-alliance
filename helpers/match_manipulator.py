@@ -139,6 +139,7 @@ class MatchManipulator(ManipulatorBase):
             "time_string",
             "actual_time",
             "predicted_time",
+            "post_result_time",
             "push_sent",
             "tiebreak_match_key",
         ]

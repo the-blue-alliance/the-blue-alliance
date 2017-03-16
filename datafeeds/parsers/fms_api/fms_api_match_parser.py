@@ -244,15 +244,22 @@ class FMSAPIHybridScheduleParser(object):
                 continue
 
             time = datetime.datetime.strptime(match['startTime'].split('.')[0], TIME_PATTERN)
-            actual_time_raw = match['actualStartTime'] if 'actualStartTime' in match else None
-            actual_time = None
             if event_tz is not None:
                 time = time - event_tz.utcoffset(time)
 
+            actual_time_raw = match['actualStartTime'] if 'actualStartTime' in match else None
+            actual_time = None
             if actual_time_raw is not None:
                 actual_time = datetime.datetime.strptime(actual_time_raw.split('.')[0], TIME_PATTERN)
                 if event_tz is not None:
                     actual_time = actual_time - event_tz.utcoffset(actual_time)
+
+            post_result_time_raw = match.get('postResultTime')
+            post_result_time = None
+            if post_result_time_raw is not None:
+                post_result_time = datetime.datetime.strptime(post_result_time_raw.split('.')[0], TIME_PATTERN)
+                if event_tz is not None:
+                    post_result_time = post_result_time - event_tz.utcoffset(post_result_time)
 
             key_name = Match.renderKeyName(
                 event_key,
@@ -315,6 +322,7 @@ class FMSAPIHybridScheduleParser(object):
                 team_key_names=team_key_names,
                 time=time,
                 actual_time=actual_time,
+                post_result_time=post_result_time,
                 alliances_json=json.dumps(alliances),
             ))
 

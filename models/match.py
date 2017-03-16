@@ -86,6 +86,7 @@ class Match(ndb.Model):
     time_string = ndb.StringProperty(indexed=False)  # the time as displayed on FIRST's site (event's local time)
     actual_time = ndb.DateTimeProperty()  # UTC time of match actual start
     predicted_time = ndb.DateTimeProperty()  # UTC time of when we predict the match will start
+    post_result_time = ndb.DateTimeProperty()  # UTC time scores were shown to the audience
     youtube_videos = ndb.StringProperty(repeated=True)  # list of Youtube IDs
     tba_videos = ndb.StringProperty(repeated=True)  # list of filetypes a TBA video exists for
     push_sent = ndb.BooleanProperty()  # has an upcoming match notification been sent for this match? None counts as False

@@ -324,6 +324,7 @@
         <th>Scheduled Time</th>
         <th>Predicted Time</th>
         <th>Actual Time</th>
+        <th>Post Result Time</th>
         <th>Alliances JSON</th>
         <th>Score Breakdown JSON</th>
     </thead>
@@ -335,6 +336,7 @@
             {% if match.prediction_error_str %}<br>({{ match.prediction_error_str}}){% endif %}</td>
         <td>{{ match.actual_time|local_time:event.timezone_id}}
             {% if match.schedule_error_str%}<br>({{ match.schedule_error_str}}){% endif %}</td>
+        <td>{{ match.post_result_time|local_time:event.timezone_id}}</td>
         <td>{% if match.alliances_json %}
             <button data-toggle="collapse" data-target="#alliances_{{ match.key_name }}" class="btn btn-info">Show</button>
             <div id="alliances_{{ match.key_name }}" class="collapse">{{ match.alliances_json }}</div>
