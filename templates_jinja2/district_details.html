@@ -52,7 +52,7 @@
     <div class="col-xs-12 col-sm-9 col-lg-10">
       <h1 class="hidden-xs end_header">{% if explicit_year %}{{year}} {% endif %}{{district_name}} District{% if events|length > 0 %}<small> {{ events|length }} Events</small>{% endif %}</h1>
 
-      <ul class="nav nav-tabs" role="tablist">
+      <ul class="nav nav-pills nav-justified" role="tablist">
         <li class="active"><a href="#events" role="tab" data-toggle="tab">Events</a></li>
         {% if teams_a or teams_b %}
         <li><a href="#teams" role="tab" data-toggle="tab">Teams</a></li>
