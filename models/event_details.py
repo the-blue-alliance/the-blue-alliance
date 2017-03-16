@@ -38,18 +38,19 @@ class EventDetails(ndb.Model):
         from helpers.rankings_helper import RankingsHelper
 
         has_extra_stats = False
-        for rank in self.rankings2:
-            rank['extra_stats'] = []
-            if self.year == 2017:
-                rank['extra_stats'] = [
-                    int(round(rank['sort_orders'][0] * rank['matches_played'])),
-                ]
-                has_extra_stats = True
-            elif rank['qual_average'] is None:
-                rank['extra_stats'] = [
-                    rank['sort_orders'][0] / rank['matches_played'] if rank['matches_played'] > 0 else 0,
-                ]
-                has_extra_stats = True
+        if self.rankings2:
+            for rank in self.rankings2:
+                rank['extra_stats'] = []
+                if self.year == 2017:
+                    rank['extra_stats'] = [
+                        int(round(rank['sort_orders'][0] * rank['matches_played'])),
+                    ]
+                    has_extra_stats = True
+                elif rank['qual_average'] is None:
+                    rank['extra_stats'] = [
+                        rank['sort_orders'][0] / rank['matches_played'] if rank['matches_played'] > 0 else 0,
+                    ]
+                    has_extra_stats = True
 
         sort_order_info = RankingsHelper.get_sort_order_info(self)
         extra_stats_info = []
