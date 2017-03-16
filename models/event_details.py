@@ -36,9 +36,39 @@ class EventDetails(ndb.Model):
     @property
     def renderable_rankings(self):
         from helpers.rankings_helper import RankingsHelper
+
+        has_extra_stats = False
+        for rank in self.rankings2:
+            rank['extra_stats'] = []
+            if self.year == 2017:
+                rank['extra_stats'] = [
+                    int(round(rank['sort_orders'][0] * rank['matches_played'])),
+                ]
+                has_extra_stats = True
+            elif rank['qual_average'] is None:
+                rank['extra_stats'] = [
+                    rank['sort_orders'][0] / rank['matches_played'] if rank['matches_played'] > 0 else 0,
+                ]
+                has_extra_stats = True
+
+        sort_order_info = RankingsHelper.get_sort_order_info(self)
+        extra_stats_info = []
+        if has_extra_stats:
+            if self.year == 2017:
+                extra_stats_info = [{
+                    'name': 'Total Ranking Points',
+                    'precision': 0,
+                }]
+            else:
+                extra_stats_info = [{
+                    'name': '{}/Match'.format(sort_order_info[0]['name']),
+                    'precision': 2,
+                }]
+
         return {
             'rankings': self.rankings2,
-            'sort_order_info': RankingsHelper.get_sort_order_info(self),
+            'sort_order_info': sort_order_info,
+            'extra_stats_info': extra_stats_info,
         }
 
     @property
@@ -46,15 +76,18 @@ class EventDetails(ndb.Model):
         if not self.rankings2:
             return None
 
-        from helpers.rankings_helper import RankingsHelper
+        rankings = self.renderable_rankings
 
         precisions = []
-        for item in RankingsHelper.get_sort_order_info(self):
+        for item in rankings['sort_order_info']:
             precisions.append(item['precision'])
+
+        extra_precisions = []
+        for item in rankings['extra_stats_info']:
+            extra_precisions.append(item['precision'])
 
         rankings_table = []
         has_record = False
-        has_qual_avg = False
         for rank in self.rankings2:
             row = [rank['rank'], rank['team_key'][3:]]
             # for i, item in enumerate(rank['sort_orders']):
@@ -66,22 +99,21 @@ class EventDetails(ndb.Model):
                 has_record = True
             row.append(rank['dq'])
             row.append(rank['matches_played'])
-            if rank['qual_average'] is None and self.year != 2017:
-                row.append('%.*f' % (2, round(
-                    rank['sort_orders'][0] / rank['matches_played'] if rank['matches_played'] > 0 else 0, 2)))
-            else:
-                has_qual_avg = True
+
+            for i, precision in enumerate(extra_precisions):
+                row.append('%.*f' % (precision, round(rank['extra_stats'][i], precision)))
+
             rankings_table.append(row)
 
         title_row = ['Rank', 'Team']
-        sort_order_info = RankingsHelper.get_sort_order_info(self)
-        for item in sort_order_info:
+        for item in rankings['sort_order_info']:
             title_row.append(item['name'])
         if has_record:
             title_row += ['Record (W-L-T)']
         title_row += ['DQ', 'Played']
-        if not has_qual_avg and self.year != 2017:
-            title_row.append('{}/Match*'.format(sort_order_info[0]['name']))
+
+        for item in rankings['extra_stats_info']:
+            title_row.append('{}*'.format(item['name']))
 
         rankings_table = [title_row] + rankings_table
         return rankings_table
