@@ -18,11 +18,11 @@
           {% if event.now %}
             {% if event.next_match %}
               <br>
-              <b>Next Match: </b> {{event.next_match.verbose_name}}
+              <small>Next Match: {{event.next_match.verbose_name}}</small>
             {% else %}
               {% if not event.alliance_selections and event.previous_match %}
                 <br>
-                <b>Next: </b> Alliance Selections
+                <small>Next: Alliance Selections</small>
               {% endif %}
             {% endif %}
           {% endif %}
