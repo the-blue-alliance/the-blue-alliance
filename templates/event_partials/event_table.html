@@ -15,7 +15,9 @@
             <br>
             <small>{{event.city_state_country}}</small>
             <br>
-            {% if event.now and event.next_match %}
+          {% endif %}
+          {% if event.now %}
+            {% if event.next_match %}
               <b>Next Match: </b> {{event.next_match.verbose_name}}
             {% else %}
               {% if not event.alliance_selections and event.previous_match %}
