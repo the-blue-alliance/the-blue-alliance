@@ -7,7 +7,7 @@
 
 {% block detailed_content %}
   <h1 class="end_header">{{selected_year}} Insights</h1>
-  {% if last_updated %}<p>Last updated on <time datetime="{{render_time|rfc2822}}+00:00" class="tba-verbose-datetime-utc">{{render_time|strftime("%b. %d, %Y at %I:%M%p")}} UTC</time></p>{% endif %}
+  {% if last_updated %}<p>Last updated on <time datetime="{{last_updated|rfc2822}}+00:00" class="tba-verbose-datetime-utc">{{last_updated|strftime("%b. %d, %Y at %I:%M%p")}} UTC</time></p>{% endif %}
 
   {% if match_highscore or match_averages_by_week or score_distribution %}
   <h2>Matches{% if num_matches %} <small>{{num_matches.data}} Matches Played</small>{% endif %}</h2>
