@@ -324,35 +324,15 @@ class PredictionHelper(object):
                     mean_vars[color][stat]['mean'] += team_mean
                     mean_vars[color][stat]['var'] += team_var
 
-        # Prob win
-        red_score = mean_vars['red']['score']['mean']
-        blue_score = mean_vars['blue']['score']['mean']
-        red_score_var = mean_vars['red']['score']['var']
-        blue_score_var = mean_vars['blue']['score']['var']
-
-        mu = abs(red_score - blue_score)
-        prob = 1 - cls._normcdf(-mu / np.sqrt(red_score_var + blue_score_var))
-        if math.isnan(prob):
-            prob = 0.5
-
-        if red_score > blue_score:
-            winning_alliance = 'red'
-        elif blue_score > red_score:
-            winning_alliance = 'blue'
-        else:
-            winning_alliance = 'red'  # Choose red if predicted tie
-
         prediction = {
             'red': {
-                'score': red_score,
-                'score_var': red_score_var,
+                'score': mean_vars['red']['score']['mean'],
+                'score_var': mean_vars['red']['score']['var'],
             },
             'blue': {
-                'score': blue_score,
-                'score_var': blue_score_var,
+                'score': mean_vars['blue']['score']['mean'],
+                'score_var': mean_vars['blue']['score']['var'],
             },
-            'winning_alliance': winning_alliance,
-            'prob': prob,
         }
 
         # Year specific
@@ -406,6 +386,27 @@ class PredictionHelper(object):
                     # Playoff Bonus
                     if is_playoff:
                         prediction[color]['score'] += prob * 100
+
+        # Prob win
+        red_score = prediction['red']['score']
+        blue_score = prediction['blue']['score']
+        red_score_var = prediction['red']['score_var']
+        blue_score_var = prediction['blue']['score_var']
+
+        mu = abs(red_score - blue_score)
+        prob = 1 - cls._normcdf(-mu / np.sqrt(red_score_var + blue_score_var))
+        if math.isnan(prob):
+            prob = 0.5
+
+        if red_score > blue_score:
+            winning_alliance = 'red'
+        elif blue_score > red_score:
+            winning_alliance = 'blue'
+        else:
+            winning_alliance = 'red'  # Choose red if predicted tie
+
+        prediction['winning_alliance'] = winning_alliance
+        prediction['prob'] = prob
 
         return prediction
 
