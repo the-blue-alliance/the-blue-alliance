@@ -353,6 +353,8 @@ class PredictionHelper(object):
                     # Playoff Bonus
                     if is_playoff:
                         prediction[color]['score'] += prob * 25
+                        prob_int = int(prob * 100)
+                        prediction[color]['score_var'] += np.var([0] * (100 - prob_int) + [25] * prob_int)
 
                 elif stat == 'crossings':
                     # Prob breach
@@ -365,6 +367,8 @@ class PredictionHelper(object):
                     # Playoff Bonus
                     if is_playoff:
                         prediction[color]['score'] += prob * 20
+                        prob_int = int(prob * 100)
+                        prediction[color]['score_var'] += np.var([0] * (100 - prob_int) + [20] * prob_int)
                 # 2017
                 if stat == 'pressure':
                     required_pressure = 40
@@ -376,6 +380,8 @@ class PredictionHelper(object):
                     # Playoff Bonus
                     if is_playoff:
                         prediction[color]['score'] += prob * 20
+                        prob_int = int(prob * 100)
+                        prediction[color]['score_var'] += np.var([0] * (100 - prob_int) + [20] * prob_int)
                 if stat == 'gears':
                     requried_gears = 12
 
@@ -386,6 +392,8 @@ class PredictionHelper(object):
                     # Playoff Bonus
                     if is_playoff:
                         prediction[color]['score'] += prob * 100
+                        prob_int = int(prob * 100)
+                        prediction[color]['score_var'] += np.var([0] * (100 - prob_int) + [100] * prob_int)
 
         # Prob win
         red_score = prediction['red']['score']
