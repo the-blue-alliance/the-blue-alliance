@@ -453,3 +453,13 @@ class Event(ndb.Model):
             return '{} {}'.format(self.short_name, EventType.short_type_names[self.event_type_enum])
         else:
             return self.name
+
+    @property
+    def next_match(self):
+        from helpers.match_helper import MatchHelper
+        return MatchHelper.upcomingMatches(self.matches, 1)[0]
+
+    @property
+    def previous_match(self):
+        from helpers.match_helper import MatchHelper
+        return MatchHelper.recentMatches(self.matches, 1)[0]
