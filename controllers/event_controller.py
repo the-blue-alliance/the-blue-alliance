@@ -200,6 +200,8 @@ class EventDetail(CacheableHandler):
 
         medias_by_slugname = MediaHelper.group_by_slugname([media for media in event_medias_future.get_result()])
 
+        event.details.set_matches(event.matches)  # To augment rankings
+
         self.template_values.update({
             "event": event,
             "district_name": district.display_name if district else None,

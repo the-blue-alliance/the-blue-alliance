@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from google.appengine.ext import ndb
 
 
@@ -24,6 +26,7 @@ class EventDetails(ndb.Model):
         self._affected_references = {
             'key': set(),
         }
+        self._match_breakdowns = defaultdict(list)
         super(EventDetails, self).__init__(*args, **kw)
 
     def key_name(self):
@@ -32,6 +35,13 @@ class EventDetails(ndb.Model):
     @property
     def year(self):
         return int(self.key.id()[:4])
+
+    def set_matches(self, matches):
+        for match in matches:
+            for color in ['red', 'blue']:
+                for team_key in match.alliances[color]['teams']:
+                    if match.score_breakdown_json and match.has_been_played:
+                        self._match_breakdowns[team_key].append(match.score_breakdown[color])
 
     @property
     def renderable_rankings(self):
@@ -45,6 +55,18 @@ class EventDetails(ndb.Model):
                     rank['extra_stats'] = [
                         int(round(rank['sort_orders'][0] * rank['matches_played'])),
                     ]
+                    if not self._match_breakdowns:
+                        from database.match_query import EventMatchesQuery
+                        self.set_matches(EventMatchesQuery(self.key.id()).fetch())
+
+                    if self._match_breakdowns:
+                        pressure_rp = 0
+                        rotor_rp = 0
+                        for match_breakdown in self._match_breakdowns[rank['team_key']]:
+                            pressure_rp += 1 if match_breakdown.get('kPaRankingPointAchieved') else 0
+                            rotor_rp += 1 if match_breakdown.get('rotorRankingPointAchieved') else 0
+                        rank['extra_stats'] += [pressure_rp, rotor_rp]
+
                     has_extra_stats = True
                 elif rank['qual_average'] is None:
                     rank['extra_stats'] = [
@@ -60,6 +82,17 @@ class EventDetails(ndb.Model):
                     'name': 'Total Ranking Points',
                     'precision': 0,
                 }]
+                if self._match_breakdowns:
+                    extra_stats_info += [
+                        {
+                            'name': 'Pressure Ranking Points',
+                            'precision': 0,
+                        },
+                        {
+                            'name': 'Rotor Ranking Points',
+                            'precision': 0,
+                        }
+                    ]
             else:
                 extra_stats_info = [{
                     'name': '{}/Match'.format(sort_order_info[0]['name']),
