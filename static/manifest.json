@@ -9,8 +9,8 @@
             "type": "image/png"
         }
     ],
-    "theme_color": "#4d5fbc",
-    "background_color": "#4d5fbc",
+    "theme_color": "#3F51B5",
+    "background_color": "#3F51B5",
     "display": "standalone",
     "gcm_sender_id": "103953800507"
 }
