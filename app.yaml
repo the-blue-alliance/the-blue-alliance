@@ -42,7 +42,7 @@ handlers:
 - url: /ovp
   static_dir: static/ovp
 - url: /icons
-  static_files: static/icons
+  static_dir: static/icons
   expiration: "1d"
 - url: /robots.txt
   static_files: static/robots.txt
