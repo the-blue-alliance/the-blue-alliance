@@ -23,7 +23,8 @@ from controllers.admin.admin_offseason_scraper_controller import AdminOffseasonS
 from controllers.admin.admin_offseason_spreadsheet_controller import AdminOffseasonSpreadsheetController
 from controllers.admin.admin_sitevar_controller import AdminSitevarCreate, AdminSitevarEdit, AdminSitevarList
 from controllers.admin.admin_suggestion_controller import AdminCreateTestSuggestions
-from controllers.admin.admin_team_controller import AdminTeamCreateTest, AdminTeamDetail, AdminTeamList
+from controllers.admin.admin_team_controller import AdminTeamCreateTest, AdminTeamDetail, AdminTeamList, \
+    AdminTeamRobotNameUpdate
 from controllers.admin.admin_user_controller import AdminUserDetail, AdminUserEdit, AdminUserTestSetup, AdminUserList, AdminUserPermissionsList
 
 from google.appengine.ext.webapp import template
@@ -84,6 +85,7 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/tasks', AdminTasksHandler),
                                ('/admin/teams', AdminTeamList),
                                ('/admin/team/create/test', AdminTeamCreateTest),
+                               ('/admin/team/set_robot_name', AdminTeamRobotNameUpdate),
                                ('/admin/team/(.*)', AdminTeamDetail),
                                ('/admin/users', AdminUserList),
                                ('/admin/users/permissions', AdminUserPermissionsList),

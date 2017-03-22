@@ -101,6 +101,29 @@
     <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-thumbs-up"></span> Add Media</button>
 </form>
 
+<h2>Update Robot Name</h2>
+<p><i>Note:</i> Don't change the current year's robot name, is it will be clobbered by FRC API calls</p>
+<form action="/admin/team/set_robot_name" method="post">
+  <table class="table table-striped table-hover table-condensed">
+    <tr>
+      <td>Year</td>
+      <td>
+        <select name="robot_year">
+        {% for year in years_participated %}
+          <option value="{{ year }}">{{ year }}</option>
+        {% endfor %}
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td>Robot Name</td>
+      <td><input class="form-control" name="robot_name" type="text" /></td>
+    </tr>
+  </table>
+  <input type="hidden" name="team_key" value="{{ team.key_name }}" />
+  <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-thumbs-up"></span> Add Robot Name</button>
+</form>
+
 <h2>Media</h2>
 {% for year in team_media_years %}
   {% if year == None %}
