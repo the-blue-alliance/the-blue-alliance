@@ -8,6 +8,7 @@ from consts.event_type import EventType
 from helpers.event_helper import EventHelper
 from models.district import District
 from models.event import Event
+from models.sitevar import Sitevar
 
 
 class FMSAPIEventListParser(object):
@@ -36,11 +37,15 @@ class FMSAPIEventListParser(object):
         'roebling': ('roe', 'Roebling'),
         'tesla': ('tes', 'Tesla'),
         'turing': ('tur', 'Turing'),
-        'cmp': ('cmp', 'Einstein'),
-        'cmpmo': ('cmpmo', 'Einstein (St. Louis)'),
-        'cmptx': ('cmptx', 'Einstein (Houston)'),
+
+        # For Einstein, format with the name "Einstein" or "FIRST Championship" or whatever
+        'cmp': ('cmp', '{}'),
+        'cmpmo': ('cmpmo', '{} (St. Louis)'),
+        'cmptx': ('cmptx', '{} (Houston)'),
     }
 
+    EINSTEIN_SHORT_NAME_DEFAULT = 'Einstein'
+    EINSTEIN_NAME_DEFAULT = 'Einstein Field'
     EINSTEIN_CODES = {'cmp', 'cmpmo', 'cmptx'}
 
     def __init__(self, season):
@@ -49,6 +54,17 @@ class FMSAPIEventListParser(object):
     def parse(self, response):
         events = []
         districts = {}
+
+        cmp_hack_sitevar = Sitevar.get_or_insert('cmp_registration_hacks')
+        store_cmp_division = cmp_hack_sitevar.contents.get('should_store_divisions', True) \
+            if cmp_hack_sitevar else True
+        einstein_name = cmp_hack_sitevar.contents.get('einstein_name', self.EINSTEIN_NAME_DEFAULT) \
+            if cmp_hack_sitevar else self.EINSTEIN_NAME_DEFAULT
+        einstein_short_name = cmp_hack_sitevar.contents.get('einstein_short_name', self.EINSTEIN_SHORT_NAME_DEFAULT) \
+            if cmp_hack_sitevar else self.EINSTEIN_SHORT_NAME_DEFAULT
+        change_einstein_dates = cmp_hack_sitevar.contents.get('should_change_einstein_dates', False) \
+            if cmp_hack_sitevar else False
+
         for event in response['Events']:
             code = event['code'].lower()
             event_type = EventType.PRESEASON if code == 'week0' else self.EVENT_TYPES.get(event['type'].lower(), None)
@@ -72,11 +88,23 @@ class FMSAPIEventListParser(object):
             # Special cases for champs
             if code in self.EVENT_CODE_EXCEPTIONS:
                 code, short_name = self.EVENT_CODE_EXCEPTIONS[code]
+
+                # FIRST indicates CMP registration before divisions are assigned by adding all teams
+                # to Einstein. We will hack around that by not storing divisions and renaming
+                # Einstein to simply "Championship" when certain sitevar flags are set
+
                 if code in self.EINSTEIN_CODES:
-                    name = '{} Field'.format(short_name)
-                    start = end.replace(hour=0, minute=0, second=0, microsecond=0)  # Set to beginning of last day
+                    name = short_name.format(einstein_name)
+                    short_name = short_name.format(einstein_short_name)
+                    if change_einstein_dates:
+                        # Set to beginning of last day
+                        start = end.replace(hour=0, minute=0, second=0, microsecond=0)
                 else:  # Divisions
                     name = '{} Division'.format(short_name)
+
+                    # Allow skipping storing CMP divisions before they're announced
+                    if not store_cmp_division:
+                        continue
 
             events.append(Event(
                 id="{}{}".format(self.season, code),
