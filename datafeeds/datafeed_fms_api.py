@@ -323,8 +323,6 @@ class DatafeedFMSAPI(object):
     def getEventTeams(self, event_key):
         year = int(event_key[:4])
         event_code = self._get_event_short(event_key[4:])
-        if event_code == 'cmp':  # Don't add cmp teams because FIRST serves all Championship teams under Einstein
-            return []
 
         parser = FMSAPITeamDetailsParser(year)
         models = []  # will be list of tuples (team, districtteam, robot) model
