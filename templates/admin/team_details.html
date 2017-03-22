@@ -140,7 +140,14 @@
 <div class="tab-pane" id="robots">
 <div class="row">
 <h2>Update Robot Name</h2>
-<p><i>Note:</i> Don't change the current year's robot name, is it will be clobbered by FRC API calls</p>
+<strong>Current Robot Names:</strong>
+<ul>
+{% for robot in robots %}
+  <li>{{ robot.year }}: {{ robot.robot_name }}</li>
+{% endfor %}
+</ul>
+
+<p><i>Note:</i> Don't change the current year's robot name, as it will be clobbered by FRC API calls</p>
 <form action="/admin/team/set_robot_name" method="post">
   <table class="table table-striped table-hover table-condensed">
     <tr>
