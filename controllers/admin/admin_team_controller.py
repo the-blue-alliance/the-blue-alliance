@@ -51,10 +51,12 @@ class AdminTeamDetail(LoggedInHandler):
                 team_medias_by_year[media.year].append(media)
             else:
                 team_medias_by_year[media.year] = [media]
+        media_years = sorted(team_medias_by_year.keys())
 
         self.template_values.update({
             'event_teams': event_teams,
             'team': team,
+            'team_media_years': media_years,
             'team_medias_by_year': team_medias_by_year,
             'robots': robots,
             'district_teams': district_teams,

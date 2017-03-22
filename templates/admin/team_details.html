@@ -102,14 +102,14 @@
 </form>
 
 <h2>Media</h2>
-{% for year, medias in team_medias_by_year.items %}
+{% for year in team_media_years %}
   {% if year == None %}
     <h3>No Year:</h3>
   {% else %}
     <h3>{{year}}:</h3>
   {% endif %}
   <ul>
-  {% for media in medias %}
+  {% for media in team_medias_by_year|get_item:year %}
     <li>{% include "partials/admin_media_display.html" %}</li>
   {% endfor %}
   </ul>
