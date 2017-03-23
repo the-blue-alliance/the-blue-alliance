@@ -74,6 +74,12 @@
 
     <table class="table table-condensed table-striped text-right">
       <tbody>
+        {% if 'high_kpa' in event_insights %}
+        <tr>
+          <td>Highest Pressure (kPa)</td>
+          <td>{{event_insights.high_kpa[0]}} in <a href="/match/{{event_insights.high_kpa[1]}}">{{event_insights.high_kpa[2]}}</a></td>
+        </tr>
+        {% endif %}
         <tr>
           <td>High Score</td>
           <td>{{event_insights.high_score[0]}} in <a href="/match/{{event_insights.high_score[1]}}">{{event_insights.high_score[2]}}</a></td>
