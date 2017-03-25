@@ -14,6 +14,14 @@ export default class SwapPositionDialog extends React.Component {
     onRequestClose: PropTypes.func.isRequired,
   }
 
+  componentDidMount() {
+    this.updateSizing()
+  }
+
+  componentDidUpdate() {
+    this.updateSizing()
+  }
+
   onRequestSwap(targetPosition) {
     this.props.swapWebcasts(this.props.position, targetPosition)
     this.onRequestClose()
@@ -25,14 +33,6 @@ export default class SwapPositionDialog extends React.Component {
     }
   }
 
-  componentDidMount() {
-    this.updateSizing()
-  }
-
-  componentDidUpdate() {
-    this.updateSizing()
-  }
-
   updateSizing() {
     const container = this.container
     if (this.props.open && container) {
@@ -40,7 +40,6 @@ export default class SwapPositionDialog extends React.Component {
       const windowHeight = window.innerHeight
       const aspectRatio = windowWidth / windowHeight
 
-      const container = this.container
       const containerWidth = container.offsetWidth
       const containerHeight = containerWidth / aspectRatio
 
@@ -68,9 +67,9 @@ export default class SwapPositionDialog extends React.Component {
     const actions = [
       <FlatButton
         label="Cancel"
-        primary={true}
+        primary
         onTouchTap={() => this.onRequestClose()}
-      />
+      />,
     ]
 
     const bodyStyle = {
@@ -90,7 +89,7 @@ export default class SwapPositionDialog extends React.Component {
         bodyStyle={bodyStyle}
         open={this.props.open}
         onRequestClose={() => this.onRequestClose()}
-        autoScrollBodyContent={true}
+        autoScrollBodyContent
       >
         <EventListener
           target="window"
@@ -98,7 +97,7 @@ export default class SwapPositionDialog extends React.Component {
         />
         <div
           style={previewContainerStyle}
-          ref={(e) => { this.container = e; this.updateSizing(); }}
+          ref={(e) => { this.container = e; this.updateSizing() }}
         >
           {videoViews}
         </div>

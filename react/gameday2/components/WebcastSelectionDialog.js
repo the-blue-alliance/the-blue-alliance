@@ -24,10 +24,6 @@ export default class WebcastSelectionDialog extends React.Component {
     onRequestClose: PropTypes.func.isRequired,
   }
 
-  constructor(props) {
-    super(props)
-  }
-
   onRequestClose() {
     if (this.props.onRequestClose) {
       this.props.onRequestClose()
@@ -180,7 +176,7 @@ export default class WebcastSelectionDialog extends React.Component {
       <FlatButton
         label="Cancel"
         onTouchTap={() => this.onRequestClose()}
-        primary={true}
+        primary
       />,
     ]
 
@@ -201,7 +197,7 @@ export default class WebcastSelectionDialog extends React.Component {
         bodyStyle={bodyStyle}
         open={this.props.open}
         onRequestClose={() => this.onRequestClose()}
-        autoScrollBodyContent={true}
+        autoScrollBodyContent
       >
         <List>
           {allWebcastItems}
