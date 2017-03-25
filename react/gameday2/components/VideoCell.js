@@ -3,7 +3,7 @@ import RaisedButton from 'material-ui/RaisedButton'
 import WebcastEmbed from './WebcastEmbed'
 import VideoCellToolbarContainer from '../containers/VideoCellToolbarContainer'
 import WebcastSelectionDialogContainer from '../containers/WebcastSelectionDialogContainer'
-import SwapPositionOverlayDialogContainer from '../containers/SwapPositionOverlayDialogContainer'
+import SwapPositionDialogContainer from '../containers/SwapPositionDialogContainer'
 import { webcastPropType } from '../utils/webcastUtils'
 import { LAYOUT_STYLES } from '../constants/LayoutConstants'
 
@@ -73,13 +73,13 @@ export default class VideoCell extends React.Component {
             onRequestOpenWebcastSelectionDialog={() => this.onRequestOpenWebcastSelectionDialog()}
             onRequestOpenSwapPositionDialog={() => this.onRequestOpenSwapPositionDialog()}
           />
-        <WebcastSelectionDialogContainer
+          <WebcastSelectionDialogContainer
             open={this.state.webcastSelectionDialogOpen}
             webcast={this.props.webcast}
             onRequestClose={() => this.onRequestCloseWebcastSelectionDialog()}
             onWebcastSelected={(webcastId) => this.onWebcastSelected(webcastId)}
           />
-          <SwapPositionOverlayDialogContainer
+          <SwapPositionDialogContainer
             open={this.state.swapPositionDialogOpen}
             position={this.props.position}
             onRequestClose={() => this.onRequestCloseSwapPositionDialog()}

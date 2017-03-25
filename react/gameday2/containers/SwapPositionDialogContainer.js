@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import SwapPositionOverlayDialog from '../components/SwapPositionOverlayDialog'
+import SwapPositionDialog from '../components/SwapPositionDialog'
 import { swapWebcasts } from '../actions'
 
 const mapStateToProps = (state) => ({
@@ -10,4 +10,4 @@ const mapDispatchToProps = (dispatch) => ({
   swapWebcasts: (firstPosition, secondPosition) => dispatch(swapWebcasts(firstPosition, secondPosition)),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(SwapPositionOverlayDialog)
+export default connect(mapStateToProps, mapDispatchToProps)(SwapPositionDialog)
