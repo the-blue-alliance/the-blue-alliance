@@ -35,7 +35,7 @@ const VideoCellToolbar = (props) => {
     right: 0,
     marginRight: 0,
     backgroundColor: grey900,
-    boxShadow: '-2px 0px 15px 6px rgba(0, 0, 0, 0.5)',
+    boxShadow: '-2px 0px 15px -2px rgba(0, 0, 0, 0.5)',
   }
 
   // Create tickerMatches
