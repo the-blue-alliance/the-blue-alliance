@@ -2,8 +2,8 @@ import React, { PropTypes } from 'react'
 import RaisedButton from 'material-ui/RaisedButton'
 import WebcastEmbed from './WebcastEmbed'
 import VideoCellToolbarContainer from '../containers/VideoCellToolbarContainer'
-import WebcastSelectionOverlayDialogContainer from '../containers/WebcastSelectionOverlayDialogContainer'
-import SwapPositionOverlayDialogContainer from '../containers/SwapPositionOverlayDialogContainer'
+import WebcastSelectionDialogContainer from '../containers/WebcastSelectionDialogContainer'
+import SwapPositionDialogContainer from '../containers/SwapPositionDialogContainer'
 import { webcastPropType } from '../utils/webcastUtils'
 import { LAYOUT_STYLES } from '../constants/LayoutConstants'
 
@@ -73,13 +73,13 @@ export default class VideoCell extends React.Component {
             onRequestOpenWebcastSelectionDialog={() => this.onRequestOpenWebcastSelectionDialog()}
             onRequestOpenSwapPositionDialog={() => this.onRequestOpenSwapPositionDialog()}
           />
-          <WebcastSelectionOverlayDialogContainer
+          <WebcastSelectionDialogContainer
             open={this.state.webcastSelectionDialogOpen}
             webcast={this.props.webcast}
             onRequestClose={() => this.onRequestCloseWebcastSelectionDialog()}
             onWebcastSelected={(webcastId) => this.onWebcastSelected(webcastId)}
           />
-          <SwapPositionOverlayDialogContainer
+          <SwapPositionDialogContainer
             open={this.state.swapPositionDialogOpen}
             position={this.props.position}
             onRequestClose={() => this.onRequestCloseSwapPositionDialog()}
@@ -116,7 +116,7 @@ export default class VideoCell extends React.Component {
             onTouchTap={() => this.onRequestOpenWebcastSelectionDialog()}
           />
         </div>
-        <WebcastSelectionOverlayDialogContainer
+        <WebcastSelectionDialogContainer
           open={this.state.webcastSelectionDialogOpen}
           webcast={this.props.webcast}
           onRequestClose={() => this.onRequestCloseWebcastSelectionDialog()}
