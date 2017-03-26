@@ -5,7 +5,7 @@ import VideoCellToolbarContainer from '../containers/VideoCellToolbarContainer'
 import WebcastSelectionDialogContainer from '../containers/WebcastSelectionDialogContainer'
 import SwapPositionDialogContainer from '../containers/SwapPositionDialogContainer'
 import { webcastPropType } from '../utils/webcastUtils'
-import { LAYOUT_STYLES } from '../constants/LayoutConstants'
+import { LAYOUT_STYLES, NUM_VIEWS_FOR_LAYOUT } from '../constants/LayoutConstants'
 
 export default class VideoCell extends React.Component {
   static propTypes = {
@@ -15,6 +15,7 @@ export default class VideoCell extends React.Component {
     layoutId: PropTypes.number.isRequired,
     position: PropTypes.number.isRequired,
     addWebcastAtPosition: PropTypes.func.isRequired,
+    swapWebcasts: PropTypes.func.isRequired,
   }
 
   constructor(props) {
@@ -23,6 +24,16 @@ export default class VideoCell extends React.Component {
     this.state = {
       webcastSelectionDialogOpen: false,
       swapPositionDialogOpen: false,
+    }
+  }
+
+  onRequestSwapPosition() {
+    const numViewsInLayout = NUM_VIEWS_FOR_LAYOUT[this.props.layoutId]
+    if (numViewsInLayout == 2) {
+      // It doesn't matter which position we are
+      this.props.swapWebcasts(0, 1)
+    } else {
+      this.onRequestOpenSwapPositionDialog()
     }
   }
 
@@ -70,8 +81,8 @@ export default class VideoCell extends React.Component {
             style={toolbarStyle}
             webcast={this.props.webcast}
             isBlueZone={this.props.webcast.key === 'bluezone'}
-            onRequestOpenWebcastSelectionDialog={() => this.onRequestOpenWebcastSelectionDialog()}
-            onRequestOpenSwapPositionDialog={() => this.onRequestOpenSwapPositionDialog()}
+            onRequestSelectWebcast={() => this.onRequestOpenWebcastSelectionDialog()}
+            onRequestSwapPosition={() => this.onRequestSwapPosition()}
           />
           <WebcastSelectionDialogContainer
             open={this.state.webcastSelectionDialogOpen}
