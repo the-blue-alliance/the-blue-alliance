@@ -18,7 +18,7 @@ describe('favorites reducer', () => {
         model_key: 'frc111',
       }, {
         model_key: 'frc2056',
-      }
+      },
     ]
 
     const expectedState = new Set()
@@ -26,7 +26,7 @@ describe('favorites reducer', () => {
 
     const action = {
       type: SET_FAVORITE_TEAMS,
-      favoriteTeams
+      favoriteTeams,
     }
 
     expect(favorites(initialState, action)).toEqual(expectedState)
