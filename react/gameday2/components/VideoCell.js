@@ -29,7 +29,7 @@ export default class VideoCell extends React.Component {
 
   onRequestSwapPosition() {
     const numViewsInLayout = NUM_VIEWS_FOR_LAYOUT[this.props.layoutId]
-    if (numViewsInLayout == 2) {
+    if (numViewsInLayout === 2) {
       // It doesn't matter which position we are
       this.props.swapWebcasts(0, 1)
     } else {

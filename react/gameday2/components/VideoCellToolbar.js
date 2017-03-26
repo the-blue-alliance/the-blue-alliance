@@ -62,10 +62,8 @@ const VideoCellToolbar = (props) => {
     )
   })
 
-  const numViewInLayout = NUM_VIEWS_FOR_LAYOUT[props.layoutId]
-  console.log('Num views: ' + numViewInLayout)
   let swapButton
-  if (NUM_VIEWS_FOR_LAYOUT[props.layoutId] == 1) {
+  if (NUM_VIEWS_FOR_LAYOUT[props.layoutId] === 1) {
     swapButton = null
   } else {
     swapButton = (
