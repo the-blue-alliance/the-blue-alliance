@@ -1,3 +1,3 @@
-{% macro blue_banner(award, event) %}
-<div class="banner"><img src="/images/first_icon.svg"><div class="award-name{% if award.normalized_name|length > 18 %}-long{% endif %}"><span>{{award.normalized_name}}</span></div><div class="{% if event.normalized_name|length < 30 %}award-event{% else %}award-event-long{% endif %}"><span>{{award.year}} {{event.normalized_name}}</span></div></div>
+{% macro blue_banner(award, event, hidden=False) %}
+<div class="banner{% if hidden %} hidden-banner hidden{% endif %}"><img src="/images/first_icon.svg"><div class="award-name{% if award.normalized_name|length > 18 %}-long{% endif %}"><span>{{award.normalized_name}}</span></div><div class="{% if event.normalized_name|length < 30 %}award-event{% else %}award-event-long{% endif %}"><span>{{award.year}} {{event.normalized_name}}</span></div></div>
 {% endmacro %}
