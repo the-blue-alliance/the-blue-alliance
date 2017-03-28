@@ -90,7 +90,7 @@ class ContributionCalculator(object):
                             event.details:
                         # event.details is backed by in-context cache
                         predictions = event.details.predictions
-                        if predictions and 'stat_mean_vars' in predictions:
+                        if predictions and predictions.get('stat_mean_vars') and predictions['stat_mean_vars'].get('qual'):
                             if team in predictions['stat_mean_vars']['qual'].get(self._stat, {}).get('mean', []):
                                 team_mean = predictions['stat_mean_vars']['qual'][self._stat]['mean'][team]
                                 if year_diff != 0:
