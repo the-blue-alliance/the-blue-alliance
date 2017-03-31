@@ -87,13 +87,14 @@ class MatchTimePredictionHelper(object):
         next_match = unplayed_matches[0] if unplayed_matches else None
 
         if last_match:
-            to_log += "[TIME PREDICTIONS] Last Match: {}, Actual Time: {}, Schedule: {}, Predicted: {}\n"\
+            to_log += "[TIME PREDICTIONS] Last Match: {}, Actual Time: {}, Schedule: {} - {}, Predicted: {} - {}\n"\
                 .format(last_match.key_name, cls.as_local(last_match.actual_time, timezone),
-                        last_match.schedule_error_str, last_match.prediction_error_str)
+                        cls.as_local(last_match.time, timezone), last_match.schedule_error_str,
+                        cls.as_local(last_match.predicted_time, timezone), last_match.prediction_error_str)
 
         if next_match:
             to_log += "[TIME PREDICTIONS] Next Match: {}, Schedule: {}, Last Predicted: {}\n"\
-                .format(next_match.key_name, next_match.prediction_error_str)
+                .format(next_match.key_name, cls.as_local(next_match.time, timezone), next_match.prediction_error_str)
 
         if len(played_matches) >= 2:
             two_ago = played_matches[-2]
