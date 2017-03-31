@@ -219,7 +219,7 @@
   <thead>
     <tr class="key">
       <th colspan="12">Teams</th>
-      <th>Score</th>
+      <th>{% if match.has_been_played or not match.time %}Score{% else %}Scheduled Time{% endif %}</th>
     </tr>
   </thead>
   <tbody>
@@ -228,14 +228,20 @@
         {{mtcm.match_team_td(match, 'red', team_key, cur_team_key, compact=True)}}
       {% endfor %}
 
-      {{mtcm.match_score_td(match, 'red', cur_team_key, compact=True, force_played=force_played)}}
+      {% if match.has_been_played or not match.time %}
+        {{mtcm.match_score_td(match, 'red', cur_team_key, compact=True, force_played=force_played)}}
+      {% else %}
+        {{mtcm.match_time_td(match, compact=True)}}
+      {% endif %}
     </tr>
     <tr>
       {% for team_key in match.alliances.blue.teams %}
         {{mtcm.match_team_td(match, 'blue', team_key, cur_team_key, compact=True)}}
       {% endfor %}
 
-      {{mtcm.match_score_td(match, 'blue', cur_team_key, compact=True, force_played=force_played)}}
+      {% if match.has_been_played or not match.time %}
+        {{mtcm.match_score_td(match, 'blue', cur_team_key, compact=True, force_played=force_played)}}
+      {% endif %}
     </tr>
   </tbody>
 </table>
