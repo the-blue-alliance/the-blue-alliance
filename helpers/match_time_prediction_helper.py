@@ -87,8 +87,8 @@ class MatchTimePredictionHelper(object):
         average_cycle_time = cls.compute_average_cycle_time(played_matches, next_match, timezone)
         last = last_match
 
-        # Only predict up to 20 matches in the future on the same day
-        for i in range(0, min(20, len(unplayed_matches))):
+        # Run predictions for all unplayed matches on this day
+        for i in range(0, len(unplayed_matches)):
             match = unplayed_matches[i]
             scheduled_time = cls.as_local(match.time, timezone)
             if scheduled_time.day != last_match_day and last_match_day is not None:
