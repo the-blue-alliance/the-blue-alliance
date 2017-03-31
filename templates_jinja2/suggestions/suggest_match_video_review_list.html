@@ -39,8 +39,8 @@
                     <div class="col-xs-3">
                         <ul>
                             <li>{{ suggestion.key.id() }}</li>
-                            <li>{{ suggestion.author.get.email }}</li>
-                            <li>{{ suggestion.author.get.nickname }}</li>
+                            <li>{{ suggestion.author.get().email }}</li>
+                            <li>{{ suggestion.author.get().nickname }}</li>
                             <li>{{ suggestion.target_model }}:{{ suggestion.target_key }}</li>
                             <li>{{ suggestion.contents_json }}</li>
                         </ul>
