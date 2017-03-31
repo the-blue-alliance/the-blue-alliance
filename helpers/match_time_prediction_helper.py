@@ -1,3 +1,4 @@
+import cloudstorage
 import datetime
 import time
 import pytz
@@ -13,6 +14,8 @@ class MatchTimePredictionHelper(object):
 
     @classmethod
     def as_local(cls, time, timezone):
+        if not time:
+            return None
         return pytz.utc.localize(time).astimezone(timezone)
 
     @classmethod
@@ -72,12 +75,31 @@ class MatchTimePredictionHelper(object):
         return np.percentile(cycles, 35) if cycles else None
 
     @classmethod
-    def predict_future_matches(cls, played_matches, unplayed_matches, timezone, is_live):
+    def predict_future_matches(cls, event_key, played_matches, unplayed_matches, timezone, is_live):
         """
         Add match time predictions for future matches
         """
+        to_log = '--------------------------------------------------\n'
+        to_log += "[TIME PREDICTIONS] Current time: {}\n".format(datetime.datetime.now())
+        to_log += "[TIME PREDICTIONS] Current event: {}\n".format(event_key)
+
         last_match = played_matches[-1] if played_matches else None
         next_match = unplayed_matches[0] if unplayed_matches else None
+
+        if last_match:
+            to_log += "[TIME PREDICTIONS] Last Match: {}, Actual Time: {}, Schedule: {}, Predicted: {}\n"\
+                .format(last_match.key_name, cls.as_local(last_match.actual_time, timezone),
+                        last_match.schedule_error_str, last_match.prediction_error_str)
+
+        if next_match:
+            to_log += "[TIME PREDICTIONS] Next Match: {}, Schedule: {}, Last Predicted: {}\n"\
+                .format(next_match.key_name, next_match.prediction_error_str)
+
+        if len(played_matches) >= 2:
+            two_ago = played_matches[-2]
+            cycle = last_match.actual_time - two_ago.actual_time
+            s = int(cycle.total_seconds())
+            to_log += '[TIME PREDICTIONS] Last Cycle: {:02}:{:02}:{:02}\n'.format(s // 3600, s % 3600 // 60, s % 60)
 
         if not next_match:
             # Nothing to predict
@@ -86,6 +108,8 @@ class MatchTimePredictionHelper(object):
         last_match_day = cls.as_local(last_match.time, timezone).day if last_match else None
         average_cycle_time = cls.compute_average_cycle_time(played_matches, next_match, timezone)
         last = last_match
+
+        to_log += "[TIME PREDICTIONS] Average Cycle Time: {}\n".format(average_cycle_time)
 
         # Run predictions for all unplayed matches on this day
         for i in range(0, len(unplayed_matches)):
@@ -112,3 +136,16 @@ class MatchTimePredictionHelper(object):
             last = match
 
         MatchManipulator.createOrUpdate(unplayed_matches)
+
+        # Log to cloudstorage
+        log_dir = '/tbatv-prod-hrd.appspot.com/tba-logging/match-time-predictions/'
+        log_file = '{}.txt'.format(event_key)
+        full_path = log_dir + log_file
+
+        existing_contents = ''
+        if full_path in set([f.filename for f in cloudstorage.listbucket(log_dir)]):
+            with cloudstorage.open(full_path, 'r') as existing_file:
+                existing_contents = existing_file.read()
+
+        with cloudstorage.open(full_path, 'w') as new_file:
+            new_file.write(existing_contents + to_log)
