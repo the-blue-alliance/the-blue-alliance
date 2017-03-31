@@ -280,7 +280,7 @@ class BlueZoneHelper(object):
                 bluezone_config.put()
 
                 # Log to cloudstorage
-                log_dir = '/tbatv-prod-hrd.appspot.com/tba-logging/'
+                log_dir = '/tbatv-prod-hrd.appspot.com/tba-logging/bluezone/'
                 log_file = 'bluezone_{}.txt'.format(now.date())
                 full_path = log_dir + log_file
 
