@@ -8,37 +8,19 @@
 <div class="container">
   <h1 class="end_header">Search Results</h1>
   <div class="row">
-    <div id="resultsBox" class="col-xs-8 col-sm-offset-2 col-lg-offset-2">
-      <div id="cse" style="width: 100%;">Loading</div>
-      <script src="http://www.google.com/jsapi" type="text/javascript"></script>
-      <script type="text/javascript">
-        google.load('search', '1', {language : 'en', style : google.loader.themes.V2_DEFAULT});
-        google.setOnLoadCallback(function() {
-          var customSearchOptions = {};  var customSearchControl = new google.search.CustomSearchControl(
-            '017956276086362105630:99ctqytcokm', customSearchOptions);
-          customSearchControl.setResultSetSize(google.search.Search.FILTERED_CSE_RESULTSET);
-          customSearchControl.setLinkTarget(google.search.Search.LINK_TARGET_SELF);
-          customSearchControl.draw('cse');
-          function parseParamsFromUrl() {
-            var params = {};
-            var parts = window.location.search.substr(1).split('\x26');
-            for (var i = 0; i < parts.length; i++) {
-              var keyValuePair = parts[i].split('=');
-              var key = decodeURIComponent(keyValuePair[0]);
-              params[key] = keyValuePair[1] ?
-                  decodeURIComponent(keyValuePair[1].replace(/\+/g, ' ')) :
-                  keyValuePair[1];
-            }
-            return params;
-          }
-
-          var urlParams = parseParamsFromUrl();
-          var queryParamName = "q";
-          if (urlParams[queryParamName]) {
-            customSearchControl.execute(urlParams[queryParamName]);
-          }
-        }, true);
+    <div id="resultsBox" class="col-xs-12 col-md-8 col-md-offset-2">
+      <script>
+        (function() {
+          var cx = '017956276086362105630:99ctqytcokm';
+          var gcse = document.createElement('script');
+          gcse.type = 'text/javascript';
+          gcse.async = true;
+          gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;
+          var s = document.getElementsByTagName('script')[0];
+          s.parentNode.insertBefore(gcse, s);
+        })();
       </script>
+      <gcse:search></gcse:search>
     </div>
   </div>
 </div>
