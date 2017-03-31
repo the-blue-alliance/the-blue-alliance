@@ -3,7 +3,7 @@ import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
 import RaisedButton from 'material-ui/RaisedButton'
 import { webcastPropType } from '../../utils/webcastUtils'
 
-const EmbedDaCast = (props) => {
+const EmbedDirectLink = (props) => {
   const directLink = props.webcast.channel
   const style = {
       position: 'absolute',
@@ -27,8 +27,8 @@ const EmbedDaCast = (props) => {
   )
 }
 
-EmbedDaCast.propTypes = {
+EmbedDirectLink.propTypes = {
   webcast: webcastPropType.isRequired,
 }
 
-export default EmbedDaCast
+export default EmbedDirectLink
