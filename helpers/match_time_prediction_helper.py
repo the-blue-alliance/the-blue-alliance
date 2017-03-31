@@ -120,6 +120,7 @@ class MatchTimePredictionHelper(object):
             memcache.set(memcache_key, last_match.key_name, 60*60*24)
 
         if average_cycle_time:
+            average_cycle_time = int(average_cycle_time)
             to_log += "[TIME PREDICTIONS] Average Cycle Time: {:02}:{:02}:{:02}\n".format(average_cycle_time // 3600, average_cycle_time % 3600 // 60, average_cycle_time % 60)
 
         # Run predictions for all unplayed matches on this day
