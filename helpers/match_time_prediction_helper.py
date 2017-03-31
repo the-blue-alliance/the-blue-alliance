@@ -11,7 +11,7 @@ from helpers.match_manipulator import MatchManipulator
 class MatchTimePredictionHelper(object):
 
     EPOCH = datetime.datetime.fromtimestamp(0)
-    MAX_IN_PAST = datetime.timedelta(minutes=-3)  # One match length, ish
+    MAX_IN_PAST = datetime.timedelta(minutes=-4)  # One match length, ish
 
     @classmethod
     def as_local(cls, time, timezone):
@@ -140,6 +140,7 @@ class MatchTimePredictionHelper(object):
                 last_predicted = cls.as_local(last_match.actual_time if i == 0 else last.predicted_time, timezone)
             if last_predicted and average_cycle_time:
                 predicted = last_predicted + datetime.timedelta(seconds=average_cycle_time)
+                predicted = predicted.replace(second=0)  # Round down to the nearest minute
             else:
                 predicted = match.time
 
