@@ -94,7 +94,7 @@ class MatchTimePredictionHelper(object):
 
         if next_match:
             to_log += "[TIME PREDICTIONS] Next Match: {}, Schedule: {}, Last Predicted: {}\n"\
-                .format(next_match.key_name, cls.as_local(next_match.time, timezone), next_match.prediction_error_str)
+                .format(next_match.key_name, cls.as_local(next_match.time, timezone), cls.as_local(next_match.predicted_time, timezone))
 
         if len(played_matches) >= 2:
             two_ago = played_matches[-2]
@@ -110,7 +110,11 @@ class MatchTimePredictionHelper(object):
         average_cycle_time = cls.compute_average_cycle_time(played_matches, next_match, timezone)
         last = last_match
 
-        to_log += "[TIME PREDICTIONS] Average Cycle Time: {}\n".format(average_cycle_time)
+        # Only write logs if this is the first time we're predicting a time for the next match
+        write_logs = not next_match.predicted_time
+
+        if average_cycle_time:
+            to_log += "[TIME PREDICTIONS] Average Cycle Time: {:02}:{:02}:{:02}\n".format(average_cycle_time // 3600, average_cycle_time % 3600 // 60, average_cycle_time % 60)
 
         # Run predictions for all unplayed matches on this day
         for i in range(0, len(unplayed_matches)):
@@ -138,7 +142,9 @@ class MatchTimePredictionHelper(object):
 
         MatchManipulator.createOrUpdate(unplayed_matches)
 
-        # Log to cloudstorage
+        # Log to cloudstorage, but only if we have something new
+        if not write_logs:
+            return
         log_dir = '/tbatv-prod-hrd.appspot.com/tba-logging/match-time-predictions/'
         log_file = '{}.txt'.format(event_key)
         full_path = log_dir + log_file
