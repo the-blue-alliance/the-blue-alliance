@@ -4,6 +4,7 @@ import time
 import pytz
 import numpy as np
 
+from google.appengine.api import memcache
 from helpers.match_manipulator import MatchManipulator
 
 
@@ -110,8 +111,13 @@ class MatchTimePredictionHelper(object):
         average_cycle_time = cls.compute_average_cycle_time(played_matches, next_match, timezone)
         last = last_match
 
-        # Only write logs if this is the first time we're predicting a time for the next match
-        write_logs = not next_match.predicted_time
+        # Only write logs if this is the first time after a new match is played
+        memcache_key = "time_prediction:last_match:{}".format(event_key)
+        last_played = memcache.get(memcache_key)
+        write_logs = False
+        if last_match and last_match.key_name != last_played:
+            write_logs = True
+            memcache.set(memcache_key, last_match.key_name, 60*60*24)
 
         if average_cycle_time:
             to_log += "[TIME PREDICTIONS] Average Cycle Time: {:02}:{:02}:{:02}\n".format(average_cycle_time // 3600, average_cycle_time % 3600 // 60, average_cycle_time % 60)
@@ -122,6 +128,8 @@ class MatchTimePredictionHelper(object):
             scheduled_time = cls.as_local(match.time, timezone)
             if scheduled_time.day != last_match_day and last_match_day is not None:
                 # Stop, once we exhaust all unplayed matches on this day
+                if i == 0:
+                    write_logs = False
                 break
 
             # For the first iteration, base the predictions off the newest known actual start time
