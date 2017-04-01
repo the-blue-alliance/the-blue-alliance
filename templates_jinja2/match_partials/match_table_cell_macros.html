@@ -12,7 +12,7 @@
 {% endmacro %}
 
 
-{% macro match_name_td(match, compact=False, fake_matches=False) %}
+{% macro match_name_td(match, compact=False, fake_matches=False, show_event=False) %}
 <td{% if compact %} rowspan="2"{% endif %}>
   <div class="match-name-container">
     <div class="favorite-match-icon favorite-match-icon-{{match.key.id()}}">
@@ -23,7 +23,7 @@
       {% if fake_matches %}
       {{match.verbose_name}}
       {% else %}
-      <a href="/match/{{match.key_name}}">{{match.verbose_name}}</a>
+      <a href="/match/{{match.key_name}}">{% if show_event %}{{match.verbose_name_with_event_code}}{% else %}{{match.verbose_name}}{% endif %}</a>
       {% endif %}
     </div>
   </div>

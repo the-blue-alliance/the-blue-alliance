@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import 'match_partials/match_table_macros.html' as mtm %}
 
 {% block title %}The Blue Alliance{% endblock %}
 
@@ -6,7 +7,7 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-sm-8">
+    <div class="col-sm-12">
       {% if any_webcast_online %}
         <h2>Currently On Air</h2>
       {% endif %}
@@ -22,16 +23,21 @@
         {% endif %}
       {% endfor %}
       <div class="row">
-        <div class="col-xs-12">
+        <div class="col-xs-7">
           <h2>Currently Competing Favorite Teams</h2>
           <input id="add-team-input" class="form-control" type="text" placeholder="Add Team by Name or Number">
+
+          {% if live_table %}
+              {{ live_table|safe }}
+          {% else %}
+            <p>No favorite teams are currently competing.</p>
+          {% endif %}
+        </div>
+        <div class="col-xs-5">
+          <h2>Matches to Watch</h2>
+          {{ mtm.upcoming_match_table(favorite_team_matches, show_event=match_table_show_event) }}
         </div>
       </div>
-      {% if live_events_with_teams %}
-        {% include "live_teams_partial.html" %}
-      {% else %}
-        <p>No favorite teams are currently competing.</p>
-      {% endif %}
     </div>
   </div>
 </div>

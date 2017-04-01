@@ -185,7 +185,7 @@
 </table>
 {% endmacro %}
 
-{% macro upcoming_match_table(matches, cur_team_key=None) %}
+{% macro upcoming_match_table(matches, cur_team_key=None, show_event=False) %}
 <table class="match-table">
   <thead>
     {% include "match_partials/match_table_header_upcoming.html" %}
@@ -193,7 +193,7 @@
 
   <tbody>
     {% for match in matches %}
-      {{mtrm.match_row_tr(match, cur_team_key, upcoming=True)}}
+      {{mtrm.match_row_tr(match, cur_team_key, upcoming=True, show_event=show_event)}}
     {% endfor %}
   </tbody>
 </table>

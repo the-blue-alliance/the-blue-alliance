@@ -217,6 +217,10 @@ class Match(ndb.Model):
             return "%s %s Match %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.set_number, self.match_number)
 
     @property
+    def verbose_name_with_event_code(self):
+        return "[{}] {}".format(self.event_key_name[4:].upper(), self.verbose_name)
+
+    @property
     def short_name(self):
         if self.comp_level == "qm":
             return "Q%s" % self.match_number

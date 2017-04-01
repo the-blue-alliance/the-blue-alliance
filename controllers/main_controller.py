@@ -176,19 +176,36 @@ class NewCompSeasonHandler(LoggedInHandler):
         year = datetime.datetime.now().year
         favorite_teams, favorite_teams_events_futures, favorite_teams_awards_futures = \
             MyTBAHelper.build_live_favorite_futures(user, year)
+        favorite_team_keys = [t.key_name for t in favorite_teams]
         live_events_by_event = MyTBAHelper.render_favorite_teams_events(favorite_teams,
                                                                         favorite_teams_events_futures,
                                                                         favorite_teams_awards_futures)[1]
         live_events_with_teams = MyTBAHelper.render_live_events_with_teams(live_events_by_event)
 
+        for event, _ in live_events_by_event.values():
+            event.prep_matches()
+        live_event_matches = map(lambda x: x[0].matches, live_events_by_event.values())
+
+        favorite_team_matches = []
+        for matches in live_event_matches:
+            for match in matches:
+                if not match.has_been_played and any(k in match.team_key_names for k in favorite_team_keys):
+                    favorite_team_matches.append(match)
+        favorite_team_matches.sort(key=lambda x: x.predicted_time if x.predicted_time else x.time)
+
+        # UNGODLY AND HACKY :(
+        path = os.path.join(os.path.dirname(__file__), '../templates/live_teams_partial.html')
+        live_table = template.render(path, {'live_events_with_teams': live_events_with_teams})
+
         self.template_values.update({
-            'live_events_with_teams': live_events_with_teams,
+            'live_table': live_table,
+            'favorite_team_matches': favorite_team_matches,
+            'match_table_show_event': True,
             "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
             "special_webcasts": special_webcasts,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/index_mytba.html')
-        self.response.out.write(template.render(path, self.template_values))
+        self.response.out.write(jinja2_engine.render('index_mytba.html', self.template_values))
 
 
 class MainInsightsHandler(CacheableHandler):
