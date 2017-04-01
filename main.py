@@ -20,7 +20,7 @@ from controllers.main_controller import TwoChampsHandler, ContactHandler, Hashta
     MainInsightsHandler, MainOffseasonHandler, OprHandler, PredictionsHandler, SearchHandler, \
     AboutHandler, ThanksHandler, handle_404, handle_500, \
     WebcastsHandler, RecordHandler, ApiDocumentationHandler, ApiWriteHandler, MatchInputHandler, WebhookDocumentationHandler, \
-      AddDataHandler
+      AddDataHandler, NewCompSeasonHandler
 from controllers.match_controller import MatchDetail
 from controllers.mytba_controller import MyTBALiveController
 from controllers.nearby_controller import NearbyController
@@ -72,7 +72,8 @@ class Webapp2HandlerAdapter(webapp2.BaseHandlerAdapter):
         return handler.get()
 
 app = webapp2.WSGIApplication([
-      RedirectRoute(r'/', landing_handler[tba_config.CONFIG['landing_handler']], 'landing', strict_slash=True),
+      # RedirectRoute(r'/', landing_handler[tba_config.CONFIG['landing_handler']], 'landing', strict_slash=True),
+      RedirectRoute(r'/', NewCompSeasonHandler, 'landing-new', strict_slash=True),
       RedirectRoute(r'/2champs', TwoChampsHandler, '2champs', strict_slash=True),
       RedirectRoute(r'/about', AboutHandler, 'about', strict_slash=True),
       RedirectRoute(r'/account', AccountOverview, 'account-overview', strict_slash=True),

@@ -8,11 +8,12 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 import tba_config
-from base_controller import CacheableHandler
+from base_controller import CacheableHandler, LoggedInHandler
 from consts.event_type import EventType
 from consts.notification_type import NotificationType
 from helpers.event_helper import EventHelper
 from helpers.firebase.firebase_pusher import FirebasePusher
+from helpers.mytba_helper import MyTBAHelper
 from models.event import Event
 from models.insight import Insight
 from models.team import Team
@@ -158,6 +159,36 @@ class MainCompetitionseasonHandler(CacheableHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../templates/index_competitionseason.html')
         return template.render(path, self.template_values)
+
+
+class NewCompSeasonHandler(LoggedInHandler):
+    #  CACHE_VERSION = 5
+    #  CACHE_KEY_FORMAT = "main_competitionseason"
+
+    # def __init__(self, *args, **kw):
+        # super(MainCompetitionseasonHandler, self).__init__(*args, **kw)
+        # self._cache_expiration = 60 * 5
+
+    def get(self):
+        special_webcasts = FirebasePusher.get_special_webcasts()
+
+        user = self.user_bundle.account.key
+        year = datetime.datetime.now().year
+        favorite_teams, favorite_teams_events_futures, favorite_teams_awards_futures = \
+            MyTBAHelper.build_live_favorite_futures(user, year)
+        live_events_by_event = MyTBAHelper.render_favorite_teams_events(favorite_teams,
+                                                                        favorite_teams_events_futures,
+                                                                        favorite_teams_awards_futures)[1]
+        live_events_with_teams = MyTBAHelper.render_live_events_with_teams(live_events_by_event)
+
+        self.template_values.update({
+            'live_events_with_teams': live_events_with_teams,
+            "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
+            "special_webcasts": special_webcasts,
+        })
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/index_competitionseason.html')
+        self.response.out.write(template.render(path, self.template_values))
 
 
 class MainInsightsHandler(CacheableHandler):
