@@ -149,7 +149,7 @@ class MatchTimePredictionHelper(object):
             # However, if the event is not live (we're running the job manually for a single event),
             # then allow predicted times to be in the past.
             now = datetime.datetime.now(timezone) + cls.MAX_IN_PAST if is_live else cls.as_local(cls.EPOCH, timezone)
-            earliest_possible = cls.as_local(match.time + datetime.timedelta(minutes=cls.MAX_SCHEDULE_OFFSET), timezone)
+            earliest_possible = cls.as_local(match.time + cls.MAX_SCHEDULE_OFFSET, timezone)
             match.predicted_time = max(cls.as_utc(predicted), cls.as_utc(earliest_possible), cls.as_utc(now))
             last = match
 
