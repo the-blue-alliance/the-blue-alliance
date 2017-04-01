@@ -19,6 +19,7 @@ COMPETITIONSEASON = 3
 OFFSEASON = 4
 INSIGHTS = 5
 CHAMPS = 6
+LIVE_MyTBA = 7
 
 # The CONFIG variables should have exactly the same structure between environments
 # Eventually a test environment should be added. -gregmarra 17 Jul 2012
@@ -45,5 +46,5 @@ else:
         "save-frc-api-response": True,
     }
 
-CONFIG['landing_handler'] = COMPETITIONSEASON
+CONFIG['landing_handler'] = LIVE_MyTBA
 CONFIG["static_resource_version"] = 8

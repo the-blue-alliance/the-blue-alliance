@@ -187,7 +187,7 @@ class NewCompSeasonHandler(LoggedInHandler):
             "special_webcasts": special_webcasts,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/index_competitionseason.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/index_mytba.html')
         self.response.out.write(template.render(path, self.template_values))
 
 

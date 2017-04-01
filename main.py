@@ -61,6 +61,7 @@ landing_handler = {tba_config.KICKOFF: MainKickoffHandler,
                    tba_config.COMPETITIONSEASON: MainCompetitionseasonHandler,
                    tba_config.OFFSEASON: MainOffseasonHandler,
                    tba_config.INSIGHTS: MainInsightsHandler,
+                   tba_config.LIVE_MyTBA: NewCompSeasonHandler,
                    }
 
 
@@ -72,8 +73,7 @@ class Webapp2HandlerAdapter(webapp2.BaseHandlerAdapter):
         return handler.get()
 
 app = webapp2.WSGIApplication([
-      # RedirectRoute(r'/', landing_handler[tba_config.CONFIG['landing_handler']], 'landing', strict_slash=True),
-      RedirectRoute(r'/', NewCompSeasonHandler, 'landing-new', strict_slash=True),
+      RedirectRoute(r'/', landing_handler[tba_config.CONFIG['landing_handler']], 'landing', strict_slash=True),
       RedirectRoute(r'/2champs', TwoChampsHandler, '2champs', strict_slash=True),
       RedirectRoute(r'/about', AboutHandler, 'about', strict_slash=True),
       RedirectRoute(r'/account', AccountOverview, 'account-overview', strict_slash=True),
