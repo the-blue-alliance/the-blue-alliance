@@ -80,7 +80,7 @@ class NightbotTeamNextmatchHandler(CacheableHandler):
         match_time = next_match.predicted_time if next_match.predicted_time else next_match.time
         timezone = pytz.timezone(event.timezone_id) if event.timezone_id else None
         predicted_time_local = pytz.utc.localize(match_time).astimezone(timezone) if timezone else match_time
-        time_string = ", {} to start at {}".format(predicted_str, predicted_time_local.strftime("%a %X %Z")) if match_time else ""
+        time_string = ", {} to start at {}".format(predicted_str, predicted_time_local.strftime("%a %H:%M %Z")) if match_time else ""
         return "{}[{}] Team {} will be playing in match {}{}".format(user_str, event_code_upper, team_number, next_match.short_name, time_string)
 
 
