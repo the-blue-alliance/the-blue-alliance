@@ -24,6 +24,7 @@
       <div class="row">
         <div class="col-xs-12">
           <h2>Currently Competing Favorite Teams</h2>
+          <input id="add-team-input" class="form-control" type="text" placeholder="Add Team by Name or Number">
         </div>
       </div>
       {% if live_events_with_teams %}
@@ -35,4 +36,32 @@
   </div>
 </div>
 
+{% endblock %}
+
+{% block inline_javascript %}
+<script>
+  $(function() {
+    // Setup Team typeahead
+    $('#add-team-input').attr('autocomplete', 'off');
+    $('#add-team-input').typeahead([
+      {
+        prefetch: {
+          url: '/_/typeahead/teams-all',
+          filter: teamFilter
+        },
+      }
+    ]);
+
+    // Submit form when Team entry chosen
+    function doTeamAction(obj, datum) {
+      var team_re = datum.value.match(/(\d+) [|] .+/);
+      if (team_re != null) {
+        var team_num = team_re[1];
+        window.location.href = '/account/mytba/team/' + team_num + '?return=/';
+      }
+    }
+    $('#add-team-input').bind('typeahead:selected', doTeamAction);
+    $('#add-team-input').bind('typeahead:autocompleted', doTeamAction);
+  });
+</script>
 {% endblock %}

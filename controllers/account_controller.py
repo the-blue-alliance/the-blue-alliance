@@ -592,4 +592,7 @@ class MyTBATeamController(LoggedInHandler):
         else:
             MyTBAHelper.remove_subscription(current_user_id, team_key, ModelType.TEAM)
 
-        self.redirect('/account/mytba?status=team_updated#my-teams')
+        if self.request.get('return'):
+            self.redirect(self.request.get('return'))
+        else:
+            self.redirect('/account/mytba?status=team_updated#my-teams')
