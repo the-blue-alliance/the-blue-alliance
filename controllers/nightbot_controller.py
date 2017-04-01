@@ -1,3 +1,5 @@
+import pytz
+
 from base_controller import CacheableHandler
 from database.event_query import TeamEventsQuery
 from database.match_query import TeamEventMatchesQuery
@@ -74,7 +76,12 @@ class NightbotTeamNextmatchHandler(CacheableHandler):
         if next_match is None:
             return "{}[{}] Team {} has no more scheduled matches.".format(user_str, event_code_upper, team_number)
 
-        return "{}[{}] Team {} will be playing in match {}.".format(user_str, event_code_upper, team_number, match.short_name)
+        predicted_str = "predicted" if next_match.predicted_time else "scheduled"
+        match_time = next_match.predicted_time if next_match.predicted_time else next_match.time
+        timezone = pytz.timezone(event.timezone_id) if event.timezone_id else None
+        predicted_time_local = pytz.utc.localize(match_time).astimezone(timezone) if timezone else match_time
+        time_string = ", {} to start at {}".format(predicted_str, predicted_time_local.strftime("%a %X %Z")) if match_time else ""
+        return "{}[{}] Team {} will be playing in match {}{}".format(user_str, event_code_upper, team_number, next_match.short_name, time_string)
 
 
 class NightbotTeamStatuskHandler(CacheableHandler):
