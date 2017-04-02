@@ -20,6 +20,7 @@ from helpers.event_details_manipulator import EventDetailsManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_helper import MatchHelper
 from helpers.match_manipulator import MatchManipulator
+from helpers.rankings_helper import RankingsHelper
 
 from models.award import Award
 from models.event import Event
@@ -183,6 +184,7 @@ class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
             id=event_key,
             rankings=rankings
         )
+        event_details.rankings2 = RankingsHelper.convert_rankings(event_details)  # TODO: Directly parse request into rankings2
         EventDetailsManipulator.createOrUpdate(event_details)
 
         self.response.out.write(json.dumps({'Success': "Rankings successfully updated"}))
