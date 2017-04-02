@@ -1,6 +1,7 @@
 import getpass
 import urllib2
 
+import datetime
 import argparse
 import json
 
@@ -96,6 +97,17 @@ def store_match(data):
     match.comp_level = data['comp_level']
     match.set_number = data['set_number']
     match.match_number = data['match_number']
+    if data.get('time'):
+        match.time = datetime.datetime.fromtimestamp(int(data['time']))
+
+    if data.get('actual_time'):
+        match.actual_time = datetime.datetime.fromtimestamp(int(data['actual_time']))
+
+    if data.get('predicted_time'):
+        match.predicted_time = datetime.datetime.fromtimestamp(int(data['predicted_time']))
+
+    if data.get('post_result_time'):
+        match.post_result_time = datetime.datetime.fromtimestamp(int(data['post_result_time']))
     match.score_breakdown_json = json.dumps(data['score_breakdown'])
 
     for alliance in ['red', 'blue']:
