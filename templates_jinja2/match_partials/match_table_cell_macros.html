@@ -1,6 +1,8 @@
 {% macro match_time_td(match, compact=False) %}
 <td colspan="2"{% if compact %} rowspan="2"{% endif %}>
-  {% if match.time %}<time class="tba-match-time-utc" datetime="{{match.time.isoformat()}}+00:00">{{match.time|strftime("%a %I:%M%p UTC")}}</time>{% else %}--{% endif %}
+  {% if match.predicted_time %}<span title="Scheduled at {{match.time|strftime("%a %I:%M%p UTC")}}"><i><time class="tba-match-time-utc" datetime="{{match.predicted_time.isoformat()}}+00:00">{{match.predicted_time|strftime("%a %I:%M%p UTC")}}</time>*</i></span>
+  {% elif match.time%}<time class="tba-match-time-utc" datetime="{{match.time.isoformat()}}+00:00">{{match.time|strftime("%a %I:%M%p UTC")}}</time>
+  {% else %}--{% endif %}
 </td>
 {% endmacro %}
 

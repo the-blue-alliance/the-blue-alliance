@@ -219,7 +219,7 @@
   <thead>
     <tr class="key">
       <th colspan="12">Teams</th>
-      <th>{% if match.has_been_played or not match.time %}Score{% else %}Scheduled Time{% endif %}</th>
+      <th>{% if match.has_been_played %}Score{% elif match.predicted_time %}Predicted Time{% elif match.time%}Scheduled Time{% else %}Score{% endif %}</th>
     </tr>
   </thead>
   <tbody>
