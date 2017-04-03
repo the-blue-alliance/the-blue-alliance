@@ -31,25 +31,25 @@ Setup
   * Install git on your PATH
   * [GitHub help](https://help.github.com/)
   * [Try Git](https://try.github.io/)
-1. Install [Python 2.7.X](https://www.python.org/downloads/)
-1. Install [App Engine](https://cloud.google.com/appengine/docs)
+2. Install [Python 2.7.X](https://www.python.org/downloads/)
+3. Install [App Engine](https://cloud.google.com/appengine/docs)
   * Specifically use the [Python SDK](https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python)
   * Windows/OS X: Run the installer and allow it make symbolic links (it might ask you to enter your root password)
   * Linux: Unzip the .zip file and add the location of your `google_appengine` directory to your `PATH` environment variable.
-1. Get the latest version of The Blue Alliance
+4. Get the latest version of The Blue Alliance
   * Fork TBA by clicking on "Fork" in the top right of [its GitHub page](https://github.com/the-blue-alliance/the-blue-alliance)
   * Run `git clone https://github.com/USERNAME/the-blue-alliance.git` where _USERNAME_ is your GitHub username, or use GitHub's Windows or OS X app to clone it to your computer
   * For detailed instructions see [the GitHub guide on contributing](https://guides.github.com/activities/contributing-to-open-source/index.html#contributing)
-1. Install initial required Python packages
+5. Install initial required Python packages
   * `pip install -r requirements.txt`
-1. Install [Node.js](https://nodejs.org/) which includes [Node Package Manager](https://www.npmjs.org/)
-1. Install [UglifyJS2](https://github.com/mishoo/UglifyJS2) by running `npm install uglify-js -g`
-1. Install [gulp](https://github.com/gulpjs/gulp) by running `npm rm --global gulp && npm install --global gulp-cli`. This removes any version of `gulp` that was previously installed globally so it doesn't conflict with `gulp-cli`. Gulp is used as the build tool for Gameday2.
-1. Install all node dependencies by running `npm install`. This includes `less`, which is used to build CSS files for production, as well as a number of packages used in Gameday2.
-1. Fill out `static/javascript/tba_js/tba_keys_template.js` and save it in the same directory as `tba_keys.js`. It's okay to leave a key blank if you're not doing any development that requires it, but the file `tba_keys.js` must exist or else JavaScript won't compile.
-1. Fill out `test_keys_template.json` and save it in the same directory as `test_keys.json`. These are used for unit testing on your local machine only.
-1. Run `paver setup` to install remaining dependencies and do an initial build of static files (CSS, HTML templates, javascript) to get you going
-1. Run the app in GoogleAppEngineLauncher according to the directions below, and visit the local URL to see your own copy of The Blue Alliance!
+6. Install [Node.js](https://nodejs.org/) which includes [Node Package Manager](https://www.npmjs.org/)
+7. Install [UglifyJS2](https://github.com/mishoo/UglifyJS2) by running `npm install uglify-js -g`
+8. Install [gulp](https://github.com/gulpjs/gulp) by running `npm rm --global gulp && npm install --global gulp-cli`. This removes any version of `gulp` that was previously installed globally so it doesn't conflict with `gulp-cli`. Gulp is used as the build tool for Gameday2.
+9. Install all node dependencies by running `npm install`. This includes `less`, which is used to build CSS files for production, as well as a number of packages used in Gameday2.
+10. Fill out `static/javascript/tba_js/tba_keys_template.js` and save it in the same directory as `tba_keys.js`. It's okay to leave a key blank if you're not doing any development that requires it, but the file `tba_keys.js` must exist or else JavaScript won't compile.
+11. Fill out `test_keys_template.json` and save it in the same directory as `test_keys.json`. These are used for unit testing on your local machine only.
+12. Run `paver setup` to install remaining dependencies and do an initial build of static files (CSS, HTML templates, javascript) to get you going
+13. Run the app in GoogleAppEngineLauncher according to the directions below, and visit the local URL to see your own copy of The Blue Alliance!
 
 Run a local dev server
 ----------------------
