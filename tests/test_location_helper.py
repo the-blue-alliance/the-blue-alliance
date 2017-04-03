@@ -490,7 +490,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(team.normalized_location.state_prov_short, 'MS')
         self.assertEqual(team.normalized_location.country, 'United States')
         self.assertEqual(team.normalized_location.country_short, 'US')
-        self.assertEqual(team.normalized_location.postal_code, None)
+        self.assertEqual(team.normalized_location.postal_code, 39180)
         # self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(32.3526456, -90.877882))
 
     def test_team_location_1868(self):
