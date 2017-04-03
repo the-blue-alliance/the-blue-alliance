@@ -184,7 +184,8 @@ class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
             id=event_key,
             rankings=rankings
         )
-        event_details.rankings2 = RankingsHelper.convert_rankings(event_details)  # TODO: Directly parse request into rankings2
+        if event_details.year == 2017:  # TODO: Temporary fix. Should directly parse request into rankings2
+            event_details.rankings2 = RankingsHelper.convert_rankings(event_details)
         EventDetailsManipulator.createOrUpdate(event_details)
 
         self.response.out.write(json.dumps({'Success': "Rankings successfully updated"}))
