@@ -1,4 +1,5 @@
 from collections import defaultdict
+import copy
 import math
 import numpy as np
 import time
@@ -469,7 +470,7 @@ class PredictionHelper(object):
                 match_idx += 1
                 stat_mean_vars[level] = {}
                 for (stat, _, _), mean_var in zip(relevant_stats, mean_vars):
-                    stat_mean_vars[level][stat] = mean_var
+                    stat_mean_vars[level][stat] = copy.deepcopy(mean_var)
 
                 ####################################################################
                 # Make prediction
