@@ -4,7 +4,7 @@ from database.dict_converters.converter_base import ConverterBase
 
 class EventDetailsConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        3: 2,
+        3: 3,
     }
 
     @classmethod
@@ -36,6 +36,7 @@ class EventDetailsConverter(ConverterBase):
             'district_points': event_details.district_points if event_details else None,
             'insights': event_details.insights if event_details else None,
             'oprs': normalized_oprs if normalized_oprs else None,  # OPRs, DPRs, CCWMs
+            'predictions': event_details.predictions if event_details else None,
             'rankings': event_details.renderable_rankings if event_details else None,
         }
 
