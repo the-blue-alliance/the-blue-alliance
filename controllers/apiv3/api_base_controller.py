@@ -87,12 +87,24 @@ class ApiBaseController(CacheableHandler):
         self.response.headers['X-TBA-Version'] = '{}'.format(self.API_VERSION)
         self.response.headers['Vary'] = 'Accept-Encoding'
 
+    def post(self, *args, **kw):
+        self._validate_tba_auth_key()
+        self._errors = ValidationHelper.validate_request(self)
+        if self._errors:
+            self.abort(400)
+
+        rendered = self._render(*args, **kw)
+        self._track_call(*args, **kw)
+        self.response.out.write(rendered)
+        self.response.headers['X-TBA-Version'] = '{}'.format(self.API_VERSION)
+        self.response.headers['Vary'] = 'Accept-Encoding'
+
     def options(self, *args, **kw):
         """
         Supply an OPTIONS method in order to comply with CORS preflghted requests
         https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests
         """
-        self.response.headers['Access-Control-Allow-Methods'] = "GET, OPTIONS"
+        self.response.headers['Access-Control-Allow-Methods'] = "GET, POST, OPTIONS"
         self.response.headers['Access-Control-Allow-Headers'] = 'X-TBA-Auth-Key'
 
     def _track_call_defer(self, api_action, api_label):
@@ -131,15 +143,3 @@ class ApiBaseController(CacheableHandler):
             else:
                 self._errors = json.dumps({"Error": "X-TBA-Auth-Key is invalid. Please get an access key at http://www.thebluealliance.com/account."})
                 self.abort(400)
-
-class ApiSuggestBaseController(ApiBaseController):
-    def post(self, *args, **kw):
-        super(ApiSuggestBaseController, self).get(*args, **kw)
-
-    def options(self, *args, **kw):
-        """
-        Supply an OPTIONS method in order to comply with CORS preflghted requests
-        https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests
-        """
-        self.response.headers['Access-Control-Allow-Methods'] = "POST, OPTIONS"
-        self.response.headers['Access-Control-Allow-Headers'] = 'X-TBA-Auth-Key'

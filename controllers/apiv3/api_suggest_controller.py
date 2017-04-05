@@ -1,11 +1,11 @@
 import json
 
-from controllers.apiv3.api_base_controller import ApiSuggestBaseController
+from controllers.apiv3.api_base_controller import ApiBaseController
 from database.team_query import TeamParticipationQuery
 from helpers.suggestions.suggestion_creator import SuggestionCreator
 
 
-class ApiSuggestTeamMediaController(ApiSuggestBaseController):
+class ApiSuggestTeamMediaController(ApiBaseController):
     CACHE_VERSION = 0
 
     def _track_call(self, team_key, year):
