@@ -12,7 +12,7 @@ class ApiSuggestTeamMediaController(ApiBaseController):
         self._track_call_defer('team/suggest/media', team_key)
 
     def _render(self, team_key, year):
-        if year not in TeamParticipationQuery(team_key).fetch():
+        if int(year) not in list(TeamParticipationQuery(team_key).fetch()):
             self.abort(400)
 
         if 'media_url' in self.request.POST:
