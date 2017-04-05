@@ -108,11 +108,13 @@ class ApiBaseController(CacheableHandler):
             x_tba_auth_key = self.request.get('X-TBA-Auth-Key')
 
         self.auth_owner = None
+        self.auth_owner_key = None
         self.auth_description = None
         if not x_tba_auth_key:
             account = self._user_bundle.account
             if account:
-                self.auth_owner = account.key
+                self.auth_owner = account.key.id()
+                self.auth_owner_key = account.key
             else:
                 self._errors = json.dumps({"Error": "X-TBA-Auth-Key is a required header or URL param. Please get an access key at http://www.thebluealliance.com/account."})
                 self.abort(400)
@@ -122,7 +124,8 @@ class ApiBaseController(CacheableHandler):
         else:
             auth = ApiAuthAccess.get_by_id(x_tba_auth_key)
             if auth and auth.is_read_key:
-                self.auth_owner = auth.owner
+                self.auth_owner = auth.owner.id()
+                self.auth_owner_key = auth.owner
                 self.auth_description = auth.description
                 logging.info("Auth owner: {}, X-TBA-Auth-Key: {}".format(self.auth_owner, x_tba_auth_key))
             else:

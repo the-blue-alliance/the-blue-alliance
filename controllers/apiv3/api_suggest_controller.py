@@ -13,7 +13,7 @@ class ApiSuggestTeamMediaController(ApiSuggestBaseController):
     def _render(self, team_key, year):
         if 'media_url' in self.request.POST:
             status, suggestion = SuggestionCreator.createTeamMediaSuggestion(
-                author_account_key=self.auth_owner,
+                author_account_key=self.auth_owner_key,
                 media_url=self.request.POST["media_url"],
                 team_key=team_key,
                 year_str=year)
