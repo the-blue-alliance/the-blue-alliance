@@ -69,7 +69,7 @@ app = webapp2.WSGIApplication([
         atc.ApiTeamYearMediaController, methods=['GET', 'OPTIONS']),
     # Team Media Suggestions
     webapp2.Route(r'/api/v3/team/<team_key:>/suggest/media/<year:([0-9]+)>',
-        asgc.ApiSuggestTeamMediaController, methods=['POST', 'GET', 'OPTIONS']),
+        asgc.ApiSuggestTeamMediaController, methods=['POST', 'OPTIONS']),
     # Event List
     webapp2.Route(r'/api/v3/events/<year:([0-9]+)>',
         aec.ApiEventListController, methods=['GET', 'OPTIONS']),
