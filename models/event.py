@@ -47,6 +47,7 @@ class Event(ndb.Model):
     facebook_eid = ndb.StringProperty(indexed=False)  # from Facebook
     custom_hashtag = ndb.StringProperty(indexed=False)  # Custom HashTag
     website = ndb.StringProperty(indexed=False)
+    facebook_event = ndb.StringProperty(indexed=False)
     webcast_json = ndb.TextProperty(indexed=False)  # list of dicts, valid keys include 'type' and 'channel'
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
