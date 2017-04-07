@@ -223,11 +223,15 @@
                     </style>
                   {% if loop.index0 == 1 %}
                     {%for team, image_medias in teams_a %}
-                    {% if team.team_number|int() == element|int() %}
-                        <a title="{% if team.nickname %}{{ team.nickname }}{% else %}--{% endif %}" href="/team/{{ element }}/{{event.year}}">{{ element }}</a>
-                    {% endif %}
+                        {% if team.team_number|int() == element|int() %}
+                            <a title="{% if team.nickname %}{{ team.nickname }}{% else %}--{% endif %}" href="/team/{{ element }}/{{event.year}}">{{ element }}</a>
+                        {% endif %}
                     {% endfor %}
-                    <a href="/team/{{ element }}/{{event.year}}">{{ element }}</a>
+                    {%for team, image_medias in teams_b %}
+                        {% if team.team_number|int() == element|int() %}
+                            <a title="{% if team.nickname %}{{ team.nickname }}{% else %}--{% endif %}" href="/team/{{ element }}/{{event.year}}">{{ element }}</a>
+                        {% endif %}
+                    {% endfor %}
                   {% else %}
                     {{ element }}
                   {% endif %}
