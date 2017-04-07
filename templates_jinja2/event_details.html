@@ -198,12 +198,29 @@
               {% endfor %}
               </tr>
             </thead>
-            <tbody>
+            <tbody id="robots">
               {% for row in event.details.rankings_table %}
               {% if not loop.first %}
               <tr>
                 {% for element in row %}
                 <td>
+                    <style>
+                    #robots a[title]:hover:after {
+                        content: attr(title);
+                        width: 120px;
+                        background-color: black;
+                        color: #fff;
+                        text-align: center;
+                        padding: 5px 0;
+                        border-radius: 6px;
+                        position: absolute;
+                        z-index: 1;
+                        width: 120px;
+                        top: 100%;
+                        left: 50%;
+                        margin-left: -60px;
+                    }
+                    </style>
                   {% if loop.index0 == 1 %}
                     {%for team, image_medias in teams_a %}
                     {% if team.team_number|int() == element|int() %}
