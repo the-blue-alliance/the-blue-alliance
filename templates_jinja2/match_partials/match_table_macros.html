@@ -1,6 +1,14 @@
 {% import "match_partials/match_table_row_macros.html" as mtrm %}
 {% import "match_partials/match_table_cell_macros.html" as mtcm %}
 
+{% macro build_list(teams_a) %}
+<ul>
+{% for team, image_media in teams_a %}
+<li>{{team.nickname}}</li>
+{% endfor %}
+</ul>
+{% endmacro %}
+
 {% macro qual_match_table(matches, cur_team_key=None) %}
 <table class="match-table">
   <thead>

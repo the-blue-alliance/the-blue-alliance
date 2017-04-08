@@ -123,6 +123,7 @@
     {% if matches.num > 0 %}
     <div class="tab-pane active" id="results">
       <div class="row">
+        {{mtm.build_list(teams_a)}}
         {% if matches.qm %}
         <div class="col-sm-6">
           <h3>Qualification Results</h3>
@@ -352,11 +353,21 @@
                 <th>Total Points</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="robots">
               {% for team_key, breakdown in district_points_sorted %}
               <tr>
                 <td>{{loop.index}}</td>
-                <td><a href="/team/{{team_key|strip_frc}}/{{event.year}}">{{team_key|strip_frc}}</a></td>
+                <td>{%for team, image_medias in teams_a %}
+                    {% if team.team_number|int() == team_key|strip_frc|int() %}
+                        <a title="{{team.nickname}}" href="/team/{{team_key|strip_frc}}/{{event.year}}">{{team_key|strip_frc}}</a>
+                    {% endif %}
+                {% endfor %}
+                {%for team, image_medias in teams_b %}
+                    {% if team.team_number|int() == team_key|strip_frc|int() %}
+                        <a title="{{team.nickname}}" href="/team/{{team_key|strip_frc}}/{{event.year}}">{{team_key|strip_frc}}</a>
+                    {% endif %}
+                {% endfor %}
+                </td>
                 <td>{{breakdown.qual_points}}</td>
                 <td>{{breakdown.elim_points}}</td>
                 <td>{{breakdown.alliance_points}}</td>

@@ -11,7 +11,7 @@
   {{mtcm.match_name_td(match, fake_matches=fake_matches)}}
 
   {% for team_key in match.alliances.red.teams %}
-    {{mtcm.match_team_td(match, 'red', team_key, cur_team_key, fake_matches=fake_matches)}}
+    {{mtcm.match_team_td(match, 'red', team_key, cur_team_key, fake_matches=fake_matches, team_name="hey")}}
   {% endfor %}
   {% for team_key in match.alliances.blue.teams %}
     {{mtcm.match_team_td(match, 'blue', team_key, cur_team_key, fake_matches=fake_matches)}}

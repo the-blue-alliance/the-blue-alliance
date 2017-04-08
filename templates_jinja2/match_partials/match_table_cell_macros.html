@@ -33,7 +33,7 @@
 {% endmacro %}
 
 
-{% macro match_team_td(match, alliance_color, team_key, cur_team_key, compact=False, fake_matches=False) %}
+{% macro match_team_td(match, alliance_color, team_key, cur_team_key, compact=False, fake_matches=False, team_name="asdf") %}
 {% set num_teams = match.alliances.get(alliance_color).teams|length %}
 {% if compact %}
   {% if num_teams == 3 %}
@@ -59,7 +59,7 @@
   {% if fake_matches %}
   {{ team_key|strip_frc }}
   {% else %}
-  <a href="/team/{{team_key|digits}}/{{match.year}}"{% if team_key in match.alliances.get(alliance_color).surrogates %} class="surrogate" rel="tooltip" title="Team {{team_key|strip_frc}} is playing as a surrogate."{% endif %}>{{ team_key|strip_frc }}</a>
+  <a title="{{ team_name }}" href="/team/{{team_key|digits}}/{{match.year}}"{% if team_key in match.alliances.get(alliance_color).surrogates %} class="surrogate" rel="tooltip" title="Team {{team_key|strip_frc}} is playing as a surrogate."{% endif %}>{{ team_key|strip_frc }}</a>
   {% endif %}
 </td>
 {% endmacro %}
