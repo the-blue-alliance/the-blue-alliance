@@ -123,11 +123,10 @@
     {% if matches.num > 0 %}
     <div class="tab-pane active" id="results">
       <div class="row">
-        {{mtm.build_list(teams_a)}}
         {% if matches.qm %}
         <div class="col-sm-6">
           <h3>Qualification Results</h3>
-          {{mtm.qual_match_table(matches)}}
+          {{mtm.qual_match_table(matches, teams_a=teams_a, teams_b=teams_b)}}
         </div>
         {% endif %}
 
@@ -138,7 +137,7 @@
           {% endif %}
 
           <h3>{% if event.year >= 2015 %}Playoff{% else %}Elimination{% endif %} Results</h3>
-          {{mtm.elim_match_table(matches)}}
+          {{mtm.elim_match_table(matches, teams_a=teams_a, teams_b=teams_b)}}
 
           {% if matches.qm %}
             {% if matches.qf or matches.sf or matches.f %}

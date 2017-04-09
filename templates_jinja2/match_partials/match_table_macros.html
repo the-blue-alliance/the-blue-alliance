@@ -1,15 +1,7 @@
 {% import "match_partials/match_table_row_macros.html" as mtrm %}
 {% import "match_partials/match_table_cell_macros.html" as mtcm %}
 
-{% macro build_list(teams_a) %}
-<ul>
-{% for team, image_media in teams_a %}
-<li>{{team.nickname}}</li>
-{% endfor %}
-</ul>
-{% endmacro %}
-
-{% macro qual_match_table(matches, cur_team_key=None) %}
+{% macro qual_match_table(matches, cur_team_key=None, teams_a, teams_b) %}
 <table class="match-table">
   <thead>
     {% include "match_partials/match_table_header.html" %}
@@ -21,7 +13,7 @@
         <th colspan="16">Qualifications</th>
       </tr>
       {% for match in matches.qm %}
-        {{mtrm.match_row_tr(match, cur_team_key)}}
+        {{mtrm.match_row_tr(match, cur_team_key, teams_a=teams_a, teams_b=teams_b)}}
       {% endfor %}
     {% endif %}
   </tbody>
@@ -109,7 +101,7 @@
 </table>
 {% endmacro %}
 
-{% macro elim_match_table(matches, cur_team_key=None) %}
+{% macro elim_match_table(matches, cur_team_key=None, teams_a, teams_b) %}
 <table class="match-table">
   <thead>
     {% include "match_partials/match_table_header.html" %}
@@ -126,21 +118,21 @@
     {% if matches.qf %}
       <tr class="key"><th colspan="16">Quarterfinals</th></tr>
       {% for match in matches.qf %}
-        {{mtrm.match_row_tr(match, cur_team_key)}}
+        {{mtrm.match_row_tr(match, cur_team_key, teams_a=teams_a, teams_b=teams_b)}}
       {% endfor %}
     {% endif %}
 
     {% if matches.sf %}
       <tr class="key"><th colspan="16">Semifinals</th></tr>
       {% for match in matches.sf %}
-        {{mtrm.match_row_tr(match, cur_team_key)}}
+        {{mtrm.match_row_tr(match, cur_team_key, teams_a=teams_a, teams_b=teams_b)}}
       {% endfor %}
     {% endif %}
 
     {% if matches.f %}
       <tr class="key"><th colspan="16">Finals</th></tr>
       {% for match in matches.f %}
-        {{mtrm.match_row_tr(match, cur_team_key)}}
+        {{mtrm.match_row_tr(match, cur_team_key, teams_a=teams_a, teams_b=teams_b)}}
       {% endfor %}
     {% endif %}
   </tbody>
