@@ -122,6 +122,44 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
         )
         self.match.put()
 
+        self.match2 = Match(
+            id="2016necmp_f1m2",
+            event=ndb.Key(Event, "2016necmp"),
+            year=2016,
+            comp_level="f",
+            set_number=1,
+            match_number=2,
+            team_key_names=['frc846', 'frc2135', 'frc971', 'frc254', 'frc1678', 'frc973'],
+            time=datetime.fromtimestamp(1409527874),
+            time_string="4:31 PM",
+            tba_videos=[],
+            alliances_json='{\
+                "blue": {\
+                    "score": 270,\
+                    "teams": [\
+                    "frc846",\
+                    "frc2135",\
+                    "frc971"]},\
+                "red": {\
+                    "score": 310,\
+                    "teams": [\
+                    "frc254",\
+                    "frc1678",\
+                    "frc973"]}}',
+            score_breakdown_json = '{\
+                "blue": {\
+                    "auto": 70,\
+                    "teleop_goal+foul": 40,\
+                    "assist": 120,\
+                    "truss+catch": 40\
+                },"red": {\
+                    "auto": 70,\
+                    "teleop_goal+foul": 50,\
+                    "assist": 150,\
+                    "truss+catch": 40}}'
+        )
+        self.match2.put()
+
     def tearDown(self):
         self.testbed.deactivate()
 
@@ -169,6 +207,54 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
         self.assertIsNotNone(match)
         self.assertIsNotNone(match.youtube_videos)
         self.assertTrue('H-54KMwMKY0' in match.youtube_videos)
+
+    def testAcceptNewKey(self):
+        self.loginUser()
+        self.givePermission()
+        suggestion_id = self.createSuggestion()
+        form = self.getSuggestionForm()
+        form.set('accept_keys[]', suggestion_id)
+        form.set('key-{}'.format(suggestion_id), '2016necmp_f1m2')
+        response = form.submit().follow()
+        self.assertEqual(response.status_int, 200)
+
+        # Make sure we mark the Suggestion as REVIEWED
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.review_state, Suggestion.REVIEW_ACCEPTED)
+
+        # Make sure the video gets associated
+        match = Match.get_by_id(self.match2.key_name)
+        self.assertIsNotNone(match)
+        self.assertIsNotNone(match.youtube_videos)
+        self.assertTrue('H-54KMwMKY0' in match.youtube_videos)
+
+        # Make sure we don't add it to the first match
+        match = Match.get_by_id(self.match.key_name)
+        self.assertIsNotNone(match)
+        self.assertIsNotNone(match.youtube_videos)
+        self.assertFalse('H-54KMwMKY0' in match.youtube_videos)
+
+    def testAcceptBadKey(self):
+        self.loginUser()
+        self.givePermission()
+        suggestion_id = self.createSuggestion()
+        form = self.getSuggestionForm()
+        form.set('accept_keys[]', suggestion_id)
+        form.set('key-{}'.format(suggestion_id), '2016necmp_f1m3')  # This match doesn't exist
+        response = form.submit().follow()
+        self.assertEqual(response.status_int, 200)
+
+        # Make sure we don't mark the Suggestion as REVIEWED
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.review_state, Suggestion.REVIEW_PENDING)
+
+        # Make sure the video doesn't get associated
+        match = Match.get_by_id(self.match.key_name)
+        self.assertIsNotNone(match)
+        self.assertIsNotNone(match.youtube_videos)
+        self.assertFalse('H-54KMwMKY0' in match.youtube_videos)
 
     def testRejectSuggestion(self):
         self.loginUser()

@@ -64,7 +64,7 @@ class InsightsHelper(object):
         blue_banner_award_keys_future = Award.query(
             Award.year == year,
             Award.award_type_enum.IN(AwardType.BLUE_BANNER_AWARDS),
-            Award.event_type_enum.IN({EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP, EventType.CMP_DIVISION, EventType.CMP_FINALS})
+            Award.event_type_enum.IN({EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP_DIVISION, EventType.DISTRICT_CMP, EventType.CMP_DIVISION, EventType.CMP_FINALS})
         ).fetch_async(10000, keys_only=True)
         cmp_finalist_award_keys_future = Award.query(
             Award.year == year,
@@ -125,7 +125,7 @@ class InsightsHelper(object):
                                     correct_matches_count_cmp[level] += 1
 
                 for level in ['qual', 'playoff']:
-                    if 'match_prediction_stats' in predictions:
+                    if predictions.get('match_prediction_stats'):
                         bs = predictions.get('match_prediction_stats', {}).get(level, {}).get('brier_scores', {})
                         if bs:
                             brier_scores[level].append(bs['win_loss'])
@@ -165,6 +165,7 @@ class InsightsHelper(object):
                 'verbose_name': match.verbose_name,
                 'event_name': event.name,
                 'alliances': match.alliances,
+                'score_breakdown': match.score_breakdown,
                 'winning_alliance': match.winning_alliance,
                 'tba_video': match.tba_video,
                 'youtube_videos_formatted': match.youtube_videos_formatted

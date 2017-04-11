@@ -5,7 +5,9 @@ import CloseIcon from 'material-ui/svg-icons/navigation/close'
 import SwapIcon from 'material-ui/svg-icons/action/compare-arrows'
 import VideocamIcon from 'material-ui/svg-icons/av/videocam'
 import { white, grey900 } from 'material-ui/styles/colors'
+
 import TickerMatch from './TickerMatch'
+import { NUM_VIEWS_FOR_LAYOUT } from '../constants/LayoutConstants'
 
 const VideoCellToolbar = (props) => {
   const toolbarStyle = {
@@ -35,7 +37,7 @@ const VideoCellToolbar = (props) => {
     right: 0,
     marginRight: 0,
     backgroundColor: grey900,
-    boxShadow: '-2px 0px 15px 6px rgba(0, 0, 0, 0.5)',
+    boxShadow: '-2px 0px 15px -2px rgba(0, 0, 0, 0.5)',
   }
 
   // Create tickerMatches
@@ -60,6 +62,22 @@ const VideoCellToolbar = (props) => {
     )
   })
 
+  let swapButton
+  if (NUM_VIEWS_FOR_LAYOUT[props.layoutId] === 1) {
+    swapButton = null
+  } else {
+    swapButton = (
+      <IconButton
+        tooltip="Swap position"
+        tooltipPosition="top-center"
+        onTouchTap={() => props.onRequestSwapPosition()}
+        touch
+      >
+        <SwapIcon color={white} />
+      </IconButton>
+    )
+  }
+
   return (
     <Toolbar style={toolbarStyle}>
       <ToolbarGroup>
@@ -74,18 +92,11 @@ const VideoCellToolbar = (props) => {
         </div>
       </ToolbarGroup>
       <ToolbarGroup lastChild style={controlsStyle}>
-        <IconButton
-          tooltip="Swap position"
-          tooltipPosition="top-center"
-          onTouchTap={() => props.onRequestOpenSwapPositionDialog()}
-          touch
-        >
-          <SwapIcon color={white} />
-        </IconButton>
+        {swapButton}
         <IconButton
           tooltip="Change webcast"
           tooltipPosition="top-center"
-          onTouchTap={() => props.onRequestOpenWebcastSelectionDialog()}
+          onTouchTap={() => props.onRequestSelectWebcast()}
           touch
         >
           <VideocamIcon color={white} />
@@ -106,13 +117,14 @@ const VideoCellToolbar = (props) => {
 VideoCellToolbar.propTypes = {
   matches: PropTypes.arrayOf(PropTypes.object).isRequired,
   webcast: PropTypes.object.isRequired,
-  isBlueZone: PropTypes.bool.isRequired,
   /* eslint-disable react/no-unused-prop-types */
-  onRequestOpenSwapPositionDialog: PropTypes.func.isRequired,
-  onRequestOpenWebcastSelectionDialog: PropTypes.func.isRequired,
+  isBlueZone: PropTypes.bool.isRequired,
+  onRequestSwapPosition: PropTypes.func.isRequired,
+  onRequestSelectWebcast: PropTypes.func.isRequired,
   /* eslint-enable react/no-unused-prop-types */
   removeWebcast: PropTypes.func.isRequired,
   style: PropTypes.object,
+  layoutId: PropTypes.number.isRequired,
 }
 
 export default VideoCellToolbar

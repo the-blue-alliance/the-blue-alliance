@@ -3,6 +3,7 @@ import collections
 import datetime
 import re
 
+from google.appengine.api import memcache
 from google.appengine.ext import ndb
 
 from consts.district_type import DistrictType
@@ -71,7 +72,7 @@ class EventHelper(object):
                     to_return[champs_label].append(event)
                 else:
                     to_return[champs_label] = [event]
-            elif event.official and event.event_type_enum in {EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP}:
+            elif event.official and event.event_type_enum in {EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP_DIVISION, EventType.DISTRICT_CMP}:
                 if (event.start_date is None or
                    (event.start_date.month == 12 and event.start_date.day == 31)):
                     weekless_events.append(event)
@@ -170,6 +171,10 @@ class EventHelper(object):
         OR
         b) The event.start_date is on or within 4 days after the closest Wednesday
         """
+        event_keys = memcache.get('EventHelper.getWeekEvents():event_keys')
+        if event_keys is not None:
+            return ndb.get_multi(event_keys)
+
         today = datetime.datetime.today()
 
         # Make sure all events to be returned are within range
@@ -193,16 +198,18 @@ class EventHelper(object):
                     events.append(event)
 
         EventHelper.sort_events(events)
+        memcache.set('EventHelper.getWeekEvents():event_keys', [e.key for e in events], 60*60)
         return events
 
     @classmethod
     def getEventsWithinADay(self):
-        week_events = self.getWeekEvents()
-        ret = []
-        for event in week_events:
-            if event.within_a_day:
-                ret.append(event)
-        return ret
+        event_keys = memcache.get('EventHelper.getEventsWithinADay():event_keys')
+        if event_keys is not None:
+            return ndb.get_multi(event_keys)
+
+        events = filter(lambda e: e.within_a_day, self.getWeekEvents())
+        memcache.set('EventHelper.getEventsWithinADay():event_keys', [e.key for e in events], 60*60)
+        return events
 
     @classmethod
     def getShortName(self, name_str):

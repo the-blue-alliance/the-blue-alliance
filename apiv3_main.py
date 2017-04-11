@@ -76,7 +76,7 @@ app = webapp2.WSGIApplication([
         aec.ApiEventController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/event/<event_key:>/<model_type:(simple)>',
         aec.ApiEventController, methods=['GET', 'OPTIONS']),
-    webapp2.Route(r'/api/v3/event/<event_key:>/<detail_type:(alliances|district_points|insights|oprs|rankings)>',
+    webapp2.Route(r'/api/v3/event/<event_key:>/<detail_type:(alliances|district_points|insights|oprs|predictions|rankings)>',
         aec.ApiEventDetailsController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/event/<event_key:>/teams',
         aec.ApiEventTeamsController, methods=['GET', 'OPTIONS']),

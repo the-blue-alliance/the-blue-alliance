@@ -58,6 +58,14 @@ class MatchManipulator(ManipulatorBase):
                         if event not in unplayed_match_events:
                             unplayed_match_events.append(event)
 
+            # Try to send video notifications
+            if '_video_added' in updated_attrs:
+                try:
+                    NotificationHelper.send_match_video(match)
+                except Exception, exception:
+                    logging.error("Error sending match video updates: {}".format(exception))
+                    logging.error(traceback.format_exc())
+
         '''
         If we have an unplayed match during an event within a day, send out a schedule update notification
         '''
@@ -71,15 +79,18 @@ class MatchManipulator(ManipulatorBase):
         '''
         Enqueue firebase push
         '''
-        event_keys = set()
-        for match in matches:
-            event_keys.add(match.event.id())
+        affected_stats_event_keys = set()
+        for (match, updated_attrs, is_new) in zip(matches, updated_attr_list, is_new_list):
+            # Only attrs that affect stats
+            if is_new or set(['alliances_json', 'score_breakdown_json']).intersection(set(updated_attrs)) != set():
+                affected_stats_event_keys.add(match.event.id())
             try:
                 FirebasePusher.update_match(match)
             except Exception:
                 logging.warning("Firebase update_match failed!")
 
-        for event_key in event_keys:
+        # Enqueue statistics
+        for event_key in affected_stats_event_keys:
             # Enqueue task to calculate matchstats
             try:
                 taskqueue.add(
@@ -128,7 +139,9 @@ class MatchManipulator(ManipulatorBase):
             "time_string",
             "actual_time",
             "predicted_time",
+            "post_result_time",
             "push_sent",
+            "tiebreak_match_key",
         ]
 
         json_attrs = [
@@ -146,6 +159,10 @@ class MatchManipulator(ManipulatorBase):
         ]
 
         old_match._updated_attrs = []
+
+        # Lets postUpdateHook know if videos went from 0 to >0
+        if not old_match.has_video and new_match.has_video:
+            old_match._updated_attrs.append('_video_added')
 
         # if not auto_union, treat auto_union_attrs as list_attrs
         if not auto_union:

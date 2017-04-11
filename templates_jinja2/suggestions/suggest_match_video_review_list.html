@@ -28,8 +28,9 @@
             <div class="row">
                 <div class="well">
                     <div class="col-xs-2">
-                      <label class="checkbox text-success" for="accept_{{suggestion.key.id}}"><input class="accept" type="checkbox" name="accept_keys[]" id="accept_{{suggestion.key.id}}" value="{{suggestion.key.id}}"> Accept</label>
-                      <label class="checkbox text-danger" for="reject_{{suggestion.key.id}}"><input class="reject" type="checkbox" name="reject_keys[]" id="reject_{{suggestion.key.id}}" value="{{suggestion.key.id}}"> Reject</label>
+                      <label class="checkbox text-success" for="accept_{{suggestion.key.id()}}"><input class="accept" type="checkbox" name="accept_keys[]" id="accept_{{suggestion.key.id()}}" value="{{suggestion.key.id()}}"> Accept</label>
+                      <label class="checkbox text-danger" for="reject_{{suggestion.key.id()}}"><input class="reject" type="checkbox" name="reject_keys[]" id="reject_{{suggestion.key.id()}}" value="{{suggestion.key.id()}}"> Reject</label>
+                      <input type="text" class="form-control" name="key-{{suggestion.key.id()}}" placeholder="Match Key" value="{{suggestion.target_key}}">
                     </div>
                     <div class="col-xs-7 fitvids">
                         <p><a href="/match/{{ suggestion.target_key }}" target="_blank"><strong>{{ suggestion.target_key }}</strong></a></p>
@@ -37,9 +38,9 @@
                     </div>
                     <div class="col-xs-3">
                         <ul>
-                            <li>{{ suggestion.key.id }}</a></li>
-                            <li>{{ suggestion.author.get.email }}</a></li>
-                            <li>{{ suggestion.author.get.nickname }}</a></li>
+                            <li>{{ suggestion.key.id() }}</li>
+                            <li>{{ suggestion.author.get().email }}</li>
+                            <li>{{ suggestion.author.get().nickname }}</li>
                             <li>{{ suggestion.target_model }}:{{ suggestion.target_key }}</li>
                             <li>{{ suggestion.contents_json }}</li>
                         </ul>
@@ -47,7 +48,7 @@
                     <div class="clearfix"></div>
                 </div>
             </div>
-            {% empty %}
+            {% else %}
             <div class="row">
                 <div class="well">
                     <p>No suggestions! Go build more community!</p>

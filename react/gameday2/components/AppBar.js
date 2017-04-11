@@ -44,6 +44,7 @@ const AppBar = (props) => {
     color: props.muiTheme.appBar.textColor,
     textDecoration: 'none',
     marginLeft: 32,
+    marginRight: 64,
     fontSize: 12,
     display: 'flex',
     alignItems: 'center',
@@ -90,6 +91,15 @@ const AppBar = (props) => {
               height={16}
             />
           </a>
+          <div
+            className="fb-like"
+            data-href="https://www.facebook.com/thebluealliance/"
+            data-layout="button_count"
+            data-action="like"
+            data-size="small"
+            data-show-faces="false"
+            data-share="false"
+          />
         </ToolbarGroup>
         <ToolbarGroup lastChild>
           {configureLayoutButton}

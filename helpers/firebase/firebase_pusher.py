@@ -191,7 +191,12 @@ class FirebasePusher(object):
         for event_key, event in cls._update_live_events_helper().items():
             converted_event = EventConverter.convert(event, 3)
             # Only what's needed to render webcast
-            events_by_key[event_key] = {key: converted_event[key] for key in ['key', 'name', 'short_name', 'webcasts']}
+            partial_event = {key: converted_event[key] for key in ['key', 'name', 'short_name', 'webcasts']}
+            # Hack in district code
+            if event.district_key and partial_event.get('short_name'):
+                partial_event['short_name'] = '[{}] {}'.format(event.district_key.id()[4:].upper(), partial_event['short_name'])
+
+            events_by_key[event_key] = partial_event
 
         deferred.defer(
             cls._put_data,

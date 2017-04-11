@@ -74,7 +74,8 @@ class EventInsightsHelper(object):
         win_margins = 0
         total_scores = 0
         foul_scores = 0
-        high_score = [0, "", ""]  # score, match key, match name
+        high_kpa = [0, "", ""]  # score, match key, match name
+        high_score = [0, "", ""]  # kpa, match key, match name
 
         finished_matches = 0
         has_insights = False
@@ -96,6 +97,11 @@ class EventInsightsHelper(object):
             for alliance_color in ['red', 'blue']:
                 try:
                     alliance_breakdown = match.score_breakdown[alliance_color]
+
+                    # High kPa
+                    kpa = alliance_breakdown['autoFuelPoints'] + alliance_breakdown['teleopFuelPoints']
+                    if kpa > high_kpa[0]:
+                        high_kpa = [kpa, match.key_name, match.short_name]
 
                     # Auto
                     mobility_points_auto += alliance_breakdown['autoMobilityPoints']
@@ -186,6 +192,7 @@ class EventInsightsHelper(object):
             'average_score': float(total_scores) / (2 * finished_matches),
             'average_foul_score': float(foul_scores) / (2 * finished_matches),
             'high_score': high_score,  # [score, match key, match name]
+            'high_kpa': high_kpa,  # [kpa, match key, match name]
         }
 
         return event_insights

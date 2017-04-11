@@ -77,6 +77,9 @@
           {% endif %}
 
           <div class="text-center">
+            {# for 4/1 #}
+            {{bbm.blue_banner({'year': year, 'normalized_name': 'Participation Award'}, {'normalized_name': 'Season'}, hidden=True)}}
+
             {% for comp in participation %}
               {% if comp.event.is_season_event and comp.awards %}
                 {% for award in comp.awards %}

@@ -11,7 +11,7 @@ class MatchDetail(CacheableHandler):
     Display a Match.
     """
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
-    SHORT_CACHE_EXPIRATION = 60 * 5
+    SHORT_CACHE_EXPIRATION = 61
     CACHE_VERSION = 4
     CACHE_KEY_FORMAT = "match_detail_{}"  # (match_key)
     VALID_BREAKDOWN_YEARS = set([2015, 2016, 2017])

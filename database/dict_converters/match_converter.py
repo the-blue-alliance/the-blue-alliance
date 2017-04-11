@@ -4,7 +4,7 @@ from database.dict_converters.converter_base import ConverterBase
 
 class MatchConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        3: 3,
+        3: 5,
     }
 
     @classmethod
@@ -47,5 +47,9 @@ class MatchConverter(ConverterBase):
             match_dict['predicted_time'] = int(time.mktime(match.predicted_time.timetuple()))
         else:
             match_dict['predicted_time'] = None
+        if match.post_result_time is not None:
+            match_dict['post_result_time'] = int(time.mktime(match.post_result_time.timetuple()))
+        else:
+            match_dict['post_result_time'] = None
 
         return match_dict

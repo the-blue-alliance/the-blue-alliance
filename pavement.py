@@ -101,16 +101,17 @@ def preflight():
 
 
 @task
-def setup():
-    """Set up for development environments."""
-    setup_function()
-
-
-@task
 @consume_args
 def test(args):
     """Run tests. Accepts an argument to match subnames of tests"""
     test_function(args)
+
+
+@task
+def setup():
+    sh("pip install -r requirements.txt")
+    install_libs()
+    make()
 
 
 @task
@@ -130,9 +131,22 @@ def test_fast():
     sh("python run_tests.py --test_pattern=test_event_get_short_name.py")
 
 
-def setup_function():
-    install_libs()
-    make()
+@task
+@cmdopts([
+    optparse.make_option("--key", help="Event, Team, or Match key to import", default="2016necmp"),
+    optparse.make_option("--project", help="App Engine Project", default=""),
+    optparse.make_option("--port", type=int, help="Local port running the API server", default=41017),
+])
+def bootstrap(options):
+    """Download and import an event or team from apiv3"""
+    key = options.bootstrap.key
+    if options.bootstrap.project:
+        url = "https://{}.appspot.com".format(options.bootstrap.project)
+    else:
+        url = "localhost:{}".format(options.bootstrap.port)
+    args = ["python", "bootstrap.py", "--url", url, key]
+    print "Running {}".format(subprocess.list2cmdline(args))
+    subprocess.call(args)
 
 
 def test_function(args):

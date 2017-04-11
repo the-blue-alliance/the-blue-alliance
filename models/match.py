@@ -86,9 +86,11 @@ class Match(ndb.Model):
     time_string = ndb.StringProperty(indexed=False)  # the time as displayed on FIRST's site (event's local time)
     actual_time = ndb.DateTimeProperty()  # UTC time of match actual start
     predicted_time = ndb.DateTimeProperty()  # UTC time of when we predict the match will start
+    post_result_time = ndb.DateTimeProperty()  # UTC time scores were shown to the audience
     youtube_videos = ndb.StringProperty(repeated=True)  # list of Youtube IDs
     tba_videos = ndb.StringProperty(repeated=True)  # list of filetypes a TBA video exists for
     push_sent = ndb.BooleanProperty()  # has an upcoming match notification been sent for this match? None counts as False
+    tiebreak_match_key = ndb.KeyProperty(kind='Match')  # Points to a match that was played to tiebreak this one
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True)
@@ -139,6 +141,31 @@ class Match(ndb.Model):
         """
         if self._score_breakdown is None and self.score_breakdown_json is not None:
             self._score_breakdown = json.loads(self.score_breakdown_json)
+
+            # Add in RP calculations
+            if self.has_been_played:
+                if self.year >= 2016:
+                    for color in ['red', 'blue']:
+                        if self.comp_level == 'qm':
+                            rp_earned = 0
+                            if self.winning_alliance == color:
+                                rp_earned += 2
+                            elif self.winning_alliance == '':
+                                rp_earned += 1
+
+                            if self.year == 2016:
+                                if self._score_breakdown.get(color, {}).get('teleopDefensesBreached'):
+                                    rp_earned += 1
+                                if self._score_breakdown.get(color, {}).get('teleopTowerCaptured'):
+                                    rp_earned += 1
+                            elif self.year == 2017:
+                                if self._score_breakdown.get(color, {}).get('kPaRankingPointAchieved'):
+                                    rp_earned += 1
+                                if self._score_breakdown.get(color, {}).get('rotorRankingPointAchieved'):
+                                    rp_earned += 1
+                            self._score_breakdown[color]['tba_rpEarned'] = rp_earned
+                        else:
+                            self._score_breakdown[color]['tba_rpEarned'] = None
 
         return self._score_breakdown
 
@@ -292,3 +319,9 @@ class Match(ndb.Model):
         key_name_regex = re.compile(r'^[1-9]\d{3}[a-z]+[0-9]?\_(?:qm|ef\dm|qf\dm|sf\dm|f\dm)\d+$')
         match = re.match(key_name_regex, match_key)
         return True if match else False
+
+    def within_seconds(self, seconds):
+        """
+        Returns: Boolean whether match started within specified seconds of now
+        """
+        return self.actual_time and abs((datetime.datetime.now() - self.actual_time).total_seconds()) <= seconds

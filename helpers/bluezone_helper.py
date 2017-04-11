@@ -22,8 +22,7 @@ class BlueZoneHelper(object):
     def get_upcoming_matches(cls, live_events, n=1):
         matches = []
         for event in live_events:
-            event_matches = event.matches
-            upcoming_matches = MatchHelper.upcomingMatches(event_matches, n)
+            upcoming_matches = MatchHelper.upcomingMatches(event.matches, n)
             matches.extend(upcoming_matches)
         return matches
 
@@ -157,6 +156,9 @@ class BlueZoneHelper(object):
         logging.info("[BLUEZONE] live_events: {}".format([le.key.id() for le in live_events]))
         to_log += "[BLUEZONE] live_events: {}\n".format([le.key.id() for le in live_events])
         live_events = filter(lambda e: e.webcast_status != 'offline', live_events)
+        for event in live_events:  # Fetch all matches and details asynchronously
+            event.prep_matches()
+            event.prep_details()
         logging.info("[BLUEZONE] Online live_events: {}".format([le.key.id() for le in live_events]))
         to_log += "[BLUEZONE] Online live_events: {}\n".format([le.key.id() for le in live_events])
         upcoming_matches = cls.get_upcoming_matches(live_events)
@@ -261,7 +263,7 @@ class BlueZoneHelper(object):
                 logging.info("[BLUEZONE] Switching to: {}".format(bluezone_match.key.id()))
                 to_log += "[BLUEZONE] Switching to: {}\n".format(bluezone_match.key.id())
                 OutgoingNotificationHelper.send_slack_alert(slack_url, "It is now {}. Switching BlueZone to {}, scheduled for {} and predicted to be at {}.".format(now, bluezone_match.key.id(), bluezone_match.time, bluezone_match.predicted_time))
-                if current_match.has_been_played:
+                if not current_match or current_match.has_been_played:
                     last_match = current_match
 
             # Only need to update if things changed
@@ -278,7 +280,7 @@ class BlueZoneHelper(object):
                 bluezone_config.put()
 
                 # Log to cloudstorage
-                log_dir = '/tbatv-prod-hrd.appspot.com/tba-logging/'
+                log_dir = '/tbatv-prod-hrd.appspot.com/tba-logging/bluezone/'
                 log_file = 'bluezone_{}.txt'.format(now.date())
                 full_path = log_dir + log_file
 

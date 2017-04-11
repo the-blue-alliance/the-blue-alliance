@@ -10,8 +10,21 @@
     <a href="/team/{{team.team_number}}" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> View on TBA</a>
     <a href="/backend-tasks/get/team_details/{{team.key.id}}" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span> Refresh from FIRST</a>
 </div>
-<br><br>
+<hr>
 
+<div class="row">
+<div class="col-sm-12">
+  <ul class="nav nav-tabs nav-justified">
+    <li class="active"><a href="#info" data-toggle="tab">Info</a></li>
+    <li><a href="#media" data-toggle="tab">Media</a></li>
+    <li><a href="#robots" data-toggle="tab">Robot Names</a></li>
+  </ul>
+</div>
+</div>
+
+<div class="tab-content">
+<div class="tab-pane active" id="info">
+<div class="row">
 <table class="table table-striped table-hover">
     <tr>
         <td>Name</td>
@@ -83,6 +96,11 @@
 
 <p>Teams are currently uneditable. They are updated via FRC API scraping.</p>
 
+</div>
+</div>
+
+<div class="tab-pane" id="media">
+<div class="row">
 <h2>Add Media</h2>
 <form action="/admin/media/add_media" method="post">
     <table class="table table-striped table-hover table-condensed">
@@ -101,20 +119,57 @@
     <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-thumbs-up"></span> Add Media</button>
 </form>
 
+
 <h2>Media</h2>
-{% for year, medias in team_medias_by_year.items %}
+{% for year in team_media_years %}
   {% if year == None %}
     <h3>No Year:</h3>
   {% else %}
     <h3>{{year}}:</h3>
   {% endif %}
   <ul>
-  {% for media in medias %}
+  {% for media in team_medias_by_year|get_item:year %}
     <li>{% include "partials/admin_media_display.html" %}</li>
   {% endfor %}
   </ul>
 {% endfor %}
 
+</div>
+</div>
+
+<div class="tab-pane" id="robots">
+<div class="row">
+<h2>Update Robot Name</h2>
+<strong>Current Robot Names:</strong>
+<ul>
+{% for robot in robots %}
+  <li>{{ robot.year }}: {{ robot.robot_name }}</li>
+{% endfor %}
+</ul>
+
+<p><i>Note:</i> Don't change the current year's robot name, as it will be clobbered by FRC API calls</p>
+<form action="/admin/team/set_robot_name" method="post">
+  <table class="table table-striped table-hover table-condensed">
+    <tr>
+      <td>Year</td>
+      <td>
+        <select name="robot_year">
+        {% for year in years_participated %}
+          <option value="{{ year }}">{{ year }}</option>
+        {% endfor %}
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td>Robot Name</td>
+      <td><input class="form-control" name="robot_name" type="text" /></td>
+    </tr>
+  </table>
+  <input type="hidden" name="team_key" value="{{ team.key_name }}" />
+  <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-thumbs-up"></span> Add Robot Name</button>
+</form>
+</div>
+</div>
 <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">

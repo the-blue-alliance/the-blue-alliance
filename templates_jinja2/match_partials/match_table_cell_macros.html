@@ -1,6 +1,8 @@
 {% macro match_time_td(match, compact=False) %}
-<td{% if compact %} rowspan="2"{% endif %}>
-  {% if match.time %}<time class="tba-match-time-utc" datetime="{{match.time.isoformat()}}+00:00">{{match.time|strftime("%a %I:%M%p UTC")}}</time>{% else %}--{% endif %}
+<td colspan="2"{% if compact %} rowspan="2"{% endif %}>
+  {% if match.predicted_time %}<span title="Scheduled at {{match.time|strftime("%a %I:%M%p UTC")}}"><i><time class="tba-match-time-utc" datetime="{{match.predicted_time.isoformat()}}+00:00">{{match.predicted_time|strftime("%a %I:%M%p UTC")}}</time>*</i></span>
+  {% elif match.time%}<time class="tba-match-time-utc" datetime="{{match.time.isoformat()}}+00:00">{{match.time|strftime("%a %I:%M%p UTC")}}</time>
+  {% else %}--{% endif %}
 </td>
 {% endmacro %}
 
@@ -66,14 +68,16 @@
 {% macro match_score_td(match, alliance_color, cur_team_key, compact=False, force_played=False, predictions=None) %}
 <td{% if compact %} colspan="2"{% endif %} class="{{alliance_color}}Score{% if cur_team_key and cur_team_key in match.alliances.get(alliance_color).teams %} current-team{% endif %}">
   {% if match.score_breakdown and not predictions %}
-    {% if ("teleopDefensesBreached" in match.score_breakdown.get(alliance_color) and match.score_breakdown.get(alliance_color).teleopDefensesBreached)
-      or ("kPaRankingPointAchieved" in match.score_breakdown.get(alliance_color) and match.score_breakdown.get(alliance_color).kPaRankingPointAchieved) %}
+    {% if match.score_breakdown.get(alliance_color).teleopDefensesBreached
+      or match.score_breakdown.get(alliance_color).kPaRankingPointAchieved
+      or match.score_breakdown.get(alliance_color).kPaBonusPoints %}
     <svg class="top-left-dot" rel="tooltip" title="{% if match.year == 2016 %}Defenses Breached{% elif match.year == 2017 %}Pressure Reached{% endif %}">
       <circle cx="2" cy="2" r="2"/>
     </svg>
     {% endif %}
-    {% if ("teleopTowerCaptured" in match.score_breakdown.get(alliance_color) and match.score_breakdown.get(alliance_color).teleopTowerCaptured)
-      or ("rotorRankingPointAchieved" in match.score_breakdown.get(alliance_color) and match.score_breakdown.get(alliance_color).rotorRankingPointAchieved) %}
+    {% if match.score_breakdown.get(alliance_color).teleopTowerCaptured
+      or match.score_breakdown.get(alliance_color).rotorRankingPointAchieved
+      or match.score_breakdown.get(alliance_color).rotorBonusPoints %}
     <svg class="top-left-dot-2" rel="tooltip" title="{% if match.year == 2016 %}Tower Captured{% elif match.year == 2017 %}All Rotors Engaged{% endif %}">
       <circle cx="2" cy="2" r="2"/>
     </svg>
@@ -98,14 +102,11 @@
       {% else %}--{% endif %}
     {% endif %}
   {% elif match.year == 2017 and match.has_been_played and match.score_breakdown %}
-    {% if "kPaRankingPointAchieved" in match.score_breakdown.get(alliance_color) and
-    match.score_breakdown.get(alliance_color).kPaRankingPointAchieved and
-    "teleopTowerCaptured" in match.score_breakdown.get(alliance_color) and
-    match.score_breakdown.get(alliance_color).teleopTowerCaptured %}
+    {% if (match.score_breakdown.get(alliance_color).get('kPaRankingPointAchieved') or match.score_breakdown.get(alliance_color).get('kPaBonusPoints')) and (match.score_breakdown.get(alliance_color).get('rotorRankingPointAchieved') or match.score_breakdown.get(alliance_color).get('rotorBonusPoints')) %}
     P / R
     {% else %}
-      {% if "kPaRankingPointAchieved" in match.score_breakdown.get(alliance_color) and match.score_breakdown.get(alliance_color).kPaRankingPointAchieved %}P
-      {% elif "rotorRankingPointAchieved" in match.score_breakdown.get(alliance_color) and match.score_breakdown.get(alliance_color).rotorRankingPointAchieved %}R
+      {% if match.score_breakdown.get(alliance_color).get('kPaRankingPointAchieved') or match.score_breakdown.get(alliance_color).get('kPaBonusPoints') %}P
+      {% elif match.score_breakdown.get(alliance_color).get('rotorRankingPointAchieved') or match.score_breakdown.get(alliance_color).get('rotorBonusPoints') %}R
       {% else %}--{% endif %}
     {% endif %}
   {% else %}

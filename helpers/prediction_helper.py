@@ -1,4 +1,5 @@
 from collections import defaultdict
+import copy
 import math
 import numpy as np
 import time
@@ -90,7 +91,7 @@ class ContributionCalculator(object):
                             event.details:
                         # event.details is backed by in-context cache
                         predictions = event.details.predictions
-                        if predictions and 'stat_mean_vars' in predictions:
+                        if predictions and predictions.get('stat_mean_vars') and predictions['stat_mean_vars'].get('qual'):
                             if team in predictions['stat_mean_vars']['qual'].get(self._stat, {}).get('mean', []):
                                 team_mean = predictions['stat_mean_vars']['qual'][self._stat]['mean'][team]
                                 if year_diff != 0:
@@ -164,13 +165,13 @@ class ContributionCalculator(object):
                     var += weight * o
                     weight_sum += weight
                 var /= weight_sum
-            else:
-                if self._past_stats_var:
-                    # Use averages from other past teams
-                    var = np.mean([ato[-1] for ato in self._past_stats_var.values()])
-                elif self._var_sums:
-                    # Use averages from this event
-                    var = np.mean(self._var_sums) / 3
+            # else:
+            #     if self._past_stats_var:
+            #         # Use averages from other past teams
+            #         var = np.mean([ato[-1] for ato in self._past_stats_var.values()])
+            #     elif self._var_sums:
+            #         # Use averages from this event
+            #         var = np.mean(self._var_sums) / 3
 
             self._Oe[self._team_id_map[team]] = var
             self._diags[self._team_id_map[team]] = 3  # TODO
@@ -218,16 +219,21 @@ class ContributionCalculator(object):
                         float(match.score_breakdown[color].get('teleopFuelHigh', 0)) / 3 +
                         float(match.score_breakdown[color].get('teleopFuelLow', 0)) / 9)
                 elif self._stat == 'gears':
-                    # Guess gears from rotors
-                    num_gears = 0
-                    if match.score_breakdown[color].get('rotor1Auto') or match.score_breakdown[color].get('rotor1Engaged'):
-                        num_gears += 1
-                    if match.score_breakdown[color].get('rotor2Auto') or match.score_breakdown[color].get('rotor2Engaged'):
-                        num_gears += 2
-                    if match.score_breakdown[color].get('rotor3Engaged'):
-                        num_gears += 4
+                    # Guess gears from rotors.
                     if match.score_breakdown[color].get('rotor4Engaged'):
-                        num_gears += 6
+                        num_gears = 12
+                    elif match.score_breakdown[color].get('rotor3Engaged'):
+                        num_gears = 6
+                    elif match.score_breakdown[color].get('rotor2Auto'):
+                        num_gears = 3
+                    elif match.score_breakdown[color].get('rotor2Engaged'):
+                        num_gears = 2
+                    elif match.score_breakdown[color].get('rotor1Auto'):
+                        num_gears = 1
+                    elif match.score_breakdown[color].get('rotor1Engaged'):
+                        num_gears = 0  # Free gear
+                    else:
+                        num_gears = -1  # Failed to place reserve gear
                     means[color] = num_gears
                 else:
                     raise Exception("Unknown stat: {}".format(self._stat))
@@ -319,35 +325,15 @@ class PredictionHelper(object):
                     mean_vars[color][stat]['mean'] += team_mean
                     mean_vars[color][stat]['var'] += team_var
 
-        # Prob win
-        red_score = mean_vars['red']['score']['mean']
-        blue_score = mean_vars['blue']['score']['mean']
-        red_score_var = mean_vars['red']['score']['var']
-        blue_score_var = mean_vars['blue']['score']['var']
-
-        mu = abs(red_score - blue_score)
-        prob = 1 - cls._normcdf(-mu / np.sqrt(red_score_var + blue_score_var))
-        if math.isnan(prob):
-            prob = 0.5
-
-        if red_score > blue_score:
-            winning_alliance = 'red'
-        elif blue_score > red_score:
-            winning_alliance = 'blue'
-        else:
-            winning_alliance = 'red'  # Choose red if predicted tie
-
         prediction = {
             'red': {
-                'score': red_score,
-                'score_var': red_score_var,
+                'score': mean_vars['red']['score']['mean'],
+                'score_var': mean_vars['red']['score']['var'],
             },
             'blue': {
-                'score': blue_score,
-                'score_var': blue_score_var,
+                'score': mean_vars['blue']['score']['mean'],
+                'score_var': mean_vars['blue']['score']['var'],
             },
-            'winning_alliance': winning_alliance,
-            'prob': prob,
         }
 
         # Year specific
@@ -368,6 +354,8 @@ class PredictionHelper(object):
                     # Playoff Bonus
                     if is_playoff:
                         prediction[color]['score'] += prob * 25
+                        prob_int = int(prob * 100)
+                        prediction[color]['score_var'] += np.var([0] * (100 - prob_int) + [25] * prob_int)
 
                 elif stat == 'crossings':
                     # Prob breach
@@ -380,6 +368,8 @@ class PredictionHelper(object):
                     # Playoff Bonus
                     if is_playoff:
                         prediction[color]['score'] += prob * 20
+                        prob_int = int(prob * 100)
+                        prediction[color]['score_var'] += np.var([0] * (100 - prob_int) + [20] * prob_int)
                 # 2017
                 if stat == 'pressure':
                     required_pressure = 40
@@ -391,8 +381,10 @@ class PredictionHelper(object):
                     # Playoff Bonus
                     if is_playoff:
                         prediction[color]['score'] += prob * 20
+                        prob_int = int(prob * 100)
+                        prediction[color]['score_var'] += np.var([0] * (100 - prob_int) + [20] * prob_int)
                 if stat == 'gears':
-                    requried_gears = 13
+                    requried_gears = 12
 
                     mu = mean_vars[color][stat]['mean'] - requried_gears
                     prob = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
@@ -401,6 +393,29 @@ class PredictionHelper(object):
                     # Playoff Bonus
                     if is_playoff:
                         prediction[color]['score'] += prob * 100
+                        prob_int = int(prob * 100)
+                        prediction[color]['score_var'] += np.var([0] * (100 - prob_int) + [100] * prob_int)
+
+        # Prob win
+        red_score = prediction['red']['score']
+        blue_score = prediction['blue']['score']
+        red_score_var = prediction['red']['score_var']
+        blue_score_var = prediction['blue']['score_var']
+
+        mu = abs(red_score - blue_score)
+        prob = 1 - cls._normcdf(-mu / np.sqrt(red_score_var + blue_score_var))
+        if math.isnan(prob):
+            prob = 0.5
+
+        if red_score > blue_score:
+            winning_alliance = 'red'
+        elif blue_score > red_score:
+            winning_alliance = 'blue'
+        else:
+            winning_alliance = 'red'  # Choose red if predicted tie
+
+        prediction['winning_alliance'] = winning_alliance
+        prediction['prob'] = prob
 
         return prediction
 
@@ -455,7 +470,7 @@ class PredictionHelper(object):
                 match_idx += 1
                 stat_mean_vars[level] = {}
                 for (stat, _, _), mean_var in zip(relevant_stats, mean_vars):
-                    stat_mean_vars[level][stat] = mean_var
+                    stat_mean_vars[level][stat] = copy.deepcopy(mean_var)
 
                 ####################################################################
                 # Make prediction

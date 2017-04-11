@@ -10,7 +10,6 @@ from controllers.api.api_base_controller import ApiBaseController
 from database.event_query import EventListQuery
 
 from helpers.award_helper import AwardHelper
-from helpers.district_helper import DistrictHelper
 from helpers.event_insights_helper import EventInsightsHelper
 from helpers.model_to_dict import ModelToDict
 
@@ -175,7 +174,7 @@ class ApiEventDistrictPointsController(ApiEventController):
     def _render(self, event_key):
         self._set_event(event_key)
 
-        points = DistrictHelper.calculate_event_points(self.event)
+        points = self.event.district_points
         return json.dumps(points, ensure_ascii=True)
 
 

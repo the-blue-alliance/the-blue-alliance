@@ -2,6 +2,7 @@ import calendar
 import datetime
 
 from consts.notification_type import NotificationType
+from helpers.webcast_online_helper import WebcastOnlineHelper
 from notifications.base_notification import BaseNotification
 
 
@@ -33,5 +34,13 @@ class UpcomingMatchNotification(BaseNotification):
         else:
             data['message_data']['scheduled_time'] = None
             data['message_data']['predicted_time'] = None
+
+        current_webcasts = self.event.current_webcasts
+        WebcastOnlineHelper.add_online_status(current_webcasts)
+        online_webcasts = filter(lambda x: x.get('status', '') != 'offline', current_webcasts if current_webcasts else [])
+        if online_webcasts:
+            data['message_data']['webcast'] = online_webcasts[0]
+        else:
+            data['message_data']['webcast'] = None
 
         return data

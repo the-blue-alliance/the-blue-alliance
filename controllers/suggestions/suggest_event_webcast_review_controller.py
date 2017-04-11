@@ -34,6 +34,7 @@ class SuggestEventWebcastReviewController(SuggestionsReviewBaseController):
         # Defer because of transactions
         deferred.defer(EventWebcastAdder.add_webcast, event, webcast)
         deferred.defer(MemcacheWebcastFlusher.flush)
+        return True
 
     """
     View the list of suggestions.

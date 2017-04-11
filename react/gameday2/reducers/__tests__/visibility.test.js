@@ -4,8 +4,8 @@ import * as types from '../../constants/ActionTypes'
 describe('visibility reducer', () => {
   const defaultState = {
     hashtagSidebar: false,
-    chatSidebar: false,
-    chatSidebarHasBeenVisible: false,
+    chatSidebar: true,
+    chatSidebarHasBeenVisible: true,
     tickerSidebar: false,
     layoutDrawer: false,
   }
@@ -14,10 +14,10 @@ describe('visibility reducer', () => {
     expect(visibility(undefined, {})).toEqual(defaultState)
   })
 
-  it('toggles chat sidebar from false to true', () => {
+  it('toggles chat sidebar from true to false', () => {
     const initialState = defaultState
     const expectedState = Object.assign({}, defaultState, {
-      chatSidebar: true,
+      chatSidebar: false,
       chatSidebarHasBeenVisible: true,
     })
     const action = {
@@ -26,12 +26,13 @@ describe('visibility reducer', () => {
     expect(visibility(initialState, action)).toEqual(expectedState)
   })
 
-  it('toggles chat sidebar from true to false', () => {
+  it('toggles chat sidebar from false to true', () => {
     const initialState = Object.assign({}, defaultState, {
-      chatSidebar: true,
+      chatSidebar: false,
       chatSidebarHasBeenVisible: true,
     })
     const expectedState = Object.assign({}, defaultState, {
+      chatSidebar: true,
       chatSidebarHasBeenVisible: true,
     })
     const action = {

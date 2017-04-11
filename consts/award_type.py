@@ -97,6 +97,7 @@ class AwardType(object):
         VOLUNTEER,
         WINNER,
         FINALIST,
+        WILDCARD,
     }
 
     normalized_name = {

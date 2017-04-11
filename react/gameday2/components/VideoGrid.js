@@ -1,17 +1,14 @@
 import React, { PropTypes } from 'react'
-import VideoCell from './VideoCell'
+import VideoCellContainer from '../containers/VideoCellContainer'
 import { getNumViewsForLayout } from '../utils/layoutUtils'
 import { webcastPropType } from '../utils/webcastUtils'
 
 export default class VideoGrid extends React.Component {
   static propTypes = {
-    displayedWebcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
     domOrder: PropTypes.arrayOf(PropTypes.string).isRequired,
     positionMap: PropTypes.arrayOf(PropTypes.number).isRequired,
-    webcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
     webcastsById: PropTypes.objectOf(webcastPropType).isRequired,
     layoutId: PropTypes.number.isRequired,
-    addWebcastAtPosition: PropTypes.func.isRequired,
   }
 
   renderLayout(webcastCount) {
@@ -61,14 +58,10 @@ export default class VideoGrid extends React.Component {
       }
       if (hasWebcast) {
         videoCells.push(
-          <VideoCell
+          <VideoCellContainer
             position={position}
-            layoutId={this.props.layoutId}
             key={id}
             webcast={webcast}
-            webcasts={this.props.webcasts}
-            displayedWebcasts={this.props.displayedWebcasts}
-            addWebcastAtPosition={this.props.addWebcastAtPosition}
           />
         )
       } else {

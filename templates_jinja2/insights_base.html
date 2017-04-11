@@ -7,21 +7,20 @@
 <div class="container">
   <div class="row">
     <div class="col-sm-2 col-lg-2">
-      <div class="tba-sidebar">
-        <ul class="nav tba-sidenav">
-          <li>
-            <a href="/insights">
-              {% if not selected_year %}<strong>{% endif %}Overview{% if not selected_year %}</strong>{% endif %}
-            </a>
-          </li>
-          {% for year in valid_years %}
-          <li>
-            <a href="/insights/{{year}}">
-            {% if selected_year == year %}<strong>{% endif %}{{year}}{% if selected_year == year %}</strong>{% endif %}
-            </a>
-          </li>
-          {% endfor %}
-        </ul>
+
+      <div class="clearfix">
+        <div class="btn-group inline pull-left" style="margin-top: 3px">
+          <a class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" href="#">
+            {% if not selected_year %}Overview{% else %}{{selected_year}}{% endif %}
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu tba-dropdown-menu-limited">
+            <li><a href="/insights">Overview</a></li>
+            {% for year in valid_years %}
+              <li><a href="/insights/{{year}}">{{year}}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
       </div>
     </div>
     <div class="col-xs-12 col-sm-10 col-lg-10">

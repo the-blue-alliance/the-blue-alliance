@@ -18,7 +18,7 @@ class SuggestSocialMediaReviewController(SuggestionsReviewBaseController):
 
     def create_target_model(self, suggestion):
         # Create a basic Media from this suggestion
-        MediaCreator.from_suggestion(suggestion)
+        return MediaCreator.from_suggestion(suggestion)
 
     """
     View the list of suggestions.

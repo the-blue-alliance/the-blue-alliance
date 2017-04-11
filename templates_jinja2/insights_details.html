@@ -7,7 +7,7 @@
 
 {% block detailed_content %}
   <h1 class="end_header">{{selected_year}} Insights</h1>
-  {% if last_updated %}<p>Last updated on <time datetime="{{render_time|rfc2822}}+00:00" class="tba-verbose-datetime-utc">{{render_time|strftime("%b. %d, %Y at %I:%M%p")}} UTC</time></p>{% endif %}
+  {% if last_updated %}<p>Last updated on <time datetime="{{last_updated|rfc2822}}+00:00" class="tba-verbose-datetime-utc">{{last_updated|strftime("%b. %d, %Y at %I:%M%p")}} UTC</time></p>{% endif %}
 
   {% if match_highscore or match_averages_by_week or score_distribution %}
   <h2>Matches{% if num_matches %} <small>{{num_matches.data}} Matches Played</small>{% endif %}</h2>
@@ -19,15 +19,17 @@
     <div class="col-xs-12">
       <h3>Highest Scoring Qual Match{% if match_highscore.data.qual|length > 1 %}es{% endif %}{% if selected_year >= 2017 %} <small>(Penalty Free)</small>{% endif %}</h3>
       {% for match in match_highscore.data.qual %}
-      <h4><a href="/match/{{match.key_name}}">{{ match.event_name }} <small>{{ match.verbose_name }}</small></a></h4>
-      <div class="col-xs-8 col-xs-offset-2">
-        {{mtm.single_match_table(match, force_played=True)}}
-        {% if match.tba_video %}
-          {% include "video_partials/tbavideo_player.html" %}
-        {% elif match.youtube_videos_formatted %}
-          {% set youtube_video = match.youtube_videos_formatted.0 %}
-          {% include "video_partials/youtube_video_player.html" %}
-        {% endif %}
+      <div class="row">
+        <div class="col-xs-12 col-md-8 col-md-offset-2">
+        <h4><a href="/match/{{match.key_name}}">{{ match.event_name }} <small>{{ match.verbose_name }}</small></a></h4>
+          {{mtm.single_match_table(match, force_played=True)}}
+          {% if match.tba_video %}
+            {% include "video_partials/tbavideo_player.html" %}
+          {% elif match.youtube_videos_formatted %}
+            {% set youtube_video = match.youtube_videos_formatted.0 %}
+            {% include "video_partials/youtube_video_player.html" %}
+          {% endif %}
+        </div>
       </div>
       {% endfor %}
     </div>
@@ -38,15 +40,17 @@
     <div class="col-xs-12">
       <h3>Highest Scoring Playoff Match{% if match_highscore.data.playoff|length > 1 %}es{% endif %}{% if selected_year >= 2017 %} <small>(Penalty Free)</small>{% endif %}</h3>
       {% for match in match_highscore.data.playoff %}
-      <h4><a href="/match/{{match.key_name}}">{{ match.event_name }} <small>{{ match.verbose_name }}</small></a></h4>
-      <div class="col-xs-8 col-xs-offset-2">
-        {{mtm.single_match_table(match, force_played=True)}}
-        {% if match.tba_video %}
-          {% include "video_partials/tbavideo_player.html" %}
-        {% elif match.youtube_videos_formatted %}
-          {% set youtube_video = match.youtube_videos_formatted.0 %}
-          {% include "video_partials/youtube_video_player.html" %}
-        {% endif %}
+      <div class="row">
+        <div class="col-xs-12 col-md-8 col-md-offset-2">
+        <h4><a href="/match/{{match.key_name}}">{{ match.event_name }} <small>{{ match.verbose_name }}</small></a></h4>
+          {{mtm.single_match_table(match, force_played=True)}}
+          {% if match.tba_video %}
+            {% include "video_partials/tbavideo_player.html" %}
+          {% elif match.youtube_videos_formatted %}
+            {% set youtube_video = match.youtube_videos_formatted.0 %}
+            {% include "video_partials/youtube_video_player.html" %}
+          {% endif %}
+        </div>
       </div>
       {% endfor %}
     </div>
@@ -57,15 +61,17 @@
     <div class="col-xs-12">
       <h3>Highest Scoring Match Overall{% if match_highscore.data.overall|length > 1 %}es{% endif %}</h3>
       {% for match in match_highscore.data.overall %}
-      <h4><a href="/match/{{match.key_name}}">{{ match.event_name }} <small>{{ match.verbose_name }}</small></a></h4>
-      <div class="col-xs-8 col-xs-offset-2">
-        {{mtm.single_match_table(match, force_played=True)}}
-        {% if match.tba_video %}
-          {% include "video_partials/tbavideo_player.html" %}
-        {% elif match.youtube_videos_formatted %}
-          {% set youtube_video = match.youtube_videos_formatted.0 %}
-          {% include "video_partials/youtube_video_player.html" %}
-        {% endif %}
+      <div class="row">
+        <div class="col-xs-12 col-md-8 col-md-offset-2">
+        <h4><a href="/match/{{match.key_name}}">{{ match.event_name }} <small>{{ match.verbose_name }}</small></a></h4>
+          {{mtm.single_match_table(match, force_played=True)}}
+          {% if match.tba_video %}
+            {% include "video_partials/tbavideo_player.html" %}
+          {% elif match.youtube_videos_formatted %}
+            {% set youtube_video = match.youtube_videos_formatted.0 %}
+            {% include "video_partials/youtube_video_player.html" %}
+          {% endif %}
+        </div>
       </div>
       {% endfor %}
     </div>
@@ -136,7 +142,7 @@
 
   {% if year_specific_by_week or year_specific %}
   <h3>Year Specific Statistics</h3>
-  <ul class="nav nav-tabs">
+  <ul class="nav nav-tabs nav-justified">
     {% if year_specific %}
       <li class="active"><a href="#year-specific" data-toggle="tab">Year Aggregate</a></li>
     {% endif %}

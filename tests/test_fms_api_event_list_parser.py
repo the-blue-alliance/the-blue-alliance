@@ -9,6 +9,7 @@ from google.appengine.ext import testbed
 
 from consts.district_type import DistrictType
 from consts.event_type import EventType
+from models.sitevar import Sitevar
 
 
 class TestFMSAPIEventListParser(unittest2.TestCase):
@@ -121,6 +122,8 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
     def test_parse_2017_event(self):
         with open('test_data/fms_api/2017_event_list.json', 'r') as f:
             events, districts = FMSAPIEventListParser(2017).parse(json.loads(f.read()))
+            self.assertEqual(len(events), 164)
+            self.assertEqual(len(districts), 10)
             event = events[16]
 
             self.assertEquals(event.key_name, "2017casj")
@@ -140,3 +143,36 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
 
             # New in 2017
             self.assertEquals(event.website, "http://www.firstsv.org")
+
+    def test_parse_2017_events_with_cmp_hacks(self):
+        hack_sitevar = Sitevar(id='cmp_registration_hacks')
+        hack_sitevar.contents = {
+            'should_store_divisions': False,
+            'einstein_name': 'FIRST Championship Event',
+            'einstein_short_name': 'Championship',
+            'should_change_einstein_dates': False
+        }
+        hack_sitevar.put()
+
+        with open('test_data/fms_api/2017_event_list.json', 'r') as f:
+            events, districts = FMSAPIEventListParser(2017).parse(json.loads(f.read()))
+            self.assertEqual(len(events), 152)
+            self.assertEqual(len(districts), 10)
+
+            non_einstein_types = EventType.CMP_EVENT_TYPES
+            non_einstein_types.remove(EventType.CMP_FINALS)
+            self.assertFalse(any(event.event_type_enum in non_einstein_types for event in events))
+
+            einstein_stl = next(e for e in events if e.key_name == '2017cmpmo')
+            self.assertIsNotNone(einstein_stl)
+            self.assertEqual(einstein_stl.name, "FIRST Championship Event (St. Louis)")
+            self.assertEqual(einstein_stl.short_name, "Championship (St. Louis)")
+            self.assertEquals(einstein_stl.start_date, datetime.datetime(year=2017, month=4, day=26, hour=0, minute=0, second=0))
+            self.assertEquals(einstein_stl.end_date, datetime.datetime(year=2017, month=4, day=29, hour=23, minute=59, second=59))
+
+            einstein_hou = next(e for e in events if e.key_name == '2017cmptx')
+            self.assertIsNotNone(einstein_hou)
+            self.assertEqual(einstein_hou.name, "FIRST Championship Event (Houston)")
+            self.assertEqual(einstein_hou.short_name, "Championship (Houston)")
+            self.assertEquals(einstein_hou.start_date, datetime.datetime(year=2017, month=4, day=19, hour=0, minute=0, second=0))
+            self.assertEquals(einstein_hou.end_date, datetime.datetime(year=2017, month=4, day=22, hour=23, minute=59, second=59))

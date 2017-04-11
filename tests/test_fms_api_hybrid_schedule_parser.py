@@ -20,7 +20,6 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
         self.testbed.init_memcache_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
-
     def tearDown(self):
         self.testbed.deactivate()
 
@@ -39,7 +38,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
         )
         self.event.put()
         with open('test_data/fms_api/2016_hybrid_schedule_no_matches.json', 'r') as f:
-            matches = FMSAPIHybridScheduleParser(2016, 'nyny').parse(json.loads(f.read()))
+            matches, _ = FMSAPIHybridScheduleParser(2016, 'nyny').parse(json.loads(f.read()))
 
             self.assertTrue(isinstance(matches, list))
             self.assertEqual(len(matches), 0)
@@ -59,7 +58,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
         )
         self.event.put()
         with open('test_data/fms_api/2016_nyny_hybrid_schedule_qual.json', 'r') as f:
-            matches = FMSAPIHybridScheduleParser(2016, 'nyny').parse(json.loads(f.read()))
+            matches, _ = FMSAPIHybridScheduleParser(2016, 'nyny').parse(json.loads(f.read()))
 
             self.assertTrue(isinstance(matches, list))
             self.assertEqual(len(matches), 88)
@@ -83,7 +82,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
         )
         self.event.put()
         with open('test_data/fms_api/2016_nyny_hybrid_schedule_playoff.json', 'r') as f:
-            matches = FMSAPIHybridScheduleParser(2016, 'nyny').parse(json.loads(f.read()))
+            matches, _ = FMSAPIHybridScheduleParser(2016, 'nyny').parse(json.loads(f.read()))
 
             self.assertTrue(isinstance(matches, list))
             self.assertEqual(len(matches), 15)
@@ -111,7 +110,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
         self.event.put()
 
         with open('test_data/fms_api/2016_micmp_staging_hybrid_schedule_playoff.json', 'r') as f:
-            matches = FMSAPIHybridScheduleParser(2016, 'micmp').parse(json.loads(f.read()))
+            matches, _ = FMSAPIHybridScheduleParser(2016, 'micmp').parse(json.loads(f.read()))
 
             self.assertTrue(isinstance(matches, list))
 

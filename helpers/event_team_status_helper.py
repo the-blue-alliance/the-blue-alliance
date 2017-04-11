@@ -70,8 +70,9 @@ class EventTeamStatusHelper(object):
         """
         Generate a team at event status string from a status dict
         """
+        default_msg = 'Team {} is waiting for the event to begin.'.format(team_key[3:])
         if not status_dict:
-            return 'Team {} is waiting for the event to begin.'.format(team_key[3:])
+            return default_msg
 
         qual = status_dict.get('qual')
         alliance = status_dict.get('alliance')
@@ -164,7 +165,7 @@ class EventTeamStatusHelper(object):
                 components.append(playoff_str)
 
         if not components:
-            return None
+            return default_msg
 
         team_str = 'Team {}'.format(team_key[3:])
         if len(components) > 1:
@@ -263,6 +264,7 @@ class EventTeamStatusHelper(object):
                         } if year != 2015 else None,
                         'qual_average': qual_average if year == 2015 else None,
                         'sort_orders': None,
+                        'team_key': team_key,
                     },
                     'num_teams': len(all_teams),
                     'sort_order_info': None

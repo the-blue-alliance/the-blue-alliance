@@ -4,6 +4,7 @@ import re
 import time
 import urllib
 
+from helpers.youtube_video_helper import YouTubeVideoHelper
 
 defense_render_names_2016 = {
     'A_ChevalDeFrise': 'Cheval De Frise',
@@ -71,3 +72,16 @@ def rfc2822(datetime):
 def slugify(value):
     from django.template.defaultfilters import slugify as django_slugify
     return django_slugify(value)
+
+
+def yt_start(value):
+    if '?t=' in value:  # Treat ?t= the same as #t=
+        value = value.replace('?t=', '#t=')
+    if '#t=' in value:
+        sp = value.split('#t=')
+        video_id = sp[0]
+        old_ts = sp[1]
+        total_seconds = YouTubeVideoHelper.time_to_seconds(old_ts)
+        value = '%s?start=%i' % (video_id, total_seconds)
+
+    return value
