@@ -99,8 +99,7 @@ const AppBar = (props) => {
             data-size="small"
             data-show-faces="false"
             data-share="false"
-          >
-          </div>
+          />
         </ToolbarGroup>
         <ToolbarGroup lastChild>
           {configureLayoutButton}
