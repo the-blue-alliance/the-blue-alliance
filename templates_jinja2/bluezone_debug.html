@@ -9,6 +9,8 @@
   <div class="row">
     <div class="col-xs-12">
       <h1>BlueZone Debug</h1>
+
+      <div id="timeline"></div>
     </div>
   </div>
 </div>
@@ -16,7 +18,51 @@
 
 
 {% block inline_javascript %}
-<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
-<script>
+<script type="text/javascript">
+  var container = document.getElementById('timeline');
+
+  // create a data set with groups
+  var groupNames = ['CASJ', 'CAIR', 'HIHO', 'IDBO', 'ILCH', 'MXTO', 'NYLI', 'OHCL', 'MELEW'];
+  var groups = new vis.DataSet();
+  for (var g = 0; g < groupNames.length; g++) {
+    groups.add({id: '2017' + groupNames[g].toLowerCase(), content: groupNames[g]});
+  }
+
+  var timelineItems = new vis.DataSet([]);
+
+  // Configuration for the Timeline
+  var options = {};
+
+  // Create a Timeline
+  var timeline = new vis.Timeline(container, timelineItems, groups, options);
+
+
+  // Subscribe to Firebase
+  for (var groupName in groupNames) {
+    var eventRef = firebase.database().ref('events/2017' + groupNames[groupName].toLowerCase() + '/matches');
+    eventRef.on('value', function(snapshot) {
+      var matches = snapshot.val();
+      for (var matchKey in matches) {
+        var match = matches[matchKey];
+        var time;
+        if (match.actual_time) {
+          time = match.actual_time;
+        } else if (match.predicted_time) {
+          time = match.predicted_time;
+        } else {
+          time = match.time;
+        }
+        var splitKey = match.key.split('_');
+        var timelineItem = {
+          id: match.key,
+          group: splitKey[0],
+          content: splitKey[1],
+          start: new Date(time * 1000).toISOString(),
+          end: new Date((time + 150) * 1000).toISOString(),
+        };
+        timelineItems.update(timelineItem);
+      }
+    });
+  }
 </script>
 {% endblock %}
