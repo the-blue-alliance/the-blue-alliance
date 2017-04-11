@@ -122,7 +122,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
     def test_parse_2017_event(self):
         with open('test_data/fms_api/2017_event_list.json', 'r') as f:
             events, districts = FMSAPIEventListParser(2017).parse(json.loads(f.read()))
-            self.assertEqual(len(events), 159)
+            self.assertEqual(len(events), 164)
             self.assertEqual(len(districts), 10)
             event = events[16]
 
@@ -156,7 +156,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
 
         with open('test_data/fms_api/2017_event_list.json', 'r') as f:
             events, districts = FMSAPIEventListParser(2017).parse(json.loads(f.read()))
-            self.assertEqual(len(events), 147)
+            self.assertEqual(len(events), 152)
             self.assertEqual(len(districts), 10)
 
             non_einstein_types = EventType.CMP_EVENT_TYPES
