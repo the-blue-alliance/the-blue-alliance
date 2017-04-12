@@ -56,11 +56,21 @@
           time = match.time;
         }
         time += 60 * 60 * 24 * 11;  // TODO TEMP shift to now
-        var splitKey = match.key.split('_');
+        var eventKey = match.key.split('_')[0];
+        var matchShort;
+        if (match.comp_level == 'qm') {
+          matchShort = 'Q' + match.match_number;
+        } else {
+          matchShort = match.comp_level.toUpperCase() + match.set_number + '-' + match.match_number;
+        }
+
+        // Format content
+        var content = '<b>' + matchShort + '</b>' + '<br>' + '500, 50%, 30%' + '<br>' + '500, 50%, 30%';
+
         var timelineItem = {
           id: match.key,
-          group: splitKey[0],
-          content: splitKey[1],
+          group: eventKey,
+          content: content,
           start: new Date(time * 1000).toISOString(),
           end: new Date((time + 150) * 1000).toISOString(),
         };
