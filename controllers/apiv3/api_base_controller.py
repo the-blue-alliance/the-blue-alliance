@@ -80,7 +80,7 @@ class ApiBaseController(CacheableHandler):
         self._validate_tba_auth_key()
         self._errors = ValidationHelper.validate_request(self)
         if self._errors:
-            self.abort(400)
+            self.abort(404)
 
         self._track_call(*args, **kw)
         super(ApiBaseController, self).get(*args, **kw)
@@ -91,7 +91,7 @@ class ApiBaseController(CacheableHandler):
         self._validate_tba_auth_key()
         self._errors = ValidationHelper.validate_request(self)
         if self._errors:
-            self.abort(400)
+            self.abort(404)
 
         rendered = self._render(*args, **kw)
         self._track_call(*args, **kw)
