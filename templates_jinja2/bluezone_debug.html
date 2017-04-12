@@ -67,6 +67,10 @@
         timelineItems.update(timelineItem);
       }
     });
+    eventRef.on('child_removed', function(snapshot) {
+      var removedMatch = snapshot.val();
+      timelineItems.remove(removedMatch.key);
+    });
   }
 </script>
 {% endblock %}
