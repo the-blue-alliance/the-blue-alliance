@@ -27,7 +27,7 @@ class ApiSuggestTeamMediaController(ApiBaseController):
                     "success": True
                 }
             else:
-                message ={
+                message = {
                     "success": False,
                     "message": status
                 }
