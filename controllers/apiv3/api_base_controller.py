@@ -87,12 +87,24 @@ class ApiBaseController(CacheableHandler):
         self.response.headers['X-TBA-Version'] = '{}'.format(self.API_VERSION)
         self.response.headers['Vary'] = 'Accept-Encoding'
 
+    def post(self, *args, **kw):
+        self._validate_tba_auth_key()
+        self._errors = ValidationHelper.validate_request(self)
+        if self._errors:
+            self.abort(400)
+
+        rendered = self._render(*args, **kw)
+        self._track_call(*args, **kw)
+        self.response.out.write(rendered)
+        self.response.headers['X-TBA-Version'] = '{}'.format(self.API_VERSION)
+        self.response.headers['Vary'] = 'Accept-Encoding'
+
     def options(self, *args, **kw):
         """
         Supply an OPTIONS method in order to comply with CORS preflghted requests
         https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests
         """
-        self.response.headers['Access-Control-Allow-Methods'] = "GET, OPTIONS"
+        self.response.headers['Access-Control-Allow-Methods'] = "GET, POST, OPTIONS"
         self.response.headers['Access-Control-Allow-Headers'] = 'X-TBA-Auth-Key'
 
     def _track_call_defer(self, api_action, api_label):
@@ -108,11 +120,13 @@ class ApiBaseController(CacheableHandler):
             x_tba_auth_key = self.request.get('X-TBA-Auth-Key')
 
         self.auth_owner = None
+        self.auth_owner_key = None
         self.auth_description = None
         if not x_tba_auth_key:
             account = self._user_bundle.account
             if account:
                 self.auth_owner = account.key.id()
+                self.auth_owner_key = account.key
             else:
                 self._errors = json.dumps({"Error": "X-TBA-Auth-Key is a required header or URL param. Please get an access key at http://www.thebluealliance.com/account."})
                 self.abort(400)
@@ -123,6 +137,7 @@ class ApiBaseController(CacheableHandler):
             auth = ApiAuthAccess.get_by_id(x_tba_auth_key)
             if auth and auth.is_read_key:
                 self.auth_owner = auth.owner.id()
+                self.auth_owner_key = auth.owner
                 self.auth_description = auth.description
                 logging.info("Auth owner: {}, X-TBA-Auth-Key: {}".format(self.auth_owner, x_tba_auth_key))
             else:
