@@ -13,7 +13,7 @@ class ApiSuggestTeamMediaController(ApiBaseController):
 
     def _render(self, team_key, year):
         if int(year) not in list(TeamParticipationQuery(team_key).fetch()):
-            self.abort(400)
+            self.abort(404)
 
         if 'media_url' in self.request.POST:
             status, suggestion = SuggestionCreator.createTeamMediaSuggestion(
