@@ -78,6 +78,7 @@ class MediaParser(object):
         ('youtube.com/watch', MediaType.YOUTUBE_VIDEO),
         ('youtu.be', MediaType.YOUTUBE_VIDEO),
         ('imgur.com/', MediaType.IMGUR),
+        ('i.imgur.com/', MediaType.IMGUR),
         ('grabcad.com/library/', MediaType.GRABCAD),
 
         # Keep this last, so it doesn't greedy match over other more specific youtube urls
