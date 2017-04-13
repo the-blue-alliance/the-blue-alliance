@@ -125,12 +125,14 @@ class MatchTimePredictionHelper(object):
             average_cycle_time = int(average_cycle_time)
             to_log += "[TIME PREDICTIONS] Average Cycle Time: {:02}:{:02}:{:02}\n".format(average_cycle_time // 3600, average_cycle_time % 3600 // 60, average_cycle_time % 60)
 
-        # Run predictions for all unplayed matches on this day
+        # Run predictions for all unplayed matches on this day and comp level
+        last_comp_level = next_match.comp_level if next_match else None
         for i in range(0, len(unplayed_matches)):
             match = unplayed_matches[i]
             scheduled_time = cls.as_local(match.time, timezone)
-            if scheduled_time.day != last_match_day and last_match_day is not None:
-                # Stop, once we exhaust all unplayed matches on this day
+            if (scheduled_time.day != last_match_day and last_match_day is not None) \
+                    or last_comp_level != match.comp_level:
+                # Stop, once we exhaust all unplayed matches on this day or move to a new comp level
                 if i == 0:
                     write_logs = False
                 break
@@ -156,6 +158,7 @@ class MatchTimePredictionHelper(object):
                 if match.comp_level not in Match.ELIM_LEVELS else cls.as_local(cls.EPOCH, timezone)
             match.predicted_time = max(cls.as_utc(predicted), cls.as_utc(earliest_possible), cls.as_utc(now))
             last = match
+            last_comp_level = match.comp_level
 
         MatchManipulator.createOrUpdate(unplayed_matches)
 
