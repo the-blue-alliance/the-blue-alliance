@@ -144,7 +144,6 @@ class MatchTimePredictionHelper(object):
                 last_predicted = cls.as_local(last_match.actual_time if i == 0 else last.predicted_time, timezone)
             if last_predicted and average_cycle_time:
                 predicted = last_predicted + datetime.timedelta(seconds=average_cycle_time)
-                predicted = predicted.replace(second=0)  # Round down to the nearest minute
             else:
                 predicted = match.time
 
