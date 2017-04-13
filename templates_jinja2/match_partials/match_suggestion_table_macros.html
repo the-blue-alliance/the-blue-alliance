@@ -54,8 +54,8 @@
         {% for team in match.alliances.blue.teams %}
         <td>{{ranks[team]}}</td>
         {% endfor %}
-        <td>{{match.prediction.red.score|round|int}}</td>
-        <td>{{match.prediction.blue.score|round|int}}</td>
+        <td class="red">{{match.prediction.red.score|round|int}}</td>
+        <td class="blue">{{match.prediction.blue.score|round|int}}</td>
         <td>
           <div class="progress" style="margin: 0px;">
             <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{(match.prediction.red.pressure/80*100)|round|int}}%; color: black;">
@@ -86,8 +86,8 @@
         </td>
         <td>
           <div class="progress" style="margin: 0px;">
-            <div class="progress-bar {% if match.prediction.prob < 0.65 %}progress-bar-danger{% elif match.prediction.prob < 0.80 %}progress-bar-warning{% else %}progress-bar-success{% endif %}" role="progressbar" style="width: {{(match.prediction.prob*100)|round|int}}%; color: black;">
-              {{(match.prediction.prob*100)|round|int}}
+            <div class="progress-bar {% if match.bluezone_score < 30 %}progress-bar-danger{% elif match.bluezone_score < 50 %}progress-bar-warning{% else %}progress-bar-success{% endif %}" role="progressbar" style="width: {{match.bluezone_score}}%; color: black;">
+              {{match.bluezone_score|round|int}}
             </div>
           </div>
         </td>
