@@ -1,0 +1,86 @@
+{% macro match_suggestion_table(matches) %}
+<table class="table match-table table-striped">
+  <thead>
+    <tr>
+      <th>Event</th>
+      <th>Match</th>
+      <th>Time</th>
+      <th class="red">R1</th>
+      <th class="red">R2</th>
+      <th class="red">R3</th>
+      <th class="blue">B1</th>
+      <th class="blue">B2</th>
+      <th class="blue">B3</th>
+      <th>Red Predicted Score</th>
+      <th>Red Prob 40 kPa</th>
+      <th>Red Prob 4 Rotors</th>
+      <th>Blue Predicted Score</th>
+      <th>Blue Prob 40 kPa</th>
+      <th>Blue Prob 4 Rotors</th>
+      <th>BlueZone Score</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for match in matches %}
+      <tr>
+        <td>{{match.event.id()[4:].upper()}}</td>
+        <td>{{match.short_name}}</td>
+        <td><time class="tba-match-time-utc" datetime="{{match.predicted_time.isoformat()}}+00:00">{{match.predicted_time|strftime("%a %I:%M%p UTC")}}</time></td>
+        {% for team in match.alliances.red.teams %}
+        <td class="red">
+          <svg class="favorite-team-dot" data-team="{{team}}" data-match="{{match.key_name}}">
+            <circle cx="2.5" cy="2.5" r="2.5"/>
+          </svg>
+          <a href="/team/{{team|strip_frc}}">{{team|strip_frc}}</a>
+        </td>
+        {% endfor %}
+        {% for team in match.alliances.blue.teams %}
+        <td class="blue">
+          <svg class="favorite-team-dot" data-team="{{team}}" data-match="{{match.key_name}}">
+            <circle cx="2.5" cy="2.5" r="2.5"/>
+          </svg>
+          <a href="/team/{{team|strip_frc}}">{{team|strip_frc}}</a>
+        </td>
+        {% endfor %}
+        <td>{{match.prediction.red.score|round|int}}</td>
+        <td>
+          <div class="progress" style="margin: 0px;">
+            <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{(match.prediction.red.prob_pressure*100)|round|int}}%;">
+              {{(match.prediction.red.prob_pressure*100)|round|int}}%
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="progress" style="margin: 0px;">
+            <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{(match.prediction.red.prob_gears*100)|round|int}}%;">
+              {{(match.prediction.red.prob_gears*100)|round|int}}%
+            </div>
+          </div>
+        </td>
+        <td>{{match.prediction.blue.score|round|int}}</td>
+        <td>
+          <div class="progress" style="margin: 0px;">
+            <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{(match.prediction.blue.prob_pressure*100)|round|int}}%;">
+              {{(match.prediction.blue.prob_pressure*100)|round|int}}%
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="progress" style="margin: 0px;">
+            <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{(match.prediction.blue.prob_gears*100)|round|int}}%;">
+              {{(match.prediction.blue.prob_gears*100)|round|int}}%
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="progress" style="margin: 0px;">
+            <div class="progress-bar {% if match.prediction.prob < 0.65 %}progress-bar-danger{% elif match.prediction.prob < 0.80 %}progress-bar-warning{% else %}progress-bar-success{% endif %}" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{(match.prediction.prob*100)|round|int}}%;">
+              {{(match.prediction.prob*100)|round|int}}
+            </div>
+          </div>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endmacro %}

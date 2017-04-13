@@ -22,6 +22,7 @@ from controllers.main_controller import TwoChampsHandler, ContactHandler, Hashta
     WebcastsHandler, RecordHandler, ApiDocumentationHandler, ApiWriteHandler, MatchInputHandler, WebhookDocumentationHandler, \
       AddDataHandler
 from controllers.match_controller import MatchDetail
+from controllers.match_suggestion_controller import MatchSuggestionHandler
 from controllers.match_timeline_controller import MatchTimelineHandler
 from controllers.mytba_controller import MyTBALiveController
 from controllers.nearby_controller import NearbyController
@@ -111,6 +112,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/login', AccountLogin, 'account-login', strict_slash=True),
       RedirectRoute(r'/logout', AccountLogout, 'account-logout', strict_slash=True),
       RedirectRoute(r'/match/<match_key>', MatchDetail, 'match-detail', strict_slash=True),
+      RedirectRoute(r'/match_suggestion', MatchSuggestionHandler, 'match-suggestion', strict_slash=True),
       RedirectRoute(r'/match_timeline', MatchTimelineHandler, 'match-timeline', strict_slash=True),
       RedirectRoute(r'/matchinput', MatchInputHandler, 'match-input', strict_slash=True),
       RedirectRoute(r'/mytba', MyTBALiveController, 'mytba-live', strict_slash=True),
