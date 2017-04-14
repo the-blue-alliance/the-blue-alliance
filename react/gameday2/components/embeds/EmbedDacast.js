@@ -12,6 +12,7 @@ const EmbedDacast = (props) => {
       height="100%"
       frameBorder="0"
       scrolling="no"
+      allowFullScreen
     />
   )
 }
