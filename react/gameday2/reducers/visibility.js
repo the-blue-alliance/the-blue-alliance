@@ -11,8 +11,8 @@ import {
 
 const defaultState = {
   hashtagSidebar: false,
-  chatSidebar: true,
-  chatSidebarHasBeenVisible: true,
+  chatSidebar: false,
+  chatSidebarHasBeenVisible: false,
   tickerSidebar: false,
   layoutDrawer: false,
 }
