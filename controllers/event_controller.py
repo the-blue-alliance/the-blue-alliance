@@ -220,6 +220,7 @@ class EventDetail(CacheableHandler):
             "event_insights_playoff": event_insights['playoff'] if event_insights else None,
             "event_insights_template": event_insights_template,
             "medias_by_slugname": medias_by_slugname,
+            "team_and_medias": team_and_medias,
         })
 
         if event.within_a_day:

@@ -1,6 +1,6 @@
 {% import "match_partials/match_table_cell_macros.html" as mtcm %}
 
-{% macro match_row_tr(match, cur_team_key, upcoming=False, fake_matches=False, teams_a, teams_b) %}
+{% macro match_row_tr(match, cur_team_key, upcoming=False, fake_matches=False, team_and_medias) %}
 <tr class="visible-lg">
   {% if upcoming %}
     {{mtcm.match_time_td(match)}}
@@ -11,18 +11,11 @@
   {{mtcm.match_name_td(match, fake_matches=fake_matches)}}
 
   {% for team_key in match.alliances.red.teams %}
-    {% if teams_a %}
-        {% for team in teams_a %}
-            {% for team1 in team %}
-                {% if team1.team_number == team_key|strip_frc|int() %}
-                    {{mtcm.match_team_td(match, 'red', team_key, cur_team_key, fake_matches=fake_matches, team_name=team1.nickname)}}
-                {% endif %}
-            {% endfor %}
-        {% endfor %}
-        {% for team in teams_b %}
-            {% for team1 in team %}
-                {% if team1.team_number == team_key|strip_frc|int() %}
-                    {{mtcm.match_team_td(match, 'red', team_key, cur_team_key, fake_matches=fake_matches, team_name=team1.nickname)}}
+    {% if team_and_medias %}
+        {% for teams in team_and_medias %}
+            {% for team in teams %}
+                {% if team.team_number == team_key|strip_frc|int() %}
+                    {{mtcm.match_team_td(match, 'red', team_key, cur_team_key, fake_matches=fake_matches, team_name=team.nickname)}}
                 {% endif %}
             {% endfor %}
         {% endfor %}
@@ -30,23 +23,16 @@
     {% endif %}
   {% endfor %}
   {% for team_key in match.alliances.blue.teams %}
-  {% if teams_a %}
-      {% for team in teams_a %}
-          {% for team1 in team %}
-              {% if team1.team_number == team_key|strip_frc|int() %}
-                  {{mtcm.match_team_td(match, 'blue', team_key, cur_team_key, fake_matches=fake_matches, team_name=team1.nickname)}}
-              {% endif %}
+      {% if team_and_medias %}
+          {% for teams in team_and_medias %}
+              {% for team in teams %}
+                  {% if team.team_number == team_key|strip_frc|int() %}
+                      {{mtcm.match_team_td(match, 'blue', team_key, cur_team_key, fake_matches=fake_matches, team_name=team.nickname)}}
+                  {% endif %}
+              {% endfor %}
           {% endfor %}
-      {% endfor %}
-      {% for team in teams_b %}
-          {% for team1 in team %}
-              {% if team1.team_number == team_key|strip_frc|int() %}
-                  {{mtcm.match_team_td(match, 'blue', team_key, cur_team_key, fake_matches=fake_matches, team_name=team1.nickname)}}
-              {% endif %}
-          {% endfor %}
-      {% endfor %}
-  {% else %}
-  {% endif %}
+      {% else %}
+      {% endif %}
   {% endfor %}
 
   {% if not upcoming %}

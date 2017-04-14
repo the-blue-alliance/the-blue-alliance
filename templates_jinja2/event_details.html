@@ -126,7 +126,7 @@
         {% if matches.qm %}
         <div class="col-sm-6">
           <h3>Qualification Results</h3>
-          {{mtm.qual_match_table(matches, teams_a=teams_a, teams_b=teams_b)}}
+          {{mtm.qual_match_table(matches, team_and_medias=team_and_medias)}}
         </div>
         {% endif %}
 
@@ -137,7 +137,7 @@
           {% endif %}
 
           <h3>{% if event.year >= 2015 %}Playoff{% else %}Elimination{% endif %} Results</h3>
-          {{mtm.elim_match_table(matches, teams_a=teams_a, teams_b=teams_b)}}
+          {{mtm.elim_match_table(matches, team_and_medias=team_and_medias)}}
 
           {% if matches.qm %}
             {% if matches.qf or matches.sf or matches.f %}
@@ -198,7 +198,7 @@
               {% endfor %}
               </tr>
             </thead>
-            <tbody id="robots">
+            <tbody>
               {% for row in event.details.rankings_table %}
               {% if not loop.first %}
               <tr>
@@ -352,7 +352,7 @@
                 <th>Total Points</th>
               </tr>
             </thead>
-            <tbody id="robots">
+            <tbody>
               {% for team_key, breakdown in district_points_sorted %}
               <tr>
                 <td>{{loop.index}}</td>

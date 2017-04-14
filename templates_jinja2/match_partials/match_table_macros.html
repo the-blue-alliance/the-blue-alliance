@@ -1,7 +1,7 @@
 {% import "match_partials/match_table_row_macros.html" as mtrm %}
 {% import "match_partials/match_table_cell_macros.html" as mtcm %}
 
-{% macro qual_match_table(matches, cur_team_key=None, teams_a, teams_b) %}
+{% macro qual_match_table(matches, cur_team_key=None, team_and_medias) %}
 <table class="match-table">
   <thead>
     {% include "match_partials/match_table_header.html" %}
@@ -13,7 +13,7 @@
         <th colspan="16">Qualifications</th>
       </tr>
       {% for match in matches.qm %}
-        {{mtrm.match_row_tr(match, cur_team_key, teams_a=teams_a, teams_b=teams_b)}}
+        {{mtrm.match_row_tr(match, cur_team_key, team_and_medias=team_and_medias)}}
       {% endfor %}
     {% endif %}
   </tbody>
@@ -101,7 +101,7 @@
 </table>
 {% endmacro %}
 
-{% macro elim_match_table(matches, cur_team_key=None, teams_a, teams_b) %}
+{% macro elim_match_table(matches, cur_team_key=None, team_and_medias) %}
 <table class="match-table">
   <thead>
     {% include "match_partials/match_table_header.html" %}
@@ -118,21 +118,21 @@
     {% if matches.qf %}
       <tr class="key"><th colspan="16">Quarterfinals</th></tr>
       {% for match in matches.qf %}
-        {{mtrm.match_row_tr(match, cur_team_key, teams_a=teams_a, teams_b=teams_b)}}
+        {{mtrm.match_row_tr(match, cur_team_key, team_and_medias=team_and_medias)}}
       {% endfor %}
     {% endif %}
 
     {% if matches.sf %}
       <tr class="key"><th colspan="16">Semifinals</th></tr>
       {% for match in matches.sf %}
-        {{mtrm.match_row_tr(match, cur_team_key, teams_a=teams_a, teams_b=teams_b)}}
+        {{mtrm.match_row_tr(match, cur_team_key, team_and_medias=team_and_medias)}}
       {% endfor %}
     {% endif %}
 
     {% if matches.f %}
       <tr class="key"><th colspan="16">Finals</th></tr>
       {% for match in matches.f %}
-        {{mtrm.match_row_tr(match, cur_team_key, teams_a=teams_a, teams_b=teams_b)}}
+        {{mtrm.match_row_tr(match, cur_team_key, team_and_medias=team_and_medias)}}
       {% endfor %}
     {% endif %}
   </tbody>
