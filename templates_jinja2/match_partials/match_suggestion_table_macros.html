@@ -31,7 +31,7 @@
       <tr>
         <td>{{match.event.id()[4:].upper()}}</td>
         <td>{{match.short_name}}</td>
-        <td><time class="tba-match-time-utc" datetime="{{match.predicted_time.isoformat()}}+00:00">{{match.predicted_time|strftime("%a %I:%M%p UTC")}}</time></td>
+        <td><time class="tba-match-time-utc" datetime="{{match.predicted_time.isoformat() if match.predicted_time else match.time.isoformat()}}+00:00">{{(match.predicted_time if match.predicted_time else match.time)|strftime("%a %I:%M%p UTC")}}</time></td>
         {% for team in match.alliances.red.teams %}
         <td class="red">
           <svg class="favorite-team-dot" data-team="{{team}}" data-match="{{match.key_name}}">
