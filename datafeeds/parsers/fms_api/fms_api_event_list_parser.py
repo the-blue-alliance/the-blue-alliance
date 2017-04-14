@@ -58,14 +58,12 @@ class FMSAPIEventListParser(object):
         districts = {}
 
         cmp_hack_sitevar = Sitevar.get_or_insert('cmp_registration_hacks')
-        store_cmp_division = cmp_hack_sitevar.contents.get('should_store_divisions', True) \
-            if cmp_hack_sitevar else True
-        einstein_name = cmp_hack_sitevar.contents.get('einstein_name', self.EINSTEIN_NAME_DEFAULT) \
-            if cmp_hack_sitevar else self.EINSTEIN_NAME_DEFAULT
-        einstein_short_name = cmp_hack_sitevar.contents.get('einstein_short_name', self.EINSTEIN_SHORT_NAME_DEFAULT) \
-            if cmp_hack_sitevar else self.EINSTEIN_SHORT_NAME_DEFAULT
-        change_einstein_dates = cmp_hack_sitevar.contents.get('should_change_einstein_dates', False) \
-            if cmp_hack_sitevar else False
+        divisions_to_skip = cmp_hack_sitevar.contents.get('divisions_to_skip', []) \
+            if cmp_hack_sitevar else []
+        event_name_override = cmp_hack_sitevar.contents.get('event_name_override', []) \
+            if cmp_hack_sitevar else []
+        events_to_change_dates = cmp_hack_sitevar.contents.get('set_start_to_last_day', []) \
+            if cmp_hack_sitevar else []
 
         for event in response['Events']:
             code = event['code'].lower()
@@ -103,20 +101,23 @@ class FMSAPIEventListParser(object):
                 # Einstein to simply "Championship" when certain sitevar flags are set
 
                 if code in self.EINSTEIN_CODES:
-                    name = short_name.format(einstein_name)
-                    short_name = short_name.format(einstein_short_name)
-                    if change_einstein_dates:
-                        # Set to beginning of last day
-                        start = end.replace(hour=0, minute=0, second=0, microsecond=0)
+                    override = [item for item in event_name_override if item['event'] == "{}{}".format(self.season, code)]
+                    if override:
+                        name = short_name.format(override[0]['name'])
+                        short_name = short_name.format(override[0]['short_name'])
                 else:  # Divisions
                     name = '{} Division'.format(short_name)
 
-                    # Allow skipping storing CMP divisions before they're announced
-                    if not store_cmp_division:
-                        continue
+            event_key = "{}{}".format(self.season, code)
+            if event_key in divisions_to_skip:
+                continue
+
+            # Allow an overriding the start date to be the beginning of the last day
+            if event_key in events_to_change_dates:
+                start = end.replace(hour=0, minute=0, second=0, microsecond=0)
 
             events.append(Event(
-                id="{}{}".format(self.season, code),
+                id=event_key,
                 name=name,
                 short_name=short_name,
                 event_short=code,

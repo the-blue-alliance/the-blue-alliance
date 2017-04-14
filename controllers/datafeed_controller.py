@@ -32,6 +32,7 @@ from models.event import Event
 from models.event_details import EventDetails
 from models.event_team import EventTeam
 from models.robot import Robot
+from models.sitevar import Sitevar
 from models.team import Team
 
 
@@ -493,15 +494,19 @@ class EventDetailsGet(webapp.RequestHandler):
             teams = [teams]
 
         # Build EventTeams
+        cmp_hack_sitevar = Sitevar.get_or_insert('cmp_registration_hacks')
+        events_without_eventteams = cmp_hack_sitevar.contents.get('skip_eventteams', []) \
+            if cmp_hack_sitevar else []
+        skip_eventteams = event_key in events_without_eventteams
         event_teams = [EventTeam(
             id=event.key_name + "_" + team.key_name,
             event=event.key,
             team=team.key,
             year=event.year)
-            for team in teams]
+            for team in teams] if not skip_eventteams else []
 
         # Delete eventteams of teams that are no longer registered
-        if event_teams != []:
+        if event_teams != [] and not skip_eventteams:
             existing_event_team_keys = set(EventTeam.query(EventTeam.event == event.key).fetch(1000, keys_only=True))
             event_team_keys = set([et.key for et in event_teams])
             et_keys_to_delete = existing_event_team_keys.difference(event_team_keys)
