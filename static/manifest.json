@@ -12,5 +12,12 @@
     "background_color": "#3F51B5",
     "theme_color": "#3F51B5",
     "display": "standalone",
-    "gcm_sender_id": "103953800507"
+    "gcm_sender_id": "103953800507",
+    "prefer_related_applications": true,
+    "related_applications": [
+      {
+        "platform": "play",
+        "id": "com.thebluealliance.androidclient"
+      }
+    ]
 }
