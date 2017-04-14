@@ -45,5 +45,5 @@ else:
         "save-frc-api-response": True,
     }
 
-CONFIG['landing_handler'] = COMPETITIONSEASON
+CONFIG['landing_handler'] = CHAMPS
 CONFIG["static_resource_version"] = 8

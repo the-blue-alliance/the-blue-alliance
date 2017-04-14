@@ -6,21 +6,48 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-xs-12 col-sm-5 col-lg-4">
-      {% include "index_lhc.html" %}
+    <div class="col-xs-12">
+      <h2>Welcome to The Blue Alliance's coverage of the 2017 <i>FIRST</i> Championship!</h2>
+      <h4>More info at <a href="https://www.firstchampionship.org">firstchampionship.org</a></h4>
     </div>
-    <div class="col-xs-12 col-sm-7 col-lg-8">
-      <h2>Watch the Championship LIVE on GameDay!</h2>
 
-      <!-- <p><a class="btn btn-primary" href="https://www.facebook.com/events/460552190748295/" target="_blank"><span class="glyphicon glyphicon-calendar"></span> RSVP on Facebook</a></p> -->
-      <p><a class="btn btn-success" href="/gameday#champs">Watch #FIRSTChampLIVE on GameDay!</a></p>
-      <p><a class="btn btn-default" href="/gameday#champs-all">Watch All Championship Streams!</a></p>
-      {% if events and events|length > 0%}
-        {% with events as events %}
-          {% include "event_partials/event_table.html" %}
-        {% endwith %}
-      {% endif %}
+    <div class="col-xs-12 visible-xs">
+      <a class="btn btn-block btn-success" href="/watch/champs"><span class="glyphicon glyphicon-facetime-video"></span> Watch #FIRSTChampLIVE!</a>
+      <a class="btn btn-block btn-default" href="/watch/champs-all"><span class="glyphicon glyphicon-facetime-video"></span> Watch All Championship Streams!</a>
+    </div>
+    <div class="col-md-8 col-lg-6 col-md-offset-2 col-lg-offset-3 hidden-xs">
+      <div class="btn-group btn-group-block-2">
+        <a class="btn btn-success" href="/watch/champs"><span class="glyphicon glyphicon-facetime-video"></span> Watch #FIRSTChampLIVE!</a>
+        <a class="btn btn-default" href="/watch/champs-all"><span class="glyphicon glyphicon-facetime-video"></span> Watch All Championship Streams!</a>
+      </div>
+    </div>
 
+    <div class="col-xs-12">
+      <div class="row">
+        <div class="col-xs-12 col-md-6">
+          <h3>
+            <span class="glyphicon glyphicon-map-marker"></span> Houston
+            <a class="btn btn-primary btn-sm pull-right" href="https://www.facebook.com/events/1468298706578930/"><span class="glyphicon glyphicon-calendar"></span> RSVP on Facebook</a>
+          </h3>
+          {% with hou_events as events %}
+            {% include "event_partials/event_table.html" %}
+          {% endwith %}
+        </div>
+        <div class="col-xs-12 col-md-6">
+          <h3>
+            <span class="glyphicon glyphicon-map-marker"></span> St. Louis
+            <a class="btn btn-primary btn-sm pull-right" href="https://www.facebook.com/events/469106486766522/"><span class="glyphicon glyphicon-calendar"></span> RSVP on Facebook</a>
+          </h3>
+          {% with stl_events as events %}
+            {% include "event_partials/event_table.html" %}
+          {% endwith %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-12">
       <h2 class="end_header">{{year}} Stats Recap{% if num_matches %} <small>{{num_matches.data}} Matches Played</small>{% endif %}</h2>
 
       {% if match_highscore %}
