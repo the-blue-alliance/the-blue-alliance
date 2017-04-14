@@ -268,7 +268,7 @@ class EventInsights(CacheableHandler):
         fake_matches = False
         if not matches['qm'] and match_predictions['qual']:
             fake_matches = True
-            for i in xrange(len(match_predictions.keys())):
+            for i in xrange(len(match_predictions['qual'].keys())):
                 match_number = i + 1
                 alliances = {
                     'red': {
