@@ -139,11 +139,6 @@ class MainChampsHandler(CacheableHandler):
             "year": year,
         })
 
-        insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(year, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
-        for insight in insights:
-            if insight:
-                self.template_values[insight.name] = insight
-
         path = os.path.join(os.path.dirname(__file__), '../templates/index_champs.html')
         return template.render(path, self.template_values)
 
