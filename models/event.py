@@ -6,6 +6,7 @@ import json
 import pytz
 import re
 
+from consts.playoff_type import PlayoffType
 from consts.district_type import DistrictType
 from consts.event_type import EventType
 from context_cache import context_cache
@@ -30,6 +31,7 @@ class Event(ndb.Model):
     district_key = ndb.KeyProperty(kind=District)
     start_date = ndb.DateTimeProperty()
     end_date = ndb.DateTimeProperty()
+    playoff_type = ndb.IntegerProperty(default=PlayoffType.BRACKET_8_TEAM)
 
     # venue, venue_addresss, city, state_prov, country, and postalcode are from FIRST
     venue = ndb.StringProperty(indexed=False)  # Name of the event venue

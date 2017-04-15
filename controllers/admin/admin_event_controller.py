@@ -6,6 +6,7 @@ import os
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
+from consts.playoff_type import PlayoffType
 from controllers import event_controller
 from controllers.base_controller import LoggedInHandler
 from datafeeds.csv_alliance_selections_parser import CSVAllianceSelectionsParser
@@ -337,6 +338,7 @@ class AdminEventDetail(LoggedInHandler):
             "medias": event_medias,
             "cache_key": event_controller.EventDetail('2016nyny').cache_key.format(event.key_name),
             "flushed": self.request.get("flushed"),
+            "playoff_types": PlayoffType.type_names,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_details.html')
@@ -356,6 +358,7 @@ class AdminEventEdit(LoggedInHandler):
             "event": event,
             'alliance_selections': json.dumps(event.alliance_selections),
             'rankings': json.dumps(event.rankings),
+            "playoff_types": PlayoffType.type_names,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_edit.html')
@@ -397,6 +400,7 @@ class AdminEventEdit(LoggedInHandler):
             facebook_eid=self.request.get("facebook_eid"),
             custom_hashtag=self.request.get("custom_hashtag"),
             webcast_json=self.request.get("webcast_json"),
+            playoff_type=int(self.request.get("playoff_type")),
         )
         event = EventManipulator.createOrUpdate(event)
 

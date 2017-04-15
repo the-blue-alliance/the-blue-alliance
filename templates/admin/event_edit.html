@@ -51,6 +51,14 @@
             <td><input type="text" name="event_district_key" value="{{event.event_district_key}}" /></td>
         </tr>
         <tr>
+            <td>Playoff Type</td>
+            <td><select name="playoff_type">
+                {% for type, name in playoff_types.iteritems %}
+                  <option value="{{ type }}" {% if type == event.playoff_type %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select></td>
+        </tr>
+        <tr>
             <td>Event Venue</td>
             <td><input type="text" name="venue" value="{{event.venue}}" /></td>
         </tr>

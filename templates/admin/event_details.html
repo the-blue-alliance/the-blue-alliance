@@ -76,6 +76,10 @@
         <td>{{ event.district_key }}</td>
     </tr>
     <tr>
+        <td>Playoff Type</td>
+        <td>{{ playoff_types|get_item:event.playoff_type }}</td>
+    </tr>
+    <tr>
         <td>Event Venue</td>
         <td><a href="http://maps.google.com/maps?q={{ event.venue|urlencode }}">{{ event.venue }}</a></td>
     </tr>
