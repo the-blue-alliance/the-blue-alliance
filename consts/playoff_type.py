@@ -34,6 +34,9 @@ class PlayoffType(object):
                     return 'sf'
                 else:
                     return 'f'
+            elif playoff_type == cls.ROUND_ROBIN_6_TEAM:
+                # Einstein 2017 for example. 15 round robin matches, then finals
+                return 'sf' if match_number <= 15 else 'f'
             else:
                 if playoff_type == cls.BRACKET_16_TEAM:
                     return cls.get_comp_level_octo(match_number)
@@ -68,6 +71,10 @@ class PlayoffType(object):
                 return 1, match_number - 14
             else:  # qm, qf
                 return 1, match_number
+        if playoff_type == cls.ROUND_ROBIN_6_TEAM:
+            # Einstein 2017 for example. 15 round robin matches, then finals
+            match_number = match_number if match_number <= 15 else match_number - 15
+            return 1, match_number
         else:
             if playoff_type == cls.BRACKET_4_TEAM and match_number <= 12:
                 match_number += 12

@@ -183,3 +183,33 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEqual(len(clean_matches["qf"]), 0)
             self.assertEqual(len(clean_matches["sf"]), 4)
             self.assertEqual(len(clean_matches["f"]), 2)
+
+    def test_parse_2champs_einstein(self):
+        self.event = Event(
+                id="2017cmptx",
+                name="Einstein (Houston)",
+                event_type_enum=EventType.CMP_FINALS,
+                short_name="Einstein",
+                event_short="cmptx",
+                year=2017,
+                end_date=datetime(2017, 03, 27),
+                official=True,
+                start_date=datetime(2017, 03, 24),
+                timezone_id="America/New_York",
+                playoff_type=PlayoffType.ROUND_ROBIN_6_TEAM
+        )
+        self.event.put()
+
+        with open('test_data/fms_api/2017cmptx_staging_playoff_schedule.json', 'r') as f:
+            matches, _ = FMSAPIHybridScheduleParser(2017, 'cmptx').parse(json.loads(f.read()))
+
+            self.assertTrue(isinstance(matches, list))
+
+            self.assertEquals(len(matches), 18)
+
+            # Assert we get enough of each match type
+            clean_matches = MatchHelper.organizeMatches(matches)
+            self.assertEqual(len(clean_matches["ef"]), 0)
+            self.assertEqual(len(clean_matches["qf"]), 0)
+            self.assertEqual(len(clean_matches["sf"]), 15)
+            self.assertEqual(len(clean_matches["f"]), 3)
