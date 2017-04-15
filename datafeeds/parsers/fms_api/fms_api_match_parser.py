@@ -5,6 +5,7 @@ import pytz
 
 from google.appengine.ext import ndb
 
+from consts.playoff_type import PlayoffType
 from helpers.match_helper import MatchHelper
 from models.event import Event
 from models.match import Match
@@ -24,140 +25,6 @@ LAST_LEVEL = {
 }
 
 TIME_PATTERN = "%Y-%m-%dT%H:%M:%S"
-
-ELIM_MAPPING = {
-    1: (1, 1),  # (set, match)
-    2: (2, 1),
-    3: (3, 1),
-    4: (4, 1),
-    5: (1, 2),
-    6: (2, 2),
-    7: (3, 2),
-    8: (4, 2),
-    9: (1, 3),
-    10: (2, 3),
-    11: (3, 3),
-    12: (4, 3),
-    13: (1, 1),
-    14: (2, 1),
-    15: (1, 2),
-    16: (2, 2),
-    17: (1, 3),
-    18: (2, 3),
-    19: (1, 1),
-    20: (1, 2),
-    21: (1, 3),
-    22: (1, 4),
-    23: (1, 5),
-    24: (1, 6),
-}
-
-OCTO_ELIM_MAPPING = {
-    # octofinals
-    1: (1, 1),  # (set, match)
-    2: (2, 1),
-    3: (3, 1),
-    4: (4, 1),
-    5: (5, 1),
-    6: (6, 1),
-    7: (7, 1),
-    8: (8, 1),
-    9: (1, 2),
-    10: (2, 2),
-    11: (3, 2),
-    12: (4, 2),
-    13: (5, 2),
-    14: (6, 2),
-    15: (7, 2),
-    16: (8, 2),
-    17: (1, 3),
-    18: (2, 3),
-    19: (3, 3),
-    20: (4, 3),
-    21: (5, 3),
-    22: (6, 3),
-    23: (7, 3),
-    24: (8, 3),
-
-    # quarterfinals
-    25: (1, 1),
-    26: (2, 1),
-    27: (3, 1),
-    28: (4, 1),
-    29: (1, 2),
-    30: (2, 2),
-    31: (3, 2),
-    32: (4, 2),
-    33: (1, 3),
-    34: (2, 3),
-    35: (3, 3),
-    36: (4, 3),
-
-    # semifinals
-    37: (1, 1),
-    38: (2, 1),
-    39: (1, 2),
-    40: (2, 2),
-    41: (1, 3),
-    42: (2, 3),
-
-    # finals
-    43: (1, 1),
-    44: (1, 2),
-    45: (1, 3),
-    46: (1, 4),
-    47: (1, 5),
-    48: (1, 6),
-}
-
-
-def get_comp_level(year, match_level, match_number, is_octofinals):
-    if match_level == 'Qualification':
-        return 'qm'
-    else:
-        if year == 2015:
-            if match_number <= 8:
-                return 'qf'
-            elif match_number <= 14:
-                return 'sf'
-            else:
-                return 'f'
-        else:
-            if is_octofinals:
-                return get_comp_level_octo(year, match_number)
-            if match_number <= 12:
-                return 'qf'
-            elif match_number <= 18:
-                return 'sf'
-            else:
-                return 'f'
-
-
-def get_comp_level_octo(year, match_number):
-    """ No 2015 support """
-    if match_number <= 24:
-        return 'ef'
-    elif match_number <= 36:
-        return 'qf'
-    elif match_number <= 42:
-        return 'sf'
-    else:
-        return 'f'
-
-
-def get_set_match_number(year, comp_level, match_number, is_octofinals):
-    if year == 2015:
-        if comp_level == 'sf':
-            return 1, match_number - 8
-        elif comp_level == 'f':
-            return 1, match_number - 14
-        else:  # qm, qf
-            return 1, match_number
-    else:
-        if comp_level in {'ef', 'qf', 'sf', 'f'}:
-            return OCTO_ELIM_MAPPING[match_number] if is_octofinals else ELIM_MAPPING[match_number]
-        else:  # qm
-            return 1, match_number
 
 
 class FMSAPIHybridScheduleParser(object):
@@ -194,14 +61,13 @@ class FMSAPIHybridScheduleParser(object):
 
         parsed_matches = []
         remapped_matches = {}  # If a key changes due to a tiebreaker
-        is_octofinals = len(matches) > 0 and 'Octofinal' in matches[0]['description']
         for match in matches:
             if 'tournamentLevel' in match:  # 2016+
                 level = match['tournamentLevel']
             else:  # 2015
                 level = match['level']
-            comp_level = get_comp_level(self.year, level, match['matchNumber'], is_octofinals)
-            set_number, match_number = get_set_match_number(self.year, comp_level, match['matchNumber'], is_octofinals)
+            comp_level = PlayoffType.get_comp_level(event.playoff_type, level, match['matchNumber'])
+            set_number, match_number = PlayoffType.get_set_match_number(event.playoff_type, comp_level, match['matchNumber'])
 
             red_teams = []
             blue_teams = []
@@ -368,12 +234,14 @@ class FMSAPIMatchDetailsParser(object):
     def parse(self, response):
         matches = response['MatchScores']
 
+        event_key = '{}{}'.format(self.year, self.event_short)
+        event = Event.get_by_id(event_key)
+
         match_details_by_key = {}
 
-        is_octofinals = len(matches) > 0 and matches[len(matches) - 1]['matchNumber'] > 23  # Hacky; this should be 24. Banking on the fact that 3 tiebreakers is rare
         for match in matches:
-            comp_level = get_comp_level(self.year, match['matchLevel'], match['matchNumber'], is_octofinals)
-            set_number, match_number = get_set_match_number(self.year, comp_level, match['matchNumber'], is_octofinals)
+            comp_level = PlayoffType.get_comp_level(event.playoff_type, match['matchLevel'], match['matchNumber'])
+            set_number, match_number = PlayoffType.get_set_match_number(event.playoff_type, comp_level, match['matchNumber'])
             breakdown = {
                 'red': {},
                 'blue': {},
