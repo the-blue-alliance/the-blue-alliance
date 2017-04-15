@@ -153,3 +153,33 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEqual(len(clean_matches["sf"]), 6)
             self.assertEqual(len(clean_matches["f"]), 3)
 
+    def test_parse_2017micmp(self):
+        # 2017micmp is a 4 team bracket that starts playoff match numbering at 1
+        self.event = Event(
+                id="2017micmp",
+                name="Michigan District Champs",
+                event_type_enum=EventType.DISTRICT_CMP,
+                short_name="Michigan",
+                event_short="micmp",
+                year=2017,
+                end_date=datetime(2017, 03, 27),
+                official=True,
+                start_date=datetime(2017, 03, 24),
+                timezone_id="America/New_York",
+                playoff_type=PlayoffType.BRACKET_4_TEAM
+        )
+        self.event.put()
+
+        with open('test_data/fms_api/2017micmp_playoff_schedule.json', 'r') as f:
+            matches, _ = FMSAPIHybridScheduleParser(2017, 'micmp').parse(json.loads(f.read()))
+
+            self.assertTrue(isinstance(matches, list))
+
+            self.assertEquals(len(matches), 6)
+
+            # Assert we get enough of each match type
+            clean_matches = MatchHelper.organizeMatches(matches)
+            self.assertEqual(len(clean_matches["ef"]), 0)
+            self.assertEqual(len(clean_matches["qf"]), 0)
+            self.assertEqual(len(clean_matches["sf"]), 4)
+            self.assertEqual(len(clean_matches["f"]), 2)

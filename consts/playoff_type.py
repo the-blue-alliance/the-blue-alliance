@@ -37,6 +37,9 @@ class PlayoffType(object):
             else:
                 if playoff_type == cls.BRACKET_16_TEAM:
                     return cls.get_comp_level_octo(match_number)
+                elif playoff_type == cls.BRACKET_4_TEAM and match_number <= 12:
+                    # Account for a 4 team bracket where numbering starts at 1
+                    match_number += 12
                 if match_number <= 12:
                     return 'qf'
                 elif match_number <= 18:
@@ -66,6 +69,8 @@ class PlayoffType(object):
             else:  # qm, qf
                 return 1, match_number
         else:
+            if playoff_type == cls.BRACKET_4_TEAM and match_number <= 12:
+                match_number += 12
             if comp_level in {'ef', 'qf', 'sf', 'f'}:
                 return cls.BRACKET_OCTO_ELIM_MAPPING[match_number] if playoff_type == cls.BRACKET_16_TEAM \
                     else cls.BRACKET_ELIM_MAPPING[match_number]
