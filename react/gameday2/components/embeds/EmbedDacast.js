@@ -13,7 +13,7 @@ const EmbedDacast = (props) => {
       frameBorder="0"
       scrolling="no"
       player="vjs5"
-      autoplay="true"
+      autoPlay="true"
       allowFullScreen
       webkitallowfullscreen
       mozallowfullscreen
