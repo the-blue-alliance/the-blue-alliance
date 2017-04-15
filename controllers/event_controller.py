@@ -188,7 +188,7 @@ class EventDetail(CacheableHandler):
             playoff_advancement = None
 
         district_points_sorted = None
-        if event.district_points:
+        if event.district_key and event.district_points:
             district_points_sorted = sorted(event.district_points['points'].items(), key=lambda (team, points): -points['total'])
 
         event_insights = event.details.insights if event.details else None
