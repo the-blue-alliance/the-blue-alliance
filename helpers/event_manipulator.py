@@ -80,6 +80,7 @@ class EventManipulator(ManipulatorBase):
             "state_prov",
             "country",
             "postalcode",
+            "playoff_type",
             "normalized_location",  # Overwrite whole thing as one
             "timezone_id",
             "name",
