@@ -118,6 +118,19 @@ class MatchHelper(object):
         return matches
 
     @classmethod
+    def organizeKeys(cls, match_keys):
+        matches = dict([(comp_level, list()) for comp_level in Match.COMP_LEVELS])
+        matches["num"] = len(match_keys)
+        while len(match_keys) > 0:
+            match_key = match_keys.pop(0)
+            match_id = match_key.split("_")[1]
+            for comp_level in Match.COMP_LEVELS:
+                if match_id.startswith(comp_level):
+                    matches[comp_level].append(match_key)
+
+        return matches
+
+    @classmethod
     def recentMatches(self, matches, num=3):
         matches = filter(lambda x: x.has_been_played, matches)
         matches = self.play_order_sort_matches(matches)

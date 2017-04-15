@@ -7,6 +7,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from consts.event_type import EventType
+from consts.playoff_type import PlayoffType
 from datafeeds.parsers.fms_api.fms_api_match_parser import FMSAPIHybridScheduleParser
 from helpers.match_helper import MatchHelper
 from models.event import Event
@@ -105,7 +106,8 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
                 end_date=datetime(2016, 03, 27),
                 official=True,
                 start_date=datetime(2016, 03, 24),
-                timezone_id="America/New_York"
+                timezone_id="America/New_York",
+                playoff_type=PlayoffType.BRACKET_16_TEAM
         )
         self.event.put()
 
@@ -122,3 +124,32 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEqual(len(clean_matches["qf"]), 10)
             self.assertEqual(len(clean_matches["sf"]), 4)
             self.assertEqual(len(clean_matches["f"]), 2)
+
+    def test_parse_2015_playoff(self):
+        self.event = Event(
+                id="2015nyny",
+                name="NYC Regional",
+                event_type_enum=EventType.REGIONAL,
+                short_name="NYC",
+                event_short="nyny",
+                year=2015,
+                end_date=datetime(2015, 03, 27),
+                official=True,
+                start_date=datetime(2015, 03, 24),
+                timezone_id="America/New_York",
+                playoff_type=PlayoffType.AVG_SCORE_8_TEAM
+        )
+        self.event.put()
+        with open('test_data/fms_api/2015nyny_hybrid_schedule_playoff.json', 'r') as f:
+            matches, _ = FMSAPIHybridScheduleParser(2015, 'nyny').parse(json.loads(f.read()))
+
+            self.assertTrue(isinstance(matches, list))
+            self.assertEqual(len(matches), 17)
+
+            # Assert we get enough of each match type
+            clean_matches = MatchHelper.organizeMatches(matches)
+            self.assertEqual(len(clean_matches["ef"]), 0)
+            self.assertEqual(len(clean_matches["qf"]), 8)
+            self.assertEqual(len(clean_matches["sf"]), 6)
+            self.assertEqual(len(clean_matches["f"]), 3)
+
