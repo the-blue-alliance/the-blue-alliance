@@ -8,6 +8,7 @@ from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from google.appengine.api import urlfetch
 
+from consts.event_type import EventType
 from controllers.apiv3.model_properties import filter_match_properties
 from database.dict_converters.match_converter import MatchConverter
 from database.dict_converters.event_converter import EventConverter
@@ -135,7 +136,8 @@ class FirebasePusher(object):
             _queue="firebase")
 
         try:
-            cls.update_champ_numbers(match)
+            if match.event.get().event_type_enum in EventType.CMP_EVENT_TYPES:
+                cls.update_champ_numbers(match)
         except Exception, exception:
             logging.warning("Update champ numbers failed: {}".format(exception))
             logging.warning(traceback.format_exc())
