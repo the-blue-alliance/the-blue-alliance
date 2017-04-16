@@ -179,17 +179,16 @@ class EventDetail(CacheableHandler):
             matches_upcoming = None
 
         bracket_table = MatchHelper.generateBracket(matches, event.alliance_selections)
-        is_2015_playoff = EventHelper.is_2015_playoff(event_key)
-        is_round_robin = event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM
+
         playoff_advancement = None
         playoff_template = None
-        if is_2015_playoff:
+        if EventHelper.is_2015_playoff(event_key):
             playoff_advancement = MatchHelper.generatePlayoffAdvancement2015(matches, event.alliance_selections)
             playoff_template = 'playoff_table'
             for comp_level in ['qf', 'sf']:
                 if comp_level in bracket_table:
                     del bracket_table[comp_level]
-        elif is_round_robin:
+        elif event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM:
             playoff_advancement = MatchHelper.generatePlayoffAdvancementRoundRobin(matches, event.alliance_selections)
             playoff_template = 'playoff_round_robin_6_team'
             comp_levels = bracket_table.keys()
