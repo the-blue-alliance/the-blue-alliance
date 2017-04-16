@@ -10,6 +10,7 @@ from google.appengine.ext.webapp import template
 
 from base_controller import CacheableHandler
 from consts.district_type import DistrictType
+from consts.playoff_type import PlayoffType
 from database import event_query, media_query
 from database.district_query import DistrictsInYearQuery, DistrictQuery
 from database.event_query import EventQuery
@@ -178,17 +179,25 @@ class EventDetail(CacheableHandler):
             matches_upcoming = None
 
         bracket_table = MatchHelper.generateBracket(matches, event.alliance_selections)
-        is_2015_playoff = EventHelper.is_2015_playoff(event_key)
-        if is_2015_playoff:
+
+        playoff_advancement = None
+        playoff_template = None
+        if EventHelper.is_2015_playoff(event_key):
             playoff_advancement = MatchHelper.generatePlayoffAdvancement2015(matches, event.alliance_selections)
+            playoff_template = 'playoff_table'
             for comp_level in ['qf', 'sf']:
                 if comp_level in bracket_table:
                     del bracket_table[comp_level]
-        else:
-            playoff_advancement = None
+        elif event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM:
+            playoff_advancement = MatchHelper.generatePlayoffAdvancementRoundRobin(matches, event.alliance_selections)
+            playoff_template = 'playoff_round_robin_6_team'
+            comp_levels = bracket_table.keys()
+            for comp_level in comp_levels:
+                if comp_level != 'f':
+                    del bracket_table[comp_level]
 
         district_points_sorted = None
-        if event.district_points:
+        if event.district_key and event.district_points:
             district_points_sorted = sorted(event.district_points['points'].items(), key=lambda (team, points): -points['total'])
 
         event_insights = event.details.insights if event.details else None
@@ -214,8 +223,8 @@ class EventDetail(CacheableHandler):
             "oprs": oprs,
             "bracket_table": bracket_table,
             "playoff_advancement": playoff_advancement,
+            "playoff_template": playoff_template,
             "district_points_sorted": district_points_sorted,
-            "is_2015_playoff": is_2015_playoff,
             "event_insights_qual": event_insights['qual'] if event_insights else None,
             "event_insights_playoff": event_insights['playoff'] if event_insights else None,
             "event_insights_template": event_insights_template,
