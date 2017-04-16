@@ -7,6 +7,8 @@ import re
 import time
 from google.appengine.ext import ndb
 
+from consts.event_type import EventType
+from consts.playoff_type import PlayoffType
 from helpers.tbavideo_helper import TBAVideoHelper
 from helpers.youtube_video_helper import YouTubeVideoHelper
 from models.event import Event
@@ -184,7 +186,11 @@ class Match(ndb.Model):
             elif blue_score > red_score:
                 self._winning_alliance = 'blue'
             else:  # tie
-                self._winning_alliance = MatchHelper.tiebreak_winner(self)
+                event = self.event.get()
+                if event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM and event.event_type == EventType.CMP_FINALS:
+                    self._winning_alliance == ''
+                else:
+                    self._winning_alliance = MatchHelper.tiebreak_winner(self)
         return self._winning_alliance
 
     @property

@@ -141,9 +141,9 @@
 
           {% if matches.qm %}
             {% if matches.qf or matches.sf or matches.f %}
-              {% if is_2015_playoff %}
+              {% if playoff_advancement %}
                 <h3>Playoff Advancement</h3>
-                {% include "playoff_partials/playoff_table.html" %}
+                {% include "playoff_partials/{}.html".format(playoff_template) %}
               {% else %}
                 <h3>{% if event.year >= 2015 %}Playoff{% else %}Elimination{% endif %} Bracket</h3>
                 {% include "bracket_partials/bracket_table.html" %}
@@ -165,9 +165,9 @@
           {% include "event_partials/event_alliances_table.html" %}
 
           {% if matches.qf or matches.sf or matches.f %}
-            {% if is_2015_playoff %}
+            {% if playoff_advancement %}
               <h3>Playoff Advancement</h3>
-              {% include "playoff_partials/playoff_table.html" %}
+              {% include "playoff_partials/{}.html".format(playoff_template) %}
             {% else %}
               <h3>{% if event.year >= 2015 %}Playoff{% else %}Elimination{% endif %} Bracket</h3>
               {% include "bracket_partials/bracket_table.html" %}
