@@ -1,10 +1,11 @@
+from consts.playoff_type import PlayoffType
 from database.dict_converters.converter_base import ConverterBase
 from database.dict_converters.district_converter import DistrictConverter
 
 
 class EventConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        3: 3,
+        3: 4,
     }
 
     @classmethod
@@ -29,6 +30,8 @@ class EventConverter(ConverterBase):
             'event_code': event.event_short,
             'event_type': event.event_type_enum,
             'event_type_string': event.event_type_str,
+            'playoff_type': event.playoff_type,
+            'playoff_type_string': PlayoffType.type_names[event.playoff_type],
             'district': DistrictConverter.convert(district_future.get_result(), 3) if district_future else None,
             'first_event_id': event.first_eid,
             'year': event.year,
