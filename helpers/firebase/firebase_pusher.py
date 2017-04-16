@@ -2,11 +2,13 @@ import datetime
 import json
 import logging
 import tba_config
+import traceback
 
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from google.appengine.api import urlfetch
 
+from consts.event_type import EventType
 from controllers.apiv3.model_properties import filter_match_properties
 from database.dict_converters.match_converter import MatchConverter
 from database.dict_converters.event_converter import EventConverter
@@ -133,6 +135,13 @@ class FirebasePusher(object):
             match_data_json,
             _queue="firebase")
 
+        try:
+            if match.event.get().event_type_enum in EventType.CMP_EVENT_TYPES:
+                cls.update_champ_numbers(match)
+        except Exception, exception:
+            logging.warning("Update champ numbers failed: {}".format(exception))
+            logging.warning(traceback.format_exc())
+
         # for team_key_name in match.team_key_names:
         #     deferred.defer(
         #         cls._put_data,
@@ -225,6 +234,13 @@ class FirebasePusher(object):
             if event.within_a_day:
                 live_events.append(event)
 
+        # To get Champ events to show up before they are actually going on
+        forced_live_events = Sitevar.get_or_insert(
+            'forced_live_events',
+            values_json=json.dumps([]))
+        for event in ndb.get_multi([ndb.Key('Event', ekey) for ekey in forced_live_events.contents]):
+            events_by_key[event.key.id()] = event
+
         # Add in the Fake TBA BlueZone event (watch for circular imports)
         from helpers.bluezone_helper import BlueZoneHelper
         bluezone_event = BlueZoneHelper.update_bluezone(live_events)
@@ -260,4 +276,37 @@ class FirebasePusher(object):
             cls._patch_data,
             'live_events/{}'.format(event.key_name),
             json.dumps({key: converted_event[key] for key in ['key', 'name', 'short_name', 'webcasts']}),
+            _queue="firebase")
+
+    @classmethod
+    @ndb.transactional
+    def update_champ_numbers(cls, match):
+        champ_numbers_sitevar = Sitevar.get_or_insert(
+            'champ_numbers',
+            values_json=json.dumps({
+                'kpa_accumulated': 0,
+                'rotors_engaged': 0,
+                'ready_for_takeoff': 0,
+            }))
+
+        old_contents = champ_numbers_sitevar.contents
+        for color in ['red', 'blue']:
+            old_contents['kpa_accumulated'] += match.score_breakdown[color]['autoFuelPoints'] + match.score_breakdown[color]['teleopFuelPoints']
+            if match.score_breakdown[color]['rotor4Engaged']:
+                old_contents['rotors_engaged'] += 4
+            elif match.score_breakdown[color]['rotor3Engaged']:
+                old_contents['rotors_engaged'] += 3
+            elif match.score_breakdown[color]['rotor2Engaged']:
+                old_contents['rotors_engaged'] += 2
+            elif match.score_breakdown[color]['rotor1Engaged']:
+                old_contents['rotors_engaged'] += 1
+            old_contents['ready_for_takeoff'] += match.score_breakdown[color]['teleopTakeoffPoints'] / 50
+
+        champ_numbers_sitevar.contents = old_contents
+        champ_numbers_sitevar.put()
+
+        deferred.defer(
+            cls._patch_data,
+            'champ_numbers',
+            json.dumps(old_contents),
             _queue="firebase")

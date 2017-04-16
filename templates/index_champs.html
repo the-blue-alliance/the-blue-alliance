@@ -6,80 +6,112 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-xs-12 col-sm-5 col-lg-4">
-      {% include "index_lhc.html" %}
+    <div class="col-xs-12">
+      <h2>Welcome to The Blue Alliance's coverage of the {{year}} <i>FIRST</i> Championship!</h2>
+      <h4>More info at <a href="https://www.firstchampionship.org">firstchampionship.org</a></h4>
     </div>
-    <div class="col-xs-12 col-sm-7 col-lg-8">
-      <h2>Watch the Championship LIVE on GameDay!</h2>
 
-      <!-- <p><a class="btn btn-primary" href="https://www.facebook.com/events/460552190748295/" target="_blank"><span class="glyphicon glyphicon-calendar"></span> RSVP on Facebook</a></p> -->
-      <p><a class="btn btn-success" href="/gameday#champs">Watch #FIRSTChampLIVE on GameDay!</a></p>
-      <p><a class="btn btn-default" href="/gameday#champs-all">Watch All Championship Streams!</a></p>
-      {% if events and events|length > 0%}
-        {% with events as events %}
-          {% include "event_partials/event_table.html" %}
-        {% endwith %}
-      {% endif %}
+    <div class="col-xs-12">
+      <h3>Championship by the Numbers:</h3>
 
-      <h2 class="end_header">{{year}} Stats Recap{% if num_matches %} <small>{{num_matches.data}} Matches Played</small>{% endif %}</h2>
-
-      {% if match_highscore %}
+      <div class="col-xs-4">
         <div class="row">
-          <div class="col-xs-12">
-            <h3>Highest Scoring Match{% if match_highscore.data|length > 1 %}es{% endif %}</h3>
-            {% for match in  match_highscore.data %}
-              <h4><a href="/match/{{match.key_name}}">{{ match.event_name }} <small>{{ match.verbose_name }}</small></a></h4>
-              <table class="match-table insights-table">
-                <thead>
-                  <tr class="key">
-                    <th colspan="{{match.alliances.items.0.1.teams|length}}">Teams</th>
-                    <th>Score</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for items in match.alliances.items reversed %}
-                  <tr>
-                    {% for team in items.1.teams %}
-                    <td class="{{items.0}}{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}"><a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a></td>
-                    {% endfor %}
-                    <td class="{{items.0}}Score{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}">{% ifequal items.1.score "-1" %}?{% else %}{{ items.1.score }}{% endifequal %}</td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            {% endfor %}
+          <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
+            <img src="/images/2017_boiler.png" class="img-responsive"/>
           </div>
         </div>
-      {% endif %}
+        <h2 id="champ-kpa-accumulated" class="text-center">0</h2>
+        <h4 class="text-center">kPa Accumulated</h4>
+      </div>
+      <div class="col-xs-4">
+        <div class="row">
+          <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
+            <img src="/images/2017_rotors.png" class="img-responsive"/>
+          </div>
+        </div>
+        <h2 id="champ-rotors-engaged" class="text-center">0</h2>
+        <h4 class="text-center">Rotors Engaged</h4>
+      </div>
+      <div class="col-xs-4">
+        <div class="row">
+          <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
+            <img src="/images/2017_touchpad.png" class="img-responsive"/>
+          </div>
+        </div>
+        <h2 id="champ-ready-for-takeoff" class="text-center">0</h2>
+        <h4 class="text-center">Robots Ready for Takeoff</h4>
+      </div>
+      <small class="pull-right">Artwork by: <a href="https://www.facebook.com/WordPlayAllDay">Word Play All Day</a></small>
+    </div>
+  </div>
 
-      {% if match_averages_by_week %}
-        <h3>Average Match Score By Week</h3>
-        {% if elim_match_averages_by_week %}
-          <div class="chart-key"><div class="color-key blue-color-key"></div><div class="chart-key-text">All Match Averages</div></div>
-          <div class="chart-key"><div class="color-key green-color-key"></div><div class="chart-key-text">Elim Match Averages</div></div>
-          <figure style="width: 90%; height: 300px;" id="elim-match-average-chart"></figure>
-          <div id="elim-match-average" class="xcharts-data xcharts-line-data">[{{ match_averages_by_week.data_json|safe }}, {{ elim_match_averages_by_week.data_json|safe }}]</div>
-        {% else %}
-          <figure style="width: 90%; height: 300px;" id="match-average-chart"></figure>
-          <div id="match-average" class="xcharts-data xcharts-line-data">[{{ match_averages_by_week.data_json|safe }}]</div>
-        {% endif %}
-        <br><br>
-      {% endif %}
+  <div class="row">
+    <div class="col-xs-12 visible-xs">
+      <a class="btn btn-block btn-success" href="/watch/champs"><span class="glyphicon glyphicon-facetime-video"></span> Watch #FIRSTChampLIVE!</a>
+      <a class="btn btn-block btn-default" href="/watch/champs-all"><span class="glyphicon glyphicon-facetime-video"></span> Watch All Championship Streams!</a>
+      <a class="btn btn-block btn-primary" href="/mytba"><span class="glyphicon glyphicon-star"></span> Follow your Favorite teams with myTBA</a>
+    </div>
+    <div class="col-md-8 col-lg-6 col-md-offset-2 col-lg-offset-3 hidden-xs">
+      <div class="btn-group btn-group-block-2">
+        <a class="btn btn-success" href="/watch/champs"><span class="glyphicon glyphicon-facetime-video"></span> Watch #FIRSTChampLIVE!</a>
+        <a class="btn btn-default" href="/watch/champs-all"><span class="glyphicon glyphicon-facetime-video"></span> Watch All Championship Streams!</a>
+      </div>
+      <br><br>
+      <a class="btn btn-block btn-primary" href="/mytba"><span class="glyphicon glyphicon-star"></span> Follow your Favorite teams with myTBA</a>
+    </div>
 
-      {% if score_distribution %}
-        <h3>Match Score Distribution <small>Percent of Matches vs. Match Score</small></h3>
-        {% if elim_score_distribution %}
-          <div class="chart-key"><div class="color-key blue-color-key"></div><div class="chart-key-text">All Match Scores</div></div>
-          <div class="chart-key"><div class="color-key green-color-key"></div><div class="chart-key-text">Elim Match Scores</div></div>
-          <figure style="width: 90%; height: 300px;" id="elim-match-distribution-chart"></figure>
-          <div id="elim-match-distribution" class="xcharts-data xcharts-bar-data">[{{ score_distribution.data_json|safe }}, {{ elim_score_distribution.data_json|safe }}]</div>
-        {% else %}
-          <figure style="width: 90%; height: 300px;" id="match-distribution-chart"></figure>
-          <div id="match-distribution" class="xcharts-data xcharts-bar-data">[{{ score_distribution.data_json|safe }}]</div>
-        {% endif %}
-        <br><br>
-      {% endif %}
+    <div class="col-xs-12">
+      <div class="row">
+        <div class="col-xs-12 col-md-6">
+          <h3>
+            <span class="glyphicon glyphicon-map-marker"></span> Houston
+            <a class="btn btn-default btn-sm pull-right" href="https://www.facebook.com/events/1468298706578930/"><span class="glyphicon glyphicon-calendar"></span> RSVP on Facebook</a>
+          </h3>
+          {% with hou_events as events %}
+            {% include "event_partials/event_table.html" %}
+          {% endwith %}
+        </div>
+        <div class="col-xs-12 col-md-6">
+          <h3>
+            <span class="glyphicon glyphicon-map-marker"></span> St. Louis
+            <a class="btn btn-default btn-sm pull-right" href="https://www.facebook.com/events/469106486766522/"><span class="glyphicon glyphicon-calendar"></span> RSVP on Facebook</a>
+          </h3>
+          {% with stl_events as events %}
+            {% include "event_partials/event_table.html" %}
+          {% endwith %}
+        </div>
+      </div>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block inline_javascript %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/countup.js/1.8.3/countUp.min.js"></script>
+<script>
+  var options = {
+    useEasing : true,
+    useGrouping : true,
+    separator : ',',
+    decimal : '.',
+    prefix : '',
+    suffix : ''
+  };
+
+  var counters = {
+    'kpa_accumulated': new CountUp("champ-kpa-accumulated", 0, 0, 0, 1.0, options),
+    'rotors_engaged': new CountUp("champ-rotors-engaged", 0, 0, 0, 1.0, options),
+    'ready_for_takeoff': new CountUp("champ-ready-for-takeoff", 0, 0, 0, 1.0, options),
+  }
+
+  var champNumbersRef = firebase.database().ref('champ_numbers');
+  champNumbersRef.on('value', function(snapshot) {
+    var s = snapshot.val();
+    for (e in s) {
+      if (e in counters) {
+        counters[e].update(s[e]);
+      }
+    }
+  });
+</script>
 {% endblock %}
