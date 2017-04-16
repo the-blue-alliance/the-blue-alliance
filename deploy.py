@@ -26,7 +26,9 @@ def main():
     args = parser.parse_args()
 
     os.chdir('../the-blue-alliance-prod')
+    os.system('git stash')
     os.system('git pull origin master')
+    os.system('git stash pop')
 
     test_status = 0
     if args.yolo:
