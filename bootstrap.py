@@ -67,6 +67,7 @@ def store_event(data):
     event.city = data['city']
     event.state_prov = data['state_prov']
     event.country = data['country']
+    event.playoff_type = data['playoff_type']
 
     district = store_district(data['district']) if data['district'] else None
     event.district_key = district.key if district else None
