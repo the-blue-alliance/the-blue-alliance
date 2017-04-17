@@ -1,6 +1,6 @@
 // How many layouts are defined
 // Valid layout IDs are in the range [0, NUM_LAYOUTS - 1]
-export const NUM_LAYOUTS = 10
+export const NUM_LAYOUTS = 11
 
 // The maximum number of views any layout can support.
 // Currently 9 for the nona-view
@@ -8,11 +8,11 @@ export const MAX_SUPPORTED_VIEWS = 9
 
 // Maps a layout ID to the number of views that layout supports
 // The layout ID is the index into this array
-export const NUM_VIEWS_FOR_LAYOUT = [1, 2, 3, 4, 4, 5, 6, 8, 9, 2]
+export const NUM_VIEWS_FOR_LAYOUT = [1, 2, 3, 4, 4, 5, 6, 8, 9, 2, 7]
 
 // Defines the order layouts are shown in the layout selection list
 // Each element is the number of the layout that should be shown at that index
-export const LAYOUT_DISPLAY_ORDER = [0, 1, 9, 2, 3, 4, 5, 6, 7, 8]
+export const LAYOUT_DISPLAY_ORDER = [0, 1, 9, 2, 3, 4, 5, 6, 10, 7, 8]
 
 // Maps a layout ID for the appropriate name for that layout
 export const NAME_FOR_LAYOUT = [
@@ -26,6 +26,7 @@ export const NAME_FOR_LAYOUT = [
   'Octo-View',
   'Nona-View',
   'Horizontal Split View',
+  '"1+6" View'
 ]
 
 // Holds SVG path data that can be used to render icons for each layout
@@ -41,6 +42,7 @@ export const LAYOUT_SVG_PATHS = [
   'M0 0h5v7h-5v-7z M6 0h5v7h-5v-7z M12 0h5v7h-5v-7z M18 0h5v7h-5v-7z M0 8h5v7h-5v-7z M6 8h5v7h-5v-7z M12 8h5v7h-5v-7z M18 8h5v7h-5v-7z',
   'M0 0h7v4.33h-7v-4.33z M8 0h7v4.33h-7v-4.33z M16 0h7v4.33h-7v-4.33z M0 5.33h7v4.33h-7v-4.33z M8 5.33h7v4.33h-7v-4.33z M16 5.33h7v4.33h-7v-4.33z M0 10.67h7v4.33h-7v-4.33z M8 10.67h7v4.33h-7v-4.33z M16 10.67h7v4.33h-7v-4.33z',
   'M0 0h23v7h-23v-7z M0 8h23v7h-23v-7z',
+  'M6 0h11v15h-11v-15z M0 0h5v4.33h-5v-4.33z M18 0h5v4.33h-5v-4.33z M0 5.33h5v4.33h-5v-4.33z M18 5.33h5v4.33h-5v-4.33z M0 10.67h5v4.33h-5v-4.33z M18 10.67h5v4.33h-5v-4.33z',
 ]
 
 // Holds styling information about the various layouts
@@ -448,6 +450,65 @@ const LAYOUT_9 = [
   },
 ]
 
+
+/* Layout 10
+
++------+------+------+
+|  1   |      |   4  |
+|------|      |------|
+|  2   |   0  |   5  |
+|------|      |------|
+|  3   |      |   6  |
++------+------+------+
+
+ */
+const LAYOUT_10 = [
+  {
+    width: '50%',
+    height: '100%',
+    top: 0,
+    left: '25%',
+    position: 'absolute',
+  }, {
+    width: '25%',
+    height: '33.33%',
+    top: 0,
+    left: 0,
+    position: 'absolute',
+  }, {
+    width: '25%',
+    height: '33.33%',
+    top: '33.33%',
+    left: 0,
+    position: 'absolute',
+  }, {
+    width: '25%',
+    height: '33.33%',
+    top: '66.67%',
+    left: 0,
+    position: 'absolute',
+  }, {
+    width: '25%',
+    height: '33.33%',
+    top: 0,
+    left: '75%',
+    position: 'absolute',
+  }, {
+    width: '25%',
+    height: '33.33%',
+    top: '33.33%',
+    left: '75%',
+    position: 'absolute',
+  }, {
+    width: '25%',
+    height: '33.33%',
+    top: '66.67%',
+    left: '75%',
+    position: 'absolute',
+  },
+]
+
+
 export const LAYOUT_STYLES = [
   LAYOUT_0,
   LAYOUT_1,
@@ -459,4 +520,5 @@ export const LAYOUT_STYLES = [
   LAYOUT_7,
   LAYOUT_8,
   LAYOUT_9,
+  LAYOUT_10,
 ]
