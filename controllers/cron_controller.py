@@ -398,12 +398,18 @@ class TypeaheadCalcDo(webapp.RequestHandler):
             teams = yield ndb.get_multi_async(team_keys)
             raise ndb.Return(teams)
 
-        @ndb.toplevel
-        def get_events_and_teams():
-            events, teams = yield get_events_async(), get_teams_async()
-            raise ndb.Return((events, teams))
+        @ndb.tasklet
+        def get_districts_async():
+            district_keys = yield District.query().order(-District.year).fetch_async(keys_only=True)
+            districts = yield ndb.get_multi_async(district_keys)
+            raise ndb.Return(districts)
 
-        events, teams = get_events_and_teams()
+        @ndb.toplevel
+        def get_events_teams_districts():
+            events, teams, districts = yield get_events_async(), get_teams_async(), get_districts_async()
+            raise ndb.Return((events, teams, districts))
+
+        events, teams, districts = get_events_teams_districts()
 
         results = {}
         for team in teams:
@@ -417,6 +423,16 @@ class TypeaheadCalcDo(webapp.RequestHandler):
             else:
                 results[TypeaheadEntry.ALL_TEAMS_KEY] = [data]
 
+        for district in districts:
+            data = '%s District [%s]' % (district.display_name, district.abbreviation.upper())
+            # all districts
+            if TypeaheadEntry.ALL_DISTRICTS_KEY in results:
+                if data not in results[TypeaheadEntry.ALL_DISTRICTS_KEY]:
+                    results[TypeaheadEntry.ALL_DISTRICTS_KEY].append(data)
+            else:
+                results[TypeaheadEntry.ALL_DISTRICTS_KEY] = [data]
+            
+            
         for event in events:
             data = '%s %s [%s]' % (event.year, event.name, event.event_short.upper())
             # all events

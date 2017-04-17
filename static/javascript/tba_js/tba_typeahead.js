@@ -1,9 +1,9 @@
 $(document).ready(function(){
-	// Disable browser autocompletes
-	$('.typeahead').attr('autocomplete', 'off');
-
+  // Disable browser autocompletes
+  $('.typeahead').attr('autocomplete', 'off');
+  
   // Set up Twitter Typeahead
-	$('.typeahead').typeahead([
+  $('.typeahead').typeahead([
 	  {
       name: 'teams',
       prefetch: {
@@ -19,6 +19,14 @@ $(document).ready(function(){
         filter: eventFilter
       },
       header: '<div class="tba-typeahead-header">Events</div>'
+    },
+    {
+	    name: 'districts',
+      prefetch: {
+        url: '/_/typeahead/districts-all',
+        filter: districtFilter
+      },
+      header: '<div class="tba-typeahead-header">Districts</div>'
     }
 	]);
 
@@ -28,6 +36,12 @@ $(document).ready(function(){
     if (event_re != null) {
       event_key = (event_re[1] + event_re[2]).toLowerCase();
       url = "/event/" + event_key;
+      window.location.href = url;
+    }
+    var district_re = datum.value.match(/.+District \[(.+?)]/);
+    if (district_re != null) {
+      district_key = district_re[1];
+      url = '/events/' + district_key.toLowerCase();
       window.location.href = url;
     }
     var team_re = datum.value.match(/(\d+) [|] .+/);
@@ -77,6 +91,17 @@ function teamFilter(data) {
 }
 
 function eventFilter(data) {
+  var to_return = [];
+  for(var i=0; i<data.length; i++) {
+    to_return.push({
+      value: data[i],
+      tokens: cleanUnicode(data[i]).replace('[', '').replace(']', '').split(' ')
+    });
+  }
+  return to_return;
+}
+
+function districtFilter(data) {
   var to_return = [];
   for(var i=0; i<data.length; i++) {
     to_return.push({
