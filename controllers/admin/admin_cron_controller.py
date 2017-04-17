@@ -15,7 +15,7 @@ from consts.district_type import DistrictType
 from consts.event_type import EventType
 from controllers.base_controller import LoggedInHandler
 from database import match_query
-from database.event_query import DistrictEventsQuery
+from database.event_query import DistrictEventsQuery, EventListQuery
 from database.district_query import DistrictChampsInYearQuery
 from helpers.award_manipulator import AwardManipulator
 from helpers.district_manipulator import DistrictManipulator
@@ -165,6 +165,56 @@ class AdminCreateDistrictTeamsEnqueue(LoggedInHandler):
             method='GET')
 
         self.response.out.write("Enqueued district teams for {}".format(year))
+
+
+class AdminRebuildDivisionsEnqueue(LoggedInHandler):
+    """
+    Enqueue a task to build past event parent/child relationships
+    """
+    def get(self, year):
+        self._require_admin()
+        taskqueue.add(
+            queue_name='admin',
+            target='backend-tasks',
+            url='/backend-tasks/do/rebuild_divisions/{}'.format(year),
+            method='GET')
+
+
+class AdminRebuildDivisionsDo(LoggedInHandler):
+    """
+    Add in event parent/child relationships
+    Map CMP_DIVISION -> CMP_FINALS and DCMP_DIVISION -> DCMP (in the same district)
+    Ensure all events end on the same day, to account for #2champz
+    """
+    TYPE_MAP = {
+        EventType.CMP_DIVISION: EventType.CMP_FINALS,
+        EventType.DISTRICT_CMP_DIVISION: EventType.DISTRICT_CMP,
+    }
+
+    def get(self, year):
+        year = int(year)
+        events = EventListQuery(year).fetch()
+        events_by_type = defaultdict(list)
+        for event in events:
+            if event.event_type_enum in self.TYPE_MAP.keys() or event.event_type_enum in self.TYPE_MAP.values():
+                events_by_type[event.event_type_enum].append(event)
+
+        output = ""
+        for from_type, to_type in self.TYPE_MAP.iteritems():
+            for event in events_by_type[to_type]:
+                divisions = []
+                for candidate_division in events_by_type[from_type]:
+                    if candidate_division.end_date.date() == event.end_date.date() and candidate_division.district_key == event.district_key:
+                        candidate_division.parent_event = event.key
+                        divisions.append(candidate_division.key)
+                        output += "Event {} is the parent of {}<br/>".format(event.key_name, candidate_division.key_name)
+                        EventManipulator.createOrUpdate(candidate_division)
+
+                event.divisions = divisions
+                if divisions:
+                    output += "Divisions {} added to {}<br/>".format(event.division_keys_json, event.key_name)
+                EventManipulator.createOrUpdate(event)
+        self.response.out.write(output)
 
 
 class AdminCreateDistrictTeamsDo(LoggedInHandler):
