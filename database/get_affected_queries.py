@@ -1,6 +1,9 @@
+from google.appengine.ext import ndb
+
 from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
 from database.district_query import DistrictsInYearQuery, DistrictHistoryQuery, DistrictQuery
-from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
+from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery, \
+    EventDivisionsQuery
 from database.event_details_query import EventDetailsQuery
 from database.match_query import MatchQuery, EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery, \
@@ -42,10 +45,12 @@ def event_updated(affected_refs):
     event_district_keys = filter(None, affected_refs['district_key'])
 
     event_team_keys_future = EventTeam.query(EventTeam.event.IN([event_key for event_key in event_keys])).fetch_async(None, keys_only=True)
+    events_future = ndb.get_multi_async(event_keys)
 
     queries_and_keys = []
     for event_key in event_keys:
         queries_and_keys.append((EventQuery(event_key.id())))
+        queries_and_keys.append(EventDivisionsQuery(event_key.id()))
 
     for year in years:
         queries_and_keys.append((EventListQuery(year)))
@@ -58,6 +63,11 @@ def event_updated(affected_refs):
         year = int(et_key.id()[:4])
         queries_and_keys.append((TeamEventsQuery(team_key)))
         queries_and_keys.append((TeamYearEventsQuery(team_key, year)))
+
+    events_with_parents = filter(lambda e: e.get_result() is not None and e.get_result().parent_event is not None, events_future)
+    parent_keys = set([e.get_result().parent_event for e in events_with_parents])
+    for parent_key in parent_keys:
+        queries_and_keys.append((EventDivisionsQuery(parent_key.id())))
 
     return queries_and_keys
 
