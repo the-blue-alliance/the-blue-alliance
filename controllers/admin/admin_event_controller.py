@@ -378,6 +378,10 @@ class AdminEventEdit(LoggedInHandler):
             end_date = datetime.strptime(self.request.get("end_date"), "%Y-%m-%d")
 
         district_key = self.request.get("event_district_key", None)
+        parent_key = self.request.get("parent_event", None)
+
+        division_key_names = json.loads(self.request.get('divisions'), '[]')
+        division_keys = [ndb.Key(Event, key) for key in division_key_names] if division_key_names else []
 
         event = Event(
             id=str(self.request.get("year")) + str.lower(str(self.request.get("event_short"))),
@@ -401,6 +405,8 @@ class AdminEventEdit(LoggedInHandler):
             custom_hashtag=self.request.get("custom_hashtag"),
             webcast_json=self.request.get("webcast_json"),
             playoff_type=int(self.request.get("playoff_type")),
+            parent_event=ndb.Key(Event, parent_key) if parent_key and parent_key.lower() != 'none' else None,
+            divisions=division_keys,
         )
         event = EventManipulator.createOrUpdate(event)
 

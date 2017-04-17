@@ -99,6 +99,14 @@
             <td><input type="text" name="custom_hashtag" value="{{event.custom_hashtag}}" /></td>
         </tr>
         <tr>
+            <td>Parent Event</td>
+            <td><input type="text" name="parent_event" value="{% if event.parent_event %}{{ event.parent_event.id }}{% endif %}"/></td>
+        </tr>
+        <tr>
+            <td>Event Divisions</td>
+            <td><input type="text" name="divisions" value="{{ event.division_keys_json }}"</td>
+        </tr>
+        <tr>
             <td>Webcast JSON</td>
             <td>
                 <textarea name="webcast_json">{{event.webcast_json}}</textarea>

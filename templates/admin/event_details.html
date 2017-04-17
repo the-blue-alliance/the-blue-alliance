@@ -132,6 +132,15 @@
         <td>{{event.webcast_json}}</td>
     </tr>
     <tr>
+        <td>Parent Event</td>
+        <td>{% if event.parent_event %}<a href="/admin/event/{{ event.parent_event.id }}">{{ event.parent_event.id }}</a>{% else %}None{% endif %}</td>
+    </tr>
+    <tr>
+        <td>Divisions</td>
+        <td>{{ event.divisions|length }} Divisions - {% for div_key in event.divisions %}<a href="/admin/event/{{ div_key.id }}">{{ div_key.id }}</a>, {% endfor %}<ul>
+        </ul></td>
+    </tr>
+    <tr>
         <td>Teams Attending</td>
         <td>{{ event.teams|length }} teams - {% for team in event.teams %}<a href="/admin/team/{{team.team_number}}">{{team.team_number}}</a>, {% endfor %}</td>
     </tr>

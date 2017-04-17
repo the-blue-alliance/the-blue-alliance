@@ -46,6 +46,8 @@ class Event(ndb.Model):
     timezone_id = ndb.StringProperty()  # such as 'America/Los_Angeles' or 'Asia/Jerusalem'
     official = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
     first_eid = ndb.StringProperty()  # from USFIRST
+    parent_event = ndb.KeyProperty()  # This is the division -> event champs relationship
+    divisions = ndb.KeyProperty(repeated=True)  # event champs -> all divisions
     facebook_eid = ndb.StringProperty(indexed=False)  # from Facebook
     custom_hashtag = ndb.StringProperty(indexed=False)  # Custom HashTag
     website = ndb.StringProperty(indexed=False)
@@ -366,6 +368,11 @@ class Event(ndb.Model):
             else:
                 current_webcasts.append(webcast)
         return current_webcasts
+
+    @property
+    def division_keys_json(self):
+        keys = [key.id() for key in self.divisions]
+        return json.dumps(keys)
 
     @property
     def key_name(self):
