@@ -302,6 +302,8 @@ class EventHelper(object):
         if ('district' in event_type_str) or ('state' in event_type_str)\
            or ('region' in event_type_str) or ('qualif' in event_type_str):
             if 'championship' in event_type_str:
+                if 'division' in event_type_str:
+                    return EventType.DISTRICT_CMP_DIVISION
                 return EventType.DISTRICT_CMP
             else:
                 return EventType.DISTRICT
