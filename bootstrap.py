@@ -68,6 +68,8 @@ def store_event(data):
     event.state_prov = data['state_prov']
     event.country = data['country']
     event.playoff_type = data['playoff_type']
+    event.parent_event = ndb.Key(Event, data['parent_event_key']) if data['parent_event_key'] else None
+    event.divisions = [ndb.Key(Event, div_key) for div_key in data['division_keys']] if data['division_keys'] else []
 
     district = store_district(data['district']) if data['district'] else None
     event.district_key = district.key if district else None
