@@ -75,3 +75,16 @@ class TeamYearEventsQuery(DatabaseQuery):
         event_keys = map(lambda event_team: event_team.event, event_teams)
         events = yield ndb.get_multi_async(event_keys)
         raise ndb.Return(events)
+
+
+class EventDivisionsQuery(DatabaseQuery):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "event_divisions_{}"  # (event_key)
+    DICT_CONVERTER = EventConverter
+
+    @ndb.tasklet
+    def _query_async(self):
+        event_key = self._query_args[0]
+        event = yield Event.get_by_id_async(event_key)
+        divisions = yield ndb.get_multi_async(event.divisions)
+        raise ndb.Return(divisions)
