@@ -73,6 +73,7 @@ class EventManipulator(ManipulatorBase):
             "event_type_enum",
             "event_district_enum",
             "district_key",
+            "divisions",
             "custom_hashtag",
             "facebook_eid",
             "first_eid",
@@ -80,6 +81,7 @@ class EventManipulator(ManipulatorBase):
             "state_prov",
             "country",
             "postalcode",
+            "parent_event",
             "playoff_type",
             "normalized_location",  # Overwrite whole thing as one
             "timezone_id",
