@@ -13,7 +13,7 @@ from consts.district_type import DistrictType
 from consts.playoff_type import PlayoffType
 from database import event_query, media_query
 from database.district_query import DistrictsInYearQuery, DistrictQuery
-from database.event_query import EventQuery
+from database.event_query import EventQuery, EventDivisionsQuery
 from helpers.match_helper import MatchHelper
 from helpers.award_helper import AwardHelper
 from helpers.team_helper import TeamHelper
@@ -146,6 +146,15 @@ class EventDetail(CacheableHandler):
         district_future = DistrictQuery(event.district_key.id()).fetch_async() if event.district_key else None
         event_medias_future = media_query.EventMediasQuery(event_key).fetch_async()
 
+        event_divisions_future = None
+        event_codivisions_future = None
+        parent_event_future = None
+        if event.divisions:
+            event_divisions_future = ndb.get_multi_async(event.divisions)
+        elif event.parent_event:
+            parent_event_future = event.parent_event.get_async()
+            event_codivisions_future = EventDivisionsQuery(event.parent_event.id()).fetch_async()
+
         awards = AwardHelper.organizeAwards(event.awards)
         cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
         matches = MatchHelper.organizeMatches(cleaned_matches)
@@ -206,6 +215,11 @@ class EventDetail(CacheableHandler):
             event_insights_template = 'event_partials/event_insights_{}.html'.format(event.year)
 
         district = district_future.get_result() if district_future else None
+        event_divisions = None
+        if event_divisions_future:
+            event_divisions = [e.get_result() for e in event_divisions_future]
+        elif event_codivisions_future:
+            event_divisions = event_codivisions_future.get_result()
 
         medias_by_slugname = MediaHelper.group_by_slugname([media for media in event_medias_future.get_result()])
 
@@ -229,6 +243,8 @@ class EventDetail(CacheableHandler):
             "event_insights_playoff": event_insights['playoff'] if event_insights else None,
             "event_insights_template": event_insights_template,
             "medias_by_slugname": medias_by_slugname,
+            "event_divisions": event_divisions,
+            'parent_event': parent_event_future.get_result() if parent_event_future else None
         })
 
         if event.within_a_day:
