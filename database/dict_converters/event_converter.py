@@ -32,7 +32,7 @@ class EventConverter(ConverterBase):
             'event_type_string': event.event_type_str,
             'parent_event_key': event.parent_event.id() if event.parent_event else None,
             'playoff_type': event.playoff_type,
-            'playoff_type_string': PlayoffType.type_names[event.playoff_type],
+            'playoff_type_string': PlayoffType.type_names.get(event.playoff_type),
             'district': DistrictConverter.convert(district_future.get_result(), 3) if district_future else None,
             'division_keys': [key.id() for key in event.divisions],
             'first_event_id': event.first_eid,
