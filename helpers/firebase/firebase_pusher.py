@@ -239,6 +239,8 @@ class FirebasePusher(object):
             'forced_live_events',
             values_json=json.dumps([]))
         for event in ndb.get_multi([ndb.Key('Event', ekey) for ekey in forced_live_events.contents]):
+            for webcast in event.webcast:
+                WebcastOnlineHelper.add_online_status_async(webcast)
             events_by_key[event.key.id()] = event
 
         # # Add in the Fake TBA BlueZone event (watch for circular imports)
