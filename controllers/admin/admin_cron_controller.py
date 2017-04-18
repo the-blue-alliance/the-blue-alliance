@@ -13,6 +13,7 @@ from consts.award_type import AwardType
 from consts.client_type import ClientType
 from consts.district_type import DistrictType
 from consts.event_type import EventType
+from consts.playoff_type import PlayoffType
 from controllers.base_controller import LoggedInHandler
 from database import match_query
 from database.event_query import DistrictEventsQuery, EventListQuery
@@ -215,6 +216,41 @@ class AdminRebuildDivisionsDo(LoggedInHandler):
                     output += "Divisions {} added to {}<br/>".format(event.division_keys_json, event.key_name)
                 EventManipulator.createOrUpdate(event)
         self.response.out.write(output)
+
+
+class AdminBackfillPlayoffTypeEnqueue(LoggedInHandler):
+    """
+    Enqueue a task to build past event parent/child relationships
+    """
+    def get(self, year):
+        self._require_admin()
+        taskqueue.add(
+            queue_name='admin',
+            target='backend-tasks',
+            url='/backend-tasks/do/backfill_playoff_type/{}'.format(year),
+            method='GET')
+
+
+class AdminBackfillPlayoffTypeDo(LoggedInHandler):
+    """
+    Set playoff types
+    """
+
+    # These offseasons played the 2014 game
+    EXCEPTIONS_2015 = ['2015cc', '2015cacc', '2015mttd']
+
+    def get(self, year):
+        self._require_admin()
+        year = int(year)
+        events = EventListQuery(year).fetch()
+        for event in events:
+            if not event.playoff_type:
+                if event.year == 2015 and event.key_name not in self.EXCEPTIONS_2015:
+                    event.playoff_type = PlayoffType.AVG_SCORE_8_TEAM
+                else:
+                    event.playoff_type = PlayoffType.BRACKET_8_TEAM
+            EventManipulator.createOrUpdate(event)
+        self.response.out.write("Update {} events".format(len(events)))
 
 
 class AdminCreateDistrictTeamsDo(LoggedInHandler):
