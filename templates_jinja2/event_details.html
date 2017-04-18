@@ -27,24 +27,22 @@
       {% if event.year == 2016 and event.event_type_enum == 3 %}
       <p class="pull-right"><a class="btn btn-primary" href="/event/{{event.key_name}}/insights"><span class="glyphicon glyphicon-align-left"></span> Advanced Insights</a></p>
       {% endif %}
-      <div class="row">
-          <a class="btn btn-default" href="/events/{{event.year}}"><span class="glyphicon glyphicon-chevron-left"></span> {{event.year}} Events</a>
-          {% if event_divisions %}
-          <div class="btn-group">
-          <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
-            {% if event.divisions %}Event Divisions{% elif parent_event %}Other Divisions{% endif %}
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu tba-dropdown-menu-limited">
-            {% for division in event_divisions%}
-              {% if division.key_name != event.key_name %}
-                <li><a href="/event/{{division.key_name}}">{{division.short_name}}</a></li>
-              {% endif %}
-            {% endfor %}
-          </ul>
-        </div>
-        {% endif %}
+      <a class="btn btn-default" href="/events/{{event.year}}"><span class="glyphicon glyphicon-chevron-left"></span> {{event.year}} Events</a>
+      {% if event_divisions %}
+        <div class="btn-group">
+        <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+          {% if event.divisions %}Event Divisions{% elif parent_event %}Other Divisions{% endif %}
+          <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu tba-dropdown-menu-limited">
+          {% for division in event_divisions%}
+            {% if division.key_name != event.key_name %}
+              <li><a href="/event/{{division.key_name}}">{{division.short_name}}</a></li>
+            {% endif %}
+          {% endfor %}
+        </ul>
       </div>
+      {% endif %}
       <h1 itemprop="summary">{{event.name}} {{event.year}}</h1>
       {% if district_name or parent_event %}<blockquote>
           {% if district_name %}<p></p><em>Part of the <a href="/events/{{district_abbrev}}/{{event.year}}">{{district_name}} District</a></em></p>{% endif %}
