@@ -193,6 +193,7 @@ class AdminRebuildDivisionsDo(LoggedInHandler):
     }
 
     def get(self, year):
+        self._require_admin()
         year = int(year)
         events = EventListQuery(year).fetch()
         events_by_type = defaultdict(list)
