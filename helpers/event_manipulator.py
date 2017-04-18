@@ -73,7 +73,6 @@ class EventManipulator(ManipulatorBase):
             "event_type_enum",
             "event_district_enum",
             "district_key",
-            "divisions",
             "custom_hashtag",
             "facebook_eid",
             "first_eid",
@@ -100,7 +99,9 @@ class EventManipulator(ManipulatorBase):
             'district_key'
         }
 
-        list_attrs = []
+        list_attrs = [
+            "divisions",
+        ]
 
         old_event._updated_attrs = []
 
