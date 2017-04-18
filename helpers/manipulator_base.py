@@ -98,15 +98,21 @@ class ManipulatorBase(object):
                     old_model._affected_references[attr] = old_model._affected_references[attr].union(val)
 
     @classmethod
+    @ndb.transactional
+    def _createOrUpdateDBOperations(cls, new_models, auto_union):
+        models = cls.listify(cls.findOrSpawn(cls.listify(new_models), auto_union=auto_union))
+        models_to_put = [model for model in models if getattr(model, "dirty", False)]
+        ndb.put_multi(models_to_put)
+        return models, models_to_put
+
+    @classmethod
     def createOrUpdate(self, new_models, auto_union=True, run_post_update_hook=True):
         """
         Given a model or list of models, either insert them into the database, or update
         existing models with the same key.
         Once inserted or updated, the model can be marked not dirty.
         """
-        models = self.listify(self.findOrSpawn(self.listify(new_models), auto_union=auto_union))
-        models_to_put = [model for model in models if getattr(model, "dirty", False)]
-        ndb.put_multi(models_to_put)
+        models, models_to_put = self._createOrUpdateDBOperations(new_models, auto_union)
         self._clearCache(models)
         if run_post_update_hook:
             self.runPostUpdateHook(models_to_put)
