@@ -190,6 +190,7 @@ class ApiTeamEventStatusController(ApiBaseController):
 
     def _render(self, team_key, event_key):
         event_team = EventTeam.get_by_id('{}_{}'.format(event_key, team_key))
+        self._last_modified = event_team.updated
         status = None
         if event_team:
             status = event_team.status
