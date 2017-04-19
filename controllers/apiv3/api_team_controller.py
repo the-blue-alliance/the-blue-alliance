@@ -1,3 +1,4 @@
+import datetime
 import json
 
 from google.appengine.ext import ndb
@@ -190,10 +191,12 @@ class ApiTeamEventStatusController(ApiBaseController):
 
     def _render(self, team_key, event_key):
         event_team = EventTeam.get_by_id('{}_{}'.format(event_key, team_key))
-        self._last_modified = event_team.updated
         status = None
         if event_team:
             status = event_team.status
+            self._last_modified = event_team.updated
+        else:
+            self._last_modified = datetime.datetime.now()
         if status:
             status.update({
                 'alliance_status_str': EventTeamStatusHelper.generate_team_at_event_alliance_status_string(team_key, status),
