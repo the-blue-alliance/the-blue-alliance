@@ -291,7 +291,7 @@ class EventInsights(CacheableHandler):
         # If no matches but there are match predictions, create fake matches
         # For cases where FIRST doesn't allow posting of match schedule
         fake_matches = False
-        if not matches['qm'] and match_predictions['qual']:
+        if match_predictions and (not matches['qm'] and match_predictions['qual']):
             fake_matches = True
             for i in xrange(len(match_predictions['qual'].keys())):
                 match_number = i + 1
