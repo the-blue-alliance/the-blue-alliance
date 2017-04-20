@@ -13,6 +13,7 @@ from controllers.apiv3.model_properties import filter_match_properties
 from database.dict_converters.match_converter import MatchConverter
 from database.dict_converters.event_converter import EventConverter
 from database.dict_converters.event_details_converter import EventDetailsConverter
+from database.match_query import EventMatchesQuery
 from helpers.event_helper import EventHelper
 from helpers.webcast_online_helper import WebcastOnlineHelper
 from models.sitevar import Sitevar
@@ -137,7 +138,7 @@ class FirebasePusher(object):
 
         try:
             if match.event.get().event_type_enum in EventType.CMP_EVENT_TYPES:
-                cls.update_champ_numbers(match)
+                cls.update_champ_numbers()
         except Exception, exception:
             logging.warning("Update champ numbers failed: {}".format(exception))
             logging.warning(traceback.format_exc())
@@ -282,34 +283,37 @@ class FirebasePusher(object):
             _queue="firebase")
 
     @classmethod
-    @ndb.transactional
-    def update_champ_numbers(cls, match):
-        champ_numbers_sitevar = Sitevar.get_or_insert(
-            'champ_numbers',
-            values_json=json.dumps({
-                'kpa_accumulated': 0,
-                'rotors_engaged': 0,
-                'ready_for_takeoff': 0,
-            }))
+    def update_champ_numbers(cls):
+        events = EventHelper.getWeekEvents()
+        matches_futures = []
+        for event in events:
+            matches_futures.append(EventMatchesQuery(event.key.id()).fetch_async())
 
-        old_contents = champ_numbers_sitevar.contents
-        for color in ['red', 'blue']:
-            old_contents['kpa_accumulated'] += match.score_breakdown[color]['autoFuelPoints'] + match.score_breakdown[color]['teleopFuelPoints']
-            if match.score_breakdown[color]['rotor4Engaged']:
-                old_contents['rotors_engaged'] += 4
-            elif match.score_breakdown[color]['rotor3Engaged']:
-                old_contents['rotors_engaged'] += 3
-            elif match.score_breakdown[color]['rotor2Engaged']:
-                old_contents['rotors_engaged'] += 2
-            elif match.score_breakdown[color]['rotor1Engaged']:
-                old_contents['rotors_engaged'] += 1
-            old_contents['ready_for_takeoff'] += match.score_breakdown[color]['teleopTakeoffPoints'] / 50
-
-        champ_numbers_sitevar.contents = old_contents
-        champ_numbers_sitevar.put()
+        pressure = 0
+        rotors = 0
+        climbs = 0
+        for matches_future in matches_futures:
+            for match in matches_future.get_result():
+                if not match.has_been_played:
+                    continue
+                for color in ['red', 'blue']:
+                    pressure += match.score_breakdown[color]['autoFuelPoints'] + match.score_breakdown[color]['teleopFuelPoints']
+                    if match.score_breakdown[color]['rotor4Engaged']:
+                        rotors += 4
+                    elif match.score_breakdown[color]['rotor3Engaged']:
+                        rotors += 3
+                    elif match.score_breakdown[color]['rotor2Engaged']:
+                        rotors += 2
+                    elif match.score_breakdown[color]['rotor1Engaged']:
+                        rotors += 1
+                    climbs += match.score_breakdown[color]['teleopTakeoffPoints'] / 50
 
         deferred.defer(
             cls._patch_data,
             'champ_numbers',
-            json.dumps(old_contents),
+            json.dumps({
+                'kpa_accumulated': pressure,
+                'rotors_engaged': rotors,
+                'ready_for_takeoff': climbs,
+            }),
             _queue="firebase")
