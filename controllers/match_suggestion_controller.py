@@ -28,8 +28,8 @@ class MatchSuggestionHandler(LoggedInHandler):
                 match.bluezone_score = min(100, (
                     min(match.prediction['red']['pressure'] * match.prediction['red']['pressure'], 3600) / 1200 +
                     min(match.prediction['blue']['pressure'] * match.prediction['blue']['pressure'], 3600) / 1200 +
-                    min(match.prediction['red']['gears'] * match.prediction['red']['gears'], 144) / 36 +
-                    min(match.prediction['blue']['gears'] * match.prediction['blue']['gears'], 144) / 36
+                    min(match.prediction['red']['gears'] * match.prediction['red']['gears'], 144) / 64 +
+                    min(match.prediction['blue']['gears'] * match.prediction['blue']['gears'], 144) / 64
                 ) * 25)
                 if i == 0:
                     current_matches.append(match)
