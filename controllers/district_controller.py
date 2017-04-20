@@ -62,14 +62,13 @@ class DistrictDetail(CacheableHandler):
         # needed for valid_districts
         districts_in_year_future = DistrictsInYearQuery(district.year).fetch_async()
 
-        # Temp disabled on 2017-02-18 -fangeugene
-        # # Needed for active team statuses
-        # live_events = []
-        # if year == datetime.datetime.now().year:  # Only show active teams for current year
-        #     live_events = EventHelper.getWeekEvents()
-        # live_eventteams_futures = []
-        # for event in live_events:
-        #     live_eventteams_futures.append(EventTeamsQuery(event.key_name).fetch_async())
+        # needed for active team statuses
+        live_events = []
+        if year == datetime.datetime.now().year:  # Only show active teams for current year
+            live_events = EventHelper.getWeekEvents()
+        live_eventteams_futures = []
+        for event in live_events:
+            live_eventteams_futures.append(EventTeamsQuery(event.key_name).fetch_async())
 
         events = events_future.get_result()
         EventHelper.sort_events(events)
@@ -85,6 +84,7 @@ class DistrictDetail(CacheableHandler):
         valid_districts = sorted(valid_districts, key=lambda (name, _): name)
 
         teams = TeamHelper.sortTeams(district_teams_future.get_result())
+        team_keys = set([t.key.id() for t in teams])
 
         num_teams = len(teams)
         middle_value = num_teams / 2
@@ -92,10 +92,37 @@ class DistrictDetail(CacheableHandler):
             middle_value += 1
         teams_a, teams_b = teams[:middle_value], teams[middle_value:]
 
-        # Temp disabled on 2017-02-18 -fangeugene
-        # # Currently Competing Team Status
-        # live_events_with_teams = EventTeamStatusHelper.buildEventTeamStatus(live_events, live_eventteams_futures, teams)
-        # live_events_with_teams.sort(key=lambda x: x[0].name)
+        # Currently Competing Team Status
+        event_team_keys = []
+        for event, teams_future in zip(live_events, live_eventteams_futures):
+            for team in teams_future.get_result():
+                if team.key.id() in team_keys:
+                    event_team_keys.append(ndb.Key(EventTeam, '{}_{}'.format(event.key.id(), team.key.id())))  # Should be in context cache
+
+        ndb.get_multi(event_team_keys)  # Warms context cache
+        live_events_with_teams = []
+        for event, teams_future in zip(live_events, live_eventteams_futures):
+            teams_and_statuses = []
+            has_teams = False
+            for team in teams_future.get_result():
+                if team.key.id() in team_keys:
+                    has_teams = True
+                    event_team = EventTeam.get_by_id('{}_{}'.format(event.key.id(), team.key.id()))  # Should be in context cache
+                    status_str = {
+                        'alliance': EventTeamStatusHelper.generate_team_at_event_alliance_status_string(team.key.id(), event_team.status),
+                        'playoff': EventTeamStatusHelper.generate_team_at_event_playoff_status_string(team.key.id(), event_team.status),
+                    }
+                    teams_and_statuses.append((
+                        team,
+                        event_team.status,
+                        status_str
+                    ))
+            if has_teams:
+                teams_and_statuses.sort(key=lambda x: x[0].team_number)
+                live_events_with_teams.append((event, teams_and_statuses))
+        live_events_with_teams.sort(key=lambda x: x[0].name)
+        live_events_with_teams.sort(key=lambda x: EventHelper.distantFutureIfNoStartDate(x[0]))
+        live_events_with_teams.sort(key=lambda x: EventHelper.distantFutureIfNoEndDate(x[0]))
 
         # Get valid years
         district_history = history_future.get_result()
@@ -114,7 +141,7 @@ class DistrictDetail(CacheableHandler):
             'rankings': district.rankings,
             'teams_a': teams_a,
             'teams_b': teams_b,
-            # 'live_events_with_teams': live_events_with_teams,  # Temp disabled on 2017-02-18 -fangeugene
+            'live_events_with_teams': live_events_with_teams,
         })
 
         return jinja2_engine.render('district_details.html', self.template_values)
