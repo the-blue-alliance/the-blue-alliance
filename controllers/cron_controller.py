@@ -431,8 +431,8 @@ class TypeaheadCalcDo(webapp.RequestHandler):
                     results[TypeaheadEntry.ALL_DISTRICTS_KEY].append(data)
             else:
                 results[TypeaheadEntry.ALL_DISTRICTS_KEY] = [data]
-            
-            
+
+
         for event in events:
             data = '%s %s [%s]' % (event.year, event.name, event.event_short.upper())
             # all events
@@ -626,7 +626,7 @@ class MatchTimePredictionsEnqueue(webapp.RequestHandler):
         for event in live_events:
             taskqueue.add(url='/tasks/math/do/predict_match_times/{}'.format(event.key_name),
                           method='GET')
-        taskqueue.add(url='/tasks/do/bluezone_update', method='GET')
+        # taskqueue.add(url='/tasks/do/bluezone_update', method='GET')
         self.response.out.write("Enqueued time prediction for {} events".format(len(live_events)))
 
 
