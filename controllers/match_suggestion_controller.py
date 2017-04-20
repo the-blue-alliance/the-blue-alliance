@@ -17,10 +17,12 @@ class MatchSuggestionHandler(LoggedInHandler):
             event.prep_details()
             event.prep_matches()
 
+        finished_matches = []
         current_matches = []
         upcoming_matches = []
         ranks = {}
         for event in current_events:
+            finished_matches += MatchHelper.recentMatches(event.matches, num=1)
             for i, match in enumerate(MatchHelper.upcomingMatches(event.matches, num=3)):
                 match.prediction = event.details.predictions['match_predictions']['qual' if match.comp_level == 'qm' else 'playoff'][match.key.id()]
                 match.bluezone_score = min(100, (
@@ -35,10 +37,12 @@ class MatchSuggestionHandler(LoggedInHandler):
                     upcoming_matches.append(match)
             for rank in event.details.rankings2:
                 ranks[rank['team_key']] = rank['rank']
+        finished_matches = sorted(finished_matches, key=lambda m: m.actual_time if m.actual_time else m.time)
         current_matches = sorted(current_matches, key=lambda m: m.predicted_time if m.predicted_time else m.time)
         upcoming_matches = sorted(upcoming_matches, key=lambda m: m.predicted_time if m.predicted_time else m.time)
 
         self.template_values.update({
+            'finished_matches': finished_matches,
             'current_matches': current_matches,
             'upcoming_matches': upcoming_matches,
             'ranks': ranks,
