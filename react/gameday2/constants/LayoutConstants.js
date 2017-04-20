@@ -43,7 +43,7 @@ export const LAYOUT_SVG_PATHS = [
   'M0 0h5v7h-5v-7z M6 0h5v7h-5v-7z M12 0h5v7h-5v-7z M18 0h5v7h-5v-7z M0 8h5v7h-5v-7z M6 8h5v7h-5v-7z M12 8h5v7h-5v-7z M18 8h5v7h-5v-7z',
   'M0 0h7v4.33h-7v-4.33z M8 0h7v4.33h-7v-4.33z M16 0h7v4.33h-7v-4.33z M0 5.33h7v4.33h-7v-4.33z M8 5.33h7v4.33h-7v-4.33z M16 5.33h7v4.33h-7v-4.33z M0 10.67h7v4.33h-7v-4.33z M8 10.67h7v4.33h-7v-4.33z M16 10.67h7v4.33h-7v-4.33z',
   'M0 0h23v7h-23v-7z M0 8h23v7h-23v-7z',
-  'M6 0h11v15h-11v-15z M0 0h5v4.33h-5v-4.33z M18 0h5v4.33h-5v-4.33z M0 5.33h5v4.33h-5v-4.33z M18 5.33h5v4.33h-5v-4.33z M0 10.67h5v4.33h-5v-4.33z M18 10.67h5v4.33h-5v-4.33z',
+  'M0 0h17.75v9.67h-17.75v-9.67z M0 10.67h5.25v4.33h-5.25v4.33z M6 10.67h5.25v4.33h-5.25v4.33z M12 10.67h5.25v4.33h-5.25v4.33z M17.75 10.67h5.25v4.33h-5.25v4.33z M17.75 0h5.25v4.33h-5.25v4.33z M17.75 5.33h5.25v4.33h-5.25v4.33z',
   'M0 0h11v3h-11v-3z M0 4h11v3h-11v-3z M0 8h11v3h-11v-3z M0 12h11v3h-11v-3z M12 0h11v3h-11v-3z M12 4h11v3h-11v-3z M12 8h11v3h-11v-3z M12 12h11v3h-11v-3z',
 ]
 
@@ -455,57 +455,57 @@ const LAYOUT_9 = [
 
 /* Layout 10
 
-+------+------+------+
-|  1   |      |   4  |
-|------|      |------|
-|  2   |   0  |   5  |
-|------|      |------|
-|  3   |      |   6  |
-+------+------+------+
++-----------+------+------+
+|                  |   1  |
+|         0        |------|
+|                  |   2  |
+|------------------|------|
+|  6  |  5   |  4  |   3  |
++-----+------+-----+------+
 
  */
 const LAYOUT_10 = [
   {
-    width: '50%',
-    height: '100%',
+    width: '75%',
+    height: '66.67%',
     top: 0,
+    left: 0,
+    position: 'absolute',
+  }, {
+    width: '25%',
+    height: '33.33%',
+    top: 0,
+    left: '75%',
+    position: 'absolute',
+  }, {
+    width: '25%',
+    height: '33.33%',
+    top: '33.33%',
+    left: '75%',
+    position: 'absolute',
+  }, {
+    width: '25%',
+    height: '33.33%',
+    top: '66.67%',
+    left: '75%',
+    position: 'absolute',
+  }, {
+    width: '25%',
+    height: '33.33%',
+    top: '66.67%',
+    left: '50%',
+    position: 'absolute',
+  }, {
+    width: '25%',
+    height: '33.33%',
+    top: '66.67%',
     left: '25%',
     position: 'absolute',
   }, {
     width: '25%',
     height: '33.33%',
-    top: 0,
-    left: 0,
-    position: 'absolute',
-  }, {
-    width: '25%',
-    height: '33.33%',
-    top: '33.33%',
-    left: 0,
-    position: 'absolute',
-  }, {
-    width: '25%',
-    height: '33.33%',
     top: '66.67%',
     left: 0,
-    position: 'absolute',
-  }, {
-    width: '25%',
-    height: '33.33%',
-    top: 0,
-    left: '75%',
-    position: 'absolute',
-  }, {
-    width: '25%',
-    height: '33.33%',
-    top: '33.33%',
-    left: '75%',
-    position: 'absolute',
-  }, {
-    width: '25%',
-    height: '33.33%',
-    top: '66.67%',
-    left: '75%',
     position: 'absolute',
   },
 ]
