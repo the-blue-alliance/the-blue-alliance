@@ -222,6 +222,7 @@ class EventDetail(CacheableHandler):
             event_divisions = event_codivisions_future.get_result()
 
         medias_by_slugname = MediaHelper.group_by_slugname([media for media in event_medias_future.get_result()])
+        has_time_predictions = matches_upcoming and any(match.predicted_time for match in matches_upcoming)
 
         self.template_values.update({
             "event": event,
@@ -230,6 +231,7 @@ class EventDetail(CacheableHandler):
             "matches": matches,
             "matches_recent": matches_recent,
             "matches_upcoming": matches_upcoming,
+            'has_time_predictions': has_time_predictions,
             "awards": awards,
             "teams_a": teams_a,
             "teams_b": teams_b,
