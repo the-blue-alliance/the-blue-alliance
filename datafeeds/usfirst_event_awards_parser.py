@@ -82,7 +82,7 @@ class UsfirstEventAwardsParser(ParserBase):
                 awards_by_type[award_type_enum]['recipient_json_list'].append(recipient_json)
             else:
                 awards_by_type[award_type_enum] = {
-                    'name_str': strip_number(name_str),
+                    'name_str': fix_unicode(strip_number(name_str)),
                     'award_type_enum': award_type_enum,
                     'team_number_list': [team_number] if team_number is not None else [],
                     'recipient_json_list': [recipient_json],
@@ -103,3 +103,7 @@ def strip_number(text):
         return m.group(1) + m.group(2)
     else:
         return text
+
+def fix_unicode(text):
+    # Fixes bad characters such as copyright after the "Gracious Professionalism" award in 2013
+    return text.encode('ascii', 'ignore')
