@@ -118,7 +118,7 @@ class EventTeamUpdater(object):
         alliance_selections = event.alliance_selections
         if alliance_selections:
             for alliance in alliance_selections:
-                if winning_teams.intersection(set(alliance['picks'])) >= 2:
+                if len(winning_teams.intersection(set(alliance['picks']))) >= 2:
                     complete_alliance = set(alliance['picks']) if alliance else set()
                     if alliance and alliance.get('backup'):
                         complete_alliance.add(alliance['backup']['in'])
