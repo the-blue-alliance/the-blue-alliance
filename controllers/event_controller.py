@@ -288,7 +288,8 @@ class EventInsights(CacheableHandler):
         ranking_predictions = event.details.predictions.get('ranking_predictions', None)
         ranking_prediction_stats = event.details.predictions.get('ranking_prediction_stats', None)
 
-        cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
+        #cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
+        cleaned_matches = event.matches # Emergency Einstein fix
         matches = MatchHelper.organizeMatches(cleaned_matches)
 
         # If no matches but there are match predictions, create fake matches
