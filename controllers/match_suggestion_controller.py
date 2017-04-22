@@ -8,6 +8,23 @@ from helpers.match_helper import MatchHelper
 
 
 class MatchSuggestionHandler(LoggedInHandler):
+
+    def get_qual_bluezone_score(self, prediction):
+        return min(100, (
+            min(prediction['red']['pressure'] * prediction['red']['pressure'], 3600) / 1200 +
+            min(prediction['blue']['pressure'] * prediction['blue']['pressure'], 3600) / 1200 +
+            min(prediction['red']['gears'] * prediction['red']['gears'], 144) / 64 +
+            min(prediction['blue']['gears'] * prediction['blue']['gears'], 144) / 64
+        ) * 25)
+
+    def get_elim_bluezone_score(self, prediction):
+        return min(100, (
+            min(prediction['red']['pressure'] * prediction['red']['pressure'], 8000) / 2500 +
+            min(prediction['blue']['pressure'] * prediction['blue']['pressure'], 8000) / 2500 +
+            min(prediction['red']['gears'] * prediction['red']['gears'], 144) / 64 +
+            min(prediction['blue']['gears'] * prediction['blue']['gears'], 144) / 64
+        ) * 25)
+
     def get(self):
         self._require_registration()
 
@@ -25,12 +42,7 @@ class MatchSuggestionHandler(LoggedInHandler):
             finished_matches += MatchHelper.recentMatches(event.matches, num=1)
             for i, match in enumerate(MatchHelper.upcomingMatches(event.matches, num=3)):
                 match.prediction = event.details.predictions['match_predictions']['qual' if match.comp_level == 'qm' else 'playoff'][match.key.id()]
-                match.bluezone_score = min(100, (
-                    min(match.prediction['red']['pressure'] * match.prediction['red']['pressure'], 3600) / 1200 +
-                    min(match.prediction['blue']['pressure'] * match.prediction['blue']['pressure'], 3600) / 1200 +
-                    min(match.prediction['red']['gears'] * match.prediction['red']['gears'], 144) / 64 +
-                    min(match.prediction['blue']['gears'] * match.prediction['blue']['gears'], 144) / 64
-                ) * 25)
+                match.bluezone_score = self.get_qual_bluezone_score(match.prediction) if match.comp_level == 'qm' else self.get_elim_bluezone_score(match.prediction)
                 if i == 0:
                     current_matches.append(match)
                 else:
