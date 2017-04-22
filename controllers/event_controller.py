@@ -156,7 +156,8 @@ class EventDetail(CacheableHandler):
             event_codivisions_future = EventDivisionsQuery(event.parent_event.id()).fetch_async()
 
         awards = AwardHelper.organizeAwards(event.awards)
-        cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
+        #cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
+        cleaned_matches = event.matches # Emergency Einstein fix
         matches = MatchHelper.organizeMatches(cleaned_matches)
         teams = TeamHelper.sortTeams(event.teams)
 
