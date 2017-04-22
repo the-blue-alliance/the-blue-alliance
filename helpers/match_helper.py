@@ -303,10 +303,10 @@ class MatchHelper(object):
                                     record['wins'] += 1
                                 elif match.winning_alliance == '':
                                     cp = 1
-                                    record['losses'] += 1
+                                    record['ties'] += 1
                                 else:
                                     cp = 0
-                                    record['ties'] += 1
+                                    record['losses'] += 1
                                 if match.has_been_played:
                                     champ_points.append(cp)
                                     match_points.append(match.alliances[color]['score'])
@@ -325,10 +325,10 @@ class MatchHelper(object):
                         record['wins'] += 1
                     elif match.winning_alliance == '':
                         cp = 1
-                        record['losses'] += 1
+                        record['ties'] += 1
                     else:
                         cp = 0
-                        record['ties'] += 1
+                        record['losses'] += 1
                     if i is None:
                         advancement[comp_level].append([alliance, [cp], cp, [score], score, alliance_name, record])
                     elif is_new:
