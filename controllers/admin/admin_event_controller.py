@@ -380,7 +380,7 @@ class AdminEventEdit(LoggedInHandler):
         district_key = self.request.get("event_district_key", None)
         parent_key = self.request.get("parent_event", None)
 
-        division_key_names = json.loads(self.request.get('divisions'), '[]')
+        division_key_names = json.loads(self.request.get('divisions'), '[]') if self.request.get('divisions') else []
         division_keys = [ndb.Key(Event, key) for key in division_key_names] if division_key_names else []
 
         event = Event(
