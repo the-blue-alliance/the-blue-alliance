@@ -17,7 +17,7 @@
           <td>{% for team in alliance %}<a href="/team/{{ team|digits }}/{{ event.year }}">{{ team }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</td>
           <td>{{ champ_points }}</td>
           <td>{{ match_points }}</td>
-          <td>{% if loop.index0 < 2 %}<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>{% endif %}</td>
+          <td>{% if playoff_advancement.sf_complete and loop.index0 < 2 %}<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>{% endif %}</td>
         </tr>
       {% endfor %}
     </tbody>

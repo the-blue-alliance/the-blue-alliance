@@ -271,11 +271,12 @@ class MatchHelper(object):
     @classmethod
     def generatePlayoffAdvancementRoundRobin(cls, matches, alliance_selections=None):
         complete_alliances = []
-        advancement = defaultdict(list)  # key: comp level; value: list of [complete_alliance, [champ_points], sum_champ_points, [match_points], sum_match_points]
+        advancement = defaultdict(list)  # key: comp level; value: list of [complete_alliance, [champ_points], sum_champ_points, [match_points], sum_match_points
         for comp_level in ['sf']:  # In case this needs to scale to more levels
+            any_unplayed = False
             for match in matches.get(comp_level, []):
                 if not match.has_been_played:
-                    continue
+                    any_unplayed = True
                 for color in ['red', 'blue']:
                     alliance = cls.getOrderedAlliance(match.alliances[color]['teams'], alliance_selections)
                     for i, complete_alliance in enumerate(complete_alliances):  # search for alliance. could be more efficient
@@ -292,22 +293,25 @@ class MatchHelper(object):
                         for j, (complete_alliance, champ_points, _, match_points, _) in enumerate(advancement[comp_level]):  # search for alliance. could be more efficient
                             if len(set(complete_alliances[i]).intersection(set(complete_alliance))) >= 2:  # if >= 2 teams are the same, then the alliance is the same
                                 complete_alliance = complete_alliances[i]
-                                match_points.append(match.alliances[color]['score'])
                                 if match.winning_alliance == color:
                                     cp = 2
                                 elif match.winning_alliance == '':
                                     cp = 1
                                 else:
                                     cp = 0
-                                champ_points.append(cp)
-                                advancement[comp_level][j][2] = sum(champ_points)
-                                advancement[comp_level][j][4] = sum(match_points)
+                                if match.has_been_played:
+                                    champ_points.append(cp)
+                                    match_points.append(match.alliances[color]['score'])
+                                    advancement[comp_level][j][2] = sum(champ_points)
+                                    advancement[comp_level][j][4] = sum(match_points)
                                 break
                         else:
                             is_new = True
 
-                    score = match.alliances[color]['score']
-                    if match.winning_alliance == color:
+                    score = match.alliances[color]['score'] if match.has_been_played else 0
+                    if not match.has_been_played:
+                        cp = 0
+                    elif match.winning_alliance == color:
                         cp = 2
                     elif match.winning_alliance == '':
                         cp = 1
@@ -320,6 +324,7 @@ class MatchHelper(object):
 
             advancement[comp_level] = sorted(advancement[comp_level], key=lambda x: -x[4])  # sort by match points
             advancement[comp_level] = sorted(advancement[comp_level], key=lambda x: -x[2])  # sort by championship points
+            advancement['{}_complete'.format(comp_level)] = not any_unplayed
 
         return advancement
 
