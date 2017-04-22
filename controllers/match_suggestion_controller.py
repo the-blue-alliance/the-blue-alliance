@@ -19,10 +19,10 @@ class MatchSuggestionHandler(LoggedInHandler):
 
     def get_elim_bluezone_score(self, prediction):
         return min(100, (
-            min(prediction['red']['pressure'] * prediction['red']['pressure'], 8000) / 2500 +
-            min(prediction['blue']['pressure'] * prediction['blue']['pressure'], 8000) / 2500 +
-            min(prediction['red']['gears'] * prediction['red']['gears'], 144) / 64 +
-            min(prediction['blue']['gears'] * prediction['blue']['gears'], 144) / 64
+            min(prediction['red']['pressure'] * prediction['red']['pressure'], 8000) / 3000 +
+            min(prediction['blue']['pressure'] * prediction['blue']['pressure'], 8000) / 3000 +
+            min(prediction['red']['gears'] * prediction['red']['gears'], 144) / 72 +
+            min(prediction['blue']['gears'] * prediction['blue']['gears'], 144) / 72
         ) * 25)
 
     def get(self):
