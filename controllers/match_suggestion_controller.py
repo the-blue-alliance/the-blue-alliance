@@ -1,4 +1,5 @@
 import json
+from collections import defaultdict
 
 from controllers.base_controller import LoggedInHandler
 from template_engine import jinja2_engine
@@ -41,6 +42,10 @@ class MatchSuggestionHandler(LoggedInHandler):
         for event in current_events:
             finished_matches += MatchHelper.recentMatches(event.matches, num=1)
             for i, match in enumerate(MatchHelper.upcomingMatches(event.matches, num=3)):
+                if match.key.id() not in event.details.predictions['match_predictions']['qual' if match.comp_level == 'qm' else 'playoff']:
+                    match.prediction = defaultdict(lambda: defaultdict())
+                    match.bluezone_score = 0
+                    continue
                 match.prediction = event.details.predictions['match_predictions']['qual' if match.comp_level == 'qm' else 'playoff'][match.key.id()]
                 match.bluezone_score = self.get_qual_bluezone_score(match.prediction) if match.comp_level == 'qm' else self.get_elim_bluezone_score(match.prediction)
                 if i == 0:
