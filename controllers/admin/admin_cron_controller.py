@@ -22,6 +22,7 @@ from helpers.award_manipulator import AwardManipulator
 from helpers.district_manipulator import DistrictManipulator
 from helpers.district_team_manipulator import DistrictTeamManipulator
 from helpers.event_manipulator import EventManipulator
+from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_helper import MatchHelper
 from helpers.notification_sender import NotificationSender
 from helpers.search_helper import SearchHelper
@@ -252,6 +253,22 @@ class AdminBackfillPlayoffTypeDo(LoggedInHandler):
                     event.playoff_type = PlayoffType.BRACKET_8_TEAM
             EventManipulator.createOrUpdate(event)
         self.response.out.write("Update {} events".format(len(events)))
+
+
+class AdminClearEventTeamsDo(LoggedInHandler):
+    """
+    Remove all eventteams from an event
+    """
+    def get(self, event_key):
+        self._require_admin()
+        event = Event.get_by_id(event_key)
+        if not event:
+            self.abort(404)
+            return
+        existing_event_team_keys = set(EventTeam.query(EventTeam.event == event.key).fetch(1000, keys_only=True))
+        EventTeamManipulator.delete_keys(existing_event_team_keys)
+
+        self.response.out.write("Deleted {} EventTeams from {}".format(len(existing_event_team_keys), event_key))
 
 
 class AdminCreateDistrictTeamsDo(LoggedInHandler):

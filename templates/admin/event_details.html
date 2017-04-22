@@ -142,7 +142,8 @@
     </tr>
     <tr>
         <td>Teams Attending</td>
-        <td>{{ event.teams|length }} teams - {% for team in event.teams %}<a href="/admin/team/{{team.team_number}}">{{team.team_number}}</a>, {% endfor %}</td>
+        <td>{{ event.teams|length }} teams - {% for team in event.teams %}<a href="/admin/team/{{team.team_number}}">{{team.team_number}}</a>, {% endfor %}
+            <p><a href="/tasks/admin/do/clear_eventteams/{{ event.key_name }}" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Delete All</a></p></td>
     </tr>
     <tr>
         <td>Created - Updated</td>
