@@ -188,7 +188,7 @@ class Match(ndb.Model):
             else:  # tie
                 event = self.event.get()
                 if event and event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM and event.event_type_enum == EventType.CMP_FINALS:
-                    self._winning_alliance == ''
+                    self._winning_alliance = ''
                 else:
                     self._winning_alliance = MatchHelper.tiebreak_winner(self)
         return self._winning_alliance
