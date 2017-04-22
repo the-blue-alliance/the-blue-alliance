@@ -404,7 +404,7 @@ class AdminEventEdit(LoggedInHandler):
             facebook_eid=self.request.get("facebook_eid"),
             custom_hashtag=self.request.get("custom_hashtag"),
             webcast_json=self.request.get("webcast_json"),
-            playoff_type=int(self.request.get("playoff_type")),
+            playoff_type=int(self.request.get("playoff_type")) if self.request.get('playoff_type') else PlayoffType.BRACKET_8_TEAM,
             parent_event=ndb.Key(Event, parent_key) if parent_key and parent_key.lower() != 'none' else None,
             divisions=division_keys,
         )
