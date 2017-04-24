@@ -8,6 +8,7 @@ import re
 
 from collections import defaultdict
 from consts.event_type import EventType
+from consts.playoff_type import PlayoffType
 
 from helpers.match_manipulator import MatchManipulator
 
@@ -155,7 +156,7 @@ class MatchHelper(object):
         return upcoming_matches
 
     @classmethod
-    def deleteInvalidMatches(self, match_list):
+    def deleteInvalidMatches(self, match_list, event):
         """
         A match is invalid iff it is an elim match that has not been played
         and the same alliance already won in 2 match numbers in the same set.
@@ -173,6 +174,9 @@ class MatchHelper(object):
         return_list = []
         for match in match_list:
             if match.comp_level in Match.ELIM_LEVELS and not match.has_been_played:
+                if event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM and match.comp_level != 'f':
+                    # Don't delete round robin semifinal matches
+                    continue
                 key = '{}{}'.format(match.comp_level, match.set_number)
                 if red_win_counts[key] == 2 or blue_win_counts[key] == 2:
                     try:

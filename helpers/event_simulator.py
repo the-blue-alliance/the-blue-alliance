@@ -334,6 +334,6 @@ class EventSimulator(object):
         ndb.get_context().clear_cache()
         # Re fetch event matches
         event = Event.get_by_id('2016nytr')
-        MatchHelper.deleteInvalidMatches(event.matches)
+        MatchHelper.deleteInvalidMatches(event.matches, event)
         ndb.get_context().clear_cache()
         self._update_rankings()

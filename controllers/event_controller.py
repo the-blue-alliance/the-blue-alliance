@@ -156,8 +156,7 @@ class EventDetail(CacheableHandler):
             event_codivisions_future = EventDivisionsQuery(event.parent_event.id()).fetch_async()
 
         awards = AwardHelper.organizeAwards(event.awards)
-        #cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
-        cleaned_matches = event.matches # Emergency Einstein fix
+        cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches, event)
         matches = MatchHelper.organizeMatches(cleaned_matches)
         teams = TeamHelper.sortTeams(event.teams)
 
@@ -288,8 +287,7 @@ class EventInsights(CacheableHandler):
         ranking_predictions = event.details.predictions.get('ranking_predictions', None)
         ranking_prediction_stats = event.details.predictions.get('ranking_prediction_stats', None)
 
-        #cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
-        cleaned_matches = event.matches # Emergency Einstein fix
+        cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches, event)
         matches = MatchHelper.organizeMatches(cleaned_matches)
 
         # If no matches but there are match predictions, create fake matches
