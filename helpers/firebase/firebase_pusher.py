@@ -16,6 +16,7 @@ from database.dict_converters.event_details_converter import EventDetailsConvert
 from database.match_query import EventMatchesQuery
 from helpers.event_helper import EventHelper
 from helpers.webcast_online_helper import WebcastOnlineHelper
+from models.event import Event
 from models.sitevar import Sitevar
 
 
@@ -284,7 +285,11 @@ class FirebasePusher(object):
 
     @classmethod
     def update_champ_numbers(cls):
-        events = EventHelper.getWeekEvents()
+        events = Event.query(
+            Event.year==2017,
+            Event.event_type_enum.IN([
+                EventType.CMP_DIVISION,
+                EventType.CMP_FINALS])).fetch()
         matches_futures = []
         for event in events:
             matches_futures.append(EventMatchesQuery(event.key.id()).fetch_async())
