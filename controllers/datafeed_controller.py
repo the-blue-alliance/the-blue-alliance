@@ -245,7 +245,12 @@ class FMSAPIMatchesGet(webapp.RequestHandler):
     def get(self, event_key):
         df = DatafeedFMSAPI('v2.0', save_response=True)
 
-        new_matches = MatchManipulator.createOrUpdate(df.getMatches(event_key))
+        new_matches = MatchManipulator.createOrUpdate(
+            MatchHelper.deleteInvalidMatches(
+                df.getMatches(event_key),
+                Event.get_by_id(event_key)
+            )
+        )
 
         template_values = {
             'matches': new_matches,
