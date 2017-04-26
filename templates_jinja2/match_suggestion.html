@@ -21,3 +21,16 @@
   </div>
 </div>
 {% endblock %}
+
+
+{% block inline_javascript %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.countdown/2.2.0/jquery.countdown.min.js"></script>
+<script type="text/javascript">
+  $('.tba-match-time-utc-countdown').each(function () {
+    var matchTime = new Date($(this).attr('datetime'));  // Converts UTC to local time
+    $(this).countdown(matchTime, function(event) {
+      $(this).text(event.strftime('%D:%H:%M:%S'));
+    });
+  });
+</script>
+{% endblock %}
