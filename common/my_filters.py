@@ -7,6 +7,7 @@ import re
 
 # More info on custom Django template filters here:
 # https://docs.djangoproject.com/en/dev/howto/custom-template-tags/#registering-custom-filters
+from template_engine import jinja2_filters
 
 register = webapp.template.create_template_register()
 
@@ -60,3 +61,8 @@ def sort_by(values, prop):
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)
+
+
+@register.filter
+def match_short(match_key):
+    return jinja2_filters.match_short(match_key)

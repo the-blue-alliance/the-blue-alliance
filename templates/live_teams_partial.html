@@ -19,6 +19,7 @@
                     <tr>
                         <th>Team Number</th>
                         <th>Team Name</th>
+                        <th>Next Match</th>
                         <th>Qual Record</th>
                         <th>Ranking</th>
                         <th>Alliance</th>
@@ -30,6 +31,9 @@
                             <td>{{ team.team_number }}</td>
                             <td>
                                 <a href="/team/{{ team.team_number }}/{{ event.year }}#{{ event.key_name }}">{{ team.nickname }}</a>
+                            </td>
+                             <td>
+                                {% if status.next_match_key %}<a href="/match/{{ status.next_match_key }}">{{ status.next_match_key|match_short }}</a>{% else %}--{% endif %}
                             </td>
                             <td>{{ status.qual.ranking.record.wins }}-{{ status.qual.ranking.record.losses }}-{{ status.qual.ranking.record.ties }}</td>
                             <td>{% if status.qual.ranking.rank %}{{ status.qual.ranking.rank }}/{{ status.qual.num_teams }}{% else %}--{% endif %}</td>
