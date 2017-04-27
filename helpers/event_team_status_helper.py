@@ -188,11 +188,16 @@ class EventTeamStatusHelper(object):
         event_details = event.details
         if not matches:
             matches = event.matches
-            matches = MatchHelper.organizeMatches(matches)
+        team_matches = [m for m in matches if team_key in m.team_key_names]
+        next_match = MatchHelper.upcomingMatches(team_matches, num=1)
+        last_match = MatchHelper.recentMatches(team_matches, num=1)
+        matches = MatchHelper.organizeMatches(matches)
         return copy.deepcopy({
             'qual': cls._build_qual_info(team_key, event_details, matches, event.year),
             'alliance': cls._build_alliance_info(team_key, event_details, matches),
-            'playoff': cls._build_playoff_info(team_key, event_details, matches, event.year)
+            'playoff': cls._build_playoff_info(team_key, event_details, matches, event.year),
+            'last_match': last_match[0].key_name if last_match else None,
+            'next_match': next_match[0].key_name if next_match else None,
         })  # TODO: Results are getting mixed unless copied. 2017-02-03 -fangeugene
 
     @classmethod
