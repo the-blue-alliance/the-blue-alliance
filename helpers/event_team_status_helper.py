@@ -196,8 +196,8 @@ class EventTeamStatusHelper(object):
             'qual': cls._build_qual_info(team_key, event_details, matches, event.year),
             'alliance': cls._build_alliance_info(team_key, event_details, matches),
             'playoff': cls._build_playoff_info(team_key, event_details, matches, event.year),
-            'last_match': last_match[0].key_name if last_match else None,
-            'next_match': next_match[0].key_name if next_match else None,
+            'last_match_key': last_match[0].key_name if last_match else None,
+            'next_match_key': next_match[0].key_name if next_match else None,
         })  # TODO: Results are getting mixed unless copied. 2017-02-03 -fangeugene
 
     @classmethod

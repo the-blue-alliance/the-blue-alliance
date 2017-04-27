@@ -31,6 +31,7 @@ def get_jinja_env(force_filesystemloader=False):
     env.filters['rfc2822'] = jinja2_filters.rfc2822
     env.filters['slugify'] = jinja2_filters.slugify
     env.filters['yt_start'] = jinja2_filters.yt_start
+    env.filters['match_short'] = jinja2_filters.match_short
     return env
 
 

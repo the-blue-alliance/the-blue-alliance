@@ -5,6 +5,7 @@ import time
 import urllib
 
 from helpers.youtube_video_helper import YouTubeVideoHelper
+from models.match import Match
 
 defense_render_names_2016 = {
     'A_ChevalDeFrise': 'Cheval De Frise',
@@ -85,3 +86,12 @@ def yt_start(value):
         value = '%s?start=%i' % (video_id, total_seconds)
 
     return value
+
+
+def match_short(match_key):
+    if not Match.validate_key_name(match_key):
+        return ''
+    match_id = match_key.split('_')[1]
+    if match_id.startswith('qm'):
+        return 'Q{}'.format(match_id[2:])
+    return match_id.replace('m', '-').upper()
