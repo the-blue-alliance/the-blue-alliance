@@ -61,7 +61,7 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
         author = suggestion.author.get()
         OutgoingNotificationHelper.send_suggestion_result_email(
             to=author.email,
-            subject="[TBA] Offseason Event Suggestion: ".format(event.name),
+            subject="[TBA] Offseason Event Suggestion: {}".format(event.name),
             email_body="""Dear {},
 
 Thank you for suggesting an offseason event to The Blue Alliance. Your suggestion has been approved and you can find the event at https://thebluealliance.com/event/{}
