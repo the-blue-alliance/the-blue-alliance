@@ -63,12 +63,13 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
             to=author.email,
             subject="[TBA] Offseason Event Suggestion: ".format(event.name),
             email_body="""Dear {},
-            Thank you for suggesting an offseason event to The Blue Alliance. Your suggestion has been approved and you can find the event at https://thebluealliance.com/event/{}
 
-            If you would like to upload teams attending, match videos, or real-time match results to TBA before or during the event, you can do so using the TBA EventWizard - request auth keys here: https://www.thebluealliance.com/request/apiwrite
+Thank you for suggesting an offseason event to The Blue Alliance. Your suggestion has been approved and you can find the event at https://thebluealliance.com/event/{}
 
-            Thanks for helping make TBA better,
-            The Blue Alliance Admins
+If you would like to upload teams attending, match videos, or real-time match results to TBA before or during the event, you can do so using the TBA EventWizard - request auth keys here: https://www.thebluealliance.com/request/apiwrite
+
+Thanks for helping make TBA better,
+The Blue Alliance Admins
             """.format(author.nickname, event_key)
         )
 
