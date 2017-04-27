@@ -6,6 +6,7 @@ from consts.event_type import EventType
 from controllers.suggestions.suggestions_review_base_controller import \
     SuggestionsReviewBaseController
 from helpers.event_manipulator import EventManipulator
+from helpers.outgoing_notification_helper import OutgoingNotificationHelper
 from models.event import Event
 from models.suggestion import Suggestion
 from template_engine import jinja2_engine
@@ -56,6 +57,21 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
             official=False,
         )
         EventManipulator.createOrUpdate(event)
+
+        author = suggestion.author.get()
+        OutgoingNotificationHelper.send_suggestion_result_email(
+            to=author.email,
+            subject="[TBA] Offseason Event Suggestion: ".format(event.name),
+            email_body="""Dear {},
+            Thank you for suggesting an offseason event to The Blue Alliance. Your suggestion has been approved and you can find the event at https://thebluealliance.com/event/{}
+
+            If you would like to upload teams attending, match videos, or real-time match results to TBA before or during the event, you can do so using the TBA EventWizard - request auth keys here: https://www.thebluealliance.com/request/apiwrite
+
+            Thanks for helping make TBA better,
+            The Blue Alliance Admins
+            """.format(author.nickname, event_key)
+        )
+
         return event_key
 
     def get(self):
