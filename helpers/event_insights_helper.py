@@ -69,6 +69,7 @@ class EventInsightsHelper(object):
         fuel_points = 0
 
         kpa_achieved = 0
+        unicorn_matches = 0
 
         winning_scores = 0
         win_margins = 0
@@ -136,7 +137,11 @@ class EventInsightsHelper(object):
                     low_goals += alliance_breakdown['autoFuelLow'] + alliance_breakdown['teleopFuelLow']
                     fuel_points += alliance_breakdown['autoFuelPoints'] + alliance_breakdown['teleopFuelPoints']
 
-                    kpa_achieved += 1 if alliance_breakdown['kPaRankingPointAchieved'] or alliance_breakdown['kPaBonusPoints'] > 0 else 0
+                    kpa_bonus = alliance_breakdown['kPaRankingPointAchieved'] or alliance_breakdown['kPaBonusPoints'] > 0
+                    kpa_achieved += 1 if kpa_bonus else 0
+
+                    alliance_win = alliance_color == match.winning_alliance
+                    unicorn_matches += 1 if alliance_win and kpa_bonus and alliance_breakdown['rotor4Engaged'] else 0
 
                     foul_scores += alliance_breakdown['foulPoints']
                     has_insights = True
@@ -187,6 +192,7 @@ class EventInsightsHelper(object):
             'rotor_3_engaged': [rotor_3_engaged, opportunities_1x, 100.0 * float(rotor_3_engaged) / opportunities_1x],
             'rotor_4_engaged': [rotor_4_engaged, opportunities_1x, 100.0 * float(rotor_4_engaged) / opportunities_1x],
             'kpa_achieved': [kpa_achieved, opportunities_1x, 100.0 * float(kpa_achieved) / opportunities_1x],
+            'unicorn_matches': [unicorn_matches, opportunities_1x, 100.0 * float(unicorn_matches) / opportunities_1x],
             'average_win_score': float(winning_scores) / finished_matches,
             'average_win_margin': float(win_margins) / finished_matches,
             'average_score': float(total_scores) / (2 * finished_matches),
