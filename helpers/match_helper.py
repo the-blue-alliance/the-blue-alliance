@@ -173,6 +173,7 @@ class MatchHelper(object):
 
         return_list = []
         for match in match_list:
+            return_list.append(match)
             if match.comp_level in Match.ELIM_LEVELS and not match.has_been_played:
                 if event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM and match.comp_level != 'f':
                     # Don't delete round robin semifinal matches
@@ -185,7 +186,7 @@ class MatchHelper(object):
                     except:
                         logging.warning("Tried to delete invalid match, but failed: %s" % match.key_name)
                     continue
-            return_list.append(match)
+
         return return_list
 
     @classmethod
