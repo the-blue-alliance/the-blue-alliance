@@ -97,7 +97,7 @@ class EventTeamUpdater(object):
         """
         matches_by_type = MatchHelper.organizeMatches(matches)
         if 'f' not in matches_by_type or not matches_by_type['f']:
-            return
+            return set()
         finals_matches = matches_by_type['f']
         red_wins = 0
         blue_wins = 0
