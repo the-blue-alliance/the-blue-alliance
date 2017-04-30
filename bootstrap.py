@@ -187,6 +187,27 @@ def local_auth_func():
     return 'user', 'pass'
 
 
+def update_event(key):
+    event_data = fetch_event(key)
+    event = store_event(event_data)
+
+    event_teams = fetch_event_detail(key, 'teams')
+    teams = map(store_team, event_teams)
+    map(lambda t: store_eventteam(t, event), teams)
+
+    event_matches = fetch_event_detail(key, 'matches')
+    map(store_match, event_matches)
+
+    event_rankings = fetch_event_detail(key, 'rankings')
+    store_eventdetail(event, 'rankings2', event_rankings['rankings'] if event_rankings else [])
+
+    event_alliances = fetch_event_detail(key, 'alliances')
+    store_eventdetail(event, 'alliance_selections', event_alliances)
+
+    event_awards = fetch_event_detail(key, 'awards')
+    map(lambda t: store_award(t, event), event_awards)
+
+
 def main(key, url):
     print "Configuring GAE Remote API on {} to import {}".format(url, key)
     if 'localhost' in url:
@@ -206,29 +227,14 @@ def main(key, url):
         store_match(match_data)
 
     elif Event.validate_key_name(key):
-        event_data = fetch_event(key)
-        event = store_event(event_data)
-
-        event_teams = fetch_event_detail(key, 'teams')
-        teams = map(store_team, event_teams)
-        map(lambda t: store_eventteam(t, event), teams)
-
-        event_matches = fetch_event_detail(key, 'matches')
-        map(store_match, event_matches)
-
-        event_rankings = fetch_event_detail(key, 'rankings')
-        store_eventdetail(event, 'rankings2', event_rankings['rankings'] if event_rankings else [])
-
-        event_alliances = fetch_event_detail(key, 'alliances')
-        store_eventdetail(event, 'alliance_selections', event_alliances)
-
-        event_awards = fetch_event_detail(key, 'awards')
-        map(lambda t: store_award(t, event), event_awards)
-
+        update_event(key)
     elif Team.validate_key_name(key):
         team_data = fetch_team(key)
         store_team(team_data)
-
+    elif key.isdigit():
+        event_keys = [event['key'] for event in fetch_endpoint('events/{}'.format(key))]
+        for event in event_keys:
+            update_event(event)
     else:
         print "Unknown key :("
 
