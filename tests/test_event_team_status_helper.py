@@ -393,6 +393,8 @@ class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
             },
             "status": "won"
         },
+        "last_match_key": "2016nytr_f1m3",
+        "next_match_key": None,
         "qual": {
             "num_teams": 36,
             "ranking": {
@@ -462,6 +464,8 @@ class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
             },
             "status": "eliminated"
         },
+        "last_match_key": "2016nytr_sf1m2",
+        "next_match_key": None,
         "qual": {
             "num_teams": 36,
             "ranking": {
@@ -534,6 +538,8 @@ class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
             },
             "status": "eliminated"
         },
+        "last_match_key": "2016nytr_sf2m1",
+        "next_match_key": None,
         "qual": {
             "num_teams": 36,
             "ranking": {
@@ -606,6 +612,8 @@ class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
             },
             "status": "eliminated"
         },
+        "last_match_key": "2016nytr_f1m3",
+        "next_match_key": None,
         "qual": {
             "num_teams": 36,
             "ranking": {
@@ -656,6 +664,8 @@ class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
     status_5964 = {
         "alliance": None,
         "playoff": None,
+        "next_match_key": None,
+        "last_match_key": "2016nytr_qm67",
         "qual": {
             "num_teams": 36,
             "ranking": {
@@ -783,6 +793,8 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
             },
             "status": "won"
         },
+        "last_match_key": "2016nytr_f1m3",
+        "next_match_key": None,
         "qual": {
             "num_teams": 36,
             "ranking": {
@@ -820,6 +832,8 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
             },
             "status": "eliminated"
         },
+        "last_match_key": "2016nytr_sf1m2",
+        "next_match_key": None,
         "qual": {
             "num_teams": 36,
             "ranking": {
@@ -857,6 +871,8 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
             },
             "status": "eliminated"
         },
+        "last_match_key": "2016nytr_sf2m1",
+        "next_match_key": None,
         "qual": {
             "num_teams": 36,
             "ranking": {
@@ -894,6 +910,8 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
             },
             "status": "eliminated"
         },
+        "last_match_key": "2016nytr_f1m3",
+        "next_match_key": None,
         "qual": {
             "num_teams": 36,
             "ranking": {
@@ -917,6 +935,8 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
     status_5964 = {
         "alliance": None,
         "playoff": None,
+        "last_match_key": "2016nytr_qm67",
+        "next_match_key": None,
         "qual": {
             "num_teams": 36,
             "ranking": {
@@ -1018,6 +1038,8 @@ class Test2016casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
             },
             "status": "won"
         },
+        "last_match_key": "2016casj_f1m2",
+        "next_match_key": None,
         "qual": {
             "num_teams": 64,
             "ranking": {
@@ -1085,6 +1107,8 @@ class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
             "record": None,
             "status": "won"
         },
+        "last_match_key": "2015casj_f1m2",
+        "next_match_key": None,
         "qual": {
             "num_teams": 57,
             "ranking": {
@@ -1147,6 +1171,8 @@ class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
             "record": None,
             "status": "eliminated"
         },
+        "last_match_key": "2015casj_sf1m5",
+        "next_match_key": None,
         "qual": {
             "num_teams": 57,
             "ranking": {
@@ -1198,6 +1224,8 @@ class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
     status_8 = {
         "alliance": None,
         "playoff": None,
+        "last_match_key": "2015casj_qm92",
+        "next_match_key": None,
         "qual": {
             "num_teams": 57,
             "ranking": {
@@ -1308,6 +1336,8 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
             "record": None,
             "status": "won"
         },
+        "last_match_key": "2015casj_f1m2",
+        "next_match_key": None,
         "qual": {
             "num_teams": 57,
             "ranking": {
@@ -1333,6 +1363,8 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
             "record": None,
             "status": "eliminated"
         },
+        "last_match_key": "2015casj_sf1m5",
+        "next_match_key": None,
         "qual": {
             "num_teams": 57,
             "ranking": {
@@ -1352,6 +1384,8 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
     status_8 = {
         "alliance": None,
         "playoff": None,
+        "last_match_key": "2015casj_qm92",
+        "next_match_key": None,
         "qual": {
             "num_teams": 57,
             "ranking": {
