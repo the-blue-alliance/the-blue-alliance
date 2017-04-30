@@ -41,7 +41,7 @@ class MatchManipulator(ManipulatorBase):
         for (match, updated_attrs, is_new) in zip(matches, updated_attr_list, is_new_list):
             event = match.event.get()
             # Only continue if the event is currently happening
-            if event.within_a_day:
+            if event.now:
                 if match.has_been_played:
                     if is_new or 'alliances_json' in updated_attrs:
                         # There is a score update for this match, push a notification
