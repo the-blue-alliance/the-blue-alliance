@@ -7,3 +7,4 @@ webapp2==2.5.2
 jinja2==2.6
 appengine-fixture-loader==0.1.8
 pytz==2016.4
+PyYAML==3.12
