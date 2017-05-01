@@ -1,9 +1,12 @@
+import logging
+
 from consts.ranking_indexes import RankingIndexes
 from models.event_details import EventDetails
 
 
 class RankingsHelper(object):
     SORT_ORDERS = {
+        2017: [2, 3, 4, 5, 6, 7],
         2016: [2, 3, 4, 5, 6],
         2015: [2, 5, 3, 4, 7, 6],
         2014: [2, 3, 4, 5, 6],

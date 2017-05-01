@@ -178,13 +178,11 @@ class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
     def _process_request(self, request, event_key):
         rankings = JSONRankingsParser.parse(request.body)
 
-        event = Event.get_by_id(event_key)
-
         event_details = EventDetails(
             id=event_key,
             rankings=rankings
         )
-        if event_details.year == 2017:  # TODO: Temporary fix. Should directly parse request into rankings2
+        if event_details.year >= 2017:  # TODO: Temporary fix. Should directly parse request into rankings2
             event_details.rankings2 = RankingsHelper.convert_rankings(event_details)
         EventDetailsManipulator.createOrUpdate(event_details)
 
