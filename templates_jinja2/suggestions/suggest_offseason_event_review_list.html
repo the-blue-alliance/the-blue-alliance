@@ -66,6 +66,24 @@
     <div class="col-xs-12">
       {% for suggestion_id, event in events_and_ids %}
         <div class="well">
+          <h3>Similar Events This Year</h3>
+          <ul>
+          {% for similar_key, similar_name in similar_events[loop.index0] %}
+            <li><a href="/event/{{similar_key}}">{{similar_name}} ({{similar_key}})</a></li>
+          {% else %}
+            <p>None Found</p>
+          {% endfor %}
+          </ul>
+
+          <h3>Similar Events Last Year</h3>
+          <ul>
+          {% for similar_key, similar_name in similar_last_year[loop.index0] %}
+            <li><a href="/event/{{similar_key}}">{{similar_name}} ({{similar_key}})</a></li>
+          {% else %}
+            <p>None Found</p>
+          {% endfor %}
+          </ul>
+
           {% include "event_partials/suggest_event_info.html" %}
         </div>
       {% else %}

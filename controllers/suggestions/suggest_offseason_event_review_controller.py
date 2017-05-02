@@ -1,10 +1,11 @@
 from datetime import datetime
+from difflib import SequenceMatcher
 
 from consts.account_permissions import AccountPermissions
-from consts.district_type import DistrictType
 from consts.event_type import EventType
 from controllers.suggestions.suggestions_review_base_controller import \
     SuggestionsReviewBaseController
+from database.event_query import EventListQuery
 from helpers.event_manipulator import EventManipulator
 from helpers.outgoing_notification_helper import OutgoingNotificationHelper
 from models.event import Event
@@ -79,12 +80,26 @@ The Blue Alliance Admins
         suggestions = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
             Suggestion.target_model == "offseason-event")
+
+        year = datetime.now().year
+        year_events_future = EventListQuery(year).fetch_async()
+        last_year_events_future = EventListQuery(year - 1).fetch_async()
         events_and_ids = [self._create_candidate_event(suggestion) for suggestion in suggestions]
+
+        year_events = year_events_future.get_result()
+        year_offseason_events = [e for e in year_events if e.event_type_enum == EventType.OFFSEASON]
+        last_year_events = last_year_events_future.get_result()
+        last_year_offseason_events = [e for e in last_year_events if e.event_type_enum == EventType.OFFSEASON]
+
+        similar_events = [self._get_similar_events(event[1], year_offseason_events) for event in events_and_ids]
+        similar_last_year = [self._get_similar_events(event[1], last_year_offseason_events) for event in events_and_ids]
 
         self.template_values.update({
             'success': self.request.get("success"),
             'event_key': self.request.get("event_key"),
             'events_and_ids': events_and_ids,
+            'similar_events': similar_events,
+            'similar_last_year': similar_last_year,
         })
         self.response.out.write(
             jinja2_engine.render('suggestions/suggest_offseason_event_review_list.html', self.template_values))
@@ -134,3 +149,17 @@ The Blue Alliance Admins
             website=suggestion.contents['website'],
             year=start_date.year if start_date else None,
             official=False)
+
+    @classmethod
+    def _get_similar_events(cls, candidate_event, offseason_events):
+        """
+        Finds events this year with a similar name
+        Returns a tuple of (event key, event name)
+        """
+        similar_events = []
+        for event in offseason_events:
+            similarity = SequenceMatcher(a=candidate_event.name, b=event.name).ratio()
+            if similarity > 0.5:
+                # Somewhat arbitrary cutoff
+                similar_events.append((event.key_name, event.name))
+        return similar_events
