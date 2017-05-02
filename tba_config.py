@@ -45,5 +45,5 @@ else:
         "save-frc-api-response": True,
     }
 
-CONFIG['landing_handler'] = CHAMPS
+CONFIG['landing_handler'] = INSIGHTS
 CONFIG["static_resource_version"] = 8
