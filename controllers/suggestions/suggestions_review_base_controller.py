@@ -26,6 +26,9 @@ class SuggestionsReviewBaseController(LoggedInHandler):
         """
         raise NotImplementedError("Subclasses should implement create_target_model")
 
+    def was_create_success(self, ret):
+        return ret
+
     @ndb.transactional(xg=True)
     def _process_accepted(self, accept_key):
         """
@@ -45,7 +48,7 @@ class SuggestionsReviewBaseController(LoggedInHandler):
 
         # Do all DB writes
         ret = self.create_target_model(suggestion)
-        if ret:
+        if self.was_create_success(ret):
             # Mark Suggestion as accepted
             suggestion.review_state = Suggestion.REVIEW_ACCEPTED
             suggestion.reviewer = self.user_bundle.account.key

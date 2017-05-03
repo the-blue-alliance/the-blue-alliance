@@ -24,12 +24,10 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
         event_key = str(self.request.get("year")) + str.lower(str(self.request.get("event_short")))
         if not event_id:
             # Need to supply a key :(
-            self.redirect("/suggest/offseason/review?success=missing_key")
-            return
+            return 'missing_key', None
         if not Event.validate_key_name(event_key):
             # Bad event key generated
-            self.redirect("/suggest/offseason/review?success=bad_key")
-            return
+            return 'bad_key', None
 
         start_date = None
         if self.request.get("start_date"):
@@ -38,6 +36,10 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
         end_date = None
         if self.request.get("end_date"):
             end_date = datetime.strptime(self.request.get("end_date"), "%Y-%m-%d")
+
+        existing_event = Event.get_by_id(event_key)
+        if existing_event:
+            return 'duplicate_key', None
 
         event = Event(
             id=event_key,
@@ -74,7 +76,10 @@ The Blue Alliance Admins
             """.format(author.nickname, event_key)
         )
 
-        return event_key
+        return 'success', event_key
+
+    def was_create_success(self, ret):
+        return ret and ret[0] == 'success'
 
     def get(self):
         suggestions = Suggestion.query().filter(
@@ -109,8 +114,8 @@ The Blue Alliance Admins
         suggestion_id = int(self.request.get("suggestion_id"))
         verdict = self.request.get("verdict")
         if verdict == "accept":
-            event_key = self._process_accepted(suggestion_id)
-            self.redirect("/suggest/offseason/review?success=accept&event_key=%s" % event_key)
+            status, event_key = self._process_accepted(suggestion_id)
+            self.redirect("/suggest/offseason/review?success={}&event_key={}".format(status, event_key))
             return
         elif verdict == "reject":
             self._process_rejected(suggestion_id)
