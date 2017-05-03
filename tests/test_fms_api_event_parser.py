@@ -144,3 +144,37 @@ class TestFMSAPIEventParser(unittest2.TestCase):
             [30, 4469, 15, 14, 0, 0, 0, 16, 2],
             [31, 2557, 15, 6, 0, 0,  0, 36, 2],
             [32, 1318, 1, 6, 0, 0, 0, 8, 2]])
+
+    def test_parse2017Awards(self):
+        self.event = Event(
+            id="2017cmpmo",
+            end_date=datetime.datetime(2017, 4, 29, 0, 0),
+            event_short="cmpmo",
+            event_type_enum=EventType.CMP_FINALS,
+            district_key=None,
+            first_eid="22465",
+            name="Einstein Field (St. Louis)",
+            start_date=datetime.datetime(2017, 4, 29, 0, 0),
+            year=2017,
+            timezone_id='America/Chicago'
+        )
+        self.event.put()
+
+        with open('test_data/fms_api/2017cmpmo_awards.json', 'r') as f:
+            awards = FMSAPIAwardsParser(self.event).parse(json.loads(f.read()))
+
+        self.assertEqual(len(awards), 6)
+
+        for award in awards:
+            if award.key.id() == '2017cmpmo_0':
+                self.assertEqual(award.name_str, 'Chairman\'s Award')
+                self.assertEqual(award.award_type_enum, 0)
+                self.assertFalse({'team_number': 2169, 'awardee': None} in award.recipient_list)
+                self.assertFalse({'team_number': 1885, 'awardee': None} in award.recipient_list)
+                self.assertTrue({'team_number': 2614, 'awardee': None} in award.recipient_list)
+            elif award.key.id() == '2017cmpmo_69':
+                self.assertEqual(award.name_str, 'Chairman\'s Award Finalist')
+                self.assertEqual(award.award_type_enum, 69)
+                self.assertTrue({'team_number': 2169, 'awardee': None} in award.recipient_list)
+                self.assertTrue({'team_number': 1885, 'awardee': None} in award.recipient_list)
+                self.assertFalse({'team_number': 2614, 'awardee': None} in award.recipient_list)
