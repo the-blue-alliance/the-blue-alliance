@@ -106,7 +106,7 @@ class AwardType(object):
             None: "Chairman's Award",
         },
         CHAIRMANS_FINALIST: {
-            None: "Chairman's Finalist Award",
+            None: "Chairman's Award Finalist",
         },
         WINNER: {
             None: "Winner",
