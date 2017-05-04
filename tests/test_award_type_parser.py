@@ -14,6 +14,7 @@ class TestUsfirstEventTypeParser(unittest2.TestCase):
         """
         self.assertEqual(AwardHelper.parse_award_type("Chairman's"), AwardType.CHAIRMANS)
         self.assertEqual(AwardHelper.parse_award_type("Chairman"), AwardType.CHAIRMANS)
+        self.assertEqual(AwardHelper.parse_award_type("Chairman's Award Finalist"), AwardType.CHAIRMANS_FINALIST)
 
         self.assertEqual(AwardHelper.parse_award_type("Winner #1"), AwardType.WINNER)
         self.assertEqual(AwardHelper.parse_award_type("Division Winner #2"), AwardType.WINNER)
@@ -77,5 +78,10 @@ class TestUsfirstEventTypeParser(unittest2.TestCase):
 
         # test 2015 award names
         with open('test_data/fms_api/2015_award_types.json', 'r') as f:
+            for award in json.loads(f.read()):
+                self.assertNotEqual(AwardHelper.parse_award_type(award['description']), None)
+
+        # test 2017 award types
+        with open('test_data/fms_api/2017_award_types.json', 'r') as f:
             for award in json.loads(f.read()):
                 self.assertNotEqual(AwardHelper.parse_award_type(award['description']), None)
