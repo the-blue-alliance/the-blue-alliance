@@ -457,7 +457,10 @@ class Event(ndb.Model):
     @property
     def normalized_name(self):
         if self.event_type_enum == EventType.CMP_FINALS:
-            return 'Championship'
+            if self.year >= 2017:
+                return '{} {}'.format(self.city, 'Championship')
+            else:
+                return 'Championship'
         elif self.short_name:
             return '{} {}'.format(self.short_name, EventType.short_type_names[self.event_type_enum])
         else:
