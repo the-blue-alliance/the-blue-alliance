@@ -209,7 +209,7 @@ $('#results_file').change(function(){
             var match = matches[i];
 
             // check for invalid match
-            if(!match['Time']){
+            if(!match['Time'] || !match['Red 1']){
                 continue;
             }
             good_matches++;
