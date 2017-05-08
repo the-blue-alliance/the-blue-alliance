@@ -205,11 +205,11 @@ $('#results_file').change(function(){
         $('#results_preview').html("<tr><th>Time</th><th>Match</th><th>TBA Key</th><th>Red 1</th><th>Red 2</th><th>Red 3</th><th>Blue 1</th><th>Blue 2</th><th>Blue 3</th><th>Red Score</th><th>Blue Score</th></tr>");
         var good_matches = 0;
         var last_match_type = null;
-        for(var i=0; i<matches.length; i++){
+        for(var i=0; i<matches.length; i++) {
             var match = matches[i];
 
             // check for invalid match
-            if(!match['Time']){
+            if (!match['Time'] || !match['Red Score'] || !match['Blue Score']) {
                 continue;
             }
             good_matches++;
