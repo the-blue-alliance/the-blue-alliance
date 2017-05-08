@@ -27,7 +27,12 @@
             </div>
             <p>If you're setting up a full copy of The Blue Alliance, these will help you create all the data you need.
             <ol>
-                <li><a href="/tasks/get/usfirst_event_list/{{cur_year}}">UsfirstEventListGet</a>, enqueues Tasks to create Event objects for regional events from USFIRST.</li>
+                <li>
+                  EventListGet, enqueues Tasks to create Event objects for regional events from USFIRST by year.<br>
+                  {% for year in years %}
+                    <a href="/backend-tasks/get/event_list/{{year}}" target="_blank">{{year}}</a>&nbsp;{% if not forloop.last %}&#124;{% endif %}
+                  {% endfor %}
+                </li>
                 <li>Initiate 2014 Teams: <a href="/tasks/get/usfirst_teams_tpids/2014?skip=0">UsfirstTeamsTpidsGet @0</a> <a href="/tasks/get/usfirst_teams_tpids/2014?skip=1000">@1000</a> <a href="/tasks/get/usfirst_teams_tpids/2014?skip=2000">@2000</a> <a href="/tasks/get/usfirst_teams_tpids/2014?skip=3000">@3000</a> <a href="/tasks/get/usfirst_teams_tpids/2014?skip=4000">@4000</a>
                 <a href="/tasks/get/usfirst_teams_tpids/2014?skip=5000">@5000</a></li>
                 <li>Initiate 2013 Teams: <a href="/tasks/get/usfirst_teams_tpids/2013?skip=0">UsfirstTeamsTpidsGet @0</a> <a href="/tasks/get/usfirst_teams_tpids/2013?skip=1000">@1000</a> <a href="/tasks/get/usfirst_teams_tpids/2013?skip=2000">@2000</a> <a href="/tasks/get/usfirst_teams_tpids/2013?skip=3000">@3000</a> <a href="/tasks/get/usfirst_teams_tpids/2013?skip=4000">@4000</a></li>

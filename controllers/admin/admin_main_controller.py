@@ -62,6 +62,7 @@ class AdminDebugHandler(LoggedInHandler):
     def get(self):
         self._require_admin()
         self.template_values['cur_year'] = datetime.datetime.now().year
+        self.template_values['years'] = range(datetime.datetime.now().year, 2005, -1)
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/debug.html')
         self.response.out.write(template.render(path, self.template_values))
 
