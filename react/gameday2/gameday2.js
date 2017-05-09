@@ -140,8 +140,6 @@ firedux.ref.child('live_events').on('value', (snapshot) => {
         store.dispatch(addWebcastAtPosition(params[key], i))
       }
     }
-    // Always start with chat open
-    store.dispatch(setChatSidebarVisibility(true))
     if (params.chat) {
       store.dispatch(setTwitchChat(params.chat))
     }

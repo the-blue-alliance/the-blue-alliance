@@ -26,6 +26,19 @@ class ChatSidebar extends React.Component {
     this.state = {
       chatSelectorOpen: false,
     }
+
+    this.onResize = this.onResize.bind(this)
+  }
+
+  componentDidMount() {
+    this.onResize()
+    window.addEventListener('resize', this.onResize)
+  }
+
+  onResize() {
+    if (window.innerWidth < 760) {
+      this.props.setChatSidebarVisibility(false)
+    }
   }
 
   onRequestOpenChatSelector() {
