@@ -18,6 +18,8 @@ class ChatSidebar extends React.Component {
     currentChat: PropTypes.string.isRequired,
     setTwitchChat: PropTypes.func.isRequired,
     muiTheme: PropTypes.object.isRequired,
+    setChatSidebarVisibility: PropTypes.object.isRequired,
+    setHashtagSidebarVisibility: PropTypes.object.isRequired,
   }
 
   constructor(props) {
@@ -38,6 +40,7 @@ class ChatSidebar extends React.Component {
   onResize() {
     if (window.innerWidth < 760) {
       this.props.setChatSidebarVisibility(false)
+      this.props.setHashtagSidebarVisibility(false)
     }
   }
 
