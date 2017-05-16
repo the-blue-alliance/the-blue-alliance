@@ -91,6 +91,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/account/mytba/team/<team_number:[0-9]+>', MyTBATeamController, 'account-mytba-team', strict_slash=True),
       RedirectRoute(r'/add-data', AddDataHandler, 'add-data', strict_slash=True),
       RedirectRoute(r'/advanced_team_search', AdvancedSearchController, 'advanced_team_search', strict_slash=True),
+      RedirectRoute(r'/apidocs', redirect_to='/apidocs/v2'),
       RedirectRoute(r'/apidocs/v2', ApiV2DocumentationHandler, 'api-documentation', strict_slash=True),
       RedirectRoute(r'/apidocs/v3', ApiV3DocumentationHandler, 'api-documentation', strict_slash=True),
       RedirectRoute(r'/apidocs/webhooks', WebhookDocumentationHandler, 'webhook-documentation', strict_slash=True),
