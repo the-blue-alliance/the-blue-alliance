@@ -362,6 +362,19 @@ class ApiV2DocumentationHandler(CacheableHandler):
         return template.render(path, self.template_values)
 
 
+class ApiV3DocumentationHandler(CacheableHandler):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "api_docs"
+
+    def __init__(self, *args, **kw):
+        super(ApiV3DocumentationHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/apidocsv3.html")
+        return template.render(path, self.template_values)
+
+
 class ApiWriteHandler(CacheableHandler):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "api_write"

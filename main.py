@@ -20,7 +20,7 @@ from controllers.main_controller import TwoChampsHandler, ContactHandler, Hashta
     MainInsightsHandler, MainOffseasonHandler, OprHandler, PredictionsHandler, SearchHandler, \
     AboutHandler, ThanksHandler, handle_404, handle_500, \
     WebcastsHandler, RecordHandler, ApiV2DocumentationHandler, ApiWriteHandler, MatchInputHandler, WebhookDocumentationHandler, \
-      AddDataHandler
+      AddDataHandler, ApiV3DocumentationHandler
 from controllers.match_controller import MatchDetail
 from controllers.match_suggestion_controller import MatchSuggestionHandler
 from controllers.match_timeline_controller import MatchTimelineHandler
@@ -92,6 +92,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/add-data', AddDataHandler, 'add-data', strict_slash=True),
       RedirectRoute(r'/advanced_team_search', AdvancedSearchController, 'advanced_team_search', strict_slash=True),
       RedirectRoute(r'/apidocs/v2', ApiV2DocumentationHandler, 'api-documentation', strict_slash=True),
+      RedirectRoute(r'/apidocs/v3', ApiV3DocumentationHandler, 'api-documentation', strict_slash=True),
       RedirectRoute(r'/apidocs/webhooks', WebhookDocumentationHandler, 'webhook-documentation', strict_slash=True),
       RedirectRoute(r'/apiwrite', ApiWriteHandler, 'api-write', strict_slash=True),
       RedirectRoute(r'/contact', ContactHandler, 'contact', strict_slash=True),

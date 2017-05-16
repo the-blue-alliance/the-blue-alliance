@@ -19,7 +19,8 @@
     "redux": "^3.5.2",
     "redux-thunk": "^2.0.1",
     "reselect": "^2.5.1",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "swagger-ui": "^3.0.10"
   },
   "devDependencies": {
     "babel-eslint": "^7.1.1",
@@ -53,12 +54,13 @@
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.7.0",
-    "yargs": "^6.5.0"
+    "yargs": "^6.5.0",
+    "swagger-ui": "^3.0.10"
   },
   "scripts": {
     "build": "gulp build",
     "test": "jest",
-    "lint": "eslint --ext js react/gameday2"
+    "lint": "eslint --ext js react"
   },
   "jest": {
     "automock": false,
