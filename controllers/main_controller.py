@@ -364,7 +364,7 @@ class ApiV2DocumentationHandler(CacheableHandler):
 
 class ApiV3DocumentationHandler(CacheableHandler):
     CACHE_VERSION = 1
-    CACHE_KEY_FORMAT = "api_docs"
+    CACHE_KEY_FORMAT = "api_docs_v3"
 
     def __init__(self, *args, **kw):
         super(ApiV3DocumentationHandler, self).__init__(*args, **kw)
