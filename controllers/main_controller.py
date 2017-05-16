@@ -349,12 +349,12 @@ class RecordHandler(CacheableHandler):
         return template.render(path, self.template_values)
 
 
-class ApiDocumentationHandler(CacheableHandler):
+class ApiV2DocumentationHandler(CacheableHandler):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "api_docs"
 
     def __init__(self, *args, **kw):
-        super(ApiDocumentationHandler, self).__init__(*args, **kw)
+        super(ApiV2DocumentationHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
