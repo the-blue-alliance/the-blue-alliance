@@ -490,7 +490,7 @@ function updateRankings(cell) {
     cell.parent().css('background-color', '#eb9316');
     $.ajax({
         type: 'GET',
-        url: 'http://10.0.100.5/pit/getdata?random=' + Math.random(),
+        url: 'http://10.0.100.5/Pit/GetData?random=' + Math.random(),
         dataType: 'json',
         cache: false,
         timeout: 5000,
@@ -503,6 +503,10 @@ function updateRankings(cell) {
             //var breakdowns = ['Avg', 'CP', 'AP', 'RC', 'TP', 'LP'];
 
             // 2016 Headers
+            //var breakdowns  = ['RS', 'Sort2', 'Sort3', 'Sort4', 'Sort 5', 'Wins', 'Losses', 'Ties', 'Played', 'DQ'];
+            //var display = ["Ranking Score", "Auto", "Scale/Challenge", "Goals", "Defense", "Wins", "Losses", "Ties", "Played", 'DQ'];
+
+            // 2017 Headers
             var breakdowns  = ['RS', 'Sort2', 'Sort3', 'Sort4', 'Sort 5', 'Wins', 'Losses', 'Ties', 'Played', 'DQ'];
             var display = ["Ranking Score", "Auto", "Scale/Challenge", "Goals", "Defense", "Wins", "Losses", "Ties", "Played", 'DQ'];
 
@@ -518,7 +522,7 @@ function updateRankings(cell) {
                 teamRank['played'] = rankData[i]['Played'];
                 teamRank['dqs'] = 0;
                 for(var j=0; j<breakdowns.length; j++){
-                    teamRank[display[j]] = parseInt(rankData[i][breakdowns[j]]);
+                    teamRank[display[j]] = Number(rankData[i][breakdowns[j]].replace(',',''));
                 }
                 request_body['rankings'].push(teamRank);
             }
