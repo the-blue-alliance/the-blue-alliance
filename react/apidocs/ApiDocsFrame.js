@@ -23,7 +23,7 @@ ApiDocsFrame.propTypes = {
 };
 
 ApiDocsFrame.defaultProps = {
-    url: `http://petstore.swagger.io/v2/swagger.json`,
+    url: 'https://raw.githubusercontent.com/the-blue-alliance/the-blue-alliance-android/master/libTba/swagger/apiv3-swagger.json',
 };
 
 export default ApiDocsFrame;
