@@ -44,6 +44,9 @@ handlers:
 - url: /icons
   static_dir: static/icons
   expiration: "1d"
+- url: /swagger
+  static_dir: static/swagger
+  expiration: "1h"
 - url: /robots.txt
   static_files: static/robots.txt
   upload: static/robots.txt
