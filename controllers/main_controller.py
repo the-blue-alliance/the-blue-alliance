@@ -371,7 +371,24 @@ class ApiV3DocumentationHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/apidocsv3.html")
+        self.template_values['title'] = 'APIv3'
+        self.template_values['swagger_url'] = 'https://raw.githubusercontent.com/the-blue-alliance/the-blue-alliance-android/master/libTba/swagger/apiv3-swagger.json'
+        path = os.path.join(os.path.dirname(__file__), "../templates/apidocs_swagger.html")
+        return template.render(path, self.template_values)
+
+
+class ApiTrustedDocumentationHandler(CacheableHandler):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "api_docs_trusted_v1"
+
+    def __init__(self, *args, **kw):
+        super(ApiTrustedDocumentationHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+
+    def _render(self, *args, **kw):
+        self.template_values['title'] = 'Trusted API'
+        self.template_values['swagger_url'] = '/swagger/api_trusted_v1.json'
+        path = os.path.join(os.path.dirname(__file__), "../templates/apidocs_swagger.html")
         return template.render(path, self.template_values)
 
 

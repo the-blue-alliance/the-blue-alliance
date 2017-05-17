@@ -20,7 +20,7 @@ from controllers.main_controller import TwoChampsHandler, ContactHandler, Hashta
     MainInsightsHandler, MainOffseasonHandler, OprHandler, PredictionsHandler, SearchHandler, \
     AboutHandler, ThanksHandler, handle_404, handle_500, \
     WebcastsHandler, RecordHandler, ApiV2DocumentationHandler, ApiWriteHandler, MatchInputHandler, WebhookDocumentationHandler, \
-      AddDataHandler, ApiV3DocumentationHandler
+      AddDataHandler, ApiV3DocumentationHandler, ApiTrustedDocumentationHandler
 from controllers.match_controller import MatchDetail
 from controllers.match_suggestion_controller import MatchSuggestionHandler
 from controllers.match_timeline_controller import MatchTimelineHandler
@@ -93,7 +93,9 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/advanced_team_search', AdvancedSearchController, 'advanced_team_search', strict_slash=True),
       RedirectRoute(r'/apidocs/v2', ApiV2DocumentationHandler, 'api-documentation-v2', strict_slash=True),
       RedirectRoute(r'/apidocs/v3', ApiV3DocumentationHandler, 'api-documentation-v3', strict_slash=True),
+      RedirectRoute(r'/apidocs/trusted/v1', ApiTrustedDocumentationHandler, 'api-docs-trusted-v1', strict_slash=True),
       RedirectRoute(r'/apidocs', redirect_to='/apidocs/v2', name='api-documentation', strict_slash=True),
+      RedirectRoute(r'/apidocs/trusted', redirect_to='/apidocs/trusted/v1', name='api-trusted-documentation', strict_slash=True),
       RedirectRoute(r'/apidocs/webhooks', WebhookDocumentationHandler, 'webhook-documentation', strict_slash=True),
       RedirectRoute(r'/apiwrite', ApiWriteHandler, 'api-write', strict_slash=True),
       RedirectRoute(r'/contact', ContactHandler, 'contact', strict_slash=True),
