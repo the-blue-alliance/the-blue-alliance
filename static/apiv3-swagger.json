@@ -248,7 +248,7 @@
           "team",
           "list"
         ],
-        "description": "Gets a list of Team keys, paginated in groups of 500.",
+        "description": "Gets a list of Team keys, paginated in groups of 500. (Note, each page will not have 500 teams, but will include the teams within that range of 500.)",
         "parameters": [
           {
             "$ref": "#/parameters/If-Modified-Since"
@@ -2922,7 +2922,7 @@
         },
         "address": {
           "type": "string",
-          "description": "Address for the team"
+          "description": "Will be NULL, for future development"
         },
         "postal_code": {
           "type": "string",
@@ -2930,26 +2930,26 @@
         },
         "gmaps_place_id": {
           "type": "string",
-          "description": "Google Maps Place ID for the team address"
+          "description": "Will be NULL, for future development"
         },
         "gmaps_url": {
           "type": "string",
           "format": "url",
-          "description": "Link to address location on Google Maps"
+          "description": "Will be NULL, for future development"
         },
         "lat": {
           "type": "number",
           "format": "double",
-          "description": "Latitude for the team address"
+          "description": "Will be NULL, for future development"
         },
         "lng": {
           "type": "number",
           "format": "double",
-          "description": "Longitude for the team address"
+          "description": "Will be NULL, for future development"
         },
         "location_name": {
           "type": "string",
-          "description": "Name of the location at the address for the team, eg. Blue Alliance High School"
+          "description": "Will be NULL, for future development"
         },
         "website": {
           "type": "string",
@@ -2966,7 +2966,7 @@
         },
         "home_championship": {
           "type": "object",
-          "description": "Location of the team's home championship each year as a key-value pair. The year is the key, and the city is the value."
+          "description": "Location of the team's home championship each year as a key-value pair. The year (as a string) is the key, and the city is the value."
         }
       }
     },
@@ -3138,35 +3138,9 @@
           "type": "string",
           "description": "Same as name but doesn't include event specifiers, such as 'Regional' or 'District'. May be null."
         },
-        "event_district_name": {
-          "type": "string",
-          "enum": [
-            "Michigan",
-            "Mid-Atlantic",
-            "New England",
-            "Pacific Northwest",
-            "Indiana",
-            "Chesapeake",
-            "North Carolina",
-            "Georgia",
-            "Ontario",
-            "Israel"
-          ],
-          "description": "Event District"
-        },
         "event_type_string": {
           "type": "string",
-          "description": "Event Type, eg Regional, District, or Offseason.",
-          "enum": [
-            "Regional",
-            "District",
-            "District Championship",
-            "Championship Division",
-            "Championship Finals",
-            "Offseason",
-            "Preseason",
-            "--"
-          ]
+          "description": "Event Type, eg Regional, District, or Offseason."
         },
         "week": {
           "type": "integer",
@@ -3220,13 +3194,32 @@
           "items": {
             "$ref": "#/definitions/Webcast"
           }
+        },
+        "division_keys": {
+          "type": "array",
+          "description": "An array of event keys for the divisions at this event.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "parent_event_key": {
+          "type": "string",
+          "description": "The TBA Event key that represents the event's parent. Used to link back to the event from a division event. It is also the inverse relation of divison_keys."
+        },
+        "playoff_type": {
+          "type": "integer",
+          "description": "Playoff Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/playoff_type.py#L4, or null"
+        },
+        "playoff_type_string": {
+          "type": "string",
+          "description": "String representation of the playoff_type, or null."
         }
       }
     },
     "Team_Event_Status": {
       "type": "object",
       "properties": {
-        "rank": {
+        "qual": {
           "$ref": "#/definitions/Team_Event_Status_rank"
         },
         "alliance": {
@@ -3234,33 +3227,79 @@
         },
         "playoff": {
           "$ref": "#/definitions/Team_Event_Status_playoff"
+        },
+        "alliance_status_str": {
+          "type": "string",
+          "description": "An HTML formatted string suitable for display to the user containing the team's alliance pick status."
+        },
+        "playoff_status_str": {
+          "type": "string",
+          "description": "An HTML formatter string suitable for display to the user containing the team's playoff status."
+        },
+        "overall_status_str": {
+          "type": "string",
+          "description": "An HTML formatted string suitable for display to the user containing the team's overall status summary of the event."
         }
       }
     },
     "Team_Event_Status_rank": {
       "properties": {
-        "first_sort": {
-          "type": "integer"
-        },
-        "breakdown": {
-          "type": "string",
-          "description": "String of year-specific ranking details."
-        },
-        "record": {
-          "type": "string",
-          "description": "Record as a string in the format WINS-LOSSES-TIES over all matches"
-        },
-        "played": {
+        "num_teams": {
           "type": "integer",
-          "description": "Matches played"
+          "description": "Number of teams ranked."
         },
-        "rank": {
-          "type": "integer",
-          "description": "Relative rank position"
+        "ranking": {
+          "type": "object",
+          "properties": {
+            "dq": {
+              "type": "integer",
+              "description": "Number of matches the team was disqualified for."
+            },
+            "matches_played": {
+              "type": "integer",
+              "description": "Number of matches played."
+            },
+            "qual_average": {
+              "type": "number",
+              "format": "double",
+              "description": "For some years, average qualification score. Can be null."
+            },
+            "rank": {
+              "type": "integer",
+              "description": "Relative rank of this team."
+            },
+            "record": {
+              "#ref": "#/definitions/WLT_Record"
+            },
+            "sort_orders": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "team_key": {
+              "type": "string",
+              "description": "TBA team key for this rank"
+            }
+          }
         },
-        "total": {
-          "type": "integer",
-          "description": "Number of teams at the event"
+        "sort_order_info": {
+          "type": "array",
+          "description": "Ordered list of names corresponding to the elements of the sort_orders array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "precision": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "status": {
+          "type": "string"
         }
       }
     },
@@ -3269,6 +3308,10 @@
         "name": {
           "type": "string",
           "description": "Alliance name, may be null"
+        },
+        "number": {
+          "type": "integer",
+          "description": "Alliance number"
         },
         "backup": {
           "$ref": "#/definitions/Team_Event_Status_alliance_backup"
@@ -3353,31 +3396,11 @@
               "record": {
                 "properties": {
                   "qualifications": {
-                    "properties": {
-                      "wins": {
-                        "type": "integer"
-                      },
-                      "losses": {
-                        "type": "integer"
-                      },
-                      "ties": {
-                        "type": "integer"
-                      }
-                    },
+                    "#ref": "#/definitions/WLT_Record",
                     "description": "W-L-T record in qualification matches"
                   },
                   "overall": {
-                    "properties": {
-                      "wins": {
-                        "type": "integer"
-                      },
-                      "losses": {
-                        "type": "integer"
-                      },
-                      "ties": {
-                        "type": "integer"
-                      }
-                    },
+                    "#ref": "#/definitions/WLT_Record",
                     "description": "W-L-T record across all matches at an event"
                   }
                 },
@@ -3674,7 +3697,7 @@
         },
         "file": {
           "type": "string",
-          "description": "File identification as may be required for some times. May be null."
+          "description": "File identification as may be required for some types. May be null."
         }
       }
     },
@@ -3739,6 +3762,11 @@
           "format": "int64",
           "description": "UNIX timestamp of match time, as taken from the published schedule"
         },
+        "predicted_time": {
+          "type": "integer",
+          "format": "int64",
+          "description": "UNIX timestamp of the TBA predicted match start time"
+        },
         "actual_time": {
           "type": "integer",
           "format": "int64",
@@ -3792,11 +3820,7 @@
         },
         "winning_alliance": {
           "type": "string",
-          "description": "The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie.",
-          "enum": [
-            "red",
-            "blue"
-          ]
+          "description": "The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie."
         },
         "event_key": {
           "type": "string",
@@ -3811,6 +3835,16 @@
           "type": "integer",
           "format": "int64",
           "description": "UNIX timestamp of actual match start time"
+        },
+        "predicted_time": {
+          "type": "integer",
+          "format": "int64",
+          "description": "UNIX timestamp of the TBA predicted match start time"
+        },
+        "post_result_time": {
+          "type": "integer",
+          "format": "int64",
+          "description": "UNIX timestamp when the match result was posted"
         },
         "score_breakdown": {
           "type": "object",
@@ -4317,6 +4351,27 @@
             "type": "string",
             "description": "Team key picked for the alliance."
           }
+        },
+        "status": {
+          "type": "object",
+          "properties": {
+            "current_level_record": {
+              "#ref": "#/definitions/WLT_Record"
+            },
+            "level": {
+              "type": "string"
+            },
+            "playoff_average": {
+              "type": "number",
+              "format": "double"
+            },
+            "record": {
+              "#ref": "#/definitions/WLT_Record"
+            },
+            "status": {
+              "type": "string"
+            }
+          }
         }
       }
     },
@@ -4334,79 +4389,8 @@
           "description": "The name of the award as provided by FIRST. May vary for the same award type."
         },
         "award_type": {
-          "type": "string",
-          "description": "Type of award given.",
-          "enum": [
-            "Chairman's",
-            "Winner",
-            "Finalist",
-            "Woodie Flowers",
-            "Dean's List",
-            "Volunteer",
-            "Founders",
-            "Bart Kamen Memorial",
-            "Make It Loud",
-            "Engineering Inspiration",
-            "Rookie All Star",
-            "Gracious Professionalism",
-            "Coopertition",
-            "Judge's",
-            "Highest Rookie Seed",
-            "Rookie Inspiration",
-            "Industrial Design",
-            "Quality",
-            "Safety",
-            "Sportsmanship",
-            "Creativity",
-            "Engineering Excellence",
-            "Entrepreneurship",
-            "Excellence In Design",
-            "Excellence in Design CAD",
-            "Excellence in Design Animation",
-            "Driving Tomorrows Technology",
-            "Imagery",
-            "Media and Technology",
-            "Innovation in Control",
-            "Spirit",
-            "Website",
-            "Visualization",
-            "Autodesk Inventor",
-            "Future Innovator",
-            "Recgonition of Extraordinary Service",
-            "Outstanding Cart",
-            "WSU Aim Higher",
-            "Leadership in Control",
-            "Number 1 Seed",
-            "Incredible Play",
-            "People's Choice Animation",
-            "Visualization Rising Star",
-            "Best Offensive Round",
-            "Best Play of the Day",
-            "Featherweight in the Finals",
-            "Most Photogenic",
-            "Outstanding Defense",
-            "Power to Simplify",
-            "Against All Odds",
-            "Rising Star",
-            "Chairman's Honorable Mention",
-            "Content and Communication Honorable Mention",
-            "Technical Execution Honorable Mention",
-            "Realization",
-            "Realization Honorable Mention",
-            "Design Your Future",
-            "Design Your Future Honorable Mention",
-            "Special Recognition Character Animation",
-            "High Score",
-            "Teacher Pioneer",
-            "Best Craftsmanship",
-            "Best Defensive Match",
-            "Play of the Day",
-            "Programming",
-            "Professionalism",
-            "Golden Corndog",
-            "Most Improved Team",
-            "Wildcard"
-          ]
+          "type": "integer",
+          "description": "Type of award given. See https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/award_type.py#L6"
         },
         "event_key": {
           "type": "string",
@@ -4497,6 +4481,24 @@
               }
             }
           }
+        }
+      }
+    },
+    "WLT_Record": {
+      "type": "object",
+      "description": "A Win-Loss-Tie record for a team, or an alliance",
+      "properties": {
+        "losses": {
+          "type": "integer",
+          "description": "Number of losses"
+        },
+        "wins": {
+          "type": "integer",
+          "description": "Number of wins"
+        },
+        "ties": {
+          "type": "integer",
+          "description": "Number of ties"
         }
       }
     }
