@@ -3269,7 +3269,7 @@
               "description": "Relative rank of this team."
             },
             "record": {
-              "#ref": "#/definitions/WLT_Record"
+              "$ref": "#/definitions/WLT_Record"
             },
             "sort_orders": {
               "type": "array",
@@ -3396,11 +3396,11 @@
               "record": {
                 "properties": {
                   "qualifications": {
-                    "#ref": "#/definitions/WLT_Record",
+                    "$ref": "#/definitions/WLT_Record",
                     "description": "W-L-T record in qualification matches"
                   },
                   "overall": {
-                    "#ref": "#/definitions/WLT_Record",
+                    "$ref": "#/definitions/WLT_Record",
                     "description": "W-L-T record across all matches at an event"
                   }
                 },
@@ -4356,7 +4356,7 @@
           "type": "object",
           "properties": {
             "current_level_record": {
-              "#ref": "#/definitions/WLT_Record"
+              "$ref": "#/definitions/WLT_Record"
             },
             "level": {
               "type": "string"
@@ -4366,7 +4366,7 @@
               "format": "double"
             },
             "record": {
-              "#ref": "#/definitions/WLT_Record"
+              "$ref": "#/definitions/WLT_Record"
             },
             "status": {
               "type": "string"
