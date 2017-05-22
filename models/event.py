@@ -420,7 +420,7 @@ class Event(ndb.Model):
 
     @classmethod
     def validate_key_name(self, event_key):
-        key_name_regex = re.compile(r'^[1-9]\d{3}[a-z]+[0-9]?$')
+        key_name_regex = re.compile(r'^[1-9]\d{3}[a-z]+[0-9]{0,2}$')
         match = re.match(key_name_regex, event_key)
         return True if match else False
 

@@ -2,6 +2,7 @@ import unittest2
 
 from helpers.validation_helper import ValidationHelper
 
+
 class TestValidationHelper(unittest2.TestCase):
 
     def testTeamValidation(self):
@@ -19,7 +20,11 @@ class TestValidationHelper(unittest2.TestCase):
     def testMichiganEigthFinalsValidValidation(self):
         errors = ValidationHelper.validate([("match_id_validator", "2015micmp_ef3m1")])
         self.assertEqual(None, errors)
-        
+
+    def testMultiDigitsInEventKey(self):
+        errors = ValidationHelper.validate([("event_id_validator", "2017bc18")])
+        self.assertEqual(None, errors)
+
     def testComboValidation(self):
         errors = ValidationHelper.validate([("match_id_validator", "0010c1_0m2"),
             ("team_id_validator", "frc01"),
