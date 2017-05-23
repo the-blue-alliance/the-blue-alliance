@@ -75,6 +75,7 @@ class EventManipulator(ManipulatorBase):
             "district_key",
             "custom_hashtag",
             "facebook_eid",
+            "first_code",
             "first_eid",
             "city",
             "state_prov",

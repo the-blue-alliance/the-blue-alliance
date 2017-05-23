@@ -26,6 +26,7 @@ class Event(ndb.Model):
     event_type_enum = ndb.IntegerProperty(required=True)
     short_name = ndb.StringProperty(indexed=False)  # Should not contain "Regional" or "Division", like "Hartford"
     event_short = ndb.StringProperty(required=True, indexed=False)  # Smaller abbreviation like "CT"
+    first_code = ndb.StringProperty()  # Event code used in FIRST's API, if different from event_short
     year = ndb.IntegerProperty(required=True)
     event_district_enum = ndb.IntegerProperty(default=DistrictType.NO_DISTRICT)  # Deprecated, use district_key instead
     district_key = ndb.KeyProperty(kind=District)
@@ -465,6 +466,12 @@ class Event(ndb.Model):
             return '{} {}'.format(self.short_name, EventType.short_type_names[self.event_type_enum])
         else:
             return self.name
+
+    @property
+    def first_api_code(self):
+        if self.first_code is None:
+            return self.event_short
+        return self.first_code
 
     @property
     def next_match(self):

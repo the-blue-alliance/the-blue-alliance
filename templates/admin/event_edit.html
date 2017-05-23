@@ -43,6 +43,10 @@
             <td><input type="text" name="disabled_event_short" value="{{event.event_short}}" disabled="disabled" /><input type="hidden" name="event_short" value="{{event.event_short}}" /></td>
         </tr>
         <tr>
+            <td>FIRST API Code</td>
+            <td><input type="text" name="first_code" placeholder="ct" {% if event.first_code %}value="{{ event.first_code }}"{% endif %}/></td>
+        </tr>
+        <tr>
             <td>Event Type</td>
             <td><input type="text" name="event_type_str" value="{{event.event_type_str}}" /></td>
         </tr>
