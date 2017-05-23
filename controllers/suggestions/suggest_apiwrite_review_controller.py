@@ -111,7 +111,7 @@ View the key: https://www.thebluealliance.com/admin/api_auth/edit/{}
             status = 'reject'
             email_body = """Hi {},
 
-We have reviewer your request for auth tokens for {} {} and have regretfully declined with the following message:
+We have reviewed your request for auth tokens for {} {} and have regretfully declined to issue keys with the following message:
 
 {}
 
