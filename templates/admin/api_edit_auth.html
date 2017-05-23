@@ -20,7 +20,7 @@
         </tr>
         <tr>
             <td>Expiration</td>
-            <td><input class="form-control" type="text" name="expiration" placeholder="2017-06-30" {% if auth.expiration %}value="{{ auth.expiration }}"{% endif %}/></td>
+            <td><input class="form-control" type="text" name="expiration" placeholder="2017-06-30" {% if auth.expiration %}value="{{ auth.expiration|date:"Y-m-d" }}"{% endif %}/></td>
         </tr>
         <tr>
             <td>Events</td>
