@@ -50,8 +50,9 @@ class FMSAPIEventListParser(object):
     EINSTEIN_NAME_DEFAULT = 'Einstein Field'
     EINSTEIN_CODES = {'cmp', 'cmpmo', 'cmptx'}
 
-    def __init__(self, season):
+    def __init__(self, season, short=None):
         self.season = int(season)
+        self.event_short = short
 
     def parse(self, response):
         events = []
@@ -68,7 +69,7 @@ class FMSAPIEventListParser(object):
         for event in response['Events']:
             code = event['code'].lower()
             event_type = EventType.PRESEASON if code == 'week0' else self.EVENT_TYPES.get(event['type'].lower(), None)
-            if event_type is None:
+            if event_type is None and not self.event_short:
                 logging.warn("Event type '{}' not recognized!".format(event['type']))
                 continue
             name = event['name']
@@ -107,6 +108,8 @@ class FMSAPIEventListParser(object):
                         short_name = short_name.format(override[0]['short_name'])
                 else:  # Divisions
                     name = '{} Division'.format(short_name)
+            elif self.event_short:
+                code = self.event_short
 
             event_key = "{}{}".format(self.season, code)
             if event_key in divisions_to_skip:

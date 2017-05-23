@@ -11,7 +11,7 @@ from google.appengine.ext import ndb
 from consts.event_type import EventType
 from controllers.api.api_status_controller import ApiStatusController
 from datafeeds.datafeed_base import DatafeedBase
-
+from models.event import Event
 from models.event_team import EventTeam
 from models.sitevar import Sitevar
 
@@ -110,7 +110,12 @@ class DatafeedFMSAPI(object):
         else:
             raise Exception("Unknown FMS API version: {}".format(version))
 
-    def _get_event_short(self, event_short):
+    def _get_event_short(self, event_short, event=None):
+        # First, check if we've manually set the FRC API key
+        if event and event.first_code:
+            return event.first_code
+
+        # Otherwise, check hard-coded exceptions
         return self.EVENT_SHORT_EXCEPTIONS.get(event_short, event_short)
 
     @ndb.tasklet
@@ -246,26 +251,28 @@ class DatafeedFMSAPI(object):
                 division = self.SUBDIV_TO_DIV[event.event_short]
             awards += self._parse(self.FMS_API_AWARDS_URL_PATTERN % (event.year, self._get_event_short(division)), FMSAPIAwardsParser(event, valid_team_nums))
 
-        awards += self._parse(self.FMS_API_AWARDS_URL_PATTERN % (event.year, self._get_event_short(event.event_short)), FMSAPIAwardsParser(event))
+        awards += self._parse(self.FMS_API_AWARDS_URL_PATTERN % (event.year, self._get_event_short(event.event_short, event)), FMSAPIAwardsParser(event))
         return awards
 
     def getEventAlliances(self, event_key):
         year = int(event_key[:4])
         event_short = event_key[4:]
 
-        alliances = self._parse(self.FMS_API_EVENT_ALLIANCES_URL_PATTERN % (year, self._get_event_short(event_short)), FMSAPIEventAlliancesParser())
+        event = Event.get_by_id(event_key)
+        alliances = self._parse(self.FMS_API_EVENT_ALLIANCES_URL_PATTERN % (year, self._get_event_short(event_short, event)), FMSAPIEventAlliancesParser())
         return alliances
 
     def getMatches(self, event_key):
         year = int(event_key[:4])
         event_short = event_key[4:]
 
+        event = Event.get_by_id(event_key)
         hs_parser = FMSAPIHybridScheduleParser(year, event_short)
         detail_parser = FMSAPIMatchDetailsParser(year, event_short)
-        qual_matches_future = self._parse_async(self.FMS_API_HYBRID_SCHEDULE_QUAL_URL_PATTERN % (year, self._get_event_short(event_short)), hs_parser)
-        playoff_matches_future = self._parse_async(self.FMS_API_HYBRID_SCHEDULE_PLAYOFF_URL_PATTERN % (year, self._get_event_short(event_short)), hs_parser)
-        qual_details_future = self._parse_async(self.FMS_API_MATCH_DETAILS_QUAL_URL_PATTERN % (year, self._get_event_short(event_short)), detail_parser)
-        playoff_details_future = self._parse_async(self.FMS_API_MATCH_DETAILS_PLAYOFF_URL_PATTERN % (year, self._get_event_short(event_short)), detail_parser)
+        qual_matches_future = self._parse_async(self.FMS_API_HYBRID_SCHEDULE_QUAL_URL_PATTERN % (year, self._get_event_short(event_short, event)), hs_parser)
+        playoff_matches_future = self._parse_async(self.FMS_API_HYBRID_SCHEDULE_PLAYOFF_URL_PATTERN % (year, self._get_event_short(event_short, event)), hs_parser)
+        qual_details_future = self._parse_async(self.FMS_API_MATCH_DETAILS_QUAL_URL_PATTERN % (year, self._get_event_short(event_short, event)), detail_parser)
+        playoff_details_future = self._parse_async(self.FMS_API_MATCH_DETAILS_PLAYOFF_URL_PATTERN % (year, self._get_event_short(event_short, event)), detail_parser)
 
         matches_by_key = {}
         qual_matches = qual_matches_future.get_result()
@@ -294,8 +301,9 @@ class DatafeedFMSAPI(object):
         year = int(event_key[:4])
         event_short = event_key[4:]
 
+        event = Event.get_by_id(event_key)
         rankings, rankings2 = self._parse(
-            self.FMS_API_EVENT_RANKINGS_URL_PATTERN % (year, self._get_event_short(event_short)),
+            self.FMS_API_EVENT_RANKINGS_URL_PATTERN % (year, self._get_event_short(event_short, event)),
             [FMSAPIEventRankingsParser(year), FMSAPIEventRankings2Parser(year)])
         return rankings, rankings2
 
@@ -316,7 +324,10 @@ class DatafeedFMSAPI(object):
     def getEventDetails(self, event_key):
         year = int(event_key[:4])
         event_short = event_key[4:]
-        events, districts = self._parse(self.FMS_API_EVENT_DETAILS_URL_PATTERN % (year, self._get_event_short(event_short)), FMSAPIEventListParser(year))
+
+        event = Event.get_by_id(event_key)
+        api_event_short = self._get_event_short(event_short, event)
+        events, districts = self._parse(self.FMS_API_EVENT_DETAILS_URL_PATTERN % (year, api_event_short), FMSAPIEventListParser(year, short=event_short))
         return events, districts
 
     # Returns list of tuples (team, districtteam, robot)
@@ -324,10 +335,11 @@ class DatafeedFMSAPI(object):
         year = int(event_key[:4])
         event_code = self._get_event_short(event_key[4:])
 
+        event = Event.get_by_id(event_key)
         parser = FMSAPITeamDetailsParser(year)
         models = []  # will be list of tuples (team, districtteam, robot) model
         for page in range(1, 9):  # Ensure this won't loop forever. 8 pages should be more than enough
-            url = self.FMS_API_EVENTTEAM_LIST_URL_PATTERN % (year, event_code, page)
+            url = self.FMS_API_EVENTTEAM_LIST_URL_PATTERN % (year, self._get_event_short(event_code, event), page)
             result = self._parse(url, parser)
             if result is None:
                 break
