@@ -15,6 +15,14 @@
             <td><input type="text" name="description" value="{{auth.description}}" /></td>
         </tr>
         <tr>
+            <td>Owner Email</td>
+            <td><input class="form-control" type="text" name="owner" placeholder="foo@bar.com" {% if auth.owner %}value="{{ auth.owner.get.email }}"{% endif %}/></td>
+        </tr>
+        <tr>
+            <td>Expiration</td>
+            <td><input class="form-control" type="text" name="expiration" placeholder="2017-06-30" {% if auth.expiration %}value="{{ auth.expiration }}"{% endif %}/></td>
+        </tr>
+        <tr>
             <td>Events</td>
             <td><input type="text" name="event_list_str" value="{{auth.event_list_str}}" /></td>
         </tr>
