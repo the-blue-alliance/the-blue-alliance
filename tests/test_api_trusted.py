@@ -11,12 +11,14 @@ from google.appengine.ext import testbed
 
 from consts.auth_type import AuthType
 from consts.event_type import EventType
+from consts.media_type import MediaType
 from models.account import Account
 from models.api_auth_access import ApiAuthAccess
 from models.award import Award
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
+from models.media import Media
 from models.sitevar import Sitevar
 from models.team import Team
 
@@ -577,3 +579,29 @@ class TestApiTrustedController(unittest2.TestCase):
 
         self.assertEqual(set(Match.get_by_id('2014casj_qm1').youtube_videos), {'abcdef', 'aFZy8iibMD0'})
         self.assertEqual(set(Match.get_by_id('2014casj_sf1m1').youtube_videos), {'RpSgUrsghv4'})
+
+    def test_event_media_add(self):
+        self.video_auth.put()
+
+        event = Event(
+            id='2014casj',
+            event_type_enum=EventType.REGIONAL,
+            event_short='casj',
+            year=2014,
+        )
+        event.put()
+
+        videos = ['aFZy8iibMD0']
+        request_body = json.dumps(videos)
+        request_path = '/api/trusted/v1/event/2014casj/media/add'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_5', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+
+        self.assertEqual(response.status_code, 200)
+
+        media_key = Media.render_key_name(MediaType.YOUTUBE_VIDEO, 'aFZy8iibMD0')
+        media = Media.get_by_id(media_key)
+        self.assertIsNotNone(media)
+        self.assertEqual(media.media_type_enum, MediaType.YOUTUBE_VIDEO)
+        self.assertEqual(media.foreign_key, 'aFZy8iibMD0')
+        self.assertIn(ndb.Key(Event, '2014casj'), media.references)

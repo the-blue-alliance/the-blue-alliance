@@ -5,7 +5,7 @@ import webapp2
 from google.appengine.ext import ndb
 
 from consts.auth_type import AuthType
-
+from consts.media_type import MediaType
 from controllers.api.api_base_controller import ApiTrustedBaseController
 
 from datafeeds.parsers.json.json_alliance_selections_parser import JSONAllianceSelectionsParser
@@ -20,6 +20,7 @@ from helpers.event_details_manipulator import EventDetailsManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_helper import MatchHelper
 from helpers.match_manipulator import MatchManipulator
+from helpers.media_manipulator import MediaManipulator
 from helpers.rankings_helper import RankingsHelper
 
 from models.award import Award
@@ -27,6 +28,7 @@ from models.event import Event
 from models.event_details import EventDetails
 from models.event_team import EventTeam
 from models.match import Match
+from models.media import Media
 from models.sitevar import Sitevar
 from models.team import Team
 
@@ -245,3 +247,47 @@ class ApiTrustedAddMatchYoutubeVideo(ApiTrustedBaseController):
         MatchManipulator.createOrUpdate(matches_to_put)
 
         self.response.out.write(json.dumps({'Success': "Match videos successfully updated"}))
+
+
+class ApiTrustedAddEventMedia(ApiTrustedBaseController):
+    """
+    Add media linked to an event
+    """
+
+    REQUIRED_AUTH_TYPES = {AuthType.MATCH_VIDEO}
+
+    def _process_request(self, request, event_key):
+        try:
+            video_list = json.loads(request.body)
+        except Exception:
+            self._errors = json.dumps({"Error": "Invalid JSON. Please check input."})
+            self.abort(400)
+            return
+
+        if not isinstance(video_list, list) or not video_list:
+            self._errors = json.dumps({"Error": "Invalid JSON. Please check input."})
+            self.abort(400)
+            return
+
+        event = Event.get_by_id(event_key)
+        if not event:
+            self._errors = json.dumps({"Error": "Event {} not found".format(event_key)})
+            self.abort(404)
+            return
+
+        media_to_put = []
+        event_reference = Media.create_reference('event', event.key_name)
+        for youtube_id in video_list:
+            media = Media(
+                id=Media.render_key_name(MediaType.YOUTUBE_VIDEO, youtube_id),
+                foreign_key=youtube_id,
+                media_type_enum=MediaType.YOUTUBE_VIDEO,
+                details_json=None,
+                private_details_json=None,
+                year=event.year,
+                references=[event_reference],
+                preferred_references=[],
+            )
+            media_to_put.append(media)
+
+        MediaManipulator.createOrUpdate(media_to_put)

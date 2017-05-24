@@ -373,6 +373,43 @@
           }
        },
      },
+     "/event/{eventKey}/media/add": {
+       "post": {
+         "tags": [
+           "Event Media"
+          ],
+          "summary": "Add event videos",
+          "description": "Link YouTube videos to an event",
+          "operationId": "updateMatchVideos",
+          "parameters": [
+            { "$ref": "#/parameters/eventKeyParam" },
+            {
+              "name": "videoData",
+              "in": "body",
+              "description": "List of YouTube video IDs to add",
+              "required": true,
+              "schema": {
+                "type": "array",
+                "items": {
+                  "schema": "string",
+                  "example": "aFZy8iibMD0"
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/successResponse"
+            },
+            "400": {
+              "$ref": "#/responses/invalidHeadersResponse"
+            },
+            "401": {
+              "$ref": "#/responses/invalidSigResponse"
+            }
+          }
+       },
+     },
   },
   "parameters": {
     "eventKeyParam": {
