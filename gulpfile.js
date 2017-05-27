@@ -41,6 +41,19 @@ var config = {
       outputFile: 'apidocs.min.css',
       watch: ['./react/apidocs/**/*.less']
     }
+  },
+  eventwizard: {
+    js: {
+      src: ['./react/eventwizard/eventwizard.js'],
+      outputDir: './static/compiled/javascript',
+      outputFile: 'eventwizard.min.js'
+    },
+    less: {
+      src: ['./react/eventwizard/eventwizard.less'],
+      outputDir: './static/compiled/css/',
+      outputFile: 'eventwizard.min.css',
+      watch: ['./react/eventwizard/**/*.less']
+    }
   }
 };
 
@@ -85,12 +98,32 @@ function compile(watch, config) {
   rebundle();
 }
 
+function compileLess(config) {
+  gulp.src(config.less.src)
+    .pipe(sourcemaps.init())
+    .pipe(less())
+    .pipe(cleanCSS())
+    .pipe(sourcemaps.write())
+    .pipe(debug())
+    .on('error', errorHandler)
+    .pipe(rename(config.less.outputFile))
+    .pipe(gulp.dest(config.less.outputDir));
+}
+
 gulp.task('apidocs-js', function() {
   return compile(false, config.apidocs);
 });
 
 gulp.task('apidocs-js-watch', function() {
   return compile(true, config.apidocs);
+});
+
+gulp.task('eventwizard-js', function() {
+  return compile(false, config.eventwizard);
+});
+
+gulp.task('eventwizard-js-watch', function() {
+  return compile(true, config.eventwizard);
 });
 
 gulp.task('gameday-js', function() {
@@ -102,36 +135,27 @@ gulp.task('gameday-js-watch', function() {
 });
 
 gulp.task('apidocs-less', function() {
-  return gulp.src(config.apidocs.less.src)
-    .pipe(sourcemaps.init())
-    .pipe(less())
-    .pipe(cleanCSS())
-    .pipe(sourcemaps.write())
-    .pipe(debug())
-    .on('error', errorHandler)
-    .pipe(rename(config.apidocs.less.outputFile))
-    .pipe(gulp.dest(config.apidocs.less.outputDir));
+  return compileLess(config.apidocs)
 });
 
-
 gulp.task('gameday-less', function() {
-  return gulp.src(config.gameday.less.src)
-    .pipe(sourcemaps.init())
-    .pipe(less())
-    .pipe(cleanCSS())
-    .pipe(sourcemaps.write())
-    .pipe(debug())
-    .on('error', errorHandler)
-    .pipe(rename(config.gameday.less.outputFile))
-    .pipe(gulp.dest(config.gameday.less.outputDir));
+  return compileLess(config.gameday)
+});
+
+gulp.task('eventwizard-less', function() {
+  return compileLess(config.eventwizard)
 });
 
 gulp.task('gameday-less-watch', function() {
   gulp.watch(config.gameday.less.watch, ['gameday-less']);
 });
 
-gulp.task('build', ['gameday-js', 'gameday-less', 'apidocs-js', 'apidocs-less']);
+gulp.task('build', ['gameday-js', 'gameday-less',
+                    'apidocs-js', 'apidocs-less',
+                    'eventwizard-js', 'eventwizard-less']);
 
-gulp.task('watch', ['gameday-js-watch', 'gameday-less-watch', 'apidocs-js-watch']);
+gulp.task('watch', ['gameday-js-watch', 'gameday-less-watch',
+                    'apidocs-js-watch',
+                    'eventwizard-js-watch']);
 
 gulp.task('default', ['build', 'watch']);

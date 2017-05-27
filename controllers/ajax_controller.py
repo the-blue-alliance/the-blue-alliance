@@ -326,7 +326,7 @@ class AllowedApiWriteEventsHandler(LoggedInHandler):
             event_keys.extend(token.event_list)
 
         events = ndb.get_multi(event_keys)
-        details = {}
+        details = []
         for event in events:
-            details[event.key_name] =  "{} {}".format(event.year, event.name)
+            details.append({'value': event.key_name, 'label': "{} {}".format(event.year, event.name)})
         self.response.out.write(json.dumps(details))

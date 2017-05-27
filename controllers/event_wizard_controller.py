@@ -14,6 +14,6 @@ class EventWizardHandler(CacheableHandler):
         self.cache_expiration = 60 * 60
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/eventwizard.html")
+        path = os.path.join(os.path.dirname(__file__), "../templates/react-eventwizard.html")
 
         return template.render(path, self.template_values)
