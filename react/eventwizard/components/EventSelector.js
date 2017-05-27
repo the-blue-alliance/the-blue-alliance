@@ -4,6 +4,19 @@ import Select from 'react-select'
 
 class EventSelector extends Component {
 
+  static loadEvents() {
+    return fetch('/_/account/apiwrite_events', {
+      credentials: 'same-origin',
+    })
+      .then((response) => (
+        response.json()
+      ))
+      .then((events) => {
+        events.push({ value: '_other', label: 'Other' })
+        return { options: events }
+      })
+  }
+
   constructor(props) {
     super(props)
     this.state = {
@@ -13,23 +26,11 @@ class EventSelector extends Component {
     this.onManualEventChange = this.onManualEventChange.bind(this)
   }
 
-  loadEvents() {
-    return fetch('/_/account/apiwrite_events', {
-        credentials: 'same-origin'
-      })
-      .then((response) => {
-        return response.json()
-      }).then((events) => {
-        events.push({value: '_other', label: 'Other'})
-        return { options: events }
-      });
-  }
-
   onEventSelected(newEvent) {
     this.props.clearAuth()
-    this.setState({eventSelectValue: newEvent.value})
+    this.setState({ eventSelectValue: newEvent.value })
 
-    if (newEvent.value == '_other') {
+    if (newEvent.value === '_other') {
       this.props.setManualEvent(true)
       this.props.setEvent('')
     } else {
@@ -51,7 +52,8 @@ class EventSelector extends Component {
           className="form-control"
           id="event_key"
           placeholder="Event Key"
-          onChange={this.onManualEventChange}/>
+          onChange={this.onManualEventChange}
+        />
       )
     }
 
@@ -67,7 +69,7 @@ class EventSelector extends Component {
             cache={false}
             searchable={false}
             value={this.state.eventSelectValue}
-            loadOptions={this.loadEvents}
+            loadOptions={EventSelector.loadEvents}
             onChange={this.onEventSelected}
           />
           {eventKeyBox}
@@ -78,11 +80,10 @@ class EventSelector extends Component {
 }
 
 EventSelector.propTypes = {
-  selectedEvent: PropTypes.string.isRequired,
   manualEvent: PropTypes.bool.isRequired,
   setEvent: PropTypes.func.isRequired,
   setManualEvent: PropTypes.func.isRequired,
-  clearAuth: PropTypes.func.isRequired
+  clearAuth: PropTypes.func.isRequired,
 }
 
 export default EventSelector

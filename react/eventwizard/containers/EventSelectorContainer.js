@@ -4,13 +4,13 @@ import { setEvent, setManualEvent, clearAuth } from '../actions'
 
 const mapStateToProps = (state) => ({
   selectedEvent: state.auth.selectedEvent,
-  manualEvent: state.auth.manualEvent
+  manualEvent: state.auth.manualEvent,
 })
 
 const mapDispatchToProps = (dispatch) => ({
   setEvent: (eventKey) => dispatch(setEvent(eventKey)),
   setManualEvent: (manualEvent) => dispatch(setManualEvent(manualEvent)),
-  clearAuth: () => dispatch(clearAuth())
+  clearAuth: () => dispatch(clearAuth()),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(EventSelector)

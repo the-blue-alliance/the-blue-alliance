@@ -10,7 +10,7 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = (dispatch) => ({
-  setAuth: (authId, authSecret) => dispatch(updateAuth(authId, authSecret))
+  setAuth: (authId, authSecret) => dispatch(updateAuth(authId, authSecret)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(AuthTools)

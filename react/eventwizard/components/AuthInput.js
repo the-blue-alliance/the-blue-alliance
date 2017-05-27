@@ -59,7 +59,7 @@ AuthInput.propTypes = {
   authId: PropTypes.string,
   authSecret: PropTypes.string,
   manualEvent: PropTypes.bool,
-  setAuth: PropTypes.func.isRequired
+  setAuth: PropTypes.func.isRequired,
 }
 
 export default AuthInput

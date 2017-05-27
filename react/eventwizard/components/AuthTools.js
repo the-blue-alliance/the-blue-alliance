@@ -5,42 +5,66 @@ class AuthTools extends Component {
 
   constructor(props) {
     super(props)
+    this.state = {
+      errorMessage: null,
+      successMessage: null,
+    }
     this.storeAuth = this.storeAuth.bind(this)
     this.loadAuth = this.loadAuth.bind(this)
   }
 
   storeAuth() {
     if (!this.props.selectedEvent) {
-      alert('You must enter an event key.')
+      this.setState({
+        successMessage: null,
+        errorMessage: 'You must enter an event key.',
+      })
       return
     }
 
     if (!this.props.authId || !this.props.authSecret) {
-      alert('You must enter your auth id and secret.')
+      this.setState({
+        successMessage: null,
+        errorMessage: 'You must enter your auth id and secret.',
+      })
       return
     }
 
-    var auth = {};
-    auth['id'] = this.props.authId;
-    auth['secret'] = this.props.authSecret;
+    const auth = {}
+    auth.id = this.props.authId
+    auth.secret = this.props.authSecret
 
-    localStorage.setItem(this.props.selectedEvent+"_auth", JSON.stringify(auth))
-    alert('Auth Stored!')
+    localStorage.setItem(`${this.props.selectedEvent}_auth`, JSON.stringify(auth))
+    this.setState({
+      errorMessage: null,
+      successMessage: 'Auth Stored!',
+    })
   }
 
   loadAuth() {
     if (!this.props.selectedEvent) {
-      alert('You must enter an event key.')
-      return
-    }
-    var auth = localStorage.getItem(this.props.selectedEvent+"_auth")
-    if (!auth) {
-      alert('No auth found for ' + this.props.selectedEvent)
+      this.setState({
+        successMessage: null,
+        errorMessage: 'You must enter an event key.',
+      })
       return
     }
 
-    var authData = JSON.parse(auth)
+    const auth = localStorage.getItem(`${this.props.selectedEvent}_auth`)
+    if (!auth) {
+      this.setState({
+        successMessage: null,
+        errorMessage: `No auth found for ${this.props.selectedEvent}`,
+      })
+      return
+    }
+
+    const authData = JSON.parse(auth)
     this.props.setAuth(authData.id, authData.secret)
+    this.setState({
+      errorMessage: null,
+      successMessage: 'Auth Loaded!',
+    })
   }
 
   render() {
@@ -49,8 +73,23 @@ class AuthTools extends Component {
     }
 
     return (
+
       <div className="form-group" id="auth-tools">
-        <label className="col-sm-2 control-label">Auth Tools</label>
+        <div
+          className="alert alert-danger"
+          style={{ display: this.state.errorMessage ? 'block' : 'none' }}
+        >
+          <button type="button" className="close" data-dismiss="alert">&times;</button>
+          <p><strong>Error!</strong> {this.state.errorMessage}</p>
+        </div>
+        <div
+          className="alert alert-success"
+          style={{ display: this.state.successMessage ? 'block' : 'none' }}
+        >
+          <button type="button" className="close" data-dismiss="alert">&times;</button>
+          <p>{this.state.successMessage}</p>
+        </div>
+        <label className="col-sm-2 control-label" htmlFor="load_auth">Auth Tools</label>
         <div className="col-sm-10">
           <button
             type="button"
@@ -79,7 +118,7 @@ AuthTools.propTypes = {
   authSecret: PropTypes.string,
   manualEvent: PropTypes.bool,
   selectedEvent: PropTypes.string,
-  setAuth: PropTypes.func.isRequired
+  setAuth: PropTypes.func.isRequired,
 }
 
 export default AuthTools

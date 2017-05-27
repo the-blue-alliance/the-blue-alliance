@@ -13,7 +13,7 @@ const store = createStore(eventwizardReducer, compose(
 
 ReactDOM.render(
   <Provider store={store}>
-    <EventWizardFrame/>
+    <EventWizardFrame />
   </Provider>,
   document.getElementById('content')
 )
