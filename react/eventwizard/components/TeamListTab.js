@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import TeamItem from './TeamItem'
+import Dialog from 'react-bootstrap-dialog'
 
 class TeamListTab extends Component {
 
@@ -43,12 +44,13 @@ class TeamListTab extends Component {
         return a.team_number - b.team_number
       })))
       .then((data) => (this.setState({ teams: data })))
-      .catch((error) => (console.log('request failed', error)))
+      .catch((error) => (this.refs.dialog.showAlert(`Network Error: ${error}`)))
   }
 
   render() {
     return (
       <div className="tab-pane" id="teams">
+        <Dialog ref="dialog" />
         <h3>Team List</h3>
         <div className="row">
           <div className="col-sm-6">

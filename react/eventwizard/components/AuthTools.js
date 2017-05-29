@@ -1,31 +1,34 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import Dialog from 'react-bootstrap-dialog'
 
 class AuthTools extends Component {
 
   constructor(props) {
     super(props)
-    this.state = {
-      errorMessage: null,
-      successMessage: null,
-    }
     this.storeAuth = this.storeAuth.bind(this)
     this.loadAuth = this.loadAuth.bind(this)
   }
 
   storeAuth() {
     if (!this.props.selectedEvent) {
-      this.setState({
-        successMessage: null,
-        errorMessage: 'You must enter an event key.',
+      this.refs.dialog.show({
+        title: 'Error',
+        body: 'You must enter an event key',
+        actions: [
+          Dialog.OKAction()
+        ],
       })
       return
     }
 
     if (!this.props.authId || !this.props.authSecret) {
-      this.setState({
-        successMessage: null,
-        errorMessage: 'You must enter your auth id and secret.',
+      this.refs.dialog.show({
+        title: 'Error',
+        body: 'You must enter you auth ID and secret',
+        actions: [
+          Dialog.OKAction()
+        ],
       })
       return
     }
@@ -35,35 +38,47 @@ class AuthTools extends Component {
     auth.secret = this.props.authSecret
 
     localStorage.setItem(`${this.props.selectedEvent}_auth`, JSON.stringify(auth))
-    this.setState({
-      errorMessage: null,
-      successMessage: 'Auth Stored!',
+    this.refs.dialog.show({
+      title: 'Success',
+      body: 'Auth Stored',
+      actions: [
+        Dialog.OKAction()
+      ],
     })
   }
 
   loadAuth() {
     if (!this.props.selectedEvent) {
-      this.setState({
-        successMessage: null,
-        errorMessage: 'You must enter an event key.',
+      this.refs.dialog.show({
+        title: 'Error',
+        body: 'You must select an event',
+        actions: [
+          Dialog.OKAction()
+        ],
       })
       return
     }
 
     const auth = localStorage.getItem(`${this.props.selectedEvent}_auth`)
     if (!auth) {
-      this.setState({
-        successMessage: null,
-        errorMessage: `No auth found for ${this.props.selectedEvent}`,
+      this.refs.dialog.show({
+        title: 'Error',
+        body: `No auth found for ${this.props.selectedEvent}`,
+        actions: [
+          Dialog.OKAction()
+        ],
       })
       return
     }
 
     const authData = JSON.parse(auth)
     this.props.setAuth(authData.id, authData.secret)
-    this.setState({
-      errorMessage: null,
-      successMessage: 'Auth Loaded!',
+    this.refs.dialog.show({
+      title: 'Success',
+      body: 'Auth Loaded',
+      actions: [
+        Dialog.OKAction()
+      ],
     })
   }
 
@@ -73,22 +88,8 @@ class AuthTools extends Component {
     }
 
     return (
-
       <div className="form-group" id="auth-tools">
-        <div
-          className="alert alert-danger"
-          style={{ display: this.state.errorMessage ? 'block' : 'none' }}
-        >
-          <button type="button" className="close" data-dismiss="alert">&times;</button>
-          <p><strong>Error!</strong> {this.state.errorMessage}</p>
-        </div>
-        <div
-          className="alert alert-success"
-          style={{ display: this.state.successMessage ? 'block' : 'none' }}
-        >
-          <button type="button" className="close" data-dismiss="alert">&times;</button>
-          <p>{this.state.successMessage}</p>
-        </div>
+        <Dialog ref="dialog" />
         <label className="col-sm-2 control-label" htmlFor="load_auth">Auth Tools</label>
         <div className="col-sm-10">
           <button
