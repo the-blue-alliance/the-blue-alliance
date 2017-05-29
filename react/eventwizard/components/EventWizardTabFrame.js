@@ -1,12 +1,12 @@
 import React from 'react'
+import TeamListContainer from '../containers/TeamListContainer'
 
 const EventWizardTabFrame = () => (
   <div>
     <div className="row">
       <div className="col-sm-12">
         <ul className="nav nav-tabs">
-          <li><a href="#teams" data-toggle="tab">Manual Teams</a></li>
-          <li><a href="#fms-teams" data-toggle="tab">FMS Teams</a></li>
+          <li><a href="#teams" data-toggle="tab">Teams</a></li>
           <li><a href="#schedule" data-toggle="tab">FMS Schedule Import</a></li>
           <li><a href="#matches" data-toggle="tab">Match Play</a></li>
           <li><a href="#results" data-toggle="tab">FMS Match Import</a></li>
@@ -16,12 +16,7 @@ const EventWizardTabFrame = () => (
       </div>
     </div>
     <div className="tab-content row">
-      <div className="tab-pane" id="teams">
-        <h3>Team List</h3>
-      </div>
-      <div className="tab-pane" id="fms-teams">
-        <h3>FMS Team List</h3>
-      </div>
+      <TeamListContainer />
       <div className="tab-pane" id="schedule">
         <h3>FMS Schedule</h3>
       </div>

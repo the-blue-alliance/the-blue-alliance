@@ -127,6 +127,8 @@ class ApiBaseController(CacheableHandler):
             if account:
                 self.auth_owner = account.key.id()
                 self.auth_owner_key = account.key
+            elif 'thebluealliance.com' in self.request.headers.get("Origin", ""):
+                self.auth_owner = 'The Blue Alliance'
             else:
                 self._errors = json.dumps({"Error": "X-TBA-Auth-Key is a required header or URL param. Please get an access key at http://www.thebluealliance.com/account."})
                 self.abort(401)
