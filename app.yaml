@@ -35,6 +35,8 @@ handlers:
   expiration: "1h"
 - url: /javascript
   static_dir: static/compiled/javascript
+- url: /outdatedbrowser
+  static_dir: static/outdatedbrowser
 - url: /jwplayer
   static_dir: static/jwplayer
 - url: /flowplayer
