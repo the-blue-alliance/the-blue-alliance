@@ -2424,24 +2424,21 @@
         ]
       }
     },
-    "/district/{district_key}/{year}/events": {
+    "/district/{district_key}/events": {
       "get": {
-        "operationId": "getDistrictYearEvents",
+        "operationId": "getDistrictEvents",
         "tags": [
           "district",
           "event",
           "list"
         ],
-        "description": "Gets a list of events in the given district in the given year.",
+        "description": "Gets a list of events in the given district.",
         "parameters": [
           {
             "$ref": "#/parameters/If-Modified-Since"
           },
           {
             "$ref": "#/parameters/district_key"
-          },
-          {
-            "$ref": "#/parameters/year"
           }
         ],
         "responses": {
@@ -2475,24 +2472,21 @@
         ]
       }
     },
-    "/district/{district_key}/{year}/events/simple": {
+    "/district/{district_key}/events/simple": {
       "get": {
-        "operationId": "getDistrictYearEventsSimple",
+        "operationId": "getDistrictEventsSimple",
         "tags": [
           "district",
           "event",
           "list"
         ],
-        "description": "Gets a short-form list of events in the given district in the given year.",
+        "description": "Gets a short-form list of events in the given district.",
         "parameters": [
           {
             "$ref": "#/parameters/If-Modified-Since"
           },
           {
             "$ref": "#/parameters/district_key"
-          },
-          {
-            "$ref": "#/parameters/year"
           }
         ],
         "responses": {
@@ -2526,15 +2520,15 @@
         ]
       }
     },
-    "/district/{district_key}/{year}/events/keys": {
+    "/district/{district_key}/events/keys": {
       "get": {
-        "operationId": "getDistrictYearEventsKeys",
+        "operationId": "getDistrictEventsKeys",
         "tags": [
           "district",
           "event",
           "list"
         ],
-        "description": "Gets a list of event keys for events in the given district in the given year.",
+        "description": "Gets a list of event keys for events in the given district.",
         "parameters": [
           {
             "$ref": "#/parameters/If-Modified-Since"
@@ -2578,24 +2572,21 @@
         ]
       }
     },
-    "/district/{district_key}/{year}/teams": {
+    "/district/{district_key}/teams": {
       "get": {
-        "operationId": "getDistrictYearTeams",
+        "operationId": "getDistrictTeams",
         "tags": [
           "district",
           "team",
           "list"
         ],
-        "description": "Gets a list of `Team` objects that competed in events in the given district in the given year.",
+        "description": "Gets a list of `Team` objects that competed in events in the given district.",
         "parameters": [
           {
             "$ref": "#/parameters/If-Modified-Since"
           },
           {
             "$ref": "#/parameters/district_key"
-          },
-          {
-            "$ref": "#/parameters/year"
           }
         ],
         "responses": {
@@ -2629,24 +2620,21 @@
         ]
       }
     },
-    "/district/{district_key}/{year}/teams/simple": {
+    "/district/{district_key}/teams/simple": {
       "get": {
-        "operationId": "getDistrictYearTeamsSimple",
+        "operationId": "getDistrictTeamsSimple",
         "tags": [
           "district",
           "team",
           "list"
         ],
-        "description": "Gets a short-form list of `Team` objects that competed in events in the given district in the given year.",
+        "description": "Gets a short-form list of `Team` objects that competed in events in the given district.",
         "parameters": [
           {
             "$ref": "#/parameters/If-Modified-Since"
           },
           {
             "$ref": "#/parameters/district_key"
-          },
-          {
-            "$ref": "#/parameters/year"
           }
         ],
         "responses": {
@@ -2680,24 +2668,21 @@
         ]
       }
     },
-    "/district/{district_key}/{year}/teams/keys": {
+    "/district/{district_key}/teams/keys": {
       "get": {
-        "operationId": "getDistrictYearTeamsKeys",
+        "operationId": "getDistrictTeamsKeys",
         "tags": [
           "district",
           "team",
           "list"
         ],
-        "description": "Gets a list of `Team` objects that competed in events in the given district in the given year.",
+        "description": "Gets a list of `Team` objects that competed in events in the given district.",
         "parameters": [
           {
             "$ref": "#/parameters/If-Modified-Since"
           },
           {
             "$ref": "#/parameters/district_key"
-          },
-          {
-            "$ref": "#/parameters/year"
           }
         ],
         "responses": {
@@ -2732,24 +2717,21 @@
         ]
       }
     },
-    "/district/{district_key}/{year}/rankings": {
+    "/district/{district_key}/rankings": {
       "get": {
-        "operationId": "getDistrictYearRankings",
+        "operationId": "getDistrictRankings",
         "tags": [
           "district",
           "team",
           "list"
         ],
-        "description": "Gets a list of team district rankings for the given district in the given year.",
+        "description": "Gets a list of team district rankings for the given district.",
         "parameters": [
           {
             "$ref": "#/parameters/If-Modified-Since"
           },
           {
             "$ref": "#/parameters/district_key"
-          },
-          {
-            "$ref": "#/parameters/year"
           }
         ],
         "responses": {
@@ -4423,14 +4405,29 @@
       }
     },
     "District_List": {
+      "type": "object",
+      "required": [
+            "display_name",
+            "abbreviation",
+            "key",
+            "year"
+      ],
       "properties": {
-        "name": {
+        "abbreviation": {
           "type": "string",
-          "description": "District Name"
+          "description": "The short identifier for the district"
+        },
+        "display_name": {
+          "type": "string",
+          "description": "The long name for the district"
         },
         "key": {
           "type": "string",
-          "description": "District Key"
+          "description": "Key for this district, e.g. 2016ne"
+        },
+        "year": {
+          "type": "integer",
+          "description": "Year this district happened"
         }
       }
     },
