@@ -3030,7 +3030,6 @@
       "required": [
         "android",
         "current_season",
-        "current_season_week",
         "down_events",
         "ios",
         "is_datafeed_down",
@@ -3040,10 +3039,6 @@
         "current_season": {
           "type": "integer",
           "description": "Year of the current FRC season."
-        },
-        "current_season_week": {
-          "type": "string",
-          "description": "Current week of the current FRC competition season, 99 for off season."
         },
         "max_season": {
           "type": "integer",
