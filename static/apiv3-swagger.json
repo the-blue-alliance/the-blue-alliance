@@ -2142,10 +2142,7 @@
           "200": {
             "description": "Successful response",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Event_District_Points"
-              }
+              "$ref": "#/definitions/Event_District_Points"
             },
             "headers": {
               "Last-Modified": {
@@ -3689,13 +3686,11 @@
       ],
       "properties": {
         "points": {
-          "type": "array",
-          "description": "Points gained for each team at the event.",
-          "items": {
+          "type": "object",
+          "description": "Points gained for each team at the event. Stored as a key-value pair with the team key as the key, and an object describing the points as it's value.",
+          "additionalProperties": {
+            "type": "object",
             "properties": {
-              "team_key": {
-                "type": "string"
-              },
               "alliance_points": {
                 "type": "integer"
               },
@@ -3715,13 +3710,11 @@
           }
         },
         "tiebreakers": {
-          "type": "array",
-          "description": "Tiebreaker values for each team at the event.",
-          "items": {
+          "type": "object",
+          "description": "Tiebreaker values for each team at the event. Stored as a key-value pair with the team key as the key, and an object describing the tiebreaker elements as it's value.",
+          "additionalProperties": {
+            "type": "object",
             "properties": {
-              "team_key": {
-                "type": "string"
-              },
               "highest_qual_scores": {
                 "type": "array",
                 "items": {
