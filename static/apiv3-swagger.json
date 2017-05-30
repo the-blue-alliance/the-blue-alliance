@@ -1825,13 +1825,13 @@
         ]
       }
     },
-    "/event/{event_key}/stats": {
+    "/event/{event_key}/insights": {
       "get": {
-        "operationId": "getEventStats",
+        "operationId": "getEventInsights",
         "tags": [
           "event"
         ],
-        "description": "Gets a list of Stats for the given Event.",
+        "description": "Gets a set of Event-specific insights for the given Event.",
         "parameters": [
           {
             "$ref": "#/parameters/If-Modified-Since"
@@ -1845,7 +1845,93 @@
             "description": "Successful response",
             "schema": {
               "type": "object",
-              "description": "A year-specific event stat object expressed as a JSON string. See also Event_Stats_2016"
+              "description": "A year-specific event insight object expressed as a JSON string. See also Event_Insights_2016 & Event_Insights_2017"
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/event/{event_key}/oprs": {
+      "get": {
+        "operationId": "getEventOPRs",
+        "tags": [
+          "event"
+        ],
+        "description": "Gets a set of Event OPRs (including OPR, DPR, and CCWM) for the given Event.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/Event_OPRs"
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/event/{event_key}/predictions": {
+      "get": {
+        "operationId": "getEventPredictions",
+        "tags": [
+          "event"
+        ],
+        "description": "Gets information on TBA-generated predictions for the given Event. Contains year-specific information. *WARNING* This endpoint is currently under development and may change at any time.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/Event_Predictions"
             },
             "headers": {
               "Last-Modified": {
@@ -2535,9 +2621,6 @@
           },
           {
             "$ref": "#/parameters/district_key"
-          },
-          {
-            "$ref": "#/parameters/year"
           }
         ],
         "responses": {
@@ -3475,19 +3558,19 @@
         }
       }
     },
-    "Event_Stats_2016": {
+    "Event_Insights_2016": {
       "type": "object",
-      "description": "Stats for FIRST Stronghold qualification and elimination matches.",
+      "description": "Insights for FIRST Stronghold qualification and elimination matches.",
       "properties": {
-        "qualifications": {
-          "$ref": "#/definitions/Event_Stats_2016_Detail"
+        "qual": {
+          "$ref": "#/definitions/Event_Insights_2016_Detail"
         },
-        "eliminations": {
-          "$ref": "#/definitions/Event_Stats_2016_Detail"
+        "playoff": {
+          "$ref": "#/definitions/Event_Insights_2016_Detail"
         }
       }
     },
-    "Event_Stats_2016_Detail": {
+    "Event_Insights_2016_Detail": {
       "type": "object",
       "properties": {
         "LowBar": {
@@ -3652,6 +3735,246 @@
           }
         }
       }
+    },
+    "Event_Insights_2017": {
+      "type": "object",
+      "description": "Insights for FIRST STEAMWORKS qualification and elimination matches.",
+      "properties": {
+        "qual": {
+          "$ref": "#/definitions/Event_Insights_2017_Detail"
+        },
+        "playoff": {
+          "$ref": "#/definitions/Event_Insights_2017_Detail"
+        }
+      }
+    },
+    "Event_Insights_2017_Detail": {
+      "type": "object",
+      "properties": {
+        "average_foul_score": {
+          "type": "number",
+          "format": "float",
+          "description": "Average foul score."
+        },
+        "average_fuel_points": {
+          "type": "number",
+          "format": "float",
+          "description": "Average fuel points scored."
+        },
+        "average_fuel_points_auto": {
+          "type": "number",
+          "format": "float",
+          "description": "Average fuel points scored during auto."
+        },
+        "average_fuel_points_teleop": {
+          "type": "number",
+          "format": "float",
+          "description": "Average fuel points scored during teleop."
+        },
+        "average_high_goals": {
+          "type": "number",
+          "format": "float",
+          "description": "Average points scored in the high goal."
+        },
+        "average_high_goals_auto": {
+          "type": "number",
+          "format": "float",
+          "description": "Average points scored in the high goal during auto."
+        },
+        "average_high_goals_teleop": {
+          "type": "number",
+          "format": "float",
+          "description": "Average points scored in the high goal during teleop."
+        },
+        "average_low_goals": {
+          "type": "number",
+          "format": "float",
+          "description": "Average points scored in the low goal."
+        },
+        "average_low_goals_auto": {
+          "type": "number",
+          "format": "float",
+          "description": "Average points scored in the low goal during auto."
+        },
+        "average_low_goals_teleop": {
+          "type": "number",
+          "format": "float",
+          "description": "Average points scored in the low goal during teleop."
+        },
+        "average_mobility_points_auto": {
+          "type": "number",
+          "format": "float",
+          "description": "Average mobility points scored during auto."
+        },
+        "average_points_auto": {
+          "type": "number",
+          "format": "float",
+          "description": "Average points scored during auto."
+        },
+        "average_points_teleop": {
+          "type": "number",
+          "format": "float",
+          "description": "Average points scored during teleop."
+        },
+        "average_rotor_points": {
+          "type": "number",
+          "format": "float",
+          "description": "Average rotor points scored."
+        },
+        "average_rotor_points_auto": {
+          "type": "number",
+          "format": "float",
+          "description": "Average rotor points scored during auto."
+        },
+        "average_rotor_points_teleop": {
+          "type": "number",
+          "format": "float",
+          "description": "Average rotor points scored during teleop."
+        },
+        "average_score": {
+          "type": "number",
+          "format": "float",
+          "description": "Average score."
+        },
+        "average_takeoff_points_teleop": {
+          "type": "number",
+          "format": "float",
+          "description": "Average takeoff points scored during teleop."
+        },
+        "average_win_margin": {
+          "type": "number",
+          "format": "float",
+          "description": "Average margin of victory."
+        },
+        "average_win_score": {
+          "type": "number",
+          "format": "float",
+          "description": "Average winning score."
+        },
+        "high_kpa": {
+          "type": "array",
+          "description": "An array with three values, kPa scored, match key from the match with the high kPa, and the name of the match",
+          "items": {
+            "type": "string"
+          }
+        },
+        "high_score": {
+          "type": "array",
+          "description": "An array with three values, high score, match key from the match with the high score, and the name of the match",
+          "items": {
+            "type": "string"
+          }
+        },
+        "kpa_achieved": {
+          "type": "array",
+          "description": "An array with three values, number of times kPa bonus achieved, number of opportunities to bonus, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "mobility_counts": {
+          "type": "array",
+          "description": "An array with three values, number of times mobility bonus achieved, number of opportunities to bonus, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "rotor_1_engaged": {
+          "type": "array",
+          "description": "An array with three values, number of times rotor 1 engaged, number of opportunities to engage, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "rotor_1_engaged_auto": {
+          "type": "array",
+          "description": "An array with three values, number of times rotor 1 engaged in auto, number of opportunities to engage in auto, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "rotor_2_engaged": {
+          "type": "array",
+          "description": "An array with three values, number of times rotor 2 engaged, number of opportunities to engage, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "rotor_2_engaged_auto": {
+          "type": "array",
+          "description": "An array with three values, number of times rotor 2 engaged in auto, number of opportunities to engage in auto, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "rotor_3_engaged": {
+          "type": "array",
+          "description": "An array with three values, number of times rotor 3 engaged, number of opportunities to engage, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "rotor_4_engaged": {
+          "type": "array",
+          "description": "An array with three values, number of times rotor 4 engaged, number of opportunities to engage, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "takeoff_counts": {
+          "type": "array",
+          "description": "An array with three values, number of times takeoff was counted, number of opportunities to takeoff, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        }
+      }
+    },
+    "Event_OPRs": {
+      "type": "object",
+      "description": "OPR, DPR, and CCWM for teams at the event.",
+      "properties": {
+        "oprs": {
+          "type": "object",
+          "description": "A key-value pair with team key (eg `frc254`) as key and OPR as value",
+          "additionalProperties": {
+            "type": "number",
+            "format": "float",
+            "description": "OPR for team"
+          }
+        },
+        "dprs": {
+          "type": "object",
+          "description": "A key-value pair with team key (eg `frc254`) as key and DPR as value",
+          "additionalProperties": {
+            "type": "number",
+            "format": "float",
+            "description": "DPR for team"
+          }
+        },
+        "ccwms": {
+          "type": "object",
+          "description": "A key-value pair with team key (eg `frc254`) as key and CCWM as value",
+          "additionalProperties": {
+            "type": "number",
+            "format": "float",
+            "description": "CCWM for team"
+          }
+        }
+      }
+    },
+    "Event_Predictions": {
+      "type": "object",
+      "description": "JSON Object containing prediction information for the event. Contains year-specific information and is subject to change.",
     },
     "Webcast": {
       "type": "object",
