@@ -1,9 +1,10 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "The Blue Alliance API v3.",
-    "version": "3.0.0 beta",
-    "title": "TBA API v3"
+    "description": "Information and statistics about FIRST Robotics Competition teams and events.",
+    "version": "3.0.0",
+    "title": "The Blue Alliance API v3",
+    "x-version-info": "Versions of the API follow the format X.Y.Z, with X being a major version, Y denoting the minor version, and Z the point release. Changes to the spec or API that result in a major version change will significantly impact implementations. Changes to the minor version indicate paths and/or fields in existing models may be added, and any breaking changes will be confined to paths or models listed as in-development in the prior minor version. Changes to the point release indicate no format or structure changes to the paths or models, but updated or clarified documentation."
   },
   "host": "www.thebluealliance.com",
   "basePath": "/api/v3",
@@ -41,7 +42,7 @@
   ],
   "securityDefinitions": {
     "apiKey": {
-      "description": "Your TBA API Key can be obtained from your Account Page on the TBA website.",
+      "description": "Your TBA v3 API Key can be obtained from your [Account Page](https://www.thebluealliance.com/account) on the TBA website.",
       "type": "apiKey",
       "name": "X-TBA-Auth-Key",
       "in": "header"
@@ -66,7 +67,7 @@
     "year": {
       "name": "year",
       "in": "path",
-      "description": "Competition Year (or Season)",
+      "description": "Competition Year (or Season). Must be 4 digits.",
       "required": true,
       "type": "number",
       "format": "integer"
@@ -95,12 +96,15 @@
     "district_key": {
       "name": "district_key",
       "in": "path",
-      "description": "TBA District Key, eg `fim`",
+      "description": "TBA District Key, eg `2016fim`",
       "required": true,
       "type": "string"
     }
   },
   "responses": {
+    "Unauthorized": {
+      "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid."
+    },
     "NotModified": {
       "description": "Not Modified - Use Local Cached Value"
     }
@@ -137,6 +141,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -184,6 +191,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -232,6 +242,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -279,6 +292,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -329,6 +345,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -379,6 +398,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -430,6 +452,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -473,6 +498,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -516,6 +544,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -562,6 +593,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -611,6 +645,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -657,6 +694,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -704,6 +744,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -751,6 +794,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -799,6 +845,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -849,6 +898,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -899,6 +951,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -950,6 +1005,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1001,6 +1059,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1052,6 +1113,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1104,6 +1168,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1154,6 +1221,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1201,6 +1271,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1247,6 +1320,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1296,6 +1372,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1346,6 +1425,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1396,6 +1478,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1447,6 +1532,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1496,6 +1584,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1542,6 +1633,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1589,6 +1683,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1636,6 +1733,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1684,6 +1784,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1727,6 +1830,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1770,6 +1876,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1816,6 +1925,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1860,6 +1972,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1903,6 +2018,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1946,6 +2064,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1989,6 +2110,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -2036,6 +2160,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -2084,6 +2211,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -2132,6 +2262,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -2181,6 +2314,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -2228,6 +2364,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -2275,6 +2414,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -2323,6 +2465,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -2369,6 +2514,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -2412,6 +2560,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -2455,6 +2606,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -2501,6 +2655,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -2549,6 +2706,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -2597,6 +2757,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -2646,6 +2809,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -2694,6 +2860,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -2742,6 +2911,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -2791,6 +2963,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -2839,6 +3014,9 @@
           },
           "304": {
             "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
