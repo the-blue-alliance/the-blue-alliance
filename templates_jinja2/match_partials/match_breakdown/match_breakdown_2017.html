@@ -1,0 +1,185 @@
+<table class="match-table">
+  <tbody>
+    <!-- Auto Fuel -->
+    {% if "autoFuelHigh" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.autoFuelHigh %} {{match.score_breakdown.red.autoFuelHigh}} {% else %} 0 {% endif %}</td>
+      <td>Fuel High</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.autoFuelHigh %} {{match.score_breakdown.blue.autoFuelHigh}} {% else %} 0 {% endif %}</td>
+    </tr>
+    {% endif %}
+    {% if "autoFuelLow" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.autoFuelLow %} {{match.score_breakdown.red.autoFuelLow}} {% else %} 0 {% endif %}</td>
+      <td>Fuel Low</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.autoFuelLow %} {{match.score_breakdown.blue.autoFuelLow}} {% else %} 0 {% endif %}</td>
+    </tr>
+    {% endif %}
+    {% if "autoFuelPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">{% if match.score_breakdown.red.autoFuelPoints %} {{match.score_breakdown.red.autoFuelPoints}} {% else %} 0 {% endif %}</td>
+      <td>Pressure (kPa) Points</td>
+      <td class="blueScore" colspan="2">{% if match.score_breakdown.blue.autoFuelPoints %} {{match.score_breakdown.blue.autoFuelPoints}} {% else %} 0 {% endif %}</td>
+    </tr>
+    {% endif %}
+    <!-- Auto Rotor -->
+    {% if "rotor1Auto" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.rotor1Auto %} <span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
+      <td>Rotor 1 Engaged</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.rotor1Auto %} <span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
+    </tr>
+    {% endif %}
+    {% if "rotor2Auto" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.rotor2Auto %} <span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
+      <td>Rotor 2 Engaged</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.rotor2Auto %} <span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
+    </tr>
+    {% endif %}
+    {% if "autoRotorPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">{% if match.score_breakdown.red.autoRotorPoints %} {{match.score_breakdown.red.autoRotorPoints}} {% else %} 0 {% endif %}</td>
+      <td>Rotor Points</td>
+      <td class="blueScore" colspan="2">{% if match.score_breakdown.blue.autoRotorPoints %} {{match.score_breakdown.blue.autoRotorPoints}} {% else %} 0 {% endif %}</td>
+    </tr>
+    {% endif %}
+    <!-- Auto Mobility -->
+    {% if "autoMobilityPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">{% if match.score_breakdown.red.autoMobilityPoints %} {{match.score_breakdown.red.autoMobilityPoints}} {% else %} 0 {% endif %}</td>
+      <td>Mobility Points</td>
+      <td class="blueScore" colspan="2">{% if match.score_breakdown.blue.autoMobilityPoints %} {{match.score_breakdown.blue.autoMobilityPoints}} {% else %} 0 {% endif %}</td>
+    </tr>
+    {% endif %}
+    <!-- Auto Total -->
+    {% if "autoPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2"><b>{% if match.score_breakdown.red.autoPoints %}{{match.score_breakdown.red.autoPoints}}{%else%}0{%endif%}</b></td>
+      <th>Total Auto</th>
+      <td class="blueScore" colspan="2"><b>{% if match.score_breakdown.blue.autoPoints %}{{match.score_breakdown.blue.autoPoints}}{%else%}0{%endif%}</b></td>
+    </tr>
+    {% endif %}
+
+    <!-- Teleop Fuel -->
+    {% if "teleopFuelHigh" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.teleopFuelHigh %} {{match.score_breakdown.red.teleopFuelHigh}} {% else %} 0 {% endif %}</td>
+      <td>Fuel High</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.teleopFuelHigh %} {{match.score_breakdown.blue.teleopFuelHigh}} {% else %} 0 {% endif %}</td>
+    </tr>
+    {% endif %}
+    {% if "teleopFuelLow" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.teleopFuelLow %} {{match.score_breakdown.red.teleopFuelLow}} {% else %} 0 {% endif %}</td>
+      <td>Fuel Low</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.teleopFuelLow %} {{match.score_breakdown.blue.teleopFuelLow}} {% else %} 0 {% endif %}</td>
+    </tr>
+    {% endif %}
+    {% if "teleopFuelPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">{% if match.score_breakdown.red.teleopFuelPoints %} {{match.score_breakdown.red.teleopFuelPoints}} {% else %} 0 {% endif %}</td>
+      <td>Pressure (kPa) Points</td>
+      <td class="blueScore" colspan="2">{% if match.score_breakdown.blue.teleopFuelPoints %} {{match.score_breakdown.blue.teleopFuelPoints}} {% else %} 0 {% endif %}</td>
+    </tr>
+    {% endif %}
+    <!-- Teleop Rotor -->
+    {% if "rotor1Engaged" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.rotor1Engaged %}{% if match.score_breakdown.red.rotor1Auto %}<span class="glyphicon glyphicon-text-background"></span>{% else %} <span class="glyphicon glyphicon-ok"></span>{% endif %}{% endif %}</td>
+      <td>Rotor 1 Engaged</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.rotor1Engaged %}{% if match.score_breakdown.blue.rotor1Auto %}<span class="glyphicon glyphicon-text-background"></span>{% else %} <span class="glyphicon glyphicon-ok"></span>{% endif %}{% endif %}</td>
+    </tr>
+    {% endif %}
+    {% if "rotor2Engaged" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.rotor2Engaged %}{% if match.score_breakdown.red.rotor2Auto %}<span class="glyphicon glyphicon-text-background"></span>{% else %} <span class="glyphicon glyphicon-ok"></span>{% endif %}{% endif %}</td>
+      <td>Rotor 2 Engaged</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.rotor2Engaged %}{% if match.score_breakdown.blue.rotor2Auto %}<span class="glyphicon glyphicon-text-background"></span>{% else %} <span class="glyphicon glyphicon-ok"></span>{% endif %}{% endif %}</td>
+    </tr>
+    {% endif %}
+    {% if "rotor3Engaged" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.rotor3Engaged %} <span class="glyphicon glyphicon-ok"></span> {% endif %}</td>
+      <td>Rotor 3 Engaged</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.rotor3Engaged %} <span class="glyphicon glyphicon-ok"></span> {% endif %}</td>
+    </tr>
+    {% endif %}
+    {% if "rotor4Engaged" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.rotor4Engaged %} <span class="glyphicon glyphicon-ok"></span> {% endif %}</td>
+      <td>Rotor 4 Engaged</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.rotor4Engaged %} <span class="glyphicon glyphicon-ok"></span> {% endif %}</td>
+    </tr>
+    {% endif %}
+    {% if "teleopRotorPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">{% if match.score_breakdown.red.teleopRotorPoints %} {{match.score_breakdown.red.teleopRotorPoints}} {% else %} 0 {% endif %}</td>
+      <td>Rotor Points</td>
+      <td class="blueScore" colspan="2">{% if match.score_breakdown.blue.teleopRotorPoints %} {{match.score_breakdown.blue.teleopRotorPoints}} {% else %} 0 {% endif %}</td>
+    </tr>
+    {% endif %}
+    <!-- Teleop Takeoff -->
+    {% if "teleopTakeoffPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">{% if match.score_breakdown.red.teleopTakeoffPoints %} {{match.score_breakdown.red.teleopTakeoffPoints}} {% else %} 0 {% endif %}</td>
+      <td>Takeoff Points</td>
+      <td class="blueScore" colspan="2">{% if match.score_breakdown.blue.teleopTakeoffPoints %} {{match.score_breakdown.blue.teleopTakeoffPoints}} {% else %} 0 {% endif %}</td>
+    </tr>
+    {% endif %}
+    <!-- Teleop Total -->
+    {% if "teleopPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2"><b>{% if match.score_breakdown.red.teleopPoints %}{{match.score_breakdown.red.teleopPoints}}{%else%}0{%endif%}</b></td>
+      <th>Total Teleop</th>
+      <td class="blueScore" colspan="2"><b>{% if match.score_breakdown.blue.teleopPoints %}{{match.score_breakdown.blue.teleopPoints}}{%else%}0{%endif%}</b></td>
+    </tr>
+    {% endif %}
+
+    <!-- Pressure/Rotor -->
+    {% if "kPaRankingPointAchieved" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.kPaRankingPointAchieved or match.score_breakdown.red.kPaBonusPoints > 0 %} <span class="glyphicon glyphicon-ok"></span> {% if match.score_breakdown.red.kPaBonusPoints > 0 %} (+{{ match.score_breakdown.red.kPaBonusPoints }}) {% endif %} {% else %} <span class="glyphicon glyphicon-remove"></span> {% endif %}</td>
+      <td>Pressure Reached</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.kPaRankingPointAchieved or match.score_breakdown.blue.kPaBonusPoints > 0 %} <span class="glyphicon glyphicon-ok"></span> {% if match.score_breakdown.blue.kPaBonusPoints > 0 %} (+{{ match.score_breakdown.blue.kPaBonusPoints }}) {% endif %} {% else %} <span class="glyphicon glyphicon-remove"></span> {% endif %}</td>
+    </tr>
+    {% endif %}
+    {% if "rotorRankingPointAchieved" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.rotorRankingPointAchieved or match.score_breakdown.red.rotorBonusPoints > 0 %} <span class="glyphicon glyphicon-ok"></span> {% if match.score_breakdown.red.rotorBonusPoints > 0 %} (+{{ match.score_breakdown.red.rotorBonusPoints }}) {% endif %}{% else %} <span class="glyphicon glyphicon-remove"></span> {% endif %}</td>
+      <td>All Rotors Engaged</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.rotorRankingPointAchieved or match.score_breakdown.blue.rotorBonusPoints > 0 %} <span class="glyphicon glyphicon-ok"></span> {% if match.score_breakdown.blue.rotorBonusPoints > 0 %} (+{{ match.score_breakdown.blue.rotorBonusPoints }}) {% endif %}{% else %} <span class="glyphicon glyphicon-remove"></span> {% endif %}</td>
+    </tr>
+    {% endif %}
+
+    <!-- Fouls & Adjustments -->
+    {% if "foulPoints" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">+{%if match.score_breakdown.red.foulPoints%}{{match.score_breakdown.red.foulPoints}}{%else%}0{%endif%}</td>
+      <td>Fouls</td>
+      <td class="blue" colspan="2">+{%if match.score_breakdown.blue.foulPoints%}{{match.score_breakdown.blue.foulPoints}}{%else%}0{%endif%}</td>
+    </tr>
+    {% endif %}
+    {% if "adjustPoints" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.adjustPoints%}{{match.score_breakdown.red.adjustPoints}}{%else%}0{%endif%}</td>
+      <td>Adjustments</td>
+      <td class="blue" colspan="2">{%if match.score_breakdown.blue.adjustPoints%}{{match.score_breakdown.blue.adjustPoints}}{%else%}0{%endif%}</td>
+    </tr>
+    {% endif %}
+
+    <tr class="key">
+      <td class="redScore" colspan="2"><b>{%if match.score_breakdown.red.totalPoints%}{{match.score_breakdown.red.totalPoints}}{%else%}0{%endif%}</b></td>
+      <th>Total Score</th>
+      <td class="blueScore" colspan="2"><b>{%if match.score_breakdown.blue.totalPoints%}{{match.score_breakdown.blue.totalPoints}}{%else%}0{%endif%}</b></td>
+    </tr>
+
+    {% if match.score_breakdown.red.get('tba_rpEarned') is not none %}
+    <tr>
+      <td class="red" colspan="2">+{% if match.score_breakdown.red.tba_rpEarned%}{{match.score_breakdown.red.tba_rpEarned}} {%else%}0{%endif%} RP</td>
+      <td>Ranking Points</td>
+      <td class="blue" colspan="2">+{%if match.score_breakdown.blue.tba_rpEarned%}{{match.score_breakdown.blue.tba_rpEarned}} {%else%}0{%endif%} RP</td>
+    </tr>
+    {% endif %}
+  </tbody>
+</table>

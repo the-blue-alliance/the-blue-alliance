@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Pending Suggestions{% endblock %}
+
+{% block content %}
+<div class="container">
+  {% if status %}
+  <div class="row">
+    <div class="col-xs-12 col-lg-6 col-lg-offset-3">
+      {% if status == 'accepted' %}
+      <div class="alert alert-success">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Thanks!</h4>
+        <p>This suggestion has been successfully added!</p>
+      </div>
+      {% elif status == 'rejected' %}
+      <div class="alert alert-success">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Thanks!</h4>
+        <p>This suggestion has been successfully rejected</p>
+      </div>
+      {% elif status == 'already_reviewed' %}
+      <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Uh oh!</h4>
+        <p>This suggestion has already been reviewed!</p>
+      </div>
+      {% elif status == 'bad_suggestion' %}
+      <div class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Uh oh!</h4>
+        <p>This suggestion is unable to be reviewed!</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="row">
+    <h1>Review Pending Suggestions</h1>
+    <p>Thanks for helping us get more data!</p>
+
+    <div class="row">
+        <div class="col-xs-6">
+            {% include "suggestions/pending_suggestion_rows_partial.html" %}
+        </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

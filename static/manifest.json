@@ -1,7 +1,23 @@
 {
-  "short_name": "The Blue Alliance",
-  "name": "The Blue Alliance",
-  "start_url": "/",
-
-  "gcm_sender_id": "103953800507"
+    "name": "The Blue Alliance",
+    "short_name": "TBA",
+    "start_url": "/",
+    "icons": [
+        {
+            "src": "/icons/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        }
+    ],
+    "background_color": "#3F51B5",
+    "theme_color": "#3F51B5",
+    "display": "standalone",
+    "gcm_sender_id": "103953800507",
+    "prefer_related_applications": true,
+    "related_applications": [
+      {
+        "platform": "play",
+        "id": "com.thebluealliance.androidclient"
+      }
+    ]
 }

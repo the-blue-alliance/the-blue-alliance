@@ -7,8 +7,7 @@
 
 {% block more_head_tags %}
   <meta property="og:title" content="Advanced Insights: {{event.year}} {{event.name}}" />
-  <meta property="og:url" content="http://www.thebluealliance.com/event/{{event.key_name}}/insights" />
-  <meta property="og:image" content="http://www.thebluealliance.com/images/logo_square_200.png" />
+  <meta property="og:image" content="https://www.thebluealliance.com/images/logo_square_512.png" />
   <meta property="og:description" content="Advanced insights for the {{event.year}} {{event.name}} FIRST Robotics Competition."/>
   <meta property="og:site_name" content="The Blue Alliance" />
 {% endblock %}
@@ -25,35 +24,46 @@
 
   <div class="row">
     <div class="col-sm-12">
-      <ul class="nav nav-tabs">
-        <li class="active"><a href="#match-predictions" data-toggle="tab">Qual Match Predictions</a></li>
+      <ul class="nav nav-tabs nav-justified">
+        <li class="active"><a href="#qual-match-predictions" data-toggle="tab">Qual Match Predictions</a></li>
         <li><a href="#ranking-predictions" data-toggle="tab">Ranking Predictions</a></li>
+        <li><a href="#playoff-match-predictions" data-toggle="tab">Playoff Match Predictions</a></li>
       </ul>
     </div>
   </div>
 
   <div class="tab-content">
-    <div class="tab-pane active" id="match-predictions">
-      {% if match_predictions %}
+    <div class="tab-pane active" id="qual-match-predictions">
+      {% if match_predictions.qual %}
       <div class="row">
-        {% if matches.qm %}
         <div class="col-xs-12">
           <h3>Qualification Match Predictions (<a href="/predictions">?</a>)</h3>
-          <p>Remember, ranking predictions are JUST FOR FUN! Please do not be discouraged by our predictions -- they are almost certainly wrong.</p>
+          <p>Remember, match predictions are JUST FOR FUN! Please do not be discouraged by our predictions -- they are almost certainly wrong.</p>
           {% if fake_matches %}
           <p>Note: Match teams are not shown because <em>FIRST</em> does not allow the re-hosting of the preliminary match schedule. Sorry for the inconvenience.</p>
           {% endif %}
-          {% if match_prediction_stats.wl_accuracy %}<p><strong>Win/Loss prediction accuracy:</strong> {{match_prediction_stats.wl_accuracy|round|int}}%</p>{% endif %}
-          {% if match_prediction_stats.wl_accuracy_75 %}<p><strong>Win/Loss prediction accuracy (>75% confidence):</strong> {{match_prediction_stats.wl_accuracy_75|round|int}}%</p>{% endif %}
-          {% if match_prediction_stats.err_mean %}<p><strong>Match score prediction average error:</strong> {{match_prediction_stats.err_mean|round(1)}}</p>{% endif %}
-          {{mtm.qual_match_prediction_table(matches, match_predictions, fake_matches)}}
+          {% if match_prediction_stats.qual.wl_accuracy %}<p><strong>Win/Loss prediction accuracy:</strong> {{match_prediction_stats.qual.wl_accuracy|round|int}}%</p>{% endif %}
+          {% if match_prediction_stats.qual.wl_accuracy_75 %}<p><strong>Win/Loss prediction accuracy (>75% confidence):</strong> {{match_prediction_stats.qual.wl_accuracy_75|round|int}}%</p>{% endif %}
+          {% if match_prediction_stats.qual.err_mean %}<p><strong>Match score prediction average error:</strong> {{match_prediction_stats.qual.err_mean|round(1)}}</p>{% endif %}
+
+          <!--
+          {% if match_prediction_stats.qual.brier_scores.win_loss %}<p><strong>Win/Loss Brier Score:</strong> {{match_prediction_stats.qual.brier_scores.win_loss}}</p>{% endif %}
+          {% if event.year == 2016 %}
+            <p><strong>Breach Brier Score:</strong> {{match_prediction_stats.qual.brier_scores.breach}}</p>
+            <p><strong>Capture Brier Score:</strong> {{match_prediction_stats.qual.brier_scores.capture}}</p>
+          {% elif event.year == 2017 %}
+            <p><strong>Pressure Brier Score:</strong> {{match_prediction_stats.qual.brier_scores.pressure}}</p>
+            <p><strong>Rotors Brier Score:</strong> {{match_prediction_stats.qual.brier_scores.gears}}</p>
+          {% endif %}
+          -->
+
+          {{mtm.qual_match_prediction_table(matches, match_predictions.qual, fake_matches, event.year)}}
         </div>
-        {% endif %}
       </div>
       {% else %}
       <div class="row">
         <div class="col-xs-12">
-          <p>No match predictions available. Check back later!</p>
+          <p>No qual match predictions available. Check back later!</p>
         </div>
       </div>
       {% endif %}
@@ -100,6 +110,7 @@
                   <td>{{avg_rp|round(1)}}</td>
                   <td>{{max_rp}}</td>
                   <td>{{min_rp}}</td>
+                </tr>
                 {% endfor %}
               </tbody>
             </table>
@@ -114,6 +125,224 @@
       </div>
       {% endif %}
     </div>
+
+    <div class="tab-pane" id="playoff-match-predictions">
+      {% if match_predictions.playoff %}
+      <div class="row">
+        <div class="col-xs-12">
+          <h3>Playoff Match Predictions (<a href="/predictions">?</a>)</h3>
+          <p>Remember, match predictions are JUST FOR FUN! Please do not be discouraged by our predictions -- they are almost certainly wrong.</p>
+          {% if fake_matches %}
+          <p>Note: Match teams are not shown because <em>FIRST</em> does not allow the re-hosting of the preliminary match schedule. Sorry for the inconvenience.</p>
+          {% endif %}
+          {% if match_prediction_stats.playoff.wl_accuracy %}<p><strong>Win/Loss prediction accuracy:</strong> {{match_prediction_stats.playoff.wl_accuracy|round|int}}%</p>{% endif %}
+          {% if match_prediction_stats.playoff.wl_accuracy_75 %}<p><strong>Win/Loss prediction accuracy (>75% confidence):</strong> {{match_prediction_stats.playoff.wl_accuracy_75|round|int}}%</p>{% endif %}
+          {% if match_prediction_stats.playoff.err_mean %}<p><strong>Match score prediction average error:</strong> {{match_prediction_stats.playoff.err_mean|round(1)}}</p>{% endif %}
+
+          <!--
+          {% if match_prediction_stats.playoff.brier_scores.win_loss %}<p><strong>Win/Loss Brier Score:</strong> {{match_prediction_stats.playoff.brier_scores.win_loss}}</p>{% endif %}
+          {% if event.year == 2016 %}
+            <p><strong>Breach Brier Score:</strong> {{match_prediction_stats.playoff.brier_scores.breach}}</p>
+            <p><strong>Capture Brier Score:</strong> {{match_prediction_stats.playoff.brier_scores.capture}}</p>
+          {% elif event.year == 2017 %}
+            <p><strong>Pressure Brier Score:</strong> {{match_prediction_stats.playoff.brier_scores.pressure}}</p>
+            <p><strong>Rotors Brier Score:</strong> {{match_prediction_stats.playoff.brier_scores.gears}}</p>
+          {% endif %}
+          -->
+
+          {{mtm.playoff_match_prediction_table(matches, match_predictions.playoff, fake_matches, event.year)}}
+        </div>
+      </div>
+      {% else %}
+      <div class="row">
+        <div class="col-xs-12">
+          <p>No playoff match predictions available. Check back later!</p>
+        </div>
+      </div>
+      {% endif %}
+    </div>
   </div>
 </div>
+{% endblock %}
+
+{% block inline_javascript %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+<script>
+  var predictions = {{distribution_info_json|safe}};  // Kind of hacky
+  Chart.defaults.global.legend.display = false;
+  Chart.defaults.global.maintainAspectRatio = false;
+  Chart.defaults.global.tooltips = false;
+
+  var minQualScore = 1;
+  var maxQualScore = 399;
+  var qualLineHeight = 0;
+  var minPlayoffScore = 1;
+  var maxPlayoffScore = 549;
+  var playoffLineHeight = 0;
+  for (var key in predictions) {
+    var redScore = predictions[key]['red_actual_score'];
+    var blueScore = predictions[key]['blue_actual_score'];
+
+    if (predictions[key].level == 'qual') {
+      if (redScore != -1 && blueScore != -1) {
+        minQualScore = Math.min(minQualScore, redScore);
+        minQualScore = Math.min(minQualScore, blueScore);
+        maxQualScore = Math.max(maxQualScore, redScore);
+        maxQualScore = Math.max(maxQualScore, blueScore);
+      }
+      qualLineHeight = Math.max(qualLineHeight,
+        Math.max(gaussian(predictions[key]['red_mean'],
+                          predictions[key]['red_mean'],
+                          Math.sqrt(predictions[key]['red_var'])),
+                 gaussian(predictions[key]['blue_mean'],
+                          predictions[key]['blue_mean'],
+                          Math.sqrt(predictions[key]['blue_var']))));
+    } else {
+      if (redScore != -1 && blueScore != -1) {
+        minPlayoffScore = Math.min(minPlayoffScore, redScore);
+        minPlayoffScore = Math.min(minPlayoffScore, blueScore);
+        maxPlayoffScore = Math.max(maxPlayoffScore, redScore);
+        maxPlayoffScore = Math.max(maxPlayoffScore, blueScore);
+      }
+      playoffLineHeight = Math.max(playoffLineHeight,
+        Math.max(gaussian(predictions[key]['red_mean'],
+                          predictions[key]['red_mean'],
+                          Math.sqrt(predictions[key]['red_var'])),
+                 gaussian(predictions[key]['blue_mean'],
+                          predictions[key]['blue_mean'],
+                          Math.sqrt(predictions[key]['blue_var']))));
+    }
+  }
+
+  var xMinQual = minQualScore - (minQualScore % 50);
+  var xMaxQual = maxQualScore - (maxQualScore % 50) + 50;
+  var xMinPlayoff = minPlayoffScore - (minPlayoffScore % 50);
+  var xMaxPlayoff = maxPlayoffScore - (maxPlayoffScore % 50) + 50;
+
+  $('.score_chart').each(function() {
+    var ctx = document.getElementById(this.id).getContext('2d');
+    var matchKey = $(this).attr('data-match-key');
+    var isQual = predictions[matchKey].level == 'qual';
+
+    var numPoints = 10;
+    var tailScale = 7;
+
+    var redMean = predictions[matchKey]['red_mean'];
+    var redSig = Math.sqrt(predictions[matchKey]['red_var']);
+    var redDist = [];
+    for (var i=-numPoints/2; i<=numPoints/2; i++) {
+      x = redMean + redSig * i * tailScale / numPoints;
+      redDist.push({
+        x: x,
+        y: gaussian(x, redMean, redSig)
+      })
+    }
+
+    var blueMean = predictions[matchKey]['blue_mean'];
+    var blueSig = Math.sqrt(predictions[matchKey]['blue_var']);
+    var blueDist = [];
+    for (var i=-numPoints/2; i<=numPoints/2; i++) {
+      x = blueMean + blueSig * i * tailScale / numPoints;
+      blueDist.push({
+        x: x,
+        y: gaussian(x, blueMean, blueSig)
+      })
+    }
+
+    var redScore = predictions[matchKey]['red_actual_score'];
+    var blueScore = predictions[matchKey]['blue_actual_score'];
+
+    var lineHeight = Math.max(gaussian(predictions[matchKey]['red_mean'],
+                                       predictions[matchKey]['red_mean'],
+                                       Math.sqrt(predictions[matchKey]['red_var'])),
+                              gaussian(predictions[matchKey]['blue_mean'],
+                                       predictions[matchKey]['blue_mean'],
+                                       Math.sqrt(predictions[matchKey]['blue_var'])));
+
+    var datasets;
+    if (redScore != -1 && blueScore != -1) {
+      datasets = [{
+        data: [{
+          x: redScore,
+          y: 0
+        },{
+          x: redScore,
+          y: lineHeight
+        }],
+        borderColor: "rgba(255,0,0,0.8)",
+        borderWidth: 2
+      },
+      {
+        data: [{
+          x: blueScore,
+          y: 0
+        },{
+          x: blueScore,
+          y: lineHeight
+        }],
+        borderColor: "rgba(0,0,255,0.8)",
+        borderWidth: 2
+      }]
+    } else {
+      datasets = [];
+    }
+    datasets.push({
+      data: redDist,
+      backgroundColor: "rgba(255,111,111,0.4)",
+      borderColor: "rgba(255,0,0,0.4)",
+      borderWidth: 1,
+    });
+    datasets.push({
+      data: blueDist,
+      backgroundColor: "rgba(111,111,255,0.4)",
+      borderColor: "rgba(0,0,255,0.4)",
+      borderWidth: 1,
+    });
+
+    var scatterChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: datasets
+        },
+        options: {
+            animation: {
+              duration: 0,
+            },
+            scales: {
+                xAxes: [{
+                    type: 'linear',
+                    position: 'bottom',
+                    gridLines: {
+                        display: false,
+                    },
+                    ticks: {
+                      min: isQual? xMinQual : xMinPlayoff,
+                      max: isQual? xMaxQual : xMaxPlayoff,
+                    }
+                }],
+                yAxes: [{
+                    display: false,
+                    ticks: {
+                      min: 0,
+                      max: lineHeight * 1.1,
+                    }
+                }]
+            },
+            elements: {
+              point: {
+                radius: 0,
+                hoverRadius: 0
+              }
+            }
+        }
+    });
+  });
+
+  // taken from https://github.com/jasondavies/science.js/
+  function gaussian(x, mean, sig) {
+    var gaussianConstant = 1 / Math.sqrt(2 * Math.PI),
+      x = (x - mean) / sig;
+      return gaussianConstant * Math.exp(-.5 * x * x) / sig;
+  };
+</script>
 {% endblock %}

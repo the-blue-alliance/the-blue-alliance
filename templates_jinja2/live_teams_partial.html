@@ -1,32 +1,42 @@
-{% for live_event in live_events_with_teams %}
+{% for live_event, team_statuses in live_events_with_teams %}
     <div class="row">
         <div class="col-xs-12">
-            <a href="/event/{{ live_event.0.key_name }}"><h3>{{ live_event.0.name }}</h3></a>
-            {% if live_event.0.now and live_event.0.webcast %}
-            <a class="btn btn-success btn-small pull-right" href="{{live_event.0.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
+            <a href="/event/{{ live_event.key_name }}"><h3>{{ live_event.name }}</h3></a>
+            {% if live_event.now and live_event.webcast %}
+                {% if live_event.webcast_status == 'offline' %}
+                    <a class="btn btn-default btn-small pull-right" href="{{live_event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Offline</a>
+                {% else %}
+                    <a class="btn btn-success btn-small pull-right" href="{{live_event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
+                {% endif %}
             {% endif %}
             <p>
-                {% if live_event.0.location %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ live_event.0.location }}" target="_blank">{{ live_event.0.location }}</a><br />{% endif %}
-                {% if live_event.0.start_date %}<span class="glyphicon glyphicon-calendar"></span> {{ live_event.0.start_date|strftime("%b %d") }}{% if live_event.0.start_date|strftime("%b %d") != live_event.0.end_date|strftime("%b %d") %} - {{ live_event.0.end_date|strftime("%b %d") }}{% endif %}{{ live_event.0.end_date|strftime(", %Y") }}{% endif %}
+                {% if live_event.location %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ live_event.location }}" target="_blank">{{ live_event.location }}</a><br />{% endif %}
+                {% if live_event.start_date %}<span class="glyphicon glyphicon-calendar"></span> {{ live_event.start_date|strftime("%b %d") }}{% if live_event.start_date|strftime("%b %d") != live_event.end_date|strftime("%b %d") %} - {{ live_event.end_date|strftime("%b %d") }}{% endif %}{{ live_event.end_date|strftime(", %Y") }}{% endif %}
             </p>
 
             <table class="table table-striped table-condensed col-xs-11">
                 <tr>
                     <th>Team Number</th>
                     <th>Team Name</th>
+                    <th>Next Match</th>
                     <th>Qual Record</th>
                     <th>Ranking</th>
+                    <th>Alliance</th>
                     <th>Playoff Status</th>
                 </tr>
-                {% for team_and_status in live_event.1 %}
+                {% for team, status, status_str in team_statuses %}
                     <tr>
-                        <td>{{ team_and_status.0.team_number }}</td>
+                        <td>{{ team.team_number }}</td>
                         <td>
-                            <a href="/team/{{ team_and_status.0.team_number }}/{{ live_event.0.year }}#{{ live_event.0.key_name }}">{{ team_and_status.0.nickname }}</a>
+                            <a href="/team/{{ team.team_number }}/{{ live_event.year }}#{{ live_event.key_name }}">{{ team.nickname }}</a>
                         </td>
-                        <td>{{ team_and_status.1.get_result().1 }}</td>
-                        <td>{{ team_and_status.1.get_result().2 }}</td>
-                        <td>{% if team_and_status.1.get_result().3 %}{{ team_and_status.1.get_result().3 }}{% endif %}</td>
+                        <td>
+                            {% if status.next_match_key %}<a href="/match/{{ status.next_match_key }}">{{ status.next_match_key|match_short }}</a>{% else %}--{% endif %}
+                        </td>
+                        <td>{% if status.qual %}{{ status.qual.ranking.record.wins }}-{{ status.qual.ranking.record.losses }}-{{ status.qual.ranking.record.ties }}{% else %}--{% endif %}</td>
+                        <td>{% if status.qual and status.qual.ranking.rank %}{{ status.qual.ranking.rank }}/{{ status.qual.num_teams }}{% else %}--{% endif %}</td>
+                        <td>{{status_str.alliance|safe}}</td>
+                        <td>{{status_str.playoff|safe}}</td>
                     </tr>
                 {% endfor %}
             </table>

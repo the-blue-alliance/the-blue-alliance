@@ -1,9 +1,14 @@
 import json
+
+import datetime
 import numpy as np
 import re
 
+import time
 from google.appengine.ext import ndb
 
+from consts.event_type import EventType
+from consts.playoff_type import PlayoffType
 from helpers.tbavideo_helper import TBAVideoHelper
 from helpers.youtube_video_helper import YouTubeVideoHelper
 from models.event import Event
@@ -27,6 +32,13 @@ class Match(ndb.Model):
         "sf": "Semis",
         "f": "Finals",
     }
+    COMP_LEVELS_VERBOSE_FULL = {
+        "qm": "Qualification",
+        "ef": "Octo-finals",
+        "qf": "Quarterfinals",
+        "sf": "Semifinals",
+        "f": "Finals",
+    }
     COMP_LEVELS_PLAY_ORDER = {
         'qm': 1,
         'ef': 2,
@@ -38,14 +50,16 @@ class Match(ndb.Model):
     alliances_json = ndb.StringProperty(required=True, indexed=False)  # JSON dictionary with alliances and scores.
 
     # {
-    # "red": {
-    # "teams": ["frc177", "frc195", "frc125"], # These are Team keys
-    #    "score": 25
-    # },
-    # "blue": {
-    #    "teams": ["frc433", "frc254", "frc222"],
-    #    "score": 12
-    # }
+    #   "red": {
+    #     "teams": ["frc177", "frc195", "frc125"], # These are Team keys
+    #     "surrogates": ["frc177", "frc195"],
+    #     "score": 25
+    #   },
+    #   "blue": {
+    #     "teams": ["frc433", "frc254", "frc222"],
+    #     "surrogates": ["frc433"],
+    #     "score": 12
+    #   }
     # }
 
     score_breakdown_json = ndb.StringProperty(indexed=False)  # JSON dictionary with score breakdowns. Fields are those used for seeding. Varies by year.
@@ -73,9 +87,12 @@ class Match(ndb.Model):
     time = ndb.DateTimeProperty()  # UTC time of scheduled start
     time_string = ndb.StringProperty(indexed=False)  # the time as displayed on FIRST's site (event's local time)
     actual_time = ndb.DateTimeProperty()  # UTC time of match actual start
+    predicted_time = ndb.DateTimeProperty()  # UTC time of when we predict the match will start
+    post_result_time = ndb.DateTimeProperty()  # UTC time scores were shown to the audience
     youtube_videos = ndb.StringProperty(repeated=True)  # list of Youtube IDs
     tba_videos = ndb.StringProperty(repeated=True)  # list of filetypes a TBA video exists for
     push_sent = ndb.BooleanProperty()  # has an upcoming match notification been sent for this match? None counts as False
+    tiebreak_match_key = ndb.KeyProperty(kind='Match')  # Points to a match that was played to tiebreak this one
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True)
@@ -105,13 +122,17 @@ class Match(ndb.Model):
         if self._alliances is None:
             self._alliances = json.loads(self.alliances_json)
 
-            # score types are inconsistent in the db. convert everything to ints for now.
             for color in ['red', 'blue']:
+                # score types are inconsistent in the db. convert everything to ints for now.
                 score = self._alliances[color]['score']
                 if score is None:
                     self._alliances[color]['score'] = -1
                 else:
                     self._alliances[color]['score'] = int(score)
+
+                # add surrogates if not present
+                if 'surrogates' not in self._alliances[color]:
+                    self._alliances[color]['surrogates'] = []
 
         return self._alliances
 
@@ -122,6 +143,31 @@ class Match(ndb.Model):
         """
         if self._score_breakdown is None and self.score_breakdown_json is not None:
             self._score_breakdown = json.loads(self.score_breakdown_json)
+
+            # Add in RP calculations
+            if self.has_been_played:
+                if self.year >= 2016:
+                    for color in ['red', 'blue']:
+                        if self.comp_level == 'qm':
+                            rp_earned = 0
+                            if self.winning_alliance == color:
+                                rp_earned += 2
+                            elif self.winning_alliance == '':
+                                rp_earned += 1
+
+                            if self.year == 2016:
+                                if self._score_breakdown.get(color, {}).get('teleopDefensesBreached'):
+                                    rp_earned += 1
+                                if self._score_breakdown.get(color, {}).get('teleopTowerCaptured'):
+                                    rp_earned += 1
+                            elif self.year == 2017:
+                                if self._score_breakdown.get(color, {}).get('kPaRankingPointAchieved'):
+                                    rp_earned += 1
+                                if self._score_breakdown.get(color, {}).get('rotorRankingPointAchieved'):
+                                    rp_earned += 1
+                            self._score_breakdown[color]['tba_rpEarned'] = rp_earned
+                        else:
+                            self._score_breakdown[color]['tba_rpEarned'] = None
 
         return self._score_breakdown
 
@@ -140,7 +186,11 @@ class Match(ndb.Model):
             elif blue_score > red_score:
                 self._winning_alliance = 'blue'
             else:  # tie
-                self._winning_alliance = MatchHelper.tiebreak_winner(self)
+                event = self.event.get()
+                if event and event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM and event.event_type_enum == EventType.CMP_FINALS:
+                    self._winning_alliance = ''
+                else:
+                    self._winning_alliance = MatchHelper.tiebreak_winner(self)
         return self._winning_alliance
 
     @property
@@ -235,6 +285,34 @@ class Match(ndb.Model):
                 videos.append({"type": "tba", "key": tba_path})
         return videos
 
+    @property
+    def prediction_error_str(self):
+        if self.actual_time and self.predicted_time:
+            if self.actual_time > self.predicted_time:
+                delta = self.actual_time - self.predicted_time
+                s = int(delta.total_seconds())
+                return '{:02}:{:02}:{:02} early'.format(s // 3600, s % 3600 // 60, s % 60)
+            elif self.predicted_time > self.actual_time:
+                delta = self.predicted_time - self.actual_time
+                s = int(delta.total_seconds())
+                return '{:02}:{:02}:{:02} late'.format(s // 3600, s % 3600 // 60, s % 60)
+            else:
+                return "On Time"
+
+    @property
+    def schedule_error_str(self):
+        if self.actual_time and self.time:
+            if self.actual_time > self.time:
+                delta = self.actual_time - self.time
+                s = int(delta.total_seconds())
+                return '{:02}:{:02}:{:02} behind'.format(s // 3600, s % 3600 // 60, s % 60)
+            elif self.time > self.actual_time:
+                delta = self.time - self.actual_time
+                s = int(delta.total_seconds())
+                return '{:02}:{:02}:{:02} ahead'.format(s // 3600, s % 3600 // 60, s % 60)
+            else:
+                return "On Time"
+
     @classmethod
     def renderKeyName(self, event_key_name, comp_level, set_number, match_number):
         if comp_level == "qm":
@@ -247,3 +325,9 @@ class Match(ndb.Model):
         key_name_regex = re.compile(r'^[1-9]\d{3}[a-z]+[0-9]?\_(?:qm|ef\dm|qf\dm|sf\dm|f\dm)\d+$')
         match = re.match(key_name_regex, match_key)
         return True if match else False
+
+    def within_seconds(self, seconds):
+        """
+        Returns: Boolean whether match started within specified seconds of now
+        """
+        return self.actual_time and abs((datetime.datetime.now() - self.actual_time).total_seconds()) <= seconds

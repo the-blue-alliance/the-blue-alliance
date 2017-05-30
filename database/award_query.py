@@ -1,6 +1,7 @@
 from google.appengine.ext import ndb
 
 from database.database_query import DatabaseQuery
+from database.dict_converters.award_converter import AwardConverter
 from models.award import Award
 from models.event import Event
 from models.team import Team
@@ -9,9 +10,7 @@ from models.team import Team
 class EventAwardsQuery(DatabaseQuery):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = 'event_awards_{}'  # (event_key)
-
-    def __init__(self, event_key):
-        self._query_args = (event_key, )
+    DICT_CONVERTER = AwardConverter
 
     @ndb.tasklet
     def _query_async(self):
@@ -23,9 +22,7 @@ class EventAwardsQuery(DatabaseQuery):
 class TeamAwardsQuery(DatabaseQuery):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = 'team_awards_{}'  # (team_key)
-
-    def __init__(self, team_key):
-        self._query_args = (team_key, )
+    DICT_CONVERTER = AwardConverter
 
     @ndb.tasklet
     def _query_async(self):
@@ -38,9 +35,7 @@ class TeamAwardsQuery(DatabaseQuery):
 class TeamYearAwardsQuery(DatabaseQuery):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = 'team_year_awards_{}_{}'  # (team_key, year)
-
-    def __init__(self, team_key, year):
-        self._query_args = (team_key, year, )
+    DICT_CONVERTER = AwardConverter
 
     @ndb.tasklet
     def _query_async(self):
@@ -55,9 +50,7 @@ class TeamYearAwardsQuery(DatabaseQuery):
 class TeamEventAwardsQuery(DatabaseQuery):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = 'team_event_awards_{}_{}'  # (team_key, event_key)
-
-    def __init__(self, team_key, event_key):
-        self._query_args = (team_key, event_key, )
+    DICT_CONVERTER = AwardConverter
 
     @ndb.tasklet
     def _query_async(self):

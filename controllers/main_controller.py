@@ -12,6 +12,7 @@ from base_controller import CacheableHandler
 from consts.event_type import EventType
 from consts.notification_type import NotificationType
 from helpers.event_helper import EventHelper
+from helpers.firebase.firebase_pusher import FirebasePusher
 from models.event import Event
 from models.insight import Insight
 from models.team import Team
@@ -72,7 +73,7 @@ class MainKickoffHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24
 
     def _render(self, *args, **kw):
-        kickoff_datetime_est = datetime.datetime(2017, 1, 7, 10, 30)
+        kickoff_datetime_est = datetime.datetime(2017, 1, 7, 10, 00)
         kickoff_datetime_utc = kickoff_datetime_est + datetime.timedelta(hours=5)
 
         is_kickoff = datetime.datetime.now() >= kickoff_datetime_est - datetime.timedelta(days=1)  # turn on 1 day before
@@ -96,7 +97,7 @@ class MainBuildseasonHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        endbuild_datetime_est = datetime.datetime(2016, 2, 23, 23, 59)
+        endbuild_datetime_est = datetime.datetime(2017, 2, 21, 23, 59)
         endbuild_datetime_utc = endbuild_datetime_est + datetime.timedelta(hours=5)
         week_events = EventHelper.getWeekEvents()
 
@@ -116,22 +117,27 @@ class MainChampsHandler(CacheableHandler):
 
     def __init__(self, *args, **kw):
         super(MainChampsHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24
+        self._cache_expiration = 60 * 5
 
     def _render(self, *args, **kw):
         year = datetime.datetime.now().year
-        event_keys = Event.query(Event.year == year, Event.event_type_enum.IN(EventType.CMP_EVENT_TYPES)).fetch(100, keys_only=True)
-        events = [event_key.get() for event_key in event_keys]
+        hou_event_keys_future = Event.query(
+            Event.year == year,
+            Event.event_type_enum.IN(EventType.CMP_EVENT_TYPES),
+            Event.start_date <= datetime.datetime(2017, 4, 22)).fetch_async(keys_only=True)
+        stl_event_keys_future = Event.query(
+            Event.year == year,
+            Event.event_type_enum.IN(EventType.CMP_EVENT_TYPES),
+            Event.start_date > datetime.datetime(2017, 4, 22)).fetch_async(keys_only=True)
+
+        hou_events_futures = ndb.get_multi_async(hou_event_keys_future.get_result())
+        stl_events_futures = ndb.get_multi_async(stl_event_keys_future.get_result())
 
         self.template_values.update({
-            "events": events,
+            "hou_events": [e.get_result() for e in hou_events_futures],
+            "stl_events": [e.get_result() for e in stl_events_futures],
             "year": year,
         })
-
-        insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(year, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
-        for insight in insights:
-            if insight:
-                self.template_values[insight.name] = insight
 
         path = os.path.join(os.path.dirname(__file__), '../templates/index_champs.html')
         return template.render(path, self.template_values)
@@ -143,13 +149,16 @@ class MainCompetitionseasonHandler(CacheableHandler):
 
     def __init__(self, *args, **kw):
         super(MainCompetitionseasonHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60
+        self._cache_expiration = 60 * 5
 
     def _render(self, *args, **kw):
         week_events = EventHelper.getWeekEvents()
+        special_webcasts = FirebasePusher.get_special_webcasts()
 
         self.template_values.update({
             "events": week_events,
+            "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
+            "special_webcasts": special_webcasts,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/index_competitionseason.html')
@@ -288,10 +297,14 @@ class SearchHandler(webapp2.RequestHandler):
                 if team:
                     self.redirect(team.details_url)
                     return None
-            elif len(q) in {3, 4, 5}:  # event shorts are between 3 and 5 characters long
+            elif q[:4].isdigit():  # Check for event key
+                event = Event.get_by_id(q)
+                if event:
+                    self.redirect(event.details_url)
+                    return None
+            else:  # Check for event short
                 year = datetime.datetime.now().year  # default to current year
-                event_id = "%s%s" % (year, q)
-                event = Event.get_by_id(event_id)
+                event = Event.get_by_id('{}{}'.format(year, q))
                 if event:
                     self.redirect(event.details_url)
                     return None
@@ -336,16 +349,46 @@ class RecordHandler(CacheableHandler):
         return template.render(path, self.template_values)
 
 
-class ApiDocumentationHandler(CacheableHandler):
+class ApiV2DocumentationHandler(CacheableHandler):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "api_docs"
 
     def __init__(self, *args, **kw):
-        super(ApiDocumentationHandler, self).__init__(*args, **kw)
+        super(ApiV2DocumentationHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/apidocs.html")
+        return template.render(path, self.template_values)
+
+
+class ApiV3DocumentationHandler(CacheableHandler):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "api_docs_v3"
+
+    def __init__(self, *args, **kw):
+        super(ApiV3DocumentationHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+
+    def _render(self, *args, **kw):
+        self.template_values['title'] = 'APIv3'
+        self.template_values['swagger_url'] = 'https://raw.githubusercontent.com/the-blue-alliance/the-blue-alliance-android/master/libTba/swagger/apiv3-swagger.json'
+        path = os.path.join(os.path.dirname(__file__), "../templates/apidocs_swagger.html")
+        return template.render(path, self.template_values)
+
+
+class ApiTrustedDocumentationHandler(CacheableHandler):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "api_docs_trusted_v1"
+
+    def __init__(self, *args, **kw):
+        super(ApiTrustedDocumentationHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+
+    def _render(self, *args, **kw):
+        self.template_values['title'] = 'Trusted API'
+        self.template_values['swagger_url'] = '/swagger/api_trusted_v1.json'
+        path = os.path.join(os.path.dirname(__file__), "../templates/apidocs_swagger.html")
         return template.render(path, self.template_values)
 
 

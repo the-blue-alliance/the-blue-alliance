@@ -1,6 +1,7 @@
 import itertools
 import json
 import math
+import numpy as np
 
 from collections import defaultdict
 
@@ -11,6 +12,7 @@ from consts.event_type import EventType
 
 from models.insight import Insight
 from models.event import Event
+from models.event_details import EventDetails
 from models.award import Award
 from models.match import Match
 
@@ -62,7 +64,7 @@ class InsightsHelper(object):
         blue_banner_award_keys_future = Award.query(
             Award.year == year,
             Award.award_type_enum.IN(AwardType.BLUE_BANNER_AWARDS),
-            Award.event_type_enum.IN({EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP, EventType.CMP_DIVISION, EventType.CMP_FINALS})
+            Award.event_type_enum.IN({EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP_DIVISION, EventType.DISTRICT_CMP, EventType.CMP_DIVISION, EventType.CMP_FINALS})
         ).fetch_async(10000, keys_only=True)
         cmp_finalist_award_keys_future = Award.query(
             Award.year == year,
@@ -84,6 +86,67 @@ class InsightsHelper(object):
         return insights
 
     @classmethod
+    def doPredictionInsights(self, year):
+        """
+        Calculate aggregate prediction stats for all season events for a year.
+        """
+        events = Event.query(
+            Event.event_type_enum.IN(EventType.SEASON_EVENT_TYPES),
+            Event.year==(int(year))).fetch()
+        for event in events:
+            event.prep_details()
+            event.prep_matches()
+
+        has_insights = False
+        correct_matches_count = defaultdict(int)
+        total_matches_count = defaultdict(int)
+        brier_scores = defaultdict(list)
+        correct_matches_count_cmp = defaultdict(int)
+        total_matches_count_cmp = defaultdict(int)
+        brier_scores_cmp = defaultdict(list)
+        for event in events:
+            predictions = event.details.predictions if event.details else None
+            if predictions:
+                has_insights = True
+                is_cmp = event.event_type_enum in EventType.CMP_EVENT_TYPES
+                if 'match_predictions' in predictions:
+                    for match in event.matches:
+                        if match.has_been_played:
+                            level = 'qual' if match.comp_level == 'qm' else 'playoff'
+
+                            total_matches_count[level] += 1
+                            if is_cmp:
+                                total_matches_count_cmp[level] += 1
+
+                            predicted_match = predictions['match_predictions'][level].get(match.key.id())
+                            if predicted_match and match.winning_alliance == predicted_match['winning_alliance']:
+                                correct_matches_count[level] += 1
+                                if is_cmp:
+                                    correct_matches_count_cmp[level] += 1
+
+                for level in ['qual', 'playoff']:
+                    if predictions.get('match_prediction_stats'):
+                        bs = predictions.get('match_prediction_stats', {}).get(level, {}).get('brier_scores', {})
+                        if bs:
+                            brier_scores[level].append(bs['win_loss'])
+                            if is_cmp:
+                                brier_scores_cmp[level].append(bs['win_loss'])
+
+        if not has_insights:
+            data = None
+
+        data = defaultdict(dict)
+        for level in ['qual', 'playoff']:
+            data[level]['mean_brier_score'] = np.mean(brier_scores[level]) if brier_scores[level] else None
+            data[level]['correct_matches_count'] = correct_matches_count[level]
+            data[level]['total_matches_count'] = total_matches_count[level]
+            data[level]['mean_brier_score_cmp'] = np.mean(brier_scores_cmp[level]) if brier_scores_cmp[level] else None
+            data[level]['correct_matches_count_cmp'] = correct_matches_count_cmp[level]
+            data[level]['total_matches_count_cmp'] = total_matches_count_cmp[level]
+
+        return [self._createInsight(data, Insight.INSIGHT_NAMES[Insight.MATCH_PREDICTIONS], year)]
+
+    @classmethod
     def _createInsight(self, data, name, year):
         """
         Create Insight object given data, name, and year
@@ -102,6 +165,7 @@ class InsightsHelper(object):
                 'verbose_name': match.verbose_name,
                 'event_name': event.name,
                 'alliances': match.alliances,
+                'score_breakdown': match.score_breakdown,
                 'winning_alliance': match.winning_alliance,
                 'tba_video': match.tba_video,
                 'youtube_videos_formatted': match.youtube_videos_formatted
@@ -161,19 +225,45 @@ class InsightsHelper(object):
         """
         Returns an Insight where the data is list of highest scoring matches
         """
-        highscore_matches = []  # list of matches (if there are ties)
-        highscore = 0
+        highscore_matches = {
+            'qual': [],
+            'playoff': [],
+            'overall': [],
+        }  # dict of list of matches (if there are ties)
+        highscore = {
+            'qual': 0,
+            'playoff': 0,
+            'overall': 0,
+        }
         for _, week_events in week_event_matches:
             for event, matches in week_events:
                 for match in matches:
+                    comp_level = 'qual' if match.comp_level == 'qm' else 'playoff'
+                    match_data = self._generateMatchData(match, event)
+
                     redScore = int(match.alliances['red']['score'])
                     blueScore = int(match.alliances['blue']['score'])
+
+                    # Overall, including penalties
                     maxScore = max(redScore, blueScore)
-                    if maxScore >= highscore:
-                        if maxScore > highscore:
-                            highscore_matches = []
-                        highscore_matches.append(self._generateMatchData(match, event))
-                        highscore = maxScore
+                    if maxScore >= highscore['overall']:
+                        if maxScore > highscore['overall']:
+                            highscore_matches['overall'] = []
+                        highscore_matches['overall'].append(match_data)
+                        highscore['overall'] = maxScore
+
+                    # Penalty free, if possible
+                    if year >= 2017:
+                        if match.score_breakdown:
+                            redScore -= match.score_breakdown['red'].get('foulPoints', 0)
+                            blueScore -= match.score_breakdown['blue'].get('foulPoints', 0)
+
+                    maxScore = max(redScore, blueScore)
+                    if maxScore >= highscore[comp_level]:
+                        if maxScore > highscore[comp_level]:
+                            highscore_matches[comp_level] = []
+                        highscore_matches[comp_level].append(match_data)
+                        highscore[comp_level] = maxScore
 
         insight = None
         if highscore_matches != []:
@@ -199,6 +289,8 @@ class InsightsHelper(object):
             elim_num_matches_by_week = 0
             for _, matches in week_events:
                 for match in matches:
+                    if not match.has_been_played:
+                        continue
                     redScore = int(match.alliances['red']['score'])
                     blueScore = int(match.alliances['blue']['score'])
                     week_match_sum += redScore + blueScore

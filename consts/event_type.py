@@ -4,6 +4,7 @@ class EventType(object):
     DISTRICT_CMP = 2
     CMP_DIVISION = 3
     CMP_FINALS = 4
+    DISTRICT_CMP_DIVISION = 5
     OFFSEASON = 99
     PRESEASON = 100
     UNLABLED = -1
@@ -11,6 +12,7 @@ class EventType(object):
     type_names = {
         REGIONAL: 'Regional',
         DISTRICT: 'District',
+        DISTRICT_CMP_DIVISION: 'District Championship Division',
         DISTRICT_CMP: 'District Championship',
         CMP_DIVISION: 'Championship Division',
         CMP_FINALS: 'Championship Finals',
@@ -22,6 +24,7 @@ class EventType(object):
     short_type_names = {
         REGIONAL: 'Regional',
         DISTRICT: 'District',
+        DISTRICT_CMP_DIVISION: 'District Championship Division',
         DISTRICT_CMP: 'District Championship',
         CMP_DIVISION: 'Division',
         CMP_FINALS: 'Championship',
@@ -32,12 +35,14 @@ class EventType(object):
 
     DISTRICT_EVENT_TYPES = {
         DISTRICT,
+        DISTRICT_CMP_DIVISION,
         DISTRICT_CMP,
     }
 
     NON_CMP_EVENT_TYPES = {
         REGIONAL,
         DISTRICT,
+        DISTRICT_CMP_DIVISION,
         DISTRICT_CMP,
     }
 
@@ -49,6 +54,7 @@ class EventType(object):
     SEASON_EVENT_TYPES = {
         REGIONAL,
         DISTRICT,
+        DISTRICT_CMP_DIVISION,
         DISTRICT_CMP,
         CMP_DIVISION,
         CMP_FINALS,

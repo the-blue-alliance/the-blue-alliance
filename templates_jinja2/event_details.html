@@ -6,10 +6,10 @@
 {% block meta_description %}Videos and match results for the {{event.year}} {{event.name}} FIRST Robotics Competition in {{event.location}}.{% endblock %}
 
 {% block more_head_tags %}
-  <meta property="og:title" content="{{event.year}} {{event.name}}" />
+    <meta property="og:title" content="{{ event.year }} {{ event.name }}"
+          xmlns="http://www.w3.org/1999/html"/>
   <meta property="og:type" content="article" />
-  <meta property="og:url" content="http://www.thebluealliance.com/event/{{event.key_name}}" />
-  <meta property="og:image" content="http://www.thebluealliance.com/images/logo_square_200.png" />
+  <meta property="og:image" content="http://www.thebluealliance.com/images/logo_square_512.png" />
   <meta property="og:description" content="Videos and match results for the {{event.year}} {{event.name}} FIRST Robotics Competition in {{event.location}}."/>
   <meta property="og:site_name" content="The Blue Alliance" />
   <meta property="og:location" content="{{event.location}}" />
@@ -27,19 +27,44 @@
       {% if event.year == 2016 and event.event_type_enum == 3 %}
       <p class="pull-right"><a class="btn btn-primary" href="/event/{{event.key_name}}/insights"><span class="glyphicon glyphicon-align-left"></span> Advanced Insights</a></p>
       {% endif %}
-      <p><a class="btn btn-default" href="/events/{{event.year}}"><span class="glyphicon glyphicon-chevron-left"></span> {{event.year}} Events</a></p>
+      <a class="btn btn-default" href="/events/{{event.year}}"><span class="glyphicon glyphicon-chevron-left"></span> {{event.year}} Events</a>
+      {% if event_divisions %}
+        <div class="btn-group">
+        <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+          {% if event.divisions %}Event Divisions{% elif parent_event %}Other Divisions{% endif %}
+          <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu tba-dropdown-menu-limited">
+          {% for division in event_divisions%}
+            {% if division.key_name != event.key_name %}
+              <li><a href="/event/{{division.key_name}}">{{division.short_name}}</a></li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
       <h1 itemprop="summary">{{event.name}} {{event.year}}</h1>
-      {% if district_name %}<blockquote><em>Part of the <a href="/events/{{district_abbrev}}/{{event.year}}">{{district_name}} District</a></em></blockquote>{% endif %}
+      {% if district_name or parent_event %}<blockquote>
+          {% if district_name %}<p></p><em>Part of the <a href="/events/{{district_abbrev}}/{{event.year}}">{{district_name}} District</a></em></p>{% endif %}
+          {% if parent_event %}<p><em>Winners advance to the <a href="/event/{{ parent_event.key_name }}">{{ parent_event.name }}</a></em></p>{% endif %}
+      </blockquote>{% endif %}
     </div>
   </div>
   <div class="row">
     <div class="col-sm-12">
-      <a class="btn btn-success pull-right" href="/suggest/event/video?event_key={{event.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add videos!</a>
+      <a class="btn btn-success pull-right" href="/suggest/event/video?event_key={{event.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add match videos!</a>
       <p>
         {% if event.start_date %}
           <span class="glyphicon glyphicon-calendar"></span> <time itemprop="startDate" datetime="{{event.start_date.isoformat()}}">{{ event.start_date|strftime("%B %d") }}{% if event.start_date.date() != event.end_date.date() %}</time> to <time itemprop="endDate" datetime="{{event.end_date.isoformat()}}">{{ event.end_date|strftime("%B %d") }}{% endif %}, {{ event.end_date|strftime("%Y") }}</time>
         {% endif %}
-        {% if event.location or event.venue_address_safe %}
+        {% if event.nl and event.nl.name and event.nl.city_state_country %}
+          <br><span class="glyphicon glyphicon-map-marker"></span>
+          {% if event.nl and event.nl.name %}
+            <a href="{{event.nl.place_details.url}}" target="_blank">{{event.nl.name}}</a> in {{event.nl.city_state_country}}
+          {% else %}
+            <a href="//maps.google.com/maps?q={{ event.city_state_country|urlencode }}" target="_blank">{{event.city_state_country}}</a>
+          {% endif %}
+        {% elif event.location or event.venue_address_safe %}
           <br><span class="glyphicon glyphicon-map-marker"></span>
           {% if event.venue_address_safe %}
             <a href="http://maps.google.com/maps?q={{ event.venue_address_safe|urlencode }}" target="_blank">{{ event.venue_or_venue_from_address }}</a>{% if event.location %} in {{event.location}}{% endif %}
@@ -66,9 +91,13 @@
     <div class="col-sm-12">
       <div class="panel panel-default">
         <div class="panel-heading">
-          <div class="hidden-xs pull-right">
+          <div class="pull-right">
             {% if event.webcast %}
-              <a class="btn btn-xs btn-success" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch now</a>
+              {% if event.webcast_status == 'offline' %}
+                <a class="btn btn-default btn-xs" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Offline</a>
+              {% else %}
+                <a class="btn btn-success btn-xs" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
+              {% endif %}
             {% else %}
               <a class="btn btn-xs btn-default" href="/suggest/event/webcast?event_key={{event.key_name}}" target="_blank">Add webcast</a>
             {% endif %}
@@ -97,13 +126,14 @@
 
   <div class="row">
     <div class="col-sm-12">
-      <ul class="nav nav-tabs">
+      <ul class="nav nav-tabs nav-justified">
         {% if matches.num > 0 %}<li class="active"><a href="#results" data-toggle="tab">Results</a></li>{% endif %}
-        {% if event.rankings %}<li><a href="#rankings" data-toggle="tab">Rankings</a></li>{% endif %}
+        {% if event.details and event.details.rankings_table %}<li><a href="#rankings" data-toggle="tab">Rankings</a></li>{% endif %}
         {% if awards %}<li><a href="#awards" data-toggle="tab">Awards</a></li>{% endif %}
         {% if district_points_sorted %}<li><a href="#district-points" data-toggle="tab">District Points</a></li>{% endif %}
         <li class="{% if matches.num == 0 %}active{% endif %}"><a href="#teams" data-toggle="tab">Teams <span class="badge">{{num_teams}}</span></a></li>
         {% if event_insights_qual or event_insights_playoff %}<li><a href="#event-insights" data-toggle="tab">Insights</a></li>{% endif %}
+        <li><a href="#media" data-toggle="tab">Media <span class="badge">{{medias_by_slugname.youtube|length}}</span></a></li>
       </ul>
     </div>
   </div>
@@ -130,9 +160,9 @@
 
           {% if matches.qm %}
             {% if matches.qf or matches.sf or matches.f %}
-              {% if is_2015_playoff %}
+              {% if playoff_advancement %}
                 <h3>Playoff Advancement</h3>
-                {% include "playoff_partials/playoff_table.html" %}
+                {% include "playoff_partials/{}.html".format(playoff_template) %}
               {% else %}
                 <h3>{% if event.year >= 2015 %}Playoff{% else %}Elimination{% endif %} Bracket</h3>
                 {% include "bracket_partials/bracket_table.html" %}
@@ -154,9 +184,9 @@
           {% include "event_partials/event_alliances_table.html" %}
 
           {% if matches.qf or matches.sf or matches.f %}
-            {% if is_2015_playoff %}
+            {% if playoff_advancement %}
               <h3>Playoff Advancement</h3>
-              {% include "playoff_partials/playoff_table.html" %}
+              {% include "playoff_partials/{}.html".format(playoff_template) %}
             {% else %}
               <h3>{% if event.year >= 2015 %}Playoff{% else %}Elimination{% endif %} Bracket</h3>
               {% include "bracket_partials/bracket_table.html" %}
@@ -167,6 +197,7 @@
       </div>
       <div class="row">
         <div class="col-sm-12">
+          {% if has_time_predictions %}<p>Match times listed with a <em>*</em> are unofficial predicted times computed by The Blue Alliance for your convenience.</p>{% endif %}
           <p><a class="btn btn-default" href="/contact"><span class="glyphicon glyphicon-upload"></span> Tell us about YouTube videos</a></p>
           <p><a class="btn btn-default" href="/event/{{ event.key_name }}/feed"><span class="glyphicon glyphicon-barcode"></span> Matches in RSS</a></p>
         </div>
@@ -174,27 +205,20 @@
     </div>
     {% endif %}
 
-    {% if event.rankings %}
+    {% if event.details and event.details.rankings_table %}
     <div class="tab-pane" id="rankings">
       <div class="row">
         <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
-          {% if event.official %}
-            {% if event.year > 2014 %}
-              <p>Data from <a href="http://frc-events.firstinspires.org/{{event.year}}/{{event.event_short}}/rankings" target="_blank"> <em>FIRST</em>'s event page</a>.</p>
-            {% else %}
-              <p>Data from <a href="http://www2.usfirst.org/{{event.year}}comp/events/{{event.event_short}}/rankings.html" target="_blank"> <em>FIRST</em>'s event page</a>.</p>
-            {% endif %}
-          {% endif %}
           <table class="table table-striped table-condensed table-center tablesorter" id="rankingsTable">
             <thead>
               <tr>
-              {% for element in event.rankings.0 %}
+              {% for element in event.details.rankings_table.0 %}
                 <th>{{ element }}</th>
               {% endfor %}
               </tr>
             </thead>
             <tbody>
-              {% for row in event.rankings %}
+              {% for row in event.details.rankings_table %}
               {% if not loop.first %}
               <tr>
                 {% for element in row %}
@@ -239,7 +263,7 @@
                     </div>
                   </div>
                 </td>
-                <td>{% if team.location %}{{ team.location }}{% else %}--{% endif %}</td>
+                <td>{% if team.city_state_country %}{{ team.city_state_country }}{% else %}--{% endif %}</td>
                 <td>{% if image_medias %}{% set small_thumbnail = True %}{% include "media_partials/image_carousel_partial.html" %}{% else %}<a class="btn btn-success" href="/suggest/team/media?team_key={{team.key_name}}&year={{event.year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span></a>{% endif %}</td>
               </tr>
               {% endfor %}
@@ -271,7 +295,7 @@
                     </div>
                   </div>
                 </td>
-                <td>{% if team.location %}{{ team.location }}{% else %}--{% endif %}</td>
+                <td>{% if team.city_state_country %}{{ team.city_state_country }}{% else %}--{% endif %}</td>
                 <td>{% if image_medias %}{% set small_thumbnail = True %}{% include "media_partials/image_carousel_partial.html" %}{% else %}<a class="btn btn-success" href="/suggest/team/media?team_key={{team.key_name}}&year={{event.year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span></a>{% endif %}</td>
               </tr>
               {% endfor %}
@@ -379,5 +403,29 @@
       </div>
     </div>
     {% endif %}
+
+    <div class="tab-pane" id="media">
+        <div class="col-xs-12">
+          <a class="btn btn-success pull-right" href="/suggest/event/media?event_key={{event.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add Other Media!</a>
+          <h2 id="media">Media</h2>
+
+          <div class="row">
+            <div class="col-xs-12">
+              {% if medias_by_slugname.youtube %}
+                {% for media in medias_by_slugname.youtube %}
+                  <div class="col-xs-12 col-md-6 fitvids">
+                  {% include "media_partials/media_display_partial.html" %}
+                  </div>
+                {% endfor %}
+              {% else %}
+                <p>No videos for this event... <a href="/suggest/event/media?event_key={{event.key_name}}" target="_blank">Why not add one</a>?</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      </div>
+    </div>
 </div>
 {% endblock %}

@@ -14,12 +14,14 @@
     Remove media reference
 </button>
 
-{% if team.key in media.preferred_references %}
-<button class="btn btn-warning" data-key-name="{{media.key_name}}" data-toggle="modal" data-target="#remove-preferred">
-    Remove Preferred
-</button>
-{% else %}
-<button class="btn btn-default" data-key-name="{{media.key_name}}" data-toggle="modal" data-target="#make-preferred">
-    Make Preferred
-</button>
+{% if media.is_image %}
+  {% if team.key in media.preferred_references %}
+  <button class="btn btn-warning" data-key-name="{{media.key_name}}" data-toggle="modal" data-target="#remove-preferred">
+      Remove Preferred
+  </button>
+  {% else %}
+  <button class="btn btn-default" data-key-name="{{media.key_name}}" data-toggle="modal" data-target="#make-preferred">
+      Make Preferred
+  </button>
+  {% endif %}
 {% endif %}

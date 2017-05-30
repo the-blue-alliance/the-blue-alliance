@@ -154,13 +154,13 @@ class MatchstatsHelper(object):
 
         stats = {'oprs': oprs_dict, 'dprs': dprs_dict, 'ccwms': ccwms_dict}
 
-        if year == 2016:
-            # First ranking tiebreaker
-            stats['2016autoPointsOPR'] = cls.calc_stat(matches, team_list, team_id_map, Minv, '2016autoPointsOPR')
+        # if year == 2016:
+        #     # First ranking tiebreaker
+        #     stats['2016autoPointsOPR'] = cls.calc_stat(matches, team_list, team_id_map, Minv, '2016autoPointsOPR')
 
-            # For RP calculation
-            stats['2016crossingsOPR'] = cls.calc_stat(matches, team_list, team_id_map, Minv, '2016crossingsOPR')
-            stats['2016bouldersOPR'] = cls.calc_stat(matches, team_list, team_id_map, Minv, '2016bouldersOPR')
+        #     # For RP calculation
+        #     stats['2016crossingsOPR'] = cls.calc_stat(matches, team_list, team_id_map, Minv, '2016crossingsOPR')
+        #     stats['2016bouldersOPR'] = cls.calc_stat(matches, team_list, team_id_map, Minv, '2016bouldersOPR')
 
         return stats
 

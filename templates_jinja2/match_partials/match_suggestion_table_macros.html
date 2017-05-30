@@ -1,0 +1,101 @@
+{% macro match_suggestion_table(matches, ranks) %}
+<table class="table match-table table-striped">
+  <thead>
+    <tr>
+      <th>Event</th>
+      <th>Match</th>
+      <th>Time<br>ETA</th>
+      <th>R1</th>
+      <th>R2</th>
+      <th>R3</th>
+      <th>R1 Rank</th>
+      <th>R2 Rank</th>
+      <th>R3 Rank</th>
+      <th>B1</th>
+      <th>B2</th>
+      <th>B3</th>
+      <th>B1 Rank</th>
+      <th>B2 Rank</th>
+      <th>B3 Rank</th>
+      <th>Red Predicted Score</th>
+      <th>Blue Predicted Score</th>
+      <th>Red kPa Power</th>
+      <th>Blue kPa Power</th>
+      <th>Red Gear Power</th>
+      <th>Blue Gear Power</th>
+      <th>BlueZone Score</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for match in matches %}
+      <tr>
+        <td>{{match.event.id()[4:].upper()}}</td>
+        <td>{{match.short_name}}</td>
+        <td>
+          <time class="tba-match-time-utc" datetime="{{match.predicted_time.isoformat() if match.predicted_time else match.time.isoformat()}}+00:00">{{(match.predicted_time if match.predicted_time else match.time)|strftime("%a %I:%M%p UTC")}}</time>
+          <time class="tba-match-time-utc-countdown" datetime="{{match.predicted_time.isoformat() if match.predicted_time else match.time.isoformat()}}+00:00">--</time>
+        </td>
+        {% for team in match.alliances.red.teams %}
+        <td class="red">
+          <svg class="favorite-team-dot" data-team="{{team}}" data-match="{{match.key_name}}">
+            <circle cx="2.5" cy="2.5" r="2.5"/>
+          </svg>
+          <a href="/team/{{team|strip_frc}}">{{team|strip_frc}}</a>
+        </td>
+        {% endfor %}
+        {% for team in match.alliances.red.teams %}
+        <td>{{ranks[team]}}</td>
+        {% endfor %}
+        {% for team in match.alliances.blue.teams %}
+        <td class="blue">
+          <svg class="favorite-team-dot" data-team="{{team}}" data-match="{{match.key_name}}">
+            <circle cx="2.5" cy="2.5" r="2.5"/>
+          </svg>
+          <a href="/team/{{team|strip_frc}}">{{team|strip_frc}}</a>
+        </td>
+        {% endfor %}
+        {% for team in match.alliances.blue.teams %}
+        <td>{{ranks[team]}}</td>
+        {% endfor %}
+        <td class="red">{{match.prediction.red.score|round|int}}</td>
+        <td class="blue">{{match.prediction.blue.score|round|int}}</td>
+        <td>
+          <div class="progress" style="margin: 0px;">
+            <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{(match.prediction.red.pressure/80*100)|round|int}}%; color: black;">
+              {{(match.prediction.red.pressure)|round|int}}
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="progress" style="margin: 0px;">
+            <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{(match.prediction.blue.pressure/80*100)|round|int}}%; color: black;">
+              {{(match.prediction.blue.pressure)|round|int}}
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="progress" style="margin: 0px;">
+            <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{(match.prediction.red.gears/16*100)}}%; color: black;">
+              {{(match.prediction.red.gears|round(1))}}
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="progress" style="margin: 0px;">
+            <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{(match.prediction.blue.gears/16*100)}}%; color: black;">
+              {{(match.prediction.blue.gears|round(1))}}
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="progress" style="margin: 0px;">
+            <div class="progress-bar {% if match.bluezone_score < 30 %}progress-bar-danger{% elif match.bluezone_score < 50 %}progress-bar-warning{% else %}progress-bar-success{% endif %}" role="progressbar" style="width: {{match.bluezone_score}}%; color: black;">
+              {{match.bluezone_score|round|int}}
+            </div>
+          </div>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endmacro %}

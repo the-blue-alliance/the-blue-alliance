@@ -5,7 +5,7 @@ import logging
 import os
 import re
 
-from google.appengine.api import search, taskqueue
+from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
@@ -13,13 +13,22 @@ from consts.award_type import AwardType
 from consts.client_type import ClientType
 from consts.district_type import DistrictType
 from consts.event_type import EventType
+from consts.playoff_type import PlayoffType
 from controllers.base_controller import LoggedInHandler
 from database import match_query
+from database.event_query import DistrictEventsQuery, EventListQuery
+from database.district_query import DistrictChampsInYearQuery
 from helpers.award_manipulator import AwardManipulator
+from helpers.district_manipulator import DistrictManipulator
 from helpers.district_team_manipulator import DistrictTeamManipulator
+from helpers.event_manipulator import EventManipulator
+from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_helper import MatchHelper
 from helpers.notification_sender import NotificationSender
+from helpers.search_helper import SearchHelper
+from helpers.team_manipulator import TeamManipulator
 from models.award import Award
+from models.district import District
 from models.district_team import DistrictTeam
 from models.event import Event
 from models.event_team import EventTeam
@@ -160,28 +169,195 @@ class AdminCreateDistrictTeamsEnqueue(LoggedInHandler):
         self.response.out.write("Enqueued district teams for {}".format(year))
 
 
+class AdminRebuildDivisionsEnqueue(LoggedInHandler):
+    """
+    Enqueue a task to build past event parent/child relationships
+    """
+    def get(self, year):
+        self._require_admin()
+        taskqueue.add(
+            queue_name='admin',
+            target='backend-tasks',
+            url='/backend-tasks/do/rebuild_divisions/{}'.format(year),
+            method='GET')
+
+
+class AdminRebuildDivisionsDo(LoggedInHandler):
+    """
+    Add in event parent/child relationships
+    Map CMP_DIVISION -> CMP_FINALS and DCMP_DIVISION -> DCMP (in the same district)
+    Ensure all events end on the same day, to account for #2champz
+    """
+    TYPE_MAP = {
+        EventType.CMP_DIVISION: EventType.CMP_FINALS,
+        EventType.DISTRICT_CMP_DIVISION: EventType.DISTRICT_CMP,
+    }
+
+    def get(self, year):
+        self._require_admin()
+        year = int(year)
+        events = EventListQuery(year).fetch()
+        events_by_type = defaultdict(list)
+        for event in events:
+            if event.event_type_enum in self.TYPE_MAP.keys() or event.event_type_enum in self.TYPE_MAP.values():
+                events_by_type[event.event_type_enum].append(event)
+
+        output = ""
+        for from_type, to_type in self.TYPE_MAP.iteritems():
+            for event in events_by_type[to_type]:
+                divisions = []
+                for candidate_division in events_by_type[from_type]:
+                    if candidate_division.end_date.date() == event.end_date.date() and candidate_division.district_key == event.district_key:
+                        candidate_division.parent_event = event.key
+                        divisions.append(candidate_division.key)
+                        output += "Event {} is the parent of {}<br/>".format(event.key_name, candidate_division.key_name)
+                        EventManipulator.createOrUpdate(candidate_division)
+
+                event.divisions = divisions
+                if divisions:
+                    output += "Divisions {} added to {}<br/>".format(event.division_keys_json, event.key_name)
+                EventManipulator.createOrUpdate(event)
+        self.response.out.write(output)
+
+
+class AdminBackfillPlayoffTypeEnqueue(LoggedInHandler):
+    """
+    Enqueue a task to build past event parent/child relationships
+    """
+    def get(self, year):
+        self._require_admin()
+        taskqueue.add(
+            queue_name='admin',
+            target='backend-tasks',
+            url='/backend-tasks/do/backfill_playoff_type/{}'.format(year),
+            method='GET')
+
+
+class AdminBackfillPlayoffTypeDo(LoggedInHandler):
+    """
+    Set playoff types
+    """
+
+    # These offseasons played the 2014 game
+    EXCEPTIONS_2015 = ['2015cc', '2015cacc', '2015mttd']
+
+    def get(self, year):
+        self._require_admin()
+        year = int(year)
+        events = EventListQuery(year).fetch()
+        for event in events:
+            if not event.playoff_type:
+                if event.year == 2015 and event.key_name not in self.EXCEPTIONS_2015:
+                    event.playoff_type = PlayoffType.AVG_SCORE_8_TEAM
+                else:
+                    event.playoff_type = PlayoffType.BRACKET_8_TEAM
+            EventManipulator.createOrUpdate(event)
+        self.response.out.write("Update {} events".format(len(events)))
+
+
+class AdminClearEventTeamsDo(LoggedInHandler):
+    """
+    Remove all eventteams from an event
+    """
+    def get(self, event_key):
+        self._require_admin()
+        event = Event.get_by_id(event_key)
+        if not event:
+            self.abort(404)
+            return
+        existing_event_team_keys = set(EventTeam.query(EventTeam.event == event.key).fetch(1000, keys_only=True))
+        EventTeamManipulator.delete_keys(existing_event_team_keys)
+
+        self.response.out.write("Deleted {} EventTeams from {}".format(len(existing_event_team_keys), event_key))
+
+
 class AdminCreateDistrictTeamsDo(LoggedInHandler):
     def get(self, year):
         year = int(year)
         team_districts = defaultdict(list)
         logging.info("Fetching events in {}".format(year))
-        year_events = Event.query(year == Event.year, Event.event_district_enum != DistrictType.NO_DISTRICT, Event.event_district_enum != None).fetch()
+        year_events = Event.query(year == Event.year, Event.district_key == None, Event.event_district_enum != None).fetch()
         for event in year_events:
             logging.info("Fetching EventTeams for {}".format(event.key_name))
             event_teams = EventTeam.query(EventTeam.event == event.key).fetch()
             for event_team in event_teams:
-                team_districts[event_team.team.id()].append(event.event_district_enum)
+                team_districts[event_team.team.id()].append(event.district_key.id())
 
         new_district_teams = []
         for team_key, districts in team_districts.iteritems():
-            most_frequent_district = max(set(districts), key=districts.count)
-            logging.info("Assuming team {} belongs to {}".format(team_key, DistrictType.type_names[most_frequent_district]))
-            dt_key = DistrictTeam.renderKeyName(year, most_frequent_district, team_key)
-            new_district_teams.append(DistrictTeam(id=dt_key, year=year, team=ndb.Key(Team, team_key), district=most_frequent_district))
+            most_frequent_district_key = max(set(districts), key=districts.count)
+            logging.info("Assuming team {} belongs to {}".format(team_key, most_frequent_district_key))
+            dt_key = DistrictTeam.renderKeyName(year, most_frequent_district_key[4:], team_key)
+            new_district_teams.append(DistrictTeam(id=dt_key, year=year, team=ndb.Key(Team, team_key), district_key=ndb.Key(District, most_frequent_district_key)))
 
         logging.info("Finishing updating old district teams from event teams")
         DistrictTeamManipulator.createOrUpdate(new_district_teams)
         self.response.out.write("Finished creating district teams for {}".format(year))
+
+
+class AdminCreateDistrictsEnqueue(LoggedInHandler):
+    """
+    Create District models from old DCMPs
+    """
+    def get(self, year):
+        self._require_admin()
+        taskqueue.add(
+            queue_name='admin',
+            target='backend-tasks',
+            url='/backend-tasks-b2/do/rebuild_districts/{}'.format(year),
+            method='GET'
+        )
+        self.response.out.write("Enqueued district creation for {}".format(year))
+
+
+class AdminCreateDistrictsDo(LoggedInHandler):
+    def get(self, year):
+        year = int(year)
+        year_dcmps = DistrictChampsInYearQuery(year).fetch()
+        districts_to_write = []
+
+        for dcmp in year_dcmps:
+            district_abbrev = DistrictType.type_abbrevs[dcmp.event_district_enum]
+            district_key = District.renderKeyName(year, district_abbrev)
+            logging.info("Creating {}".format(district_key))
+
+            district = District(
+                id=district_key,
+                year=year,
+                abbreviation=district_abbrev,
+                display_name=DistrictType.type_names[dcmp.event_district_enum],
+                elasticsearch_name=next((k for k, v in DistrictType.elasticsearch_names.iteritems() if v == dcmp.event_district_enum), None)
+            )
+            districts_to_write.append(district)
+
+        logging.info("Writing {} new districts".format(len(districts_to_write)))
+        DistrictManipulator.createOrUpdate(districts_to_write, run_post_update_hook=False)
+
+        for dcmp in year_dcmps:
+            district_abbrev = DistrictType.type_abbrevs[dcmp.event_district_enum]
+            district_key = District.renderKeyName(year, district_abbrev)
+            district_events_future = DistrictEventsQuery(district_key).fetch_async()
+
+            district_events = district_events_future.get_result()
+            logging.info("Found {} events to update".format(len(district_events)))
+            events_to_write = []
+            for event in district_events:
+                event.district_key = ndb.Key(District, district_key)
+                events_to_write.append(event)
+            EventManipulator.createOrUpdate(events_to_write)
+
+        for dcmp in year_dcmps:
+            district_abbrev = DistrictType.type_abbrevs[dcmp.event_district_enum]
+            district_key = District.renderKeyName(year, district_abbrev)
+            districtteams_future = DistrictTeam.query(DistrictTeam.year == year, DistrictTeam.district == DistrictType.abbrevs.get(district_abbrev, None)).fetch_async()
+
+            districtteams = districtteams_future.get_result()
+            logging.info("Found {} DistrictTeams to update".format(len(districtteams)))
+            districtteams_to_write = []
+            for districtteam in districtteams:
+                districtteam.district_key = ndb.Key(District, district_key)
+                districtteams_to_write.append(districtteam)
+            DistrictTeamManipulator.createOrUpdate(districtteams_to_write)
 
 
 class AdminPostEventTasksDo(LoggedInHandler):
@@ -287,60 +463,74 @@ class AdminRegistrationDayEnqueue(LoggedInHandler):
         self.response.out.write("Enqueued {} tasks to update {} events starting at {}".format((24*60/interval), event_year, start))
 
 
-class AdminBuildSearchIndexEnqueue(LoggedInHandler):
+class AdminRunPostUpdateHooksEnqueue(LoggedInHandler):
     def get(self, model_type):
         if model_type == 'events':
             taskqueue.add(
                 queue_name='admin',
-                url='/tasks/admin/do/build_search_index/events',
+                url='/tasks/admin/do/run_post_update_hooks/events',
                 method='GET')
-            self.response.out.write("Enqueued build search index for events")
+            self.response.out.write("Enqueued run post update hooks for events")
         elif model_type == 'teams':
             taskqueue.add(
                 queue_name='admin',
-                url='/tasks/admin/do/build_search_index/teams',
+                url='/tasks/admin/do/run_post_update_hooks/teams',
                 method='GET')
-            self.response.out.write("Enqueued build search index for teams")
+            self.response.out.write("Enqueued run post update hooks for teams")
         else:
             self.response.out.write("Unknown model type: {}".format(model_type))
 
 
-class AdminBuildSearchIndexDo(LoggedInHandler):
+class AdminRunPostUpdateHooksDo(LoggedInHandler):
     def get(self, model_type):
         if model_type == 'events':
             event_keys = Event.query().fetch(keys_only=True)
             for event_key in event_keys:
                 taskqueue.add(
                     queue_name='admin',
-                    url='/tasks/admin/do/add_event_search_index/' + event_key.id(),
+                    url='/tasks/admin/do/run_event_post_update_hook/' + event_key.id(),
                     method='GET')
         elif model_type == 'teams':
             team_keys = Team.query().fetch(keys_only=True)
             for team_key in team_keys:
                 taskqueue.add(
                     queue_name='admin',
-                    url='/tasks/admin/do/add_team_search_index/' + team_key.id(),
+                    url='/tasks/admin/do/run_team_post_update_hook/' + team_key.id(),
                     method='GET')
 
 
-class AdminAddEventSearchIndexDo(LoggedInHandler):
+class AdminRunEventPostUpdateHookDo(LoggedInHandler):
     def get(self, event_key):
         event = Event.get_by_id(event_key)
-        lat_lon = event.get_lat_lon()
-        if lat_lon:
-            fields = [
-                search.NumberField(name='year', value=event.year),
-                search.GeoField(name='location', value=search.GeoPoint(lat_lon[0], lat_lon[1]))
-            ]
-            search.Index(name="eventLocation").put(search.Document(doc_id=event.key.id(), fields=fields))
+        EventManipulator.runPostUpdateHook([event])
 
 
-class AdminAddTeamSearchIndexDo(LoggedInHandler):
+class AdminRunTeamPostUpdateHookDo(LoggedInHandler):
     def get(self, team_key):
         team = Team.get_by_id(team_key)
-        lat_lon = team.get_lat_lon()
-        if lat_lon:
-            fields = [
-                search.GeoField(name='location', value=search.GeoPoint(lat_lon[0], lat_lon[1]))
-            ]
-            search.Index(name="teamLocation").put(search.Document(doc_id=team.key.id(), fields=fields))
+        TeamManipulator.runPostUpdateHook([team])
+
+
+class AdminUpdateAllTeamSearchIndexEnqueue(LoggedInHandler):
+    def get(self):
+        taskqueue.add(
+            queue_name='search-index-update',
+            url='/tasks/do/update_all_team_search_index',
+            method='GET')
+        self.response.out.write("Enqueued update all team search index")
+
+
+class AdminUpdateAllTeamSearchIndexDo(LoggedInHandler):
+    def get(self):
+        team_keys = Team.query().fetch(keys_only=True)
+        for team_key in team_keys:
+            taskqueue.add(
+                queue_name='search-index-update',
+                url='/tasks/do/update_team_search_index/' + team_key.id(),
+                method='GET')
+
+
+class AdminUpdateTeamSearchIndexDo(LoggedInHandler):
+    def get(self, team_key):
+        team = Team.get_by_id(team_key)
+        SearchHelper.update_team_awards_index(team)

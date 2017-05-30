@@ -22,6 +22,7 @@ class EventTeamManipulator(ManipulatorBase):
 
         attrs = [
             "year",  # technically immutable, but corruptable and needs repair. See github issue #409
+            "status",
         ]
 
         for attr in attrs:

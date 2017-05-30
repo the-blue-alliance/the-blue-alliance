@@ -1,3 +1,4 @@
+import copy
 import logging
 import heapq
 import math
@@ -10,6 +11,8 @@ from google.appengine.ext import ndb
 from consts.award_type import AwardType
 from consts.district_point_values import DistrictPointValues
 from consts.event_type import EventType
+
+from database.team_query import DistrictTeamsQuery
 
 from helpers.event_helper import EventHelper
 
@@ -41,7 +44,6 @@ class DistrictHelper(object):
     def calculate_event_points(cls, event):
         event.get_awards_async()
         event.get_matches_async()
-        district_team_key_futures = DistrictTeam.query(DistrictTeam.district == event.event_district_enum, DistrictTeam.year == event.year).fetch_async(None, keys_only=True)
 
         # Typically 3 for District CMP, 1 otherwise
         POINTS_MULTIPLIER = DistrictPointValues.DISTRICT_CMP_MULTIPLIER.get(event.year, DistrictPointValues.DISTRICT_CMP_MULIPLIER_DEFAULT) if event.event_type_enum == EventType.DISTRICT_CMP else DistrictPointValues.STANDARD_MULTIPLIER
@@ -59,7 +61,7 @@ class DistrictHelper(object):
                 'highest_qual_scores': [],
             }),
         }
-        single_district_points = district_points.copy()
+        single_district_points = copy.deepcopy(district_points)
 
         # match points
         if event.year >= 2015:
@@ -70,7 +72,7 @@ class DistrictHelper(object):
 
         # alliance points
         if event.alliance_selections:
-            selection_points = EventHelper.alliance_selections_to_points(event.key_name, POINTS_MULTIPLIER, event.alliance_selections)
+            selection_points = EventHelper.alliance_selections_to_points(event, POINTS_MULTIPLIER, event.alliance_selections)
             for team, points in selection_points.items():
                 district_points['points'][team]['alliance_points'] += points
         else:
@@ -101,23 +103,14 @@ class DistrictHelper(object):
             for team in award.team_list:
                 district_points['points'][team.id()]['award_points'] += point_value * POINTS_MULTIPLIER
 
-        # Filter out teams not in this district (only keep those with a DistrictTeam present for this district)
-        for district_team_future in ndb.get_multi_async(district_team_key_futures.get_result()):
-            district_team = district_team_future.get_result()
-            team_key = district_team.team.id()
-            if team_key in district_points['points']:
-                single_district_points['points'][team_key] = district_points['points'][team_key]
-            if team_key in district_points['tiebreakers']:
-                single_district_points['tiebreakers'][team_key] = district_points['tiebreakers'][team_key]
-
-        for team, point_breakdown in single_district_points['points'].items():
+        for team, point_breakdown in district_points['points'].items():
             for p in point_breakdown.values():
-                single_district_points['points'][team]['total'] += p
+                district_points['points'][team]['total'] += p
 
-        return single_district_points
+        return district_points
 
     @classmethod
-    def calculate_rankings(cls, events, team_futures, year):
+    def calculate_rankings(cls, events, teams, year):
         # aggregate points from first two events and district championship
         team_attendance_count = defaultdict(int)
         team_totals = defaultdict(lambda: {
@@ -145,8 +138,11 @@ class DistrictHelper(object):
                             team_totals[team_key]['tiebreakers'][5] = heapq.nlargest(3, event.district_points['tiebreakers'][team_key]['highest_qual_scores'] + team_totals[team_key]['tiebreakers'][5])
 
         # adding in rookie bonus
-        for team_future in team_futures:
-            team = team_future.get_result()
+        if type(teams) == ndb.tasklets.Future:
+            teams = teams.get_result()
+        for team in teams:
+            if type(team) == ndb.tasklets.Future:
+                team = team.get_result()
             bonus = None
             if team.rookie_year == year:
                 bonus = 10

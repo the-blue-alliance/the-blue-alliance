@@ -4,7 +4,11 @@
             <div class="col-xs-12">
                 <a href="/event/{{ event.key_name }}"><h3>{{ event.name }}</h3></a>
                 {% if event.now and event.webcast %}
-                <a class="btn btn-success btn-small pull-right" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
+                    {% if event.webcast_status == 'offline' %}
+                        <a class="btn btn-default btn-small pull-right" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Offline</a>
+                    {% else %}
+                        <a class="btn btn-success btn-small pull-right" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
+                    {% endif %}
                 {% endif %}
                 <p>
                     {% if event.location %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ event.location }}" target="_blank">{{ event.location }}</a><br />{% endif %}
@@ -15,25 +19,39 @@
                     <tr>
                         <th>Team Number</th>
                         <th>Team Name</th>
+                        <th>Next Match</th>
                         <th>Qual Record</th>
                         <th>Ranking</th>
+                        <th>Alliance</th>
                         <th>Playoff Status</th>
+                        <th>Awards</th>
                     </tr>
-                    {% for team_and_status in live_event.1 %}
+                    {% for team, status, status_str, awards in live_event.1 %}
                         <tr>
-                            {% with team_and_status.0 as team %}
-                                {% with team_and_status.1 as status %}
-                                    <td>{{ team.team_number }}</td>
-                                    <td>
-                                        <a href="/team/{{ team.team_number }}/{{ event.year }}#{{ event.key_name }}">{{ team.nickname }}</a>
-                                    </td>
-                                    <td>{{ status.1 }}</td>
-                                    <td>{{ status.2 }}</td>
-                                    {% with status.3 as playoff %}
-                                        <td>{% if playoff %} {{ playoff }} {% endif %}</td>
-                                    {% endwith %}
-                                {% endwith %}
-                            {% endwith %}
+                            <td>{{ team.team_number }}</td>
+                            <td>
+                                <a href="/team/{{ team.team_number }}/{{ event.year }}#{{ event.key_name }}">{{ team.nickname }}</a>
+                            </td>
+                             <td>
+                                {% if status.next_match_key %}<a href="/match/{{ status.next_match_key }}">{{ status.next_match_key|match_short }}</a>{% else %}--{% endif %}
+                            </td>
+                            <td>{{ status.qual.ranking.record.wins }}-{{ status.qual.ranking.record.losses }}-{{ status.qual.ranking.record.ties }}</td>
+                            <td>{% if status.qual.ranking.rank %}{{ status.qual.ranking.rank }}/{{ status.qual.num_teams }}{% else %}--{% endif %}</td>
+                            <td>{{status_str.alliance|safe}}</td>
+                            <td>{{status_str.playoff|safe}}</td>
+                            <td>
+                                <ul>
+                                {% for award in awards %}
+                                    {% for team_number, awardees in award.recipient_dict.items %}
+                                        {% if team_number == team.team_number %}
+                                            {% for awardee in awardees %}
+                                                <li>{{ award.name_str }}{% if awardee %} ({{ awardee }}){% endif %}</li>
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                                </ul>
+                            </td>
                         </tr>
                     {% endfor %}
                 </table>

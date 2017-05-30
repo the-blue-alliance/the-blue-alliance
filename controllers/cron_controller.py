@@ -2,6 +2,7 @@ import datetime
 import logging
 import os
 import json
+import pytz
 
 from google.appengine.api import taskqueue
 
@@ -11,16 +12,26 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
 from consts.district_type import DistrictType
+from consts.event_type import EventType
 
+from database.district_query import DistrictsInYearQuery
+from database.event_query import DistrictEventsQuery
+from database.team_query import DistrictTeamsQuery
+from helpers.bluezone_helper import BlueZoneHelper
 from helpers.district_helper import DistrictHelper
+from helpers.district_manipulator import DistrictManipulator
 from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
 from helpers.event_details_manipulator import EventDetailsManipulator
+from helpers.event_insights_helper import EventInsightsHelper
 from helpers.event_team_manipulator import EventTeamManipulator
+from helpers.event_team_status_helper import EventTeamStatusHelper
 from helpers.event_team_repairer import EventTeamRepairer
 from helpers.event_team_updater import EventTeamUpdater
+from helpers.firebase.firebase_pusher import FirebasePusher
 from helpers.insights_helper import InsightsHelper
 from helpers.match_helper import MatchHelper
+from helpers.match_time_prediction_helper import MatchTimePredictionHelper
 from helpers.matchstats_helper import MatchstatsHelper
 from helpers.notification_helper import NotificationHelper
 from helpers.prediction_helper import PredictionHelper
@@ -28,7 +39,7 @@ from helpers.prediction_helper import PredictionHelper
 from helpers.insight_manipulator import InsightManipulator
 from helpers.team_manipulator import TeamManipulator
 from helpers.match_manipulator import MatchManipulator
-
+from models.district import District
 from models.event import Event
 from models.event_details import EventDetails
 from models.event_team import EventTeam
@@ -145,6 +156,7 @@ class EventMatchstatsDo(webapp.RequestHandler):
     """
     Calculates match stats (OPR/DPR/CCWM) for an event
     Calculates predictions for an event
+    Calculates insights for an event
     """
     def get(self, event_key):
         event = Event.get_by_id(event_key)
@@ -156,22 +168,26 @@ class EventMatchstatsDo(webapp.RequestHandler):
             matchstats_dict = None
 
         predictions_dict = None
-        if event.year == 2016:
-            organized_matches = MatchHelper.organizeMatches(event.matches)
-            match_predictions, match_prediction_stats = PredictionHelper.get_match_predictions(organized_matches['qm'])
-            ranking_predictions, ranking_prediction_stats = PredictionHelper.get_ranking_predictions(organized_matches['qm'], match_predictions)
+        if event.year >= 2016 and event.event_type_enum in EventType.SEASON_EVENT_TYPES:
+            sorted_matches = MatchHelper.play_order_sort_matches(event.matches)
+            match_predictions, match_prediction_stats, stat_mean_vars = PredictionHelper.get_match_predictions(sorted_matches)
+            ranking_predictions, ranking_prediction_stats = PredictionHelper.get_ranking_predictions(sorted_matches, match_predictions)
 
             predictions_dict = {
                 'match_predictions': match_predictions,
                 'match_prediction_stats': match_prediction_stats,
+                'stat_mean_vars': stat_mean_vars,
                 'ranking_predictions': ranking_predictions,
                 'ranking_prediction_stats': ranking_prediction_stats
             }
 
+        event_insights = EventInsightsHelper.calculate_event_insights(event.matches, event.year)
+
         event_details = EventDetails(
             id=event_key,
             matchstats=matchstats_dict,
-            predictions=predictions_dict
+            predictions=predictions_dict,
+            insights=event_insights,
         )
         EventDetailsManipulator.createOrUpdate(event_details)
 
@@ -179,8 +195,9 @@ class EventMatchstatsDo(webapp.RequestHandler):
             'matchstats_dict': matchstats_dict,
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/math/event_matchstats_do.html')
-        self.response.out.write(template.render(path, template_values))
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/math/event_matchstats_do.html')
+            self.response.out.write(template.render(path, template_values))
 
     def post(self):
         self.get()
@@ -196,8 +213,10 @@ class EventMatchstatsEnqueue(webapp.RequestHandler):
         else:
             events = Event.query(Event.year == int(when)).fetch(500)
 
+        EventHelper.sort_events(events)
         for event in events:
             taskqueue.add(
+                queue_name='run-in-order',  # Because predictions depend on past events
                 url='/tasks/math/do/event_matchstats/' + event.key_name,
                 method='GET')
 
@@ -283,6 +302,8 @@ class YearInsightsDo(webapp.RequestHandler):
             insights = InsightsHelper.doMatchInsights(year)
         elif kind == 'awards':
             insights = InsightsHelper.doAwardInsights(year)
+        elif kind == 'predictions':
+            insights = InsightsHelper.doPredictionInsights(year)
 
         if insights != None:
             InsightManipulator.createOrUpdate(insights)
@@ -377,12 +398,18 @@ class TypeaheadCalcDo(webapp.RequestHandler):
             teams = yield ndb.get_multi_async(team_keys)
             raise ndb.Return(teams)
 
-        @ndb.toplevel
-        def get_events_and_teams():
-            events, teams = yield get_events_async(), get_teams_async()
-            raise ndb.Return((events, teams))
+        @ndb.tasklet
+        def get_districts_async():
+            district_keys = yield District.query().order(-District.year).fetch_async(keys_only=True)
+            districts = yield ndb.get_multi_async(district_keys)
+            raise ndb.Return(districts)
 
-        events, teams = get_events_and_teams()
+        @ndb.toplevel
+        def get_events_teams_districts():
+            events, teams, districts = yield get_events_async(), get_teams_async(), get_districts_async()
+            raise ndb.Return((events, teams, districts))
+
+        events, teams, districts = get_events_teams_districts()
 
         results = {}
         for team in teams:
@@ -395,6 +422,16 @@ class TypeaheadCalcDo(webapp.RequestHandler):
                 results[TypeaheadEntry.ALL_TEAMS_KEY].append(data)
             else:
                 results[TypeaheadEntry.ALL_TEAMS_KEY] = [data]
+
+        for district in districts:
+            data = '%s District [%s]' % (district.display_name, district.abbreviation.upper())
+            # all districts
+            if TypeaheadEntry.ALL_DISTRICTS_KEY in results:
+                if data not in results[TypeaheadEntry.ALL_DISTRICTS_KEY]:
+                    results[TypeaheadEntry.ALL_DISTRICTS_KEY].append(data)
+            else:
+                results[TypeaheadEntry.ALL_DISTRICTS_KEY] = [data]
+
 
         for event in events:
             data = '%s %s [%s]' % (event.year, event.name, event.event_short.upper())
@@ -432,23 +469,17 @@ class TypeaheadCalcDo(webapp.RequestHandler):
 
 class DistrictPointsCalcEnqueue(webapp.RequestHandler):
     """
-    Enqueues calculation of district points for events within a district for a given year
+    Enqueues calculation of district points for all season events for a given year
     """
 
     def get(self, year):
-        all_event_keys = []
-        for district_type_enum in DistrictType.type_names.keys():
-            if district_type_enum == DistrictType.NO_DISTRICT:
-                continue
+        year = int(year)
 
-            year = int(year)
+        event_keys = Event.query(Event.year == year, Event.event_type_enum.IN(EventType.SEASON_EVENT_TYPES)).fetch(None, keys_only=True)
+        for event_key in event_keys:
+            taskqueue.add(url='/tasks/math/do/district_points_calc/{}'.format(event_key.id()), method='GET')
 
-            event_keys = Event.query(Event.year == year, Event.event_district_enum == district_type_enum).fetch(None, keys_only=True)
-            all_event_keys += event_keys
-            for event_key in event_keys:
-                taskqueue.add(url='/tasks/math/do/district_points_calc/{}'.format(event_key.id()), method='GET')
-
-        self.response.out.write("Enqueued for: {}".format([event_key.id() for event_key in all_event_keys]))
+        self.response.out.write("Enqueued for: {}".format([event_key.id() for event_key in event_keys]))
 
 
 class DistrictPointsCalcDo(webapp.RequestHandler):
@@ -458,8 +489,10 @@ class DistrictPointsCalcDo(webapp.RequestHandler):
 
     def get(self, event_key):
         event = Event.get_by_id(event_key)
-        if event.event_district_enum == DistrictType.NO_DISTRICT:
-            self.response.out.write("Can't calculate district points for a non-district event!")
+        if event.event_type_enum not in EventType.SEASON_EVENT_TYPES:
+            if 'X-Appengine-Taskname' not in self.request.headers:
+                self.response.out.write("Can't calculate district points for a non-season event {}!"
+                                        .format(event.key_name))
             return
 
         district_points = DistrictHelper.calculate_event_points(event)
@@ -470,7 +503,101 @@ class DistrictPointsCalcDo(webapp.RequestHandler):
         )
         EventDetailsManipulator.createOrUpdate(event_details)
 
-        self.response.out.write(event.district_points)
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            self.response.out.write(event.district_points)
+
+        # Enqueue task to update rankings
+        if event.district_key:
+            taskqueue.add(url='/tasks/math/do/district_rankings_calc/{}'.format(event.district_key.id()), method='GET')
+
+
+class DistrictRankingsCalcEnqueue(webapp.RequestHandler):
+    """
+    Enqueues calculation of rankings for all districts for a given year
+    """
+
+    def get(self, year):
+        districts = DistrictsInYearQuery(int(year)).fetch()
+        district_keys = [district.key.id() for district in districts]
+        for district_key in district_keys:
+            taskqueue.add(url='/tasks/math/do/district_rankings_calc/{}'.format(district_key), method='GET')
+
+        self.response.out.write("Enqueued for: {}".format(district_keys))
+
+
+class DistrictRankingsCalcDo(webapp.RequestHandler):
+    """
+    Calculates district rankings for a district year
+    """
+
+    def get(self, district_key):
+        district = District.get_by_id(district_key)
+        if not district:
+            self.response.out.write("District {} does not exist!".format(district_key))
+            return
+
+        events_future = DistrictEventsQuery(district_key).fetch_async()
+        teams_future = DistrictTeamsQuery(district_key).fetch_async()
+
+        events = events_future.get_result()
+        for event in events:
+            event.prep_details()
+        EventHelper.sort_events(events)
+        team_totals = DistrictHelper.calculate_rankings(events, teams_future, district.year)
+
+        rankings = []
+        current_rank = 1
+        for key, points in team_totals:
+            point_detail = {}
+            point_detail["rank"] = current_rank
+            point_detail["team_key"] = key
+            point_detail["event_points"] = []
+            for event, event_points in points["event_points"]:
+                event_points['event_key'] = event.key.id()
+                event_points['district_cmp'] = True if event.event_type_enum == EventType.DISTRICT_CMP else False
+                point_detail["event_points"].append(event_points)
+
+            point_detail["rookie_bonus"] = points.get("rookie_bonus", 0)
+            point_detail["point_total"] = points["point_total"]
+            rankings.append(point_detail)
+            current_rank += 1
+
+        if rankings:
+            district.rankings = rankings
+            DistrictManipulator.createOrUpdate(district)
+
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            self.response.out.write("Finished calculating rankings for: {}".format(district_key))
+
+
+class EventTeamStatusCalcEnqueue(webapp.RequestHandler):
+    """
+    Enqueues calculation of event team status for a year
+    """
+
+    def get(self, year):
+        event_keys = [e.id() for e in Event.query(Event.year==int(year)).fetch(keys_only=True)]
+        for event_key in event_keys:
+            taskqueue.add(url='/tasks/math/do/event_team_status/{}'.format(event_key), method='GET')
+
+        self.response.out.write("Enqueued for: {}".format(event_keys))
+
+
+class EventTeamStatusCalcDo(webapp.RequestHandler):
+    """
+    Calculates event team statuses for all teams at an event
+    """
+    def get(self, event_key):
+        event = Event.get_by_id(event_key)
+        event_teams = EventTeam.query(EventTeam.event==event.key).fetch()
+        for event_team in event_teams:
+            status = EventTeamStatusHelper.generate_team_at_event_status(event_team.team.id(), event)
+            event_team.status = status
+            FirebasePusher.update_event_team_status(event_key, event_team.team.id(), status)
+        EventTeamManipulator.createOrUpdate(event_teams)
+
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            self.response.out.write("Finished calculating event team statuses for: {}".format(event_key))
 
 
 class UpcomingNotificationDo(webapp.RequestHandler):
@@ -480,3 +607,56 @@ class UpcomingNotificationDo(webapp.RequestHandler):
     def get(self):
         live_events = EventHelper.getEventsWithinADay()
         NotificationHelper.send_upcoming_matches(live_events)
+
+
+class UpdateLiveEventsDo(webapp.RequestHandler):
+    """
+    Updates live events
+    """
+    def get(self):
+        FirebasePusher.update_live_events()
+
+
+class MatchTimePredictionsEnqueue(webapp.RequestHandler):
+    """
+    Enqueue match time predictions for all current events
+    """
+    def get(self):
+        live_events = EventHelper.getEventsWithinADay()
+        for event in live_events:
+            taskqueue.add(url='/tasks/math/do/predict_match_times/{}'.format(event.key_name),
+                          method='GET')
+        # taskqueue.add(url='/tasks/do/bluezone_update', method='GET')
+        self.response.out.write("Enqueued time prediction for {} events".format(len(live_events)))
+
+
+class MatchTimePredictionsDo(webapp.RequestHandler):
+    """
+    Predicts match times for a given live event
+    """
+    def get(self, event_key):
+        event = Event.get_by_id(event_key)
+        if not event:
+            self.abort(404)
+
+        matches = event.matches
+        if not matches:
+            return
+
+        timezone = pytz.timezone(event.timezone_id)
+        played_matches = MatchHelper.recentMatches(matches, num=0)
+        unplayed_matches = MatchHelper.upcomingMatches(matches, num=len(matches))
+        MatchTimePredictionHelper.predict_future_matches(event_key, played_matches, unplayed_matches, timezone, event.within_a_day)
+
+
+class BlueZoneUpdateDo(webapp.RequestHandler):
+    """
+    Update the current "best match"
+    """
+    def get(self):
+        live_events = EventHelper.getEventsWithinADay()
+        try:
+            BlueZoneHelper.update_bluezone(live_events)
+        except Exception, e:
+            logging.error("BlueZone update failed")
+            logging.exception(e)

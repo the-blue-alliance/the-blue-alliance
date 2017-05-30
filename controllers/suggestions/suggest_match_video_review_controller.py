@@ -1,13 +1,9 @@
-import datetime
-import os
-
-from google.appengine.ext import ndb
-from google.appengine.ext.webapp import template
-
 from consts.account_permissions import AccountPermissions
 from controllers.suggestions.suggestions_review_base_controller import SuggestionsReviewBaseController
 from helpers.suggestions.match_suggestion_accepter import MatchSuggestionAccepter
+from models.match import Match
 from models.suggestion import Suggestion
+from template_engine import jinja2_engine
 
 
 class SuggestMatchVideoReviewController(SuggestionsReviewBaseController):
@@ -15,6 +11,13 @@ class SuggestMatchVideoReviewController(SuggestionsReviewBaseController):
     def __init__(self, *args, **kw):
         self.REQUIRED_PERMISSIONS.append(AccountPermissions.REVIEW_MEDIA)
         super(SuggestMatchVideoReviewController, self).__init__(*args, **kw)
+
+    def create_target_model(self, suggestion):
+        target_key = self.request.get('key-{}'.format(suggestion.key.id()), suggestion.target_key)
+        match = Match.get_by_id(target_key)
+        if not match:
+            return None
+        return MatchSuggestionAccepter.accept_suggestion(match, suggestion)
 
     """
     View the list of suggestions.
@@ -31,31 +34,15 @@ class SuggestMatchVideoReviewController(SuggestionsReviewBaseController):
             "suggestions": suggestions,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/suggest_match_video_review_list.html')
-        self.response.out.write(template.render(path, self.template_values))
+        self.response.out.write(jinja2_engine.render('suggestions/suggest_match_video_review_list.html', self.template_values))
 
     def post(self):
         accept_keys = map(lambda x: int(x) if x.isdigit() else x, self.request.POST.getall("accept_keys[]"))
         reject_keys = map(lambda x: int(x) if x.isdigit() else x, self.request.POST.getall("reject_keys[]"))
 
-        accepted_suggestion_futures = [Suggestion.get_by_id_async(key) for key in accept_keys]
-        rejected_suggestion_futures = [Suggestion.get_by_id_async(key) for key in reject_keys]
-        accepted_suggestions = map(lambda a: a.get_result(), accepted_suggestion_futures)
-        rejected_suggestions = map(lambda a: a.get_result(), rejected_suggestion_futures)
+        for accept_key in accept_keys:
+            self._process_accepted(accept_key)
 
-        MatchSuggestionAccepter.accept_suggestions(accepted_suggestions)
-
-        all_suggestions = accepted_suggestions
-        all_suggestions.extend(rejected_suggestions)
-
-        for suggestion in all_suggestions:
-            if suggestion.key.id() in accept_keys:
-                suggestion.review_state = Suggestion.REVIEW_ACCEPTED
-            if suggestion.key.id() in reject_keys:
-                suggestion.review_state = Suggestion.REVIEW_REJECTED
-            suggestion.reviewer = self.user_bundle.account.key
-            suggestion.reviewed_at = datetime.datetime.now()
-
-        ndb.put_multi(all_suggestions)
+        self._process_rejected(reject_keys)
 
         self.redirect("/suggest/match/video/review")

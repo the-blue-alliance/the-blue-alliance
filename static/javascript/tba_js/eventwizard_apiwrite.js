@@ -114,7 +114,7 @@ $('#schedule_file').change(function(){
             var compLevel, setNumber, matchNumber, matchKey;
             var has_octo = $('input[name="alliance-count-schedule"]:checked').val() == "16";
             matchNumber = parseInt(match['Match']);
-            if(match['Description'].indexOf("Qualification") == 0){
+            if(!match.hasOwnProperty('Description') || match['Description'].indexOf("Qualification") == 0){
                 compLevel = "qm";
                 setNumber = 1;
                 matchKey = "qm" + matchNumber;
@@ -276,7 +276,6 @@ $('#results_file').change(function(){
         $('#results-ok').show();
         $('#results-ok').unbind('click').click(function(){
             $(this).css('background-color', '#eb9316');
-            alert(JSON.stringify(request_body));
             makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/matches/update', JSON.stringify(request_body), $(this));
         });
 
@@ -306,14 +305,19 @@ $('#rankings_file').change(function(){
         //var headers = ['Rank', 'Team', 'Qual Avg', 'Coopertition', 'Auto', 'Container', 'Tote', 'Litter', 'DQ', 'Played'];
 
         // 2016 Headers
-        var headers  = ['Rank', 'Team', 'RS', 'Auto', 'S/C', 'Boulders', 'Defenses', 'W-L-T', 'Played', 'DQ'];
-        var display_headers = ["Rank", "Team", "Ranking Score", "Auto", "Scale/Challenge", "Goals", "Defense", "Record (W-L-T)", "Played", 'DQ'];
-        var is_int = [true, true, true, true, true, false, true, true];
+        //var headers  = ['Rank', 'Team', 'RS', 'Auto', 'S/C', 'Boulders', 'Defenses', 'W-L-T', 'Played', 'DQ'];
+        //var display_headers = ["Rank", "Team", "Ranking Score", "Auto", "Scale/Challenge", "Goals", "Defense", "Record (W-L-T)", "Played", 'DQ'];
+        //var is_int = [true, true, true, true, true, false, true, true];
+
+        // 2017 Headers
+        var headers = ['Rank', 'Team', 'RS', 'TotalPts', 'Auto', 'Rotor', 'Takeoff', 'kPa', 'W-L-T', 'DQ', 'Played'];
+        var display_headers = ['Rank', 'Team', 'Ranking Score', 'Match Points', 'Auto', 'Rotor', 'Takeoff', 'kPa', 'Record (W-L-T)', 'DQ', 'Played'];
+        var is_num = [true, true, true, true, true, true, false, true, true];
 
         $('#rankings_preview').empty();
         $('#rankings_preview').html("<tr><th>" + display_headers.join("</th><th>") + "</th></tr>");
 
-        request_body['breakdowns'] = display_headers.slice(2, 8);
+        request_body['breakdowns'] = display_headers.slice(2, 9);
         request_body['rankings'] = [];
 
         for(var i=0; i<rankings.length; i++){
@@ -338,7 +342,7 @@ $('#rankings_file').change(function(){
             breakdown['dqs'] = parseInt(rank['DQ']);
             for(var j=0; j<request_body['breakdowns'].length; j++){
                 var val = rank[headers[j + 2]];
-                breakdown[request_body['breakdowns'][j]] = is_int[j] ? parseInt(val) : val;
+                breakdown[request_body['breakdowns'][j]] = is_num[j] ? Number(val.replace(',','')) : val;
             }
             request_body['rankings'].push(breakdown);
         }
@@ -486,7 +490,7 @@ function updateRankings(cell) {
     cell.parent().css('background-color', '#eb9316');
     $.ajax({
         type: 'GET',
-        url: 'http://10.0.100.5/pit/getdata?random=' + Math.random(),
+        url: 'http://10.0.100.5/Pit/GetData?random=' + Math.random(),
         dataType: 'json',
         cache: false,
         timeout: 5000,
@@ -499,6 +503,10 @@ function updateRankings(cell) {
             //var breakdowns = ['Avg', 'CP', 'AP', 'RC', 'TP', 'LP'];
 
             // 2016 Headers
+            //var breakdowns  = ['RS', 'Sort2', 'Sort3', 'Sort4', 'Sort 5', 'Wins', 'Losses', 'Ties', 'Played', 'DQ'];
+            //var display = ["Ranking Score", "Auto", "Scale/Challenge", "Goals", "Defense", "Wins", "Losses", "Ties", "Played", 'DQ'];
+
+            // 2017 Headers
             var breakdowns  = ['RS', 'Sort2', 'Sort3', 'Sort4', 'Sort 5', 'Wins', 'Losses', 'Ties', 'Played', 'DQ'];
             var display = ["Ranking Score", "Auto", "Scale/Challenge", "Goals", "Defense", "Wins", "Losses", "Ties", "Played", 'DQ'];
 
@@ -514,7 +522,7 @@ function updateRankings(cell) {
                 teamRank['played'] = rankData[i]['Played'];
                 teamRank['dqs'] = 0;
                 for(var j=0; j<breakdowns.length; j++){
-                    teamRank[display[j]] = parseInt(rankData[i][breakdowns[j]]);
+                    teamRank[display[j]] = Number(rankData[i][breakdowns[j]].replace(',',''));
                 }
                 request_body['rankings'].push(teamRank);
             }

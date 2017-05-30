@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% import 'match_partials/match_table_macros.html' as mtm %}
+{% import 'match_partials/match_suggestion_table_macros.html' as mstm %}
+
+{% block title %}Match Suggestion - The Blue Alliance{% endblock %}
+
+{% block meta_description %}Suggests interesting matches across all ongoing events{% endblock %}
+
+{% block content %}
+<div class="container" style="width: 100%;">
+  <div class="row">
+    <div class="col-xs-12">
+      <h1>Match Suggestions</h1>
+      <h3>Finished Matches</h3>
+      {{mtm.recent_match_table(finished_matches, show_event=True)}}
+      <h3>Current Matches</h3>
+      {{mstm.match_suggestion_table(current_matches, ranks)}}
+      <h3>Upcoming Matches</h3>
+      {{mstm.match_suggestion_table(upcoming_matches, ranks)}}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block inline_javascript %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.countdown/2.2.0/jquery.countdown.min.js"></script>
+<script type="text/javascript">
+  $('.tba-match-time-utc-countdown').each(function () {
+    var matchTime = new Date($(this).attr('datetime'));  // Converts UTC to local time
+    $(this).countdown(matchTime, function(event) {
+      $(this).text(event.strftime('%D:%H:%M:%S'));
+    });
+  });
+</script>
+{% endblock %}

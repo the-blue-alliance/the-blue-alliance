@@ -11,7 +11,7 @@
   <div class="row">
     <div class="col-xs-12">
       <p class="pull-right">
-        <em>Signed in with: {{user_bundle.account.email}}</em>
+        <a disabled="true" class="btn btn-default">{{user_bundle.account.email}}</a>
         <a class="btn btn-warning" href="/logout"><span class="glyphicon glyphicon-remove"></span> Logout</a>
       </p>
       <h1>myTBA Dashboard</h1>
@@ -27,6 +27,7 @@
       <hr>
     </div>
   </div>
+  {% if not past_only %}
   <div class="row">
     <div class="col-xs-12">
       <h2>Currently Competing</h2>
@@ -41,47 +42,54 @@
       {% endif %}
     </div>
   </div>
+  <hr>
   <div class="row">
     <div class="col-xs-12">
-      <h2>Upcoming Competitions</h2>
+      <h2>Future Competitions</h2>
     </div>
   </div>
-  <div class="row">
-    {% if future_events_with_teams %}
-    {% for future_event in future_events_with_teams %}
-      {% with future_event.0 as event %}
-      <div class="col-sm-4">
-        <h3><a href="/event/{{ event.key_name }}">{{ event.name }}</a></h3>
-        <p>
-          {% if event.location %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ event.location }}" target="_blank">{{ event.location }}</a><br />{% endif %}
-          {% if event.start_date %}<span class="glyphicon glyphicon-calendar"></span> {{ event.start_date|date:"M d" }}{% if event.start_date|date:"M d" != event.end_date|date:"M d" %} - {{ event.end_date|date:"M d" }}{% endif %}, {{ event.end_date|date:"Y" }}{% endif %}
-        </p>
-        <table class="table table-striped table-condensed">
-          <tr>
-            <th>Team Number</th>
-            <th>Team Name</th>
-          </tr>
-          {% for team in future_event.1 %}
-          <tr>
-            <td>{{ team.team_number }}</td>
-            <td>
-                <a href="/team/{{ team.team_number }}/{{ event.year }}#{{ event.key_name }}">{{ team.nickname }}</a>
-            </td>
-          </tr>
-          {% endfor %}
-        </table>
+  {% if future_events_with_teams %}
+    {% for batch in future_events_with_teams|batch:3 %}
+      <div class="row">
+      {% for future_event in batch %}
+        {% with future_event.0 as event %}
+        <div class="col-sm-4">
+          <h3><a href="/event/{{ event.key_name }}">{{ event.name }}</a></h3>
+          <p>
+            {% if event.city_state_country %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ event.city_state_country }}" target="_blank">{{ event.city_state_country }}</a><br />{% endif %}
+            {% if event.start_date %}<span class="glyphicon glyphicon-calendar"></span> {{ event.start_date|date:"M d" }}{% if event.start_date|date:"M d" != event.end_date|date:"M d" %} - {{ event.end_date|date:"M d" }}{% endif %}, {{ event.end_date|date:"Y" }}{% endif %}
+          </p>
+          <table class="table table-striped table-condensed">
+            <tr>
+              <th>Team Number</th>
+              <th>Team Name</th>
+            </tr>
+            {% for team in future_event.1 %}
+            <tr>
+              <td>{{ team.team_number }}</td>
+              <td>
+                  <a href="/team/{{ team.team_number }}/{{ event.year }}#{{ event.key_name }}">{{ team.nickname }}</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+        {% endwith %}
+      {% endfor %}
       </div>
-      {% endwith %}
     {% endfor %}
-    {% else %}
+  {% else %}
+    <div class="row">
       <div class="col-xs-12">
         <p>No favorite teams have upcoming competitions.</p>
       </div>
-    {% endif %}
-  </div>
+    </div>
+  {% endif %}
+  <hr>
+  {% endif %}
   <div class="row">
     <div class="col-xs-12">
-      <h2>Past Competitions This Year</h2>
+      <h2>Past Competitions In {{year}}</h2>
     </div>
   </div>
   <div class="row">

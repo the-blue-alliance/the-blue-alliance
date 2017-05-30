@@ -1,0 +1,165 @@
+{% import "advanced_search_partials/search_macros.html" as sm with context %}
+
+{% extends "base.html" %}
+
+{% block title %}Advanced Team Search - The Blue Alliance{% endblock %}
+
+{% block meta_description %}Search for teams using powerful filters{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+      <h1>Advanced Team Search</h1>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-4">
+      <form>
+        <div class="form-group">
+          <label for="input-year">Search for teams</label>
+          <div class="input-group">
+            <div class="input-group-addon">in</div>
+            <select class="form-control selectpicker" data-dropup-auto="false" id="input-year" name="year">
+              {% for valid_year in valid_years %}
+                <option value="{{valid_year}}"{% if valid_year == year %} selected="selected"{% endif %}>{{valid_year}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="input-award-type">that won any of the following awards:</label>
+          <select class="form-control selectpicker" data-dropup-auto="false" id="input-award-type" name="award_type" multiple title="No awards selected" data-live-search="true" data-actions-box="true">
+            {% for valid_award_type, valid_award_type_name in valid_award_types %}
+              <option value="{{valid_award_type}}"{% if valid_award_type in award_types %} selected="selected"{% endif %}>{{valid_award_type_name}}</option>
+              {% if loop.index == num_special_awards %}<option data-divider="true"></option>{% endif %}
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="input-seed">and were ranked</label>
+          <div class="input-group">
+            <select class="form-control selectpicker" data-dropup-auto="false" id="input-seed" name="seed">
+              <option value="0">Any Rank</option>
+              {% for valid_seed in valid_seeds %}
+                <option value="{{valid_seed}}"{% if valid_seed == seed %} selected="selected"{% endif %}>Top {{valid_seed}}</option>
+              {% endfor %}
+            </select>
+            <div class="input-group-addon">in quals</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="input-playoff-level">and at least</label>
+          <div class="input-group">
+            <select class="form-control selectpicker" data-dropup-auto="false" id="input-playoff-level" name="playoff_level">
+              <option value="0"{% if playoff_level == 0 %} selected="selected"{% endif %}>--</option>
+              <option value="1"{% if playoff_level == 1 %} selected="selected"{% endif %}>Made it to Semifinals</option>
+              <option value="2"{% if playoff_level == 2 %} selected="selected"{% endif %}>Made it to Finals</option>
+              <option value="3"{% if playoff_level == 3 %} selected="selected"{% endif %}>Won the Event</option>
+            </select>
+            <div class="input-group-addon">in playoffs</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>and have:</label>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" name="cad_model"{% if cad_model %} checked{% endif %}> a CAD model
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-search"></span> Search</button>
+      </form>
+    </div>
+
+    <div class="col-sm-8">
+      {% if new_search %}
+        <p class="well">Add some filters to begin a search.</p>
+      {% else %}
+        {% if result_models %}
+          <p>{{num_results}} result{% if num_results != 1 %}s{% endif %} found.{% if num_results > max_results %} Only the top {{max_results}} are available.{% endif %}</p>
+
+          {% if capped_num_results > page_size %}
+            <nav aria-label="Page navigation">
+              <ul class="pagination">
+                {% if page != 0 %}
+                <li>
+                  <a href="{{sm.search_params(page-1)}}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
+                </li>
+                {% endif %}
+                {% for i in range((capped_num_results / page_size)|ceil) %}
+                  <li {% if i == page %}class="active"{% endif %}>
+                    <a href="{{sm.search_params(i)}}">
+                      {{page_size * i + 1}}-
+                      {%- if loop.last -%}
+                        {{page_size * i + capped_num_results - page_size * i}}
+                      {%- else -%}
+                        {{page_size * i + page_size}}
+                      {% endif %}
+                    </a>
+                  </li>
+                {% endfor %}
+                {% if page != (capped_num_results / page_size)|ceil - 1 %}
+                <li>
+                  <a href="{{sm.search_params(page+1)}}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+                {% elif capped_num_results < num_results %}
+                <li>
+                  <span>More results not available</span>
+                </li>
+                {% endif %}
+              </ul>
+            </nav>
+          {% endif %}
+
+          <table class="event-table">
+            <thead>
+              <tr>
+                <th>{{sm.sort_header('Team', 'team')}}</th>
+                {% if seed %}
+                <th>{{sm.sort_header('# Events ranked top {}'.format(seed), 'seed')}}</th>
+                {% endif %}
+                {% if playoff_level %}
+                <th>{{sm.sort_header('# ' + 'Semifinals' if playoff_level == 1 else 'Finals' if playoff_level == 2 else 'Events Won' if playoff_level == 3, 'playoff_level')}}</th>
+                {% endif %}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for team in result_models %}
+                <tr>
+                  <td>
+                    <a href="/team/{{team.team_number}}/{% if year == 0 %}history{% else %}{{year}}{% endif %}" title="Team {{team.team_number }} - {{team.nickname}}">Team {{team.team_number }} - {{team.nickname}}</a>
+                    {% if team.city_state_country %}
+                      <br>
+                      <small>{{team.city_state_country}}</small>
+                    {% endif %}
+                  </td>
+                  {% if seed %}
+                  <td>{{result_expressions.get(team.key.id()).get('seed_count')|int}}</td>
+                  {% endif %}
+                  {% if playoff_level %}
+                  <td>{{result_expressions.get(team.key.id()).get('comp_level_count')|int}}</td>
+                  {% endif %}
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p class="well">No results were found matching the search criteria. Try choosing less restrictive filters.</p>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

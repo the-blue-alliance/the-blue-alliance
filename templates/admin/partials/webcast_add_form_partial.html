@@ -3,7 +3,6 @@
         <td>Type</td>
         <td><select name="webcast_type">
             <option value="livestream">livestream</option>
-            <option value="mms">mms</option>
             <option value="rtmp">rtmp</option>
             <option value="twitch">twitch</option>
             <option value="ustream">ustream</option>
@@ -12,6 +11,7 @@
             <option value="html5">html5</option>
             <option value="stemtv">stemtv</option>
             <option value="dacast">dacast</option>
+            <option value="direct_link">direct_link</option>
         </select></td>
     </tr>
     <tr>
@@ -21,5 +21,9 @@
     <tr>
         <td>File (RTMP, Livestream and DaCast only)</td>
         <td><input type="text" name="webcast_file" value="" /></td>
+    </tr>
+    <tr>
+        <td>Date</td>
+        <td><input type="text" name="webcast_date" value="{% if suggestion.contents.webcast_date%}{{suggestion.contents.webcast_date}}{% endif %}" /></td>
     </tr>
 </table>

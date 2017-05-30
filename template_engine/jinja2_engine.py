@@ -24,11 +24,14 @@ def get_jinja_env(force_filesystemloader=False):
     env.filters['defense_name'] = jinja2_filters.defense_name
     env.filters['digits'] = jinja2_filters.digits
     env.filters['floatformat'] = jinja2_filters.floatformat
+    env.filters['limit_prob'] = jinja2_filters.limit_prob
     env.filters['strftime'] = jinja2_filters.strftime
     env.filters['strip_frc'] = jinja2_filters.strip_frc
     env.filters['urlencode'] = jinja2_filters.urlencode
     env.filters['rfc2822'] = jinja2_filters.rfc2822
     env.filters['slugify'] = jinja2_filters.slugify
+    env.filters['yt_start'] = jinja2_filters.yt_start
+    env.filters['match_short'] = jinja2_filters.match_short
     return env
 
 

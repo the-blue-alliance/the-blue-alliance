@@ -29,6 +29,23 @@ class AdminAwardDashboard(LoggedInHandler):
         self.response.out.write(template.render(path, self.template_values))
 
 
+class AdminAwardDelete(LoggedInHandler):
+    """
+    Delete an award by ID
+    """
+
+    def post(self):
+        award_key = self.request.get('award_key')
+        if not award_key:
+            self.abort(400)
+        award = Award.get_by_id(award_key)
+        if not award:
+            self.abort(404)
+
+        AwardManipulator.delete(award)
+        self.redirect('/admin/awards')
+
+
 class AdminAwardAdd(LoggedInHandler):
     """
     Add Award from CSV.

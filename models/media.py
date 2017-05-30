@@ -3,6 +3,7 @@ import json
 from google.appengine.ext import ndb
 
 from consts.media_type import MediaType
+from models.event import Event
 from models.team import Team
 
 
@@ -27,7 +28,8 @@ class Media(ndb.Model):
     }
 
     REFERENCE_MAP = {
-        'team': Team
+        'team': Team,
+        'event': Event,
     }
 
     MAX_PREFERRED = 3  # Loosely enforced. Not a big deal.
@@ -36,8 +38,8 @@ class Media(ndb.Model):
     media_type_enum = ndb.IntegerProperty(required=True)
     foreign_key = ndb.StringProperty(required=True)  # Unique id for the particular media type. Ex: the Youtube Video key at the end of a YouTube url
 
-    details_json = ndb.StringProperty()  # Additional details required for rendering
-    private_details_json = ndb.StringProperty()  # Additional properties we don't want to expose via API
+    details_json = ndb.TextProperty()  # Additional details required for rendering
+    private_details_json = ndb.TextProperty()  # Additional properties we don't want to expose via API
     year = ndb.IntegerProperty()  # None if year is not relevant
     references = ndb.KeyProperty(repeated=True)  # Other models that are linked to this object
     preferred_references = ndb.KeyProperty(repeated=True)  # Other models for which this media is "Preferred". All preferred_references MUST also be in references
@@ -155,6 +157,10 @@ class Media(ndb.Model):
     @property
     def type_name(self):
         return MediaType.type_names[self.media_type_enum]
+
+    @property
+    def is_image(self):
+        return self.media_type_enum in MediaType.image_types
 
     @property
     def image_direct_url_med(self):

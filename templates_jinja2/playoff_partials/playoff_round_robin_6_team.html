@@ -1,0 +1,51 @@
+{% if playoff_advancement.sf %}
+  <h4>Round Robin Semifinals</h4>
+  <table class="table table-condensed table-striped">
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Alliance</th>
+        <th>Teams</th>
+        <th>Record</th>
+        <th>Champ Points</th>
+        <th>Match Points</th>
+        <th>Advance to Finals</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for alliance, _, champ_points, _, match_points, alliance_name, record in playoff_advancement.sf %}
+        <tr>
+          <td>{{loop.index}}</td>
+          <td>{{ alliance_name }}</td>
+          <td style="white-space: nowrap">{% for team in alliance %}<a href="/team/{{ team|digits }}/{{ event.year }}">{{ team }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</td>
+          <td>{{ record.wins }}-{{ record.losses }}-{{ record.ties }}</td>
+          <td>{{ champ_points }}</td>
+          <td>{{ match_points }}</td>
+          <td>{% if playoff_advancement.sf_complete and loop.index0 < 2 %}<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>{% endif %}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+
+{% if bracket_table.f %}
+  <h4>Finals</h4>
+  <table class="brackettable">
+    <tbody>
+      <tr>
+        <td class="{% if bracket_table.f.1.winning_alliance == 'red' %}winnerC{% else %}{% if bracket_table.f.1.winning_alliance == 'blue' %}secondC{% endif %}{% endif %}">
+          <br>
+          {% for team in bracket_table.f.1.red_alliance %}
+            <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
+          {% endfor %}
+        </td>
+        <td class="{% if bracket_table.f.1.winning_alliance == 'blue' %}winnerC{% else %}{% if bracket_table.f.1.winning_alliance == 'red' %}secondC{% endif %}{% endif %}">
+          <br>
+          {% for team in bracket_table.f.1.blue_alliance %}
+            <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
+          {% endfor %}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+{% endif %}

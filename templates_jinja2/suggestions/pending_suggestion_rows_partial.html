@@ -1,0 +1,65 @@
+<ul class="nav nav-pills nav-stacked">
+    {% if media_permission in user_bundle.account.permissions %}
+    <li{% if suggestions.match %} class="active"{% endif %}>
+        <a href="/suggest/match/video/review">
+            <span class="badge pull-right">{{suggestions.match}}</span>
+            Match Video Suggestions
+        </a>
+    </li>
+    <li{% if suggestions.event %} class="active"{% endif %}>
+        <a href="/suggest/event/webcast/review">
+            <span class="badge pull-right">{{suggestions.event}}</span>
+            Event Webcast Suggestions
+        </a>
+    </li>
+
+    <li{% if suggestions.media %} class="active"{% endif %}>
+        <a href="/suggest/team/media/review">
+            <span class="badge pull-right">{{suggestions.media}}</span>
+            Team Media Suggestions
+        </a>
+    </li>
+    <li{% if suggestions.social %} class="active"{% endif %}>
+        <a href="/suggest/team/social/review">
+            <span class="badge pull-right">{{suggestions.social}}</span>
+            Team Social Media Suggestions
+        </a>
+    </li>
+    {% endif %}
+
+    {% if event_media_permission in user_bundle.account.permissions %}
+    <li{% if suggestions.event_media %} class="active"{% endif %}>
+        <a href="/suggest/event/media/review">
+            <span class="badge pull-right">{{suggestions.event_media}}</span>
+            Event Media Suggestions
+        </a>
+    </li>
+    {% endif %}
+
+    {% if cad_permission in user_bundle.account.permissions %}
+    <li{% if suggestions.cad %} class="active"{% endif %}>
+        <a href="/suggest/cad/review">
+            <span class="badge pull-right">{{suggestions.cad}}</span>
+            Team CAD Suggestions
+        </a>
+    </li>
+    {% endif %}
+
+    {% if offseason_permission in user_bundle.account.permissions %}
+    <li{% if suggestions.offseason %} class="active"{% endif %}>
+        <a href="/suggest/offseason/review">
+            <span class="badge pull-right">{{suggestions.offseason}}</span>
+            Offseason Event Suggestions
+        </a>
+    </li>
+    {% endif %}
+
+    {% if apiwrite_permission in user_bundle.account.permissions %}
+    <li{% if suggestions.apiwrite %} class="active"{% endif %}>
+        <a href="/suggest/apiwrite/review">
+            <span class="badge pull-right">{{suggestions.apiwrite}}</span>
+            Trusted API Requests
+        </a>
+    </li>
+    {% endif %}
+</ul>

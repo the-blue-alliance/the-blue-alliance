@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance - Request Write Keys{% endblock %}
+
+{% block meta_description %}Request auth tokens to import your offseason event to The Blue Alliance{% endblock %}
+
+{% block content %}
+    <div class="container">
+        {% if status %}
+            <div class="row">
+                <div class="col-xs-12 col-lg-8 col-lg-offset-2">
+                    {% if status == 'success' %}
+                        <div class="alert alert-success">
+                            <button type="button" class="close"
+                                    data-dismiss="alert">&times;</button>
+                            <h4>Thanks!</h4>
+
+                            <p>We'll review your request and let you know soon!</p>
+                        </div>
+                    {% elif status == 'bad_event' %}
+                        <div class="alert alert-danger">
+                            <button type="button" class="close"
+                                    data-dismiss="alert">&times;</button>
+                            <h4>Uh Oh!</h4>
+
+                            <p>You can only request write tokens for offseason events that are
+                            already on The Blue Alliance. If you can't find your event, be sure
+                            to <a href="/suggest/offseason">suggest it</a>.</p>
+                        </div>
+                    {% elif status == 'no_affiliation' %}
+                        <div class="alert alert-danger">
+                            <button type="button" class="close"
+                                    data-dismiss="alert">&times;</button>
+                            <h4>Uh Oh!</h4>
+
+                            <p>Please specify your affiliation with the event.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+        <div class="row">
+            <div class="col-xs-12 col-lg-8 col-lg-offset-2">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h1 class="panel-title">Add data for your offseason event!</h1>
+                    </div>
+                    <div class="panel-body">
+                        <p>Thanks for helping make The Blue Alliance better! Let us know if you're
+                            willing to import data for an offseason event you run! These auth keys
+                            allow you to import data via the <a href="/eventwizard">TBA Event
+                            Wizard</a> as well as the
+                            <a href="https://github.com/Team254/cheesy-arena">Cheesy Arena FMS</a></p>
+                        <ul>
+                            <li>Your request will be reviewed by a moderator</li>
+                            <li>After review, we will send you an email at the address associated
+                                with your TBA account, <strong>{{ user_bundle.user.email() }}</strong>.
+                                You can also find auth tokens associated with your account on your
+                                <a href="/account">account overview</a>. You can also
+                                <a href="{{ user_bundle.logout_url }}">log in as a different
+                                    user</a> if this is not correct.</li>
+                            <li>You can only request tokens for offseason events, please
+                                <a href="/contact">contact us</a> you find errors with official
+                                regional and district events on the site.
+                            </li>
+                            <li>If your event is not yet listed on The Blue Alliance, <a
+                                    href="/suggest/offseason">make a suggestion</a>!</li>
+                            <li>You must be part of the team that runs an event or a scoring table
+                                volunteer in order to get write keys.</li>
+                        </ul>
+                        <h3>Request Write Tokens</h3>
+                        <p>All fields below are required, please do the best you can to fill them accurately </p>
+
+                        <form action="/request/apiwrite" method="post" id="suggest_apiwrite">
+                            <table class="table table-striped table-hover table-condensed">
+                                <tr>
+                                    <td>Event Key</td>
+                                    <td>
+                                        <input class="form-control" type="text" name="event_key"  placeholder="2016ctsc"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Your Affiliation with Event</td>
+                                    <td>
+                                        <input class="form-control" type="text" name="role"  placeholder="What will you be doing?"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Auth Types Requested</td>
+                                    <td>
+                                        {% for type,name in auth_types.iteritems() %}
+                                            <input type="checkbox" name="auth_types" value="{{ type }}"/> {{ name }} <br/>
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                            </table>
+                            <button class="btn btn-success" type="submit"><span class="glyphicon glyphicon-plus-sign"></span> Request Tokens </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

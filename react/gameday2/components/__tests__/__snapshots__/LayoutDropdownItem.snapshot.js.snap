@@ -1,9 +1,0 @@
-exports[`LayoutDropdownItem snapshot renders correctly 1`] = `
-<li
-  onClick={[Function bound handleClick]}>
-  <a
-    href="#">
-    Test Item
-  </a>
-</li>
-`;

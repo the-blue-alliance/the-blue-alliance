@@ -1,6 +1,8 @@
 {% macro match_time_td(match, compact=False) %}
-<td{% if compact %} rowspan="2"{% endif %}>
-  {% if match.time %}<time class="tba-match-time-utc" datetime="{{match.time.isoformat()}}+00:00">{{match.time|strftime("%a %I:%M%p UTC")}}</time>{% else %}--{% endif %}
+<td colspan="2"{% if compact %} rowspan="2"{% endif %}>
+  {% if match.predicted_time %}<span title="Scheduled at {{match.time|strftime("%a %I:%M%p UTC")}}"><i><time class="tba-match-time-utc" datetime="{{match.predicted_time.isoformat()}}+00:00">{{match.predicted_time|strftime("%a %I:%M%p UTC")}}</time>*</i></span>
+  {% elif match.time%}<time class="tba-match-time-utc" datetime="{{match.time.isoformat()}}+00:00">{{match.time|strftime("%a %I:%M%p UTC")}}</time>
+  {% else %}--{% endif %}
 </td>
 {% endmacro %}
 
@@ -12,7 +14,7 @@
 {% endmacro %}
 
 
-{% macro match_name_td(match, compact=False, fake_matches=False) %}
+{% macro match_name_td(match, show_event=False, compact=False, fake_matches=False) %}
 <td{% if compact %} rowspan="2"{% endif %}>
   <div class="match-name-container">
     <div class="favorite-match-icon favorite-match-icon-{{match.key.id()}}">
@@ -20,6 +22,9 @@
         <span class="glyphicon glyphicon-star" rel="tooltip" title="A Favorited team is in this match!"></span>
     </div>
     <div class="match-name">
+      {% if show_event %}
+      [{{match.event.id()[4:].upper()}}]
+      {% endif %}
       {% if fake_matches %}
       {{match.verbose_name}}
       {% else %}
@@ -57,7 +62,7 @@
   {% if fake_matches %}
   {{ team_key|strip_frc }}
   {% else %}
-  <a href="/team/{{team_key|digits}}/{{match.year}}">{{ team_key|strip_frc }}</a>
+  <a href="/team/{{team_key|digits}}/{{match.year}}"{% if team_key in match.alliances.get(alliance_color).surrogates %} class="surrogate" rel="tooltip" title="Team {{team_key|strip_frc}} is playing as a surrogate."{% endif %}>{{ team_key|strip_frc }}</a>
   {% endif %}
 </td>
 {% endmacro %}
@@ -65,14 +70,18 @@
 
 {% macro match_score_td(match, alliance_color, cur_team_key, compact=False, force_played=False, predictions=None) %}
 <td{% if compact %} colspan="2"{% endif %} class="{{alliance_color}}Score{% if cur_team_key and cur_team_key in match.alliances.get(alliance_color).teams %} current-team{% endif %}">
-  {% if match.year == 2016 and match.score_breakdown and not predictions %}
-    {% if "teleopDefensesBreached" in match.score_breakdown.get(alliance_color) and match.score_breakdown.get(alliance_color).teleopDefensesBreached %}
-    <svg class="top-left-dot" rel="tooltip" title="Defenses Breached">
+  {% if match.score_breakdown and not predictions %}
+    {% if match.score_breakdown.get(alliance_color).teleopDefensesBreached
+      or match.score_breakdown.get(alliance_color).kPaRankingPointAchieved
+      or match.score_breakdown.get(alliance_color).kPaBonusPoints %}
+    <svg class="top-left-dot" rel="tooltip" title="{% if match.year == 2016 %}Defenses Breached{% elif match.year == 2017 %}Pressure Reached{% endif %}">
       <circle cx="2" cy="2" r="2"/>
     </svg>
     {% endif %}
-    {% if "teleopTowerCaptured" in match.score_breakdown.get(alliance_color) and match.score_breakdown.get(alliance_color).teleopTowerCaptured %}
-    <svg class="top-left-dot-2" rel="tooltip" title="Tower Captured">
+    {% if match.score_breakdown.get(alliance_color).teleopTowerCaptured
+      or match.score_breakdown.get(alliance_color).rotorRankingPointAchieved
+      or match.score_breakdown.get(alliance_color).rotorBonusPoints %}
+    <svg class="top-left-dot-2" rel="tooltip" title="{% if match.year == 2016 %}Tower Captured{% elif match.year == 2017 %}All Rotors Engaged{% endif %}">
       <circle cx="2" cy="2" r="2"/>
     </svg>
     {% endif %}
@@ -84,7 +93,7 @@
 
 {% macro breach_prob_td(match, alliance_color, predictions) %}
 <td class="{{alliance_color}}">
-  {% if match.has_been_played and match.score_breakdown %}
+  {% if match.year == 2016 and match.has_been_played and match.score_breakdown %}
     {% if "teleopDefensesBreached" in match.score_breakdown.get(alliance_color) and
     match.score_breakdown.get(alliance_color).teleopDefensesBreached and
     "teleopTowerCaptured" in match.score_breakdown.get(alliance_color) and
@@ -95,25 +104,38 @@
       {% elif "teleopTowerCaptured" in match.score_breakdown.get(alliance_color) and match.score_breakdown.get(alliance_color).teleopTowerCaptured %}C
       {% else %}--{% endif %}
     {% endif %}
+  {% elif match.year == 2017 and match.has_been_played and match.score_breakdown %}
+    {% if (match.score_breakdown.get(alliance_color).get('kPaRankingPointAchieved') or match.score_breakdown.get(alliance_color).get('kPaBonusPoints')) and (match.score_breakdown.get(alliance_color).get('rotorRankingPointAchieved') or match.score_breakdown.get(alliance_color).get('rotorBonusPoints')) %}
+    P / R
+    {% else %}
+      {% if match.score_breakdown.get(alliance_color).get('kPaRankingPointAchieved') or match.score_breakdown.get(alliance_color).get('kPaBonusPoints') %}P
+      {% elif match.score_breakdown.get(alliance_color).get('rotorRankingPointAchieved') or match.score_breakdown.get(alliance_color).get('rotorBonusPoints') %}R
+      {% else %}--{% endif %}
+    {% endif %}
   {% else %}
     ?
   {% endif %}
-  <br><em>{{predictions.get(match.key.id()).get(alliance_color).prob_breach|round|int}}% / {{predictions.get(match.key.id()).get(alliance_color).prob_capture|round|int}}%</em>
+  <br>
+  {% if match.year == 2016 %}
+  <em>{{(predictions.get(match.key.id()).get(alliance_color).prob_breach)|limit_prob}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_capture)|limit_prob}}%</em>
+  {% elif match.year == 2017 %}
+  <em>{{(predictions.get(match.key.id()).get(alliance_color).prob_pressure)|limit_prob}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_gears)|limit_prob}}%</em>
+  {% endif %}
 </td>
 {% endmacro %}
 
-{% macro prob_td(match, predictions, compact=False) %}
-<td{% if compact %} rowspan="2"{% endif %}>
+{% macro prob_td(match, predictions) %}
+<td rowspan="2">
   <div class="progress" style="margin: 0px;">
-    <div class="progress-bar {% if predictions.get(match.key.id()).prob < 65 %}progress-bar-danger{% elif predictions.get(match.key.id()).prob < 80 %}progress-bar-warning{% else %}progress-bar-success{% endif %}" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{predictions.get(match.key.id()).prob|round|int}}%;">
-      {{predictions.get(match.key.id()).prob|round|int}}%
+    <div class="progress-bar {% if predictions.get(match.key.id()).prob < 0.65 %}progress-bar-danger{% elif predictions.get(match.key.id()).prob < 0.80 %}progress-bar-warning{% else %}progress-bar-success{% endif %}" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{(predictions.get(match.key.id()).prob)|limit_prob}}%;">
+      {{(predictions.get(match.key.id()).prob)|limit_prob}}%
     </div>
   </div>
 </td>
 {% endmacro %}
 
-{% macro correct_prediction_td(match, predictions, compact=False) %}
-<td{% if compact %} rowspan="2"{% endif %}>
+{% macro correct_prediction_td(match, predictions) %}
+<td rowspan="2">
   {% if match.has_been_played %}
     {% if match.winning_alliance == predictions.get(match.key.id()).winning_alliance %}<span class="glyphicon glyphicon-ok"></span>{% endif %}
   {% else %}

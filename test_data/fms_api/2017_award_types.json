@@ -1,0 +1,614 @@
+[
+    {
+        "awardId": 251,
+        "eventType": "DistrictChampionship",
+        "description": "Highest Rookie Seed",
+        "forPerson": false
+    },
+    {
+        "awardId": 645,
+        "eventType": "DistrictEvent",
+        "description": "Team Spirit Award sponsored by FCA Foundation",
+        "forPerson": false
+    },
+    {
+        "awardId": 637,
+        "eventType": "DistrictChampionship",
+        "description": "District Championship Rookie All Star Award",
+        "forPerson": false
+    },
+    {
+        "awardId": 633,
+        "eventType": "DistrictEvent",
+        "description": "District Engineering Inspiration Award",
+        "forPerson": false
+    },
+    {
+        "awardId": 417,
+        "eventType": "DistrictEvent",
+        "description": "Rookie All Star Award",
+        "forPerson": false
+    },
+    {
+        "awardId": 233,
+        "eventType": "Regional",
+        "description": "FIRST Dean's List Finalist Award",
+        "forPerson": true
+    },
+    {
+        "awardId": 329,
+        "eventType": "DistrictChampionshipDivision",
+        "description": "Judges' Award",
+        "forPerson": false
+    },
+    {
+        "awardId": 647,
+        "eventType": "DistrictChampionship",
+        "description": "Quality Award sponsored by Motorola Solutions Foundation",
+        "forPerson": false
+    },
+    {
+        "awardId": 277,
+        "eventType": "DistrictChampionshipDivision",
+        "description": "Imagery Award in honor of Jack Kamen",
+        "forPerson": false
+    },
+    {
+        "awardId": 209,
+        "eventType": "DistrictChampionshipDivision",
+        "description": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+        "forPerson": false
+    },
+    {
+        "awardId": 625,
+        "eventType": "DistrictChampionship",
+        "description": "District Championship Winner",
+        "forPerson": false
+    },
+    {
+        "awardId": 657,
+        "eventType": "Regional",
+        "description": "Safety Award sponsored by Underwriters Laboratories",
+        "forPerson": false
+    },
+    {
+        "awardId": 645,
+        "eventType": "ChampionshipDivision",
+        "description": "Team Spirit Award sponsored by FCA Foundation",
+        "forPerson": false
+    },
+    {
+        "awardId": 209,
+        "eventType": "ChampionshipDivision",
+        "description": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+        "forPerson": false
+    },
+    {
+        "awardId": 609,
+        "eventType": "DistrictEvent",
+        "description": "District Event Winner",
+        "forPerson": false
+    },
+    {
+        "awardId": 233,
+        "eventType": "DistrictChampionship",
+        "description": "FIRST Dean's List Finalist Award",
+        "forPerson": true
+    },
+    {
+        "awardId": 207,
+        "eventType": "ChampionshipDivision",
+        "description": "Engineering Inspiration Award",
+        "forPerson": false
+    },
+    {
+        "awardId": 647,
+        "eventType": "ChampionshipDivision",
+        "description": "Quality Award sponsored by Motorola Solutions Foundation",
+        "forPerson": false
+    },
+    {
+        "awardId": 643,
+        "eventType": "DistrictChampionshipDivision",
+        "description": "Rookie Inspiration Award sponsored by National Instruments",
+        "forPerson": false
+    },
+    {
+        "awardId": 209,
+        "eventType": "DistrictEvent",
+        "description": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+        "forPerson": false
+    },
+    {
+        "awardId": 621,
+        "eventType": "DistrictChampionshipDivision",
+        "description": "Excellence in Engineering Award sponsored by Delphi",
+        "forPerson": false
+    },
+    {
+        "awardId": 581,
+        "eventType": "DistrictEvent",
+        "description": "District Chairman's Award",
+        "forPerson": false
+    },
+    {
+        "awardId": 647,
+        "eventType": "Regional",
+        "description": "Quality Award sponsored by Motorola Solutions Foundation",
+        "forPerson": false
+    },
+    {
+        "awardId": 625,
+        "eventType": "DistrictChampionshipDivision",
+        "description": "District Championship Winner",
+        "forPerson": false
+    },
+    {
+        "awardId": 245,
+        "eventType": "ChampionshipDivision",
+        "description": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+        "forPerson": false
+    },
+    {
+        "awardId": 151,
+        "eventType": "ChampionshipDivision",
+        "description": "Creativity Award sponsored by Xerox",
+        "forPerson": false
+    },
+    {
+        "awardId": 621,
+        "eventType": "ChampionshipDivision",
+        "description": "Excellence in Engineering Award sponsored by Delphi",
+        "forPerson": false
+    },
+    {
+        "awardId": 73,
+        "eventType": "Championship",
+        "description": "Chairman's Award",
+        "forPerson": false
+    },
+    {
+        "awardId": 649,
+        "eventType": "Regional",
+        "description": "Wildcard",
+        "forPerson": false
+    },
+    {
+        "awardId": 251,
+        "eventType": "Regional",
+        "description": "Highest Rookie Seed",
+        "forPerson": false
+    },
+    {
+        "awardId": 329,
+        "eventType": "DistrictChampionship",
+        "description": "Judges' Award",
+        "forPerson": false
+    },
+    {
+        "awardId": 631,
+        "eventType": "ChampionshipSubdivision",
+        "description": "Championship Subdivision Finalist",
+        "forPerson": false
+    },
+    {
+        "awardId": 639,
+        "eventType": "Championship",
+        "description": "Make It Loud Award",
+        "forPerson": true
+    },
+    {
+        "awardId": 655,
+        "eventType": "ChampionshipDivision",
+        "description": "Championship Division Highest Rookie Seed",
+        "forPerson": false
+    },
+    {
+        "awardId": 635,
+        "eventType": "DistrictChampionship",
+        "description": "Regional Engineering Inspiration Award",
+        "forPerson": false
+    },
+    {
+        "awardId": 277,
+        "eventType": "Regional",
+        "description": "Imagery Award in honor of Jack Kamen",
+        "forPerson": false
+    },
+    {
+        "awardId": 245,
+        "eventType": "Regional",
+        "description": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+        "forPerson": false
+    },
+    {
+        "awardId": 295,
+        "eventType": "DistrictEvent",
+        "description": "Innovation in Control Award sponsored by Rockwell Automation",
+        "forPerson": false
+    },
+    {
+        "awardId": 417,
+        "eventType": "ChampionshipDivision",
+        "description": "Rookie All Star Award",
+        "forPerson": false
+    },
+    {
+        "awardId": 657,
+        "eventType": "DistrictChampionship",
+        "description": "Safety Award sponsored by Underwriters Laboratories",
+        "forPerson": false
+    },
+    {
+        "awardId": 251,
+        "eventType": "DistrictChampionshipDivision",
+        "description": "Highest Rookie Seed",
+        "forPerson": false
+    },
+    {
+        "awardId": 295,
+        "eventType": "DistrictChampionship",
+        "description": "Innovation in Control Award sponsored by Rockwell Automation",
+        "forPerson": false
+    },
+    {
+        "awardId": 647,
+        "eventType": "DistrictChampionshipDivision",
+        "description": "Quality Award sponsored by Motorola Solutions Foundation",
+        "forPerson": false
+    },
+    {
+        "awardId": 417,
+        "eventType": "Regional",
+        "description": "Rookie All Star Award",
+        "forPerson": false
+    },
+    {
+        "awardId": 151,
+        "eventType": "DistrictChampionshipDivision",
+        "description": "Creativity Award sponsored by Xerox",
+        "forPerson": false
+    },
+    {
+        "awardId": 455,
+        "eventType": "DistrictChampionship",
+        "description": "Woodie Flowers Finalist Award",
+        "forPerson": true
+    },
+    {
+        "awardId": 151,
+        "eventType": "DistrictChampionship",
+        "description": "Creativity Award sponsored by Xerox",
+        "forPerson": false
+    },
+    {
+        "awardId": 289,
+        "eventType": "ChampionshipDivision",
+        "description": "Industrial Design Award sponsored by General Motors",
+        "forPerson": false
+    },
+    {
+        "awardId": 659,
+        "eventType": "Championship",
+        "description": "Chairman's Award Finalist",
+        "forPerson": false
+    },
+    {
+        "awardId": 295,
+        "eventType": "ChampionshipDivision",
+        "description": "Innovation in Control Award sponsored by Rockwell Automation",
+        "forPerson": false
+    },
+    {
+        "awardId": 621,
+        "eventType": "DistrictChampionship",
+        "description": "Excellence in Engineering Award sponsored by Delphi",
+        "forPerson": false
+    },
+    {
+        "awardId": 559,
+        "eventType": "Championship",
+        "description": "Founder's Award",
+        "forPerson": true
+    },
+    {
+        "awardId": 289,
+        "eventType": "Regional",
+        "description": "Industrial Design Award sponsored by General Motors",
+        "forPerson": false
+    },
+    {
+        "awardId": 151,
+        "eventType": "DistrictEvent",
+        "description": "Creativity Award sponsored by Xerox",
+        "forPerson": false
+    },
+    {
+        "awardId": 645,
+        "eventType": "DistrictChampionshipDivision",
+        "description": "Team Spirit Award sponsored by FCA Foundation",
+        "forPerson": false
+    },
+    {
+        "awardId": 627,
+        "eventType": "DistrictChampionshipDivision",
+        "description": "District Championship Finalist",
+        "forPerson": false
+    },
+    {
+        "awardId": 621,
+        "eventType": "Regional",
+        "description": "Excellence in Engineering Award sponsored by Delphi",
+        "forPerson": false
+    },
+    {
+        "awardId": 289,
+        "eventType": "DistrictChampionshipDivision",
+        "description": "Industrial Design Award sponsored by General Motors",
+        "forPerson": false
+    },
+    {
+        "awardId": 209,
+        "eventType": "DistrictChampionship",
+        "description": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+        "forPerson": false
+    },
+    {
+        "awardId": 277,
+        "eventType": "DistrictEvent",
+        "description": "Imagery Award in honor of Jack Kamen",
+        "forPerson": false
+    },
+    {
+        "awardId": 397,
+        "eventType": "Regional",
+        "description": "Regional Chairman's Award",
+        "forPerson": false
+    },
+    {
+        "awardId": 277,
+        "eventType": "DistrictChampionship",
+        "description": "Imagery Award in honor of Jack Kamen",
+        "forPerson": false
+    },
+    {
+        "awardId": 627,
+        "eventType": "DistrictChampionship",
+        "description": "District Championship Finalist",
+        "forPerson": false
+    },
+    {
+        "awardId": 209,
+        "eventType": "Regional",
+        "description": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+        "forPerson": false
+    },
+    {
+        "awardId": 329,
+        "eventType": "Regional",
+        "description": "Judges' Award",
+        "forPerson": false
+    },
+    {
+        "awardId": 251,
+        "eventType": "DistrictEvent",
+        "description": "Highest Rookie Seed",
+        "forPerson": false
+    },
+    {
+        "awardId": 657,
+        "eventType": "DistrictEvent",
+        "description": "Safety Award sponsored by Underwriters Laboratories",
+        "forPerson": false
+    },
+    {
+        "awardId": 643,
+        "eventType": "ChampionshipDivision",
+        "description": "Rookie Inspiration Award sponsored by National Instruments",
+        "forPerson": false
+    },
+    {
+        "awardId": 561,
+        "eventType": "DistrictChampionship",
+        "description": "Volunteer of the Year",
+        "forPerson": true
+    },
+    {
+        "awardId": 403,
+        "eventType": "Regional",
+        "description": "Regional Finalists",
+        "forPerson": false
+    },
+    {
+        "awardId": 135,
+        "eventType": "Championship",
+        "description": "Championship Finalist",
+        "forPerson": false
+    },
+    {
+        "awardId": 295,
+        "eventType": "DistrictChampionshipDivision",
+        "description": "Innovation in Control Award sponsored by Rockwell Automation",
+        "forPerson": false
+    },
+    {
+        "awardId": 235,
+        "eventType": "Championship",
+        "description": "FIRST Dean's List Award",
+        "forPerson": true
+    },
+    {
+        "awardId": 245,
+        "eventType": "DistrictChampionship",
+        "description": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+        "forPerson": false
+    },
+    {
+        "awardId": 277,
+        "eventType": "ChampionshipDivision",
+        "description": "Imagery Award in honor of Jack Kamen",
+        "forPerson": false
+    },
+    {
+        "awardId": 329,
+        "eventType": "DistrictEvent",
+        "description": "Judges' Award",
+        "forPerson": false
+    },
+    {
+        "awardId": 137,
+        "eventType": "Championship",
+        "description": "Championship Winner",
+        "forPerson": false
+    },
+    {
+        "awardId": 643,
+        "eventType": "DistrictChampionship",
+        "description": "Rookie Inspiration Award sponsored by National Instruments",
+        "forPerson": false
+    },
+    {
+        "awardId": 245,
+        "eventType": "DistrictEvent",
+        "description": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+        "forPerson": false
+    },
+    {
+        "awardId": 455,
+        "eventType": "Regional",
+        "description": "Woodie Flowers Finalist Award",
+        "forPerson": true
+    },
+    {
+        "awardId": 561,
+        "eventType": "Regional",
+        "description": "Volunteer of the Year",
+        "forPerson": true
+    },
+    {
+        "awardId": 645,
+        "eventType": "DistrictChampionship",
+        "description": "Team Spirit Award sponsored by FCA Foundation",
+        "forPerson": false
+    },
+    {
+        "awardId": 629,
+        "eventType": "ChampionshipSubdivision",
+        "description": "Championship Subdivision Winner",
+        "forPerson": false
+    },
+    {
+        "awardId": 295,
+        "eventType": "Regional",
+        "description": "Innovation in Control Award sponsored by Rockwell Automation",
+        "forPerson": false
+    },
+    {
+        "awardId": 635,
+        "eventType": "Regional",
+        "description": "Regional Engineering Inspiration Award",
+        "forPerson": false
+    },
+    {
+        "awardId": 645,
+        "eventType": "Regional",
+        "description": "Team Spirit Award sponsored by FCA Foundation",
+        "forPerson": false
+    },
+    {
+        "awardId": 621,
+        "eventType": "DistrictEvent",
+        "description": "Excellence in Engineering Award sponsored by Delphi",
+        "forPerson": false
+    },
+    {
+        "awardId": 151,
+        "eventType": "Regional",
+        "description": "Creativity Award sponsored by Xerox",
+        "forPerson": false
+    },
+    {
+        "awardId": 643,
+        "eventType": "DistrictEvent",
+        "description": "Rookie Inspiration Award sponsored by National Instruments",
+        "forPerson": false
+    },
+    {
+        "awardId": 329,
+        "eventType": "ChampionshipDivision",
+        "description": "Judges' Award",
+        "forPerson": false
+    },
+    {
+        "awardId": 407,
+        "eventType": "Regional",
+        "description": "Regional Winners",
+        "forPerson": false
+    },
+    {
+        "awardId": 647,
+        "eventType": "DistrictEvent",
+        "description": "Quality Award sponsored by Motorola Solutions Foundation",
+        "forPerson": false
+    },
+    {
+        "awardId": 643,
+        "eventType": "Regional",
+        "description": "Rookie Inspiration Award sponsored by National Instruments",
+        "forPerson": false
+    },
+    {
+        "awardId": 611,
+        "eventType": "DistrictEvent",
+        "description": "District Event Finalist",
+        "forPerson": false
+    },
+    {
+        "awardId": 561,
+        "eventType": "Championship",
+        "description": "Volunteer of the Year",
+        "forPerson": true
+    },
+    {
+        "awardId": 657,
+        "eventType": "ChampionshipDivision",
+        "description": "Safety Award sponsored by Underwriters Laboratories",
+        "forPerson": false
+    },
+    {
+        "awardId": 289,
+        "eventType": "DistrictChampionship",
+        "description": "Industrial Design Award sponsored by General Motors",
+        "forPerson": false
+    },
+    {
+        "awardId": 245,
+        "eventType": "DistrictChampionshipDivision",
+        "description": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+        "forPerson": false
+    },
+    {
+        "awardId": 289,
+        "eventType": "DistrictEvent",
+        "description": "Industrial Design Award sponsored by General Motors",
+        "forPerson": false
+    },
+    {
+        "awardId": 657,
+        "eventType": "DistrictChampionshipDivision",
+        "description": "Safety Award sponsored by Underwriters Laboratories",
+        "forPerson": false
+    },
+    {
+        "awardId": 397,
+        "eventType": "DistrictChampionship",
+        "description": "Regional Chairman's Award",
+        "forPerson": false
+    },
+    {
+        "awardId": 453,
+        "eventType": "Championship",
+        "description": "Woodie Flowers Award",
+        "forPerson": true
+    }
+]

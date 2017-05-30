@@ -3,13 +3,14 @@ import logging
 import random
 import string
 import os
+from datetime import datetime
 
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from consts.auth_type import AuthType
 from controllers.base_controller import LoggedInHandler
-
+from models.account import Account
 from models.api_auth_access import ApiAuthAccess
 from models.event import Event
 
@@ -95,10 +96,23 @@ class AdminApiAuthEdit(LoggedInHandler):
         if self.request.get('allow_edit_match_video'):
             auth_types_enum.append(AuthType.MATCH_VIDEO)
 
+        if self.request.get('owner', None):
+            owner = Account.query(Account.email == self.request.get('owner')).fetch()
+            owner_key = owner[0].key if owner else None
+        else:
+            owner_key = None
+
+        if self.request.get('expiration', None):
+            expiration = datetime.strptime(self.request.get('expiration'), '%Y-%m-%d')
+        else:
+            expiration = None
+
         if not auth:
             auth = ApiAuthAccess(
                 id=auth_id,
                 description=self.request.get('description'),
+                owner=owner_key,
+                expiration=expiration,
                 secret=''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _ in range(64)),
                 event_list=[ndb.Key(Event, event_key.strip()) for event_key in self.request.get('event_list_str').split(',')],
                 auth_types_enum=auth_types_enum,
@@ -107,6 +121,8 @@ class AdminApiAuthEdit(LoggedInHandler):
             auth.description = self.request.get('description')
             auth.event_list = event_list=[ndb.Key(Event, event_key.strip()) for event_key in self.request.get('event_list_str').split(',')]
             auth.auth_types_enum = auth_types_enum
+            auth.owner = owner_key
+            auth.expiration = expiration
 
         auth.put()
 
@@ -120,10 +136,13 @@ class AdminApiAuthManage(LoggedInHandler):
     def get(self):
         self._require_admin()
 
-        auths = ApiAuthAccess.query().fetch(None)
+        auths = ApiAuthAccess.query().fetch()
+        write_auths = filter(lambda auth: auth.is_write_key, auths)
+        read_auths = filter(lambda auth: auth.is_read_key, auths)
 
         self.template_values.update({
-            'auths': auths,
+            'write_auths': write_auths,
+            'read_auths': read_auths,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/api_manage_auth.html')

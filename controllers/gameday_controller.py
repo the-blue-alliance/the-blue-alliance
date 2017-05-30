@@ -19,12 +19,12 @@ from helpers.event_helper import EventHelper
 
 
 class Gameday2Controller(CacheableHandler):
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "main_gameday2"
 
     def __init__(self, *args, **kw):
         super(Gameday2Controller, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24 * 7
+        self._cache_expiration = 61
 
     def _render(self, *args, **kw):
         special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
@@ -40,19 +40,8 @@ class Gameday2Controller(CacheableHandler):
                 toAppend[str(key)] = str(value)
             special_webcasts.append(toAppend)
 
-        ongoing_events = []
-        ongoing_events_w_webcasts = []
-        week_events = EventHelper.getWeekEvents()
-        for event in week_events:
-            if event.now:
-                ongoing_events.append(ModelToDict.eventConverter(event))
-                if event.webcast:
-                    ongoing_events_w_webcasts.append(ModelToDict.eventConverter(event))
-
         webcasts_json = {
             'special_webcasts': special_webcasts,
-            'ongoing_events': ongoing_events,
-            'ongoing_events_w_webcasts': ongoing_events_w_webcasts
         }
 
         self.template_values.update({
@@ -131,7 +120,7 @@ class GamedayRedirectHandler(webapp2.RequestHandler):
         # Allow an alias to be an event key
         if not ValidationHelper.event_id_validator(alias):
             event = Event.get_by_id(alias)
-            if event and event.webcast and event.within_a_day:
+            if event and event.within_a_day:
                 params = self.get_param_string_for_event(event)
                 self.redirect("/gameday{}".format(params))
                 return
@@ -143,7 +132,7 @@ class GamedayRedirectHandler(webapp2.RequestHandler):
             team_events_future = TeamYearEventsQuery(team_key, now.year).fetch_async()
             team_events = team_events_future.get_result()
             for event in team_events:
-                if event and event.webcast and event.within_a_day:
+                if event and event.within_a_day:
                     params = self.get_param_string_for_event(event)
                     self.redirect("/gameday{}".format(params))
                     return
@@ -153,12 +142,14 @@ class GamedayRedirectHandler(webapp2.RequestHandler):
 
     @staticmethod
     def get_param_string_for_event(event):
-        count = len(event.webcast)
+        current_webcasts = event.current_webcasts
+        count = len(current_webcasts)
         if count == 0:
             return ""
-        layout = count - 1 if count < 5 else 5  # Fall back to hex-view
+        layout = count - 1 if count < 5 else 6  # Fall back to hex-view
         params = "#layout={}".format(layout)
-        for i, webcast in enumerate(event.webcast):
-            params += "&view_{}={}-{}".format(i, webcast['key_name'], i+1)
+        for i, webcast in enumerate(current_webcasts):
+            # The various streams for an event are 0-indexed in GD2
+            params += "&view_{0}={1}-{0}".format(i, event.key.id())
 
         return params

@@ -5,7 +5,6 @@ from notifications.base_notification import BaseNotification
 class BroadcastNotification(BaseNotification):
 
     _track_call = False
-    _push_firebase = False
 
     def __init__(self, title, message, url, app_version=''):
         self.title = title

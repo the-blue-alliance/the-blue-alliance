@@ -10,6 +10,7 @@ from webapp2_extras.routes import RedirectRoute
 from consts.district_type import DistrictType
 from consts.event_type import EventType
 from controllers.event_controller import EventDetail, EventInsights, EventList
+from models.district import District
 from models.event import Event
 from models.event_details import EventDetails
 
@@ -31,11 +32,19 @@ class TestEventController(unittest2.TestCase):
         ])
         self.testapp = webtest.TestApp(app)
 
+        self.district = District(
+            id='2016ne',
+            abbreviation='ne',
+            year=2016,
+            display_name='New England'
+        )
+        self.district.put()
+
         self.event1 = Event(
                 id="2016necmp",
                 name="New England District Championship",
                 event_type_enum=EventType.DISTRICT_CMP,
-                event_district_enum=DistrictType.NEW_ENGLAND,
+                district_key=ndb.Key(District, '2016ne'),
                 short_name="New England",
                 event_short="necmp",
                 year=2016,
@@ -51,12 +60,15 @@ class TestEventController(unittest2.TestCase):
                 webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
                 website="http://www.firstsv.org",
         )
+        self.event1.put()
+
+        # To test that /events defaults to current year
         this_year = datetime.now().year
         self.event2 = Event(
-                id="2016necmp",
+                id="{}necmp".format(this_year),
                 name="New England District Championship",
                 event_type_enum=EventType.DISTRICT_CMP,
-                event_district_enum=DistrictType.NEW_ENGLAND,
+                district_key=ndb.Key(District, '2016ne'),
                 short_name="New England",
                 event_short="necmp",
                 year=this_year,
@@ -72,18 +84,17 @@ class TestEventController(unittest2.TestCase):
                 webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
                 website="http://www.firstsv.org",
         )
-        self.event1.put()
         self.event2.put()
 
         self.event1_details = EventDetails(
             id=self.event1.key.id(),
-            predictions={"ranking_prediction_stats": None, "match_predictions": None, "ranking_predictions": None, "match_prediction_stats": None}
+            predictions={"ranking_prediction_stats": {'qual': None, 'playoff': None}, "match_predictions": {'qual': None, 'playoff': None}, "ranking_predictions": None, "match_prediction_stats": {'qual': None, 'playoff': None}}
         )
         self.event1_details.put()
 
         self.event2_details = EventDetails(
             id=self.event2.key.id(),
-            predictions={"ranking_prediction_stats": None, "match_predictions": None, "ranking_predictions": None, "match_prediction_stats": None}
+            predictions={"ranking_prediction_stats": {'qual': None, 'playoff': None}, "match_predictions": {'qual': None, 'playoff': None}, "ranking_predictions": None, "match_prediction_stats": {'qual': None, 'playoff': None}}
         )
         self.event2_details.put()
 

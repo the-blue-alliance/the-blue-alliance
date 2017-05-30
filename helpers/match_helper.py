@@ -1,10 +1,14 @@
 import logging
+from collections import defaultdict
 import copy
 import datetime
+import json
 import pytz
 import re
 
 from collections import defaultdict
+from consts.event_type import EventType
+from consts.playoff_type import PlayoffType
 
 from helpers.match_manipulator import MatchManipulator
 
@@ -45,6 +49,45 @@ class MatchHelper(object):
 
             match.time = match_time - tz.utcoffset(match_time)
 
+    @classmethod
+    def add_surrogates(cls, event):
+        """
+        If a team has more scheduled matches than other teams, then the third
+        match is a surrogate.
+        Valid for 2008 and up, don't compute for offseasons.
+        """
+        if event.year < 2008 or event.event_type_enum not in EventType.SEASON_EVENT_TYPES:
+            return
+
+        qual_matches = cls.organizeMatches(event.matches)['qm']
+        if not qual_matches:
+            return
+
+        # Find surrogate teams
+        match_counts = defaultdict(int)
+        for match in qual_matches:
+            for alliance_color in ['red', 'blue']:
+                for team in match.alliances[alliance_color]['teams']:
+                    match_counts[team] += 1
+        num_matches = min(match_counts.values())
+        surrogate_teams = set()
+        for k, v in match_counts.items():
+            if v > num_matches:
+                surrogate_teams.add(k)
+
+        # Add surrogate info
+        num_played = defaultdict(int)
+        for match in qual_matches:
+            for alliance_color in ['red', 'blue']:
+                match.alliances[alliance_color]['surrogates'] = []
+                for team in match.alliances[alliance_color]['teams']:
+                    num_played[team] += 1
+                    if team in surrogate_teams and num_played[team] == 3:
+                        match.alliances[alliance_color]['surrogates'].append(team)
+            match.alliances_json = json.dumps(match.alliances)
+
+        MatchManipulator.createOrUpdate(qual_matches)
+
     """
     Helper to put matches into sub-dictionaries for the way we render match tables
     """
@@ -76,6 +119,19 @@ class MatchHelper(object):
         return matches
 
     @classmethod
+    def organizeKeys(cls, match_keys):
+        matches = dict([(comp_level, list()) for comp_level in Match.COMP_LEVELS])
+        matches["num"] = len(match_keys)
+        while len(match_keys) > 0:
+            match_key = match_keys.pop(0)
+            match_id = match_key.split("_")[1]
+            for comp_level in Match.COMP_LEVELS:
+                if match_id.startswith(comp_level):
+                    matches[comp_level].append(match_key)
+
+        return matches
+
+    @classmethod
     def recentMatches(self, matches, num=3):
         matches = filter(lambda x: x.has_been_played, matches)
         matches = self.play_order_sort_matches(matches)
@@ -100,23 +156,27 @@ class MatchHelper(object):
         return upcoming_matches
 
     @classmethod
-    def deleteInvalidMatches(self, match_list):
+    def deleteInvalidMatches(self, match_list, event):
         """
-        A match is invalid iff it is an elim match where the match number is 3
-        and the same alliance won in match numbers 1 and 2 of the same set.
+        A match is invalid iff it is an elim match that has not been played
+        and the same alliance already won in 2 match numbers in the same set.
         """
-        matches_by_key = {}
+        red_win_counts = defaultdict(int)  # key: <comp_level><set_number>
+        blue_win_counts = defaultdict(int)  # key: <comp_level><set_number>
         for match in match_list:
-            matches_by_key[match.key_name] = match
+            if match.has_been_played and match.comp_level in Match.ELIM_LEVELS:
+                key = '{}{}'.format(match.comp_level, match.set_number)
+                if match.winning_alliance == 'red':
+                    red_win_counts[key] += 1
+                elif match.winning_alliance == 'blue':
+                    blue_win_counts[key] += 1
 
         return_list = []
         for match in match_list:
-            if match.comp_level in Match.ELIM_LEVELS and match.match_number == 3 and (not match.has_been_played):
-                match_1 = matches_by_key.get(Match.renderKeyName(match.event.id(), match.comp_level, match.set_number, 1))
-                match_2 = matches_by_key.get(Match.renderKeyName(match.event.id(), match.comp_level, match.set_number, 2))
-                if match_1 is not None and match_2 is not None and\
-                    match_1.has_been_played and match_2.has_been_played and\
-                    match_1.winning_alliance == match_2.winning_alliance:
+            if match.comp_level in Match.ELIM_LEVELS and not match.has_been_played:
+                if event.playoff_type != PlayoffType.ROUND_ROBIN_6_TEAM or match.comp_level == 'f':  # Don't delete round robin semifinal matches
+                    key = '{}{}'.format(match.comp_level, match.set_number)
+                    if red_win_counts[key] == 2 or blue_win_counts[key] == 2:
                         try:
                             MatchManipulator.delete(match)
                             logging.warning("Deleting invalid match: %s" % match.key_name)
@@ -124,6 +184,7 @@ class MatchHelper(object):
                             logging.warning("Tried to delete invalid match, but failed: %s" % match.key_name)
                         continue
             return_list.append(match)
+
         return return_list
 
     @classmethod
@@ -211,6 +272,78 @@ class MatchHelper(object):
         return advancement
 
     @classmethod
+    def generatePlayoffAdvancementRoundRobin(cls, matches, alliance_selections=None):
+        complete_alliances = []
+        alliance_names = []
+        advancement = defaultdict(list)  # key: comp level; value: list of [complete_alliance, [champ_points], sum_champ_points, [match_points], sum_match_points
+        for comp_level in ['sf']:  # In case this needs to scale to more levels
+            any_unplayed = False
+            for match in matches.get(comp_level, []):
+                if not match.has_been_played:
+                    any_unplayed = True
+                for color in ['red', 'blue']:
+                    alliance = cls.getOrderedAlliance(match.alliances[color]['teams'], alliance_selections)
+                    alliance_name = cls.getAllianceName(match.alliances[color]['teams'], alliance_selections)
+                    for i, complete_alliance in enumerate(complete_alliances):  # search for alliance. could be more efficient
+                        if len(set(alliance).intersection(set(complete_alliance))) >= 2:  # if >= 2 teams are the same, then the alliance is the same
+                            backups = list(set(alliance).difference(set(complete_alliance)))
+                            complete_alliances[i] += backups  # ensures that backup robots are listed last
+                            alliance_names[i] = alliance_name
+                            break
+                    else:
+                        i = None
+                        complete_alliances.append(alliance)
+                        alliance_names.append(alliance_name)
+
+                    is_new = False
+                    if i is not None:
+                        for j, (complete_alliance, champ_points, _, match_points, _, _, record) in enumerate(advancement[comp_level]):  # search for alliance. could be more efficient
+                            if len(set(complete_alliances[i]).intersection(set(complete_alliance))) >= 2:  # if >= 2 teams are the same, then the alliance is the same
+                                if not match.has_been_played:
+                                    cp = 0
+                                elif match.winning_alliance == color:
+                                    cp = 2
+                                    record['wins'] += 1
+                                elif match.winning_alliance == '':
+                                    cp = 1
+                                    record['ties'] += 1
+                                else:
+                                    cp = 0
+                                    record['losses'] += 1
+                                if match.has_been_played:
+                                    champ_points.append(cp)
+                                    match_points.append(match.alliances[color]['score'])
+                                    advancement[comp_level][j][2] = sum(champ_points)
+                                    advancement[comp_level][j][4] = sum(match_points)
+                                break
+                        else:
+                            is_new = True
+
+                    score = match.alliances[color]['score'] if match.has_been_played else 0
+                    record = {'wins': 0, 'losses': 0, 'ties': 0}
+                    if not match.has_been_played:
+                        cp = 0
+                    elif match.winning_alliance == color:
+                        cp = 2
+                        record['wins'] += 1
+                    elif match.winning_alliance == '':
+                        cp = 1
+                        record['ties'] += 1
+                    else:
+                        cp = 0
+                        record['losses'] += 1
+                    if i is None:
+                        advancement[comp_level].append([alliance, [cp], cp, [score], score, alliance_name, record])
+                    elif is_new:
+                        advancement[comp_level].append([complete_alliances[i], [cp], cp, [score], score, alliance_names[i], record])
+
+            advancement[comp_level] = sorted(advancement[comp_level], key=lambda x: -x[4])  # sort by match points
+            advancement[comp_level] = sorted(advancement[comp_level], key=lambda x: -x[2])  # sort by championship points
+            advancement['{}_complete'.format(comp_level)] = not any_unplayed
+
+        return advancement
+
+    @classmethod
     def getOrderedAlliance(cls, team_keys, alliance_selections):
         if alliance_selections:
             for alliance_selection in alliance_selections:  # search for alliance. could be more efficient
@@ -225,6 +358,16 @@ class MatchHelper(object):
             # Strip the "frc" prefix
             team_nums.append(team[3:])
         return team_nums
+
+    @classmethod
+    def getAllianceName(cls, team_keys, alliance_selections):
+        if alliance_selections:
+            for alliance_selection in alliance_selections:  # search for alliance. could be more efficient
+                picks = alliance_selection['picks']
+                if len(set(picks).intersection(set(team_keys))) >= 2:  # if >= 2 teams are the same, then the alliance is the same
+                    return alliance_selection.get('name')
+
+        return ''
 
     """
     Valid breakdowns are those used for seeding. Varies by year.
@@ -316,6 +459,42 @@ class MatchHelper(object):
                 red_crossing = red_breakdown['autoCrossingPoints'] + red_breakdown['teleopCrossingPoints']
                 blue_crossing = blue_breakdown['autoCrossingPoints'] + blue_breakdown['teleopCrossingPoints']
                 tiebreakers.append((red_crossing, blue_crossing))
+            else:
+                tiebreakers.append(None)
+        elif match.year == 2017 and not (match.comp_level == 'f' and match.match_number <= 3):  # Finals can't be tiebroken. Only overtime
+            # Greater number of FOUL points awarded (i.e. the ALLIANCE that played the cleaner MATCH)
+            if 'foulPoints' in red_breakdown and 'foulPoints' in blue_breakdown:
+                tiebreakers.append((red_breakdown['foulPoints'], blue_breakdown['foulPoints']))
+            else:
+                tiebreakers.append(None)
+
+            # Cumulative sum of scored AUTO points
+            if 'autoPoints' in red_breakdown and 'autoPoints' in blue_breakdown:
+                tiebreakers.append((red_breakdown['autoPoints'], blue_breakdown['autoPoints']))
+            else:
+                tiebreakers.append(None)
+
+            # Cumulative ROTOR engagement score (AUTO and TELEOP)
+            if 'autoRotorPoints' in red_breakdown and 'autoRotorPoints' in blue_breakdown and \
+                    'teleopRotorPoints' in red_breakdown and 'teleopRotorPoints' in blue_breakdown:
+                red_rotor = red_breakdown['autoRotorPoints'] + red_breakdown['teleopRotorPoints']
+                blue_rotor = blue_breakdown['autoRotorPoints'] + blue_breakdown['teleopRotorPoints']
+                tiebreakers.append((red_rotor, blue_rotor))
+            else:
+                tiebreakers.append(None)
+
+            # Cumulative TOUCHPAD score
+            if 'teleopTakeoffPoints' in red_breakdown and 'teleopTakeoffPoints' in blue_breakdown:
+                tiebreakers.append((red_breakdown['teleopTakeoffPoints'], blue_breakdown['teleopTakeoffPoints']))
+            else:
+                tiebreakers.append(None)
+
+            # Total accumulated pressure
+            if 'autoFuelPoints' in red_breakdown and 'autoFuelPoints' in blue_breakdown and \
+                    'teleopFuelPoints' in red_breakdown and 'teleopFuelPoints' in blue_breakdown:
+                red_pressure = red_breakdown['autoFuelPoints'] + red_breakdown['teleopFuelPoints']
+                blue_pressure = blue_breakdown['autoFuelPoints'] + blue_breakdown['teleopFuelPoints']
+                tiebreakers.append((red_pressure, blue_pressure))
             else:
                 tiebreakers.append(None)
 

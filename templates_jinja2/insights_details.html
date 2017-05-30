@@ -7,30 +7,76 @@
 
 {% block detailed_content %}
   <h1 class="end_header">{{selected_year}} Insights</h1>
-  {% if last_updated %}<p>Last updated on <time datetime="{{render_time|rfc2822}}+00:00" class="tba-verbose-datetime-utc">{{render_time|strftime("%b. %d, %Y at %I:%M%p")}} UTC</time></p>{% endif %}
+  {% if last_updated %}<p>Last updated on <time datetime="{{last_updated|rfc2822}}+00:00" class="tba-verbose-datetime-utc">{{last_updated|strftime("%b. %d, %Y at %I:%M%p")}} UTC</time></p>{% endif %}
 
   {% if match_highscore or match_averages_by_week or score_distribution %}
   <h2>Matches{% if num_matches %} <small>{{num_matches.data}} Matches Played</small>{% endif %}</h2>
   {% endif %}
 
   {% if match_highscore %}
+  {% if match_highscore.data.qual %}
   <div class="row">
     <div class="col-xs-12">
-      <h3>Highest Scoring Match{% if match_highscore.data|length > 1 %}es{% endif %}</h3>
-      {% for match in match_highscore.data %}
-      <h4><a href="/match/{{match.key_name}}">{{ match.event_name }} <small>{{ match.verbose_name }}</small></a></h4>
-      <div class="col-xs-8 col-xs-offset-2">
-        {{mtm.single_match_table(match, force_played=True)}}
-        {% if match.tba_video %}
-          {% include "video_partials/tbavideo_player.html" %}
-        {% elif match.youtube_videos_formatted %}
-          {% set youtube_video = match.youtube_videos_formatted.0 %}
-          {% include "video_partials/youtube_video_player.html" %}
-        {% endif %}
+      <h3>Highest Scoring Qual Match{% if match_highscore.data.qual|length > 1 %}es{% endif %}{% if selected_year >= 2017 %} <small>(Penalty Free)</small>{% endif %}</h3>
+      {% for match in match_highscore.data.qual %}
+      <div class="row">
+        <div class="col-xs-12 col-md-8 col-md-offset-2">
+        <h4><a href="/match/{{match.key_name}}">{{ match.event_name }} <small>{{ match.verbose_name }}</small></a></h4>
+          {{mtm.single_match_table(match, force_played=True)}}
+          {% if match.tba_video %}
+            {% include "video_partials/tbavideo_player.html" %}
+          {% elif match.youtube_videos_formatted %}
+            {% set youtube_video = match.youtube_videos_formatted.0 %}
+            {% include "video_partials/youtube_video_player.html" %}
+          {% endif %}
+        </div>
       </div>
       {% endfor %}
     </div>
   </div>
+  {% endif %}
+  {% if match_highscore.data.playoff %}
+  <div class="row">
+    <div class="col-xs-12">
+      <h3>Highest Scoring Playoff Match{% if match_highscore.data.playoff|length > 1 %}es{% endif %}{% if selected_year >= 2017 %} <small>(Penalty Free)</small>{% endif %}</h3>
+      {% for match in match_highscore.data.playoff %}
+      <div class="row">
+        <div class="col-xs-12 col-md-8 col-md-offset-2">
+        <h4><a href="/match/{{match.key_name}}">{{ match.event_name }} <small>{{ match.verbose_name }}</small></a></h4>
+          {{mtm.single_match_table(match, force_played=True)}}
+          {% if match.tba_video %}
+            {% include "video_partials/tbavideo_player.html" %}
+          {% elif match.youtube_videos_formatted %}
+            {% set youtube_video = match.youtube_videos_formatted.0 %}
+            {% include "video_partials/youtube_video_player.html" %}
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  {% if match_highscore.data.overall %}
+  <div class="row">
+    <div class="col-xs-12">
+      <h3>Highest Scoring Match Overall{% if match_highscore.data.overall|length > 1 %}es{% endif %}</h3>
+      {% for match in match_highscore.data.overall %}
+      <div class="row">
+        <div class="col-xs-12 col-md-8 col-md-offset-2">
+        <h4><a href="/match/{{match.key_name}}">{{ match.event_name }} <small>{{ match.verbose_name }}</small></a></h4>
+          {{mtm.single_match_table(match, force_played=True)}}
+          {% if match.tba_video %}
+            {% include "video_partials/tbavideo_player.html" %}
+          {% elif match.youtube_videos_formatted %}
+            {% set youtube_video = match.youtube_videos_formatted.0 %}
+            {% include "video_partials/youtube_video_player.html" %}
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
   <!--
   <div class="row">
     <h3>Highest Scoring Matches By Week</h3>
@@ -96,7 +142,7 @@
 
   {% if year_specific_by_week or year_specific %}
   <h3>Year Specific Statistics</h3>
-  <ul class="nav nav-tabs">
+  <ul class="nav nav-tabs nav-justified">
     {% if year_specific %}
       <li class="active"><a href="#year-specific" data-toggle="tab">Year Aggregate</a></li>
     {% endif %}
@@ -219,6 +265,63 @@
       </table>
     </div>
   </div>
+  {% endif %}
+
+  {% if match_predictions %}
+  <h2>Match Predictions</h2>
+  <div class="row">
+    <div class="col-xs-12">
+      <h3>Prediction Accuracy</h3>
+      <table class="table table-striped table-condensed table-center insights-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th># Correct</th>
+            <th># Matches</th>
+            <th>% Correct</th>
+            <th>Brier Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if match_predictions.data.qual.total_matches_count %}
+          <tr>
+            <th>All Qual</th>
+            <td>{{match_predictions.data.qual.correct_matches_count}}</td>
+            <td>{{match_predictions.data.qual.total_matches_count}}</td>
+            <td>{{'%0.2f' % (100 * match_predictions.data.qual.correct_matches_count / match_predictions.data.qual.total_matches_count|float)}} %</td>
+            <td>{{'%0.5f' % (match_predictions.data.qual.mean_brier_score|float)}}</td>
+          </tr>
+          {% endif %}
+          {% if match_predictions.data.playoff.total_matches_count %}
+          <tr>
+            <th>All Playoff</th>
+            <td>{{match_predictions.data.playoff.correct_matches_count}}</td>
+            <td>{{match_predictions.data.playoff.total_matches_count}}</td>
+            <td>{{'%0.2f' % (100 * match_predictions.data.playoff.correct_matches_count / match_predictions.data.playoff.total_matches_count|float)}} %</td>
+            <td>{{'%0.5f' % (match_predictions.data.playoff.mean_brier_score|float)}}</td>
+          </tr>
+          {% endif %}
+          {% if match_predictions.data.qual.total_matches_count_cmp %}
+          <tr>
+            <th>Champs Qual</th>
+            <td>{{match_predictions.data.qual.correct_matches_count_cmp}}</td>
+            <td>{{match_predictions.data.qual.total_matches_count_cmp}}</td>
+            <td>{{'%0.2f' % (100 * match_predictions.data.qual.correct_matches_count_cmp / match_predictions.data.qual.total_matches_count_cmp|float)}} %</td>
+            <td>{{'%0.5f' % (match_predictions.data.qual.mean_brier_score_cmp|float)}}</td>
+          </tr>
+          {% endif %}
+          {% if match_predictions.data.playoff.total_matches_count_cmp %}
+          <tr>
+            <th>Champs Playoff</th>
+            <td>{{match_predictions.data.playoff.correct_matches_count_cmp}}</td>
+            <td>{{match_predictions.data.playoff.total_matches_count_cmp}}</td>
+            <td>{{'%0.2f' % (100 * match_predictions.data.playoff.correct_matches_count_cmp / match_predictions.data.playoff.total_matches_count_cmp|float)}} %</td>
+            <td>{{'%0.5f' % (match_predictions.data.playoff.mean_brier_score_cmp|float)}}</td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
   {% endif %}
 
   {% if blue_banners or regional_district_winners or match_highscore or match_averages_by_week or score_distribution %}

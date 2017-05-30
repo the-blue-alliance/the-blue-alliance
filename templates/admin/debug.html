@@ -13,16 +13,13 @@
             </div>
             <p>Hello developer! Welcome to the debug page for The Blue Alliance. This page is full of useful pointers to help you locally develop TBA.</p>
             <p>To get started, you have to set up some initial test data for your local copy of TBA. We use <a href="http://paver.github.com/paver/">paver</a> scripts in pavement.py to set up this test data in your dev environment. <a href="http://packages.python.org/distribute/easy_install.html">easy_install</a> paver if you don't have it.</p>
-            <p>Now run this on the command line in your the-blue-alliance folder:</p>
-            <pre>$ paver setup</pre>
-            <p>This test data gives you the <a href="/event/2010cmp">2010 Championship Einstein Field</a> as your main test data.</p>
-            <p>It does the following:</p>
-            <ol>
-                <li><a href="/tasks/get/fms_team_list">/tasks/get/fms_team_list</a> : Sets up all current year teams, fast.</li>
-                <li>Imports some pre-2011 events. Imports 2010cmp matches.</li>
-                <li><a href="/tasks/math/enqueue/eventteam_update/2012">/math/enqueue/eventteam_update/2012</a> : Builds event attendance information.</li>
-                <li><a href="/tasks/get/tba_videos/2010cmp">/tasks/get/tba_videos/2010cmp</a> : Grabs videos for 2010cmp</li>
-            </ol>
+            <p>First, watch the startup of the App Engine dev server and look for the following line. You will need the port (in this case 42211)</p>
+            <pre>Starting API server at: http://localhost:42211</pre>
+            <p>Now run these commands on the command line in your the-blue-alliance folder:</p>
+            <pre>$ paver make</pre>
+            <pre>$ paver bootstrap --port=&lt;port_from_above&gt;</pre>
+            <p>This test data gives you the <a href="/event/2016necmp">2016 New England District Championship</a> as your main test event.</p>
+            <p>It loads data using the production API and writes the information into the local database. You can load a different event's data by running <pre>$ paver bootstrap --port=&lt;same as above&gt; --key=&lt;event_key&gt;</pre>, where <pre>&lt;event_key&gt;</pre> is the year+event code for the event (like "2016necmp").</p>
         </div>
         <div>
             <div>

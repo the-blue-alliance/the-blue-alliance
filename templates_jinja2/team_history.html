@@ -70,6 +70,9 @@
 
       <div class="col-sm-4">
         <div class="text-center">
+          {# for 4/1 #}
+          {{bbm.blue_banner({'year': current_year, 'normalized_name': 'Participation Award'}, {'normalized_name': 'Season'}, hidden=True)}}
+
           {% for event, awards in event_awards|reverse %}
             {% if event.is_season_event and awards %}
               {% for award in awards %}

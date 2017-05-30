@@ -15,7 +15,7 @@ from consts.event_type import EventType
 from datafeeds.datafeed_fms_api import DatafeedFMSAPI
 from datafeeds.datafeed_first_elasticsearch import DatafeedFIRSTElasticSearch
 from datafeeds.datafeed_tba import DatafeedTba
-
+from helpers.district_manipulator import DistrictManipulator
 from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
 from helpers.event_details_manipulator import EventDetailsManipulator
@@ -32,6 +32,7 @@ from models.event import Event
 from models.event_details import EventDetails
 from models.event_team import EventTeam
 from models.robot import Robot
+from models.sitevar import Sitevar
 from models.team import Team
 
 
@@ -66,7 +67,7 @@ class FMSAPIAwardsGet(webapp.RequestHandler):
     Handles updating awards
     """
     def get(self, event_key):
-        datafeed = DatafeedFMSAPI('v2.0')
+        datafeed = DatafeedFMSAPI('v2.0', save_response=True)
 
         event = Event.get_by_id(event_key)
         new_awards = AwardManipulator.createOrUpdate(datafeed.getAwards(event))
@@ -139,7 +140,7 @@ class FMSAPIEventAlliancesGet(webapp.RequestHandler):
     Handles updating an event's alliances
     """
     def get(self, event_key):
-        df = DatafeedFMSAPI('v2.0')
+        df = DatafeedFMSAPI('v2.0', save_response=True)
 
         event = Event.get_by_id(event_key)
 
@@ -191,13 +192,14 @@ class FMSAPIEventRankingsGet(webapp.RequestHandler):
     Handles updating an event's rankings
     """
     def get(self, event_key):
-        df = DatafeedFMSAPI('v2.0')
+        df = DatafeedFMSAPI('v2.0', save_response=True)
 
-        rankings = df.getEventRankings(event_key)
+        rankings, rankings2 = df.getEventRankings(event_key)
 
         event_details = EventDetails(
             id=event_key,
-            rankings=rankings
+            rankings=rankings,
+            rankings2=rankings2
         )
         EventDetailsManipulator.createOrUpdate(event_details)
 
@@ -241,9 +243,14 @@ class FMSAPIMatchesGet(webapp.RequestHandler):
     Handles updating matches
     """
     def get(self, event_key):
-        df = DatafeedFMSAPI('v2.0')
+        df = DatafeedFMSAPI('v2.0', save_response=True)
 
-        new_matches = MatchManipulator.createOrUpdate(df.getMatches(event_key))
+        new_matches = MatchManipulator.createOrUpdate(
+            MatchHelper.deleteInvalidMatches(
+                df.getMatches(event_key),
+                Event.get_by_id(event_key)
+            )
+        )
 
         template_values = {
             'matches': new_matches,
@@ -317,7 +324,8 @@ class TeamDetailsGet(webapp.RequestHandler):
 
         fms_df = DatafeedFMSAPI('v2.0')
         df2 = DatafeedFIRSTElasticSearch()
-        fms_details = fms_df.getTeamDetails(datetime.date.today().year, key_name)
+        year = datetime.date.today().year
+        fms_details = fms_df.getTeamDetails(year, key_name)
 
         if fms_details:
             team, district_team, robot = fms_details[0]
@@ -333,6 +341,17 @@ class TeamDetailsGet(webapp.RequestHandler):
 
         if team:
             team = TeamManipulator.createOrUpdate(team)
+
+        # Clean up junk district teams
+        # https://www.facebook.com/groups/moardata/permalink/1310068625680096/
+        dt_keys = DistrictTeam.query(
+            DistrictTeam.team == existing_team.key,
+            DistrictTeam.year == year).fetch(keys_only=True)
+        keys_to_delete = set()
+        for dt_key in dt_keys:
+            if not district_team or dt_key.id() != district_team.key.id():
+                keys_to_delete.add(dt_key)
+        DistrictTeamManipulator.delete_keys(keys_to_delete)
 
         if district_team:
             district_team = DistrictTeamManipulator.createOrUpdate(district_team)
@@ -385,8 +404,11 @@ class EventListGet(webapp.RequestHandler):
         df = DatafeedFMSAPI('v2.0')
         df2 = DatafeedFIRSTElasticSearch()
 
-        merged_events = EventManipulator.mergeModels(df.getEventList(year), df2.getEventList(year))
+        fmsapi_events, fmsapi_districts = df.getEventList(year)
+        elasticsearch_events = df2.getEventList(year)
+        merged_events = EventManipulator.mergeModels(fmsapi_events, elasticsearch_events)
         events = EventManipulator.createOrUpdate(merged_events)
+        districts = DistrictManipulator.createOrUpdate(fmsapi_districts)
 
         # Fetch event details for each event
         for event in events:
@@ -398,7 +420,8 @@ class EventListGet(webapp.RequestHandler):
             )
 
         template_values = {
-            "events": events
+            "events": events,
+            "districts": districts,
         }
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
@@ -438,9 +461,14 @@ class EventDetailsGet(webapp.RequestHandler):
         event = Event.get_by_id(event_key)
 
         # Update event
-        updated_event = df2.getEventDetails(event)
+        fmsapi_events, fmsapi_districts = df.getEventDetails(event_key)
+        elasticsearch_events = df2.getEventDetails(event)
+        updated_event = EventManipulator.mergeModels(
+            fmsapi_events,
+            elasticsearch_events)
         if updated_event:
             event = EventManipulator.createOrUpdate(updated_event)
+        DistrictManipulator.createOrUpdate(fmsapi_districts)
 
         models = df.getEventTeams(event_key)
         teams = []
@@ -471,15 +499,19 @@ class EventDetailsGet(webapp.RequestHandler):
             teams = [teams]
 
         # Build EventTeams
+        cmp_hack_sitevar = Sitevar.get_or_insert('cmp_registration_hacks')
+        events_without_eventteams = cmp_hack_sitevar.contents.get('skip_eventteams', []) \
+            if cmp_hack_sitevar else []
+        skip_eventteams = event_key in events_without_eventteams
         event_teams = [EventTeam(
             id=event.key_name + "_" + team.key_name,
             event=event.key,
             team=team.key,
             year=event.year)
-            for team in teams]
+            for team in teams] if not skip_eventteams else []
 
         # Delete eventteams of teams that are no longer registered
-        if event_teams != []:
+        if event_teams and not skip_eventteams:
             existing_event_team_keys = set(EventTeam.query(EventTeam.event == event.key).fetch(1000, keys_only=True))
             event_team_keys = set([et.key for et in event_teams])
             et_keys_to_delete = existing_event_team_keys.difference(event_team_keys)

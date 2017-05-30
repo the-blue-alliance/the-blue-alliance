@@ -6,6 +6,8 @@ import os
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
+from consts.playoff_type import PlayoffType
+from controllers import event_controller
 from controllers.base_controller import LoggedInHandler
 from datafeeds.csv_alliance_selections_parser import CSVAllianceSelectionsParser
 from datafeeds.csv_teams_parser import CSVTeamsParser
@@ -19,11 +21,12 @@ from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.team_manipulator import TeamManipulator
 from helpers.match_manipulator import MatchManipulator
 from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
-from models.award import Award
+from models.district import District
 from models.event import Event
 from models.event_details import EventDetails
 from models.event_team import EventTeam
 from models.match import Match
+from models.media import Media
 from models.team import Team
 
 import tba_config
@@ -228,6 +231,28 @@ class AdminEventAddWebcast(LoggedInHandler):
         self.redirect("/admin/event/" + event.key_name)
 
 
+class AdminEventRemoveWebcast(LoggedInHandler):
+    """
+    Remove a webcast from an event
+    """
+    def post(self, event_key_id):
+        self._require_admin()
+
+        event = Event.get_by_id(event_key_id)
+        if not event:
+            self.abort(404)
+
+        type = self.request.get("type")
+        channel = self.request.get("channel")
+        index = int(self.request.get("index")) - 1
+        if self.request.get("file"):
+            file = self.request.get("file")
+        else:
+            file = None
+        EventWebcastAdder.remove_webcast(event, index, type, channel, file)
+        self.redirect("/admin/event/{}#webcasts".format(event.key_name))
+
+
 class AdminEventCreate(LoggedInHandler):
     """
     Create an Event. POSTs to AdminEventEdit.
@@ -306,8 +331,14 @@ class AdminEventDetail(LoggedInHandler):
             self.abort(404)
         event.prepAwardsMatchesTeams()
 
+        event_medias = Media.query(Media.references == event.key).fetch(500)
+
         self.template_values.update({
-            "event": event
+            "event": event,
+            "medias": event_medias,
+            "cache_key": event_controller.EventDetail('2016nyny').cache_key.format(event.key_name),
+            "flushed": self.request.get("flushed"),
+            "playoff_types": PlayoffType.type_names,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_details.html')
@@ -327,6 +358,7 @@ class AdminEventEdit(LoggedInHandler):
             "event": event,
             'alliance_selections': json.dumps(event.alliance_selections),
             'rankings': json.dumps(event.rankings),
+            "playoff_types": PlayoffType.type_names,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_edit.html')
@@ -345,12 +377,20 @@ class AdminEventEdit(LoggedInHandler):
         if self.request.get("end_date"):
             end_date = datetime.strptime(self.request.get("end_date"), "%Y-%m-%d")
 
+        first_code = self.request.get("first_code", None)
+        district_key = self.request.get("event_district_key", None)
+        parent_key = self.request.get("parent_event", None)
+
+        division_key_names = json.loads(self.request.get('divisions'), '[]') if self.request.get('divisions') else []
+        division_keys = [ndb.Key(Event, key) for key in division_key_names] if division_key_names else []
+
         event = Event(
             id=str(self.request.get("year")) + str.lower(str(self.request.get("event_short"))),
             end_date=end_date,
             event_short=self.request.get("event_short"),
+            first_code=first_code if first_code and first_code != 'None' else None,
             event_type_enum=EventHelper.parseEventType(self.request.get("event_type_str")),
-            event_district_enum=EventHelper.parseDistrictName(self.request.get("event_district_str")),
+            district_key=ndb.Key(District, self.request.get("event_district_key")) if district_key and district_key != 'None' else None,
             venue=self.request.get("venue"),
             venue_address=self.request.get("venue_address"),
             city=self.request.get("city"),
@@ -366,6 +406,9 @@ class AdminEventEdit(LoggedInHandler):
             facebook_eid=self.request.get("facebook_eid"),
             custom_hashtag=self.request.get("custom_hashtag"),
             webcast_json=self.request.get("webcast_json"),
+            playoff_type=int(self.request.get("playoff_type")) if self.request.get('playoff_type') else PlayoffType.BRACKET_8_TEAM,
+            parent_event=ndb.Key(Event, parent_key) if parent_key and parent_key.lower() != 'none' else None,
+            divisions=division_keys,
         )
         event = EventManipulator.createOrUpdate(event)
 

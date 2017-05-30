@@ -3,6 +3,9 @@ import json
 import logging
 import pytz
 
+from google.appengine.ext import ndb
+
+from consts.playoff_type import PlayoffType
 from helpers.match_helper import MatchHelper
 from models.event import Event
 from models.match import Match
@@ -23,140 +26,27 @@ LAST_LEVEL = {
 
 TIME_PATTERN = "%Y-%m-%dT%H:%M:%S"
 
-ELIM_MAPPING = {
-    1: (1, 1),  # (set, match)
-    2: (2, 1),
-    3: (3, 1),
-    4: (4, 1),
-    5: (1, 2),
-    6: (2, 2),
-    7: (3, 2),
-    8: (4, 2),
-    9: (1, 3),
-    10: (2, 3),
-    11: (3, 3),
-    12: (4, 3),
-    13: (1, 1),
-    14: (2, 1),
-    15: (1, 2),
-    16: (2, 2),
-    17: (1, 3),
-    18: (2, 3),
-    19: (1, 1),
-    20: (1, 2),
-    21: (1, 3),
-}
-
-OCTO_ELIM_MAPPING = {
-    # octofinals
-    1: (1, 1),  # (set, match)
-    2: (2, 1),
-    3: (3, 1),
-    4: (4, 1),
-    5: (5, 1),
-    6: (6, 1),
-    7: (7, 1),
-    8: (8, 1),
-    9: (1, 2),
-    10: (2, 2),
-    11: (3, 2),
-    12: (4, 2),
-    13: (5, 2),
-    14: (6, 2),
-    15: (7, 2),
-    16: (8, 2),
-    17: (1, 3),
-    18: (2, 3),
-    19: (3, 3),
-    20: (4, 3),
-    21: (5, 3),
-    22: (6, 3),
-    23: (7, 3),
-    24: (8, 3),
-
-    # quarterfinals
-    25: (1, 1),
-    26: (2, 1),
-    27: (3, 1),
-    28: (4, 1),
-    29: (1, 2),
-    30: (2, 2),
-    31: (3, 2),
-    32: (4, 2),
-    33: (1, 3),
-    34: (2, 3),
-    35: (3, 3),
-    36: (4, 3),
-
-    # semifinals
-    37: (1, 1),
-    38: (2, 1),
-    39: (1, 2),
-    40: (2, 2),
-    41: (1, 3),
-    42: (2, 3),
-
-    # finals
-    43: (1, 1),
-    44: (1, 2),
-    45: (1, 3),
-}
-
-
-def get_comp_level(year, match_level, match_number, is_octofinals):
-    if match_level == 'Qualification':
-        return 'qm'
-    else:
-        if year == 2015:
-            if match_number <= 8:
-                return 'qf'
-            elif match_number <= 14:
-                return 'sf'
-            else:
-                return 'f'
-        else:
-            if is_octofinals:
-                return get_comp_level_octo(year, match_number)
-            if match_number <= 12:
-                return 'qf'
-            elif match_number <= 18:
-                return 'sf'
-            else:
-                return 'f'
-
-
-def get_comp_level_octo(year, match_number):
-    """ No 2015 support """
-    if match_number <= 24:
-        return 'ef'
-    elif match_number <= 36:
-        return 'qf'
-    elif match_number <= 42:
-        return 'sf'
-    else:
-        return 'f'
-
-
-def get_set_match_number(year, comp_level, match_number, is_octofinals):
-    if year == 2015:
-        if comp_level == 'sf':
-            return 1, match_number - 8
-        elif comp_level == 'f':
-            return 1, match_number - 14
-        else:  # qm, qf
-            return 1, match_number
-    else:
-        if comp_level in {'ef', 'qf', 'sf', 'f'}:
-            return OCTO_ELIM_MAPPING[match_number] if is_octofinals else ELIM_MAPPING[match_number]
-        else:  # qm
-            return 1, match_number
-
 
 class FMSAPIHybridScheduleParser(object):
 
     def __init__(self, year, event_short):
         self.year = year
         self.event_short = event_short
+
+    @classmethod
+    def is_blank_match(cls, match):
+        """
+        Detect junk playoff matches like in 2017scmb
+        """
+        if match.comp_level == 'qm' or not match.score_breakdown:
+            return False
+        for color in ['red', 'blue']:
+            if match.alliances[color]['score'] != 0:
+                return False
+            for value in match.score_breakdown[color].values():
+                if value and value not in  {'Unknown', 'None'}:  # Nonzero, False, blank, None, etc.
+                    return False
+        return True
 
     def parse(self, response):
         matches = response['Schedule']
@@ -170,17 +60,19 @@ class FMSAPIHybridScheduleParser(object):
             event_tz = None
 
         parsed_matches = []
-        is_octofinals = len(matches) > 0 and 'Octofinal' in matches[0]['description']
+        remapped_matches = {}  # If a key changes due to a tiebreaker
         for match in matches:
             if 'tournamentLevel' in match:  # 2016+
                 level = match['tournamentLevel']
             else:  # 2015
                 level = match['level']
-            comp_level = get_comp_level(self.year, level, match['matchNumber'], is_octofinals)
-            set_number, match_number = get_set_match_number(self.year, comp_level, match['matchNumber'], is_octofinals)
+            comp_level = PlayoffType.get_comp_level(event.playoff_type, level, match['matchNumber'])
+            set_number, match_number = PlayoffType.get_set_match_number(event.playoff_type, comp_level, match['matchNumber'])
 
             red_teams = []
             blue_teams = []
+            red_surrogates = []
+            blue_surrogates = []
             team_key_names = []
             null_team = False
             sorted_teams = sorted(match['Teams'], key=lambda team: team['station'])  # Sort by station to ensure correct ordering. Kind of hacky.
@@ -191,42 +83,103 @@ class FMSAPIHybridScheduleParser(object):
                 team_key_names.append(team_key)
                 if 'Red' in team['station']:
                     red_teams.append(team_key)
+                    if team['surrogate']:
+                        red_surrogates.append(team_key)
                 elif 'Blue' in team['station']:
                     blue_teams.append(team_key)
+                    if team['surrogate']:
+                        blue_surrogates.append(team_key)
+
             if null_team and match['scoreRedFinal'] is None and match['scoreBlueFinal'] is None:
                 continue
 
             alliances = {
                 'red': {
                     'teams': red_teams,
+                    'surrogates': red_surrogates,
                     'score': match['scoreRedFinal']
                 },
                 'blue': {
                     'teams': blue_teams,
+                    'surrogates': blue_surrogates,
                     'score': match['scoreBlueFinal']
-                }
+                },
             }
 
             if not match['startTime']:  # no startTime means it's an unneeded rubber match
                 continue
 
             time = datetime.datetime.strptime(match['startTime'].split('.')[0], TIME_PATTERN)
-            actual_time_raw = match['actualStartTime'] if 'actualStartTime' in match else None
-            actual_time = None
             if event_tz is not None:
                 time = time - event_tz.utcoffset(time)
 
+            actual_time_raw = match['actualStartTime'] if 'actualStartTime' in match else None
+            actual_time = None
             if actual_time_raw is not None:
                 actual_time = datetime.datetime.strptime(actual_time_raw.split('.')[0], TIME_PATTERN)
                 if event_tz is not None:
                     actual_time = actual_time - event_tz.utcoffset(actual_time)
 
-            parsed_matches.append(Match(
-                id=Match.renderKeyName(
+            post_result_time_raw = match.get('postResultTime')
+            post_result_time = None
+            if post_result_time_raw is not None:
+                post_result_time = datetime.datetime.strptime(post_result_time_raw.split('.')[0], TIME_PATTERN)
+                if event_tz is not None:
+                    post_result_time = post_result_time - event_tz.utcoffset(post_result_time)
+
+            key_name = Match.renderKeyName(
+                event_key,
+                comp_level,
+                set_number,
+                match_number)
+
+            # Check for tiebreaker matches
+            existing_match = Match.get_by_id(key_name)
+            # Follow chain of existing matches
+            while existing_match is not None and existing_match.tiebreak_match_key is not None:
+                logging.info("Following Match {} to {}".format(existing_match.key.id(), existing_match.tiebreak_match_key.id()))
+                existing_match = existing_match.tiebreak_match_key.get()
+            # Check if last existing match needs to be tiebroken
+            if existing_match and existing_match.comp_level != 'qm' and \
+                    existing_match.has_been_played and \
+                    existing_match.winning_alliance == '' and \
+                    existing_match.actual_time != actual_time and \
+                    not self.is_blank_match(existing_match):
+                logging.warning("Match {} is tied!".format(existing_match.key.id()))
+
+                # TODO: Only query within set if set_number ever gets indexed
+                match_count = 0
+                for match_key in Match.query(Match.event==event.key, Match.comp_level==comp_level).fetch(keys_only=True):
+                    _, match_key = match_key.id().split('_')
+                    if match_key.startswith('{}{}'.format(comp_level, set_number)):
+                        match_count += 1
+
+                # Sanity check: Tiebreakers must be played after at least 3 matches, or 6 for finals
+                if match_count < 3 or (match_count < 6 and comp_level == 'f'):
+                    logging.warning("Match supposedly tied, but existing count is {}! Skipping match.".format(match_count))
+                    continue
+
+                match_number = match_count + 1
+                new_key_name = Match.renderKeyName(
                     event_key,
                     comp_level,
                     set_number,
-                    match_number),
+                    match_number)
+                remapped_matches[key_name] = new_key_name
+                key_name = new_key_name
+
+                # Point existing match to new tiebreaker match
+                existing_match.tiebreak_match_key = ndb.Key(Match, key_name)
+                parsed_matches.append(existing_match)
+
+                logging.warning("Creating new match: {}".format(key_name))
+            elif existing_match:
+                remapped_matches[key_name] = existing_match.key.id()
+                key_name = existing_match.key.id()
+                match_number = existing_match.match_number
+
+            parsed_matches.append(Match(
+                id=key_name,
                 event=event.key,
                 year=event.year,
                 set_number=set_number,
@@ -235,6 +188,7 @@ class FMSAPIHybridScheduleParser(object):
                 team_key_names=team_key_names,
                 time=time,
                 actual_time=actual_time,
+                post_result_time=post_result_time,
                 alliances_json=json.dumps(alliances),
             ))
 
@@ -269,7 +223,7 @@ class FMSAPIHybridScheduleParser(object):
                             fixed_matches.append(match)
             parsed_matches = fixed_matches
 
-        return parsed_matches
+        return parsed_matches, remapped_matches
 
 
 class FMSAPIMatchDetailsParser(object):
@@ -280,12 +234,14 @@ class FMSAPIMatchDetailsParser(object):
     def parse(self, response):
         matches = response['MatchScores']
 
+        event_key = '{}{}'.format(self.year, self.event_short)
+        event = Event.get_by_id(event_key)
+
         match_details_by_key = {}
 
-        is_octofinals = len(matches) > 0 and matches[len(matches) - 1]['matchNumber'] > 21
         for match in matches:
-            comp_level = get_comp_level(self.year, match['matchLevel'], match['matchNumber'], is_octofinals)
-            set_number, match_number = get_set_match_number(self.year, comp_level, match['matchNumber'], is_octofinals)
+            comp_level = PlayoffType.get_comp_level(event.playoff_type, match['matchLevel'], match['matchNumber'])
+            set_number, match_number = PlayoffType.get_set_match_number(event.playoff_type, comp_level, match['matchNumber'])
             breakdown = {
                 'red': {},
                 'blue': {},

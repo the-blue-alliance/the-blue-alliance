@@ -4,7 +4,7 @@ export function getWebcastId(name, num) {
   return `${name}-${num}`
 }
 
-export const WebcastPropType = PropTypes.shape({
+export const webcastPropType = PropTypes.shape({
   key: PropTypes.string.isRequired,
   num: PropTypes.number.isRequired,
   id: PropTypes.string.isRequired,

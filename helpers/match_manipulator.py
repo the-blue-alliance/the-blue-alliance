@@ -28,7 +28,7 @@ class MatchManipulator(ManipulatorBase):
             try:
                 FirebasePusher.delete_match(match)
             except Exception:
-                logging.warning("Enqueuing Firebase delete failed!")
+                logging.warning("Firebase delete_match failed!")
 
     @classmethod
     def postUpdateHook(cls, matches, updated_attr_list, is_new_list):
@@ -41,7 +41,7 @@ class MatchManipulator(ManipulatorBase):
         for (match, updated_attrs, is_new) in zip(matches, updated_attr_list, is_new_list):
             event = match.event.get()
             # Only continue if the event is currently happening
-            if event.within_a_day:
+            if event.now:
                 if match.has_been_played:
                     if is_new or 'alliances_json' in updated_attrs:
                         # There is a score update for this match, push a notification
@@ -58,6 +58,14 @@ class MatchManipulator(ManipulatorBase):
                         if event not in unplayed_match_events:
                             unplayed_match_events.append(event)
 
+            # Try to send video notifications
+            if '_video_added' in updated_attrs:
+                try:
+                    NotificationHelper.send_match_video(match)
+                except Exception, exception:
+                    logging.error("Error sending match video updates: {}".format(exception))
+                    logging.error(traceback.format_exc())
+
         '''
         If we have an unplayed match during an event within a day, send out a schedule update notification
         '''
@@ -71,25 +79,44 @@ class MatchManipulator(ManipulatorBase):
         '''
         Enqueue firebase push
         '''
-        event_keys = set()
-        for match in matches:
-            event_keys.add(match.event.id())
+        affected_stats_event_keys = set()
+        for (match, updated_attrs, is_new) in zip(matches, updated_attr_list, is_new_list):
+            # Only attrs that affect stats
+            if is_new or set(['alliances_json', 'score_breakdown_json']).intersection(set(updated_attrs)) != set():
+                affected_stats_event_keys.add(match.event.id())
             try:
                 FirebasePusher.update_match(match)
             except Exception:
-                logging.warning("Enqueuing Firebase push failed!")
+                logging.warning("Firebase update_match failed!")
 
-        # Enqueue task to calculate matchstats
-        for event_key in event_keys:
-            taskqueue.add(
-                url='/tasks/math/do/event_matchstats/' + event_key,
-                method='GET')
+        # Enqueue statistics
+        for event_key in affected_stats_event_keys:
+            # Enqueue task to calculate matchstats
+            try:
+                taskqueue.add(
+                    url='/tasks/math/do/event_matchstats/' + event_key,
+                    method='GET')
+            except Exception:
+                logging.error("Error enqueuing event_matchstats for {}".format(event_key))
+                logging.error(traceback.format_exc())
 
-        # Enqueue task to calculate district points
-        for event_key in event_keys:
-            taskqueue.add(
-                url='/tasks/math/do/district_points_calc/{}'.format(event_key),
-                method='GET')
+            # Enqueue task to calculate district points
+            try:
+                taskqueue.add(
+                    url='/tasks/math/do/district_points_calc/{}'.format(event_key),
+                    method='GET')
+            except Exception:
+                logging.error("Error enqueuing district_points_calc for {}".format(event_key))
+                logging.error(traceback.format_exc())
+
+            # Enqueue task to calculate event team status
+            try:
+                taskqueue.add(
+                    url='/tasks/math/do/event_team_status/{}'.format(event_key),
+                    method='GET')
+            except Exception:
+                logging.error("Error enqueuing event_team_status for {}".format(event_key))
+                logging.error(traceback.format_exc())
 
     @classmethod
     def updateMerge(self, new_match, old_match, auto_union=True):
@@ -111,7 +138,10 @@ class MatchManipulator(ManipulatorBase):
             "time",
             "time_string",
             "actual_time",
+            "predicted_time",
+            "post_result_time",
             "push_sent",
+            "tiebreak_match_key",
         ]
 
         json_attrs = [
@@ -129,6 +159,10 @@ class MatchManipulator(ManipulatorBase):
         ]
 
         old_match._updated_attrs = []
+
+        # Lets postUpdateHook know if videos went from 0 to >0
+        if not old_match.has_video and new_match.has_video:
+            old_match._updated_attrs.append('_video_added')
 
         # if not auto_union, treat auto_union_attrs as list_attrs
         if not auto_union:

@@ -14,6 +14,8 @@ class EventTeam(ndb.Model):
     team = ndb.KeyProperty(kind=Team)
     year = ndb.IntegerProperty()
 
+    status = ndb.JsonProperty()
+
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 

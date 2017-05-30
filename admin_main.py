@@ -7,21 +7,25 @@ import tba_config
 from controllers.admin.admin_api_controller import AdminApiAuthAdd, AdminApiAuthDelete, AdminApiAuthEdit, AdminApiAuthManage
 from controllers.admin.admin_apistatus_controller import AdminApiStatus
 from controllers.admin.admin_authkeys_controller import AdminAuthKeys
+from controllers.admin.admin_district_controller import AdminDistrictList, AdminDistrictEdit, \
+    AdminDistrictCreate
 from controllers.admin.admin_event_controller import AdminEventAddAllianceSelections, AdminEventDeleteTeams, AdminEventAddTeams, AdminEventRemapTeams, AdminEventAddWebcast, AdminEventCreate, AdminEventCreateTest, AdminEventDelete, AdminEventDetail, AdminEventEdit, AdminEventList, \
-    AdminAddAllianceBackup
+    AdminAddAllianceBackup, AdminEventRemoveWebcast
 from controllers.admin.admin_gameday_controller import AdminGamedayDashboard
 from controllers.admin.admin_main_controller import AdminDebugHandler, AdminMain, AdminTasksHandler
-from controllers.admin.admin_award_controller import AdminAwardDashboard, AdminAwardEdit, AdminAwardAdd
+from controllers.admin.admin_award_controller import AdminAwardDashboard, AdminAwardEdit, AdminAwardAdd, \
+    AdminAwardDelete
 from controllers.admin.admin_match_controller import AdminVideosAdd, AdminMatchCleanup, AdminMatchDashboard, AdminMatchDelete, AdminMatchDetail, AdminMatchAdd, AdminMatchEdit
 from controllers.admin.admin_media_controller import AdminMediaDashboard, AdminMediaDeleteReference, AdminMediaMakePreferred, AdminMediaRemovePreferred, AdminMediaAdd
 from controllers.admin.admin_memcache_controller import AdminMemcacheMain
-from controllers.admin.admin_migration_controller import AdminMigration, AdminMigrationCreateEventDetails
+from controllers.admin.admin_migration_controller import AdminMigration, AdminMigrationCreateEventDetails, AdminMigrationRankings, AdminMigrationAddSurrogates
 from controllers.admin.admin_mobile_controller import AdminMobile, AdminBroadcast, AdminMobileWebhooks
 from controllers.admin.admin_offseason_scraper_controller import AdminOffseasonScraperController
 from controllers.admin.admin_offseason_spreadsheet_controller import AdminOffseasonSpreadsheetController
 from controllers.admin.admin_sitevar_controller import AdminSitevarCreate, AdminSitevarEdit, AdminSitevarList
 from controllers.admin.admin_suggestion_controller import AdminCreateTestSuggestions
-from controllers.admin.admin_team_controller import AdminTeamCreateTest, AdminTeamDetail, AdminTeamList
+from controllers.admin.admin_team_controller import AdminTeamCreateTest, AdminTeamDetail, AdminTeamList, \
+    AdminTeamRobotNameUpdate
 from controllers.admin.admin_user_controller import AdminUserDetail, AdminUserEdit, AdminUserTestSetup, AdminUserList, AdminUserPermissionsList
 
 from google.appengine.ext.webapp import template
@@ -35,6 +39,10 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/apistatus', AdminApiStatus),
                                ('/admin/authkeys', AdminAuthKeys),
                                ('/admin/debug', AdminDebugHandler),
+                               ('/admin/districts', AdminDistrictList),
+                               ('/admin/districts/([0-9]*)', AdminDistrictList),
+                               ('/admin/district/edit/(.*)', AdminDistrictEdit),
+                               ('/admin/district/create', AdminDistrictCreate),
                                ('/admin/events', AdminEventList),
                                ('/admin/events/([0-9]*)', AdminEventList),
                                ('/admin/event/add_alliance_backup/(.*)', AdminAddAllianceBackup),
@@ -42,6 +50,7 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/event/add_teams/(.*)', AdminEventAddTeams),
                                ('/admin/event/delete_teams/(.*)', AdminEventDeleteTeams),
                                ('/admin/event/add_webcast/(.*)', AdminEventAddWebcast),
+                               ('/admin/event/remove_webcast/(.*)', AdminEventRemoveWebcast),
                                ('/admin/event/remap_teams/(.*)', AdminEventRemapTeams),
                                ('/admin/event/create', AdminEventCreate),
                                ('/admin/event/create/test', AdminEventCreateTest),
@@ -52,6 +61,7 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/awards', AdminAwardDashboard),
                                ('/admin/award/add', AdminAwardAdd),
                                ('/admin/award/edit/(.*)', AdminAwardEdit),
+                               ('/admin/award/delete', AdminAwardDelete),
                                ('/admin/matches', AdminMatchDashboard),
                                ('/admin/match/add', AdminMatchAdd),
                                ('/admin/match/cleanup', AdminMatchCleanup),
@@ -66,6 +76,8 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/memcache', AdminMemcacheMain),
                                ('/admin/migration', AdminMigration),
                                ('/admin/migration/create_event_details', AdminMigrationCreateEventDetails),
+                               ('/admin/migration/migrate_rankings/([0-9]*)', AdminMigrationRankings),
+                               ('/admin/migration/add_surrogates/([0-9]*)', AdminMigrationAddSurrogates),
                                ('/admin/offseasons', AdminOffseasonScraperController),
                                ('/admin/offseasons/spreadsheet', AdminOffseasonSpreadsheetController),
                                ('/admin/sitevars', AdminSitevarList),
@@ -75,6 +87,7 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/tasks', AdminTasksHandler),
                                ('/admin/teams', AdminTeamList),
                                ('/admin/team/create/test', AdminTeamCreateTest),
+                               ('/admin/team/set_robot_name', AdminTeamRobotNameUpdate),
                                ('/admin/team/(.*)', AdminTeamDetail),
                                ('/admin/users', AdminUserList),
                                ('/admin/users/permissions', AdminUserPermissionsList),

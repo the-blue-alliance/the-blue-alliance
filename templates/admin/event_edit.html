@@ -43,12 +43,24 @@
             <td><input type="text" name="disabled_event_short" value="{{event.event_short}}" disabled="disabled" /><input type="hidden" name="event_short" value="{{event.event_short}}" /></td>
         </tr>
         <tr>
+            <td>FIRST API Code</td>
+            <td><input type="text" name="first_code" placeholder="ct" {% if event.first_code %}value="{{ event.first_code }}"{% endif %}/></td>
+        </tr>
+        <tr>
             <td>Event Type</td>
             <td><input type="text" name="event_type_str" value="{{event.event_type_str}}" /></td>
         </tr>
         <tr>
-            <td>Event District</td>
-            <td><input type="text" name="event_district_str" value="{{event.event_district_str}}" /></td>
+            <td>Event District Key</td>
+            <td><input type="text" name="event_district_key" value="{{event.event_district_key}}" /></td>
+        </tr>
+        <tr>
+            <td>Playoff Type</td>
+            <td><select name="playoff_type">
+                {% for type, name in playoff_types.iteritems %}
+                  <option value="{{ type }}" {% if type == event.playoff_type %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select></td>
         </tr>
         <tr>
             <td>Event Venue</td>
@@ -89,6 +101,14 @@
         <tr>
             <td>Custom Hashtag</td>
             <td><input type="text" name="custom_hashtag" value="{{event.custom_hashtag}}" /></td>
+        </tr>
+        <tr>
+            <td>Parent Event</td>
+            <td><input type="text" name="parent_event" value="{% if event.parent_event %}{{ event.parent_event.id }}{% endif %}"/></td>
+        </tr>
+        <tr>
+            <td>Event Divisions</td>
+            <td><input type="text" name="divisions" value="{{ event.division_keys_json }}"</td>
         </tr>
         <tr>
             <td>Webcast JSON</td>

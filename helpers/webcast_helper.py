@@ -107,7 +107,7 @@ class WebcastParser(object):
             if regex2 is not None:
                 youtube_id = regex2.group(1)
 
-        if youtube_id is None:
+        if not youtube_id:
             return None
         else:
             return youtube_id

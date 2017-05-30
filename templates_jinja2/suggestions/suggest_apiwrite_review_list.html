@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Pending Suggestions{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <ol class="breadcrumb">
+    <li><a href="/suggest/review">Suggestions</a></li>
+    <li class="active">Trusted API Requests</li>
+  </ol>
+  <h1>{{ suggestions|length }} Pending Requests</h1>
+
+  {% if success == "accept" %}
+  <div class="row">
+    <div class="alert alert-success">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <h4>Success!</h4>
+    </div>
+  </div>
+  {% elif success == "reject" %}
+  <div class="row">
+    <div class="alert alert-warning">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <h4>Rejected Request!</h4>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="row">
+    <div class="col-sm-6">
+      <h2>Request Approval Guidelines</h2>
+      <div class="alert alert-success">
+        <strong>Do approve:</strong>
+        <ul>
+          <li><strong>New</strong> requests for events (try to limit one set of keys per event)</li>
+        </ul>
+      </div>
+      <div class="alert alert-danger">
+        <strong>Do NOT approve:</strong>
+        <ul>
+          <li>Requests for official events</li>
+          <li>Requests for events that already have keys issued</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      {% for suggestion_id, event, account, existing_users, suggestion in suggestions %}
+        <div class="well">
+            <h3>{{ event.year }} {{ event.name }} [<a href="/event/{{ event.key_name }}">{{ event.event_short }}</a>]</h3>
+            <p><strong>User:</strong> {{ account.display_name }}</p>
+            <p><strong>Email:</strong> {{ account.email }}</p>
+            <p><strong>User's role:</strong> {{ suggestion.contents.affiliation }}</p>
+
+            <form action="/suggest/apiwrite/review" method="post" id="apiwrite_review_{{ suggestion_id }}">
+            <h4>Requested Auth Types</h4>
+                <ul>
+                {% for type,name in auth_names.iteritems() %}
+                    <li><input {% if type in suggestion.contents.auth_types %} checked {% endif %} type="checkbox" name="auth_types" value="{{ type }}"/> {{ name }} </li>
+                {% endfor %}
+                </ul>
+
+            <h4>Key Expiration</h4>
+            <p>Number of days after the event to keep key valid:</p>
+            <select name="expiration_days">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="3">3</option>
+                <option value="7" selected>7</option>
+                <option value="-1">--</option>
+            </select>
+
+            <h4>Existing Keys for This Event</h4>
+            {% for auth,user in existing_users %}
+                <ul>
+                    <li><a href="/admin/api_auth/edit/{{ auth.key.id() }}">{% if user %} {{ user.email }} {% else %} -- {% endif %}</a></li>
+                </ul>
+            {% else %}
+                <p>No existing tokens for this event</p>
+            {% endfor %}
+
+            <h4>Message for the User</h4>
+            <p><textarea name="user_message" form="apiwrite_review_{{ suggestion_id }}">Thanks for helping make TBA better!</textarea></p>
+
+            <input type="hidden" name="suggestion_id" value="{{ suggestion_id }}" />
+            <button type="submit" class="btn btn-primary" name="verdict" value="accept"><span class="glyphicon glyphicon-thumbs-up"></span> Add Auth</button>
+            <button type="submit" class="btn btn-danger" name="verdict" value="reject"><span class="glyphicon glyphicon-thumbs-down"></span> Reject</button>
+            </form>
+        </div>
+      {% else %}
+        <div class="well">
+          <p>No suggestions! Go build more community!</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

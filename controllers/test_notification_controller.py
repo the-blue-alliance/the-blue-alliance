@@ -3,6 +3,7 @@ import logging
 from consts.notification_type import NotificationType
 from base_controller import LoggedInHandler
 from helpers.push_helper import PushHelper
+from models.district import District
 from models.match import Match
 from models.event import Event
 
@@ -11,6 +12,7 @@ from notifications.awards_updated import AwardsUpdatedNotification
 from notifications.district_points_updated import DistrictPointsUpdatedNotification
 from notifications.level_starting import CompLevelStartingNotification
 from notifications.match_score import MatchScoreNotification
+from notifications.match_video import MatchVideoNotification, EventMatchVideoNotification
 from notifications.schedule_updated import ScheduleUpdatedNotification
 from notifications.upcoming_match import UpcomingMatchNotification
 
@@ -37,6 +39,7 @@ class TestNotificationController(LoggedInHandler):
 
         event = Event.get_by_id('2014necmp')
         match = Match.get_by_id('2014necmp_f1m1')
+        district = District.get_by_id('2014ne')
 
         if type == NotificationType.UPCOMING_MATCH:
             notification = UpcomingMatchNotification(match, event)
@@ -52,12 +55,16 @@ class TestNotificationController(LoggedInHandler):
             # Not implemented yet
             pass
         elif type == NotificationType.DISTRICT_POINTS_UPDATED:
-            notification = DistrictPointsUpdatedNotification('2014ne')
+            notification = DistrictPointsUpdatedNotification(district)
         elif type == NotificationType.SCHEDULE_UPDATED:
             notification = ScheduleUpdatedNotification(event, match)
         elif type == NotificationType.FINAL_RESULTS:
             # Not implemented yet
             pass
+        elif type == NotificationType.MATCH_VIDEO:
+            notification = MatchVideoNotification(match)
+        elif type == NotificationType.EVENT_MATCH_VIDEO:
+            notification = EventMatchVideoNotification(match)
         else:
             # Not passed a valid int, return
             self.redirect('/apidocs/webhooks')

@@ -11,6 +11,7 @@ from controllers.api.api_team_controller import ApiTeamController, ApiTeamEvents
     ApiTeamHistoryDistrictsController
 from database import get_affected_queries
 
+from models.district import District
 from models.district_team import DistrictTeam
 from models.event import Event
 from models.event_team import EventTeam
@@ -45,7 +46,7 @@ class CacheClearer(object):
         """
         event_keys = affected_refs['key']
         years = affected_refs['year']
-        event_district_abbrevs = affected_refs['event_district_abbrev']
+        event_district_abbrevs = map(lambda x: x.id()[4:], filter(None, affected_refs['district_key']))
 
         event_team_keys_future = EventTeam.query(EventTeam.event.IN([event_key for event_key in event_keys])).fetch_async(None, keys_only=True)
 
@@ -97,7 +98,8 @@ class CacheClearer(object):
             cls._get_team_events_cache_keys_and_controllers(team_keys, years) + \
             cls._get_districtlist_cache_keys_and_controllers(years) + \
             cls._get_district_events_cache_keys_and_controllers(event_district_abbrevs, years) + \
-            cls._get_district_rankings_cache_keys_and_controllers(event_district_abbrevs, years)
+            cls._get_district_rankings_cache_keys_and_controllers(event_district_abbrevs, years) + \
+            cls._queries_to_cache_keys_and_controllers(get_affected_queries.event_details_updated(affected_refs))
 
     @classmethod
     def get_eventteam_cache_keys_and_controllers(cls, affected_refs):
@@ -162,6 +164,16 @@ class CacheClearer(object):
             cls._queries_to_cache_keys_and_controllers(get_affected_queries.robot_updated(affected_refs))
 
     @classmethod
+    def get_district_cache_keys_and_controllers(cls, affected_refs):
+        """
+        Gets cache keys and controllers that reference this district
+        """
+        years = affected_refs['year']
+
+        return cls._get_districtlist_cache_keys_and_controllers(years) + \
+            cls._queries_to_cache_keys_and_controllers(get_affected_queries.district_updated(affected_refs))
+
+    @classmethod
     def get_team_cache_keys_and_controllers(cls, affected_refs):
         """
         Gets cache keys and controllers that references this team
@@ -179,7 +191,7 @@ class CacheClearer(object):
         district_keys = set()
         for dt_key in district_team_keys_future.get_result():
             district_key_name = dt_key.id().split('_')[0]
-            district_keys.add(district_key_name)
+            district_keys.add(ndb.Key(District, district_key_name))
 
         return cls._get_teams_cache_keys_and_controllers(team_keys) + \
             cls._get_eventteams_cache_keys_and_controllers(event_keys) + \
@@ -251,8 +263,9 @@ class CacheClearer(object):
     def _get_districtteams_cache_keys_and_controllers(cls, district_keys, team_keys):
         cache_keys_and_controllers = []
         for district_key in filter(None, district_keys):
-            year = district_key[:4]
-            district_short = district_key[4:]
+            key_name = district_key.id()
+            year = key_name[:4]
+            district_short = key_name[4:]
             cache_keys_and_controllers.append((ApiDistrictTeamsController.get_cache_key_from_format(district_short, year), ApiDistrictTeamsController))
         for team_key in filter(None, team_keys):
             cache_keys_and_controllers.append((ApiTeamHistoryDistrictsController.get_cache_key_from_format(team_key.id()), ApiTeamHistoryDistrictsController))

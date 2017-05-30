@@ -5,7 +5,7 @@
 {% block content %}
 <div class="row">
     <div class="alert alert-block alert-success">
-        <h4>Got {{events|length}} events</h4>
+        <h4>Got {{events|length}} events in {{ districts|length }} districts</h4>
     </div>
     <table class="table table-condensed table-hover table-striped">
         <thead>
@@ -15,6 +15,7 @@
             <th>state_prov</th>
             <th>country</th>
             <th>start_date</th>
+            <th>district</th>
         </thead>
         {% for event in events %}
         <tr>
@@ -24,6 +25,7 @@
             <td>{{event.state_prov}}</td>
             <td>{{event.country}}</td>
             <td>{{event.start_date}}</td>
+            <td>{{event.district_key}}</td>
         </tr>
         {% endfor %}
     </table>

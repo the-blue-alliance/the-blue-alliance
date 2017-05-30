@@ -5,12 +5,12 @@ import urllib
 import uuid
 
 from google.appengine.ext import deferred
+from google.appengine.api import memcache
 from google.appengine.api import urlfetch
 
 from controllers.gcm.gcm import GCMMessage
 from consts.client_type import ClientType
 from consts.notification_type import NotificationType
-from helpers.firebase.firebase_pusher import FirebasePusher
 from helpers.notification_sender import NotificationSender
 from models.sitevar import Sitevar
 
@@ -33,14 +33,13 @@ class BaseNotification(object):
     # Can be overridden by subclasses if not
     _track_call = True
 
-    # Also post this notification to the Firebase stream?
-    # Can be overridden if not
-    _push_firebase = True
-
     # GCM Priority for this message, set to "High" for important pushes
     # Valid types are 'high' and 'normal'
     # https://developers.google.com/cloud-messaging/concept-options#setting-the-priority-of-a-message
     _priority = 'normal'
+
+    # If set to (key, timeout_seconds), won't send multiple notifications
+    _timeout = None
 
     """
     Class that acts as a basic notification.
@@ -48,10 +47,16 @@ class BaseNotification(object):
     """
 
     def send(self, keys, push_firebase=True, track_call=True):
+        if self._timeout is not None:
+            key, timeout = self._timeout
+            if memcache.get(key):  # Using memcache is a hacky implementation, since it is not guaranteed.
+                logging.info("Notification timeout for: {}".format(key))
+                return  # Currently in timeout. Don't send.
+            else:
+                memcache.set(key, True, timeout)
+
         self.keys = keys  # dict like {ClientType : [ key ] } ... The list for webhooks is a tuple of (key, secret)
         deferred.defer(self.render, self._supported_clients, _queue="push-notifications")
-        if self._push_firebase and push_firebase:
-            FirebasePusher.push_notification(self)
         if self._track_call and track_call:
             num_keys = 0
             for v in keys.values():

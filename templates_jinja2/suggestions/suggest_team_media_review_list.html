@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Pending Suggestions{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <ol class="breadcrumb">
+    <li><a href="/suggest/review">Suggestions</a></li>
+    <li class="active">Team Medias</li>
+  </ol>
+  <h1>{{ suggestions_and_references_and_preferred|length }} Pending Team Media Suggestions</h1>
+
+  <div class="row">
+    <div class="col-sm-6">
+      <h2>Video Approval Guidelines</h2>
+      <div class="alert alert-success">
+        <strong>Do approve:</strong>
+        <ul>
+          <li>Chairman's video</li>
+          <li>Robot reveal</li>
+          <li>Robot testing</li>
+          <li>Awards ceremony</li>
+          <li>Practice matches</li>
+        </ul>
+      </div>
+      <div class="alert alert-danger">
+        <strong>Do NOT approve:</strong>
+        <ul>
+          <li>Full matches (from any PoV)</li>
+          <li>People dancing</li>
+          <li>Long, drawn out videos with little to no real content</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <h2>Image Approval Guidelines</h2>
+      <div class="alert alert-success">
+        <strong>Do approve:</strong>
+        <ul>
+          <li>Robot photos</li>
+          <li>Team photos with robot</li>
+        </ul>
+      </div>
+      <div class="alert alert-danger">
+        <strong>Do NOT approve:</strong>
+        <ul>
+          <li>GIFs</li>
+          <li>Images without robot</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <form action="/suggest/team/media/review" method="post" id="review_media">
+      <div class="col-xs-12">
+
+          <div class="row">
+              <div class="control-group">
+                  <div class="controls">
+                      <a href="#" id="accept_all_button" class="btn btn-success">Select All Accepts</a>
+                      <a href="#" id="reject_all_button" class="btn btn-danger">Select All Rejects</a>
+                      <a href="#" id="deselect_all_button" class="btn btn-default">Deselect All</a>
+                  </div>
+              </div>
+          </div><br>
+
+          {% for suggestion, reference, preferred in suggestions_and_references_and_preferred %}
+          <div class="row">
+              <div class="well">
+                  <div class="col-xs-2">
+                    <label class="radio text-success">
+                      <input class="accept" type="radio" name="accept_reject-{{suggestion.key.id()}}" value="accept::{{suggestion.key.id()}}"> Accept
+                    </label>
+                    <label class="radio text-danger">
+                      <input class="reject" type="radio" name="accept_reject-{{suggestion.key.id()}}" value="reject::{{suggestion.key.id()}}"> Reject
+                    </label>
+                    <input type="text" class="form-control" name="year-{{suggestion.key.id()}}" placeholder="Year" value="{{suggestion.contents.year}}">
+                  </div>
+                  <div class="col-xs-5 fitvids">
+                      <p><strong><a href="/team/{{reference.team_number}}/{{suggestion.contents.year}}" target="_blank">Team {{reference.team_number}}{% if reference.nickname %} - {{reference.nickname}}{% endif %} ({{suggestion.contents.year}})</a></strong></p>
+                      {% set media = suggestion.candidate_media -%}
+                      {% include "media_partials/media_display_partial.html" %}
+                  </div>
+                  <div class="col-xs-3">
+                    {% if preferred %}
+                    <strong>Existing Preferred:</strong>
+                    {% endif %}
+                    {% for media in preferred %}
+                      {% if preferred|length >= max_preferred %}
+                      <label class="radio text-info">
+                        <input type="radio" name="replace-preferred-{{suggestion.key.id()}}" value="{{media.key.id()}}"> Replace
+                      </label>
+                      {% endif %}
+                      <div style="max-width: 100px;">
+                        {% include "media_partials/image_thumbnail_partial.html" %}
+                      </div>
+                    {% endfor %}
+                    {% if suggestion.contents.media_type_enum == 1 or suggestion.contents.media_type_enum == 2 %}
+                      {% if preferred|length < max_preferred %}
+                      <label class="checkbox text-info" for="preferred_{{suggestion.key.id()}}">
+                        <input type="checkbox" name="preferred_keys[]" id="preferred_{{suggestion.key.id()}}" value="preferred::{{suggestion.key.id()}}"> Add as Preferred<br>(Doesn't do anything for non-images)
+                      </label>
+                      {% else %}
+                        <label class="radio text-info">
+                          <input type="radio" name="replace-preferred-{{suggestion.key.id()}}" value="" checked> Keep Current Preferred
+                        </label>
+                      {% endif %}
+                    {% endif %}
+                  </div>
+                  <div class="col-xs-2">
+                      <ul>
+                          <li>{{ suggestion.key.id() }}</a></li>
+                          <li>{{ suggestion.author.get().email }}</a></li>
+                          <li>{{ suggestion.author.get().nickname }}</a></li>
+                          <li>{{ suggestion.contents_json }}</li>
+                          <li>{{ suggestion.private_details_json }}</li>
+                      </ul>
+                  </div>
+                  <div class="clearfix"></div>
+              </div>
+          </div>
+          {% else %}
+          <div class="row">
+              <div class="well">
+                  <p>No suggestions! Go build more community!</p>
+              </div>
+          </div>
+          {% endfor %}
+
+          <div class="row">
+              <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-pencil"></span> Act On Selected</button>
+          </div>
+      </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block inline_javascript %}
+<script src="//cdn.jsdelivr.net/github-cards/latest/widget.js"></script>
+<script>
+$("#accept_all_button").click(function(e) {
+    e.preventDefault();
+    $('.accept').prop('checked', true);
+    $('.reject').prop('checked', false);
+});
+$("#reject_all_button").click(function(e) {
+    e.preventDefault();
+    $('.accept').prop('checked', false);
+    $('.reject').prop('checked', true);
+});
+$("#deselect_all_button").click(function(e) {
+    e.preventDefault();
+    $('.accept').prop('checked', false);
+    $('.reject').prop('checked', false);
+});
+</script>
+{% endblock %}

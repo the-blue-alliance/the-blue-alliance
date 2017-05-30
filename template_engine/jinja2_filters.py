@@ -4,6 +4,8 @@ import re
 import time
 import urllib
 
+from helpers.youtube_video_helper import YouTubeVideoHelper
+from models.match import Match
 
 defense_render_names_2016 = {
     'A_ChevalDeFrise': 'Cheval De Frise',
@@ -39,6 +41,12 @@ def floatformat(num, num_decimals):
     return "%.{}f".format(num_decimals) % num
 
 
+def limit_prob(prob):
+    prob *= 100
+    prob = min(95, max(prob, 5))
+    return int(round(prob))
+
+
 def strftime(datetime, formatstr):
     """
     Uses Python's strftime with some tweaks
@@ -65,3 +73,25 @@ def rfc2822(datetime):
 def slugify(value):
     from django.template.defaultfilters import slugify as django_slugify
     return django_slugify(value)
+
+
+def yt_start(value):
+    if '?t=' in value:  # Treat ?t= the same as #t=
+        value = value.replace('?t=', '#t=')
+    if '#t=' in value:
+        sp = value.split('#t=')
+        video_id = sp[0]
+        old_ts = sp[1]
+        total_seconds = YouTubeVideoHelper.time_to_seconds(old_ts)
+        value = '%s?start=%i' % (video_id, total_seconds)
+
+    return value
+
+
+def match_short(match_key):
+    if not Match.validate_key_name(match_key):
+        return ''
+    match_id = match_key.split('_')[1]
+    if match_id.startswith('qm'):
+        return 'Q{}'.format(match_id[2:])
+    return match_id.replace('m', '-').upper()

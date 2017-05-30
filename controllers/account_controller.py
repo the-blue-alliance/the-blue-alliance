@@ -1,6 +1,8 @@
 import os
 import logging
 import datetime
+import random
+import string
 
 from collections import defaultdict
 
@@ -64,7 +66,9 @@ class AccountOverview(LoggedInHandler):
             total_pending = Suggestion.query(Suggestion.review_state==Suggestion.REVIEW_PENDING).count()
 
         # Fetch trusted API keys
-        trusted_keys = ApiAuthAccess.query(ApiAuthAccess.owner == user).fetch()
+        api_keys = ApiAuthAccess.query(ApiAuthAccess.owner == user).fetch()
+        write_keys = filter(lambda key: key.is_write_key, api_keys)
+        read_keys = filter(lambda key: key.is_read_key, api_keys)
 
         self.template_values['status'] = self.request.get('status')
         self.template_values['webhook_verification_success'] = self.request.get('webhook_verification_success')
@@ -76,8 +80,9 @@ class AccountOverview(LoggedInHandler):
         self.template_values['review_permissions'] = review_permissions
         self.template_values['num_reviewed'] = num_reviewed
         self.template_values['total_pending'] = total_pending
-        self.template_values['trusted_keys'] = trusted_keys
-        self.template_values['auth_type_names'] = AuthType.type_names
+        self.template_values['read_keys'] = read_keys
+        self.template_values['write_keys'] = write_keys
+        self.template_values['auth_write_type_names'] = AuthType.write_type_names
 
         self.response.out.write(jinja2_engine.render('account_overview.html', self.template_values))
 
@@ -174,6 +179,37 @@ class AccountLogout(LoggedInHandler):
         response.delete_cookie('SACSID')
 
         return response
+
+
+class AccountAPIReadKeyAdd(LoggedInHandler):
+    def post(self):
+        self._require_registration()
+
+        description = self.request.get('description')
+        if description:
+            ApiAuthAccess(
+                id=''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _ in range(64)),
+                owner=self.user_bundle.account.key,
+                auth_types_enum=[AuthType.READ_API],
+                description=description,
+            ).put()
+            self.redirect('/account?status=read_key_add_success')
+        else:
+            self.redirect('/account?status=read_key_add_no_description')
+
+
+class AccountAPIReadKeyDelete(LoggedInHandler):
+    def post(self):
+        self._require_registration()
+
+        key_id = self.request.get('key_id')
+        auth = ApiAuthAccess.get_by_id(key_id)
+
+        if auth and auth.owner == self.user_bundle.account.key:
+            auth.key.delete()
+            self.redirect('/account?status=read_key_delete_success')
+        else:
+            self.redirect('/account?status=read_key_delete_failure')
 
 
 class MyTBAController(LoggedInHandler):
@@ -295,8 +331,10 @@ class myTBAAddHotMatchesController(LoggedInHandler):
             ancestor=self.user_bundle.account.key).fetch_async(projection=[Subscription.model_key])
 
         matches = []
-        if event.matchstats and 'match_predictions' in event.matchstats:
-            match_predictions = event.matchstats['match_predictions']
+        if event.details and event.details.predictions and event.details.predictions['match_predictions']:
+            match_predictions = dict(
+                event.details.predictions['match_predictions']['qual'].items() +
+                event.details.predictions['match_predictions']['playoff'].items())
             max_hotness = 0
             min_hotness = float('inf')
             for match in event.matches:

@@ -24,13 +24,12 @@ class TestFMSAPIEventParser(unittest2.TestCase):
         self.testbed.init_memcache_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
-
         self.event = Event(
             id="2015waamv",
             end_date=datetime.datetime(2015, 4, 2, 0, 0),
             event_short="waamv",
             event_type_enum=EventType.REGIONAL,
-            event_district_enum=DistrictType.NO_DISTRICT,
+            district_key=None,
             first_eid="13467",
             name="PNW District - Auburn Mountainview Event",
             start_date=datetime.datetime(2015, 3, 31, 0, 0),
@@ -65,7 +64,7 @@ class TestFMSAPIEventParser(unittest2.TestCase):
 
     def test_parseMatches(self):
         with open('test_data/fms_api/2015waamv_staging_matches.json', 'r') as f:
-            matches = FMSAPIHybridScheduleParser(2015, 'waamv').parse(json.loads(f.read()))
+            matches, _ = FMSAPIHybridScheduleParser(2015, 'waamv').parse(json.loads(f.read()))
 
         self.assertEqual(len(matches), 64)
 
@@ -77,7 +76,7 @@ class TestFMSAPIEventParser(unittest2.TestCase):
         self.assertEqual(match.set_number, 1)
         self.assertEqual(match.match_number, 1)
         self.assertEqual(match.team_key_names, [u'frc4131', u'frc4469', u'frc3663', u'frc3684', u'frc5295', u'frc2976'])
-        self.assertEqual(match.alliances_json, """{"blue": {"score": 30, "teams": ["frc4131", "frc4469", "frc3663"]}, "red": {"score": 18, "teams": ["frc3684", "frc5295", "frc2976"]}}""")
+        self.assertEqual(match.alliances_json, """{"blue": {"surrogates": [], "score": 30, "teams": ["frc4131", "frc4469", "frc3663"]}, "red": {"surrogates": [], "score": 18, "teams": ["frc3684", "frc5295", "frc2976"]}}""")
         self.assertEqual(match.time, datetime.datetime(2015, 2, 27, 0, 0))
         self.assertEqual(match.actual_time, datetime.datetime(2015, 2, 27, 0, 0))
 
@@ -87,7 +86,7 @@ class TestFMSAPIEventParser(unittest2.TestCase):
         self.assertEqual(match.set_number, 1)
         self.assertEqual(match.match_number, 12)
         self.assertEqual(match.team_key_names, [u'frc3663', u'frc5295', u'frc2907', u'frc2046', u'frc3218', u'frc2412'])
-        self.assertEqual(match.alliances_json, """{"blue": {"score": null, "teams": ["frc3663", "frc5295", "frc2907"]}, "red": {"score": null, "teams": ["frc2046", "frc3218", "frc2412"]}}""")
+        self.assertEqual(match.alliances_json, """{"blue": {"surrogates": [], "score": null, "teams": ["frc3663", "frc5295", "frc2907"]}, "red": {"surrogates": [], "score": null, "teams": ["frc2046", "frc3218", "frc2412"]}}""")
         self.assertEqual(match.time, datetime.datetime(2015, 2, 27, 2, 17))
         self.assertEqual(match.actual_time, None)
 
@@ -145,3 +144,37 @@ class TestFMSAPIEventParser(unittest2.TestCase):
             [30, 4469, 15, 14, 0, 0, 0, 16, 2],
             [31, 2557, 15, 6, 0, 0,  0, 36, 2],
             [32, 1318, 1, 6, 0, 0, 0, 8, 2]])
+
+    def test_parse2017Awards(self):
+        self.event = Event(
+            id="2017cmpmo",
+            end_date=datetime.datetime(2017, 4, 29, 0, 0),
+            event_short="cmpmo",
+            event_type_enum=EventType.CMP_FINALS,
+            district_key=None,
+            first_eid="22465",
+            name="Einstein Field (St. Louis)",
+            start_date=datetime.datetime(2017, 4, 29, 0, 0),
+            year=2017,
+            timezone_id='America/Chicago'
+        )
+        self.event.put()
+
+        with open('test_data/fms_api/2017cmpmo_awards.json', 'r') as f:
+            awards = FMSAPIAwardsParser(self.event).parse(json.loads(f.read()))
+
+        self.assertEqual(len(awards), 6)
+
+        for award in awards:
+            if award.key.id() == '2017cmpmo_0':
+                self.assertEqual(award.name_str, 'Chairman\'s Award')
+                self.assertEqual(award.award_type_enum, 0)
+                self.assertFalse({'team_number': 2169, 'awardee': None} in award.recipient_list)
+                self.assertFalse({'team_number': 1885, 'awardee': None} in award.recipient_list)
+                self.assertTrue({'team_number': 2614, 'awardee': None} in award.recipient_list)
+            elif award.key.id() == '2017cmpmo_69':
+                self.assertEqual(award.name_str, 'Chairman\'s Award Finalist')
+                self.assertEqual(award.award_type_enum, 69)
+                self.assertTrue({'team_number': 2169, 'awardee': None} in award.recipient_list)
+                self.assertTrue({'team_number': 1885, 'awardee': None} in award.recipient_list)
+                self.assertFalse({'team_number': 2614, 'awardee': None} in award.recipient_list)

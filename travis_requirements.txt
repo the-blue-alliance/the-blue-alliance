@@ -1,8 +1,10 @@
 # Packages that are needed for testing on Travis
 Django==1.4.3
 Paver==1.1.1
-WebTest==1.4.0
+WebTest==2.0.24
 unittest2==0.5.1
 webapp2==2.5.2
 jinja2==2.6
 appengine-fixture-loader==0.1.8
+pytz==2016.4
+PyYAML==3.12

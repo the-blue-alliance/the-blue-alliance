@@ -39,7 +39,7 @@
 </table>
 {% endmacro %}
 
-{% macro qual_match_prediction_table(matches, predictions, fake_matches) %}
+{% macro qual_match_prediction_table(matches, predictions, fake_matches, year) %}
 <table class="match-table">
   <thead>
     {% include "match_partials/match_predictions_table_header.html" %}
@@ -48,10 +48,53 @@
   <tbody>
     {% if matches.qm %}
       <tr class="key">
-        <th colspan="20">Qualifications</th>
+        <th colspan="19">Qualifications</th>
       </tr>
       {% for match in matches.qm %}
-        {{mtrm.match_row_tr(match, predictions=predictions, fake_matches=fake_matches)}}
+        {{mtrm.match_prediction_row_tr(match, predictions, fake_matches=fake_matches)}}
+      {% endfor %}
+    {% endif %}
+  </tbody>
+</table>
+{% endmacro %}
+
+{% macro playoff_match_prediction_table(matches, predictions, fake_matches, year) %}
+<table class="match-table">
+  <thead>
+    {% include "match_partials/match_predictions_table_header.html" %}
+  </thead>
+
+  <tbody>
+    {% if matches.ef %}
+      <tr class="key">
+        <th colspan="19">Eighth-Finals</th>
+      </tr>
+      {% for match in matches.ef %}
+        {{mtrm.match_prediction_row_tr(match, predictions, fake_matches=fake_matches)}}
+      {% endfor %}
+    {% endif %}
+    {% if matches.qf %}
+      <tr class="key">
+        <th colspan="19">Quarterfinals</th>
+      </tr>
+      {% for match in matches.qf %}
+        {{mtrm.match_prediction_row_tr(match, predictions, fake_matches=fake_matches)}}
+      {% endfor %}
+    {% endif %}
+    {% if matches.sf %}
+      <tr class="key">
+        <th colspan="19">Semifinals</th>
+      </tr>
+      {% for match in matches.sf %}
+        {{mtrm.match_prediction_row_tr(match, predictions, fake_matches=fake_matches)}}
+      {% endfor %}
+    {% endif %}
+    {% if matches.f %}
+      <tr class="key">
+        <th colspan="19">Finals</th>
+      </tr>
+      {% for match in matches.f %}
+        {{mtrm.match_prediction_row_tr(match, predictions, fake_matches=fake_matches)}}
       {% endfor %}
     {% endif %}
   </tbody>
@@ -156,7 +199,7 @@
 </table>
 {% endmacro %}
 
-{% macro recent_match_table(matches, cur_team_key=None) %}
+{% macro recent_match_table(matches, cur_team_key=None, show_event=False) %}
 {% set cur_team = none %}
 <table class="match-table">
   <thead>
@@ -165,7 +208,7 @@
 
   <tbody>
     {% for match in matches %}
-      {{mtrm.match_row_tr(match, cur_team_key)}}
+      {{mtrm.match_row_tr(match, cur_team_key, show_event)}}
     {% endfor %}
   </tbody>
 </table>
@@ -176,7 +219,7 @@
   <thead>
     <tr class="key">
       <th colspan="12">Teams</th>
-      <th>Score</th>
+      <th>{% if match.has_been_played %}Score{% elif match.predicted_time %}Predicted Time{% elif match.time%}Scheduled Time{% else %}Score{% endif %}</th>
     </tr>
   </thead>
   <tbody>
@@ -185,14 +228,20 @@
         {{mtcm.match_team_td(match, 'red', team_key, cur_team_key, compact=True)}}
       {% endfor %}
 
-      {{mtcm.match_score_td(match, 'red', cur_team_key, compact=True, force_played=force_played)}}
+      {% if match.has_been_played or not match.time %}
+        {{mtcm.match_score_td(match, 'red', cur_team_key, compact=True, force_played=force_played)}}
+      {% else %}
+        {{mtcm.match_time_td(match, compact=True)}}
+      {% endif %}
     </tr>
     <tr>
       {% for team_key in match.alliances.blue.teams %}
         {{mtcm.match_team_td(match, 'blue', team_key, cur_team_key, compact=True)}}
       {% endfor %}
 
-      {{mtcm.match_score_td(match, 'blue', cur_team_key, compact=True, force_played=force_played)}}
+      {% if match.has_been_played or not match.time %}
+        {{mtcm.match_score_td(match, 'blue', cur_team_key, compact=True, force_played=force_played)}}
+      {% endif %}
     </tr>
   </tbody>
 </table>

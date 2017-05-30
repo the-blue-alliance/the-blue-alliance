@@ -8,6 +8,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from consts.district_type import DistrictType
+from models.district import District
 from models.district_team import DistrictTeam
 from models.robot import Robot
 from models.team import Team
@@ -48,7 +49,7 @@ class TestFMSAPITeamParser(unittest2.TestCase):
             self.assertNotEqual(districtTeam, None)
             self.assertEqual(districtTeam.key_name, "2015ne_frc1124")
             self.assertEqual(districtTeam.team.id(), "frc1124")
-            self.assertEqual(districtTeam.district, DistrictType.abbrevs['ne'])
+            self.assertEqual(districtTeam.district_key, ndb.Key(District, '2015ne'))
 
             # Test the Robot model we get back
             self.assertNotEqual(robot, None)
@@ -112,3 +113,36 @@ class TestFMSAPITeamParser(unittest2.TestCase):
                 self.assertEqual(team.country, "USA")
                 self.assertEqual(team.rookie_year, 2003)
                 self.assertEqual(team.website, expected)
+
+    def test_parse2017Team(self):
+        with open('test_data/fms_api/2017_frc604.json', 'r') as f:
+            models, more_pages = FMSAPITeamDetailsParser(2017).parse(json.loads(f.read()))
+
+            self.assertFalse(more_pages)
+            self.assertEqual(len(models), 1)
+
+            team, districtTeam, robot = models[0]
+
+            # Ensure we get the proper Team model back
+            self.assertEqual(team.key_name, "frc604")
+            self.assertEqual(team.team_number, 604)
+            self.assertEqual(team.name, "IBM/Team Grandma/The Brin Wojcicki Foundation/BAE Systems/Boston Scientific - The Argosy Foundation/Qualcomm/Intuitive Surgical/Leland Bridge/Councilman J. Khamis/Almaden Valley Women's Club/NVIDIA/Hurricane Electric/Exatron/MDR Precision/SOLIDWORKS/Hurricane Electric/Dropbox/GitHub&Leland High")
+            self.assertEqual(team.nickname, "Quixilver")
+            self.assertEqual(team.city, "San Jose")
+            self.assertEqual(team.state_prov, "California")
+            self.assertEqual(team.country, "USA")
+            self.assertEqual(team.rookie_year, 2001)
+            self.assertEqual(team.website, "http://604Robotics.com")
+
+            # Test the DistrictTeam model we get back
+            self.assertEqual(districtTeam, None)
+
+            # Test the Robot model we get back
+            self.assertNotEqual(robot, None)
+            self.assertEqual(robot.key_name, "frc604_2017")
+            self.assertEqual(robot.team.id(), "frc604")
+            self.assertEqual(robot.robot_name, "Ratchet")
+
+            # New properties for 2017
+            self.assertEqual(team.school_name, "Leland High")
+            self.assertEqual(team.home_cmp, "cmptx")

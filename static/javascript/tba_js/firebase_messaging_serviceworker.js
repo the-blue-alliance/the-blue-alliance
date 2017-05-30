@@ -63,13 +63,13 @@ function buildAndShowNotification(registration, payload) {
     notificationTitle = message_data.title;
     notificationOptions = {
       body: message_data.desc,
-      icon: '/images/logo_square_200.png'
+      icon: '/images/logo_square_512.png'
     };
   } else if (message_type == 'match_score') {  // TODO: incomplete
     notificationTitle = message_data.match.key + ' Results';
     notificationOptions = {
       body: 'TODO',
-      icon: '/images/logo_square_200.png'
+      icon: '/images/logo_square_512.png'
     };
   } else {  // TODO: support other notifications
     return;

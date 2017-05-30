@@ -1,6 +1,6 @@
 {% import "match_partials/match_table_cell_macros.html" as mtcm %}
 
-{% macro match_row_tr(match, cur_team_key, upcoming=False, predictions=None, fake_matches=False) %}
+{% macro match_row_tr(match, cur_team_key, show_event, upcoming=False, fake_matches=False) %}
 <tr class="visible-lg">
   {% if upcoming %}
     {{mtcm.match_time_td(match)}}
@@ -8,7 +8,7 @@
     {{mtcm.match_hasvideo_td(match)}}
   {% endif %}
 
-  {{mtcm.match_name_td(match, fake_matches=fake_matches)}}
+  {{mtcm.match_name_td(match, show_event=show_event, fake_matches=fake_matches)}}
 
   {% for team_key in match.alliances.red.teams %}
     {{mtcm.match_team_td(match, 'red', team_key, cur_team_key, fake_matches=fake_matches)}}
@@ -18,19 +18,16 @@
   {% endfor %}
 
   {% if not upcoming %}
-    {{mtcm.match_score_td(match, 'red', cur_team_key, predictions=predictions)}}
-    {{mtcm.match_score_td(match, 'blue', cur_team_key, predictions=predictions)}}
-  {% endif %}
-
-  {% if predictions %}
-    {{mtcm.breach_prob_td(match, 'red', predictions)}}
-    {{mtcm.breach_prob_td(match, 'blue', predictions)}}
-    {{mtcm.prob_td(match, predictions)}}
-    {{mtcm.correct_prediction_td(match, predictions)}}
+    {% if match.has_been_played or not match.time %}
+      {{mtcm.match_score_td(match, 'red', cur_team_key)}}
+      {{mtcm.match_score_td(match, 'blue', cur_team_key)}}
+    {% else %}
+      {{mtcm.match_time_td(match)}}
+    {% endif %}
   {% endif %}
 </tr>
 
-<tr class="hidden-lg">
+<tr class="hidden-lg compact-row">
   {% if upcoming %}
     {{mtcm.match_time_td(match, compact=True)}}
   {% else %}
@@ -44,13 +41,11 @@
   {% endfor %}
 
   {% if not upcoming %}
-  {{mtcm.match_score_td(match, 'red', cur_team_key, compact=True, predictions=predictions)}}
-  {% endif %}
-
-  {% if predictions %}
-    {{mtcm.breach_prob_td(match, 'red', predictions)}}
-    {{mtcm.prob_td(match, predictions, compact=True)}}
-    {{mtcm.correct_prediction_td(match, predictions, compact=True)}}
+    {% if match.has_been_played or not match.time %}
+      {{mtcm.match_score_td(match, 'red', cur_team_key, compact=True)}}
+    {% else %}
+      {{mtcm.match_time_td(match, compact=True)}}
+    {% endif %}
   {% endif %}
 </tr>
 <tr class="hidden-lg">
@@ -58,8 +53,37 @@
     {{mtcm.match_team_td(match, 'blue', team_key, cur_team_key, compact=True, fake_matches=fake_matches)}}
   {% endfor %}
 
+  {% if not upcoming and match.has_been_played %}
+    {{mtcm.match_score_td(match, 'blue', cur_team_key, compact=True)}}
+  {% endif %}
+</tr>
+{% endmacro %}
+
+{% macro match_prediction_row_tr(match, predictions, fake_matches=False) %}
+<tr>
+  {{mtcm.match_name_td(match, compact=True, fake_matches=fake_matches)}}
+
+  {% for team_key in match.alliances.red.teams %}
+    {{mtcm.match_team_td(match, 'red', team_key, None, compact=True, fake_matches=fake_matches)}}
+  {% endfor %}
+
+  {{mtcm.match_score_td(match, 'red', None, compact=True, predictions=predictions)}}
+  {{mtcm.breach_prob_td(match, 'red', predictions)}}
+  <td rowspan="2" style="width: 300px;">
+    <div style="width: 300px; height: 90px;">
+      <canvas id="chart_{{match.key.id()}}" class="score_chart" data-match-key="{{match.key.id()}}"></canvas>
+    </div>
+  </td>
+  {{mtcm.prob_td(match, predictions)}}
+  {{mtcm.correct_prediction_td(match, predictions)}}
+</tr>
+<tr>
+  {% for team_key in match.alliances.blue.teams %}
+    {{mtcm.match_team_td(match, 'blue', team_key, None, compact=True, fake_matches=fake_matches)}}
+  {% endfor %}
+
   {% if not upcoming %}
-  {{mtcm.match_score_td(match, 'blue', cur_team_key, compact=True, predictions=predictions)}}
+  {{mtcm.match_score_td(match, 'blue', None, compact=True, predictions=predictions)}}
   {% endif %}
 
   {% if predictions %}
@@ -67,7 +91,6 @@
   {% endif %}
 </tr>
 {% endmacro %}
-
 
 {% macro match_row_tr_hot(match) %}
 <tr>

@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% import 'media_partials/social_media_macros.html' as smm %}
+
+{% block title %}The Blue Alliance - Add Team Social Media{% endblock %}
+
+{% block meta_description %}Add team social media to The Blue Alliance.{% endblock %}
+
+{% block content %}
+<div class="container">
+  {% if status %}
+  <div class="row">
+    <div class="col-xs-12 col-lg-6 col-lg-offset-3">
+      {% if status == 'success' %}
+      <div class="alert alert-success">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Thanks!</h4>
+        <p>We'll review your suggestion and get it added to the site soon!</p>
+      </div>
+      {% elif status == 'media_exists' %}
+      <div class="alert alert-info">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Thanks!</h4>
+        <p>The URL you submitted has already been approved!</p>
+      </div>
+      {% elif status == 'suggestion_exists' %}
+      <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Thanks!</h4>
+        <p>The URL you submitted is already pending review!</p>
+      </div>
+      {% else %}
+      <div class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Uh oh!</h4>
+        <p>Sorry, but we are currently unable to support the URL you submitted. See below for currently supported formats.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+  <div class="row">
+    <div class="col-xs-12 col-lg-6 col-lg-offset-3">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h1 class="panel-title">Help others by adding social media!</h1>
+        </div>
+        <div class="panel-body">
+          <p>Thanks for helping make The Blue Alliance better! Let us know about media so we can add them to the site!</p>
+          <ul>
+            <li>Your suggestion will be reviewed by a moderator</li>
+            <li>Your account info (like {{user_bundle.user.email()}} and {{user_bundle.user.nickname()}}) will also be submitted. <a href="{{user_bundle.logout_url}}">log in as a different user</a></li>
+          </ul>
+
+          <hr>
+
+          <p><strong>Currently supported formats are:</strong></p>
+          <ul>
+            <li>Facebook Pages
+              <ul>
+                <li>Example: <code>https://facebook.com/theuberbots</code></li>
+              </ul>
+            </li>
+            <li>Twitter Profiles
+              <ul>
+                <li>Example: <code>https://twitter.com/team1124</code></li>
+              </ul>
+            </li>
+            <li>YouTube Profiles
+              <p>Please note that we can only accept YouTube channels with custom urls, if you do not have one, please create one by following <a href="https://support.google.com/youtube/answer/2657968?hl=en" target="_blank">these instructions</a>.</p>
+              <ul>
+                <li>Example: <code>https://www.youtube.com/user/Uberbots1124</code></li>
+              </ul>
+            </li>
+            <li>GitHub Accounts
+              <ul>
+                <li>Example: <code>https://github.com/frc1124</code></li>
+              </ul>
+            </li>
+            <li>Instagram Profiles
+              <ul>
+                <li>Example: <code>https://www.instagram.com/4hteamneutrino</code></li>
+              </ul>
+            </li>
+          <li>Periscope Profiles
+              <ul>
+                <li>Example: <code>https://www.periscope.tv/Evolution2626</code></li>
+              </ul>
+            </li>
+          </ul>
+
+          <hr>
+
+          <h3>Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h3>
+
+
+          <div class="row">
+            <div class="col-xs-12">
+              {% if social_medias%}
+                <h4>Existing Social Media Accounts</h4>
+                <ul>
+                {% for media in social_medias %}
+                  <li>{{smm.social_media_icon_link(media)}}</li>
+                {% endfor %}
+                </ul>
+              {% else %}
+                <p>No existing social media accounts!</p>
+              {% endif %}
+            </div>
+          </div>
+
+          <hr>
+          <div class="row">
+            <div class="col-xs-12">
+              <h4>Add more social media</h4>
+              <form action="/suggest/team/social_media" method="post" id="suggest_social_media">
+                <input name="team_key" type="hidden" value="{{team.key.id()}}" />
+                <div class="input-group">
+                  <input class="form-control" type="text" name="media_url" placeholder="https://facebook.com/theuberbots" value="" />
+                  <span class="input-group-btn">
+                    <button class="btn btn-success" type="submit"><span class="glyphicon glyphicon-plus-sign"></span> Add Media</button>
+                  </span>
+                </div>
+              </form>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

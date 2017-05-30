@@ -9,12 +9,39 @@
 <div class="btn-group">
     <a href="/admin/event/edit/{{event.key_name}}" class="btn btn-primary"><span class="glyphicon glyphicon-edit"></span> Edit</a>
     <a href="/event/{{event.key_name}}" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> View on TBA</a>
-    <a href="/tasks/math/do/eventteam_update/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-user"></span> Rebuild EventTeams</a>
-    <a href="/backend-tasks/get/event_details/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Refresh from FIRST</a>
-    <a href="/backend-tasks/do/post_event_tasks/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-play"></span> Run Post-Event Tasks</a>
+    <button class="btn btn-danger" form="event_cache_clear"><span class="glyphicon glyphicon-trash"></span> Clear Cache</button>
 </div>
-<br />
 
+<form action="/admin/memcache" method="post" id="event_cache_clear">
+  <input name="memcache_key" value="{{cache_key}}" type="hidden" />
+  <input name="return_url" value="/admin/event/{{ event.key_name }}" type="hidden" />
+</form>
+
+{% if flushed %}
+<div class="row">
+  <p>Cleared cache keys {{ flushed }}</p>
+</div>
+{% endif %}
+<hr>
+
+<div class="row">
+<div class="col-sm-12">
+  <ul class="nav nav-tabs nav-justified">
+    <li class="active"><a href="#info" data-toggle="tab">Info</a></li>
+    <li><a href="#tasks" data-toggle="tab">Tasks</a></li>
+    <li><a href="#webcasts" data-toggle="tab">Webcasts</a></li>
+    <li><a href="#rankings" data-toggle="tab">Rankings</a></li>
+    <li><a href="#alliances" data-toggle="tab">Alliances</a></li>
+    <li><a href="#awards" data-toggle="tab">Awards</a></li>
+    <li><a href="#matches" data-toggle="tab">Matches</a></li>
+    <li><a href="#media" data-toggle="tab">Media</a></li>
+  </ul>
+</div>
+</div>
+
+<div class="tab-content">
+<div class="tab-pane active" id="info">
+<div class="row">
 <table class="table table-striped table-hover">
     <tr>
         <td>Name</td>
@@ -41,12 +68,20 @@
         <td>{{ event.event_short }}</td>
     </tr>
     <tr>
+        <td>FIRST API Code</td>
+        <td>{{ event.first_code }}</td>
+    </tr>
+    <tr>
         <td>Event Type</td>
         <td>{{ event.event_type_str }}</td>
     </tr>
     <tr>
-        <td>Event District</td>
-        <td>{{ event.event_district_str }}</td>
+        <td>Event District Key</td>
+        <td>{{ event.district_key }}</td>
+    </tr>
+    <tr>
+        <td>Playoff Type</td>
+        <td>{{ playoff_types|get_item:event.playoff_type }}</td>
     </tr>
     <tr>
         <td>Event Venue</td>
@@ -73,6 +108,10 @@
         <td>{{ event.country }}</td>
     </tr>
     <tr>
+        <td>Normalized Location</td>
+        <td>{{ event.normalized_location }}</td>
+    </tr>
+    <tr>
         <td>Event Timezone</td>
         <td>{{ event.timezone_id }}</td>
     </tr>
@@ -97,14 +136,41 @@
         <td>{{event.webcast_json}}</td>
     </tr>
     <tr>
+        <td>Parent Event</td>
+        <td>{% if event.parent_event %}<a href="/admin/event/{{ event.parent_event.id }}">{{ event.parent_event.id }}</a>{% else %}None{% endif %}</td>
+    </tr>
+    <tr>
+        <td>Divisions</td>
+        <td>{{ event.divisions|length }} Divisions - {% for div_key in event.divisions %}<a href="/admin/event/{{ div_key.id }}">{{ div_key.id }}</a>, {% endfor %}<ul>
+        </ul></td>
+    </tr>
+    <tr>
         <td>Teams Attending</td>
-        <td>{{ event.teams|length }} teams - {% for team in event.teams %}<a href="/admin/team/{{team.team_number}}">{{team.team_number}}</a>, {% endfor %}</td>
+        <td>{{ event.teams|length }} teams - {% for team in event.teams %}<a href="/admin/team/{{team.team_number}}">{{team.team_number}}</a>, {% endfor %}
+            <p><a href="/tasks/admin/do/clear_eventteams/{{ event.key_name }}" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Delete All</a></p></td>
     </tr>
     <tr>
         <td>Created - Updated</td>
         <td>{{ event.created }} - {{ event.updated }}</td>
     </tr>
 </table>
+</div>
+</div>
+
+<div class="tab-pane" id="tasks">
+<div class="row">
+  <h2>Event Tasks</h2>
+  <div class="btn-group">
+    <a href="/tasks/math/do/eventteam_update/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-user"></span> Rebuild EventTeams</a>
+    <a href="/backend-tasks/get/event_details/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Event Info</a>
+    <a href="/tasks/get/fmsapi_matches/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Matches</a>
+    <a href="/tasks/get/fmsapi_event_alliances/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Alliances</a>
+    <a href="/tasks/get/fmsapi_event_rankings/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Rankings</a>
+    <a href="/tasks/get/fmsapi_awards/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Awards</a>
+    <a href="/backend-tasks/do/post_event_tasks/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-play"></span> Run Post-Event Tasks</a>
+  </div>
+</div>
+<div class="row">
 <h2>Remap Teams</h2>
 <p>Change all matches, awards and alliance selections for one team to another</p>
 <p>Example:</p>
@@ -157,14 +223,37 @@
   <p>Outgoing team that was replaced: <input name="backup_out" placeholder="456"/></p>
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Backup Team</button>
 </form>
+</div>
+</div>
 
-<h2>Add Webcast</h2>
+<div class="tab-pane" id="webcasts">
+<div class="row">
+<h2>Event Webcasts</h2>
+<p>Current webcasts:</p>
+<ul>
+  {% for webcast in event.webcast %}
+    <li>{{ webcast }}
+        <button class="btn btn-danger" form="remove_webcast_{{ webcast.type }}_{{ webcast.channel }}_{{ webcast.file }}"><span class="glyphicon glyphicon-trash"></span> Remove</button></li>
+        <form id="remove_webcast_{{ webcast.type }}_{{ webcast.channel }}_{{ webcast.file }}" method="post" action="/admin/event/remove_webcast/{{ event.key_name }}">
+          <input type="hidden" name="type" value="{{ webcast.type }}" />
+          <input type="hidden" name="channel" value="{{ webcast.channel }}" />
+          <input type="hidden" name="file" value="{{ webcast.file }}" />
+          <input type="hidden" name="index" value="{{ forloop.counter }}" />
+        </form>
+  {% empty %}
+    <p>No webcasts found</p>
+  {% endfor %}
+</ul>
 {% include "partials/webcast_add_instructions_partial.html" %}
 <form action="/admin/event/add_webcast/{{event.key_name}}" method="post">
     {% include "partials/webcast_add_form_partial.html" %}
     <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Add Webcast</button>
 </form>
+</div>
+</div>
 
+<div class="tab-pane" id="rankings">
+<div class="row">
 <h2>Rankings</h2>
 <table class="table table-striped table-condensed table-center">
   {% for row in event.rankings %}
@@ -179,9 +268,15 @@
         {% endfor %}
     {% endif %}
     </tr>
+  {% empty %}
+      <p>No ranking data yet</p>
   {% endfor %}
 </table>
+</div>
+</div>
 
+<div class="tab-pane" id="alliances">
+<div class="row">
 <h2>Alliances</h2>
 <table class="table table-striped table-condensed">
 {% for alliance in event.alliance_selections %}
@@ -191,9 +286,15 @@
             <td>{{ team }}{% if alliance.backup and alliance.backup.out == team %} ({{alliance.backup.in}}){% endif %}</td>
         {% endfor %}
     </tr>
+{% empty %}
+    <p>No alliance data yet</p>
 {% endfor %}
 </table>
+</div>
+</div>
 
+<div class="tab-pane" id="awards">
+<div class="row">
 <h2>Awards</h2>
 <table class="table table-striped table-condensed">
     <tbody>
@@ -228,22 +329,87 @@
       {% endfor %}
     </tbody>
   </table>
+</div>
+</div>
 
+<div class="tab-pane" id="matches">
+<div class="row">
 <h2>Match Listing</h2>
 
 <table class="table table-striped table-condensed table-center">
     <thead>
         <th>Match Key</th>
+        <th>Scheduled Time</th>
+        <th>Predicted Time</th>
+        <th>Actual Time</th>
+        <th>Post Result Time</th>
         <th>Alliances JSON</th>
         <th>Score Breakdown JSON</th>
     </thead>
-    {% for match in event.matches %}
+    {% for match in event.matches|sort_by:"play_order" %}
     <tr>
-        <td><a href="/admin/match/{{match.key_name}}">{{ match.key_name }}</a></td>
-        <td>{{ match.alliances_json }}</td>
-        <td>{{ match.score_breakdown_json }}</td>
+        <td><a href="/admin/match/{{match.key_name}}">{{ match.verbose_name }}</a></td>
+        <td>{{ match.time|local_time:event.timezone_id}}</td>
+        <td>{{ match.predicted_time|local_time:event.timezone_id}}
+            {% if match.prediction_error_str %}<br>({{ match.prediction_error_str}}){% endif %}</td>
+        <td>{{ match.actual_time|local_time:event.timezone_id}}
+            {% if match.schedule_error_str%}<br>({{ match.schedule_error_str}}){% endif %}</td>
+        <td>{{ match.post_result_time|local_time:event.timezone_id}}</td>
+        <td>{% if match.alliances_json %}
+            <button data-toggle="collapse" data-target="#alliances_{{ match.key_name }}" class="btn btn-info">Show</button>
+            <div id="alliances_{{ match.key_name }}" class="collapse">{{ match.alliances_json }}</div>
+            {% endif %}</td>
+        <td>{% if match.score_breakdown_json %}
+            <button data-toggle="collapse" data-target="#breakdown_{{ match.key_name }}" class="btn btn-info">Show</button>
+            <div id="breakdown_{{ match.key_name }}" class="collapse">{{ match.score_breakdown_json }}</div>
+            {% endif %}</td>
     </tr>
     {% endfor %}
 </table>
+</div>
+</div>
 
+<div class="tab-pane" id="media">
+<div class="row">
+<h2>Event Media</h2>
+  {% for media in medias %}
+    <li>{% include "partials/admin_media_display.html" %}</li>
+  {% empty %}
+    <p>No media found</p>
+  {% endfor %}
+
+<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Confirm media reference removal
+            </div>
+            <div class="modal-body">
+                Are you sure you want to remove this reference to this media? References to other models will persist.
+            </div>
+            <div class="modal-footer">
+                <form id="delete_media_form" method="post">
+                <input name="reference_type" type="hidden" value="event" />
+                <input name="reference_key_name" type="hidden" value="{{event.key_name}}" />
+                <input name="originating_url" type="hidden" value="/admin/event/{{event.key_name}}" />
+
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-danger" type="submit"><span class="glyphicon glyphicon-delete"></span> Remove reference</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+</div>
+
+<script>
+$(document).ready(function(){
+    $('#confirm-delete').on('show.bs.modal', function(e) {
+        $(this).find('#delete_media_form').attr('action', '/admin/media/delete_reference/' + $(e.relatedTarget).data('key-name'));
+    });
+});
+</script>
 {% endblock %}

@@ -1,4 +1,5 @@
-var eventsRef = new Firebase('https://thebluealliance.firebaseio.com/events/');
+var database = firebase.database();
+var eventsRef = database.ref('events');
 var savedSnapshots = {};
 
 function setActiveEvents(eventKeys) {
@@ -25,7 +26,7 @@ function setActiveEvents(eventKeys) {
 }
 
 function saveSnapshotAndUpdate(snapshot) {
-  var eventKey = snapshot.key()
+  var eventKey = snapshot.key
   savedSnapshots[eventKey] = snapshot;
   updateMatchbar(eventKey, snapshot);
 }
@@ -34,6 +35,17 @@ function updateAllMatchbars() {
   for (eventKey in savedSnapshots) {
     updateMatchbar(eventKey, savedSnapshots[eventKey]);
   }
+}
+
+var compLevelsPlayOrder = {
+  'qm': 1,
+  'ef': 2,
+  'qf': 3,
+  'sf': 4,
+  'f': 5,
+}
+function calculateOrder(match) {
+  return compLevelsPlayOrder[match.comp_level] * 1000000 + match.match_number * 1000 + match.set_number
 }
 
 function updateMatchbar(event_key, snapshot) {
@@ -60,7 +72,9 @@ function updateMatchbar(event_key, snapshot) {
     match.key_name = match_key;
     matches_list.push(match);
   }
-  matches_list.sort(function(match1, match2){return match1.order - match2.order});
+  matches_list.sort(function(match1, match2) {
+    return calculateOrder(match1) - calculateOrder(match2);
+  });
 
   var upcoming_matches = [];
   var last_matches = [];
@@ -100,7 +114,7 @@ function updateMatchbar(event_key, snapshot) {
         if ($(this).children('div[id="' + upcoming_match.key_name + '"]').length == 0) {
           var rendered_match = renderMatch(upcoming_match).addClass('upcoming_match');
           // Color followed matches a different color
-          var teams = upcoming_match.alliances.red.teams.concat(upcoming_match.alliances.blue.teams);
+          var teams = upcoming_match.alliances.red.team_keys.concat(upcoming_match.alliances.blue.team_keys);
           for (var n=0; n<teams.length; n++) {
             var number = teams[n].substring(3);
 
@@ -131,12 +145,12 @@ function renderMatch(match) {
   var match_number = (comp_level == 'QF' || comp_level == 'SF' || comp_level == 'F') ? match.set_number + '-' + match.match_number : match.match_number;
   var match_label = comp_level + match_number;
 
-  var red_teams = match.alliances.red.teams[0].substring(3) + ', ' +
-    match.alliances.red.teams[1].substring(3) + ', ' +
-    match.alliances.red.teams[2].substring(3);
-  var blue_teams = match.alliances.blue.teams[0].substring(3) + ', ' +
-    match.alliances.blue.teams[1].substring(3) + ', ' +
-    match.alliances.blue.teams[2].substring(3);
+  var red_teams = match.alliances.red.team_keys[0].substring(3) + ', ' +
+    match.alliances.red.team_keys[1].substring(3) + ', ' +
+    match.alliances.red.team_keys[2].substring(3);
+  var blue_teams = match.alliances.blue.team_keys[0].substring(3) + ', ' +
+    match.alliances.blue.team_keys[1].substring(3) + ', ' +
+    match.alliances.blue.team_keys[2].substring(3);
 
   var red_score = match.alliances.red.score;
   var blue_score = match.alliances.blue.score;

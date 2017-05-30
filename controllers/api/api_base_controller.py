@@ -182,16 +182,23 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
         self.response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-TBA-Auth-Id, X-TBA-Auth-Sig'
 
     def _validate_auth(self, auth, event_key):
+        status_sitevar_future = Sitevar.get_by_id_async('trustedapi')
         allowed_event_keys = [ekey.id() for ekey in auth.event_list]
         if event_key not in allowed_event_keys:
             return "Only allowed to edit events: {}".format(', '.join(allowed_event_keys))
 
         missing_auths = self.REQUIRED_AUTH_TYPES.difference(set(auth.auth_types_enum))
         if missing_auths != set():
-            return "You do not have permission to edit: {}. If this is incorrect, please contact TBA admin.".format(",".join([AuthType.type_names[ma] for ma in missing_auths]))
+            return "You do not have permission to edit: {}. If this is incorrect, please contact TBA admin.".format(",".join([AuthType.write_type_names[ma] for ma in missing_auths]))
 
         if auth.expiration and auth.expiration < datetime.datetime.now():
             return "These keys expired on {}. Contact TBA admin to make changes".format(auth.expiration)
+
+        status_sitevar = status_sitevar_future.get_result()
+        if status_sitevar:
+            for auth_type in self.REQUIRED_AUTH_TYPES:
+                if not status_sitevar.contents.get(str(auth_type), True):  # Fail open
+                    return "The trusted API has been temporarily disabled by the TBA admins. Please contact them for more details."
 
         return None
 

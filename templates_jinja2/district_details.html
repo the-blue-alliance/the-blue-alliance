@@ -52,12 +52,12 @@
     <div class="col-xs-12 col-sm-9 col-lg-10">
       <h1 class="hidden-xs end_header">{% if explicit_year %}{{year}} {% endif %}{{district_name}} District{% if events|length > 0 %}<small> {{ events|length }} Events</small>{% endif %}</h1>
 
-      <ul class="nav nav-tabs" role="tablist">
+      <ul class="nav nav-tabs nav-justified" role="tablist">
         <li class="active"><a href="#events" role="tab" data-toggle="tab">Events</a></li>
         {% if teams_a or teams_b %}
         <li><a href="#teams" role="tab" data-toggle="tab">Teams</a></li>
         {% endif %}
-        {% if team_totals %}
+        {% if rankings %}
         <li><a href="#rankings" role="tab" data-toggle="tab">Rankings</a></li>
         {% endif %}
         {% if live_events_with_teams %}
@@ -112,7 +112,7 @@
           {% endif %}
         </div>
         {% endif %}
-        {% if team_totals %}
+        {% if rankings %}
         <div class="tab-pane" id="rankings">
           <table class="table table-striped table-condensed table-center">
             <thead>
@@ -127,39 +127,39 @@
               </tr>
             </thead>
             <tbody>
-              {% for team_key, totals in team_totals %}
+              {% for item in rankings %}
               <tr>
                 <td>{{loop.index}}</td>
-                <td><a href="/team/{{team_key|digits}}/{{year}}">{{team_key|digits}}</a></td>
+                <td><a href="/team/{{item.team_key|digits}}/{{year}}">{{item.team_key|digits}}</a></td>
                 <td>
-                  {% if totals.event_points.0 %}
-                  {{totals.event_points.0.1.total}} <a href="/event/{{totals.event_points.0.0.key.id()}}" rel="tooltip" title="{{totals.event_points.0.0.short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
+                  {% if item.event_points[0] %}
+                  {{item.event_points[0].total}} <a href="/event/{{item.event_points[0].event_key}}" rel="tooltip" title="{{events_by_key[item.event_points[0].event_key].short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
                   {% else %}
                   --
                   {% endif %}
                 </td>
                 <td>
-                  {% if totals.event_points.1 %}
-                  {{totals.event_points.1.1.total}} <a href="/event/{{totals.event_points.1.0.key.id()}}" rel="tooltip" title="{{totals.event_points.1.0.short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
+                  {% if item.event_points[1] %}
+                  {{item.event_points[1].total}} <a href="/event/{{item.event_points[1].event_key}}" rel="tooltip" title="{{events_by_key[item.event_points[1].event_key].short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
                   {% else %}
                   --
                   {% endif %}
                 </td>
                 <td>
-                  {% if totals.event_points.2 %}
-                  {{totals.event_points.2.1.total}} <a href="/event/{{totals.event_points.2.0.key.id()}}" rel="tooltip" title="{{totals.event_points.2.0.short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
+                  {% if item.event_points[2] %}
+                  {{item.event_points[2].total}} <a href="/event/{{item.event_points[2].event_key}}" rel="tooltip" title="{{events_by_key[item.event_points[2].event_key].short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
                   {% else %}
                   --
                   {% endif %}
                 </td>
                 <td>
-                  {% if totals.rookie_bonus %}
-                  {{totals.rookie_bonus}}
+                  {% if item.rookie_bonus %}
+                  {{item.rookie_bonus}}
                   {% else %}
                   --
                   {% endif %}
                 </td>
-                <td><strong>{{totals.point_total}}</strong></td>
+                <td><strong>{{item.point_total}}</strong></td>
               </tr>
               {% endfor %}
             </tbody>

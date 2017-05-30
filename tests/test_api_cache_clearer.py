@@ -11,7 +11,7 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import testbed
 
 import api_main
-
+import tba_config
 from consts.award_type import AwardType
 from consts.district_type import DistrictType
 from consts.event_type import EventType
@@ -51,6 +51,7 @@ from helpers.team_manipulator import TeamManipulator
 
 from models.award import Award
 from models.cached_response import CachedResponse
+from models.district import District
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
@@ -73,12 +74,22 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.testbed.init_taskqueue_stub(root_path=".")
         self.taskqueue_stub = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
 
+        # Enable the cache we're testing
+        tba_config.CONFIG['response_cache'] = True
+
+        self.district_2010fim = District(
+            id='2010fim',
+            year=2010,
+            abbreviation='fim',
+        )
+        self.district_2010fim.put()
+
         # populate mini db
         self.event_2010sc_1 = Event(
             id='2010sc',
             name='Palmetto Regional',
             event_type_enum=EventType.REGIONAL,
-            event_district_enum=DistrictType.MICHIGAN,
+            district_key=ndb.Key(District, '2010fim'),
             short_name='Palmetto',
             event_short='sc',
             year=2010,
@@ -94,7 +105,7 @@ class TestApiCacheClearer(unittest2.TestCase):
             id='2010sc',
             name='New Regional',
             event_type_enum=EventType.REGIONAL,
-            event_district_enum=DistrictType.MICHIGAN,
+            district_key=ndb.Key(District, '2010fim'),
             short_name='Palmetto',
             event_short='sc',
             year=2010,

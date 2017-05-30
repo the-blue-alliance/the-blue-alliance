@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react'
-import classNames from 'classnames'
+import muiThemeable from 'material-ui/styles/muiThemeable'
 import VideoGridContainer from '../containers/VideoGridContainer'
 import LayoutSelectionPanel from './LayoutSelectionPanel'
 import NoWebcasts from './NoWebcasts'
@@ -30,25 +30,30 @@ const MainContent = (props) => {
     child = (<VideoGridContainer />)
   }
 
-  const classes = classNames({
-    content: true,
-    'leave-left-margin': props.hashtagSidebarVisible,
-    'leave-right-margin': props.chatSidebarVisible,
-  })
+  const contentStyles = {
+    position: 'absolute',
+    top: props.muiTheme.layout.appBarHeight,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    marginRight: props.chatSidebarVisible ? props.muiTheme.layout.chatPanelWidth : 0,
+    marginLeft: props.hashtagSidebarVisible ? props.muiTheme.layout.socialPanelWidth : 0,
+  }
 
   return (
-    <div className={classes}>
+    <div style={contentStyles}>
       {child}
     </div>
   )
 }
 
 MainContent.propTypes = {
-  webcasts: PropTypes.array.isRequired,
+  webcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
   hashtagSidebarVisible: PropTypes.bool.isRequired,
   chatSidebarVisible: PropTypes.bool.isRequired,
   layoutSet: PropTypes.bool.isRequired,
   setLayout: PropTypes.func.isRequired,
+  muiTheme: PropTypes.object.isRequired,
 }
 
-export default MainContent
+export default muiThemeable()(MainContent)

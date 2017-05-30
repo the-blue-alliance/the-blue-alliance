@@ -5,9 +5,16 @@ import * as types from '../constants/ActionTypes'
  * webcasts.
  */
 export function setWebcastsRaw(webcasts) {
-  return {
-    type: types.SET_WEBCASTS_RAW,
-    webcasts,
+  return (dispatch, getState) => {
+    dispatch({
+      type: types.SET_WEBCASTS_RAW,
+      webcasts,
+    })
+
+    dispatch({
+      type: types.WEBCASTS_UPDATED,
+      webcasts: Object.assign({}, getState().webcastsById),
+    })
   }
 }
 
@@ -17,9 +24,36 @@ export function toggleChatSidebarVisibility() {
   }
 }
 
+export function setChatSidebarVisibility(visible) {
+  return {
+    type: types.SET_CHAT_SIDEBAR_VISIBILITY,
+    visible,
+  }
+}
+
 export function toggleHashtagSidebarVisibility() {
   return {
     type: types.TOGGLE_HASHTAG_SIDEBAR_VISIBILITY,
+  }
+}
+
+export function setHashtagSidebarVisibility(visible) {
+  return {
+    type: types.SET_HASHTAG_SIDEBAR_VISIBILITY,
+    visible,
+  }
+}
+
+export function toggleLayoutDrawerVisibility() {
+  return {
+    type: types.TOGGLE_LAYOUT_DRAWER_VISIBILITY,
+  }
+}
+
+export function setLayoutDrawerVisibility(visible) {
+  return {
+    type: types.SET_LAYOUT_DRAWER_VISIBILITY,
+    visible,
   }
 }
 
@@ -40,13 +74,13 @@ export function addWebcast(webcastId) {
   }
 }
 
-const addWebcastAtLocationNoCheck = (webcastId, location) => ({
-  type: types.ADD_WEBCAST_AT_LOCATION,
+const addWebcastAtPositionNoCheck = (webcastId, position) => ({
+  type: types.ADD_WEBCAST_AT_POSITION,
   webcastId,
-  location,
+  position,
 })
 
-export function addWebcastAtLocation(webcastId, location) {
+export function addWebcastAtPosition(webcastId, position) {
   // Before displaying the webcast, check that the provided webcast ID
   // references a webcast that actually exists
   return (dispatch, getState) => {
@@ -54,15 +88,15 @@ export function addWebcastAtLocation(webcastId, location) {
       return
     }
 
-    dispatch(addWebcastAtLocationNoCheck(webcastId, location))
+    dispatch(addWebcastAtPositionNoCheck(webcastId, position))
   }
 }
 
-export function swapWebcasts(firstLocation, secondLocation) {
+export function swapWebcasts(firstPosition, secondPosition) {
   return {
     type: types.SWAP_WEBCASTS,
-    firstLocation,
-    secondLocation,
+    firstPosition,
+    secondPosition,
   }
 }
 
@@ -83,5 +117,19 @@ export function setLayout(layoutId) {
   return {
     type: types.SET_LAYOUT,
     layoutId,
+  }
+}
+
+export function setTwitchChat(channel) {
+  return {
+    type: types.SET_TWITCH_CHAT,
+    channel,
+  }
+}
+
+export function setFavoriteTeams(favoriteTeams) {
+  return {
+    type: types.SET_FAVORITE_TEAMS,
+    favoriteTeams,
   }
 }

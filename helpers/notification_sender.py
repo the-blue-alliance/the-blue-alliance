@@ -42,9 +42,9 @@ class NotificationSender(object):
                 resp = urllib2.urlopen(request)
             except urllib2.HTTPError, e:
                 if e.code == 400:
-                    logging.warning('400, Invalid message: ' + repr(gcm_post_json_str))
+                    logging.warning('400, Bad request for URL: {}'.format(url))
                 elif e.code == 401:
-                    logging.warning('401, Webhook unauthorized')
+                    logging.warning('401, Webhook unauthorized for URL: {}'.format(url))
                 elif e.code == 404:
                     invalid_urls.append(url)
                 elif e.code == 500:

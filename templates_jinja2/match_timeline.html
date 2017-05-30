@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Match Timeline - The Blue Alliance{% endblock %}
+
+{% block meta_description %}Timeline of matches across all ongoing events{% endblock %}
+
+{% block content %}
+<div class="container" style="width: 100%;">
+  <div class="row">
+    <div class="col-xs-12">
+      <h1>Match Timeline</h1>
+      <div id="event-keys" class="hidden">{{event_keys_json|safe}}</div>
+      <div id="timeline"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block inline_javascript %}
+<script type="text/javascript">
+  var eventKeys = JSON.parse($('#event-keys').html());
+
+  var container = document.getElementById('timeline');
+
+  // create a data set with groups
+  var groups = new vis.DataSet();
+  for (var i in eventKeys) {
+    groups.add({id: eventKeys[i], content: eventKeys[i].substring(4).toUpperCase()});
+  }
+
+  var timelineItems = new vis.DataSet([]);
+
+  // Configuration for the Timeline
+  var options = {
+    rollingMode: true,
+    zoomMin: 1000 * 60 * 20,  // 20 min
+    zoomMax: 1000 * 60 * 60,  // 60 min
+    // zoomMax: 1000 * 60 * 60 * 24 * 7,  // One week
+  };
+
+  // Create a Timeline
+  var timeline = new vis.Timeline(container, timelineItems, groups, options);
+
+  // Subscribe to Firebase
+  for (var i in eventKeys) {
+    var eventRef = firebase.database().ref('events/' + eventKeys[i] + '/matches');
+    eventRef.on('value', function(snapshot) {
+      var matches = snapshot.val();
+      for (var matchKey in matches) {
+        var match = matches[matchKey];
+        var time;
+        var className = 'upcoming';
+        if (match.actual_time) {
+          time = match.actual_time;
+        } else if (match.predicted_time) {
+          time = match.predicted_time;
+        } else {
+          time = match.time;
+        }
+
+        var eventKey = match.key.split('_')[0];
+        var matchShort;
+        if (match.comp_level == 'qm') {
+          matchShort = 'Q' + match.match_number;
+        } else {
+          matchShort = match.comp_level.toUpperCase() + match.set_number + '-' + match.match_number;
+        }
+
+        // Format content
+        var content = '<a href="/match/' + match.key +'"><b>' + matchShort + '</b></a>' + '<br>' +
+          '<table class="match-table" style="margin: 0;">\
+            <tbody>\
+              <tr>\
+                <td class="red">' + match.alliances.red.team_keys[0].substring(3) +
+                '</td><td class="red">' + match.alliances.red.team_keys[1].substring(3) +
+                '</td><td class="red">' + match.alliances.red.team_keys[2].substring(3) + '</td>'
+        if (match.actual_time) {
+          content += '<td class="redScore">' + match.alliances.red.score + '</td>'
+        }
+        content += '</tr>\
+              <tr>\
+                <td class="blue">' + match.alliances.blue.team_keys[0].substring(3) +
+                '</td><td class="blue">' + match.alliances.blue.team_keys[1].substring(3) +
+                '</td><td class="blue">' + match.alliances.blue.team_keys[2].substring(3) + '</td>'
+        if (match.actual_time) {
+          content += '<td class="blueScore">' + match.alliances.blue.score + '</td>'
+        }
+        content += '</tr>\
+          </tbody>\
+        </table>'
+
+        var timelineItem = {
+          id: match.key,
+          group: eventKey,
+          content: content,
+          start: new Date(time * 1000).toISOString(),
+          end: new Date((time + 150) * 1000).toISOString(),
+          className: className,
+        };
+        timelineItems.update(timelineItem);
+      }
+    });
+    eventRef.on('child_removed', function(snapshot) {
+      var removedMatch = snapshot.val();
+      timelineItems.remove(removedMatch.key);
+    });
+  }
+</script>
+{% endblock %}

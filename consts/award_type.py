@@ -86,8 +86,9 @@ class AwardType(object):
     GOLDEN_CORNDOG = 66
     MOST_IMPROVED_TEAM = 67
     WILDCARD = 68
+    CHAIRMANS_FINALIST = 69
 
-    BLUE_BANNER_AWARDS = {CHAIRMANS, WINNER, WOODIE_FLOWERS}
+    BLUE_BANNER_AWARDS = {CHAIRMANS, CHAIRMANS_FINALIST, WINNER, WOODIE_FLOWERS}
     INDIVIDUAL_AWARDS = {WOODIE_FLOWERS, DEANS_LIST, VOLUNTEER, FOUNDERS,
                          BART_KAMEN_MEMORIAL, MAKE_IT_LOUD}
     NON_JUDGED_NON_TEAM_AWARDS = {  # awards not used in the district point model
@@ -97,11 +98,15 @@ class AwardType(object):
         VOLUNTEER,
         WINNER,
         FINALIST,
+        WILDCARD,
     }
 
     normalized_name = {
         CHAIRMANS: {
             None: "Chairman's Award",
+        },
+        CHAIRMANS_FINALIST: {
+            None: "Chairman's Award Finalist",
         },
         WINNER: {
             None: "Winner",
@@ -110,4 +115,29 @@ class AwardType(object):
             None: "Woodie Flowers Finalist Award",
             EventType.CMP_FINALS: "Woodie Flowers Award",
         },
+    }
+
+    SEARCHABLE = {  # Only searchable awards. Obscure & old awards not listed
+        CHAIRMANS: 'Chairman\'s',
+        CHAIRMANS_FINALIST: 'Chairman\'s Finalist',
+        ENGINEERING_INSPIRATION: 'Engineering Inspiration',
+        COOPERTITION: 'Coopertition',
+        CREATIVITY: 'Creativity',
+        ENGINEERING_EXCELLENCE: 'Engineering Excellence',
+        ENTREPRENEURSHIP: 'Entrepreneurship',
+        DEANS_LIST: 'Dean\'s List',
+        BART_KAMEN_MEMORIAL: 'Bart Kamen Memorial',
+        GRACIOUS_PROFESSIONALISM: 'Gracious Professionalism',
+        HIGHEST_ROOKIE_SEED: 'Highest Rookie Seed',
+        IMAGERY: 'Imagery',
+        INDUSTRIAL_DEESIGN: 'Industrial Design',
+        SAFETY: 'Safety',
+        INNOVATION_IN_CONTROL: 'Innovation in Control',
+        QUALITY: 'Quality',
+        ROOKIE_ALL_STAR: 'Rookie All Star',
+        ROOKIE_INSPIRATION: 'Rookie Inspiration',
+        SPIRIT: 'Spirit',
+        VOLUNTEER: 'Volunteer',
+        WOODIE_FLOWERS: 'Woodie Flowers',
+        JUDGES: 'Judges\'',
     }

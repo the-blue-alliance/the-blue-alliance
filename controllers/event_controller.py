@@ -10,32 +10,34 @@ from google.appengine.ext.webapp import template
 
 from base_controller import CacheableHandler
 from consts.district_type import DistrictType
+from consts.playoff_type import PlayoffType
 from database import event_query, media_query
+from database.district_query import DistrictsInYearQuery, DistrictQuery
+from database.event_query import EventQuery, EventDivisionsQuery
 from helpers.match_helper import MatchHelper
 from helpers.award_helper import AwardHelper
 from helpers.team_helper import TeamHelper
 from helpers.event_helper import EventHelper
-from helpers.event_insights_helper import EventInsightsHelper
 from helpers.media_helper import MediaHelper
 
 from models.event import Event
 from models.match import Match
 from template_engine import jinja2_engine
 
-from consts.ranking_indexes import RankingIndexes
-
 
 class EventList(CacheableHandler):
     """
     List all Events.
     """
+    LONG_CACHE_EXPIRATION = 60 * 60 * 24
+    SHORT_CACHE_EXPIRATION = 60 * 5
     VALID_YEARS = list(reversed(range(1992, tba_config.MAX_YEAR + 1)))
     CACHE_VERSION = 4
     CACHE_KEY_FORMAT = "event_list_{}_{}_{}"  # (year, explicit_year, state_prov)
 
     def __init__(self, *args, **kw):
         super(EventList, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24
+        self._cache_expiration = self.LONG_CACHE_EXPIRATION
 
     def get(self, year=None, explicit_year=False):
         if year == '':
@@ -62,6 +64,7 @@ class EventList(CacheableHandler):
     def _render(self, year=None, explicit_year=False):
         state_prov = self.request.get('state_prov', None)
 
+        districts_future = DistrictsInYearQuery(year).fetch_async()
         all_events_future = event_query.EventListQuery(year).fetch_async()  # Needed for state_prov
         if state_prov:
             events_future = Event.query(Event.year==year, Event.state_prov==state_prov).fetch_async()
@@ -76,15 +79,9 @@ class EventList(CacheableHandler):
 
         week_events = EventHelper.groupByWeek(events)
 
-        district_enums = set()
-        for event in events:
-            if event.event_district_enum is not None and event.event_district_enum != DistrictType.NO_DISTRICT:
-                district_enums.add(event.event_district_enum)
-
         districts = []  # a tuple of (district abbrev, district name)
-        for district_enum in district_enums:
-            districts.append((DistrictType.type_abbrevs[district_enum],
-                              DistrictType.type_names[district_enum]))
+        for district in districts_future.get_result():
+            districts.append((district.abbreviation, district.display_name))
         districts = sorted(districts, key=lambda d: d[1])
 
         valid_state_provs = set()
@@ -103,6 +100,9 @@ class EventList(CacheableHandler):
             "state_prov": state_prov,
             "valid_state_provs": valid_state_provs,
         })
+
+        if year == datetime.datetime.now().year:
+            self._cache_expiration = self.SHORT_CACHE_EXPIRATION
 
         return jinja2_engine.render('event_list.html', self.template_values)
 
@@ -135,16 +135,28 @@ class EventDetail(CacheableHandler):
         super(EventDetail, self).get(event_key)
 
     def _render(self, event_key):
-        event = Event.get_by_id(event_key)
+        event = EventQuery(event_key).fetch()
 
         if not event:
             self.abort(404)
 
         event.prepAwardsMatchesTeams()
+        event.prep_details()
         medias_future = media_query.EventTeamsPreferredMediasQuery(event_key).fetch_async()
+        district_future = DistrictQuery(event.district_key.id()).fetch_async() if event.district_key else None
+        event_medias_future = media_query.EventMediasQuery(event_key).fetch_async()
+
+        event_divisions_future = None
+        event_codivisions_future = None
+        parent_event_future = None
+        if event.divisions:
+            event_divisions_future = ndb.get_multi_async(event.divisions)
+        elif event.parent_event:
+            parent_event_future = event.parent_event.get_async()
+            event_codivisions_future = EventDivisionsQuery(event.parent_event.id()).fetch_async()
 
         awards = AwardHelper.organizeAwards(event.awards)
-        cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
+        cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches, event)
         matches = MatchHelper.organizeMatches(cleaned_matches)
         teams = TeamHelper.sortTeams(event.teams)
 
@@ -176,50 +188,50 @@ class EventDetail(CacheableHandler):
             matches_upcoming = None
 
         bracket_table = MatchHelper.generateBracket(matches, event.alliance_selections)
-        is_2015_playoff = EventHelper.is_2015_playoff(event_key)
-        if is_2015_playoff:
+
+        playoff_advancement = None
+        playoff_template = None
+        if EventHelper.is_2015_playoff(event_key):
             playoff_advancement = MatchHelper.generatePlayoffAdvancement2015(matches, event.alliance_selections)
+            playoff_template = 'playoff_table'
             for comp_level in ['qf', 'sf']:
                 if comp_level in bracket_table:
                     del bracket_table[comp_level]
-        else:
-            playoff_advancement = None
+        elif event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM:
+            playoff_advancement = MatchHelper.generatePlayoffAdvancementRoundRobin(matches, event.alliance_selections)
+            playoff_template = 'playoff_round_robin_6_team'
+            comp_levels = bracket_table.keys()
+            for comp_level in comp_levels:
+                if comp_level != 'f':
+                    del bracket_table[comp_level]
 
         district_points_sorted = None
-        if event.district_points:
+        if event.district_key and event.district_points:
             district_points_sorted = sorted(event.district_points['points'].items(), key=lambda (team, points): -points['total'])
 
-        event_insights = EventInsightsHelper.calculate_event_insights(cleaned_matches, event.year)
+        event_insights = event.details.insights if event.details else None
         event_insights_template = None
         if event_insights:
             event_insights_template = 'event_partials/event_insights_{}.html'.format(event.year)
 
-        # rankings processing for ranking score per match
-        full_rankings = event.rankings
-        rankings_enhanced = event.rankings_enhanced
-        if rankings_enhanced is not None:
-            rp_index = RankingIndexes.CUMULATIVE_RANKING_SCORE[event.year]
-            matches_index = RankingIndexes.MATCHES_PLAYED[event.year]
-            ranking_criterion_name = full_rankings[0][rp_index]
-            full_rankings[0].append(ranking_criterion_name + "/Match*")
+        district = district_future.get_result() if district_future else None
+        event_divisions = None
+        if event_divisions_future:
+            event_divisions = [e.get_result() for e in event_divisions_future]
+        elif event_codivisions_future:
+            event_divisions = event_codivisions_future.get_result()
 
-            for row in full_rankings[1:]:
-                team = row[1]
-                if rankings_enhanced["ranking_score_per_match"] is not None:
-                    rp_per_match = rankings_enhanced['ranking_score_per_match'][team]
-                    row.append(rp_per_match)
-                if rankings_enhanced["match_offset"] is not None:
-                    match_offset = rankings_enhanced["match_offset"][team]
-                    if match_offset != 0:
-                        row[matches_index] = "{} ({})".format(row[matches_index], match_offset)
+        medias_by_slugname = MediaHelper.group_by_slugname([media for media in event_medias_future.get_result()])
+        has_time_predictions = matches_upcoming and any(match.predicted_time for match in matches_upcoming)
 
         self.template_values.update({
             "event": event,
-            "district_name": DistrictType.type_names.get(event.event_district_enum, None),
-            "district_abbrev": DistrictType.type_abbrevs.get(event.event_district_enum, None),
+            "district_name": district.display_name if district else None,
+            "district_abbrev": district.abbreviation if district else None,
             "matches": matches,
             "matches_recent": matches_recent,
             "matches_upcoming": matches_upcoming,
+            'has_time_predictions': has_time_predictions,
             "awards": awards,
             "teams_a": teams_a,
             "teams_b": teams_b,
@@ -227,11 +239,14 @@ class EventDetail(CacheableHandler):
             "oprs": oprs,
             "bracket_table": bracket_table,
             "playoff_advancement": playoff_advancement,
+            "playoff_template": playoff_template,
             "district_points_sorted": district_points_sorted,
-            "is_2015_playoff": is_2015_playoff,
             "event_insights_qual": event_insights['qual'] if event_insights else None,
             "event_insights_playoff": event_insights['playoff'] if event_insights else None,
             "event_insights_template": event_insights_template,
+            "medias_by_slugname": medias_by_slugname,
+            "event_divisions": event_divisions,
+            'parent_event': parent_event_future.get_result() if parent_event_future else None
         })
 
         if event.within_a_day:
@@ -261,7 +276,7 @@ class EventInsights(CacheableHandler):
     def _render(self, event_key):
         event = Event.get_by_id(event_key)
 
-        if not event or event.year != 2016:
+        if not event or event.year < 2016 or not event.details.predictions:
             self.abort(404)
 
         event.get_matches_async()
@@ -272,15 +287,15 @@ class EventInsights(CacheableHandler):
         ranking_predictions = event.details.predictions.get('ranking_predictions', None)
         ranking_prediction_stats = event.details.predictions.get('ranking_prediction_stats', None)
 
-        cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
+        cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches, event)
         matches = MatchHelper.organizeMatches(cleaned_matches)
 
         # If no matches but there are match predictions, create fake matches
         # For cases where FIRST doesn't allow posting of match schedule
         fake_matches = False
-        if not matches['qm'] and match_predictions:
+        if match_predictions and (not matches['qm'] and match_predictions['qual']):
             fake_matches = True
-            for i in xrange(len(match_predictions.keys())):
+            for i in xrange(len(match_predictions['qual'].keys())):
                 match_number = i + 1
                 alliances = {
                     'red': {
@@ -306,6 +321,21 @@ class EventInsights(CacheableHandler):
                     alliances_json=json.dumps(alliances),
                 ))
 
+        # Add actual scores to predictions
+        distribution_info = {}
+        for comp_level in Match.COMP_LEVELS:
+            level = 'qual' if comp_level == 'qm' else 'playoff'
+            for match in matches[comp_level]:
+                distribution_info[match.key.id()] = {
+                    'level': level,
+                    'red_actual_score': match.alliances['red']['score'],
+                    'blue_actual_score': match.alliances['blue']['score'],
+                    'red_mean': match_predictions[level][match.key.id()]['red']['score'],
+                    'blue_mean': match_predictions[level][match.key.id()]['blue']['score'],
+                    'red_var': match_predictions[level][match.key.id()]['red']['score_var'],
+                    'blue_var': match_predictions[level][match.key.id()]['blue']['score_var'],
+            }
+
         last_played_match_num = None
         if ranking_prediction_stats:
             last_played_match_key = ranking_prediction_stats.get('last_played_match', None)
@@ -317,6 +347,7 @@ class EventInsights(CacheableHandler):
             "matches": matches,
             "fake_matches": fake_matches,
             "match_predictions": match_predictions,
+            "distribution_info_json": json.dumps(distribution_info),
             "match_prediction_stats": match_prediction_stats,
             "ranking_predictions": ranking_predictions,
             "ranking_prediction_stats": ranking_prediction_stats,

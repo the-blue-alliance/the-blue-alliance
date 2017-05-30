@@ -1,0 +1,7 @@
+{% macro sort_header(text, index) %}
+<a href="{{search_params(page, sort_field_override=index)}}">{{text}}{% if index == sort_field %} <span class="glyphicon glyphicon-triangle-{% if index != 'team' %}bottom{% else %}top{% endif %}"></span>{% endif %}</a>
+{% endmacro %}
+
+{% macro search_params(new_page, sort_field_override=None) %}
+?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}&seed={{seed}}&playoff_level={{playoff_level}}{% if cad_model %}&cad_model=on{% endif %}&page={{new_page}}&sort_field={% if sort_field_override %}{{sort_field_override}}{% else %}{{sort_field}}{% endif %}
+{% endmacro %}

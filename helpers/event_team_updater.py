@@ -2,6 +2,7 @@ import datetime
 
 from google.appengine.ext import ndb
 
+from helpers.match_helper import MatchHelper
 from models.award import Award
 from models.event import Event
 from models.event_team import EventTeam
@@ -20,7 +21,8 @@ class EventTeamUpdater(object):
         b) the team received an award at the event,
         c) the event has not yet occurred,
         d) the team is on an alliance
-        e) or the event is not from the current year. (This is to make sure we don't delete old data we may no longer be able to scrape)
+        e) the winning alliance of one of this event's divisions
+        f) or the event is not from the current year. (This is to make sure we don't delete old data we may no longer be able to scrape)
         """
         event = Event.get_by_id(event_key)
         cur_year = datetime.datetime.now().year
@@ -34,6 +36,10 @@ class EventTeamUpdater(object):
         match_futures = ndb.get_multi_async(match_key_futures.get_result())
         award_futures = ndb.get_multi_async(award_key_futures.get_result())
 
+        division_futures = ndb.get_multi_async(event.divisions) if event.divisions else []
+        division_matches_futures = [Match.query(
+            Match.event == division).fetch_async(1000) for division in event.divisions] if event.divisions else []
+
         for match_future in match_futures:
             match = match_future.get_result()
             for team in match.team_key_names:
@@ -46,6 +52,12 @@ class EventTeamUpdater(object):
         # Add teams from Alliances
         for team in event.alliance_teams:
             team_ids.add(team)
+
+        # Add teams from division winners
+        if division_futures and division_matches_futures:
+            for division_future, matches_future in zip(division_futures, division_matches_futures):
+                division_winners = self.get_event_winners(division_future.get_result(), matches_future.get_result())
+                team_ids = team_ids.union(division_winners)
 
         # Create or update EventTeams
         teams = [Team(id=team_id,
@@ -77,3 +89,40 @@ class EventTeamUpdater(object):
                 et_keys_to_delete.add(ndb.Key(EventTeam, et_key_name))
 
         return teams, event_teams, et_keys_to_delete
+
+    @classmethod
+    def get_event_winners(cls, event, matches):
+        """
+        First alliance to win two finals matches is the winner
+        """
+        matches_by_type = MatchHelper.organizeMatches(matches)
+        if 'f' not in matches_by_type or not matches_by_type['f']:
+            return set()
+        finals_matches = matches_by_type['f']
+        red_wins = 0
+        blue_wins = 0
+        for match in finals_matches:
+            if match.has_been_played:
+                if match.winning_alliance == 'red':
+                    red_wins += 1
+                elif match.winning_alliance == 'blue':
+                    blue_wins += 1
+
+        winning_teams = set()
+        if red_wins >= 2:
+            winning_teams = set(finals_matches[0].alliances['red']['teams'])
+        elif blue_wins >= 2:
+            winning_teams = set(finals_matches[0].alliances['blue']['teams'])
+
+        # Return the entire alliance
+        alliance_selections = event.alliance_selections
+        if alliance_selections:
+            for alliance in alliance_selections:
+                if len(winning_teams.intersection(set(alliance['picks']))) >= 2:
+                    complete_alliance = set(alliance['picks']) if alliance else set()
+                    if alliance and alliance.get('backup'):
+                        complete_alliance.add(alliance['backup']['in'])
+                    return complete_alliance
+
+        # Fall back to the match winners
+        return winning_teams

@@ -2,7 +2,8 @@ from controllers.ajax_controller import WebcastHandler
 from controllers.event_controller import EventList
 from controllers.main_controller import MainChampsHandler, MainCompetitionseasonHandler, MainOffseasonHandler, MainInsightsHandler, \
     WebcastsHandler
-from controllers.gameday_controller import GamedayHandler
+from controllers.gameday_controller import GamedayHandler, Gameday2Controller
+from helpers.firebase.firebase_pusher import FirebasePusher
 
 
 class MemcacheWebcastFlusher(object):
@@ -15,8 +16,10 @@ class MemcacheWebcastFlusher(object):
         flushed.append(MainOffseasonHandler().memcacheFlush())
         flushed.append(MainInsightsHandler().memcacheFlush())
         flushed.append(GamedayHandler().memcacheFlush())
+        flushed.append(Gameday2Controller().memcacheFlush())
         flushed.append(WebcastsHandler().memcacheFlush())
         flushed.append(EventList().memcacheFlush())
+        FirebasePusher.update_live_events()
 
         return flushed
 
@@ -24,4 +27,5 @@ class MemcacheWebcastFlusher(object):
     def flushEvent(self, event_key):
         flushed = self.flush()
         flushed.append(WebcastHandler().memcacheFlush(event_key))
+        FirebasePusher.update_live_events()
         return flushed

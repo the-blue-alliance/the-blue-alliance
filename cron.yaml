@@ -40,26 +40,43 @@ cron:
   timezone: America/Los_Angeles
 
 - description: Match Insights Calculation
-  url: /backend-tasks-b2/math/enqueue/insights/matches/2016
+  url: /backend-tasks-b2/math/enqueue/insights/matches/2017
   schedule: every day 01:00
   timezone: America/Los_Angeles
 
 - description: Award Insights Calculation
-  url: /backend-tasks-b2/math/enqueue/insights/awards/2016
+  url: /backend-tasks-b2/math/enqueue/insights/awards/2017
+  schedule: every day 01:00
+  timezone: America/Los_Angeles
+
+- description: Prediction Insights Calculation
+  url: /backend-tasks-b2/math/enqueue/insights/predictions/2017
   schedule: every day 01:00
   timezone: America/Los_Angeles
 
 - description: Match Overall Insights Calculation
   url: /backend-tasks-b2/math/enqueue/overallinsights/matches
-  schedule: every day 01:10
+  schedule: every day 01:01
   timezone: America/Los_Angeles
 
 - description: Award Overall Insights Calculation
   url: /backend-tasks-b2/math/enqueue/overallinsights/awards
-  schedule: every day 01:10
+  schedule: every day 01:01
   timezone: America/Los_Angeles
 
 - description: Upcoming match notification sending
   url: /tasks/notifications/upcoming_match
   schedule: every 2 minutes
   timezone: America/Los_Angeles
+
+- description: Update live events (and bluezone)
+  url: /tasks/do/update_live_events
+  schedule: every 5 minutes
+
+- description: Predict Match Times
+  url: /tasks/math/enqueue/predict_match_times
+  schedule: every 1 minutes
+
+# - description: BlueZone Update
+#   url: /tasks/do/bluezone_update
+#   schedule: every 1 minutes

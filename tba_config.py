@@ -2,6 +2,7 @@ import os
 
 
 DEBUG = os.environ.get('SERVER_SOFTWARE') is not None and os.getenv('APPLICATION_ID') != 's~tbatv-prod-hrd'
+DEBUG = DEBUG or os.getenv('IS_TBA_TEST') is not None or os.getenv('TRAVIS') is not None
 
 MAX_YEAR = 2017
 
@@ -27,8 +28,10 @@ if DEBUG:
         "memcache": False,
         "database_query_cache": False,
         "response_cache": False,
-        "firebase-url": "https://thebluealliance-dev.firebaseio.com/{}.json?auth={}",
+        "firebase-url": "https://thebluealliance-dev.firebaseio.com/{}.json?print=silent&auth={}",
+        "firebase-push": False,
         "use-compiled-templates": False,
+        "save-frc-api-response": False,
     }
 else:
     CONFIG = {
@@ -36,9 +39,11 @@ else:
         "memcache": True,
         "database_query_cache": True,
         "response_cache": True,
-        "firebase-url": "https://thebluealliance.firebaseio.com/{}.json?auth={}",
-        "use-compiled-templates": True
+        "firebase-url": "https://tbatv-prod-hrd.firebaseio.com/{}.json?print=silent&auth={}",
+        "firebase-push": True,
+        "use-compiled-templates": True,
+        "save-frc-api-response": True,
     }
 
-CONFIG['landing_handler'] = KICKOFF
+CONFIG['landing_handler'] = INSIGHTS
 CONFIG["static_resource_version"] = 8

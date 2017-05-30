@@ -5,7 +5,7 @@ from google.appengine.ext import ndb
 
 from consts.district_type import DistrictType
 from database import award_query, event_query, match_query, media_query, team_query
-
+from database.district_query import DistrictQuery
 from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetcher
 
 from helpers.award_helper import AwardHelper
@@ -14,6 +14,7 @@ from helpers.match_helper import MatchHelper
 from helpers.media_helper import MediaHelper
 
 from models.award import Award
+from models.district import District
 from models.event_team import EventTeam
 from models.match import Match
 from models.robot import Robot
@@ -129,11 +130,10 @@ class TeamRenderer(object):
         district_name = None
         district_abbrev = None
         team_districts = team_districts_future.get_result()
-        if year in team_districts:
-            district_key = team_districts[year]
-            district_abbrev = district_key[4:]
-            district_type = DistrictType.abbrevs[district_abbrev]
-            district_name = DistrictType.type_names[district_type]
+        for district in team_districts:
+            if district.year == year:
+                district_abbrev = district.abbreviation
+                district_name = district.display_name
 
         last_competed = None
         participation_years = participation_future.get_result()

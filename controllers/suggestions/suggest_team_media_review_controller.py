@@ -18,6 +18,7 @@ from template_engine import jinja2_engine
 class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
 
     def __init__(self, *args, **kw):
+        self.preferred_keys = []
         self.REQUIRED_PERMISSIONS.append(AccountPermissions.REVIEW_MEDIA)
         super(SuggestTeamMediaReviewController, self).__init__(*args, **kw)
 
@@ -69,32 +70,18 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
             "max_preferred": Media.MAX_PREFERRED,
         })
 
-        self.response.out.write(jinja2_engine.render('suggest_team_media_review_list.html', self.template_values))
+        self.response.out.write(jinja2_engine.render('suggestions/suggest_team_media_review_list.html', self.template_values))
 
-    @ndb.transactional(xg=True)
-    def _process_accepted(self, accept_key, preferred_keys):
-        """
-        Performs all actions for an accepted Suggestion in a Transaction.
-        Suggestions are processed one at a time (instead of in batch) in a
-        Transaction to prevent possible race conditions.
-
-        Actions include:
-        - Creating and saving a new Media for the Suggestion
-        - Removing a reference from another Media's preferred_references
-        - Marking the Suggestion as accepted and saving it
-        """
-        # Async get
-        suggestion_future = Suggestion.get_by_id_async(accept_key)
-
+    def create_target_model(self, suggestion):
         # Setup
-        to_replace_id = self.request.POST.get('replace-preferred-{}'.format(accept_key), None)
+        to_replace = None
+        to_replace_id = self.request.POST.get('replace-preferred-{}'.format(suggestion.key.id()), None)
+        year = int(self.request.POST.get('year-{}'.format(suggestion.key.id())))
 
-        # Resolve async Futures
-        suggestion = suggestion_future.get_result()
-
-        # Make sure Suggestion hasn't been processed (by another thread)
-        if suggestion.review_state != Suggestion.REVIEW_PENDING:
-            return
+        # Override year if necessary
+        suggestion.contents['year'] = year
+        suggestion.contents_json = json.dumps(suggestion.contents)
+        suggestion._contents = None
 
         # Remove preferred reference from another Media if specified
         team_reference = Media.create_reference(
@@ -103,31 +90,25 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
         if to_replace_id:
             to_replace = Media.get_by_id(to_replace_id)
             if team_reference not in to_replace.preferred_references:
-                return  # Preferred reference must have been edited earlier. Skip this Suggestion for now.
+                # Preferred reference must have been edited earlier. Skip this Suggestion for now.
+                return
             to_replace.preferred_references.remove(team_reference)
 
         # Add preferred reference to current Media (images only) if explicitly listed in preferred_keys or if to_replace_id exists
         media_type_enum = suggestion.contents['media_type_enum']
         preferred_references = []
-        if media_type_enum in MediaType.image_types and ('preferred::{}'.format(suggestion.key.id()) in preferred_keys or to_replace_id):
+        if media_type_enum in MediaType.image_types and ('preferred::{}'.format(suggestion.key.id()) in self.preferred_keys or to_replace_id):
             preferred_references = [team_reference]
 
-        media = MediaCreator.create_media(suggestion, team_reference, preferred_references)
-
-        # Mark Suggestion as accepted
-        suggestion.review_state = Suggestion.REVIEW_ACCEPTED
-        suggestion.reviewer = self.user_bundle.account.key
-        suggestion.reviewed_at = datetime.datetime.now()
+        media = MediaCreator.create_media_model(suggestion, team_reference, preferred_references)
 
         # Do all DB writes
-        if to_replace_id:
+        if to_replace:
             MediaManipulator.createOrUpdate(to_replace, auto_union=False)
-        MediaManipulator.createOrUpdate(media)
-        suggestion.put()
+        return MediaManipulator.createOrUpdate(media)
 
     def post(self):
-        preferred_keys = self.request.POST.getall("preferred_keys[]")
-
+        self.preferred_keys = self.request.POST.getall("preferred_keys[]")
         accept_keys = []
         reject_keys = []
         for value in self.request.POST.values():
@@ -144,18 +125,9 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
 
         # Process accepts
         for accept_key in accept_keys:
-            self._process_accepted(accept_key, preferred_keys)
+            self._process_accepted(accept_key)
 
         # Process rejects
-        rejected_suggestion_futures = [Suggestion.get_by_id_async(key) for key in reject_keys]
-        rejected_suggestions = map(lambda a: a.get_result(), rejected_suggestion_futures)
-
-        for suggestion in rejected_suggestions:
-            if suggestion.review_state == Suggestion.REVIEW_PENDING:
-                suggestion.review_state = Suggestion.REVIEW_REJECTED
-                suggestion.reviewer = self.user_bundle.account.key
-                suggestion.reviewed_at = datetime.datetime.now()
-
-        ndb.put_multi(rejected_suggestions)
+        self._process_rejected(reject_keys)
 
         self.redirect("/suggest/team/media/review")

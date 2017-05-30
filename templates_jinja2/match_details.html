@@ -8,11 +8,11 @@
 {% block more_head_tags %}
   <meta property="og:title" content="{{match.verbose_name}} - {{event.year}} {{event.name}}" />
   <meta property="og:type" content="article" />
-  <meta property="og:url" content="http://www.thebluealliance.com/match/{{match.key_name}}" />
+  <meta property="og:url" content="https://www.thebluealliance.com/match/{{match.key_name}}" />
   {% if match.tba_video.thumbnail_path %}
     <meta property="og:image" content="{{match.tba_video.thumbnail_path}}" />
   {% else %}
-    <meta property="og:image" content="http://www.thebluealliance.com/images/logo_square_200.png" />
+    <meta property="og:image" content="https://www.thebluealliance.com/images/logo_square_512.png" />
   {% endif %}
   <meta property="og:description" content="{{match.verbose_name}} at the {{event.year}} {{event.name}} FIRST Robotics Competition in {{event.location}}."/>
   <meta property="og:site_name" content="The Blue Alliance" />

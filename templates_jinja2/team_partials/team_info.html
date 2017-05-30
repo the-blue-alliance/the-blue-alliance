@@ -12,7 +12,15 @@
 <div class="row">
   <div class="col-sm-7">
     <p>
-      {% if team.location %}<span class="glyphicon glyphicon-map-marker"></span> From <a href="http://maps.google.com/maps?q={{ team.location|urlencode }}" target="_blank">{{ team.location }}</a><br>{% endif %}
+      {% if team.city_state_country or (team.nl and team.nl.name and team.nl.city_state_country) %}
+        <span class="glyphicon glyphicon-map-marker"></span> From
+        {% if team.nl and team.nl.name %}
+          <a href="{{team.nl.place_details.url}}" target="_blank">{{team.nl.name}}</a> in {{team.nl.city_state_country}}
+        {% else %}
+          <a href="{% if team.nl and team.nl.name %}{{team.nl.place_details.url}}{% else %}//maps.google.com/maps?q={{ team.city_state_country|urlencode }}{% endif %}" target="_blank">{{team.city_state_country}}</a>
+        {% endif %}
+        <br>
+      {% endif %}
       {% if team.name %}<span class="glyphicon glyphicon-info-sign"></span> aka <em>{{ team.name }}</em><br>{% endif %}
       {% if team.rookie_year %}<span class="glyphicon glyphicon-calendar"></span> Rookie Year: {{ team.rookie_year }}<br>{% endif %}
       {% if last_competed and year != current_year %}<span class="glyphicon glyphicon-time"></span> Last competed in {{ last_competed }}.<br>{% endif %}
@@ -39,7 +47,11 @@
       <div class="panel-heading">
         {% if current_event.webcast%}
           <div class="hidden-xs pull-right">
-            <a class="btn btn-success" href="{{current_event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch now</a>
+            {% if current_event.webcast_status == 'offline' %}
+              <a class="btn btn-default" href="{{current_event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Offline</a>
+            {% else %}
+              <a class="btn btn-success" href="{{current_event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
+            {% endif %}
           </div>
         {% endif %}
         <h3 class="panel-title">

@@ -1,8 +1,8 @@
 <meta property="og:title" content="Team {{team.team_number}} - {{team.nickname}}" />
 <meta property="og:type" content="sports_team" />
-<meta property="og:url" content="http://www.thebluealliance.com/team/{{team.team_number}}" />
-<meta property="og:image" content="{% if preferred_image_medias %}{{preferred_image_medias[0].image_direct_url_med}}{% else %}http://www.thebluealliance.com/images/logo_square_200.png{% endif %}" />
-<meta property="og:description" content="FIRST Robotics Competition team{% if team.location %} from {{team.location}}{% endif %}."/>
+<meta property="og:url" content="https://www.thebluealliance.com/team/{{team.team_number}}" />
+<meta property="og:image" content="{% if preferred_image_medias %}{{preferred_image_medias[0].image_direct_url_med}}{% else %}https://www.thebluealliance.com/images/logo_square_512.png{% endif %}" />
+<meta property="og:description" content="FIRST Robotics Competition team{% if team.city_state_country %} from {{team.city_state_country}}{% endif %}."/>
 <meta property="og:site_name" content="The Blue Alliance" />
 {% if team.city %}<meta property="og:locality" content="{{team.city}}" />{% endif %}
 {% if team.state_prov %}<meta property="og:region" content="{{team.state_prov}}" />{% endif %}

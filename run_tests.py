@@ -2,9 +2,12 @@
 import multiprocessing
 import optparse
 import StringIO
+import os
+import random
+import string
 import sys
 import time
-import warnings
+import django.conf.global_settings
 
 # Install the Python unittest2 package before you run this script.
 import unittest2
@@ -18,6 +21,7 @@ SDK_PATH    Path to the SDK installation"""
 
 sys.path.insert(1, 'lib')
 
+
 def start_suite(suite, queue):
     sio = StringIO.StringIO()
     testresult = unittest2.TextTestRunner(sio, verbosity=2).run(suite)
@@ -26,6 +30,16 @@ def start_suite(suite, queue):
 
 def main(sdk_path, test_pattern):
     start_time = time.time()
+
+    os.environ['IS_TBA_TEST'] = "true"
+
+    # Fix django template loaders being messed up
+    django.conf.global_settings.SECRET_KEY = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django.conf.global_settings')
+
+    # Set up custom django template filters
+    from google.appengine.ext.webapp import template
+    template.register_template_library('common.my_filters')
 
     sys.path.insert(0, sdk_path)
     import dev_appserver
@@ -43,13 +57,14 @@ def main(sdk_path, test_pattern):
     for process in processes:
         process.join()
 
+    os.unsetenv('IS_TBA_TEST')
     fail = False
     total_tests_run = 0
     while not result_queue.empty():
         test_output, tests_run, was_successful = result_queue.get()
         total_tests_run += tests_run
         print '-----------------------'
-        print test_output
+        print test_output.encode('utf-8')
         if not was_successful:
             fail = True
 

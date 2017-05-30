@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - The Blue Alliance{% endblock %}
+{% block main_style %}
+  <link rel="stylesheet" href="/css/tba_combined_style.main.min.css"/>
+  <link rel="stylesheet" href="/css/apidocs.min.css" type="text/css"/>
+{% endblock %}
+
+{% block content %}
+  <div style="display: none;" id="swagger_url">{{ swagger_url }}</div>
+  <div id="content"></div>
+{% endblock %}
+
+{% block inline_javascript %}
+  <script type="text/javascript" src="/javascript/apidocs.min.js"></script>
+{% endblock %}

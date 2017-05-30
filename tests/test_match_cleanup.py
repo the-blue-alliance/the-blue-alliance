@@ -11,18 +11,19 @@ from models.match import Match
 
 class TestMatchCleanup(unittest2.TestCase):
     def setUp(self):
-        self.event = Event(
-          id="2013test",
-          event_short="test",
-          year=2013
-        )
-
         self.testbed = testbed.Testbed()
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
+        self.event = Event(
+          id="2013test",
+          event_short="test",
+          year=2013,
+          event_type_enum=0,
+        )
+        self.event.put()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -49,7 +50,7 @@ class TestMatchCleanup(unittest2.TestCase):
 
     def test_cleanup(self):
         matches = self.setupMatches('test_data/cleanup_matches.csv')
-        cleaned_matches = MatchHelper.deleteInvalidMatches(matches)
+        cleaned_matches = MatchHelper.deleteInvalidMatches(matches, self.event)
         indices = {9, 12, 26}
         correct_matches = []
         for i, match in enumerate(matches):

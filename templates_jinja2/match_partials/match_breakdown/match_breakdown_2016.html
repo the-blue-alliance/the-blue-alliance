@@ -164,5 +164,13 @@
       <th>Total Score</th>
       <td class="blueScore" colspan="2">{%if match.score_breakdown.blue.totalPoints%}{{match.score_breakdown.blue.totalPoints}}{%else%}0{%endif%}</td>
     </tr>
+
+    {% if match.score_breakdown.red.get('tba_rpEarned') is not none %}
+    <tr>
+      <td class="red" colspan="2">+{% if match.score_breakdown.red.tba_rpEarned%}{{match.score_breakdown.red.tba_rpEarned}} {%else%}0{%endif%} RP</td>
+      <td>Ranking Points</td>
+      <td class="blue" colspan="2">+{%if match.score_breakdown.blue.tba_rpEarned%}{{match.score_breakdown.blue.tba_rpEarned}} {%else%}0{%endif%} RP</td>
+    </tr>
+    {% endif %}
   </tbody>
 </table>

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Pending Suggestions{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <ol class="breadcrumb">
+    <li><a href="/suggest/review">Suggestions</a></li>
+    <li class="active">Offseason Events</li>
+  </ol>
+  <h1>{{ events_and_ids|length }} Pending Event Suggestions</h1>
+
+  {% if success == "accept" %}
+  <div class="row">
+    <div class="alert alert-success">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <h4>Created event {{event_key}}!</h4>
+      <div class="btn-group">
+        <a href="/event/{{event_key}}" class="btn btn-default">View on TBA</a>
+      </div>
+    </div>
+  </div>
+  {% elif success == "reject" %}
+  <div class="row">
+    <div class="alert alert-warning">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <h4>Rejected event!</h4>
+    </div>
+  </div>
+  {% elif success == "bad_key" %}
+  <div class="row">
+    <div class="alert alert-warning">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <h4>You must enter a valid event short, used to generate the key (only letters and numbers allowed)!</h4>
+    </div>
+  </div>
+  {% elif success == "missing_key" %}
+  <div class="row">
+    <div class="alert alert-warning">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <h4>You must enter an event short (needed to generate key)!</h4>
+    </div>
+  </div>
+  {% elif success == "duplicate_key" %}
+  <div class="row">
+    <div class="alert alert-warning">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <h4>This event key already exists! Try another...</h4>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="row">
+    <div class="col-sm-6">
+      <h2>Event Approval Guidelines</h2>
+      <div class="alert alert-success">
+        <strong>Do approve:</strong>
+        <ul>
+          <li><strong>New</strong> Offseason Events (ensure they don't already exist)</li>
+        </ul>
+      </div>
+      <div class="alert alert-danger">
+        <strong>Do NOT approve:</strong>
+        <ul>
+          <li>Official Events</li>
+          <li>Events Without Websites you can verify the info for</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      {% for suggestion_id, event in events_and_ids %}
+        <div class="well">
+          <h3>Similar Events This Year</h3>
+          <ul>
+          {% for similar_key, similar_name in similar_events[loop.index0] %}
+            <li><a href="/event/{{similar_key}}">{{similar_name}} ({{similar_key}})</a></li>
+          {% else %}
+            <p>None Found</p>
+          {% endfor %}
+          </ul>
+
+          <h3>Similar Events Last Year</h3>
+          <ul>
+          {% for similar_key, similar_name in similar_last_year[loop.index0] %}
+            <li><a href="/event/{{similar_key}}">{{similar_name}} ({{similar_key}})</a></li>
+          {% else %}
+            <p>None Found</p>
+          {% endfor %}
+          </ul>
+
+          {% include "event_partials/suggest_event_info.html" %}
+        </div>
+      {% else %}
+        <div class="well">
+          <p>No suggestions! Go build more community!</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,169 @@
+<div class="row">
+  <div class="col-xs-12">
+    <h3>Bonus Objective Statistics</h3>
+    <table class="table table-condensed table-striped text-right">
+      <thead>
+        <tr>
+          <th class="text-right">Objective</th>
+          <th class="text-right">Count</th>
+          <th class="text-right"># Opportunities</th>
+          <th class="text-right">% Success</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Auto Mobility</td>
+          <td>{{event_insights.mobility_counts[0]}}</td>
+          <td>{{event_insights.mobility_counts[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.mobility_counts[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Teleop Takeoff (Climb)</td>
+          <td>{{event_insights.takeoff_counts[0]}}</td>
+          <td>{{event_insights.takeoff_counts[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.takeoff_counts[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Pressure (kPa) Achieved</td>
+          <td>{{event_insights.kpa_achieved[0]}}</td>
+          <td>{{event_insights.kpa_achieved[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.kpa_achieved[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Rotor 1 Engaged (Auto)</td>
+          <td>{{event_insights.rotor_1_engaged_auto[0]}}</td>
+          <td>{{event_insights.rotor_1_engaged_auto[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.rotor_1_engaged_auto[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Rotor 2 Engaged (Auto)</td>
+          <td>{{event_insights.rotor_2_engaged_auto[0]}}</td>
+          <td>{{event_insights.rotor_2_engaged_auto[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.rotor_2_engaged_auto[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Rotor 1 Engaged</td>
+          <td>{{event_insights.rotor_1_engaged[0]}}</td>
+          <td>{{event_insights.rotor_1_engaged[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.rotor_1_engaged[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Rotor 2 Engaged</td>
+          <td>{{event_insights.rotor_2_engaged[0]}}</td>
+          <td>{{event_insights.rotor_2_engaged[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.rotor_2_engaged[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Rotor 3 Engaged</td>
+          <td>{{event_insights.rotor_3_engaged[0]}}</td>
+          <td>{{event_insights.rotor_3_engaged[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.rotor_3_engaged[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Rotor 4 Engaged</td>
+          <td>{{event_insights.rotor_4_engaged[0]}}</td>
+          <td>{{event_insights.rotor_4_engaged[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.rotor_4_engaged[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>"Unicorn Matches"<br/>(Win + kPa & Rotor Bonuses)</td>
+          <td>{% if event_insights.unicorn_matches %}{{event_insights.unicorn_matches[0]}}{% else %}--{% endif %}</td>
+          <td>{% if event_insights.unicorn_matches %}{{event_insights.unicorn_matches[1]}}{% else %}--{% endif %}</td>
+          <td>{% if event_insights.unicorn_matches %}{{'%0.2f' | format(event_insights.unicorn_matches[2]|float)}}%{% else %}--{% endif %}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-xs-12">
+    <h3>Match Statistics</h3>
+
+    <table class="table table-condensed table-striped text-right">
+      <tbody>
+        {% if 'high_kpa' in event_insights %}
+        <tr>
+          <td>Highest Pressure (kPa)</td>
+          <td>{{event_insights.high_kpa[0]}} in <a href="/match/{{event_insights.high_kpa[1]}}">{{event_insights.high_kpa[2]}}</a></td>
+        </tr>
+        {% endif %}
+        <tr>
+          <td>High Score</td>
+          <td>{{event_insights.high_score[0]}} in <a href="/match/{{event_insights.high_score[1]}}">{{event_insights.high_score[2]}}</a></td>
+        </tr>
+        <tr>
+          <td>Average Match Score</td>
+          <td>{{'%0.2f' | format(event_insights.average_score|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average Winning Score</td>
+          <td>{{'%0.2f' | format(event_insights.average_win_score|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average Win Margin</td>
+          <td>{{'%0.2f' | format(event_insights.average_win_margin|float)}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="table table-condensed table-striped text-right">
+      <thead>
+        <tr>
+            <th></th>
+            <th class="text-right">Auto</th>
+            <th class="text-right">Teleop</th>
+            <th class="text-right">Overall</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Average Mobility Points</td>
+          <td>{{'%0.2f' | format(event_insights.average_mobility_points_auto|float)}}</td>
+          <td>--</td>
+          <td>--</td>
+        </tr>
+        <tr>
+          <td>Average Rotor Points</td>
+          <td>{{'%0.2f' | format(event_insights.average_rotor_points_auto|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_rotor_points_teleop|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_rotor_points|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average Fuel Points</td>
+          <td>{{'%0.2f' | format(event_insights.average_fuel_points_auto|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_fuel_points_teleop|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_fuel_points|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average High Goals</td>
+          <td>{{'%0.2f' | format(event_insights.average_high_goals_auto|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_high_goals_teleop|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_high_goals|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average Low Goals</td>
+          <td>{{'%0.2f' | format(event_insights.average_low_goals_auto|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_low_goals_teleop|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_low_goals|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average Takeoff (Climb) Points</td>
+          <td>--</td>
+          <td>{{'%0.2f' | format(event_insights.average_takeoff_points_teleop|float)}}</td>
+          <td>--</td>
+        </tr>
+        <tr>
+          <td>Average Foul Points</td>
+          <td>--</td>
+          <td>--</td>
+          <td>{{'%0.2f' | format(event_insights.average_foul_score|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average Score</td>
+          <td>{{'%0.2f' | format(event_insights.average_points_auto|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_points_teleop|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_score|float)}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

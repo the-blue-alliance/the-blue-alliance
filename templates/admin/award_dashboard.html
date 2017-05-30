@@ -17,6 +17,16 @@
     </div>
 </form>
 
+<form class="form-inline" method="post" action="/admin/award/delete">
+    <legend>Delete an Award</legend>
+    <div class="input-group">
+        <input class="form-control" size="16" name="award_key" type="text" placeholder="award_key">
+        <span class="input-group-btn">
+            <button class="btn btn-danger" type="submit"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+        </span>
+    </div>
+</form>
+
 <legend>Add Awards</legend>
 <p>Add awards formatted as a CSV.</p>
 <p>Format:</p>
