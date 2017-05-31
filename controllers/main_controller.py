@@ -358,7 +358,7 @@ class ApiV2DocumentationHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/apidocs.html")
+        path = os.path.join(os.path.dirname(__file__), "../templates/apidocs_v2.html")
         return template.render(path, self.template_values)
 
 

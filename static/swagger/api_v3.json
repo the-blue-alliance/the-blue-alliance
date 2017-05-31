@@ -1,7 +1,13 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "Information and statistics about FIRST Robotics Competition teams and events.",
+    "description": "# Overview
+
+    Information and statistics about FIRST Robotics Competition teams and events. If you are looking for the old version (v2) of the API, documentation can be found [here](/apidocs/v2).
+
+    # Authentication
+
+    All endpoints require an Auth Key to be passed in the header `X-TBA-Auth-Key`. If you do not have an auth key yet, you can obtain one from your [Account Page](/account).",
     "version": "3.0.0",
     "title": "The Blue Alliance API v3",
     "x-version-info": "Versions of the API follow the format X.Y.Z, with X being a major version, Y denoting the minor version, and Z the point release. Changes to the spec or API that result in a major version change will significantly impact implementations. Changes to the minor version indicate paths and/or fields in existing models may be added, and any breaking changes will be confined to paths or models listed as in-development in the prior minor version. Changes to the point release indicate no format or structure changes to the paths or models, but updated or clarified documentation."
@@ -42,7 +48,7 @@
   ],
   "securityDefinitions": {
     "apiKey": {
-      "description": "Your TBA v3 API Key can be obtained from your [Account Page](https://www.thebluealliance.com/account) on the TBA website.",
+      "description": "Your TBA v3 API Key can be obtained from your [Account Page](/account) on the TBA website.",
       "type": "apiKey",
       "name": "X-TBA-Auth-Key",
       "in": "header"
