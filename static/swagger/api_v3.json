@@ -1,0 +1,4992 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Information and statistics about FIRST Robotics Competition teams and events.",
+    "version": "3.0.0",
+    "title": "The Blue Alliance API v3",
+    "x-version-info": "Versions of the API follow the format X.Y.Z, with X being a major version, Y denoting the minor version, and Z the point release. Changes to the spec or API that result in a major version change will significantly impact implementations. Changes to the minor version indicate paths and/or fields in existing models may be added, and any breaking changes will be confined to paths or models listed as in-development in the prior minor version. Changes to the point release indicate no format or structure changes to the paths or models, but updated or clarified documentation."
+  },
+  "host": "www.thebluealliance.com",
+  "basePath": "/api/v3",
+  "tags": [
+    {
+      "name": "TBA",
+      "description": "Calls that expose TBA internals or status."
+    },
+    {
+      "name": "list",
+      "description": "Calls that return a list of records."
+    },
+    {
+      "name": "team",
+      "description": "Calls that return team or team-specific information."
+    },
+    {
+      "name": "event",
+      "description": "Calls that return event, or event-specific information."
+    },
+    {
+      "name": "match",
+      "description": "Calls that return match, or match-specific information."
+    },
+    {
+      "name": "district",
+      "description": "Calls that return district, or district-related information."
+    }
+  ],
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "apiKey": {
+      "description": "Your TBA v3 API Key can be obtained from your [Account Page](https://www.thebluealliance.com/account) on the TBA website.",
+      "type": "apiKey",
+      "name": "X-TBA-Auth-Key",
+      "in": "header"
+    }
+  },
+  "parameters": {
+    "If-Modified-Since": {
+      "name": "If-Modified-Since",
+      "in": "header",
+      "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
+      "required": false,
+      "type": "string"
+    },
+    "page_num": {
+      "name": "page_num",
+      "in": "path",
+      "description": "Page number of results to return, zero-indexed",
+      "required": true,
+      "type": "number",
+      "format": "integer"
+    },
+    "year": {
+      "name": "year",
+      "in": "path",
+      "description": "Competition Year (or Season). Must be 4 digits.",
+      "required": true,
+      "type": "number",
+      "format": "integer"
+    },
+    "team_key": {
+      "name": "team_key",
+      "in": "path",
+      "description": "TBA Team Key, eg `frc254`",
+      "required": true,
+      "type": "string"
+    },
+    "event_key": {
+      "name": "event_key",
+      "in": "path",
+      "description": "TBA Event Key, eg `2016nytr`",
+      "required": true,
+      "type": "string"
+    },
+    "match_key": {
+      "name": "match_key",
+      "in": "path",
+      "description": "TBA Match Key, eg `2016nytr_qm1`",
+      "required": true,
+      "type": "string"
+    },
+    "district_key": {
+      "name": "district_key",
+      "in": "path",
+      "description": "TBA District Key, eg `2016fim`",
+      "required": true,
+      "type": "string"
+    }
+  },
+  "responses": {
+    "Unauthorized": {
+      "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid."
+    },
+    "NotModified": {
+      "description": "Not Modified - Use Local Cached Value"
+    }
+  },
+  "paths": {
+    "/status": {
+      "get": {
+        "operationId": "getStatus",
+        "tags": [
+          "TBA"
+        ],
+        "description": "Returns API status, and TBA status information.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/API_Status"
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/teams/{page_num}": {
+      "get": {
+        "operationId": "getTeams",
+        "tags": [
+          "team",
+          "list"
+        ],
+        "description": "Gets a list of `Team` objects, paginated in groups of 500.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/page_num"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Team"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/teams/{page_num}/simple": {
+      "x-comment": "Simple (non-full) responses need a separate path definition. See also https://github.com/OAI/OpenAPI-Specification/issues/270",
+      "get": {
+        "operationId": "getTeamsSimple",
+        "tags": [
+          "team",
+          "list"
+        ],
+        "description": "Gets a list of short form `Team_Simple` objects, paginated in groups of 500.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/page_num"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Team_Simple"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/teams/{page_num}/keys": {
+      "get": {
+        "operationId": "getTeamsKeys",
+        "tags": [
+          "team",
+          "list"
+        ],
+        "description": "Gets a list of Team keys, paginated in groups of 500. (Note, each page will not have 500 teams, but will include the teams within that range of 500.)",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/page_num"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/teams/{year}/{page_num}": {
+      "get": {
+        "operationId": "getTeamsByYear",
+        "tags": [
+          "team",
+          "list"
+        ],
+        "description": "Gets a list of `Team` objects that competed in the given year, paginated in groups of 500.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/year"
+          },
+          {
+            "$ref": "#/parameters/page_num"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Team"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/teams/{year}/{page_num}/simple": {
+      "get": {
+        "operationId": "getTeamsByYearSimple",
+        "tags": [
+          "team",
+          "list"
+        ],
+        "description": "Gets a list of short form `Team_Simple` objects that competed in the given year, paginated in groups of 500.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/year"
+          },
+          {
+            "$ref": "#/parameters/page_num"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Team_Simple"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/teams/{year}/{page_num}/keys": {
+      "get": {
+        "operationId": "getTeamsByYearKeys",
+        "tags": [
+          "team",
+          "list"
+        ],
+        "description": "Gets a list Team Keys that competed in the given year, paginated in groups of 500.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/year"
+          },
+          {
+            "$ref": "#/parameters/page_num"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "description": "Array of Team Keys",
+              "items": {
+                "type": "string"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}": {
+      "get": {
+        "operationId": "getTeam",
+        "tags": [
+          "team"
+        ],
+        "description": "Gets a `Team` object for the team referenced by the given key.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/Team"
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/simple": {
+      "get": {
+        "operationId": "getTeamSimple",
+        "tags": [
+          "team"
+        ],
+        "description": "Gets a `Team_Simple` object for the team referenced by the given key.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/Team_Simple"
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/years_participated": {
+      "get": {
+        "operationId": "getTeamYearsParticipated",
+        "tags": [
+          "team"
+        ],
+        "description": "Gets a list of years in which the team participated in at least one competition.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/districts": {
+      "get": {
+        "operationId": "getTeamDistricts",
+        "tags": [
+          "team",
+          "district"
+        ],
+        "description": "Gets a list or year and district pairs to denote each year the team was in a district. Will return an empty array if the team was never in a district.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "object",
+              "description": "A key-value pair with year as key and district key as value",
+              "additionalProperties": {
+                "type": "string",
+                "description": "District key"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/robots": {
+      "get": {
+        "operationId": "getTeamRobots",
+        "tags": [
+          "team"
+        ],
+        "description": "Gets a list of year and robot name pairs for each year that a robot name was provided. Will return an empty array if the team has never named a robot.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/Team_Robot"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/events": {
+      "get": {
+        "operationId": "getTeamEvents",
+        "tags": [
+          "team",
+          "event"
+        ],
+        "description": "Gets a list of all events this team has competed at.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Event"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/events/simple": {
+      "get": {
+        "operationId": "getTeamEventsSimple",
+        "tags": [
+          "team",
+          "event"
+        ],
+        "description": "Gets a short-form list of all events this team has competed at.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Event_Simple"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/events/keys": {
+      "get": {
+        "operationId": "getTeamEventsKeys",
+        "tags": [
+          "team",
+          "event"
+        ],
+        "description": "Gets a list of the event keys for all events this team has competed at.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "description": "Array of Event Keys",
+              "items": {
+                "type": "string"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/events/{year}": {
+      "get": {
+        "operationId": "getTeamEventsByYear",
+        "tags": [
+          "team",
+          "event"
+        ],
+        "description": "Gets a list of events this team has competed at in the given year.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          },
+          {
+            "$ref": "#/parameters/year"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Event"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/events/{year}/simple": {
+      "get": {
+        "operationId": "getTeamEventsByYearSimple",
+        "tags": [
+          "team",
+          "event"
+        ],
+        "description": "Gets a short-form list of events this team has competed at in the given year.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          },
+          {
+            "$ref": "#/parameters/year"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Event_Simple"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/events/{year}/keys": {
+      "get": {
+        "operationId": "getTeamEventsByYearKeys",
+        "tags": [
+          "team",
+          "event"
+        ],
+        "description": "Gets a list of the event keys for events this team has competed at in the given year.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          },
+          {
+            "$ref": "#/parameters/year"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "description": "Array of Event Keys",
+              "items": {
+                "type": "string"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/event/{event_key}/matches": {
+      "get": {
+        "operationId": "getTeamEventMatches",
+        "tags": [
+          "team",
+          "event",
+          "match"
+        ],
+        "description": "Gets a list of matches for the given team and event.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Match"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/event/{event_key}/matches/simple": {
+      "get": {
+        "operationId": "getTeamEventMatchesSimple",
+        "tags": [
+          "team",
+          "event",
+          "match"
+        ],
+        "description": "Gets a short-form list of matches for the given team and event.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Match"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/event/{event_key}/matches/keys": {
+      "get": {
+        "operationId": "getTeamEventMatchesKeys",
+        "tags": [
+          "team",
+          "event",
+          "match"
+        ],
+        "description": "Gets a list of match keys for matches for the given team and event.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "description": "Array of Match Keys",
+              "items": {
+                "type": "string"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/event/{event_key}/awards": {
+      "get": {
+        "operationId": "getTeamEventAwards",
+        "tags": [
+          "team",
+          "event"
+        ],
+        "description": "Gets a list of awards the given team won at the given event.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Award"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/event/{event_key}/status": {
+      "get": {
+        "operationId": "getTeamEventStatus",
+        "tags": [
+          "team",
+          "event"
+        ],
+        "description": "Gets the competition rank and status of the team at the given event.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/Team_Event_Status"
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/awards": {
+      "get": {
+        "operationId": "getTeamAwards",
+        "tags": [
+          "team"
+        ],
+        "description": "Gets a list of awards the given team has won.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Award"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/awards/{year}": {
+      "get": {
+        "operationId": "getTeamAwardsByYear",
+        "tags": [
+          "team"
+        ],
+        "description": "Gets a list of awards the given team has won in a given year.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          },
+          {
+            "$ref": "#/parameters/year"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Award"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/matches/{year}": {
+      "get": {
+        "operationId": "getTeamMatchesByYear",
+        "tags": [
+          "team",
+          "match"
+        ],
+        "description": "Gets a list of matches for the given team and year.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          },
+          {
+            "$ref": "#/parameters/year"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Match"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/matches/{year}/simple": {
+      "get": {
+        "operationId": "getTeamMatchesByYearSimple",
+        "tags": [
+          "team",
+          "match"
+        ],
+        "description": "Gets a short-form list of matches for the given team and year.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          },
+          {
+            "$ref": "#/parameters/year"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Match_Simple"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/matches/{year}/keys": {
+      "get": {
+        "operationId": "getTeamMatchesByYearKeys",
+        "tags": [
+          "team",
+          "match"
+        ],
+        "description": "Gets a list of match keys for matches for the given team and year.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          },
+          {
+            "$ref": "#/parameters/year"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "description": "Array of Match Keys",
+              "items": {
+                "type": "string"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/media/{year}": {
+      "get": {
+        "operationId": "getTeamMediaByYear",
+        "tags": [
+          "team"
+        ],
+        "description": "Gets a list of Media (videos / pictures) for the given team and year.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          },
+          {
+            "$ref": "#/parameters/year"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Media"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/social_media": {
+      "get": {
+        "operationId": "getTeamSocialMedia",
+        "tags": [
+          "team"
+        ],
+        "description": "Gets a list of Media (social media) for the given team.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Media"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/events/{year}": {
+      "get": {
+        "operationId": "getEventsByYear",
+        "tags": [
+          "event",
+          "list"
+        ],
+        "description": "Gets a list of events in the given year.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/year"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Event"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/events/{year}/simple": {
+      "get": {
+        "operationId": "getEventsByYearSimple",
+        "tags": [
+          "event",
+          "list"
+        ],
+        "description": "Gets a short-form list of events in the given year.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/year"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Event_Simple"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/events/{year}/keys": {
+      "get": {
+        "operationId": "getEventsByYearKeys",
+        "tags": [
+          "event",
+          "list"
+        ],
+        "description": "Gets a list of event keys in the given year.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/year"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "description": "Array of Event Keys",
+              "items": {
+                "type": "string"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/event/{event_key}": {
+      "get": {
+        "operationId": "getEvent",
+        "tags": [
+          "event"
+        ],
+        "description": "Gets an Event.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/Event"
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/event/{event_key}/simple": {
+      "get": {
+        "operationId": "getEventSimple",
+        "tags": [
+          "event"
+        ],
+        "description": "Gets a short-form Event.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/Event_Simple"
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/event/{event_key}/alliances": {
+      "get": {
+        "operationId": "getEventAlliances",
+        "tags": [
+          "event"
+        ],
+        "description": "Gets a list of Elimination Alliances for the given Event.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Elimination_Alliance"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/event/{event_key}/insights": {
+      "get": {
+        "operationId": "getEventInsights",
+        "tags": [
+          "event"
+        ],
+        "description": "Gets a set of Event-specific insights for the given Event.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "object",
+              "description": "A year-specific event insight object expressed as a JSON string. See also Event_Insights_2016 & Event_Insights_2017"
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/event/{event_key}/oprs": {
+      "get": {
+        "operationId": "getEventOPRs",
+        "tags": [
+          "event"
+        ],
+        "description": "Gets a set of Event OPRs (including OPR, DPR, and CCWM) for the given Event.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/Event_OPRs"
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/event/{event_key}/predictions": {
+      "get": {
+        "operationId": "getEventPredictions",
+        "tags": [
+          "event"
+        ],
+        "description": "Gets information on TBA-generated predictions for the given Event. Contains year-specific information. *WARNING* This endpoint is currently under development and may change at any time.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/Event_Predictions"
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/event/{event_key}/rankings": {
+      "get": {
+        "operationId": "getEventRankings",
+        "tags": [
+          "event"
+        ],
+        "description": "Gets a list of team rankings for the Event.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/Event_Ranking"
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/event/{event_key}/district_points": {
+      "get": {
+        "operationId": "getEventDistrictPoints",
+        "tags": [
+          "event",
+          "district"
+        ],
+        "description": "Gets a list of team rankings for the Event.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/Event_District_Points"
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/event/{event_key}/teams": {
+      "get": {
+        "operationId": "getEventTeams",
+        "tags": [
+          "event",
+          "team",
+          "list"
+        ],
+        "description": "Gets a list of `Team` objects that competed in the given event.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Team"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/event/{event_key}/teams/simple": {
+      "get": {
+        "operationId": "getEventTeamsSimple",
+        "tags": [
+          "event",
+          "team",
+          "list"
+        ],
+        "description": "Gets a short-form list of `Team` objects that competed in the given event.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Team_Simple"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/event/{event_key}/teams/keys": {
+      "get": {
+        "operationId": "getEventTeamsKeys",
+        "tags": [
+          "event",
+          "team",
+          "list"
+        ],
+        "description": "Gets a list of `Team` keys that competed in the given event.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "description": "Array of Team Keys",
+              "items": {
+                "type": "string"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/event/{event_key}/matches": {
+      "get": {
+        "operationId": "getEventMatches",
+        "tags": [
+          "event",
+          "match"
+        ],
+        "description": "Gets a list of matches for the given event.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Match"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/event/{event_key}/matches/simple": {
+      "get": {
+        "operationId": "getEventMatchesSimple",
+        "tags": [
+          "event",
+          "match"
+        ],
+        "description": "Gets a short-form list of matches for the given event.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Match_Simple"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/event/{event_key}/matches/keys": {
+      "get": {
+        "operationId": "getEventMatchesKeys",
+        "tags": [
+          "event",
+          "match"
+        ],
+        "description": "Gets a list of match keys for the given event.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "description": "Array of Match Keys",
+              "items": {
+                "type": "string"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/event/{event_key}/awards": {
+      "get": {
+        "operationId": "getEventAwards",
+        "tags": [
+          "event"
+        ],
+        "description": "Gets a list of awards from the given event.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Award"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/match/{match_key}": {
+      "get": {
+        "operationId": "getMatch",
+        "tags": [
+          "match"
+        ],
+        "description": "Gets a `Match` object for the given match key.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/match_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/Match"
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/match/{match_key}/simple": {
+      "get": {
+        "operationId": "getMatchSimple",
+        "tags": [
+          "match"
+        ],
+        "description": "Gets a short-form `Match` object for the given match key.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/match_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/Match_Simple"
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/districts/{year}": {
+      "get": {
+        "operationId": "getDistrictsByYear",
+        "tags": [
+          "district"
+        ],
+        "description": "Gets a list of districts and their corresponding district key, for the given year.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/year"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/District_List"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/district/{district_key}/events": {
+      "get": {
+        "operationId": "getDistrictEvents",
+        "tags": [
+          "district",
+          "event",
+          "list"
+        ],
+        "description": "Gets a list of events in the given district.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/district_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Event"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/district/{district_key}/events/simple": {
+      "get": {
+        "operationId": "getDistrictEventsSimple",
+        "tags": [
+          "district",
+          "event",
+          "list"
+        ],
+        "description": "Gets a short-form list of events in the given district.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/district_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Event_Simple"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/district/{district_key}/events/keys": {
+      "get": {
+        "operationId": "getDistrictEventsKeys",
+        "tags": [
+          "district",
+          "event",
+          "list"
+        ],
+        "description": "Gets a list of event keys for events in the given district.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/district_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "description": "Array of Event Keys",
+              "items": {
+                "type": "string"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/district/{district_key}/teams": {
+      "get": {
+        "operationId": "getDistrictTeams",
+        "tags": [
+          "district",
+          "team",
+          "list"
+        ],
+        "description": "Gets a list of `Team` objects that competed in events in the given district.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/district_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Team"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/district/{district_key}/teams/simple": {
+      "get": {
+        "operationId": "getDistrictTeamsSimple",
+        "tags": [
+          "district",
+          "team",
+          "list"
+        ],
+        "description": "Gets a short-form list of `Team` objects that competed in events in the given district.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/district_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Team_Simple"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/district/{district_key}/teams/keys": {
+      "get": {
+        "operationId": "getDistrictTeamsKeys",
+        "tags": [
+          "district",
+          "team",
+          "list"
+        ],
+        "description": "Gets a list of `Team` objects that competed in events in the given district.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/district_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "description": "Array of Team Keys",
+              "items": {
+                "type": "string"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/district/{district_key}/rankings": {
+      "get": {
+        "operationId": "getDistrictRankings",
+        "tags": [
+          "district",
+          "team",
+          "list"
+        ],
+        "description": "Gets a list of team district rankings for the given district.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/district_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/District_Ranking"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "API_Status": {
+      "type": "object",
+      "required": [
+        "android",
+        "current_season",
+        "down_events",
+        "ios",
+        "is_datafeed_down",
+        "max_season"
+      ],
+      "properties": {
+        "current_season": {
+          "type": "integer",
+          "description": "Year of the current FRC season."
+        },
+        "max_season": {
+          "type": "integer",
+          "description": "Maximum FRC season year for valid queries."
+        },
+        "is_datafeed_down": {
+          "type": "boolean",
+          "description": "True if the entire FMS API provided by FIRST is down."
+        },
+        "down_events": {
+          "type": "array",
+          "description": "An array of strings containing event keys of any active events that are no longer updating.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ios": {
+          "$ref": "#/definitions/API_Status_App_Version"
+        },
+        "android": {
+          "$ref": "#/definitions/API_Status_App_Version"
+        }
+      }
+    },
+    "API_Status_App_Version": {
+      "type": "object",
+      "required": [
+        "latest_app_version",
+        "min_app_version"
+      ],
+      "properties": {
+        "min_app_version": {
+          "type": "integer",
+          "description": "Internal use - Minimum application version required to correctly connect and process data."
+        },
+        "latest_app_version": {
+          "type": "integer",
+          "description": "Internal use - Latest application version available."
+        }
+      }
+    },
+    "Team_Simple": {
+      "type": "object",
+      "required": [
+        "key",
+        "name",
+        "team_number"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "TBA team key with the format frcyyyy"
+        },
+        "team_number": {
+          "type": "integer",
+          "description": "Official team number issued by FIRST"
+        },
+        "nickname": {
+          "type": "string",
+          "description": "Team nickname provided by FIRST"
+        },
+        "name": {
+          "type": "string",
+          "description": "Official long name registered with FIRST"
+        },
+        "city": {
+          "type": "string",
+          "description": "City of team derived from parsing the address registered with FIRST"
+        },
+        "state_prov": {
+          "type": "string",
+          "description": "State of team derived from parsing the address registered with FIRST"
+        },
+        "country": {
+          "type": "string",
+          "description": "Country of team derived from parsing the address registered with FIRST"
+        }
+      }
+    },
+    "Team": {
+      "type": "object",
+      "required": [
+        "key",
+        "name",
+        "team_number",
+        "rookie_year"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "TBA team key with the format frcyyyy"
+        },
+        "team_number": {
+          "type": "integer",
+          "description": "Official team number issued by FIRST"
+        },
+        "nickname": {
+          "type": "string",
+          "description": "Team nickname provided by FIRST"
+        },
+        "name": {
+          "type": "string",
+          "description": "Official long name registered with FIRST"
+        },
+        "city": {
+          "type": "string",
+          "description": "City of team derived from parsing the address registered with FIRST"
+        },
+        "state_prov": {
+          "type": "string",
+          "description": "State of team derived from parsing the address registered with FIRST"
+        },
+        "country": {
+          "type": "string",
+          "description": "Country of team derived from parsing the address registered with FIRST"
+        },
+        "address": {
+          "type": "string",
+          "description": "Will be NULL, for future development"
+        },
+        "postal_code": {
+          "type": "string",
+          "description": "Postal code from the team address"
+        },
+        "gmaps_place_id": {
+          "type": "string",
+          "description": "Will be NULL, for future development"
+        },
+        "gmaps_url": {
+          "type": "string",
+          "format": "url",
+          "description": "Will be NULL, for future development"
+        },
+        "lat": {
+          "type": "number",
+          "format": "double",
+          "description": "Will be NULL, for future development"
+        },
+        "lng": {
+          "type": "number",
+          "format": "double",
+          "description": "Will be NULL, for future development"
+        },
+        "location_name": {
+          "type": "string",
+          "description": "Will be NULL, for future development"
+        },
+        "website": {
+          "type": "string",
+          "format": "url",
+          "description": "Official website associated with the team"
+        },
+        "rookie_year": {
+          "type": "integer",
+          "description": "First year the team officially competed"
+        },
+        "motto": {
+          "type": "string",
+          "description": "Team's motto as provided by FIRST"
+        },
+        "home_championship": {
+          "type": "object",
+          "description": "Location of the team's home championship each year as a key-value pair. The year (as a string) is the key, and the city is the value."
+        }
+      }
+    },
+    "Team_Robot": {
+      "properties": {
+        "year": {
+          "type": "integer",
+          "description": "Year this robot competed in"
+        },
+        "robot_name": {
+          "type": "string",
+          "description": "Name of the robot as provided by the team"
+        },
+        "key": {
+          "type": "string",
+          "description": "Internal TBA identifier for this robot"
+        },
+        "team_key": {
+          "type": "string",
+          "description": "TBA team key for this robot"
+        }
+      }
+    },
+    "Event_Simple": {
+      "type": "object",
+      "required": [
+        "end_date",
+        "event_code",
+        "event_type",
+        "key",
+        "name",
+        "start_date",
+        "year"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "TBA event key with the format yyyy[EVENT_CODE], where yyyy is the year, and EVENT_CODE is the event code of the event."
+        },
+        "name": {
+          "type": "string",
+          "description": "Official name of event on record either provided by FIRST or organizers of offseason event."
+        },
+        "event_code": {
+          "type": "string",
+          "description": "Event short code, as provided by FIRST."
+        },
+        "event_type": {
+          "type": "integer",
+          "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2"
+        },
+        "district": {
+          "type": "object",
+          "properties": {
+            "abbreviation": {
+              "type": "string"
+            },
+            "display_name": {
+              "type": "string"
+            },
+            "key": {
+              "type": "string"
+            },
+            "year": {
+              "type": "integer"
+            }
+          }
+        },
+        "city": {
+          "type": "string",
+          "description": "City of event"
+        },
+        "state_prov": {
+          "type": "string",
+          "description": "State of event"
+        },
+        "country": {
+          "type": "string",
+          "description": "Country of event"
+        },
+        "start_date": {
+          "type": "string",
+          "format": "date",
+          "description": "Event start date in `yyyy-mm-dd` format."
+        },
+        "end_date": {
+          "type": "string",
+          "format": "date",
+          "description": "Event end date in `yyyy-mm-dd` format."
+        },
+        "year": {
+          "type": "integer",
+          "description": "Year the event data is for."
+        }
+      }
+    },
+    "Event": {
+      "type": "object",
+      "required": [
+        "end_date",
+        "event_code",
+        "event_type",
+        "key",
+        "name",
+        "start_date",
+        "year"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "TBA event key with the format yyyy[EVENT_CODE], where yyyy is the year, and EVENT_CODE is the event code of the event."
+        },
+        "name": {
+          "type": "string",
+          "description": "Official name of event on record either provided by FIRST or organizers of offseason event."
+        },
+        "event_code": {
+          "type": "string",
+          "description": "Event short code, as provided by FIRST."
+        },
+        "event_type": {
+          "type": "integer",
+          "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2"
+        },
+        "district": {
+          "type": "object",
+          "properties": {
+            "abbreviation": {
+              "type": "string"
+            },
+            "display_name": {
+              "type": "string"
+            },
+            "key": {
+              "type": "string"
+            },
+            "year": {
+              "type": "integer"
+            }
+          }
+        },
+        "city": {
+          "type": "string",
+          "description": "City of event"
+        },
+        "state_prov": {
+          "type": "string",
+          "description": "State of event"
+        },
+        "country": {
+          "type": "string",
+          "description": "Country of event"
+        },
+        "start_date": {
+          "type": "string",
+          "format": "date",
+          "description": "Event start date in `yyyy-mm-dd` format."
+        },
+        "end_date": {
+          "type": "string",
+          "format": "date",
+          "description": "Event end date in `yyyy-mm-dd` format."
+        },
+        "year": {
+          "type": "integer",
+          "description": "Year the event data is for."
+        },
+        "short_name": {
+          "type": "string",
+          "description": "Same as name but doesn't include event specifiers, such as 'Regional' or 'District'. May be null."
+        },
+        "event_type_string": {
+          "type": "string",
+          "description": "Event Type, eg Regional, District, or Offseason."
+        },
+        "week": {
+          "type": "integer",
+          "description": "Week of the competition season this event is in."
+        },
+        "address": {
+          "type": "string",
+          "description": "Address of the event's venue, if available."
+        },
+        "postal_code": {
+          "type": "string",
+          "description": "Postal code from the event address"
+        },
+        "gmaps_place_id": {
+          "type": "string",
+          "description": "Google Maps Place ID for the event address"
+        },
+        "gmaps_url": {
+          "type": "string",
+          "format": "url",
+          "description": "Link to address location on Google Maps"
+        },
+        "lat": {
+          "type": "number",
+          "format": "double",
+          "description": "Latitude for the event address"
+        },
+        "lng": {
+          "type": "number",
+          "format": "double",
+          "description": "Longitude for the event address"
+        },
+        "location_name": {
+          "type": "string",
+          "description": "Name of the location at the address for the event, eg. Blue Alliance High School"
+        },
+        "timezone": {
+          "type": "string",
+          "description": "Timezone name"
+        },
+        "website": {
+          "type": "string",
+          "description": "The event's website, if any."
+        },
+        "first_event_id": {
+          "type": "integer",
+          "description": "The FIRST internal Event ID, used to link to the event on the FRC webpage."
+        },
+        "webcasts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Webcast"
+          }
+        },
+        "division_keys": {
+          "type": "array",
+          "description": "An array of event keys for the divisions at this event.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "parent_event_key": {
+          "type": "string",
+          "description": "The TBA Event key that represents the event's parent. Used to link back to the event from a division event. It is also the inverse relation of divison_keys."
+        },
+        "playoff_type": {
+          "type": "integer",
+          "description": "Playoff Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/playoff_type.py#L4, or null"
+        },
+        "playoff_type_string": {
+          "type": "string",
+          "description": "String representation of the playoff_type, or null."
+        }
+      }
+    },
+    "Team_Event_Status": {
+      "type": "object",
+      "properties": {
+        "qual": {
+          "$ref": "#/definitions/Team_Event_Status_rank"
+        },
+        "alliance": {
+          "$ref": "#/definitions/Team_Event_Status_alliance"
+        },
+        "playoff": {
+          "$ref": "#/definitions/Team_Event_Status_playoff"
+        },
+        "alliance_status_str": {
+          "type": "string",
+          "description": "An HTML formatted string suitable for display to the user containing the team's alliance pick status."
+        },
+        "playoff_status_str": {
+          "type": "string",
+          "description": "An HTML formatter string suitable for display to the user containing the team's playoff status."
+        },
+        "overall_status_str": {
+          "type": "string",
+          "description": "An HTML formatted string suitable for display to the user containing the team's overall status summary of the event."
+        }
+      }
+    },
+    "Team_Event_Status_rank": {
+      "properties": {
+        "num_teams": {
+          "type": "integer",
+          "description": "Number of teams ranked."
+        },
+        "ranking": {
+          "type": "object",
+          "properties": {
+            "dq": {
+              "type": "integer",
+              "description": "Number of matches the team was disqualified for."
+            },
+            "matches_played": {
+              "type": "integer",
+              "description": "Number of matches played."
+            },
+            "qual_average": {
+              "type": "number",
+              "format": "double",
+              "description": "For some years, average qualification score. Can be null."
+            },
+            "rank": {
+              "type": "integer",
+              "description": "Relative rank of this team."
+            },
+            "record": {
+              "$ref": "#/definitions/WLT_Record"
+            },
+            "sort_orders": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "team_key": {
+              "type": "string",
+              "description": "TBA team key for this rank"
+            }
+          }
+        },
+        "sort_order_info": {
+          "type": "array",
+          "description": "Ordered list of names corresponding to the elements of the sort_orders array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "precision": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "Team_Event_Status_alliance": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Alliance name, may be null"
+        },
+        "number": {
+          "type": "integer",
+          "description": "Alliance number"
+        },
+        "backup": {
+          "$ref": "#/definitions/Team_Event_Status_alliance_backup"
+        },
+        "pick": {
+          "type": "integer",
+          "description": "Order the team was picked in the alliance from 0-2, with 0 being alliance captain."
+        }
+      }
+    },
+    "Team_Event_Status_alliance_backup": {
+      "properties": {
+        "out": {
+          "type": "string",
+          "description": "TBA key for the team replaced by the backup."
+        },
+        "in": {
+          "type": "string",
+          "description": "TBA key for the backup team called in."
+        }
+      },
+      "description": "Backup status, may be null"
+    },
+    "Team_Event_Status_playoff": {
+      "properties": {
+        "level": {
+          "type": "string",
+          "description": "The highest playoff level the team reached.",
+          "enum": [
+            "qm",
+            "ef",
+            "qf",
+            "sf",
+            "f"
+          ]
+        },
+        "record": {
+          "type": "string",
+          "description": "Record in playoffs as a string in the format WINS-LOSSES-TIES"
+        },
+        "status": {
+          "type": "string",
+          "description": "Current competition status for the playoffs",
+          "enum": [
+            "won",
+            "eliminated",
+            "playing"
+          ]
+        }
+      },
+      "description": "Playoff status for this team, may be null if the team did not make playoffs, or playoffs have not begun."
+    },
+    "Event_Ranking": {
+      "type": "object",
+      "required": [
+        "rankings",
+        "sort_order_info"
+      ],
+      "properties": {
+        "rankings" : {
+          "type": "array",
+          "description": "List of rankings at the event.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "dq": {
+                "type": "integer",
+                "description": "Disqualifications"
+              },
+              "matches_played": {
+                "type": "integer",
+                "description": "Number of matches played by this team."
+              },
+              "qual_average": {
+                "type": "integer",
+                "description": "TODO"
+              },
+              "rank": {
+                "type": "integer",
+                "description": "The team's rank at the event as provided by FIRST."
+              },
+              "record": {
+                "properties": {
+                  "qualifications": {
+                    "$ref": "#/definitions/WLT_Record",
+                    "description": "W-L-T record in qualification matches"
+                  },
+                  "overall": {
+                    "$ref": "#/definitions/WLT_Record",
+                    "description": "W-L-T record across all matches at an event"
+                  }
+                },
+                "description": "Win-Loss-Tie record information, if available. May be null."
+              },
+              "sort_orders": {
+                "type": "array",
+                "description": "Additional year-specific information, may be null. See parent `sort_order_info` for details.",
+                "items": {
+                  "type": "number"
+                }
+              },
+              "team_key": {
+                "type": "string",
+                "description": "The team with this rank."
+              }
+            }
+          }
+        },
+        "sort_order_info": {
+          "type": "array",
+          "description": "List of year-specific values provided in the `sort_orders` array for each team.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Name of the field used in the `sort_order` array"
+              },
+              "precision": {
+                "type": "integer",
+                "description": "Integer expressing the number of digits of precision in the number provided in `sort_orders`"
+              }
+            }
+          }
+        }
+      }
+    },
+    "Event_District_Points": {
+      "type": "object",
+      "required": [
+        "points"
+      ],
+      "properties": {
+        "points": {
+          "type": "object",
+          "description": "Points gained for each team at the event. Stored as a key-value pair with the team key as the key, and an object describing the points as it's value.",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "alliance_points": {
+                "type": "integer"
+              },
+              "award_points": {
+                "type": "integer"
+              },
+              "qual_points": {
+                "type": "integer"
+              },
+              "elim_points": {
+                "type": "integer"
+              },
+              "total": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "tiebreakers": {
+          "type": "object",
+          "description": "Tiebreaker values for each team at the event. Stored as a key-value pair with the team key as the key, and an object describing the tiebreaker elements as it's value.",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "highest_qual_scores": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "qual_wins": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    },
+    "Event_Insights_2016": {
+      "type": "object",
+      "description": "Insights for FIRST Stronghold qualification and elimination matches.",
+      "properties": {
+        "qual": {
+          "$ref": "#/definitions/Event_Insights_2016_Detail"
+        },
+        "playoff": {
+          "$ref": "#/definitions/Event_Insights_2016_Detail"
+        }
+      }
+    },
+    "Event_Insights_2016_Detail": {
+      "type": "object",
+      "properties": {
+        "LowBar": {
+          "type": "array",
+          "description": "For the Low Bar - An array with three values, number of times damaged, number of opportunities to damage, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "A_ChevalDeFrise": {
+          "type": "array",
+          "description": "For the Cheval De Frise - An array with three values, number of times damaged, number of opportunities to damage, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "A_Portcullis": {
+          "type": "array",
+          "description": "For the Portcullis - An array with three values, number of times damaged, number of opportunities to damage, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "B_Ramparts": {
+          "type": "array",
+          "description": "For the Ramparts - An array with three values, number of times damaged, number of opportunities to damage, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "B_Moat": {
+          "type": "array",
+          "description": "For the Moat - An array with three values, number of times damaged, number of opportunities to damage, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "C_SallyPort": {
+          "type": "array",
+          "description": "For the Sally Port - An array with three values, number of times damaged, number of opportunities to damage, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "C_Drawbridge": {
+          "type": "array",
+          "description": "For the Drawbridge - An array with three values, number of times damaged, number of opportunities to damage, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "D_RoughTerrain": {
+          "type": "array",
+          "description": "For the Rough Terrain - An array with three values, number of times damaged, number of opportunities to damage, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "D_RockWall": {
+          "type": "array",
+          "description": "For the Rock Wall - An array with three values, number of times damaged, number of opportunities to damage, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "average_high_goals": {
+          "type": "number",
+          "format": "float",
+          "description": "Average number of high goals scored."
+        },
+        "average_low_goals": {
+          "type": "number",
+          "format": "float",
+          "description": "Average number of low goals scored."
+        },
+        "breaches": {
+          "type": "array",
+          "description": "An array with three values, number of times breached, number of opportunities to breech, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "scales": {
+          "type": "array",
+          "description": "An array with three values, number of times scaled, number of opportunities to scale, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "challenges": {
+          "type": "array",
+          "description": "An array with three values, number of times challenged, number of opportunities to challenge, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "captures": {
+          "type": "array",
+          "description": "An array with three values, number of times captured, number of opportunities to capture, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "average_win_score": {
+          "type": "number",
+          "format": "float",
+          "description": "Average winning score."
+        },
+        "average_win_margin": {
+          "type": "number",
+          "format": "float",
+          "description": "Average margin of victory."
+        },
+        "average_score": {
+          "type": "number",
+          "format": "float",
+          "description": "Average total score."
+        },
+        "average_auto_score": {
+          "type": "number",
+          "format": "float",
+          "description": "Average autonomous score."
+        },
+        "average_crossing_score": {
+          "type": "number",
+          "format": "float",
+          "description": "Average crossing score."
+        },
+        "average_boulder_score": {
+          "type": "number",
+          "format": "float",
+          "description": "Average boulder score."
+        },
+        "average_tower_score": {
+          "type": "number",
+          "format": "float",
+          "description": "Average tower score."
+        },
+        "average_foul_score": {
+          "type": "number",
+          "format": "float",
+          "description": "Average foul score."
+        },
+        "high_score": {
+          "type": "array",
+          "description": "An array with three values, high score, match key from the match with the high score, and the name of the match",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Event_Insights_2017": {
+      "type": "object",
+      "description": "Insights for FIRST STEAMWORKS qualification and elimination matches.",
+      "properties": {
+        "qual": {
+          "$ref": "#/definitions/Event_Insights_2017_Detail"
+        },
+        "playoff": {
+          "$ref": "#/definitions/Event_Insights_2017_Detail"
+        }
+      }
+    },
+    "Event_Insights_2017_Detail": {
+      "type": "object",
+      "properties": {
+        "average_foul_score": {
+          "type": "number",
+          "format": "float",
+          "description": "Average foul score."
+        },
+        "average_fuel_points": {
+          "type": "number",
+          "format": "float",
+          "description": "Average fuel points scored."
+        },
+        "average_fuel_points_auto": {
+          "type": "number",
+          "format": "float",
+          "description": "Average fuel points scored during auto."
+        },
+        "average_fuel_points_teleop": {
+          "type": "number",
+          "format": "float",
+          "description": "Average fuel points scored during teleop."
+        },
+        "average_high_goals": {
+          "type": "number",
+          "format": "float",
+          "description": "Average points scored in the high goal."
+        },
+        "average_high_goals_auto": {
+          "type": "number",
+          "format": "float",
+          "description": "Average points scored in the high goal during auto."
+        },
+        "average_high_goals_teleop": {
+          "type": "number",
+          "format": "float",
+          "description": "Average points scored in the high goal during teleop."
+        },
+        "average_low_goals": {
+          "type": "number",
+          "format": "float",
+          "description": "Average points scored in the low goal."
+        },
+        "average_low_goals_auto": {
+          "type": "number",
+          "format": "float",
+          "description": "Average points scored in the low goal during auto."
+        },
+        "average_low_goals_teleop": {
+          "type": "number",
+          "format": "float",
+          "description": "Average points scored in the low goal during teleop."
+        },
+        "average_mobility_points_auto": {
+          "type": "number",
+          "format": "float",
+          "description": "Average mobility points scored during auto."
+        },
+        "average_points_auto": {
+          "type": "number",
+          "format": "float",
+          "description": "Average points scored during auto."
+        },
+        "average_points_teleop": {
+          "type": "number",
+          "format": "float",
+          "description": "Average points scored during teleop."
+        },
+        "average_rotor_points": {
+          "type": "number",
+          "format": "float",
+          "description": "Average rotor points scored."
+        },
+        "average_rotor_points_auto": {
+          "type": "number",
+          "format": "float",
+          "description": "Average rotor points scored during auto."
+        },
+        "average_rotor_points_teleop": {
+          "type": "number",
+          "format": "float",
+          "description": "Average rotor points scored during teleop."
+        },
+        "average_score": {
+          "type": "number",
+          "format": "float",
+          "description": "Average score."
+        },
+        "average_takeoff_points_teleop": {
+          "type": "number",
+          "format": "float",
+          "description": "Average takeoff points scored during teleop."
+        },
+        "average_win_margin": {
+          "type": "number",
+          "format": "float",
+          "description": "Average margin of victory."
+        },
+        "average_win_score": {
+          "type": "number",
+          "format": "float",
+          "description": "Average winning score."
+        },
+        "high_kpa": {
+          "type": "array",
+          "description": "An array with three values, kPa scored, match key from the match with the high kPa, and the name of the match",
+          "items": {
+            "type": "string"
+          }
+        },
+        "high_score": {
+          "type": "array",
+          "description": "An array with three values, high score, match key from the match with the high score, and the name of the match",
+          "items": {
+            "type": "string"
+          }
+        },
+        "kpa_achieved": {
+          "type": "array",
+          "description": "An array with three values, number of times kPa bonus achieved, number of opportunities to bonus, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "mobility_counts": {
+          "type": "array",
+          "description": "An array with three values, number of times mobility bonus achieved, number of opportunities to bonus, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "rotor_1_engaged": {
+          "type": "array",
+          "description": "An array with three values, number of times rotor 1 engaged, number of opportunities to engage, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "rotor_1_engaged_auto": {
+          "type": "array",
+          "description": "An array with three values, number of times rotor 1 engaged in auto, number of opportunities to engage in auto, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "rotor_2_engaged": {
+          "type": "array",
+          "description": "An array with three values, number of times rotor 2 engaged, number of opportunities to engage, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "rotor_2_engaged_auto": {
+          "type": "array",
+          "description": "An array with three values, number of times rotor 2 engaged in auto, number of opportunities to engage in auto, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "rotor_3_engaged": {
+          "type": "array",
+          "description": "An array with three values, number of times rotor 3 engaged, number of opportunities to engage, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "rotor_4_engaged": {
+          "type": "array",
+          "description": "An array with three values, number of times rotor 4 engaged, number of opportunities to engage, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "takeoff_counts": {
+          "type": "array",
+          "description": "An array with three values, number of times takeoff was counted, number of opportunities to takeoff, and percentage.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        }
+      }
+    },
+    "Event_OPRs": {
+      "type": "object",
+      "description": "OPR, DPR, and CCWM for teams at the event.",
+      "properties": {
+        "oprs": {
+          "type": "object",
+          "description": "A key-value pair with team key (eg `frc254`) as key and OPR as value",
+          "additionalProperties": {
+            "type": "number",
+            "format": "float",
+            "description": "OPR for team"
+          }
+        },
+        "dprs": {
+          "type": "object",
+          "description": "A key-value pair with team key (eg `frc254`) as key and DPR as value",
+          "additionalProperties": {
+            "type": "number",
+            "format": "float",
+            "description": "DPR for team"
+          }
+        },
+        "ccwms": {
+          "type": "object",
+          "description": "A key-value pair with team key (eg `frc254`) as key and CCWM as value",
+          "additionalProperties": {
+            "type": "number",
+            "format": "float",
+            "description": "CCWM for team"
+          }
+        }
+      }
+    },
+    "Event_Predictions": {
+      "type": "object",
+      "description": "JSON Object containing prediction information for the event. Contains year-specific information and is subject to change.",
+    },
+    "Webcast": {
+      "type": "object",
+      "required": [
+        "channel",
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Type of webcast, typically descriptive of the streaming provider",
+          "enum": [
+            "youtube",
+            "twitch",
+            "ustream",
+            "iframe",
+            "html5",
+            "rtmp",
+            "livestream"
+          ]
+        },
+        "channel": {
+          "type": "string",
+          "description": "Type specific channel information. May be the YouTube stream, or Twitch channel name. In the case of iframe types, contains HTML to embed the stream in an HTML iframe."
+        },
+        "file": {
+          "type": "string",
+          "description": "File identification as may be required for some types. May be null."
+        }
+      }
+    },
+    "Match_Simple": {
+      "type": "object",
+      "required": [
+        "comp_level",
+        "event_key",
+        "key",
+        "match_number",
+        "set_number"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "TBA event key with the format yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER], where yyyy is the year, and EVENT_CODE is the event code of the event, COMP_LEVEL is (qm, ef, qf, sf, f), and MATCH_NUMBER is the match number in the competition level. A set number may append the competition level if more than one match in required per set."
+        },
+        "comp_level": {
+          "type": "string",
+          "description": "The competition level the match was played at.",
+          "enum": [
+            "qm",
+            "ef",
+            "qf",
+            "sf",
+            "f"
+          ]
+        },
+        "set_number": {
+          "type": "integer",
+          "description": "The set number in a series of matches where more than one match is required in the match series."
+        },
+        "match_number": {
+          "type": "integer",
+          "description": "The match number of the match in the competition level."
+        },
+        "alliances": {
+          "properties": {
+            "blue": {
+              "$ref": "#/definitions/Match_alliance"
+            },
+            "red": {
+              "$ref": "#/definitions/Match_alliance"
+            }
+          },
+          "description": "A list of alliances, the teams on the alliances, and their score."
+        },
+        "winning_alliance": {
+          "type": "string",
+          "description": "The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie.",
+          "enum": [
+            "red",
+            "blue"
+          ]
+        },
+        "event_key": {
+          "type": "string",
+          "description": "Event key of the event the match was played at."
+        },
+        "time": {
+          "type": "integer",
+          "format": "int64",
+          "description": "UNIX timestamp of match time, as taken from the published schedule"
+        },
+        "predicted_time": {
+          "type": "integer",
+          "format": "int64",
+          "description": "UNIX timestamp of the TBA predicted match start time"
+        },
+        "actual_time": {
+          "type": "integer",
+          "format": "int64",
+          "description": "UNIX timestamp of actual match start time"
+        }
+      }
+    },
+    "Match": {
+      "type": "object",
+      "required": [
+        "comp_level",
+        "event_key",
+        "key",
+        "match_number",
+        "set_number"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "TBA event key with the format yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER], where yyyy is the year, and EVENT_CODE is the event code of the event, COMP_LEVEL is (qm, ef, qf, sf, f), and MATCH_NUMBER is the match number in the competition level. A set number may append the competition level if more than one match in required per set."
+        },
+        "comp_level": {
+          "type": "string",
+          "description": "The competition level the match was played at.",
+          "enum": [
+            "qm",
+            "ef",
+            "qf",
+            "sf",
+            "f"
+          ]
+        },
+        "set_number": {
+          "type": "integer",
+          "description": "The set number in a series of matches where more than one match is required in the match series."
+        },
+        "match_number": {
+          "type": "integer",
+          "description": "The match number of the match in the competition level."
+        },
+        "alliances": {
+          "properties": {
+            "blue": {
+              "$ref": "#/definitions/Match_alliance"
+            },
+            "red": {
+              "$ref": "#/definitions/Match_alliance"
+            }
+          },
+          "description": "A list of alliances, the teams on the alliances, and their score."
+        },
+        "winning_alliance": {
+          "type": "string",
+          "description": "The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie."
+        },
+        "event_key": {
+          "type": "string",
+          "description": "Event key of the event the match was played at."
+        },
+        "time": {
+          "type": "integer",
+          "format": "int64",
+          "description": "UNIX timestamp of match time, as taken from the published schedule"
+        },
+        "actual_time": {
+          "type": "integer",
+          "format": "int64",
+          "description": "UNIX timestamp of actual match start time"
+        },
+        "predicted_time": {
+          "type": "integer",
+          "format": "int64",
+          "description": "UNIX timestamp of the TBA predicted match start time"
+        },
+        "post_result_time": {
+          "type": "integer",
+          "format": "int64",
+          "description": "UNIX timestamp when the match result was posted"
+        },
+        "score_breakdown": {
+          "type": "object",
+          "description": "Score breakdown for auto, teleop, etc. points. Varies from year to year. May be null."
+        },
+        "videos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Media"
+          },
+          "description": "Array of Media associated with this match and corresponding information"
+        }
+      }
+    },
+    "Match_alliance": {
+      "type": "object",
+      "required": [
+        "score",
+        "team_keys"
+      ],
+      "properties": {
+        "score": {
+          "type": "integer"
+        },
+        "team_keys": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Team keys"
+          }
+        },
+        "surrogate_team_keys": {
+          "type": "array",
+          "description": "TBA team keys of any teams playing as a surrogate.",
+          "items": {
+            "type": "string",
+            "description": "Team keys"
+          }
+        }
+      }
+    },
+    "Match_Score_Breakdown_2015": {
+      "type": "object",
+      "properties": {
+        "blue": {
+          "$ref": "#/definitions/Match_Score_Breakdown_2015_Alliance"
+        },
+        "red": {
+          "$ref": "#/definitions/Match_Score_Breakdown_2015_Alliance"
+        },
+        "coopertition": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Unknown",
+            "Stack"
+          ]
+        },
+        "coopertition_points": {
+          "type": "integer"
+        }
+      },
+      "description": "See the 2015 FMS API documentation for a description of each value"
+    },
+    "Match_Score_Breakdown_2015_Alliance": {
+      "type": "object",
+      "properties": {
+        "auto_points": {
+          "type": "integer"
+        },
+        "teleop_points": {
+          "type": "integer"
+        },
+        "container_points": {
+          "type": "integer"
+        },
+        "tote_points": {
+          "type": "integer"
+        },
+        "litter_points": {
+          "type": "integer"
+        },
+        "foul_points": {
+          "type": "integer"
+        },
+        "adjust_points": {
+          "type": "integer"
+        },
+        "total_points": {
+          "type": "integer"
+        },
+        "foul_count": {
+          "type": "integer"
+        },
+        "tote_count_far": {
+          "type": "integer"
+        },
+        "tote_count_near": {
+          "type": "integer"
+        },
+        "tote_set": {
+          "type": "boolean"
+        },
+        "tote_stack": {
+          "type": "boolean"
+        },
+        "container_count_level1": {
+          "type": "integer"
+        },
+        "container_count_level2": {
+          "type": "integer"
+        },
+        "container_count_level3": {
+          "type": "integer"
+        },
+        "container_count_level4": {
+          "type": "integer"
+        },
+        "container_count_level5": {
+          "type": "integer"
+        },
+        "container_count_level6": {
+          "type": "integer"
+        },
+        "container_set": {
+          "type": "boolean"
+        },
+        "litter_count_container": {
+          "type": "integer"
+        },
+        "litter_count_landfill": {
+          "type": "integer"
+        },
+        "litter_count_unprocessed": {
+          "type": "integer"
+        },
+        "robot_set": {
+          "type": "boolean"
+        }
+      }
+    },
+    "Match_Score_Breakdown_2016": {
+      "type": "object",
+      "properties": {
+        "blue": {
+          "$ref": "#/definitions/Match_Score_Breakdown_2016_Alliance"
+        },
+        "red": {
+          "$ref": "#/definitions/Match_Score_Breakdown_2016_Alliance"
+        }
+      },
+      "description": "See the 2016 FMS API documentation for a description of each value."
+    },
+    "Match_Score_Breakdown_2016_Alliance": {
+      "type": "object",
+      "properties": {
+        "autoPoints": {
+          "type": "integer"
+        },
+        "teleopPoints": {
+          "type": "integer"
+        },
+        "breechPoints": {
+          "type": "integer"
+        },
+        "foulPoints": {
+          "type": "integer"
+        },
+        "capturePoints": {
+          "type": "integer"
+        },
+        "adjustPoints": {
+          "type": "integer"
+        },
+        "totalPoints": {
+          "type": "integer"
+        },
+        "robot1Auto": {
+          "type": "string",
+          "enum": [
+            "Crossed",
+            "Reached",
+            "None"
+          ]
+        },
+        "robot2Auto": {
+          "type": "string",
+          "enum": [
+            "Crossed",
+            "Reached",
+            "None"
+          ]
+        },
+        "robot3Auto": {
+          "type": "string",
+          "enum": [
+            "Crossed",
+            "Reached",
+            "None"
+          ]
+        },
+        "autoReachPoints": {
+          "type": "integer"
+        },
+        "autoCrossingPoints": {
+          "type": "integer"
+        },
+        "autoBouldersLow": {
+          "type": "integer"
+        },
+        "autoBouldersHigh": {
+          "type": "integer"
+        },
+        "autoBoulderPoints": {
+          "type": "integer"
+        },
+        "teleopCrossingPoints": {
+          "type": "integer"
+        },
+        "teleopBouldersLow": {
+          "type": "integer"
+        },
+        "teleopBouldersHigh": {
+          "type": "integer"
+        },
+        "teleopBoulderPoints": {
+          "type": "integer"
+        },
+        "teleopDefensesBreached": {
+          "type": "boolean"
+        },
+        "teleopChallengePoints": {
+          "type": "integer"
+        },
+        "teleopScalePoints": {
+          "type": "integer"
+        },
+        "teleopTowerCaptured": {
+          "type": "integer"
+        },
+        "towerFaceA": {
+          "type": "string"
+        },
+        "towerFaceB": {
+          "type": "string"
+        },
+        "towerFaceC": {
+          "type": "string"
+        },
+        "towerEndStrength": {
+          "type": "integer"
+        },
+        "techFoulCount": {
+          "type": "integer"
+        },
+        "foulCount": {
+          "type": "integer"
+        },
+        "position2": {
+          "type": "string"
+        },
+        "position3": {
+          "type": "string"
+        },
+        "position4": {
+          "type": "string"
+        },
+        "position5": {
+          "type": "string"
+        },
+        "position1crossings": {
+          "type": "integer"
+        },
+        "position2crossings": {
+          "type": "integer"
+        },
+        "position3crossings": {
+          "type": "integer"
+        },
+        "position4crossings": {
+          "type": "integer"
+        },
+        "position5crossings": {
+          "type": "integer"
+        }
+      }
+    },
+    "Match_Score_Breakdown_2017": {
+      "type": "object",
+      "properties": {
+        "blue": {
+          "$ref": "#/definitions/Match_Score_Breakdown_2017_Alliance"
+        },
+        "red": {
+          "$ref": "#/definitions/Match_Score_Breakdown_2017_Alliance"
+        }
+      },
+      "description": "See the 2017 FMS API documentation for a description of each value."
+    },
+    "Match_Score_Breakdown_2017_Alliance": {
+      "type": "object",
+      "properties": {
+        "autoPoints": {
+          "type": "integer"
+        },
+        "teleopPoints": {
+          "type": "integer"
+        },
+        "breechPoints": {
+          "type": "integer"
+        },
+        "foulPoints": {
+          "type": "integer"
+        },
+        "capturePoints": {
+          "type": "integer"
+        },
+        "adjustPoints": {
+          "type": "integer"
+        },
+        "totalPoints": {
+          "type": "integer"
+        },
+        "robot1Auto": {
+          "type": "string",
+          "enum": [
+            "Unknown",
+            "Mobility",
+            "None"
+          ]
+        },
+        "robot2Auto": {
+          "type": "string",
+          "enum": [
+            "Unknown",
+            "Mobility",
+            "None"
+          ]
+        },
+        "robot3Auto": {
+          "type": "string",
+          "enum": [
+            "Unknown",
+            "Mobility",
+            "None"
+          ]
+        },
+        "rotor1Auto": {
+          "type": "boolean"
+        },
+        "rotor2Auto": {
+          "type": "boolean"
+        },
+        "autoFuelLow": {
+          "type": "integer"
+        },
+        "autoFuelHigh": {
+          "type": "integer"
+        },
+        "autoMobilityPoints": {
+          "type": "integer"
+        },
+        "autoRotorPoints": {
+          "type": "integer"
+        },
+        "autoFuelPoints": {
+          "type": "integer"
+        },
+        "teleopFuelPoints": {
+          "type": "integer"
+        },
+        "teleopFuelLow": {
+          "type": "integer"
+        },
+        "teleopFuelHigh": {
+          "type": "integer"
+        },
+        "teleopRotorPoints": {
+          "type": "integer"
+        },
+        "kPaRankingPointAchieved": {
+          "type": "boolean"
+        },
+        "teleopTakeoffPoints": {
+          "type": "integer"
+        },
+        "kPaBonusPoints": {
+          "type": "integer"
+        },
+        "rotorBonusPoints": {
+          "type": "integer"
+        },
+        "rotor1Engaged": {
+          "type": "boolean"
+        },
+        "rotor2Engaged": {
+          "type": "boolean"
+        },
+        "rotor3Engaged": {
+          "type": "boolean"
+        },
+        "rotor4Engaged": {
+          "type": "boolean"
+        },
+        "rotorRankingPointAchieved": {
+          "type": "boolean"
+        },
+        "techFoulCount": {
+          "type": "integer"
+        },
+        "foulCount": {
+          "type": "integer"
+        },
+        "touchpadNear": {
+          "type": "string"
+        },
+        "touchpadMiddle": {
+          "type": "string"
+        },
+        "touchpadFar": {
+          "type": "string"
+        }
+      }
+    },
+    "Media": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "TBA identifier for this media"
+        },
+        "type": {
+          "type": "string",
+          "description": "String type of the media element.",
+          "enum": [
+            "youtube",
+            "cdphotothread",
+            "imgur",
+            "facebook-profile",
+            "youtube-channel",
+            "twitter-profile",
+            "github-profile",
+            "instagram-profile",
+            "periscope-profile",
+            "grabcad",
+            "pinterest-profile",
+            "snapchat-profile",
+            "twitch-channel"
+          ]
+        },
+        "foreign_key": {
+          "type": "string",
+          "description": "The key used to identify this media on the media site."
+        },
+        "details": {
+          "type": "object",
+          "description": "If required, a JSON dict of additional media information."
+        },
+        "preferred": {
+          "type": "boolean",
+          "description": "True if the media is of high quality"
+        }
+      }
+    },
+    "Elimination_Alliance": {
+      "type": "object",
+      "required": [
+        "picks"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Alliance name, may be null."
+        },
+        "backup": {
+          "type": "object",
+          "properties": {
+            "out": {
+              "type": "string",
+              "description": "Team key that was replaced by the backup team."
+            },
+            "in": {
+              "type": "string",
+              "description": "Team key that was called in as the backup."
+            }
+          },
+          "description": "Backup team called in, may be null."
+        },
+        "declines": {
+          "type": "array",
+          "description": "List of teams that declined the alliance.",
+          "items": {
+            "type": "string",
+            "description": "Team key that declined the alliance."
+          }
+        },
+        "picks": {
+          "type": "array",
+          "description": "List of team keys picked for the alliance. First pick is captain.",
+          "items": {
+            "type": "string",
+            "description": "Team key picked for the alliance."
+          }
+        },
+        "status": {
+          "type": "object",
+          "properties": {
+            "current_level_record": {
+              "$ref": "#/definitions/WLT_Record"
+            },
+            "level": {
+              "type": "string"
+            },
+            "playoff_average": {
+              "type": "number",
+              "format": "double"
+            },
+            "record": {
+              "$ref": "#/definitions/WLT_Record"
+            },
+            "status": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "Award": {
+      "type": "object",
+      "required": [
+        "award_type",
+        "event_key",
+        "name",
+        "year"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the award as provided by FIRST. May vary for the same award type."
+        },
+        "award_type": {
+          "type": "integer",
+          "description": "Type of award given. See https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/award_type.py#L6"
+        },
+        "event_key": {
+          "type": "string",
+          "description": "The event_key of the event the award was won at."
+        },
+        "recipient_list": {
+          "type": "array",
+          "description": "A list of recipients of the award at the event. Either team_key and/or awardee for individual awards.",
+          "items": {
+            "$ref": "#/definitions/Award_Recipient"
+          }
+        },
+        "year": {
+          "type": "integer",
+          "description": "The year this award was won."
+        }
+      }
+    },
+    "Award_Recipient": {
+      "type": "object",
+      "properties": {
+        "team_key": {
+          "type": "string",
+          "description": "The TBA team key for the team that was given the award. May be null."
+        },
+        "awardee": {
+          "type": "string",
+          "description": "The name of the individual given the award. May be null."
+        }
+      }
+    },
+    "District_List": {
+      "type": "object",
+      "required": [
+            "display_name",
+            "abbreviation",
+            "key",
+            "year"
+      ],
+      "properties": {
+        "abbreviation": {
+          "type": "string",
+          "description": "The short identifier for the district"
+        },
+        "display_name": {
+          "type": "string",
+          "description": "The long name for the district"
+        },
+        "key": {
+          "type": "string",
+          "description": "Key for this district, e.g. 2016ne"
+        },
+        "year": {
+          "type": "integer",
+          "description": "Year this district happened"
+        }
+      }
+    },
+    "District_Ranking": {
+      "type": "object",
+      "required": [
+        "point_total",
+        "rank",
+        "team_key"
+      ],
+      "properties": {
+        "team_key": {
+          "type": "string"
+        },
+        "rank": {
+          "type": "integer"
+        },
+        "rookie_bonus": {
+          "type": "integer"
+        },
+        "point_total": {
+          "type": "integer"
+        },
+        "event_points": {
+          "type": "array",
+          "items": {
+            "properties": {
+              "event_key": {
+                "type": "string"
+              },
+              "district_cmp": {
+                "type": "boolean"
+              },
+              "alliance_points": {
+                "type": "integer"
+              },
+              "award_points": {
+                "type": "integer"
+              },
+              "qual_points": {
+                "type": "integer"
+              },
+              "elim_points": {
+                "type": "integer"
+              },
+              "total": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    },
+    "WLT_Record": {
+      "type": "object",
+      "description": "A Win-Loss-Tie record for a team, or an alliance",
+      "properties": {
+        "losses": {
+          "type": "integer",
+          "description": "Number of losses"
+        },
+        "wins": {
+          "type": "integer",
+          "description": "Number of wins"
+        },
+        "ties": {
+          "type": "integer",
+          "description": "Number of ties"
+        }
+      }
+    }
+  }
+}
