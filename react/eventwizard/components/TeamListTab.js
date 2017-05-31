@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import TeamItem from './TeamItem'
 import Dialog from 'react-bootstrap-dialog'
+import { Typeahead } from 'react-bootstrap-typeahead'
 
 class TeamListTab extends Component {
 
@@ -19,6 +20,7 @@ class TeamListTab extends Component {
     super(props)
     this.state = {
       teams: [],
+      teamTypeaheadOptions: [],
     }
     this.updateAttendingTeams = this.updateAttendingTeams.bind(this)
   }
@@ -27,6 +29,12 @@ class TeamListTab extends Component {
     if (this.props.selectedEvent !== nextProps.selectedEvent) {
       this.setState({ teams: [] })
     }
+  }
+
+  componentDidMount() {
+    fetch('/_/typeahead/teams-all')
+      .then(resp => resp.json())
+      .then(json => this.setState({teamTypeaheadOptions: json}))
   }
 
   updateAttendingTeams() {
@@ -55,6 +63,10 @@ class TeamListTab extends Component {
         <div className="row">
           <div className="col-sm-6">
             <h4>Add Single Team</h4>
+            <Typeahead
+              placeholder="Enter team name or number..."
+              options={this.state.teamTypeaheadOptions}
+            />
             <h4>Add Multiple Teams</h4>
             <h4>Import FMS Report</h4>
           </div>
