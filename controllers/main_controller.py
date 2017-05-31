@@ -372,7 +372,7 @@ class ApiV3DocumentationHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         self.template_values['title'] = 'APIv3'
-        self.template_values['swagger_url'] = 'https://raw.githubusercontent.com/the-blue-alliance/the-blue-alliance-android/master/libTba/swagger/apiv3-swagger.json'
+        self.template_values['swagger_url'] = 'https://www.thebluealliance.com/swagger/api_v3.json'
         path = os.path.join(os.path.dirname(__file__), "../templates/apidocs_swagger.html")
         return template.render(path, self.template_values)
 
