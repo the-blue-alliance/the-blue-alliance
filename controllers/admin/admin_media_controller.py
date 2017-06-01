@@ -4,12 +4,16 @@ import logging
 import os
 
 import StringIO
+
+from google.appengine.ext import deferred
+from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
 from helpers.media_helper import MediaParser
 from helpers.media_manipulator import MediaManipulator
 from helpers.suggestions.suggestion_creator import SuggestionCreator
+from models.account import Account
 from models.media import Media
 
 
@@ -102,6 +106,16 @@ class AdminMediaAdd(LoggedInHandler):
         self.redirect(self.request.get('originating_url'))
 
 
+def create_insta_suggestion(account_key_id, team_num, year, insta_id):
+        instagram_url = "https://www.instagram.com/p/{}".format(insta_id)
+        SuggestionCreator.createTeamMediaSuggestion(
+            author_account_key=ndb.Key(Account, account_key_id),
+            media_url=instagram_url,
+            team_key="frc{}".format(team_num),
+            year_str=str(year),
+            default_preferred=True)
+
+
 class AdminMediaInstagramImport(LoggedInHandler):
     def get(self):
         self._require_admin()
@@ -117,14 +131,14 @@ class AdminMediaInstagramImport(LoggedInHandler):
                 continue
             team_num = int(row[0])
             year = int(row[1])
-            intagram_id = row[2]
-            instagram_url = "https://www.instagram.com/p/{}".format(intagram_id)
-
-            SuggestionCreator.createTeamMediaSuggestion(
-                author_account_key=self.user_bundle.account.key,
-                media_url=instagram_url,
-                team_key="frc{}".format(team_num),
-                year_str=str(year),
-                default_preferred=True)
+            instagram_id = row[2]
+            deferred.defer(
+                create_insta_suggestion,
+                self.user_bundle.account.key.id(),
+                team_num,
+                year,
+                instagram_id,
+                _queue="admin"
+            )
 
         self.redirect('/admin/media/import/instagram')
