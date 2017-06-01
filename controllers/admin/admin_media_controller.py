@@ -106,11 +106,10 @@ class AdminMediaAdd(LoggedInHandler):
         self.redirect(self.request.get('originating_url'))
 
 
-def create_insta_suggestion(account_key_id, team_num, year, insta_id):
-        instagram_url = "https://www.instagram.com/p/{}".format(insta_id)
+def create_insta_suggestion(account_key_id, team_num, year, insta_url):
         SuggestionCreator.createTeamMediaSuggestion(
             author_account_key=ndb.Key(Account, account_key_id),
-            media_url=instagram_url,
+            media_url=insta_url,
             team_key="frc{}".format(team_num),
             year_str=str(year),
             default_preferred=True)
@@ -131,13 +130,13 @@ class AdminMediaInstagramImport(LoggedInHandler):
                 continue
             team_num = int(row[0])
             year = int(row[1])
-            instagram_id = row[2]
+            instagram_url = row[2]
             deferred.defer(
                 create_insta_suggestion,
                 self.user_bundle.account.key.id(),
                 team_num,
                 year,
-                instagram_id,
+                instagram_url,
                 _queue="admin"
             )
 
