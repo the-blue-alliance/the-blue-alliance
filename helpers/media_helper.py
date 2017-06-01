@@ -47,7 +47,9 @@ class MediaHelper(object):
 class MediaParser(object):
 
     # Add MediaTypes to this list to indicate that they case case-sensitive (shouldn't be normalized to lower case)
-    CASE_SENSITIVE_FOREIGN_KEYS = [MediaType.YOUTUBE_VIDEO, MediaType.IMGUR, MediaType.CD_PHOTO_THREAD]
+    CASE_SENSITIVE_FOREIGN_KEYS = [MediaType.YOUTUBE_VIDEO, MediaType.IMGUR, MediaType.CD_PHOTO_THREAD, MediaType.INSTAGRAM_IMAGE]
+
+    OEMBED_PROVIDERS = [MediaType.INSTAGRAM_IMAGE]
 
     # Dict that maps media types -> list of tuple of regex pattern and group # of foreign key
     FOREIGN_KEY_PATTERNS = {
@@ -61,7 +63,8 @@ class MediaParser(object):
         MediaType.IMGUR: [(r".*imgur.com\/(\w+)\/?\Z", 1), (r".*imgur.com\/(\w+)\.\w+\Z", 1)],
         MediaType.INSTAGRAM_PROFILE: [(r".*instagram.com\/(.*)(\/(.*))?", 1)],
         MediaType.PERISCOPE_PROFILE: [(r".*periscope.tv\/(.*)(\/(.*))?", 1)],
-        MediaType.GRABCAD: [(r".*grabcad.com\/library\/(.*)", 1)]
+        MediaType.GRABCAD: [(r".*grabcad.com\/library\/(.*)", 1)],
+        MediaType.INSTAGRAM_IMAGE:  [(r".*instagram.com/p/([^\/]*)(\/(.*))?", 1)],
     }
 
     # Media URL patterns that map a URL -> Profile type (used to determine which type represents a given url)
@@ -72,16 +75,17 @@ class MediaParser(object):
         ('youtube.com/user', MediaType.YOUTUBE_CHANNEL),
         ('youtube.com/c/', MediaType.YOUTUBE_CHANNEL),
         ('github.com/', MediaType.GITHUB_PROFILE),
-        ('instagram.com/', MediaType.INSTAGRAM_PROFILE),
         ('periscope.tv/', MediaType.PERISCOPE_PROFILE),
         ('chiefdelphi.com/media/photos/', MediaType.CD_PHOTO_THREAD),
         ('youtube.com/watch', MediaType.YOUTUBE_VIDEO),
         ('youtu.be', MediaType.YOUTUBE_VIDEO),
         ('imgur.com/', MediaType.IMGUR),
         ('grabcad.com/library/', MediaType.GRABCAD),
+        ('instagram.com/p/', MediaType.INSTAGRAM_IMAGE),
 
-        # Keep this last, so it doesn't greedy match over other more specific youtube urls
+        # Keep these last, so they don't greedy match over other more specific urls
         ('youtube.com/', MediaType.YOUTUBE_CHANNEL),
+        ('instagram.com/', MediaType.INSTAGRAM_PROFILE),
     ]
 
     # The default is to strip out all urlparams, but this is a white-list for exceptions
@@ -90,6 +94,9 @@ class MediaParser(object):
     }
 
     GRABCAD_DETAIL_URL = "https://grabcad.com/community/api/v1/models/{}"  # Format w/ foreign key
+    OEMBED_DETAIL_URL = {
+        MediaType.INSTAGRAM_IMAGE: "https://api.instagram.com/oembed/?url=http://instagram.com/p/{}"
+    }
 
     @classmethod
     def partial_media_dict_from_url(cls, url):
@@ -108,6 +115,8 @@ class MediaParser(object):
                     # GrabCAD images are special - we'll need to do a second fetch to a SUPER HACKY
                     # API so we can get embed images and titles and stuff
                     return cls._partial_media_dict_from_grabcad(url)
+                elif media_type in cls.OEMBED_PROVIDERS:
+                    return cls._partial_media_dict_from_oembed(media_type, url)
                 else:
                     return cls._create_media_dict(media_type, url)
 
@@ -217,6 +226,24 @@ class MediaParser(object):
             'model_image': grabcad_data['preview_image'],
             'model_created': grabcad_data['created_at']
         })
+        return media_dict
+
+    @classmethod
+    def _partial_media_dict_from_oembed(cls, media_type, url):
+        media_dict = cls._create_media_dict(media_type, url)
+        if not media_dict:
+            return None
+
+        url = cls.OEMBED_DETAIL_URL.get(media_type).format(media_dict['foreign_key'])
+        urlfetch_result = urlfetch.fetch(url, deadline=10)
+        if urlfetch_result.status_code != 200:
+            logging.warning('Unable to retreive url: {}'.format(url))
+
+        oembed_data = json.loads(urlfetch_result.content)
+        if not oembed_data:
+            return None
+
+        media_dict['details_json'] = json.dumps(oembed_data)
         return media_dict
 
     @classmethod

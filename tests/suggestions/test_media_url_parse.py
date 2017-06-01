@@ -127,6 +127,15 @@ class TestMediaUrlParser(unittest2.TestCase):
         self.assertEqual(details['model_image'], 'https://d2t1xqejof9utc.cloudfront.net/screenshots/pics/96268d5c5e6c1b7fe8892f713813bb40/card.jpg')
         self.assertEqual(details['model_created'], '2016-09-19T11:52:23Z')
 
+    def test_instagram_image(self):
+        result = MediaParser.partial_media_dict_from_url("https://www.instagram.com/p/BUnZiriBYre/")
+        self.assertEqual(result['media_type_enum'], MediaType.INSTAGRAM_IMAGE)
+        self.assertEqual(result['foreign_key'], "BUnZiriBYre")
+        details = json.loads(result['details_json'])
+        self.assertEqual(details['title'], "FRC 195 @ 2017 Battlecry @ WPI")
+        self.assertEqual(details['author_name'], '1stroboticsrocks')
+        self.assertEqual(details['thumbnail_url'], "https://scontent-lga3-1.cdninstagram.com/t51.2885-15/s640x640/sh0.08/e35/18645780_1490936127647923_1736927294678630400_n.jpg")
+
     def test_unsupported_url_parse(self):
         self.assertEqual(MediaParser.partial_media_dict_from_url("http://foo.bar"), None)
 

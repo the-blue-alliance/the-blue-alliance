@@ -25,6 +25,7 @@ class Media(ndb.Model):
         MediaType.INSTAGRAM_PROFILE: 'instagram-profile',
         MediaType.PERISCOPE_PROFILE: 'periscope-profile',
         MediaType.GRABCAD: 'grabcad',
+        MediaType.INSTAGRAM_IMAGE: 'instagram-image',
     }
 
     REFERENCE_MAP = {
@@ -133,6 +134,8 @@ class Media(ndb.Model):
             return self.imgur_url
         elif self.media_type_enum == MediaType.GRABCAD:
             return "https://grabcad.com/library/{}".format(self.foreign_key)
+        elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
+            return "https://www.instagram.com/p/{}".format(self.foreign_key)
         else:
             return ""
 
@@ -145,6 +148,8 @@ class Media(ndb.Model):
             return self.imgur_direct_url
         elif self.media_type_enum == MediaType.GRABCAD:
             return self.details['model_image'].replace('card.jpg', 'large.png')
+        elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
+            return self.details['thumbnail_url']
         else:
             return ""
 
@@ -170,6 +175,8 @@ class Media(ndb.Model):
             return self.imgur_direct_url_med
         elif self.media_type_enum == MediaType.GRABCAD:
             return self.details['model_image']
+        elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
+            return self.image_direct_url
         else:
             return ""
 
