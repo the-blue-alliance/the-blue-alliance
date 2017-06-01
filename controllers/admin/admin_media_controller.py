@@ -124,6 +124,7 @@ class AdminMediaInstagramImport(LoggedInHandler):
                 author_account_key=self.user_bundle.account.key,
                 media_url=instagram_url,
                 team_key="frc{}".format(team_num),
-                year_str=str(year))
+                year_str=str(year),
+                default_preferred=True)
 
         self.redirect('/admin/media/import/instagram')

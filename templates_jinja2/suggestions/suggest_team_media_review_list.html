@@ -96,10 +96,10 @@
                         {% include "media_partials/image_thumbnail_partial.html" %}
                       </div>
                     {% endfor %}
-                    {% if suggestion.contents.media_type_enum == 1 or suggestion.contents.media_type_enum == 2 %}
+                    {% if suggestion.contents.media_type_enum == 1 or suggestion.contents.media_type_enum == 2 or suggestion.contents.media_type_enum == 10 %}
                       {% if preferred|length < max_preferred %}
                       <label class="checkbox text-info" for="preferred_{{suggestion.key.id()}}">
-                        <input type="checkbox" name="preferred_keys[]" id="preferred_{{suggestion.key.id()}}" value="preferred::{{suggestion.key.id()}}"> Add as Preferred<br>(Doesn't do anything for non-images)
+                        <input type="checkbox" name="preferred_keys[]" id="preferred_{{suggestion.key.id()}}" value="preferred::{{suggestion.key.id()}}" {% if suggestion.contents.default_preferred %}checked{% endif %}> Add as Preferred<br>(Doesn't do anything for non-images)
                       </label>
                       {% else %}
                         <label class="radio text-info">

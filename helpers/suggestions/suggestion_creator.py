@@ -15,7 +15,7 @@ from models.suggestion import Suggestion
 
 class SuggestionCreator(object):
     @classmethod
-    def createTeamMediaSuggestion(cls, author_account_key, media_url, team_key, year_str, private_details_json=None, is_social=False):
+    def createTeamMediaSuggestion(cls, author_account_key, media_url, team_key, year_str, private_details_json=None, is_social=False, default_preferred=False):
         """Create a Team Media Suggestion. Returns status (success, suggestion_exists, media_exists, bad_url)"""
 
         media_dict = MediaParser.partial_media_dict_from_url(media_url)
@@ -32,6 +32,7 @@ class SuggestionCreator(object):
                     media_dict['year'] = int(year_str) if year_str else None
                     media_dict['reference_type'] = 'team'
                     media_dict['reference_key'] = team_key
+                    media_dict['default_preferred'] = default_preferred
                     if private_details_json is not None:
                         media_dict['private_details_json'] = private_details_json
 
