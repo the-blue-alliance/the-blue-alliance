@@ -16,7 +16,8 @@ from controllers.admin.admin_main_controller import AdminDebugHandler, AdminMain
 from controllers.admin.admin_award_controller import AdminAwardDashboard, AdminAwardEdit, AdminAwardAdd, \
     AdminAwardDelete
 from controllers.admin.admin_match_controller import AdminVideosAdd, AdminMatchCleanup, AdminMatchDashboard, AdminMatchDelete, AdminMatchDetail, AdminMatchAdd, AdminMatchEdit
-from controllers.admin.admin_media_controller import AdminMediaDashboard, AdminMediaDeleteReference, AdminMediaMakePreferred, AdminMediaRemovePreferred, AdminMediaAdd
+from controllers.admin.admin_media_controller import AdminMediaDashboard, AdminMediaDeleteReference, AdminMediaMakePreferred, AdminMediaRemovePreferred, AdminMediaAdd, \
+    AdminMediaInstagramImport
 from controllers.admin.admin_memcache_controller import AdminMemcacheMain
 from controllers.admin.admin_migration_controller import AdminMigration, AdminMigrationCreateEventDetails, AdminMigrationRankings, AdminMigrationAddSurrogates
 from controllers.admin.admin_mobile_controller import AdminMobile, AdminBroadcast, AdminMobileWebhooks
@@ -73,6 +74,7 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/media/delete_reference/(.*)', AdminMediaDeleteReference),
                                ('/admin/media/make_preferred/(.*)', AdminMediaMakePreferred),
                                ('/admin/media/remove_preferred/(.*)', AdminMediaRemovePreferred),
+                               ('/admin/media/import/instagram', AdminMediaInstagramImport),
                                ('/admin/memcache', AdminMemcacheMain),
                                ('/admin/migration', AdminMigration),
                                ('/admin/migration/create_event_details', AdminMigrationCreateEventDetails),
