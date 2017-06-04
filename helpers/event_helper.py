@@ -224,16 +224,15 @@ class EventHelper(object):
         match = re.match(re_string, name_str)
         if match:
             partial = match.group(1).strip()
-            match2 = re.match(r'(.+)Event', partial)
-            if match2:
-                return match2.group(1).strip()
-            else:
-                return partial
+            match2 = re.sub(r'(?<=[\w\s])Event\s*(?:[\w\s]*$)?', '', partial)
+            return match2.strip()
 
         # district championships, other districts, and regionals
-        match = re.match(r'\s*(?:MAR |PNW |)(?:FIRST Robotics|FRC|)(.+)(?:District|Regional|Region|Provincial|State|Tournament|FRC|Field)\b', name_str)
+        name_str = re.sub(r'\s?Event','', name_str)
+        match = re.match(r'\s*(?:MAR |PNW |)(?:FIRST Robotics|FRC|)(.+)(?:District|Regional|Region|Provincial|State|Tournament|FRC|Field)(?:\b)(?:[\w\s]+?(#\d*)*)?', name_str)
+
         if match:
-            short = match.group(1)
+            short = ''.join(match.groups(''))
             match = re.match(r'(.+)(?:FIRST Robotics|FRC)', short)
             if match:
                 result = match.group(1).strip()
@@ -333,4 +332,3 @@ class EventHelper(object):
         year = event_key[:4]
         event_short = event_key[4:]
         return year == '2015' and event_short not in {'cc', 'cacc', 'mttd'}
-
