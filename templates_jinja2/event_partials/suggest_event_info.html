@@ -29,6 +29,10 @@
             <td><input type="text" name="website" {% if event.website %}value="{{ event.website }}"{% endif %}/></td>
         </tr>
         <tr>
+            <td>Facebook Event</td>
+            <td><input type="text" name="facebook" {% if event.facebook_event %}value="{{ event.facebook_event }}"{% endif %}/></td>
+        </tr>
+        <tr>
             <td>Year</td>
             <td><input type="text" name="year" {% if event.year %}value="{{ event.year }}"{% endif %}/></td>
         </tr>

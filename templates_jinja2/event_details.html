@@ -206,6 +206,7 @@
     {% endif %}
 
     {% if event.details and event.details.rankings_table %}
+
     <div class="tab-pane" id="rankings">
       <div class="row">
         <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
@@ -217,14 +218,23 @@
               {% endfor %}
               </tr>
             </thead>
-            <tbody>
+            <tbody id="robots">
               {% for row in event.details.rankings_table %}
               {% if not loop.first %}
               <tr>
                 {% for element in row %}
                 <td>
                   {% if loop.index0 == 1 %}
-                    <a href="/team/{{ element }}/{{event.year}}">{{ element }}</a>
+                    {%for team, image_medias in teams_a %}
+                        {% if team.team_number|int() == element|int() %}
+                            <a title="{% if team.nickname %}{{ team.nickname }}{% else %}--{% endif %}" href="/team/{{ element }}/{{event.year}}">{{ element }}</a>
+                        {% endif %}
+                    {% endfor %}
+                    {%for team, image_medias in teams_b %}
+                        {% if team.team_number|int() == element|int() %}
+                            <a title="{% if team.nickname %}{{ team.nickname }}{% else %}--{% endif %}" href="/team/{{ element }}/{{event.year}}">{{ element }}</a>
+                        {% endif %}
+                    {% endfor %}
                   {% else %}
                     {{ element }}
                   {% endif %}

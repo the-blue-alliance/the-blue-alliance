@@ -192,7 +192,7 @@ class SuggestionCreator(object):
             return 'bad_url'
 
     @classmethod
-    def createOffseasonEventSuggestion(cls, author_account_key, name, start_date, end_date, website, venue_name, address, city, state, country):
+    def createOffseasonEventSuggestion(cls, author_account_key, name, start_date, end_date, website, facebook_event, venue_name, address, city, state, country):
         """
         Create a suggestion for offseason event. Returns (status, failures):
         ('success', None)
@@ -207,6 +207,8 @@ class SuggestionCreator(object):
             failures['end_date'] = "Missing end date"
         if not website:
             failures['website'] = "Missing website"
+        if not facebook_event:
+            failures['facebook_event'] = "Missing Facebook event"
         if not address:
             failures['venue_address'] = "Missing address"
         if not venue_name:
@@ -249,6 +251,7 @@ class SuggestionCreator(object):
             'start_date': start_date,
             'end_date': end_date,
             'website': website,
+            'facebook_event': facebook_event,
             'venue_name': venue_name,
             'address': address,
             'city': city,
