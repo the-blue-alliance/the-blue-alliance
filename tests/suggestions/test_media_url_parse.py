@@ -134,7 +134,7 @@ class TestMediaUrlParser(unittest2.TestCase):
         details = json.loads(result['details_json'])
         self.assertEqual(details['title'], "FRC 195 @ 2017 Battlecry @ WPI")
         self.assertEqual(details['author_name'], '1stroboticsrocks')
-        self.assertEqual(details['thumbnail_url'], "https://scontent-lga3-1.cdninstagram.com/t51.2885-15/s640x640/sh0.08/e35/18645780_1490936127647923_1736927294678630400_n.jpg")
+        self.assertIsNotNone(details.get('thumbnail_url', None))
 
     def test_unsupported_url_parse(self):
         self.assertEqual(MediaParser.partial_media_dict_from_url("http://foo.bar"), None)
