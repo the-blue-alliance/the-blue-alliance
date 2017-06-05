@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { setTwitchChat } from '../actions'
+import { setTwitchChat, setChatSidebarVisibility, setHashtagSidebarVisibility } from '../actions'
 import ChatSidebar from '../components/ChatSidebar'
 import { getChatsInDisplayOrder } from '../selectors'
 
@@ -14,6 +14,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   setTwitchChat: (channel) => dispatch(setTwitchChat(channel)),
+  setChatSidebarVisibility: (visible) => dispatch(setChatSidebarVisibility(visible)),
+  setHashtagSidebarVisibility: (visible) => dispatch(setHashtagSidebarVisibility(visible)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChatSidebar)
