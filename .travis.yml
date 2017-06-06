@@ -18,7 +18,7 @@ install:
   -nv
 - unzip -q google_appengine_1.9.40.zip
 - export PYTHONPATH=${PYTHONPATH}:google_appengine
-- npm install uglify-js -g
+- npm install uglify-js@2.7.0 -g
 - npm install uglifycss -g
 - travis_retry npm install
 before_script:
