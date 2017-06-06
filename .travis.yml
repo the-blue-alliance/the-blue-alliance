@@ -7,6 +7,8 @@ cache:
   - node_modules
 before_install:
 - openssl aes-256-cbc -K $encrypted_7463bcfc1880_key -iv $encrypted_7463bcfc1880_iv
+  -in deploy-keys.json.enc -out deploy-keys.json -d
+- openssl aes-256-cbc -K $encrypted_7463bcfc1880_key -iv $encrypted_7463bcfc1880_iv
   -in tba_keys.js.enc -out static/javascript/tba_js/tba_keys.js -d
 - nvm install 6.0.0
 install:
@@ -25,3 +27,11 @@ script:
 - npm run lint -s
 after_failure:
 - cat test_failures.temp
+deploy:
+  provider: gae
+  project: tbatv-prod-hrd
+  keyfile: deploy-keys.json
+  on: prod
+  version: prod-1
+  skip_cleanup: true
+  config: app.yaml app-backend-tasks-b2.yaml app-backend-tasks.yaml cron.yaml dispatch.yaml index.yaml queue.yaml
