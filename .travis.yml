@@ -34,5 +34,4 @@ deploy:
   on: prod
   version: prod-1
   skip_cleanup: true
-  config: app.yaml app-backend-tasks-b2.yaml app-backend-tasks.yaml cron.yaml dispatch.yaml
-    index.yaml queue.yaml
+  config: 'app.yaml app-backend-tasks-b2.yaml app-backend-tasks.yaml cron.yaml dispatch.yaml index.yaml queue.yaml'
