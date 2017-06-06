@@ -30,10 +30,24 @@ script:
 after_failure:
 - cat test_failures.temp
 deploy:
-  provider: gae
+- provider: gae
   project: tbatv-prod-hrd
   keyfile: deploy-keys.json
   on: prod
   version: prod-1
   skip_cleanup: true
-  config: ['app.yaml', 'app-backend-tasks-b2.yaml', 'app-backend-tasks.yaml', 'cron.yaml', 'dispatch.yaml', 'index.yaml', 'queue.yaml']
+  config: app.yaml
+- provider: gae
+  project: tbatv-prod-hrd
+  keyfile: deploy-keys.json
+  on: prod
+  version: prod-1
+  skip_cleanup: true
+  config: app-backend-tasks-b2.yaml
+- provider: gae
+  project: tbatv-prod-hrd
+  keyfile: deploy-keys.json
+  on: prod
+  version: prod-1
+  skip_cleanup: true
+  config: app-backend-tasks.yaml
