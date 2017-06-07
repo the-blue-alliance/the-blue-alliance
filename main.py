@@ -11,6 +11,8 @@ from controllers.advanced_search_controller import AdvancedSearchController
 from controllers.ajax_controller import AccountInfoHandler, AccountRegisterFCMToken, AccountFavoritesHandler, AccountFavoritesAddHandler, AccountFavoritesDeleteHandler, \
       YouTubePlaylistHandler, AllowedApiWriteEventsHandler
 from controllers.ajax_controller import LiveEventHandler, TypeaheadHandler, WebcastHandler
+from controllers.apidocs_controller import AddDataHandler, ApiV3DocumentationHandler, \
+      ApiV2DocumentationHandler, ApiTrustedDocumentationHandler, WebhookDocumentationHandler
 from controllers.event_controller import EventList, EventDetail, EventInsights, EventRss
 from controllers.event_wizard_controller import EventWizardHandler
 from controllers.gameday_controller import Gameday2Controller, GamedayHandler, GamedayRedirectHandler
@@ -19,8 +21,7 @@ from controllers.main_controller import TwoChampsHandler, ContactHandler, Hashta
     MainKickoffHandler, MainBuildseasonHandler, MainChampsHandler, MainCompetitionseasonHandler, \
     MainInsightsHandler, MainOffseasonHandler, OprHandler, PredictionsHandler, SearchHandler, \
     AboutHandler, ThanksHandler, handle_404, handle_500, \
-    WebcastsHandler, RecordHandler, ApiV2DocumentationHandler, ApiWriteHandler, MatchInputHandler, WebhookDocumentationHandler, \
-      AddDataHandler, ApiV3DocumentationHandler, ApiTrustedDocumentationHandler
+    WebcastsHandler, RecordHandler, ApiWriteHandler, MatchInputHandler
 from controllers.match_controller import MatchDetail
 from controllers.match_suggestion_controller import MatchSuggestionHandler
 from controllers.match_timeline_controller import MatchTimelineHandler
