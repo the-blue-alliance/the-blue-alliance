@@ -12,7 +12,8 @@ from controllers.ajax_controller import AccountInfoHandler, AccountRegisterFCMTo
       YouTubePlaylistHandler, AllowedApiWriteEventsHandler
 from controllers.ajax_controller import LiveEventHandler, TypeaheadHandler, WebcastHandler
 from controllers.apidocs_controller import AddDataHandler, ApiV3DocumentationHandler, \
-      ApiV2DocumentationHandler, ApiTrustedDocumentationHandler, WebhookDocumentationHandler
+      ApiV2DocumentationHandler, ApiTrustedDocumentationHandler, WebhookDocumentationHandler, \
+      ApiDocumentationOverviewHandler
 from controllers.event_controller import EventList, EventDetail, EventInsights, EventRss
 from controllers.event_wizard_controller import EventWizardHandler
 from controllers.gameday_controller import Gameday2Controller, GamedayHandler, GamedayRedirectHandler
@@ -95,7 +96,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/apidocs/v2', ApiV2DocumentationHandler, 'api-documentation-v2', strict_slash=True),
       RedirectRoute(r'/apidocs/v3', ApiV3DocumentationHandler, 'api-documentation-v3', strict_slash=True),
       RedirectRoute(r'/apidocs/trusted/v1', ApiTrustedDocumentationHandler, 'api-docs-trusted-v1', strict_slash=True),
-      RedirectRoute(r'/apidocs', redirect_to='/apidocs/v3', name='api-documentation', strict_slash=True),
+      RedirectRoute(r'/apidocs', ApiDocumentationOverviewHandler, 'api-documentation', strict_slash=True),
       RedirectRoute(r'/apidocs/trusted', redirect_to='/apidocs/trusted/v1', name='api-trusted-documentation', strict_slash=True),
       RedirectRoute(r'/apidocs/webhooks', WebhookDocumentationHandler, 'webhook-documentation', strict_slash=True),
       RedirectRoute(r'/apiwrite', ApiWriteHandler, 'api-write', strict_slash=True),
