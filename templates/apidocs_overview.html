@@ -15,6 +15,7 @@
           <ul class="nav tba-sidenav">
               <li><a class="smooth-scroll" href="#getting-started">Getting Started</a></li>
               <li><a class="smooth-scroll" href="#apiv3">Read API (v3)</a></li>
+              <li><a class="smooth-scroll" href="#apiv3">Read API (v2)</a></li>
               <li><a class="smooth-scroll" href="#webhooks">Webhooks</a></li>
               <li><a class="smooth-scroll" href="#trusted">Write API</a></li>
               <li><a class="smooth-scroll" href="#archives">Data Archives</a></li>
@@ -29,16 +30,16 @@
       <h3>Need Help?</h3>
       <p>Here are some areas where you can ask the TBA developer community for assistance if you run into trouble.</p>
       <ul>
-        <li>Start a thread on the <a href="https://groups.google.com/forum/#!forum/thebluealliance-developers">developer mailing list</a> or the <a href="https://www.chiefdelphi.com">ChiefDelphi forms</a> if you're having trouble using the APIs</li>
+        <li>Start a thread on the <a href="https://groups.google.com/forum/#!forum/thebluealliance-developers">developer mailing list</a> or the <a href="https://www.chiefdelphi.com">Chief Delphi forums</a> if you're having trouble using the APIs</li>
         <li><a href="https://github.com/the-blue-alliance/the-blue-alliance/issues/new">File an issue on GitHub</a> if you think you've found a problem or would like to request a feature.</li>
         <li>If you'd like to hack on TBA and help us build awesome things, <a href="https://github.com/the-blue-alliance/the-blue-alliance">send us a pull request!</a></li>
         <li><a href="/contact">Contact us</a> with any other questions or comments you may have.</li>
       </ul>
 
       <h2 id="getting-started">Getting Started</h2>
-      <p>Before you get started using the TBA APIs, you need to be familiar with a few elements of web technology. First, you need some way of sending HTTP Requests to The Blue Alliance's servers. This will be your primary means of communication with TBA. For testing purposes, your web browser may suffice. For more advanced applications, you may want to use an external library. <a href="https://www.w3schools.com/jquery/jquery_ajax_intro.asp">jQuery</a> (Javascript), <a href="http://docs.python-requests.org/en/master/">Requests</a> (Python), and <a href="https://square.github.io/okhttp/">OkHttp</a> (Java) are all examples of HTTP Libraries.</p>
+      <p>Before you get started using the TBA APIs, you need to be familiar with a few elements of web technology. First, you need some way of sending HTTPS Requests to The Blue Alliance's servers. This will be your primary means of communication with TBA. For testing purposes, your web browser may suffice. For more advanced applications, you may want to use an external library. <a href="https://www.w3schools.com/jquery/jquery_ajax_intro.asp">jQuery</a> (Javascript), <a href="http://docs.python-requests.org/en/master/">Requests</a> (Python), and <a href="https://square.github.io/okhttp/">OkHttp</a> (Java) are all examples of HTTPS Libraries.</p>
       <p>You will also need to be familiar with <a href="https://en.wikipedia.org/wiki/Json">JSON</a>, a machine-readable format for sending and receiving data. Most of the TBA APIs use JSON-formatted data, so you should find out how to parse JSON text in the language of your choice.</p>
-      <p>Once you've figured out how to make HTTP requests, you will need to figure out how to manipulate request and response headers. These will be used to pass authentication keys to TBA and understand the cache life of returned data.</p>
+      <p>Once you've figured out how to make HTTPS requests, you will need to figure out how to manipulate request and response headers. These will be used to pass authentication keys to TBA and understand the cache life of returned data.</p>
 
       <h2 id="apiv3">Read API (v3)</h2>
       <p>Most people want to pull event listings, team information, match results, or statistics from The Blue Alliance to use in their own application. The read API is the tool they should be looking for. This API exposes almost all of the data you see on TBA to your application in a machine-readable format (JSON).</p>
@@ -61,11 +62,16 @@
       <p>The Blue Alliance automatically builds and publishes client libraries to make it easier for you to get started using APIv3. The libraries are automatically generated  by <a href="http://swagger.io/swagger-codegen/">Swagger Codegen</a> and are not provided with any guarantee of support from The Blue Alliance and are not guaranteed to be complete implementations of the API. They are merely provided as a convenience to developers looking to get started.</p>
       <p><em>Coming Soon</em></p>
 
+      <h2 id="apiv2">Read API (v2) - Deprecated</h2>
+      <p>The Blue Alliance also provides continued access to our version 2 read API. The v2 API is deprecated and will be shut down on January 1, 2018.</p>
+      <p>All API users are strongly encouraged to use the v3 API which provides more information than is available in our v2 API.</p>
+      <p><a href="/apidocs/v2">Legacy documentation on v2</a> is still available.</p>
+
       <h2 id="webhooks">Webhooks</h2>
       <p>The TBA API also includes support for <a href="https://en.wikipedia.org/wiki/Webhook">webhooks</a>, or HTTP callbacks. When an item of interest changes, TBA can send a HTTP request to your server, allowing your application to react instantly to the change. This can save both your client and our server time and processing power, as it can reduce the need to poll the API. See <a href="/apidocs/webhooks">this page</a> for more documentation on webhooks.
 
       <h2 id="trusted">Write API (v1)</h2>
-      <p>The Blue Alliance provides a trusted API which allows users to import data to The Blue Alliance for archival. For example, many offseason events use the Trusted API to provide real-time match results to their audience. To get started, you need to <a href="request/apiwrite/">request access tokens</a> for your desired event. These need to be used when constructing each request.</p>
+      <p>The Blue Alliance provides a Write API, called the Trusted API which allows users to import data to The Blue Alliance for archival. For example, many offseason events use the Trusted API to provide real-time match results to their audience. To get started, you need to <a href="request/apiwrite/">request access tokens</a> for your desired event. These need to be used when constructing each request.</p>
       <p>To see the complete specification of the trusted API, refer to the <a href="/apidocs/trusted">full documentation</a>.</p>
 
       <h2 id="archives">Data Archives</h2>
