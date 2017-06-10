@@ -403,7 +403,7 @@ class EventNextMatchHandler(CacheableHandler):
 
     def __init__(self, *args, **kw):
         super(EventNextMatchHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60
+        self._cache_expiration = 61
 
     def _render(self, event_key):
         event = Event.get_by_id(event_key)
