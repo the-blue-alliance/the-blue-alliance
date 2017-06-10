@@ -2,6 +2,7 @@ import csv
 import json
 import StringIO
 
+from consts.award_type import AwardType
 from datafeeds.parser_base import ParserBase
 from helpers.award_helper import AwardHelper
 from models.award import Award
@@ -48,7 +49,8 @@ class CSVAwardsParser(ParserBase):
 
             award_type_enum = AwardHelper.parse_award_type(name_str)
             if award_type_enum is None:
-                continue
+                # If we can't figure it out, fall back to OTHER (good for offseason events)
+                award_type_enum = AwardType.OTHER
             award_key_name = Award.render_key_name('{}{}'.format(year, event_short), award_type_enum)
 
             if award_key_name in awards_by_key:
