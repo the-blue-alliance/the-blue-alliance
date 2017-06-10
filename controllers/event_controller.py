@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict
 import datetime
 import json
@@ -22,6 +23,7 @@ from helpers.media_helper import MediaHelper
 
 from models.event import Event
 from models.match import Match
+from models.team import Team
 from template_engine import jinja2_engine
 
 
@@ -393,3 +395,43 @@ class EventRss(CacheableHandler):
 
         self.response.headers['content-type'] = 'application/xml; charset=UTF-8'
         return jinja2_engine.render('event_rss.xml', self.template_values)
+
+
+class EventNextMatchHandler(CacheableHandler):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "next_match"
+
+    def __init__(self, *args, **kw):
+        super(EventNextMatchHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60
+
+    def _render(self, event_key):
+        event = Event.get_by_id(event_key)
+        if not event:
+            self.abort(404)
+            return
+        medias_future = media_query.EventTeamsPreferredMediasQuery(event_key).fetch_async()
+        next_match = MatchHelper.upcomingMatches(event.matches, num=1)
+        next_match = next_match[0] if next_match else None
+        team_and_medias = []
+        if next_match:
+            # Organize medias by team
+            teams = ndb.get_multi([ndb.Key(Team, team_key) for team_key in next_match.alliances['red']['teams'] + next_match.alliances['blue']['teams']])
+            image_medias = MediaHelper.get_images([media for media in medias_future.get_result()])
+            team_medias = defaultdict(list)
+            for image_media in image_medias:
+                for reference in image_media.references:
+                    team_medias[reference].append(image_media)
+
+            stations = ['Red 1', 'Red 2', 'Red 3', 'Blue 1', 'Blue 2', 'Blue 3']
+            for i, team in enumerate(teams):
+                team_and_medias.append((team, stations[i], team_medias.get(team.key, [])))
+
+        self.template_values.update({
+            'event': event,
+            'next_match': next_match,
+            'teams_and_media': team_and_medias,
+        })
+        return jinja2_engine.render('nextmatch.html', self.template_values)
+
+

@@ -14,7 +14,8 @@ from controllers.ajax_controller import LiveEventHandler, TypeaheadHandler, Webc
 from controllers.apidocs_controller import AddDataHandler, ApiV3DocumentationHandler, \
       ApiV2DocumentationHandler, ApiTrustedDocumentationHandler, WebhookDocumentationHandler, \
       ApiDocumentationOverviewHandler
-from controllers.event_controller import EventList, EventDetail, EventInsights, EventRss
+from controllers.event_controller import EventList, EventDetail, EventInsights, EventRss, \
+      EventNextMatchHandler
 from controllers.event_wizard_controller import EventWizardHandler
 from controllers.gameday_controller import Gameday2Controller, GamedayHandler, GamedayRedirectHandler
 from controllers.insights_controller import InsightsOverview, InsightsDetail
@@ -104,6 +105,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/event/<event_key>', EventDetail, 'event-detail', strict_slash=True),
       RedirectRoute(r'/event/<event_key>/insights', EventInsights, 'event-insights', strict_slash=True),
       RedirectRoute(r'/event/<event_key>/feed', EventRss, 'event-rss', strict_slash=True),
+      RedirectRoute(r'/event/<event_key>/nextmatch', EventNextMatchHandler, 'nextmatch', strict_slash=True),
       RedirectRoute(r'/events/<year:[0-9]+>', EventList, 'event-list-year', strict_slash=True),
       RedirectRoute(r'/events/<district_abbrev:[a-z]+>/<year:[0-9]+>', DistrictDetail, 'district-detail', strict_slash=True),
       RedirectRoute(r'/events/<district_abbrev:[a-z]+>', DistrictDetail, 'district-canonical', strict_slash=True),

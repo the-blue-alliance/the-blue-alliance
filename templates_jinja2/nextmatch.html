@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Next Match - The Blue Alliance{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2">
+      <h1>{{ event.name }}</h1>
+      {% if next_match %}
+        <h3>Next Match: {{ next_match.short_name }}</h3>
+        <table class="table table-striped table-condensed table-center team-table">
+            <thead>
+              <tr><th>Station</th><th>Team</th><th>Location</th><th>Image</th></tr>
+            </thead>
+            <tbody>
+              {% for team, station, image_medias in teams_and_media %}
+              <tr>
+                <td>{{ station }}</td>
+                <td>
+                  <div class="team-name-container">
+                    <div class="favorite-team-icon" data-team="{{team.key.id()}}">
+                        <span class="favorite-team-icon-spacer"></span>
+                        <span class="glyphicon glyphicon-star"></span>
+                    </div>
+                    <div class="team-name">
+                      <a href="/team/{{ team.team_number }}/{{event.year}}">{{ team.team_number }}<br>{% if team.nickname %}{{ team.nickname }}{% else %}--{% endif %}</a>
+                    </div>
+                  </div>
+                </td>
+                <td>{% if team.city_state_country %}{{ team.city_state_country }}{% else %}--{% endif %}</td>
+                <td>{% if image_medias %}{% set small_thumbnail = True %}{% include "media_partials/image_carousel_partial.html" %}{% else %}<a class="btn btn-success" href="/suggest/team/media?team_key={{team.key_name}}&year={{event.year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span></a>{% endif %}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+      {% else %}
+        <p>No matches found</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
