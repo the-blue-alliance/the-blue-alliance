@@ -163,7 +163,7 @@
           {% endif %}
 
           {% if matches.qm %}
-            {% if matches.qf or matches.sf or matches.f %}
+            {% if event.playoff_type not in double_elim_playoff_types and (matches.qf or matches.sf or matches.f) %}
               {% if playoff_advancement %}
                 <h3>Playoff Advancement</h3>
                 {% include "playoff_partials/{}.html".format(playoff_template) %}
