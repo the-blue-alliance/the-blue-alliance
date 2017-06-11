@@ -11,7 +11,11 @@ class PlayoffType(object):
     # Round Robin
     ROUND_ROBIN_6_TEAM = 4
 
+    # Double Elimination Bracket
+    DOUBLE_ELIM_8_TEAM = 5
+
     BRACKET_TYPES = [BRACKET_8_TEAM, BRACKET_16_TEAM, BRACKET_4_TEAM]
+    DOUBLE_ELIM_TYPES = [DOUBLE_ELIM_8_TEAM]
 
     # Names for Rendering
     type_names = {
@@ -19,7 +23,8 @@ class PlayoffType(object):
         BRACKET_4_TEAM: "Elimination Bracket (4 Alliances)",
         BRACKET_16_TEAM: "Elimination Bracket (16 Alliances)",
         AVG_SCORE_8_TEAM: "Average Score (8 Alliances)",
-        ROUND_ROBIN_6_TEAM: "Round Robin (6 Alliances)"
+        ROUND_ROBIN_6_TEAM: "Round Robin (6 Alliances)",
+        DOUBLE_ELIM_8_TEAM: "Double Elimination Bracket (8 Alliances)",
     }
 
     @classmethod
@@ -37,6 +42,9 @@ class PlayoffType(object):
             elif playoff_type == cls.ROUND_ROBIN_6_TEAM:
                 # Einstein 2017 for example. 15 round robin matches, then finals
                 return 'sf' if match_number <= 15 else 'f'
+            elif playoff_type == cls.DOUBLE_ELIM_8_TEAM:
+                level, _, _ = cls.DOUBLE_ELIM_MAPPING.get(match_number)
+                return level
             else:
                 if playoff_type == cls.BRACKET_16_TEAM:
                     return cls.get_comp_level_octo(match_number)
@@ -77,6 +85,12 @@ class PlayoffType(object):
             if comp_level == 'f':
                 return 1, match_number
             else:
+                return 1, match_number
+        elif playoff_type == cls.DOUBLE_ELIM_8_TEAM:
+            if comp_level in {'ef', 'qf', 'sf', 'f'}:
+                level, set, match = cls.DOUBLE_ELIM_MAPPING.get(match_number)
+                return set, match
+            else:  # qual
                 return 1, match_number
         else:
             if playoff_type == cls.BRACKET_4_TEAM and match_number <= 12:
@@ -170,4 +184,40 @@ class PlayoffType(object):
         46: (1, 4),
         47: (1, 5),
         48: (1, 6),
+    }
+
+    # Map match number -> set/match for a 8 alliance double elim bracket
+    # Based off: https://www.printyourbrackets.com/fillable-brackets/8-seeded-double-fillable.pdf
+    # Matches 1-6 are ef, 7-10 are qf, 11/12 are sf, 13 is f1, and 14/15 are f2
+    DOUBLE_ELIM_MAPPING = {
+        # octofinals (winners bracket)
+        1: ('ef', 1, 1),
+        2: ('ef', 2, 1),
+        3: ('ef', 3, 1),
+        4: ('ef', 4, 1),
+
+        # octofinals (losers bracket)
+        5: ('ef', 5, 1),
+        6: ('ef', 6, 1),
+
+        # quarterfinals (winners bracket)
+        7: ('qf', 1, 1),
+        8: ('qf', 2, 1),
+
+        # quarterfinals (losers bracket)
+        9: ('qf', 3, 1),
+        10: ('qf', 4, 1),
+
+        # semifinals (winners bracket)
+        11: ('sf', 1, 1),
+
+        # semifinals (losers bracket)
+        12: ('sf', 2, 1),
+
+        # finals (losers bracket)
+        13: ('f', 1, 1),
+
+        # overall finals (winners bracket)
+        14: ('f', 2, 1),
+        15: ('f', 2, 2),
     }
