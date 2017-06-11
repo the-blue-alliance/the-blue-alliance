@@ -206,6 +206,8 @@ class EventDetail(CacheableHandler):
             for comp_level in comp_levels:
                 if comp_level != 'f':
                     del bracket_table[comp_level]
+        elif event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
+            double_elim_matches = MatchHelper.organizeDoubleElimMatches(matches)
 
         district_points_sorted = None
         if event.district_key and event.district_points:
@@ -248,7 +250,9 @@ class EventDetail(CacheableHandler):
             "event_insights_template": event_insights_template,
             "medias_by_slugname": medias_by_slugname,
             "event_divisions": event_divisions,
-            'parent_event': parent_event_future.get_result() if parent_event_future else None
+            'parent_event': parent_event_future.get_result() if parent_event_future else None,
+            'double_elim_matches': double_elim_matches,
+            'double_elim_playoff_types': PlayoffType.DOUBLE_ELIM_TYPES,
         })
 
         if event.within_a_day:

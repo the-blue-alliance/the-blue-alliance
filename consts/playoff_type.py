@@ -101,6 +101,18 @@ class PlayoffType(object):
             else:  # qm
                 return 1, match_number
 
+    # Determine if a match is in the winner or loser bracket
+    @classmethod
+    def get_double_elim_bracket(cls, level, set):
+        if level == 'ef':
+            return 'winner' if set <= 4 else 'loser'
+        elif level == 'qf':
+            return 'winner' if set <= 2 else 'loser'
+        elif level == 'sf':
+            return 'winner' if set == 1 else 'loser'
+        elif level == 'f':
+            return 'loser' if set == 1 else 'winner'
+
     BRACKET_ELIM_MAPPING = {
         1: (1, 1),  # (set, match)
         2: (2, 1),

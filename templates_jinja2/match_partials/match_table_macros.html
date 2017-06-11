@@ -139,6 +139,16 @@
 </table>
 {% endmacro %}
 
+{% macro double_elim_table(matches, cur_team_key=None) %}
+  {% if matches.winner %}
+    <h4>Winner's Bracket</h4>
+    {{ elim_match_table(matches.winner) }}
+  {% endif %}
+  {% if matches.loser%}
+    <h4>Loser's Bracket</h4>
+    {{ elim_match_table(matches.loser) }}
+  {% endif %}
+{% endmacro %}
 
 {% macro full_match_table(matches, cur_team_key=None) %}
 <table class="match-table">

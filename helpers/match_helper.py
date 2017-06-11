@@ -118,6 +118,20 @@ class MatchHelper(object):
 
         return matches
 
+    # Assumed that organizeMatches is called first
+    @classmethod
+    def organizeDoubleElimMatches(cls, organized_matches):
+        matches = defaultdict(lambda: defaultdict(list))
+        for level in Match.COMP_LEVELS:
+            level_matches = organized_matches[level]
+            if level == 'qm':
+                matches['qm'] = level_matches
+                continue
+            for match in level_matches:
+                bracket = PlayoffType.get_double_elim_bracket(level, match.set_number)
+                matches[bracket][level].append(match)
+        return matches
+
     @classmethod
     def organizeKeys(cls, match_keys):
         matches = dict([(comp_level, list()) for comp_level in Match.COMP_LEVELS])
