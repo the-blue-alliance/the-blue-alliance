@@ -489,7 +489,7 @@ class DistrictPointsCalcDo(webapp.RequestHandler):
 
     def get(self, event_key):
         event = Event.get_by_id(event_key)
-        if event.event_type_enum not in EventType.SEASON_EVENT_TYPES:
+        if event.event_type_enum not in EventType.SEASON_EVENT_TYPES and not self.request.get('allow-offseason', None):
             if 'X-Appengine-Taskname' not in self.request.headers:
                 self.response.out.write("Can't calculate district points for a non-season event {}!"
                                         .format(event.key_name))
