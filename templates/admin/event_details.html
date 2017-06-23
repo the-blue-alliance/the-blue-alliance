@@ -159,15 +159,21 @@
 
 <div class="tab-pane" id="tasks">
 <div class="row">
-  <h2>Event Tasks</h2>
+  <h2>FMS API Tasks</h2>
   <div class="btn-group">
-    <a href="/tasks/math/do/eventteam_update/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-user"></span> Rebuild EventTeams</a>
-    <a href="/backend-tasks/get/event_details/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Event Info</a>
     <a href="/tasks/get/fmsapi_matches/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Matches</a>
     <a href="/tasks/get/fmsapi_event_alliances/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Alliances</a>
     <a href="/tasks/get/fmsapi_event_rankings/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Rankings</a>
     <a href="/tasks/get/fmsapi_awards/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Awards</a>
+  </div>
+  <h2>Math Tasks</h2>
+  <div class="btn-group">
+    <a href="/tasks/math/do/eventteam_update/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-user"></span> Rebuild EventTeams</a>
     <a href="/backend-tasks/do/post_event_tasks/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-play"></span> Run Post-Event Tasks</a>
+    <a href="/tasks/math/do/district_points_calc/{{event.key_name}}?allow-offseason=true" class="btn btn-warning"><span class="glyphicon glyphicon-tasks"></span> District Points</a>
+    <a href="/tasks/math/do/event_team_status/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-stats"></span> Team@Event Status</a>
+    <a href="/tasks/math/do/event_matchstats/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-stats"></span> MatchStats</a>
+    <a href="/tasks/math/do/predict_match_times/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-time"></span> Match Time Predictions</a>
   </div>
 </div>
 <div class="row">
