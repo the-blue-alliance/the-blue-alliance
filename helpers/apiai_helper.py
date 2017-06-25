@@ -22,6 +22,24 @@ class APIAIHelper(object):
         return getattr(APIAIHelper, cls.ACTION_MAP.get(action, '_unknown_action'))(parameters)
 
     @classmethod
+    def _team_number_tts(cls, team_number):
+        team_number = int(team_number)
+        if team_number < 10:
+            return team_number
+        if team_number % 100 == 0:
+            return team_number
+
+        team_number_str = str(team_number)
+        if len(team_number_str) % 2 == 0:
+            tts = ''
+            start_idx = 0
+        else:
+            tts = '{} '.format(team_number_str[0])
+            start_idx = 1
+
+        return tts + ' '.join([team_number_str[i:i+2] for i in range(start_idx, len(team_number_str), 2)])
+
+    @classmethod
     def _create_simple_response(cls, display_text, tts=None):
         return [{
             'type': 0,
@@ -88,12 +106,15 @@ class APIAIHelper(object):
         if team:
             text = 'What would you like to know about Team {0}? You can ask about their location, rookie year, or current status.'.format(
                 team_number, team.city_state_country)
+            tts = 'What would you like to know about Team {0}? You can ask about their location, rookie year, or current status.'.format(
+                cls._team_number_tts(team_number), team.city_state_country)
         else:
             text = 'Team {0} does not exist. Please ask about another team.'.format(team_number)
+            tts = 'Team {0} does not exist. Please ask about another team.'.format(cls._team_number_tts(team_number))
 
         return {
             'speech': text,
-            'messages': cls._create_simple_response(text) +
+            'messages': cls._create_simple_response(text, tts=tts) +
                 cls._create_suggestion_chips([
                     'Location',
                     'Rookie year',
@@ -108,7 +129,9 @@ class APIAIHelper(object):
         if team:
             text = 'Team {0} is from {1}. Would you like to know more about {0} or another team?'.format(
                 team_number, team.city_state_country)
-            messages = cls._create_simple_response(text) + \
+            tts = 'Team {0} is from {1}. Would you like to know more about {0} or another team?'.format(
+                cls._team_number_tts(team_number), team.city_state_country)
+            messages = cls._create_simple_response(text, tts=tts) + \
                 cls._create_suggestion_chips([
                     'Rookie year',
                     'Current status',
@@ -116,7 +139,8 @@ class APIAIHelper(object):
                 ])
         else:
             text = 'Team {0} does not exist. Please ask about another team.'.format(team_number)
-            messages = []
+            tts = 'Team {0} does not exist. Please ask about another team.'.format(cls._team_number_tts(team_number))
+            messages = cls._create_simple_response(text, tts=tts)
 
         return {
             'speech': text,
@@ -130,7 +154,9 @@ class APIAIHelper(object):
         if team:
             text = 'Team {0} first competed in {1}. Would you like to know more about {0} or another team?'.format(
                 team_number, team.rookie_year)
-            messages = cls._create_simple_response(text) + \
+            tts = 'Team {0} first competed in {1}. Would you like to know more about {0} or another team?'.format(
+                cls._team_number_tts(team_number), team.rookie_year)
+            messages = cls._create_simple_response(text, tts=tts) + \
                 cls._create_suggestion_chips([
                     'Location',
                     'Current status',
@@ -138,7 +164,8 @@ class APIAIHelper(object):
                 ])
         else:
             text = 'Team {0} does not exist. Please ask about another team.'.format(team_number)
-            messages = []
+            tts = 'Team {0} does not exist. Please ask about another team.'.format(cls._team_number_tts(team_number))
+            messages = cls._create_simple_response(text, tts=tts)
 
         return {
             'speech': text,
@@ -159,8 +186,10 @@ class APIAIHelper(object):
 
             if current_event:
                 event_team = EventTeam.get_by_id('{}_{}'.format(current_event.key.id(), team_key))
+
                 text = EventTeamStatusHelper.generate_team_at_event_status_string(team_key, event_team.status, formatting=False, event=current_event)
-                tts = 'Team {} {}'.format(team_number, EventTeamStatusHelper.generate_team_at_event_status_string(team_key, event_team.status, formatting=False, event=current_event, include_team=False, verbose=True))
+                tts = 'Team {} {}'.format(cls._team_number_tts(team_number), EventTeamStatusHelper.generate_team_at_event_status_string(team_key, event_team.status, formatting=False, event=current_event, include_team=False, verbose=True))
+
                 additional_prompt = ' Would you like to know more about {} or another team?'.format(team_number)
                 text += additional_prompt
                 tts += additional_prompt
@@ -170,7 +199,9 @@ class APIAIHelper(object):
             else:
                 text = 'Team {0} is not currently competing. Would you like to know more about {0} or another team?'.format(
                     team_number)
-                messages = cls._create_simple_response(text)
+                tts = 'Team {0} is not currently competing. Would you like to know more about {0} or another team?'.format(
+                    cls._team_number_tts(team_number))
+                messages = cls._create_simple_response(text, tts=tts)
 
             messages += cls._create_suggestion_chips([
                     'Location',
@@ -179,7 +210,8 @@ class APIAIHelper(object):
                 ])
         else:
             text = 'Team {0} does not exist. Please ask about another team.'.format(team_number)
-            messages = []
+            tts = 'Team {0} does not exist. Please ask about another team.'.format(cls._team_number_tts(team_number))
+            messages = cls._create_simple_response(text, tts=tts)
 
         return {
             'speech': text,
