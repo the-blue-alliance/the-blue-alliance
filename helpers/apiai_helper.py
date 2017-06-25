@@ -23,6 +23,9 @@ class APIAIHelper(object):
 
     @classmethod
     def _team_number_tts(cls, team_number):
+        if not team_number.isdigit():  # For handling invalid team numbers
+            return team_number
+
         team_number = int(team_number)
         if team_number < 10:
             return team_number
