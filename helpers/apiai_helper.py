@@ -101,7 +101,7 @@ class APIAIHelper(object):
 
     @classmethod
     def _getteam_generic(cls, parameters):
-        team_number = parameters['number']
+        team_number = parameters['team_number']
         team = Team.get_by_id('frc{}'.format(team_number))
         if team:
             text = 'What would you like to know about Team {0}? You can ask about their location, rookie year, or current status.'.format(
@@ -124,7 +124,7 @@ class APIAIHelper(object):
 
     @classmethod
     def _getteam_location(cls, parameters):
-        team_number = parameters['number']
+        team_number = parameters['team_number']
         team = Team.get_by_id('frc{}'.format(team_number))
         if team:
             text = 'Team {0} is from {1}. Would you like to know more about {0} or another team?'.format(
@@ -149,7 +149,7 @@ class APIAIHelper(object):
 
     @classmethod
     def _getteam_rookieyear(cls, parameters):
-        team_number = parameters['number']
+        team_number = parameters['team_number']
         team = Team.get_by_id('frc{}'.format(team_number))
         if team:
             text = 'Team {0} first competed in {1}. Would you like to know more about {0} or another team?'.format(
@@ -174,7 +174,7 @@ class APIAIHelper(object):
 
     @classmethod
     def _getteam_status(cls, parameters):
-        team_number = parameters['number']
+        team_number = parameters['team_number']
         team_key = 'frc{}'.format(team_number)
         team = Team.get_by_id(team_key)
         if team:
