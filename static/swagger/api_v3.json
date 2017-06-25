@@ -10,8 +10,8 @@
     All endpoints require an Auth Key to be passed in the header `X-TBA-Auth-Key`. If you do not have an auth key yet, you can obtain one from your [Account Page](/account).",
     "version": "3.0.1",
     "title": "The Blue Alliance API v3",
-    "x-version-info": "Versions of the API follow the format X.Y.Z, with X being a major version, Y denoting the minor version, and Z the point release. Changes to the spec or API that result in a major version change will significantly impact implementations. Changes to the minor version indicate paths and/or fields in existing models may be added, and any breaking changes will be confined to paths or models listed as in-development in the prior minor version. Changes to the point release indicate no format or structure changes to the paths or models, but updated or clarified documentation.",
-    "x-changes": "3.0.0 - 3.0.1 - Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical."
+    "x-version-info": "Versions of the API follow the format X.Y.Z, with X being a major version, Y denoting the minor version, and Z the point release. Changes to the spec or API that result in a major version change will significantly impact implementations. Changes to the minor version indicate paths and/or fields in existing models may be added, and any breaking changes will be confined to paths or models listed as in-development in the prior minor version. Changes to the point release indicate no format or structure changes to the paths or models, but updated or clarified documentation. Note that changes to paths and models refer to the actual result from the API, not the documentation.",
+    "x-changes": "3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
   },
   "host": "www.thebluealliance.com",
   "basePath": "/api/v3",
@@ -3091,8 +3091,8 @@
       "type": "object",
       "required": [
         "key",
-        "name",
-        "team_number"
+        "team_number",
+        "name"
       ],
       "properties": {
         "key": {
@@ -3129,8 +3129,8 @@
       "type": "object",
       "required": [
         "key",
-        "name",
         "team_number",
+        "name",
         "rookie_year"
       ],
       "properties": {
@@ -3213,6 +3213,13 @@
       }
     },
     "Team_Robot": {
+      "type": "object",
+      "required": [
+        "year",
+        "robot_name",
+        "key",
+        "team_key"
+      ],
       "properties": {
         "year": {
           "type": "integer",
@@ -3235,12 +3242,12 @@
     "Event_Simple": {
       "type": "object",
       "required": [
-        "end_date",
-        "event_code",
-        "event_type",
         "key",
         "name",
+        "event_code",
+        "event_type",
         "start_date",
+        "end_date",
         "year"
       ],
       "properties": {
@@ -3295,13 +3302,14 @@
     "Event": {
       "type": "object",
       "required": [
-        "end_date",
-        "event_code",
-        "event_type",
         "key",
         "name",
+        "event_code",
+        "event_type",
         "start_date",
-        "year"
+        "end_date",
+        "year",
+        "event_type_string"
       ],
       "properties": {
         "key": {
@@ -3459,6 +3467,7 @@
       }
     },
     "Team_Event_Status_rank": {
+      "type": "object",
       "properties": {
         "num_teams": {
           "type": "integer",
@@ -3523,6 +3532,11 @@
       }
     },
     "Team_Event_Status_alliance": {
+      "type": "object",
+      "required": [
+        "number",
+        "pick"
+      ],
       "properties": {
         "name": {
           "type": "string",
@@ -3542,6 +3556,7 @@
       }
     },
     "Team_Event_Status_alliance_backup": {
+      "type": "object",
       "properties": {
         "out": {
           "type": "string",
@@ -3555,6 +3570,7 @@
       "description": "Backup status, may be null."
     },
     "Team_Event_Status_playoff": {
+      "type": "object",
       "properties": {
         "level": {
           "type": "string",
@@ -3595,6 +3611,13 @@
           "description": "List of rankings at the event.",
           "items": {
             "type": "object",
+            "required": [
+              "dq",
+              "matches_played",
+              "rank",
+              "record",
+              "team_key"
+            ],
             "properties": {
               "dq": {
                 "type": "integer",
@@ -3606,7 +3629,7 @@
               },
               "qual_average": {
                 "type": "integer",
-                "description": "The average match score during qualifications. Year specific. May be null if not relivant for a given year."
+                "description": "The average match score during qualifications. Year specific. May be null if not relevant for a given year."
               },
               "rank": {
                 "type": "integer",
@@ -3644,6 +3667,10 @@
           "description": "List of year-specific values provided in the `sort_orders` array for each team.",
           "items": {
             "type": "object",
+            "required": [
+              "name",
+              "precision"
+            ],
             "properties": {
               "name": {
                 "type": "string",
@@ -3666,6 +3693,13 @@
       "properties": {
         "points": {
           "type": "object",
+          "required": [
+            "alliance_points",
+            "award_points",
+            "qual_points",
+            "elim_points",
+            "total"
+          ],
           "description": "Points gained for each team at the event. Stored as a key-value pair with the team key as the key, and an object describing the points as it's value.",
           "additionalProperties": {
             "type": "object",
@@ -3722,6 +3756,32 @@
     },
     "Event_Insights_2016_Detail": {
       "type": "object",
+      "required": [
+        "LowBar",
+        "A_ChevalDeFrise",
+        "A_Portcullis",
+        "B_Ramparts",
+        "B_Moat",
+        "C_SallyPort",
+        "C_Drawbridge",
+        "D_RoughTerrain",
+        "D_RockWall",
+        "average_high_goals",
+        "average_low_goals",
+        "breaches",
+        "scales",
+        "challenges",
+        "captures",
+        "average_win_score",
+        "average_win_margin",
+        "average_score",
+        "average_auto_score",
+        "average_crossing_score",
+        "average_boulder_score",
+        "average_tower_score",
+        "average_foul_score",
+        "high_score"
+      ],
       "properties": {
         "LowBar": {
           "type": "array",
@@ -3900,6 +3960,39 @@
     },
     "Event_Insights_2017_Detail": {
       "type": "object",
+      "required": [
+        "average_foul_score",
+        "average_fuel_points",
+        "average_fuel_points_auto",
+        "average_fuel_points_teleop",
+        "average_high_goals",
+        "average_high_goals_auto",
+        "average_high_goals_teleop",
+        "average_low_goals",
+        "average_low_goals_auto",
+        "average_low_goals_teleop",
+        "average_mobility_points_auto",
+        "average_points_auto",
+        "average_points_teleop",
+        "average_rotor_points",
+        "average_rotor_points_auto",
+        "average_rotor_points_teleop",
+        "average_score",
+        "average_takeoff_points_teleop",
+        "average_win_margin",
+        "average_win_score",
+        "high_kpa",
+        "high_score",
+        "kpa_achieved",
+        "mobility_counts",
+        "rotor_1_engaged",
+        "rotor_1_engaged_auto",
+        "rotor_2_engaged",
+        "rotor_2_engaged_auto",
+        "rotor_3_engaged",
+        "rotor_4_engaged",
+        "takeoff_counts"
+      ],
       "properties": {
         "average_foul_score": {
           "type": "number",
@@ -4124,7 +4217,7 @@
     },
     "Event_Predictions": {
       "type": "object",
-      "description": "JSON Object containing prediction information for the event. Contains year-specific information and is subject to change.",
+      "description": "JSON Object containing prediction information for the event. Contains year-specific information and is subject to change."
     },
     "Webcast": {
       "type": "object",
@@ -4728,6 +4821,7 @@
     "Media": {
       "type": "object",
       "required": [
+        "key",
         "type"
       ],
       "description": "The `Media` object contains a reference for most any media associated with a team or event on TBA.",
@@ -4838,7 +4932,8 @@
         "award_type",
         "event_key",
         "name",
-        "year"
+        "year",
+        "recipient_list"
       ],
       "properties": {
         "name": {
@@ -4883,10 +4978,10 @@
     "District_List": {
       "type": "object",
       "required": [
-            "display_name",
-            "abbreviation",
-            "key",
-            "year"
+        "display_name",
+        "abbreviation",
+        "key",
+        "year"
       ],
       "properties": {
         "abbreviation": {
@@ -4914,43 +5009,66 @@
         "rank",
         "team_key"
       ],
+      "description": "Rank of a team in a district.",
       "properties": {
         "team_key": {
-          "type": "string"
+          "type": "string",
+          "description": "TBA team key for the team."
         },
         "rank": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Numerical rank of the team, 1 being top rank."
         },
         "rookie_bonus": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Any points added to a team as a result of the rookie bonus."
         },
         "point_total": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Total district points for the team."
         },
         "event_points": {
           "type": "array",
+          "description": "List of events that contributed to the point total for the team.",
           "items": {
+            "type": "object",
+            "required": [
+              "event_key",
+              "district_cmp",
+              "alliance_points",
+              "award_points",
+              "qual_points",
+              "elim_points",
+              "total"
+            ],
             "properties": {
               "event_key": {
-                "type": "string"
+                "type": "string",
+                "description": "TBA Event key for this event."
               },
               "district_cmp": {
-                "type": "boolean"
+                "type": "boolean",
+                "description": "`true` if this event is a District Championship event."
               },
               "alliance_points": {
-                "type": "integer"
+                "type": "integer",
+                "description": "Points awarded for alliance selection."
               },
               "award_points": {
-                "type": "integer"
+                "type": "integer",
+                "description": "Points awarded for event awards."
               },
               "qual_points": {
-                "type": "integer"
+                "type": "integer",
+                "description": "Points awarded for qualification match performance."
               },
               "elim_points": {
-                "type": "integer"
+                "type": "integer",
+                "description": "Points awarded for elimination match performance."
               },
               "total": {
-                "type": "integer"
+                "type": "integer",
+                "description": "Total points awarded at this event."
               }
             }
           }
@@ -4959,6 +5077,11 @@
     },
     "WLT_Record": {
       "type": "object",
+      "required": [
+        "wins",
+        "losses",
+        "ties"
+      ],
       "description": "A Win-Loss-Tie record for a team, or an alliance.",
       "properties": {
         "losses": {
