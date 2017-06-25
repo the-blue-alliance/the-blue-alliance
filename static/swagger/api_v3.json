@@ -1,16 +1,11 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "# Overview
-
-    Information and statistics about FIRST Robotics Competition teams and events. If you are looking for the old version (v2) of the API, documentation can be found [here](/apidocs/v2).
-
-    # Authentication
-
-    All endpoints require an Auth Key to be passed in the header `X-TBA-Auth-Key`. If you do not have an auth key yet, you can obtain one from your [Account Page](/account).",
-    "version": "3.0.0",
+    "description": "# Overview \n\n Information and statistics about FIRST Robotics Competition teams and events. If you are looking for the old version (v2) of the API, documentation can be found [here](/apidocs/v2). \n\n# Authentication \n\nAll endpoints require an Auth Key to be passed in the header `X-TBA-Auth-Key`. If you do not have an auth key yet, you can obtain one from your [Account Page](/account).",
+    "version": "3.0.1",
     "title": "The Blue Alliance API v3",
-    "x-version-info": "Versions of the API follow the format X.Y.Z, with X being a major version, Y denoting the minor version, and Z the point release. Changes to the spec or API that result in a major version change will significantly impact implementations. Changes to the minor version indicate paths and/or fields in existing models may be added, and any breaking changes will be confined to paths or models listed as in-development in the prior minor version. Changes to the point release indicate no format or structure changes to the paths or models, but updated or clarified documentation."
+    "x-version-info": "Versions of the API follow the format X.Y.Z, with X being a major version, Y denoting the minor version, and Z the point release. Changes to the spec or API that result in a major version change will significantly impact implementations. Changes to the minor version indicate paths and/or fields in existing models may be added, and any breaking changes will be confined to paths or models listed as in-development in the prior minor version. Changes to the point release indicate no format or structure changes to the paths or models, but updated or clarified documentation. Note that changes to paths and models refer to the actual result from the API, not the documentation.",
+    "x-changes": "3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
   },
   "host": "www.thebluealliance.com",
   "basePath": "/api/v3",
@@ -3090,37 +3085,37 @@
       "type": "object",
       "required": [
         "key",
-        "name",
-        "team_number"
+        "team_number",
+        "name"
       ],
       "properties": {
         "key": {
           "type": "string",
-          "description": "TBA team key with the format frcyyyy"
+          "description": "TBA team key with the format `frcXXXX` with `XXXX` representing the team number."
         },
         "team_number": {
           "type": "integer",
-          "description": "Official team number issued by FIRST"
+          "description": "Official team number issued by FIRST."
         },
         "nickname": {
           "type": "string",
-          "description": "Team nickname provided by FIRST"
+          "description": "Team nickname provided by FIRST."
         },
         "name": {
           "type": "string",
-          "description": "Official long name registered with FIRST"
+          "description": "Official long name registered with FIRST."
         },
         "city": {
           "type": "string",
-          "description": "City of team derived from parsing the address registered with FIRST"
+          "description": "City of team derived from parsing the address registered with FIRST."
         },
         "state_prov": {
           "type": "string",
-          "description": "State of team derived from parsing the address registered with FIRST"
+          "description": "State of team derived from parsing the address registered with FIRST."
         },
         "country": {
           "type": "string",
-          "description": "Country of team derived from parsing the address registered with FIRST"
+          "description": "Country of team derived from parsing the address registered with FIRST."
         }
       }
     },
@@ -3128,82 +3123,82 @@
       "type": "object",
       "required": [
         "key",
-        "name",
         "team_number",
+        "name",
         "rookie_year"
       ],
       "properties": {
         "key": {
           "type": "string",
-          "description": "TBA team key with the format frcyyyy"
+          "description": "TBA team key with the format `frcXXXX` with `XXXX` representing the team number."
         },
         "team_number": {
           "type": "integer",
-          "description": "Official team number issued by FIRST"
+          "description": "Official team number issued by FIRST."
         },
         "nickname": {
           "type": "string",
-          "description": "Team nickname provided by FIRST"
+          "description": "Team nickname provided by FIRST."
         },
         "name": {
           "type": "string",
-          "description": "Official long name registered with FIRST"
+          "description": "Official long name registered with FIRST."
         },
         "city": {
           "type": "string",
-          "description": "City of team derived from parsing the address registered with FIRST"
+          "description": "City of team derived from parsing the address registered with FIRST."
         },
         "state_prov": {
           "type": "string",
-          "description": "State of team derived from parsing the address registered with FIRST"
+          "description": "State of team derived from parsing the address registered with FIRST."
         },
         "country": {
           "type": "string",
-          "description": "Country of team derived from parsing the address registered with FIRST"
+          "description": "Country of team derived from parsing the address registered with FIRST."
         },
         "address": {
           "type": "string",
-          "description": "Will be NULL, for future development"
+          "description": "Will be NULL, for future development."
         },
         "postal_code": {
           "type": "string",
-          "description": "Postal code from the team address"
+          "description": "Postal code from the team address."
         },
         "gmaps_place_id": {
           "type": "string",
-          "description": "Will be NULL, for future development"
+          "description": "Will be NULL, for future development."
         },
         "gmaps_url": {
           "type": "string",
           "format": "url",
-          "description": "Will be NULL, for future development"
+          "description": "Will be NULL, for future development."
         },
         "lat": {
           "type": "number",
           "format": "double",
-          "description": "Will be NULL, for future development"
+          "description": "Will be NULL, for future development."
         },
         "lng": {
           "type": "number",
           "format": "double",
-          "description": "Will be NULL, for future development"
+          "description": "Will be NULL, for future development."
         },
         "location_name": {
           "type": "string",
-          "description": "Will be NULL, for future development"
+          "description": "Will be NULL, for future development."
         },
         "website": {
           "type": "string",
           "format": "url",
-          "description": "Official website associated with the team"
+          "description": "Official website associated with the team."
         },
         "rookie_year": {
           "type": "integer",
-          "description": "First year the team officially competed"
+          "description": "First year the team officially competed."
         },
         "motto": {
           "type": "string",
-          "description": "Team's motto as provided by FIRST"
+          "description": "Team's motto as provided by FIRST."
         },
         "home_championship": {
           "type": "object",
@@ -3212,34 +3207,41 @@
       }
     },
     "Team_Robot": {
+      "type": "object",
+      "required": [
+        "year",
+        "robot_name",
+        "key",
+        "team_key"
+      ],
       "properties": {
         "year": {
           "type": "integer",
-          "description": "Year this robot competed in"
+          "description": "Year this robot competed in."
         },
         "robot_name": {
           "type": "string",
-          "description": "Name of the robot as provided by the team"
+          "description": "Name of the robot as provided by the team."
         },
         "key": {
           "type": "string",
-          "description": "Internal TBA identifier for this robot"
+          "description": "Internal TBA identifier for this robot."
         },
         "team_key": {
           "type": "string",
-          "description": "TBA team key for this robot"
+          "description": "TBA team key for this robot."
         }
       }
     },
     "Event_Simple": {
       "type": "object",
       "required": [
-        "end_date",
-        "event_code",
-        "event_type",
         "key",
         "name",
+        "event_code",
+        "event_type",
         "start_date",
+        "end_date",
         "year"
       ],
       "properties": {
@@ -3260,33 +3262,20 @@
           "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2"
         },
         "district": {
-          "type": "object",
-          "properties": {
-            "abbreviation": {
-              "type": "string"
-            },
-            "display_name": {
-              "type": "string"
-            },
-            "key": {
-              "type": "string"
-            },
-            "year": {
-              "type": "integer"
-            }
-          }
+          "$ref": "#/definitions/District_List",
+          "description": "The district this event is in, may be null."
         },
         "city": {
           "type": "string",
-          "description": "City of event"
+          "description": "City, town, village, etc. the event is located in."
         },
         "state_prov": {
           "type": "string",
-          "description": "State of event"
+          "description": "State or Province the event is located in."
         },
         "country": {
           "type": "string",
-          "description": "Country of event"
+          "description": "Country the event is located in."
         },
         "start_date": {
           "type": "string",
@@ -3307,13 +3296,14 @@
     "Event": {
       "type": "object",
       "required": [
-        "end_date",
-        "event_code",
-        "event_type",
         "key",
         "name",
+        "event_code",
+        "event_type",
         "start_date",
-        "year"
+        "end_date",
+        "year",
+        "event_type_string"
       ],
       "properties": {
         "key": {
@@ -3333,33 +3323,20 @@
           "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2"
         },
         "district": {
-          "type": "object",
-          "properties": {
-            "abbreviation": {
-              "type": "string"
-            },
-            "display_name": {
-              "type": "string"
-            },
-            "key": {
-              "type": "string"
-            },
-            "year": {
-              "type": "integer"
-            }
-          }
+          "$ref": "#/definitions/District_List",
+          "description": "The district this event is in, may be null."
         },
         "city": {
           "type": "string",
-          "description": "City of event"
+          "description": "City, town, village, etc. the event is located in."
         },
         "state_prov": {
           "type": "string",
-          "description": "State of event"
+          "description": "State or Province the event is located in."
         },
         "country": {
           "type": "string",
-          "description": "Country of event"
+          "description": "Country the event is located in."
         },
         "start_date": {
           "type": "string",
@@ -3377,7 +3354,7 @@
         },
         "short_name": {
           "type": "string",
-          "description": "Same as name but doesn't include event specifiers, such as 'Regional' or 'District'. May be null."
+          "description": "Same as `name` but doesn't include event specifiers, such as 'Regional' or 'District'. May be null."
         },
         "event_type_string": {
           "type": "string",
@@ -3393,34 +3370,34 @@
         },
         "postal_code": {
           "type": "string",
-          "description": "Postal code from the event address"
+          "description": "Postal code from the event address."
         },
         "gmaps_place_id": {
           "type": "string",
-          "description": "Google Maps Place ID for the event address"
+          "description": "Google Maps Place ID for the event address."
         },
         "gmaps_url": {
           "type": "string",
           "format": "url",
-          "description": "Link to address location on Google Maps"
+          "description": "Link to address location on Google Maps."
         },
         "lat": {
           "type": "number",
           "format": "double",
-          "description": "Latitude for the event address"
+          "description": "Latitude for the event address."
         },
         "lng": {
           "type": "number",
           "format": "double",
-          "description": "Longitude for the event address"
+          "description": "Longitude for the event address."
         },
         "location_name": {
           "type": "string",
-          "description": "Name of the location at the address for the event, eg. Blue Alliance High School"
+          "description": "Name of the location at the address for the event, eg. Blue Alliance High School."
         },
         "timezone": {
           "type": "string",
-          "description": "Timezone name"
+          "description": "Timezone name."
         },
         "website": {
           "type": "string",
@@ -3445,15 +3422,15 @@
         },
         "parent_event_key": {
           "type": "string",
-          "description": "The TBA Event key that represents the event's parent. Used to link back to the event from a division event. It is also the inverse relation of divison_keys."
+          "description": "The TBA Event key that represents the event's parent. Used to link back to the event from a division event. It is also the inverse relation of `divison_keys`."
         },
         "playoff_type": {
           "type": "integer",
-          "description": "Playoff Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/playoff_type.py#L4, or null"
+          "description": "Playoff Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/playoff_type.py#L4, or null."
         },
         "playoff_type_string": {
           "type": "string",
-          "description": "String representation of the playoff_type, or null."
+          "description": "String representation of the `playoff_type`, or null."
         }
       }
     },
@@ -3484,6 +3461,7 @@
       }
     },
     "Team_Event_Status_rank": {
+      "type": "object",
       "properties": {
         "num_teams": {
           "type": "integer",
@@ -3514,27 +3492,30 @@
             },
             "sort_orders": {
               "type": "array",
+              "description": "Ordered list of values used to determine the rank. See the `sort_order_info` property for the name of each value.",
               "items": {
                 "type": "number"
               }
             },
             "team_key": {
               "type": "string",
-              "description": "TBA team key for this rank"
+              "description": "TBA team key for this rank."
             }
           }
         },
         "sort_order_info": {
           "type": "array",
-          "description": "Ordered list of names corresponding to the elements of the sort_orders array",
+          "description": "Ordered list of names corresponding to the elements of the `sort_orders` array.",
           "items": {
             "type": "object",
             "properties": {
               "name": {
-                "type": "string"
+                "type": "string",
+                "description": "The descriptive name of the value used to sort the ranking."
               },
               "precision": {
-                "type": "integer"
+                "type": "integer",
+                "description": "The number of digits of precision used for this value, eg `2` would correspond to a value of `101.11` while `0` would correspond to `101`."
               }
             }
           }
@@ -3545,14 +3526,19 @@
       }
     },
     "Team_Event_Status_alliance": {
+      "type": "object",
+      "required": [
+        "number",
+        "pick"
+      ],
       "properties": {
         "name": {
           "type": "string",
-          "description": "Alliance name, may be null"
+          "description": "Alliance name, may be null."
         },
         "number": {
           "type": "integer",
-          "description": "Alliance number"
+          "description": "Alliance number."
         },
         "backup": {
           "$ref": "#/definitions/Team_Event_Status_alliance_backup"
@@ -3564,6 +3550,7 @@
       }
     },
     "Team_Event_Status_alliance_backup": {
+      "type": "object",
       "properties": {
         "out": {
           "type": "string",
@@ -3574,9 +3561,10 @@
           "description": "TBA key for the backup team called in."
         }
       },
-      "description": "Backup status, may be null"
+      "description": "Backup status, may be null."
     },
     "Team_Event_Status_playoff": {
+      "type": "object",
       "properties": {
         "level": {
           "type": "string",
@@ -3591,11 +3579,11 @@
         },
         "record": {
           "type": "string",
-          "description": "Record in playoffs as a string in the format WINS-LOSSES-TIES"
+          "description": "Record in playoffs as a string in the format `WINS-LOSSES-TIES`."
         },
         "status": {
           "type": "string",
-          "description": "Current competition status for the playoffs",
+          "description": "Current competition status for the playoffs.",
           "enum": [
             "won",
             "eliminated",
@@ -3617,10 +3605,17 @@
           "description": "List of rankings at the event.",
           "items": {
             "type": "object",
+            "required": [
+              "dq",
+              "matches_played",
+              "rank",
+              "record",
+              "team_key"
+            ],
             "properties": {
               "dq": {
                 "type": "integer",
-                "description": "Disqualifications"
+                "description": "Number of times disqualified."
               },
               "matches_played": {
                 "type": "integer",
@@ -3628,7 +3623,7 @@
               },
               "qual_average": {
                 "type": "integer",
-                "description": "TODO"
+                "description": "The average match score during qualifications. Year specific. May be null if not relevant for a given year."
               },
               "rank": {
                 "type": "integer",
@@ -3638,11 +3633,11 @@
                 "properties": {
                   "qualifications": {
                     "$ref": "#/definitions/WLT_Record",
-                    "description": "W-L-T record in qualification matches"
+                    "description": "W-L-T record in qualification matches."
                   },
                   "overall": {
                     "$ref": "#/definitions/WLT_Record",
-                    "description": "W-L-T record across all matches at an event"
+                    "description": "W-L-T record across all matches at an event."
                   }
                 },
                 "description": "Win-Loss-Tie record information, if available. May be null."
@@ -3666,14 +3661,18 @@
           "description": "List of year-specific values provided in the `sort_orders` array for each team.",
           "items": {
             "type": "object",
+            "required": [
+              "name",
+              "precision"
+            ],
             "properties": {
               "name": {
                 "type": "string",
-                "description": "Name of the field used in the `sort_order` array"
+                "description": "Name of the field used in the `sort_order` array."
               },
               "precision": {
                 "type": "integer",
-                "description": "Integer expressing the number of digits of precision in the number provided in `sort_orders`"
+                "description": "Integer expressing the number of digits of precision in the number provided in `sort_orders`."
               }
             }
           }
@@ -3688,6 +3687,13 @@
       "properties": {
         "points": {
           "type": "object",
+          "required": [
+            "alliance_points",
+            "award_points",
+            "qual_points",
+            "elim_points",
+            "total"
+          ],
           "description": "Points gained for each team at the event. Stored as a key-value pair with the team key as the key, and an object describing the points as it's value.",
           "additionalProperties": {
             "type": "object",
@@ -3744,6 +3750,32 @@
     },
     "Event_Insights_2016_Detail": {
       "type": "object",
+      "required": [
+        "LowBar",
+        "A_ChevalDeFrise",
+        "A_Portcullis",
+        "B_Ramparts",
+        "B_Moat",
+        "C_SallyPort",
+        "C_Drawbridge",
+        "D_RoughTerrain",
+        "D_RockWall",
+        "average_high_goals",
+        "average_low_goals",
+        "breaches",
+        "scales",
+        "challenges",
+        "captures",
+        "average_win_score",
+        "average_win_margin",
+        "average_score",
+        "average_auto_score",
+        "average_crossing_score",
+        "average_boulder_score",
+        "average_tower_score",
+        "average_foul_score",
+        "high_score"
+      ],
       "properties": {
         "LowBar": {
           "type": "array",
@@ -3901,7 +3933,7 @@
         },
         "high_score": {
           "type": "array",
-          "description": "An array with three values, high score, match key from the match with the high score, and the name of the match",
+          "description": "An array with three values, high score, match key from the match with the high score, and the name of the match.",
           "items": {
             "type": "string"
           }
@@ -3922,6 +3954,39 @@
     },
     "Event_Insights_2017_Detail": {
       "type": "object",
+      "required": [
+        "average_foul_score",
+        "average_fuel_points",
+        "average_fuel_points_auto",
+        "average_fuel_points_teleop",
+        "average_high_goals",
+        "average_high_goals_auto",
+        "average_high_goals_teleop",
+        "average_low_goals",
+        "average_low_goals_auto",
+        "average_low_goals_teleop",
+        "average_mobility_points_auto",
+        "average_points_auto",
+        "average_points_teleop",
+        "average_rotor_points",
+        "average_rotor_points_auto",
+        "average_rotor_points_teleop",
+        "average_score",
+        "average_takeoff_points_teleop",
+        "average_win_margin",
+        "average_win_score",
+        "high_kpa",
+        "high_score",
+        "kpa_achieved",
+        "mobility_counts",
+        "rotor_1_engaged",
+        "rotor_1_engaged_auto",
+        "rotor_2_engaged",
+        "rotor_2_engaged_auto",
+        "rotor_3_engaged",
+        "rotor_4_engaged",
+        "takeoff_counts"
+      ],
       "properties": {
         "average_foul_score": {
           "type": "number",
@@ -4117,36 +4182,36 @@
       "properties": {
         "oprs": {
           "type": "object",
-          "description": "A key-value pair with team key (eg `frc254`) as key and OPR as value",
+          "description": "A key-value pair with team key (eg `frc254`) as key and OPR as value.",
           "additionalProperties": {
             "type": "number",
             "format": "float",
-            "description": "OPR for team"
+            "description": "OPR for team."
           }
         },
         "dprs": {
           "type": "object",
-          "description": "A key-value pair with team key (eg `frc254`) as key and DPR as value",
+          "description": "A key-value pair with team key (eg `frc254`) as key and DPR as value.",
           "additionalProperties": {
             "type": "number",
             "format": "float",
-            "description": "DPR for team"
+            "description": "DPR for team."
           }
         },
         "ccwms": {
           "type": "object",
-          "description": "A key-value pair with team key (eg `frc254`) as key and CCWM as value",
+          "description": "A key-value pair with team key (eg `frc254`) as key and CCWM as value.",
           "additionalProperties": {
             "type": "number",
             "format": "float",
-            "description": "CCWM for team"
+            "description": "CCWM for team."
           }
         }
       }
     },
     "Event_Predictions": {
       "type": "object",
-      "description": "JSON Object containing prediction information for the event. Contains year-specific information and is subject to change.",
+      "description": "JSON Object containing prediction information for the event. Contains year-specific information and is subject to change."
     },
     "Webcast": {
       "type": "object",
@@ -4157,7 +4222,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "description": "Type of webcast, typically descriptive of the streaming provider",
+          "description": "Type of webcast, typically descriptive of the streaming provider.",
           "enum": [
             "youtube",
             "twitch",
@@ -4190,7 +4255,7 @@
       "properties": {
         "key": {
           "type": "string",
-          "description": "TBA event key with the format yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER], where yyyy is the year, and EVENT_CODE is the event code of the event, COMP_LEVEL is (qm, ef, qf, sf, f), and MATCH_NUMBER is the match number in the competition level. A set number may append the competition level if more than one match in required per set."
+          "description": "TBA event key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may append the competition level if more than one match in required per set."
         },
         "comp_level": {
           "type": "string",
@@ -4237,17 +4302,17 @@
         "time": {
           "type": "integer",
           "format": "int64",
-          "description": "UNIX timestamp of match time, as taken from the published schedule"
+          "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the scheduled match time, as taken from the published schedule."
         },
         "predicted_time": {
           "type": "integer",
           "format": "int64",
-          "description": "UNIX timestamp of the TBA predicted match start time"
+          "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the TBA predicted match start time."
         },
         "actual_time": {
           "type": "integer",
           "format": "int64",
-          "description": "UNIX timestamp of actual match start time"
+          "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of actual match start time."
         }
       }
     },
@@ -4263,7 +4328,7 @@
       "properties": {
         "key": {
           "type": "string",
-          "description": "TBA event key with the format yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER], where yyyy is the year, and EVENT_CODE is the event code of the event, COMP_LEVEL is (qm, ef, qf, sf, f), and MATCH_NUMBER is the match number in the competition level. A set number may append the competition level if more than one match in required per set."
+          "description": "TBA event key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may be appended to the competition level if more than one match in required per set."
         },
         "comp_level": {
           "type": "string",
@@ -4306,22 +4371,22 @@
         "time": {
           "type": "integer",
           "format": "int64",
-          "description": "UNIX timestamp of match time, as taken from the published schedule"
+          "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the scheduled match time, as taken from the published schedule."
         },
         "actual_time": {
           "type": "integer",
           "format": "int64",
-          "description": "UNIX timestamp of actual match start time"
+          "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of actual match start time."
         },
         "predicted_time": {
           "type": "integer",
           "format": "int64",
-          "description": "UNIX timestamp of the TBA predicted match start time"
+          "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the TBA predicted match start time."
         },
         "post_result_time": {
           "type": "integer",
           "format": "int64",
-          "description": "UNIX timestamp when the match result was posted"
+          "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) when the match result was posted."
         },
         "score_breakdown": {
           "type": "object",
@@ -4332,7 +4397,7 @@
           "items": {
             "$ref": "#/definitions/Media"
           },
-          "description": "Array of Media associated with this match and corresponding information"
+          "description": "Array of `Media` objects associated with this match."
         }
       }
     },
@@ -4344,21 +4409,22 @@
       ],
       "properties": {
         "score": {
+          "description": "Score for this alliance. Will be null or -1 for an unplayed match.",
           "type": "integer"
         },
         "team_keys": {
           "type": "array",
           "items": {
             "type": "string",
-            "description": "Team keys"
+            "description": "TBA Team keys (eg `frc254`) for teams on this alliance."
           }
         },
         "surrogate_team_keys": {
           "type": "array",
-          "description": "TBA team keys of any teams playing as a surrogate.",
+          "description": "TBA team keys (eg `frc254`) of any teams playing as a surrogate.",
           "items": {
             "type": "string",
-            "description": "Team keys"
+            "description": "Team key of a surrogate team."
           }
         }
       }
@@ -4749,12 +4815,14 @@
     "Media": {
       "type": "object",
       "required": [
+        "key",
         "type"
       ],
+      "description": "The `Media` object contains a reference for most any media associated with a team or event on TBA.",
       "properties": {
         "key": {
           "type": "string",
-          "description": "TBA identifier for this media"
+          "description": "TBA identifier for this media."
         },
         "type": {
           "type": "string",
@@ -4785,7 +4853,7 @@
         },
         "preferred": {
           "type": "boolean",
-          "description": "True if the media is of high quality"
+          "description": "True if the media is of high quality."
         }
       }
     },
@@ -4858,7 +4926,8 @@
         "award_type",
         "event_key",
         "name",
-        "year"
+        "year",
+        "recipient_list"
       ],
       "properties": {
         "name": {
@@ -4888,6 +4957,7 @@
     },
     "Award_Recipient": {
       "type": "object",
+      "description": "An `Award_Recipient` object represents the team and/or person who received an award at an event.",
       "properties": {
         "team_key": {
           "type": "string",
@@ -4902,27 +4972,27 @@
     "District_List": {
       "type": "object",
       "required": [
-            "display_name",
-            "abbreviation",
-            "key",
-            "year"
+        "display_name",
+        "abbreviation",
+        "key",
+        "year"
       ],
       "properties": {
         "abbreviation": {
           "type": "string",
-          "description": "The short identifier for the district"
+          "description": "The short identifier for the district."
         },
         "display_name": {
           "type": "string",
-          "description": "The long name for the district"
+          "description": "The long name for the district."
         },
         "key": {
           "type": "string",
-          "description": "Key for this district, e.g. 2016ne"
+          "description": "Key for this district, e.g. `2016ne`."
         },
         "year": {
           "type": "integer",
-          "description": "Year this district happened"
+          "description": "Year this district participated."
         }
       }
     },
@@ -4933,43 +5003,66 @@
         "rank",
         "team_key"
       ],
+      "description": "Rank of a team in a district.",
       "properties": {
         "team_key": {
-          "type": "string"
+          "type": "string",
+          "description": "TBA team key for the team."
         },
         "rank": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Numerical rank of the team, 1 being top rank."
         },
         "rookie_bonus": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Any points added to a team as a result of the rookie bonus."
         },
         "point_total": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Total district points for the team."
         },
         "event_points": {
           "type": "array",
+          "description": "List of events that contributed to the point total for the team.",
           "items": {
+            "type": "object",
+            "required": [
+              "event_key",
+              "district_cmp",
+              "alliance_points",
+              "award_points",
+              "qual_points",
+              "elim_points",
+              "total"
+            ],
             "properties": {
               "event_key": {
-                "type": "string"
+                "type": "string",
+                "description": "TBA Event key for this event."
               },
               "district_cmp": {
-                "type": "boolean"
+                "type": "boolean",
+                "description": "`true` if this event is a District Championship event."
               },
               "alliance_points": {
-                "type": "integer"
+                "type": "integer",
+                "description": "Points awarded for alliance selection."
               },
               "award_points": {
-                "type": "integer"
+                "type": "integer",
+                "description": "Points awarded for event awards."
               },
               "qual_points": {
-                "type": "integer"
+                "type": "integer",
+                "description": "Points awarded for qualification match performance."
               },
               "elim_points": {
-                "type": "integer"
+                "type": "integer",
+                "description": "Points awarded for elimination match performance."
               },
               "total": {
-                "type": "integer"
+                "type": "integer",
+                "description": "Total points awarded at this event."
               }
             }
           }
@@ -4978,19 +5071,24 @@
     },
     "WLT_Record": {
       "type": "object",
-      "description": "A Win-Loss-Tie record for a team, or an alliance",
+      "required": [
+        "wins",
+        "losses",
+        "ties"
+      ],
+      "description": "A Win-Loss-Tie record for a team, or an alliance.",
       "properties": {
         "losses": {
           "type": "integer",
-          "description": "Number of losses"
+          "description": "Number of losses."
         },
         "wins": {
           "type": "integer",
-          "description": "Number of wins"
+          "description": "Number of wins."
         },
         "ties": {
           "type": "integer",
-          "description": "Number of ties"
+          "description": "Number of ties."
         }
       }
     }
