@@ -66,11 +66,14 @@ class EventTeamStatusHelper(object):
             return '--'
 
     @classmethod
-    def generate_team_at_event_status_string(cls, team_key, status_dict):
+    def generate_team_at_event_status_string(cls, team_key, status_dict, formatting=True, event=None, include_team=True, verbose=False):
         """
         Generate a team at event status string from a status dict
         """
-        default_msg = 'Team {} is waiting for the event to begin.'.format(team_key[3:])
+        if include_team:
+            default_msg = 'Team {} is waiting for the {} to begin.'.format(team_key[3:], event.normalized_name if event else 'event')
+        else:
+            default_msg = 'is waiting for the {} to begin.'.format(team_key[3:], event.normalized_name if event else 'event')
         if not status_dict:
             return default_msg
 
@@ -91,7 +94,7 @@ class EventTeamStatusHelper(object):
 
                 num_teams_str = ''
                 if num_teams:
-                    num_teams_str = '/{}'.format(num_teams)
+                    num_teams_str = ' of {}'.format(num_teams) if verbose else '/{}'.format(num_teams)
 
                 if status == 'completed':
                     is_tense = 'was'
@@ -102,7 +105,10 @@ class EventTeamStatusHelper(object):
 
                 qual_str = None
                 if record:
-                    record_str = '{}-{}-{}'.format(record['wins'], record['losses'], record['ties'])
+                    if verbose:
+                        record_str = cls._build_verbose_record(record)
+                    else:
+                        record_str = '{}-{}-{}'.format(record['wins'], record['losses'], record['ties'])
                     if rank:
                         qual_str = '{} <b>Rank {}{}</b> with a record of <b>{}</b> in quals'.format(is_tense, rank, num_teams_str, record_str)
                     else:
@@ -140,7 +146,10 @@ class EventTeamStatusHelper(object):
             playoff_average = playoff.get('playoff_average')
 
             if status == 'playing':
-                record_str = '{}-{}-{}'.format(level_record['wins'], level_record['losses'], level_record['ties'])
+                if verbose:
+                    record_str = cls._build_verbose_record(level_record)
+                else:
+                    record_str = '{}-{}-{}'.format(level_record['wins'], level_record['losses'], level_record['ties'])
                 playoff_str = 'is <b>{}</b> in the <b>{}</b>'.format(record_str, Match.COMP_LEVELS_VERBOSE_FULL[level])
                 if alliance:
                     playoff_str += ' as the <b>{}</b> of <b>{}</b>'.format(pick, alliance['name'])
@@ -167,7 +176,6 @@ class EventTeamStatusHelper(object):
         if not components:
             return default_msg
 
-        team_str = 'Team {}'.format(team_key[3:])
         if len(components) > 1:
             components[-1] = 'and {}'.format(components[-1])
         if len(components) > 2:
@@ -175,7 +183,15 @@ class EventTeamStatusHelper(object):
         else:
             join_str = ' '
 
-        return '{} {}.'.format(team_str, join_str.join(components))
+        if include_team:
+            final_string = 'Team {} {}'.format(team_key[3:], join_str.join(components))
+        else:
+            final_string = '{}'.format(join_str.join(components))
+        if event:
+            final_string += ' at the {}.'.format(event.normalized_name)
+        else:
+            final_string += '.'
+        return final_string if formatting else final_string.replace('<b>', '').replace('</b>', '')
 
     @classmethod
     def generate_team_at_event_status(cls, team_key, event, matches=None):
@@ -417,3 +433,13 @@ class EventTeamStatusHelper(object):
 
         alliance_number = 0
         return None, alliance_number  # Team didn't make it to elims
+
+    @classmethod
+    def _build_verbose_record(cls, record):
+        win_label = 'wins' if record['wins'] != 1 else 'win'
+        loss_label = 'losses' if record['losses'] != 1 else 'loss'
+        tie_label = 'ties' if record['ties'] != 1 else 'tie'
+        return '{} {}, {} {}, and {} {}'.format(
+            record['wins'], win_label,
+            record['losses'], loss_label,
+            record['ties'], tie_label)
