@@ -11,6 +11,7 @@ from controllers.advanced_search_controller import AdvancedSearchController
 from controllers.ajax_controller import AccountInfoHandler, AccountRegisterFCMToken, AccountFavoritesHandler, AccountFavoritesAddHandler, AccountFavoritesDeleteHandler, \
       YouTubePlaylistHandler, AllowedApiWriteEventsHandler
 from controllers.ajax_controller import LiveEventHandler, TypeaheadHandler, WebcastHandler
+from controllers.apiai_controller import APIAIHandler
 from controllers.apidocs_controller import AddDataHandler, ApiV3DocumentationHandler, \
       ApiV2DocumentationHandler, ApiTrustedDocumentationHandler, WebhookDocumentationHandler, \
       ApiDocumentationOverviewHandler
@@ -167,6 +168,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/_/account/favorites/add', AccountFavoritesAddHandler, 'ajax-account-favorites-add', strict_slash=True),
       RedirectRoute(r'/_/account/favorites/delete', AccountFavoritesDeleteHandler, 'ajax-account-favorites-delete', strict_slash=True),
       RedirectRoute(r'/_/live-event/<event_key>/<timestamp:[0-9]+>', LiveEventHandler, 'ajax-live-event', strict_slash=True),
+      RedirectRoute(r'/_/api_ai', APIAIHandler, 'api-ai', strict_slash=True),
       RedirectRoute(r'/_/nightbot/nextmatch/<arg_str:(.*)>', NightbotTeamNextmatchHandler, 'nightbot-team-nextmatch', strict_slash=True),
       RedirectRoute(r'/_/nightbot/status/<team_number:[0-9]+>', NightbotTeamStatuskHandler, 'nightbot-team-status', strict_slash=True),
       RedirectRoute(r'/_/typeahead/<search_key>', TypeaheadHandler, 'ajax-typeahead', strict_slash=True),
