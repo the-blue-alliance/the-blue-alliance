@@ -1,6 +1,7 @@
 import json
 from base_controller import LoggedInHandler
 from helpers.apiai_helper import APIAIHelper
+from models.sitevar import Sitevar
 
 
 class APIAIHandler(LoggedInHandler):
@@ -8,7 +9,8 @@ class APIAIHandler(LoggedInHandler):
         super(APIAIHandler, self).__init__(*args, **kw)
 
     def post(self):
-        # TODO: Authentication
+        if self.request.headers.get('X-TBA-APIAI-Auth') != Sitevar.get_by_id('apiai.secrets').contents['key']:
+            return
 
         request = json.loads(self.request.body)
 
