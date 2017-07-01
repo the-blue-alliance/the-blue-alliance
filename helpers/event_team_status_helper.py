@@ -73,7 +73,7 @@ class EventTeamStatusHelper(object):
         if include_team:
             default_msg = 'Team {} is waiting for the {} to begin.'.format(team_key[3:], event.normalized_name if event else 'event')
         else:
-            default_msg = 'is waiting for the {} to begin.'.format(team_key[3:], event.normalized_name if event else 'event')
+            default_msg = 'is waiting for the {} to begin.'.format(event.normalized_name if event else 'event')
         if not status_dict:
             return default_msg
 
