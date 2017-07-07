@@ -10,8 +10,8 @@ class WebsiteHelper(object):
 
         website_url = website_url.strip()
         if not website_url.startswith('http://') and not website_url.startswith('https://'):
-            formatted_url = website_url
-        else:
             formatted_url = 'http://{}'.format(website_url)
+        else:
+            formatted_url = website_url
 
         return formatted_url
