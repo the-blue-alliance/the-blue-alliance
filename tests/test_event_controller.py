@@ -16,7 +16,6 @@ from models.event_details import EventDetails
 
 
 class TestEventController(unittest2.TestCase):
-
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -101,30 +100,30 @@ class TestEventController(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testEventListDefaultYear(self):
+    def test_event_list_default_year(self):
         response = self.testapp.get("/events")
         self.assertEqual(response.status_int, 200)
 
-    def testEventListExplicitYear(self):
+    def test_event_list_explicit_year(self):
         response = self.testapp.get("/events/2015")
         self.assertEqual(response.status_int, 200)
 
-    def testEventListNoEvents(self):
+    def test_event_list_no_events(self):
         response = self.testapp.get("/events/2014")
         self.assertEqual(response.status_int, 200)
 
-    def testEventDetails(self):
+    def test_event_details(self):
         response = self.testapp.get("/event/2016necmp")
         self.assertEqual(response.status_int, 200)
 
-    def testEventDetailsNotFound(self):
+    def test_event_details_not_found(self):
         response = self.testapp.get("/event/2016meow", status=404)
         self.assertEqual(response.status_int, 404)
 
-    def testEventInsights(self):
+    def test_event_insights(self):
         response = self.testapp.get("/event/2016necmp/insights")
         self.assertEqual(response.status_int, 200)
 
-    def testEventInsightsNotFound(self):
+    def test_event_insights_not_found(self):
         response = self.testapp.get("/event/2016meow/insights", status=404)
         self.assertEqual(response.status_int, 404)

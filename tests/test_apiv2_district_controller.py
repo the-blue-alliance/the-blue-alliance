@@ -85,7 +85,7 @@ class TestListDistrictsController(unittest2.TestCase):
         self.assertEqual(district["key"], self.district.abbreviation)
         self.assertEqual(district["name"], self.district.display_name)
 
-    def testDistrictApi(self):
+    def test_district_api(self):
         response = self.testapp.get('/{}'.format(self.event.year), headers={"X-TBA-App-Id": "tba-tests:disstrict-controller-test:v01"})
 
         districts = json.loads(response.body)
@@ -170,10 +170,8 @@ class TestListDistrictEventsController(unittest2.TestCase):
         self.assertEqual(event["alliances"], self.event.alliance_selections)
         self.assertEqual(event["website"], self.event.website)
 
-    def testEventApi(self):
+    def test_event_api(self):
         response = self.testapp.get("/{}/2010".format(self.district.abbreviation), headers={"X-TBA-App-Id": "tba-tests:disstrict-controller-test:v01"})
 
         events = json.loads(response.body)
         self.assertDistrictEvent(events[0])
-
-

@@ -18,7 +18,7 @@ class TestFIRSTElasticSearchTeamParser(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def test_parseTeam(self):
+    def test_parse_team(self):
         with open('test_data/first_elasticsearch/2015casj_event_teams.json', 'r') as f:
             teams = FIRSTElasticSearchTeamDetailsParser(2015).parse(json.loads(f.read()))
 

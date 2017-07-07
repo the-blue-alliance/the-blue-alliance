@@ -29,6 +29,6 @@ class TestSuggestionFetcher(unittest2.TestCase):
             target_key="2012cmp",
             target_model="event").put()
 
-    def testCount(self):
+    def test_count(self):
         self.assertEqual(SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "event"), 1)
         self.assertEqual(SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "media"), 0)

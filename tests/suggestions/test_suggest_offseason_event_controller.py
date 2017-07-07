@@ -11,19 +11,6 @@ from models.account import Account
 
 
 class TestSuggestApiWriteController(unittest2.TestCase):
-
-    def loginUser(self):
-        self.testbed.setup_env(
-            user_email="user@example.com",
-            user_id="123",
-            user_is_admin='0',
-            overwrite=True)
-
-        Account.get_or_insert(
-            "123",
-            email="user@example.com",
-            registered=True)
-
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -40,6 +27,18 @@ class TestSuggestApiWriteController(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
+    def loginUser(self):
+        self.testbed.setup_env(
+            user_email="user@example.com",
+            user_id="123",
+            user_is_admin='0',
+            overwrite=True)
+
+        Account.get_or_insert(
+            "123",
+            email="user@example.com",
+            registered=True)
+
     def getSuggestionForm(self):
         response = self.testapp.get('/suggest/offseason')
         self.assertEqual(response.status_int, 200)
@@ -48,18 +47,18 @@ class TestSuggestApiWriteController(unittest2.TestCase):
         self.assertIsNotNone(form)
         return form
 
-    def testLogInRedirect(self):
+    def test_login_redirect(self):
         response = self.testapp.get('/suggest/offseason', status='3*')
         response = response.follow(expect_errors=True)
         self.assertTrue(response.request.path.startswith("/account/login_required"))
 
-    def testSubmitEmptyForm(self):
+    def test_submit_empty_form(self):
         self.loginUser()
         form = self.getSuggestionForm()
         response = form.submit()
         self.assertEqual(response.status_int, 200)
 
-    def testSuggestEvent(self):
+    def test_suggest_event(self):
         self.loginUser()
         form = self.getSuggestionForm()
         form['name'] = 'Test Event'
@@ -73,5 +72,3 @@ class TestSuggestApiWriteController(unittest2.TestCase):
         form['venue_country'] = "USA"
         response = form.submit().follow()
         self.assertEqual(response.status_int, 200)
-
-

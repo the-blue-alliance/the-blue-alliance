@@ -24,7 +24,6 @@ from models.team import Team
 
 
 class TestApiTrustedController(unittest2.TestCase):
-
     def setUp(self):
         self.testapp = webtest.TestApp(api_main.app)
 

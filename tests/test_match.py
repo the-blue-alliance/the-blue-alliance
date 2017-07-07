@@ -10,6 +10,9 @@ class TestMatch(unittest2.TestCase):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
 
+    def tearDown(self):
+        self.testbed.deactivate()
+
     def test_youtube_videos_formatted(self):
         # Test timestamp conversion
         data = {
@@ -39,6 +42,3 @@ class TestMatch(unittest2.TestCase):
             youtube_videos=['TqY324xLU4s']
         )
         self.assertListEqual(match.youtube_videos_formatted, ['TqY324xLU4s'])
-
-    def tearDown(self):
-        self.testbed.deactivate()

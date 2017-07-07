@@ -73,7 +73,7 @@ class TestTeamApiController(unittest2.TestCase):
         self.assertEqual(team["rookie_year"], self.team.rookie_year)
         self.assertEqual(team["motto"], self.team.motto)
 
-    def testTeamApi(self):
+    def test_team_api(self):
         response = self.testapp.get('/frc281', headers={"X-TBA-App-Id": "tba-tests:team-controller-test:v01"})
 
         team_dict = json.loads(response.body)
@@ -81,7 +81,6 @@ class TestTeamApiController(unittest2.TestCase):
 
 
 class TestTeamEventsApiController(unittest2.TestCase):
-
     def setUp(self):
         app = webapp2.WSGIApplication([webapp2.Route(r'/<team_key:>/<year:>', ApiTeamEventsController, methods=['GET'])], debug=True)
         self.testapp = webtest.TestApp(app)
@@ -146,7 +145,7 @@ class TestTeamEventsApiController(unittest2.TestCase):
         self.assertEqual(event["event_type_string"], self.event.event_type_str)
         self.assertEqual(event["event_type"], self.event.event_type_enum)
 
-    def testTeamApi(self):
+    def test_team_api(self):
         response = self.testapp.get('/frc281/2010', headers={"X-TBA-App-Id": "tba-tests:team-controller-test:v01"})
 
         event_dict = json.loads(response.body)
@@ -215,7 +214,7 @@ class TestDistrictTeamsApiController(unittest2.TestCase):
         self.assertEqual(team["website"], self.team.website)
         self.assertEqual(team["motto"], self.team.motto)
 
-    def testDistrictsApi(self):
+    def test_districts_api(self):
         response = self.testapp.get('/ne/2015', headers={"X-TBA-App-Id": "tba-tests:team-districts-controller-test:v01"})
         teams = json.loads(response.body)
         self.assertTeamJson(teams)

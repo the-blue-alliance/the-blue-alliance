@@ -6,7 +6,6 @@ from models.team import Team
 
 
 class TestKeyNameValidators(unittest2.TestCase):
-
     def setUp(self):
         self.valid_team_key = "frc177"
         self.valid_team_key2 = "frc1"

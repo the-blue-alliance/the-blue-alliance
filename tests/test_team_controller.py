@@ -99,47 +99,47 @@ class TestTeamController(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testTeamListDefaultPage(self):
+    def test_team_list_default_page(self):
         response = self.testapp.get("/teams")
         self.assertEqual(response.status_int, 200)
 
-    def testTeamListExplicitPage(self):
+    def test_team_list_explicit_page(self):
         response = self.testapp.get("/teams/1")
         self.assertEqual(response.status_int, 200)
 
-    def testTeamListBadPage(self):
+    def test_team_list_bad_page(self):
         response = self.testapp.get("/teams/19", status=404)
         self.assertEqual(response.status_int, 404)
 
-    def testTeamCanonical(self):
+    def test_team_canonical(self):
         response = self.testapp.get("/team/1124")
         self.assertEqual(response.status_int, 200)
 
-    def testBadTeamCanonical(self):
+    def test_bad_team_canonical(self):
         response = self.testapp.get("/team/1337", status=404)
         self.assertEqual(response.status_int, 404)
 
-    def testTeamDetail(self):
+    def test_team_detail(self):
         response = self.testapp.get("/team/1124/2016")
         self.assertEqual(response.status_int, 200)
 
     # Because 2015 is special :/
-    def testTeamDetail2015(self):
+    def test_team_detail_2015(self):
         response = self.testapp.get("/team/1124/2015")
         self.assertEqual(response.status_int, 200)
 
-    def testTeamDetailBadYear(self):
+    def test_team_detail_bad_year(self):
         response = self.testapp.get("/team/1124/2014", status=404)
         self.assertEqual(response.status_int, 404)
 
-    def testBadTeamDetail(self):
+    def test_bad_team_detail(self):
         response = self.testapp.get("/team/1337/2016", status=404)
         self.assertEqual(response.status_int, 404)
 
-    def testTeamHistory(self):
+    def test_team_history(self):
         response = self.testapp.get("/team/1124/history")
         self.assertEqual(response.status_int, 200)
 
-    def testBadTeamHistory(self):
+    def test_bad_team_history(self):
         response = self.testapp.get("/team/1337/history", status=404)
         self.assertEqual(response.status_int, 404)

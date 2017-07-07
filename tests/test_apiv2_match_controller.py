@@ -84,7 +84,7 @@ class TestMatchApiController(unittest2.TestCase):
         else:
             self.assertEqual(match["time"], 1409527874)
 
-    def testMatchApi(self):
+    def test_match_api(self):
         response = self.testapp.get('/2014cc_f1m1', headers={"X-TBA-App-Id": "tba-tests:match-controller-test:v01"})
 
         match_json = json.loads(response.body)

@@ -22,30 +22,6 @@ from models.suggestion import Suggestion
 
 
 class TestSuggestEventWebcastController(unittest2.TestCase):
-
-    def loginUser(self):
-        self.testbed.setup_env(
-            user_email="user@example.com",
-            user_id="123",
-            user_is_admin='0',
-            overwrite=True)
-
-        self.account = Account.get_or_insert(
-            "123",
-            email="user@example.com",
-            registered=True)
-
-    def givePermission(self):
-        self.account.permissions.append(AccountPermissions.REVIEW_MEDIA)
-        self.account.put()
-
-    def createSuggestion(self):
-        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key,
-                                                                     "H-54KMwMKY0",
-                                                                     "2016necmp_f1m1")
-        self.assertEqual(status, 'success')
-        return Suggestion.render_media_key_name(2016, 'match', '2016necmp_f1m1', 'youtube', 'H-54KMwMKY0')
-
     def setUp(self):
         self.policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1)
         self.testbed = testbed.Testbed()
@@ -163,6 +139,29 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
+    def loginUser(self):
+        self.testbed.setup_env(
+            user_email="user@example.com",
+            user_id="123",
+            user_is_admin='0',
+            overwrite=True)
+
+        self.account = Account.get_or_insert(
+            "123",
+            email="user@example.com",
+            registered=True)
+
+    def givePermission(self):
+        self.account.permissions.append(AccountPermissions.REVIEW_MEDIA)
+        self.account.put()
+
+    def createSuggestion(self):
+        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key,
+                                                                     "H-54KMwMKY0",
+                                                                     "2016necmp_f1m1")
+        self.assertEqual(status, 'success')
+        return Suggestion.render_media_key_name(2016, 'match', '2016necmp_f1m1', 'youtube', 'H-54KMwMKY0')
+
     def getSuggestionForm(self):
         response = self.testapp.get('/suggest/match/video/review')
         self.assertEqual(response.status_int, 200)
@@ -171,24 +170,24 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
         self.assertIsNotNone(form)
         return form
 
-    def testLogInRedirect(self):
+    def test_login_redirect(self):
         response = self.testapp.get('/suggest/match/video/review', status='3*')
         response = response.follow(expect_errors=True)
         self.assertTrue(response.request.path.startswith("/account/login_required"))
 
-    def testNoPermissions(self):
+    def test_no_permissions(self):
         self.loginUser()
         response = self.testapp.get('/suggest/match/video/review', status='3*')
         response = response.follow(expect_errors=True)
         self.assertEqual(response.request.path, '/')
 
-    def testNothingToReview(self):
+    def test_nothing_to_review(self):
         self.loginUser()
         self.givePermission()
         response = self.testapp.get('/suggest/match/video/review')
         self.assertEqual(response.status_int, 200)
 
-    def testAcceptSuggestion(self):
+    def test_accept_suggestion(self):
         self.loginUser()
         self.givePermission()
         suggestion_id = self.createSuggestion()
@@ -208,7 +207,7 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
         self.assertIsNotNone(match.youtube_videos)
         self.assertTrue('H-54KMwMKY0' in match.youtube_videos)
 
-    def testAcceptNewKey(self):
+    def test_accept_new_key(self):
         self.loginUser()
         self.givePermission()
         suggestion_id = self.createSuggestion()
@@ -235,7 +234,7 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
         self.assertIsNotNone(match.youtube_videos)
         self.assertFalse('H-54KMwMKY0' in match.youtube_videos)
 
-    def testAcceptBadKey(self):
+    def test_accept_bad_key(self):
         self.loginUser()
         self.givePermission()
         suggestion_id = self.createSuggestion()
@@ -256,7 +255,7 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
         self.assertIsNotNone(match.youtube_videos)
         self.assertFalse('H-54KMwMKY0' in match.youtube_videos)
 
-    def testRejectSuggestion(self):
+    def test_reject_suggestion(self):
         self.loginUser()
         self.givePermission()
         suggestion_id = self.createSuggestion()

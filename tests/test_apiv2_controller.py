@@ -9,7 +9,6 @@ from google.appengine.ext import testbed
 from controllers.api.api_event_controller import ApiEventController
 
 class TestApiController(unittest2.TestCase):
-
     def setUp(self):
         # Use ApiEventController as a random API controller to test on
         app = webapp2.WSGIApplication([webapp2.Route(r'/<event_key:>', ApiEventController, methods=['GET'])], debug=True)

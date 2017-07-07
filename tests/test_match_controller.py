@@ -86,10 +86,10 @@ class TestMatchController(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testMatchDetail(self):
+    def test_match_detail(self):
         response = self.testapp.get("/match/2014cc_f1m1")
         self.assertEqual(response.status_int, 200)
 
-    def testBadMatchDetail(self):
+    def test_bad_match_detail(self):
         response = self.testapp.get("/match/2014cc_f1m2", status=404)
         self.assertEqual(response.status_int, 404)

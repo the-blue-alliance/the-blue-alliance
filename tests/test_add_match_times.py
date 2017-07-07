@@ -43,7 +43,7 @@ class TestAddMatchTimes(unittest2.TestCase):
             timezone_id="America/Los_Angeles",
         )
 
-    def match_dict_to_matches(self, match_dicts):
+    def matchDictToMatches(self, match_dicts):
         return [Match(
             id=Match.renderKeyName(
                 self.event.key.id(),
@@ -65,7 +65,7 @@ class TestAddMatchTimes(unittest2.TestCase):
         with open('test_data/usfirst_html/usfirst_event_matches_2013cama.html', 'r') as f:  # using matches from a random event as data
             match_dicts, _ = UsfirstMatchesParser.parse(f.read())
 
-        matches = self.match_dict_to_matches(match_dicts)
+        matches = self.matchDictToMatches(match_dicts)
         MatchHelper.add_match_times(self.event, matches)
 
         self.assertEqual(len(matches), 92)
@@ -78,7 +78,7 @@ class TestAddMatchTimes(unittest2.TestCase):
         with open('test_data/usfirst_html/usfirst_event_matches_2012ct.html', 'r') as f:  # using matches from a random event as data
             match_dicts, _ = UsfirstMatchesParser.parse(f.read())
 
-        matches = self.match_dict_to_matches(match_dicts)
+        matches = self.matchDictToMatches(match_dicts)
         MatchHelper.add_match_times(self.event_dst, matches)
 
         self.assertEqual(len(matches), 125)
@@ -87,4 +87,3 @@ class TestAddMatchTimes(unittest2.TestCase):
         PDT_OFFSET = -7
         self.assertEqual(matches[0].time, datetime.datetime(2014, 3, 8, 9, 0) - datetime.timedelta(hours=PST_OFFSET))
         self.assertEqual(matches[-1].time, datetime.datetime(2014, 3, 9, 16, 5) - datetime.timedelta(hours=PDT_OFFSET))
-

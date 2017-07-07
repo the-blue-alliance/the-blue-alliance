@@ -83,7 +83,7 @@ class TestAwardManipulator(unittest2.TestCase):
         for r in award.recipient_json_list:
             self.assertTrue(json.loads(r) in [{'team_number': 111, 'awardee': None}, {'team_number': 234, 'awardee': None}])
 
-    def test_createOrUpdate(self):
+    def test_createOrUpdateupdate(self):
         AwardManipulator.createOrUpdate(self.old_award)
         self.assertOldAward(Award.get_by_id("2013casj_1"))
 

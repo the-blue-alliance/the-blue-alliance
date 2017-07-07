@@ -18,19 +18,6 @@ from models.suggestion import Suggestion
 
 
 class TestSuggestEventWebcastController(unittest2.TestCase):
-
-    def loginUser(self):
-        self.testbed.setup_env(
-            user_email="user@example.com",
-            user_id="123",
-            user_is_admin='0',
-            overwrite=True)
-
-        Account.get_or_insert(
-            "123",
-            email="user@example.com",
-            registered=True)
-
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -108,6 +95,18 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
+    def loginUser(self):
+        self.testbed.setup_env(
+            user_email="user@example.com",
+            user_id="123",
+            user_is_admin='0',
+            overwrite=True)
+
+        Account.get_or_insert(
+            "123",
+            email="user@example.com",
+            registered=True)
+
     def getSuggestionForm(self, match_key):
         response = self.testapp.get('/suggest/match/video?match_key={}'.format(match_key))
         self.assertEqual(response.status_int, 200)
@@ -116,18 +115,18 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
         self.assertIsNotNone(form)
         return form
 
-    def testLoginRedirect(self):
+    def test_login_redirect(self):
         response = self.testapp.get('/suggest/match/video?match_key=2016necmp_f1m1', status='3*')
         response = response.follow(expect_errors=True)
         self.assertTrue(response.request.path.startswith("/account/login_required"))
 
-    def testNoParams(self):
+    def test_no_params(self):
         self.loginUser()
         response = self.testapp.get('/suggest/match/video', status='3*')
         response = response.follow(expect_errors=True)
         self.assertEqual(response.request.path, '/')
 
-    def testSubmitEmptyForm(self):
+    def test_submit_empty_form(self):
         self.loginUser()
         form = self.getSuggestionForm('2016necmp_f1m1')
         response = form.submit().follow()
@@ -136,7 +135,7 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
         request = response.request
         self.assertEqual(request.GET.get('status'), 'bad_url')
 
-    def testSubmitMatchVideo(self):
+    def test_submit_match_video(self):
         self.loginUser()
         form = self.getSuggestionForm('2016necmp_f1m1')
         form['youtube_url'] = "http://youtu.be/bHGyTjxbLz8"
@@ -155,19 +154,6 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
 
 
 class TestSuggestMatchVideoPlaylistController(unittest2.TestCase):
-
-    def loginUser(self):
-        self.testbed.setup_env(
-            user_email="user@example.com",
-            user_id="123",
-            user_is_admin='0',
-            overwrite=True)
-
-        Account.get_or_insert(
-            "123",
-            email="user@example.com",
-            registered=True)
-
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -245,6 +231,18 @@ class TestSuggestMatchVideoPlaylistController(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
+    def loginUser(self):
+        self.testbed.setup_env(
+            user_email="user@example.com",
+            user_id="123",
+            user_is_admin='0',
+            overwrite=True)
+
+        Account.get_or_insert(
+            "123",
+            email="user@example.com",
+            registered=True)
+
     def getSuggestionForm(self, event_key):
         response = self.testapp.get('/suggest/event/video?event_key={}'.format(event_key))
         self.assertEqual(response.status_int, 200)
@@ -253,23 +251,23 @@ class TestSuggestMatchVideoPlaylistController(unittest2.TestCase):
         self.assertIsNotNone(form)
         return form
 
-    def testLoginRedirect(self):
+    def test_login_redirect(self):
         response = self.testapp.get('/suggest/event/video?event_key=2016necmp', status='3*')
         response = response.follow(expect_errors=True)
         self.assertTrue(response.request.path.startswith("/account/login_required"))
 
-    def testNoParams(self):
+    def test_no_params(self):
         self.loginUser()
         response = self.testapp.get('/suggest/event/video', status='3*')
         response = response.follow(expect_errors=True)
         self.assertEqual(response.request.path, '/')
 
-    def testBadEvent(self):
+    def test_bad_event(self):
         self.loginUser()
         response = self.testapp.get('/suggest/event/video?event_key=2016foo', expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
-    def testSubmitEmptyForm(self):
+    def test_submit_empty_form(self):
         self.loginUser()
         form = self.getSuggestionForm('2016necmp')
         response = form.submit().follow()
@@ -278,7 +276,7 @@ class TestSuggestMatchVideoPlaylistController(unittest2.TestCase):
         request = response.request
         self.assertEqual(request.GET.get('num_added'), '0')
 
-    def testSubmitOneVideo(self):
+    def test_submit_one_video(self):
         self.loginUser()
         response = self.testapp.post('/suggest/event/video?event_key=2016necmp', {
             'num_videos': 1,

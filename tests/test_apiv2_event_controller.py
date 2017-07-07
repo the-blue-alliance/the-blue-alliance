@@ -97,7 +97,7 @@ class TestEventApiController(unittest2.TestCase):
         self.assertEqual(event["website"], self.event.website)
         self.assertEqual(event["timezone"], self.event.timezone_id)
 
-    def testEventApi(self):
+    def test_event_api(self):
         response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
 
         event_dict = json.loads(response.body)
@@ -170,7 +170,7 @@ class TestEventTeamsApiController(unittest2.TestCase):
         self.assertEqual(team["region"], "SC")
         self.assertEqual(team["website"], self.team.website)
 
-    def testEventTeamsApi(self):
+    def test_event_teams_api(self):
         response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
 
         team_dict = json.loads(response.body)
@@ -236,7 +236,7 @@ class TestEventMatchApiController(unittest2.TestCase):
         self.assertEqual(match["time_string"], self.match.time_string)
         self.assertEqual(match["time"], 1409527874)
 
-    def testEventMatchApi(self):
+    def test_event_match_api(self):
         response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
 
         match_json = json.loads(response.body)
@@ -288,7 +288,7 @@ class TestEventStatsApiController(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testEventStatsApi(self):
+    def test_event_stats_api(self):
         response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
 
         matchstats = json.loads(response.body)
@@ -357,13 +357,13 @@ class TestEventRankingsApiController(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testEventRankingsApi(self):
+    def test_event_rankings_api(self):
         response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
 
         rankings = json.loads(response.body)
         self.assertEqual(self.rankings, rankings)
 
-    def testEventNoRankingsApi(self):
+    def test_event_no_rankings_api(self):
         response = self.testapp.get('/2010ct', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
 
         self.assertEqual("[]", response.body)
@@ -411,7 +411,7 @@ class TestEventListApiController(unittest2.TestCase):
         self.assertEqual(event["start_date"], self.event.start_date.date().isoformat())
         self.assertEqual(event["end_date"], self.event.end_date.date().isoformat())
 
-    def testEventListApi(self):
+    def test_event_list_api(self):
         response = self.testapp.get('/2010', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
         event_dict = json.loads(response.body)
         self.assertEventJson(event_dict[0])

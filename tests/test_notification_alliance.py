@@ -11,7 +11,6 @@ from notifications.alliance_selections import AllianceSelectionNotification
 
 
 class TestAllianceNotification(unittest2.TestCase):
-
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()

@@ -9,7 +9,6 @@ from controllers.api.api_base_controller import ApiBaseController
 
 
 class TestTeamApi(unittest2.TestCase):
-
     def setUp(self):
         app = webapp2.WSGIApplication([webapp2.Route(r'/', ApiBaseController, methods=['GET'])], debug=True)
         self.testapp = webtest.TestApp(app)
