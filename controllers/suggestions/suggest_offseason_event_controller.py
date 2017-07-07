@@ -1,4 +1,5 @@
 from controllers.base_controller import LoggedInHandler
+from helpers.website_helper import WebsiteHelper
 from helpers.suggestions.suggestion_creator import SuggestionCreator
 from helpers.outgoing_notification_helper import OutgoingNotificationHelper
 from template_engine import jinja2_engine
@@ -21,12 +22,13 @@ class SuggestOffseasonEventController(LoggedInHandler):
         self._require_registration()
 
         event_name = self.request.get("name", None)
+        website = WebsiteHelper.format_url(self.request.get("website", None))
         status, failures = SuggestionCreator.createOffseasonEventSuggestion(
             author_account_key=self.user_bundle.account.key,
             name=event_name,
             start_date=self.request.get("start_date", None),
             end_date=self.request.get("end_date", None),
-            website=self.request.get("website", None),
+            website=website,
             venue_name=self.request.get("venue_name", None),
             address=self.request.get("venue_address", None),
             city=self.request.get("venue_city", None),
