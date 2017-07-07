@@ -1,6 +1,3 @@
-import urlparse
-
-
 class WebsiteHelper(object):
     @classmethod
     def format_url(cls, website_url):
@@ -11,8 +8,8 @@ class WebsiteHelper(object):
         """
         formatted_url = None
 
-        parsed = urlparse.urlparse(website_url)
-        if parsed.scheme:
+        website_url = website_url.strip()
+        if not website_url.startswith('http://') and not website_url.startswith('https://'):
             formatted_url = website_url
         else:
             formatted_url = 'http://{}'.format(website_url)
