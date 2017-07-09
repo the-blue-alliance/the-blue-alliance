@@ -1,15 +1,11 @@
 import datetime
 import unittest2
-import json
 
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from consts.event_type import EventType
-from helpers.event_manipulator import EventManipulator
 from helpers.event.event_test_creator import EventTestCreator
-from helpers.event_team.event_team_test_creator import EventTeamTestCreator
-from helpers.match.match_test_creator import MatchTestCreator
 from models.event import Event
 
 

@@ -1,7 +1,4 @@
 import unittest2
-import csv
-import json
-import StringIO
 
 from helpers.youtube_video_helper import YouTubeVideoHelper
 

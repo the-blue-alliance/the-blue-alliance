@@ -23,10 +23,10 @@ class TestAwardManipulator(unittest2.TestCase):
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.event = Event(
-          id="2013casj",
-          event_short="casj",
-          year=2013,
-          event_type_enum=EventType.REGIONAL,
+            id="2013casj",
+            event_short="casj",
+            year=2013,
+            event_type_enum=EventType.REGIONAL,
         )
 
         self.old_award = Award(

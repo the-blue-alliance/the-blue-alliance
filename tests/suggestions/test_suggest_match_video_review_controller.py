@@ -1,8 +1,8 @@
-from datetime import datetime
-
 import unittest2
 import webapp2
 import webtest
+from datetime import datetime
+
 from google.appengine.datastore import datastore_stub_util
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
@@ -17,7 +17,6 @@ from helpers.suggestions.suggestion_creator import SuggestionCreator
 from models.account import Account
 from models.event import Event
 from models.match import Match
-from models.media import Media
 from models.suggestion import Suggestion
 
 
@@ -39,24 +38,24 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
         self.testapp = webtest.TestApp(app)
 
         self.event = Event(
-                id="2016necmp",
-                name="New England District Championship",
-                event_type_enum=EventType.DISTRICT_CMP,
-                event_district_enum=DistrictType.NEW_ENGLAND,
-                short_name="New England",
-                event_short="necmp",
-                year=2016,
-                end_date=datetime(2016, 03, 27),
-                official=False,
-                city='Hartford',
-                state_prov='CT',
-                country='USA',
-                venue="Some Venue",
-                venue_address="Some Venue, Hartford, CT, USA",
-                timezone_id="America/New_York",
-                start_date=datetime(2016, 03, 24),
-                webcast_json="",
-                website="http://www.firstsv.org",
+            id="2016necmp",
+            name="New England District Championship",
+            event_type_enum=EventType.DISTRICT_CMP,
+            event_district_enum=DistrictType.NEW_ENGLAND,
+            short_name="New England",
+            event_short="necmp",
+            year=2016,
+            end_date=datetime(2016, 03, 27),
+            official=False,
+            city='Hartford',
+            state_prov='CT',
+            country='USA',
+            venue="Some Venue",
+            venue_address="Some Venue, Hartford, CT, USA",
+            timezone_id="America/New_York",
+            start_date=datetime(2016, 03, 24),
+            webcast_json="",
+            website="http://www.firstsv.org"
         )
         self.event.put()
 
@@ -84,7 +83,7 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
                     "frc254",\
                     "frc1678",\
                     "frc973"]}}',
-            score_breakdown_json = '{\
+            score_breakdown_json='{\
                 "blue": {\
                     "auto": 70,\
                     "teleop_goal+foul": 40,\
@@ -122,7 +121,7 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
                     "frc254",\
                     "frc1678",\
                     "frc973"]}}',
-            score_breakdown_json = '{\
+            score_breakdown_json='{\
                 "blue": {\
                     "auto": 70,\
                     "teleop_goal+foul": 40,\
@@ -144,12 +143,14 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
             user_email="user@example.com",
             user_id="123",
             user_is_admin='0',
-            overwrite=True)
+            overwrite=True
+        )
 
         self.account = Account.get_or_insert(
             "123",
             email="user@example.com",
-            registered=True)
+            registered=True
+        )
 
     def givePermission(self):
         self.account.permissions.append(AccountPermissions.REVIEW_MEDIA)

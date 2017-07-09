@@ -1,6 +1,7 @@
 import unittest2
 import webapp2
 import webtest
+
 from google.appengine.ext import testbed
 from google.appengine.ext import ndb
 from webapp2_extras.routes import RedirectRoute
@@ -34,12 +35,14 @@ class TestSuggestEventMediaController(unittest2.TestCase):
             user_email="user@example.com",
             user_id="123",
             user_is_admin='0',
-            overwrite=True)
+            overwrite=True
+        )
 
         Account.get_or_insert(
             "123",
             email="user@example.com",
-            registered=True)
+            registered=True
+        )
 
     def storeEvent(self):
         self.event = Event(
@@ -47,7 +50,7 @@ class TestSuggestEventMediaController(unittest2.TestCase):
             event_type_enum=EventType.REGIONAL,
             name="NYC",
             event_short="NYC",
-            year=2016,
+            year=2016
         )
         self.event.put()
 

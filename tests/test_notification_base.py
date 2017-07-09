@@ -1,7 +1,5 @@
 import unittest2
-import json
 
-from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from consts.client_type import ClientType
@@ -17,7 +15,7 @@ class TestBaseNotification(unittest2.TestCase):
         # User a Ping notification to test the render and send classes
         # It's as simple as it gets
         self.notification = PingNotification()
-        self.keys = { ClientType.OS_ANDROID: ["abc123"], ClientType.WEBHOOK: ["123abc"] }
+        self.keys = {ClientType.OS_ANDROID: ["abc123"], ClientType.WEBHOOK: ["123abc"]}
         self.notification.keys = self.keys
 
     def tearDown(self):

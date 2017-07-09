@@ -1,6 +1,5 @@
-import json
-
 import unittest2
+
 from appengine_fixture_loader.loader import load_fixture
 from google.appengine.ext import testbed
 from google.appengine.ext import ndb
@@ -727,8 +726,8 @@ class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
         load_fixture('test_data/fixtures/2016nytr_event_team_status.json',
-                      kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
-                      post_processor=self.eventKeyAdder)
+                     kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
+                     post_processor=self.eventKeyAdder)
         self.event = Event.get_by_id('2016nytr')
         self.assertIsNotNone(self.event)
 
@@ -970,8 +969,8 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
         load_fixture('test_data/fixtures/2016nytr_event_team_status.json',
-                      kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
-                      post_processor=self.eventKeyAdder)
+                     kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
+                     post_processor=self.eventKeyAdder)
         self.event = Event.get_by_id('2016nytr')
         EventDetails.get_by_id('2016nytr').key.delete()  # Remove EventDetails
         self.assertIsNotNone(self.event)
@@ -1067,8 +1066,8 @@ class Test2016casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
         load_fixture('test_data/fixtures/2016casj.json',
-                      kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
-                      post_processor=self.eventKeyAdder)
+                     kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
+                     post_processor=self.eventKeyAdder)
         self.event = Event.get_by_id('2016casj')
         self.assertIsNotNone(self.event)
 
@@ -1287,8 +1286,8 @@ class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
         load_fixture('test_data/fixtures/2015casj.json',
-                      kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
-                      post_processor=self.eventKeyAdder)
+                     kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
+                     post_processor=self.eventKeyAdder)
         self.event = Event.get_by_id('2015casj')
         self.assertIsNotNone(self.event)
 
@@ -1415,8 +1414,8 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
         load_fixture('test_data/fixtures/2015casj.json',
-                      kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
-                      post_processor=self.eventKeyAdder)
+                     kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
+                     post_processor=self.eventKeyAdder)
         self.event = Event.get_by_id('2015casj')
         EventDetails.get_by_id('2015casj').key.delete()  # Remove EventDetails
         self.assertIsNotNone(self.event)

@@ -26,9 +26,9 @@ class TestValidationHelper(unittest2.TestCase):
 
     def test_combo_validation(self):
         errors = ValidationHelper.validate([("match_id_validator", "0010c1_0m2"),
-            ("team_id_validator", "frc01"),
-            ("event_id_validator", "1cmp")])
-        self.assertEqual(errors, {"Errors": [{"match_id": "0010c1_0m2 is not a valid match id"}, {"team_id": "frc01 is not a valid team id"},{"event_id": "1cmp is not a valid event id"}]})
+                                            ("team_id_validator", "frc01"),
+                                            ("event_id_validator", "1cmp")])
+        self.assertEqual(errors, {"Errors": [{"match_id": "0010c1_0m2 is not a valid match id"}, {"team_id": "frc01 is not a valid team id"}, {"event_id": "1cmp is not a valid event id"}]})
 
     def test_valid_validation(self):
         errors = ValidationHelper.validate([("team_id_validator", "frc101")])

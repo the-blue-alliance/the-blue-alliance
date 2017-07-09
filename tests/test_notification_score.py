@@ -1,5 +1,4 @@
 import unittest2
-import json
 
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed

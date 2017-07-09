@@ -7,7 +7,6 @@ from google.appengine.ext.webapp import Response
 
 from consts.event_type import EventType
 from controllers.cron_controller import EventTeamUpdate
-from datafeeds.datafeed_usfirst import DatafeedUsfirst
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
@@ -22,18 +21,17 @@ class TestDatafeedUsfirstTeams(unittest2.TestCase):
         self.testbed.init_memcache_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
-
         self.event = Event(
-                id="2010sc",
-                name="Palmetto Regional",
-                event_type_enum=EventType.REGIONAL,
-                short_name="Palmetto",
-                event_short="sc",
-                year=2010,
-                end_date=datetime.datetime(2010, 03, 27),
-                official=True,
-                location='Clemson, SC',
-                start_date=datetime.datetime(2010, 03, 24),
+            id="2010sc",
+            name="Palmetto Regional",
+            event_type_enum=EventType.REGIONAL,
+            short_name="Palmetto",
+            event_short="sc",
+            year=2010,
+            end_date=datetime.datetime(2010, 03, 27),
+            official=True,
+            location='Clemson, SC',
+            start_date=datetime.datetime(2010, 03, 24)
         )
         self.event.put()
 

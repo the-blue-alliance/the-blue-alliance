@@ -7,10 +7,8 @@ from datafeeds.parsers.first_elasticsearch.first_elasticsearch_event_list_parser
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from consts.district_type import DistrictType
 from consts.event_type import EventType
 from models.district import District
-from models.event import Event
 
 
 class TestFIRSTElasticSearchEventListParser(unittest2.TestCase):

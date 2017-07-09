@@ -6,7 +6,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from helpers.location_helper import LocationHelper
-from models.event import Event
+# from models.event import Event
 from models.sitevar import Sitevar
 from models.team import Team
 
@@ -450,7 +450,7 @@ class TestLocationHelper(unittest2.TestCase):
             state_prov='California',
             postalcode='95120',
             country='USA'
-            )
+        )
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -476,7 +476,7 @@ class TestLocationHelper(unittest2.TestCase):
             state_prov='Mississippi',
             postalcode='39180',
             country='USA'
-            )
+        )
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -502,7 +502,7 @@ class TestLocationHelper(unittest2.TestCase):
             state_prov='California',
             postalcode='94035',
             country='USA'
-            )
+        )
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -540,7 +540,7 @@ class TestLocationHelper(unittest2.TestCase):
             state_prov='Pennsylvania',
             postalcode='15213',
             country='USA'
-            )
+        )
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -578,7 +578,7 @@ class TestLocationHelper(unittest2.TestCase):
             state_prov='Michigan',
             postalcode='48357',
             country='USA'
-            )
+        )
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -604,7 +604,7 @@ class TestLocationHelper(unittest2.TestCase):
             state_prov='Gansu',
             postalcode='730070',
             country='China'
-            )
+        )
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -630,7 +630,7 @@ class TestLocationHelper(unittest2.TestCase):
             state_prov='New South Wales',
             postalcode='2176',
             country='Australia'
-            )
+        )
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -656,7 +656,7 @@ class TestLocationHelper(unittest2.TestCase):
             state_prov='Idaho',
             postalcode='83709',
             country='USA'
-            )
+        )
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -694,7 +694,7 @@ class TestLocationHelper(unittest2.TestCase):
             state_prov=u'Quer\xe9taro',
             postalcode='76130',
             country='Mexico'
-            )
+        )
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -732,7 +732,7 @@ class TestLocationHelper(unittest2.TestCase):
             state_prov='Distrito Federal',
             postalcode='01389',
             country='Mexico'
-            )
+        )
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -770,7 +770,7 @@ class TestLocationHelper(unittest2.TestCase):
             state_prov='Shaanxi',
             postalcode=None,
             country='China'
-            )
+        )
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -808,7 +808,7 @@ class TestLocationHelper(unittest2.TestCase):
             state_prov='Istanbul',
             postalcode='34367',
             country='Turkey'
-            )
+        )
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -846,7 +846,7 @@ class TestLocationHelper(unittest2.TestCase):
             state_prov='Istanbul',
             postalcode=None,
             country='Turkey'
-            )
+        )
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -872,7 +872,7 @@ class TestLocationHelper(unittest2.TestCase):
             state_prov='Coahuila',
             postalcode='27250',
             country='Mexico'
-            )
+        )
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -910,7 +910,7 @@ class TestLocationHelper(unittest2.TestCase):
             state_prov='HaDarom (Southern)',
             postalcode='80500',
             country='Israel'
-            )
+        )
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -936,7 +936,7 @@ class TestLocationHelper(unittest2.TestCase):
             state_prov='Oklahoma',
             postalcode='74465',
             country='USA'
-            )
+        )
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -960,7 +960,7 @@ class TestLocationHelper(unittest2.TestCase):
             city='San Jose',
             state_prov='CA',
             country='USA',
-            )
+        )
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -971,7 +971,7 @@ class TestLocationHelper(unittest2.TestCase):
         # self.assertEqual(team.normalized_location.street, None)
         self.assertEqual(team.normalized_location.city, 'San Jose')
         self.assertEqual(team.normalized_location.state_prov, 'California')
-        self.assertEqual(team.normalized_location.state_prov_short,  'CA')
+        self.assertEqual(team.normalized_location.state_prov_short, 'CA')
         self.assertEqual(team.normalized_location.country, 'United States')
         self.assertEqual(team.normalized_location.country_short, 'US')
         self.assertEqual(team.normalized_location.postal_code, None)
@@ -984,7 +984,7 @@ class TestLocationHelper(unittest2.TestCase):
             city='NOTACITY',
             state_prov='NOTASTATE',
             country='NOTACOUNTRY',
-            )
+        )
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -994,7 +994,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(team.normalized_location.street, None)
         self.assertEqual(team.normalized_location.city, None)
         self.assertEqual(team.normalized_location.state_prov, None)
-        self.assertEqual(team.normalized_location.state_prov_short,  None)
+        self.assertEqual(team.normalized_location.state_prov_short, None)
         self.assertEqual(team.normalized_location.country, None)
         self.assertEqual(team.normalized_location.country_short, None)
         self.assertEqual(team.normalized_location.postal_code, None)

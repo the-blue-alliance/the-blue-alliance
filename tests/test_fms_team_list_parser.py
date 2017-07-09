@@ -10,7 +10,7 @@ class TestFmsTeamListParser(unittest2.TestCase):
 
         # Test frc1
         team = teams[0]
-        #self.assertEqual(team["address"], u'Pontiac, MI, USA')
+        # self.assertEqual(team["address"], u'Pontiac, MI, USA')
         self.assertEqual(team["name"], u'BAE Systems/The Chrysler Fondation & Oakland Schools Technical Campus Northeast High School')
         self.assertEqual(team["nickname"], u'The Juggernauts')
         self.assertEqual(team["short_name"], u'ChryslerOSTCNE')
@@ -18,7 +18,7 @@ class TestFmsTeamListParser(unittest2.TestCase):
 
         # Test frc4403
         team = teams[-7]
-        #self.assertEqual(team["address"], u'Torreon, CU, Mexico')
+        # self.assertEqual(team["address"], u'Torreon, CU, Mexico')
         self.assertEqual(team["name"], u'MET MEX PE\xd1OLES, S.A. DE C.V. & Tec de Monterrey Campus Laguna')
         self.assertEqual(team["nickname"], u'Pe\xf1oles-ITESM')
         self.assertEqual(team["short_name"], u'')

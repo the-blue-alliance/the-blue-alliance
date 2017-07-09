@@ -1,4 +1,3 @@
-import datetime
 import json
 import unittest2
 
@@ -7,11 +6,7 @@ from datafeeds.parsers.fms_api.fms_api_team_details_parser import FMSAPITeamDeta
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from consts.district_type import DistrictType
 from models.district import District
-from models.district_team import DistrictTeam
-from models.robot import Robot
-from models.team import Team
 
 
 class TestFMSAPITeamParser(unittest2.TestCase):

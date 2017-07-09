@@ -74,11 +74,11 @@ class TestApiTrustedController(unittest2.TestCase):
                                         auth_types_enum=[AuthType.MATCH_VIDEO])
 
         self.expired_auth = ApiAuthAccess(id='tEsT_id_6',
-                                        secret='321tEsTsEcReT',
-                                        description='test',
-                                        event_list=[ndb.Key(Event, '2014casj')],
-                                        auth_types_enum=[AuthType.EVENT_MATCHES],
-                                        expiration=datetime.datetime(year=1970, month=1, day=1))
+                                          secret='321tEsTsEcReT',
+                                          description='test',
+                                          event_list=[ndb.Key(Event, '2014casj')],
+                                          auth_types_enum=[AuthType.EVENT_MATCHES],
+                                          expiration=datetime.datetime(year=1970, month=1, day=1))
 
         self.owned_auth = ApiAuthAccess(id='tEsT_id_7',
                                         secret='321tEsTsEcReT',
@@ -88,12 +88,12 @@ class TestApiTrustedController(unittest2.TestCase):
                                         owner=ndb.Key(Account, "42"))
 
         self.owned_auth_expired = ApiAuthAccess(id='tEsT_id_8',
-                                        secret='321tEsTsEcReT',
-                                        description='test',
-                                        event_list=[ndb.Key(Event, '2014casj')],
-                                        auth_types_enum=[AuthType.EVENT_MATCHES],
-                                        owner=ndb.Key(Account, "42"),
-                                        expiration=datetime.datetime(year=1970, month=1, day=1))
+                                                secret='321tEsTsEcReT',
+                                                description='test',
+                                                event_list=[ndb.Key(Event, '2014casj')],
+                                                auth_types_enum=[AuthType.EVENT_MATCHES],
+                                                owner=ndb.Key(Account, "42"),
+                                                expiration=datetime.datetime(year=1970, month=1, day=1))
 
         self.event = Event(
             id='2014casj',
@@ -265,7 +265,7 @@ class TestApiTrustedController(unittest2.TestCase):
                      ['frc1678', 'frc368', 'frc4171'],
                      ['frc2035', 'frc192', 'frc4990'],
                      ['frc1323', 'frc846', 'frc2135'],
-                     [],[],[],[]]
+                     [], [], [], []]
         request_body = json.dumps(alliances)
 
         request_path = '/api/trusted/v1/event/2014casj/alliance_selections/update'

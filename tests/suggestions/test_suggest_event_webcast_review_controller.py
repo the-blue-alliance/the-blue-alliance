@@ -1,10 +1,8 @@
-from datetime import datetime
-
-import django
-
 import unittest2
 import webapp2
 import webtest
+from datetime import datetime
+
 from google.appengine.datastore import datastore_stub_util
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
@@ -40,24 +38,24 @@ class TestSuggestApiWriteController(unittest2.TestCase):
         self.testapp = webtest.TestApp(app)
 
         self.event = Event(
-                id="2016necmp",
-                name="New England District Championship",
-                event_type_enum=EventType.OFFSEASON,
-                event_district_enum=DistrictType.NEW_ENGLAND,
-                short_name="New England",
-                event_short="necmp",
-                year=2016,
-                end_date=datetime(2016, 03, 27),
-                official=False,
-                city='Hartford',
-                state_prov='CT',
-                country='USA',
-                venue="Some Venue",
-                venue_address="Some Venue, Hartford, CT, USA",
-                timezone_id="America/New_York",
-                start_date=datetime(2016, 03, 24),
-                webcast_json="",
-                website="http://www.firstsv.org",
+            id="2016necmp",
+            name="New England District Championship",
+            event_type_enum=EventType.OFFSEASON,
+            event_district_enum=DistrictType.NEW_ENGLAND,
+            short_name="New England",
+            event_short="necmp",
+            year=2016,
+            end_date=datetime(2016, 03, 27),
+            official=False,
+            city='Hartford',
+            state_prov='CT',
+            country='USA',
+            venue="Some Venue",
+            venue_address="Some Venue, Hartford, CT, USA",
+            timezone_id="America/New_York",
+            start_date=datetime(2016, 03, 24),
+            webcast_json="",
+            website="http://www.firstsv.org"
         )
         self.event.put()
 

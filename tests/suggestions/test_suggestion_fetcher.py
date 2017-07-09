@@ -17,13 +17,12 @@ class TestSuggestionFetcher(unittest2.TestCase):
         self.testbed.init_memcache_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
-
         account = Account.get_or_insert(
             "123",
             email="user@example.com",
             registered=True).put()
 
-        suggestion = Suggestion(
+        Suggestion(
             author=account,
             review_state=Suggestion.REVIEW_PENDING,
             target_key="2012cmp",

@@ -1,6 +1,5 @@
-import json
-
 import unittest2
+
 from appengine_fixture_loader.loader import load_fixture
 from google.appengine.ext import testbed
 from google.appengine.ext import ndb
@@ -20,8 +19,8 @@ class TestAddSurrogates(unittest2.TestCase):
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
         load_fixture('test_data/2016cama_no_surrogate.json',
-                      kind={'Event': Event, 'Match': Match},
-                      post_processor=self.eventKeyAdder)
+                     kind={'Event': Event, 'Match': Match},
+                     post_processor=self.eventKeyAdder)
         self.event = Event.get_by_id('2016cama')
         self.assertIsNotNone(self.event)
 

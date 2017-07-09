@@ -1,7 +1,6 @@
 import json
 import unittest2
 import webtest
-import webapp2
 
 from datetime import datetime
 
@@ -13,7 +12,6 @@ from google.appengine.ext import testbed
 import api_main
 import tba_config
 from consts.award_type import AwardType
-from consts.district_type import DistrictType
 from consts.event_type import EventType
 from consts.media_type import MediaType
 

@@ -1,12 +1,12 @@
 import unittest2
 import webtest
-import json
 import webapp2
 
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from controllers.api.api_event_controller import ApiEventController
+
 
 class TestApiController(unittest2.TestCase):
     def setUp(self):

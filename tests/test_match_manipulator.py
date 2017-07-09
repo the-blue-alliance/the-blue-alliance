@@ -20,9 +20,9 @@ class TestMatchManipulator(unittest2.TestCase):
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.event = Event(
-          id="2012ct",
-          event_short="ct",
-          year=2012
+            id="2012ct",
+            event_short="ct",
+            year=2012
         )
 
         self.old_match = Match(

@@ -1,6 +1,7 @@
 import unittest2
 import webapp2
 import webtest
+
 from google.appengine.datastore import datastore_stub_util
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
@@ -48,12 +49,14 @@ class TestSuggestDesignsReviewController(unittest2.TestCase):
             user_email="user@example.com",
             user_id="123",
             user_is_admin='0',
-            overwrite=True)
+            overwrite=True
+        )
 
         self.account = Account.get_or_insert(
             "123",
             email="user@example.com",
-            registered=True)
+            registered=True
+        )
 
     def givePermission(self):
         self.account.permissions.append(AccountPermissions.REVIEW_DESIGNS)

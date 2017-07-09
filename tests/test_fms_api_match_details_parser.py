@@ -22,31 +22,31 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
         self.event_nyny = Event(
-                id="2016nyny",
-                name="NYC Regional",
-                event_type_enum=EventType.REGIONAL,
-                short_name="NYC",
-                event_short="nyny",
-                year=2016,
-                end_date=datetime(2016, 03, 27),
-                official=True,
-                start_date=datetime(2016, 03, 24),
-                timezone_id="America/New_York"
+            id="2016nyny",
+            name="NYC Regional",
+            event_type_enum=EventType.REGIONAL,
+            short_name="NYC",
+            event_short="nyny",
+            year=2016,
+            end_date=datetime(2016, 03, 27),
+            official=True,
+            start_date=datetime(2016, 03, 24),
+            timezone_id="America/New_York"
         )
         self.event_nyny.put()
 
         self.event_micmp = Event(
-                id="2016micmp",
-                name="Michigan District Champs",
-                event_type_enum=EventType.DISTRICT_CMP,
-                short_name="Michigan",
-                event_short="micmp",
-                year=2016,
-                end_date=datetime(2016, 03, 27),
-                official=True,
-                start_date=datetime(2016, 03, 24),
-                timezone_id="America/New_York",
-                playoff_type=PlayoffType.BRACKET_16_TEAM
+            id="2016micmp",
+            name="Michigan District Champs",
+            event_type_enum=EventType.DISTRICT_CMP,
+            short_name="Michigan",
+            event_short="micmp",
+            year=2016,
+            end_date=datetime(2016, 03, 27),
+            official=True,
+            start_date=datetime(2016, 03, 24),
+            timezone_id="America/New_York",
+            playoff_type=PlayoffType.BRACKET_16_TEAM
         )
         self.event_micmp.put()
 

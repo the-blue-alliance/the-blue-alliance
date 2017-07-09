@@ -1,7 +1,5 @@
 import unittest2
-import json
 
-from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from consts.client_type import ClientType
@@ -16,7 +14,7 @@ class TestUpdateFavoritesNotification(unittest2.TestCase):
 
         self.test_user = "1124"  # Mock user ID
         self.sending_key = "31415926"
-        self.keys = { ClientType.OS_ANDROID: [self.sending_key, "123456", "abcdefg"] }
+        self.keys = {ClientType.OS_ANDROID: [self.sending_key, "123456", "abcdefg"]}
         self.notification = UpdateFavoritesNotification(self.test_user, self.sending_key)
         self.notification.keys = self.keys
 
