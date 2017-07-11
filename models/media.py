@@ -127,6 +127,22 @@ class Media(ndb.Model):
         return 'https://i.imgur.com/{}s.jpg'.format(self.foreign_key)
 
     @property
+    def instagram_url(self):
+        return "https://www.instagram.com/p/{}".format(self.foreign_key)
+
+    @property
+    def instagram_direct_url(self):
+        return self.details['thumbnail_url']
+
+    @property
+    def instagram_direct_url_med(self):
+        return self.image_direct_url.replace('s640x640', 's320x320')
+
+    @property
+    def instagram_direct_url_sm(self):
+        return self.image_direct_url.replace('s640x640', 's120x120')
+
+    @property
     def view_image_url(self):
         if self.media_type_enum == MediaType.CD_PHOTO_THREAD:
             return self.cdphotothread_image_url
@@ -135,7 +151,7 @@ class Media(ndb.Model):
         elif self.media_type_enum == MediaType.GRABCAD:
             return "https://grabcad.com/library/{}".format(self.foreign_key)
         elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
-            return "https://www.instagram.com/p/{}".format(self.foreign_key)
+            return self.instagram_url
         else:
             return ""
 
@@ -149,7 +165,7 @@ class Media(ndb.Model):
         elif self.media_type_enum == MediaType.GRABCAD:
             return self.details['model_image'].replace('card.jpg', 'large.png')
         elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
-            return self.details['thumbnail_url']
+            return self.instagram_direct_url
         else:
             return ""
 
@@ -176,7 +192,7 @@ class Media(ndb.Model):
         elif self.media_type_enum == MediaType.GRABCAD:
             return self.details['model_image']
         elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
-            return self.image_direct_url
+            return self.instagram_direct_url_med
         else:
             return ""
 
@@ -188,5 +204,7 @@ class Media(ndb.Model):
             return self.imgur_direct_url_sm
         elif self.media_type_enum == MediaType.GRABCAD:
             return self.details['model_image'].replace('large.jpg', 'tiny.jpg')
+        elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
+            return self.instagram_direct_url_sm
         else:
             return ""
