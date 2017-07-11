@@ -51,7 +51,7 @@ Setup
 12. Run `paver setup` to install remaining dependencies and do an initial build of static files (CSS, HTML templates, javascript) to get you going
 13. Run the app in GoogleAppEngineLauncher according to the directions below, and visit the local URL to see your own copy of The Blue Alliance!
 
-Run a local dev server
+Run a Local Dev Server
 ----------------------
 1. Import the project into Google App Engine Launcher
   * NOTE: If you have the Linux version, skip to step 2, as it does not come packaged with the App Engine Launcher. You will be manually adding the ports and modules as options when launching the server.
@@ -75,7 +75,7 @@ Run a local dev server
 5. Ignore these warnings in the local dev server:
   * `pytz is required to calculate future run times for cron jobs with timezones` (The pytz library is in the source tree and works fine.)
 
-Run an App Engine server
+Run an App Engine Server
 ------------------------
 See [myTBA Configuration](https://github.com/the-blue-alliance/the-blue-alliance-android/wiki/myTBA-Configuration) for how to create and configure an App Engine server.
 
