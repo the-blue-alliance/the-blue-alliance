@@ -51,7 +51,7 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
             MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=query_time).getMatches('2017{}'.format(event_code)), run_post_update_hook=False)
         MatchHelper.deleteInvalidMatches(event.matches, event)
 
-        sf_matches = Match.query(Match.event==ndb.Key(Event, '2017flwp'), Match.comp_level=='sf').fetch()
+        sf_matches = Match.query(Match.event == ndb.Key(Event, '2017flwp'), Match.comp_level == 'sf').fetch()
         self.assertEqual(len(sf_matches), 7)
 
         self.assertEqual(Match.get_by_id('2017flwp_sf1m1').alliances['red']['score'], 305)
@@ -92,7 +92,7 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
         MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 04, 21, 22)).getMatches('2017flwp'))
         MatchHelper.deleteInvalidMatches(event.matches, event)
 
-        sf_matches = Match.query(Match.event==ndb.Key(Event, '2017flwp'), Match.comp_level=='sf').fetch()
+        sf_matches = Match.query(Match.event == ndb.Key(Event, '2017flwp'), Match.comp_level == 'sf').fetch()
         self.assertEqual(len(sf_matches), 5)
         old_match = Match.get_by_id('2017flwp_sf1m3')
         self.assertNotEqual(old_match, None)
@@ -106,7 +106,7 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
         MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 04, 21, 35)).getMatches('2017flwp'))
         MatchHelper.deleteInvalidMatches(event.matches, event)
 
-        sf_matches = Match.query(Match.event==ndb.Key(Event, '2017flwp'), Match.comp_level=='sf').fetch()
+        sf_matches = Match.query(Match.event == ndb.Key(Event, '2017flwp'), Match.comp_level == 'sf').fetch()
         self.assertEqual(len(sf_matches), 6)
         new_match = Match.get_by_id('2017flwp_sf1m3')
         self.assertNotEqual(new_match, None)
@@ -134,7 +134,7 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
 
         MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 05, 20, 45)).getMatches('2017pahat'))
         MatchHelper.deleteInvalidMatches(event.matches, event)
-        f_matches = Match.query(Match.event==ndb.Key(Event, '2017pahat'), Match.comp_level=='f').fetch()
+        f_matches = Match.query(Match.event == ndb.Key(Event, '2017pahat'), Match.comp_level == 'f').fetch()
         self.assertEqual(len(f_matches), 3)
         old_match = Match.get_by_id('2017pahat_f1m2')
         self.assertNotEqual(old_match, None)
@@ -147,7 +147,7 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
 
         MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 05, 21, 02)).getMatches('2017pahat'))
         MatchHelper.deleteInvalidMatches(event.matches, event)
-        f_matches = Match.query(Match.event==ndb.Key(Event, '2017pahat'), Match.comp_level=='f').fetch()
+        f_matches = Match.query(Match.event == ndb.Key(Event, '2017pahat'), Match.comp_level == 'f').fetch()
         self.assertEqual(len(f_matches), 4)
         new_match = Match.get_by_id('2017pahat_f1m2')
         self.assertNotEqual(new_match, None)
@@ -187,13 +187,13 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
             MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=query_time).getMatches('2017{}'.format(event_code)), run_post_update_hook=False)
         MatchHelper.deleteInvalidMatches(event.matches, event)
 
-        qf_matches = Match.query(Match.event==ndb.Key(Event, '2017scmb'), Match.comp_level=='qf').fetch()
+        qf_matches = Match.query(Match.event == ndb.Key(Event, '2017scmb'), Match.comp_level == 'qf').fetch()
         self.assertEqual(len(qf_matches), 11)
 
-        sf_matches = Match.query(Match.event==ndb.Key(Event, '2017scmb'), Match.comp_level=='sf').fetch()
+        sf_matches = Match.query(Match.event == ndb.Key(Event, '2017scmb'), Match.comp_level == 'sf').fetch()
         self.assertEqual(len(sf_matches), 4)
 
-        f_matches = Match.query(Match.event==ndb.Key(Event, '2017scmb'), Match.comp_level=='f').fetch()
+        f_matches = Match.query(Match.event == ndb.Key(Event, '2017scmb'), Match.comp_level == 'f').fetch()
         self.assertEqual(len(f_matches), 3)
 
         self.assertEqual(Match.get_by_id('2017scmb_qf4m1').alliances['red']['score'], 305)
@@ -228,7 +228,7 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
 
         MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 04, 19, 17)).getMatches('2017scmb'))
         MatchHelper.deleteInvalidMatches(event.matches, event)
-        qf_matches = Match.query(Match.event==ndb.Key(Event, '2017scmb'), Match.comp_level=='qf').fetch()
+        qf_matches = Match.query(Match.event == ndb.Key(Event, '2017scmb'), Match.comp_level == 'qf').fetch()
         self.assertEqual(len(qf_matches), 12)
 
         self.assertEqual(Match.get_by_id('2017scmb_qf4m1').alliances['red']['score'], 305)
@@ -240,7 +240,7 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
 
         MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 04, 19, 50)).getMatches('2017scmb'))
         MatchHelper.deleteInvalidMatches(event.matches, event)
-        qf_matches = Match.query(Match.event==ndb.Key(Event, '2017scmb'), Match.comp_level=='qf').fetch()
+        qf_matches = Match.query(Match.event == ndb.Key(Event, '2017scmb'), Match.comp_level == 'qf').fetch()
         self.assertEqual(len(qf_matches), 12)
 
         self.assertEqual(Match.get_by_id('2017scmb_qf4m1').alliances['red']['score'], 305)
@@ -256,7 +256,7 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
 
         MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 04, 20, 12)).getMatches('2017scmb'))
         MatchHelper.deleteInvalidMatches(event.matches, event)
-        qf_matches = Match.query(Match.event==ndb.Key(Event, '2017scmb'), Match.comp_level=='qf').fetch()
+        qf_matches = Match.query(Match.event == ndb.Key(Event, '2017scmb'), Match.comp_level == 'qf').fetch()
         self.assertEqual(len(qf_matches), 12)
 
         self.assertEqual(Match.get_by_id('2017scmb_qf4m1').alliances['red']['score'], 305)
@@ -276,7 +276,7 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
 
         MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 04, 20, 48)).getMatches('2017scmb'))
         MatchHelper.deleteInvalidMatches(event.matches, event)
-        qf_matches = Match.query(Match.event==ndb.Key(Event, '2017scmb'), Match.comp_level=='qf').fetch()
+        qf_matches = Match.query(Match.event == ndb.Key(Event, '2017scmb'), Match.comp_level == 'qf').fetch()
         self.assertEqual(len(qf_matches), 13)
 
         self.assertEqual(Match.get_by_id('2017scmb_qf4m1').alliances['red']['score'], 305)
@@ -308,7 +308,7 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
 
         MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 05, 21, 2)).getMatches('2017ncwin'))
         MatchHelper.deleteInvalidMatches(event.matches, event)
-        sf_matches = Match.query(Match.event==ndb.Key(Event, '2017ncwin'), Match.comp_level=='sf').fetch()
+        sf_matches = Match.query(Match.event == ndb.Key(Event, '2017ncwin'), Match.comp_level == 'sf').fetch()
         self.assertEqual(len(sf_matches), 6)
 
         self.assertEqual(Match.get_by_id('2017ncwin_sf2m1').alliances['red']['score'], 265)
@@ -320,7 +320,7 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
 
         MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 05, 21, 30)).getMatches('2017ncwin'))
         MatchHelper.deleteInvalidMatches(event.matches, event)
-        sf_matches = Match.query(Match.event==ndb.Key(Event, '2017ncwin'), Match.comp_level=='sf').fetch()
+        sf_matches = Match.query(Match.event == ndb.Key(Event, '2017ncwin'), Match.comp_level == 'sf').fetch()
         self.assertEqual(len(sf_matches), 6)
 
         self.assertEqual(Match.get_by_id('2017ncwin_sf2m1').alliances['red']['score'], 265)
@@ -336,7 +336,7 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
 
         MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 05, 21, 35)).getMatches('2017ncwin'))
         MatchHelper.deleteInvalidMatches(event.matches, event)
-        sf_matches = Match.query(Match.event==ndb.Key(Event, '2017ncwin'), Match.comp_level=='sf').fetch()
+        sf_matches = Match.query(Match.event == ndb.Key(Event, '2017ncwin'), Match.comp_level == 'sf').fetch()
         self.assertEqual(len(sf_matches), 6)
 
         self.assertEqual(Match.get_by_id('2017ncwin_sf2m1').alliances['red']['score'], 265)
@@ -356,7 +356,7 @@ class TestFMSAPIMatchTiebreaker(unittest2.TestCase):
 
         MatchManipulator.createOrUpdate(DatafeedFMSAPI('v2.0', sim_time=datetime.datetime(2017, 3, 05, 21, 51)).getMatches('2017ncwin'))
         MatchHelper.deleteInvalidMatches(event.matches, event)
-        sf_matches = Match.query(Match.event==ndb.Key(Event, '2017ncwin'), Match.comp_level=='sf').fetch()
+        sf_matches = Match.query(Match.event == ndb.Key(Event, '2017ncwin'), Match.comp_level == 'sf').fetch()
         self.assertEqual(len(sf_matches), 7)
 
         self.assertEqual(Match.get_by_id('2017ncwin_sf2m1').alliances['red']['score'], 265)

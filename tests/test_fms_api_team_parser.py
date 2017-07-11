@@ -1,4 +1,3 @@
-import datetime
 import json
 import unittest2
 
@@ -7,11 +6,7 @@ from datafeeds.parsers.fms_api.fms_api_team_details_parser import FMSAPITeamDeta
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from consts.district_type import DistrictType
 from models.district import District
-from models.district_team import DistrictTeam
-from models.robot import Robot
-from models.team import Team
 
 
 class TestFMSAPITeamParser(unittest2.TestCase):
@@ -25,7 +20,7 @@ class TestFMSAPITeamParser(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def test_parseTeamWithDistrict(self):
+    def test_parse_team_with_district(self):
         with open('test_data/fms_api/2015_frc1124.json', 'r') as f:
             models, more_pages = FMSAPITeamDetailsParser(2015).parse(json.loads(f.read()))
 
@@ -57,7 +52,7 @@ class TestFMSAPITeamParser(unittest2.TestCase):
             self.assertEqual(robot.team.id(), "frc1124")
             self.assertEqual(robot.robot_name, "Orion")
 
-    def test_parseTeamWithNoDistrict(self):
+    def test_parse_team_with_no_district(self):
         with open('test_data/fms_api/2015_frc254.json', 'r') as f:
             models, more_pages = FMSAPITeamDetailsParser(2015).parse(json.loads(f.read()))
 
@@ -86,7 +81,7 @@ class TestFMSAPITeamParser(unittest2.TestCase):
             self.assertEqual(robot.team.id(), "frc254")
             self.assertEqual(robot.robot_name, "Deadlift")
 
-    def test_parseTeamWebsites(self):
+    def test_parse_team_websites(self):
         # Modify the websites to some known bad ones, and ensure the parser can recover
         bad_websites = [None, '', 'www.firstinspires.org', 'website.com', 'www.website.com', 'http://website.com',
                         'https://website.com', 'ftp://website.com']
@@ -114,7 +109,7 @@ class TestFMSAPITeamParser(unittest2.TestCase):
                 self.assertEqual(team.rookie_year, 2003)
                 self.assertEqual(team.website, expected)
 
-    def test_parse2017Team(self):
+    def test_parse_2017_team(self):
         with open('test_data/fms_api/2017_frc604.json', 'r') as f:
             models, more_pages = FMSAPITeamDetailsParser(2017).parse(json.loads(f.read()))
 

@@ -1,6 +1,5 @@
 import calendar
 import unittest2
-import json
 
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
@@ -8,7 +7,6 @@ from google.appengine.ext import testbed
 from consts.notification_type import NotificationType
 from helpers.event.event_test_creator import EventTestCreator
 from helpers.match_helper import MatchHelper
-from helpers.model_to_dict import ModelToDict
 from models.team import Team
 from notifications.schedule_updated import ScheduleUpdatedNotification
 

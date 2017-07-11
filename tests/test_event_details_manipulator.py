@@ -5,7 +5,6 @@ from google.appengine.ext import testbed
 
 from datafeeds.usfirst_event_rankings_parser import UsfirstEventRankingsParser
 from helpers.event_details_manipulator import EventDetailsManipulator
-from models.event import Event
 from models.event_details import EventDetails
 
 
@@ -27,25 +26,25 @@ class TestEventDetailsManipulator(unittest2.TestCase):
             bad_rankings, _ = UsfirstEventRankingsParser.parse(f.read())
 
         self.old_alliance_selections = {
-            '1': {'picks': ['frc254', 'frc469', 'frc2848', 'frc74'], 'declines':[] },
-            '2': {'picks': ['frc1718', 'frc2451', 'frc573', 'frc2016'], 'declines':[] },
-            '3': {'picks': ['frc2928', 'frc2013', 'frc1311', 'frc842'], 'declines':[] },
-            '4': {'picks': ['frc180', 'frc125', 'frc1323', 'frc2468'], 'declines':[] },
-            '5': {'picks': ['frc118', 'frc359', 'frc4334', 'frc865'], 'declines':[] },
-            '6': {'picks': ['frc135', 'frc1241', 'frc11', 'frc68'], 'declines':[] },
-            '7': {'picks': ['frc3478', 'frc177', 'frc294', 'frc230'], 'declines':[] },
-            '8': {'picks': ['frc624', 'frc987', 'frc3476', 'frc123'], 'declines':[] },
+            '1': {'picks': ['frc254', 'frc469', 'frc2848', 'frc74'], 'declines': []},
+            '2': {'picks': ['frc1718', 'frc2451', 'frc573', 'frc2016'], 'declines': []},
+            '3': {'picks': ['frc2928', 'frc2013', 'frc1311', 'frc842'], 'declines': []},
+            '4': {'picks': ['frc180', 'frc125', 'frc1323', 'frc2468'], 'declines': []},
+            '5': {'picks': ['frc118', 'frc359', 'frc4334', 'frc865'], 'declines': []},
+            '6': {'picks': ['frc135', 'frc1241', 'frc11', 'frc68'], 'declines': []},
+            '7': {'picks': ['frc3478', 'frc177', 'frc294', 'frc230'], 'declines': []},
+            '8': {'picks': ['frc624', 'frc987', 'frc3476', 'frc123'], 'declines': []},
         }
 
         self.new_alliance_selections = {
-            '1': {'picks': ['frc254', 'frc469', 'frc2848', 'frc74'], 'declines':[] },
-            '2': {'picks': ['frc1718', 'frc2451', 'frc573', 'frc2016'], 'declines':[] },
-            '3': {'picks': ['frc2928', 'frc2013', 'frc1311', 'frc842'], 'declines':[] },
-            '4': {'picks': ['frc180', 'frc125', 'frc1323', 'frc2468'], 'declines':[] },
-            '5': {'picks': ['frc118', 'frc359', 'frc4334', 'frc865'], 'declines':[] },
-            '6': {'picks': ['frc135', 'frc1241', 'frc11', 'frc68'], 'declines':[] },
-            '7': {'picks': ['frc3478', 'frc177', 'frc294', 'frc230'], 'declines':[] },
-            '8': {'picks': ['frc624', 'frc987', 'frc3476', 'frc3015'], 'declines':[] },
+            '1': {'picks': ['frc254', 'frc469', 'frc2848', 'frc74'], 'declines': []},
+            '2': {'picks': ['frc1718', 'frc2451', 'frc573', 'frc2016'], 'declines': []},
+            '3': {'picks': ['frc2928', 'frc2013', 'frc1311', 'frc842'], 'declines': []},
+            '4': {'picks': ['frc180', 'frc125', 'frc1323', 'frc2468'], 'declines': []},
+            '5': {'picks': ['frc118', 'frc359', 'frc4334', 'frc865'], 'declines': []},
+            '6': {'picks': ['frc135', 'frc1241', 'frc11', 'frc68'], 'declines': []},
+            '7': {'picks': ['frc3478', 'frc177', 'frc294', 'frc230'], 'declines': []},
+            '8': {'picks': ['frc624', 'frc987', 'frc3476', 'frc3015'], 'declines': []},
         }
 
         self.old_event_details = EventDetails(

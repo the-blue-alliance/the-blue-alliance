@@ -27,7 +27,7 @@ class TestEventGetShortName(unittest2.TestCase):
         self.assertEquals(EventHelper.getShortName(" MAR FIRST Robotics   Rosa Parks    FRC Tournament of Roses  "), "Rosa Parks")
         self.assertEquals(EventHelper.getShortName("Washington D.C. FIRST Robotics Region"), "Washington D.C.")
         self.assertEquals(EventHelper.getShortName("Washington D.C. FIRST Robotics Region."), "Washington D.C.")
-        self.assertEquals(EventHelper.getShortName("Washington D.C. FIRST Robotics Regiontonian"), "Washington D.C. FIRST Robotics Regiontonian") # Does not match "Region\b"
+        self.assertEquals(EventHelper.getShortName("Washington D.C. FIRST Robotics Regiontonian"), "Washington D.C. FIRST Robotics Regiontonian")  # Does not match "Region\b"
 
         # Tests from various years
         self.assertEqual(EventHelper.getShortName("FIRST Robotics Competition"), "FIRST Robotics Competition")

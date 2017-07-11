@@ -1,5 +1,4 @@
 import unittest2
-import json
 
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
@@ -11,7 +10,6 @@ from notifications.alliance_selections import AllianceSelectionNotification
 
 
 class TestAllianceNotification(unittest2.TestCase):
-
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()

@@ -1,4 +1,5 @@
 import unittest2
+
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
@@ -32,7 +33,7 @@ class TestTeamMediaSuggestionCreator(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testCreateSuggestion(self):
+    def test_create_suggestion(self):
         status, _ = SuggestionCreator.createTeamMediaSuggestion(
             self.account.key,
             "http://imgur.com/ruRAxDm",
@@ -50,7 +51,7 @@ class TestTeamMediaSuggestionCreator(unittest2.TestCase):
         self.assertEqual(suggestion.target_model, 'media')
         self.assertDictContainsSubset(expected_dict, suggestion.contents)
 
-    def testCreateSuggestionWithUrlParams(self):
+    def test_create_suggestion_with_url_params(self):
         status, _ = SuggestionCreator.createTeamMediaSuggestion(
             self.account.key,
             "https://www.youtube.com/watch?v=VP992UKFbko",
@@ -68,7 +69,7 @@ class TestTeamMediaSuggestionCreator(unittest2.TestCase):
         self.assertEqual(suggestion.target_model, 'media')
         self.assertDictContainsSubset(expected_dict, suggestion.contents)
 
-    def testCleanUrl(self):
+    def test_clean_url(self):
         status, _ = SuggestionCreator.createTeamMediaSuggestion(
             self.account.key,
             " http://imgur.com/ruRAxDm?foo=bar#meow ",
@@ -84,7 +85,7 @@ class TestTeamMediaSuggestionCreator(unittest2.TestCase):
         self.assertEqual(suggestion.author, self.account.key)
         self.assertEqual(suggestion.target_model, 'media')
 
-    def testDuplicateSuggestion(self):
+    def test_duplicate_suggestion(self):
         suggestion_id = Suggestion.render_media_key_name('2016', 'team', 'frc1124', 'imgur', 'ruRAxDm')
         Suggestion(
             id=suggestion_id,
@@ -100,7 +101,7 @@ class TestTeamMediaSuggestionCreator(unittest2.TestCase):
             "2016")
         self.assertEqual(status, 'suggestion_exists')
 
-    def testMediaExists(self):
+    def test_media_exists(self):
         media_id = Media.render_key_name(MediaType.IMGUR, 'ruRAxDm')
         Media.get_or_insert(
             media_id,
@@ -114,7 +115,7 @@ class TestTeamMediaSuggestionCreator(unittest2.TestCase):
             "2016")
         self.assertEqual(status, 'media_exists')
 
-    def testBadUrl(self):
+    def test_bad_url(self):
         status, _ = SuggestionCreator.createTeamMediaSuggestion(
             self.account.key,
             "http://foo.com/blah",
@@ -140,7 +141,7 @@ class TestEventMediaSuggestionCreator(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testCreateSuggestion(self):
+    def test_create_suggestion(self):
         status, _ = SuggestionCreator.createEventMediaSuggestion(
             self.account.key,
             "https://www.youtube.com/watch?v=H-54KMwMKY0",
@@ -157,14 +158,14 @@ class TestEventMediaSuggestionCreator(unittest2.TestCase):
         self.assertEqual(suggestion.target_model, 'event_media')
         self.assertDictContainsSubset(expected_dict, suggestion.contents)
 
-    def testCreateNonVideoSuggestion(self):
+    def test_create_non_video_suggestion(self):
         status, _ = SuggestionCreator.createEventMediaSuggestion(
             self.account.key,
             "http://imgur.com/ruRAxDm",
             "2016nyny")
         self.assertEqual(status, 'bad_url')
 
-    def testDuplicateSuggestion(self):
+    def test_duplicate_suggestion(self):
         suggestion_id = Suggestion.render_media_key_name('2016', 'event', '2016nyny', 'youtube', 'H-54KMwMKY0')
         Suggestion(
             id=suggestion_id,
@@ -179,7 +180,7 @@ class TestEventMediaSuggestionCreator(unittest2.TestCase):
             "2016nyny")
         self.assertEqual(status, 'suggestion_exists')
 
-    def testMediaExists(self):
+    def test_media_exists(self):
         media_id = Media.render_key_name(MediaType.YOUTUBE_VIDEO, 'H-54KMwMKY0')
         Media.get_or_insert(
             media_id,
@@ -192,7 +193,7 @@ class TestEventMediaSuggestionCreator(unittest2.TestCase):
             "2016nyny")
         self.assertEqual(status, 'media_exists')
 
-    def testCreateBadUrl(self):
+    def test_create_bad_url(self):
         status, _ = SuggestionCreator.createEventMediaSuggestion(
             self.account.key,
             "http://foobar.com/ruRAxDm",
@@ -217,7 +218,7 @@ class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testCreateSuggestion(self):
+    def test_create_suggestion(self):
         status, _ = SuggestionCreator.createOffseasonEventSuggestion(
             self.account.key,
             "Test Event",
@@ -246,7 +247,7 @@ class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
         self.assertEqual(suggestion.contents['country'], 'USA')
         self.assertEqual(suggestion.contents['venue_name'], 'The Venue')
 
-    def testMissingParameters(self):
+    def test_missing_params(self):
         status, failures = SuggestionCreator.createOffseasonEventSuggestion(
             self.account.key,
             "",
@@ -316,7 +317,7 @@ class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
         self.assertTrue('venue_state' in failures)
         self.assertTrue('venue_country' in failures)
 
-    def testOutOfOrderDates(self):
+    def test_out_of_order_dates(self):
         status, failures = SuggestionCreator.createOffseasonEventSuggestion(
             self.account.key,
             "Test Event",
@@ -328,7 +329,7 @@ class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
         self.assertEqual(status, 'validation_failure')
         self.assertTrue('end_date' in failures)
 
-    def testMalformedDates(self):
+    def test_malformed_dates(self):
         status, failures = SuggestionCreator.createOffseasonEventSuggestion(
             self.account.key,
             "Test Event",
@@ -369,7 +370,7 @@ class TestApiWriteSuggestionCreator(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testCreateSuggestion(self):
+    def test_create_suggestion(self):
         event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
         event.put()
 
@@ -391,7 +392,7 @@ class TestApiWriteSuggestionCreator(unittest2.TestCase):
         self.assertEqual(suggestion.contents['affiliation'], "Event Organizer")
         self.assertListEqual(suggestion.contents['auth_types'], [1, 2, 3])
 
-    def testOfficialEvent(self):
+    def test_official_event(self):
         event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.REGIONAL)
         event.put()
 
@@ -413,7 +414,7 @@ class TestApiWriteSuggestionCreator(unittest2.TestCase):
         self.assertEqual(suggestion.contents['affiliation'], "Event Organizer")
         self.assertListEqual(suggestion.contents['auth_types'], [AuthType.MATCH_VIDEO])
 
-    def testNoEvent(self):
+    def test_no_event(self):
         status = SuggestionCreator.createApiWriteSuggestion(
             self.account.key,
             "2016test",
@@ -421,7 +422,7 @@ class TestApiWriteSuggestionCreator(unittest2.TestCase):
             [1, 2, 3])
         self.assertEqual(status, 'bad_event')
 
-    def testNoRole(self):
+    def test_no_role(self):
         event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
         event.put()
         status = SuggestionCreator.createApiWriteSuggestion(
@@ -431,7 +432,7 @@ class TestApiWriteSuggestionCreator(unittest2.TestCase):
             [1, 2, 3])
         self.assertEqual(status, 'no_affiliation')
 
-    def testUndefinedAuthType(self):
+    def test_undefined_auth_type(self):
         event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
         event.put()
 
@@ -471,7 +472,7 @@ class TestSuggestEventWebcastCreator(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testBadEvent(self):
+    def test_bad_event(self):
         status = SuggestionCreator.createEventWebcastSuggestion(
             self.account.key,
             "http://twitch.tv/frcgamesense",
@@ -479,7 +480,7 @@ class TestSuggestEventWebcastCreator(unittest2.TestCase):
             "2016test")
         self.assertEqual(status, 'bad_event')
 
-    def testCreateSuggestion(self):
+    def test_create_suggestion(self):
         event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
         event.put()
 
@@ -502,7 +503,7 @@ class TestSuggestEventWebcastCreator(unittest2.TestCase):
         self.assertEqual(suggestion.contents.get('webcast_url'), "http://twitch.tv/frcgamesense")
         self.assertIsNotNone(suggestion.contents.get('webcast_dict'))
 
-    def testCleanupUrlWithoutScheme(self):
+    def test_cleanup_url_without_scheme(self):
         event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
         event.put()
 
@@ -520,7 +521,7 @@ class TestSuggestEventWebcastCreator(unittest2.TestCase):
         self.assertIsNotNone(suggestion.contents.get('webcast_dict'))
         self.assertEqual(suggestion.contents.get('webcast_url'), "http://twitch.tv/frcgamesense")
 
-    def testUnknownUrlScheme(self):
+    def test_unknown_url_scheme(self):
         event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
         event.put()
 
@@ -541,7 +542,7 @@ class TestSuggestEventWebcastCreator(unittest2.TestCase):
         self.assertIsNone(suggestion.contents.get('webcast_dict'))
         self.assertEqual(suggestion.contents.get('webcast_url'), "http://myweb.site/somewebcast")
 
-    def testWebcastAlreadyExists(self):
+    def test_webcast_already_exists(self):
         event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016,
                       event_type_enum=EventType.OFFSEASON,
                       webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]")
@@ -554,7 +555,7 @@ class TestSuggestEventWebcastCreator(unittest2.TestCase):
             "2016test")
         self.assertEqual(status, 'webcast_exists')
 
-    def testDuplicateSuggestion(self):
+    def test_duplicate_suggestion(self):
         event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
         event.put()
 
@@ -571,7 +572,7 @@ class TestSuggestEventWebcastCreator(unittest2.TestCase):
             "2016test")
         self.assertEqual(status, 'suggestion_exists')
 
-    def testDuplicateUnknownSuggestionType(self):
+    def test_duplicate_unknown_suggestion_type(self):
         event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
         event.put()
 
@@ -588,7 +589,7 @@ class TestSuggestEventWebcastCreator(unittest2.TestCase):
             "2016test")
         self.assertEqual(status, 'suggestion_exists')
 
-    def testWebcastBadDate(self):
+    def test_webcast_bad_date(self):
         event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016,
                       event_type_enum=EventType.OFFSEASON,
                       webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]")
@@ -601,7 +602,7 @@ class TestSuggestEventWebcastCreator(unittest2.TestCase):
             "2016test")
         self.assertEqual(status, 'invalid_date')
 
-    def testWebcastGoodDate(self):
+    def test_webcast_good_date(self):
         event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
         event.put()
 
@@ -650,11 +651,11 @@ class TestSuggestMatchVideoYouTube(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testBadMatch(self):
+    def test_bad_match(self):
         status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "37F5tbrFqJQ", "2016necmp_f1m2")
         self.assertEqual(status, 'bad_match')
 
-    def testCreateSuggestion(self):
+    def test_create_suggestion(self):
         status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "37F5tbrFqJQ", "2016test_f1m1")
         self.assertEqual(status, 'success')
 
@@ -670,20 +671,20 @@ class TestSuggestMatchVideoYouTube(unittest2.TestCase):
         self.assertEqual(len(suggestion.contents.get('youtube_videos')), 1)
         self.assertEqual(suggestion.contents.get('youtube_videos')[0], "37F5tbrFqJQ")
 
-    def testExistingVideo(self):
+    def test_existing_video(self):
         self.match.youtube_videos = ["37F5tbrFqJQ"]
         self.match.put()
 
         status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "37F5tbrFqJQ", "2016test_f1m1")
         self.assertEqual(status, 'video_exists')
 
-    def testExistingSuggestion(self):
+    def test_existing_suggestion(self):
         status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "37F5tbrFqJQ", "2016test_f1m1")
         self.assertEqual(status, 'success')
 
         status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "37F5tbrFqJQ", "2016test_f1m1")
         self.assertEqual(status, 'suggestion_exists')
 
-    def testBadYouTubeKey(self):
+    def test_bad_youtube_key(self):
         status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "", "2016test_f1m1")
         self.assertEqual(status, 'bad_url')

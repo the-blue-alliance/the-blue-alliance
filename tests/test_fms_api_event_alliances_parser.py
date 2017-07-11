@@ -16,7 +16,6 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
         self.testbed.init_memcache_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
-
     def tearDown(self):
         self.testbed.deactivate()
 

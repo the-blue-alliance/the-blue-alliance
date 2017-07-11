@@ -18,10 +18,10 @@ class TestMatchCleanup(unittest2.TestCase):
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
         self.event = Event(
-          id="2013test",
-          event_short="test",
-          year=2013,
-          event_type_enum=0,
+            id="2013test",
+            event_short="test",
+            year=2013,
+            event_type_enum=0,
         )
         self.event.put()
 
@@ -31,21 +31,18 @@ class TestMatchCleanup(unittest2.TestCase):
     def setupMatches(self, csv):
         with open(csv, 'r') as f:
             parsed_matches, _ = OffseasonMatchesParser.parse(f.read())
-            matches = [Match(
-                id=Match.renderKeyName(
-                    self.event.key.id(),
-                    match.get("comp_level", None),
-                    match.get("set_number", 0),
-                    match.get("match_number", 0)),
-                event=self.event.key,
-                year=self.event.year,
-                set_number=match.get("set_number", 0),
-                match_number=match.get("match_number", 0),
-                comp_level=match.get("comp_level", None),
-                team_key_names=match.get("team_key_names", None),
-                alliances_json=match.get("alliances_json", None)
-                )
-                for match in parsed_matches]
+            matches = [Match(id=Match.renderKeyName(self.event.key.id(),
+                                                    match.get("comp_level", None),
+                                                    match.get("set_number", 0),
+                                                    match.get("match_number", 0)),
+                             event=self.event.key,
+                             year=self.event.year,
+                             set_number=match.get("set_number", 0),
+                             match_number=match.get("match_number", 0),
+                             comp_level=match.get("comp_level", None),
+                             team_key_names=match.get("team_key_names", None),
+                             alliances_json=match.get("alliances_json", None))
+                       for match in parsed_matches]
             return matches
 
     def test_cleanup(self):

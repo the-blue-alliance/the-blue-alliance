@@ -1,12 +1,9 @@
 import unittest2
-import csv
-import json
-import StringIO
 
 from helpers.youtube_video_helper import YouTubeVideoHelper
 
 
-class TestUsfirstEventTypeParser(unittest2.TestCase):
+class TestYouTubeVideoHelper(unittest2.TestCase):
     def test_parse_id_from_url(self):
         # Standard HTTP
         self.assertEqual(YouTubeVideoHelper.parse_id_from_url('http://www.youtube.com/watch?v=1v8_2dW7Kik'), '1v8_2dW7Kik')

@@ -1,6 +1,7 @@
 import unittest2
 import webapp2
 import webtest
+
 from google.appengine.ext import testbed
 from google.appengine.ext import ndb
 from webapp2_extras.routes import RedirectRoute
@@ -13,29 +14,6 @@ from models.suggestion import Suggestion
 
 
 class TestSuggestEventMediaController(unittest2.TestCase):
-
-    def loginUser(self):
-        self.testbed.setup_env(
-            user_email="user@example.com",
-            user_id="123",
-            user_is_admin='0',
-            overwrite=True)
-
-        Account.get_or_insert(
-            "123",
-            email="user@example.com",
-            registered=True)
-
-    def storeEvent(self):
-        self.event = Event(
-            id="2016nyny",
-            event_type_enum=EventType.REGIONAL,
-            name="NYC",
-            event_short="NYC",
-            year=2016,
-        )
-        self.event.put()
-
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -52,6 +30,30 @@ class TestSuggestEventMediaController(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
+    def loginUser(self):
+        self.testbed.setup_env(
+            user_email="user@example.com",
+            user_id="123",
+            user_is_admin='0',
+            overwrite=True
+        )
+
+        Account.get_or_insert(
+            "123",
+            email="user@example.com",
+            registered=True
+        )
+
+    def storeEvent(self):
+        self.event = Event(
+            id="2016nyny",
+            event_type_enum=EventType.REGIONAL,
+            name="NYC",
+            event_short="NYC",
+            year=2016
+        )
+        self.event.put()
+
     def getSuggestionForm(self, event_key):
         response = self.testapp.get('/suggest/event/media?event_key={}'.format(event_key))
         self.assertEqual(response.status_int, 200)
@@ -60,18 +62,18 @@ class TestSuggestEventMediaController(unittest2.TestCase):
         self.assertIsNotNone(form)
         return form
 
-    def testLoginRedirect(self):
+    def test_login_redirect(self):
         response = self.testapp.get('/suggest/event/media?event_key=2016nyny')
         response = response.follow(expect_errors=True)
         self.assertTrue(response.request.path.startswith("/account/login_required"))
 
-    def testNoParams(self):
+    def test_no_params(self):
         self.loginUser()
         response = self.testapp.get('/suggest/event/media', status='3*')
         response = response.follow(expect_errors=True)
         self.assertEqual(response.request.path, '/')
 
-    def testSubmitEmptyForm(self):
+    def test_submit_empty_form(self):
         self.loginUser()
         self.storeEvent()
         form = self.getSuggestionForm('2016nyny')
@@ -81,12 +83,12 @@ class TestSuggestEventMediaController(unittest2.TestCase):
         request = response.request
         self.assertEqual(request.GET.get('status'), 'bad_url')
 
-    def testBadEvent(self):
+    def test_bad_event(self):
         self.loginUser()
         response = self.testapp.get('/suggest/event/media?event_key=2016nyny', status='4*')
         self.assertEqual(response.status_int, 404)
 
-    def testSuggestMedia(self):
+    def test_suggest_media(self):
         self.loginUser()
         self.storeEvent()
         form = self.getSuggestionForm('2016nyny')

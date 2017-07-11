@@ -17,7 +17,7 @@ class TestFmsEventListParser(unittest2.TestCase):
         self.assertEqual(events[1]["name"], "BAE Systems Granite State Regional")
 
     def test_parse_2014(self):
-    	with open('test_data/usfirst_html/fms_event_list_2014.html', 'r') as f:
+        with open('test_data/usfirst_html/fms_event_list_2014.html', 'r') as f:
             events, _ = FmsEventListParser.parse_2014(f.read())
 
         self.assertEqual(len(events), 103)

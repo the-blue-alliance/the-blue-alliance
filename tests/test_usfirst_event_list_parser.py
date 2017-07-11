@@ -1,5 +1,4 @@
 import unittest2
-import datetime
 
 from consts.district_type import DistrictType
 from consts.event_type import EventType

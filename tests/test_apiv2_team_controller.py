@@ -11,17 +11,13 @@ from google.appengine.ext import testbed
 from consts.event_type import EventType
 from controllers.api.api_district_controller import ApiDistrictTeamsController
 from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController, ApiTeamMediaController,\
-                                                ApiTeamListController, ApiTeamHistoryRobotsController, \
-    ApiTeamHistoryDistrictsController
-from consts.award_type import AwardType
-from consts.event_type import EventType
+                                                ApiTeamListController, ApiTeamHistoryRobotsController,\
+                                                ApiTeamHistoryDistrictsController
 
-from models.award import Award
 from models.district import District
 from models.district_team import DistrictTeam
 from models.event import Event
 from models.event_team import EventTeam
-from models.match import Match
 from models.media import Media
 from models.robot import Robot
 from models.team import Team
@@ -42,19 +38,19 @@ class TestTeamApiController(unittest2.TestCase):
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.team = Team(
-                id="frc281",
-                name="Michelin / Caterpillar / Greenville Technical College /\
-                jcpenney / Baldor / ASME / Gastroenterology Associates /\
-                Laserflex South & Greenville County Schools & Greenville\
-                Technical Charter High School",
-                team_number=281,
-                rookie_year=1999,
-                nickname="EnTech GreenVillians",
-                city="Greenville",
-                state_prov="SC",
-                country="USA",
-                website="www.entech.org",
-                motto = "Infiltrating Young Minds One Robot at a Time",
+            id="frc281",
+            name="Michelin / Caterpillar / Greenville Technical College /\
+            jcpenney / Baldor / ASME / Gastroenterology Associates /\
+            Laserflex South & Greenville County Schools & Greenville\
+            Technical Charter High School",
+            team_number=281,
+            rookie_year=1999,
+            nickname="EnTech GreenVillians",
+            city="Greenville",
+            state_prov="SC",
+            country="USA",
+            website="www.entech.org",
+            motto="Infiltrating Young Minds One Robot at a Time"
         )
         self.team.put()
 
@@ -73,7 +69,7 @@ class TestTeamApiController(unittest2.TestCase):
         self.assertEqual(team["rookie_year"], self.team.rookie_year)
         self.assertEqual(team["motto"], self.team.motto)
 
-    def testTeamApi(self):
+    def test_team_api(self):
         response = self.testapp.get('/frc281', headers={"X-TBA-App-Id": "tba-tests:team-controller-test:v01"})
 
         team_dict = json.loads(response.body)
@@ -81,7 +77,6 @@ class TestTeamApiController(unittest2.TestCase):
 
 
 class TestTeamEventsApiController(unittest2.TestCase):
-
     def setUp(self):
         app = webapp2.WSGIApplication([webapp2.Route(r'/<team_key:>/<year:>', ApiTeamEventsController, methods=['GET'])], debug=True)
         self.testapp = webtest.TestApp(app)
@@ -96,40 +91,40 @@ class TestTeamEventsApiController(unittest2.TestCase):
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.team = Team(
-                id="frc281",
-                name="Michelin / Caterpillar / Greenville Technical College /\
-                jcpenney / Baldor / ASME / Gastroenterology Associates /\
-                Laserflex South & Greenville County Schools & Greenville\
-                Technical Charter High School",
-                team_number=281,
-                nickname="EnTech GreenVillians",
-                city="Greenville",
-                state_prov="SC",
-                country="USA",
-                website="www.entech.org",
+            id="frc281",
+            name="Michelin / Caterpillar / Greenville Technical College /\
+            jcpenney / Baldor / ASME / Gastroenterology Associates /\
+            Laserflex South & Greenville County Schools & Greenville\
+            Technical Charter High School",
+            team_number=281,
+            nickname="EnTech GreenVillians",
+            city="Greenville",
+            state_prov="SC",
+            country="USA",
+            website="www.entech.org"
         )
         self.team.put()
 
         self.event = Event(
-                id="2010sc",
-                name="Palmetto Regional",
-                event_type_enum=EventType.REGIONAL,
-                short_name="Palmetto",
-                event_short="sc",
-                year=datetime.now().year,
-                end_date=datetime(2010, 03, 27),
-                official=True,
-                city='Clemson',
-                state_prov='SC',
-                country='USA',
-                start_date=datetime(2010, 03, 24),
+            id="2010sc",
+            name="Palmetto Regional",
+            event_type_enum=EventType.REGIONAL,
+            short_name="Palmetto",
+            event_short="sc",
+            year=datetime.now().year,
+            end_date=datetime(2010, 03, 27),
+            official=True,
+            city='Clemson',
+            state_prov='SC',
+            country='USA',
+            start_date=datetime(2010, 03, 24)
         )
         self.event.put()
 
         self.event_team = EventTeam(
-                team=self.team.key,
-                event=self.event.key,
-                year=2010
+            team=self.team.key,
+            event=self.event.key,
+            year=2010
         )
         self.event_team.put()
 
@@ -146,7 +141,7 @@ class TestTeamEventsApiController(unittest2.TestCase):
         self.assertEqual(event["event_type_string"], self.event.event_type_str)
         self.assertEqual(event["event_type"], self.event.event_type_enum)
 
-    def testTeamApi(self):
+    def test_team_api(self):
         response = self.testapp.get('/frc281/2010', headers={"X-TBA-App-Id": "tba-tests:team-controller-test:v01"})
 
         event_dict = json.loads(response.body)
@@ -168,37 +163,36 @@ class TestDistrictTeamsApiController(unittest2.TestCase):
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.team = Team(
-                id="frc281",
-                name="Michelin / Caterpillar / Greenville Technical College /\
-                jcpenney / Baldor / ASME / Gastroenterology Associates /\
-                Laserflex South & Greenville County Schools & Greenville\
-                Technical Charter High School",
-                team_number=281,
-                nickname="EnTech GreenVillians",
-                city="Greenville",
-                state_prov="SC",
-                country="USA",
-                website="www.entech.org",
-                motto = "Infiltrating Young Minds One Robot at a Time",
+            id="frc281",
+            name="Michelin / Caterpillar / Greenville Technical College /\
+            jcpenney / Baldor / ASME / Gastroenterology Associates /\
+            Laserflex South & Greenville County Schools & Greenville\
+            Technical Charter High School",
+            team_number=281,
+            nickname="EnTech GreenVillians",
+            city="Greenville",
+            state_prov="SC",
+            country="USA",
+            website="www.entech.org",
+            motto="Infiltrating Young Minds One Robot at a Time"
         )
 
         self.district = District(
             id='2015ne',
             year=2015,
-            abbreviation='ne',
+            abbreviation='ne'
         )
 
         self.district_team = DistrictTeam(
-                id="2015ne_frc281",
-                team=self.team.key,
-                year=2015,
-                district_key=ndb.Key(District, '2015ne')
+            id="2015ne_frc281",
+            team=self.team.key,
+            year=2015,
+            district_key=ndb.Key(District, '2015ne')
         )
 
         self.team.put()
         self.district.put()
         self.district_team.put()
-
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -215,7 +209,7 @@ class TestDistrictTeamsApiController(unittest2.TestCase):
         self.assertEqual(team["website"], self.team.website)
         self.assertEqual(team["motto"], self.team.motto)
 
-    def testDistrictsApi(self):
+    def test_districts_api(self):
         response = self.testapp.get('/ne/2015', headers={"X-TBA-App-Id": "tba-tests:team-districts-controller-test:v01"})
         teams = json.loads(response.body)
         self.assertTeamJson(teams)
@@ -237,34 +231,36 @@ class TestTeamMediaApiController(unittest2.TestCase):
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.team = Team(
-                id="frc254",
-                name="very long name",
-                team_number=254,
-                nickname="Teh Chezy Pofs",
-                city="Greenville",
-                state_prov="SC",
-                country="USA",
+            id="frc254",
+            name="very long name",
+            team_number=254,
+            nickname="Teh Chezy Pofs",
+            city="Greenville",
+            state_prov="SC",
+            country="USA"
         )
         self.team.put()
 
         self.cdmedia = Media(
-                        key=ndb.Key('Media', 'cdphotothread_39894'),
-                        details_json=u'{"image_partial": "fe3/fe38d320428adf4f51ac969efb3db32c_l.jpg"}',
-                        foreign_key=u'39894',
-                        media_type_enum=1,
-                        references=[ndb.Key('Team', 'frc254')],
-                        year=2014)
+            key=ndb.Key('Media', 'cdphotothread_39894'),
+            details_json=u'{"image_partial": "fe3/fe38d320428adf4f51ac969efb3db32c_l.jpg"}',
+            foreign_key=u'39894',
+            media_type_enum=1,
+            references=[ndb.Key('Team', 'frc254')],
+            year=2014
+        )
         self.cdmedia.put()
         self.cddetails = dict()
         self.cddetails["image_partial"] = "fe3/fe38d320428adf4f51ac969efb3db32c_l.jpg"
 
         self.ytmedia = Media(
-                        key=ndb.Key('Media', 'youtube_aFZy8iibMD0'),
-                        details_json=None,
-                        foreign_key=u'aFZy8iibMD0',
-                        media_type_enum=0,
-                        references=[ndb.Key('Team', 'frc254')],
-                        year=2014)
+            key=ndb.Key('Media', 'youtube_aFZy8iibMD0'),
+            details_json=None,
+            foreign_key=u'aFZy8iibMD0',
+            media_type_enum=0,
+            references=[ndb.Key('Team', 'frc254')],
+            year=2014
+        )
         self.ytmedia.put()
 
     def tearDown(self):
@@ -302,25 +298,25 @@ class TestTeamListApiController(unittest2.TestCase):
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.team1 = Team(
-                id="frc123",
-                name="SomeName",
-                team_number=123,
-                nickname="SomeNickname",
-                city="San Jose",
-                state_prov="CA",
-                country="USA",
-                website="www.website.com",
+            id="frc123",
+            name="SomeName",
+            team_number=123,
+            nickname="SomeNickname",
+            city="San Jose",
+            state_prov="CA",
+            country="USA",
+            website="www.website.com"
         )
 
         self.team2 = Team(
-                id="frc4567",
-                name="SomeName",
-                team_number=4567,
-                nickname="SomeNickname",
-                city="San Jose",
-                state_prov="CA",
-                country="USA",
-                website="www.website.com",
+            id="frc4567",
+            name="SomeName",
+            team_number=4567,
+            nickname="SomeNickname",
+            city="San Jose",
+            state_prov="CA",
+            country="USA",
+            website="www.website.com"
         )
 
         self.team1.put()
@@ -368,17 +364,17 @@ class TestTeamHistoryRobotsApiController(unittest2.TestCase):
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.team = Team(
-                id="frc1124",
-                name="UberBots",
-                team_number=1124,
-                nickname="UberBots",
+            id="frc1124",
+            name="UberBots",
+            team_number=1124,
+            nickname="UberBots"
         )
 
         self.robot = Robot(
-                id="frc1124_2015",
-                team=self.team.key,
-                year=2015,
-                robot_name="Orion"
+            id="frc1124_2015",
+            team=self.team.key,
+            year=2015,
+            robot_name="Orion"
         )
 
         self.team.put()
@@ -415,22 +411,22 @@ class TestTeamHistoryDistrictsApiController(unittest2.TestCase):
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.team = Team(
-                id="frc1124",
-                name="UberBots",
-                team_number=1124,
-                nickname="UberBots",
+            id="frc1124",
+            name="UberBots",
+            team_number=1124,
+            nickname="UberBots"
         )
 
         self.district_team = DistrictTeam(
-                id="2015ne_frc1124",
-                team=self.team.key,
-                year=2015,
-                district_key=ndb.Key(District, '2015ne')
+            id="2015ne_frc1124",
+            team=self.team.key,
+            year=2015,
+            district_key=ndb.Key(District, '2015ne')
         )
 
         self.district = District(
             id='2015ne',
-            year=2015,
+            year=2015
         )
 
         self.team.put()

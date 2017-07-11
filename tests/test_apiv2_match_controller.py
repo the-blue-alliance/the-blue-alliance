@@ -31,15 +31,15 @@ class TestMatchApiController(unittest2.TestCase):
             id="2014cc_f1m1",
             event=ndb.Key(Event, "2014cc"),
             year=2014,
-            comp_level = "f",
-            set_number = 1,
-            match_number = 1,
-            team_key_names = [u'frc846',u'frc2135',u'frc971',u'254',u'frc1678',u'frc973'],
-            time = datetime.datetime.fromtimestamp(1409527874),
-            time_string = "4:31 PM",
-            youtube_videos = ["JbwUzl3W9ug","bHGyTjxbLz8"],
-            tba_videos = [],
-            alliances_json = '{\
+            comp_level="f",
+            set_number=1,
+            match_number=1,
+            team_key_names=[u'frc846', u'frc2135', u'frc971', u'254', u'frc1678', u'frc973'],
+            time=datetime.datetime.fromtimestamp(1409527874),
+            time_string="4:31 PM",
+            youtube_videos=["JbwUzl3W9ug", "bHGyTjxbLz8"],
+            tba_videos=[],
+            alliances_json='{\
                 "blue": {\
                     "score": 270,\
                     "teams": [\
@@ -52,7 +52,7 @@ class TestMatchApiController(unittest2.TestCase):
                     "frc254",\
                     "frc1678",\
                     "frc973"]}}',
-            score_breakdown_json = '{\
+            score_breakdown_json='{\
                 "blue": {\
                     "auto": 70,\
                     "teleop_goal+foul": 40,\
@@ -84,7 +84,7 @@ class TestMatchApiController(unittest2.TestCase):
         else:
             self.assertEqual(match["time"], 1409527874)
 
-    def testMatchApi(self):
+    def test_match_api(self):
         response = self.testapp.get('/2014cc_f1m1', headers={"X-TBA-App-Id": "tba-tests:match-controller-test:v01"})
 
         match_json = json.loads(response.body)

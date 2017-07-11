@@ -1,6 +1,5 @@
-import json
-
 import unittest2
+
 from appengine_fixture_loader.loader import load_fixture
 from google.appengine.ext import testbed
 from google.appengine.ext import ndb
@@ -24,7 +23,7 @@ class TestSimulated2016nytrEventTeamStatusHelper(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testSimulatedEvent(self):
+    def test_simulated_event(self):
         es = EventSimulator()
         event = Event.get_by_id('2016nytr')
 
@@ -719,10 +718,6 @@ class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
         "alliance": None
     }
 
-    # Because I can't figure out how to get these to generate
-    def event_key_adder(self, obj):
-        obj.event = ndb.Key(Event, '2016nytr')
-
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -731,43 +726,46 @@ class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
         load_fixture('test_data/fixtures/2016nytr_event_team_status.json',
-                      kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
-                      post_processor=self.event_key_adder)
+                     kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
+                     post_processor=self.eventKeyAdder)
         self.event = Event.get_by_id('2016nytr')
         self.assertIsNotNone(self.event)
 
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testEventWinner(self):
+    def eventKeyAdder(self, obj):
+        obj.event = ndb.Key(Event, '2016nytr')
+
+    def test_event_winner(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc359', self.event)
         self.assertDictEqual(status, self.status_359)
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
             'Team 359 was <b>Rank 1/36</b> with a record of <b>11-1-0</b> in quals, competed in the playoffs as the <b>Captain</b> of <b>Alliance 1</b>, and <b>won the event</b> with a playoff record of <b>6-1-0</b>.')
 
-    def testElimSemisAndFirstPick(self):
+    def test_elim_semis_and_first_pick(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc5240', self.event)
         self.assertDictEqual(status, self.status_5240)
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc5240', status),
             'Team 5240 was <b>Rank 6/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>, and was <b>eliminated in the Semifinals</b> with a playoff record of <b>2-3-0</b>.')
 
-    def testBackupOut(self):
+    def test_backup_out(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc229', self.event)
         self.assertDictEqual(status, self.status_229)
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc229', status),
             'Team 229 was <b>Rank 20/36</b> with a record of <b>6-6-0</b> in quals, competed in the playoffs as the <b>2nd Pick</b> of <b>Alliance 2</b>, and was <b>eliminated in the Finals</b> with a playoff record of <b>5-3-0</b>.')
 
-    def testBackupIn(self):
+    def test_backup_in(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc1665', self.event)
         self.assertDictEqual(status, self.status_1665)
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc1665', status),
             'Team 1665 was <b>Rank 18/36</b> with a record of <b>6-6-0</b> in quals, competed in the playoffs as the <b>Backup</b> of <b>Alliance 2</b>, and was <b>eliminated in the Finals</b> with a playoff record of <b>5-3-0</b>.')
 
-    def testTeamNotPicked(self):
+    def test_team_not_picked(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc5964', self.event)
         self.assertDictEqual(status, self.status_5964)
         self.assertEqual(
@@ -963,10 +961,6 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
         "alliance": None
     }
 
-    # Because I can't figure out how to get these to generate
-    def event_key_adder(self, obj):
-        obj.event = ndb.Key(Event, '2016nytr')
-
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -975,8 +969,8 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
         load_fixture('test_data/fixtures/2016nytr_event_team_status.json',
-                      kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
-                      post_processor=self.event_key_adder)
+                     kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
+                     post_processor=self.eventKeyAdder)
         self.event = Event.get_by_id('2016nytr')
         EventDetails.get_by_id('2016nytr').key.delete()  # Remove EventDetails
         self.assertIsNotNone(self.event)
@@ -984,28 +978,32 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testEventWinner(self):
+    # Because I can't figure out how to get these to generate
+    def eventKeyAdder(self, obj):
+        obj.event = ndb.Key(Event, '2016nytr')
+
+    def test_event_winner(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc359', self.event)
         self.assertDictEqual(status, self.status_359)
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
             'Team 359 had a record of <b>11-1-0</b> in quals and <b>won the event</b> with a playoff record of <b>6-1-0</b>.')
 
-    def testElimSemisAndFirstPick(self):
+    def test_elim_semis_and_first_pick(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc5240', self.event)
         self.assertDictEqual(status, self.status_5240)
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc5240', status),
             'Team 5240 had a record of <b>9-3-0</b> in quals and was <b>eliminated in the Semifinals</b> with a playoff record of <b>2-3-0</b>.')
 
-    def testBackupOut(self):
+    def test_backup_out(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc229', self.event)
         self.assertDictEqual(status, self.status_229)
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc229', status),
             'Team 229 had a record of <b>6-6-0</b> in quals and was <b>eliminated in the Finals</b> with a playoff record of <b>5-3-0</b>.')
 
-    def testBackupIn(self):
+    def test_backup_in(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc1665', self.event)
         self.assertDictEqual(status, self.status_1665)
         self.assertEqual(
@@ -1060,10 +1058,6 @@ class Test2016casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
         }
     }
 
-    # Because I can't figure out how to get these to generate
-    def event_key_adder(self, obj):
-        obj.event = ndb.Key(Event, '2016casj')
-
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -1072,15 +1066,19 @@ class Test2016casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
         load_fixture('test_data/fixtures/2016casj.json',
-                      kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
-                      post_processor=self.event_key_adder)
+                     kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
+                     post_processor=self.eventKeyAdder)
         self.event = Event.get_by_id('2016casj')
         self.assertIsNotNone(self.event)
 
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testEventSurrogate(self):
+    # Because I can't figure out how to get these to generate
+    def eventKeyAdder(self, obj):
+        obj.event = ndb.Key(Event, '2016casj')
+
+    def test_event_surrogate(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc254', self.event)
         self.assertDictEqual(status, self.status_254)
         self.assertEqual(
@@ -1280,10 +1278,6 @@ class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
         "alliance": None
     }
 
-    # Because I can't figure out how to get these to generate
-    def event_key_adder(self, obj):
-        obj.event = ndb.Key(Event, '2015casj')
-
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -1292,29 +1286,33 @@ class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
         load_fixture('test_data/fixtures/2015casj.json',
-                      kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
-                      post_processor=self.event_key_adder)
+                     kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
+                     post_processor=self.eventKeyAdder)
         self.event = Event.get_by_id('2015casj')
         self.assertIsNotNone(self.event)
 
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testEventWinner(self):
+    # Because I can't figure out how to get these to generate
+    def eventKeyAdder(self, obj):
+        obj.event = ndb.Key(Event, '2015casj')
+
+    def test_event_winner(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc254', self.event)
         self.assertDictEqual(status, self.status_254)
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc254', status),
             'Team 254 was <b>Rank 1/57</b> with an average score of <b>200.4</b> in quals, competed in the playoffs as the <b>Captain</b> of <b>Alliance 1</b>, and <b>won the event</b> with a playoff average of <b>224.1</b>.')
 
-    def testElimSemisAndFirstPick(self):
+    def test_elim_semis_and_first_pick(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc846', self.event)
         self.assertDictEqual(status, self.status_846)
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc846', status),
             'Team 846 was <b>Rank 8/57</b> with an average score of <b>97.0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 3</b>, and was <b>eliminated in the Semifinals</b> with a playoff average of <b>133.6</b>.')
 
-    def testTeamNotPicked(self):
+    def test_team_not_picked(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc8', self.event)
         self.assertDictEqual(status, self.status_8)
         self.assertEqual(
@@ -1408,10 +1406,6 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
         "alliance": None
     }
 
-    # Because I can't figure out how to get these to generate
-    def event_key_adder(self, obj):
-        obj.event = ndb.Key(Event, '2015casj')
-
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -1420,8 +1414,8 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
         load_fixture('test_data/fixtures/2015casj.json',
-                      kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
-                      post_processor=self.event_key_adder)
+                     kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
+                     post_processor=self.eventKeyAdder)
         self.event = Event.get_by_id('2015casj')
         EventDetails.get_by_id('2015casj').key.delete()  # Remove EventDetails
         self.assertIsNotNone(self.event)
@@ -1429,21 +1423,25 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testEventWinner(self):
+    # Because I can't figure out how to get these to generate
+    def eventKeyAdder(self, obj):
+        obj.event = ndb.Key(Event, '2015casj')
+
+    def test_event_winner(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc254', self.event)
         self.assertDictEqual(status, self.status_254)
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc254', status),
             'Team 254 had an average score of <b>200.4</b> in quals and <b>won the event</b> with a playoff average of <b>224.1</b>.')
 
-    def testElimSemisAndFirstPick(self):
+    def test_elim_semis_and_first_pick(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc846', self.event)
         self.assertDictEqual(status, self.status_846)
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc846', status),
             'Team 846 had an average score of <b>97.0</b> in quals and was <b>eliminated in the Semifinals</b> with a playoff average of <b>133.6</b>.')
 
-    def testTeamNotPicked(self):
+    def test_team_not_picked(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc8', self.event)
         self.assertDictEqual(status, self.status_8)
         self.assertEqual(

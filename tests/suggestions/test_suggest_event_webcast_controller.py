@@ -1,8 +1,8 @@
-from datetime import datetime
-
 import unittest2
 import webapp2
 import webtest
+from datetime import datetime
+
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from webapp2_extras.routes import RedirectRoute
@@ -16,19 +16,6 @@ from models.suggestion import Suggestion
 
 
 class TestSuggestEventWebcastController(unittest2.TestCase):
-
-    def loginUser(self):
-        self.testbed.setup_env(
-            user_email="user@example.com",
-            user_id="123",
-            user_is_admin='0',
-            overwrite=True)
-
-        Account.get_or_insert(
-            "123",
-            email="user@example.com",
-            registered=True)
-
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -43,29 +30,43 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
         self.testapp = webtest.TestApp(app)
 
         self.event = Event(
-                id="2016necmp",
-                name="New England District Championship",
-                event_type_enum=EventType.DISTRICT_CMP,
-                event_district_enum=DistrictType.NEW_ENGLAND,
-                short_name="New England",
-                event_short="necmp",
-                year=2016,
-                end_date=datetime(2016, 03, 27),
-                official=False,
-                city='Hartford',
-                state_prov='CT',
-                country='USA',
-                venue="Some Venue",
-                venue_address="Some Venue, Hartford, CT, USA",
-                timezone_id="America/New_York",
-                start_date=datetime(2016, 03, 24),
-                webcast_json="",
-                website="http://www.firstsv.org",
+            id="2016necmp",
+            name="New England District Championship",
+            event_type_enum=EventType.DISTRICT_CMP,
+            event_district_enum=DistrictType.NEW_ENGLAND,
+            short_name="New England",
+            event_short="necmp",
+            year=2016,
+            end_date=datetime(2016, 03, 27),
+            official=False,
+            city='Hartford',
+            state_prov='CT',
+            country='USA',
+            venue="Some Venue",
+            venue_address="Some Venue, Hartford, CT, USA",
+            timezone_id="America/New_York",
+            start_date=datetime(2016, 03, 24),
+            webcast_json="",
+            website="http://www.firstsv.org"
         )
         self.event.put()
 
     def tearDown(self):
         self.testbed.deactivate()
+
+    def loginUser(self):
+        self.testbed.setup_env(
+            user_email="user@example.com",
+            user_id="123",
+            user_is_admin='0',
+            overwrite=True
+        )
+
+        Account.get_or_insert(
+            "123",
+            email="user@example.com",
+            registered=True
+        )
 
     def getSuggestionForm(self, event_key):
         response = self.testapp.get('/suggest/event/webcast?event_key={}'.format(event_key))
@@ -75,18 +76,18 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
         self.assertIsNotNone(form)
         return form
 
-    def testLoginRedirect(self):
+    def test_login_redirect(self):
         response = self.testapp.get('/suggest/event/webcast?event_key=2016necmp', status='3*')
         response = response.follow(expect_errors=True)
         self.assertTrue(response.request.path.startswith("/account/login_required"))
 
-    def testNoParams(self):
+    def test_no_params(self):
         self.loginUser()
         response = self.testapp.get('/suggest/event/webcast', status='3*')
         response = response.follow(expect_errors=True)
         self.assertEqual(response.request.path, '/')
 
-    def testSubmitEmptyForm(self):
+    def test_submit_empty_form(self):
         self.loginUser()
         form = self.getSuggestionForm('2016necmp')
         response = form.submit().follow()
@@ -95,7 +96,7 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
         request = response.request
         self.assertEqual(request.GET.get('status'), 'blank_webcast')
 
-    def testSubmitBadUrl(self):
+    def test_submit_bad_url(self):
         self.loginUser()
         form = self.getSuggestionForm('2016necmp')
         form['webcast_url'] = 'The Blue Alliance'
@@ -105,7 +106,7 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
         request = response.request
         self.assertEqual(request.GET.get('status'), 'invalid_url')
 
-    def testSubmitTBAUrl(self):
+    def test_submit_tba_url(self):
         self.loginUser()
         form = self.getSuggestionForm('2016necmp')
         form['webcast_url'] = 'http://thebluealliance.com'
@@ -115,7 +116,7 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
         request = response.request
         self.assertEqual(request.GET.get('status'), 'invalid_url')
 
-    def testSubmitWebcast(self):
+    def test_submit_webcast(self):
         self.loginUser()
         form = self.getSuggestionForm('2016necmp')
         form['webcast_url'] = 'https://twitch.tv/frcgamesense'
@@ -132,4 +133,3 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
         self.assertEqual(suggestion.target_key, '2016necmp')
         self.assertEqual(suggestion.contents['webcast_url'], 'https://twitch.tv/frcgamesense')
         self.assertIsNotNone(suggestion.contents.get('webcast_dict'))
-

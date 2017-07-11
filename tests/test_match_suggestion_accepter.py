@@ -35,10 +35,10 @@ class TestMatchSuggestionAccepter(unittest2.TestCase):
         self.suggestion.put()
 
         self.event = Event(
-          id="2012ct",
-          event_short="ct",
-          year=2012,
-          event_type_enum=EventType.REGIONAL,
+            id="2012ct",
+            event_short="ct",
+            year=2012,
+            event_type_enum=EventType.REGIONAL
         )
         self.event.put()
 

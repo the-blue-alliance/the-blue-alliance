@@ -8,16 +8,12 @@ from datetime import datetime
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from consts.district_type import DistrictType
 from consts.event_type import EventType
 
-from controllers.api.api_district_controller import ApiDistrictListController, ApiDistrictEventsController, ApiDistrictRankingsController
+from controllers.api.api_district_controller import ApiDistrictListController, ApiDistrictEventsController
 from models.district import District
 from models.event import Event
 from models.event_details import EventDetails
-from models.team import Team
-from models.match import Match
-from models.event_team import EventTeam
 
 
 class TestListDistrictsController(unittest2.TestCase):
@@ -43,23 +39,23 @@ class TestListDistrictsController(unittest2.TestCase):
         self.district.put()
 
         self.event = Event(
-                id="2010sc",
-                name="Palmetto Regional",
-                event_type_enum=EventType.DISTRICT_CMP,
-                district_key=ndb.Key(District, '2010ne'),
-                short_name="Palmetto",
-                event_short="sc",
-                year=2010,
-                end_date=datetime(2010, 03, 27),
-                official=True,
-                city="Clemson",
-                state_prov="SC",
-                country="USA",
-                venue="Long Beach Arena",
-                venue_address="Long Beach Arena\r\n300 East Ocean Blvd\r\nLong Beach, CA 90802\r\nUSA",
-                start_date=datetime(2010, 03, 24),
-                webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
-                website="http://www.firstsv.org",
+            id="2010sc",
+            name="Palmetto Regional",
+            event_type_enum=EventType.DISTRICT_CMP,
+            district_key=ndb.Key(District, '2010ne'),
+            short_name="Palmetto",
+            event_short="sc",
+            year=2010,
+            end_date=datetime(2010, 03, 27),
+            official=True,
+            city="Clemson",
+            state_prov="SC",
+            country="USA",
+            venue="Long Beach Arena",
+            venue_address="Long Beach Arena\r\n300 East Ocean Blvd\r\nLong Beach, CA 90802\r\nUSA",
+            start_date=datetime(2010, 03, 24),
+            webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
+            website="http://www.firstsv.org"
         )
         self.event.put()
 
@@ -85,7 +81,7 @@ class TestListDistrictsController(unittest2.TestCase):
         self.assertEqual(district["key"], self.district.abbreviation)
         self.assertEqual(district["name"], self.district.display_name)
 
-    def testDistrictApi(self):
+    def test_district_api(self):
         response = self.testapp.get('/{}'.format(self.event.year), headers={"X-TBA-App-Id": "tba-tests:disstrict-controller-test:v01"})
 
         districts = json.loads(response.body)
@@ -115,23 +111,23 @@ class TestListDistrictEventsController(unittest2.TestCase):
         self.district.put()
 
         self.event = Event(
-                id="2010sc",
-                name="Palmetto Regional",
-                event_type_enum=EventType.DISTRICT_CMP,
-                district_key=ndb.Key(District, '2010ne'),
-                short_name="Palmetto",
-                event_short="sc",
-                year=2010,
-                end_date=datetime(2010, 03, 27),
-                official=True,
-                city="Clemson",
-                state_prov="SC",
-                country="USA",
-                venue="Long Beach Arena",
-                venue_address="Long Beach Arena\r\n300 East Ocean Blvd\r\nLong Beach, CA 90802\r\nUSA",
-                start_date=datetime(2010, 03, 24),
-                webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
-                website="http://www.firstsv.org",
+            id="2010sc",
+            name="Palmetto Regional",
+            event_type_enum=EventType.DISTRICT_CMP,
+            district_key=ndb.Key(District, '2010ne'),
+            short_name="Palmetto",
+            event_short="sc",
+            year=2010,
+            end_date=datetime(2010, 03, 27),
+            official=True,
+            city="Clemson",
+            state_prov="SC",
+            country="USA",
+            venue="Long Beach Arena",
+            venue_address="Long Beach Arena\r\n300 East Ocean Blvd\r\nLong Beach, CA 90802\r\nUSA",
+            start_date=datetime(2010, 03, 24),
+            webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
+            website="http://www.firstsv.org"
         )
         self.event.put()
 
@@ -170,10 +166,8 @@ class TestListDistrictEventsController(unittest2.TestCase):
         self.assertEqual(event["alliances"], self.event.alliance_selections)
         self.assertEqual(event["website"], self.event.website)
 
-    def testEventApi(self):
+    def test_event_api(self):
         response = self.testapp.get("/{}/2010".format(self.district.abbreviation), headers={"X-TBA-App-Id": "tba-tests:disstrict-controller-test:v01"})
 
         events = json.loads(response.body)
         self.assertDistrictEvent(events[0])
-
-

@@ -1,4 +1,3 @@
-import json
 import unittest2
 
 from google.appengine.ext import ndb
@@ -7,8 +6,6 @@ from google.appengine.ext import testbed
 from helpers.event_simulator import EventSimulator
 from helpers.match_helper import MatchHelper
 from models.event import Event
-from models.event_details import EventDetails
-from models.match import Match
 
 
 class TestEventSimulator(unittest2.TestCase):

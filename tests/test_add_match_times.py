@@ -20,7 +20,6 @@ class TestAddMatchTimes(unittest2.TestCase):
         self.testbed.init_memcache_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
-
         self.event = Event(
             id="2014casj",
             event_short="casj",
@@ -43,29 +42,26 @@ class TestAddMatchTimes(unittest2.TestCase):
             timezone_id="America/Los_Angeles",
         )
 
-    def match_dict_to_matches(self, match_dicts):
-        return [Match(
-            id=Match.renderKeyName(
-                self.event.key.id(),
-                match_dict.get("comp_level", None),
-                match_dict.get("set_number", 0),
-                match_dict.get("match_number", 0)),
-            event=self.event.key,
-            year=self.event.year,
-            set_number=match_dict.get("set_number", 0),
-            match_number=match_dict.get("match_number", 0),
-            comp_level=match_dict.get("comp_level", None),
-            team_key_names=match_dict.get("team_key_names", None),
-            time_string=match_dict.get("time_string", None),
-            alliances_json=match_dict.get("alliances_json", None)
-            )
-            for match_dict in match_dicts]
+    def matchDictToMatches(self, match_dicts):
+        return [Match(id=Match.renderKeyName(self.event.key.id(),
+                                             match_dict.get("comp_level", None),
+                                             match_dict.get("set_number", 0),
+                                             match_dict.get("match_number", 0)),
+                      event=self.event.key,
+                      year=self.event.year,
+                      set_number=match_dict.get("set_number", 0),
+                      match_number=match_dict.get("match_number", 0),
+                      comp_level=match_dict.get("comp_level", None),
+                      team_key_names=match_dict.get("team_key_names", None),
+                      time_string=match_dict.get("time_string", None),
+                      alliances_json=match_dict.get("alliances_json", None))
+                for match_dict in match_dicts]
 
     def test_match_times(self):
         with open('test_data/usfirst_html/usfirst_event_matches_2013cama.html', 'r') as f:  # using matches from a random event as data
             match_dicts, _ = UsfirstMatchesParser.parse(f.read())
 
-        matches = self.match_dict_to_matches(match_dicts)
+        matches = self.matchDictToMatches(match_dicts)
         MatchHelper.add_match_times(self.event, matches)
 
         self.assertEqual(len(matches), 92)
@@ -78,7 +74,7 @@ class TestAddMatchTimes(unittest2.TestCase):
         with open('test_data/usfirst_html/usfirst_event_matches_2012ct.html', 'r') as f:  # using matches from a random event as data
             match_dicts, _ = UsfirstMatchesParser.parse(f.read())
 
-        matches = self.match_dict_to_matches(match_dicts)
+        matches = self.matchDictToMatches(match_dicts)
         MatchHelper.add_match_times(self.event_dst, matches)
 
         self.assertEqual(len(matches), 125)
@@ -87,4 +83,3 @@ class TestAddMatchTimes(unittest2.TestCase):
         PDT_OFFSET = -7
         self.assertEqual(matches[0].time, datetime.datetime(2014, 3, 8, 9, 0) - datetime.timedelta(hours=PST_OFFSET))
         self.assertEqual(matches[-1].time, datetime.datetime(2014, 3, 9, 16, 5) - datetime.timedelta(hours=PDT_OFFSET))
-

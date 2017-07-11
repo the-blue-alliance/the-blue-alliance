@@ -26,16 +26,16 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
 
     def test_parse_no_matches(self):
         self.event = Event(
-                id="2016nyny",
-                name="NYC Regional",
-                event_type_enum=EventType.REGIONAL,
-                short_name="NYC",
-                event_short="nyny",
-                year=2016,
-                end_date=datetime(2016, 03, 27),
-                official=True,
-                start_date=datetime(2016, 03, 24),
-                timezone_id="America/New_York"
+            id="2016nyny",
+            name="NYC Regional",
+            event_type_enum=EventType.REGIONAL,
+            short_name="NYC",
+            event_short="nyny",
+            year=2016,
+            end_date=datetime(2016, 03, 27),
+            official=True,
+            start_date=datetime(2016, 03, 24),
+            timezone_id="America/New_York"
         )
         self.event.put()
         with open('test_data/fms_api/2016_hybrid_schedule_no_matches.json', 'r') as f:
@@ -46,16 +46,16 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
 
     def test_parse_qual(self):
         self.event = Event(
-                id="2016nyny",
-                name="NYC Regional",
-                event_type_enum=EventType.REGIONAL,
-                short_name="NYC",
-                event_short="nyny",
-                year=2016,
-                end_date=datetime(2016, 03, 27),
-                official=True,
-                start_date=datetime(2016, 03, 24),
-                timezone_id="America/New_York"
+            id="2016nyny",
+            name="NYC Regional",
+            event_type_enum=EventType.REGIONAL,
+            short_name="NYC",
+            event_short="nyny",
+            year=2016,
+            end_date=datetime(2016, 03, 27),
+            official=True,
+            start_date=datetime(2016, 03, 24),
+            timezone_id="America/New_York"
         )
         self.event.put()
         with open('test_data/fms_api/2016_nyny_hybrid_schedule_qual.json', 'r') as f:
@@ -70,16 +70,16 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
 
     def test_parse_playoff(self):
         self.event = Event(
-                id="2016nyny",
-                name="NYC Regional",
-                event_type_enum=EventType.REGIONAL,
-                short_name="NYC",
-                event_short="nyny",
-                year=2016,
-                end_date=datetime(2016, 03, 27),
-                official=True,
-                start_date=datetime(2016, 03, 24),
-                timezone_id="America/New_York"
+            id="2016nyny",
+            name="NYC Regional",
+            event_type_enum=EventType.REGIONAL,
+            short_name="NYC",
+            event_short="nyny",
+            year=2016,
+            end_date=datetime(2016, 03, 27),
+            official=True,
+            start_date=datetime(2016, 03, 24),
+            timezone_id="America/New_York"
         )
         self.event.put()
         with open('test_data/fms_api/2016_nyny_hybrid_schedule_playoff.json', 'r') as f:
@@ -97,17 +97,17 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
 
     def test_parse_playoff_with_octofinals(self):
         self.event = Event(
-                id="2016micmp",
-                name="Michigan District Champs",
-                event_type_enum=EventType.DISTRICT_CMP,
-                short_name="Michigan",
-                event_short="micmp",
-                year=2016,
-                end_date=datetime(2016, 03, 27),
-                official=True,
-                start_date=datetime(2016, 03, 24),
-                timezone_id="America/New_York",
-                playoff_type=PlayoffType.BRACKET_16_TEAM
+            id="2016micmp",
+            name="Michigan District Champs",
+            event_type_enum=EventType.DISTRICT_CMP,
+            short_name="Michigan",
+            event_short="micmp",
+            year=2016,
+            end_date=datetime(2016, 03, 27),
+            official=True,
+            start_date=datetime(2016, 03, 24),
+            timezone_id="America/New_York",
+            playoff_type=PlayoffType.BRACKET_16_TEAM
         )
         self.event.put()
 
@@ -127,17 +127,17 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
 
     def test_parse_2015_playoff(self):
         self.event = Event(
-                id="2015nyny",
-                name="NYC Regional",
-                event_type_enum=EventType.REGIONAL,
-                short_name="NYC",
-                event_short="nyny",
-                year=2015,
-                end_date=datetime(2015, 03, 27),
-                official=True,
-                start_date=datetime(2015, 03, 24),
-                timezone_id="America/New_York",
-                playoff_type=PlayoffType.AVG_SCORE_8_TEAM
+            id="2015nyny",
+            name="NYC Regional",
+            event_type_enum=EventType.REGIONAL,
+            short_name="NYC",
+            event_short="nyny",
+            year=2015,
+            end_date=datetime(2015, 03, 27),
+            official=True,
+            start_date=datetime(2015, 03, 24),
+            timezone_id="America/New_York",
+            playoff_type=PlayoffType.AVG_SCORE_8_TEAM
         )
         self.event.put()
         with open('test_data/fms_api/2015nyny_hybrid_schedule_playoff.json', 'r') as f:
@@ -156,17 +156,17 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
     def test_parse_2017micmp(self):
         # 2017micmp is a 4 team bracket that starts playoff match numbering at 1
         self.event = Event(
-                id="2017micmp",
-                name="Michigan District Champs",
-                event_type_enum=EventType.DISTRICT_CMP,
-                short_name="Michigan",
-                event_short="micmp",
-                year=2017,
-                end_date=datetime(2017, 03, 27),
-                official=True,
-                start_date=datetime(2017, 03, 24),
-                timezone_id="America/New_York",
-                playoff_type=PlayoffType.BRACKET_4_TEAM
+            id="2017micmp",
+            name="Michigan District Champs",
+            event_type_enum=EventType.DISTRICT_CMP,
+            short_name="Michigan",
+            event_short="micmp",
+            year=2017,
+            end_date=datetime(2017, 03, 27),
+            official=True,
+            start_date=datetime(2017, 03, 24),
+            timezone_id="America/New_York",
+            playoff_type=PlayoffType.BRACKET_4_TEAM
         )
         self.event.put()
 
@@ -186,17 +186,17 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
 
     def test_parse_2champs_einstein(self):
         self.event = Event(
-                id="2017cmptx",
-                name="Einstein (Houston)",
-                event_type_enum=EventType.CMP_FINALS,
-                short_name="Einstein",
-                event_short="cmptx",
-                year=2017,
-                end_date=datetime(2017, 03, 27),
-                official=True,
-                start_date=datetime(2017, 03, 24),
-                timezone_id="America/New_York",
-                playoff_type=PlayoffType.ROUND_ROBIN_6_TEAM
+            id="2017cmptx",
+            name="Einstein (Houston)",
+            event_type_enum=EventType.CMP_FINALS,
+            short_name="Einstein",
+            event_short="cmptx",
+            year=2017,
+            end_date=datetime(2017, 03, 27),
+            official=True,
+            start_date=datetime(2017, 03, 24),
+            timezone_id="America/New_York",
+            playoff_type=PlayoffType.ROUND_ROBIN_6_TEAM
         )
         self.event.put()
 

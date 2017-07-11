@@ -33,10 +33,10 @@ class TestMatchController(unittest2.TestCase):
             comp_level="f",
             set_number=1,
             match_number=1,
-            team_key_names=[u'frc846',u'frc2135',u'frc971',u'254',u'frc1678',u'frc973'],
+            team_key_names=[u'frc846', u'frc2135', u'frc971', u'254', u'frc1678', u'frc973'],
             time=datetime.fromtimestamp(1409527874),
             time_string="4:31 PM",
-            youtube_videos=["JbwUzl3W9ug","bHGyTjxbLz8"],
+            youtube_videos=["JbwUzl3W9ug", "bHGyTjxbLz8"],
             tba_videos=[],
             alliances_json='{\
                 "blue": {\
@@ -64,21 +64,21 @@ class TestMatchController(unittest2.TestCase):
                     "truss+catch": 40}}'
         )
         self.event = Event(
-                id="2014cc",
-                name="Cheesy Champs",
-                event_type_enum=EventType.OFFSEASON,
-                short_name="Cheesy Champs",
-                event_short="cc",
-                year=2014,
-                end_date=datetime(2014, 03, 27),
-                official=True,
-                city='Hartford',
-                state_prov='CT',
-                country='USA',
-                venue="Some Venue",
-                venue_address="Some Venue, Hartford, CT, USA",
-                timezone_id="America/New_York",
-                start_date=datetime(2014, 03, 24),
+            id="2014cc",
+            name="Cheesy Champs",
+            event_type_enum=EventType.OFFSEASON,
+            short_name="Cheesy Champs",
+            event_short="cc",
+            year=2014,
+            end_date=datetime(2014, 03, 27),
+            official=True,
+            city='Hartford',
+            state_prov='CT',
+            country='USA',
+            venue="Some Venue",
+            venue_address="Some Venue, Hartford, CT, USA",
+            timezone_id="America/New_York",
+            start_date=datetime(2014, 03, 24)
         )
         self.match.put()
         self.event.put()
@@ -86,10 +86,10 @@ class TestMatchController(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testMatchDetail(self):
+    def test_match_detail(self):
         response = self.testapp.get("/match/2014cc_f1m1")
         self.assertEqual(response.status_int, 200)
 
-    def testBadMatchDetail(self):
+    def test_bad_match_detail(self):
         response = self.testapp.get("/match/2014cc_f1m2", status=404)
         self.assertEqual(response.status_int, 404)

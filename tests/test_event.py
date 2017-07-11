@@ -1,15 +1,11 @@
 import datetime
 import unittest2
-import json
 
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from consts.event_type import EventType
-from helpers.event_manipulator import EventManipulator
 from helpers.event.event_test_creator import EventTestCreator
-from helpers.event_team.event_team_test_creator import EventTeamTestCreator
-from helpers.match.match_test_creator import MatchTestCreator
 from models.event import Event
 
 
@@ -58,30 +54,30 @@ class TestEventManipulator(unittest2.TestCase):
 
         self.testbed.deactivate()
 
-    def test_datesFuture(self):
+    def test_dates_future(self):
         self.assertFalse(self.future_event.now)
         self.assertTrue(self.future_event.future)
         self.assertFalse(self.future_event.past)
         self.assertFalse(self.future_event.withinDays(0, 8))
         self.assertTrue(self.future_event.withinDays(-8, 0))
 
-    def test_datesPast(self):
+    def test_dates_past(self):
         self.assertFalse(self.past_event.now)
         self.assertFalse(self.past_event.future)
         self.assertTrue(self.past_event.past)
         self.assertTrue(self.past_event.withinDays(0, 8))
         self.assertFalse(self.past_event.withinDays(-8, 0))
 
-    def test_datesPresent(self):
+    def test_dates_present(self):
         self.assertTrue(self.present_event.now)
         self.assertTrue(self.present_event.withinDays(-1, 1))
         self.assertFalse(self.present_event.future)
         self.assertFalse(self.present_event.past)
 
-    def test_datesStartsToday(self):
+    def test_dates_starts_today(self):
         self.assertTrue(self.event_starts_today.starts_today)
         self.assertFalse(self.event_starts_today.ends_today)
 
-    def test_datesEndsToday(self):
+    def test_dates_ends_today(self):
         self.assertFalse(self.event_ends_today.starts_today)
         self.assertTrue(self.event_ends_today.ends_today)

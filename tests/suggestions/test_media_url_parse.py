@@ -1,5 +1,4 @@
 import json
-
 import unittest2
 
 from google.appengine.ext import testbed
@@ -10,15 +9,12 @@ from helpers.webcast_helper import WebcastParser
 
 
 class TestMediaUrlParser(unittest2.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
+    def setUp(cls):
         cls.testbed = testbed.Testbed()
         cls.testbed.activate()
         cls.testbed.init_urlfetch_stub()
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(cls):
         cls.testbed.deactivate()
 
     def test_youtube_parse(self):

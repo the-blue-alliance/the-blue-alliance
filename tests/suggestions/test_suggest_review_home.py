@@ -1,6 +1,7 @@
 import unittest2
 import webapp2
 import webtest
+
 from google.appengine.datastore import datastore_stub_util
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
@@ -12,22 +13,6 @@ from models.account import Account
 
 
 class TestSuggestEventWebcastController(unittest2.TestCase):
-    def loginUser(self):
-        self.testbed.setup_env(
-            user_email="user@example.com",
-            user_id="123",
-            user_is_admin='0',
-            overwrite=True)
-
-        self.account = Account.get_or_insert(
-            "123",
-            email="user@example.com",
-            registered=True)
-
-    def givePermission(self):
-        self.account.permissions.append(AccountPermissions.REVIEW_MEDIA)
-        self.account.put()
-
     def setUp(self):
         self.policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1)
         self.testbed = testbed.Testbed()
@@ -47,18 +32,34 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testLogInRedirect(self):
+    def loginUser(self):
+        self.testbed.setup_env(
+            user_email="user@example.com",
+            user_id="123",
+            user_is_admin='0',
+            overwrite=True)
+
+        self.account = Account.get_or_insert(
+            "123",
+            email="user@example.com",
+            registered=True)
+
+    def givePermission(self):
+        self.account.permissions.append(AccountPermissions.REVIEW_MEDIA)
+        self.account.put()
+
+    def test_login_redirect(self):
         response = self.testapp.get('/suggest/review', status='3*')
         response = response.follow(expect_errors=True)
         self.assertTrue(response.request.path.startswith("/account/login_required"))
 
-    def testNoPermissions(self):
+    def test_no_permissions(self):
         self.loginUser()
         response = self.testapp.get('/suggest/review', status='3*')
         response = response.follow(expect_errors=True)
         self.assertEqual(response.request.path, '/')
 
-    def testGetPage(self):
+    def test_get_page(self):
         self.loginUser()
         self.givePermission()
         response = self.testapp.get('/suggest/review')

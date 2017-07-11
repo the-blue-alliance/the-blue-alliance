@@ -1,9 +1,8 @@
-import os
-from datetime import datetime
-
 import unittest2
 import webapp2
 import webtest
+from datetime import datetime
+
 from google.appengine.ext import testbed
 from google.appengine.ext import ndb
 from webapp2_extras.routes import RedirectRoute
@@ -18,19 +17,6 @@ from models.suggestion import Suggestion
 
 
 class TestSuggestApiWriteController(unittest2.TestCase):
-
-    def loginUser(self):
-        self.testbed.setup_env(
-            user_email="user@example.com",
-            user_id="123",
-            user_is_admin='0',
-            overwrite=True)
-
-        Account.get_or_insert(
-            "123",
-            email="user@example.com",
-            registered=True)
-
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -45,29 +31,43 @@ class TestSuggestApiWriteController(unittest2.TestCase):
         self.testapp = webtest.TestApp(app)
 
         self.event = Event(
-                id="2016necmp",
-                name="New England District Championship",
-                event_type_enum=EventType.OFFSEASON,
-                event_district_enum=DistrictType.NEW_ENGLAND,
-                short_name="New England",
-                event_short="necmp",
-                year=2016,
-                end_date=datetime(2016, 03, 27),
-                official=False,
-                city='Hartford',
-                state_prov='CT',
-                country='USA',
-                venue="Some Venue",
-                venue_address="Some Venue, Hartford, CT, USA",
-                timezone_id="America/New_York",
-                start_date=datetime(2016, 03, 24),
-                webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
-                website="http://www.firstsv.org",
+            id="2016necmp",
+            name="New England District Championship",
+            event_type_enum=EventType.OFFSEASON,
+            event_district_enum=DistrictType.NEW_ENGLAND,
+            short_name="New England",
+            event_short="necmp",
+            year=2016,
+            end_date=datetime(2016, 03, 27),
+            official=False,
+            city='Hartford',
+            state_prov='CT',
+            country='USA',
+            venue="Some Venue",
+            venue_address="Some Venue, Hartford, CT, USA",
+            timezone_id="America/New_York",
+            start_date=datetime(2016, 03, 24),
+            webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
+            website="http://www.firstsv.org"
         )
         self.event.put()
 
     def tearDown(self):
         self.testbed.deactivate()
+
+    def loginUser(self):
+        self.testbed.setup_env(
+            user_email="user@example.com",
+            user_id="123",
+            user_is_admin='0',
+            overwrite=True
+        )
+
+        Account.get_or_insert(
+            "123",
+            email="user@example.com",
+            registered=True
+        )
 
     def getSuggestionForm(self):
         response = self.testapp.get('/request/apiwrite')
@@ -77,12 +77,12 @@ class TestSuggestApiWriteController(unittest2.TestCase):
         self.assertIsNotNone(form)
         return form
 
-    def testLogInRedirect(self):
+    def test_login_redirect(self):
         response = self.testapp.get('/request/apiwrite', status='3*')
         response = response.follow(expect_errors=True)
         self.assertTrue(response.request.path.startswith("/account/login_required"))
 
-    def testSubmitEmptyForm(self):
+    def test_submit_empty_form(self):
         self.loginUser()
         form = self.getSuggestionForm()
         response = form.submit().follow()
@@ -92,7 +92,7 @@ class TestSuggestApiWriteController(unittest2.TestCase):
         request = response.request
         self.assertEqual(request.GET.get('status'), 'no_affiliation')
 
-    def testSuggestApiWrite(self):
+    def test_suggest_api_write(self):
         self.loginUser()
         form = self.getSuggestionForm()
         form['event_key'] = '2016necmp'
@@ -114,7 +114,7 @@ class TestSuggestApiWriteController(unittest2.TestCase):
         request = response.request
         self.assertEqual(request.GET.get('status'), 'success')
 
-    def testNoEvent(self):
+    def test_no_event(self):
         self.loginUser()
         form = self.getSuggestionForm()
         form['event_key'] = ''
@@ -125,7 +125,7 @@ class TestSuggestApiWriteController(unittest2.TestCase):
         request = response.request
         self.assertEqual(request.GET.get('status'), 'bad_event')
 
-    def testNonExistentEvent(self):
+    def test_non_existent_event(self):
         self.loginUser()
         form = self.getSuggestionForm()
         form['event_key'] = '2016foobar'

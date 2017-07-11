@@ -8,7 +8,6 @@ from datetime import datetime
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from consts.district_type import DistrictType
 from consts.event_type import EventType
 
 from controllers.api.api_event_controller import ApiEventController
@@ -40,24 +39,24 @@ class TestEventApiController(unittest2.TestCase):
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.event = Event(
-                id="2010sc",
-                name="Palmetto Regional",
-                event_type_enum=EventType.REGIONAL,
-                district_key=None,
-                short_name="Palmetto",
-                event_short="sc",
-                year=2010,
-                end_date=datetime(2010, 03, 27),
-                official=True,
-                city="Clemson",
-                state_prov="SC",
-                country="USA",
-                venue="Long Beach Arena",
-                venue_address="Long Beach Arena\r\n300 East Ocean Blvd\r\nLong Beach, CA 90802\r\nUSA",
-                timezone_id="America/New_York",
-                start_date=datetime(2010, 03, 24),
-                webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
-                website="http://www.firstsv.org",
+            id="2010sc",
+            name="Palmetto Regional",
+            event_type_enum=EventType.REGIONAL,
+            district_key=None,
+            short_name="Palmetto",
+            event_short="sc",
+            year=2010,
+            end_date=datetime(2010, 03, 27),
+            official=True,
+            city="Clemson",
+            state_prov="SC",
+            country="USA",
+            venue="Long Beach Arena",
+            venue_address="Long Beach Arena\r\n300 East Ocean Blvd\r\nLong Beach, CA 90802\r\nUSA",
+            timezone_id="America/New_York",
+            start_date=datetime(2010, 03, 24),
+            webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
+            website="http://www.firstsv.org"
         )
         self.event.put()
 
@@ -97,7 +96,7 @@ class TestEventApiController(unittest2.TestCase):
         self.assertEqual(event["website"], self.event.website)
         self.assertEqual(event["timezone"], self.event.timezone_id)
 
-    def testEventApi(self):
+    def test_event_api(self):
         response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
 
         event_dict = json.loads(response.body)
@@ -119,40 +118,40 @@ class TestEventTeamsApiController(unittest2.TestCase):
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.event = Event(
-                id="2010sc",
-                name="Palmetto Regional",
-                event_type_enum=EventType.REGIONAL,
-                short_name="Palmetto",
-                event_short="sc",
-                year=2010,
-                end_date=datetime(2010, 03, 27),
-                official=True,
-                city="Clemson",
-                state_prov="SC",
-                country="USA",
-                start_date=datetime(2010, 03, 24),
+            id="2010sc",
+            name="Palmetto Regional",
+            event_type_enum=EventType.REGIONAL,
+            short_name="Palmetto",
+            event_short="sc",
+            year=2010,
+            end_date=datetime(2010, 03, 27),
+            official=True,
+            city="Clemson",
+            state_prov="SC",
+            country="USA",
+            start_date=datetime(2010, 03, 24)
         )
         self.event.put()
 
         self.team = Team(
-                id="frc281",
-                name="Michelin / Caterpillar / Greenville Technical College /\
-                jcpenney / Baldor / ASME / Gastroenterology Associates /\
-                Laserflex South & Greenville County Schools & Greenville\
-                Technical Charter High School",
-                team_number=281,
-                nickname="EnTech GreenVillians",
-                city="Greenville",
-                state_prov="SC",
-                country="USA",
-                website="www.entech.org",
+            id="frc281",
+            name="Michelin / Caterpillar / Greenville Technical College /\
+            jcpenney / Baldor / ASME / Gastroenterology Associates /\
+            Laserflex South & Greenville County Schools & Greenville\
+            Technical Charter High School",
+            team_number=281,
+            nickname="EnTech GreenVillians",
+            city="Greenville",
+            state_prov="SC",
+            country="USA",
+            website="www.entech.org"
         )
         self.team.put()
 
         self.event_team = EventTeam(
-                team=self.team.key,
-                event=self.event.key,
-                year=datetime.now().year
+            team=self.team.key,
+            event=self.event.key,
+            year=datetime.now().year
         )
         self.event_team.put()
 
@@ -170,7 +169,7 @@ class TestEventTeamsApiController(unittest2.TestCase):
         self.assertEqual(team["region"], "SC")
         self.assertEqual(team["website"], self.team.website)
 
-    def testEventTeamsApi(self):
+    def test_event_teams_api(self):
         response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
 
         team_dict = json.loads(response.body)
@@ -192,18 +191,18 @@ class TestEventMatchApiController(unittest2.TestCase):
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.event = Event(
-                id="2010sc",
-                name="Palmetto Regional",
-                event_type_enum=EventType.REGIONAL,
-                short_name="Palmetto",
-                event_short="sc",
-                year=2010,
-                end_date=datetime(2010, 03, 27),
-                official=True,
-                city="Clemson",
-                state_prov="SC",
-                country="USA",
-                start_date=datetime(2010, 03, 24),
+            id="2010sc",
+            name="Palmetto Regional",
+            event_type_enum=EventType.REGIONAL,
+            short_name="Palmetto",
+            event_short="sc",
+            year=2010,
+            end_date=datetime(2010, 03, 27),
+            official=True,
+            city="Clemson",
+            state_prov="SC",
+            country="USA",
+            start_date=datetime(2010, 03, 24)
         )
         self.event.put()
 
@@ -236,7 +235,7 @@ class TestEventMatchApiController(unittest2.TestCase):
         self.assertEqual(match["time_string"], self.match.time_string)
         self.assertEqual(match["time"], 1409527874)
 
-    def testEventMatchApi(self):
+    def test_event_match_api(self):
         response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
 
         match_json = json.loads(response.body)
@@ -264,18 +263,18 @@ class TestEventStatsApiController(unittest2.TestCase):
         }
 
         self.event = Event(
-                id="2010sc",
-                name="Palmetto Regional",
-                event_type_enum=EventType.REGIONAL,
-                short_name="Palmetto",
-                event_short="sc",
-                year=2010,
-                end_date=datetime(2010, 03, 27),
-                official=True,
-                city="Clemson",
-                state_prov="SC",
-                country="USA",
-                start_date=datetime(2010, 03, 24)
+            id="2010sc",
+            name="Palmetto Regional",
+            event_type_enum=EventType.REGIONAL,
+            short_name="Palmetto",
+            event_short="sc",
+            year=2010,
+            end_date=datetime(2010, 03, 27),
+            official=True,
+            city="Clemson",
+            state_prov="SC",
+            country="USA",
+            start_date=datetime(2010, 03, 24)
         )
         self.event.put()
 
@@ -288,7 +287,7 @@ class TestEventStatsApiController(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testEventStatsApi(self):
+    def test_event_stats_api(self):
         response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
 
         matchstats = json.loads(response.body)
@@ -314,21 +313,21 @@ class TestEventRankingsApiController(unittest2.TestCase):
             ["1", "1126", "20.00", "240.00", "480.00", "230.00", "478.00", "10-2-0", "0", "12"],
             ["2", "5030", "20.00", "200.00", "290.00", "220.00", "592.00", "10-2-0", "0", "12"],
             ["3", "250", "20.00", "70.00", "415.00", "220.00", "352.00", "10-2-0", "0", "12"]
-            ]
+        ]
 
         self.event = Event(
-                id="2010sc",
-                name="Palmetto Regional",
-                event_type_enum=EventType.REGIONAL,
-                short_name="Palmetto",
-                event_short="sc",
-                year=2010,
-                end_date=datetime(2010, 03, 27),
-                official=True,
-                city="Clemson",
-                state_prov="SC",
-                country="USA",
-                start_date=datetime(2010, 03, 24)
+            id="2010sc",
+            name="Palmetto Regional",
+            event_type_enum=EventType.REGIONAL,
+            short_name="Palmetto",
+            event_short="sc",
+            year=2010,
+            end_date=datetime(2010, 03, 27),
+            official=True,
+            city="Clemson",
+            state_prov="SC",
+            country="USA",
+            start_date=datetime(2010, 03, 24)
         )
         self.event.put()
 
@@ -339,31 +338,31 @@ class TestEventRankingsApiController(unittest2.TestCase):
         self.event_details.put()
 
         self.eventNoRanks = Event(
-                id="2010ct",
-                name="Palmetto Regional",
-                event_type_enum=EventType.REGIONAL,
-                short_name="Palmetto",
-                event_short="ct",
-                year=2010,
-                end_date=datetime(2010, 03, 27),
-                official=True,
-                city="Clemson",
-                state_prov="SC",
-                country="USA",
-                start_date=datetime(2010, 03, 24),
+            id="2010ct",
+            name="Palmetto Regional",
+            event_type_enum=EventType.REGIONAL,
+            short_name="Palmetto",
+            event_short="ct",
+            year=2010,
+            end_date=datetime(2010, 03, 27),
+            official=True,
+            city="Clemson",
+            state_prov="SC",
+            country="USA",
+            start_date=datetime(2010, 03, 24)
         )
         self.eventNoRanks.put()
 
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testEventRankingsApi(self):
+    def test_event_rankings_api(self):
         response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
 
         rankings = json.loads(response.body)
         self.assertEqual(self.rankings, rankings)
 
-    def testEventNoRankingsApi(self):
+    def test_event_no_rankings_api(self):
         response = self.testapp.get('/2010ct', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
 
         self.assertEqual("[]", response.body)
@@ -384,18 +383,18 @@ class TestEventListApiController(unittest2.TestCase):
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.event = Event(
-                id="2010sc",
-                name="Palmetto Regional",
-                event_type_enum=EventType.REGIONAL,
-                short_name="Palmetto",
-                event_short="sc",
-                year=2010,
-                end_date=datetime(2010, 03, 27),
-                official=True,
-                city="Clemson",
-                state_prov="SC",
-                country="USA",
-                start_date=datetime(2010, 03, 24),
+            id="2010sc",
+            name="Palmetto Regional",
+            event_type_enum=EventType.REGIONAL,
+            short_name="Palmetto",
+            event_short="sc",
+            year=2010,
+            end_date=datetime(2010, 03, 27),
+            official=True,
+            city="Clemson",
+            state_prov="SC",
+            country="USA",
+            start_date=datetime(2010, 03, 24)
         )
 
         self.event.put()
@@ -411,7 +410,7 @@ class TestEventListApiController(unittest2.TestCase):
         self.assertEqual(event["start_date"], self.event.start_date.date().isoformat())
         self.assertEqual(event["end_date"], self.event.end_date.date().isoformat())
 
-    def testEventListApi(self):
+    def test_event_list_api(self):
         response = self.testapp.get('/2010', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
         event_dict = json.loads(response.body)
         self.assertEventJson(event_dict[0])

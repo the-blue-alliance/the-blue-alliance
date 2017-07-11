@@ -1,12 +1,10 @@
 import datetime
 import json
-import os
 import unittest2
 
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from consts.district_type import DistrictType
 from consts.event_type import EventType
 from helpers.event_manipulator import EventManipulator
 from models.event import Event

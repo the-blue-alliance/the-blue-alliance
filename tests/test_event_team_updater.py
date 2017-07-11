@@ -1,5 +1,4 @@
 import datetime
-import os
 import unittest2
 
 from google.appengine.ext import ndb
@@ -20,21 +19,18 @@ CUR_YEAR = datetime.datetime.now().year
 def set_up_matches(html, event):
     with open(html, 'r') as f:
         parsed_matches, _ = UsfirstMatchesParser.parse(f.read())
-        matches = [Match(
-            id=Match.renderKeyName(
-                event.key.id(),
-                match.get("comp_level", None),
-                match.get("set_number", 0),
-                match.get("match_number", 0)),
-            event=event.key,
-            year=event.year,
-            set_number=match.get("set_number", 0),
-            match_number=match.get("match_number", 0),
-            comp_level=match.get("comp_level", None),
-            team_key_names=match.get("team_key_names", None),
-            alliances_json=match.get("alliances_json", None)
-            )
-            for match in parsed_matches]
+        matches = [Match(id=Match.renderKeyName(event.key.id(),
+                                                match.get("comp_level", None),
+                                                match.get("set_number", 0),
+                                                match.get("match_number", 0)),
+                         event=event.key,
+                         year=event.year,
+                         set_number=match.get("set_number", 0),
+                         match_number=match.get("match_number", 0),
+                         comp_level=match.get("comp_level", None),
+                         team_key_names=match.get("team_key_names", None),
+                         alliances_json=match.get("alliances_json", None))
+                   for match in parsed_matches]
         return matches
 
 
@@ -45,7 +41,6 @@ class TestEventTeamUpdater(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
-
 
         past_event = Event(
             id="{}tstupdaterpast".format(CUR_YEAR),

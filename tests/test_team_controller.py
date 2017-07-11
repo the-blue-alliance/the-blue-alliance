@@ -32,62 +32,62 @@ class TestTeamController(unittest2.TestCase):
         self.testapp = webtest.TestApp(app)
 
         self.team = Team(
-                id="frc1124",
-                name="Really Long Name",
-                team_number=1124,
-                rookie_year=2003,
-                nickname="The UberBots",
-                city="Avon",
-                state_prov="CT",
-                country="USA",
-                website="www.uberbots.org",
-                motto="This is a motto",
+            id="frc1124",
+            name="Really Long Name",
+            team_number=1124,
+            rookie_year=2003,
+            nickname="The UberBots",
+            city="Avon",
+            state_prov="CT",
+            country="USA",
+            website="www.uberbots.org",
+            motto="This is a motto"
         )
         self.event = Event(
-                id="2016necmp",
-                name="New England District Championship",
-                event_type_enum=EventType.DISTRICT_CMP,
-                short_name="New England",
-                event_short="necmp",
-                year=2016,
-                end_date=datetime(2016, 03, 27),
-                official=True,
-                city='Hartford',
-                state_prov='CT',
-                country='USA',
-                venue="Some Venue",
-                venue_address="Some Venue, Hartford, CT, USA",
-                timezone_id="America/New_York",
-                start_date=datetime(2016, 03, 24),
+            id="2016necmp",
+            name="New England District Championship",
+            event_type_enum=EventType.DISTRICT_CMP,
+            short_name="New England",
+            event_short="necmp",
+            year=2016,
+            end_date=datetime(2016, 03, 27),
+            official=True,
+            city='Hartford',
+            state_prov='CT',
+            country='USA',
+            venue="Some Venue",
+            venue_address="Some Venue, Hartford, CT, USA",
+            timezone_id="America/New_York",
+            start_date=datetime(2016, 03, 24)
         )
         self.event_team = EventTeam(
-                id="2016necmp_frc1124",
-                team=self.team.key,
-                event=self.event.key,
-                year=2016
+            id="2016necmp_frc1124",
+            team=self.team.key,
+            event=self.event.key,
+            year=2016
         )
         self.event2 = Event(
-                id="2015necmp",
-                name="New England District Championship",
-                event_type_enum=EventType.DISTRICT_CMP,
-                short_name="New England",
-                event_short="necmp",
-                year=2015,
-                end_date=datetime(2015, 03, 27),
-                official=True,
-                city='Hartford',
-                state_prov='CT',
-                country='USA',
-                venue="Some Venue",
-                venue_address="Some Venue, Hartford, CT, USA",
-                timezone_id="America/New_York",
-                start_date=datetime(2015, 03, 24),
+            id="2015necmp",
+            name="New England District Championship",
+            event_type_enum=EventType.DISTRICT_CMP,
+            short_name="New England",
+            event_short="necmp",
+            year=2015,
+            end_date=datetime(2015, 03, 27),
+            official=True,
+            city='Hartford',
+            state_prov='CT',
+            country='USA',
+            venue="Some Venue",
+            venue_address="Some Venue, Hartford, CT, USA",
+            timezone_id="America/New_York",
+            start_date=datetime(2015, 03, 24)
         )
         self.event_team2 = EventTeam(
-                id="2015necmp_frc1124",
-                team=self.team.key,
-                event=self.event2.key,
-                year=2015
+            id="2015necmp_frc1124",
+            team=self.team.key,
+            event=self.event2.key,
+            year=2015
         )
         self.event_team.put()
         self.team.put()
@@ -99,47 +99,47 @@ class TestTeamController(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testTeamListDefaultPage(self):
+    def test_team_list_default_page(self):
         response = self.testapp.get("/teams")
         self.assertEqual(response.status_int, 200)
 
-    def testTeamListExplicitPage(self):
+    def test_team_list_explicit_page(self):
         response = self.testapp.get("/teams/1")
         self.assertEqual(response.status_int, 200)
 
-    def testTeamListBadPage(self):
+    def test_team_list_bad_page(self):
         response = self.testapp.get("/teams/19", status=404)
         self.assertEqual(response.status_int, 404)
 
-    def testTeamCanonical(self):
+    def test_team_canonical(self):
         response = self.testapp.get("/team/1124")
         self.assertEqual(response.status_int, 200)
 
-    def testBadTeamCanonical(self):
+    def test_bad_team_canonical(self):
         response = self.testapp.get("/team/1337", status=404)
         self.assertEqual(response.status_int, 404)
 
-    def testTeamDetail(self):
+    def test_team_detail(self):
         response = self.testapp.get("/team/1124/2016")
         self.assertEqual(response.status_int, 200)
 
     # Because 2015 is special :/
-    def testTeamDetail2015(self):
+    def test_team_detail_2015(self):
         response = self.testapp.get("/team/1124/2015")
         self.assertEqual(response.status_int, 200)
 
-    def testTeamDetailBadYear(self):
+    def test_team_detail_bad_year(self):
         response = self.testapp.get("/team/1124/2014", status=404)
         self.assertEqual(response.status_int, 404)
 
-    def testBadTeamDetail(self):
+    def test_bad_team_detail(self):
         response = self.testapp.get("/team/1337/2016", status=404)
         self.assertEqual(response.status_int, 404)
 
-    def testTeamHistory(self):
+    def test_team_history(self):
         response = self.testapp.get("/team/1124/history")
         self.assertEqual(response.status_int, 200)
 
-    def testBadTeamHistory(self):
+    def test_bad_team_history(self):
         response = self.testapp.get("/team/1337/history", status=404)
         self.assertEqual(response.status_int, 404)

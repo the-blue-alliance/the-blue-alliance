@@ -1,4 +1,3 @@
-import datetime
 import unittest2
 
 from google.appengine.ext import ndb
