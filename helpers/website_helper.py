@@ -6,13 +6,13 @@ class WebsiteHelper(object):
         "website.com" to "http://website.com", while keeping
         "https://website.com" the same.
         """
-        if website_url is None:
+        if not website_url:
             return None
 
         formatted_url = None
 
         website_url = website_url.strip()
-        if not website_url.startswith('http://') and not website_url.startswith('https://'):
+        if not website_url.startswith('http://') and not website_url.startswith('https://') and not website_url.startswith('ftp://'):
             formatted_url = 'http://{}'.format(website_url)
         else:
             formatted_url = website_url
