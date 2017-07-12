@@ -6,6 +6,9 @@ class WebsiteHelper(object):
         "website.com" to "http://website.com", while keeping
         "https://website.com" the same.
         """
+        if website_url is None:
+            return None
+
         formatted_url = None
 
         website_url = website_url.strip()
