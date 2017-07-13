@@ -2,6 +2,7 @@ import urlparse
 
 from google.appengine.ext import ndb
 
+from helpers.website_helper import WebsiteHelper
 from consts.district_type import DistrictType
 from models.district import District
 from models.district_team import DistrictTeam
@@ -32,11 +33,7 @@ class FMSAPITeamDetailsParser(object):
             if teamData['website'] is not None and 'www.firstinspires.org' in teamData['website']:
                 website = None
             else:
-                raw_website = teamData.get('website', None)
-                website = urlparse.urlparse(raw_website, 'http').geturl() if raw_website else None
-
-                # Fix oddity with urlparse having three slashes after the scheme (#1635)
-                website = website.replace('///', '//') if website else None
+                website = WebsiteHelper.format_url(teamData.get('website', None))
 
             team = Team(
                 id="frc{}".format(teamData['teamNumber']),

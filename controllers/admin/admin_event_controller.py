@@ -21,6 +21,7 @@ from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.team_manipulator import TeamManipulator
 from helpers.match_manipulator import MatchManipulator
 from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
+from helpers.website_helper import WebsiteHelper
 from models.district import District
 from models.event import Event
 from models.event_details import EventDetails
@@ -384,6 +385,8 @@ class AdminEventEdit(LoggedInHandler):
         division_key_names = json.loads(self.request.get('divisions'), '[]') if self.request.get('divisions') else []
         division_keys = [ndb.Key(Event, key) for key in division_key_names] if division_key_names else []
 
+        website = WebsiteHelper.format_url(self.request.get("website"))
+
         event = Event(
             id=str(self.request.get("year")) + str.lower(str(self.request.get("event_short"))),
             end_date=end_date,
@@ -400,7 +403,7 @@ class AdminEventEdit(LoggedInHandler):
             name=self.request.get("name"),
             short_name=self.request.get("short_name"),
             start_date=start_date,
-            website=self.request.get("website"),
+            website=website,
             year=int(self.request.get("year")),
             official={"true": True, "false": False}.get(self.request.get("official").lower()),
             facebook_eid=self.request.get("facebook_eid"),

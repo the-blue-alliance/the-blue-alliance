@@ -4,6 +4,7 @@ from datetime import datetime
 from consts.auth_type import AuthType
 from consts.event_type import EventType
 from consts.media_type import MediaType
+from helpers.website_helper import WebsiteHelper
 from helpers.media_helper import MediaParser
 from helpers.webcast_helper import WebcastParser
 
@@ -103,9 +104,7 @@ class SuggestionCreator(object):
     def createEventWebcastSuggestion(cls, author_account_key, webcast_url, webcast_date, event_key):
         """Create a Event Webcast Suggestion. Returns status string"""
 
-        webcast_url = webcast_url.strip()
-        if not webcast_url.startswith('http://') and not webcast_url.startswith('https://'):
-            webcast_url = 'http://' + webcast_url
+        webcast_url = WebsiteHelper.format_url(webcast_url)
 
         webcast_date = webcast_date.strip()
         if webcast_date:
