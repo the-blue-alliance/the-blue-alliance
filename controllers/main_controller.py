@@ -175,9 +175,12 @@ class MainInsightsHandler(CacheableHandler):
     def _render(self, *args, **kw):
         week_events = EventHelper.getWeekEvents()
         year = datetime.datetime.now().year
+        special_webcasts = FirebasePusher.get_special_webcasts()
         self.template_values.update({
             "events": week_events,
             "year": year,
+            "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
+            "special_webcasts": special_webcasts,
         })
 
         insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(year, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
