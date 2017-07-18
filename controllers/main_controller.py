@@ -165,12 +165,12 @@ class MainCompetitionseasonHandler(CacheableHandler):
 
 
 class MainInsightsHandler(CacheableHandler):
-    CACHE_VERSION = 2
+    CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "main_insights"
 
     def __init__(self, *args, **kw):
         super(MainInsightsHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24
+        self._cache_expiration = 60 * 5
 
     def _render(self, *args, **kw):
         week_events = EventHelper.getWeekEvents()
