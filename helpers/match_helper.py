@@ -401,7 +401,15 @@ class MatchHelper(object):
             'teleopBoulderPoints', 'teleopBouldersHigh', 'teleopBouldersLow',
             'teleopChallengePoints', 'teleopCrossingPoints', 'teleopDefensesBreached',
             'teleopPoints', 'teleopScalePoints', 'teleopTowerCaptured', 'totalPoints',
-            'towerEndStrength', 'towerFaceA', 'towerFaceB', 'towerFaceC'])
+            'towerEndStrength', 'towerFaceA', 'towerFaceB', 'towerFaceC']),
+        2017: set([
+            'adjustPoints', 'autoFuelHigh', 'autoFuelLow', 'autoFuelPoints',
+            'autoMobilityPoints', 'autoPoints', 'autoRotorPoints', 'foulCount', 'foulPoints',
+            'kPaBonusPoints', 'kPaRankingPointAchieved', 'robot1Auto', 'robot2Auto', 'robot3Auto',
+            'rotor1Auto', 'rotor1Engaged', 'rotor2Auto', 'rotor2Engaged', 'rotor3Engaged', 'rotor4Engaged',
+            'rotorBonusPoints', 'rotorRankingPointAchieved', 'techFoulCount', 'teleopFuelHigh',
+            'teleopFuelLow', 'teleopFuelPoints', 'teleopPoints', 'teleopRotorPoints', 'teleopTakeoffPoints',
+            'totalPoints', 'touchpadFar', 'touchpadMiddle', 'touchpadNear']),
     }
 
     @classmethod
