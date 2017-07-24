@@ -14,6 +14,9 @@ class PlayoffType(object):
     # Double Elimination Bracket
     DOUBLE_ELIM_8_TEAM = 5
 
+    # Festival of Champions
+    BO5_FINALS = 6
+
     BRACKET_TYPES = [BRACKET_8_TEAM, BRACKET_16_TEAM, BRACKET_4_TEAM]
     DOUBLE_ELIM_TYPES = [DOUBLE_ELIM_8_TEAM]
 
@@ -25,6 +28,7 @@ class PlayoffType(object):
         AVG_SCORE_8_TEAM: "Average Score (8 Alliances)",
         ROUND_ROBIN_6_TEAM: "Round Robin (6 Alliances)",
         DOUBLE_ELIM_8_TEAM: "Double Elimination Bracket (8 Alliances)",
+        BO5_FINALS: "Best of 5 Finals",
     }
 
     @classmethod

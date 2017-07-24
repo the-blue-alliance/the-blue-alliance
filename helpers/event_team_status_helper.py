@@ -4,6 +4,7 @@ import numpy as np
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb.tasklets import Future
 
+from consts.playoff_type import PlayoffType
 from helpers.match_helper import MatchHelper
 from helpers.rankings_helper import RankingsHelper
 from helpers.team_helper import TeamHelper
@@ -211,7 +212,7 @@ class EventTeamStatusHelper(object):
         return copy.deepcopy({
             'qual': cls._build_qual_info(team_key, event_details, matches, event.year),
             'alliance': cls._build_alliance_info(team_key, event_details, matches),
-            'playoff': cls._build_playoff_info(team_key, event_details, matches, event.year),
+            'playoff': cls._build_playoff_info(team_key, event_details, matches, event.year, event.playoff_type),
             'last_match_key': last_match[0].key_name if last_match else None,
             'next_match_key': next_match[0].key_name if next_match else None,
         })  # TODO: Results are getting mixed unless copied. 2017-02-03 -fangeugene
@@ -317,12 +318,14 @@ class EventTeamStatusHelper(object):
         }
 
     @classmethod
-    def _build_playoff_info(cls, team_key, event_details, matches, year):
+    def _build_playoff_info(cls, team_key, event_details, matches, year, playoff_type):
         # Matches needs to be all playoff matches at the event, to properly account for backups
         alliance, _ = cls._get_alliance(team_key, event_details, matches)
         complete_alliance = set(alliance['picks']) if alliance else set()
         if alliance and alliance.get('backup'):
             complete_alliance.add(alliance['backup']['in'])
+
+        is_bo5 = playoff_type == PlayoffType.BO5_FINALS
 
         all_wins = 0
         all_losses = 0
@@ -358,12 +361,12 @@ class EventTeamStatusHelper(object):
                 if not status:
                     # Only set this for the first comp level that gets this far,
                     # But run through the rest to calculate the full record
-                    if level_wins == 2:
+                    if level_wins == 3 if is_bo5 else 2:
                         status = {
                             'status': 'won',
                             'level': comp_level,
                         }
-                    elif level_losses == 2:
+                    elif level_losses == 3 if is_bo5 else 2:
                         status = {
                             'status': 'eliminated',
                             'level': comp_level
