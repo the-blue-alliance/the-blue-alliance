@@ -361,12 +361,12 @@ class EventTeamStatusHelper(object):
                 if not status:
                     # Only set this for the first comp level that gets this far,
                     # But run through the rest to calculate the full record
-                    if level_wins == 3 if is_bo5 else 2:
+                    if level_wins == (3 if is_bo5 else 2):
                         status = {
                             'status': 'won',
                             'level': comp_level,
                         }
-                    elif level_losses == 3 if is_bo5 else 2:
+                    elif level_losses == (3 if is_bo5 else 2):
                         status = {
                             'status': 'eliminated',
                             'level': comp_level
