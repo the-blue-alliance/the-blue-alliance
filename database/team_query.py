@@ -12,7 +12,7 @@ from models.team import Team
 
 
 class TeamQuery(DatabaseQuery):
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'team_{}'  # (team_key)
     DICT_CONVERTER = TeamConverter
 
