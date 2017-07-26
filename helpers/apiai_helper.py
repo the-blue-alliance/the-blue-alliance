@@ -1,7 +1,10 @@
 import datetime
 
 from database.event_query import TeamYearEventsQuery
+from database.match_query import TeamEventMatchesQuery
+from helpers.event_helper import EventHelper
 from helpers.event_team_status_helper import EventTeamStatusHelper
+from helpers.match_helper import MatchHelper
 from models.event_team import EventTeam
 from models.team import Team
 
@@ -9,17 +12,17 @@ from models.team import Team
 class APIAIHelper(object):
     ACTION_MAP = {
         'getteam.generic': '_getteam_generic',
+        'getteam.fallback': '_getteam_fallback',
         'getteam.location': '_getteam_location',
         'getteam.rookieyear': '_getteam_rookieyear',
         'getteam.status': '_getteam_status',
+        'getteam.nextmatch': '_getteam_nextmatch',
     }
 
     @classmethod
     def process_request(cls, request):
         action = request['result']['action']
-        parameters = request['result']['parameters']
-
-        return getattr(APIAIHelper, cls.ACTION_MAP.get(action, '_unknown_action'))(parameters)
+        return getattr(APIAIHelper, cls.ACTION_MAP.get(action, '_unknown_action'))(request)
 
     @classmethod
     def _team_number_tts(cls, team_number):
@@ -95,7 +98,7 @@ class APIAIHelper(object):
         }]
 
     @classmethod
-    def _unknown_action(cls, parameters):
+    def _unknown_action(cls, request):
         text = 'Whoops, something went wrong. Please ask me something else.'
         return {
             'speech': text,
@@ -103,46 +106,79 @@ class APIAIHelper(object):
         }
 
     @classmethod
-    def _getteam_generic(cls, parameters):
-        team_number = parameters['team_number']
+    def _getteam_generic(cls, request):
+        team_number = request['result']['parameters']['team_number']
         team = Team.get_by_id('frc{}'.format(team_number))
         if team:
-            text = 'What would you like to know about Team {0}? You can ask about their location, rookie year, or current status.'.format(
-                team_number, team.city_state_country)
-            tts = 'What would you like to know about Team {0}? You can ask about their location, rookie year, or current status.'.format(
-                cls._team_number_tts(team_number), team.city_state_country)
+            fmt = 'What would you like to know about Team {0}? I can tell you about \
+                their next match, how they are currently doing, or generic \
+                information like their location or rookie year.'
+            add_messages = cls._create_suggestion_chips([
+                'Next match',
+                'Current status',
+                'Location',
+                'Rookie year',
+            ])
         else:
-            text = 'Team {0} does not exist. Please ask about another team.'.format(team_number)
-            tts = 'Team {0} does not exist. Please ask about another team.'.format(cls._team_number_tts(team_number))
+            fmt = 'Team {0} does not exist. Please ask about another team.'
+            add_messages = []
+        text = fmt.format(team_number)
+        tts = fmt.format(cls._team_number_tts(team_number))
+
+        return {
+            'speech': text,
+            'messages': cls._create_simple_response(text, tts=tts) + add_messages
+        }
+
+    @classmethod
+    def _getteam_fallback(cls, request):
+        team_number = None
+        for context in request['result']['contexts']:
+            if context['name'] == 'getteam':
+                team_number = context['parameters']['team_number']
+                break
+        team = Team.get_by_id('frc{}'.format(team_number))
+        if team:
+            fmt = 'Sorry, I don\'t understand your question about Team {0}. \
+            Try asking about their next match, status, location, or rookie year.'
+        else:
+            fmt = 'Team {0} does not exist. Please ask about another team.'
+        text = fmt.format(team_number)
+        tts = fmt.format(cls._team_number_tts(team_number))
 
         return {
             'speech': text,
             'messages': cls._create_simple_response(text, tts=tts) +
                 cls._create_suggestion_chips([
+                    'Next match',
+                    'Current status',
                     'Location',
                     'Rookie year',
-                    'Current status'
                 ])
         }
 
     @classmethod
-    def _getteam_location(cls, parameters):
-        team_number = parameters['team_number']
+    def _getteam_location(cls, request):
+        team_number = request['result']['parameters']['team_number']
         team = Team.get_by_id('frc{}'.format(team_number))
         if team:
-            text = 'Team {0} is from {1}. Would you like to know more about {0} or another team?'.format(
+            fmt = 'Team {0} is from {1}. Would you like to know more about {0} or another team?'
+            text = fmt.format(
                 team_number, team.city_state_country)
-            tts = 'Team {0} is from {1}. Would you like to know more about {0} or another team?'.format(
+            tts = fmt.format(
                 cls._team_number_tts(team_number), team.city_state_country)
             messages = cls._create_simple_response(text, tts=tts) + \
                 cls._create_suggestion_chips([
-                    'Rookie year',
+                    'Next match',
                     'Current status',
-                    'Another team'
+                    'Rookie year',
+                    'Another team',
+                    'No thanks',
                 ])
         else:
-            text = 'Team {0} does not exist. Please ask about another team.'.format(team_number)
-            tts = 'Team {0} does not exist. Please ask about another team.'.format(cls._team_number_tts(team_number))
+            fmt = 'Team {0} does not exist. Please ask about another team.'
+            text = fmt.format(team_number)
+            tts = fmt.format(cls._team_number_tts(team_number))
             messages = cls._create_simple_response(text, tts=tts)
 
         return {
@@ -151,23 +187,27 @@ class APIAIHelper(object):
         }
 
     @classmethod
-    def _getteam_rookieyear(cls, parameters):
-        team_number = parameters['team_number']
+    def _getteam_rookieyear(cls, request):
+        team_number = request['result']['parameters']['team_number']
         team = Team.get_by_id('frc{}'.format(team_number))
         if team:
-            text = 'Team {0} first competed in {1}. Would you like to know more about {0} or another team?'.format(
+            fmt = 'Team {0} first competed in {1}. Would you like to know more about {0} or another team?'
+            text = fmt.format(
                 team_number, team.rookie_year)
-            tts = 'Team {0} first competed in {1}. Would you like to know more about {0} or another team?'.format(
+            tts = fmt.format(
                 cls._team_number_tts(team_number), team.rookie_year)
             messages = cls._create_simple_response(text, tts=tts) + \
                 cls._create_suggestion_chips([
-                    'Location',
+                    'Next match',
                     'Current status',
-                    'Another team'
+                    'Location',
+                    'Another team',
+                    'No thanks',
                 ])
         else:
-            text = 'Team {0} does not exist. Please ask about another team.'.format(team_number)
-            tts = 'Team {0} does not exist. Please ask about another team.'.format(cls._team_number_tts(team_number))
+            fmt = 'Team {0} does not exist. Please ask about another team.'
+            text = fmt.format(team_number)
+            tts = fmt.format(cls._team_number_tts(team_number))
             messages = cls._create_simple_response(text, tts=tts)
 
         return {
@@ -176,8 +216,8 @@ class APIAIHelper(object):
         }
 
     @classmethod
-    def _getteam_status(cls, parameters):
-        team_number = parameters['team_number']
+    def _getteam_status(cls, request):
+        team_number = request['result']['parameters']['team_number']
         team_key = 'frc{}'.format(team_number)
         team = Team.get_by_id(team_key)
         if team:
@@ -190,8 +230,12 @@ class APIAIHelper(object):
             if current_event:
                 event_team = EventTeam.get_by_id('{}_{}'.format(current_event.key.id(), team_key))
 
-                text = EventTeamStatusHelper.generate_team_at_event_status_string(team_key, event_team.status, formatting=False, event=current_event)
-                tts = 'Team {} {}'.format(cls._team_number_tts(team_number), EventTeamStatusHelper.generate_team_at_event_status_string(team_key, event_team.status, formatting=False, event=current_event, include_team=False, verbose=True))
+                text = EventTeamStatusHelper.generate_team_at_event_status_string(
+                    team_key, event_team.status, formatting=False, event=current_event)
+                tts = 'Team {} {}'.format(
+                    cls._team_number_tts(team_number),
+                    EventTeamStatusHelper.generate_team_at_event_status_string(
+                        team_key, event_team.status, formatting=False, event=current_event, include_team=False, verbose=True))
 
                 additional_prompt = ' Would you like to know more about {} or another team?'.format(team_number)
                 text += additional_prompt
@@ -200,23 +244,121 @@ class APIAIHelper(object):
                 messages = cls._create_simple_response(text, tts=tts) +\
                     cls._create_link_chip(event.display_name, 'https://www.thebluealliance.com/event/{}'.format(event.key.id()))
             else:
-                text = 'Team {0} is not currently competing. Would you like to know more about {0} or another team?'.format(
+                fmt = 'Team {0} is not currently competing. Would you like to know more about {0} or another team?'
+                text = fmt.format(
                     team_number)
-                tts = 'Team {0} is not currently competing. Would you like to know more about {0} or another team?'.format(
+                tts = fmt.format(
                     cls._team_number_tts(team_number))
                 messages = cls._create_simple_response(text, tts=tts)
 
             messages += cls._create_suggestion_chips([
+                    'Next match',
                     'Location',
                     'Rookie year',
-                    'Another team'
+                    'Another team',
+                    'No thanks',
                 ])
         else:
-            text = 'Team {0} does not exist. Please ask about another team.'.format(team_number)
-            tts = 'Team {0} does not exist. Please ask about another team.'.format(cls._team_number_tts(team_number))
+            fmt = 'Team {0} does not exist. Please ask about another team.'
+            text = fmt.format(team_number)
+            tts = fmt.format(cls._team_number_tts(team_number))
             messages = cls._create_simple_response(text, tts=tts)
 
         return {
             'speech': text,
             'messages': messages,
+        }
+
+    @classmethod
+    def _getteam_nextmatch(cls, request):
+        team_number = request['result']['parameters']['team_number']
+        team_key = 'frc{}'.format(team_number)
+        team = Team.get_by_id(team_key)
+        if team:
+            events = TeamYearEventsQuery(team_key, datetime.datetime.now().year).fetch()
+            EventHelper.sort_events(events)
+
+            # Find first current or future event
+            for event in events:
+                if event.now:
+                    matches = TeamEventMatchesQuery(team_key, event.key.id()).fetch()
+                    matches = MatchHelper.play_order_sort_matches(matches)
+                    if matches:
+                        next_match = None
+                        for match in matches:
+                            if not match.has_been_played:
+                                next_match = match
+                                break
+
+                        if next_match is not None:
+                            if match.time:
+                                eta = match.time - datetime.datetime.now()
+                                eta_str = None
+                                if eta < datetime.timedelta(0):
+                                    fmt = 'Team {0} will be playing in {1} soon at the {3}.'
+                                else:
+                                    eta_str = ''
+                                    days = eta.days
+                                    hours, rem = divmod(eta.seconds, 3600)
+                                    minutes, _ = divmod(rem, 60)
+                                    if days:
+                                        eta_str += ' {} day{}'.format(days, '' if days == 1 else 's')
+                                    if hours:
+                                        eta_str += ' {} hour{}'.format(hours, '' if hours == 1 else 's')
+                                    if minutes:
+                                        eta_str += ' {} minute{}'.format(minutes, '' if minutes == 1 else 's')
+                                    fmt = 'Team {0} will be playing in {1} in about{2} at the {3}.'
+                                text = fmt.format(team_number, match.verbose_name, eta_str, event.normalized_name)
+                                tts = fmt.format(cls._team_number_tts(team_number), match.verbose_name, eta_str, event.normalized_name)
+                            else:
+                                fmt = 'Team {0} will be playing in {1} at the {2}.'
+                                text = fmt.format(team_number, match.verbose_name, event.normalized_name)
+                                tts = fmt.format(cls._team_number_tts(team_number), match.verbose_name, event.normalized_name)
+                            add_messages = cls._create_link_chip(
+                                match.verbose_name,
+                                'https://www.thebluealliance.com/event/{}'.format(event.key.id()))
+                        else:
+                            fmt = 'Team {0} has no more scheduled matches at the {1}.'
+                            text = fmt.format(team_number, event.normalized_name)
+                            tts = fmt.format(cls._team_number_tts(team_number), event.normalized_name)
+                            add_messages = []
+                    else:
+                        fmt = 'Team {0} has no scheduled matches at the {1}.'
+                        text = fmt.format(team_number, event.normalized_name)
+                        tts = fmt.format(cls._team_number_tts(team_number), event.normalized_name)
+                        add_messages = []
+                    break
+                elif event.future:
+                    fmt = 'Team {0} will be competing at the {1} which begins on {2}.'
+                    event_date = event.start_date.strftime("%B %d")
+                    text = fmt.format(team_number, event.normalized_name, event_date)
+                    tts = fmt.format(cls._team_number_tts(team_number), event.normalized_name, event_date)
+                    add_messages = cls._create_link_chip(
+                        'event page', 'https://www.thebluealliance.com/event/{}'.format(event.key.id()))
+                    break
+            else:
+                fmt = 'Team {0} is not registered for any more events this season.'
+                text = fmt.format(team_number)
+                tts = fmt.format(cls._team_number_tts(team_number))
+                add_messages = []
+
+            fmt = ' Would you like to know more about {} or another team?'
+            text += fmt.format(team_number)
+            tts += fmt.format(cls._team_number_tts(team_number))
+            add_messages += cls._create_suggestion_chips([
+                'Current status',
+                'Location',
+                'Rookie year',
+                'Another team',
+                'No thanks',
+            ])
+        else:
+            fmt = 'Team {0} does not exist. Please ask about another team.'
+            text = fmt.format(team_number)
+            tts = fmt.format(cls._team_number_tts(team_number))
+            add_messages = []
+
+        return {
+            'speech': text,
+            'messages': cls._create_simple_response(text, tts=tts) + add_messages,
         }
