@@ -110,9 +110,7 @@ class APIAIHelper(object):
         team_number = request['result']['parameters']['team_number']
         team = Team.get_by_id('frc{}'.format(team_number))
         if team:
-            fmt = 'What would you like to know about Team {0}? I can tell you about \
-                their next match, how they are currently doing, or generic \
-                information like their location or rookie year.'
+            fmt = 'What would you like to know about Team {0}? I can tell you about their next match, how they are currently doing, or generic information like their location or rookie year.'
             add_messages = cls._create_suggestion_chips([
                 'Next match',
                 'Current status',
@@ -139,8 +137,7 @@ class APIAIHelper(object):
                 break
         team = Team.get_by_id('frc{}'.format(team_number))
         if team:
-            fmt = 'Sorry, I don\'t understand your question about Team {0}. \
-            Try asking about their next match, status, location, or rookie year.'
+            fmt = 'Sorry, I don\'t understand your question about Team {0}. Try asking about their next match, status, location, or rookie year.'
         else:
             fmt = 'Team {0} does not exist. Please ask about another team.'
         text = fmt.format(team_number)
