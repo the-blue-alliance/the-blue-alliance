@@ -318,8 +318,11 @@ class DatafeedFMSAPI(object):
 
     # Returns a tuple: (list(Event), list(District))
     def getEventList(self, year):
-        events, districts = self._parse(self.FMS_API_EVENT_LIST_URL_PATTERN % (year), FMSAPIEventListParser(year))
-        return events, districts
+        result = self._parse(self.FMS_API_EVENT_LIST_URL_PATTERN % (year), FMSAPIEventListParser(year))
+        if result:
+            return result
+        else:
+            return [], []
 
     def getEventDetails(self, event_key):
         year = int(event_key[:4])
