@@ -213,7 +213,7 @@ class EventHelper(object):
         return events
 
     @classmethod
-    def getShortName(self, name_str):
+    def getShortName(self, name_str, district_code=None):
         """
         Extracts a short name like "Silicon Valley" from an event name like
         "Silicon Valley Regional sponsored by Google.org".
@@ -222,7 +222,10 @@ class EventHelper(object):
         """
         district_keys = memcache.get('EventHelper.getShortName():district_keys')
         if not district_keys:
-            district_keys = '|'.join(set([d.id()[4:].upper() for d in District.query().fetch(keys_only=True)]))
+            codes = set([d.id()[4:].upper() for d in District.query().fetch(keys_only=True)])
+            if district_code:
+                codes.add(district_code.upper())
+            district_keys = '|'.join(codes)
         memcache.set('EventHelper.getShortName():district_keys', district_keys, 60*60)
 
         # 2015+ districts

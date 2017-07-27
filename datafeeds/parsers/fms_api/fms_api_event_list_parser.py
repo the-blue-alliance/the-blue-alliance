@@ -73,7 +73,7 @@ class FMSAPIEventListParser(object):
                 logging.warn("Event type '{}' not recognized!".format(event['type']))
                 continue
             name = event['name']
-            short_name = EventHelper.getShortName(name)
+            short_name = EventHelper.getShortName(name, district_code=event['districtCode'])
             district_enum = EventHelper.parseDistrictName(event['districtCode'].lower()) if event['districtCode'] else DistrictType.NO_DISTRICT
             district_key = District.renderKeyName(self.season, event['districtCode'].lower()) if event['districtCode'] else None
             venue = event['venue']
