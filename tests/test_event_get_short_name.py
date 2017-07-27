@@ -1,9 +1,33 @@
 import unittest2
 
+from google.appengine.ext import ndb
+from google.appengine.ext import testbed
+
+from helpers.district_manipulator import DistrictManipulator
 from helpers.event_helper import EventHelper
+from models.district import District
 
 
 class TestEventGetShortName(unittest2.TestCase):
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+        self.testbed.init_taskqueue_stub(root_path=".")
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
+        # Create districts
+        districts = []
+        for code in ['mar', 'isr', 'nc', 'ne', 'pnw', 'pch', 'chs', 'in', 'ont', 'fim']:
+            year = 2017
+            districts.append(District(
+                id=District.renderKeyName(year, code),
+                year=year,
+                abbreviation=code,
+            ))
+        DistrictManipulator.createOrUpdate(districts)
+
     def test_event_get_short_name(self):
         # Edge cases.
         self.assertEquals(EventHelper.getShortName("  { Random 2.718 stuff! }  "), "{ Random 2.718 stuff! }")
@@ -245,3 +269,5 @@ class TestEventGetShortName(unittest2.TestCase):
         self.assertEqual(EventHelper.getShortName("FIRST Ontario Provincial Championship"), "Ontario")
         self.assertEqual(EventHelper.getShortName("FIM District - Kettering University Event #1"), "Kettering University #1")
         self.assertEqual(EventHelper.getShortName("ISR District Event #1"), "ISR #1")
+        # 2018 edge cases
+        self.assertEqual(EventHelper.getShortName("PNW District Clackamas Academy Event"), "Clackamas Academy")

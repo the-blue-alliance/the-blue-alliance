@@ -9,6 +9,7 @@ from google.appengine.ext import ndb
 from consts.district_type import DistrictType
 from consts.event_type import EventType
 
+from models.district import District
 from models.event import Event
 from models.match import Match
 
@@ -219,14 +220,26 @@ class EventHelper(object):
 
         See https://github.com/the-blue-alliance/the-blue-alliance-android/blob/master/android/src/test/java/com/thebluealliance/androidclient/test/helpers/EventHelperTest.java
         """
+        district_keys = memcache.get('EventHelper.getShortName():district_keys')
+        if not district_keys:
+            district_keys = '|'.join(set([d.id()[4:].upper() for d in District.query().fetch(keys_only=True)]))
+        memcache.set('EventHelper.getShortName():district_keys', district_keys, 60*60)
+
         # 2015+ districts
-        re_string = '(?:[A-Z]+ District -(.+))'
+        # Numbered events with no name
+        re_string = '({}) District Event (#\d+)'.format(district_keys)
+        match = re.match(re_string, name_str)
+        if match:
+            return '{} {}'.format(match.group(1).strip(), match.group(2).strip())
+        # The rest
+        re_string = '(?:{}) District -?(.+)'.format(district_keys)
         match = re.match(re_string, name_str)
         if match:
             partial = match.group(1).strip()
             match2 = re.sub(r'(?<=[\w\s])Event\s*(?:[\w\s]*$)?', '', partial)
             return match2.strip()
 
+        # 2014- districts
         # district championships, other districts, and regionals
         name_str = re.sub(r'\s?Event','', name_str)
         match = re.match(r'\s*(?:MAR |PNW |)(?:FIRST Robotics|FRC|)(.+)(?:District|Regional|Region|Provincial|State|Tournament|FRC|Field)(?:\b)(?:[\w\s]+?(#\d*)*)?', name_str)
