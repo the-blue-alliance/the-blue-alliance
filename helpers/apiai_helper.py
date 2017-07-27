@@ -288,10 +288,10 @@ class APIAIHelper(object):
                                 break
 
                         if next_match is not None:
-                            if match.time:
-                                eta = match.time - datetime.datetime.now()
+                            if match.predicted_time:
+                                eta = match.predicted_time - datetime.datetime.now()
                                 eta_str = None
-                                if eta < datetime.timedelta(0):
+                                if eta < datetime.timedelta(minutes=5):
                                     fmt = 'Team {0} will be playing in {1} soon at the {3}.'
                                 else:
                                     eta_str = ''
