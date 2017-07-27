@@ -32,12 +32,11 @@ class EventManipulator(ManipulatorBase):
         To run after models have been updated
         """
         for (event, updated_attrs) in zip(events, updated_attr_list):
-            # Disabled due to unreliability. 2017-01-24 -fangeugene
-            # try:
-            #     LocationHelper.update_event_location(event)
-            # except Exception, e:
-            #     logging.error("update_event_location for {} errored!".format(event.key.id()))
-            #     logging.exception(e)
+            try:
+                LocationHelper.update_event_location(event)
+            except Exception, e:
+                logging.error("update_event_location for {} errored!".format(event.key.id()))
+                logging.exception(e)
 
             try:
                 if event.normalized_location and event.normalized_location.lat_lng:
