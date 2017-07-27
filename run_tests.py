@@ -20,6 +20,7 @@ SDK_PATH    Path to the SDK installation"""
 
 
 sys.path.insert(1, 'lib')
+MULTITHREAD = False
 
 
 def start_suite(suite, queue):
@@ -50,9 +51,14 @@ def main(sdk_path, test_pattern):
     processes = []
     result_queue = multiprocessing.Queue()
     for suite in suites:
-        process = multiprocessing.Process(target=start_suite, args=[suite, result_queue])
-        process.start()
-        processes.append(process)
+        if MULTITHREAD:
+            process = multiprocessing.Process(target=start_suite, args=[suite, result_queue])
+            process.start()
+            processes.append(process)
+        else:
+            sio = StringIO.StringIO()
+            testresult = unittest2.TextTestRunner(sio, verbosity=2).run(suite)
+            result_queue.put((sio.getvalue(), testresult.testsRun, testresult.wasSuccessful()))
 
     for process in processes:
         process.join()
