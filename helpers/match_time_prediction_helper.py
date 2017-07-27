@@ -129,6 +129,8 @@ class MatchTimePredictionHelper(object):
         last_comp_level = next_match.comp_level if next_match else None
         for i in range(0, len(unplayed_matches)):
             match = unplayed_matches[i]
+            if not match.time:
+                continue
             scheduled_time = cls.as_local(match.time, timezone)
             if (scheduled_time.day != last_match_day and last_match_day is not None) \
                     or last_comp_level != match.comp_level:
