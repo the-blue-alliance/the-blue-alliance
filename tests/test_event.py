@@ -9,7 +9,7 @@ from helpers.event.event_test_creator import EventTestCreator
 from models.event import Event
 
 
-class TestEventManipulator(unittest2.TestCase):
+class TestEvent(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -46,6 +46,31 @@ class TestEventManipulator(unittest2.TestCase):
             venue_address="123 Fake Street, California, USA",
             website="http://www.google.com"
         )
+        self.event_starts_tomorrow = Event(
+            id="{}teststartstomorrow".format(datetime.datetime.now().year),
+            end_date=datetime.datetime.today() + datetime.timedelta(days=3),
+            event_short="teststartstomorrow",
+            event_type_enum=EventType.REGIONAL,
+            first_eid="5561",
+            name="Test Event (Starts Tomorrow)",
+            start_date=datetime.datetime.today() + datetime.timedelta(days=1),
+            year=datetime.datetime.now().year,
+            venue_address="123 Fake Street, California, USA",
+            website="http://www.google.com"
+        )
+        self.event_starts_tomorrow_tz = Event(
+            id="{}teststartstomorrow".format(datetime.datetime.now().year),
+            end_date=datetime.datetime.today() + datetime.timedelta(days=3),
+            event_short="teststartstomorrow",
+            event_type_enum=EventType.REGIONAL,
+            first_eid="5561",
+            name="Test Event (Starts Tomorrow)",
+            start_date=datetime.datetime.today() + datetime.timedelta(days=1),
+            year=datetime.datetime.now().year,
+            venue_address="123 Fake Street, California, USA",
+            website="http://www.google.com",
+            timezone_id="America/New_York",
+        )
 
     def tearDown(self):
         self.future_event.key.delete()
@@ -60,6 +85,14 @@ class TestEventManipulator(unittest2.TestCase):
         self.assertFalse(self.future_event.past)
         self.assertFalse(self.future_event.withinDays(0, 8))
         self.assertTrue(self.future_event.withinDays(-8, 0))
+
+        self.assertFalse(self.event_starts_tomorrow.future)
+        self.assertTrue(self.event_starts_tomorrow.now)
+        self.assertFalse(self.event_starts_tomorrow.past)
+
+        self.assertTrue(self.event_starts_tomorrow_tz.future)
+        self.assertFalse(self.event_starts_tomorrow_tz.now)
+        self.assertFalse(self.event_starts_tomorrow_tz.past)
 
     def test_dates_past(self):
         self.assertFalse(self.past_event.now)
