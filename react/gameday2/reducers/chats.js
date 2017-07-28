@@ -31,8 +31,8 @@ const defaultState = {
   chats: {
     [defaultChat.channel]: Object.assign({}, defaultChat),
   },
-  renderedChats: ['tbagameday'],
-  currentChat: 'tbagameday',
+  renderedChats: ['firstinspires'],
+  currentChat: 'firstinspires',
 }
 
 const setChatsFromWebcasts = (webcasts, state) => {
