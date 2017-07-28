@@ -85,6 +85,7 @@ class ChatSidebar extends React.Component {
       height: metrics.switcherHeight,
       width: '100%',
       background: this.props.muiTheme.palette.primary1Color,
+      cursor: 'pointer',
     }
 
     const toolbarTitleStyle = {
@@ -128,7 +129,10 @@ class ChatSidebar extends React.Component {
           <div style={chatEmbedContainerStyle}>
             {renderedChats}
           </div>
-          <Toolbar style={switcherToolbarStyle}>
+          <Toolbar
+            style={switcherToolbarStyle}
+            onTouchTap={() => this.onRequestOpenChatSelector()}
+          >
             <ToolbarGroup>
               <ToolbarTitle
                 text={currentChatName}
@@ -139,7 +143,6 @@ class ChatSidebar extends React.Component {
               <IconButton
                 style={toolbarButtonStyle}
                 iconStyle={toolbarButtonIconStyle}
-                onTouchTap={() => this.onRequestOpenChatSelector()}
               >
                 <ArrowDropUp color={white} />
               </IconButton>
