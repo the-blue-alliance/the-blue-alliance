@@ -49,6 +49,8 @@ class PlayoffType(object):
             elif playoff_type == cls.DOUBLE_ELIM_8_TEAM:
                 level, _, _ = cls.DOUBLE_ELIM_MAPPING.get(match_number)
                 return level
+            elif playoff_type == cls.BO5_FINALS:
+                return 'f'
             else:
                 if playoff_type == cls.BRACKET_16_TEAM:
                     return cls.get_comp_level_octo(match_number)

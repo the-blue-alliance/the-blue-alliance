@@ -213,3 +213,34 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEqual(len(clean_matches["qf"]), 0)
             self.assertEqual(len(clean_matches["sf"]), 15)
             self.assertEqual(len(clean_matches["f"]), 3)
+
+    def test_parse_foc_b05(self):
+        self.event = Event(
+            id="2017nhfoc",
+            name="FIRST Festival of Champions",
+            event_type_enum=EventType.CMP_FINALS,
+            short_name="FIRST Festival of Champions",
+            event_short="nhfoc",
+            first_code="foc",
+            year=2017,
+            end_date=datetime(2017, 07, 29),
+            official=True,
+            start_date=datetime(2017, 07, 29),
+            timezone_id="America/New_York",
+            playoff_type=PlayoffType.BO5_FINALS
+        )
+        self.event.put()
+
+        with open('test_data/fms_api/2017foc_staging_hybrid_schedule_playoff.json', 'r') as f:
+            matches, _ = FMSAPIHybridScheduleParser(2017, 'nhfoc').parse(json.loads(f.read()))
+
+            self.assertTrue(isinstance(matches, list))
+
+            self.assertEquals(len(matches), 5)
+
+            # Assert we get enough of each match type
+            clean_matches = MatchHelper.organizeMatches(matches)
+            self.assertEqual(len(clean_matches["ef"]), 0)
+            self.assertEqual(len(clean_matches["qf"]), 0)
+            self.assertEqual(len(clean_matches["sf"]), 0)
+            self.assertEqual(len(clean_matches["f"]), 5)
