@@ -244,3 +244,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEqual(len(clean_matches["qf"]), 0)
             self.assertEqual(len(clean_matches["sf"]), 0)
             self.assertEqual(len(clean_matches["f"]), 5)
+
+            for i, match in enumerate(clean_matches['f']):
+                self.assertEqual(match.set_number, 1)
+                self.assertEqual(match.match_number, i+1)

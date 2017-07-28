@@ -98,6 +98,8 @@ class PlayoffType(object):
                 return set, match
             else:  # qual
                 return 1, match_number
+        elif playoff_type == cls.BO5_FINALS:
+            return 1, match_number
         else:
             if playoff_type == cls.BRACKET_4_TEAM and match_number <= 12:
                 match_number += 12
