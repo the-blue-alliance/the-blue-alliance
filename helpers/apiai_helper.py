@@ -313,7 +313,7 @@ class APIAIHelper(object):
                                 tts = fmt.format(cls._team_number_tts(team_number), match.verbose_name, event.normalized_name)
                             add_messages = cls._create_link_chip(
                                 match.verbose_name,
-                                'https://www.thebluealliance.com/event/{}'.format(event.key.id()))
+                                'https://www.thebluealliance.com/match/{}'.format(match.key.id()))
                         else:
                             fmt = 'Team {0} has no more scheduled matches at the {1}.'
                             text = fmt.format(team_number, event.normalized_name)
