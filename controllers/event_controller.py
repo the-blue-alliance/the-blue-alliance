@@ -207,6 +207,12 @@ class EventDetail(CacheableHandler):
             for comp_level in comp_levels:
                 if comp_level != 'f':
                     del bracket_table[comp_level]
+        elif event.playoff_type == PlayoffType.BO5_FINALS:
+            comp_levels = bracket_table.keys()
+            for comp_level in comp_levels:
+                if comp_level != 'f':
+                    del bracket_table[comp_level]
+            logging.info(bracket_table)
         elif event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
             double_elim_matches = MatchHelper.organizeDoubleElimMatches(matches)
 
