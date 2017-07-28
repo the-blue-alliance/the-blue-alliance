@@ -239,7 +239,7 @@ class APIAIHelper(object):
                 tts += additional_prompt
 
                 messages = cls._create_simple_response(text, tts=tts) +\
-                    cls._create_link_chip(event.display_name, 'https://www.thebluealliance.com/event/{}'.format(event.key.id()))
+                    cls._create_link_chip(event.display_name, 'https://www.thebluealliance.com/event/{}'.format(current_event.key.id()))
             else:
                 fmt = 'Team {0} is not currently competing. Would you like to know more about {0} or another team?'
                 text = fmt.format(
