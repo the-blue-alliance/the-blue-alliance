@@ -190,7 +190,8 @@ class MatchHelper(object):
             if match.comp_level in Match.ELIM_LEVELS and not match.has_been_played:
                 if event.playoff_type != PlayoffType.ROUND_ROBIN_6_TEAM or match.comp_level == 'f':  # Don't delete round robin semifinal matches
                     key = '{}{}'.format(match.comp_level, match.set_number)
-                    if red_win_counts[key] == 2 or blue_win_counts[key] == 2:
+                    n = 3 if event.playoff_type == PlayoffType.BO5_FINALS else 2
+                    if red_win_counts[key] == n or blue_win_counts[key] == n:
                         try:
                             MatchManipulator.delete(match)
                             logging.warning("Deleting invalid match: %s" % match.key_name)
