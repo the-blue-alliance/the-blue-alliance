@@ -91,11 +91,6 @@ store.subscribe(() => {
 // Load any special webcasts
 store.dispatch(setWebcastsRaw(webcastData))
 
-// Set the default chat channel
-if (defaultChat) {
-  store.dispatch(setTwitchChat(defaultChat))
-}
-
 // Restore layout from URL hash.
 const params = queryString.parse(location.hash)
 if (params.layout && Number.isInteger(Number.parseInt(params.layout, 10))) {
@@ -146,6 +141,11 @@ firedux.ref.child('live_events').on('value', (snapshot) => {
         store.dispatch(addWebcastAtPosition(params[key], i))
       }
     }
+    // Set the default chat channel
+    if (defaultChat) {
+      store.dispatch(setTwitchChat(defaultChat))
+    }
+    // Overwrite default chat with param
     if (params.chat) {
       store.dispatch(setTwitchChat(params.chat))
     }
