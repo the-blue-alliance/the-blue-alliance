@@ -38,6 +38,7 @@ const defaultState = {
 const setChatsFromWebcasts = (webcasts, state) => {
   const newState = Object.assign({}, defaultState)
   newState.currentChat = state.currentChat
+  newState.renderedChats = state.renderedChats
 
   Object.keys(webcasts).forEach((key) => {
     const webcast = webcasts[key]

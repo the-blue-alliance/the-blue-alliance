@@ -17,6 +17,7 @@ import { MAX_SUPPORTED_VIEWS } from './constants/LayoutConstants'
 injectTapEventPlugin()
 
 const webcastData = JSON.parse(document.getElementById('webcasts_json').innerHTML)
+const defaultChat = document.getElementById('default_chat').innerHTML
 
 const store = createStore(gamedayReducer, compose(
   applyMiddleware(thunk),
@@ -89,6 +90,11 @@ store.subscribe(() => {
 
 // Load any special webcasts
 store.dispatch(setWebcastsRaw(webcastData))
+
+// Set the default chat channel
+if (defaultChat) {
+  store.dispatch(setTwitchChat(defaultChat))
+}
 
 // Restore layout from URL hash.
 const params = queryString.parse(location.hash)

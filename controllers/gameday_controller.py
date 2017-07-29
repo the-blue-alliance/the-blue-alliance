@@ -30,8 +30,10 @@ class Gameday2Controller(CacheableHandler):
         special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
         special_webcasts_temp = special_webcasts_future.get_result()
         if special_webcasts_temp:
+            default_chat = special_webcasts_temp.contents.get("default_chat", "")
             special_webcasts_temp = special_webcasts_temp.contents.get("webcasts", [])
         else:
+            default_chat = ""
             special_webcasts_temp = []
         special_webcasts = []
         for webcast in special_webcasts_temp:
@@ -45,7 +47,8 @@ class Gameday2Controller(CacheableHandler):
         }
 
         self.template_values.update({
-            'webcasts_json': json.dumps(webcasts_json)
+            'webcasts_json': json.dumps(webcasts_json),
+            'default_chat': default_chat,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/gameday2.html')
