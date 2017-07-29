@@ -9,8 +9,8 @@ describe('chats reducer', () => {
         channel: 'tbagameday',
       },
     },
-    renderedChats: ['firstinspires'],
-    currentChat: 'firstinspires',
+    renderedChats: ['tbagameday'],
+    currentChat: 'tbagameday',
   }
 
   it('defaults to the appropriate state', () => {
