@@ -16,10 +16,12 @@ class AdminGamedayDashboard(LoggedInHandler):
         gd_sitevar = Sitevar.get_by_id("gameday.special_webcasts")
         special_webcasts = gd_sitevar.contents.get("webcasts", []) if gd_sitevar else []
         path_aliases = gd_sitevar.contents.get("aliases", {}) if gd_sitevar else {}
+        default_chat = gd_sitevar.contents.get("default_chat", "") if gd_sitevar else ""
 
         self.template_values.update({
             "webcasts": special_webcasts,
             "aliases": path_aliases,
+            "default_chat": default_chat,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/gameday_dashboard.html')
@@ -40,6 +42,8 @@ class AdminGamedayDashboard(LoggedInHandler):
             self.add_alias(gd_sitevar)
         elif action == "delete" and item == "alias":
             self.delete_alias(gd_sitevar)
+        elif action == "defaultChat":
+            self.set_default_chat(gd_sitevar)
 
         self.redirect("/admin/gameday")
         return
@@ -96,5 +100,12 @@ class AdminGamedayDashboard(LoggedInHandler):
             return
 
         del sitevar_contents['aliases'][key_to_delete]
+        gd_sitevar.contents = sitevar_contents
+        gd_sitevar.put()
+
+    def set_default_chat(self, gd_sitevar):
+        new_channel = self.request.get('defaultChat', 'tbagameday')
+        sitevar_contents = gd_sitevar.contents
+        sitevar_contents['default_chat'] = new_channel
         gd_sitevar.contents = sitevar_contents
         gd_sitevar.put()
