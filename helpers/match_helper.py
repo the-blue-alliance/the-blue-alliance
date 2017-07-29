@@ -203,7 +203,7 @@ class MatchHelper(object):
         return return_list
 
     @classmethod
-    def generateBracket(cls, matches, alliance_selections=None):
+    def generateBracket(cls, matches, event, alliance_selections=None):
         complete_alliances = []
         bracket_table = defaultdict(lambda: defaultdict(dict))
         for comp_level in ['qf', 'sf', 'f']:
@@ -239,9 +239,10 @@ class MatchHelper(object):
 
                 bracket_table[comp_level][set_number]['{}_wins'.format(winner)] = \
                     bracket_table[comp_level][set_number]['{}_wins'.format(winner)] + 1
-                if bracket_table[comp_level][set_number]['red_wins'] == 2:
+                n = 3 if event.playoff_type == PlayoffType.BO5_FINALS else 2
+                if bracket_table[comp_level][set_number]['red_wins'] == n:
                     bracket_table[comp_level][set_number]['winning_alliance'] = 'red'
-                if bracket_table[comp_level][set_number]['blue_wins'] == 2:
+                if bracket_table[comp_level][set_number]['blue_wins'] == n:
                     bracket_table[comp_level][set_number]['winning_alliance'] = 'blue'
 
         return bracket_table

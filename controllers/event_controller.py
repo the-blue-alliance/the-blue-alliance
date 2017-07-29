@@ -189,7 +189,7 @@ class EventDetail(CacheableHandler):
             matches_recent = None
             matches_upcoming = None
 
-        bracket_table = MatchHelper.generateBracket(matches, event.alliance_selections)
+        bracket_table = MatchHelper.generateBracket(matches, event, event.alliance_selections)
 
         playoff_advancement = None
         playoff_template = None
@@ -212,7 +212,6 @@ class EventDetail(CacheableHandler):
             for comp_level in comp_levels:
                 if comp_level != 'f':
                     del bracket_table[comp_level]
-            logging.info(bracket_table)
         elif event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
             double_elim_matches = MatchHelper.organizeDoubleElimMatches(matches)
 

@@ -379,7 +379,7 @@ class AdminPostEventTasksDo(LoggedInHandler):
         event = event_future.get_result()
         if event.event_type_enum == EventType.OFFSEASON:
             matches = MatchHelper.organizeMatches(matches_future.get_result())
-            bracket = MatchHelper.generateBracket(matches, event.alliance_selections)
+            bracket = MatchHelper.generateBracket(matches, event, event.alliance_selections)
             if 'f' in bracket:
                 winning_alliance = '{}_alliance'.format(bracket['f'][1]['winning_alliance'])
                 if winning_alliance == 'red_alliance':

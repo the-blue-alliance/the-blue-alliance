@@ -17,11 +17,13 @@
       </td>
       {% endif %}
       <td class="{% if bracket_table.f.1.winning_alliance == 'red' %}winnerC{% else %}{% if bracket_table.f.1.winning_alliance == 'blue' %}secondC{% endif %}{% endif %}" rowspan="4">
+        <br>
         {% for team in bracket_table.f.1.red_alliance %}
           <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
         {% endfor %}
       </td>
       <td class="{% if bracket_table.f.1.winning_alliance == 'blue' %}winnerC{% else %}{% if bracket_table.f.1.winning_alliance == 'red' %}secondC{% endif %}{% endif %}" rowspan="4">
+        <br>
         {% for team in bracket_table.f.1.blue_alliance %}
           <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
         {% endfor %}
