@@ -262,6 +262,10 @@ class AdminEventCreate(LoggedInHandler):
     def get(self):
         self._require_admin()
 
+        self.template_values.update({
+            "event_types": EventType.type_names,
+        })
+
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_create.html')
         self.response.out.write(template.render(path, self.template_values))
 
@@ -394,7 +398,7 @@ class AdminEventEdit(LoggedInHandler):
             end_date=end_date,
             event_short=self.request.get("event_short"),
             first_code=first_code if first_code and first_code != 'None' else None,
-            event_type_enum=int(self.request.get("event_type")) if self.request.get('event_type') else EventType.UNLABELED,
+            event_type_enum=int(self.request.get("event_type")) if self.request.get('event_type') else EventType.UNLABLED,
             district_key=ndb.Key(District, self.request.get("event_district_key")) if district_key and district_key != 'None' else None,
             venue=self.request.get("venue"),
             venue_address=self.request.get("venue_address"),
