@@ -64,7 +64,14 @@ class InsightsHelper(object):
         blue_banner_award_keys_future = Award.query(
             Award.year == year,
             Award.award_type_enum.IN(AwardType.BLUE_BANNER_AWARDS),
-            Award.event_type_enum.IN({EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP_DIVISION, EventType.DISTRICT_CMP, EventType.CMP_DIVISION, EventType.CMP_FINALS})
+            Award.event_type_enum.IN({
+                EventType.REGIONAL,
+                EventType.DISTRICT,
+                EventType.DISTRICT_CMP_DIVISION,
+                EventType.DISTRICT_CMP,
+                EventType.CMP_DIVISION,
+                EventType.CMP_FINALS,
+                EventType.FOC})
         ).fetch_async(10000, keys_only=True)
         cmp_finalist_award_keys_future = Award.query(
             Award.year == year,
