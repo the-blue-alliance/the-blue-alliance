@@ -50,7 +50,7 @@
             <td>Event Type</td>
             <td><select name="event_type">
                 {% for type, name in event_types.iteritems %}
-                  <option value="{{ type }}" {% if type == event.event_type %}selected{% endif %}>{{ name }}</option>
+                  <option value="{{ type }}" {% if type == event.event_type_enum %}selected{% endif %}>{{ name }}</option>
                 {% endfor %}
             </select></td>
         </tr>
