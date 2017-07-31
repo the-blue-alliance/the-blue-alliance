@@ -6,6 +6,7 @@ import os
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
+from consts.event_type import EventType
 from consts.playoff_type import PlayoffType
 from controllers import event_controller
 from controllers.base_controller import LoggedInHandler
@@ -360,6 +361,7 @@ class AdminEventEdit(LoggedInHandler):
             'alliance_selections': json.dumps(event.alliance_selections),
             'rankings': json.dumps(event.rankings),
             "playoff_types": PlayoffType.type_names,
+            "event_types": EventType.type_names,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_edit.html')
@@ -392,7 +394,7 @@ class AdminEventEdit(LoggedInHandler):
             end_date=end_date,
             event_short=self.request.get("event_short"),
             first_code=first_code if first_code and first_code != 'None' else None,
-            event_type_enum=EventHelper.parseEventType(self.request.get("event_type_str")),
+            event_type_enum=int(self.request.get("event_type")) if self.request.get('event_type') else EventType.UNLABELED,
             district_key=ndb.Key(District, self.request.get("event_district_key")) if district_key and district_key != 'None' else None,
             venue=self.request.get("venue"),
             venue_address=self.request.get("venue_address"),

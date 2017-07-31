@@ -5,6 +5,8 @@ class EventType(object):
     CMP_DIVISION = 3
     CMP_FINALS = 4
     DISTRICT_CMP_DIVISION = 5
+    FOC = 6
+
     OFFSEASON = 99
     PRESEASON = 100
     UNLABLED = -1
@@ -16,6 +18,7 @@ class EventType(object):
         DISTRICT_CMP: 'District Championship',
         CMP_DIVISION: 'Championship Division',
         CMP_FINALS: 'Championship Finals',
+        FOC: 'Festival of Champions',
         OFFSEASON: 'Offseason',
         PRESEASON: 'Preseason',
         UNLABLED: '--',
@@ -28,6 +31,7 @@ class EventType(object):
         DISTRICT_CMP: 'District Championship',
         CMP_DIVISION: 'Division',
         CMP_FINALS: 'Championship',
+        FOC: 'FoC',
         OFFSEASON: 'Offseason',
         PRESEASON: 'Preseason',
         UNLABLED: '--',
@@ -58,4 +62,5 @@ class EventType(object):
         DISTRICT_CMP,
         CMP_DIVISION,
         CMP_FINALS,
+        FOC,
     }
