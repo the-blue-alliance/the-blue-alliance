@@ -15,6 +15,7 @@ from models.match import Match
 
 CHAMPIONSHIP_EVENTS_LABEL = 'FIRST Championship'
 TWO_CHAMPS_LABEL = 'FIRST Championship - {}'
+FOC_LABEL = 'FIRST Festival of Champions'
 REGIONAL_EVENTS_LABEL = 'Week {}'
 WEEKLESS_EVENTS_LABEL = 'Other Official Events'
 OFFSEASON_EVENTS_LABEL = 'Offseason'
@@ -87,6 +88,11 @@ class EventHelper(object):
                         to_return[label].append(event)
                     else:
                         to_return[label] = [event]
+            elif event.event_type_enum == EventType.FOC:
+                if FOC_LABEL in to_return:
+                    to_return[FOC_LABEL].append(event)
+                else:
+                    to_return[FOC_LABEL] = [event]
             elif event.event_type_enum == EventType.PRESEASON:
                 preseason_events.append(event)
             else:
