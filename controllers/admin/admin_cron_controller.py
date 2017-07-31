@@ -377,7 +377,7 @@ class AdminPostEventTasksDo(LoggedInHandler):
         # Create Winner/Finalist awards for offseason events
         awards = []
         event = event_future.get_result()
-        if event.event_type_enum == EventType.OFFSEASON:
+        if event.event_type_enum in {EventType.OFFSEASON, EventType.FOC}:
             matches = MatchHelper.organizeMatches(matches_future.get_result())
             bracket = MatchHelper.generateBracket(matches, event, event.alliance_selections)
             if 'f' in bracket:

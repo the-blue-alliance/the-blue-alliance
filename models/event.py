@@ -462,7 +462,7 @@ class Event(ndb.Model):
                 return '{} {}'.format(self.city, 'Championship')
             else:
                 return 'Championship'
-        elif self.short_name:
+        elif self.short_name and self.event_type_enum != EventType.FOC:
             if self.event_type_enum == EventType.OFFSEASON:
                 return self.short_name
             else:
