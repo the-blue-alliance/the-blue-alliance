@@ -87,6 +87,15 @@
                                     </td>
                                 </tr>
                                 <tr>
+                                    <td>Facebook Event</td>
+                                    <td>
+                                        <span{% if 'facebook_event' in failures %} class="has-error"{% endif %}>
+                                            <input class="form-control" type="text" name="facebook_event" placeholder="https://facebook.com/event/12345"{% if facebook_event %} value="{{facebook_event}}"{% endif %}/>
+                                            {% if 'facebook_event' in failures %}<span class="help-block">{{failures.facebook_event}}</span>{% endif %}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
                                     <td>Venue Name</td>
                                     <td>
                                         <span{% if 'venue_name' in failures %} class="has-error"{% endif %}>

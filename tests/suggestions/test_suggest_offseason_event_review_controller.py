@@ -58,6 +58,7 @@ class TestSuggestApiWriteController(unittest2.TestCase):
                                                                   '2016-10-12',
                                                                   '2016-10-13',
                                                                   'http://foo.bar.com',
+                                                                  'www.facebook.com',
                                                                   'Venue Name',
                                                                   '123 Fake St',
                                                                   'New York',

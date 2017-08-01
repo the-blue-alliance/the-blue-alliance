@@ -56,6 +56,7 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
             short_name=self.request.get("short_name"),
             start_date=start_date,
             website=self.request.get("website"),
+            facebook_event=self.request.get("facebook_event"),
             year=int(self.request.get("year")),
             official=False,
         )
@@ -152,6 +153,7 @@ The Blue Alliance Admins
             name=suggestion.contents['name'],
             start_date=start_date,
             website=suggestion.contents['website'],
+            facebook_event=suggestion.contents['facebook_event'],
             year=start_date.year if start_date else None,
             official=False)
 

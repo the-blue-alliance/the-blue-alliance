@@ -225,6 +225,7 @@ class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
             "2016-5-1",
             "2016-5-2",
             "http://foo.bar.com",
+            "www.facebook.com",
             "The Venue",
             "123 Fake Street",
             "New York", "NY", "USA")
@@ -241,6 +242,7 @@ class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
         self.assertEqual(suggestion.contents['start_date'], '2016-5-1')
         self.assertEqual(suggestion.contents['end_date'], '2016-5-2')
         self.assertEqual(suggestion.contents['website'], 'http://foo.bar.com')
+        self.assertEqual(suggestion.contents['facebook_event'], 'www.facebook.com')
         self.assertEqual(suggestion.contents['address'], '123 Fake Street')
         self.assertEqual(suggestion.contents['city'], 'New York')
         self.assertEqual(suggestion.contents['state'], 'NY')
@@ -254,6 +256,7 @@ class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
             "2016-5-1",
             "2016-5-2",
             "http://foo.bar.com",
+            "www.facebook.com",
             "The Venue",
             "123 Fake Street", "New York", "NY", "USA")
         self.assertEqual(status, 'validation_failure')
@@ -265,6 +268,7 @@ class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
             "",
             "2016-5-2",
             "http://foo.bar.com",
+            "www.facebook.com",
             "The Venue",
             "123 Fake Street", "New York", "NY", "USA")
         self.assertEqual(status, 'validation_failure')
@@ -276,6 +280,7 @@ class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
             "2016-5-1",
             "",
             "http://foo.bar.com",
+            "www.facebook.com",
             "The Venue",
             "123 Fake Street", "New York", "NY", "USA")
         self.assertEqual(status, 'validation_failure')
@@ -287,6 +292,7 @@ class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
             "2016-5-1",
             "2016-5-2",
             "",
+            "www.facebook.com",
             "The Venue",
             "123 Fake Street", "New York", "NY", "USA")
         self.assertEqual(status, 'validation_failure')
@@ -298,6 +304,7 @@ class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
             "2016-5-1",
             "2016-5-2",
             "http://foo.bar.com",
+            "www.facebook.com",
             "The Venue",
             "", "New York", "NY", "USA")
         self.assertEqual(status, 'validation_failure')
@@ -309,6 +316,7 @@ class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
             "2016-5-1",
             "2016-5-2",
             "http://foo.bar.com",
+            "www.facebook.com",
             "",
             "123 Fake Street", "", "", "")
         self.assertEqual(status, 'validation_failure')
@@ -324,6 +332,7 @@ class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
             "2016-5-4",
             "2016-5-2",
             "http://foo.bar.com",
+            "www.facebook.com",
             "The Venue",
             "123 Fake Street", "New York", "NY", "USA")
         self.assertEqual(status, 'validation_failure')
@@ -336,6 +345,7 @@ class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
             "meow",
             "2016-5-2",
             "http://foo.bar.com",
+            "www.facebook.com",
             "The Venue",
             "123 Fake Street", "New York", "NY", "USA")
         self.assertEqual(status, 'validation_failure')
@@ -347,6 +357,7 @@ class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
             "2016-5-1",
             "moo",
             "http://foo.bar.com",
+            "www.facebook.com",
             "The Venue",
             "123 Fake Street", "New York", "NY", "USA")
         self.assertEqual(status, 'validation_failure')

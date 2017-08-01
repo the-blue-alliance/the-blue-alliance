@@ -66,6 +66,7 @@ class TestSuggestApiWriteController(unittest2.TestCase):
         form['start_date'] = '2012-04-04'
         form['end_date'] = '2012-04-06'
         form['website'] = 'http://foo.com/bar'
+        form['facebook_event'] = 'www.facebook.com'
         form['venue_name'] = 'This is a Venue'
         form['venue_address'] = '123 Fake St'
         form['venue_city'] = 'New York'
