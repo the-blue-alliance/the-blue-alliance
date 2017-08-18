@@ -28,6 +28,9 @@ class TestEventGetShortName(unittest2.TestCase):
             ))
         DistrictManipulator.createOrUpdate(districts)
 
+    def tearDown(self):
+        self.testbed.deactivate()
+
     def test_event_get_short_name(self):
         # Edge cases.
         self.assertEquals(EventHelper.getShortName("  { Random 2.718 stuff! }  "), "{ Random 2.718 stuff! }")
