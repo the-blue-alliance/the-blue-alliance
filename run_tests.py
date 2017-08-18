@@ -8,6 +8,7 @@ import string
 import sys
 import time
 import django.conf.global_settings
+import logging
 
 # Install the Python unittest2 package before you run this script.
 import unittest2
@@ -30,6 +31,8 @@ def start_suite(suite, queue):
 
 
 def main(sdk_path, test_pattern):
+    logging.disable(logging.WARNING)
+
     start_time = time.time()
 
     os.environ['IS_TBA_TEST'] = "true"
