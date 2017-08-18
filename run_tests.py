@@ -20,7 +20,7 @@ SDK_PATH    Path to the SDK installation"""
 
 
 sys.path.insert(1, 'lib')
-MULTITHREAD = False
+MULTITHREAD = True
 
 
 def start_suite(suite, queue):
