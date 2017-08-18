@@ -1,6 +1,7 @@
 import base64
 import json
 import logging
+import tba_config
 
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
@@ -30,6 +31,8 @@ class WebcastOnlineHelper(object):
 
         webcast['status'] = 'unknown'
         webcast['stream_title'] = None
+        if not tba_config.CONFIG['update-webcast-online-status']:
+            return
         if webcast['type'] == 'twitch':
             yield cls._add_twitch_status_async(webcast)
         elif webcast['type'] == 'ustream':

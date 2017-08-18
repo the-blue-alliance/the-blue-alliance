@@ -32,6 +32,7 @@ if DEBUG:
         "firebase-push": False,
         "use-compiled-templates": False,
         "save-frc-api-response": False,
+        "update-webcast-online-status": False,
     }
 else:
     CONFIG = {
@@ -43,6 +44,7 @@ else:
         "firebase-push": True,
         "use-compiled-templates": True,
         "save-frc-api-response": True,
+        "update-webcast-online-status": True,
     }
 
 CONFIG['landing_handler'] = INSIGHTS
