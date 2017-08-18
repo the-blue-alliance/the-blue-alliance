@@ -62,6 +62,9 @@ def main(sdk_path, test_pattern):
             sio = StringIO.StringIO()
             testresult = unittest2.TextTestRunner(sio, verbosity=2).run(suite)
             result_queue.put((sio.getvalue(), testresult.testsRun, testresult.wasSuccessful()))
+            if not MULTITHREAD:
+                print '-----------------------'
+                print sio.getvalue().encode('utf-8')
 
     for process in processes:
         process.join()
@@ -72,8 +75,9 @@ def main(sdk_path, test_pattern):
     while not result_queue.empty():
         test_output, tests_run, was_successful = result_queue.get()
         total_tests_run += tests_run
-        print '-----------------------'
-        print test_output.encode('utf-8')
+        if MULTITHREAD:
+            print '-----------------------'
+            print test_output.encode('utf-8')
         if not was_successful:
             fail = True
 
