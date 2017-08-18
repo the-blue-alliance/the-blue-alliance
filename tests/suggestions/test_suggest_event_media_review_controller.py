@@ -18,7 +18,7 @@ from models.media import Media
 from models.suggestion import Suggestion
 
 
-class TestSuggestEventWebcastController(unittest2.TestCase):
+class TestSuggestEventMediaReviewController(unittest2.TestCase):
     def setUp(self):
         self.policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1)
         self.testbed = testbed.Testbed()

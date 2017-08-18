@@ -18,7 +18,7 @@ from models.suggestion import Suggestion
 from models.team import Team
 
 
-class TestSuggestEventWebcastController(unittest2.TestCase):
+class TestSuggestSocialMediaReviewController(unittest2.TestCase):
     def setUp(self):
         self.policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1)
         self.testbed = testbed.Testbed()

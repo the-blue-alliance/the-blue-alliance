@@ -17,7 +17,7 @@ from models.match import Match
 from models.suggestion import Suggestion
 
 
-class TestSuggestEventWebcastController(unittest2.TestCase):
+class TestSuggestMatchVideoController(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()

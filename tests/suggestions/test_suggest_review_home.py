@@ -12,7 +12,7 @@ from controllers.suggestions.suggest_review_home_controller import SuggestReview
 from models.account import Account
 
 
-class TestSuggestEventWebcastController(unittest2.TestCase):
+class TestSuggestReviewHomeController(unittest2.TestCase):
     def setUp(self):
         self.policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1)
         self.testbed = testbed.Testbed()

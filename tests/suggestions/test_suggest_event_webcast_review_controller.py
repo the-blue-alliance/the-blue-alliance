@@ -20,7 +20,7 @@ from models.event import Event
 from models.suggestion import Suggestion
 
 
-class TestSuggestApiWriteController(unittest2.TestCase):
+class TestSuggestEventWebcastReviewController(unittest2.TestCase):
     def setUp(self):
         self.policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1)
         self.testbed = testbed.Testbed()

@@ -11,7 +11,7 @@ from controllers.suggestions.suggest_offseason_event_controller import \
 from models.account import Account
 
 
-class TestSuggestApiWriteController(unittest2.TestCase):
+class TestSuggestOffseasonEventController(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
