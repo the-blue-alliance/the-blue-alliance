@@ -7,9 +7,9 @@ from template_engine import jinja2_engine
 
 
 class SuggestMatchVideoReviewController(SuggestionsReviewBaseController):
+    REQUIRED_PERMISSIONS = [AccountPermissions.REVIEW_MEDIA]
 
     def __init__(self, *args, **kw):
-        self.REQUIRED_PERMISSIONS.append(AccountPermissions.REVIEW_MEDIA)
         super(SuggestMatchVideoReviewController, self).__init__(*args, **kw)
 
     def create_target_model(self, suggestion):

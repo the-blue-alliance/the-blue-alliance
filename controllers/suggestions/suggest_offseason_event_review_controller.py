@@ -14,9 +14,9 @@ from template_engine import jinja2_engine
 
 
 class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
+    REQUIRED_PERMISSIONS = [AccountPermissions.REVIEW_OFFSEASON_EVENTS]
 
     def __init__(self, *args, **kw):
-        self.REQUIRED_PERMISSIONS.append(AccountPermissions.REVIEW_OFFSEASON_EVENTS)
         super(SuggestOffseasonEventReviewController, self).__init__(*args, **kw)
 
     def create_target_model(self, suggestion):

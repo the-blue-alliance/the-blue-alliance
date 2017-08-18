@@ -16,9 +16,9 @@ from models.suggestion import Suggestion
 
 
 class SuggestEventWebcastReviewController(SuggestionsReviewBaseController):
+    REQUIRED_PERMISSIONS = [AccountPermissions.REVIEW_MEDIA]
 
     def __init__(self, *args, **kw):
-        self.REQUIRED_PERMISSIONS.append(AccountPermissions.REVIEW_MEDIA)
         super(SuggestEventWebcastReviewController, self).__init__(*args, **kw)
 
     def create_target_model(self, suggestion):

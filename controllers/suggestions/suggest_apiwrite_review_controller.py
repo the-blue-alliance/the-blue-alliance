@@ -20,9 +20,9 @@ from template_engine import jinja2_engine
 
 
 class SuggestApiWriteReviewController(SuggestionsReviewBaseController):
+    REQUIRED_PERMISSIONS = [AccountPermissions.REVIEW_APIWRITE]
 
     def __init__(self, *args, **kw):
-        self.REQUIRED_PERMISSIONS.append(AccountPermissions.REVIEW_APIWRITE)
         super(SuggestApiWriteReviewController, self).__init__(*args, **kw)
 
     def create_target_model(self, suggestion):

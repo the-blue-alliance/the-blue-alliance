@@ -89,7 +89,7 @@ class TestSuggestSocialMediaReviewController(unittest2.TestCase):
         response = self.testapp.get('/suggest/team/social/review')
         self.assertEqual(response.status_int, 200)
 
-    def test_accespt_suggestion(self):
+    def test_accept_suggestion(self):
         self.loginUser()
         self.givePermission()
         suggestion_id = self.createSuggestion()

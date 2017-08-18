@@ -16,10 +16,10 @@ from template_engine import jinja2_engine
 
 
 class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
+    REQUIRED_PERMISSIONS = [AccountPermissions.REVIEW_MEDIA]
 
     def __init__(self, *args, **kw):
         self.preferred_keys = []
-        self.REQUIRED_PERMISSIONS.append(AccountPermissions.REVIEW_MEDIA)
         super(SuggestTeamMediaReviewController, self).__init__(*args, **kw)
 
     """
