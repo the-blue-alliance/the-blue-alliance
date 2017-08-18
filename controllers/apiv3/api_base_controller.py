@@ -71,7 +71,7 @@ class ApiBaseController(CacheableHandler):
         """
         if isinstance(exception, webapp2.HTTPException):
             self.response.set_status(exception.code)
-            self.response.out.write(self._errors)
+            self.response.out.write(json.dumps(self._errors))
         else:
             logging.exception(exception)
             self.response.set_status(500)
