@@ -35,5 +35,6 @@ deploy:
   version: prod-1
   config: "app.yaml app-backend-tasks-b2.yaml app-backend-tasks.yaml cron.yaml dispatch.yaml index.yaml queue.yaml"
   on:
-    all_branches: true
+    repo: the-blue-alliance/the-blue-alliance
+    branch: master
 
