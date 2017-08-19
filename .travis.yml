@@ -32,7 +32,8 @@ deploy:
   keyfile: ops/tbatv-prod-hrd-deploy.json
   project: tbatv-prod-hrd
   version: prod-1
-  config: "app.yaml app-backend-tasks-b2.yaml app-backend-tasks.yaml cron.yaml dispatch.yaml index.yaml queue.yaml"
+  config: app.yaml
+  # config: "app.yaml app-backend-tasks-b2.yaml app-backend-tasks.yaml cron.yaml dispatch.yaml index.yaml queue.yaml"
   on:
     repo: the-blue-alliance/the-blue-alliance
     branch: master
