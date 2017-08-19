@@ -21,7 +21,7 @@ class AddTeamsFMSReport extends Component {
 
 AddTeamsFMSReport.propTypes = {
   selectedEvent: PropTypes.string,
-  makeTrustedRequest: PropTypes.func.isRequired,
+  updateTeamList: PropTypes.func.isRequired,
   clearTeams: PropTypes.func,
   showErrorMessage: PropTypes.func.isRequired,
 }

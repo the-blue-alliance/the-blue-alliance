@@ -29,7 +29,7 @@ class AttendingTeamList extends Component {
     }
 
     this.setState({buttonClass: 'btn-warning'})
-    fetch(`/api/v3/event/${this.props.selectedEvent}/teams`, {
+    fetch(`/api/v3/event/${this.props.selectedEvent}/teams/simple`, {
       credentials: 'same-origin',
     })
       .then(ensureRequestSuccess)

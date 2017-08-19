@@ -36,9 +36,8 @@ class AddMultipleTeams extends Component {
     }
 
     this.setState({buttonClass: 'btn-warning'})
-    this.props.makeTrustedRequest(
-      '/api/trusted/v1/event/'+this.props.selectedEvent+'/team_list/update',
-      JSON.stringify(teams),
+    this.props.updateTeamList(
+      teams,
       () => {
         this.setState({buttonClass: 'btn-success'})
         this.props.clearTeams()
@@ -72,7 +71,7 @@ class AddMultipleTeams extends Component {
 AddMultipleTeams.propTypes = {
   selectedEvent: PropTypes.string,
   clearTeams: PropTypes.func,
-  makeTrustedRequest: PropTypes.func.isRequired,
+  updateTeamList: PropTypes.func.isRequired,
   showErrorMessage: PropTypes.func.isRequired,
 }
 

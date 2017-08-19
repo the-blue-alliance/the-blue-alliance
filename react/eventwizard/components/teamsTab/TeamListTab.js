@@ -19,12 +19,22 @@ class TeamListTab extends Component {
     this.showError = this.showError.bind(this)
     this.updateTeams = this.updateTeams.bind(this)
     this.clearTeams = this.clearTeams.bind(this)
+    this.updateTeamList = this.updateTeamList.bind(this)
   }
 
   componentWillReceiveProps(nextProps) {
     if (this.props.selectedEvent !== nextProps.selectedEvent) {
       this.clearTeams()
     }
+  }
+
+  updateTeamList(team_keys, on_success, on_error) {
+    this.props.makeTrustedRequest(
+      '/api/trusted/v1/event/'+this.props.selectedEvent+'/team_list/update',
+      JSON.stringify(team_keys),
+      on_success,
+      on_error
+    )
   }
 
   showError(errorMessage) {
@@ -48,15 +58,17 @@ class TeamListTab extends Component {
           <div className="col-sm-6">
             <AddRemoveSingleTeam
               selectedEvent={this.props.selectedEvent}
-              makeTrustedRequest={this.props.makeTrustedRequest}
+              updateTeamList={this.updateTeamList}
               showErrorMessage={this.showError}
+              hasFetchedTeams={this.state.hasFetchedTeams}
+              currentTeams={this.state.teams}
               clearTeams={this.clearTeams}
             />
             <hr />
 
             <AddMultipleTeams
               selectedEvent={this.props.selectedEvent}
-              makeTrustedRequest={this.props.makeTrustedRequest}
+              updateTeamList={this.updateTeamList}
               showErrorMessage={this.showError}
               clearTeams={this.clearTeams}
             />
@@ -64,7 +76,7 @@ class TeamListTab extends Component {
 
             <AddTeamsFMSReport
               selectedEvent={this.props.selectedEvent}
-              makeTrustedRequest={this.props.makeTrustedRequest}
+              updateTeamList={this.updateTeamList}
               showErrorMessage={this.showError}
               clearTeams={this.clearTeams}
             />
