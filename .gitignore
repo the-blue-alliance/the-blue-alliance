@@ -79,4 +79,6 @@ coverage
 # Keys #
 ########
 static/javascript/tba_js/tba_keys.js
+ops/deploy_keys.tar
+ops/tbatv-prod-hrd-deploy.json
 test_keys.json
