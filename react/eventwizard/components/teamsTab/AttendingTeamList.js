@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
+import ensureRequestSuccess from '../../net/EnsureRequestSuccess'
 import TeamList from './TeamList'
 
 class AttendingTeamList extends Component {
@@ -31,12 +32,7 @@ class AttendingTeamList extends Component {
     fetch(`/api/v3/event/${this.props.selectedEvent}/teams`, {
       credentials: 'same-origin',
     })
-      .then(function(response) {
-        if (!response.ok) {
-          throw new Error(response.statusText);
-        }
-        return response;
-      })
+      .then(ensureRequestSuccess)
       .then((response) => (response.json()))
       .then((data) => (data.sort(function(a, b){
         return a.team_number - b.team_number

@@ -1,4 +1,5 @@
 import md5 from 'md5'
+import ensureRequestSuccess from './EnsureRequestSuccess'
 
 function makeTrustedApiRequest(auth_id, auth_secret, request_path, request_body, on_success, on_error) {
   const auth_sig = md5(auth_secret + request_path + request_body);
@@ -10,12 +11,7 @@ function makeTrustedApiRequest(auth_id, auth_secret, request_path, request_body,
     credentials: 'same-origin',
     body: request_body,
   })
-    .then(function(response) {
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
-      return response;
-    })
+    .then(ensureRequestSuccess)
     .then(on_success)
     .catch(on_error);
 }

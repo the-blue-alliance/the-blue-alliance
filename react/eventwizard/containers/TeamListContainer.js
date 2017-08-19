@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import TeamListTab from '../components/teamsTab/TeamListTab'
-import makeTrustedApiRequest from '../actions/TrustedApiRequest'
+import makeTrustedApiRequest from '../net/TrustedApiRequest'
 
 const mapStateToProps = (state) => ({
   selectedEvent: state.auth.selectedEvent,
