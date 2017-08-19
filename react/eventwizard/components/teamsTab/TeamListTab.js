@@ -1,8 +1,11 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import TeamList from './TeamList'
 import Dialog from 'react-bootstrap-dialog'
-import { Typeahead } from 'react-bootstrap-typeahead'
+
+import AddRemoveSingleTeam from './AddRemoveSingleTeam'
+import AddMultipleTeams from './AddMultipleTeams'
+import AddTeamsFMSReport from './AddTeamsFMSReport'
+import AttendingTeamList from './AttendingTeamList'
 
 class TeamListTab extends Component {
 
@@ -10,76 +13,30 @@ class TeamListTab extends Component {
     super(props)
     this.state = {
       teams: [],
-      teamTypeaheadOptions: [],
-      addSingleButtonStatus: 'btn-primary',
-      removeSingleButtonStatus: 'btn-primary',
+      hasFetchedTeams: false,
       addMultipleButtonStatus: 'btn-primary',
     }
-    this.updateAttendingTeams = this.updateAttendingTeams.bind(this)
-    this.addSingleTeam = this.addSingleTeam.bind(this)
-    this.removeSingleTeam = this.removeSingleTeam.bind(this)
-    this.addMultipleTeams = this.addMultipleTeams.bind(this)
+    this.showError = this.showError.bind(this)
+    this.updateTeams = this.updateTeams.bind(this)
+    this.clearTeams = this.clearTeams.bind(this)
   }
 
   componentWillReceiveProps(nextProps) {
     if (this.props.selectedEvent !== nextProps.selectedEvent) {
-      this.setState({ teams: [] })
+      this.clearTeams()
     }
   }
 
-  componentDidMount() {
-    // Load team typeahead data
-    fetch('/_/typeahead/teams-all')
-      .then(resp => resp.json())
-      .then(json => this.setState({teamTypeaheadOptions: json}))
+  showError(errorMessage) {
+    this.refs.dialog.showAlert(errorMessage)
   }
 
-  updateAttendingTeams() {
-    if (!this.props.selectedEvent) {
-      // No valid event
-      return
-    }
-
-    fetch(`/api/v3/event/${this.props.selectedEvent}/teams`, {
-      credentials: 'same-origin',
-    })
-      .then(function(response) {
-        if (!response.ok) {
-          throw new Error(response.statusText);
-        }
-        return response;
-      })
-      .then((response) => (response.json()))
-      .then((data) => (data.sort(function(a, b){
-        return a.team_number - b.team_number
-      })))
-      .then((data) => (this.setState({ teams: data })))
-      .catch((error) => (this.refs.dialog.showAlert(`${error}`)))
+  updateTeams(teams) {
+    this.setState({teams: teams, hasFetchedTeams: true})
   }
 
-  addSingleTeam() {
-    this.refs.dialog.showAlert('TODO: Implement API to add single team');
-    this.setState({addSingleButtonStatus: 'btn-danger'});
-  }
-
-  removeSingleTeam() {
-    this.refs.dialog.showAlert('TODO: Implement API to remove single team');
-    this.setState({addSingleButtonStatus: 'btn-danger'});
-  }
-
-  addMultipleTeams() {
-    if (!this.props.selectedEvent) {
-      // No valid event
-      return
-    }
-
-    this.setState({addMultipleButtonStatus: 'btn-warning'})
-    this.props.makeTrustedRequest(
-      '/api/trusted/v1/event/'+this.props.selectedEvent+'/team_list/update',
-      '[]',
-      (data) => this.setState({addMultipleButtonStatus: 'btn-success'}),
-      (error) => (this.refs.dialog.showAlert(`${error}`))
-    )
+  clearTeams() {
+    this.setState({teams: [], hasFetchedTeams: false})
   }
 
   render() {
@@ -89,36 +46,37 @@ class TeamListTab extends Component {
         <h3>Team List</h3>
         <div className="row">
           <div className="col-sm-6">
-            <h4>Add/Remove Single Team</h4>
-            <Typeahead
-              placeholder="Enter team name or number..."
-              options={this.state.teamTypeaheadOptions}
+            <AddRemoveSingleTeam
+              selectedEvent={this.props.selectedEvent}
+              makeTrustedRequest={this.props.makeTrustedRequest}
+              showErrorMessage={this.showError}
+              clearTeams={this.clearTeams}
             />
-            <button className={`btn ${this.state.addSingleButtonStatus}`} onClick={this.addSingleTeam} disabled>
-              Add Team
-            </button>
-            <button className={`btn ${this.state.removeSingleButtonStatus}`} onClick={this.removeSingleTeam} disabled>
-              Remove Team
-            </button>
-
             <hr />
-            <h4>Add Multiple Teams</h4>
-            <p>Enter a list of team numbers, one per line. This will <em>overwrite</em> all existing teams for this event.</p>
-            <textarea className="form-control" id="team_list" />
-            <button className={`btn ${this.state.addMultipleButtonStatus}`} onClick={this.addMultipleTeams}>
-              Overwrite Teams
-            </button>
 
+            <AddMultipleTeams
+              selectedEvent={this.props.selectedEvent}
+              makeTrustedRequest={this.props.makeTrustedRequest}
+              showErrorMessage={this.showError}
+              clearTeams={this.clearTeams}
+            />
             <hr />
-            <h4>Import FMS Report</h4>
+
+            <AddTeamsFMSReport
+              selectedEvent={this.props.selectedEvent}
+              makeTrustedRequest={this.props.makeTrustedRequest}
+              showErrorMessage={this.showError}
+              clearTeams={this.clearTeams}
+            />
           </div>
           <div className="col-sm-6">
-            <h4>Currently Attending Teams</h4>
-            <button className="btn btn-info" onClick={this.updateAttendingTeams}>
-              Fetch Teams
-            </button>
-            <TeamList teams={this.state.teams} />
-
+            <AttendingTeamList
+              selectedEvent={this.props.selectedEvent}
+              hasFetchedTeams={this.state.hasFetchedTeams}
+              teams={this.state.teams}
+              updateTeams={this.updateTeams}
+              showErrorMessage={this.showError}
+            />
           </div>
         </div>
       </div>
