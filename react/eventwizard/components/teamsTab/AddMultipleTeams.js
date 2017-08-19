@@ -24,14 +24,15 @@ class AddMultipleTeams extends Component {
       return
     }
 
-    var teams = this.state.inputTeams.split("\n");
-    for (var i = 0; i < teams.length; i++) {
-        var teamNum = parseInt(teams[i]);
+    var teams = []
+    var team_input = this.state.inputTeams.split("\n");
+    for (var i = 0; this.state.inputTeams && i < team_input.length; i++) {
+        var teamNum = parseInt(team_input[i]);
         if(!teamNum || isNaN(teamNum) || teamNum <= 0 || teamNum > 9999){
           this.props.showErrorMessage("Invalid team "+teams[i]);
           return
         }
-        teams[i] = "frc"+teamNum;
+        teams.push("frc"+teamNum);
     }
 
     this.setState({buttonClass: 'btn-warning'})
