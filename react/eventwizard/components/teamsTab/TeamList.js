@@ -1,6 +1,8 @@
-import React, { Component } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import TeamItem from './TeamItem'
+
+import TEAM_SHAPE from '../../constants/ApiTeam'
 
 const TeamList = (props) => (
   <div>
@@ -22,7 +24,7 @@ const TeamList = (props) => (
 )
 
 TeamList.propTypes = {
-  teams: PropTypes.array.isRequired,
+  teams: PropTypes.arrayOf(TEAM_SHAPE).isRequired,
 }
 
 export default TeamList

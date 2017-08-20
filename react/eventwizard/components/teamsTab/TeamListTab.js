@@ -28,31 +28,31 @@ class TeamListTab extends Component {
     }
   }
 
-  updateTeamList(team_keys, on_success, on_error) {
+  updateTeamList(teamKeys, onSuccess, onError) {
     this.props.makeTrustedRequest(
-      '/api/trusted/v1/event/'+this.props.selectedEvent+'/team_list/update',
-      JSON.stringify(team_keys),
-      on_success,
-      on_error
+      `/api/trusted/v1/event/${this.props.selectedEvent}/team_list/update`,
+      JSON.stringify(teamKeys),
+      onSuccess,
+      onError
     )
   }
 
   showError(errorMessage) {
-    this.refs.dialog.showAlert(errorMessage)
+    this.dialog.showAlert(errorMessage)
   }
 
   updateTeams(teams) {
-    this.setState({teams: teams, hasFetchedTeams: true})
+    this.setState({ teams, hasFetchedTeams: true })
   }
 
   clearTeams() {
-    this.setState({teams: [], hasFetchedTeams: false})
+    this.setState({ teams: [], hasFetchedTeams: false })
   }
 
   render() {
     return (
       <div className="tab-pane" id="teams">
-        <Dialog ref="dialog" />
+        <Dialog ref={(dialog) => (this.dialog = dialog)} />
         <h3>Team List</h3>
         <div className="row">
           <div className="col-sm-6">

@@ -12,24 +12,12 @@ class AuthTools extends Component {
 
   storeAuth() {
     if (!this.props.selectedEvent) {
-      this.refs.dialog.show({
-        title: 'Error',
-        body: 'You must enter an event key',
-        actions: [
-          Dialog.OKAction()
-        ],
-      })
+      this.dialog.showAlert('You must enter an event key')
       return
     }
 
     if (!this.props.authId || !this.props.authSecret) {
-      this.refs.dialog.show({
-        title: 'Error',
-        body: 'You must enter you auth ID and secret',
-        actions: [
-          Dialog.OKAction()
-        ],
-      })
+      this.dialog.showAlert('You must enter you auth ID and secret')
       return
     }
 
@@ -38,49 +26,26 @@ class AuthTools extends Component {
     auth.secret = this.props.authSecret
 
     localStorage.setItem(`${this.props.selectedEvent}_auth`, JSON.stringify(auth))
-    this.refs.dialog.show({
-      title: 'Success',
-      body: 'Auth Stored',
-      actions: [
-        Dialog.OKAction()
-      ],
-    })
+    this.dialog.showAlert('Auth Stored')
   }
 
   loadAuth() {
     if (!this.props.selectedEvent) {
-      this.refs.dialog.show({
-        title: 'Error',
-        body: 'You must select an event',
-        actions: [
-          Dialog.OKAction()
-        ],
-      })
+      this.dialog.showAlert('You must select an event')
       return
     }
 
     const auth = localStorage.getItem(`${this.props.selectedEvent}_auth`)
     if (!auth) {
-      this.refs.dialog.show({
-        title: 'Error',
-        body: `No auth found for ${this.props.selectedEvent}`,
-        actions: [
-          Dialog.OKAction()
-        ],
-      })
+      this.dialog.showAlert(`No auth found for ${this.props.selectedEvent}`)
       return
     }
 
     const authData = JSON.parse(auth)
     this.props.setAuth(authData.id, authData.secret)
-    this.refs.dialog.show({
-      title: 'Success',
-      body: 'Auth Loaded',
-      actions: [
-        Dialog.OKAction()
-      ],
-    })
+    this.dialog.showAlert('Auth Loaded')
   }
+
 
   render() {
     if (!this.props.manualEvent) {
@@ -89,7 +54,9 @@ class AuthTools extends Component {
 
     return (
       <div className="form-group" id="auth-tools">
-        <Dialog ref="dialog" />
+        <Dialog
+          ref={(dialog) => { this.dialog = dialog }}
+        />
         <label className="col-sm-2 control-label" htmlFor="load_auth">Auth Tools</label>
         <div className="col-sm-10">
           <button

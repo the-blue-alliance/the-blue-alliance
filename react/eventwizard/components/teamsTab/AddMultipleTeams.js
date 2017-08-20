@@ -7,14 +7,14 @@ class AddMultipleTeams extends Component {
     super(props)
     this.state = {
       inputTeams: '',
-      buttonClass: 'btn-primary'
+      buttonClass: 'btn-primary',
     }
     this.addTeams = this.addTeams.bind(this)
     this.onInputChange = this.onInputChange.bind(this)
   }
 
   onInputChange(event) {
-    this.setState({inputTeams: event.target.value})
+    this.setState({ inputTeams: event.target.value })
   }
 
   addTeams() {
@@ -24,22 +24,22 @@ class AddMultipleTeams extends Component {
       return
     }
 
-    var teams = []
-    var team_input = this.state.inputTeams.split("\n");
-    for (var i = 0; this.state.inputTeams && i < team_input.length; i++) {
-        var teamNum = parseInt(team_input[i]);
-        if(!teamNum || isNaN(teamNum) || teamNum <= 0 || teamNum > 9999){
-          this.props.showErrorMessage("Invalid team "+teams[i]);
-          return
-        }
-        teams.push("frc"+teamNum);
+    const teams = []
+    const teamInput = this.state.inputTeams.split('\n')
+    for (let i = 0; this.state.inputTeams && i < teamInput.length; i++) {
+      const teamNum = parseInt(teamInput[i], 10)
+      if (!teamNum || isNaN(teamNum) || teamNum <= 0 || teamNum > 9999) {
+        this.props.showErrorMessage(`Invalid team ${teams[i]}`)
+        return
+      }
+      teams.push(`frc${teamNum}`)
     }
 
-    this.setState({buttonClass: 'btn-warning'})
+    this.setState({ buttonClass: 'btn-warning' })
     this.props.updateTeamList(
       teams,
       () => {
-        this.setState({buttonClass: 'btn-success'})
+        this.setState({ buttonClass: 'btn-success' })
         this.props.clearTeams()
       },
       (error) => (this.props.showErrorMessage(`${error}`))
@@ -50,17 +50,18 @@ class AddMultipleTeams extends Component {
     return (
       <div>
         <h4>Add Multiple Teams</h4>
-            <p>Enter a list of team numbers, one per line. This will <em>overwrite</em> all existing teams for this event.</p>
-            <textarea
-              className="form-control"
-              value={this.state.inputTeams}
-              onChange={this.onInputChange}
-            />
-            <button
-              className={`btn ${this.state.buttonClass}`}
-              onClick={this.addTeams}
-              disabled={!this.props.selectedEvent}
-            >
+        <p>Enter a list of team numbers, one per line. This will <em>overwrite</em> all existing
+          teams for this event.</p>
+        <textarea
+          className="form-control"
+          value={this.state.inputTeams}
+          onChange={this.onInputChange}
+        />
+        <button
+          className={`btn ${this.state.buttonClass}`}
+          onClick={this.addTeams}
+          disabled={!this.props.selectedEvent}
+        >
               Overwrite Teams
             </button>
       </div>

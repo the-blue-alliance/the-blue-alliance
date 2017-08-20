@@ -67,7 +67,8 @@
   "scripts": {
     "build": "gulp build",
     "test": "jest",
-    "lint": "eslint --ext js react"
+    "lint": "eslint --ext js react",
+    "fixlint": "eslint --fix --ext js react"
   },
   "jest": {
     "automock": false,
