@@ -5,6 +5,12 @@ cache:
   pip: true
   directories:
   - node_modules
+env:
+  matrix:
+  - JOB=PYUNIT
+  - JOB=PYLINT
+  - JOB=JSUNIT
+  - JOB=JSLINT
 before_install:
 - nvm install 6.0.0
 install:
@@ -17,9 +23,7 @@ install:
 before_script:
 - paver make
 script:
-- paver test
-- npm test
-- npm run lint -s
+- ./ops/travis-worker.sh $JOB
 after_failure:
 - cat test_failures.temp
 before_deploy:
@@ -37,4 +41,5 @@ deploy:
   on:
     repo: the-blue-alliance/the-blue-alliance
     branch: master
+    condition: $JOB = PYUNIT
 
