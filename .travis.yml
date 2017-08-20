@@ -30,16 +30,20 @@ before_deploy:
 - openssl aes-256-cbc -K $encrypted_7463bcfc1880_key -iv $encrypted_7463bcfc1880_iv -in ops/deploy_keys.tar.enc -out ops/deploy_keys.tar -d
 - ./ops/manage_deploy_keys.sh -x
 - paver make
-deploy:
-  skip_cleanup: true
-  provider: gae
-  keyfile: ops/tbatv-prod-hrd-deploy.json
-  project: tbatv-prod-hrd
-  version: prod-1
-  config: app.yaml
-  # config: "app.yaml app-backend-tasks-b2.yaml app-backend-tasks.yaml cron.yaml dispatch.yaml index.yaml queue.yaml"
-  on:
-    repo: the-blue-alliance/the-blue-alliance
-    branch: master
-    condition: $JOB = PYUNIT
+jobs:
+  include:
+  - stage: deploy
+    script: skip
+    env: JOB=none
+    deploy:
+      skip_cleanup: true
+      provider: gae
+      keyfile: ops/tbatv-prod-hrd-deploy.json
+      project: tbatv-prod-hrd
+      version: prod-1
+      config: app.yaml
+      # config: "app.yaml app-backend-tasks-b2.yaml app-backend-tasks.yaml cron.yaml dispatch.yaml index.yaml queue.yaml"
+      on:
+        repo: the-blue-alliance/the-blue-alliance
+        branch: master
 
