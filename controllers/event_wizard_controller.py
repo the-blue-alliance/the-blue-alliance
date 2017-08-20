@@ -20,7 +20,7 @@ class EventWizardHandler(CacheableHandler):
 
 class ReactEventWizardHandler(CacheableHandler):
     CACHE_VERSION = 1
-    CACHE_KEY_FORMAT = "event_wizard"
+    CACHE_KEY_FORMAT = "event_wizard_react"
 
     def __init__(self, *args, **kw):
         super(ReactEventWizardHandler, self).__init__(*args, **kw)
