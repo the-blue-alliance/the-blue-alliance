@@ -103,6 +103,7 @@ class AddRemoveSingleTeam extends Component {
           placeholder="Enter team name or number..."
           options={this.state.teamTypeaheadOptions}
           onChange={this.onTeamSelectionChanged}
+          disabled={!this.props.selectedEvent}
         />
         <button
           className={`btn ${this.state.addButtonClass}`}

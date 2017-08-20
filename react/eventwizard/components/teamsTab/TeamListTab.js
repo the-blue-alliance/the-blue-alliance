@@ -56,6 +56,14 @@ class TeamListTab extends Component {
         <h3>Team List</h3>
         <div className="row">
           <div className="col-sm-6">
+            <AddTeamsFMSReport
+              selectedEvent={this.props.selectedEvent}
+              updateTeamList={this.updateTeamList}
+              showErrorMessage={this.showError}
+              clearTeams={this.clearTeams}
+            />
+            <hr />
+
             <AddRemoveSingleTeam
               selectedEvent={this.props.selectedEvent}
               updateTeamList={this.updateTeamList}
@@ -67,14 +75,6 @@ class TeamListTab extends Component {
             <hr />
 
             <AddMultipleTeams
-              selectedEvent={this.props.selectedEvent}
-              updateTeamList={this.updateTeamList}
-              showErrorMessage={this.showError}
-              clearTeams={this.clearTeams}
-            />
-            <hr />
-
-            <AddTeamsFMSReport
               selectedEvent={this.props.selectedEvent}
               updateTeamList={this.updateTeamList}
               showErrorMessage={this.showError}
