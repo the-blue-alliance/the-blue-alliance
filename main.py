@@ -17,7 +17,7 @@ from controllers.apidocs_controller import AddDataHandler, ApiV3DocumentationHan
       ApiDocumentationOverviewHandler
 from controllers.event_controller import EventList, EventDetail, EventInsights, EventRss, \
       EventNextMatchHandler
-from controllers.event_wizard_controller import EventWizardHandler
+from controllers.event_wizard_controller import EventWizardHandler, ReactEventWizardHandler
 from controllers.gameday_controller import Gameday2Controller, GamedayHandler, GamedayRedirectHandler
 from controllers.insights_controller import InsightsOverview, InsightsDetail
 from controllers.main_controller import TwoChampsHandler, ContactHandler, HashtagsHandler, \
@@ -112,6 +112,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/events/<district_abbrev:[a-z]+>', DistrictDetail, 'district-canonical', strict_slash=True),
       RedirectRoute(r'/events', EventList, 'event-list', strict_slash=True),
       RedirectRoute(r'/eventwizard', EventWizardHandler, 'event-wizard', strict_slash=True),
+      RedirectRoute(r'/eventwizard2', ReactEventWizardHandler, 'event-wizard', strict_slash=True),
       RedirectRoute(r'/oldgameday', GamedayHandler, 'gameday', strict_slash=True),
       RedirectRoute(r'/gameday/<alias>', GamedayRedirectHandler, 'gameday-alias', strict_slash=True),
       RedirectRoute(r'/gameday', Gameday2Controller, 'gameday2', strict_slash=True),
