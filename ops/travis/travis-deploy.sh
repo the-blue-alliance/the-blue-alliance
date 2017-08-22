@@ -1,0 +1,52 @@
+#! /usr/bin/env sh
+set -e
+
+# Deploy to GAE from travis CI
+# Basically an implementation of:
+# https://github.com/travis-ci/dpl/blob/master/lib/dpl/provider/gae.rb
+
+KEYFILE=ops/tbatv-prod-hrd-deploy.json
+PROJECT=tbatv-prod-hrd
+VERSION=prod-1
+YAML=app.yaml
+
+BASE='https://dl.google.com/dl/cloudsdk/channels/rapid/'
+NAME='google-cloud-sdk'
+EXT='.tar.gz'
+INSTALL=$HOME
+BOOTSTRAP="$INSTALL/$NAME/bin/bootstrapping/install.py"
+GCLOUD="$INSTALL/$NAME/bin/gcloud"
+API_STATUS=https://www.thebluealliance.com/api/v3/status
+
+with_python27() {
+    bash -c "source $HOME/virtualenv/python2.7/bin/activate; $1"
+}
+
+fetch_apiv3_status() {
+    curl -s --header "X-TBA-Auth-Key: $APIv3_KEY" $API_STATUS
+}
+
+check_killswitch() {
+    ENABLED=$(fetch_apiv3_status | jq '.contbuild_enabled')
+    if [ "$ENABLED" != "true" ]; then
+        echo "Continuous Deployment disabled via killswitch..."
+        exit 0
+    fi
+}
+
+check_killswitch
+
+echo "python 2.7 version:"
+with_python27 "python -c 'import sys; print(sys.version)'"
+
+echo "Downloading Google Cloud SDK ..."
+curl -L "${BASE}${NAME}${EXT}" | gzip -d | tar -x -C ${INSTALL}
+
+echo "Bootstrapping Google Cloud SDK ..."
+with_python27 "$BOOTSTRAP --usage-reporting=false --command-completion=false --path-update=false"
+
+echo "Configuring service account auth..."
+with_python27 "$GCLOUD -q auth activate-service-account --key-file $KEYFILE"
+
+echo "Deploying $PROJECT:$VERSION"
+with_python27 "$GCLOUD --quiet --verbosity warning --project $PROJECT app deploy $YAML --version $VERSION"

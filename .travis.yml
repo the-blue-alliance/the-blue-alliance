@@ -1,6 +1,10 @@
 language: python
 python: 2.7
 sudo: false
+addons:
+  apt:
+    packages:
+    - jq
 cache:
   pip: true
   directories:
@@ -21,9 +25,9 @@ install:
 - export PYTHONPATH=${PYTHONPATH}:google_appengine
 - travis_retry npm install
 before_script:
-- paver make
+- ./ops/travis/travis-before.sh $JOB
 script:
-- ./ops/travis-worker.sh $JOB
+- ./ops/travis/travis-worker.sh $JOB
 after_failure:
 - cat test_failures.temp
 before_deploy:
@@ -34,15 +38,11 @@ jobs:
   include:
   - stage: deploy
     script: skip
-    env: JOB=none
+    env: JOB=DEPLOY
     deploy:
       skip_cleanup: true
-      provider: gae
-      keyfile: ops/tbatv-prod-hrd-deploy.json
-      project: tbatv-prod-hrd
-      version: prod-1
-      config: app.yaml
-      # config: "app.yaml app-backend-tasks-b2.yaml app-backend-tasks.yaml cron.yaml dispatch.yaml index.yaml queue.yaml"
+      provider: script
+      script: ./ops/travis/travis-deploy.sh
       on:
         repo: the-blue-alliance/the-blue-alliance
         branch: master
