@@ -12,6 +12,7 @@ from controllers.base_controller import LoggedInHandler
 from database.database_query import DatabaseQuery
 from helpers.suggestions.suggestion_fetcher import SuggestionFetcher
 from models.account import Account
+from models.sitevar import Sitevar
 from models.suggestion import Suggestion
 
 
@@ -32,6 +33,10 @@ class AdminMain(LoggedInHandler):
         self.template_values['suggestions_count'] = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).count()
 
+        # Continuous deployment info
+        status_sitevar = Sitevar.get_by_id('apistatus')
+        self.template_values['contbuild_enabled'] = status_sitevar.contents.get('contbuild_enabled')
+
         # version info
         try:
             fname = os.path.join(os.path.dirname(__file__), '../../version_info.json')
@@ -41,6 +46,7 @@ class AdminMain(LoggedInHandler):
 
             self.template_values['git_branch_name'] = data['git_branch_name']
             self.template_values['build_time'] = data['build_time']
+            self.template_values['build_number'] = data.get('build_number')
 
             commit_parts = re.split("[\n]+", data['git_last_commit'])
             self.template_values['commit_hash'] = commit_parts[0].split(" ")

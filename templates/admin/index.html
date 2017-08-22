@@ -120,7 +120,21 @@ $(function () {
         </div>
     </div>
     <div class="col-xs-6">
-        <div class="panel panel-default">
+       <div class="panel panel-info">
+          <div class="panel-heading">
+            <h3 class="panel-title">Continuous Deployment</h3>
+          </div>
+         <div class="panel-body">
+           <p>Continuous Deployment is <b>{% if contbuild_enabled %}ENABLED{% else %}DISABLED{% endif %}</b>!
+           </p>
+           <img src="https://travis-ci.org/the-blue-alliance/the-blue-alliance.svg?branch=master" />
+           <p>Travis build: {% if build_number %}<a href="https://travis-ci.org/the-blue-alliance/the-blue-alliance/builds/{{ build_number }}">{{ build_number }}</a>{% else %}unknown{% endif %}</p>
+           <a class="btn btn-danger" href="/admin/contbuild/{% if contbuild_enabled %}disable{% else %}enable{% endif %}">
+             <span class="glyphicon glyphicon-{% if contbuild_enabled %}pause{% else %}play{% endif %}"></span> {% if contbuild_enabled %}Disable{% else %}Enable{% endif %} Continuous Push
+           </a>
+         </div>
+       </div>
+       <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Setup</h3>
             </div>
