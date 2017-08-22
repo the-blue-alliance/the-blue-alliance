@@ -4,6 +4,7 @@ import subprocess
 import json
 import time
 import optparse
+import os
 from paver.easy import *
 
 path = path("./")
@@ -85,9 +86,12 @@ def make():
     git_branch_name = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
     git_last_commit = subprocess.check_output(["git", "log", "-1"])
     build_time = time.ctime()
+    travis_job = os.environ.get('TRAVIS_BUILD_ID', '')
     data = {"git_branch_name": git_branch_name,
             "git_last_commit": git_last_commit,
-            "build_time": build_time}
+            "build_time": build_time,
+            "build_number": travis_job,
+            }
     with open("version_info.json", "w") as f:
         f.write(json.dumps(data))
 

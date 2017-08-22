@@ -8,7 +8,6 @@ set -e
 KEYFILE=ops/tbatv-prod-hrd-deploy.json
 PROJECT=tbatv-prod-hrd
 VERSION=prod-1
-YAML=app.yaml
 
 BASE='https://dl.google.com/dl/cloudsdk/channels/rapid/'
 NAME='google-cloud-sdk'
@@ -49,4 +48,5 @@ echo "Configuring service account auth..."
 with_python27 "$GCLOUD -q auth activate-service-account --key-file $KEYFILE"
 
 echo "Deploying $PROJECT:$VERSION"
-with_python27 "$GCLOUD --quiet --verbosity warning --project $PROJECT app deploy $YAML --version $VERSION"
+for config in dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml cron.yaml queue.yaml index.yaml; do
+    with_python27 "$GCLOUD --quiet --verbosity warning --project $PROJECT app deploy $config --version $VERSION"
