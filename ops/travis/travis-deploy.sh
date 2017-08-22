@@ -50,3 +50,4 @@ with_python27 "$GCLOUD -q auth activate-service-account --key-file $KEYFILE"
 echo "Deploying $PROJECT:$VERSION"
 for config in dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml cron.yaml queue.yaml index.yaml; do
     with_python27 "$GCLOUD --quiet --verbosity warning --project $PROJECT app deploy $config --version $VERSION"
+done
