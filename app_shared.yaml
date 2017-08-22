@@ -18,6 +18,7 @@ skip_files:
 - utils/*
 - react/*
 - node_modules/*
+- ops/*
 
 # specific files
 - .gitignore
