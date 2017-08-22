@@ -103,6 +103,10 @@ def preflight():
     test_function([])
     make()
 
+@task
+def run():
+    """Run local dev server"""
+    sh("dev_appserver.py dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml")
 
 @task
 @consume_args

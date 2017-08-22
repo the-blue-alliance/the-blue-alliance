@@ -33,7 +33,7 @@ Setup
   * [Try Git](https://try.github.io/)
 2. Install [Python 2.7.X](https://www.python.org/downloads/)
 3. Install [App Engine](https://cloud.google.com/appengine/docs)
-  * Specifically use the [Python SDK](https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python)
+  * Specifically use the [Standard Environment Python SDK](https://cloud.google.com/appengine/docs/standard/python/download)
   * Windows/OS X: Run the installer and allow it make symbolic links (it might ask you to enter your root password)
   * Linux: Unzip the .zip file and add the location of your `google_appengine` directory to your `PATH` environment variable.
 4. Get the latest version of The Blue Alliance
@@ -43,7 +43,7 @@ Setup
 5. Install initial required Python packages
   * `pip install -r requirements.txt`
 6. Install [Node.js](https://nodejs.org/) which includes [Node Package Manager](https://www.npmjs.org/)
-7. Install [UglifyJS2](https://github.com/mishoo/UglifyJS2) by running `npm install uglify-js -g` and [UglifyCSS](https://github.com/fmarcia/UglifyCSS) by running `npm install uglifycss -g`
+7. Install [UglifyJS2](https://github.com/mishoo/UglifyJS2) by running `npm install uglify-js@2 -g` and [UglifyCSS](https://github.com/fmarcia/UglifyCSS) by running `npm install uglifycss -g`
 8. Install [gulp](https://github.com/gulpjs/gulp) by running `npm rm --global gulp && npm install --global gulp-cli`. This removes any version of `gulp` that was previously installed globally so it doesn't conflict with `gulp-cli`. Gulp is used as the build tool for Gameday2.
 9. Install all node dependencies by running `npm install`. This includes `less`, which is used to build CSS files for production, as well as a number of packages used in Gameday2.
 10. Fill out `static/javascript/tba_js/tba_keys_template.js` and save it in the same directory as `tba_keys.js`. It's okay to leave a key blank if you're not doing any development that requires it, but the file `tba_keys.js` must exist or else JavaScript won't compile.
@@ -62,6 +62,7 @@ Run a Local Dev Server
   * Add modules (dispatch.yaml, app.yaml, app-backend-tasks.yaml, and app-backend-tasks-b2.yaml) as extra flags [https://cloud.google.com/appengine/docs/python/modules/#devserver](https://cloud.google.com/appengine/docs/python/modules/#devserver).
 2. Run the app in App Engine Launcher and view its Logs window
   * If you are using the Linux version, you can start the application by moving into your `the-blue-alliance` directory and running `dev_appserver.py --port 8088 dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml` on the command line.
+  * Alternatively, run `paver run`.
 3. You should now have a basic development installation!
   * Visit [localhost:8088](http://localhost:8088) to see your local version of The Blue Alliance
   * Also see [localhost:8088/admin/](http://localhost:8088/admin/)
