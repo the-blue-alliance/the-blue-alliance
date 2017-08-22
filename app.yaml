@@ -60,6 +60,9 @@ handlers:
 - url: /tasks/.*
   script: cron_main.app
   login: admin
+- url: /admin/console/.*
+  script: google.appengine.ext.admin.application
+  login: admin
 - url: /admin/.*
   script: admin_main.app
   login: admin
