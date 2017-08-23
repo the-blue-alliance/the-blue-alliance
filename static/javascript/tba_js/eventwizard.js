@@ -185,13 +185,22 @@ function playoffMatchAndSet(totalMatchNum, is_octo){
 /* Load all valid events for this user */
 var valid_events = [];
 $.get( "/_/account/apiwrite_events", function(data) {
+    var key_select = $("#event_key_select");
+    var selected = key_select.val();
     valid_events.push('<option value="">Select Event</option>');
     $.each(JSON.parse(data), function(i, event) {
         valid_events.push('<option value="'+ event['value'] +'">'+ event['label'] +'</option>');
     });
     valid_events.push('<option value="other">Other</option>');
-    $('#event_key_select').html(valid_events.join(''));
-});
+    key_select.html(valid_events.join('')).val(selected);
+    if (selected != "other"){
+        $('#auth_id').val("");
+        $('#auth_secret').val("");
+        $('#event_key').hide();
+        $('#auth-tools').hide();
+        $('#auth-container').hide();
+    }}
+);
 
 if($('#event_key_select').val() != "other"){
     $('#event_key').hide();

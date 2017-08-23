@@ -19,8 +19,11 @@
           <label for="event_key" class="col-sm-2 control-label">Select Event</label>
           <div class="col-sm-10">
             <select id="event_key_select" class="form-control">
-                <option value="">Select Event</option>
-                <option value="other">Other</option>
+               <option value="">Select Event</option>
+               {% if selected_event %}
+                  <option value="{{ selected_event.key_name }}" selected>{{ selected_event.year }} {{ selected_event.name }}</option>
+                {% endif %}
+              <option value="other">Other</option>
             </select>
             <input type="text" class="form-control" id="event_key" placeholder="Event Key"/>
           </div>

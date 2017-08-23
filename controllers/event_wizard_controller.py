@@ -2,6 +2,7 @@ import os
 
 from google.appengine.ext.webapp import template
 from base_controller import CacheableHandler
+from models.event import Event
 
 
 class EventWizardHandler(CacheableHandler):
@@ -14,6 +15,11 @@ class EventWizardHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/eventwizard.html")
+        selected_event_key = self.request.get('event', '')
+        if selected_event_key and Event.validate_key_name(selected_event_key):
+            selected_event = Event.get_by_id(selected_event_key)
+            if selected_event:
+                self.template_values['selected_event'] = selected_event
 
         return template.render(path, self.template_values)
 

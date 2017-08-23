@@ -201,11 +201,15 @@
         <tbody>
           {% for key in write_keys %}
             <tr>
-              <td>
+              <td><ul>
               {% for event in key.event_list %}
-                <a href="/event/{{ event.id() }}">{{ event.id() }}<br/></a>
+                <li>
+                  <a href="/event/{{ event.id() }}">{{ event.id() }}</a>
+                  <a href="/eventwizard?event={{ event.id() }}" class="btn btn-default">EventWizard</a>
+                </li>
+                <hr/>
               {% endfor %}
-              </td>
+              </ul></td>
               <td>
                 <ul>
                 {% for auth_type in key.auth_types_enum %}
