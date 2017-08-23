@@ -186,8 +186,8 @@ function playoffMatchAndSet(totalMatchNum, is_octo){
 var valid_events = [];
 $.get( "/_/account/apiwrite_events", function(data) {
     valid_events.push('<option value="">Select Event</option>');
-    $.each(JSON.parse(data), function(key, value) {
-        valid_events.push('<option value="'+ key +'">'+ value +'</option>');
+    $.each(JSON.parse(data), function(i, event) {
+        valid_events.push('<option value="'+ event['value'] +'">'+ event['label'] +'</option>');
     });
     valid_events.push('<option value="other">Other</option>');
     $('#event_key_select').html(valid_events.join(''));
