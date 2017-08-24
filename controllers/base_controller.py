@@ -87,7 +87,7 @@ class CacheableHandler(webapp2.RequestHandler):
         modified = True
 
         m = hashlib.md5()
-        m.update(content)
+        m.update(content.encode('utf-8'))
         etag = 'W/"{}"'.format(m.hexdigest())  # Weak ETag
         self.response.headers['ETag'] = etag
 
