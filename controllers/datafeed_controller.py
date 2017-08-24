@@ -596,7 +596,6 @@ class HallOfFameTeamsGet(webapp.RequestHandler):
         if teams:
             teams_to_update = []
             for team in teams:
-                print('=>=>=>=>=>    updating', team['team_id'], team['team_number'])
                 teams_to_update.append(Team(id=team['team_id'],
                                             team_number=team['team_number'],
                                             hof=True,
@@ -604,7 +603,6 @@ class HallOfFameTeamsGet(webapp.RequestHandler):
                                             hof_video=team['video'],
                                             hof_presentation=team['presentation'],
                                             hof_essay=team['essay']))
-                print(teams_to_update[-1])
 
             TeamManipulator.createOrUpdate(teams_to_update)
         else:
