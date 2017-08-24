@@ -33,6 +33,7 @@ from controllers.nearby_controller import NearbyController
 from controllers.nightbot_controller import NightbotTeamNextmatchHandler, NightbotTeamStatuskHandler
 from controllers.notification_controller import UserNotificationBroadcast
 from controllers.district_controller import DistrictDetail
+from controllers.short_controller import ShortTeamHandler, ShortEventHandler
 from controllers.suggestions.suggest_apiwrite_controller import SuggestApiWriteController
 from controllers.suggestions.suggest_apiwrite_review_controller import \
       SuggestApiWriteReviewController
@@ -175,6 +176,8 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/_/typeahead/<search_key>', TypeaheadHandler, 'ajax-typeahead', strict_slash=True),
       RedirectRoute(r'/_/webcast/<event_key>/<webcast_number>', WebcastHandler, 'ajax-webcast', strict_slash=True),
       RedirectRoute(r'/_/yt/playlist/videos', YouTubePlaylistHandler, 'ajex-yt-playlist', strict_slash=True),
+      RedirectRoute(r'/<team_number:[0-9]{1,5}>', ShortTeamHandler, 'short-team-canonical'),
+      RedirectRoute(r'/<event_key:[0-9]{4}[a-z]{1,5}>', ShortEventHandler, 'short-event-detail'),
       ],
       debug=tba_config.DEBUG)
 app.error_handlers[404] = handle_404
