@@ -27,7 +27,7 @@ class TestShortController(unittest2.TestCase):
             RedirectRoute(r"/team/<team_number:[0-9]+>", TeamCanonical, "team-canonical"),
             RedirectRoute(r"/event/<event_key>", EventDetail, "event-detail"),
             RedirectRoute(r"/<:(frc)?><team_number:[0-9]{1,5}>", ShortTeamHandler, "short-team-canonical"),
-            RedirectRoute(r"/<event_key:[0-9]{4}[a-z0-9]{1,5}>", ShortEventHandler, "short-event-detail"),
+            RedirectRoute(r"/<event_key:[0-9]{4}[a-z]{1,6}[0-9]?>", ShortEventHandler, "short-event-detail"),
         ], debug=True)
         self.testapp = webtest.TestApp(app)
 
