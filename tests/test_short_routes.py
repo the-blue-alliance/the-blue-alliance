@@ -26,8 +26,8 @@ class TestShortController(unittest2.TestCase):
         app = webapp2.WSGIApplication([
             RedirectRoute(r"/team/<team_number:[0-9]+>", TeamCanonical, "team-canonical"),
             RedirectRoute(r"/event/<event_key>", EventDetail, "event-detail"),
-            RedirectRoute(r"/<:(frc)?><team_number:[0-9]{1,5}>", ShortTeamHandler, "short-team-canonical"),
-            RedirectRoute(r"/<event_key:[0-9]{4}[a-z]{1,6}[0-9]?>", ShortEventHandler, "short-event-detail"),
+            RedirectRoute(r"/<:(frc)?><team_number:[0-9]+>", ShortTeamHandler, "short-team-canonical"),
+            RedirectRoute(r"/<event_key:[0-9]{4}[a-z0-9]+>", ShortEventHandler, "short-event-detail"),
         ], debug=True)
         self.testapp = webtest.TestApp(app)
 
@@ -152,10 +152,6 @@ class TestShortController(unittest2.TestCase):
     def test_no_redirect(self):
         # Teams
 
-        # Long team number
-        response = self.testapp.get("/1234567", status=404)
-        self.assertEqual(response.status_int, 404)
-
         # Negative team number
         response = self.testapp.get("/-2521", status=404)
         self.assertEqual(response.status_int, 404)
@@ -164,8 +160,4 @@ class TestShortController(unittest2.TestCase):
 
         # Semi-real year
         response = self.testapp.get("/217nytr", status=404)
-        self.assertEqual(response.status_int, 404)
-
-        # Semi-real code
-        response = self.testapp.get("/2017superlongcode", status=404)
         self.assertEqual(response.status_int, 404)
