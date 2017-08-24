@@ -213,6 +213,7 @@ class TeamRenderer(object):
 
         social_medias = sorted(social_media_future.get_result(), key=MediaHelper.social_media_sorter)
 
+        print(team)
         handler.template_values.update({
             'is_canonical': is_canonical,
             'team': team,

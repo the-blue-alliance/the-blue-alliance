@@ -31,6 +31,12 @@ class Team(ndb.Model):
     rookie_year = ndb.IntegerProperty()
     motto = ndb.StringProperty(indexed=False)
 
+    hof = ndb.BooleanProperty(default=False, indexed=False)  # Hall of Fame team
+    hof_year = ndb.IntegerProperty(indexed=False)
+    hof_video = ndb.StringProperty(indexed=False)
+    hof_presentation = ndb.StringProperty(indexed=False)
+    hof_essay = ndb.StringProperty(indexed=False)
+
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 

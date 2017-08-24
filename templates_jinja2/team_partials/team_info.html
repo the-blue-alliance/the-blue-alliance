@@ -26,6 +26,7 @@
       {% if last_competed and year != current_year %}<span class="glyphicon glyphicon-time"></span> Last competed in {{ last_competed }}.<br>{% endif %}
       {% if team.website %}<span class="glyphicon glyphicon-globe"></span> <a href="{{team.website}}" target="_blank">{{ team.website }}</a><br>{% endif %}
       {% if team.championship_location %}<span class="glyphicon glyphicon-flag"></span> Home Championship: {{team.championship_location.2017}}, 2017 {% if team.championship_location.2017 != team.championship_location.2018 %} | {{team.championship_location.2018}}, 2018+ {% endif %}<br>{% endif %}
+      {% if team.hof %}<span class="hall-of-fame"><span class="glyphicon glyphicon-certificate"></span> Hall of Fame ({{team.hof_year}}){% if team.hof_video or team.hof_presentation or team.hof_essay %}:{% endif %}{% if team.hof_video %} <a href="{{team.hof_video}}">Video</a>{% endif %}{% if team.hof_presentation %}, <a href="{{team.hof_presentation}}">Presentation</a>{% endif %}{% if team.hof_essay %}, <a href="{{team.hof_essay}}">Essay</a>{% endif %}</span><br>{% endif %}
 
       <hr>
       <a class="btn btn-xs btn-default{% if social_medias %} pull-right{% endif %}" href="/suggest/team/social_media?team_key={{team.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add social media!</a>

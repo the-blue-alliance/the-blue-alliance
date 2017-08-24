@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}HallOfFameTeamsGet{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="alert alert-block alert-success">
+        <h4>Got {{teams|length}} Hall of Fame teams from the FIRST Resource Library, and updated some Teams!</h4>
+    </div>
+    {% for team in teams %}
+    <ul>
+        <li>Year: {{team.year}}</li>
+        <li>Team Number: {{team.team_number}}</li>
+        <li>Video: {{team.video}}</li>
+        <li>Presentation: {{team.presentation}}</li>
+        <li>Essay: {{team.essay}}</li>
+    </ul>
+{% endfor %}
+</div>
+{% endblock %}

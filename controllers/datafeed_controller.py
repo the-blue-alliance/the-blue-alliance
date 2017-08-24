@@ -15,6 +15,7 @@ from consts.event_type import EventType
 from datafeeds.datafeed_fms_api import DatafeedFMSAPI
 from datafeeds.datafeed_first_elasticsearch import DatafeedFIRSTElasticSearch
 from datafeeds.datafeed_tba import DatafeedTba
+from datafeeds.datafeed_resource_library import DatafeedResourceLibrary
 from helpers.district_manipulator import DistrictManipulator
 from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
@@ -582,4 +583,38 @@ class TbaVideosGet(webapp.RequestHandler):
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
             path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_get.html')
+            self.response.out.write(template.render(path, template_values))
+
+class HallOfFameTeamsGet(webapp.RequestHandler):
+    """
+    Handles scraping the list of Hall of Fame teams from FIRST resource library.
+    """
+    def get(self):
+        df = DatafeedResourceLibrary()
+
+        teams = df.getHallOfFameTeams()
+        if teams:
+            teams_to_update = []
+            for team in teams:
+                print('=>=>=>=>=>    updating', team['team_id'], team['team_number'])
+                teams_to_update.append(Team(id=team['team_id'],
+                                            team_number=team['team_number'],
+                                            hof=True,
+                                            hof_year=team['year'],
+                                            hof_video=team['video'],
+                                            hof_presentation=team['presentation'],
+                                            hof_essay=team['essay']))
+                print(teams_to_update[-1])
+
+            TeamManipulator.createOrUpdate(teams_to_update)
+        else:
+            logging.info("No Hall of Fame teams found")
+            teams = []
+
+        template_values = {
+            'teams': teams,
+        }
+
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/hall_of_fame_teams_get.html')
             self.response.out.write(template.render(path, template_values))

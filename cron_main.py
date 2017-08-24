@@ -9,6 +9,7 @@ from controllers.backup_controller import TbaCSVBackupTeamsEnqueue
 from controllers.datafeed_controller import TbaVideosGet, TbaVideosEnqueue
 from controllers.datafeed_controller import FMSAPIAwardsEnqueue, FMSAPIEventAlliancesEnqueue, FMSAPIEventRankingsEnqueue, FMSAPIMatchesEnqueue
 from controllers.datafeed_controller import FMSAPIAwardsGet, FMSAPIEventAlliancesGet, FMSAPIEventRankingsGet, FMSAPIMatchesGet
+from controllers.datafeed_controller import HallOfFameTeamsGet
 
 from controllers.cron_controller import DistrictPointsCalcEnqueue, DistrictPointsCalcDo, \
     MatchTimePredictionsEnqueue, MatchTimePredictionsDo, BlueZoneUpdateDo
@@ -46,6 +47,7 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/get/fmsapi_event_alliances/(.*)', FMSAPIEventAlliancesGet),
                                ('/tasks/get/fmsapi_event_rankings/(.*)', FMSAPIEventRankingsGet),
                                ('/tasks/get/fmsapi_matches/(.*)', FMSAPIMatchesGet),
+                               ('/tasks/get/hof_teams', HallOfFameTeamsGet),
                                ('/tasks/math/enqueue/district_points_calc/([0-9]*)', DistrictPointsCalcEnqueue),
                                ('/tasks/math/do/district_points_calc/(.*)', DistrictPointsCalcDo),
                                ('/tasks/math/enqueue/district_rankings_calc/([0-9]*)', DistrictRankingsCalcEnqueue),
