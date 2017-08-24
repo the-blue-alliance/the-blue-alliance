@@ -35,7 +35,7 @@ class AdminMain(LoggedInHandler):
 
         # Continuous deployment info
         status_sitevar = Sitevar.get_by_id('apistatus')
-        self.template_values['contbuild_enabled'] = status_sitevar.contents.get('contbuild_enabled')
+        self.template_values['contbuild_enabled'] = status_sitevar.contents.get('contbuild_enabled') if status_sitevar else None
 
         # version info
         try:
