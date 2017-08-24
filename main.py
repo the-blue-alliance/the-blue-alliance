@@ -177,7 +177,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/_/webcast/<event_key>/<webcast_number>', WebcastHandler, 'ajax-webcast', strict_slash=True),
       RedirectRoute(r'/_/yt/playlist/videos', YouTubePlaylistHandler, 'ajex-yt-playlist', strict_slash=True),
       RedirectRoute(r'/<:(frc)?><team_number:[0-9]{1,5}>', ShortTeamHandler, 'short-team-canonical'),
-      RedirectRoute(r'/<event_key:[0-9]{4}[a-z]{1,5}>', ShortEventHandler, 'short-event-detail'),
+      RedirectRoute(r'/<event_key:[0-9]{4}[a-z0-9]{1,5}>', ShortEventHandler, 'short-event-detail'),
       ],
       debug=tba_config.DEBUG)
 app.error_handlers[404] = handle_404
