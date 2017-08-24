@@ -1,5 +1,6 @@
 import cPickle
 import datetime
+import hashlib
 import time
 import logging
 import re
@@ -70,35 +71,44 @@ class CacheableHandler(webapp2.RequestHandler):
 
         if cached_response is None:
             self._set_cache_header_length(self.CACHE_HEADER_LENGTH)
-            self.template_values["render_time"] = datetime.datetime.now()
+            self.template_values["render_time"] = datetime.datetime.now().replace(second=0, microsecond=0)  # Prevent ETag from changing too quickly
             rendered = self._render(*args, **kw)
-            if self._has_been_modified_since(self._last_modified):
-                self.response.out.write(self._add_admin_bar(rendered))
+            if self._output_if_modified(self._add_admin_bar(rendered)):
                 self._write_cache(self.response)
-                return
-            else:
-                return None
         else:
             self.response.headers.update(cached_response.headers)
             del self.response.headers['Content-Length']  # Content-Length gets set automatically
-            if self._has_been_modified_since(self._last_modified):
-                self.response.out.write(self._add_admin_bar(cached_response.body))
-                return
-            else:
-                return None
+            self._output_if_modified(self._add_admin_bar(cached_response.body))
 
-    def _has_been_modified_since(self, datetime):
-        if datetime is None:
-            return True
+    def _output_if_modified(self, content):
+        """
+        Check for ETag, then fall back to If-Modified-Since
+        """
+        modified = True
 
-        last_modified = format_date_time(mktime(datetime.timetuple()))
-        if_modified_since = self.request.headers.get('If-Modified-Since')
-        self.response.headers['Last-Modified'] = last_modified
-        if if_modified_since and if_modified_since == last_modified:
+        m = hashlib.md5()
+        m.update(content)
+        etag = 'W/"{}"'.format(m.hexdigest())  # Weak ETag
+        self.response.headers['ETag'] = etag
+
+        if_none_match = self.request.headers.get('If-None-Match')
+        if if_none_match and etag in [x.strip() for x in if_none_match.split(',')]:
             self.response.set_status(304)
-            return False
-        else:
-            return True
+            modified = False
+
+        # Fall back to If-Modified-Since
+        if modified and self._last_modified is not None:
+            last_modified = format_date_time(mktime(self._last_modified.timetuple()))
+            if_modified_since = self.request.headers.get('If-Modified-Since')
+            self.response.headers['Last-Modified'] = last_modified
+            if if_modified_since and if_modified_since == last_modified:
+                self.response.set_status(304)
+                modified = False
+
+        if modified:
+            self.response.out.write(content)
+
+        return modified
 
     def memcacheFlush(self):
         memcache.delete(self.cache_key)
