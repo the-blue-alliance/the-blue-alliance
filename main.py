@@ -33,7 +33,7 @@ from controllers.nearby_controller import NearbyController
 from controllers.nightbot_controller import NightbotTeamNextmatchHandler, NightbotTeamStatuskHandler
 from controllers.notification_controller import UserNotificationBroadcast
 from controllers.district_controller import DistrictDetail
-from controllers.short_controller import ShortTeamHandler, ShortEventHandler
+from controllers.short_controller import ShortEventHandler, ShortTeamHandler
 from controllers.suggestions.suggest_apiwrite_controller import SuggestApiWriteController
 from controllers.suggestions.suggest_apiwrite_review_controller import \
       SuggestApiWriteReviewController
