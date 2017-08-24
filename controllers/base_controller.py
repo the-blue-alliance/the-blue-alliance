@@ -86,9 +86,13 @@ class CacheableHandler(webapp2.RequestHandler):
         """
         modified = True
 
-        m = hashlib.md5()
-        m.update(content.encode('utf-8'))
-        etag = 'W/"{}"'.format(m.hexdigest())  # Weak ETag
+        # Normalize content
+        try:
+            content = str(content)
+        except UnicodeEncodeError:
+            content = unicode(content).encode('utf-8')
+
+        etag = 'W/"{}"'.format(hashlib.md5(content).hexdigest())  # Weak ETag
         self.response.headers['ETag'] = etag
 
         if_none_match = self.request.headers.get('If-None-Match')
