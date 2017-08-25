@@ -68,13 +68,13 @@ class CacheableHandler(webapp2.RequestHandler):
 
     def get(self, *args, **kw):
         with TraceContext(self.request) as root:
-            with root.span("Read Cache") as spn:
+            with root.span("CacheableHandler._read_cache") as spn:
                 cached_response = self._read_cache()
 
             if cached_response is None:
                 self._set_cache_header_length(self.CACHE_HEADER_LENGTH)
                 self.template_values["render_time"] = datetime.datetime.now().replace(second=0, microsecond=0)  # Prevent ETag from changing too quickly
-                with root.span("Render Response") as spn:
+                with root.span("CacheableHandler._render") as spn:
                     rendered = self._render(*args, **kw)
                 if self._output_if_modified(self._add_admin_bar(rendered)):
                     self._write_cache(self.response)

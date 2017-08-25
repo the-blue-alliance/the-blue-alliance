@@ -3,15 +3,10 @@
 from datetime import datetime
 import logging
 import random
-import threading
-
 from google.appengine.api import app_identity
 from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
 import tba_config
-
-# create a thread-local global context
-_trace_context = threading.local()
 
 
 class Span(object):
@@ -26,8 +21,6 @@ class Span(object):
 
     def finish(self):
         self.endTime = datetime.now()
-        if hasattr(_trace_context, 'spans'):
-            _trace_context.spans.append(self)
 
     # Helpers for scope-specific use cases
     def __enter__(self):
@@ -55,27 +48,30 @@ class TraceContext(object):
         self._tcontext = request.headers.get('X-Cloud-Trace-Context', 'NNNN/NNNN;xxxxx')
         logging.info("Trace Context: {}".format(self._tcontext))
 
+        self._doWrite = ';o=1' in self._tcontext
+        self._spans = []
+
     def __enter__(self):
         self.start()
         return self
 
     def start(self):
-        _trace_context.spans = []
+        self._spans = []
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.finish()
 
     def finish(self):
         self.write()
-        _trace_context.spans = []
+        self._spans = []
 
     def span(self, name=""):
         spn = Span(name)
-        _trace_context.spans.append(spn)
+        self._spans.append(spn)
         return spn
 
     def write(self):
-        if tba_config.DEBUG:
+        if tba_config.DEBUG or not self._doWrite:
             return
 
         try:
@@ -83,11 +79,11 @@ class TraceContext(object):
             trace_id, root_span_id = self._tcontext.split(';')[0].split('/')
 
             # Grab our spans object as a json blob
-            spans = [s.json() for s in _trace_context.spans]
+            spans = [s.json() for s in self._spans]
 
             # catch
             if len(spans) == 0:
-                spans.append({"spanId": 16384})
+                return
 
             for s in spans:
                 s['parentSpanId'] = root_span_id
