@@ -5,6 +5,7 @@ from google.appengine.ext import ndb
 import logging
 from models.cached_query_result import CachedQueryResult
 import random
+from stackdriver.profiler import TraceContext
 import tba_config
 
 MEMCACHE_CLIENT = memcache.Client()
@@ -52,53 +53,55 @@ class DatabaseQuery(object):
 
     @ndb.tasklet
     def fetch_async(self, dict_version=None, return_updated=False):
-        if dict_version:
-            if dict_version not in self.VALID_DICT_VERSIONS:
-                raise Exception("Bad api version for database query: {}".format(dict_version))
-            cache_key = self._dict_cache_key(self.cache_key, dict_version)
-        else:
-            cache_key = self.cache_key
-
-        cached_query = yield CachedQueryResult.get_by_id_async(cache_key)
-        do_stats = random.random() < tba_config.RECORD_FRACTION
-        rpcs = []
-        if cached_query is None:
-            if do_stats:
-                rpcs.append(MEMCACHE_CLIENT.incr_async(
-                    random.choice(self.DATABASE_MISSES_MEMCACHE_KEYS),
-                    initial_value=0))
-            query_result = yield self._query_async()
-            if dict_version:
-                query_result = self.DICT_CONVERTER.convert(query_result, dict_version)
-            if tba_config.CONFIG['database_query_cache']:
+        with TraceContext() as root:
+            with root.span("{}.fetch_async".format(self.__class__.__name__)) as spn:
                 if dict_version:
-                    rpcs.append(CachedQueryResult(
-                        id=cache_key,
-                        result_dict=query_result,
-                    ).put_async())
+                    if dict_version not in self.VALID_DICT_VERSIONS:
+                        raise Exception("Bad api version for database query: {}".format(dict_version))
+                    cache_key = self._dict_cache_key(self.cache_key, dict_version)
                 else:
-                    rpcs.append(CachedQueryResult(
-                        id=cache_key,
-                        result=query_result,
-                    ).put_async())
-            updated = datetime.datetime.now()
-        else:
-            if do_stats:
-                rpcs.append(MEMCACHE_CLIENT.incr_async(
-                    random.choice(self.DATABASE_HITS_MEMCACHE_KEYS),
-                    initial_value=0))
-            if dict_version:
-                query_result = cached_query.result_dict
-            else:
-                query_result = cached_query.result
-            updated = cached_query.updated
+                    cache_key = self.cache_key
 
-        for rpc in rpcs:
-            try:
-                rpc.get_result()
-            except Exception, e:
-                logging.warning("An RPC in DatabaseQuery.fetch_async() failed!")
-        if return_updated:
-            raise ndb.Return((query_result, updated))
-        else:
-            raise ndb.Return(query_result)
+                cached_query = yield CachedQueryResult.get_by_id_async(cache_key)
+                do_stats = random.random() < tba_config.RECORD_FRACTION
+                rpcs = []
+                if cached_query is None:
+                    if do_stats:
+                        rpcs.append(MEMCACHE_CLIENT.incr_async(
+                            random.choice(self.DATABASE_MISSES_MEMCACHE_KEYS),
+                            initial_value=0))
+                    query_result = yield self._query_async()
+                    if dict_version:
+                        query_result = self.DICT_CONVERTER.convert(query_result, dict_version)
+                    if tba_config.CONFIG['database_query_cache']:
+                        if dict_version:
+                            rpcs.append(CachedQueryResult(
+                                id=cache_key,
+                                result_dict=query_result,
+                            ).put_async())
+                        else:
+                            rpcs.append(CachedQueryResult(
+                                id=cache_key,
+                                result=query_result,
+                            ).put_async())
+                    updated = datetime.datetime.now()
+                else:
+                    if do_stats:
+                        rpcs.append(MEMCACHE_CLIENT.incr_async(
+                            random.choice(self.DATABASE_HITS_MEMCACHE_KEYS),
+                            initial_value=0))
+                    if dict_version:
+                        query_result = cached_query.result_dict
+                    else:
+                        query_result = cached_query.result
+                    updated = cached_query.updated
+
+                for rpc in rpcs:
+                    try:
+                        rpc.get_result()
+                    except Exception, e:
+                        logging.warning("An RPC in DatabaseQuery.fetch_async() failed!")
+                if return_updated:
+                    raise ndb.Return((query_result, updated))
+                else:
+                    raise ndb.Return(query_result)
