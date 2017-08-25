@@ -1,3 +1,4 @@
 # Packages that are needed for deployment because
 # they are not included in App Engine
 iso8601==0.1.11
+google-api-python-client==1.6.2

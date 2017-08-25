@@ -16,6 +16,7 @@ import tba_config
 
 from helpers.user_bundle import UserBundle
 from models.sitevar import Sitevar
+from stackdriver.profiler import TraceContext
 
 
 class CacheableHandler(webapp2.RequestHandler):
@@ -66,52 +67,57 @@ class CacheableHandler(webapp2.RequestHandler):
             return html
 
     def get(self, *args, **kw):
-        cached_response = self._read_cache()
+        with TraceContext(self.request) as root:
+            with root.span("Read Cache") as spn:
+                cached_response = self._read_cache()
 
-        if cached_response is None:
-            self._set_cache_header_length(self.CACHE_HEADER_LENGTH)
-            self.template_values["render_time"] = datetime.datetime.now().replace(second=0, microsecond=0)  # Prevent ETag from changing too quickly
-            rendered = self._render(*args, **kw)
-            if self._output_if_modified(self._add_admin_bar(rendered)):
-                self._write_cache(self.response)
-        else:
-            self.response.headers.update(cached_response.headers)
-            del self.response.headers['Content-Length']  # Content-Length gets set automatically
-            self._output_if_modified(self._add_admin_bar(cached_response.body))
+            if cached_response is None:
+                self._set_cache_header_length(self.CACHE_HEADER_LENGTH)
+                self.template_values["render_time"] = datetime.datetime.now().replace(second=0, microsecond=0)  # Prevent ETag from changing too quickly
+                with root.span("Render Response") as spn:
+                    rendered = self._render(*args, **kw)
+                if self._output_if_modified(self._add_admin_bar(rendered)):
+                    self._write_cache(self.response)
+            else:
+                self.response.headers.update(cached_response.headers)
+                del self.response.headers['Content-Length']  # Content-Length gets set automatically
+                self._output_if_modified(self._add_admin_bar(cached_response.body))
 
     def _output_if_modified(self, content):
         """
         Check for ETag, then fall back to If-Modified-Since
         """
-        modified = True
+        with TraceContext(self.request) as root:
+            with root.span("CacheableHandler._output_if_modified") as spn:
+                modified = True
 
-        # Normalize content
-        try:
-            content = str(content)
-        except UnicodeEncodeError:
-            content = unicode(content).encode('utf-8')
+                # Normalize content
+                try:
+                    content = str(content)
+                except UnicodeEncodeError:
+                    content = unicode(content).encode('utf-8')
 
-        etag = 'W/"{}"'.format(hashlib.md5(content).hexdigest())  # Weak ETag
-        self.response.headers['ETag'] = etag
+                etag = 'W/"{}"'.format(hashlib.md5(content).hexdigest())  # Weak ETag
+                self.response.headers['ETag'] = etag
 
-        if_none_match = self.request.headers.get('If-None-Match')
-        if if_none_match and etag in [x.strip() for x in if_none_match.split(',')]:
-            self.response.set_status(304)
-            modified = False
+                if_none_match = self.request.headers.get('If-None-Match')
+                if if_none_match and etag in [x.strip() for x in if_none_match.split(',')]:
+                    self.response.set_status(304)
+                    modified = False
 
-        # Fall back to If-Modified-Since
-        if modified and self._last_modified is not None:
-            last_modified = format_date_time(mktime(self._last_modified.timetuple()))
-            if_modified_since = self.request.headers.get('If-Modified-Since')
-            self.response.headers['Last-Modified'] = last_modified
-            if if_modified_since and if_modified_since == last_modified:
-                self.response.set_status(304)
-                modified = False
+                # Fall back to If-Modified-Since
+                if modified and self._last_modified is not None:
+                    last_modified = format_date_time(mktime(self._last_modified.timetuple()))
+                    if_modified_since = self.request.headers.get('If-Modified-Since')
+                    self.response.headers['Last-Modified'] = last_modified
+                    if if_modified_since and if_modified_since == last_modified:
+                        self.response.set_status(304)
+                        modified = False
 
-        if modified:
-            self.response.out.write(content)
+                if modified:
+                    self.response.out.write(content)
 
-        return modified
+                return modified
 
     def memcacheFlush(self):
         memcache.delete(self.cache_key)
