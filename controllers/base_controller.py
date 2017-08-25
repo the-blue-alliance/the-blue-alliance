@@ -16,7 +16,7 @@ import tba_config
 
 from helpers.user_bundle import UserBundle
 from models.sitevar import Sitevar
-from stackdriver.profiler import TraceContext
+from stackdriver.profiler import trace_context, TraceContext
 
 
 class CacheableHandler(webapp2.RequestHandler):
@@ -67,7 +67,8 @@ class CacheableHandler(webapp2.RequestHandler):
             return html
 
     def get(self, *args, **kw):
-        with TraceContext(self.request) as root:
+        trace_context.request = self.request
+        with TraceContext() as root:
             with root.span("CacheableHandler._read_cache") as spn:
                 cached_response = self._read_cache()
 
@@ -87,7 +88,7 @@ class CacheableHandler(webapp2.RequestHandler):
         """
         Check for ETag, then fall back to If-Modified-Since
         """
-        with TraceContext(self.request) as root:
+        with TraceContext() as root:
             with root.span("CacheableHandler._output_if_modified") as spn:
                 modified = True
 

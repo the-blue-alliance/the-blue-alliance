@@ -8,11 +8,10 @@ import threading
 from google.appengine.api import app_identity
 from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
-import tba_config
 
 
 # create a thread-local global context
-_trace_context = threading.local()
+trace_context = threading.local()
 
 
 class Span(object):
@@ -50,47 +49,51 @@ class Span(object):
 
 
 class TraceContext(object):
-    def __init__(self, request):
-        self._tcontext = request.headers.get('X-Cloud-Trace-Context', 'NNNN/NNNN;xxxxx')
-        logging.info("Trace Context: {}".format(self._tcontext))
+    def __init__(self):
+        request = trace_context.request
+        if request:
+            self._tcontext = request.headers.get('X-Cloud-Trace-Context', 'NNNN/NNNN;xxxxx')
+            logging.info("Trace Context: {}".format(self._tcontext))
 
-        self._doWrite = ';o=1' in self._tcontext
+            self._doTrace = ';o=1' in self._tcontext
+        else:
+            self._doTrace = False
 
     def __enter__(self):
         self.start()
         return self
 
     def start(self):
-        if not hasattr(_trace_context, '_open_contexts'):
-            _trace_context._open_contexts = 0
-        if _trace_context._open_contexts == 0:
-            _trace_context.spans = []
-        _trace_context._open_contexts += 1
+        if self._doTrace:
+            if not hasattr(trace_context, '_open_contexts'):
+                trace_context._open_contexts = 0
+            if trace_context._open_contexts == 0:
+                trace_context.spans = []
+            trace_context._open_contexts += 1
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.finish()
 
     def finish(self):
-        _trace_context._open_contexts -= 1
-        if _trace_context._open_contexts == 0:
-            self.write()
-            _trace_context.spans = []
+        if self._doTrace:
+            trace_context._open_contexts -= 1
+            if trace_context._open_contexts == 0:
+                self.write()
+                trace_context.spans = []
 
     def span(self, name=""):
         spn = Span(name)
-        _trace_context.spans.append(spn)
+        if self._doTrace:
+            trace_context.spans.append(spn)
         return spn
 
     def write(self):
-        if tba_config.DEBUG or not self._doWrite:
-            return
-
         try:
             # Breakup our given cloud tracing context so we can get the flags out of it
             trace_id, root_span_id = self._tcontext.split(';')[0].split('/')
 
             # Grab our spans object as a json blob
-            spans = [s.json() for s in _trace_context.spans]
+            spans = [s.json() for s in trace_context.spans]
 
             # catch
             if len(spans) == 0:
