@@ -13,7 +13,6 @@ import tba_config
 
 # create a thread-local global context
 _trace_context = threading.local()
-_trace_context._open_contexts = 0
 
 
 class Span(object):
@@ -62,6 +61,8 @@ class TraceContext(object):
         return self
 
     def start(self):
+        if not hasattr(_trace_context, '_open_contexts'):
+            _trace_context._open_contexts = 0
         if _trace_context._open_contexts == 0:
             _trace_context.spans = []
         _trace_context._open_contexts += 1
