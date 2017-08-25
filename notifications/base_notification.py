@@ -1,14 +1,12 @@
 import logging
 import random
 import tba_config
-import urllib
 import uuid
 
 from google.appengine.ext import deferred
 from google.appengine.api import memcache
 from google.appengine.api import urlfetch
 
-from controllers.gcm.gcm import GCMMessage
 from consts.client_type import ClientType
 from consts.notification_type import NotificationType
 from helpers.notification_sender import NotificationSender
@@ -118,6 +116,7 @@ class BaseNotification(object):
     in order to provide that functionality.
     """
     def _render_android(self):
+        from controllers.gcm.gcm import GCMMessage
         gcm_keys = self.keys[ClientType.OS_ANDROID]
         data = self._build_dict()
         return GCMMessage(gcm_keys, data, priority=self._priority)
@@ -126,6 +125,7 @@ class BaseNotification(object):
         pass
 
     def _render_web(self):
+        from controllers.gcm.gcm import GCMMessage
         gcm_keys = self.keys[ClientType.WEB]
         data = self._build_dict()
         return GCMMessage(gcm_keys, data, priority=self._priority)
@@ -139,6 +139,7 @@ class BaseNotification(object):
         For more information about GAnalytics Protocol Parameters, visit
         https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
         """
+        import urllib
         analytics_id = Sitevar.get_by_id("google_analytics.id")
         if analytics_id is None:
             logging.warning("Missing sitevar: google_analytics.id. Can't track API usage.")

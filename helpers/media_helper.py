@@ -6,7 +6,6 @@ from urlparse import urlparse
 
 from google.appengine.api import urlfetch
 
-from BeautifulSoup import BeautifulSoup
 from consts.media_type import MediaType
 
 
@@ -263,6 +262,7 @@ class MediaParser(object):
         returns the url of the image in the thread
         ex: http://www.chiefdelphi.com/media/img/3f5/3f5db241521ae5f2636ff8460f277997_l.jpg
         """
+        from BeautifulSoup import BeautifulSoup
         html = html.decode("utf-8", "replace")
 
         # parse html for the image url

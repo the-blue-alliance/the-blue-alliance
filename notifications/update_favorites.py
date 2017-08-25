@@ -1,6 +1,5 @@
 from consts.client_type import ClientType
 from consts.notification_type import NotificationType
-from controllers.gcm.gcm import GCMMessage
 from notifications.base_notification import BaseNotification
 
 
@@ -23,6 +22,7 @@ class UpdateFavoritesNotification(BaseNotification):
         return data
 
     def _render_android(self):
+        from controllers.gcm.gcm import GCMMessage
         user_collapse_key = "{}_favorite_update".format(self.user_id)
 
         if self.sending_device_key in self.keys[ClientType.OS_ANDROID]:

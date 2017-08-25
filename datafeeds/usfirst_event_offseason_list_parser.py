@@ -2,8 +2,6 @@ from datetime import datetime
 import urlparse
 import logging
 
-from BeautifulSoup import BeautifulSoup
-
 from consts.event_type import EventType
 from datafeeds.parser_base import ParserBase
 from helpers.event_helper import EventHelper
@@ -17,6 +15,8 @@ class UsfirstEventOffseasonListParser(ParserBase):
         Parse the list of events from USFIRST. This provides us with basic
         information about events and is how we first discover them.
         """
+        from BeautifulSoup import BeautifulSoup
+
         events = list()
         soup = BeautifulSoup(html,
                              convertEntities=BeautifulSoup.HTML_ENTITIES)

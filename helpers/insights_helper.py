@@ -1,7 +1,6 @@
 import itertools
 import json
 import math
-import numpy as np
 
 from collections import defaultdict
 
@@ -97,6 +96,8 @@ class InsightsHelper(object):
         """
         Calculate aggregate prediction stats for all season events for a year.
         """
+        import numpy as np
+
         events = Event.query(
             Event.event_type_enum.IN(EventType.SEASON_EVENT_TYPES),
             Event.year==(int(year))).fetch()

@@ -4,7 +4,6 @@ import hashlib
 import time
 import logging
 import re
-import urllib
 import webapp2
 import zlib
 
@@ -17,7 +16,6 @@ import tba_config
 
 from helpers.user_bundle import UserBundle
 from models.sitevar import Sitevar
-from template_engine import jinja2_engine
 
 
 class CacheableHandler(webapp2.RequestHandler):
@@ -56,6 +54,7 @@ class CacheableHandler(webapp2.RequestHandler):
             tba_config.CONFIG["static_resource_version"])
 
     def _add_admin_bar(self, html):
+        from template_engine import jinja2_engine
         if self._is_admin:
             self.template_values["cache_key"] = self.cache_key
             self.template_values["return_url"] = self.request.path
@@ -192,6 +191,8 @@ class LoggedInHandler(webapp2.RequestHandler):
             return self.redirect(self.user_bundle.login_url, abort=True)
 
     def _require_login(self, redirect_url=None):
+        import urllib
+
         if not self.user_bundle.user:
             if not redirect_url:
                 redirect_url = self.request.get('redirect')
@@ -211,6 +212,8 @@ class LoggedInHandler(webapp2.RequestHandler):
             )
 
     def _require_registration(self, redirect_url=None):
+        import urllib
+
         self._require_login()
         if not self.user_bundle.account.registered:
             if not redirect_url:

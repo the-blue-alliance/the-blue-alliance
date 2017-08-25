@@ -1,8 +1,6 @@
 import cloudstorage
 import datetime
 import time
-import pytz
-import numpy as np
 
 from google.appengine.api import memcache
 from helpers.match_manipulator import MatchManipulator
@@ -17,6 +15,7 @@ class MatchTimePredictionHelper(object):
 
     @classmethod
     def as_local(cls, time, timezone):
+        import pytz
         if not time:
             return None
         return pytz.utc.localize(time).astimezone(timezone)
@@ -40,6 +39,8 @@ class MatchTimePredictionHelper(object):
         :param timezone: The timezone object, for computing local times
         :return: The average cycle time, in seconds, or None if not enough info
         """
+        import numpy as np
+
         cycles = []
 
         # Sort matches by when they were actually played

@@ -1,5 +1,4 @@
 import copy
-import numpy as np
 
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb.tasklets import Future
@@ -320,6 +319,7 @@ class EventTeamStatusHelper(object):
     @classmethod
     def _build_playoff_info(cls, team_key, event_details, matches, year, playoff_type):
         # Matches needs to be all playoff matches at the event, to properly account for backups
+        import numpy as np
         alliance, _ = cls._get_alliance(team_key, event_details, matches)
         complete_alliance = set(alliance['picks']) if alliance else set()
         if alliance and alliance.get('backup'):

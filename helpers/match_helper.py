@@ -3,7 +3,6 @@ from collections import defaultdict
 import copy
 import datetime
 import json
-import pytz
 import re
 
 from collections import defaultdict
@@ -23,6 +22,7 @@ class MatchHelper(object):
         Assumes the last match is played on the last day of comeptition and
         works backwards from there.
         """
+        import pytz
         if event.timezone_id is None:  # Can only calculate match times if event timezone is known
             logging.warning('Cannot compute match time for event with no timezone_id: {}'.format(event.key_name))
             return

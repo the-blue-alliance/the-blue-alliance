@@ -2,7 +2,6 @@ import datetime
 import logging
 import os
 import json
-import pytz
 
 from google.appengine.api import taskqueue
 
@@ -635,6 +634,8 @@ class MatchTimePredictionsDo(webapp.RequestHandler):
     Predicts match times for a given live event
     """
     def get(self, event_key):
+        import pytz
+
         event = Event.get_by_id(event_key)
         if not event:
             self.abort(404)

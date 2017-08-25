@@ -1,12 +1,9 @@
-import pytz
-
 from base_controller import CacheableHandler
 from database.event_query import TeamEventsQuery
 from database.match_query import TeamEventMatchesQuery
 from helpers.event_team_status_helper import EventTeamStatusHelper
 from helpers.match_helper import MatchHelper
 from helpers.team_helper import TeamHelper
-from pytz.exceptions import UnknownTimeZoneError
 from models.event_team import EventTeam
 from models.team import Team
 
@@ -55,6 +52,9 @@ class NightbotTeamNextmatchHandler(CacheableHandler):
         super(NightbotTeamNextmatchHandler, self).get(team_number, tz_str)
 
     def _render(self, team_number, tz_str=None):
+        import pytz
+        from pytz.exceptions import UnknownTimeZoneError
+
         user = self.request.get('user')
         if user:
             user_str = '@{}, '.format(user)

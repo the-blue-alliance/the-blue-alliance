@@ -1,9 +1,6 @@
 import hashlib
 import json
 import logging
-import urllib2
-
-from controllers.gcm.gcm import GCMConnection
 
 
 class NotificationSender(object):
@@ -12,6 +9,7 @@ class NotificationSender(object):
 
     @classmethod
     def send_gcm(cls, notification):
+        from controllers.gcm.gcm import GCMConnection
         gcm_connection = GCMConnection()
         gcm_connection.notify_device(notification)
 
@@ -21,6 +19,7 @@ class NotificationSender(object):
 
     @classmethod
     def send_webhook(cls, message, keys):
+        import urllib2
         payload = json.dumps(message, ensure_ascii=True)
 
         invalid_urls = []

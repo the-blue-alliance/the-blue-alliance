@@ -1,7 +1,6 @@
 import logging
 import re
 
-from BeautifulSoup import BeautifulSoup
 from google.appengine.api import urlfetch
 
 
@@ -114,6 +113,8 @@ class WebcastParser(object):
 
     @classmethod
     def _parse_ustream_channel(cls, html):
+        from BeautifulSoup import BeautifulSoup
+
         html = html.decode("utf-8", "replace")
 
         # parse html for the channel id
@@ -130,6 +131,8 @@ class WebcastParser(object):
 
     @classmethod
     def _parse_livestream_channel(cls, html):
+        from BeautifulSoup import BeautifulSoup
+
         html = html.decode("utf-8", "replace")
 
         # parse html for the channel id

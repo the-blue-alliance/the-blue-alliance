@@ -1,7 +1,6 @@
 import datetime
 import json
 import logging
-import pytz
 
 from google.appengine.ext import ndb
 
@@ -49,6 +48,8 @@ class FMSAPIHybridScheduleParser(object):
         return True
 
     def parse(self, response):
+        import pytz
+
         matches = response['Schedule']
 
         event_key = '{}{}'.format(self.year, self.event_short)

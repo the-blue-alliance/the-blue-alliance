@@ -2,7 +2,6 @@ import copy
 import logging
 import heapq
 import math
-import numpy as np
 
 from collections import defaultdict
 
@@ -216,7 +215,7 @@ class DistrictHelper(object):
                             for team in teams:
                                 points = DistrictPointValues.QF_WIN.get(match.year, DistrictPointValues.QF_WIN_DEFAULT) if last_level == 'qf' else DistrictPointValues.SF_WIN.get(match.year, DistrictPointValues.SF_WIN_DEFAULT)
                                 district_points['points'][team]['elim_points'] += int(
-                                    np.ceil(points * num_played[last_level][team])) * POINTS_MULTIPLIER
+                                    math.ceil(points * num_played[last_level][team])) * POINTS_MULTIPLIER
                             done = True
                             break
                         if done:
@@ -286,7 +285,7 @@ class DistrictHelper(object):
             for row in rankings:
                 rank = int(row[0])
                 team = 'frc{}'.format(row[1])
-                qual_points = int(np.ceil(cls.inverf(float(num_teams - 2 * rank + 2) / (alpha * num_teams)) * (
+                qual_points = int(math.ceil(cls.inverf(float(num_teams - 2 * rank + 2) / (alpha * num_teams)) * (
                 10.0 / cls.inverf(1.0 / alpha)) + 12))
                 district_points['points'][team]['qual_points'] = qual_points * POINTS_MULTIPLIER
         else:

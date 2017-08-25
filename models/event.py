@@ -3,7 +3,6 @@ from google.appengine.ext.ndb.tasklets import Future
 
 import datetime
 import json
-import pytz
 import re
 
 from consts.playoff_type import PlayoffType
@@ -148,6 +147,7 @@ class Event(ndb.Model):
         return self._matches
 
     def local_time(self):
+        import pytz
         now = datetime.datetime.now()
         if self.timezone_id is not None:
             tz = pytz.timezone(self.timezone_id)

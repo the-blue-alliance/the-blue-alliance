@@ -1,4 +1,3 @@
-import iso8601
 import json
 import re
 
@@ -82,6 +81,7 @@ class JSONMatchesParser(ParserBase):
             datetime_utc = None
             if time_utc is not None:
                 try:
+                    import iso8601
                     datetime_utc = iso8601.parse_date(time_utc)
                     # remove timezone info because DatetimeProperty can't handle timezones
                     datetime_utc = datetime_utc.replace(tzinfo=None)

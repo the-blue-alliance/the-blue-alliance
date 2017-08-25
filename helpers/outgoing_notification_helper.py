@@ -1,7 +1,5 @@
 import json
 import logging
-import urllib
-import urllib2
 
 from google.appengine.api import mail
 
@@ -36,6 +34,9 @@ class OutgoingNotificationHelper(object):
     def send_slack_alert(cls, webhook_url, body_text, attachment_list=None):
         # Send an alert to a specified slack channel
         # Only do this on prod
+        import urllib
+        import urllib2
+
         if tba_config.DEBUG or not webhook_url:
             return
 

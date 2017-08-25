@@ -1,6 +1,5 @@
 import logging
 import os
-import urllib2
 import json
 import time
 
@@ -184,6 +183,7 @@ class TypeaheadHandler(CacheableHandler):
         self._cache_expiration = self.CACHE_HEADER_LENGTH
 
     def get(self, search_key):
+        import urllib2
         search_key = urllib2.unquote(search_key)
         self._partial_cache_key = self.CACHE_KEY_FORMAT.format(search_key)
         super(TypeaheadHandler, self).get(search_key)

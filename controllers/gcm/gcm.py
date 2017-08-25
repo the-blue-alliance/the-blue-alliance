@@ -27,7 +27,6 @@
 from datetime import datetime, timedelta
 import logging
 import re
-import urllib, urllib2
 import json
 import importlib
 
@@ -160,6 +159,7 @@ class GCMConnection:
 
     # Try sending message now
     def _send_request(self, message):
+        import urllib2
         if message.device_tokens is None or message.notification is None:
             logging.error('Message must contain device_tokens and notification.')
             return False

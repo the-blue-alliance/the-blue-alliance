@@ -9,7 +9,6 @@
 # x is OPR and should be n x 1
 
 from collections import defaultdict
-import numpy as np
 
 from google.appengine.api import memcache
 
@@ -44,6 +43,8 @@ class MatchstatsHelper(object):
 
     @classmethod
     def build_Minv_matrix(cls, matches, team_id_map, played_only=False):
+        import numpy as np
+
         n = len(team_id_map.keys())
         M = np.zeros([n, n])
         for match in matches:
@@ -61,6 +62,8 @@ class MatchstatsHelper(object):
 
     @classmethod
     def build_s_matrix(cls, matches, team_id_map, stat_type, init_stats=None, init_stats_default=0, limit_matches=None):
+        import numpy as np
+
         n = len(team_id_map.keys())
         s = np.zeros([n, 1])
         for match in matches:
@@ -78,6 +81,8 @@ class MatchstatsHelper(object):
 
     @classmethod
     def calc_stat(cls, matches, team_list, team_id_map, Minv, stat_type, init_stats=None, init_stats_default=0, limit_matches=None):
+        import numpy as np
+
         s = cls.build_s_matrix(matches, team_id_map, stat_type, init_stats=init_stats, init_stats_default=init_stats_default, limit_matches=limit_matches)
         x = np.dot(Minv, s)
 

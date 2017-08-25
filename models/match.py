@@ -1,7 +1,6 @@
 import json
 
 import datetime
-import numpy as np
 import re
 
 import time
