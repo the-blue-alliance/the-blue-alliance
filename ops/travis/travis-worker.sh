@@ -7,12 +7,7 @@ case "$1" in
         echo "Running python unit tests"
         paver test
         ;;
-    "PYLINT")
-        if test "$TRAVIS" == "true" && "$TRAVIS_EVENT_TYPE" != "pull_request" ; then
-            echo "Lint should only run on pull request builds"
-            exit 0
-        fi
-
+    "LINT")
         if test "$TRAVIS_BRANCH" != "" ; then
             echo "Linting all changes between HEAD and $TRAVIS_BRANCH"
             paver lint --base $TRAVIS_BRANCH
@@ -20,6 +15,9 @@ case "$1" in
             echo "Linting all current changes"
             paver lint
         fi
+
+        # Lint Javascript
+        npm run lint -s
         ;;
     "PYBUILD")
         echo "Building all python files"
@@ -28,10 +26,6 @@ case "$1" in
     "JSUNIT")
         echo "Running javascript tests"
         npm test
-        ;;
-    "JSLINT")
-        echo "Running javascript lint"
-        npm run lint -s
         ;;
     *)
         echo "Unknown job type $JOB"
