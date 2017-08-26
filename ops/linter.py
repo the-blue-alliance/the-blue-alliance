@@ -57,6 +57,7 @@ def main():
     else:
         files = get_modified_files()
 
+    print "Linting: {}".format(files)
     tempdir = tempfile.mkdtemp()
     for name in files:
         filename = os.path.join(tempdir, name)
