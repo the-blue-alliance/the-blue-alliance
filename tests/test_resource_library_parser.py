@@ -1,7 +1,7 @@
 import unittest2
 import json
 
-from datafeeds.resource_libary_parser import ResourceLibraryParser
+from datafeeds.resource_library_parser import ResourceLibraryParser
 
 
 class TestResourceLibraryParser(unittest2.TestCase):
