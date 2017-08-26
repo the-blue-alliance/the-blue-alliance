@@ -10,8 +10,6 @@ import time
 import django.conf.global_settings
 import logging
 
-from functools import partial
-
 # Install the Python unittest2 package before you run this script.
 import unittest2
 
