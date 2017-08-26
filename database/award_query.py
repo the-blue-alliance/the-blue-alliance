@@ -62,7 +62,7 @@ class TeamEventAwardsQuery(DatabaseQuery):
         raise ndb.Return(awards)
 
 
-class TeamEventsTypeAwardsQuery(DatabaseQuery):
+class TeamEventTypeAwardsQuery(DatabaseQuery):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = 'team_events_type_tag_awards_{}_{}_{}'  # (team_Key, event_type_enum, award_type_enum)
     DICT_CONVERTER = AwardConverter

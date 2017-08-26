@@ -29,7 +29,7 @@ from consts.event_type import EventType
 class TeamRenderer(object):
     @classmethod
     def render_team_details(cls, handler, team, year, is_canonical):
-        hof_award_future = award_query.TeamEventsTypeAwardsQuery(team.key.id(), EventType.CMP_FINALS, AwardType.CHAIRMANS).fetch_async()
+        hof_award_future = award_query.TeamEventTypeAwardsQuery(team.key.id(), EventType.CMP_FINALS, AwardType.CHAIRMANS).fetch_async()
         hof_video_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_VIDEO).fetch_async()
         hof_presentation_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_PRESENTATION).fetch_async()
         hof_essay_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_ESSAY).fetch_async()
@@ -193,7 +193,7 @@ class TeamRenderer(object):
 
     @classmethod
     def render_team_history(cls, handler, team, is_canonical):
-        hof_award_future = award_query.TeamEventsTypeAwardsQuery(team.key.id(), EventType.CMP_FINALS, AwardType.CHAIRMANS).fetch_async()
+        hof_award_future = award_query.TeamEventTypeAwardsQuery(team.key.id(), EventType.CMP_FINALS, AwardType.CHAIRMANS).fetch_async()
         hof_video_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_VIDEO).fetch_async()
         hof_presentation_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_PRESENTATION).fetch_async()
         hof_essay_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_ESSAY).fetch_async()
