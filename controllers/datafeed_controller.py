@@ -629,7 +629,6 @@ class HallOfFameTeamsGet(webapp.RequestHandler):
                                                  year=team['year'],
                                                  foreign_key=essay_foreign_key))
 
-            print(media_to_update)
             MediaManipulator.createOrUpdate(media_to_update)
         else:
             logging.info("No Hall of Fame teams found")

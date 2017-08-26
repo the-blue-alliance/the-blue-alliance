@@ -84,8 +84,6 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
         suggestion._contents = None
 
         # Remove preferred reference from another Media if specified
-        print(suggestion.contents['reference_type'])
-        print(suggestion.contents['reference_key'])
         team_reference = Media.create_reference(
             suggestion.contents['reference_type'],
             suggestion.contents['reference_key'])

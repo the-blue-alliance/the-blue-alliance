@@ -53,7 +53,6 @@ class TeamRenderer(object):
                 "essay": hof_essay[0].first_resource_url if len(hof_essay) > 0 else None,
             },
         }
-        print(hall_of_fame)
 
         events_sorted, matches_by_event_key, awards_by_event_key, valid_years = TeamDetailsDataFetcher.fetch(team, year, return_valid_years=True)
         if not events_sorted:
@@ -236,7 +235,6 @@ class TeamRenderer(object):
 
         social_medias = sorted(social_media_future.get_result(), key=MediaHelper.social_media_sorter)
 
-        print(team)
         handler.template_values.update({
             'is_canonical': is_canonical,
             'team': team,
