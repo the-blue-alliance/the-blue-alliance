@@ -21,6 +21,10 @@ case "$1" in
             paver lint
         fi
         ;;
+    "PYBUILD")
+        echo "Building all python files"
+        python -m compileall .
+        ;;
     "JSUNIT")
         echo "Running javascript tests"
         npm test

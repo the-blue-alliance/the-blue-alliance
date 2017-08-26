@@ -13,6 +13,7 @@ env:
   matrix:
   - JOB=PYUNIT
   - JOB=PYLINT
+  - JOB=PYBUILD
   - JOB=JSUNIT
   - JOB=JSLINT
 before_install:
