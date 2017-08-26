@@ -15,7 +15,7 @@ import argparse
 
 # don't fill in both of these
 select_codes = ["E111", "E125", "E203", "E261", "E262", "E301", "E302", "E303",
-                "E502", "E701", "E711", "W291", "W293"]
+                "E502", "E701", "W291", "W293"]
 ignore_codes = []
 
 
