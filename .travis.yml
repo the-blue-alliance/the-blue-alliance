@@ -25,6 +25,7 @@ install:
 - rm google_appengine_1.9.40.zip
 - export PYTHONPATH=${PYTHONPATH}:${HOME}/google_appengine
 - travis_retry npm install
+- npm install -g gulp-cli uglify-js uglifycss less
 before_script:
 - ./ops/travis/travis-before.sh $JOB
 script:
