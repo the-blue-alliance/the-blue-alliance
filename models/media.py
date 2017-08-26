@@ -26,6 +26,7 @@ class Media(ndb.Model):
         MediaType.PERISCOPE_PROFILE: 'periscope-profile',
         MediaType.GRABCAD: 'grabcad',
         MediaType.INSTAGRAM_IMAGE: 'instagram-image',
+        MediaType.FIRST_RESOURCE: 'first-resource',
     }
 
     REFERENCE_MAP = {
@@ -37,6 +38,7 @@ class Media(ndb.Model):
 
     # media_type and foreign_key make up the key_name
     media_type_enum = ndb.IntegerProperty(required=True)
+    media_tag_enum = ndb.IntegerProperty()
     foreign_key = ndb.StringProperty(required=True)  # Unique id for the particular media type. Ex: the Youtube Video key at the end of a YouTube url
 
     details_json = ndb.TextProperty()  # Additional details required for rendering
@@ -105,6 +107,10 @@ class Media(ndb.Model):
     @property
     def cdphotothread_thread_url(self):
         return 'http://www.chiefdelphi.com/media/photos/{}'.format(self.foreign_key)
+
+    @property
+    def first_resource_url(self):
+        return 'https://www.firstinspires.org/{}'.format(self.foreign_key)
 
     @property
     def youtube_url(self):

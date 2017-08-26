@@ -1,6 +1,7 @@
 import re
 
 from datafeeds.parser_base import ParserBase
+from helpers.youtube_video_helper import YouTubeVideoHelper
 
 from BeautifulSoup import BeautifulSoup
 
@@ -37,18 +38,16 @@ class ResourceLibraryParser(ParserBase):
 
             video = tds[2].find('a')
             if video:
-                video = video['href']
+                video = YouTubeVideoHelper.parse_id_from_url(video['href'])
 
             presentation = tds[3].find('a')
             if presentation:
-                presentation = presentation['href']
+                presentation = YouTubeVideoHelper.parse_id_from_url(presentation['href'])
 
             essay = tds[4].find('a')
             if essay:
                 essay = essay['href']
-
-                if essay[0] == '/':
-                    essay = 'https://www.firstinspires.org' + essay
+                essay = essay[1:]
 
             teams.append({
                 'team_id': 'frc' + team_num,

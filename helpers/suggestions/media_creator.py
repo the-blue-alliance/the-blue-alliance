@@ -19,6 +19,9 @@ class MediaCreator(object):
     @classmethod
     def create_media_model(cls, suggestion, team_reference, preferred_references=[]):
         media_type_enum = suggestion.contents['media_type_enum']
+        print(suggestion.contents['foreign_key'])
+        print(team_reference)
+        print(preferred_references)
         return Media(
             id=Media.render_key_name(media_type_enum, suggestion.contents['foreign_key']),
             foreign_key=suggestion.contents['foreign_key'],

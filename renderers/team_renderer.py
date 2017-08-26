@@ -4,6 +4,8 @@ import os
 from google.appengine.ext import ndb
 
 from consts.district_type import DistrictType
+from consts.award_type import AwardType
+from consts.media_tag import MediaTag
 from database import award_query, event_query, match_query, media_query, team_query
 from database.district_query import DistrictQuery
 from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetcher
@@ -27,11 +29,31 @@ from consts.event_type import EventType
 class TeamRenderer(object):
     @classmethod
     def render_team_details(cls, handler, team, year, is_canonical):
+        hof_award_future = award_query.TeamEventsTypeAwardsQuery(team.key.id(), EventType.CMP_FINALS, AwardType.CHAIRMANS).fetch_async()
+        hof_video_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_VIDEO).fetch_async()
+        hof_presentation_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_PRESENTATION).fetch_async()
+        hof_essay_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_ESSAY).fetch_async()
         media_future = media_query.TeamYearMediaQuery(team.key.id(), year).fetch_async()
         social_media_future = media_query.TeamSocialMediaQuery(team.key.id()).fetch_async()
         robot_future = Robot.get_by_id_async('{}_{}'.format(team.key.id(), year))
         team_districts_future = team_query.TeamDistrictsQuery(team.key.id()).fetch_async()
         participation_future = team_query.TeamParticipationQuery(team.key.id()).fetch_async()
+
+        hof_awards = hof_award_future.get_result()
+        hof_video = hof_video_future.get_result()
+        hof_presentation = hof_presentation_future.get_result()
+        hof_essay = hof_essay_future.get_result()
+
+        hall_of_fame = {
+            "is_hof": len(hof_awards) > 0,
+            "year": hof_awards[0].year if len(hof_awards) > 0 else None,
+            "media": {
+                "video": hof_video[0].youtube_url if len(hof_video) > 0 else None,
+                "presentation": hof_presentation[0].youtube_url if len(hof_presentation) > 0 else None,
+                "essay": hof_essay[0].first_resource_url if len(hof_essay) > 0 else None,
+            },
+        }
+        print(hall_of_fame)
 
         events_sorted, matches_by_event_key, awards_by_event_key, valid_years = TeamDetailsDataFetcher.fetch(team, year, return_valid_years=True)
         if not events_sorted:
@@ -162,6 +184,7 @@ class TeamRenderer(object):
             "district_abbrev": district_abbrev,
             "last_competed": last_competed,
             "current_year": current_year,
+            "hof": hall_of_fame
         })
 
         if short_cache:
