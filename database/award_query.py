@@ -64,7 +64,7 @@ class TeamEventAwardsQuery(DatabaseQuery):
 
 class TeamEventTypeAwardsQuery(DatabaseQuery):
     CACHE_VERSION = 0
-    CACHE_KEY_FORMAT = 'team_events_type_tag_awards_{}_{}_{}'  # (team_Key, event_type_enum, award_type_enum)
+    CACHE_KEY_FORMAT = 'team_events_type_tag_awards_{}_{}_{}'  # (team_key, event_type_enum, award_type_enum)
     DICT_CONVERTER = AwardConverter
 
     @ndb.tasklet
