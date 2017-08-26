@@ -3,7 +3,6 @@ import logging
 import os
 import tba_config
 
-from stackdriver.profiler import TraceContext
 from template_engine import jinja2_filters
 
 
@@ -40,6 +39,7 @@ JINJA_ENV = get_jinja_env()  # Set up instance cache
 
 
 def render(template, template_values):
+    from stackdriver.profiler import TraceContext
     with TraceContext() as root:
         with root.span("jinja2_engine.render({})".format(template)) as spn:
             template = JINJA_ENV.get_template(template)
