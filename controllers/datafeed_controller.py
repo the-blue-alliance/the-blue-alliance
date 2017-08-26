@@ -589,6 +589,7 @@ class TbaVideosGet(webapp.RequestHandler):
             path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_get.html')
             self.response.out.write(template.render(path, template_values))
 
+
 class HallOfFameTeamsGet(webapp.RequestHandler):
     """
     Handles scraping the list of Hall of Fame teams from FIRST resource library.
