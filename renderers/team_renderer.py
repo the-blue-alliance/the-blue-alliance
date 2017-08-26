@@ -46,7 +46,7 @@ class TeamRenderer(object):
 
         hall_of_fame = {
             "is_hof": len(hof_awards) > 0,
-            "year": hof_awards[0].year if len(hof_awards) > 0 else None,
+            "years": [award.year for award in hof_awards],
             "media": {
                 "video": hof_video[0].youtube_url if len(hof_video) > 0 else None,
                 "presentation": hof_presentation[0].youtube_url if len(hof_presentation) > 0 else None,
@@ -209,7 +209,7 @@ class TeamRenderer(object):
 
         hall_of_fame = {
             "is_hof": len(hof_awards) > 0,
-            "year": hof_awards[0].year if len(hof_awards) > 0 else None,
+            "years": [award.year for award in hof_awards],
             "media": {
                 "video": hof_video[0].youtube_url if len(hof_video) > 0 else None,
                 "presentation": hof_presentation[0].youtube_url if len(hof_presentation) > 0 else None,
