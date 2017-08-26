@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import argparse
 
 # don't fill in both of these
 select_codes = ["E111", "E125", "E203", "E261", "E262", "E301", "E302", "E303",
@@ -25,10 +26,36 @@ def system(*args, **kwargs):
     return out
 
 
-def main():
+def get_modified_files():
     modified = re.compile('^[AM]+\s+(?P<name>.*\.py)', re.MULTILINE)
     files = system('git', 'status', '--porcelain')
-    files = modified.findall(files)
+    return modified.findall(files)
+
+
+def get_files_for_commit(commit_sha):
+    modified = re.compile('^(?P<name>.*\.py)', re.MULTILINE)
+    files = system('git', 'diff', '--diff-filter=AMR', '--name-only', commit_sha)
+    return modified.findall(files)
+
+
+def get_files_since_branch(branch):
+    modified = re.compile('^(?P<name>.*\.py)', re.MULTILINE)
+    files = system('git', 'diff', '--diff-filter=AMR', '--name-only', branch, "HEAD")
+    return modified.findall(files)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Lint some files")
+    parser.add_argument('--commit', help="Commit has to lint")
+    parser.add_argument('--base', help="Lint changes between now and the base branch")
+    args = parser.parse_args()
+
+    if args.commit:
+        files = get_files_for_commit(args.commit)
+    elif args.base:
+        files = get_files_since_branch(args.base)
+    else:
+        files = get_modified_files()
 
     tempdir = tempfile.mkdtemp()
     for name in files:
@@ -58,7 +85,7 @@ def main():
     shutil.rmtree(tempdir)
     if output:
         print 'PEP8 style violations have been detected.  Please fix them\n' \
-        'or force the commit with "git commit --no-verify".\n'
+              'or force the commit with "git commit --no-verify".\n'
         print output,
         sys.exit(1)
 

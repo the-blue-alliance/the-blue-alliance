@@ -72,8 +72,18 @@ def less():
 
 
 @task
-def lint():
-    sh("python ops/linter.py")
+@cmdopts([
+    ('commit=', 'c', 'Commit hash to lint'),
+    ('base=', 'b', 'Lint all changes between the current HEAD and this base branch'),
+])
+def lint(options):
+    args = ""
+    if 'base' in options.lint:
+        args = "--base {}".format(options.lint.base)
+    elif 'commit' in options.lint:
+        args = "--commit {}".format(options.lint.commit)
+
+    sh("python ops/linter.py {}".format(args))
 
 
 @task
