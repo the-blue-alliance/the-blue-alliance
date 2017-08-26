@@ -26,7 +26,7 @@ class Media(ndb.Model):
         MediaType.PERISCOPE_PROFILE: 'periscope-profile',
         MediaType.GRABCAD: 'grabcad',
         MediaType.INSTAGRAM_IMAGE: 'instagram-image',
-        MediaType.FIRST_RESOURCE: 'first-resource',
+        MediaType.EXTERNAL_LINK: 'external-link',
     }
 
     REFERENCE_MAP = {
@@ -109,8 +109,8 @@ class Media(ndb.Model):
         return 'http://www.chiefdelphi.com/media/photos/{}'.format(self.foreign_key)
 
     @property
-    def first_resource_url(self):
-        return 'https://www.firstinspires.org/{}'.format(self.foreign_key)
+    def external_link(self):
+        return self.foreign_key
 
     @property
     def youtube_url(self):

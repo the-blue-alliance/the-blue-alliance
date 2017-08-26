@@ -622,8 +622,8 @@ class HallOfFameTeamsGet(webapp.RequestHandler):
 
                 essay_foreign_key = team['essay']
                 if essay_foreign_key:
-                    media_to_update.append(Media(id=Media.render_key_name(MediaType.FIRST_RESOURCE, essay_foreign_key),
-                                                 media_type_enum=MediaType.FIRST_RESOURCE,
+                    media_to_update.append(Media(id=Media.render_key_name(MediaType.EXTERNAL_LINK, essay_foreign_key),
+                                                 media_type_enum=MediaType.EXTERNAL_LINK,
                                                  media_tag_enum=MediaTag.CHAIRMANS_ESSAY,
                                                  references=[team_reference],
                                                  year=team['year'],

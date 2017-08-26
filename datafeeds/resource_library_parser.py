@@ -47,7 +47,9 @@ class ResourceLibraryParser(ParserBase):
             essay = tds[4].find('a')
             if essay:
                 essay = essay['href']
-                essay = essay[1:]
+
+                if essay[0] == '/':
+                    essay = 'https://www.firstinspires.org' + essay
 
             teams.append({
                 'team_id': 'frc' + team_num,

@@ -50,7 +50,7 @@ class TeamRenderer(object):
             "media": {
                 "video": hof_video[0].youtube_url if len(hof_video) > 0 else None,
                 "presentation": hof_presentation[0].youtube_url if len(hof_presentation) > 0 else None,
-                "essay": hof_essay[0].first_resource_url if len(hof_essay) > 0 else None,
+                "essay": hof_essay[0].external_link if len(hof_essay) > 0 else None,
             },
         }
 
@@ -213,7 +213,7 @@ class TeamRenderer(object):
             "media": {
                 "video": hof_video[0].youtube_url if len(hof_video) > 0 else None,
                 "presentation": hof_presentation[0].youtube_url if len(hof_presentation) > 0 else None,
-                "essay": hof_essay[0].first_resource_url if len(hof_essay) > 0 else None,
+                "essay": hof_essay[0].external_link if len(hof_essay) > 0 else None,
             },
         }
 

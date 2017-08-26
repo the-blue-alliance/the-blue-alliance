@@ -11,7 +11,7 @@ class MediaType(object):
     PERISCOPE_PROFILE = 8
     GRABCAD = 9
     INSTAGRAM_IMAGE = 10
-    FIRST_RESOURCE = 11
+    EXTERNAL_LINK = 11
 
     type_names = {
         YOUTUBE_VIDEO: 'YouTube Video',
@@ -25,7 +25,7 @@ class MediaType(object):
         PERISCOPE_PROFILE: 'Periscope Profile',
         GRABCAD: 'GrabCAD',
         INSTAGRAM_IMAGE: 'Instagram Image',
-        FIRST_RESOURCE: 'FIRST Resource',
+        EXTERNAL_LINK: 'External Link',
     }
 
     image_types = [
