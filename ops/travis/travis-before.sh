@@ -3,7 +3,7 @@ set -e
 
 case "$1" in
 
-    "PYUNIT" | "PYLINT" | "JSUNIT" | "JSLINT")
+    "PYUNIT" | "PYLINT" | "PYBUILD" | "JSUNIT" | "JSLINT")
         echo "Setting up for unit tests..."
         paver make
         ;;
