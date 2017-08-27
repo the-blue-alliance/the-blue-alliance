@@ -57,6 +57,7 @@ class Media(ndb.Model):
             'references': set(),
             'preferred_references': set(),
             'year': set(),
+            'media_tag_enum': set(),
         }
         self._details = None
         self._private_details = None
