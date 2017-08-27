@@ -50,7 +50,8 @@ class ModelSerializer(object):
             if o.key:
                 dct['__id__'] = o.key.id()
             for attr_name in o.to_dict():
-                dct[attr_name] = cls.to_json(getattr(o, attr_name))
+                if hasattr(o, attr_name):
+                    dct[attr_name] = cls.to_json(getattr(o, attr_name))
             return dct
         return o
 
