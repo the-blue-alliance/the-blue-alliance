@@ -32,14 +32,14 @@ def award_updated(affected_refs):
         queries_and_keys.append((EventAwardsQuery(event_key.id())))
         for team_key in team_keys:
             queries_and_keys.append((TeamEventAwardsQuery(team_key.id(), event_key.id())))
-            for event_type in event_types:
-                for award_type in award_types:
-                    queries_and_keys.append((TeamEventTypeAwardsQuery(team_key.id(), event_type, award_type)))
 
     for team_key in team_keys:
         queries_and_keys.append((TeamAwardsQuery(team_key.id())))
         for year in years:
             queries_and_keys.append((TeamYearAwardsQuery(team_key.id(), year)))
+        for event_type in event_types:
+            for award_type in award_types:
+                queries_and_keys.append((TeamEventTypeAwardsQuery(team_key.id(), event_type, award_type)))
 
     return queries_and_keys
 

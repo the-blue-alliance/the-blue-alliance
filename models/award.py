@@ -34,6 +34,8 @@ class Award(ndb.Model):
             'event': set(),
             'team_list': set(),
             'year': set(),
+            'event_type_enum': set(),
+            'award_type_enum': set(),
         }
         self._recipient_list = None
         self._recipient_dict = None
