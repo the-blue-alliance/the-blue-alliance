@@ -134,8 +134,8 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
             'event': {ndb.Key(Event, '2015casj'), ndb.Key(Event, '2015cama')},
             'team_list': {ndb.Key(Team, 'frc254'), ndb.Key(Team, 'frc604')},
             'year': {2014, 2015},
-            'event_type_enum': EventType.CMP_FINALS,
-            'award_type_enum': AwardType.CHAIRMANS,
+            'event_type_enum': {EventType.REGIONAL, EventType.REGIONAL},
+            'award_type_enum': {AwardType.WINNER, AwardType.CHAIRMANS},
         }
         cache_keys = [q.cache_key for q in get_affected_queries.award_updated(affected_refs)]
 
