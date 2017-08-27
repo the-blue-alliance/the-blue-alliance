@@ -1,7 +1,6 @@
 import datetime
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
-from helpers.model_serializer import ModelSerializer
 
 import logging
 from models.cached_query_result import CachedQueryResult
@@ -13,7 +12,7 @@ MEMCACHE_CLIENT = memcache.Client()
 
 
 class DatabaseQuery(object):
-    DATABASE_QUERY_VERSION = 3
+    DATABASE_QUERY_VERSION = 2
     DATABASE_HITS_MEMCACHE_KEYS = ['database_query_hits_{}:{}'.format(i, DATABASE_QUERY_VERSION) for i in range(25)]
     DATABASE_MISSES_MEMCACHE_KEYS = ['database_query_misses_{}:{}'.format(i, DATABASE_QUERY_VERSION) for i in range(25)]
     BASE_CACHE_KEY_FORMAT = "{}:{}:{}"  # (partial_cache_key, cache_version, database_query_version)
@@ -83,7 +82,7 @@ class DatabaseQuery(object):
                         else:
                             rpcs.append(CachedQueryResult(
                                 id=cache_key,
-                                result_dict_full=ModelSerializer.to_json(query_result),
+                                result=query_result,
                             ).put_async())
                     updated = datetime.datetime.now()
                 else:
@@ -94,7 +93,7 @@ class DatabaseQuery(object):
                     if dict_version:
                         query_result = cached_query.result_dict
                     else:
-                        query_result = ModelSerializer.to_obj(cached_query.result_dict_full)
+                        query_result = cached_query.result
                     updated = cached_query.updated
 
                 for rpc in rpcs:
