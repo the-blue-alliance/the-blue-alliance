@@ -17,6 +17,7 @@ from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, Dis
 
 from consts.event_type import EventType
 from consts.award_type import AwardType
+from consts.media_tag import MediaTag
 from models.district import District
 from models.district_team import DistrictTeam
 from models.event import Event
@@ -213,6 +214,7 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         affected_refs = {
             'references': {ndb.Key(Team, 'frc254'), ndb.Key(Team, 'frc604')},
             'year': {2014, 2015},
+            'media_tag_enum': {None, MediaTag.CHAIRMANS},
         }
         cache_keys = [q.cache_key for q in get_affected_queries.media_updated(affected_refs)]
 
