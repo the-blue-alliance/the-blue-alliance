@@ -16,14 +16,9 @@ EXT='.tar.gz'
 INSTALL=$HOME
 BOOTSTRAP="$INSTALL/$NAME/bin/bootstrapping/install.py"
 GCLOUD="$INSTALL/$NAME/bin/gcloud"
-API_STATUS=https://www.thebluealliance.com/api/v3/status
 
 with_python27() {
     bash -c "source $HOME/virtualenv/python2.7/bin/activate; $1"
-}
-
-fetch_apiv3_status() {
-    curl -s --header "X-TBA-Auth-Key: $APIv3_KEY" $API_STATUS
 }
 
 should_deploy
