@@ -1,5 +1,10 @@
 #! /usr/bin/env sh
 
+API_STATUS=https://www.thebluealliance.com/api/v3/status
+fetch_apiv3_status() {
+    curl -s --header "X-TBA-Auth-Key: $APIv3_KEY" $API_STATUS
+}
+
 check_killswitch() {
     enabled=$(fetch_apiv3_status | jq '.contbuild_enabled')
     if [ "$enabled" != "true" ]; then
