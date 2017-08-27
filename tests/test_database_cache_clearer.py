@@ -214,7 +214,7 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         affected_refs = {
             'references': {ndb.Key(Team, 'frc254'), ndb.Key(Team, 'frc604')},
             'year': {2014, 2015},
-            'media_tag_enum': {None, MediaTag.CHAIRMANS},
+            'media_tag_enum': {None, MediaTag.CHAIRMANS_VIDEO},
         }
         cache_keys = [q.cache_key for q in get_affected_queries.media_updated(affected_refs)]
 
@@ -234,6 +234,7 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         affected_refs = {
             'references': {ndb.Key(Event, '2016necmp')},
             'year': {2016},
+            'media_tag_enum': {None, None}
         }
         cache_keys = [q.cache_key for q in get_affected_queries.media_updated(affected_refs)]
 
