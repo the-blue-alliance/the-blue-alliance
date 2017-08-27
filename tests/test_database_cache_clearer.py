@@ -16,6 +16,7 @@ from database.robot_query import TeamRobotsQuery
 from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
 
 from consts.event_type import EventType
+from consts.award_type import AwardType
 from models.district import District
 from models.district_team import DistrictTeam
 from models.event import Event
@@ -132,7 +133,9 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         affected_refs = {
             'event': {ndb.Key(Event, '2015casj'), ndb.Key(Event, '2015cama')},
             'team_list': {ndb.Key(Team, 'frc254'), ndb.Key(Team, 'frc604')},
-            'year': {2014, 2015}
+            'year': {2014, 2015},
+            'event_type_enum': EventType.CMP_FINALS,
+            'award_type_enum': AwardType.CHAIRMANS,
         }
         cache_keys = [q.cache_key for q in get_affected_queries.award_updated(affected_refs)]
 
