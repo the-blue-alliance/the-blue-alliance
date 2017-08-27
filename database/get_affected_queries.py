@@ -21,6 +21,7 @@ def _get_team_page_num(team_key):
 
 
 def award_updated(affected_refs):
+    print(affected_refs)
     event_keys = filter(None, affected_refs['event'])
     team_keys = filter(None, affected_refs['team_list'])
     years = filter(None, affected_refs['year'])
