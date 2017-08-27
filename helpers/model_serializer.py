@@ -14,6 +14,7 @@ from models.team import Team
 
 class LazyDeserializer(object):
     def __init__(self):
+        self._write_disabled = True  # Disable writing to DB from deserialized models for safety
         if '__id__' in self._json:
             self.key = ndb.Key(
                 'Lazy{}'.format(self._json['__kind__']), self._json['__id__'])
