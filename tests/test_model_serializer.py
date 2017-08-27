@@ -282,7 +282,6 @@ class TestModelSerializer(unittest2.TestCase):
 
         try:
             RobotManipulator.createOrUpdate(robot2)
-            print 'hi'
         except Exception:
             pass  # We want this to happen
         else:
