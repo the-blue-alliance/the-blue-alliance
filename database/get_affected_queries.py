@@ -1,6 +1,6 @@
 from google.appengine.ext import ndb
 
-from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
+from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery, TeamEventTypeAwardsQuery
 from database.district_query import DistrictsInYearQuery, DistrictHistoryQuery, DistrictQuery
 from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery, \
     EventDivisionsQuery
@@ -24,12 +24,17 @@ def award_updated(affected_refs):
     event_keys = filter(None, affected_refs['event'])
     team_keys = filter(None, affected_refs['team_list'])
     years = filter(None, affected_refs['year'])
+    event_types = filter(None, affected_refs['event_type_enum'])
+    award_types = filter(None, affected_refs['award_type_enum'])
 
     queries_and_keys = []
     for event_key in event_keys:
         queries_and_keys.append((EventAwardsQuery(event_key.id())))
         for team_key in team_keys:
             queries_and_keys.append((TeamEventAwardsQuery(team_key.id(), event_key.id())))
+            for event_type in event_types:
+                for award_type in award_types:
+                    queries_and_keys.append((TeamEventTypeAwardsQuery(team_key.id(), event_type, award_type)))
 
     for team_key in team_keys:
         queries_and_keys.append((TeamAwardsQuery(team_key.id())))
