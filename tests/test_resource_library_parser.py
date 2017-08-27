@@ -9,6 +9,7 @@ class TestResourceLibraryParser(unittest2.TestCase):
         with open('test_data/hall_of_fame.html', 'r') as f:
             teams, _ = ResourceLibraryParser.parse(f.read())
 
+        # Test number of teams
         self.assertEqual(len(teams), 14)
 
         # Test team 987
@@ -62,5 +63,50 @@ class TestResourceLibraryParser(unittest2.TestCase):
         self.assertEqual(team["team_number"], 359)
         self.assertEqual(team["year"], 2011)
         self.assertEqual(team["video"], "e9IV1chHJtg")
+        self.assertEqual(team["presentation"], None)
+        self.assertEqual(team["essay"], None)
+
+        # Test team 341
+        team = teams[6]
+        self.assertEqual(team["team_id"], "frc341")
+        self.assertEqual(team["team_number"], 341)
+        self.assertEqual(team["year"], 2010)
+        self.assertEqual(team["video"], "-AzvT02ZCNk")
+        self.assertEqual(team["presentation"], None)
+        self.assertEqual(team["essay"], None)
+
+        # Test team 236
+        team = teams[7]
+        self.assertEqual(team["team_id"], "frc236")
+        self.assertEqual(team["team_number"], 236)
+        self.assertEqual(team["year"], 2009)
+        self.assertEqual(team["video"], "NmzCLohIZLg")
+        self.assertEqual(team["presentation"], None)
+        self.assertEqual(team["essay"], None)
+
+        # Test team 842
+        team = teams[8]
+        self.assertEqual(team["team_id"], "frc842")
+        self.assertEqual(team["team_number"], 842)
+        self.assertEqual(team["year"], 2008)
+        self.assertEqual(team["video"], "N0LMLz6LK7U")
+        self.assertEqual(team["presentation"], None)
+        self.assertEqual(team["essay"], None)
+
+        # Test team 365
+        team = teams[9]
+        self.assertEqual(team["team_id"], "frc365")
+        self.assertEqual(team["team_number"], 365)
+        self.assertEqual(team["year"], 2007)
+        self.assertEqual(team["video"], "f8MT7pSRXtg")
+        self.assertEqual(team["presentation"], None)
+        self.assertEqual(team["essay"], None)
+
+        # Test team 111
+        team = teams[10]
+        self.assertEqual(team["team_id"], "frc111")
+        self.assertEqual(team["team_number"], 111)
+        self.assertEqual(team["year"], 2006)
+        self.assertEqual(team["video"], "SfCjZMMIt0k")
         self.assertEqual(team["presentation"], None)
         self.assertEqual(team["essay"], None)
