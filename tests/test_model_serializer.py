@@ -10,6 +10,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from helpers.event_simulator import EventSimulator
 from helpers.model_serializer import ModelSerializer
+from helpers.robot_manipulator import RobotManipulator
 from models.award import Award
 from models.event import Event
 from models.event_details import EventDetails
@@ -261,8 +262,28 @@ class TestModelSerializer(unittest2.TestCase):
     def test_simulated_event_conversion(self):
         es = EventSimulator()
 
-        for _ in xrange(90):
+        for _ in xrange(10):
             event = Event.get_by_id('2016nytr')
             self._test_to_and_back(event.details)
             self._test_to_and_back(event.matches)
             es.step()
+
+    def test_disabled_write(self):
+        robot = Robot(
+            id=Robot.renderKeyName('frc604', 2010),
+            team=ndb.Key('Team', 'frc604'),
+            year=2010,
+            robot_name='OverKill',
+            created=datetime.datetime.now() - datetime.timedelta(minutes=5),
+            updated=datetime.datetime.now(),
+        )
+        j = json.dumps(ModelSerializer.to_json(robot), indent=2)
+        robot2 = ModelSerializer.to_obj(json.loads(j))
+
+        try:
+            RobotManipulator.createOrUpdate(robot2)
+            print 'hi'
+        except Exception:
+            pass  # We want this to happen
+        else:
+            self.fail()

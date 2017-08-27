@@ -70,6 +70,7 @@ class ModelSerializer(object):
             obj_type = cls.KINDS[o['__kind__']]
             if obj_type is not None:
                 obj = obj_type(id=o.get('__id__'))
+                obj._write_disabled = True  # Disable writing to DB from deserialized models for safety
                 for attr_name in obj.to_dict():
                     attr_type = obj_type.__dict__[attr_name]
                     setattr(
