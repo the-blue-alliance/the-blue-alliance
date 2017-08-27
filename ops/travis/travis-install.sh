@@ -1,9 +1,14 @@
 #! /usr/bin/env sh
 set -e
+source $(pwd)/ops/travis/should-deploy.sh
 
 if test "$TRAVIS" == "true" && "$TRAVIS_EVENT_TYPE" == "pull_request" && "$1" == "DEPLOY" ; then
     echo "No deploys on pull requests, skipping travis_before"
     exit 0
+fi
+
+if test "$1" == "DEPLOY" ; then
+    should_deploy
 fi
 
 pip install -r travis_requirements.txt

@@ -1,5 +1,6 @@
 #! /usr/bin/env sh
 set -e
+source $(pwd)/ops/travis/should-deploy.sh
 
 # Deploy to GAE from travis CI
 # Basically an implementation of:
@@ -25,24 +26,7 @@ fetch_apiv3_status() {
     curl -s --header "X-TBA-Auth-Key: $APIv3_KEY" $API_STATUS
 }
 
-check_killswitch() {
-    enabled=$(fetch_apiv3_status | jq '.contbuild_enabled')
-    if [ "$enabled" != "true" ]; then
-        echo "Continuous Deployment disabled via killswitch..."
-        exit 0
-    fi
-}
-
-check_commit_tag() {
-    # The most recent commit message
-    msg=$(git log -1 --pretty=%B)
-    case "$msg" in
-        *\[nodeploy\]*) echo "Skipping due to [nodeploy] tag"; exit 0 ;;
-    esac
-}
-
-check_commit_tag
-check_killswitch
+should_deploy
 
 echo "python 2.7 version:"
 with_python27 "python -c 'import sys; print(sys.version)'"
