@@ -12,20 +12,98 @@ from models.robot import Robot
 from models.team import Team
 
 
+class LazyDeserializer(object):
+    def __init__(self):
+        if '__id__' in self._json:
+            self.key = ndb.Key(
+                'Lazy{}'.format(self._json['__kind__']), self._json['__id__'])
+
+    def __getattribute__(self, attr):
+        if attr == '_json':
+            return object.__getattribute__(self, attr)
+        if attr in self._json:
+            attr_type = self._model_type.__dict__[attr]
+            return ModelSerializer.to_obj(self._json[attr], attr_type)
+        return object.__getattribute__(self, attr)
+
+
+class LazyAward(LazyDeserializer, Award):
+    def __init__(self, json):
+        self._json = json
+        self._model_type = Award
+        super(LazyAward, self).__init__()
+
+
+class LazyDistrict(LazyDeserializer, District):
+    def __init__(self, json):
+        self._json = json
+        self._model_type = District
+        super(LazyDistrict, self).__init__()
+
+
+class LazyEvent(LazyDeserializer, Event):
+    def __init__(self, json):
+        self._json = json
+        self._model_type = Event
+        super(LazyEvent, self).__init__()
+
+
+class LazyEventDetails(LazyDeserializer, EventDetails):
+    def __init__(self, json):
+        self._json = json
+        self._model_type = EventDetails
+        super(LazyEventDetails, self).__init__()
+
+
+class LazyLocation(LazyDeserializer, Location):
+    def __init__(self, json):
+        self._json = json
+        self._model_type = Location
+        super(LazyLocation, self).__init__()
+
+
+class LazyMatch(LazyDeserializer, Match):
+    def __init__(self, json):
+        self._json = json
+        self._model_type = Match
+        super(LazyMatch, self).__init__()
+
+
+class LazyMedia(LazyDeserializer, Media):
+    def __init__(self, json):
+        self._json = json
+        self._model_type = Media
+        super(LazyMedia, self).__init__()
+
+
+class LazyRobot(LazyDeserializer, Robot):
+    def __init__(self, json):
+        self._json = json
+        self._model_type = Robot
+        super(LazyRobot, self).__init__()
+
+
+class LazyTeam(LazyDeserializer, Team):
+    def __init__(self, json):
+        self._json = json
+        self._model_type = Team
+        super(LazyTeam, self).__init__()
+
+
 class ModelSerializer(object):
     """
     Converts a model to and from a JSON serializable object.
     """
     KINDS = {
-        'Award': Award,
-        'District': District,
-        'Event': Event,
-        'EventDetails': EventDetails,
-        'Location': Location,
-        'Match': Match,
-        'Media': Media,
-        'Robot': Robot,
-        'Team': Team,
+        'Award': LazyAward,
+        'District': LazyDistrict,
+        'Event': LazyEvent,
+        'EventDetails': LazyEventDetails,
+        'Location': LazyLocation,
+        'Match': LazyMatch,
+        'Media': LazyMedia,
+        'Robot': LazyRobot,
+        'Team': LazyTeam,
     }
 
     @classmethod
@@ -68,16 +146,5 @@ class ModelSerializer(object):
         if isinstance(obj_type, ndb.KeyProperty):
             return ndb.Key(o['__kind__'], o['id'])
         if obj_type is None or isinstance(obj_type, ndb.StructuredProperty):
-            obj_type = cls.KINDS[o['__kind__']]
-            if obj_type is not None:
-                obj = obj_type(id=o.get('__id__'))
-                obj._write_disabled = True  # Disable writing to DB from deserialized models for safety
-                for attr_name in obj.to_dict():
-                    attr_type = obj_type.__dict__[attr_name]
-                    setattr(
-                        obj,
-                        attr_name,
-                        cls.to_obj(o.get(attr_name), attr_type)
-                    )
-                return obj
+            return cls.KINDS[o['__kind__']](o)
         return o
