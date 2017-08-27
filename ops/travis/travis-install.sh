@@ -1,6 +1,6 @@
 #! /usr/bin/env sh
 set -e
-source $(pwd)/ops/travis/should-deploy.sh
+. $(pwd)/ops/travis/should-deploy.sh
 
 if test "$TRAVIS" == "true" && "$TRAVIS_EVENT_TYPE" == "pull_request" && "$1" == "DEPLOY" ; then
     echo "No deploys on pull requests, skipping travis_before"

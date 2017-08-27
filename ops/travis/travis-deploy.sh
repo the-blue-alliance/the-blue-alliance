@@ -1,6 +1,6 @@
 #! /usr/bin/env sh
 set -e
-source $(pwd)/ops/travis/should-deploy.sh
+. $(pwd)/ops/travis/should-deploy.sh
 
 # Deploy to GAE from travis CI
 # Basically an implementation of:
