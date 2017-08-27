@@ -32,72 +32,63 @@ class LazyAward(LazyDeserializer, Award):
     def __init__(self, json):
         self._json = json
         self._model_type = Award
-        LazyDeserializer.__init__(self)
-        Award.__init__(self)
+        super(LazyAward, self).__init__()
 
 
 class LazyDistrict(LazyDeserializer, District):
     def __init__(self, json):
         self._json = json
         self._model_type = District
-        LazyDeserializer.__init__(self)
-        District.__init__(self)
+        super(LazyDistrict, self).__init__()
 
 
 class LazyEvent(LazyDeserializer, Event):
     def __init__(self, json):
         self._json = json
         self._model_type = Event
-        LazyDeserializer.__init__(self)
-        Event.__init__(self)
+        super(LazyEvent, self).__init__()
 
 
 class LazyEventDetails(LazyDeserializer, EventDetails):
     def __init__(self, json):
         self._json = json
         self._model_type = EventDetails
-        LazyDeserializer.__init__(self)
-        EventDetails.__init__(self)
+        super(LazyEventDetails, self).__init__()
 
 
 class LazyLocation(LazyDeserializer, Location):
     def __init__(self, json):
         self._json = json
         self._model_type = Location
-        LazyDeserializer.__init__(self)
-        Location.__init__(self)
+        super(LazyLocation, self).__init__()
 
 
 class LazyMatch(LazyDeserializer, Match):
     def __init__(self, json):
         self._json = json
         self._model_type = Match
-        LazyDeserializer.__init__(self)
-        Match.__init__(self)
+        super(LazyMatch, self).__init__()
 
 
 class LazyMedia(LazyDeserializer, Media):
     def __init__(self, json):
         self._json = json
         self._model_type = Media
-        LazyDeserializer.__init__(self)
-        Media.__init__(self)
+        super(LazyMedia, self).__init__()
 
 
 class LazyRobot(LazyDeserializer, Robot):
     def __init__(self, json):
         self._json = json
         self._model_type = Robot
-        LazyDeserializer.__init__(self)
-        Robot.__init__(self)
+        super(LazyRobot, self).__init__()
 
 
 class LazyTeam(LazyDeserializer, Team):
     def __init__(self, json):
         self._json = json
         self._model_type = Team
-        LazyDeserializer.__init__(self)
-        Team.__init__(self)
+        super(LazyTeam, self).__init__()
 
 
 class ModelSerializer(object):
