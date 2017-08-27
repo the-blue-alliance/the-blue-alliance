@@ -2,7 +2,7 @@
 set -e
 . $(pwd)/ops/travis/should-deploy.sh
 
-if [ "$TRAVIS" = "true" -a "$TRAVIS_EVENT_TYPE" = "pull_request" -a "$1" = "DEPLOY" ] ; then
+if test "$TRAVIS" = "true" && "$TRAVIS_EVENT_TYPE" = "pull_request" && "$1" = "DEPLOY" ; then
     echo "No deploys on pull requests, skipping travis_before"
     exit 0
 fi
