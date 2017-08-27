@@ -8,6 +8,7 @@ from datafeeds.parsers.fms_api.fms_api_event_list_parser import FMSAPIEventListP
 from datafeeds.usfirst_event_rankings_parser import UsfirstEventRankingsParser
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
+from helpers.event_simulator import EventSimulator
 from helpers.model_serializer import ModelSerializer
 from models.award import Award
 from models.event import Event
@@ -26,6 +27,7 @@ class TestModelSerializer(unittest2.TestCase):
         self.testbed.init_urlfetch_stub()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        self.testbed.init_taskqueue_stub(root_path=".")
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
     def tearDown(self):
@@ -255,3 +257,12 @@ class TestModelSerializer(unittest2.TestCase):
             website=u'http://604Robotics.com',
         )
         self._test_to_and_back(team)
+
+    def test_simulated_event_conversion(self):
+        es = EventSimulator()
+
+        for _ in xrange(90):
+            event = Event.get_by_id('2016nytr')
+            self._test_to_and_back(event.details)
+            self._test_to_and_back(event.matches)
+            es.step()
