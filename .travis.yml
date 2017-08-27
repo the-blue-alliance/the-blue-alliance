@@ -29,7 +29,6 @@ after_failure:
 before_deploy:
 - openssl aes-256-cbc -K $encrypted_7463bcfc1880_key -iv $encrypted_7463bcfc1880_iv -in ops/deploy_keys.tar.enc -out ops/deploy_keys.tar -d
 - ./ops/manage_deploy_keys.sh -x
-- paver make
 jobs:
   include:
   - stage: deploy

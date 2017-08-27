@@ -37,6 +37,9 @@ curl -L "${BASE}${NAME}${EXT}" | gzip -d | tar -x -C ${INSTALL}
 echo "Bootstrapping Google Cloud SDK ..."
 with_python27 "$BOOTSTRAP --usage-reporting=false --command-completion=false --path-update=false"
 
+echo "Building TBA..."
+paver make
+
 echo "Configuring service account auth..."
 with_python27 "$GCLOUD -q auth activate-service-account --key-file $KEYFILE"
 
