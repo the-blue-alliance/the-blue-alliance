@@ -4,8 +4,12 @@ from google.appengine.ext import ndb
 from models.award import Award
 from models.district import District
 from models.event import Event
+from models.event_details import EventDetails
 from models.location import Location
+from models.match import Match
+from models.media import Media
 from models.robot import Robot
+from models.team import Team
 
 
 class ModelSerializer(object):
@@ -16,8 +20,12 @@ class ModelSerializer(object):
         'Award': Award,
         'District': District,
         'Event': Event,
+        'EventDetails': EventDetails,
         'Location': Location,
+        'Match': Match,
+        'Media': Media,
         'Robot': Robot,
+        'Team': Team,
     }
 
     @classmethod
