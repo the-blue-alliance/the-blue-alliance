@@ -104,7 +104,10 @@ class ManipulatorBase(object):
         existing models with the same key.
         Once inserted or updated, the model can be marked not dirty.
         """
-        models = self.listify(self.findOrSpawn(self.listify(new_models), auto_union=auto_union))
+        new_models = self.listify(new_models)
+        if any(getattr(m, '_write_disabled', False) for m in new_models):
+            raise Exception('Writing these models is disabled!')
+        models = self.listify(self.findOrSpawn(new_models, auto_union=auto_union))
         models_to_put = [model for model in models if getattr(model, "dirty", False)]
         ndb.put_multi(models_to_put)
         self._clearCache(models)
