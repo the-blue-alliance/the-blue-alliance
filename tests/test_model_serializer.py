@@ -36,23 +36,7 @@ class TestModelSerializer(unittest2.TestCase):
 
     def _test_to_and_back(self, o):
         j = json.dumps(ModelSerializer.to_json(o), indent=2)
-        o2 = ModelSerializer.to_obj(json.loads(j))
-        self._test_equal(o, o2)
-
-    def _test_equal(self, a, b):
-        if a is None:
-            self.assertEqual(b, None)
-            return
-        if isinstance(a, list):
-            self.assertEqual(len(a), len(b))
-            for x, y in zip(a, b):
-                self._test_equal(x, y)
-            return
-        if isinstance(a, ndb.Model):
-            for attr in a.to_dict():
-                self._test_equal(getattr(a, attr), getattr(b, attr))
-            return
-        self.assertEqual(a, b)
+        self.assertEqual(o, ModelSerializer.to_obj(json.loads(j)))
 
     def test_award_conversion(self):
         event = Event(
@@ -134,7 +118,6 @@ class TestModelSerializer(unittest2.TestCase):
                 street=u'South 7th Street',
                 street_number=u'290'
             ),
-            divisions=[ndb.Key('Event', '2017arc')],
         ))
         self._test_to_and_back(events)
 
@@ -203,7 +186,6 @@ class TestModelSerializer(unittest2.TestCase):
             updated=datetime.datetime.now(),
         )
         self._test_to_and_back(robot)
-        self._test_to_and_back([robot, robot])
 
     def test_team_conversion(self):
         team = Team(
