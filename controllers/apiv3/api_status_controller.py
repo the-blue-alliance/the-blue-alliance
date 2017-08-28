@@ -20,7 +20,7 @@ class ApiStatusController(ApiBaseController):
         # Error out of no sitevar found
         status_sitevar = status_sitevar_future.get_result()
         if not status_sitevar:
-            self._errors = json.dumps({"404": "API Status Not Found"})
+            self._errors = {"404": "API Status Not Found"}
             self.abort(404)
 
         status_dict = status_sitevar.contents

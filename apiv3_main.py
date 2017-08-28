@@ -2,6 +2,7 @@
 import tba_config
 import webapp2
 
+from controllers.apiv3.api_base_controller import handle_404
 from controllers.apiv3 import api_status_controller as asc
 from controllers.apiv3 import api_district_controller as adc
 from controllers.apiv3 import api_event_controller as aec
@@ -112,3 +113,4 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/v3/district/<district_key:>/rankings',
         adc.ApiDistrictRankingsController, methods=['GET', 'OPTIONS']),
 ], debug=tba_config.DEBUG)
+app.error_handlers[404] = handle_404

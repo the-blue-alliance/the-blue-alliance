@@ -145,3 +145,10 @@ class ApiBaseController(CacheableHandler):
             else:
                 self._errors = {"Error": "X-TBA-Auth-Key is invalid. Please get an access key at http://www.thebluealliance.com/account."}
                 self.abort(401)
+
+
+def handle_404(request, response, exception):
+    response.headers['content-type'] = 'application/json; charset="utf-8"'
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.write(json.dumps({"Error": "Invalid endpoint"}))
+    response.set_status(404)
