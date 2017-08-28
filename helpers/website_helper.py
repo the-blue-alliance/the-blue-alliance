@@ -1,6 +1,7 @@
 import httplib2
 h = httplib2.Http()
 
+
 class WebsiteHelper(object):
     @classmethod
     def format_url(cls, website_url):
