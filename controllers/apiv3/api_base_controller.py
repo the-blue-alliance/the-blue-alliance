@@ -130,7 +130,7 @@ class ApiBaseController(CacheableHandler):
             elif 'thebluealliance.com' in self.request.headers.get("Origin", ""):
                 self.auth_owner = 'The Blue Alliance'
             else:
-                self._errors = json.dumps({"Error": "X-TBA-Auth-Key is a required header or URL param. Please get an access key at http://www.thebluealliance.com/account."})
+                self._errors = {"Error": "X-TBA-Auth-Key is a required header or URL param. Please get an access key at http://www.thebluealliance.com/account."}
                 self.abort(401)
 
         if self.auth_owner:
@@ -143,5 +143,5 @@ class ApiBaseController(CacheableHandler):
                 self.auth_description = auth.description
                 logging.info("Auth owner: {}, X-TBA-Auth-Key: {}".format(self.auth_owner, x_tba_auth_key))
             else:
-                self._errors = json.dumps({"Error": "X-TBA-Auth-Key is invalid. Please get an access key at http://www.thebluealliance.com/account."})
+                self._errors = {"Error": "X-TBA-Auth-Key is invalid. Please get an access key at http://www.thebluealliance.com/account."}
                 self.abort(401)
