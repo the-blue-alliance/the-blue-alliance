@@ -1,3 +1,4 @@
+from collections import defaultdict
 import datetime
 import logging
 import os
@@ -9,9 +10,13 @@ from google.appengine.ext.webapp import template
 
 import tba_config
 from base_controller import CacheableHandler
+from consts.award_type import AwardType
 from consts.event_type import EventType
+from consts.media_tag import MediaTag
+from database import media_query
 from helpers.event_helper import EventHelper
 from helpers.firebase.firebase_pusher import FirebasePusher
+from models.award import Award
 from models.event import Event
 from models.insight import Insight
 from models.team import Team
@@ -234,6 +239,42 @@ class HashtagsHandler(CacheableHandler):
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/hashtags.html")
         return template.render(path, self.template_values)
+
+
+class FIRSTHOFHandler(CacheableHandler):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "main_first_hof"
+
+    def __init__(self, *args, **kw):
+        super(FIRSTHOFHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+
+    def _render(self, *args, **kw):
+        awards_future = Award.query(
+            Award.award_type_enum==AwardType.CHAIRMANS,
+            Award.event_type_enum==EventType.CMP_FINALS).fetch_async()
+
+        teams_by_year = defaultdict(list)
+        for award in awards_future.get_result():
+            for team_key in award.team_list:
+                teams_by_year[award.year].append((
+                    team_key.get_async(),
+                    award.event.get_async(),
+                    award,
+                    media_query.TeamTagMediasQuery(team_key.id(), MediaTag.CHAIRMANS_VIDEO).fetch_async(),
+                    media_query.TeamTagMediasQuery(team_key.id(), MediaTag.CHAIRMANS_PRESENTATION).fetch_async(),
+                    media_query.TeamTagMediasQuery(team_key.id(), MediaTag.CHAIRMANS_ESSAY).fetch_async(),
+                ))
+
+        teams_by_year = sorted(teams_by_year.items(), key=lambda (k, v): -k)
+        for _, tea in teams_by_year:
+            tea.sort(key=lambda x: x[1].get_result().start_date)
+
+        self.template_values.update({
+            'teams_by_year': teams_by_year,
+        })
+
+        return jinja2_engine.render('hof.html', self.template_values)
 
 
 class AboutHandler(CacheableHandler):

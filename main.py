@@ -20,7 +20,7 @@ from controllers.event_controller import EventList, EventDetail, EventInsights, 
 from controllers.event_wizard_controller import EventWizardHandler, ReactEventWizardHandler
 from controllers.gameday_controller import Gameday2Controller, GamedayHandler, GamedayRedirectHandler
 from controllers.insights_controller import InsightsOverview, InsightsDetail
-from controllers.main_controller import TwoChampsHandler, ContactHandler, HashtagsHandler, \
+from controllers.main_controller import TwoChampsHandler, ContactHandler, HashtagsHandler, FIRSTHOFHandler, \
     MainKickoffHandler, MainBuildseasonHandler, MainChampsHandler, MainCompetitionseasonHandler, \
     MainInsightsHandler, MainOffseasonHandler, OprHandler, PredictionsHandler, SearchHandler, \
     AboutHandler, ThanksHandler, handle_404, handle_500, \
@@ -118,6 +118,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/gameday/<alias>', GamedayRedirectHandler, 'gameday-alias', strict_slash=True),
       RedirectRoute(r'/gameday', Gameday2Controller, 'gameday2', strict_slash=True),
       RedirectRoute(r'/hashtags', HashtagsHandler, 'hashtags', strict_slash=True),
+      RedirectRoute(r'/first-hof', FIRSTHOFHandler, 'hall-of-fame', strict_slash=True),
       RedirectRoute(r'/insights/<year:[0-9]+>', InsightsDetail, 'insights-detail', strict_slash=True),
       RedirectRoute(r'/insights', InsightsOverview, 'insights', strict_slash=True),
       RedirectRoute(r'/login', AccountLogin, 'account-login', strict_slash=True),

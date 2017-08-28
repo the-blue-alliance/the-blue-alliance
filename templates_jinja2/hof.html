@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% import 'team_partials/blue_banner_macros.html' as bbm %}
+
+{% block title %}FIRST Hall of Fame - The Blue Alliance{% endblock %}
+
+{% block meta_description %}Teams in the FIRST Hall of Fame{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+      <h1 class="end_header"><i>FIRST</i> Hall of Fame</h1>
+
+      <blockquote><p><em>The Chairman's Award is the most prestigious award in
+      all of FIRST. Winners best embody the purpose and goals of
+      FIRST and are inducted into the FIRST Hall of Fame.</em></p>
+      </blockquote>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-10 col-xs-offset-1">
+      {% for year, teams in teams_by_year %}
+        <h2 class="text-center">{{year}}</h2>
+        <div class="row">
+        {% for team, event, award, vid, pres, ess in teams %}
+          {% set team = team.get_result() %}
+          <div class="col-xs-12 col-md-6{% if teams|length == 1 %} col-md-offset-3{% endif %}">
+            <div class="panel panel-default">
+              <div class="panel-body text-center">
+                <h4><a href="/team/{{team.team_number}}/{{year}}">Team {{team.team_number}}{% if team.nickname %}<br>{{team.nickname}}{% endif %}</a></h4>
+                {{bbm.blue_banner(award, event.get_result())}}
+                <p>
+                  {% if vid.get_result() %} <a href="{{vid.get_result()[0].youtube_url_link}}">Video</a>{% endif %}
+                  {% if pres.get_result() %}| <a href="{{pres.get_result()[0].youtube_url_link}}">Presentation</a>{% endif %}
+                  {% if ess.get_result() %}| <a href="{{ess.get_result()[0].external_link}}">Essay</a>{% endif %}
+                </p>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+        </div>
+        {% if not loop.last %}<hr>{% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
