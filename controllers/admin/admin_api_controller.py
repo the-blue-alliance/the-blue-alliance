@@ -107,22 +107,30 @@ class AdminApiAuthEdit(LoggedInHandler):
         else:
             expiration = None
 
+        if self.request.get('event_list_str'):
+            split_events = self.request.get('event_list_str', '').split(',')
+            event_list = [ndb.Key(Event, event_key.strip()) for event_key in split_events]
+        else:
+            event_list = []
+
         if not auth:
             auth = ApiAuthAccess(
                 id=auth_id,
                 description=self.request.get('description'),
                 owner=owner_key,
                 expiration=expiration,
+                allow_admin=True if self.request.get('allow_admin') else False,
                 secret=''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _ in range(64)),
-                event_list=[ndb.Key(Event, event_key.strip()) for event_key in self.request.get('event_list_str').split(',')],
+                event_list=event_list,
                 auth_types_enum=auth_types_enum,
             )
         else:
             auth.description = self.request.get('description')
-            auth.event_list = event_list=[ndb.Key(Event, event_key.strip()) for event_key in self.request.get('event_list_str').split(',')]
+            auth.event_list = event_list
             auth.auth_types_enum = auth_types_enum
             auth.owner = owner_key
             auth.expiration = expiration
+            auth.allow_admin = True if self.request.get('allow_admin') else False
 
         auth.put()
 
@@ -139,10 +147,12 @@ class AdminApiAuthManage(LoggedInHandler):
         auths = ApiAuthAccess.query().fetch()
         write_auths = filter(lambda auth: auth.is_write_key, auths)
         read_auths = filter(lambda auth: auth.is_read_key, auths)
+        admin_auths = filter(lambda auth: auth.allow_admin, auths)
 
         self.template_values.update({
             'write_auths': write_auths,
             'read_auths': read_auths,
+            'admin_auths': admin_auths,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/api_manage_auth.html')
