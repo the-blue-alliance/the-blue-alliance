@@ -17,6 +17,7 @@ class ApiAuthAccess(ndb.Model):
     description = ndb.StringProperty(indexed=False)  # human-readable description
     auth_types_enum = ndb.IntegerProperty(repeated=True)  # read and write types should never be mixed
     owner = ndb.KeyProperty(kind=Account)
+    allow_admin = ndb.BooleanProperty(default=False)  # Allow access to admin APIv3
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True)
