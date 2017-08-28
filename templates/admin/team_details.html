@@ -128,9 +128,12 @@
     <h3>{{year}}:</h3>
   {% endif %}
   <ul>
+  <table class="table table-striped table-hover table-condensed">
+  <tr><th>Media</th><th>Details</th><th>Tags</th></tr>
   {% for media in team_medias_by_year|get_item:year %}
-    <li>{% include "partials/admin_media_display.html" %}</li>
+    {% include "partials/admin_media_display.html" %}
   {% endfor %}
+  </table>
   </ul>
 {% endfor %}
 

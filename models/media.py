@@ -2,6 +2,7 @@ import json
 
 from google.appengine.ext import ndb
 
+from consts.media_tag import MediaTag
 from consts.media_type import MediaType
 from models.event import Event
 from models.team import Team
@@ -185,6 +186,10 @@ class Media(ndb.Model):
     @property
     def type_name(self):
         return MediaType.type_names[self.media_type_enum]
+
+    @property
+    def tag_names(self):
+        return [MediaTag.tag_names[t] for t in self.media_tag_enum]
 
     @property
     def is_image(self):

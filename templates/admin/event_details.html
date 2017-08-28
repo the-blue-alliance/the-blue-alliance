@@ -378,11 +378,14 @@
 <div class="tab-pane" id="media">
 <div class="row">
 <h2>Event Media</h2>
+  <table class="table table-striped table-hover table-condensed">
+  <tr><th>Media</th><th>Details</th><th>Tags</th></tr>
   {% for media in medias %}
-    <li>{% include "partials/admin_media_display.html" %}</li>
+    {% include "partials/admin_media_display.html" %}
   {% empty %}
-    <p>No media found</p>
+    <tr>No media found</tr>
   {% endfor %}
+  </table>
 
 <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
