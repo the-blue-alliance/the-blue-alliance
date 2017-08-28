@@ -38,3 +38,13 @@ class TestWebsiteHelper(unittest2.TestCase):
         # Null URLs
         self.assertEqual(WebsiteHelper.format_url(None), None)
         self.assertEqual(WebsiteHelper.format_url(''), None)
+
+    def test_exists(self):
+        # Exists
+        self.assertEqual(WebsiteHelper.exists('https://www.google.com'), True)
+        self.assertEqual(WebsiteHelper.exists('https://www.thebluealliance.com'), True)
+        self.assertEqual(WebsiteHelper.exists('https://www.thebluealliance.com/team/2521'), True)
+
+        # Missing
+        self.assertEqual(WebsiteHelper.exists('https://www.google.com/gimmea404'), False)
+        self.assertEqual(WebsiteHelper.exists('https://www.thebluealliance.com/gimmea404'), False)

@@ -190,7 +190,7 @@ class Media(ndb.Model):
 
     @property
     def social_profile_url(self):
-        if self.media_type_enum in MediaType.social_types:
+        if self.is_social:
             return MediaType.profile_urls[self.media_type_enum].format(self.foreign_key)
         return ""
 
@@ -201,6 +201,10 @@ class Media(ndb.Model):
     @property
     def tag_names(self):
         return [MediaTag.tag_names[t] for t in self.media_tag_enum]
+
+    @property
+    def is_social(self):
+        return self.media_type_enum in MediaType.social_types
 
     @property
     def is_image(self):

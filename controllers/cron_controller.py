@@ -12,11 +12,13 @@ from google.appengine.ext.webapp import template
 
 from consts.district_type import DistrictType
 from consts.event_type import EventType
+from consts.media_type import MediaType
 
 from controllers.api.api_status_controller import ApiStatusController
 from database.district_query import DistrictsInYearQuery
 from database.event_query import DistrictEventsQuery
 from database.team_query import DistrictTeamsQuery
+from database.media_query import TeamMediaQuery, TeamSocialMediaQuery
 from helpers.award_manipulator import AwardManipulator
 from helpers.bluezone_helper import BlueZoneHelper
 from helpers.district_helper import DistrictHelper
@@ -37,6 +39,7 @@ from helpers.matchstats_helper import MatchstatsHelper
 from helpers.notification_helper import NotificationHelper
 from helpers.outgoing_notification_helper import OutgoingNotificationHelper
 from helpers.prediction_helper import PredictionHelper
+from helpers.website_helper import WebsiteHelper
 
 from helpers.insight_manipulator import InsightManipulator
 from helpers.suggestions.suggestion_fetcher import SuggestionFetcher
@@ -486,6 +489,19 @@ class DistrictPointsCalcEnqueue(webapp.RequestHandler):
         self.response.out.write("Enqueued for: {}".format([event_key.id() for event_key in event_keys]))
 
 
+class CheckTeamMediaEnqueue(webapp.RequestHandler):
+    """
+    Enqueues media checking for all teams
+    """
+
+    def get(self):
+        team_keys = Team.query().fetch(None, keys_only=True)
+        for team_key in team_keys:
+            taskqueue.add(url='/tasks/do/check_team_media/{}'.format(team_key.id()), method='GET')
+
+        self.response.out.write("Enqueued for: {}".format([team_key.id() for team_key in team_keys]))
+
+
 class DistrictPointsCalcDo(webapp.RequestHandler):
     """
     Calculates district points for an event
@@ -777,3 +793,27 @@ class RemapTeamsDo(webapp.RequestHandler):
         # Remap awards
         EventHelper.remapteams_awards(event.awards, event.remap_teams)
         AwardManipulator.createOrUpdate(event.awards, auto_union=False)
+
+
+class CheckTeamMediaDo(webapp.RequestHandler):
+    """
+    Remove unavailable team media
+    """
+    def get(self, team):
+        media_future = TeamMediaQuery(team).fetch_async()
+        social_media_future = TeamSocialMediaQuery(team).fetch_async()
+
+        medias = media_future.get_result() + social_media_future.get_result()
+
+        for media in medias:
+            if media.is_image:
+                url = media.view_image_url
+            elif media.is_social:
+                url = media.social_profile_url
+            elif media.media_type_enum == MediaType.YOUTUBE_VIDEO:
+                url = "https://www.youtube.com/oembed?url={}&format=json".format(media.youtube_url_link)
+            elif media.media_type_enum == MediaType.EXTERNAL_LINK:
+                url = media.external_link
+
+            if not WebsiteHelper.exists(url):
+                media.key.delete()
