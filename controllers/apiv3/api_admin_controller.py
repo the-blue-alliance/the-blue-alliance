@@ -19,11 +19,11 @@ class ApiAdminSetBuildInfo(ApiAdminController):
     """
 
     def _render(self):
-        current_commit_sha = ''
-        commit_time = ''
-        build_time = ''
-        deploy_time = ''
-        travis_job = ''
+        current_commit_sha = self.request.get('current_commit', '')
+        commit_time = self.request.get('commit_time', '')
+        build_time = self.request.get('build_time', '')
+        deploy_time = self.request.get('deploy_time', '')
+        travis_job = self.request.get('travis_job', '')
 
         web_info = {
             'current_commit': current_commit_sha,
