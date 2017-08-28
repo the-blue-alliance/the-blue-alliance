@@ -607,7 +607,7 @@ class HallOfFameTeamsGet(webapp.RequestHandler):
                 if video_foreign_key:
                     media_to_update.append(Media(id=Media.render_key_name(MediaType.YOUTUBE_VIDEO, video_foreign_key),
                                                  media_type_enum=MediaType.YOUTUBE_VIDEO,
-                                                 media_tag_enum=MediaTag.CHAIRMANS_VIDEO,
+                                                 media_tag_enum=[MediaTag.CHAIRMANS_VIDEO],
                                                  references=[team_reference],
                                                  year=team['year'],
                                                  foreign_key=video_foreign_key))
@@ -616,7 +616,7 @@ class HallOfFameTeamsGet(webapp.RequestHandler):
                 if presentation_foreign_key:
                     media_to_update.append(Media(id=Media.render_key_name(MediaType.YOUTUBE_VIDEO, presentation_foreign_key),
                                                  media_type_enum=MediaType.YOUTUBE_VIDEO,
-                                                 media_tag_enum=MediaTag.CHAIRMANS_PRESENTATION,
+                                                 media_tag_enum=[MediaTag.CHAIRMANS_PRESENTATION],
                                                  references=[team_reference],
                                                  year=team['year'],
                                                  foreign_key=presentation_foreign_key))
@@ -625,7 +625,7 @@ class HallOfFameTeamsGet(webapp.RequestHandler):
                 if essay_foreign_key:
                     media_to_update.append(Media(id=Media.render_key_name(MediaType.EXTERNAL_LINK, essay_foreign_key),
                                                  media_type_enum=MediaType.EXTERNAL_LINK,
-                                                 media_tag_enum=MediaTag.CHAIRMANS_ESSAY,
+                                                 media_tag_enum=[MediaTag.CHAIRMANS_ESSAY],
                                                  references=[team_reference],
                                                  year=team['year'],
                                                  foreign_key=essay_foreign_key))

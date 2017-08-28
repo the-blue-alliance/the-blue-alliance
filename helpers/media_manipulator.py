@@ -30,6 +30,7 @@ class MediaManipulator(ManipulatorBase):
         auto_union_attrs = [
             'references',
             'preferred_references',
+            'media_tag_enum',
         ]
 
         old_media._updated_attrs = []
