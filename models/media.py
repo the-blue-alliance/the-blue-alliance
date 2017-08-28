@@ -119,6 +119,10 @@ class Media(ndb.Model):
         return 'https://www.youtube.com/embed/{}'.format(self.foreign_key)
 
     @property
+    def youtube_url_link(self):
+        return 'https://youtu.be/{}'.format(self.foreign_key)
+
+    @property
     def imgur_url(self):
         return 'https://imgur.com/{}'.format(self.foreign_key)
 

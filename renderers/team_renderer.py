@@ -48,8 +48,8 @@ class TeamRenderer(object):
             "is_hof": len(hof_awards) > 0,
             "years": [award.year for award in hof_awards],
             "media": {
-                "video": hof_video[0].youtube_url if len(hof_video) > 0 else None,
-                "presentation": hof_presentation[0].youtube_url if len(hof_presentation) > 0 else None,
+                "video": hof_video[0].youtube_url_link if len(hof_video) > 0 else None,
+                "presentation": hof_presentation[0].youtube_url_link if len(hof_presentation) > 0 else None,
                 "essay": hof_essay[0].external_link if len(hof_essay) > 0 else None,
             },
         }
@@ -211,8 +211,8 @@ class TeamRenderer(object):
             "is_hof": len(hof_awards) > 0,
             "years": [award.year for award in hof_awards],
             "media": {
-                "video": hof_video[0].youtube_url if len(hof_video) > 0 else None,
-                "presentation": hof_presentation[0].youtube_url if len(hof_presentation) > 0 else None,
+                "video": hof_video[0].youtube_url_link if len(hof_video) > 0 else None,
+                "presentation": hof_presentation[0].youtube_url_link if len(hof_presentation) > 0 else None,
                 "essay": hof_essay[0].external_link if len(hof_essay) > 0 else None,
             },
         }
