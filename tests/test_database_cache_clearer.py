@@ -4,18 +4,20 @@ from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from database import get_affected_queries
-from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
+from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery, TeamEventTypeAwardsQuery
 from database.district_query import DistrictsInYearQuery, DistrictHistoryQuery, DistrictQuery
 from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery, \
     EventDivisionsQuery
 from database.event_details_query import EventDetailsQuery
 from database.match_query import MatchQuery, EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery, \
-    EventMediasQuery
+    EventMediasQuery, TeamTagMediasQuery
 from database.robot_query import TeamRobotsQuery
 from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
 
 from consts.event_type import EventType
+from consts.award_type import AwardType
+from consts.media_tag import MediaTag
 from models.district import District
 from models.district_team import DistrictTeam
 from models.event import Event
@@ -132,11 +134,13 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         affected_refs = {
             'event': {ndb.Key(Event, '2015casj'), ndb.Key(Event, '2015cama')},
             'team_list': {ndb.Key(Team, 'frc254'), ndb.Key(Team, 'frc604')},
-            'year': {2014, 2015}
+            'year': {2014, 2015},
+            'event_type_enum': {EventType.REGIONAL, EventType.DISTRICT},
+            'award_type_enum': {AwardType.WINNER, AwardType.CHAIRMANS},
         }
         cache_keys = [q.cache_key for q in get_affected_queries.award_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 12)
+        self.assertEqual(len(cache_keys), 20)
         self.assertTrue(EventAwardsQuery('2015casj').cache_key in cache_keys)
         self.assertTrue(EventAwardsQuery('2015cama').cache_key in cache_keys)
         self.assertTrue(TeamAwardsQuery('frc254').cache_key in cache_keys)
@@ -149,6 +153,10 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         self.assertTrue(TeamEventAwardsQuery('frc254', '2015cama').cache_key in cache_keys)
         self.assertTrue(TeamEventAwardsQuery('frc604', '2015casj').cache_key in cache_keys)
         self.assertTrue(TeamEventAwardsQuery('frc604', '2015cama').cache_key in cache_keys)
+        for team_key in ['frc254', 'frc604']:
+            for event_type in [EventType.REGIONAL, EventType.DISTRICT]:
+                for award_type in [AwardType.WINNER, AwardType.CHAIRMANS]:
+                    self.assertTrue(TeamEventTypeAwardsQuery(team_key, event_type, award_type).cache_key in cache_keys)
 
     def test_event_updated(self):
         affected_refs = {
@@ -210,10 +218,11 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         affected_refs = {
             'references': {ndb.Key(Team, 'frc254'), ndb.Key(Team, 'frc604')},
             'year': {2014, 2015},
+            'media_tag_enum': {None, MediaTag.CHAIRMANS_VIDEO},
         }
         cache_keys = [q.cache_key for q in get_affected_queries.media_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 10)
+        self.assertEqual(len(cache_keys), 12)
         self.assertTrue(TeamYearMediaQuery('frc254', 2014).cache_key in cache_keys)
         self.assertTrue(TeamYearMediaQuery('frc254', 2015).cache_key in cache_keys)
         self.assertTrue(TeamSocialMediaQuery('frc254').cache_key in cache_keys)
@@ -224,11 +233,14 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         self.assertTrue(EventTeamsMediasQuery('2015casj').cache_key in cache_keys)
         self.assertTrue(EventTeamsPreferredMediasQuery('2015cama').cache_key in cache_keys)
         self.assertTrue(EventTeamsPreferredMediasQuery('2015casj').cache_key in cache_keys)
+        self.assertTrue(TeamTagMediasQuery('frc254', MediaTag.CHAIRMANS_VIDEO).cache_key in cache_keys)
+        self.assertTrue(TeamTagMediasQuery('frc604', MediaTag.CHAIRMANS_VIDEO).cache_key in cache_keys)
 
     def test_media_updated_event(self):
         affected_refs = {
             'references': {ndb.Key(Event, '2016necmp')},
             'year': {2016},
+            'media_tag_enum': {None, None}
         }
         cache_keys = [q.cache_key for q in get_affected_queries.media_updated(affected_refs)]
 

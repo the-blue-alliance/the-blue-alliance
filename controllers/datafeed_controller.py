@@ -11,10 +11,13 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
 from consts.event_type import EventType
+from consts.media_type import MediaType
+from consts.media_tag import MediaTag
 
 from datafeeds.datafeed_fms_api import DatafeedFMSAPI
 from datafeeds.datafeed_first_elasticsearch import DatafeedFIRSTElasticSearch
 from datafeeds.datafeed_tba import DatafeedTba
+from datafeeds.datafeed_resource_library import DatafeedResourceLibrary
 from helpers.district_manipulator import DistrictManipulator
 from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
@@ -23,6 +26,7 @@ from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_manipulator import MatchManipulator
 from helpers.match_helper import MatchHelper
 from helpers.award_manipulator import AwardManipulator
+from helpers.media_manipulator import MediaManipulator
 from helpers.team_manipulator import TeamManipulator
 from helpers.district_team_manipulator import DistrictTeamManipulator
 from helpers.robot_manipulator import RobotManipulator
@@ -31,6 +35,7 @@ from models.district_team import DistrictTeam
 from models.event import Event
 from models.event_details import EventDetails
 from models.event_team import EventTeam
+from models.media import Media
 from models.robot import Robot
 from models.sitevar import Sitevar
 from models.team import Team
@@ -582,4 +587,58 @@ class TbaVideosGet(webapp.RequestHandler):
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
             path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_get.html')
+            self.response.out.write(template.render(path, template_values))
+
+
+class HallOfFameTeamsGet(webapp.RequestHandler):
+    """
+    Handles scraping the list of Hall of Fame teams from FIRST resource library.
+    """
+    def get(self):
+        df = DatafeedResourceLibrary()
+
+        teams = df.getHallOfFameTeams()
+        if teams:
+            media_to_update = []
+            for team in teams:
+                team_reference = Media.create_reference('team', team['team_id'])
+
+                video_foreign_key = team['video']
+                if video_foreign_key:
+                    media_to_update.append(Media(id=Media.render_key_name(MediaType.YOUTUBE_VIDEO, video_foreign_key),
+                                                 media_type_enum=MediaType.YOUTUBE_VIDEO,
+                                                 media_tag_enum=MediaTag.CHAIRMANS_VIDEO,
+                                                 references=[team_reference],
+                                                 year=team['year'],
+                                                 foreign_key=video_foreign_key))
+
+                presentation_foreign_key = team['presentation']
+                if presentation_foreign_key:
+                    media_to_update.append(Media(id=Media.render_key_name(MediaType.YOUTUBE_VIDEO, presentation_foreign_key),
+                                                 media_type_enum=MediaType.YOUTUBE_VIDEO,
+                                                 media_tag_enum=MediaTag.CHAIRMANS_PRESENTATION,
+                                                 references=[team_reference],
+                                                 year=team['year'],
+                                                 foreign_key=presentation_foreign_key))
+
+                essay_foreign_key = team['essay']
+                if essay_foreign_key:
+                    media_to_update.append(Media(id=Media.render_key_name(MediaType.EXTERNAL_LINK, essay_foreign_key),
+                                                 media_type_enum=MediaType.EXTERNAL_LINK,
+                                                 media_tag_enum=MediaTag.CHAIRMANS_ESSAY,
+                                                 references=[team_reference],
+                                                 year=team['year'],
+                                                 foreign_key=essay_foreign_key))
+
+            MediaManipulator.createOrUpdate(media_to_update)
+        else:
+            logging.info("No Hall of Fame teams found")
+            teams = []
+
+        template_values = {
+            'teams': teams,
+        }
+
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/hall_of_fame_teams_get.html')
             self.response.out.write(template.render(path, template_values))

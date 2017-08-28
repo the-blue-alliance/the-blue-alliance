@@ -4,6 +4,8 @@ import os
 from google.appengine.ext import ndb
 
 from consts.district_type import DistrictType
+from consts.award_type import AwardType
+from consts.media_tag import MediaTag
 from database import award_query, event_query, match_query, media_query, team_query
 from database.district_query import DistrictQuery
 from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetcher
@@ -27,11 +29,30 @@ from consts.event_type import EventType
 class TeamRenderer(object):
     @classmethod
     def render_team_details(cls, handler, team, year, is_canonical):
+        hof_award_future = award_query.TeamEventTypeAwardsQuery(team.key.id(), EventType.CMP_FINALS, AwardType.CHAIRMANS).fetch_async()
+        hof_video_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_VIDEO).fetch_async()
+        hof_presentation_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_PRESENTATION).fetch_async()
+        hof_essay_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_ESSAY).fetch_async()
         media_future = media_query.TeamYearMediaQuery(team.key.id(), year).fetch_async()
         social_media_future = media_query.TeamSocialMediaQuery(team.key.id()).fetch_async()
-        robot_future = Robot.get_by_id_async('{}_{}'.format(team.key.id(), year))
+        robot_future = Robot.get_by_id_async("{}_{}".format(team.key.id(), year))
         team_districts_future = team_query.TeamDistrictsQuery(team.key.id()).fetch_async()
         participation_future = team_query.TeamParticipationQuery(team.key.id()).fetch_async()
+
+        hof_awards = hof_award_future.get_result()
+        hof_video = hof_video_future.get_result()
+        hof_presentation = hof_presentation_future.get_result()
+        hof_essay = hof_essay_future.get_result()
+
+        hall_of_fame = {
+            "is_hof": len(hof_awards) > 0,
+            "years": [award.year for award in hof_awards],
+            "media": {
+                "video": hof_video[0].youtube_url if len(hof_video) > 0 else None,
+                "presentation": hof_presentation[0].youtube_url if len(hof_presentation) > 0 else None,
+                "essay": hof_essay[0].external_link if len(hof_essay) > 0 else None,
+            },
+        }
 
         events_sorted, matches_by_event_key, awards_by_event_key, valid_years = TeamDetailsDataFetcher.fetch(team, year, return_valid_years=True)
         if not events_sorted:
@@ -82,13 +103,13 @@ class TeamRenderer(object):
                         team_rank = element[0]
                         break
 
-            participation.append({'event': event,
-                                  'matches': matches_organized,
-                                  'wlt': display_wlt,
-                                  'qual_avg': qual_avg,
-                                  'elim_avg': elim_avg,
-                                  'rank': team_rank,
-                                  'awards': event_awards})
+            participation.append({"event": event,
+                                  "matches": matches_organized,
+                                  "wlt": display_wlt,
+                                  "qual_avg": qual_avg,
+                                  "elim_avg": elim_avg,
+                                  "rank": team_rank,
+                                  "awards": event_awards})
 
         season_wlt = None
         offseason_wlt = None
@@ -162,19 +183,39 @@ class TeamRenderer(object):
             "district_abbrev": district_abbrev,
             "last_competed": last_competed,
             "current_year": current_year,
+            "hof": hall_of_fame
         })
 
         if short_cache:
             handler._cache_expiration = handler.SHORT_CACHE_EXPIRATION
 
-        return jinja2_engine.render('team_details.html', handler.template_values)
+        return jinja2_engine.render("team_details.html", handler.template_values)
 
     @classmethod
     def render_team_history(cls, handler, team, is_canonical):
+        hof_award_future = award_query.TeamEventTypeAwardsQuery(team.key.id(), EventType.CMP_FINALS, AwardType.CHAIRMANS).fetch_async()
+        hof_video_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_VIDEO).fetch_async()
+        hof_presentation_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_PRESENTATION).fetch_async()
+        hof_essay_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_ESSAY).fetch_async()
         award_futures = award_query.TeamAwardsQuery(team.key.id()).fetch_async()
         event_futures = event_query.TeamEventsQuery(team.key.id()).fetch_async()
         participation_future = team_query.TeamParticipationQuery(team.key.id()).fetch_async()
         social_media_future = media_query.TeamSocialMediaQuery(team.key.id()).fetch_async()
+
+        hof_awards = hof_award_future.get_result()
+        hof_video = hof_video_future.get_result()
+        hof_presentation = hof_presentation_future.get_result()
+        hof_essay = hof_essay_future.get_result()
+
+        hall_of_fame = {
+            "is_hof": len(hof_awards) > 0,
+            "years": [award.year for award in hof_awards],
+            "media": {
+                "video": hof_video[0].youtube_url if len(hof_video) > 0 else None,
+                "presentation": hof_presentation[0].youtube_url if len(hof_presentation) > 0 else None,
+                "essay": hof_essay[0].external_link if len(hof_essay) > 0 else None,
+            },
+        }
 
         awards_by_event = {}
         for award in award_futures.get_result():
@@ -214,18 +255,19 @@ class TeamRenderer(object):
         social_medias = sorted(social_media_future.get_result(), key=MediaHelper.social_media_sorter)
 
         handler.template_values.update({
-            'is_canonical': is_canonical,
-            'team': team,
-            'event_awards': event_awards,
-            'years': sorted(years),
+            "is_canonical": is_canonical,
+            "team": team,
+            "event_awards": event_awards,
+            "years": sorted(years),
             "social_medias": social_medias,
-            'current_event': current_event,
-            'matches_upcoming': matches_upcoming,
-            'last_competed': last_competed,
-            'current_year': current_year
+            "current_event": current_event,
+            "matches_upcoming": matches_upcoming,
+            "last_competed": last_competed,
+            "current_year": current_year,
+            "hof": hall_of_fame,
         })
 
         if short_cache:
             handler._cache_expiration = handler.SHORT_CACHE_EXPIRATION
 
-        return jinja2_engine.render('team_history.html', handler.template_values)
+        return jinja2_engine.render("team_history.html", handler.template_values)

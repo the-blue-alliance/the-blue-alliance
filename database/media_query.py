@@ -98,3 +98,18 @@ class EventMediasQuery(DatabaseQuery):
         event_key = ndb.Key(Event, self._query_args[0])
         medias = yield Media.query(Media.references == event_key).fetch_async()
         raise ndb.Return(medias)
+
+
+class TeamTagMediasQuery(DatabaseQuery):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = 'team_tag_medias_{}_{}'  # (team_key, media_tag_enum)
+    DICT_CONVERTER = MediaConverter
+
+    @ndb.tasklet
+    def _query_async(self):
+        team_key = ndb.Key(Team, self._query_args[0])
+        media_tag_enum = self._query_args[1]
+        medias = yield Media.query(
+            Media.references == team_key,
+            Media.media_tag_enum == media_tag_enum).fetch_async()
+        raise ndb.Return(medias)

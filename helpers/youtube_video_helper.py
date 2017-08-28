@@ -20,6 +20,10 @@ class YouTubeVideoHelper(object):
             regex2 = re.match(r".*v=([a-zA-Z0-9_-]*)", youtube_url)
             if regex2 is not None:
                 youtube_id = regex2.group(1)
+            else:
+                regex3 = re.match(r".*/embed/([a-zA-Z0-9_-]*)", youtube_url)
+                if regex3 is not None:
+                    youtube_id = regex3.group(1)
 
         # Try to parse for time
         if youtube_id is not None:
