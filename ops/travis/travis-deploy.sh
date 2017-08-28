@@ -1,6 +1,7 @@
 #! /usr/bin/env sh
 set -e
 . $(pwd)/ops/travis/should-deploy.sh
+. $(pwd)/ops/gcslock.sh
 
 # Deploy to GAE from travis CI
 # Basically an implementation of:
@@ -9,6 +10,7 @@ set -e
 KEYFILE=ops/tbatv-prod-hrd-deploy.json
 PROJECT=tbatv-prod-hrd
 VERSION=prod-1
+DEPLOY_LOCK=tbatv-prod-hrd-deploy-lock
 
 BASE='https://dl.google.com/dl/cloudsdk/channels/rapid/'
 NAME='google-cloud-sdk'
@@ -38,8 +40,15 @@ paver make
 echo "Configuring service account auth..."
 with_python27 "$GCLOUD -q auth activate-service-account --key-file $KEYFILE"
 
-echo "Deploying $PROJECT:$VERSION"
+echo "Obtaining deploy lock..."
+lock $DEPLOY_LOCK
+
+echo "Obtained Lock. Deploying $PROJECT:$VERSION"
 # need more permissiosn for cron.yaml queue.yaml index.yaml, we can come back to them
 for config in dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml; do
     with_python27 "$GCLOUD --quiet --verbosity warning --project $PROJECT app deploy $config --version $VERSION"
 done
+
+echo "Releasing deploy lock..."
+unlock $DEPLOY_LOCK
+echo "Lock released. Deploy complete."
