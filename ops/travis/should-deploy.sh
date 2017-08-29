@@ -7,12 +7,10 @@ fetch_apiv3_status() {
 }
 
 update_build_info() {
-    version_info=$(cat version_info.json)
     current_commit=$TRAVIS_COMMIT
     commit_time="$(git show -s --format=%ci HEAD)"
-    build_time=$(echo $version_info | jq '.build_time')
     deploy_time="$(date)"
-    travis_job="$(echo $version_info | jq '.build_number')"
+    travis_job="$TRAVIS_BUILD_ID"
 
     http $SET_BUILD_STATUS x-TBA-Auth-Key:$APIv3_KEY current_commit=$current_commit commit_time=$commit_time build_time=$build_time deploy_time=$deploy_time travis_job=$travis_job
 }
