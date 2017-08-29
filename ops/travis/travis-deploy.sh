@@ -41,7 +41,7 @@ echo "Configuring service account auth..."
 with_python27 "$GCLOUD -q auth activate-service-account --key-file $KEYFILE"
 
 echo "Obtaining deploy lock..."
-lock $DEPLOY_LOCK
+# lock $DEPLOY_LOCK
 
 echo "Obtained Lock. Deploying $PROJECT:$VERSION"
 # need more permissiosn for cron.yaml queue.yaml index.yaml, we can come back to them
@@ -53,5 +53,5 @@ echo "Updating build info..."
 update_build_info
 
 echo "Releasing deploy lock..."
-unlock $DEPLOY_LOCK
+# unlock $DEPLOY_LOCK
 echo "Lock released. Deploy complete."
