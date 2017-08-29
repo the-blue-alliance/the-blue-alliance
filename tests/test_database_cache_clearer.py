@@ -222,7 +222,7 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         }
         cache_keys = [q.cache_key for q in get_affected_queries.media_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 12)
+        self.assertEqual(len(cache_keys), 22)
         self.assertTrue(TeamYearMediaQuery('frc254', 2014).cache_key in cache_keys)
         self.assertTrue(TeamYearMediaQuery('frc254', 2015).cache_key in cache_keys)
         self.assertTrue(TeamSocialMediaQuery('frc254').cache_key in cache_keys)
