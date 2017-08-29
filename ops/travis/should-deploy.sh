@@ -12,7 +12,7 @@ update_build_info() {
     deploy_time="$(date)"
     travis_job="$TRAVIS_BUILD_ID"
 
-    http $SET_BUILD_STATUS x-TBA-Auth-Key:$APIv3_KEY current_commit=$current_commit commit_time=$commit_time build_time=$build_time deploy_time=$deploy_time travis_job=$travis_job
+    http $SET_BUILD_STATUS x-TBA-Auth-Key:$APIv3_KEY current_commit="$current_commit" commit_time="$commit_time" deploy_time="$deploy_time" travis_job="$travis_job"
 }
 
 check_killswitch() {
