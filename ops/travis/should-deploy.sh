@@ -3,7 +3,7 @@
 API_STATUS=https://www.thebluealliance.com/api/v3/status
 SET_BUILD_STATUS=https://www.thebluealliance.com/api/v3/_/build
 fetch_apiv3_status() {
-    http $API_STATUS X-TBA-Auth-Key:$APIv3_KEY
+    curl -s --header "X-TBA-Auth-Key: $APIv3_KEY" $API_STATUS
 }
 
 update_build_info() {

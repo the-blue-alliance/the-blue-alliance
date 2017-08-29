@@ -10,3 +10,6 @@ pytz==2016.4
 PyYAML==3.12
 pep8==1.7.0
 requests[security]
+pyOpenSSL
+ndg-httpsclient
+pyasn1
