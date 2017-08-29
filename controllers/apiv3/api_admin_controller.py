@@ -1,3 +1,6 @@
+import json
+import logging
+
 from controllers.apiv3.api_base_controller import ApiBaseController
 from models.sitevar import Sitevar
 
@@ -19,11 +22,12 @@ class ApiAdminSetBuildInfo(ApiAdminController):
     """
 
     def _render(self):
-        current_commit_sha = self.request.get('current_commit', '')
-        commit_time = self.request.get('commit_time', '')
-        build_time = self.request.get('build_time', '')
-        deploy_time = self.request.get('deploy_time', '')
-        travis_job = self.request.get('travis_job', '')
+        data = json.loads(self.request.body)
+        current_commit_sha = data.get('current_commit', '')
+        commit_time = data.get('commit_time', '')
+        build_time = data.get('build_time', '')
+        deploy_time = data.get('deploy_time', '')
+        travis_job = data.get('travis_job', '')
 
         web_info = {
             'current_commit': current_commit_sha,
@@ -32,6 +36,8 @@ class ApiAdminSetBuildInfo(ApiAdminController):
             'deploy_time': deploy_time,
             'travis_job': travis_job,
         }
+
+        logging.info("READ: {}".format(json.dumps(web_info)))
 
         status_sitevar = Sitevar.get_or_insert('apistatus', values_json='{}')
         contents = status_sitevar.contents
