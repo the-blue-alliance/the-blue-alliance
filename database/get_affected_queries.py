@@ -7,7 +7,7 @@ from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery
 from database.event_details_query import EventDetailsQuery
 from database.match_query import MatchQuery, EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery, \
-    EventMediasQuery, TeamTagMediasQuery
+    EventMediasQuery, TeamTagMediasQuery, TeamYearTagMediasQuery
 from database.robot_query import TeamRobotsQuery
 from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
 
@@ -127,6 +127,8 @@ def media_updated(affected_refs):
         if reference_key.kind() == 'Team':
             for year in years:
                 queries_and_keys.append((TeamYearMediaQuery(reference_key.id(), year)))
+                for media_tag in media_tags:
+                    queries_and_keys.append((TeamYearTagMediasQuery(reference_key.id(), media_tag, year)))
             for media_tag in media_tags:
                 queries_and_keys.append((TeamTagMediasQuery(reference_key.id(), media_tag)))
             queries_and_keys.append((TeamSocialMediaQuery(reference_key.id())))

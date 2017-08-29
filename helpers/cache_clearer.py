@@ -8,7 +8,7 @@ from controllers.api.api_match_controller import ApiMatchController
 from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController, ApiTeamEventAwardsController, \
                                                 ApiTeamEventMatchesController, ApiTeamMediaController, ApiTeamYearsParticipatedController, \
                                                 ApiTeamListController, ApiTeamHistoryEventsController, ApiTeamHistoryAwardsController, ApiTeamHistoryRobotsController, \
-    ApiTeamHistoryDistrictsController
+                                                ApiTeamHistoryDistrictsController
 from database import get_affected_queries
 
 from models.district import District
@@ -149,8 +149,11 @@ class CacheClearer(object):
         """
         reference_keys = affected_refs['references']
         years = affected_refs['year']
+        media_tag_enums = affected_refs['media_tag_enum']
 
-        return cls._get_media_cache_keys_and_controllers(reference_keys, years) + \
+        tags = map(lambda media_tag_enum: MediaTag.tag_url_names[media_tag_enum], media_tag_enums)
+
+        return cls._get_media_cache_keys_and_controllers(reference_keys, years, tags) + \
             cls._queries_to_cache_keys_and_controllers(get_affected_queries.media_updated(affected_refs))
 
     @classmethod
@@ -287,7 +290,7 @@ class CacheClearer(object):
         return cache_keys_and_controllers
 
     @classmethod
-    def _get_media_cache_keys_and_controllers(cls, team_keys, years):
+    def _get_media_cache_keys_and_controllers(cls, team_keys, years, tags):
         cache_keys_and_controllers = []
         for team_key in filter(None, team_keys):
             for year in filter(None, years):

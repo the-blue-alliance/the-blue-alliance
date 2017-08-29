@@ -67,8 +67,13 @@ app = webapp2.WSGIApplication([
         atc.ApiTeamYearMatchesController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/team/<team_key:>/matches/<year:([0-9]+)>/<model_type:(simple|keys)>',
         atc.ApiTeamYearMatchesController, methods=['GET', 'OPTIONS']),
+    # Team Media
     webapp2.Route(r'/api/v3/team/<team_key:>/media/<year:([0-9]+)>',
         atc.ApiTeamYearMediaController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/team/<team_key:>/media/tag/<tag>',
+        atc.ApiTeamTagMediaController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/team/<team_key:>/media/tag/<tag>/<year:[0-9]+>',
+        atc.ApiTeamTagMediaController, methods=['GET', 'OPTIONS']),
     # Team Media Suggestions
     webapp2.Route(r'/api/v3/suggest/media/team/<team_key:>/<year:([0-9]+)>',
         asgc.ApiSuggestTeamMediaController, methods=['POST', 'OPTIONS']),
