@@ -45,8 +45,8 @@ cron:
   timezone: America/Los_Angeles
 
 - description: Check for and remove unavailable team media
-  url: /tasks/enqueue/check_team_media
-  schedule: every thursday 01:00
+  url: /tasks/enqueue/check_media
+  schedule: every day 01:00
   timezone: America/Los_Angeles
 
 - description: Typeahead Calculation

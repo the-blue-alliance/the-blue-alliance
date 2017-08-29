@@ -18,7 +18,7 @@ from controllers.cron_controller import EventTeamStatusCalcEnqueue, EventTeamSta
 from controllers.cron_controller import EventShortNameCalcEnqueue, EventShortNameCalcDo
 from controllers.cron_controller import EventTeamRepairDo, EventTeamUpdate, EventTeamUpdateEnqueue
 from controllers.cron_controller import EventMatchstatsDo, EventMatchstatsEnqueue
-from controllers.cron_controller import CheckTeamMediaDo, CheckTeamMediaEnqueue
+from controllers.cron_controller import CheckMediaDo, CheckMediaEnqueue
 from controllers.cron_controller import FinalMatchesRepairDo
 from controllers.cron_controller import UpcomingNotificationDo
 from controllers.cron_controller import UpdateLiveEventsDo
@@ -43,8 +43,8 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/enqueue/fmsapi_event_alliances/(.*)', FMSAPIEventAlliancesEnqueue),
                                ('/tasks/enqueue/fmsapi_event_rankings/(.*)', FMSAPIEventRankingsEnqueue),
                                ('/tasks/enqueue/fmsapi_matches/(.*)', FMSAPIMatchesEnqueue),
-                               ('/tasks/enqueue/check_team_media', CheckTeamMediaEnqueue),
-                               ('/tasks/do/check_team_media/(.*)', CheckTeamMediaDo),
+                               ('/tasks/enqueue/check_media', CheckMediaEnqueue),
+                               ('/tasks/do/check_media/(.*)', CheckMediaDo),
                                ('/tasks/get/tba_videos/(.*)', TbaVideosGet),
                                ('/tasks/get/fmsapi_awards/(.*)', FMSAPIAwardsGet),
                                ('/tasks/get/fmsapi_event_alliances/(.*)', FMSAPIEventAlliancesGet),

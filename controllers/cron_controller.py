@@ -54,6 +54,8 @@ from models.sitevar import Sitevar
 from models.suggestion import Suggestion
 from models.team import Team
 from models.typeahead_entry import TypeaheadEntry
+from models.media import Media
+from models.sitevar import Sitevar
 
 
 class EventShortNameCalcEnqueue(webapp.RequestHandler):
@@ -489,17 +491,22 @@ class DistrictPointsCalcEnqueue(webapp.RequestHandler):
         self.response.out.write("Enqueued for: {}".format([event_key.id() for event_key in event_keys]))
 
 
-class CheckTeamMediaEnqueue(webapp.RequestHandler):
+class CheckMediaEnqueue(webapp.RequestHandler):
     """
-    Enqueues media checking for all teams
+    Enqueues media checking
     """
 
     def get(self):
-        team_keys = Team.query().fetch(None, keys_only=True)
-        for team_key in team_keys:
-            taskqueue.add(url='/tasks/do/check_team_media/{}'.format(team_key.id()), method='GET')
+        cm_sitevar = Sitevar.get_by_id('check_media')
+        check_num = cm_sitevar.contents.get('number', 2500) if cm_sitevar else 2500  # Number of checks to run per queue
+        delay = cm_sitevar.contents.get('delay', 2) if cm_sitevar else 2  # Time (in seconds) between checks
 
-        self.response.out.write("Enqueued for: {}".format([team_key.id() for team_key in team_keys]))
+        media_keys = Media.query().order(Media.checked).fetch(check_num, keys_only=True)
+        for i, media_key in enumerate(media_keys):
+            task_delay = i * delay
+            taskqueue.add(url='/tasks/do/check_media/{}'.format(media_key.id()), method='GET', countdown=task_delay)
+
+        self.response.out.write("Enqueued for {} media".format(len(media_keys)))
 
 
 class DistrictPointsCalcDo(webapp.RequestHandler):
@@ -795,25 +802,24 @@ class RemapTeamsDo(webapp.RequestHandler):
         AwardManipulator.createOrUpdate(event.awards, auto_union=False)
 
 
-class CheckTeamMediaDo(webapp.RequestHandler):
+class CheckMediaDo(webapp.RequestHandler):
     """
-    Remove unavailable team media
+    Remove unavailable media
     """
-    def get(self, team):
-        media_future = TeamMediaQuery(team).fetch_async()
-        social_media_future = TeamSocialMediaQuery(team).fetch_async()
+    def get(self, media_key):
+        media = ndb.Key(Media, media_key).get()
 
-        medias = media_future.get_result() + social_media_future.get_result()
+        if media.is_image:
+            url = media.view_image_url
+        elif media.is_social:
+            url = media.social_profile_url
+        elif media.media_type_enum == MediaType.YOUTUBE_VIDEO:
+            url = "https://www.youtube.com/oembed?url={}&format=json".format(media.youtube_url_link)
+        elif media.media_type_enum == MediaType.EXTERNAL_LINK:
+            url = media.external_link
 
-        for media in medias:
-            if media.is_image:
-                url = media.view_image_url
-            elif media.is_social:
-                url = media.social_profile_url
-            elif media.media_type_enum == MediaType.YOUTUBE_VIDEO:
-                url = "https://www.youtube.com/oembed?url={}&format=json".format(media.youtube_url_link)
-            elif media.media_type_enum == MediaType.EXTERNAL_LINK:
-                url = media.external_link
-
-            if not WebsiteHelper.exists(url):
-                media.key.delete()
+        if not WebsiteHelper.exists(url):
+            media.key.delete()
+        else:
+            media.checked = datetime.datetime.now()
+            media.put()
