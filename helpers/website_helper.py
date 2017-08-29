@@ -1,5 +1,4 @@
-import httplib2
-h = httplib2.Http(disable_ssl_certificate_validation=True)
+from google.appengine.ext import ndb
 
 
 class WebsiteHelper(object):
@@ -34,9 +33,11 @@ class WebsiteHelper(object):
         """
         Verify that a given URL exists (returns a non-404 status code)
         """
+        context = ndb.get_context()
+
         if not website_url:
             return False
 
-        resp, content = h.request(website_url, "GET")
+        result = context.urlfetch(website_url).get_result()
 
-        return int(resp.status) != 404
+        return int(result.status_code) != 404

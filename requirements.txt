@@ -5,4 +5,3 @@ numpy==1.6.1
 Paver==1.2.4
 pep8==1.7.0
 pyyaml
-httplib2==0.10.3
