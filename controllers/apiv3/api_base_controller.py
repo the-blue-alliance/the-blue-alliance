@@ -138,7 +138,6 @@ class ApiBaseController(CacheableHandler):
             logging.info("Auth owner: {}, LOGGED IN".format(self.auth_owner))
         else:
             auth = ApiAuthAccess.get_by_id(x_tba_auth_key)
-            logging.info("AUTH: {}".format(x_tba_auth_key))
             if auth and auth.is_read_key:
                 self.auth_owner = auth.owner.id()
                 self.auth_owner_key = auth.owner
