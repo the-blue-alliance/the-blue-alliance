@@ -40,10 +40,22 @@ class TestWebsiteHelper(unittest2.TestCase):
         self.assertEqual(WebsiteHelper.format_url(''), None)
 
     def test_exists(self):
-        # Exists
+        # Exists (200)
         self.assertEqual(WebsiteHelper.exists('https://www.google.com'), True)
         self.assertEqual(WebsiteHelper.exists('https://imgur.com'), True)
+        self.assertEqual(WebsiteHelper.exists('http://imgur.com'), True)
+        self.assertEqual(WebsiteHelper.exists('https://github.com/the-blue-alliance'), True)
+
+        # Exists (301/302)
+        self.assertEqual(WebsiteHelper.exists('http://google.com'), True)  # 301 -> 302 -> 200
+        self.assertEqual(WebsiteHelper.exists('http://www.google.com'), True)  # 302 -> 200
+        self.assertEqual(WebsiteHelper.exists('https://google.com'), True)  # 301 -> 200
+        self.assertEqual(WebsiteHelper.exists('http://www.imgur.com'), True)  # 301 -> 200
+        self.assertEqual(WebsiteHelper.exists('https://www.imgur.com'), True)  # 301 -> 200
+        self.assertEqual(WebsiteHelper.exists('http://github.com/the-blue-alliance'), True)  # 301 -> 200
+        self.assertEqual(WebsiteHelper.exists('http://www.github.com/the-blue-alliance'), True)  # 301 -> 301 -> 200
 
         # Missing
         self.assertEqual(WebsiteHelper.exists('https://www.google.com/gimmea404'), False)
         self.assertEqual(WebsiteHelper.exists('https://imgur.com/gimmea404'), False)
+        self.assertEqual(WebsiteHelper.exists('https://github.com/404'), False)
