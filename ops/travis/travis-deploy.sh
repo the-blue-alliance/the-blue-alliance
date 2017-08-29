@@ -49,6 +49,9 @@ for config in dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2
     with_python27 "$GCLOUD --quiet --verbosity warning --project $PROJECT app deploy $config --version $VERSION"
 done
 
+echo "Updating build info..."
+update_build_info
+
 echo "Releasing deploy lock..."
 unlock $DEPLOY_LOCK
 echo "Lock released. Deploy complete."
