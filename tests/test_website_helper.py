@@ -56,6 +56,6 @@ class TestWebsiteHelper(unittest2.TestCase):
         self.assertEqual(WebsiteHelper.exists('http://www.github.com/the-blue-alliance'), True)  # 301 -> 301 -> 200
 
         # Missing
-        self.assertEqual(WebsiteHelper.exists('https://www.google.com/gimmea404'), False)
-        self.assertEqual(WebsiteHelper.exists('https://imgur.com/gimmea404'), False)
-        self.assertEqual(WebsiteHelper.exists('https://github.com/404'), False)
+        self.assertEqual(WebsiteHelper.exists('https://www.google.com/_404'), False)
+        self.assertEqual(WebsiteHelper.exists('https://imgur.com/_404'), False)
+        self.assertEqual(WebsiteHelper.exists('https://github.com/_404'), False)
