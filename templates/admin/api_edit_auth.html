@@ -23,6 +23,10 @@
             <td><input class="form-control" type="text" name="expiration" placeholder="2017-06-30" {% if auth.expiration %}value="{{ auth.expiration|date:"Y-m-d" }}"{% endif %}/></td>
         </tr>
         <tr>
+            <td>Allow Admin Access</td>
+            <td><input type="checkbox" name="allow_admin" {% if auth.allow_admin %}checked{% endif %}></td>
+        </tr>
+        <tr>
             <td>Events</td>
             <td><input type="text" name="event_list_str" value="{{auth.event_list_str}}" /></td>
         </tr>

@@ -50,6 +50,7 @@ def track_call(api_action, api_label, auth_owner):
 
 class ApiBaseController(CacheableHandler):
     API_VERSION = 3
+    REQUIRE_ADMIN_AUTH = False
 
     def __init__(self, *args, **kw):
         super(ApiBaseController, self).__init__(*args, **kw)
@@ -141,6 +142,9 @@ class ApiBaseController(CacheableHandler):
                 self.auth_owner = auth.owner.id()
                 self.auth_owner_key = auth.owner
                 self.auth_description = auth.description
+                if self.REQUIRE_ADMIN_AUTH and not auth.allow_admin:
+                    self._errors = {"Error": "X-TBA-Auth-Key does not have required permissions"}
+                    self.abort(401)
                 logging.info("Auth owner: {}, X-TBA-Auth-Key: {}".format(self.auth_owner, x_tba_auth_key))
             else:
                 self._errors = {"Error": "X-TBA-Auth-Key is invalid. Please get an access key at http://www.thebluealliance.com/account."}
