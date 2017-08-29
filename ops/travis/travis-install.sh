@@ -17,4 +17,4 @@ wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9
 unzip -q google_appengine_1.9.40.zip -d $HOME
 rm google_appengine_1.9.40.zip
 npm install
-npm install -g gulp-cli uglify-js uglifycss less
+npm install -g gulp-cli uglify-es uglifycss less
