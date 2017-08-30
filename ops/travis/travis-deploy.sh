@@ -34,6 +34,9 @@ curl -L "${BASE}${NAME}${EXT}" | gzip -d | tar -x -C ${INSTALL}
 echo "Bootstrapping Google Cloud SDK ..."
 with_python27 "$BOOTSTRAP --usage-reporting=false --command-completion=false --path-update=false"
 
+echo "Installing gsutil..."
+gcloud components install gsutil
+
 echo "Building TBA..."
 paver make
 
@@ -53,5 +56,5 @@ done
 # update_build_info
 
 echo "Releasing deploy lock..."
- unlock $DEPLOY_LOCK
+unlock $DEPLOY_LOCK
 echo "Lock released. Deploy complete."
