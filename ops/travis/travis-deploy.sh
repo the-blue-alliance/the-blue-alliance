@@ -34,8 +34,7 @@ curl -L "${BASE}${NAME}${EXT}" | gzip -d | tar -x -C ${INSTALL}
 echo "Bootstrapping Google Cloud SDK ..."
 with_python27 "$BOOTSTRAP --usage-reporting=false --command-completion=false --path-update=false"
 
-echo "Installing gsutil..."
-gcloud components install gsutil
+PATH=$PATH:$INSTALL/$NAME/bin/
 
 echo "Building TBA..."
 paver make
