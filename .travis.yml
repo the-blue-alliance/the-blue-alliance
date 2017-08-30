@@ -5,7 +5,6 @@ addons:
   apt:
     packages:
     - jq
-    - httpie
 cache:
   pip: true
   directories:
