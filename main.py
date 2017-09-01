@@ -103,6 +103,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/apidocs/trusted', redirect_to='/apidocs/trusted/v1', name='api-trusted-documentation', strict_slash=True),
       RedirectRoute(r'/apidocs/webhooks', WebhookDocumentationHandler, 'webhook-documentation', strict_slash=True),
       RedirectRoute(r'/apiwrite', ApiWriteHandler, 'api-write', strict_slash=True),
+      RedirectRoute(r'/bigquery', redirect_to='https://bigquery.cloud.google.com/dataset/tbatv-prod-hrd:the_blue_alliance'),
       RedirectRoute(r'/contact', ContactHandler, 'contact', strict_slash=True),
       RedirectRoute(r'/event/<event_key>', EventDetail, 'event-detail', strict_slash=True),
       RedirectRoute(r'/event/<event_key>/insights', EventInsights, 'event-insights', strict_slash=True),
