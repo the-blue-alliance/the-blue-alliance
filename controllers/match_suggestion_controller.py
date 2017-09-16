@@ -44,6 +44,9 @@ class MatchSuggestionHandler(LoggedInHandler):
                 continue
             finished_matches += MatchHelper.recentMatches(event.matches, num=1)
             for i, match in enumerate(MatchHelper.upcomingMatches(event.matches, num=3)):
+                if not match.time:
+                    continue
+
                 if not event.details.predictions or match.key.id() not in event.details.predictions['match_predictions']['qual' if match.comp_level == 'qm' else 'playoff']:
                     match.prediction = defaultdict(lambda: defaultdict(float))
                     match.bluezone_score = 0
