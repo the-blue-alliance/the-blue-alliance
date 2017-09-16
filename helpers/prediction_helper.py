@@ -1,6 +1,7 @@
 from collections import defaultdict
 import copy
 import math
+import numpy as np
 import time
 
 from consts.event_type import EventType
@@ -12,16 +13,11 @@ from models.event_details import EventDetails
 from models.match import Match
 
 
-def import_numpy():
-    import numpy as np
-
-
 class ContributionCalculator(object):
     def __init__(self, event, matches, stat, default_mean, default_var):
         """
         stat: 'score' or a specific breakdown like 'auto_points' or 'boulders'
         """
-        import_numpy()
         self._event = event
         self._matches = matches
         self._stat = stat
