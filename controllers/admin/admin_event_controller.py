@@ -412,6 +412,7 @@ class AdminEventEdit(LoggedInHandler):
             website=website,
             year=int(self.request.get("year")),
             official={"true": True, "false": False}.get(self.request.get("official").lower()),
+            enable_predictions={"true": True, "false": False}.get(self.request.get("enable_predictions").lower()),
             facebook_eid=self.request.get("facebook_eid"),
             custom_hashtag=self.request.get("custom_hashtag"),
             webcast_json=self.request.get("webcast_json"),
