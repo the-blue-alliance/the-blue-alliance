@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}User Lookup{% endblock %}
+
+{% block content %}
+  <h1>Lookup a User</h1>
+  <div class="row">
+  <form class="form-inline" method="post">
+    <div class="form-group"
+    <label for="email">User Email: </label>
+    <input class="form-control" name="email" />
+    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Submit</button>
+    </div>
+  </form>
+  </div>
+{% endblock %}

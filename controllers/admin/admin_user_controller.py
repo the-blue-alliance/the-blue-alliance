@@ -29,6 +29,27 @@ class AdminUserList(LoggedInHandler):
         self.response.out.write(template.render(path, self.template_values))
 
 
+class AdminUserLookup(LoggedInHandler):
+    """
+    Lookup a single user by email
+    """
+    def get(self):
+        self._require_admin()
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/user_lookup.html')
+        self.response.out.write(template.render(path, self.template_values))
+
+    def post(self):
+        self._require_admin()
+        user_email = self.request.get('email')
+        if not user_email:
+            self.abort(404)
+        users = Account.query(Account.email == user_email).fetch()
+        if not users:
+            self.abort(404)
+        user = users[0]
+        self.redirect('/admin/user/edit/{}'.format(user.key.id()))
+
+
 class AdminUserPermissionsList(LoggedInHandler):
     """
     List all Users with Permissions.
