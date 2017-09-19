@@ -81,6 +81,11 @@ cron:
   url: /tasks/math/enqueue/predict_match_times
   schedule: every 1 minutes
 
+- description: Suggestion Queue Nag
+  url: /tasks/do/nag_suggestions
+  schedule: every day 12:00
+  timezone: America/Los_Angeles
+
 # - description: BlueZone Update
 #   url: /tasks/do/bluezone_update
 #   schedule: every 1 minutes
