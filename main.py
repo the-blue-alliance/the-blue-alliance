@@ -22,7 +22,7 @@ from controllers.gameday_controller import Gameday2Controller, GamedayHandler, G
 from controllers.insights_controller import InsightsOverview, InsightsDetail
 from controllers.main_controller import TwoChampsHandler, ContactHandler, HashtagsHandler, FIRSTHOFHandler, \
     MainKickoffHandler, MainBuildseasonHandler, MainChampsHandler, MainCompetitionseasonHandler, \
-    MainInsightsHandler, MainOffseasonHandler, OprHandler, PredictionsHandler, SearchHandler, \
+    MainInsightsHandler, MainOffseasonHandler, OprHandler, PredictionsHandler, PrivacyHandler, SearchHandler, \
     AboutHandler, ThanksHandler, handle_404, handle_500, \
     WebcastsHandler, RecordHandler, ApiWriteHandler, MatchInputHandler
 from controllers.match_controller import MatchDetail
@@ -134,6 +134,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/notifications/test/<type:[0-9]+>', TestNotificationController, 'test-notifications', strict_slash=True),
       RedirectRoute(r'/opr', OprHandler, 'opr', strict_slash=True),
       RedirectRoute(r'/predictions', PredictionsHandler, 'predictions', strict_slash=True),
+      RedirectRoute(r'/privacy', PrivacyHandler, 'privacy', strict_slash=True),
       RedirectRoute(r'/record', RecordHandler, 'record', strict_slash=True),
       RedirectRoute(r'/request/apiwrite', SuggestApiWriteController, 'request-apiwrite', strict_slash=True),
       RedirectRoute(r'/search', SearchHandler, 'search', strict_slash=True),
