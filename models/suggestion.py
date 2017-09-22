@@ -15,8 +15,16 @@ class Suggestion(ndb.Model):
     """
     MODELS = {"event", "match", "media", "social-media", "offseason-event", "api_auth_access",
               "robot", "event_media"}
-    MODEL_NAMES = {"Webcasts", "Match Videos", "Team Media", "Social Media", "Offseason Events",
-                   "API Key Requests", "CAD Models", "Event Videos"}
+    MODEL_NAMES = {
+        "event": "Webcasts",
+        "match": "Match Videos",
+        "media": "Team Media",
+        "social-media": "Social Media",
+        "offseason-event": "Offseason Events",
+        "api_auth_access": "API Key Requests",
+        "robot": "CAD Models",
+        "event_media": "Event Videos"
+    }
     # social-media is a Media with no year
     # offseason-event is for new events (opposed to 'event' for adding webcasts to existing events)
 

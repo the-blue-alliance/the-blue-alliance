@@ -682,10 +682,13 @@ class SuggestionQueueDailyNag(webapp.RequestHandler):
 
         nag_text = "There are pending suggestions!\n"
         suggestions_to_nag = False
-        for count, name in zip(counts, Suggestion.MODEL_NAMES):
+        for count, name in zip(counts, Suggestion.MODELS):
             if count > 0:
                 suggestions_to_nag = True
-                nag_text += "*{0}*: {1} pending suggestions\n".format(name, count)
+                nag_text += "*{0}*: {1} pending suggestions\n".format(
+                    Suggestion.MODEL_NAMES.get(name),
+                    count
+                )
 
         if suggestions_to_nag:
             nag_text += "_Review them on <https://www.thebluealliance.com/suggest/review|TBA>_"
