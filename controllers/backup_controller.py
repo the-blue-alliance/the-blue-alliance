@@ -5,6 +5,7 @@ import json
 import logging
 import os
 import StringIO
+import time
 
 from google.appengine.api.app_identity import app_identity
 
@@ -19,6 +20,8 @@ from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
+
+from google.cloud import bigquery
 
 from helpers.award_manipulator import AwardManipulator
 from helpers.event_manipulator import EventManipulator
@@ -103,6 +106,78 @@ class DatastoreBackupFull(webapp.RequestHandler):
         except urlfetch.Error, e:
             logging.exception('Failed to initiate export: {}'.format(e.message))
             self.abort(500)
+
+
+class BigQueryImportEnqueue(webapp.RequestHandler):
+    def get(self, backup_date):
+        backup_config_sitevar = Sitevar.get_by_id('backup_config')
+        if not backup_config_sitevar:
+            self.abort(400)
+
+        # Make sure the requested backup exists
+        backup_bucket = backup_config_sitevar.contents.get(
+            'datastore_backup_bucket',
+            'tba-prod-rawbackups'
+        )
+        try:
+            stat = cloudstorage.stat("/{}/{}".format(backup_bucket, backup_date))
+            if not stat.is_dir:
+                self.response.out.write("Backup {} in bucket {} is not a directory"
+                                        .format(backup_date, backup_bucket))
+                self.abort(404)
+        except cloudstorage.NotFoundError:
+            self.response.out.write("Unable to find backup {} in GCS bucket {}"
+                                    .format(backup_date, backup_bucket))
+            self.abort(404)
+
+        backup_entities = backup_config_sitevar.contents.get('datastore_backup_entities', [])
+        for entity in backup_entities:
+            taskqueue.add(
+                    url='/backend-tasks/bigquery/import/{}/{}'.format(backup_date, entity),
+                    method='GET')
+
+
+class BigQueryImportEntity(webapp.RequestHandler):
+    def get(self, backup_date, entity):
+        backup_config_sitevar = Sitevar.get_by_id('backup_config')
+        if not backup_config_sitevar:
+            self.abort(400)
+
+        # Make sure the requested backup exists
+        backup_bucket = backup_config_sitevar.contents.get(
+            'datastore_backup_bucket',
+            'tba-prod-rawbackups'
+        )
+
+        metadata_url = "/{}/{}/all_namespaces/kind_{}/all_namespaces_kind_{}.export_metadata"\
+            .format(backup_bucket, backup_date, entity, entity)
+        try:
+            cloudstorage.stat(metadata_url)
+        except cloudstorage.NotFoundError:
+            self.response.out.write("Entity metadata {} not found in backup".format(entity))
+            self.abort(404)
+
+        # Set the first character of the entity name to lowercase
+        table_name = entity[:1].lower() + entity[1:]
+        bigquery_dataset = backup_config_sitevar.contents.get('bigquery_dataset', '')
+
+        # This is authenticated using the default App Engine service account
+        # See https://cloud.google.com/docs/authentication/production
+        bigquery_client = bigquery.Client()
+        dataset = bigquery_client.dataset(bigquery_dataset)
+        table = dataset.table(table_name)
+
+        now = int(time.time())
+        job_name = "{}_{}_{}".format(backup_date, entity, now)
+        source_url = "gs:/{}".format(metadata_url)
+
+        job = bigquery_client.load_table_from_storage(job_name, table, source_url)
+        job.source_format = "DATASTORE_BACKUP"
+        job.writeDisposition = "WRITE_TRUNCATE"
+
+        job.begin()
+        job_url = job.self_link
+        self.response.out.write("Created BigQuery job {}".format(job_url))
 
 
 class TbaCSVBackupEventsEnqueue(webapp.RequestHandler):
