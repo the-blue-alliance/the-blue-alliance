@@ -6,6 +6,7 @@ import tba_config
 from controllers.admin.admin_cron_controller import AdminPostEventTasksDo, AdminCreateDistrictTeamsEnqueue, AdminCreateDistrictTeamsDo, \
     AdminRebuildDivisionsDo, AdminRebuildDivisionsEnqueue, AdminBackfillPlayoffTypeDo, \
     AdminBackfillPlayoffTypeEnqueue
+from controllers.backup_controller import DatastoreBackupFull
 from controllers.datafeed_controller import EventListEnqueue, EventDetailsEnqueue
 from controllers.datafeed_controller import EventListGet, EventDetailsGet, TeamDetailsGet
 
@@ -21,6 +22,9 @@ app = webapp2.WSGIApplication([('/backend-tasks/enqueue/event_list/([0-9]*)', Ev
                                ('/backend-tasks/enqueue/rebuild_divisions/([0-9]+)', AdminRebuildDivisionsEnqueue),
                                ('/backend-tasks/enqueue/backfill_playoff_type/([0-9]+)', AdminBackfillPlayoffTypeEnqueue),
                                ('/backend-tasks/do/backfill_playoff_type/([0-9]+)', AdminBackfillPlayoffTypeDo),
-                               ('/backend-tasks/do/rebuild_divisions/([0-9]+)', AdminRebuildDivisionsDo)
+                               ('/backend-tasks/do/rebuild_divisions/([0-9]+)', AdminRebuildDivisionsDo),
+
+                               # Backup Tasks
+                               ('/backend-tasks/backup/datastore', DatastoreBackupFull),
                                ],
                               debug=tba_config.DEBUG)

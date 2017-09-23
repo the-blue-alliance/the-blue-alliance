@@ -5,6 +5,9 @@ import json
 import logging
 import os
 import StringIO
+
+from google.appengine.api.app_identity import app_identity
+
 import tba_config
 
 from collections import defaultdict
@@ -27,11 +30,79 @@ from models.event import Event
 from models.event_details import EventDetails
 from models.match import Match
 from models.media import Media
+from models.sitevar import Sitevar
 from models.team import Team
 
 from datafeeds.csv_alliance_selections_parser import CSVAllianceSelectionsParser
 from datafeeds.csv_awards_parser import CSVAwardsParser
 from datafeeds.offseason_matches_parser import OffseasonMatchesParser
+
+
+class MainBackupsEnqueue(webapp.RequestHandler):
+    """
+    Handles kicking off backup jobs
+    """
+    def get(self):
+        # 1. Enqueue datastore backup
+        # 2. Enqueue csv backup
+        pass
+
+
+class DatastoreBackupFull(webapp.RequestHandler):
+    """
+    Backup a specific datastore entity to Google Cloud Storage
+    Based on: https://cloud.google.com/datastore/docs/schedule-export
+    """
+
+    def get(self):
+        backup_config_sitevar = Sitevar.get_by_id('backup_config')
+        if not backup_config_sitevar:
+            self.abort(400)
+
+        # This uses the default service account for this application
+        access_token, _ = app_identity.get_access_token(
+            'https://www.googleapis.com/auth/datastore')
+
+        app_id = app_identity.get_application_id()
+        timestamp = datetime.datetime.now().strftime('%Y-%m-%d')
+
+        backup_entities = backup_config_sitevar.contents.get('datastore_backup_entities', [])
+        backup_bucket = backup_config_sitevar.contents.get(
+            'datastore_backup_bucket',
+            'tba-prod-rawbackups'
+        )
+        output_url_prefix = "gs://{}/{}".format(backup_bucket, timestamp)
+
+        entity_filter = {
+            'kinds': backup_entities,
+        }
+        request = {
+            'project_id': app_id,
+            'output_url_prefix': output_url_prefix,
+            'entity_filter': entity_filter
+        }
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + access_token
+        }
+        url = 'https://datastore.googleapis.com/v1beta1/projects/%s:export' % app_id
+        try:
+            result = urlfetch.fetch(
+                url=url,
+                payload=json.dumps(request),
+                method=urlfetch.POST,
+                deadline=60,
+                headers=headers)
+            if result.status_code == 200:
+                logging.info(result.content)
+            elif result.status_code >= 500:
+                logging.error(result.content)
+            else:
+                logging.warning(result.content)
+            self.response.status_int = result.status_code
+        except urlfetch.Error, e:
+            logging.exception('Failed to initiate export: {}'.format(e.message))
+            self.abort(500)
 
 
 class TbaCSVBackupEventsEnqueue(webapp.RequestHandler):
