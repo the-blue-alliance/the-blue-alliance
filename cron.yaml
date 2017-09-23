@@ -86,6 +86,11 @@ cron:
   schedule: every day 12:00
   timezone: America/Los_Angeles
 
+- description: Backup Cron job
+  url: /backend-tasks/backup/enqueue
+  schedule: 1 of month 03:00
+  timezone: America/Los_Angeles
+
 # - description: BlueZone Update
 #   url: /tasks/do/bluezone_update
 #   schedule: every 1 minutes

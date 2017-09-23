@@ -46,9 +46,19 @@ class MainBackupsEnqueue(webapp.RequestHandler):
     Handles kicking off backup jobs
     """
     def get(self):
-        # 1. Enqueue datastore backup
-        # 2. Enqueue csv backup
-        pass
+        # Enqueue a datastore backup
+        taskqueue.add(
+            url='/backend-tasks/backup/datastore',
+            queue_name='backups',
+            method='GET')
+
+        # After 15 minutes, kick off a bigquery sync
+        timestamp = datetime.datetime.now().strftime('%Y-%m-%d')
+        taskqueue.add(
+            url='/backend-tasks/bigquery/import/{}'.format(timestamp),
+            queue_name='backups',
+            countdown=15 * 60,
+            method='GET')
 
 
 class DatastoreBackupFull(webapp.RequestHandler):
@@ -134,6 +144,7 @@ class BigQueryImportEnqueue(webapp.RequestHandler):
         for entity in backup_entities:
             taskqueue.add(
                     url='/backend-tasks/bigquery/import/{}/{}'.format(backup_date, entity),
+                    queue_name='backups',
                     method='GET')
 
 
