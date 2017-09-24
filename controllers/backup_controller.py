@@ -71,29 +71,80 @@ class MainBackupsEnqueue(webapp.RequestHandler):
             method='GET')
 
 
-class DatastoreBackupFull(webapp.RequestHandler):
+class BackupControllerBase(webapp.RequestHandler):
+    backup_config_sitevar = None
+
+    def get_backup_config(self):
+        if self.backup_config_sitevar:
+            return self.backup_config_sitevar
+        else:
+            self.backup_config_sitevar = Sitevar.get_by_id('backup_config')
+        if not self.backup_config_sitevar:
+            self.abort(400)
+        return self.backup_config_sitevar
+
+    def get_oauth_token(self, scope):
+        # This uses the default service account for this application
+        access_token, _ = app_identity.get_access_token(scope)
+        return access_token
+
+    def get_backup_entities(self):
+        backup_config_sitevar = self.get_backup_config()
+        return backup_config_sitevar.contents.get('datastore_backup_entities', [])
+
+    def get_backup_bucket(self):
+        backup_config_sitevar = self.get_backup_config()
+        return backup_config_sitevar.contents.get(
+            'datastore_backup_bucket',
+            'tba-prod-rawbackups'
+        )
+
+    def get_bigquery_dataset(self):
+        backup_config_sitevar = self.get_backup_config()
+        return backup_config_sitevar.contents.get('bigquery_dataset', '')
+
+    def check_backup_exists(self, backup_bucket, file_name):
+        try:
+            cloudstorage.stat("/{}/{}".format(backup_bucket, file_name))
+        except cloudstorage.NotFoundError:
+            self.response.out.write("Unable to find backup {} in GCS bucket {}"
+                                    .format(file_name, backup_bucket))
+            self.abort(404)
+
+    def fetch_url(self, url, payload=None, method=urlfetch.GET, deadline=60, headers=None):
+        try:
+            logging.info("Fetching {}".format(url))
+            result = urlfetch.fetch(
+                url=url,
+                payload=payload,
+                method=method,
+                deadline=deadline,
+                headers=headers)
+            if result.status_code == 200:
+                logging.info(result.content)
+            elif result.status_code >= 500:
+                logging.error(result.content)
+            else:
+                logging.warning(result.content)
+            return result.status_code, result.content
+        except urlfetch.Error, e:
+            logging.exception('URL fetch failed: {}'.format(e.message))
+            self.abort(500)
+
+
+class DatastoreBackupFull(BackupControllerBase):
     """
     Backup a specific datastore entity to Google Cloud Storage
     Based on: https://cloud.google.com/datastore/docs/schedule-export
     """
 
     def get(self):
-        backup_config_sitevar = Sitevar.get_by_id('backup_config')
-        if not backup_config_sitevar:
-            self.abort(400)
-
-        # This uses the default service account for this application
-        access_token, _ = app_identity.get_access_token(
-            'https://www.googleapis.com/auth/datastore')
-
+        access_token = self.get_oauth_token('https://www.googleapis.com/auth/datastore')
         app_id = app_identity.get_application_id()
         timestamp = datetime.datetime.now().strftime('%Y-%m-%d')
 
-        backup_entities = backup_config_sitevar.contents.get('datastore_backup_entities', [])
-        backup_bucket = backup_config_sitevar.contents.get(
-            'datastore_backup_bucket',
-            'tba-prod-rawbackups'
-        )
+        backup_entities = self.get_backup_entities()
+        backup_bucket = self.get_backup_bucket
         output_url_prefix = "gs://{}/{}".format(backup_bucket, timestamp)
 
         entity_filter = {
@@ -109,37 +160,18 @@ class DatastoreBackupFull(webapp.RequestHandler):
             'Authorization': 'Bearer ' + access_token
         }
         url = 'https://datastore.googleapis.com/v1beta1/projects/%s:export' % app_id
-        try:
-            result = urlfetch.fetch(
-                url=url,
-                payload=json.dumps(request),
-                method=urlfetch.POST,
-                deadline=60,
-                headers=headers)
-            if result.status_code == 200:
-                logging.info(result.content)
-            elif result.status_code >= 500:
-                logging.error(result.content)
-            else:
-                logging.warning(result.content)
-            self.response.status_int = result.status_code
-        except urlfetch.Error, e:
-            logging.exception('Failed to initiate export: {}'.format(e.message))
-            self.abort(500)
+        self.fetch_url(
+            url=url,
+            payload=json.dumps(request),
+            method=urlfetch.POST,
+            headers=headers)
 
 
-class DatastoreBackupArchive(webapp.RequestHandler):
+class DatastoreBackupArchive(BackupControllerBase):
 
     def get(self, backup_date):
-        backup_config_sitevar = Sitevar.get_by_id('backup_config')
-        if not backup_config_sitevar:
-            self.abort(400)
-
         # Make sure the requested backup exists
-        backup_bucket = backup_config_sitevar.contents.get(
-            'datastore_backup_bucket',
-            'tba-prod-rawbackups'
-        )
+        backup_bucket = self.get_backup_bucket()
         backup_dir = "/{}/{}/".format(backup_bucket, backup_date)
 
         backup_files = cloudstorage.listbucket(backup_dir)
@@ -164,7 +196,7 @@ class DatastoreBackupArchive(webapp.RequestHandler):
         self.response.out.write("Enqueued updates for {} files".format(count))
 
 
-class DatastoreBackupArchiveFile(webapp.RequestHandler):
+class DatastoreBackupArchiveFile(BackupControllerBase):
     def get_object_metadata(self, bucket_name, object_name, access_token):
         bucket_name = urllib.quote_plus(bucket_name)
         object_name = urllib.quote_plus(object_name)
@@ -174,23 +206,10 @@ class DatastoreBackupArchiveFile(webapp.RequestHandler):
         }
         url = "https://www.googleapis.com/storage/v1/b/{0}/o/{1}"\
             .format(bucket_name, object_name)
-        try:
-            logging.info("Calling {} to change storage class".format(url))
-            result = urlfetch.fetch(
-                url=url,
-                method=urlfetch.GET,
-                deadline=60,
-                headers=headers)
-            if result.status_code == 200:
-                logging.info(result.content)
-            elif result.status_code >= 500:
-                logging.error(result.content)
-            else:
-                logging.warning(result.content)
-            return json.loads(result.content)
-        except urlfetch.Error, e:
-            logging.exception('Failed to set file storage class: {}'.format(e.message))
-            self.abort(500)
+        status, content = self.fetch_url(
+            url=url,
+            headers=headers)
+        return json.loads(content) if status == 200 else {}
 
     def set_file_storage_class(self, bucket_name, object_name, storage_class, access_token):
         bucket_name = urllib.quote_plus(bucket_name)
@@ -204,24 +223,12 @@ class DatastoreBackupArchiveFile(webapp.RequestHandler):
         }
         url = "https://www.googleapis.com/storage/v1/b/{0}/o/{1}/rewriteTo/b/{0}/o/{1}"\
             .format(bucket_name, object_name)
-        try:
-            logging.info("Calling {} to change storage class".format(url))
-            result = urlfetch.fetch(
-                url=url,
-                payload=json.dumps(request),
-                method=urlfetch.POST,
-                deadline=90,
-                headers=headers)
-            if result.status_code == 200:
-                logging.info(result.content)
-            elif result.status_code >= 500:
-                logging.error(result.content)
-            else:
-                logging.warning(result.content)
-            return result.status_code
-        except urlfetch.Error, e:
-            logging.exception('Failed to set file storage class: {}'.format(e.message))
-            self.abort(500)
+        self.fetch_url(
+            url=url,
+            payload=json.dumps(request),
+            method=urlfetch.POST,
+            deadline=90,
+            headers=headers)
 
     def post(self):
         backup_bucket = self.request.get('bucket', None)
@@ -242,29 +249,12 @@ class DatastoreBackupArchiveFile(webapp.RequestHandler):
         self.set_file_storage_class(backup_bucket, path, 'coldline', access_token)
 
 
-class BigQueryImportEnqueue(webapp.RequestHandler):
+class BigQueryImportEnqueue(BackupControllerBase):
     def get(self, backup_date):
-        backup_config_sitevar = Sitevar.get_by_id('backup_config')
-        if not backup_config_sitevar:
-            self.abort(400)
-
         # Make sure the requested backup exists
-        backup_bucket = backup_config_sitevar.contents.get(
-            'datastore_backup_bucket',
-            'tba-prod-rawbackups'
-        )
-        try:
-            stat = cloudstorage.stat("/{}/{}".format(backup_bucket, backup_date))
-            if not stat.is_dir:
-                self.response.out.write("Backup {} in bucket {} is not a directory"
-                                        .format(backup_date, backup_bucket))
-                self.abort(404)
-        except cloudstorage.NotFoundError:
-            self.response.out.write("Unable to find backup {} in GCS bucket {}"
-                                    .format(backup_date, backup_bucket))
-            self.abort(404)
-
-        backup_entities = backup_config_sitevar.contents.get('datastore_backup_entities', [])
+        backup_bucket = self.get_backup_bucket()
+        backup_entities = self.get_backup_entities()
+        self.check_backup_exists(backup_bucket, backup_date)
         for entity in backup_entities:
             taskqueue.add(
                     url='/backend-tasks/bigquery/import/{}/{}'.format(backup_date, entity),
@@ -272,29 +262,19 @@ class BigQueryImportEnqueue(webapp.RequestHandler):
                     method='GET')
 
 
-class BigQueryImportEntity(webapp.RequestHandler):
+class BigQueryImportEntity(BackupControllerBase):
     def get(self, backup_date, entity):
-        backup_config_sitevar = Sitevar.get_by_id('backup_config')
-        if not backup_config_sitevar:
-            self.abort(400)
-
         # Make sure the requested backup exists
-        backup_bucket = backup_config_sitevar.contents.get(
-            'datastore_backup_bucket',
-            'tba-prod-rawbackups'
-        )
+        backup_bucket = self.get_backup_bucket()
 
-        metadata_url = "/{}/{}/all_namespaces/kind_{}/all_namespaces_kind_{}.export_metadata"\
-            .format(backup_bucket, backup_date, entity, entity)
-        try:
-            cloudstorage.stat(metadata_url)
-        except cloudstorage.NotFoundError:
-            self.response.out.write("Entity metadata {} not found in backup".format(entity))
-            self.abort(404)
+        file_name = "{0}/all_namespaces/kind_{1}/all_namespaces_kind_{1}.export_metadata"\
+            .format((backup_date, entity))
+        metadata_url = "/{}/{}".format(backup_bucket, file_name)
+        self.check_backup_exists(backup_bucket, file_name)
 
         # Set the first character of the entity name to lowercase
         table_name = entity[:1].lower() + entity[1:]
-        bigquery_dataset = backup_config_sitevar.contents.get('bigquery_dataset', '')
+        bigquery_dataset = self.get_bigquery_dataset()
 
         # This is authenticated using the default App Engine service account
         # See https://cloud.google.com/docs/authentication/production
