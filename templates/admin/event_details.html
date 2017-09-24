@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<h1>{{event.key_name}} - {{ event.name }}</h1>
+<h1 xmlns="http://www.w3.org/1999/html">{{event.key_name}} - {{ event.name }}</h1>
 
 <div class="btn-group">
     <a href="/admin/event/edit/{{event.key_name}}" class="btn btn-primary"><span class="glyphicon glyphicon-edit"></span> Edit</a>
@@ -165,6 +165,7 @@
 <div class="row">
   <h2>FMS API Tasks</h2>
   <div class="btn-group">
+    <a href="/backend-tasks/get/event_details/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Details</a>
     <a href="/tasks/get/fmsapi_matches/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Matches</a>
     <a href="/tasks/get/fmsapi_event_alliances/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Alliances</a>
     <a href="/tasks/get/fmsapi_event_rankings/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Rankings</a>
