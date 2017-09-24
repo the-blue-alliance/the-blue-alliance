@@ -39,3 +39,7 @@ queue:
 - name: run-in-order
   max_concurrent_requests: 1
   rate: 5/s
+
+- name: backups
+  max_concurrent_requests: 1
+  rate: 6/m
