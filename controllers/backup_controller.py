@@ -1,3 +1,5 @@
+import urllib
+
 import cloudstorage
 import csv
 import datetime
@@ -60,6 +62,14 @@ class MainBackupsEnqueue(webapp.RequestHandler):
             countdown=15 * 60,
             method='GET')
 
+        # After an hour, set this backup's files to COLDLINE storage, since we will rarely
+        # be accessing them ever again
+        taskqueue.add(
+            url='/backend-tasks/backup/archive/{}'.format(timestamp),
+            queue_name='backups',
+            countdown=60 * 60,
+            method='GET')
+
 
 class DatastoreBackupFull(webapp.RequestHandler):
     """
@@ -116,6 +126,120 @@ class DatastoreBackupFull(webapp.RequestHandler):
         except urlfetch.Error, e:
             logging.exception('Failed to initiate export: {}'.format(e.message))
             self.abort(500)
+
+
+class DatastoreBackupArchive(webapp.RequestHandler):
+
+    def get(self, backup_date):
+        backup_config_sitevar = Sitevar.get_by_id('backup_config')
+        if not backup_config_sitevar:
+            self.abort(400)
+
+        # Make sure the requested backup exists
+        backup_bucket = backup_config_sitevar.contents.get(
+            'datastore_backup_bucket',
+            'tba-prod-rawbackups'
+        )
+        backup_dir = "/{}/{}/".format(backup_bucket, backup_date)
+
+        backup_files = cloudstorage.listbucket(backup_dir)
+        bucket_prefix = "/{}/".format(backup_bucket)
+        count = 0
+        for bfile in backup_files:
+            if bfile.is_dir:
+                continue
+
+            count += 1
+            fname = bfile.filename
+            path = fname[len(bucket_prefix):]
+            taskqueue.add(
+                url='/backend-tasks/backup/archive/file',
+                params={
+                    'bucket': backup_bucket,
+                    'object': path,
+                },
+                queue_name='backups',
+                method='POST')
+
+        self.response.out.write("Enqueued updates for {} files".format(count))
+
+
+class DatastoreBackupArchiveFile(webapp.RequestHandler):
+    def get_object_metadata(self, bucket_name, object_name, access_token):
+        bucket_name = urllib.quote_plus(bucket_name)
+        object_name = urllib.quote_plus(object_name)
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + access_token
+        }
+        url = "https://www.googleapis.com/storage/v1/b/{0}/o/{1}"\
+            .format(bucket_name, object_name)
+        try:
+            logging.info("Calling {} to change storage class".format(url))
+            result = urlfetch.fetch(
+                url=url,
+                method=urlfetch.GET,
+                deadline=60,
+                headers=headers)
+            if result.status_code == 200:
+                logging.info(result.content)
+            elif result.status_code >= 500:
+                logging.error(result.content)
+            else:
+                logging.warning(result.content)
+            return json.loads(result.content)
+        except urlfetch.Error, e:
+            logging.exception('Failed to set file storage class: {}'.format(e.message))
+            self.abort(500)
+
+    def set_file_storage_class(self, bucket_name, object_name, storage_class, access_token):
+        bucket_name = urllib.quote_plus(bucket_name)
+        object_name = urllib.quote_plus(object_name)
+        request = {
+            'storageClass': 'coldline',
+        }
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + access_token
+        }
+        url = "https://www.googleapis.com/storage/v1/b/{0}/o/{1}/rewriteTo/b/{0}/o/{1}"\
+            .format(bucket_name, object_name)
+        try:
+            logging.info("Calling {} to change storage class".format(url))
+            result = urlfetch.fetch(
+                url=url,
+                payload=json.dumps(request),
+                method=urlfetch.POST,
+                deadline=90,
+                headers=headers)
+            if result.status_code == 200:
+                logging.info(result.content)
+            elif result.status_code >= 500:
+                logging.error(result.content)
+            else:
+                logging.warning(result.content)
+            return result.status_code
+        except urlfetch.Error, e:
+            logging.exception('Failed to set file storage class: {}'.format(e.message))
+            self.abort(500)
+
+    def post(self):
+        backup_bucket = self.request.get('bucket', None)
+        path = self.request.get('object', None)
+
+        if not backup_bucket or not path:
+            logging.warning("Bad arguments, bucket: {}, path: {}".format(backup_bucket, path))
+            self.abort(400)
+        logging.info("Updating storage class for {}/{}".format(backup_bucket, path))
+        # This uses the default service account for this application
+        access_token, _ = app_identity.get_access_token(
+            'https://www.googleapis.com/auth/devstorage.read_write')
+        metadata = self.get_object_metadata(backup_bucket, path, access_token)
+        storage_class = metadata.get('storageClass')
+        if storage_class == 'COLDLINE':
+            logging.info("File is already set to COLDLINE")
+            return
+        self.set_file_storage_class(backup_bucket, path, 'coldline', access_token)
 
 
 class BigQueryImportEnqueue(webapp.RequestHandler):

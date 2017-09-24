@@ -7,7 +7,7 @@ from controllers.admin.admin_cron_controller import AdminPostEventTasksDo, Admin
     AdminRebuildDivisionsDo, AdminRebuildDivisionsEnqueue, AdminBackfillPlayoffTypeDo, \
     AdminBackfillPlayoffTypeEnqueue
 from controllers.backup_controller import DatastoreBackupFull, BigQueryImportEnqueue, \
-    BigQueryImportEntity, MainBackupsEnqueue
+    BigQueryImportEntity, MainBackupsEnqueue, DatastoreBackupArchive, DatastoreBackupArchiveFile
 from controllers.datafeed_controller import EventListEnqueue, EventDetailsEnqueue
 from controllers.datafeed_controller import EventListGet, EventDetailsGet, TeamDetailsGet
 
@@ -26,8 +26,12 @@ app = webapp2.WSGIApplication([('/backend-tasks/enqueue/event_list/([0-9]*)', Ev
                                ('/backend-tasks/do/rebuild_divisions/([0-9]+)', AdminRebuildDivisionsDo),
 
                                # Backup Tasks
-                               ('/backend-tasks/backup/enqueue', MainBackupsEnqueue),
+                               ('/backend-tasks/backup/archive/([0-9\-]+)', DatastoreBackupArchive),
+                               webapp2.Route(r'/backend-tasks/backup/archive/file',
+                                             DatastoreBackupArchiveFile,
+                                             methods=['POST']),
                                ('/backend-tasks/backup/datastore', DatastoreBackupFull),
+                               ('/backend-tasks/backup/enqueue', MainBackupsEnqueue),
                                ('/backend-tasks/bigquery/import/([0-9\-]+)', BigQueryImportEnqueue),
                                ('/backend-tasks/bigquery/import/([0-9\-]+)/([A-Za-z]+)', BigQueryImportEntity),
                                ],

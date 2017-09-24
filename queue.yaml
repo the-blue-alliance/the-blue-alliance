@@ -42,4 +42,4 @@ queue:
 
 - name: backups
   max_concurrent_requests: 1
-  rate: 1/m
+  rate: 6/m
