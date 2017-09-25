@@ -144,7 +144,7 @@ class DatastoreBackupFull(BackupControllerBase):
         timestamp = datetime.datetime.now().strftime('%Y-%m-%d')
 
         backup_entities = self.get_backup_entities()
-        backup_bucket = self.get_backup_bucket
+        backup_bucket = self.get_backup_bucket()
         output_url_prefix = "gs://{}/{}".format(backup_bucket, timestamp)
 
         entity_filter = {
