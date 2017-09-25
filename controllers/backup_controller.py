@@ -113,7 +113,7 @@ class BackupControllerBase(webapp.RequestHandler):
 
     def fetch_url(self, url, payload=None, method=urlfetch.GET, deadline=60, headers=None):
         try:
-            logging.info("Fetching {}".format(url))
+            logging.info("Fetching {}, payload={}, headers={}".format(url, payload, headers))
             result = urlfetch.fetch(
                 url=url,
                 payload=payload,
@@ -160,11 +160,16 @@ class DatastoreBackupFull(BackupControllerBase):
             'Authorization': 'Bearer ' + access_token
         }
         url = 'https://datastore.googleapis.com/v1beta1/projects/%s:export' % app_id
-        self.fetch_url(
+        status, _ = self.fetch_url(
             url=url,
             payload=json.dumps(request),
             method=urlfetch.POST,
             headers=headers)
+
+        status_sitevar = Sitevar.get_by_id('apistatus')
+        if status == 200 and status_sitevar and 'backup' in status_sitevar.contents:
+            status_sitevar.contents['backup']['db_export'] = timestamp
+            status_sitevar.put()
 
 
 class DatastoreBackupArchive(BackupControllerBase):
