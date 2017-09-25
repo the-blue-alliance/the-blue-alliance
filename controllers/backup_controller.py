@@ -106,10 +106,12 @@ class BackupControllerBase(webapp.RequestHandler):
     def check_backup_exists(self, backup_bucket, file_name):
         try:
             cloudstorage.stat("/{}/{}".format(backup_bucket, file_name))
-        except cloudstorage.NotFoundError:
-            self.response.out.write("Unable to find backup {} in GCS bucket {}"
-                                    .format(file_name, backup_bucket))
-            self.abort(404)
+        except Exception, e:
+            logging.info("Unable to find backup {} in GCS bucket {} - {}".format(
+                file_name,
+                backup_bucket,
+                e.message))
+            self.abort(400, "Unable to check backup exists")
 
     def fetch_url(self, url, payload=None, method=urlfetch.GET, deadline=60, headers=None):
         try:
@@ -262,9 +264,9 @@ class BigQueryImportEnqueue(BackupControllerBase):
         self.check_backup_exists(backup_bucket, backup_date)
         for entity in backup_entities:
             taskqueue.add(
-                    url='/backend-tasks/bigquery/import/{}/{}'.format(backup_date, entity),
-                    queue_name='backups',
-                    method='GET')
+                url='/backend-tasks/bigquery/import/{}/{}'.format(backup_date, entity),
+                queue_name='backups',
+                method='GET')
 
 
 class BigQueryImportEntity(BackupControllerBase):
@@ -272,8 +274,9 @@ class BigQueryImportEntity(BackupControllerBase):
         # Make sure the requested backup exists
         backup_bucket = self.get_backup_bucket()
 
-        file_name = "{0}/all_namespaces/kind_{1}/all_namespaces_kind_{1}.export_metadata"\
-            .format((backup_date, entity))
+        file_name = "{0}/all_namespaces/kind_{1}/all_namespaces_kind_{1}.export_metadata".format(
+            backup_date,
+            entity)
         metadata_url = "/{}/{}".format(backup_bucket, file_name)
         self.check_backup_exists(backup_bucket, file_name)
 
