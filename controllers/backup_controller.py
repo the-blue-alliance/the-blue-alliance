@@ -261,7 +261,6 @@ class BigQueryImportEnqueue(BackupControllerBase):
         # Make sure the requested backup exists
         backup_bucket = self.get_backup_bucket()
         backup_entities = self.get_backup_entities()
-        self.check_backup_exists(backup_bucket, backup_date)
         for entity in backup_entities:
             taskqueue.add(
                 url='/backend-tasks/bigquery/import/{}/{}'.format(backup_date, entity),
