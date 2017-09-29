@@ -13,8 +13,8 @@ from template_engine import jinja2_engine
 
 
 class TeamList(CacheableHandler):
-    VALID_PAGES = [1, 2, 3, 4, 5, 6, 7]
-    CACHE_VERSION = 1
+    VALID_PAGES = [1, 2, 3, 4, 5, 6, 7, 8]
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "team_list_{}"  # (page)
 
     def __init__(self, *args, **kw):
