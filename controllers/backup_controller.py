@@ -24,6 +24,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
 from google.cloud import bigquery
+from google.cloud.bigquery.job import WriteDisposition
 
 from helpers.award_manipulator import AwardManipulator
 from helpers.event_manipulator import EventManipulator
@@ -293,13 +294,29 @@ class BigQueryImportEntity(BackupControllerBase):
         job_name = "{}_{}_{}".format(backup_date, entity, now)
         source_url = "gs:/{}".format(metadata_url)
 
+        logging.info("[{}] Loading {} into {}".format(job_name, source_url, table))
         job = bigquery_client.load_table_from_storage(job_name, table, source_url)
         job.source_format = "DATASTORE_BACKUP"
-        job.writeDisposition = "WRITE_TRUNCATE"
+        job.write_disposition = WriteDisposition.WRITE_TRUNCATE
 
         job.begin()
-        job_url = job.self_link
-        self.response.out.write("Created BigQuery job {}".format(job_url))
+        logging.info("[{}] Job started at {}".format(job_name, job.started))
+
+        wait_count = 50
+        job.reload()
+        while job.state != 'DONE' and wait_count > 0:
+            logging.info("[{}] Job is {} ".format(datetime.datetime.now(), job.state))
+            time.sleep(10)
+            job.reload()
+
+        logging.info("[{}] Job ended at: {}".format(job_name, job.ended))
+        logging.info("[{}] Job ended with state: {}".format(job_name, job.state))
+        if job.errors:
+            logging.error("Job error result: {}".format(job.error_result))
+        else:
+            logging.info("[{}] Job imported {} rows to bigquery".format(job_name, job.output_rows))
+        if 'X-Appengine-Taskname' not in self.request.headers:
+            self.response.out.write("[{}] Job ended with state: {}".format(job_name, job.state))
 
 
 class TbaCSVBackupEventsEnqueue(webapp.RequestHandler):
