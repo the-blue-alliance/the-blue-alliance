@@ -4,7 +4,6 @@
 <div id="team-info" class="row hidden-xs">
   <div class="col-xs-12">
     <h2>Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h2>
-    {% if team.motto %}<h4><em>&quot;{{team.motto_without_quotes}}&quot;</em></h4>{% endif %}
     {% if district_name %}<blockquote><em>Part of the <a href="/events/{{district_abbrev}}/{{year}}">{{district_name}} District</a></em></blockquote>{% endif %}
   </div>
 </div>
