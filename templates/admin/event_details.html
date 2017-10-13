@@ -234,6 +234,18 @@
   <p>Outgoing team that was replaced: <input name="backup_out" placeholder="456"/></p>
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Backup Team</button>
 </form>
+
+<h2>Add Awards</h2>
+<p>Add awards formatted as a CSV.</p>
+<p>Format:</p>
+<div class="well">
+  award_name_str, team_number, awardee
+</div>
+<form action="/admin/award/add/{{ event.key_name }}" method="post">
+  <textarea class="form-control" name="awards_csv"></textarea><br>
+  <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add awards</button>
+</form>
+
 </div>
 </div>
 

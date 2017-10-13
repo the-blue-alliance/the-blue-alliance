@@ -15,7 +15,7 @@ from controllers.admin.admin_event_controller import AdminEventAddAllianceSelect
 from controllers.admin.admin_gameday_controller import AdminGamedayDashboard
 from controllers.admin.admin_main_controller import AdminDebugHandler, AdminMain, AdminTasksHandler
 from controllers.admin.admin_award_controller import AdminAwardDashboard, AdminAwardEdit, AdminAwardAdd, \
-    AdminAwardDelete
+    AdminAwardDelete, AdminAwardAddWithEvent
 from controllers.admin.admin_match_controller import AdminVideosAdd, AdminMatchCleanup, AdminMatchDashboard, AdminMatchDelete, AdminMatchDetail, AdminMatchAdd, AdminMatchEdit
 from controllers.admin.admin_media_controller import AdminMediaDashboard, AdminMediaDeleteReference, AdminMediaMakePreferred, AdminMediaRemovePreferred, AdminMediaAdd, \
     AdminMediaInstagramImport
@@ -63,6 +63,7 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/gameday', AdminGamedayDashboard),
                                ('/admin/awards', AdminAwardDashboard),
                                ('/admin/award/add', AdminAwardAdd),
+                               ('/admin/award/add/(.*)', AdminAwardAddWithEvent),
                                ('/admin/award/edit/(.*)', AdminAwardEdit),
                                ('/admin/award/delete', AdminAwardDelete),
                                ('/admin/matches', AdminMatchDashboard),

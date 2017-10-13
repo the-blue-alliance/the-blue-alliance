@@ -46,6 +46,27 @@ class AdminAwardDelete(LoggedInHandler):
         self.redirect('/admin/awards')
 
 
+class AdminAwardAddWithEvent(LoggedInHandler):
+    """
+    Add awards from csv, all with a single event
+    """
+    def post(self, event_key):
+        self._require_admin()
+        event = Event.get_by_id(event_key)
+        if not event:
+            self.abort(404)
+        awards_csv = self.request.get('awards_csv')
+        csv_lines = awards_csv.split('\n')
+        pre = map(lambda award: "{},{},{}".format(event.year, event.event_short, award), csv_lines)
+        updated_lines = '\n'.join(pre)
+        new_awards = AdminAwardAdd.add_awards_from_csv(updated_lines)
+        self.template_values = {
+            'awards': new_awards,
+        }
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/awards_add.html')
+        self.response.out.write(template.render(path, self.template_values))
+
+
 class AdminAwardAdd(LoggedInHandler):
     """
     Add Award from CSV.
@@ -53,7 +74,16 @@ class AdminAwardAdd(LoggedInHandler):
     def post(self):
         self._require_admin()
         awards_csv = self.request.get('awards_csv')
+        new_awards = AdminAwardAdd.add_awards_from_csv(awards_csv)
 
+        self.template_values = {
+            'awards': new_awards,
+        }
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/awards_add.html')
+        self.response.out.write(template.render(path, self.template_values))
+
+    @classmethod
+    def add_awards_from_csv(cls, awards_csv):
         events = {}  # for reducing datastore fetches of events and teams
         awards = []
         for award in CSVAwardsParser.parse(awards_csv):
@@ -81,12 +111,7 @@ class AdminAwardAdd(LoggedInHandler):
         new_awards = AwardManipulator.createOrUpdate(awards)
         if type(new_awards) != list:
             new_awards = [new_awards]
-
-        self.template_values = {
-            'awards': new_awards,
-        }
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/awards_add.html')
-        self.response.out.write(template.render(path, self.template_values))
+        return new_awards
 
 
 class AdminAwardEdit(LoggedInHandler):
