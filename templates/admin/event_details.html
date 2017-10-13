@@ -235,6 +235,20 @@
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Backup Team</button>
 </form>
 
+<h2>Add Matches</h2>
+<p>Add matches formatted as CSV.</p>
+<p class="text-error">Warning! Will overwrite any existing matches with the same key!</p>
+<p>Example:</p>
+<div class="well">
+  <p>qm1, 342, 401, 296, 1592, 71, 335, 17, 41</p>
+  <p>f1m1, 245, 217, 766, 191, 179, 494, 65, 28</p>
+</div>
+<form action="/admin/match/add" method="post">
+  <input name="event_key" type="hidden" value="{{ event.key_name }}"><br>
+  <textarea class="form-control" name="matches_csv"></textarea><br>
+  <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Matches</button>
+</form>
+
 <h2>Add Awards</h2>
 <p>Add awards formatted as a CSV.</p>
 <p>Format:</p>
