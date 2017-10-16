@@ -101,7 +101,7 @@ class PlayoffType(object):
         elif playoff_type == cls.BO5_FINALS:
             return 1, match_number
         else:
-            if playoff_type == cls.BRACKET_4_TEAM and match_number <= 12:
+            if playoff_type == cls.BRACKET_4_TEAM and comp_level != 'qm' and match_number <= 12:
                 match_number += 12
             if comp_level in {'ef', 'qf', 'sf', 'f'}:
                 return cls.BRACKET_OCTO_ELIM_MAPPING[match_number] if playoff_type == cls.BRACKET_16_TEAM \
