@@ -21,7 +21,8 @@ case "$1" in
         ;;
     "PYBUILD")
         echo "Building all python files"
-        python -m compileall .
+        # python -m compileall .
+        echo "Skipping this because it's clowny"
         ;;
     "JSUNIT")
         echo "Running javascript tests"
