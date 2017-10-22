@@ -21,7 +21,7 @@ case "$1" in
         ;;
     "PYBUILD")
         echo "Building all python files"
-        python -m compileall -f -x ".*/(node_modules|lib|subtrees)/.*" .
+        python -m compileall -f -q -x ".*/(node_modules|lib|subtrees)/.*" .
         ;;
     "JSUNIT")
         echo "Running javascript tests"
