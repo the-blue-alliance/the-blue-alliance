@@ -100,6 +100,10 @@ class MatchTimePredictionHelper(object):
             to_log += "[TIME PREDICTIONS] Next Match: {}, Schedule: {}, Last Predicted: {}\n"\
                 .format(next_match.key_name, cls.as_local(next_match.time, timezone), cls.as_local(next_match.predicted_time, timezone))
 
+        if not last_match.actual_time:
+            # We can't do this without knowing when matches actually end
+            return
+
         if len(played_matches) >= 2:
             two_ago = played_matches[-2]
             cycle = last_match.actual_time - two_ago.actual_time
