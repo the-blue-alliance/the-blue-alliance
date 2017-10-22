@@ -10,7 +10,9 @@ Vagrant.configure("2") do |config|
     group: "root",
     rsync__rsync_path: "rsync",
     rsync__exclude: [
-      ".git/"
+      ".git/",
+      "node_modules/",
+      "lib",
     ],
     rsync__auto: true
 
