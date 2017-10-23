@@ -53,7 +53,7 @@ class SearchHelper(object):
 
     @classmethod
     def remove_team_location_index(cls, team):
-        search.Index(name=TEAM_LOCATION_INDEX).delete(team.key.id())
+        search.Index(name=cls.TEAM_LOCATION_INDEX).delete(team.key.id())
 
     @classmethod
     def update_team_awards_index(cls, team):
