@@ -34,3 +34,7 @@ class TestWebsiteHelper(unittest2.TestCase):
         self.assertEqual(WebsiteHelper.format_url(u'http://websit\xe9.com'), None)
         self.assertEqual(WebsiteHelper.format_url(u'https://websit\xe9.com'), None)
         self.assertEqual(WebsiteHelper.format_url('ftp://website.com'), None)
+
+        # Null URLs
+        self.assertEqual(WebsiteHelper.format_url(None), None)
+        self.assertEqual(WebsiteHelper.format_url(''), None)
