@@ -28,3 +28,9 @@ class TestWebsiteHelper(unittest2.TestCase):
         self.assertEqual(WebsiteHelper.format_url('https://website.com/path/subpath'), 'https://website.com/path/subpath')
         self.assertEqual(WebsiteHelper.format_url('https://subdomain.website.com'), 'https://subdomain.website.com')
         self.assertEqual(WebsiteHelper.format_url('https://subdomain.website.com/path'), 'https://subdomain.website.com/path')
+
+        # Invalid URLs
+        self.assertEqual(WebsiteHelper.format_url(u'websit\xe9.com'), None)
+        self.assertEqual(WebsiteHelper.format_url(u'http://websit\xe9.com'), None)
+        self.assertEqual(WebsiteHelper.format_url(u'https://websit\xe9.com'), None)
+        self.assertEqual(WebsiteHelper.format_url('ftp://website.com'), None)

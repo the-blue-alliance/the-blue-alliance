@@ -12,9 +12,15 @@ class WebsiteHelper(object):
         formatted_url = None
 
         website_url = website_url.strip()
-        if not website_url.startswith('http://') and not website_url.startswith('https://') and not website_url.startswith('ftp://'):
+
+        # Ensure all ASCII
+        if not all(ord(c) < 128 for c in website_url):
+            return None
+
+        url_parts = website_url.split('://')
+        if len(url_parts) == 1:
             formatted_url = 'http://{}'.format(website_url)
-        else:
+        elif url_parts[0] in {'http', 'https'}:
             formatted_url = website_url
 
         return formatted_url
