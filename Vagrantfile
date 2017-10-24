@@ -13,6 +13,7 @@ Vagrant.configure("2") do |config|
       ".git/",
       "node_modules/",
       "lib",
+      "static/compiled/",
     ],
     rsync__auto: true
 
