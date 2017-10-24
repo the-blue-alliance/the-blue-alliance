@@ -93,10 +93,14 @@ def make():
     less()
     jinja2()
 
-    git_branch_name = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
-    git_last_commit = subprocess.check_output(["git", "log", "-1"])
     build_time = time.ctime()
     travis_job = os.environ.get('TRAVIS_BUILD_ID', '')
+    try:
+        git_branch_name = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
+        git_last_commit = subprocess.check_output(["git", "log", "-1"])
+    except Exception:
+        git_branch_name = 'dev'
+        git_last_commit = 'dev'
     data = {"git_branch_name": git_branch_name,
             "git_last_commit": git_last_commit,
             "build_time": build_time,
@@ -167,6 +171,11 @@ def bootstrap(options):
     args = ["python", "bootstrap.py", "--url", url, key]
     print "Running {}".format(subprocess.list2cmdline(args))
     subprocess.call(args)
+
+
+@task
+def devserver():
+    sh("dev_appserver.py --skip_sdk_update_check=true --host=0.0.0.0 dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml")
 
 
 def test_function(args):
