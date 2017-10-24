@@ -20,7 +20,7 @@ from controllers.api.api_status_controller import ApiStatusController
 from controllers.api.api_trusted_controller import ApiTrustedEventAllianceSelectionsUpdate, ApiTrustedEventAwardsUpdate, \
                                                    ApiTrustedEventMatchesUpdate, ApiTrustedEventMatchesDelete, ApiTrustedEventMatchesDeleteAll, ApiTrustedEventRankingsUpdate, \
                                                    ApiTrustedEventTeamListUpdate, ApiTrustedAddMatchYoutubeVideo, \
-    ApiTrustedAddEventMedia
+                                                   ApiTrustedAddEventMedia, ApiTrustedUpdateEventInfo
 
 # Ensure that APIv2 routes include OPTIONS method for CORS preflight compatibility
 # https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests
@@ -135,5 +135,8 @@ app = webapp2.WSGIApplication([webapp2.Route(r'/api/v1/<:.*>',
                                              methods=['POST', 'OPTIONS']),
                                webapp2.Route(r'/api/trusted/v1/event/<event_key:>/media/add',
                                              ApiTrustedAddEventMedia,
-                                             methods=['POST', 'OPTIONS'])
+                                             methods=['POST', 'OPTIONS']),
+                               webapp2.Route(r'/api/trusted/v1/event/<event_key:>/info/update',
+                                             ApiTrustedUpdateEventInfo,
+                                             methods=['POST', 'OPTIONS']),
                                ], debug=tba_config.DEBUG)

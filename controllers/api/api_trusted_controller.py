@@ -18,10 +18,13 @@ from helpers.award_manipulator import AwardManipulator
 from helpers.event_manipulator import EventManipulator
 from helpers.event_details_manipulator import EventDetailsManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
+from helpers.event.event_webcast_adder import EventWebcastAdder
 from helpers.match_helper import MatchHelper
 from helpers.match_manipulator import MatchManipulator
 from helpers.media_manipulator import MediaManipulator
+from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
 from helpers.rankings_helper import RankingsHelper
+from helpers.webcast_helper import WebcastParser
 
 from models.award import Award
 from models.event import Event
@@ -291,3 +294,69 @@ class ApiTrustedAddEventMedia(ApiTrustedBaseController):
             media_to_put.append(media)
 
         MediaManipulator.createOrUpdate(media_to_put)
+
+
+class ApiTrustedUpdateEventInfo(ApiTrustedBaseController):
+    """
+    Allow configuring fields for an event
+    """
+
+    REQUIRED_AUTH_TYPES = {AuthType.EVENT_INFO}
+
+    ALLOWED_EVENT_PARAMS = {
+        "first_code",
+        "official",
+        "playoff_type",
+        "webcasts",  # this is a list of stream URLs, we'll mutate it ourselves
+    }
+
+    def _process_request(self, request, event_key):
+        try:
+            event_info = json.loads(request.body)
+        except Exception:
+            self._errors = json.dumps({"Error": "Invalid json. Check input."})
+            self.abort(400)
+
+        if not isinstance(event_info, dict) or not event_info:
+            self._errors = json.dumps({"Error": "Invalid json. Check input."})
+            self.abort(400)
+
+        event = Event.get_by_id(event_key)
+        if not event:
+            self._errors = json.dumps(
+                {"Error": "Event {} not found".format(event_key)}
+            )
+            self.abort(404)
+
+        for field, value in event_info.iteritems():
+            if field not in self.ALLOWED_EVENT_PARAMS:
+                continue
+
+            if field == "webcasts":
+                # Do special processing here because webcasts are janky
+                if not isinstance(value, list):
+                    self._errors = json.dumps(
+                        {"Error": "Invalid json. Check input"}
+                    )
+                    self.abort(400)
+                webcast_list = [
+                    WebcastParser.webcast_dict_from_url(url) for url in value
+                ]
+                EventWebcastAdder.add_webcast(
+                    event,
+                    webcast_list,
+                    False,  # Don't createOrUpdate yet
+                )
+            else:
+                try:
+                    setattr(event, field, value)
+                except Exception, e:
+                    self._errors({
+                        "Error": "Unable to set event field",
+                        "Message": str(e)
+                    })
+                    self.abort(400)
+
+        EventManipulator.createOrUpdate(event)
+        if "webcast" in event_info:
+            MemcacheWebcastFlusher.flushEvent(event.key_name)
