@@ -29,6 +29,7 @@
   <ul class="nav nav-tabs nav-justified">
     <li class="active"><a href="#info" data-toggle="tab">Info</a></li>
     <li><a href="#tasks" data-toggle="tab">Tasks</a></li>
+    <li><a href="#apikeys" data-toggle="tab">API</a></li>
     <li><a href="#webcasts" data-toggle="tab">Webcasts</a></li>
     <li><a href="#rankings" data-toggle="tab">Rankings</a></li>
     <li><a href="#alliances" data-toggle="tab">Alliances</a></li>
@@ -261,6 +262,16 @@
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add awards</button>
 </form>
 
+</div>
+</div>
+
+<div class="tab-pane" id="apikeys">
+<div class="row">
+<h2>API Keys</h2>
+<p>Issue a key <a href="/admin/api_auth/add">here</a></p>
+
+<p>Currently Issued Keys</p>
+{% include "partials/api_write_table.html" %}
 </div>
 </div>
 

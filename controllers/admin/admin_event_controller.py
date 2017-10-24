@@ -23,6 +23,7 @@ from helpers.team_manipulator import TeamManipulator
 from helpers.match_manipulator import MatchManipulator
 from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
 from helpers.website_helper import WebsiteHelper
+from models.api_auth_access import ApiAuthAccess
 from models.district import District
 from models.event import Event
 from models.event_details import EventDetails
@@ -337,6 +338,7 @@ class AdminEventDetail(LoggedInHandler):
             self.abort(404)
         event.prepAwardsMatchesTeams()
 
+        api_keys = ApiAuthAccess.query(ApiAuthAccess.event_list == ndb.Key(Event, event_key)).fetch()
         event_medias = Media.query(Media.references == event.key).fetch(500)
 
         self.template_values.update({
@@ -345,6 +347,7 @@ class AdminEventDetail(LoggedInHandler):
             "cache_key": event_controller.EventDetail('2016nyny').cache_key.format(event.key_name),
             "flushed": self.request.get("flushed"),
             "playoff_types": PlayoffType.type_names,
+            "write_auths": api_keys,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_details.html')

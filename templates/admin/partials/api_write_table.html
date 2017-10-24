@@ -1,0 +1,36 @@
+<table class="table table-striped">
+  <tr>
+    <th>Description</th>
+    <th>User</th>
+    <th>Expiration</th>
+    <th>ID</th>
+    <th>Secret</th>
+    <th>Events</th>
+    <th>Event Teams</th>
+    <th>Event Matches</th>
+    <th>Event Rankings</th>
+    <th>Event Alliances</th>
+    <th>Event Awards</th>
+    <th>Match Video</th>
+  </tr>
+  {% for auth in write_auths %}
+  <tr>
+    <td><a href="/admin/api_auth/edit/{{auth.key.id}}">{{ auth.description }}</a></td>
+    <td>{% if auth.owner %}<a href="/admin/user/{{ auth.owner.id }}">{{ auth.owner.id }} {% endif %}</a></td>
+    <td>{% if auth.expiration %} {{ auth.expiration }} {% endif %}</td>
+    <td>{{auth.key.id}}</td>
+    <td>{{auth.secret}}</td>
+    <td>
+      {% for event_key in auth.event_list %}
+        <a href="/admin/event/{{event_key.id}}">{{event_key.id}}</a>
+      {% endfor %}
+    </td>
+    <td>{% if auth.can_edit_event_teams %}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>
+    <td>{% if auth.can_edit_event_matches %}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>
+    <td>{% if auth.can_edit_event_rankings %}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>
+    <td>{% if auth.can_edit_event_alliances %}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>
+    <td>{% if auth.can_edit_event_awards %}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>
+    <td>{% if auth.can_edit_match_video %}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>
+  </tr>
+  {% endfor %}
+</table>

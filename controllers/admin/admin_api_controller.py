@@ -82,7 +82,7 @@ class AdminApiAuthEdit(LoggedInHandler):
 
         auth = ApiAuthAccess.get_by_id(auth_id)
 
-        auth_types_enum = [AuthType.READ_API] if AuthType.READ_API in auth.auth_types_enum else []
+        auth_types_enum = [AuthType.READ_API] if auth and AuthType.READ_API in auth.auth_types_enum else []
         if self.request.get('allow_edit_teams'):
             auth_types_enum.append(AuthType.EVENT_TEAMS)
         if self.request.get('allow_edit_matches'):
