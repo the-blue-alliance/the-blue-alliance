@@ -12,4 +12,7 @@ pip install --upgrade -r travis_requirements.txt -t lib
 paver install_libs
 npm install
 
+# Put in a dummy keys so that paver make works
+mv static/javascript/tba_js/tba_keys_template.js static/javascript/tba_js/tba_keys.js
+
 paver make
