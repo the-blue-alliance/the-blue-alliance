@@ -7,7 +7,6 @@ import random
 import string
 import sys
 import time
-import django.conf.global_settings
 import logging
 
 # Install the Python unittest2 package before you run this script.
@@ -53,6 +52,7 @@ def main(sdk_path, test_pattern):
     os.environ['IS_TBA_TEST'] = "true"
 
     # Fix django template loaders being messed up
+    import django.conf.global_settings
     django.conf.global_settings.SECRET_KEY = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django.conf.global_settings')
 

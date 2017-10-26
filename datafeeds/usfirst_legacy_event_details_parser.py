@@ -2,7 +2,7 @@ import datetime
 import logging
 import re
 
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase
 from helpers.event_helper import EventHelper
@@ -19,8 +19,7 @@ class UsfirstLegacyEventDetailsParser(ParserBase):
         event_locality_region_re = r'(.*?), ([^ ]*)'
 
         result = dict()
-        soup = BeautifulSoup(html,
-                convertEntities=BeautifulSoup.HTML_ENTITIES)
+        soup = BeautifulSoup(html)
 
         for tr in soup.findAll('tr'):
             tds = tr.findAll('td')

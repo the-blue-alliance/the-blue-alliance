@@ -262,18 +262,16 @@ class MediaParser(object):
         returns the url of the image in the thread
         ex: http://www.chiefdelphi.com/media/img/3f5/3f5db241521ae5f2636ff8460f277997_l.jpg
         """
-        from BeautifulSoup import BeautifulSoup
+        from bs4 import BeautifulSoup
         html = html.decode("utf-8", "replace")
 
         # parse html for the image url
-        soup = BeautifulSoup(html,
-                             convertEntities=BeautifulSoup.HTML_ENTITIES)
+        soup = BeautifulSoup(html)
 
         # 2014-07-15: CD doesn't properly escape the photo title, which breaks the find() for cdmLargePic element below
         # Fix by removing all instances of the photo title from the HTML
         photo_title = soup.find('div', {'id': 'cdm_single_photo_title'}).text
-        cleaned_soup = BeautifulSoup(html.replace(photo_title, ''),
-                                     convertEntities=BeautifulSoup.HTML_ENTITIES)
+        cleaned_soup = BeautifulSoup(html.replace(photo_title, ''))
 
         element = cleaned_soup.find('a', {'target': 'cdmLargePic'})
         if element is not None:

@@ -4,7 +4,7 @@ import re
 # for db.link
 from google.appengine.ext import db
 
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase
 
@@ -29,8 +29,7 @@ class UsfirstTeamDetailsParser(ParserBase):
         team_address_re = r'(.*?), ([^ ]*) *.* (.*)'
 
         team = dict()
-        soup = BeautifulSoup(html,
-                             convertEntities=BeautifulSoup.HTML_ENTITIES)
+        soup = BeautifulSoup(html)
 
         page_title = soup.find('h1', {'id': 'thepagetitle'}).text
         try:

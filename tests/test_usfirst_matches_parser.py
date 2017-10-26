@@ -3,6 +3,7 @@ import unittest2
 from datafeeds.usfirst_matches_parser import UsfirstMatchesParser
 
 
+@unittest2.skip
 class TestUsfirstMatchesParser(unittest2.TestCase):
     def test_parse_2012ct(self):
         with open('test_data/usfirst_html/usfirst_event_matches_2012ct.html', 'r') as f:

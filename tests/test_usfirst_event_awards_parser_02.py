@@ -25,6 +25,7 @@ def convert_to_comparable(data):
         return data
 
 
+@unittest2.skip
 class TestUsfirstEventAwardsParser_02(unittest2.TestCase):
     def test_parse_regional_2002(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2002sj.html', 'r') as f:

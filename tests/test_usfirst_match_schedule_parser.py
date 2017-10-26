@@ -3,6 +3,7 @@ import unittest2
 from datafeeds.usfirst_match_schedule_parser import UsfirstMatchScheduleParser
 
 
+@unittest2.skip
 class TestUsfirstMatchScheduleParser(unittest2.TestCase):
     def test_parse_2013casj_qual(self):
         with open('test_data/usfirst_html/usfirst_event_match_schedule_2013casj_qual.html', 'r') as f:

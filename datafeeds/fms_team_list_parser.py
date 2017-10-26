@@ -1,6 +1,6 @@
 import logging
 
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase
 
@@ -19,8 +19,7 @@ class FmsTeamListParser(ParserBase):
         Return a list of dictionaries of team data.
         """
         teams = list()
-        soup = BeautifulSoup(html,
-                             convertEntities=BeautifulSoup.HTML_ENTITIES)
+        soup = BeautifulSoup(html)
 
         for title in soup.findAll('title'):
             if "FRC Team/Event List" not in title.string:

@@ -4,7 +4,7 @@ import re
 # for db.link
 from google.appengine.ext import db
 
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase
 
@@ -20,8 +20,7 @@ class UsfirstLegacyTeamDetailsParser(ParserBase):
         information. Return a dictionary.
         """
         team = dict()
-        soup = BeautifulSoup(html,
-                convertEntities=BeautifulSoup.HTML_ENTITIES)
+        soup = BeautifulSoup(html)
 
         if soup.find(text='No team found.') is not None:
             logging.error('FIRST lacks team.')
@@ -39,7 +38,7 @@ class UsfirstLegacyTeamDetailsParser(ParserBase):
                     #TODO: Filter out &nbsp;'s and stuff -greg 5/21/2010
                     team["address"] = unicode(tds[1].string)
                 if field == "Rookie Season":
-                   team["rookie_year"] = int(tds[1].string)
+                    team["rookie_year"] = int(tds[1].string)
                 if field == "Team Nickname":
                     team["nickname"] = unicode(tds[1].string)
                 if field == "Team Website":

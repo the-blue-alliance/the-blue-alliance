@@ -2,7 +2,7 @@ import json
 import logging
 import re
 
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 from consts.award_type import AwardType
 from datafeeds.parser_base import ParserBase
@@ -29,7 +29,7 @@ class UsfirstEventAwardsParser(ParserBase):
         Parse the awards from USFIRST.
         """
         html = html.decode('utf-8', 'ignore')  # Clean html before feeding itno BeautifulSoup
-        soup = BeautifulSoup(html, convertEntities=BeautifulSoup.HTML_ENTITIES)
+        soup = BeautifulSoup(html)
         table = soup.findAll('table')[2]
 
         awards_by_type = {}

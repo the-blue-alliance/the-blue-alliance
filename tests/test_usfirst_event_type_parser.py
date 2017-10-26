@@ -4,6 +4,7 @@ from consts.event_type import EventType
 from helpers.event_helper import EventHelper
 
 
+@unittest2.skip
 class TestUsfirstEventTypeParser(unittest2.TestCase):
     def test_parse(self):
         self.assertEqual(EventHelper.parseEventType("Regional"), EventType.REGIONAL)

@@ -2,7 +2,7 @@ import json
 import logging
 import re
 
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 from consts.award_type import AwardType
 from datafeeds.parser_base import ParserBase
@@ -20,7 +20,7 @@ class UsfirstEventAwardsParser_05_06(ParserBase):
         Parse the awards from USFIRST.
         """
         html = html.decode('utf-8', 'ignore')  # Clean html before feeding itno BeautifulSoup
-        soup = BeautifulSoup(html, convertEntities=BeautifulSoup.HTML_ENTITIES)
+        soup = BeautifulSoup(html)
 
         # Bad formatting on some pages makes this necessary
         trs1 = soup.findAll('tr', {'style': 'background-color:#D2D2FF;'})

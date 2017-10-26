@@ -1,6 +1,6 @@
 import re
 
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase
 
@@ -14,7 +14,7 @@ class UsfirstPre2003TeamEventsParser(ParserBase):
         """
         team_event_re = r'/whats-going-on/event/([0-9]+)'
 
-        soup = BeautifulSoup(html, convertEntities=BeautifulSoup.HTML_ENTITIES)
+        soup = BeautifulSoup(html)
 
         first_eids = []
         history_table = soup.find('div', {'class': 'team-history-wrapper'}).findAll('table')[0]

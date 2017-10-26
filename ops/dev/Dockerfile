@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y \
   checkinstall \
   libssl-dev \
   tmux \
+  vim \
   openssh-server
 
 # Configure ssh server

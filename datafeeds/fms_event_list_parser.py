@@ -1,7 +1,7 @@
 import datetime
 import logging
 
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase
 
@@ -24,8 +24,7 @@ class FmsEventListParser(ParserBase):
         Works for data from 2012.
         """
         events = list()
-        soup = BeautifulSoup(html,
-                             convertEntities=BeautifulSoup.HTML_ENTITIES)
+        soup = BeautifulSoup(html)
 
         for title in soup.findAll('title'):
             if "FRC Team/Event List" not in title.string:
@@ -60,8 +59,7 @@ class FmsEventListParser(ParserBase):
         Works for data from 2014.
         """
         events = list()
-        soup = BeautifulSoup(html,
-                             convertEntities=BeautifulSoup.HTML_ENTITIES)
+        soup = BeautifulSoup(html)
 
         for title in soup.findAll('title'):
             if "FRC Team/Event List" not in title.string:

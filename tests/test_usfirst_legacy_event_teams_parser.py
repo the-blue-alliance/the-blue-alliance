@@ -3,6 +3,7 @@ import unittest2
 from datafeeds.usfirst_legacy_event_teams_parser import UsfirstLegacyEventTeamsParser
 
 
+@unittest2.skip
 class TestUsfirstLegacyEventTeamsParser(unittest2.TestCase):
     def test_parse(self):
         with open('test_data/usfirst_legacy_html/usfirst_event_teams_2012ct.html', 'r') as f:

@@ -3,6 +3,7 @@ import unittest2
 from datafeeds.usfirst_alliances_parser import UsfirstAlliancesParser
 
 
+@unittest2.skip
 class TestUsfirstAlliancesParser(unittest2.TestCase):
     def test_parse_2014test(self):
         with open('test_data/usfirst_html/usfirst_event_matches_2014test.html', 'r') as f:
