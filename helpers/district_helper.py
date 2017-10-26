@@ -99,8 +99,9 @@ class DistrictHelper(object):
                     point_value = 2
 
             # Add award points to all teams who won
-            for team in award.team_list:
-                district_points['points'][team.id()]['award_points'] += point_value * POINTS_MULTIPLIER
+            if point_value:
+                for team in award.team_list:
+                    district_points['points'][team.id()]['award_points'] += point_value * POINTS_MULTIPLIER
 
         for team, point_breakdown in district_points['points'].items():
             for p in point_breakdown.values():
