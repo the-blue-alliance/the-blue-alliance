@@ -48,7 +48,8 @@ class ManipulatorBase(object):
 
         all_affected_references = []
         for model in models:
-            if getattr(model, 'dirty', False) and hasattr(model, '_affected_references'):
+            if getattr(model, 'dirty', False) and hasattr(
+                    model, '_affected_references'):
                 all_affected_references.append(model._affected_references)
 
         if all_affected_references != []:
@@ -63,7 +64,8 @@ class ManipulatorBase(object):
     def _clearCacheDeferred(cls, all_affected_references):
         to_clear = defaultdict(set)
         for affected_references in all_affected_references:
-            for cache_key, controller in cls.getCacheKeysAndControllers(affected_references):
+            for cache_key, controller in cls.getCacheKeysAndControllers(
+                    affected_references):
                 to_clear[controller].add(cache_key)
 
         for controller, cache_keys in to_clear.items():
@@ -93,19 +95,27 @@ class ManipulatorBase(object):
         """
         if hasattr(old_model, '_affected_references'):
             for attr in old_model._affected_references.keys():
-                for a in [old_model, new_model] if new_model is not None else [old_model]:
+                for a in [old_model,
+                          new_model] if new_model is not None else [old_model]:
                     val = cls.listify(getattr(a, attr))
-                    old_model._affected_references[attr] = old_model._affected_references[attr].union(val)
+                    old_model._affected_references[
+                        attr] = old_model._affected_references[attr].union(val)
 
     @classmethod
-    def createOrUpdate(self, new_models, auto_union=True, run_post_update_hook=True):
+    def createOrUpdate(self,
+                       new_models,
+                       auto_union=True,
+                       run_post_update_hook=True):
         """
         Given a model or list of models, either insert them into the database, or update
         existing models with the same key.
         Once inserted or updated, the model can be marked not dirty.
         """
-        models = self.listify(self.findOrSpawn(self.listify(new_models), auto_union=auto_union))
-        models_to_put = [model for model in models if getattr(model, "dirty", False)]
+        models = self.listify(
+            self.findOrSpawn(self.listify(new_models), auto_union=auto_union))
+        models_to_put = [
+            model for model in models if getattr(model, "dirty", False)
+        ]
         ndb.put_multi(models_to_put)
         self._clearCache(models)
         if run_post_update_hook:
@@ -123,8 +133,12 @@ class ManipulatorBase(object):
         If it does, update it and give it back. If it does not, give it back.
         """
         new_models = self.listify(new_models)
-        old_models = ndb.get_multi([model.key for model in new_models], use_cache=False)
-        new_models = [self.updateMergeBase(new_model, old_model, auto_union=auto_union) for (new_model, old_model) in zip(new_models, old_models)]
+        old_models = ndb.get_multi(
+            [model.key for model in new_models], use_cache=False)
+        new_models = [
+            self.updateMergeBase(new_model, old_model, auto_union=auto_union)
+            for (new_model, old_model) in zip(new_models, old_models)
+        ]
         return self.delistify(new_models)
 
     @classmethod
@@ -152,7 +166,11 @@ class ManipulatorBase(object):
         for model in new_models:
             model_key = model.key.id()
             if model_key in old_models_by_key:
-                merged_models.append(self.updateMergeBase(model, old_models_by_key[model_key], auto_union=auto_union))
+                merged_models.append(
+                    self.updateMergeBase(
+                        model,
+                        old_models_by_key[model_key],
+                        auto_union=auto_union))
                 untouched_old_keys.remove(model_key)
             else:
                 merged_models.append(model)
@@ -193,7 +211,8 @@ class ManipulatorBase(object):
         if models:
             post_delete_hook = getattr(cls, "postDeleteHook", None)
             if callable(post_delete_hook):
-                deferred.defer(post_delete_hook, models, _queue="post-update-hooks")
+                deferred.defer(
+                    post_delete_hook, models, _queue="post-update-hooks")
 
     @classmethod
     def runPostUpdateHook(cls, models):
@@ -203,6 +222,18 @@ class ManipulatorBase(object):
         if models:
             post_update_hook = getattr(cls, "postUpdateHook", None)
             if callable(post_update_hook):
-                updated_attrs = [model._updated_attrs if hasattr(model, '_updated_attrs') else [] for model in models]
-                is_new = [model._is_new if hasattr(model, '_is_new') else False for model in models]
-                deferred.defer(post_update_hook, models, updated_attrs, is_new, _queue="post-update-hooks")
+                updated_attrs = [
+                    model._updated_attrs
+                    if hasattr(model, '_updated_attrs') else []
+                    for model in models
+                ]
+                is_new = [
+                    model._is_new if hasattr(model, '_is_new') else False
+                    for model in models
+                ]
+                deferred.defer(
+                    post_update_hook,
+                    models,
+                    updated_attrs,
+                    is_new,
+                    _queue="post-update-hooks")

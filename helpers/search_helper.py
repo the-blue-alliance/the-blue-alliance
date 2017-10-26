@@ -21,9 +21,11 @@ class SearchHelper(object):
         if event.normalized_location and event.normalized_location.lat_lng:
             fields = [
                 search.NumberField(name='year', value=event.year),
-                search.GeoField(name='location', value=search.GeoPoint(
-                    event.normalized_location.lat_lng.lat,
-                    event.normalized_location.lat_lng.lon))
+                search.GeoField(
+                    name='location',
+                    value=search.GeoPoint(
+                        event.normalized_location.lat_lng.lat,
+                        event.normalized_location.lat_lng.lon))
             ]
             search.Index(name="eventLocation").put(
                 search.Document(doc_id=event.key.id(), fields=fields))
@@ -36,9 +38,11 @@ class SearchHelper(object):
     def update_team_location_index(cls, team):
         if team.normalized_location and team.normalized_location.lat_lng:
             partial_fields = [
-                search.GeoField(name='location', value=search.GeoPoint(
-                    team.normalized_location.lat_lng.lat,
-                    team.normalized_location.lat_lng.lon))
+                search.GeoField(
+                    name='location',
+                    value=search.GeoPoint(
+                        team.normalized_location.lat_lng.lat,
+                        team.normalized_location.lat_lng.lon))
             ]
             # Teams by year
             for year in TeamParticipationQuery(team.key.id()).fetch():
@@ -46,10 +50,12 @@ class SearchHelper(object):
                     search.NumberField(name='year', value=year)
                 ]
                 search.Index(name=cls.TEAM_LOCATION_INDEX).put(
-                    search.Document(doc_id='{}_{}'.format(team.key.id(), year), fields=fields))
+                    search.Document(
+                        doc_id='{}_{}'.format(team.key.id(), year),
+                        fields=fields))
             # Any year
             search.Index(name=cls.TEAM_LOCATION_INDEX).put(
-                    search.Document(doc_id=team.key.id(), fields=partial_fields))
+                search.Document(doc_id=team.key.id(), fields=partial_fields))
 
     @classmethod
     def remove_team_location_index(cls, team):
@@ -83,7 +89,8 @@ class SearchHelper(object):
 
         # field_counts = defaultdict(int)
         for year, events in events_by_year.items():
-            year_matches_future = TeamYearMatchesQuery(team.key.id(), year).fetch_async()
+            year_matches_future = TeamYearMatchesQuery(team.key.id(),
+                                                       year).fetch_async()
             qual_seeds = defaultdict(int)
             comp_levels = defaultdict(int)
             year_awards = set()
@@ -109,7 +116,9 @@ class SearchHelper(object):
 
             event_levels = defaultdict(set)
             for match in year_matches_future.get_result():
-                if match.comp_level in {'sf', 'f'} and match.comp_level not in event_levels[match.event.id()]:
+                if match.comp_level in {
+                        'sf', 'f'
+                } and match.comp_level not in event_levels[match.event.id()]:
                     comp_levels[match.comp_level] += 1
                 event_levels[match.event.id()].add(match.comp_level)
 
@@ -120,21 +129,27 @@ class SearchHelper(object):
                     break
 
             fields = partial_fields + [
-                search.AtomField(name='award', value=str(award)) for award in year_awards
+                search.AtomField(name='award', value=str(award))
+                for award in year_awards
             ] + [search.NumberField(name='year', value=year)]
 
             if comp_levels:
                 for level, count in comp_levels.items():
-                    fields += [search.NumberField(name='comp_level_{}'.format(level), value=count)]
+                    fields += [
+                        search.NumberField(
+                            name='comp_level_{}'.format(level), value=count)
+                    ]
 
             if qual_seeds:
                 for seed, count in qual_seeds.items():
-                    fields += [search.NumberField(name='seed_{}'.format(seed), value=count)]
+                    fields += [
+                        search.NumberField(
+                            name='seed_{}'.format(seed), value=count)
+                    ]
 
             if has_cad:
-                fields += [
-                    search.NumberField(name='has_cad', value=1)
-                ]
+                fields += [search.NumberField(name='has_cad', value=1)]
 
             search.Index(name=cls.TEAM_AWARDS_INDEX).put(
-                search.Document(doc_id='{}_{}'.format(team.key.id(), year), fields=fields))
+                search.Document(
+                    doc_id='{}_{}'.format(team.key.id(), year), fields=fields))

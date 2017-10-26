@@ -10,7 +10,8 @@ class MatchSuggestionAccepter(object):
     @classmethod
     def accept_suggestion(self, match, suggestion):
         if "youtube_videos" in suggestion.contents:
-            match = self._merge_youtube_videos(match, suggestion.contents["youtube_videos"])
+            match = self._merge_youtube_videos(
+                match, suggestion.contents["youtube_videos"])
 
         return MatchManipulator.createOrUpdate(match)
 

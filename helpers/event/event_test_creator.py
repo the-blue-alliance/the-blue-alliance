@@ -20,8 +20,7 @@ class EventTestCreator(object):
             start_date=datetime.datetime.today() + datetime.timedelta(days=8),
             year=datetime.datetime.now().year,
             venue_address="123 Fake Street, California, USA",
-            website="http://www.google.com"
-        )
+            website="http://www.google.com")
         event = EventManipulator.createOrUpdate(event)
         if not only_event:
             EventTeamTestCreator.createEventTeams(event)
@@ -41,8 +40,7 @@ class EventTestCreator(object):
             year=datetime.datetime.now().year,
             venue_address="123 Fake Street, California, USA",
             website="http://www.google.com",
-            webcast_json="""[{"type":"ustream","channel":"6540154"}]"""
-        )
+            webcast_json="""[{"type":"ustream","channel":"6540154"}]""")
         event = EventManipulator.createOrUpdate(event)
         if not only_event:
             EventTeamTestCreator.createEventTeams(event)
@@ -63,8 +61,7 @@ class EventTestCreator(object):
             start_date=datetime.datetime.today() - datetime.timedelta(days=12),
             year=datetime.datetime.now().year,
             venue_address="123 Fake Street, California, USA",
-            website="http://www.google.com"
-        )
+            website="http://www.google.com")
         event = EventManipulator.createOrUpdate(event)
         if not only_event:
             EventTeamTestCreator.createEventTeams(event)

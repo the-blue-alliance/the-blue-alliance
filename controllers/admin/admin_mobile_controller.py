@@ -17,14 +17,19 @@ class AdminMobile(LoggedInHandler):
     """
     Administrate connected mobile clients
     """
+
     def get(self):
         self._require_admin()
 
         all_clients = MobileClient.query()
-        android = all_clients.filter(MobileClient.client_type == ClientType.OS_ANDROID).count()
-        ios = all_clients.filter(MobileClient.client_type == ClientType.OS_IOS).count()
-        web = all_clients.filter(MobileClient.client_type == ClientType.WEB).count()
-        webhook = all_clients.filter(MobileClient.client_type == ClientType.WEBHOOK).count()
+        android = all_clients.filter(
+            MobileClient.client_type == ClientType.OS_ANDROID).count()
+        ios = all_clients.filter(
+            MobileClient.client_type == ClientType.OS_IOS).count()
+        web = all_clients.filter(
+            MobileClient.client_type == ClientType.WEB).count()
+        webhook = all_clients.filter(
+            MobileClient.client_type == ClientType.WEBHOOK).count()
 
         var = Sitevar.get_by_id('notifications.enable')
         if var is None or not var.values_json == "true":
@@ -33,16 +38,25 @@ class AdminMobile(LoggedInHandler):
             push_enabled = True
 
         self.template_values.update({
-            'mobile_users': all_clients.count(),
-            'android_users': android,
-            'ios_users': ios,
-            'web_users': web,
-            'webhooks': webhook,
-            'broadcast_success': self.request.get('broadcast_success'),
-            'push_enabled': push_enabled,
+            'mobile_users':
+            all_clients.count(),
+            'android_users':
+            android,
+            'ios_users':
+            ios,
+            'web_users':
+            web,
+            'webhooks':
+            webhook,
+            'broadcast_success':
+            self.request.get('broadcast_success'),
+            'push_enabled':
+            push_enabled,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/mobile_dashboard.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/mobile_dashboard.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self):
@@ -66,16 +80,20 @@ class AdminMobileWebhooks(LoggedInHandler):
     """
     Details on webhooks
     """
+
     def get(self):
         self._require_admin()
 
-        webhooks = MobileClient.query(MobileClient.client_type == ClientType.WEBHOOK).fetch()
+        webhooks = MobileClient.query(
+            MobileClient.client_type == ClientType.WEBHOOK).fetch()
 
         self.template_values.update({
             'webhooks': webhooks,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/mobile_webhooks_dashboard.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/mobile_webhooks_dashboard.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
@@ -83,6 +101,7 @@ class AdminBroadcast(LoggedInHandler):
     """
     Send a push notification to all connected users
     """
+
     def get(self):
         self._require_admin()
 
@@ -103,7 +122,9 @@ class AdminBroadcast(LoggedInHandler):
             'error': error,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/send_broadcast.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/send_broadcast.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self):
@@ -129,7 +150,14 @@ class AdminBroadcast(LoggedInHandler):
 
         try:
             clients = [int(c) for c in clients]
-            deferred.defer(NotificationHelper.send_broadcast, clients, title, message, url, app_version, _queue="admin")
+            deferred.defer(
+                NotificationHelper.send_broadcast,
+                clients,
+                title,
+                message,
+                url,
+                app_version,
+                _queue="admin")
             logging.info('User {} sent broadcast'.format(user_id))
         except Exception, e:
             logging.error("Error sending broadcast: {}".format(str(e)))

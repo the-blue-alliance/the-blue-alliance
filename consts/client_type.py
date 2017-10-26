@@ -1,4 +1,3 @@
-
 class ClientType:
 
     # Operating System types for MobileClient.client_type

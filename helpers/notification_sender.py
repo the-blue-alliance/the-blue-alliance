@@ -34,29 +34,36 @@ class NotificationSender(object):
             checksum = ch.hexdigest()
 
             request = urllib2.Request(url, payload)
-            request.add_header("Content-Type", 'application/json; charset="utf-8"')
+            request.add_header("Content-Type",
+                               'application/json; charset="utf-8"')
             request.add_header("X-TBA-Checksum", checksum)
-            request.add_header("X-TBA-Version", '{}'.format(cls.WEBHOOK_VERSION))
+            request.add_header("X-TBA-Version", '{}'.format(
+                cls.WEBHOOK_VERSION))
             try:
                 resp = urllib2.urlopen(request)
             except urllib2.HTTPError, e:
                 if e.code == 400:
                     logging.warning('400, Bad request for URL: {}'.format(url))
                 elif e.code == 401:
-                    logging.warning('401, Webhook unauthorized for URL: {}'.format(url))
+                    logging.warning(
+                        '401, Webhook unauthorized for URL: {}'.format(url))
                 elif e.code == 404:
                     invalid_urls.append(url)
                 elif e.code == 500:
-                    logging.warning('500, Internal error on server sending message')
+                    logging.warning(
+                        '500, Internal error on server sending message')
                 else:
-                    logging.warning('Unexpected HTTPError: ' + str(e.code) + " " + e.msg + " " + e.read())
+                    logging.warning('Unexpected HTTPError: ' + str(e.code) +
+                                    " " + e.msg + " " + e.read())
             except urllib2.URLError, e:
                 invalid_urls.append(url)
-                logging.warning('URLError: ' + str(e.code) + " " + e.msg + " " + e.read())
+                logging.warning('URLError: ' + str(e.code) + " " + e.msg + " "
+                                + e.read())
             except Exception, ex:
                 logging.warning("Other Exception: {}".format(str(ex)))
 
         if invalid_urls:
-            logging.warning("Invalid urls while sending webhook: {}".format(str(invalid_urls)))
+            logging.warning("Invalid urls while sending webhook: {}".format(
+                str(invalid_urls)))
             return False
         return True

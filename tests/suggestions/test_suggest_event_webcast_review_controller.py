@@ -22,7 +22,8 @@ from models.suggestion import Suggestion
 
 class TestSuggestEventWebcastReviewController(unittest2.TestCase):
     def setUp(self):
-        self.policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1)
+        self.policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(
+            probability=1)
         self.testbed = testbed.Testbed()
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub(consistency_policy=self.policy)
@@ -30,11 +31,18 @@ class TestSuggestEventWebcastReviewController(unittest2.TestCase):
         self.testbed.init_user_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_taskqueue_stub(_all_queues_valid=True)
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
-        app = webapp2.WSGIApplication([
-            RedirectRoute(r'/suggest/event/webcast/review', SuggestEventWebcastReviewController, 'review-webcast', strict_slash=True),
-        ], debug=True)
+        app = webapp2.WSGIApplication(
+            [
+                RedirectRoute(
+                    r'/suggest/event/webcast/review',
+                    SuggestEventWebcastReviewController,
+                    'review-webcast',
+                    strict_slash=True),
+            ],
+            debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.event = Event(
@@ -55,8 +63,7 @@ class TestSuggestEventWebcastReviewController(unittest2.TestCase):
             timezone_id="America/New_York",
             start_date=datetime(2016, 03, 24),
             webcast_json="",
-            website="http://www.firstsv.org"
-        )
+            website="http://www.firstsv.org")
         self.event.put()
 
     def tearDown(self):
@@ -70,19 +77,16 @@ class TestSuggestEventWebcastReviewController(unittest2.TestCase):
             overwrite=True)
 
         self.account = Account.get_or_insert(
-            "123",
-            email="user@example.com",
-            registered=True)
+            "123", email="user@example.com", registered=True)
 
     def givePermission(self):
         self.account.permissions.append(AccountPermissions.REVIEW_MEDIA)
         self.account.put()
 
     def createSuggestion(self):
-        status = SuggestionCreator.createEventWebcastSuggestion(self.account.key,
-                                                                'https://twitch.tv/frcgamesense',
-                                                                '',
-                                                                '2016necmp')
+        status = SuggestionCreator.createEventWebcastSuggestion(
+            self.account.key, 'https://twitch.tv/frcgamesense', '',
+            '2016necmp')
         self.assertEqual(status, 'success')
         return 'webcast_2016necmp_twitch_frcgamesense_None'
 
@@ -95,13 +99,16 @@ class TestSuggestEventWebcastReviewController(unittest2.TestCase):
         return form
 
     def test_login_redirect(self):
-        response = self.testapp.get('/suggest/event/webcast/review', status='3*')
+        response = self.testapp.get(
+            '/suggest/event/webcast/review', status='3*')
         response = response.follow(expect_errors=True)
-        self.assertTrue(response.request.path.startswith("/account/login_required"))
+        self.assertTrue(
+            response.request.path.startswith("/account/login_required"))
 
     def test_no_permissions(self):
         self.loginUser()
-        response = self.testapp.get('/suggest/event/webcast/review', status='3*')
+        response = self.testapp.get(
+            '/suggest/event/webcast/review', status='3*')
         response = response.follow(expect_errors=True)
         self.assertEqual(response.request.path, '/')
 
@@ -143,7 +150,8 @@ class TestSuggestEventWebcastReviewController(unittest2.TestCase):
         self.assertEqual(request.GET.get('success'), 'accept')
 
         # Process task queue
-        tasks = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME).get_filtered_tasks()
+        tasks = self.testbed.get_stub(
+            testbed.TASKQUEUE_SERVICE_NAME).get_filtered_tasks()
         for task in tasks:
             deferred.run(task.payload)
 
@@ -176,7 +184,8 @@ class TestSuggestEventWebcastReviewController(unittest2.TestCase):
         self.assertEqual(request.GET.get('success'), 'accept')
 
         # Process task queue
-        tasks = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME).get_filtered_tasks()
+        tasks = self.testbed.get_stub(
+            testbed.TASKQUEUE_SERVICE_NAME).get_filtered_tasks()
         for task in tasks:
             deferred.run(task.payload)
 

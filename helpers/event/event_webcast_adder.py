@@ -5,7 +5,6 @@ from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
 
 
 class EventWebcastAdder(object):
-
     @classmethod
     def add_webcast(cls, event, webcast):
         """Takes a webcast dictionary and adds it to an event"""
@@ -32,7 +31,8 @@ class EventWebcastAdder(object):
             return
 
         webcast = webcasts[index]
-        if type != webcast.get("type") or channel != webcast.get("channel") or file != webcast.get("file"):
+        if type != webcast.get("type") or channel != webcast.get(
+                "channel") or file != webcast.get("file"):
             return
 
         webcasts.pop(index)

@@ -21,14 +21,21 @@ class TestShortController(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
-        app = webapp2.WSGIApplication([
-            RedirectRoute(r"/team/<team_number:[0-9]+>", TeamCanonical, "team-canonical"),
-            RedirectRoute(r"/event/<event_key>", EventDetail, "event-detail"),
-            RedirectRoute(r"/<:(frc)?><team_number:[0-9]+>", ShortTeamHandler, "short-team-canonical"),
-            RedirectRoute(r"/<event_key:[0-9]{4}[a-z0-9]+>", ShortEventHandler, "short-event-detail"),
-        ], debug=True)
+        app = webapp2.WSGIApplication(
+            [
+                RedirectRoute(r"/team/<team_number:[0-9]+>", TeamCanonical,
+                              "team-canonical"),
+                RedirectRoute(r"/event/<event_key>", EventDetail,
+                              "event-detail"),
+                RedirectRoute(r"/<:(frc)?><team_number:[0-9]+>",
+                              ShortTeamHandler, "short-team-canonical"),
+                RedirectRoute(r"/<event_key:[0-9]{4}[a-z0-9]+>",
+                              ShortEventHandler, "short-event-detail"),
+            ],
+            debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.team1 = Team(
@@ -64,9 +71,9 @@ class TestShortController(unittest2.TestCase):
             venue_address="Some Venue, Hartford, CT, USA",
             timezone_id="America/New_York",
             start_date=datetime(2017, 03, 24),
-            webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
-            website="http://www.firstsv.org"
-        )
+            webcast_json=
+            "[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
+            website="http://www.firstsv.org")
 
         self.event2 = Event(
             id="2017mndu2",
@@ -81,12 +88,13 @@ class TestShortController(unittest2.TestCase):
             state_prov="MN",
             country="USA",
             venue="Duluth Entertainment Convention Center",
-            venue_address="Duluth Entertainment Convention Center, Duluth, MN, USA",
+            venue_address=
+            "Duluth Entertainment Convention Center, Duluth, MN, USA",
             timezone_id="America/New_York",
             start_date=datetime(2017, 03, 1),
-            webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
-            website="http://www.mnfirst.org"
-        )
+            webcast_json=
+            "[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
+            website="http://www.mnfirst.org")
 
         self.team1.put()
         self.team2.put()

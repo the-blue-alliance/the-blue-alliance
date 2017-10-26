@@ -45,12 +45,13 @@ class ApiTrustedEventAllianceSelectionsUpdate(ApiTrustedBaseController):
         event = Event.get_by_id(event_key)
 
         event_details = EventDetails(
-            id=event_key,
-            alliance_selections=alliance_selections
-        )
+            id=event_key, alliance_selections=alliance_selections)
         EventDetailsManipulator.createOrUpdate(event_details)
 
-        self.response.out.write(json.dumps({'Success': "Alliance selections successfully updated"}))
+        self.response.out.write(
+            json.dumps({
+                'Success': "Alliance selections successfully updated"
+            }))
 
 
 class ApiTrustedEventAwardsUpdate(ApiTrustedBaseController):
@@ -64,24 +65,32 @@ class ApiTrustedEventAwardsUpdate(ApiTrustedBaseController):
 
         awards = []
         for award in JSONAwardsParser.parse(request.body, event_key):
-            awards.append(Award(
-                id=Award.render_key_name(event.key_name, award['award_type_enum']),
-                name_str=award['name_str'],
-                award_type_enum=award['award_type_enum'],
-                year=event.year,
-                event=event.key,
-                event_type_enum=event.event_type_enum,
-                team_list=[ndb.Key(Team, team_key) for team_key in award['team_key_list']],
-                recipient_json_list=award['recipient_json_list']
-            ))
+            awards.append(
+                Award(
+                    id=Award.render_key_name(event.key_name,
+                                             award['award_type_enum']),
+                    name_str=award['name_str'],
+                    award_type_enum=award['award_type_enum'],
+                    year=event.year,
+                    event=event.key,
+                    event_type_enum=event.event_type_enum,
+                    team_list=[
+                        ndb.Key(Team, team_key)
+                        for team_key in award['team_key_list']
+                    ],
+                    recipient_json_list=award['recipient_json_list']))
 
         # it's easier to clear all awards and add new ones than try to find the difference
-        old_award_keys = Award.query(Award.event == event.key).fetch(None, keys_only=True)
+        old_award_keys = Award.query(Award.event == event.key).fetch(
+            None, keys_only=True)
         AwardManipulator.delete_keys(old_award_keys)
 
         AwardManipulator.createOrUpdate(awards)
 
-        self.response.out.write(json.dumps({'Success': "Awards successfully updated"}))
+        self.response.out.write(
+            json.dumps({
+                'Success': "Awards successfully updated"
+            }))
 
 
 class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
@@ -98,11 +107,10 @@ class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
         needs_time = []
         for match in JSONMatchesParser.parse(request.body, year):
             match = Match(
-                id=Match.renderKeyName(
-                    event.key.id(),
-                    match.get("comp_level", None),
-                    match.get("set_number", 0),
-                    match.get("match_number", 0)),
+                id=Match.renderKeyName(event.key.id(),
+                                       match.get("comp_level", None),
+                                       match.get("set_number", 0),
+                                       match.get("match_number", 0)),
                 event=event.key,
                 year=event.year,
                 set_number=match.get("set_number", 0),
@@ -129,7 +137,10 @@ class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
 
         MatchManipulator.createOrUpdate(matches)
 
-        self.response.out.write(json.dumps({'Success': "Matches successfully updated"}))
+        self.response.out.write(
+            json.dumps({
+                'Success': "Matches successfully updated"
+            }))
 
 
 class ApiTrustedEventMatchesDelete(ApiTrustedBaseController):
@@ -143,14 +154,20 @@ class ApiTrustedEventMatchesDelete(ApiTrustedBaseController):
         try:
             match_keys = json.loads(request.body)
         except Exception:
-            self._errors = json.dumps({"Error": "'keys_to_delete' could not be parsed"})
+            self._errors = json.dumps({
+                "Error":
+                "'keys_to_delete' could not be parsed"
+            })
             self.abort(400)
         for match_key in match_keys:
-            keys_to_delete.add(ndb.Key(Match, '{}_{}'.format(event_key, match_key)))
+            keys_to_delete.add(
+                ndb.Key(Match, '{}_{}'.format(event_key, match_key)))
 
         MatchManipulator.delete_keys(keys_to_delete)
 
-        ret = json.dumps({"keys_deleted": [key.id().split('_')[1] for key in keys_to_delete]})
+        ret = json.dumps({
+            "keys_deleted": [key.id().split('_')[1] for key in keys_to_delete]
+        })
         self.response.out.write(ret)
 
 
@@ -162,13 +179,21 @@ class ApiTrustedEventMatchesDeleteAll(ApiTrustedBaseController):
 
     def _process_request(self, request, event_key):
         if request.body != event_key:
-            self._errors = json.dumps({"Error": "To delete all matches for this event, the body of the request must be the event key."})
+            self._errors = json.dumps({
+                "Error":
+                "To delete all matches for this event, the body of the request must be the event key."
+            })
             self.abort(400)
 
-        keys_to_delete = Match.query(Match.event == ndb.Key(Event, event_key)).fetch(keys_only=True)
+        keys_to_delete = Match.query(
+            Match.event == ndb.Key(Event, event_key)).fetch(keys_only=True)
         MatchManipulator.delete_keys(keys_to_delete)
 
-        self.response.out.write(json.dumps({'Success': "All matches for {} deleted".format(event_key)}))
+        self.response.out.write(
+            json.dumps({
+                'Success':
+                "All matches for {} deleted".format(event_key)
+            }))
 
 
 class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
@@ -180,15 +205,16 @@ class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
     def _process_request(self, request, event_key):
         rankings = JSONRankingsParser.parse(request.body)
 
-        event_details = EventDetails(
-            id=event_key,
-            rankings=rankings
-        )
+        event_details = EventDetails(id=event_key, rankings=rankings)
         if event_details.year >= 2017:  # TODO: Temporary fix. Should directly parse request into rankings2
-            event_details.rankings2 = RankingsHelper.convert_rankings(event_details)
+            event_details.rankings2 = RankingsHelper.convert_rankings(
+                event_details)
         EventDetailsManipulator.createOrUpdate(event_details)
 
-        self.response.out.write(json.dumps({'Success': "Rankings successfully updated"}))
+        self.response.out.write(
+            json.dumps({
+                'Success': "Rankings successfully updated"
+            }))
 
 
 class ApiTrustedEventTeamListUpdate(ApiTrustedBaseController):
@@ -204,20 +230,30 @@ class ApiTrustedEventTeamListUpdate(ApiTrustedBaseController):
 
         event_teams = []
         for team_key in team_keys:
-            if Team.get_by_id(team_key):  # Don't create EventTeams for teams that don't exist
-                event_teams.append(EventTeam(id=event.key.id() + '_{}'.format(team_key),
-                                             event=event.key,
-                                             team=ndb.Key(Team, team_key),
-                                             year=event.year))
+            if Team.get_by_id(
+                    team_key
+            ):  # Don't create EventTeams for teams that don't exist
+                event_teams.append(
+                    EventTeam(
+                        id=event.key.id() + '_{}'.format(team_key),
+                        event=event.key,
+                        team=ndb.Key(Team, team_key),
+                        year=event.year))
 
         # delete old eventteams
-        old_eventteam_keys = EventTeam.query(EventTeam.event == event.key).fetch(None, keys_only=True)
-        to_delete = set(old_eventteam_keys).difference(set([et.key for et in event_teams]))
+        old_eventteam_keys = EventTeam.query(
+            EventTeam.event == event.key).fetch(
+                None, keys_only=True)
+        to_delete = set(old_eventteam_keys).difference(
+            set([et.key for et in event_teams]))
         EventTeamManipulator.delete_keys(to_delete)
 
         EventTeamManipulator.createOrUpdate(event_teams)
 
-        self.response.out.write(json.dumps({'Success': "Event teams successfully updated"}))
+        self.response.out.write(
+            json.dumps({
+                'Success': "Event teams successfully updated"
+            }))
 
 
 class ApiTrustedAddMatchYoutubeVideo(ApiTrustedBaseController):
@@ -230,7 +266,10 @@ class ApiTrustedAddMatchYoutubeVideo(ApiTrustedBaseController):
         try:
             match_videos = json.loads(request.body)
         except Exception:
-            self._errors = json.dumps({"Error": "Invalid JSON. Please check input."})
+            self._errors = json.dumps({
+                "Error":
+                "Invalid JSON. Please check input."
+            })
             self.abort(400)
 
         matches_to_put = []
@@ -238,7 +277,10 @@ class ApiTrustedAddMatchYoutubeVideo(ApiTrustedBaseController):
             match_key = '{}_{}'.format(event_key, partial_match_key)
             match = Match.get_by_id(match_key)
             if match is None:
-                self._errors = json.dumps({"Error": "Match {} does not exist!".format(match_key)})
+                self._errors = json.dumps({
+                    "Error":
+                    "Match {} does not exist!".format(match_key)
+                })
                 self.abort(400)
 
             if youtube_id not in match.youtube_videos:
@@ -246,7 +288,10 @@ class ApiTrustedAddMatchYoutubeVideo(ApiTrustedBaseController):
                 matches_to_put.append(match)
         MatchManipulator.createOrUpdate(matches_to_put)
 
-        self.response.out.write(json.dumps({'Success': "Match videos successfully updated"}))
+        self.response.out.write(
+            json.dumps({
+                'Success': "Match videos successfully updated"
+            }))
 
 
 class ApiTrustedAddEventMedia(ApiTrustedBaseController):
@@ -260,18 +305,27 @@ class ApiTrustedAddEventMedia(ApiTrustedBaseController):
         try:
             video_list = json.loads(request.body)
         except Exception:
-            self._errors = json.dumps({"Error": "Invalid JSON. Please check input."})
+            self._errors = json.dumps({
+                "Error":
+                "Invalid JSON. Please check input."
+            })
             self.abort(400)
             return
 
         if not isinstance(video_list, list) or not video_list:
-            self._errors = json.dumps({"Error": "Invalid JSON. Please check input."})
+            self._errors = json.dumps({
+                "Error":
+                "Invalid JSON. Please check input."
+            })
             self.abort(400)
             return
 
         event = Event.get_by_id(event_key)
         if not event:
-            self._errors = json.dumps({"Error": "Event {} not found".format(event_key)})
+            self._errors = json.dumps({
+                "Error":
+                "Event {} not found".format(event_key)
+            })
             self.abort(404)
             return
 

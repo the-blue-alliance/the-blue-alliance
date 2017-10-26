@@ -33,7 +33,10 @@ class ApiEventController(ApiBaseController):
     def _set_event(self, event_key):
         self.event = Event.get_by_id(event_key)
         if self.event is None:
-            self._errors = json.dumps({"404": "%s event not found" % self.event_key})
+            self._errors = json.dumps({
+                "404":
+                "%s event not found" % self.event_key
+            })
             self.abort(404)
 
     def _track_call(self, event_key):
@@ -111,7 +114,8 @@ class ApiEventStatsController(ApiEventController):
                 if stat in matchstats:
                     stats[stat] = matchstats[stat]
 
-        year_specific = EventInsightsHelper.calculate_event_insights(self.event.matches, self.event.year)
+        year_specific = EventInsightsHelper.calculate_event_insights(
+            self.event.matches, self.event.year)
         if year_specific:
             stats['year_specific'] = year_specific
 
@@ -152,10 +156,13 @@ class ApiEventAwardsController(ApiEventController):
     def _track_call(self, event_key):
         self._track_call_defer('event/awards', event_key)
 
-    def _render(self,event_key):
+    def _render(self, event_key):
         self._set_event(event_key)
 
-        award_dicts = [ModelToDict.awardConverter(award) for award in AwardHelper.organizeAwards(self.event.awards)]
+        award_dicts = [
+            ModelToDict.awardConverter(award)
+            for award in AwardHelper.organizeAwards(self.event.awards)
+        ]
         return json.dumps(award_dicts, ensure_ascii=True)
 
 
@@ -185,7 +192,8 @@ class ApiEventListController(ApiBaseController):
 
     def __init__(self, *args, **kw):
         super(ApiEventListController, self).__init__(*args, **kw)
-        self.year = int(self.request.route_kwargs.get("year") or datetime.now().year)
+        self.year = int(
+            self.request.route_kwargs.get("year") or datetime.now().year)
         self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.year)
 
     @property
@@ -197,7 +205,10 @@ class ApiEventListController(ApiBaseController):
 
     def _render(self, year=None):
         if self.year < 1992 or self.year > datetime.now().year + 1:
-            self._errors = json.dumps({"404": "No events found for %s" % self.year})
+            self._errors = json.dumps({
+                "404":
+                "No events found for %s" % self.year
+            })
             self.abort(404)
 
         events = EventListQuery(self.year).fetch()

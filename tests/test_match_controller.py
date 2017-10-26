@@ -19,7 +19,8 @@ class TestMatchController(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
         app = webapp2.WSGIApplication([
             RedirectRoute(r'/match/<match_key>', MatchDetail, 'match-detail'),
@@ -33,7 +34,9 @@ class TestMatchController(unittest2.TestCase):
             comp_level="f",
             set_number=1,
             match_number=1,
-            team_key_names=[u'frc846', u'frc2135', u'frc971', u'254', u'frc1678', u'frc973'],
+            team_key_names=[
+                u'frc846', u'frc2135', u'frc971', u'254', u'frc1678', u'frc973'
+            ],
             time=datetime.fromtimestamp(1409527874),
             time_string="4:31 PM",
             youtube_videos=["JbwUzl3W9ug", "bHGyTjxbLz8"],
@@ -61,8 +64,7 @@ class TestMatchController(unittest2.TestCase):
                     "auto": 70,\
                     "teleop_goal+foul": 50,\
                     "assist": 150,\
-                    "truss+catch": 40}}'
-        )
+                    "truss+catch": 40}}')
         self.event = Event(
             id="2014cc",
             name="Cheesy Champs",
@@ -78,8 +80,7 @@ class TestMatchController(unittest2.TestCase):
             venue="Some Venue",
             venue_address="Some Venue, Hartford, CT, USA",
             timezone_id="America/New_York",
-            start_date=datetime(2014, 03, 24)
-        )
+            start_date=datetime(2014, 03, 24))
         self.match.put()
         self.event.put()
 

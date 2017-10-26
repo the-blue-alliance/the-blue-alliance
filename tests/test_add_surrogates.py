@@ -16,11 +16,14 @@ class TestAddSurrogates(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_taskqueue_stub(root_path=".")
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
-        load_fixture('test_data/2016cama_no_surrogate.json',
-                     kind={'Event': Event, 'Match': Match},
-                     post_processor=self.eventKeyAdder)
+        load_fixture(
+            'test_data/2016cama_no_surrogate.json',
+            kind={'Event': Event,
+                  'Match': Match},
+            post_processor=self.eventKeyAdder)
         self.event = Event.get_by_id('2016cama')
         self.assertIsNotNone(self.event)
 
@@ -35,7 +38,10 @@ class TestAddSurrogates(unittest2.TestCase):
         for match in self.event.matches:
             if match.comp_level != 'qm' or match.match_number != 18:
                 for alliance_color in ['red', 'blue']:
-                    self.assertEqual(match.alliances[alliance_color]['surrogates'], [])
+                    self.assertEqual(
+                        match.alliances[alliance_color]['surrogates'], [])
             else:
-                self.assertEqual(match.alliances['red']['surrogates'], ['frc5496'])
-                self.assertEqual(match.alliances['blue']['surrogates'], ['frc1323'])
+                self.assertEqual(match.alliances['red']['surrogates'],
+                                 ['frc5496'])
+                self.assertEqual(match.alliances['blue']['surrogates'],
+                                 ['frc1323'])

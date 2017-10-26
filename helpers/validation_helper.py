@@ -21,7 +21,7 @@ class ValidationHelper(object):
         Example: ValidationHelper.validate([('team_id_validator', 'frc101')])
         """
 
-        error_dict = { "Errors": list() }
+        error_dict = {"Errors": list()}
         valid = True
         for v in validators:
             results = getattr(ValidationHelper, v[0])(v[1])
@@ -77,21 +77,37 @@ class ValidationHelper(object):
         if 'year' in kwargs:
             year = int(kwargs['year'])
             if year > tba_config.MAX_YEAR or year < 1992:
-                error_dict['Errors'].append({'year': 'Invalid year: {}. Must be between 1992 and {} inclusive.'.format(year, tba_config.MAX_YEAR)})
+                error_dict['Errors'].append({
+                    'year':
+                    'Invalid year: {}. Must be between 1992 and {} inclusive.'.
+                    format(year, tba_config.MAX_YEAR)
+                })
                 valid = False
 
         # Check if keys exist
         if team_future and team_future.get_result() is None:
-            error_dict['Errors'].append({'team_id': 'team id {} does not exist'.format(team_key)})
+            error_dict['Errors'].append({
+                'team_id':
+                'team id {} does not exist'.format(team_key)
+            })
             valid = False
         if event_future and event_future.get_result() is None:
-            error_dict['Errors'].append({'event_id': 'event id {} does not exist'.format(event_key)})
+            error_dict['Errors'].append({
+                'event_id':
+                'event id {} does not exist'.format(event_key)
+            })
             valid = False
         if match_future and match_future.get_result() is None:
-            error_dict['Errors'].append({'match_id': 'match id {} does not exist'.format(match_key)})
+            error_dict['Errors'].append({
+                'match_id':
+                'match id {} does not exist'.format(match_key)
+            })
             valid = False
         if district_future and district_future.get_result() is None:
-            error_dict['Errors'].append({'district_id': 'district id {} does not exist'.format(district_key)})
+            error_dict['Errors'].append({
+                'district_id':
+                'district id {} does not exist'.format(district_key)
+            })
             valid = False
 
         if not valid:
@@ -99,29 +115,28 @@ class ValidationHelper(object):
 
     @classmethod
     def is_valid_model_key(cls, key):
-        return (Team.validate_key_name(key) or
-            Event.validate_key_name(key) or
-            Match.validate_key_name(key) or
-            District.validate_key_name(key))
+        return (Team.validate_key_name(key) or Event.validate_key_name(key)
+                or Match.validate_key_name(key)
+                or District.validate_key_name(key))
 
     @classmethod
     def team_id_validator(cls, value):
         error_message = "{} is not a valid team id".format(value)
-        team_key_error = { "team_id": error_message}
+        team_key_error = {"team_id": error_message}
         if Team.validate_key_name(value) is False:
             return team_key_error
 
     @classmethod
     def event_id_validator(cls, value):
         error_message = "{} is not a valid event id".format(value)
-        event_key_error = { "event_id": error_message}
+        event_key_error = {"event_id": error_message}
         if Event.validate_key_name(value) is False:
             return event_key_error
 
     @classmethod
     def match_id_validator(cls, value):
         error_message = "{} is not a valid match id".format(value)
-        match_key_error = { "match_id": error_message}
+        match_key_error = {"match_id": error_message}
         if Match.validate_key_name(value) is False:
             return match_key_error
 

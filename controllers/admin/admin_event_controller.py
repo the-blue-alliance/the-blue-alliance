@@ -39,17 +39,17 @@ class AdminEventAddAllianceSelections(LoggedInHandler):
     """
     Add alliance selections to an Event.
     """
+
     def post(self, event_key_id):
         self._require_admin()
         event = Event.get_by_id(event_key_id)
 
         alliance_selections_csv = self.request.get('alliance_selections_csv')
-        alliance_selections = CSVAllianceSelectionsParser.parse(alliance_selections_csv)
+        alliance_selections = CSVAllianceSelectionsParser.parse(
+            alliance_selections_csv)
 
         event_details = EventDetails(
-            id=event_key_id,
-            alliance_selections=alliance_selections
-        )
+            id=event_key_id, alliance_selections=alliance_selections)
         EventDetailsManipulator.createOrUpdate(event_details)
 
         self.redirect("/admin/event/" + event.key_name)
@@ -59,6 +59,7 @@ class AdminAddAllianceBackup(LoggedInHandler):
     """
     Add a backup team into the alliances dict
     """
+
     def post(self, event_key_id):
         self._require_admin()
         event = Event.get_by_id(event_key_id)
@@ -98,6 +99,7 @@ class AdminEventAddTeams(LoggedInHandler):
     """
     Add a teams to an Event. Useful for legacy and offseason events.
     """
+
     def post(self, event_key_id):
         self._require_admin()
         event = Event.get_by_id(event_key_id)
@@ -108,12 +110,16 @@ class AdminEventAddTeams(LoggedInHandler):
         event_teams = []
         teams = []
         for team_number in team_numbers:
-            event_teams.append(EventTeam(id=event.key.id() + '_frc{}'.format(team_number),
-                                         event=event.key,
-                                         team=ndb.Key(Team, 'frc{}'.format(team_number)),
-                                         year=event.year))
-            teams.append(Team(id='frc{}'.format(team_number),
-                              team_number=int(team_number)))
+            event_teams.append(
+                EventTeam(
+                    id=event.key.id() + '_frc{}'.format(team_number),
+                    event=event.key,
+                    team=ndb.Key(Team, 'frc{}'.format(team_number)),
+                    year=event.year))
+            teams.append(
+                Team(
+                    id='frc{}'.format(team_number),
+                    team_number=int(team_number)))
 
         EventTeamManipulator.createOrUpdate(event_teams)
         TeamManipulator.createOrUpdate(teams)
@@ -125,6 +131,7 @@ class AdminEventDeleteTeams(LoggedInHandler):
     """
     Remove teams from an Event. Useful for legacy and offseason events.
     """
+
     def post(self, event_key_id):
         self._require_admin()
         event = Event.get_by_id(event_key_id)
@@ -134,7 +141,9 @@ class AdminEventDeleteTeams(LoggedInHandler):
 
         event_teams = []
         for team_number in team_numbers:
-            event_teams.append(ndb.Key(EventTeam, '{}_frc{}'.format(event.key.id(), team_number)))
+            event_teams.append(
+                ndb.Key(EventTeam, '{}_frc{}'.format(event.key.id(),
+                                                     team_number)))
 
         EventTeamManipulator.delete_keys(event_teams)
 
@@ -146,6 +155,7 @@ class AdminEventRemapTeams(LoggedInHandler):
     Remaps teams within an Event. Useful for offseason events.
     eg: 9254 -> 254B
     """
+
     def post(self, event_key_id):
         self._require_admin()
         event = Event.get_by_id(event_key_id)
@@ -209,7 +219,9 @@ class AdminEventRemapTeams(LoggedInHandler):
                     if str(recipient['team_number']) == old_team[3:]:
                         award.dirty = True
                         recipient['team_number'] = new_team[3:]
-                        award.recipient_json_list = [json.dumps(r) for r in award.recipient_list]
+                        award.recipient_json_list = [
+                            json.dumps(r) for r in award.recipient_list
+                        ]
         AwardManipulator.createOrUpdate(event.awards, auto_union=False)
 
         self.redirect("/admin/event/" + event.key_name)
@@ -219,6 +231,7 @@ class AdminEventAddWebcast(LoggedInHandler):
     """
     Add a webcast to an Event.
     """
+
     def post(self, event_key_id):
         self._require_admin()
 
@@ -238,6 +251,7 @@ class AdminEventRemoveWebcast(LoggedInHandler):
     """
     Remove a webcast from an event
     """
+
     def post(self, event_key_id):
         self._require_admin()
 
@@ -260,6 +274,7 @@ class AdminEventCreate(LoggedInHandler):
     """
     Create an Event. POSTs to AdminEventEdit.
     """
+
     def get(self):
         self._require_admin()
 
@@ -267,7 +282,9 @@ class AdminEventCreate(LoggedInHandler):
             "event_types": EventType.type_names,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_create.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/event_create.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
@@ -275,6 +292,7 @@ class AdminEventCreateTest(LoggedInHandler):
     """
     Create a test event that is happening now.
     """
+
     def get(self):
         self._require_admin()
 
@@ -284,8 +302,9 @@ class AdminEventCreateTest(LoggedInHandler):
             EventTestCreator.createPresentEvent()
             self.redirect("/events/")
         else:
-            logging.error("{} tried to create test events in prod! No can do.".format(
-                self.user_bundle.user.email()))
+            logging.error(
+                "{} tried to create test events in prod! No can do.".format(
+                    self.user_bundle.user.email()))
             self.redirect("/admin/")
 
 
@@ -293,25 +312,25 @@ class AdminEventDelete(LoggedInHandler):
     """
     Delete an Event.
     """
+
     def get(self, event_key_id):
         self._require_admin()
 
         event = Event.get_by_id(event_key_id)
 
-        self.template_values.update({
-            "event": event
-        })
+        self.template_values.update({"event": event})
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_delete.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/event_delete.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self, event_key_id):
         self._require_admin()
 
-        logging.warning("Deleting %s at the request of %s / %s" % (
-            event_key_id,
-            self.user_bundle.user.user_id(),
-            self.user_bundle.user.email()))
+        logging.warning("Deleting %s at the request of %s / %s" %
+                        (event_key_id, self.user_bundle.user.user_id(),
+                         self.user_bundle.user.email()))
 
         event = Event.get_by_id(event_key_id)
 
@@ -330,6 +349,7 @@ class AdminEventDetail(LoggedInHandler):
     """
     Show an Event.
     """
+
     def get(self, event_key):
         self._require_admin()
 
@@ -338,19 +358,29 @@ class AdminEventDetail(LoggedInHandler):
             self.abort(404)
         event.prepAwardsMatchesTeams()
 
-        api_keys = ApiAuthAccess.query(ApiAuthAccess.event_list == ndb.Key(Event, event_key)).fetch()
+        api_keys = ApiAuthAccess.query(
+            ApiAuthAccess.event_list == ndb.Key(Event, event_key)).fetch()
         event_medias = Media.query(Media.references == event.key).fetch(500)
 
         self.template_values.update({
-            "event": event,
-            "medias": event_medias,
-            "cache_key": event_controller.EventDetail('2016nyny').cache_key.format(event.key_name),
-            "flushed": self.request.get("flushed"),
-            "playoff_types": PlayoffType.type_names,
-            "write_auths": api_keys,
+            "event":
+            event,
+            "medias":
+            event_medias,
+            "cache_key":
+            event_controller.EventDetail('2016nyny').cache_key.format(
+                event.key_name),
+            "flushed":
+            self.request.get("flushed"),
+            "playoff_types":
+            PlayoffType.type_names,
+            "write_auths":
+            api_keys,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_details.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/event_details.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
@@ -358,20 +388,27 @@ class AdminEventEdit(LoggedInHandler):
     """
     Edit an Event.
     """
+
     def get(self, event_key):
         self._require_admin()
 
         event = Event.get_by_id(event_key)
 
         self.template_values.update({
-            "event": event,
-            'alliance_selections': json.dumps(event.alliance_selections),
-            'rankings': json.dumps(event.rankings),
-            "playoff_types": PlayoffType.type_names,
-            "event_types": EventType.type_names,
+            "event":
+            event,
+            'alliance_selections':
+            json.dumps(event.alliance_selections),
+            'rankings':
+            json.dumps(event.rankings),
+            "playoff_types":
+            PlayoffType.type_names,
+            "event_types":
+            EventType.type_names,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_edit.html')
+        path = os.path.join(
+            os.path.dirname(__file__), '../../templates/admin/event_edit.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self, event_key):
@@ -381,28 +418,38 @@ class AdminEventEdit(LoggedInHandler):
 
         start_date = None
         if self.request.get("start_date"):
-            start_date = datetime.strptime(self.request.get("start_date"), "%Y-%m-%d")
+            start_date = datetime.strptime(
+                self.request.get("start_date"), "%Y-%m-%d")
 
         end_date = None
         if self.request.get("end_date"):
-            end_date = datetime.strptime(self.request.get("end_date"), "%Y-%m-%d")
+            end_date = datetime.strptime(
+                self.request.get("end_date"), "%Y-%m-%d")
 
         first_code = self.request.get("first_code", None)
         district_key = self.request.get("event_district_key", None)
         parent_key = self.request.get("parent_event", None)
 
-        division_key_names = json.loads(self.request.get('divisions'), '[]') if self.request.get('divisions') else []
-        division_keys = [ndb.Key(Event, key) for key in division_key_names] if division_key_names else []
+        division_key_names = json.loads(
+            self.request.get('divisions'),
+            '[]') if self.request.get('divisions') else []
+        division_keys = [ndb.Key(Event, key) for key in division_key_names
+                         ] if division_key_names else []
 
         website = WebsiteHelper.format_url(self.request.get("website"))
 
         event = Event(
-            id=str(self.request.get("year")) + str.lower(str(self.request.get("event_short"))),
+            id=str(self.request.get("year")) +
+            str.lower(str(self.request.get("event_short"))),
             end_date=end_date,
             event_short=self.request.get("event_short"),
-            first_code=first_code if first_code and first_code != 'None' else None,
-            event_type_enum=int(self.request.get("event_type")) if self.request.get('event_type') else EventType.UNLABLED,
-            district_key=ndb.Key(District, self.request.get("event_district_key")) if district_key and district_key != 'None' else None,
+            first_code=first_code
+            if first_code and first_code != 'None' else None,
+            event_type_enum=int(self.request.get("event_type"))
+            if self.request.get('event_type') else EventType.UNLABLED,
+            district_key=ndb.Key(District,
+                                 self.request.get("event_district_key"))
+            if district_key and district_key != 'None' else None,
             venue=self.request.get("venue"),
             venue_address=self.request.get("venue_address"),
             city=self.request.get("city"),
@@ -414,23 +461,31 @@ class AdminEventEdit(LoggedInHandler):
             start_date=start_date,
             website=website,
             year=int(self.request.get("year")),
-            official={"true": True, "false": False}.get(self.request.get("official").lower()),
-            enable_predictions={"true": True, "false": False}.get(self.request.get("enable_predictions").lower()),
+            official={"true": True,
+                      "false": False}.get(
+                          self.request.get("official").lower()),
+            enable_predictions={
+                "true": True,
+                "false": False
+            }.get(self.request.get("enable_predictions").lower()),
             facebook_eid=self.request.get("facebook_eid"),
             custom_hashtag=self.request.get("custom_hashtag"),
             webcast_json=self.request.get("webcast_json"),
-            playoff_type=int(self.request.get("playoff_type")) if self.request.get('playoff_type') else PlayoffType.BRACKET_8_TEAM,
-            parent_event=ndb.Key(Event, parent_key) if parent_key and parent_key.lower() != 'none' else None,
+            playoff_type=int(self.request.get("playoff_type")) if
+            self.request.get('playoff_type') else PlayoffType.BRACKET_8_TEAM,
+            parent_event=ndb.Key(Event, parent_key)
+            if parent_key and parent_key.lower() != 'none' else None,
             divisions=division_keys,
         )
         event = EventManipulator.createOrUpdate(event)
 
-        if self.request.get("alliance_selections_json") or self.request.get("rankings_json"):
+        if self.request.get("alliance_selections_json") or self.request.get(
+                "rankings_json"):
             event_details = EventDetails(
                 id=event_key,
-                alliance_selections=json.loads(self.request.get("alliance_selections_json")),
-                rankings=json.loads(self.request.get("rankings_json"))
-            )
+                alliance_selections=json.loads(
+                    self.request.get("alliance_selections_json")),
+                rankings=json.loads(self.request.get("rankings_json")))
             EventDetailsManipulator.createOrUpdate(event_details)
 
         MemcacheWebcastFlusher.flushEvent(event.key_name)
@@ -452,7 +507,8 @@ class AdminEventList(LoggedInHandler):
         else:
             year = datetime.now().year
 
-        events = Event.query(Event.year == year).order(Event.start_date).fetch(10000)
+        events = Event.query(Event.year == year).order(
+            Event.start_date).fetch(10000)
 
         self.template_values.update({
             "valid_years": self.VALID_YEARS,
@@ -460,5 +516,6 @@ class AdminEventList(LoggedInHandler):
             "events": events,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_list.html')
+        path = os.path.join(
+            os.path.dirname(__file__), '../../templates/admin/event_list.html')
         self.response.out.write(template.render(path, self.template_values))

@@ -44,6 +44,7 @@ class AdminMobileClearEnqueue(LoggedInHandler):
     Clears mobile clients with duplicate client_ids
     Will leave the most recently updated one
     """
+
     def get(self):
         self._require_admin()
         taskqueue.add(
@@ -51,7 +52,9 @@ class AdminMobileClearEnqueue(LoggedInHandler):
             url='/tasks/admin/clear_mobile_duplicates',
             method='GET')
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/mobile_clear_enqueue.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/mobile_clear_enqueue.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
@@ -60,6 +63,7 @@ class AdminMobileClear(LoggedInHandler):
     Fetch all mobile clients, order by messaging ID, then update time (desc).
     If the current client has the same ID as the last one (which is always going to be newer), mark the current one to be removed
     """
+
     def get(self):
         clients = MobileClient.query().fetch()
         clients = sorted(clients, key=lambda x: (x.messaging_id, x.updated))
@@ -76,7 +80,9 @@ class AdminMobileClear(LoggedInHandler):
             ndb.delete_multi(to_remove)
         logging.info("Removed {} duplicate mobile clients".format(count))
         template_values = {'count': count}
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/mobile_clear_do.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/mobile_clear_do.html')
         self.response.out.write(template.render(path, template_values))
 
 
@@ -84,6 +90,7 @@ class AdminSubsClearEnqueue(LoggedInHandler):
     """
     Removes subscriptions to past years' things
     """
+
     def get(self):
         self._require_admin()
         taskqueue.add(
@@ -91,7 +98,9 @@ class AdminSubsClearEnqueue(LoggedInHandler):
             url='/tasks/admin/clear_old_subs',
             method='GET')
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/subs_clear_enqueue.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/subs_clear_enqueue.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
@@ -114,7 +123,9 @@ class AdminSubsClear(LoggedInHandler):
             ndb.delete_multi(to_delete)
         logging.info("Removed {} old subscriptions".format(count))
         template_values = {'count': count}
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/subs_clear_do.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/subs_clear_do.html')
         self.response.out.write(template.render(path, template_values))
 
 
@@ -122,6 +133,7 @@ class AdminWebhooksClearEnqueue(LoggedInHandler):
     """
     Tries to ping every webhook and removes ones that don't respond
     """
+
     def get(self):
         self._require_admin()
         taskqueue.add(
@@ -129,19 +141,23 @@ class AdminWebhooksClearEnqueue(LoggedInHandler):
             url='/tasks/admin/clear_old_webhooks',
             method='GET')
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/webhooks_clear_enqueue.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/webhooks_clear_enqueue.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
 class AdminWebhooksClear(LoggedInHandler):
     def get(self):
-        webhooks = MobileClient.query(MobileClient.client_type == ClientType.WEBHOOK).fetch()
+        webhooks = MobileClient.query(
+            MobileClient.client_type == ClientType.WEBHOOK).fetch()
         failures = []
 
         notification = PingNotification()._render_webhook()
 
         for key in webhooks:
-            if not NotificationSender.send_webhook(notification, [(key.messaging_id, key.secret)]):
+            if not NotificationSender.send_webhook(
+                    notification, [(key.messaging_id, key.secret)]):
                 failures.append(key.key)
 
         count = len(failures)
@@ -150,7 +166,9 @@ class AdminWebhooksClear(LoggedInHandler):
         logging.info("Deleted {} broken webhooks".format(count))
 
         template_values = {'count': count}
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/webhooks_clear_do.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/webhooks_clear_do.html')
         self.response.out.write(template.render(path, template_values))
 
 
@@ -158,6 +176,7 @@ class AdminCreateDistrictTeamsEnqueue(LoggedInHandler):
     """
     Trying to Enqueue a task to rebuild old district teams from event teams.
     """
+
     def get(self, year):
         self._require_admin()
         taskqueue.add(
@@ -173,6 +192,7 @@ class AdminRebuildDivisionsEnqueue(LoggedInHandler):
     """
     Enqueue a task to build past event parent/child relationships
     """
+
     def get(self, year):
         self._require_admin()
         taskqueue.add(
@@ -199,7 +219,8 @@ class AdminRebuildDivisionsDo(LoggedInHandler):
         events = EventListQuery(year).fetch()
         events_by_type = defaultdict(list)
         for event in events:
-            if event.event_type_enum in self.TYPE_MAP.keys() or event.event_type_enum in self.TYPE_MAP.values():
+            if event.event_type_enum in self.TYPE_MAP.keys(
+            ) or event.event_type_enum in self.TYPE_MAP.values():
                 events_by_type[event.event_type_enum].append(event)
 
         output = ""
@@ -207,15 +228,19 @@ class AdminRebuildDivisionsDo(LoggedInHandler):
             for event in events_by_type[to_type]:
                 divisions = []
                 for candidate_division in events_by_type[from_type]:
-                    if candidate_division.end_date.date() == event.end_date.date() and candidate_division.district_key == event.district_key:
+                    if candidate_division.end_date.date(
+                    ) == event.end_date.date(
+                    ) and candidate_division.district_key == event.district_key:
                         candidate_division.parent_event = event.key
                         divisions.append(candidate_division.key)
-                        output += "Event {} is the parent of {}<br/>".format(event.key_name, candidate_division.key_name)
+                        output += "Event {} is the parent of {}<br/>".format(
+                            event.key_name, candidate_division.key_name)
                         EventManipulator.createOrUpdate(candidate_division)
 
                 event.divisions = divisions
                 if divisions:
-                    output += "Divisions {} added to {}<br/>".format(event.division_keys_json, event.key_name)
+                    output += "Divisions {} added to {}<br/>".format(
+                        event.division_keys_json, event.key_name)
                 EventManipulator.createOrUpdate(event)
         self.response.out.write(output)
 
@@ -224,6 +249,7 @@ class AdminBackfillPlayoffTypeEnqueue(LoggedInHandler):
     """
     Enqueue a task to build past event parent/child relationships
     """
+
     def get(self, year):
         self._require_admin()
         taskqueue.add(
@@ -259,16 +285,20 @@ class AdminClearEventTeamsDo(LoggedInHandler):
     """
     Remove all eventteams from an event
     """
+
     def get(self, event_key):
         self._require_admin()
         event = Event.get_by_id(event_key)
         if not event:
             self.abort(404)
             return
-        existing_event_team_keys = set(EventTeam.query(EventTeam.event == event.key).fetch(1000, keys_only=True))
+        existing_event_team_keys = set(
+            EventTeam.query(EventTeam.event == event.key).fetch(
+                1000, keys_only=True))
         EventTeamManipulator.delete_keys(existing_event_team_keys)
 
-        self.response.out.write("Deleted {} EventTeams from {}".format(len(existing_event_team_keys), event_key))
+        self.response.out.write("Deleted {} EventTeams from {}".format(
+            len(existing_event_team_keys), event_key))
 
 
 class AdminCreateDistrictTeamsDo(LoggedInHandler):
@@ -276,38 +306,52 @@ class AdminCreateDistrictTeamsDo(LoggedInHandler):
         year = int(year)
         team_districts = defaultdict(list)
         logging.info("Fetching events in {}".format(year))
-        year_events = Event.query(year == Event.year, Event.district_key == None, Event.event_district_enum != None).fetch()
+        year_events = Event.query(year == Event.year,
+                                  Event.district_key == None,
+                                  Event.event_district_enum != None).fetch()
         for event in year_events:
             logging.info("Fetching EventTeams for {}".format(event.key_name))
             event_teams = EventTeam.query(EventTeam.event == event.key).fetch()
             for event_team in event_teams:
-                team_districts[event_team.team.id()].append(event.district_key.id())
+                team_districts[event_team.team.id()].append(
+                    event.district_key.id())
 
         new_district_teams = []
         for team_key, districts in team_districts.iteritems():
-            most_frequent_district_key = max(set(districts), key=districts.count)
-            logging.info("Assuming team {} belongs to {}".format(team_key, most_frequent_district_key))
-            dt_key = DistrictTeam.renderKeyName(year, most_frequent_district_key[4:], team_key)
-            new_district_teams.append(DistrictTeam(id=dt_key, year=year, team=ndb.Key(Team, team_key), district_key=ndb.Key(District, most_frequent_district_key)))
+            most_frequent_district_key = max(
+                set(districts), key=districts.count)
+            logging.info("Assuming team {} belongs to {}".format(
+                team_key, most_frequent_district_key))
+            dt_key = DistrictTeam.renderKeyName(
+                year, most_frequent_district_key[4:], team_key)
+            new_district_teams.append(
+                DistrictTeam(
+                    id=dt_key,
+                    year=year,
+                    team=ndb.Key(Team, team_key),
+                    district_key=ndb.Key(District,
+                                         most_frequent_district_key)))
 
         logging.info("Finishing updating old district teams from event teams")
         DistrictTeamManipulator.createOrUpdate(new_district_teams)
-        self.response.out.write("Finished creating district teams for {}".format(year))
+        self.response.out.write(
+            "Finished creating district teams for {}".format(year))
 
 
 class AdminCreateDistrictsEnqueue(LoggedInHandler):
     """
     Create District models from old DCMPs
     """
+
     def get(self, year):
         self._require_admin()
         taskqueue.add(
             queue_name='admin',
             target='backend-tasks',
             url='/backend-tasks-b2/do/rebuild_districts/{}'.format(year),
-            method='GET'
-        )
-        self.response.out.write("Enqueued district creation for {}".format(year))
+            method='GET')
+        self.response.out.write(
+            "Enqueued district creation for {}".format(year))
 
 
 class AdminCreateDistrictsDo(LoggedInHandler):
@@ -317,7 +361,8 @@ class AdminCreateDistrictsDo(LoggedInHandler):
         districts_to_write = []
 
         for dcmp in year_dcmps:
-            district_abbrev = DistrictType.type_abbrevs[dcmp.event_district_enum]
+            district_abbrev = DistrictType.type_abbrevs[
+                dcmp.event_district_enum]
             district_key = District.renderKeyName(year, district_abbrev)
             logging.info("Creating {}".format(district_key))
 
@@ -326,20 +371,27 @@ class AdminCreateDistrictsDo(LoggedInHandler):
                 year=year,
                 abbreviation=district_abbrev,
                 display_name=DistrictType.type_names[dcmp.event_district_enum],
-                elasticsearch_name=next((k for k, v in DistrictType.elasticsearch_names.iteritems() if v == dcmp.event_district_enum), None)
-            )
+                elasticsearch_name=next(
+                    (k
+                     for k, v in DistrictType.elasticsearch_names.iteritems()
+                     if v == dcmp.event_district_enum), None))
             districts_to_write.append(district)
 
-        logging.info("Writing {} new districts".format(len(districts_to_write)))
-        DistrictManipulator.createOrUpdate(districts_to_write, run_post_update_hook=False)
+        logging.info("Writing {} new districts".format(
+            len(districts_to_write)))
+        DistrictManipulator.createOrUpdate(
+            districts_to_write, run_post_update_hook=False)
 
         for dcmp in year_dcmps:
-            district_abbrev = DistrictType.type_abbrevs[dcmp.event_district_enum]
+            district_abbrev = DistrictType.type_abbrevs[
+                dcmp.event_district_enum]
             district_key = District.renderKeyName(year, district_abbrev)
-            district_events_future = DistrictEventsQuery(district_key).fetch_async()
+            district_events_future = DistrictEventsQuery(
+                district_key).fetch_async()
 
             district_events = district_events_future.get_result()
-            logging.info("Found {} events to update".format(len(district_events)))
+            logging.info("Found {} events to update".format(
+                len(district_events)))
             events_to_write = []
             for event in district_events:
                 event.district_key = ndb.Key(District, district_key)
@@ -347,12 +399,17 @@ class AdminCreateDistrictsDo(LoggedInHandler):
             EventManipulator.createOrUpdate(events_to_write)
 
         for dcmp in year_dcmps:
-            district_abbrev = DistrictType.type_abbrevs[dcmp.event_district_enum]
+            district_abbrev = DistrictType.type_abbrevs[
+                dcmp.event_district_enum]
             district_key = District.renderKeyName(year, district_abbrev)
-            districtteams_future = DistrictTeam.query(DistrictTeam.year == year, DistrictTeam.district == DistrictType.abbrevs.get(district_abbrev, None)).fetch_async()
+            districtteams_future = DistrictTeam.query(
+                DistrictTeam.year == year,
+                DistrictTeam.district == DistrictType.abbrevs.get(
+                    district_abbrev, None)).fetch_async()
 
             districtteams = districtteams_future.get_result()
-            logging.info("Found {} DistrictTeams to update".format(len(districtteams)))
+            logging.info("Found {} DistrictTeams to update".format(
+                len(districtteams)))
             districtteams_to_write = []
             for districtteam in districtteams:
                 districtteam.district_key = ndb.Key(District, district_key)
@@ -364,6 +421,7 @@ class AdminPostEventTasksDo(LoggedInHandler):
     """
     Runs cleanup tasks after an event is over if necessary
     """
+
     def get(self, event_key):
         # Fetch for later
         event_future = Event.get_by_id_async(event_key)
@@ -371,46 +429,71 @@ class AdminPostEventTasksDo(LoggedInHandler):
 
         # Rebuild event teams
         taskqueue.add(
-            url='/tasks/math/do/eventteam_update/' + event_key,
-            method='GET')
+            url='/tasks/math/do/eventteam_update/' + event_key, method='GET')
 
         # Create Winner/Finalist awards for offseason events
         awards = []
         event = event_future.get_result()
         if event.event_type_enum in {EventType.OFFSEASON, EventType.FOC}:
             matches = MatchHelper.organizeMatches(matches_future.get_result())
-            bracket = MatchHelper.generateBracket(matches, event, event.alliance_selections)
+            bracket = MatchHelper.generateBracket(matches, event,
+                                                  event.alliance_selections)
             if 'f' in bracket:
-                winning_alliance = '{}_alliance'.format(bracket['f'][1]['winning_alliance'])
+                winning_alliance = '{}_alliance'.format(
+                    bracket['f'][1]['winning_alliance'])
                 if winning_alliance == 'red_alliance':
                     losing_alliance = 'blue_alliance'
                 else:
                     losing_alliance = 'red_alliance'
 
-                awards.append(Award(
-                    id=Award.render_key_name(event.key_name, AwardType.WINNER),
-                    name_str="Winner",
-                    award_type_enum=AwardType.WINNER,
-                    year=event.year,
-                    event=event.key,
-                    event_type_enum=event.event_type_enum,
-                    team_list=[ndb.Key(Team, 'frc{}'.format(team)) for team in bracket['f'][1][winning_alliance] if team.isdigit()],
-                    recipient_json_list=[json.dumps({'team_number': team, 'awardee': None}) for team in bracket['f'][1][winning_alliance]],
-                ))
+                awards.append(
+                    Award(
+                        id=Award.render_key_name(event.key_name,
+                                                 AwardType.WINNER),
+                        name_str="Winner",
+                        award_type_enum=AwardType.WINNER,
+                        year=event.year,
+                        event=event.key,
+                        event_type_enum=event.event_type_enum,
+                        team_list=[
+                            ndb.Key(Team, 'frc{}'.format(team))
+                            for team in bracket['f'][1][winning_alliance]
+                            if team.isdigit()
+                        ],
+                        recipient_json_list=[
+                            json.dumps({
+                                'team_number': team,
+                                'awardee': None
+                            }) for team in bracket['f'][1][winning_alliance]
+                        ],
+                    ))
 
-                awards.append(Award(
-                    id=Award.render_key_name(event.key_name, AwardType.FINALIST),
-                    name_str="Finalist",
-                    award_type_enum=AwardType.FINALIST,
-                    year=event.year,
-                    event=event.key,
-                    event_type_enum=event.event_type_enum,
-                    team_list=[ndb.Key(Team, 'frc{}'.format(team)) for team in bracket['f'][1][losing_alliance] if team.isdigit()],
-                    recipient_json_list=[json.dumps({'team_number': team, 'awardee': None}) for team in bracket['f'][1][losing_alliance]],
-                ))
+                awards.append(
+                    Award(
+                        id=Award.render_key_name(event.key_name,
+                                                 AwardType.FINALIST),
+                        name_str="Finalist",
+                        award_type_enum=AwardType.FINALIST,
+                        year=event.year,
+                        event=event.key,
+                        event_type_enum=event.event_type_enum,
+                        team_list=[
+                            ndb.Key(Team, 'frc{}'.format(team))
+                            for team in bracket['f'][1][losing_alliance]
+                            if team.isdigit()
+                        ],
+                        recipient_json_list=[
+                            json.dumps({
+                                'team_number': team,
+                                'awardee': None
+                            }) for team in bracket['f'][1][losing_alliance]
+                        ],
+                    ))
                 AwardManipulator.createOrUpdate(awards)
 
-        self.response.out.write("Finished post-event tasks for {}. Created awards: {}".format(event_key, awards))
+        self.response.out.write(
+            "Finished post-event tasks for {}. Created awards: {}".format(
+                event_key, awards))
 
 
 class AdminRegistrationDayEnqueue(LoggedInHandler):
@@ -434,7 +517,7 @@ class AdminRegistrationDayEnqueue(LoggedInHandler):
 
         # Enqueue the tasks
         now = datetime.now()
-        for i in xrange(0, 24*60, interval):
+        for i in xrange(0, 24 * 60, interval):
             # 24*60 is number of minutes per day
             task_eta = start + timedelta(minutes=i)
             if task_eta < now:
@@ -445,22 +528,25 @@ class AdminRegistrationDayEnqueue(LoggedInHandler):
                 target='backend-tasks',
                 url='/backend-tasks/get/event_list/{}'.format(event_year),
                 eta=task_eta,
-                method='GET'
-            )
+                method='GET')
 
         # Set the cache timeout sitevar
-        end_timestamp = (start + timedelta(days=1) - datetime(1970, 1, 1)).total_seconds()
+        end_timestamp = (
+            start + timedelta(days=1) - datetime(1970, 1, 1)).total_seconds()
         cache_key_regex = ".*{}.*".format(event_year)
         turbo_mode_json = {
-            'regex':  cache_key_regex,
+            'regex': cache_key_regex,
             'valid_until': int(end_timestamp),
             'cache_length': 61
         }
-        turbo_sitevar = Sitevar.get_or_insert('turbo_mode', description="Temporarily shorten cache expiration")
+        turbo_sitevar = Sitevar.get_or_insert(
+            'turbo_mode', description="Temporarily shorten cache expiration")
         turbo_sitevar.contents = turbo_mode_json
         turbo_sitevar.put()
 
-        self.response.out.write("Enqueued {} tasks to update {} events starting at {}".format((24*60/interval), event_year, start))
+        self.response.out.write(
+            "Enqueued {} tasks to update {} events starting at {}".format(
+                (24 * 60 / interval), event_year, start))
 
 
 class AdminRunPostUpdateHooksEnqueue(LoggedInHandler):
@@ -470,7 +556,8 @@ class AdminRunPostUpdateHooksEnqueue(LoggedInHandler):
                 queue_name='admin',
                 url='/tasks/admin/do/run_post_update_hooks/events',
                 method='GET')
-            self.response.out.write("Enqueued run post update hooks for events")
+            self.response.out.write(
+                "Enqueued run post update hooks for events")
         elif model_type == 'teams':
             taskqueue.add(
                 queue_name='admin',
@@ -478,7 +565,8 @@ class AdminRunPostUpdateHooksEnqueue(LoggedInHandler):
                 method='GET')
             self.response.out.write("Enqueued run post update hooks for teams")
         else:
-            self.response.out.write("Unknown model type: {}".format(model_type))
+            self.response.out.write(
+                "Unknown model type: {}".format(model_type))
 
 
 class AdminRunPostUpdateHooksDo(LoggedInHandler):
@@ -488,14 +576,16 @@ class AdminRunPostUpdateHooksDo(LoggedInHandler):
             for event_key in event_keys:
                 taskqueue.add(
                     queue_name='admin',
-                    url='/tasks/admin/do/run_event_post_update_hook/' + event_key.id(),
+                    url='/tasks/admin/do/run_event_post_update_hook/' +
+                    event_key.id(),
                     method='GET')
         elif model_type == 'teams':
             team_keys = Team.query().fetch(keys_only=True)
             for team_key in team_keys:
                 taskqueue.add(
                     queue_name='admin',
-                    url='/tasks/admin/do/run_team_post_update_hook/' + team_key.id(),
+                    url='/tasks/admin/do/run_team_post_update_hook/' +
+                    team_key.id(),
                     method='GET')
 
 

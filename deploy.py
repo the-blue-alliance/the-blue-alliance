@@ -15,14 +15,33 @@ import re
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Deploy The Blue Alliance app.')
-    parser.add_argument('--project', default='tbatv-prod-hrd', help="App Engine project to deploy")
-    parser.add_argument('--yolo', action="store_true", help="Do not wait for travis builds to succeed #yolo", default=False)
-    parser.add_argument('--config', help="gcloud configuration profile to use", default="")
-    parser.add_argument('--version', help="Version for app engine modules", default="prod-1")
-    parser.add_argument('--modules', help="Modules to deploy, comma separated, as yaml spec files in this directory", default="")
-    parser.add_argument('--skip-cron', action="store_true", help="Do not deploy cron.yaml", default=False)
-    parser.add_argument('--app-cfg-dir', help="Location of appcfg.py [deprecated]", default="")
+    parser = argparse.ArgumentParser(
+        description='Deploy The Blue Alliance app.')
+    parser.add_argument(
+        '--project',
+        default='tbatv-prod-hrd',
+        help="App Engine project to deploy")
+    parser.add_argument(
+        '--yolo',
+        action="store_true",
+        help="Do not wait for travis builds to succeed #yolo",
+        default=False)
+    parser.add_argument(
+        '--config', help="gcloud configuration profile to use", default="")
+    parser.add_argument(
+        '--version', help="Version for app engine modules", default="prod-1")
+    parser.add_argument(
+        '--modules',
+        help=
+        "Modules to deploy, comma separated, as yaml spec files in this directory",
+        default="")
+    parser.add_argument(
+        '--skip-cron',
+        action="store_true",
+        help="Do not deploy cron.yaml",
+        default=False)
+    parser.add_argument(
+        '--app-cfg-dir', help="Location of appcfg.py [deprecated]", default="")
     args = parser.parse_args()
 
     os.chdir('../the-blue-alliance-prod')
@@ -46,7 +65,9 @@ def main():
                 info = subprocess.check_output(["travis", "show", "master"])
             except subprocess.CalledProcessError:
                 try:
-                    input("Error getting travis status. Press Enter to continue...")
+                    input(
+                        "Error getting travis status. Press Enter to continue..."
+                    )
                 except SyntaxError:
                     pass
             regex = re.search(".*State:[ \t]+((\w)*)\n", info)
@@ -64,9 +85,15 @@ def main():
     if test_status == 0:
         print "Deploying..."
         os.system("gcloud version")
-        cmd = ["gcloud", "app", "deploy", "--verbosity", "info", "--project", args.project]
+        cmd = [
+            "gcloud", "app", "deploy", "--verbosity", "info", "--project",
+            args.project
+        ]
         # appcfg.py --no_cookies -A tbatv-prod-hrd -V prod-1 update .
-        appcfg_cmd = ["{}/appcfg.py".format(args.app_cfg_dir), "--no_cookies", "-A", args.project]
+        appcfg_cmd = [
+            "{}/appcfg.py".format(args.app_cfg_dir), "--no_cookies", "-A",
+            args.project
+        ]
         if args.config:
             cmd.extend(["--configuration", args.config])
         if args.version:
@@ -76,17 +103,23 @@ def main():
             modules = args.modules.split(",")
         else:
             # Full deploy
-            modules = ["app.yaml", "app-backend-tasks-b2.yaml", "app-backend-tasks.yaml", "cron.yaml", "dispatch.yaml", "index.yaml", "queue.yaml"]
+            modules = [
+                "app.yaml", "app-backend-tasks-b2.yaml",
+                "app-backend-tasks.yaml", "cron.yaml", "dispatch.yaml",
+                "index.yaml", "queue.yaml"
+            ]
         if args.skip_cron and "cron.yaml" in modules:
             modules.remove("cron.yaml")
         cmd.extend(modules)
         appcfg_cmd.append("update")
         appcfg_cmd.extend(modules)
-        cmd_str = subprocess.list2cmdline(appcfg_cmd if args.app_cfg_dir else cmd)
+        cmd_str = subprocess.list2cmdline(appcfg_cmd
+                                          if args.app_cfg_dir else cmd)
         print "Running {}".format(cmd_str)
         os.system(cmd_str)
     else:
         print "Tests failed! Did not deploy."
+
 
 if __name__ == "__main__":
     main()

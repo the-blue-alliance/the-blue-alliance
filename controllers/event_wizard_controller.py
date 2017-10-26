@@ -14,7 +14,8 @@ class EventWizardHandler(CacheableHandler):
         self.cache_expiration = 60 * 60
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/eventwizard.html")
+        path = os.path.join(
+            os.path.dirname(__file__), "../templates/eventwizard.html")
         selected_event_key = self.request.get('event', '')
         if selected_event_key and Event.validate_key_name(selected_event_key):
             selected_event = Event.get_by_id(selected_event_key)
@@ -33,6 +34,7 @@ class ReactEventWizardHandler(CacheableHandler):
         self.cache_expiration = 60 * 60
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/react-eventwizard.html")
+        path = os.path.join(
+            os.path.dirname(__file__), "../templates/react-eventwizard.html")
 
         return template.render(path, self.template_values)

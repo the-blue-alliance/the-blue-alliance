@@ -17,7 +17,8 @@ from models.suggestion import Suggestion
 
 class TestSuggestOffseasonEventReviewController(unittest2.TestCase):
     def setUp(self):
-        self.policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1)
+        self.policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(
+            probability=1)
         self.testbed = testbed.Testbed()
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub(consistency_policy=self.policy)
@@ -25,11 +26,18 @@ class TestSuggestOffseasonEventReviewController(unittest2.TestCase):
         self.testbed.init_user_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_taskqueue_stub(_all_queues_valid=True)
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
-        app = webapp2.WSGIApplication([
-            RedirectRoute(r'/suggest/offseason/review', SuggestOffseasonEventReviewController, 'review-offseason', strict_slash=True),
-        ], debug=True)
+        app = webapp2.WSGIApplication(
+            [
+                RedirectRoute(
+                    r'/suggest/offseason/review',
+                    SuggestOffseasonEventReviewController,
+                    'review-offseason',
+                    strict_slash=True),
+            ],
+            debug=True)
         self.testapp = webtest.TestApp(app)
 
     def tearDown(self):
@@ -43,26 +51,19 @@ class TestSuggestOffseasonEventReviewController(unittest2.TestCase):
             overwrite=True)
 
         self.account = Account.get_or_insert(
-            "123",
-            email="user@example.com",
-            registered=True)
+            "123", email="user@example.com", registered=True)
 
     def givePermission(self):
-        self.account.permissions.append(AccountPermissions.REVIEW_OFFSEASON_EVENTS)
+        self.account.permissions.append(
+            AccountPermissions.REVIEW_OFFSEASON_EVENTS)
         self.account.put()
 
     def createSuggestion(self):
         from helpers.suggestions.suggestion_creator import SuggestionCreator
-        status = SuggestionCreator.createOffseasonEventSuggestion(self.account.key,
-                                                                  'Test Event',
-                                                                  '2016-10-12',
-                                                                  '2016-10-13',
-                                                                  'http://foo.bar.com',
-                                                                  'Venue Name',
-                                                                  '123 Fake St',
-                                                                  'New York',
-                                                                  'NY',
-                                                                  'USA')
+        status = SuggestionCreator.createOffseasonEventSuggestion(
+            self.account.key, 'Test Event', '2016-10-12', '2016-10-13',
+            'http://foo.bar.com', 'Venue Name', '123 Fake St', 'New York',
+            'NY', 'USA')
         self.assertEqual(status[0], 'success')
         return Suggestion.query().fetch(keys_only=True)[0].id()
 
@@ -77,7 +78,8 @@ class TestSuggestOffseasonEventReviewController(unittest2.TestCase):
     def test_login_redirect(self):
         response = self.testapp.get('/suggest/offseason/review', status='3*')
         response = response.follow(expect_errors=True)
-        self.assertTrue(response.request.path.startswith("/account/login_required"))
+        self.assertTrue(
+            response.request.path.startswith("/account/login_required"))
 
     def test_no_permissions(self):
         self.loginUser()

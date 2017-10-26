@@ -33,7 +33,8 @@ class FMSAPITeamDetailsParser(object):
             if teamData['website'] is not None and 'www.firstinspires.org' in teamData['website']:
                 website = None
             else:
-                website = WebsiteHelper.format_url(teamData.get('website', None))
+                website = WebsiteHelper.format_url(
+                    teamData.get('website', None))
 
             team = Team(
                 id="frc{}".format(teamData['teamNumber']),
@@ -41,23 +42,28 @@ class FMSAPITeamDetailsParser(object):
                 name=teamData['nameFull'],
                 nickname=teamData['nameShort'],
                 school_name=teamData.get('schoolName'),
-                home_cmp=teamData.get('homeCMP').lower() if teamData.get('homeCMP') else None,
+                home_cmp=teamData.get('homeCMP').lower()
+                if teamData.get('homeCMP') else None,
                 city=teamData['city'],
                 state_prov=teamData['stateProv'],
                 country=teamData['country'],
                 website=website,
-                rookie_year=teamData['rookieYear']
-            )
+                rookie_year=teamData['rookieYear'])
 
             districtTeam = None
             if teamData['districtCode']:
-                districtAbbrev = DistrictType.abbrevs[teamData['districtCode'].lower()]
+                districtAbbrev = DistrictType.abbrevs[teamData['districtCode']
+                                                      .lower()]
                 districtTeam = DistrictTeam(
-                    id=DistrictTeam.renderKeyName(self.year, districtAbbrev, team.key_name),
+                    id=DistrictTeam.renderKeyName(self.year, districtAbbrev,
+                                                  team.key_name),
                     team=ndb.Key(Team, team.key_name),
                     year=self.year,
                     district=districtAbbrev,
-                    district_key=ndb.Key(District, District.renderKeyName(self.year, teamData['districtCode'].lower())),
+                    district_key=ndb.Key(
+                        District,
+                        District.renderKeyName(
+                            self.year, teamData['districtCode'].lower())),
                 )
 
             robot = None
@@ -66,8 +72,7 @@ class FMSAPITeamDetailsParser(object):
                     id=Robot.renderKeyName(team.key_name, self.year),
                     team=ndb.Key(Team, team.key_name),
                     year=self.year,
-                    robot_name=teamData['robotName'].strip()
-                )
+                    robot_name=teamData['robotName'].strip())
 
             ret_models.append((team, districtTeam, robot))
 

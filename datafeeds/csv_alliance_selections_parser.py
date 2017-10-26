@@ -15,7 +15,12 @@ class CSVAllianceSelectionsParser(ParserBase):
         ...
         """
         alliances = []
-        csv_data = list(csv.reader(StringIO.StringIO(data), delimiter=',', skipinitialspace=True))
+        csv_data = list(
+            csv.reader(
+                StringIO.StringIO(data), delimiter=',', skipinitialspace=True))
         for row in csv_data:
-            alliances.append({'picks': ['frc' + team.strip() for team in row], 'declines': []})
+            alliances.append({
+                'picks': ['frc' + team.strip() for team in row],
+                'declines': []
+            })
         return alliances

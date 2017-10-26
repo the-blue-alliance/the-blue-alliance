@@ -1,5 +1,6 @@
 from consts.award_type import AwardType
 
+
 class DistrictPointValues(object):
     """
     A class that contains various district point constants over the years:
@@ -18,13 +19,7 @@ class DistrictPointValues(object):
 
     # Since 2014, points earned at District CMP has 3x bonus
     DISTRICT_CMP_MULIPLIER_DEFAULT = 3
-    DISTRICT_CMP_MULTIPLIER = {
-        2013: 1,
-        2012: 1,
-        2011: 1,
-        2010: 1,
-        2009: 1
-    }
+    DISTRICT_CMP_MULTIPLIER = {2013: 1, 2012: 1, 2011: 1, 2010: 1, 2009: 1}
 
     # In years prior to 2015, teams get points for a win/tie in a qualification match
     MATCH_WIN = 2
@@ -37,20 +32,13 @@ class DistrictPointValues(object):
     # In 2009 - 2013 (except 2010), second pick teams got fewer elim round advancement points as captain/pick 1
     # TODO many of these events don't have alliance selection data, so we can't factor this in
     ELIM_SECOND_PICK_MULTIPLIER_DEFAULT = 1
-    ELIM_SECOND_PICK_MULTIPLIER = {
-        2013: 0.8,
-        2012: 0.8,
-        2011: 0.8,
-        2009: 0.8
-    }
+    ELIM_SECOND_PICK_MULTIPLIER = {2013: 0.8, 2012: 0.8, 2011: 0.8, 2009: 0.8}
 
     # Used to determine elim/playoff points.
     # Teams on each round's winning alliance gets points per match won
     # For the 2015 game, these are awarded for participating in a qf/sf match, since there were no wins
     QF_WIN_DEFAULT = 5
-    QF_WIN = {
-        2015: 5.0
-    }
+    QF_WIN = {2015: 5.0}
 
     SF_WIN_DEFAULT = 5
     SF_WIN = {
@@ -58,18 +46,11 @@ class DistrictPointValues(object):
     }
 
     F_WIN_DEFAULT = 5
-    F_WIN = {
-        2015: 5.0
-    }
+    F_WIN = {2015: 5.0}
 
     # Chairman's Award
     CHAIRMANS_DEFAULT = 10
-    CHAIRMANS = {
-        2013: 0,
-        2012: 0,
-        2011: 0,
-        2009: 0
-    }
+    CHAIRMANS = {2013: 0, 2012: 0, 2011: 0, 2009: 0}
 
     # Engineering Inspiration and Rookie All-Star
     EI_AND_RAS_DEFAULT = 8
@@ -77,17 +58,61 @@ class DistrictPointValues(object):
 
     # Pre-2014 Awards, all worth either 5 or 2 points
     LEGACY_5_PT_AWARDS = {
-        2013: [AwardType.INDUSTRIAL_DEESIGN, AwardType.QUALITY, AwardType.ENGINEERING_EXCELLENCE, AwardType.INNOVATION_IN_CONTROL, AwardType.CREATIVITY],
-        2012: [AwardType.INDUSTRIAL_DEESIGN, AwardType.QUALITY, AwardType.ENGINEERING_EXCELLENCE, AwardType.INNOVATION_IN_CONTROL, AwardType.CREATIVITY, AwardType.ENTREPRENEURSHIP, AwardType.COOPERTITION],
-        2011: [AwardType.INDUSTRIAL_DEESIGN, AwardType.QUALITY, AwardType.ENGINEERING_EXCELLENCE, AwardType.INNOVATION_IN_CONTROL, AwardType.CREATIVITY, AwardType.ENTREPRENEURSHIP, AwardType.COOPERTITION, AwardType.EXCELLENCE_IN_DESIGN],
-        2010: [AwardType.INDUSTRIAL_DEESIGN, AwardType.QUALITY, AwardType.ENGINEERING_EXCELLENCE, AwardType.INNOVATION_IN_CONTROL, AwardType.CREATIVITY, AwardType.ROOKIE_ALL_STAR, AwardType.ENGINEERING_INSPIRATION, AwardType.ENTREPRENEURSHIP, AwardType.COOPERTITION],
-        2009: [AwardType.INDUSTRIAL_DEESIGN, AwardType.QUALITY, AwardType.DRIVING_TOMORROWS_TECHNOLOGY, AwardType.INNOVATION_IN_CONTROL, AwardType.CREATIVITY]
+        2013: [
+            AwardType.INDUSTRIAL_DEESIGN, AwardType.QUALITY,
+            AwardType.ENGINEERING_EXCELLENCE, AwardType.INNOVATION_IN_CONTROL,
+            AwardType.CREATIVITY
+        ],
+        2012: [
+            AwardType.INDUSTRIAL_DEESIGN, AwardType.QUALITY,
+            AwardType.ENGINEERING_EXCELLENCE, AwardType.INNOVATION_IN_CONTROL,
+            AwardType.CREATIVITY, AwardType.ENTREPRENEURSHIP,
+            AwardType.COOPERTITION
+        ],
+        2011: [
+            AwardType.INDUSTRIAL_DEESIGN, AwardType.QUALITY,
+            AwardType.ENGINEERING_EXCELLENCE, AwardType.INNOVATION_IN_CONTROL,
+            AwardType.CREATIVITY, AwardType.ENTREPRENEURSHIP,
+            AwardType.COOPERTITION, AwardType.EXCELLENCE_IN_DESIGN
+        ],
+        2010: [
+            AwardType.INDUSTRIAL_DEESIGN, AwardType.QUALITY,
+            AwardType.ENGINEERING_EXCELLENCE, AwardType.INNOVATION_IN_CONTROL,
+            AwardType.CREATIVITY, AwardType.ROOKIE_ALL_STAR,
+            AwardType.ENGINEERING_INSPIRATION, AwardType.ENTREPRENEURSHIP,
+            AwardType.COOPERTITION
+        ],
+        2009: [
+            AwardType.INDUSTRIAL_DEESIGN, AwardType.QUALITY,
+            AwardType.DRIVING_TOMORROWS_TECHNOLOGY,
+            AwardType.INNOVATION_IN_CONTROL, AwardType.CREATIVITY
+        ]
     }
 
     LEGACY_2_PT_AWARDS = {
-        2013: [AwardType.SPIRIT, AwardType.GRACIOUS_PROFESSIONALISM, AwardType.IMAGERY, AwardType.HIGHEST_ROOKIE_SEED, AwardType.SAFETY, AwardType.JUDGES, AwardType.ROOKIE_INSPIRATION],
-        2012: [AwardType.SPIRIT, AwardType.GRACIOUS_PROFESSIONALISM, AwardType.IMAGERY, AwardType.HIGHEST_ROOKIE_SEED, AwardType.SAFETY, AwardType.JUDGES, AwardType.ROOKIE_INSPIRATION, AwardType.WEBSITE],
-        2011: [AwardType.SPIRIT, AwardType.GRACIOUS_PROFESSIONALISM, AwardType.IMAGERY, AwardType.HIGHEST_ROOKIE_SEED, AwardType.SAFETY, AwardType.JUDGES, AwardType.ROOKIE_INSPIRATION, AwardType.WEBSITE],
-        2010: [AwardType.SPIRIT, AwardType.GRACIOUS_PROFESSIONALISM, AwardType.IMAGERY, AwardType.HIGHEST_ROOKIE_SEED, AwardType.SAFETY, AwardType.JUDGES, AwardType.ROOKIE_INSPIRATION, AwardType.WEBSITE],
-        2009: [AwardType.SPIRIT, AwardType.GRACIOUS_PROFESSIONALISM, AwardType.IMAGERY, AwardType.JUDGES, AwardType.ROOKIE_INSPIRATION, AwardType.SAFETY, AwardType.WSU_AIM_HIGHER, AwardType.WEBSITE]
+        2013: [
+            AwardType.SPIRIT, AwardType.GRACIOUS_PROFESSIONALISM,
+            AwardType.IMAGERY, AwardType.HIGHEST_ROOKIE_SEED, AwardType.SAFETY,
+            AwardType.JUDGES, AwardType.ROOKIE_INSPIRATION
+        ],
+        2012: [
+            AwardType.SPIRIT, AwardType.GRACIOUS_PROFESSIONALISM,
+            AwardType.IMAGERY, AwardType.HIGHEST_ROOKIE_SEED, AwardType.SAFETY,
+            AwardType.JUDGES, AwardType.ROOKIE_INSPIRATION, AwardType.WEBSITE
+        ],
+        2011: [
+            AwardType.SPIRIT, AwardType.GRACIOUS_PROFESSIONALISM,
+            AwardType.IMAGERY, AwardType.HIGHEST_ROOKIE_SEED, AwardType.SAFETY,
+            AwardType.JUDGES, AwardType.ROOKIE_INSPIRATION, AwardType.WEBSITE
+        ],
+        2010: [
+            AwardType.SPIRIT, AwardType.GRACIOUS_PROFESSIONALISM,
+            AwardType.IMAGERY, AwardType.HIGHEST_ROOKIE_SEED, AwardType.SAFETY,
+            AwardType.JUDGES, AwardType.ROOKIE_INSPIRATION, AwardType.WEBSITE
+        ],
+        2009: [
+            AwardType.SPIRIT, AwardType.GRACIOUS_PROFESSIONALISM,
+            AwardType.IMAGERY, AwardType.JUDGES, AwardType.ROOKIE_INSPIRATION,
+            AwardType.SAFETY, AwardType.WSU_AIM_HIGHER, AwardType.WEBSITE
+        ]
     }

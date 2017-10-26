@@ -20,19 +20,31 @@ from models.team import Team
 
 class TestSuggestDesignsReviewController(unittest2.TestCase):
     def setUp(self):
-        self.policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1)
+        self.policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(
+            probability=1)
         self.testbed = testbed.Testbed()
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub(consistency_policy=self.policy)
         self.testbed.init_memcache_stub()
         self.testbed.init_user_stub()
         self.testbed.init_urlfetch_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
-        app = webapp2.WSGIApplication([
-            RedirectRoute(r'/suggest/cad/review', SuggestDesignsReviewController, 'review-designs', strict_slash=True),
-            RedirectRoute(r'/suggest/review', SuggestReviewHomeController, 'review-home', strict_slash=True),
-        ], debug=True)
+        app = webapp2.WSGIApplication(
+            [
+                RedirectRoute(
+                    r'/suggest/cad/review',
+                    SuggestDesignsReviewController,
+                    'review-designs',
+                    strict_slash=True),
+                RedirectRoute(
+                    r'/suggest/review',
+                    SuggestReviewHomeController,
+                    'review-home',
+                    strict_slash=True),
+            ],
+            debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.team = Team(
@@ -49,26 +61,23 @@ class TestSuggestDesignsReviewController(unittest2.TestCase):
             user_email="user@example.com",
             user_id="123",
             user_is_admin='0',
-            overwrite=True
-        )
+            overwrite=True)
 
         self.account = Account.get_or_insert(
-            "123",
-            email="user@example.com",
-            registered=True
-        )
+            "123", email="user@example.com", registered=True)
 
     def givePermission(self):
         self.account.permissions.append(AccountPermissions.REVIEW_DESIGNS)
         self.account.put()
 
     def createSuggestion(self):
-        status = SuggestionCreator.createTeamMediaSuggestion(self.account.key,
-                                                             'https://grabcad.com/library/2016-148-robowranglers-1',
-                                                             'frc1124',
-                                                             '2016')
+        status = SuggestionCreator.createTeamMediaSuggestion(
+            self.account.key,
+            'https://grabcad.com/library/2016-148-robowranglers-1', 'frc1124',
+            '2016')
         self.assertEqual(status[0], 'success')
-        return Suggestion.render_media_key_name('2016', 'team', 'frc1124', 'grabcad', '2016-148-robowranglers-1')
+        return Suggestion.render_media_key_name(
+            '2016', 'team', 'frc1124', 'grabcad', '2016-148-robowranglers-1')
 
     def getSuggestionForm(self):
         response = self.testapp.get('/suggest/cad/review')
@@ -81,7 +90,8 @@ class TestSuggestDesignsReviewController(unittest2.TestCase):
     def test_login_redirect(self):
         response = self.testapp.get('/suggest/cad/review', status='3*')
         response = response.follow(expect_errors=True)
-        self.assertTrue(response.request.path.startswith("/account/login_required"))
+        self.assertTrue(
+            response.request.path.startswith("/account/login_required"))
 
     def test_no_permissions(self):
         self.loginUser()
@@ -101,7 +111,8 @@ class TestSuggestDesignsReviewController(unittest2.TestCase):
         self.givePermission()
         suggestion_id = self.createSuggestion()
         form = self.getSuggestionForm()
-        form['accept_reject-{}'.format(suggestion_id)] = 'accept::{}'.format(suggestion_id)
+        form['accept_reject-{}'.format(suggestion_id)] = 'accept::{}'.format(
+            suggestion_id)
         response = form.submit().follow()
         self.assertEqual(response.status_int, 200)
 
@@ -122,7 +133,8 @@ class TestSuggestDesignsReviewController(unittest2.TestCase):
         self.givePermission()
         suggestion_id = self.createSuggestion()
         form = self.getSuggestionForm()
-        form['accept_reject-{}'.format(suggestion_id)] = 'reject::{}'.format(suggestion_id)
+        form['accept_reject-{}'.format(suggestion_id)] = 'reject::{}'.format(
+            suggestion_id)
         response = form.submit().follow()
         self.assertEqual(response.status_int, 200)
 
@@ -140,7 +152,8 @@ class TestSuggestDesignsReviewController(unittest2.TestCase):
         self.givePermission()
         suggestion_id = self.createSuggestion()
 
-        response = self.testapp.get('/suggest/cad/review?action=accept&id={}'.format(suggestion_id))
+        response = self.testapp.get(
+            '/suggest/cad/review?action=accept&id={}'.format(suggestion_id))
         response = response.follow()
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.request.GET.get('status'), 'accepted')
@@ -161,7 +174,8 @@ class TestSuggestDesignsReviewController(unittest2.TestCase):
         self.givePermission()
         suggestion_id = self.createSuggestion()
 
-        response = self.testapp.get('/suggest/cad/review?action=reject&id={}'.format(suggestion_id))
+        response = self.testapp.get(
+            '/suggest/cad/review?action=reject&id={}'.format(suggestion_id))
         response = response.follow()
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.request.GET.get('status'), 'rejected')
@@ -182,15 +196,18 @@ class TestSuggestDesignsReviewController(unittest2.TestCase):
         suggestion.review_state = Suggestion.REVIEW_ACCEPTED
         suggestion.put()
 
-        response = self.testapp.get('/suggest/cad/review?action=accept&id={}'.format(suggestion_id))
+        response = self.testapp.get(
+            '/suggest/cad/review?action=accept&id={}'.format(suggestion_id))
         response = response.follow()
         self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.request.GET.get('status'), 'already_reviewed')
+        self.assertEqual(
+            response.request.GET.get('status'), 'already_reviewed')
 
     def test_fast_path_bad_id(self):
         self.loginUser()
         self.givePermission()
-        response = self.testapp.get('/suggest/cad/review?action=accept&id=abc123')
+        response = self.testapp.get(
+            '/suggest/cad/review?action=accept&id=abc123')
         response = response.follow()
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.request.GET.get('status'), 'bad_suggestion')

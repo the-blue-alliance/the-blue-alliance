@@ -15,7 +15,8 @@ class EventAwardsQuery(DatabaseQuery):
     @ndb.tasklet
     def _query_async(self):
         event_key = self._query_args[0]
-        awards = yield Award.query(Award.event == ndb.Key(Event, event_key)).fetch_async()
+        awards = yield Award.query(
+            Award.event == ndb.Key(Event, event_key)).fetch_async()
         raise ndb.Return(awards)
 
 
@@ -41,9 +42,8 @@ class TeamYearAwardsQuery(DatabaseQuery):
     def _query_async(self):
         team_key = self._query_args[0]
         year = self._query_args[1]
-        awards = yield Award.query(
-            Award.team_list == ndb.Key(Team, team_key),
-            Award.year == year).fetch_async()
+        awards = yield Award.query(Award.team_list == ndb.Key(Team, team_key),
+                                   Award.year == year).fetch_async()
         raise ndb.Return(awards)
 
 
@@ -57,8 +57,8 @@ class TeamEventAwardsQuery(DatabaseQuery):
         team_key = self._query_args[0]
         event_key = self._query_args[1]
         awards = yield Award.query(
-            Award.team_list == ndb.Key(Team, team_key),
-            Award.event == ndb.Key(Event, event_key)).fetch_async()
+            Award.team_list == ndb.Key(Team, team_key), Award.event == ndb.Key(
+                Event, event_key)).fetch_async()
         raise ndb.Return(awards)
 
 
@@ -73,7 +73,7 @@ class TeamEventTypeAwardsQuery(DatabaseQuery):
         event_type_enum = self._query_args[1]
         award_type_enum = self._query_args[2]
         awards = yield Award.query(
-            Award.team_list == ndb.Key(Team, team_key),
-            Award.event_type_enum == event_type_enum,
+            Award.team_list == ndb.Key(
+                Team, team_key), Award.event_type_enum == event_type_enum,
             Award.award_type_enum == award_type_enum).fetch_async()
         raise ndb.Return(awards)

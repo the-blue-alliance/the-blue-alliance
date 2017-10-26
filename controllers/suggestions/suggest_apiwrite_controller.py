@@ -17,13 +17,15 @@ class SuggestApiWriteController(LoggedInHandler):
             "auth_types": AuthType.write_type_names,
         })
         self.response.out.write(
-            jinja2_engine.render('suggestions/suggest_apiwrite.html', self.template_values))
+            jinja2_engine.render('suggestions/suggest_apiwrite.html',
+                                 self.template_values))
 
     def post(self):
         self._require_login()
 
         auth_types = self.request.get_all("auth_types", [])
-        clean_auth_types = filter(lambda a: int(a) in AuthType.write_type_names.keys(), auth_types)
+        clean_auth_types = filter(
+            lambda a: int(a) in AuthType.write_type_names.keys(), auth_types)
         event_key = self.request.get("event_key", None)
         status = SuggestionCreator.createApiWriteSuggestion(
             author_account_key=self.user_bundle.account.key,
@@ -32,7 +34,8 @@ class SuggestApiWriteController(LoggedInHandler):
             auth_types=clean_auth_types,
         )
         if status == 'success':
-            subject, body = self._gen_notification_email(event_key, self.user_bundle)
+            subject, body = self._gen_notification_email(
+                event_key, self.user_bundle)
             OutgoingNotificationHelper.send_admin_alert_email(subject, body)
         self.redirect('/request/apiwrite?status={}'.format(status), abort=True)
 
@@ -45,5 +48,6 @@ class SuggestApiWriteController(LoggedInHandler):
 View the event at https://thebluealliance.com/event/{}
 
 Review the request at https://thebluealliance.com/suggest/apiwrite/review
-""".format(user_bundle.account.display_name, user_bundle.account.email, event_key, event_key)
+""".format(user_bundle.account.display_name, user_bundle.account.email,
+           event_key, event_key)
         return subject, body

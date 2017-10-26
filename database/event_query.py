@@ -41,8 +41,8 @@ class DistrictEventsQuery(DatabaseQuery):
     @ndb.tasklet
     def _query_async(self):
         district_key = self._query_args[0]
-        events = yield Event.query(
-            Event.district_key == ndb.Key(District, district_key)).fetch_async()
+        events = yield Event.query(Event.district_key == ndb.Key(
+            District, district_key)).fetch_async()
         raise ndb.Return(events)
 
 
@@ -54,7 +54,8 @@ class TeamEventsQuery(DatabaseQuery):
     @ndb.tasklet
     def _query_async(self):
         team_key = self._query_args[0]
-        event_teams = yield EventTeam.query(EventTeam.team == ndb.Key(Team, team_key)).fetch_async()
+        event_teams = yield EventTeam.query(
+            EventTeam.team == ndb.Key(Team, team_key)).fetch_async()
         event_keys = map(lambda event_team: event_team.event, event_teams)
         events = yield ndb.get_multi_async(event_keys)
         raise ndb.Return(events)
@@ -69,9 +70,8 @@ class TeamYearEventsQuery(DatabaseQuery):
     def _query_async(self):
         team_key = self._query_args[0]
         year = self._query_args[1]
-        event_teams = yield EventTeam.query(
-            EventTeam.team == ndb.Key(Team, team_key),
-            EventTeam.year == year).fetch_async()
+        event_teams = yield EventTeam.query(EventTeam.team == ndb.Key(
+            Team, team_key), EventTeam.year == year).fetch_async()
         event_keys = map(lambda event_team: event_team.event, event_teams)
         events = yield ndb.get_multi_async(event_keys)
         raise ndb.Return(events)

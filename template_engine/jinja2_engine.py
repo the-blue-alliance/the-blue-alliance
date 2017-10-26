@@ -11,13 +11,18 @@ def get_jinja_env(force_filesystemloader=False):
         logging.info("Using jinja2.ModuleLoader")
         env = jinja2.Environment(
             auto_reload=False,
-            loader=jinja2.ModuleLoader(os.path.join(os.path.dirname(__file__), '../templates_jinja2_compiled.zip')),
+            loader=jinja2.ModuleLoader(
+                os.path.join(
+                    os.path.dirname(__file__),
+                    '../templates_jinja2_compiled.zip')),
             extensions=['jinja2.ext.autoescape'],
             autoescape=True)
     else:
         logging.info("Using jinja2.FileSystemLoader")
         env = jinja2.Environment(
-            loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), '../templates_jinja2')),
+            loader=jinja2.FileSystemLoader(
+                os.path.join(os.path.dirname(__file__),
+                             '../templates_jinja2')),
             extensions=['jinja2.ext.autoescape'],
             autoescape=True)
     env.filters['ceil'] = jinja2_filters.ceil

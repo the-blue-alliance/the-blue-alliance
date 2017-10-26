@@ -17,9 +17,12 @@ class AdminMatchCleanup(LoggedInHandler):
     Given an Event, clean up all Matches that don't have the Event's key as their key prefix.
     Used to clean up 2011 Matches, where we had dupes of "2011new_qm1" and "2011newton_qm1".
     """
+
     def get(self):
         self._require_admin()
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/matches_cleanup.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/matches_cleanup.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self):
@@ -36,11 +39,15 @@ class AdminMatchCleanup(LoggedInHandler):
             MatchManipulator.delete(matches_to_delete)
 
         self.template_values.update({
-            "match_keys_deleted": match_keys_to_delete,
-            "tried_delete": True
+            "match_keys_deleted":
+            match_keys_to_delete,
+            "tried_delete":
+            True
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/matches_cleanup.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/matches_cleanup.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
@@ -48,10 +55,13 @@ class AdminMatchDashboard(LoggedInHandler):
     """
     Show stats about Matches
     """
+
     def get(self):
         self._require_admin()
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_dashboard.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/match_dashboard.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
@@ -59,47 +69,49 @@ class AdminMatchDelete(LoggedInHandler):
     """
     Delete a Match.
     """
+
     def get(self, event_key_id):
         self._require_admin()
 
         match = Match.get_by_id(event_key_id)
 
-        self.template_values.update({
-            "match": match
-        })
+        self.template_values.update({"match": match})
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_delete.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/match_delete.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self, match_key_id):
         self._require_admin()
 
-        logging.warning("Deleting %s at the request of %s / %s" % (
-            match_key_id,
-            self.user_bundle.user.user_id(),
-            self.user_bundle.user.email()))
+        logging.warning("Deleting %s at the request of %s / %s" %
+                        (match_key_id, self.user_bundle.user.user_id(),
+                         self.user_bundle.user.email()))
 
         match = Match.get_by_id(match_key_id)
         event_key_id = match.event.id()
 
         MatchManipulator.delete(match)
 
-        self.redirect("/admin/event/%s?deleted=%s" % (event_key_id, match_key_id))
+        self.redirect("/admin/event/%s?deleted=%s" % (event_key_id,
+                                                      match_key_id))
 
 
 class AdminMatchDetail(LoggedInHandler):
     """
     Show a Match.
     """
+
     def get(self, match_key):
         self._require_admin()
         match = Match.get_by_id(match_key)
 
-        self.template_values.update({
-            "match": match
-        })
+        self.template_values.update({"match": match})
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_details.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/match_details.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
@@ -107,6 +119,7 @@ class AdminMatchAdd(LoggedInHandler):
     """
     Add Matches from CSV.
     """
+
     def post(self):
         self._require_admin()
         event_key = self.request.get('event_key')
@@ -114,21 +127,21 @@ class AdminMatchAdd(LoggedInHandler):
         matches, _ = OffseasonMatchesParser.parse(matches_csv)
 
         event = Event.get_by_id(event_key)
-        matches = [Match(
-            id=Match.renderKeyName(
-                event.key.id(),
-                match.get("comp_level", None),
-                match.get("set_number", 0),
-                match.get("match_number", 0)),
-            event=event.key,
-            year=event.year,
-            set_number=match.get("set_number", 0),
-            match_number=match.get("match_number", 0),
-            comp_level=match.get("comp_level", None),
-            team_key_names=match.get("team_key_names", None),
-            alliances_json=match.get("alliances_json", None)
-            )
-            for match in matches]
+        matches = [
+            Match(
+                id=Match.renderKeyName(event.key.id(),
+                                       match.get("comp_level", None),
+                                       match.get("set_number", 0),
+                                       match.get("match_number", 0)),
+                event=event.key,
+                year=event.year,
+                set_number=match.get("set_number", 0),
+                match_number=match.get("match_number", 0),
+                comp_level=match.get("comp_level", None),
+                team_key_names=match.get("team_key_names", None),
+                alliances_json=match.get("alliances_json", None))
+            for match in matches
+        ]
         MatchManipulator.createOrUpdate(matches)
 
         self.redirect('/admin/event/{}'.format(event_key))
@@ -138,23 +151,25 @@ class AdminMatchEdit(LoggedInHandler):
     """
     Edit a Match.
     """
+
     def get(self, match_key):
         self._require_admin()
         match = Match.get_by_id(match_key)
 
-        self.template_values.update({
-            "match": match
-        })
+        self.template_values.update({"match": match})
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_edit.html')
+        path = os.path.join(
+            os.path.dirname(__file__), '../../templates/admin/match_edit.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self, match_key):
         self._require_admin()
         alliances_json = self.request.get("alliances_json")
         alliances = json.loads(alliances_json)
-        tba_videos = json.loads(self.request.get("tba_videos")) if self.request.get("tba_videos") else []
-        youtube_videos = json.loads(self.request.get("youtube_videos")) if self.request.get("youtube_videos") else []
+        tba_videos = json.loads(self.request.get(
+            "tba_videos")) if self.request.get("tba_videos") else []
+        youtube_videos = json.loads(self.request.get(
+            "youtube_videos")) if self.request.get("youtube_videos") else []
         team_key_names = list()
 
         for alliance in alliances:
@@ -181,9 +196,11 @@ class AdminVideosAdd(LoggedInHandler):
     """
     Add a lot of youtube_videos to Matches at once.
     """
+
     def get(self):
         self._require_admin()
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/videos_add.html')
+        path = os.path.join(
+            os.path.dirname(__file__), '../../templates/admin/videos_add.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self):
@@ -191,11 +208,13 @@ class AdminVideosAdd(LoggedInHandler):
 
         additions = json.loads(self.request.get("youtube_additions_json"))
         match_keys, youtube_videos = zip(*additions["videos"])
-        matches = ndb.get_multi([ndb.Key(Match, match_key) for match_key in match_keys])
+        matches = ndb.get_multi(
+            [ndb.Key(Match, match_key) for match_key in match_keys])
 
         matches_to_put = []
         results = {"existing": [], "bad_match": [], "added": []}
-        for (match, match_key, youtube_video) in zip(matches, match_keys, youtube_videos):
+        for (match, match_key, youtube_video) in zip(matches, match_keys,
+                                                     youtube_videos):
             if match:
                 if youtube_video not in match.youtube_videos:
                     match.youtube_videos.append(youtube_video)
@@ -212,5 +231,6 @@ class AdminVideosAdd(LoggedInHandler):
             "results": results,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/videos_add.html')
+        path = os.path.join(
+            os.path.dirname(__file__), '../../templates/admin/videos_add.html')
         self.response.out.write(template.render(path, self.template_values))

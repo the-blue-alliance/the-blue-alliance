@@ -40,13 +40,20 @@ class Media(ndb.Model):
     # media_type and foreign_key make up the key_name
     media_type_enum = ndb.IntegerProperty(required=True)
     media_tag_enum = ndb.IntegerProperty(repeated=True)
-    foreign_key = ndb.StringProperty(required=True)  # Unique id for the particular media type. Ex: the Youtube Video key at the end of a YouTube url
+    foreign_key = ndb.StringProperty(
+        required=True
+    )  # Unique id for the particular media type. Ex: the Youtube Video key at the end of a YouTube url
 
-    details_json = ndb.TextProperty()  # Additional details required for rendering
-    private_details_json = ndb.TextProperty()  # Additional properties we don't want to expose via API
+    details_json = ndb.TextProperty(
+    )  # Additional details required for rendering
+    private_details_json = ndb.TextProperty(
+    )  # Additional properties we don't want to expose via API
     year = ndb.IntegerProperty()  # None if year is not relevant
-    references = ndb.KeyProperty(repeated=True)  # Other models that are linked to this object
-    preferred_references = ndb.KeyProperty(repeated=True)  # Other models for which this media is "Preferred". All preferred_references MUST also be in references
+    references = ndb.KeyProperty(
+        repeated=True)  # Other models that are linked to this object
+    preferred_references = ndb.KeyProperty(
+        repeated=True
+    )  # Other models for which this media is "Preferred". All preferred_references MUST also be in references
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
@@ -62,7 +69,8 @@ class Media(ndb.Model):
         }
         self._details = None
         self._private_details = None
-        self._updated_attrs = []  # Used in MediaManipulator to track what changed
+        self._updated_attrs = [
+        ]  # Used in MediaManipulator to track what changed
         super(Media, self).__init__(*args, **kw)
 
     @property
@@ -96,7 +104,8 @@ class Media(ndb.Model):
     # URL renderers
     @property
     def cdphotothread_image_url(self):
-        return 'http://www.chiefdelphi.com/media/img/{}'.format(self.details['image_partial'])
+        return 'http://www.chiefdelphi.com/media/img/{}'.format(
+            self.details['image_partial'])
 
     @property
     def cdphotothread_image_url_med(self):
@@ -108,7 +117,8 @@ class Media(ndb.Model):
 
     @property
     def cdphotothread_thread_url(self):
-        return 'http://www.chiefdelphi.com/media/photos/{}'.format(self.foreign_key)
+        return 'http://www.chiefdelphi.com/media/photos/{}'.format(
+            self.foreign_key)
 
     @property
     def external_link(self):
@@ -184,7 +194,8 @@ class Media(ndb.Model):
     @property
     def social_profile_url(self):
         if self.media_type_enum in MediaType.social_types:
-            return MediaType.profile_urls[self.media_type_enum].format(self.foreign_key)
+            return MediaType.profile_urls[self.media_type_enum].format(
+                self.foreign_key)
         return ""
 
     @property

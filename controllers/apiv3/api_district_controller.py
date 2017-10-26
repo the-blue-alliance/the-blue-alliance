@@ -17,8 +17,11 @@ class ApiDistrictListController(ApiBaseController):
         self._track_call_defer('district/list', year)
 
     def _render(self, year):
-        district_list, self._last_modified = DistrictsInYearQuery(int(year)).fetch(dict_version=3, return_updated=True)
-        return json.dumps(district_list, ensure_ascii=True, indent=True, sort_keys=True)
+        district_list, self._last_modified = DistrictsInYearQuery(
+            int(year)).fetch(
+                dict_version=3, return_updated=True)
+        return json.dumps(
+            district_list, ensure_ascii=True, indent=True, sort_keys=True)
 
 
 class ApiDistrictEventsController(ApiBaseController):
@@ -32,10 +35,12 @@ class ApiDistrictEventsController(ApiBaseController):
         self._track_call_defer(action, '{}'.format(district_key))
 
     def _render(self, district_key, model_type=None):
-        events, self._last_modified = DistrictEventsQuery(district_key).fetch(dict_version=3, return_updated=True)
+        events, self._last_modified = DistrictEventsQuery(district_key).fetch(
+            dict_version=3, return_updated=True)
         if model_type is not None:
             events = filter_event_properties(events, model_type)
-        return json.dumps(events, ensure_ascii=True, indent=True, sort_keys=True)
+        return json.dumps(
+            events, ensure_ascii=True, indent=True, sort_keys=True)
 
 
 class ApiDistrictTeamsController(ApiBaseController):
@@ -49,10 +54,12 @@ class ApiDistrictTeamsController(ApiBaseController):
         self._track_call_defer(action, '{}'.format(district_key))
 
     def _render(self, district_key, model_type=None):
-        teams, self._last_modified = DistrictTeamsQuery(district_key).fetch(dict_version=3, return_updated=True)
+        teams, self._last_modified = DistrictTeamsQuery(district_key).fetch(
+            dict_version=3, return_updated=True)
         if model_type is not None:
             teams = filter_team_properties(teams, model_type)
-        return json.dumps(teams, ensure_ascii=True, indent=True, sort_keys=True)
+        return json.dumps(
+            teams, ensure_ascii=True, indent=True, sort_keys=True)
 
 
 class ApiDistrictRankingsController(ApiBaseController):
@@ -66,5 +73,7 @@ class ApiDistrictRankingsController(ApiBaseController):
         self._track_call_defer(action, '{}'.format(district_key))
 
     def _render(self, district_key, model_type=None):
-        district, self._last_modified = DistrictQuery(district_key).fetch(return_updated=True)
-        return json.dumps(district.rankings, ensure_ascii=True, indent=True, sort_keys=True)
+        district, self._last_modified = DistrictQuery(district_key).fetch(
+            return_updated=True)
+        return json.dumps(
+            district.rankings, ensure_ascii=True, indent=True, sort_keys=True)

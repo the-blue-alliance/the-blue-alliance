@@ -26,7 +26,8 @@ class AdminMemcacheMain(LoggedInHandler):
             flushed.append(self.request.get("memcache_key"))
 
         if self.request.get('return_url') is not "":
-            self.redirect("{}?flushed={}".format(self.request.get('return_url'), flushed))
+            self.redirect("{}?flushed={}".format(
+                self.request.get('return_url'), flushed))
             return
 
         self.template_values.update({
@@ -34,7 +35,9 @@ class AdminMemcacheMain(LoggedInHandler):
             "memcache_stats": memcache.get_stats(),
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/memcache_index.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/memcache_index.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def get(self):
@@ -44,5 +47,7 @@ class AdminMemcacheMain(LoggedInHandler):
             "memcache_stats": memcache.get_stats(),
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/memcache_index.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/memcache_index.html')
         self.response.out.write(template.render(path, self.template_values))

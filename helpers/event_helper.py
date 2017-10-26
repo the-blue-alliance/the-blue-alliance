@@ -26,8 +26,10 @@ class EventHelper(object):
     """
     Helper class for Events.
     """
+
     @classmethod
-    def alliance_selections_to_points(self, event, multiplier, alliance_selections):
+    def alliance_selections_to_points(self, event, multiplier,
+                                      alliance_selections):
         team_points = {}
         try:
             if event.key.id() == "2015micmp":
@@ -49,7 +51,8 @@ class EventHelper(object):
         except Exception, e:
             # Log only if this matters
             if event.district_key is not None:
-                logging.error("Alliance points calc for {} errored!".format(event.key.id()))
+                logging.error("Alliance points calc for {} errored!".format(
+                    event.key.id()))
                 logging.exception(e)
 
         return team_points
@@ -59,13 +62,16 @@ class EventHelper(object):
         """
         Events should already be ordered by start_date
         """
-        to_return = collections.OrderedDict()  # key: week_label, value: list of events
+        to_return = collections.OrderedDict(
+        )  # key: week_label, value: list of events
 
         weekless_events = []
         offseason_events = []
         preseason_events = []
         for event in events:
-            if event.official and event.event_type_enum in {EventType.CMP_DIVISION, EventType.CMP_FINALS}:
+            if event.official and event.event_type_enum in {
+                    EventType.CMP_DIVISION, EventType.CMP_FINALS
+            }:
                 if event.year >= 2017:
                     champs_label = TWO_CHAMPS_LABEL.format(event.city)
                 else:
@@ -74,14 +80,19 @@ class EventHelper(object):
                     to_return[champs_label].append(event)
                 else:
                     to_return[champs_label] = [event]
-            elif event.official and event.event_type_enum in {EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP_DIVISION, EventType.DISTRICT_CMP}:
-                if (event.start_date is None or
-                   (event.start_date.month == 12 and event.start_date.day == 31)):
+            elif event.official and event.event_type_enum in {
+                    EventType.REGIONAL, EventType.DISTRICT,
+                    EventType.DISTRICT_CMP_DIVISION, EventType.DISTRICT_CMP
+            }:
+                if (event.start_date is None
+                        or (event.start_date.month == 12
+                            and event.start_date.day == 31)):
                     weekless_events.append(event)
                 else:
                     week = event.week
                     if event.year == 2016:  # Special case for 2016 week 0.5
-                        label = REGIONAL_EVENTS_LABEL.format(0.5 if week == 0 else week)
+                        label = REGIONAL_EVENTS_LABEL.format(
+                            0.5 if week == 0 else week)
                     else:
                         label = REGIONAL_EVENTS_LABEL.format(week + 1)
                     if label in to_return:
@@ -139,8 +150,10 @@ class EventHelper(object):
                         else:
                             all_qual_scores.append(alliance['score'])
                         break
-        qual_avg = float(sum(all_qual_scores)) / len(all_qual_scores) if all_qual_scores != [] else None
-        elim_avg = float(sum(all_elim_scores)) / len(all_elim_scores) if all_elim_scores != [] else None
+        qual_avg = float(sum(all_qual_scores)) / len(
+            all_qual_scores) if all_qual_scores != [] else None
+        elim_avg = float(sum(all_elim_scores)) / len(
+            all_elim_scores) if all_elim_scores != [] else None
         return qual_avg, elim_avg, all_qual_scores, all_elim_scores
 
     @classmethod
@@ -154,7 +167,8 @@ class EventHelper(object):
             if match.has_been_played and match.winning_alliance is not None:
                 if match.winning_alliance == "":
                     wlt["tie"] += 1
-                elif team_key in match.alliances[match.winning_alliance]["teams"]:
+                elif team_key in match.alliances[match.winning_alliance][
+                        "teams"]:
                     wlt["win"] += 1
                 else:
                     wlt["loss"] += 1
@@ -165,8 +179,11 @@ class EventHelper(object):
         """
         Given a team_key, and an event, find the team's Win Loss Tie.
         """
-        match_keys = Match.query(Match.event == event.key, Match.team_key_names == team_key).fetch(500, keys_only=True)
-        return self.calculateTeamWLTFromMatches(team_key, ndb.get_multi(match_keys))
+        match_keys = Match.query(Match.event == event.key,
+                                 Match.team_key_names == team_key).fetch(
+                                     500, keys_only=True)
+        return self.calculateTeamWLTFromMatches(team_key,
+                                                ndb.get_multi(match_keys))
 
     @classmethod
     def getWeekEvents(self):
@@ -186,36 +203,45 @@ class EventHelper(object):
 
         # Make sure all events to be returned are within range
         two_weeks_of_events_keys_future = Event.query().filter(
-          Event.start_date >= (today - datetime.timedelta(days=7))).filter(
-          Event.start_date <= (today + datetime.timedelta(days=7))).order(
-          Event.start_date).fetch_async(50, keys_only=True)
+            Event.start_date >= (today - datetime.timedelta(days=7))).filter(
+                Event.start_date <= (
+                    today + datetime.timedelta(days=7))).order(
+                        Event.start_date).fetch_async(
+                            50, keys_only=True)
 
         events = []
-        diff_from_wed = 2 - today.weekday()  # 2 is Wednesday. diff_from_wed ranges from 3 to -3 (Monday thru Sunday)
+        diff_from_wed = 2 - today.weekday(
+        )  # 2 is Wednesday. diff_from_wed ranges from 3 to -3 (Monday thru Sunday)
         closest_wednesday = today + datetime.timedelta(days=diff_from_wed)
 
-        two_weeks_of_event_futures = ndb.get_multi_async(two_weeks_of_events_keys_future.get_result())
+        two_weeks_of_event_futures = ndb.get_multi_async(
+            two_weeks_of_events_keys_future.get_result())
         for event_future in two_weeks_of_event_futures:
             event = event_future.get_result()
             if event.within_a_day:
                 events.append(event)
             else:
                 offset = event.start_date.date() - closest_wednesday.date()
-                if (offset == datetime.timedelta(0)) or (offset > datetime.timedelta(0) and offset < datetime.timedelta(4)):
+                if (offset == datetime.timedelta(0)) or (
+                        offset > datetime.timedelta(0)
+                        and offset < datetime.timedelta(4)):
                     events.append(event)
 
         EventHelper.sort_events(events)
-        memcache.set('EventHelper.getWeekEvents():event_keys', [e.key for e in events], 60*60)
+        memcache.set('EventHelper.getWeekEvents():event_keys',
+                     [e.key for e in events], 60 * 60)
         return events
 
     @classmethod
     def getEventsWithinADay(self):
-        event_keys = memcache.get('EventHelper.getEventsWithinADay():event_keys')
+        event_keys = memcache.get(
+            'EventHelper.getEventsWithinADay():event_keys')
         if event_keys is not None:
             return ndb.get_multi(event_keys)
 
         events = filter(lambda e: e.within_a_day, self.getWeekEvents())
-        memcache.set('EventHelper.getEventsWithinADay():event_keys', [e.key for e in events], 60*60)
+        memcache.set('EventHelper.getEventsWithinADay():event_keys',
+                     [e.key for e in events], 60 * 60)
         return events
 
     @classmethod
@@ -226,20 +252,26 @@ class EventHelper(object):
 
         See https://github.com/the-blue-alliance/the-blue-alliance-android/blob/master/android/src/test/java/com/thebluealliance/androidclient/test/helpers/EventHelperTest.java
         """
-        district_keys = memcache.get('EventHelper.getShortName():district_keys')
+        district_keys = memcache.get(
+            'EventHelper.getShortName():district_keys')
         if not district_keys:
-            codes = set([d.id()[4:].upper() for d in District.query().fetch(keys_only=True)])
+            codes = set([
+                d.id()[4:].upper()
+                for d in District.query().fetch(keys_only=True)
+            ])
             if district_code:
                 codes.add(district_code.upper())
             district_keys = '|'.join(codes)
-        memcache.set('EventHelper.getShortName():district_keys', district_keys, 60*60)
+        memcache.set('EventHelper.getShortName():district_keys', district_keys,
+                     60 * 60)
 
         # 2015+ districts
         # Numbered events with no name
         re_string = '({}) District Event (#\d+)'.format(district_keys)
         match = re.match(re_string, name_str)
         if match:
-            return '{} {}'.format(match.group(1).strip(), match.group(2).strip())
+            return '{} {}'.format(
+                match.group(1).strip(), match.group(2).strip())
         # The rest
         re_string = '(?:{}) District -?(.+)'.format(district_keys)
         match = re.match(re_string, name_str)
@@ -250,8 +282,10 @@ class EventHelper(object):
 
         # 2014- districts
         # district championships, other districts, and regionals
-        name_str = re.sub(r'\s?Event','', name_str)
-        match = re.match(r'\s*(?:MAR |PNW |)(?:FIRST Robotics|FRC|)(.+)(?:District|Regional|Region|Provincial|State|Tournament|FRC|Field)(?:\b)(?:[\w\s]+?(#\d*)*)?', name_str)
+        name_str = re.sub(r'\s?Event', '', name_str)
+        match = re.match(
+            r'\s*(?:MAR |PNW |)(?:FIRST Robotics|FRC|)(.+)(?:District|Regional|Region|Provincial|State|Tournament|FRC|Field)(?:\b)(?:[\w\s]+?(#\d*)*)?',
+            name_str)
 
         if match:
             short = ''.join(match.groups(''))
@@ -268,10 +302,12 @@ class EventHelper(object):
 
     @classmethod
     def parseDistrictName(cls, district_name_str):
-        district = DistrictType.names.get(district_name_str, DistrictType.NO_DISTRICT)
+        district = DistrictType.names.get(district_name_str,
+                                          DistrictType.NO_DISTRICT)
 
         # Fall back to checking abbreviations if needed
-        return district if district != DistrictType.NO_DISTRICT else DistrictType.abbrevs.get(district_name_str, DistrictType.NO_DISTRICT)
+        return district if district != DistrictType.NO_DISTRICT else DistrictType.abbrevs.get(
+            district_name_str, DistrictType.NO_DISTRICT)
 
     @classmethod
     def getDistrictEnumFromEventName(cls, event_name):
@@ -279,7 +315,8 @@ class EventHelper(object):
             if '{} district'.format(abbrev) in event_name.lower():
                 return district_type
 
-        for district_name, district_type in DistrictType.elasticsearch_names.items():
+        for district_name, district_type in DistrictType.elasticsearch_names.items(
+        ):
             if district_name in event_name:
                 return district_type
 
@@ -289,7 +326,8 @@ class EventHelper(object):
     def getDistrictKeyFromEventName(cls, event_name, year_districts_future):
         year_districts = year_districts_future.get_result()
         for district in year_districts:
-            if '{} district'.format(district.abbreviation) in event_name.lower():
+            if '{} district'.format(
+                    district.abbreviation) in event_name.lower():
                 return district.key
 
             if district.elasticsearch_name and district.elasticsearch_name in event_name:

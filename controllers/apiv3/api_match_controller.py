@@ -18,7 +18,8 @@ class ApiMatchController(ApiBaseController):
         self._track_call_defer(action, match_key)
 
     def _render(self, match_key, model_type=None):
-        match, self._last_modified = MatchQuery(match_key).fetch(dict_version=3, return_updated=True)
+        match, self._last_modified = MatchQuery(match_key).fetch(
+            dict_version=3, return_updated=True)
         if model_type is not None:
             match = filter_match_properties([match], model_type)[0]
 

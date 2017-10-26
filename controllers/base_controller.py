@@ -49,10 +49,8 @@ class CacheableHandler(webapp2.RequestHandler):
 
     @classmethod
     def _render_cache_key(cls, cache_key):
-        return "{}:{}:{}".format(
-            cache_key,
-            cls.CACHE_VERSION,
-            tba_config.CONFIG["static_resource_version"])
+        return "{}:{}:{}".format(cache_key, cls.CACHE_VERSION,
+                                 tba_config.CONFIG["static_resource_version"])
 
     def _add_admin_bar(self, html):
         from template_engine import jinja2_engine
@@ -61,7 +59,8 @@ class CacheableHandler(webapp2.RequestHandler):
             self.template_values["return_url"] = self.request.path
             self.template_values["flushed"] = self.request.get("flushed")
             self.template_values["user_bundle"] = self._user_bundle
-            admin_bar = jinja2_engine.render('admin_bar.html', self.template_values)
+            admin_bar = jinja2_engine.render('admin_bar.html',
+                                             self.template_values)
             return html.replace('<!-- Admin Bar -->', admin_bar.encode('utf8'))
         else:
             return html
@@ -74,15 +73,20 @@ class CacheableHandler(webapp2.RequestHandler):
 
             if cached_response is None:
                 self._set_cache_header_length(self.CACHE_HEADER_LENGTH)
-                self.template_values["render_time"] = datetime.datetime.now().replace(second=0, microsecond=0)  # Prevent ETag from changing too quickly
+                self.template_values["render_time"] = datetime.datetime.now(
+                ).replace(
+                    second=0,
+                    microsecond=0)  # Prevent ETag from changing too quickly
                 with root.span("CacheableHandler._render") as spn:
                     rendered = self._render(*args, **kw)
                 if self._output_if_modified(self._add_admin_bar(rendered)):
                     self._write_cache(self.response)
             else:
                 self.response.headers.update(cached_response.headers)
-                del self.response.headers['Content-Length']  # Content-Length gets set automatically
-                self._output_if_modified(self._add_admin_bar(cached_response.body))
+                del self.response.headers[
+                    'Content-Length']  # Content-Length gets set automatically
+                self._output_if_modified(
+                    self._add_admin_bar(cached_response.body))
 
     def _output_if_modified(self, content):
         """
@@ -98,18 +102,23 @@ class CacheableHandler(webapp2.RequestHandler):
                 except UnicodeEncodeError:
                     content = unicode(content).encode('utf-8')
 
-                etag = 'W/"{}"'.format(hashlib.md5(content).hexdigest())  # Weak ETag
+                etag = 'W/"{}"'.format(
+                    hashlib.md5(content).hexdigest())  # Weak ETag
                 self.response.headers['ETag'] = etag
 
                 if_none_match = self.request.headers.get('If-None-Match')
-                if if_none_match and etag in [x.strip() for x in if_none_match.split(',')]:
+                if if_none_match and etag in [
+                        x.strip() for x in if_none_match.split(',')
+                ]:
                     self.response.set_status(304)
                     modified = False
 
                 # Fall back to If-Modified-Since
                 if modified and self._last_modified is not None:
-                    last_modified = format_date_time(mktime(self._last_modified.timetuple()))
-                    if_modified_since = self.request.headers.get('If-Modified-Since')
+                    last_modified = format_date_time(
+                        mktime(self._last_modified.timetuple()))
+                    if_modified_since = self.request.headers.get(
+                        'If-Modified-Since')
                     self.response.headers['Last-Modified'] = last_modified
                     if if_modified_since and if_modified_since == last_modified:
                         self.response.set_status(304)
@@ -129,14 +138,17 @@ class CacheableHandler(webapp2.RequestHandler):
         if compressed_result is None:
             return None
         else:
-            response, last_modified = cPickle.loads(zlib.decompress(compressed_result))
+            response, last_modified = cPickle.loads(
+                zlib.decompress(compressed_result))
             self._last_modified = last_modified
             return response
 
     def _write_cache(self, response):
         if tba_config.CONFIG["memcache"] and not self._is_admin:
-            compressed = zlib.compress(cPickle.dumps((response, self._last_modified)))
-            memcache.set(self.cache_key, compressed, self._get_cache_expiration())
+            compressed = zlib.compress(
+                cPickle.dumps((response, self._last_modified)))
+            memcache.set(self.cache_key, compressed,
+                         self._get_cache_expiration())
 
     @classmethod
     def delete_cache_multi(cls, cache_keys):
@@ -163,12 +175,17 @@ class CacheableHandler(webapp2.RequestHandler):
 
     def _set_cache_header_length(self, seconds):
         if type(seconds) is not int:
-            logging.error("Cache-Control max-age is not integer: {}".format(seconds))
+            logging.error(
+                "Cache-Control max-age is not integer: {}".format(seconds))
             return
 
         if not self._is_admin:
-            seconds = min(seconds, self._get_cache_expiration)  # Cache header should never be longer than memcache
-            self.response.headers['Cache-Control'] = "public, max-age=%d" % max(seconds, 61)  # needs to be at least 61 seconds to work
+            seconds = min(
+                seconds, self._get_cache_expiration
+            )  # Cache header should never be longer than memcache
+            self.response.headers[
+                'Cache-Control'] = "public, max-age=%d" % max(
+                    seconds, 61)  # needs to be at least 61 seconds to work
             self.response.headers['Pragma'] = 'Public'
 
 
@@ -181,10 +198,9 @@ class LoggedInHandler(webapp2.RequestHandler):
     def __init__(self, *args, **kw):
         super(LoggedInHandler, self).__init__(*args, **kw)
         self.user_bundle = UserBundle()
-        self.template_values = {
-            "user_bundle": self.user_bundle
-        }
-        self.response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        self.template_values = {"user_bundle": self.user_bundle}
+        self.response.headers[
+            'Cache-Control'] = 'no-cache, no-store, must-revalidate'
         self.response.headers['Pragma'] = 'no-cache'
         self.response.headers['Expires'] = '0'
         self.response.headers['Vary'] = 'Accept-Encoding'
@@ -206,17 +222,14 @@ class LoggedInHandler(webapp2.RequestHandler):
             if not redirect_url:
                 redirect_url = self.request.url
             return self.redirect(
-                '/account/login_required?redirect={}'.format(urllib.quote(redirect_url)),
-                abort=True
-            )
+                '/account/login_required?redirect={}'.format(
+                    urllib.quote(redirect_url)),
+                abort=True)
 
     def _require_permission(self, permission):
         self._require_registration()
         if permission not in self.user_bundle.account.permissions:
-            return self.redirect(
-                "/",
-                abort=True
-            )
+            return self.redirect("/", abort=True)
 
     def _require_registration(self, redirect_url=None):
         import urllib
@@ -228,6 +241,6 @@ class LoggedInHandler(webapp2.RequestHandler):
             if not redirect_url:
                 redirect_url = self.request.url
             return self.redirect(
-                '/account/register?redirect={}'.format(urllib.quote(redirect_url)),
-                abort=True
-            )
+                '/account/register?redirect={}'.format(
+                    urllib.quote(redirect_url)),
+                abort=True)

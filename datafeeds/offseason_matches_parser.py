@@ -20,7 +20,9 @@ class OffseasonMatchesParser(ParserBase):
         """
         matches = list()
 
-        csv_data = list(csv.reader(StringIO.StringIO(data), delimiter=',', skipinitialspace=True))
+        csv_data = list(
+            csv.reader(
+                StringIO.StringIO(data), delimiter=',', skipinitialspace=True))
         for row in csv_data:
             matches.append(self.parseCSVMatch(row))
 
@@ -58,35 +60,48 @@ class OffseasonMatchesParser(ParserBase):
         else:
             blue_score = int(blue_score)
 
-        comp_level, match_number, set_number = self.parseMatchNumberInfo(match_id)
+        comp_level, match_number, set_number = self.parseMatchNumberInfo(
+            match_id)
 
-        alliances = {"red": {"teams": red_team_strings,
-                             "score": red_score},
-                     "blue": {"teams": blue_team_strings,
-                              "score": blue_score}}
+        alliances = {
+            "red": {
+                "teams": red_team_strings,
+                "score": red_score
+            },
+            "blue": {
+                "teams": blue_team_strings,
+                "score": blue_score
+            }
+        }
 
-        match = {"alliances_json": json.dumps(alliances),
-                 "comp_level": comp_level,
-                 "match_number": match_number,
-                 "set_number": set_number,
-                 "team_key_names": team_key_names}
+        match = {
+            "alliances_json": json.dumps(alliances),
+            "comp_level": comp_level,
+            "match_number": match_number,
+            "set_number": set_number,
+            "team_key_names": team_key_names
+        }
 
         return match
 
     @classmethod
     def parseMatchNumberInfo(self, string):
         string = string.strip()
-        COMP_LEVEL_MAP = {'qm': 'qm',
-                          'efm': 'ef',
-                          'qfm': 'qf',
-                          'sfm': 'sf',
-                          'fm': 'f', }
+        COMP_LEVEL_MAP = {
+            'qm': 'qm',
+            'efm': 'ef',
+            'qfm': 'qf',
+            'sfm': 'sf',
+            'fm': 'f',
+        }
 
-        MATCH_PARSE_STYLE = {'qm': self.parseQualMatchNumberInfo,
-                             'ef': self.parseElimMatchNumberInfo,
-                             'qf': self.parseElimMatchNumberInfo,
-                             'sf': self.parseElimMatchNumberInfo,
-                             'f': self.parseElimMatchNumberInfo, }
+        MATCH_PARSE_STYLE = {
+            'qm': self.parseQualMatchNumberInfo,
+            'ef': self.parseElimMatchNumberInfo,
+            'qf': self.parseElimMatchNumberInfo,
+            'sf': self.parseElimMatchNumberInfo,
+            'f': self.parseElimMatchNumberInfo,
+        }
 
         pattern = re.compile('[0-9]')
         comp_level = COMP_LEVEL_MAP[pattern.sub('', string)]

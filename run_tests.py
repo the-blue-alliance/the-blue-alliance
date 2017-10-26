@@ -18,7 +18,6 @@ The SDK Path is probably /usr/local/google_appengine on Mac OS
 
 SDK_PATH    Path to the SDK installation"""
 
-
 sys.path.insert(1, 'lib')
 MULTITHREAD = True
 MAX_JOBS = 4
@@ -53,8 +52,11 @@ def main(sdk_path, test_pattern):
 
     # Fix django template loaders being messed up
     import django.conf.global_settings
-    django.conf.global_settings.SECRET_KEY = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django.conf.global_settings')
+    django.conf.global_settings.SECRET_KEY = ''.join(
+        random.choice(string.ascii_uppercase + string.digits)
+        for _ in range(10))
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE',
+                          'django.conf.global_settings')
 
     # Set up custom django template filters
     from google.appengine.ext.webapp import template
@@ -72,7 +74,14 @@ def main(sdk_path, test_pattern):
         proc_lock = multiprocessing.Lock()
         fail_count = multiprocessing.Value('i', 0)
         total_run = multiprocessing.Value('i', 0)
-        pool = multiprocessing.Pool(MAX_JOBS, initializer=proc_init, initargs=(proc_lock, fail_count, total_run,))
+        pool = multiprocessing.Pool(
+            MAX_JOBS,
+            initializer=proc_init,
+            initargs=(
+                proc_lock,
+                fail_count,
+                total_run,
+            ))
         pool.map(run_suite, suites)
         pool.close()
         pool.join()
@@ -96,7 +105,8 @@ def main(sdk_path, test_pattern):
 
     os.unsetenv('IS_TBA_TEST')
     print "================================"
-    print "Completed {} tests in: {} seconds".format(total_tests_run, time.time() - start_time)
+    print "Completed {} tests in: {} seconds".format(total_tests_run,
+                                                     time.time() - start_time)
     if fail:
         print "TESTS FAILED!"
     else:
@@ -111,10 +121,18 @@ def main(sdk_path, test_pattern):
 if __name__ == '__main__':
     parser = optparse.OptionParser(USAGE)
 
-    parser.add_option("-s", "--sdk_path", type="string", default="/usr/local/google_appengine",
-                      help="path to load Google Appengine SDK from")
-    parser.add_option("-t", "--test_pattern", type="string", default="test*.py",
-                      help="pattern for tests to run")
+    parser.add_option(
+        "-s",
+        "--sdk_path",
+        type="string",
+        default="/usr/local/google_appengine",
+        help="path to load Google Appengine SDK from")
+    parser.add_option(
+        "-t",
+        "--test_pattern",
+        type="string",
+        default="test*.py",
+        help="pattern for tests to run")
     options, args = parser.parse_args()
 
     main(options.sdk_path, options.test_pattern)

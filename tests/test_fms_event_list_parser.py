@@ -14,7 +14,8 @@ class TestFmsEventListParser(unittest2.TestCase):
         self.assertEqual(events[0]["name"], "Alamo Regional")
 
         self.assertEqual(events[1]["first_eid"], "7585")
-        self.assertEqual(events[1]["name"], "BAE Systems Granite State Regional")
+        self.assertEqual(events[1]["name"],
+                         "BAE Systems Granite State Regional")
 
     def test_parse_2014(self):
         with open('test_data/usfirst_html/fms_event_list_2014.html', 'r') as f:
@@ -23,7 +24,8 @@ class TestFmsEventListParser(unittest2.TestCase):
         self.assertEqual(len(events), 103)
 
         self.assertEqual(events[0]["first_eid"], "10851")
-        self.assertEqual(events[0]["name"], "Alamo Regional sponsored by Rackspace Hosting")
+        self.assertEqual(events[0]["name"],
+                         "Alamo Regional sponsored by Rackspace Hosting")
 
         self.assertEqual(events[1]["first_eid"], "10759")
         self.assertEqual(events[1]["name"], "Arizona Regional")

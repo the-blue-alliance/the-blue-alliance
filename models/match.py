@@ -46,7 +46,9 @@ class Match(ndb.Model):
         'f': 5,
     }
 
-    alliances_json = ndb.StringProperty(required=True, indexed=False)  # JSON dictionary with alliances and scores.
+    alliances_json = ndb.StringProperty(
+        required=True,
+        indexed=False)  # JSON dictionary with alliances and scores.
 
     # {
     #   "red": {
@@ -61,7 +63,9 @@ class Match(ndb.Model):
     #   }
     # }
 
-    score_breakdown_json = ndb.StringProperty(indexed=False)  # JSON dictionary with score breakdowns. Fields are those used for seeding. Varies by year.
+    score_breakdown_json = ndb.StringProperty(
+        indexed=False
+    )  # JSON dictionary with score breakdowns. Fields are those used for seeding. Varies by year.
     # Example for 2014. Seeding outlined in Section 5.3.4 in the 2014 manual.
     # {"red": {
     #     "auto": 20,
@@ -80,18 +84,27 @@ class Match(ndb.Model):
     event = ndb.KeyProperty(kind=Event, required=True)
     year = ndb.IntegerProperty(required=True)
     match_number = ndb.IntegerProperty(required=True, indexed=False)
-    no_auto_update = ndb.BooleanProperty(default=False, indexed=False)  # Set to True after manual update
+    no_auto_update = ndb.BooleanProperty(
+        default=False, indexed=False)  # Set to True after manual update
     set_number = ndb.IntegerProperty(required=True, indexed=False)
-    team_key_names = ndb.StringProperty(repeated=True)  # list of teams in Match, for indexing.
+    team_key_names = ndb.StringProperty(
+        repeated=True)  # list of teams in Match, for indexing.
     time = ndb.DateTimeProperty()  # UTC time of scheduled start
-    time_string = ndb.StringProperty(indexed=False)  # the time as displayed on FIRST's site (event's local time)
+    time_string = ndb.StringProperty(
+        indexed=False
+    )  # the time as displayed on FIRST's site (event's local time)
     actual_time = ndb.DateTimeProperty()  # UTC time of match actual start
-    predicted_time = ndb.DateTimeProperty()  # UTC time of when we predict the match will start
-    post_result_time = ndb.DateTimeProperty()  # UTC time scores were shown to the audience
+    predicted_time = ndb.DateTimeProperty(
+    )  # UTC time of when we predict the match will start
+    post_result_time = ndb.DateTimeProperty(
+    )  # UTC time scores were shown to the audience
     youtube_videos = ndb.StringProperty(repeated=True)  # list of Youtube IDs
-    tba_videos = ndb.StringProperty(repeated=True)  # list of filetypes a TBA video exists for
-    push_sent = ndb.BooleanProperty()  # has an upcoming match notification been sent for this match? None counts as False
-    tiebreak_match_key = ndb.KeyProperty(kind='Match')  # Points to a match that was played to tiebreak this one
+    tba_videos = ndb.StringProperty(
+        repeated=True)  # list of filetypes a TBA video exists for
+    push_sent = ndb.BooleanProperty(
+    )  # has an upcoming match notification been sent for this match? None counts as False
+    tiebreak_match_key = ndb.KeyProperty(
+        kind='Match')  # Points to a match that was played to tiebreak this one
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True)
@@ -110,7 +123,8 @@ class Match(ndb.Model):
         self._tba_video = None
         self._winning_alliance = None
         self._youtube_videos = None
-        self._updated_attrs = []  # Used in MatchManipulator to track what changed
+        self._updated_attrs = [
+        ]  # Used in MatchManipulator to track what changed
         super(Match, self).__init__(*args, **kw)
 
     @property
@@ -155,16 +169,24 @@ class Match(ndb.Model):
                                 rp_earned += 1
 
                             if self.year == 2016:
-                                if self._score_breakdown.get(color, {}).get('teleopDefensesBreached'):
+                                if self._score_breakdown.get(
+                                        color,
+                                    {}).get('teleopDefensesBreached'):
                                     rp_earned += 1
-                                if self._score_breakdown.get(color, {}).get('teleopTowerCaptured'):
+                                if self._score_breakdown.get(
+                                        color, {}).get('teleopTowerCaptured'):
                                     rp_earned += 1
                             elif self.year == 2017:
-                                if self._score_breakdown.get(color, {}).get('kPaRankingPointAchieved'):
+                                if self._score_breakdown.get(
+                                        color,
+                                    {}).get('kPaRankingPointAchieved'):
                                     rp_earned += 1
-                                if self._score_breakdown.get(color, {}).get('rotorRankingPointAchieved'):
+                                if self._score_breakdown.get(
+                                        color,
+                                    {}).get('rotorRankingPointAchieved'):
                                     rp_earned += 1
-                            self._score_breakdown[color]['tba_rpEarned'] = rp_earned
+                            self._score_breakdown[color][
+                                'tba_rpEarned'] = rp_earned
                         else:
                             self._score_breakdown[color]['tba_rpEarned'] = None
 
@@ -175,7 +197,8 @@ class Match(ndb.Model):
         from helpers.event_helper import EventHelper
         from helpers.match_helper import MatchHelper
         if self._winning_alliance is None:
-            if EventHelper.is_2015_playoff(self.event_key_name) and self.comp_level != 'f':
+            if EventHelper.is_2015_playoff(
+                    self.event_key_name) and self.comp_level != 'f':
                 return ''  # report all 2015 non finals matches as ties
 
             red_score = int(self.alliances['red']['score'])
@@ -198,11 +221,15 @@ class Match(ndb.Model):
 
     @property
     def team_keys(self):
-        return [ndb.Key(Team, team_key_name) for team_key_name in self.team_key_names]
+        return [
+            ndb.Key(Team, team_key_name)
+            for team_key_name in self.team_key_names
+        ]
 
     @property
     def key_name(self):
-        return self.renderKeyName(self.event_key_name, self.comp_level, self.set_number, self.match_number)
+        return self.renderKeyName(self.event_key_name, self.comp_level,
+                                  self.set_number, self.match_number)
 
     @property
     def has_been_played(self):
@@ -216,10 +243,14 @@ class Match(ndb.Model):
     @property
     def verbose_name(self):
         from helpers.event_helper import EventHelper
-        if self.comp_level == "qm" or self.comp_level == "f" or EventHelper.is_2015_playoff(self.event_key_name):
-            return "%s %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.match_number)
+        if self.comp_level == "qm" or self.comp_level == "f" or EventHelper.is_2015_playoff(
+                self.event_key_name):
+            return "%s %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level],
+                              self.match_number)
         else:
-            return "%s %s Match %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.set_number, self.match_number)
+            return "%s %s Match %s" % (
+                self.COMP_LEVELS_VERBOSE[self.comp_level], self.set_number,
+                self.match_number)
 
     @property
     def short_name(self):
@@ -228,7 +259,8 @@ class Match(ndb.Model):
         elif self.comp_level == "f":
             return "F%s" % self.match_number
         else:
-            return "%s%s-%s" % (self.comp_level.upper(), self.set_number, self.match_number)
+            return "%s%s-%s" % (self.comp_level.upper(), self.set_number,
+                                self.match_number)
 
     @property
     def has_video(self):
@@ -247,7 +279,8 @@ class Match(ndb.Model):
 
     @property
     def play_order(self):
-        return self.COMP_LEVELS_PLAY_ORDER[self.comp_level] * 1000000 + self.match_number * 1000 + self.set_number
+        return self.COMP_LEVELS_PLAY_ORDER[self.
+                                           comp_level] * 1000000 + self.match_number * 1000 + self.set_number
 
     @property
     def name(self):
@@ -290,11 +323,13 @@ class Match(ndb.Model):
             if self.actual_time > self.predicted_time:
                 delta = self.actual_time - self.predicted_time
                 s = int(delta.total_seconds())
-                return '{:02}:{:02}:{:02} early'.format(s // 3600, s % 3600 // 60, s % 60)
+                return '{:02}:{:02}:{:02} early'.format(
+                    s // 3600, s % 3600 // 60, s % 60)
             elif self.predicted_time > self.actual_time:
                 delta = self.predicted_time - self.actual_time
                 s = int(delta.total_seconds())
-                return '{:02}:{:02}:{:02} late'.format(s // 3600, s % 3600 // 60, s % 60)
+                return '{:02}:{:02}:{:02} late'.format(s // 3600,
+                                                       s % 3600 // 60, s % 60)
             else:
                 return "On Time"
 
@@ -304,24 +339,29 @@ class Match(ndb.Model):
             if self.actual_time > self.time:
                 delta = self.actual_time - self.time
                 s = int(delta.total_seconds())
-                return '{:02}:{:02}:{:02} behind'.format(s // 3600, s % 3600 // 60, s % 60)
+                return '{:02}:{:02}:{:02} behind'.format(
+                    s // 3600, s % 3600 // 60, s % 60)
             elif self.time > self.actual_time:
                 delta = self.time - self.actual_time
                 s = int(delta.total_seconds())
-                return '{:02}:{:02}:{:02} ahead'.format(s // 3600, s % 3600 // 60, s % 60)
+                return '{:02}:{:02}:{:02} ahead'.format(
+                    s // 3600, s % 3600 // 60, s % 60)
             else:
                 return "On Time"
 
     @classmethod
-    def renderKeyName(self, event_key_name, comp_level, set_number, match_number):
+    def renderKeyName(self, event_key_name, comp_level, set_number,
+                      match_number):
         if comp_level == "qm":
             return "%s_qm%s" % (event_key_name, match_number)
         else:
-            return "%s_%s%sm%s" % (event_key_name, comp_level, set_number, match_number)
+            return "%s_%s%sm%s" % (event_key_name, comp_level, set_number,
+                                   match_number)
 
     @classmethod
     def validate_key_name(self, match_key):
-        key_name_regex = re.compile(r'^[1-9]\d{3}[a-z]+[0-9]?\_(?:qm|ef\dm|qf\dm|sf\dm|f\dm)\d+$')
+        key_name_regex = re.compile(
+            r'^[1-9]\d{3}[a-z]+[0-9]?\_(?:qm|ef\dm|qf\dm|sf\dm|f\dm)\d+$')
         match = re.match(key_name_regex, match_key)
         return True if match else False
 
@@ -329,4 +369,6 @@ class Match(ndb.Model):
         """
         Returns: Boolean whether match started within specified seconds of now
         """
-        return self.actual_time and abs((datetime.datetime.now() - self.actual_time).total_seconds()) <= seconds
+        return self.actual_time and abs(
+            (datetime.datetime.now() -
+             self.actual_time).total_seconds()) <= seconds

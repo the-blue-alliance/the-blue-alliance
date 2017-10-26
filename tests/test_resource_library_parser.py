@@ -19,7 +19,10 @@ class TestResourceLibraryParser(unittest2.TestCase):
         self.assertEqual(team["year"], 2016)
         self.assertEqual(team["video"], "wpv-9yd_CJk")
         self.assertEqual(team["presentation"], "ILxVggTpXhs")
-        self.assertEqual(team["essay"], "https://www.firstinspires.org/sites/default/files/uploads/resource_library/frc/game-and-season-info/awards/2016/chairmans/week-five/team-987.pdf")
+        self.assertEqual(
+            team["essay"],
+            "https://www.firstinspires.org/sites/default/files/uploads/resource_library/frc/game-and-season-info/awards/2016/chairmans/week-five/team-987.pdf"
+        )
 
         # Test team 597
         team = teams[1]
@@ -37,7 +40,10 @@ class TestResourceLibraryParser(unittest2.TestCase):
         self.assertEqual(team["year"], 2014)
         self.assertEqual(team["video"], "BCz2yTVPxbM")
         self.assertEqual(team["presentation"], "1rE67fTRl98")
-        self.assertEqual(team["essay"], "https://www.firstinspires.org/sites/default/files/uploads/resource_library/frc/game-and-season-info/awards/2015/2014-67-chairmans-handout.pdf")
+        self.assertEqual(
+            team["essay"],
+            "https://www.firstinspires.org/sites/default/files/uploads/resource_library/frc/game-and-season-info/awards/2015/2014-67-chairmans-handout.pdf"
+        )
 
         # Test team 1538
         team = teams[3]

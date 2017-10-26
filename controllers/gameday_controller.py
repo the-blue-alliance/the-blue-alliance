@@ -27,11 +27,14 @@ class Gameday2Controller(CacheableHandler):
         self._cache_expiration = 61
 
     def _render(self, *args, **kw):
-        special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
+        special_webcasts_future = Sitevar.get_by_id_async(
+            'gameday.special_webcasts')
         special_webcasts_temp = special_webcasts_future.get_result()
         if special_webcasts_temp:
-            default_chat = special_webcasts_temp.contents.get("default_chat", "")
-            special_webcasts_temp = special_webcasts_temp.contents.get("webcasts", [])
+            default_chat = special_webcasts_temp.contents.get(
+                "default_chat", "")
+            special_webcasts_temp = special_webcasts_temp.contents.get(
+                "webcasts", [])
         else:
             default_chat = ""
             special_webcasts_temp = []
@@ -47,11 +50,14 @@ class Gameday2Controller(CacheableHandler):
         }
 
         self.template_values.update({
-            'webcasts_json': json.dumps(webcasts_json),
-            'default_chat': default_chat,
+            'webcasts_json':
+            json.dumps(webcasts_json),
+            'default_chat':
+            default_chat,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/gameday2.html')
+        path = os.path.join(
+            os.path.dirname(__file__), '../templates/gameday2.html')
         return template.render(path, self.template_values)
 
 
@@ -64,10 +70,12 @@ class GamedayHandler(CacheableHandler):
         self._cache_expiration = 60 * 60
 
     def _render(self, *args, **kw):
-        special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
+        special_webcasts_future = Sitevar.get_by_id_async(
+            'gameday.special_webcasts')
         special_webcasts_temp = special_webcasts_future.get_result()
         if special_webcasts_temp:
-            special_webcasts_temp = special_webcasts_temp.contents.get("webcasts", [])
+            special_webcasts_temp = special_webcasts_temp.contents.get(
+                "webcasts", [])
         else:
             special_webcasts_temp = []
         special_webcasts = []
@@ -100,21 +108,26 @@ class GamedayHandler(CacheableHandler):
                     ongoing_events_w_webcasts += valid
 
         self.template_values.update({
-            'special_webcasts': special_webcasts,
-            'ongoing_events': ongoing_events,
-            'ongoing_events_w_webcasts': ongoing_events_w_webcasts
+            'special_webcasts':
+            special_webcasts,
+            'ongoing_events':
+            ongoing_events,
+            'ongoing_events_w_webcasts':
+            ongoing_events_w_webcasts
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/gameday.html')
+        path = os.path.join(
+            os.path.dirname(__file__), '../templates/gameday.html')
         return template.render(path, self.template_values)
 
 
 class GamedayRedirectHandler(webapp2.RequestHandler):
-
     def get(self, alias):
-        special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
+        special_webcasts_future = Sitevar.get_by_id_async(
+            'gameday.special_webcasts')
         special_webcasts = special_webcasts_future.get_result()
-        aliases = special_webcasts.contents.get("aliases", {}) if special_webcasts else {}
+        aliases = special_webcasts.contents.get(
+            "aliases", {}) if special_webcasts else {}
 
         if alias in aliases:
             self.redirect("/gameday{}".format(aliases[alias]))
@@ -132,7 +145,8 @@ class GamedayRedirectHandler(webapp2.RequestHandler):
         team_key = "frc{}".format(alias)
         if not ValidationHelper.team_id_validator(team_key):
             now = datetime.datetime.now()
-            team_events_future = TeamYearEventsQuery(team_key, now.year).fetch_async()
+            team_events_future = TeamYearEventsQuery(team_key,
+                                                     now.year).fetch_async()
             team_events = team_events_future.get_result()
             for event in team_events:
                 if event and event.within_a_day:

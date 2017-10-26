@@ -9,10 +9,13 @@ class APIAIHandler(LoggedInHandler):
         super(APIAIHandler, self).__init__(*args, **kw)
 
     def post(self):
-        if self.request.headers.get('X-TBA-APIAI-Auth') != Sitevar.get_by_id('apiai.secrets').contents['key']:
+        if self.request.headers.get('X-TBA-APIAI-Auth') != Sitevar.get_by_id(
+                'apiai.secrets').contents['key']:
             return
 
         request = json.loads(self.request.body)
 
-        self.response.headers['content-type'] = 'application/json; charset="utf-8"'
-        self.response.out.write(json.dumps(APIAIHelper.process_request(request)))
+        self.response.headers[
+            'content-type'] = 'application/json; charset="utf-8"'
+        self.response.out.write(
+            json.dumps(APIAIHelper.process_request(request)))

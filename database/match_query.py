@@ -26,7 +26,8 @@ class EventMatchesQuery(DatabaseQuery):
     @ndb.tasklet
     def _query_async(self):
         event_key = self._query_args[0]
-        match_keys = yield Match.query(Match.event == ndb.Key(Event, event_key)).fetch_async(keys_only=True)
+        match_keys = yield Match.query(Match.event == ndb.Key(
+            Event, event_key)).fetch_async(keys_only=True)
         matches = yield ndb.get_multi_async(match_keys)
         raise ndb.Return(matches)
 
@@ -41,8 +42,8 @@ class TeamEventMatchesQuery(DatabaseQuery):
         team_key = self._query_args[0]
         event_key = self._query_args[1]
         match_keys = yield Match.query(
-            Match.team_key_names == team_key,
-            Match.event == ndb.Key(Event, event_key)).fetch_async(keys_only=True)
+            Match.team_key_names == team_key, Match.event == ndb.Key(
+                Event, event_key)).fetch_async(keys_only=True)
         matches = yield ndb.get_multi_async(match_keys)
         raise ndb.Return(matches)
 

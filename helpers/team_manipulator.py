@@ -12,6 +12,7 @@ class TeamManipulator(ManipulatorBase):
     """
     Handle Team database writes.
     """
+
     @classmethod
     def getCacheKeysAndControllers(cls, affected_refs):
         return CacheClearer.get_team_cache_keys_and_controllers(affected_refs)
@@ -35,13 +36,17 @@ class TeamManipulator(ManipulatorBase):
                 try:
                     LocationHelper.update_team_location(team)
                 except Exception, e:
-                    logging.error("update_team_location for {} errored!".format(team.key.id()))
+                    logging.error(
+                        "update_team_location for {} errored!".format(
+                            team.key.id()))
                     logging.exception(e)
 
                 try:
                     SearchHelper.update_team_location_index(team)
                 except Exception, e:
-                    logging.error("update_team_location_index for {} errored!".format(team.key.id()))
+                    logging.error(
+                        "update_team_location_index for {} errored!".format(
+                            team.key.id()))
                     logging.exception(e)
         cls.createOrUpdate(teams, run_post_update_hook=False)
 
@@ -74,7 +79,8 @@ class TeamManipulator(ManipulatorBase):
                     old_team.dirty = True
 
         # Take the new tpid and tpid_year iff the year is newer than or equal to the old one
-        if (new_team.first_tpid_year is not None and new_team.first_tpid_year >= old_team.first_tpid_year):
+        if (new_team.first_tpid_year is not None
+                and new_team.first_tpid_year >= old_team.first_tpid_year):
             old_team.first_tpid_year = new_team.first_tpid_year
             old_team.first_tpid = new_team.first_tpid
             old_team.dirty = True

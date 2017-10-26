@@ -15,13 +15,7 @@ import logging
 import math
 from optparse import OptionParser
 
-COMPLEVELS = {
-    10: "qm",
-    20: "ef",
-    30: "qf",
-    40: "sf",
-    50: "f"
-}
+COMPLEVELS = {10: "qm", 20: "ef", 30: "qf", 40: "sf", 50: "f"}
 
 FRC_GAMES_BY_YEAR = {
     2010: "frc_2010_bkwy",
@@ -90,8 +84,10 @@ def build_new_match(old_match):
         return None
     match["game"] = FRC_GAMES_BY_YEAR[int(old_match["year"])]
 
-    red_teams = legal_teams([old_match["red1"], old_match["red2"], old_match["red3"]])
-    blue_teams = legal_teams([old_match["blue1"], old_match["blue2"], old_match["blue3"]])
+    red_teams = legal_teams(
+        [old_match["red1"], old_match["red2"], old_match["red3"]])
+    blue_teams = legal_teams(
+        [old_match["blue1"], old_match["blue2"], old_match["blue3"]])
 
     match["alliances_json"] = {
         "red": {
@@ -111,8 +107,10 @@ def build_new_match(old_match):
         match["key"] = match["event"] + "_qm" + match["match_number"]
     else:
         match["match_number"] = str(int(old_match["matchnumber"]) % 10)
-        match["set_number"] = str(int(math.floor(int(old_match["matchnumber"]) / 10.0)))
-        match["key"] = match["event"] + "_" + match["comp_level"] + match["set_number"] + "m" + match["match_number"]
+        match["set_number"] = str(
+            int(math.floor(int(old_match["matchnumber"]) / 10.0)))
+        match[
+            "key"] = match["event"] + "_" + match["comp_level"] + match["set_number"] + "m" + match["match_number"]
 
     match["no_auto_update"] = "TRUE"
 
@@ -121,10 +119,9 @@ def build_new_match(old_match):
 
 def main():
     parser = OptionParser()
-    parser.add_option("-i", "--input_file", type="string",
-                      help="Input TBA SQL export CSV")
-    parser.add_option("-o", "--output_file", type="string",
-                      help="Output CSV")
+    parser.add_option(
+        "-i", "--input_file", type="string", help="Input TBA SQL export CSV")
+    parser.add_option("-o", "--output_file", type="string", help="Output CSV")
     options, args = parser.parse_args()
 
     matches = list()
@@ -136,11 +133,23 @@ def main():
         if new_match:
             matches.append(new_match)
 
-    matchWriter = csv.writer(open(options.output_file, 'wb'), delimiter=',',
-                             quotechar='"', quoting=csv.QUOTE_MINIMAL)
-    matchWriter.writerow(["key", "event", "game", "comp_level", "set_number", "match_number", "team_key_names", "alliances_json", "no_auto_update"])
+    matchWriter = csv.writer(
+        open(options.output_file, 'wb'),
+        delimiter=',',
+        quotechar='"',
+        quoting=csv.QUOTE_MINIMAL)
+    matchWriter.writerow([
+        "key", "event", "game", "comp_level", "set_number", "match_number",
+        "team_key_names", "alliances_json", "no_auto_update"
+    ])
     for match in matches:
-        matchWriter.writerow([match["key"], match["event"], match["game"], match["comp_level"], match["set_number"], match["match_number"], match["team_key_names"], match["alliances_json"], match["no_auto_update"]])
+        matchWriter.writerow([
+            match["key"], match["event"], match["game"], match["comp_level"],
+            match["set_number"], match["match_number"],
+            match["team_key_names"], match["alliances_json"],
+            match["no_auto_update"]
+        ])
+
 
 if __name__ == "__main__":
     main()

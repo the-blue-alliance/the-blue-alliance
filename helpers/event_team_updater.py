@@ -29,16 +29,19 @@ class EventTeamUpdater(object):
 
         # Add teams from Matches and Awards
         team_ids = set()
-        match_key_futures = Match.query(
-            Match.event == event.key).fetch_async(1000, keys_only=True)
-        award_key_futures = Award.query(
-            Award.event == event.key).fetch_async(1000, keys_only=True)
+        match_key_futures = Match.query(Match.event == event.key).fetch_async(
+            1000, keys_only=True)
+        award_key_futures = Award.query(Award.event == event.key).fetch_async(
+            1000, keys_only=True)
         match_futures = ndb.get_multi_async(match_key_futures.get_result())
         award_futures = ndb.get_multi_async(award_key_futures.get_result())
 
-        division_futures = ndb.get_multi_async(event.divisions) if event.divisions else []
-        division_matches_futures = [Match.query(
-            Match.event == division).fetch_async(1000) for division in event.divisions] if event.divisions else []
+        division_futures = ndb.get_multi_async(
+            event.divisions) if event.divisions else []
+        division_matches_futures = [
+            Match.query(Match.event == division).fetch_async(1000)
+            for division in event.divisions
+        ] if event.divisions else []
 
         for match_future in match_futures:
             match = match_future.get_result()
@@ -55,36 +58,44 @@ class EventTeamUpdater(object):
 
         # Add teams from division winners
         if division_futures and division_matches_futures:
-            for division_future, matches_future in zip(division_futures, division_matches_futures):
-                division_winners = self.get_event_winners(division_future.get_result(), matches_future.get_result())
+            for division_future, matches_future in zip(
+                    division_futures, division_matches_futures):
+                division_winners = self.get_event_winners(
+                    division_future.get_result(), matches_future.get_result())
                 team_ids = team_ids.union(division_winners)
 
         # Create or update EventTeams
-        teams = [Team(id=team_id,
-                      team_number=int(team_id[3:]))
-                      for team_id in team_ids if team_id[3:].isdigit()]
+        teams = [
+            Team(id=team_id, team_number=int(team_id[3:]))
+            for team_id in team_ids if team_id[3:].isdigit()
+        ]
 
         if teams:
-            event_teams = [EventTeam(id=event_key + "_" + team.key.id(),
-                                     event=event.key,
-                                     team=team.key,
-                                     year=event.year)
-                                     for team in teams]
+            event_teams = [
+                EventTeam(
+                    id=event_key + "_" + team.key.id(),
+                    event=event.key,
+                    team=team.key,
+                    year=event.year) for team in teams
+            ]
         else:
             event_teams = None
 
         # Delete EventTeams for teams who did not participate in the event
         # Only runs if event is over
         existing_event_teams_keys = EventTeam.query(
-            EventTeam.event == event.key).fetch(1000, keys_only=True)
+            EventTeam.event == event.key).fetch(
+                1000, keys_only=True)
         existing_event_teams = ndb.get_multi(existing_event_teams_keys)
         existing_team_ids = set()
         for et in existing_event_teams:
             existing_team_ids.add(et.team.id())
 
         et_keys_to_delete = set()
-        if event.year == cur_year and event.end_date is not None and event.end_date < datetime.datetime.now():
-            for team_id in existing_team_ids.difference([team.key.id() for team in teams]):
+        if event.year == cur_year and event.end_date is not None and event.end_date < datetime.datetime.now(
+        ):
+            for team_id in existing_team_ids.difference(
+                [team.key.id() for team in teams]):
                 et_key_name = "{}_{}".format(event.key_name, team_id)
                 et_keys_to_delete.add(ndb.Key(EventTeam, et_key_name))
 
@@ -118,8 +129,10 @@ class EventTeamUpdater(object):
         alliance_selections = event.alliance_selections
         if alliance_selections:
             for alliance in alliance_selections:
-                if len(winning_teams.intersection(set(alliance['picks']))) >= 2:
-                    complete_alliance = set(alliance['picks']) if alliance else set()
+                if len(winning_teams.intersection(set(
+                        alliance['picks']))) >= 2:
+                    complete_alliance = set(
+                        alliance['picks']) if alliance else set()
                     if alliance and alliance.get('backup'):
                         complete_alliance.add(alliance['backup']['in'])
                     return complete_alliance

@@ -23,10 +23,12 @@ class ApiEventListController(ApiBaseController):
         self._track_call_defer(action, year)
 
     def _render(self, year, model_type=None):
-        events, self._last_modified = EventListQuery(int(year)).fetch(dict_version=3, return_updated=True)
+        events, self._last_modified = EventListQuery(int(year)).fetch(
+            dict_version=3, return_updated=True)
         if model_type is not None:
             events = filter_event_properties(events, model_type)
-        return json.dumps(events, ensure_ascii=True, indent=True, sort_keys=True)
+        return json.dumps(
+            events, ensure_ascii=True, indent=True, sort_keys=True)
 
 
 class ApiEventController(ApiBaseController):
@@ -40,7 +42,8 @@ class ApiEventController(ApiBaseController):
         self._track_call_defer(action, event_key)
 
     def _render(self, event_key, model_type=None):
-        event, self._last_modified = EventQuery(event_key).fetch(dict_version=3, return_updated=True)
+        event, self._last_modified = EventQuery(event_key).fetch(
+            dict_version=3, return_updated=True)
         if model_type is not None:
             event = filter_event_properties([event], model_type)[0]
 
@@ -61,9 +64,13 @@ class ApiEventDetailsController(ApiBaseController):
             if alliance['picks']:
                 captain_team_keys.append(alliance['picks'][0])
 
-        event_team_keys = [ndb.Key(EventTeam, "{}_{}".format(event_key, team_key)) for team_key in captain_team_keys]
+        event_team_keys = [
+            ndb.Key(EventTeam, "{}_{}".format(event_key, team_key))
+            for team_key in captain_team_keys
+        ]
         captain_eventteams_future = ndb.get_multi_async(event_team_keys)
-        for captain_future, alliance in zip(captain_eventteams_future, alliances):
+        for captain_future, alliance in zip(captain_eventteams_future,
+                                            alliances):
             captain = captain_future.get_result()
             if captain and captain.status and 'alliance' in captain.status and 'playoff' in captain.status:
                 alliance['status'] = captain.status['playoff']
@@ -72,9 +79,12 @@ class ApiEventDetailsController(ApiBaseController):
         return alliances
 
     def _render(self, event_key, detail_type):
-        event_details, self._last_modified = EventDetailsQuery(event_key).fetch(dict_version=3, return_updated=True)
+        event_details, self._last_modified = EventDetailsQuery(
+            event_key).fetch(
+                dict_version=3, return_updated=True)
         if detail_type == 'alliances' and event_details[detail_type]:
-            data = self._add_alliance_status(event_key, event_details[detail_type])
+            data = self._add_alliance_status(event_key,
+                                             event_details[detail_type])
         else:
             data = event_details[detail_type]
 
@@ -92,7 +102,8 @@ class ApiEventTeamsController(ApiBaseController):
         self._track_call_defer(action, event_key)
 
     def _render(self, event_key, model_type=None):
-        teams, self._last_modified = EventTeamsQuery(event_key).fetch(dict_version=3, return_updated=True)
+        teams, self._last_modified = EventTeamsQuery(event_key).fetch(
+            dict_version=3, return_updated=True)
         if model_type is not None:
             teams = filter_team_properties(teams, model_type)
 
@@ -110,7 +121,8 @@ class ApiEventMatchesController(ApiBaseController):
         self._track_call_defer(action, event_key)
 
     def _render(self, event_key, model_type=None):
-        matches, self._last_modified = EventMatchesQuery(event_key).fetch(dict_version=3, return_updated=True)
+        matches, self._last_modified = EventMatchesQuery(event_key).fetch(
+            dict_version=3, return_updated=True)
         if model_type is not None:
             matches = filter_match_properties(matches, model_type)
 
@@ -125,6 +137,7 @@ class ApiEventAwardsController(ApiBaseController):
         self._track_call_defer('event/awards', event_key)
 
     def _render(self, event_key):
-        awards, self._last_modified = EventAwardsQuery(event_key).fetch(dict_version=3, return_updated=True)
+        awards, self._last_modified = EventAwardsQuery(event_key).fetch(
+            dict_version=3, return_updated=True)
 
         return json.dumps(awards, ensure_ascii=True, indent=2, sort_keys=True)

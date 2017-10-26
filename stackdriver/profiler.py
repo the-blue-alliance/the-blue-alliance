@@ -9,7 +9,6 @@ from google.appengine.api import app_identity
 from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
 
-
 # create a thread-local global context
 trace_context = threading.local()
 
@@ -51,7 +50,8 @@ class Span(object):
 class TraceContext(object):
     def __init__(self):
         if hasattr(trace_context, 'request'):
-            self._tcontext = trace_context.request.headers.get('X-Cloud-Trace-Context', 'NNNN/NNNN;xxxxx')
+            self._tcontext = trace_context.request.headers.get(
+                'X-Cloud-Trace-Context', 'NNNN/NNNN;xxxxx')
             logging.info("Trace Context: {}".format(self._tcontext))
 
             self._doTrace = ';o=1' in self._tcontext
@@ -103,13 +103,11 @@ class TraceContext(object):
 
             projectId = app_identity.get_application_id()
             traces_body = {
-                    'projectId': projectId,
-                    'traceId': trace_id,
-                    'spans': spans
+                'projectId': projectId,
+                'traceId': trace_id,
+                'spans': spans
             }
-            body = {
-                'traces': [traces_body]
-            }
+            body = {'traces': [traces_body]}
 
             # Authentication is provided by the 'gcloud' tool when running locally
             # and by built-in service accounts when running on GAE, GCE, or GKE.
@@ -119,10 +117,12 @@ class TraceContext(object):
             # Construct the cloudtrace service object (version v1) for interacting
             # with the API. You can browse other available API services and versions at
             # https://developers.google.com/api-client-library/python/apis/
-            service = discovery.build('cloudtrace', 'v1', credentials=credentials)
+            service = discovery.build(
+                'cloudtrace', 'v1', credentials=credentials)
 
             # Actually submit the patched tracing data.
-            request = service.projects().patchTraces(projectId=projectId, body=body)
+            request = service.projects().patchTraces(
+                projectId=projectId, body=body)
             request.execute()
         except Exception, e:
             logging.warning("TraceContext.write() failed!")

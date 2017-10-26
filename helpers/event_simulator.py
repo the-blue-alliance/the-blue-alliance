@@ -33,6 +33,7 @@ class EventSimulator(object):
     (step 8, substep n) Add results of each of the n F matches +
         update alliance selection backups (if has_event_details)
     """
+
     def __init__(self, has_event_details=True, batch_advance=False):
         self._step = 0
         self._substep = 0
@@ -42,9 +43,14 @@ class EventSimulator(object):
         self._batch_advance = batch_advance
 
         # Load and save complete data
-        load_fixture('test_data/fixtures/2016nytr_event_team_status.json',
-              kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
-              post_processor=self._event_key_adder)
+        load_fixture(
+            'test_data/fixtures/2016nytr_event_team_status.json',
+            kind={
+                'EventDetails': EventDetails,
+                'Event': Event,
+                'Match': Match
+            },
+            post_processor=self._event_key_adder)
         event = Event.get_by_id('2016nytr')
 
         # Add 3rd matches that never got played
@@ -109,10 +115,12 @@ class EventSimulator(object):
         ]
 
         self._event_details = event.details
-        self._alliance_selections_without_backup = copy.deepcopy(event.details.alliance_selections)
+        self._alliance_selections_without_backup = copy.deepcopy(
+            event.details.alliance_selections)
         self._alliance_selections_without_backup[1]['backup'] = None
         self._played_matches = MatchHelper.organizeMatches(event.matches)
-        self._all_matches = MatchHelper.organizeMatches(event.matches + unplayed_matches)
+        self._all_matches = MatchHelper.organizeMatches(
+            event.matches + unplayed_matches)
 
         # Delete data
         event.details.key.delete()
@@ -170,10 +178,11 @@ class EventSimulator(object):
         for i, ranking in enumerate(rankings):
             ranking['rank'] = i + 1
 
-        EventDetailsManipulator.createOrUpdate(EventDetails(
-            id='2016nytr',
-            rankings2=rankings,
-        ))
+        EventDetailsManipulator.createOrUpdate(
+            EventDetails(
+                id='2016nytr',
+                rankings2=rankings,
+            ))
 
     def step(self):
         event = Event.get_by_id('2016nytr')
@@ -189,7 +198,8 @@ class EventSimulator(object):
 
             self._step += 1
         elif self._step == 1:  # After each qual match
-            MatchManipulator.createOrUpdate(self._played_matches['qm'][self._substep])
+            MatchManipulator.createOrUpdate(
+                self._played_matches['qm'][self._substep])
             if self._substep < len(self._played_matches['qm']) - 1:
                 self._substep += 1
             else:
@@ -197,10 +207,11 @@ class EventSimulator(object):
                 self._substep = 0
             EventDetailsManipulator.createOrUpdate(EventDetails(id='2016nytr'))
         elif self._step == 2:  # After alliance selections
-            EventDetailsManipulator.createOrUpdate(EventDetails(
-                id='2016nytr',
-                alliance_selections=self._alliance_selections_without_backup
-            ))
+            EventDetailsManipulator.createOrUpdate(
+                EventDetails(
+                    id='2016nytr',
+                    alliance_selections=self.
+                    _alliance_selections_without_backup))
             self._step += 1
         elif self._step == 3:  # QF schedule added
             for match in copy.deepcopy(self._all_matches['qf']):
@@ -212,7 +223,8 @@ class EventSimulator(object):
                 MatchManipulator.createOrUpdate(match)
             self._step += 1
         elif self._step == 4:  # After each QF match
-            new_match = MatchHelper.play_order_sort_matches(self._played_matches['qf'])[self._substep]
+            new_match = MatchHelper.play_order_sort_matches(
+                self._played_matches['qf'])[self._substep]
             MatchManipulator.createOrUpdate(new_match)
 
             if not self._batch_advance:
@@ -222,34 +234,47 @@ class EventSimulator(object):
                 }
                 for i in xrange(new_match.match_number):
                     win_counts[Match.get_by_id(
-                        Match.renderKeyName(
-                            new_match.event.id(),
-                            new_match.comp_level,
-                            new_match.set_number,
-                            i+1)).winning_alliance] += 1
+                        Match.renderKeyName(new_match.event.id(),
+                                            new_match.comp_level,
+                                            new_match.set_number,
+                                            i + 1)).winning_alliance] += 1
                 for alliance, wins in win_counts.items():
                     if wins == 2:
                         s = new_match.set_number
                         if s in {1, 2}:
-                            self._advancement_alliances['sf1']['red' if s == 1 else 'blue'] = new_match.alliances[alliance]['teams']
+                            self._advancement_alliances['sf1'][
+                                'red'
+                                if s == 1 else 'blue'] = new_match.alliances[
+                                    alliance]['teams']
                         elif s in {3, 4}:
-                            self._advancement_alliances['sf2']['red' if s == 3 else 'blue'] = new_match.alliances[alliance]['teams']
+                            self._advancement_alliances['sf2'][
+                                'red'
+                                if s == 3 else 'blue'] = new_match.alliances[
+                                    alliance]['teams']
                         else:
                             raise Exception("Invalid set number: {}".format(s))
 
-                        for match_set, alliances in self._advancement_alliances.items():
+                        for match_set, alliances in self._advancement_alliances.items(
+                        ):
                             if match_set.startswith('sf'):
                                 for i in xrange(3):
-                                    for match in copy.deepcopy(self._all_matches['sf']):
-                                        key = '2016nytr_{}m{}'.format(match_set, i+1)
+                                    for match in copy.deepcopy(
+                                            self._all_matches['sf']):
+                                        key = '2016nytr_{}m{}'.format(
+                                            match_set, i + 1)
                                         if match.key.id() == key:
                                             for color in ['red', 'blue']:
-                                                match.alliances[color]['score'] = -1
-                                                match.alliances[color]['teams'] = alliances.get(color, [])
-                                            match.alliances_json = json.dumps(match.alliances)
+                                                match.alliances[color][
+                                                    'score'] = -1
+                                                match.alliances[color][
+                                                    'teams'] = alliances.get(
+                                                        color, [])
+                                            match.alliances_json = json.dumps(
+                                                match.alliances)
                                             match.score_breakdown_json = None
                                             match.actual_time = None
-                                            MatchManipulator.createOrUpdate(match)
+                                            MatchManipulator.createOrUpdate(
+                                                match)
 
             if self._substep < len(self._played_matches['qf']) - 1:
                 self._substep += 1
@@ -267,7 +292,8 @@ class EventSimulator(object):
                     MatchManipulator.createOrUpdate(match)
                 self._step += 1
         elif self._step == 6:  # After each SF match
-            new_match = MatchHelper.play_order_sort_matches(self._played_matches['sf'])[self._substep]
+            new_match = MatchHelper.play_order_sort_matches(
+                self._played_matches['sf'])[self._substep]
             MatchManipulator.createOrUpdate(new_match)
 
             if not self._batch_advance:
@@ -277,35 +303,45 @@ class EventSimulator(object):
                 }
                 for i in xrange(new_match.match_number):
                     win_counts[Match.get_by_id(
-                        Match.renderKeyName(
-                            new_match.event.id(),
-                            new_match.comp_level,
-                            new_match.set_number,
-                            i+1)).winning_alliance] += 1
+                        Match.renderKeyName(new_match.event.id(),
+                                            new_match.comp_level,
+                                            new_match.set_number,
+                                            i + 1)).winning_alliance] += 1
                 for alliance, wins in win_counts.items():
                     if wins == 2:
-                        self._advancement_alliances['f1']['red' if new_match.set_number == 1 else 'blue'] = new_match.alliances[alliance]['teams']
+                        self._advancement_alliances['f1'][
+                            'red' if new_match.set_number == 1 else
+                            'blue'] = new_match.alliances[alliance]['teams']
 
-                        for match_set, alliances in self._advancement_alliances.items():
+                        for match_set, alliances in self._advancement_alliances.items(
+                        ):
                             if match_set.startswith('f'):
                                 for i in xrange(3):
-                                    for match in copy.deepcopy(self._all_matches['f']):
-                                        key = '2016nytr_{}m{}'.format(match_set, i+1)
+                                    for match in copy.deepcopy(
+                                            self._all_matches['f']):
+                                        key = '2016nytr_{}m{}'.format(
+                                            match_set, i + 1)
                                         if match.key.id() == key:
                                             for color in ['red', 'blue']:
-                                                match.alliances[color]['score'] = -1
-                                                match.alliances[color]['teams'] = alliances.get(color, [])
-                                            match.alliances_json = json.dumps(match.alliances)
+                                                match.alliances[color][
+                                                    'score'] = -1
+                                                match.alliances[color][
+                                                    'teams'] = alliances.get(
+                                                        color, [])
+                                            match.alliances_json = json.dumps(
+                                                match.alliances)
                                             match.score_breakdown_json = None
                                             match.actual_time = None
-                                            MatchManipulator.createOrUpdate(match)
+                                            MatchManipulator.createOrUpdate(
+                                                match)
 
             # Backup robot introduced
             if self._substep == 3:
-                EventDetailsManipulator.createOrUpdate(EventDetails(
-                    id='2016nytr',
-                    alliance_selections=self._event_details.alliance_selections
-                ))
+                EventDetailsManipulator.createOrUpdate(
+                    EventDetails(
+                        id='2016nytr',
+                        alliance_selections=self._event_details.
+                        alliance_selections))
             if self._substep < len(self._played_matches['sf']) - 1:
                 self._substep += 1
             else:

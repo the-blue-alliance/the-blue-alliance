@@ -37,7 +37,9 @@ class SuggestTeamMediaController(LoggedInHandler):
         if not team:
             self.redirect("/", abort=True)
 
-        media_key_futures = Media.query(Media.references == team.key, Media.year == year).fetch_async(500, keys_only=True)
+        media_key_futures = Media.query(Media.references == team.key,
+                                        Media.year == year).fetch_async(
+                                            500, keys_only=True)
         media_futures = ndb.get_multi_async(media_key_futures.get_result())
         medias = [media_future.get_result() for media_future in media_futures]
         medias_by_slugname = MediaHelper.group_by_slugname(medias)
@@ -49,7 +51,9 @@ class SuggestTeamMediaController(LoggedInHandler):
             "medias_by_slugname": medias_by_slugname,
         })
 
-        self.response.out.write(jinja2_engine.render('suggestions/suggest_team_media.html', self.template_values))
+        self.response.out.write(
+            jinja2_engine.render('suggestions/suggest_team_media.html',
+                                 self.template_values))
 
     def post(self):
         self._require_registration()
@@ -63,41 +67,55 @@ class SuggestTeamMediaController(LoggedInHandler):
             team_key=team_key,
             year_str=year_str)
 
-        if status == 'success' and suggestion.contents.get('media_type') == MediaType.GRABCAD:
+        if status == 'success' and suggestion.contents.get(
+                'media_type') == MediaType.GRABCAD:
             # Send an update to the frcdesigns slack
             slack_sitevar = Sitevar.get_or_insert('slack.hookurls')
             if slack_sitevar:
                 slack_url = slack_sitevar.contents.get('tbablog', '')
                 if slack_url:
-                    model_details = json.loads(suggestion.contents['details_json'])
+                    model_details = json.loads(
+                        suggestion.contents['details_json'])
                     message_body = "{0} ({1}) has suggested a CAD model for team <https://thebluealliance.com/team/{2}/{3}|{2} in {3}>.".format(
                         self.user_bundle.account.display_name,
-                        self.user_bundle.account.email,
-                        team_key[3:],
-                        year_str)
+                        self.user_bundle.account.email, team_key[3:], year_str)
                     image_attachment = {
-                        "footer": "<https://www.thebluealliance.com/suggest/cad/review|See all suggestions> on The Blue Alliance",
-                        "fallback": "CAD model",
-                        "title": model_details['model_name'],
-                        "title_link": "https://grabcad.com/library/{}".format(suggestion.contents['foreign_key']),
-                        "image_url": model_details['model_image'].replace('card.jpg', 'large.png'),
-                        "fields": [
-                            {
-                                "title": "Accept",
-                                "value": "<https://www.thebluealliance.com/suggest/cad/review?action=accept&id={}|Click Here>".format(suggestion.key.id()),
-                                "short": True,
-                            },
-                            {
-                                "title": "Reject",
-                                "value": "<https://www.thebluealliance.com/suggest/cad/review?action=reject&id={}|Click Here>".format(suggestion.key.id()),
-                                "short": True,
-                            }
-                        ],
+                        "footer":
+                        "<https://www.thebluealliance.com/suggest/cad/review|See all suggestions> on The Blue Alliance",
+                        "fallback":
+                        "CAD model",
+                        "title":
+                        model_details['model_name'],
+                        "title_link":
+                        "https://grabcad.com/library/{}".format(
+                            suggestion.contents['foreign_key']),
+                        "image_url":
+                        model_details['model_image'].replace(
+                            'card.jpg', 'large.png'),
+                        "fields": [{
+                            "title":
+                            "Accept",
+                            "value":
+                            "<https://www.thebluealliance.com/suggest/cad/review?action=accept&id={}|Click Here>".
+                            format(suggestion.key.id()),
+                            "short":
+                            True,
+                        }, {
+                            "title":
+                            "Reject",
+                            "value":
+                            "<https://www.thebluealliance.com/suggest/cad/review?action=reject&id={}|Click Here>".
+                            format(suggestion.key.id()),
+                            "short":
+                            True,
+                        }],
                     }
 
-                    OutgoingNotificationHelper.send_slack_alert(slack_url, message_body, [image_attachment])
+                    OutgoingNotificationHelper.send_slack_alert(
+                        slack_url, message_body, [image_attachment])
 
-        self.redirect('/suggest/team/media?team_key=%s&year=%s&status=%s' % (team_key, year_str, status))
+        self.redirect('/suggest/team/media?team_key=%s&year=%s&status=%s' %
+                      (team_key, year_str, status))
 
 
 class SuggestTeamSocialMediaController(LoggedInHandler):
@@ -118,7 +136,9 @@ class SuggestTeamSocialMediaController(LoggedInHandler):
         if not team:
             self.redirect("/", abort=True)
 
-        media_key_futures = Media.query(Media.references == team.key, Media.year == None).fetch_async(500, keys_only=True)
+        media_key_futures = Media.query(Media.references == team.key,
+                                        Media.year == None).fetch_async(
+                                            500, keys_only=True)
         media_futures = ndb.get_multi_async(media_key_futures.get_result())
         medias = [media_future.get_result() for media_future in media_futures]
         social_medias = MediaHelper.get_socials(medias)
@@ -129,7 +149,9 @@ class SuggestTeamSocialMediaController(LoggedInHandler):
             "social_medias": social_medias,
         })
 
-        self.response.out.write(jinja2_engine.render('suggestions/suggest_team_social_media.html', self.template_values))
+        self.response.out.write(
+            jinja2_engine.render('suggestions/suggest_team_social_media.html',
+                                 self.template_values))
 
     def post(self):
         self._require_registration()
@@ -143,4 +165,5 @@ class SuggestTeamSocialMediaController(LoggedInHandler):
             year_str=None,
             is_social=True)
 
-        self.redirect('/suggest/team/social_media?team_key=%s&status=%s' % (team_key, status))
+        self.redirect('/suggest/team/social_media?team_key=%s&status=%s' %
+                      (team_key, status))

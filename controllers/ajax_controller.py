@@ -27,19 +27,23 @@ class AccountInfoHandler(LoggedInHandler):
     For getting account info.
     Only provides logged in status for now.
     """
+
     def get(self):
-        self.response.headers['content-type'] = 'application/json; charset="utf-8"'
+        self.response.headers[
+            'content-type'] = 'application/json; charset="utf-8"'
         user = self.user_bundle.user
-        self.response.out.write(json.dumps({
-            'logged_in': True if user else False,
-            'user_id': user.user_id() if user else None
-        }))
+        self.response.out.write(
+            json.dumps({
+                'logged_in': True if user else False,
+                'user_id': user.user_id() if user else None
+            }))
 
 
 class AccountRegisterFCMToken(LoggedInHandler):
     """
     For adding/updating an FCM token
     """
+
     def post(self):
         if not self.user_bundle.user:
             self.response.set_status(401)
@@ -51,10 +55,9 @@ class AccountRegisterFCMToken(LoggedInHandler):
         display_name = self.request.get('display_name')
         client_type = ClientType.WEB
 
-        query = MobileClient.query(
-                MobileClient.user_id == user_id,
-                MobileClient.device_uuid == uuid,
-                MobileClient.client_type == client_type)
+        query = MobileClient.query(MobileClient.user_id == user_id,
+                                   MobileClient.device_uuid == uuid,
+                                   MobileClient.client_type == client_type)
         if query.count() == 0:
             # Record doesn't exist yet, so add it
             MobileClient(
@@ -76,21 +79,26 @@ class AccountFavoritesHandler(LoggedInHandler):
     """
     For getting an account's favorites
     """
+
     def get(self, model_type):
         if not self.user_bundle.user:
             self.response.set_status(401)
             return
 
         favorites = Favorite.query(
-            Favorite.model_type==int(model_type),
-            ancestor=ndb.Key(Account, self.user_bundle.user.user_id())).fetch()
-        self.response.out.write(json.dumps([ModelToDict.favoriteConverter(fav) for fav in favorites]))
+            Favorite.model_type == int(model_type),
+            ancestor=ndb.Key(Account,
+                             self.user_bundle.user.user_id())).fetch()
+        self.response.out.write(
+            json.dumps(
+                [ModelToDict.favoriteConverter(fav) for fav in favorites]))
 
 
 class AccountFavoritesAddHandler(LoggedInHandler):
     """
     For adding an account's favorites
     """
+
     def post(self):
         if not self.user_bundle.user:
             self.response.set_status(401)
@@ -104,8 +112,7 @@ class AccountFavoritesAddHandler(LoggedInHandler):
             parent=ndb.Key(Account, user_id),
             user_id=user_id,
             model_key=model_key,
-            model_type=model_type
-        )
+            model_type=model_type)
         MyTBAHelper.add_favorite(fav)
 
 
@@ -113,6 +120,7 @@ class AccountFavoritesDeleteHandler(LoggedInHandler):
     """
     For deleting an account's favorites
     """
+
     def post(self):
         if not self.user_bundle.user:
             self.response.set_status(401)
@@ -141,11 +149,13 @@ class LiveEventHandler(CacheableHandler):
     def get(self, event_key, timestamp):
         if int(timestamp) > time.time():
             self.abort(404)
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(event_key, timestamp)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(
+            event_key, timestamp)
         super(LiveEventHandler, self).get(event_key, timestamp)
 
     def _render(self, event_key, timestamp):
-        self.response.headers['content-type'] = 'application/json; charset="utf-8"'
+        self.response.headers[
+            'content-type'] = 'application/json; charset="utf-8"'
 
         event = Event.get_by_id(event_key)
 
@@ -159,8 +169,8 @@ class LiveEventHandler(CacheableHandler):
             })
 
         event_dict = {
-#             'rankings': event.rankings,
-#             'matchstats': event.matchstats,
+            #             'rankings': event.rankings,
+            #             'matchstats': event.matchstats,
             'matches': matches,
         }
 
@@ -189,7 +199,8 @@ class TypeaheadHandler(CacheableHandler):
         super(TypeaheadHandler, self).get(search_key)
 
     def _render(self, search_key):
-        self.response.headers['content-type'] = 'application/json; charset="utf-8"'
+        self.response.headers[
+            'content-type'] = 'application/json; charset="utf-8"'
 
         entry = TypeaheadEntry.get_by_id(search_key)
         if entry is None:
@@ -212,11 +223,13 @@ class WebcastHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24
 
     def get(self, event_key, webcast_number):
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(event_key, webcast_number)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(
+            event_key, webcast_number)
         super(WebcastHandler, self).get(event_key, webcast_number)
 
     def _render(self, event_key, webcast_number):
-        self.response.headers.add_header('content-type', 'application/json', charset='utf-8')
+        self.response.headers.add_header(
+            'content-type', 'application/json', charset='utf-8')
 
         output = {}
         if not webcast_number.isdigit():
@@ -229,7 +242,8 @@ class WebcastHandler(CacheableHandler):
             if 'type' in webcast and 'channel' in webcast:
                 output['player'] = self._renderPlayer(webcast)
         else:
-            special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
+            special_webcasts_future = Sitevar.get_by_id_async(
+                'gameday.special_webcasts')
             special_webcasts = special_webcasts_future.get_result()
             if special_webcasts:
                 special_webcasts = special_webcasts.contents['webcasts']
@@ -251,11 +265,16 @@ class WebcastHandler(CacheableHandler):
         webcast_type = webcast['type']
         template_values = {'webcast': webcast}
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/webcast/' + webcast_type + '.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../templates/webcast/' + webcast_type + '.html')
         return template.render(path, template_values)
 
     def memcacheFlush(self, event_key):
-        keys = [self._render_cache_key(self.CACHE_KEY_FORMAT.format(event_key, n)) for n in range(10)]
+        keys = [
+            self._render_cache_key(self.CACHE_KEY_FORMAT.format(event_key, n))
+            for n in range(10)
+        ]
         memcache.delete_multi(keys)
         return keys
 
@@ -264,6 +283,7 @@ class YouTubePlaylistHandler(LoggedInHandler):
     """
     For Hitting the YouTube API to get a list of video keys associated with a playlist
     """
+
     def get(self):
         if not self.user_bundle.user:
             self.response.set_status(401)
@@ -288,9 +308,11 @@ class YouTubePlaylistHandler(LoggedInHandler):
 
         while True:
             try:
-                result = urlfetch.fetch(url.format(playlist_id, next_page_token, yt_key.contents["api_key"]),
-                                        headers=headers,
-                                        deadline=5)
+                result = urlfetch.fetch(
+                    url.format(playlist_id, next_page_token,
+                               yt_key.contents["api_key"]),
+                    headers=headers,
+                    deadline=5)
             except Exception, e:
                 self.response.set_status(500)
                 return []
@@ -300,7 +322,10 @@ class YouTubePlaylistHandler(LoggedInHandler):
                 return []
 
             video_result = json.loads(result.content)
-            video_ids += [video for video in video_result["items"] if video["snippet"]["resourceId"]["kind"] == "youtube#video"]
+            video_ids += [
+                video for video in video_result["items"]
+                if video["snippet"]["resourceId"]["kind"] == "youtube#video"
+            ]
 
             if "nextPageToken" not in video_result:
                 break
@@ -313,14 +338,17 @@ class AllowedApiWriteEventsHandler(LoggedInHandler):
     """
     Get the events the current user is allowed to edit via the trusted API
     """
+
     def get(self):
         if not self.user_bundle.user:
             self.response.out.write(json.dumps([]))
             return
 
         now = datetime.datetime.now()
-        auth_tokens = ApiAuthAccess.query(ApiAuthAccess.owner == self.user_bundle.account.key,
-                                          ndb.OR(ApiAuthAccess.expiration == None, ApiAuthAccess.expiration >= now)).fetch()
+        auth_tokens = ApiAuthAccess.query(
+            ApiAuthAccess.owner == self.user_bundle.account.key,
+            ndb.OR(ApiAuthAccess.expiration == None,
+                   ApiAuthAccess.expiration >= now)).fetch()
         event_keys = []
         for token in auth_tokens:
             event_keys.extend(token.event_list)
@@ -328,5 +356,8 @@ class AllowedApiWriteEventsHandler(LoggedInHandler):
         events = ndb.get_multi(event_keys)
         details = []
         for event in events:
-            details.append({'value': event.key_name, 'label': "{} {}".format(event.year, event.name)})
+            details.append({
+                'value': event.key_name,
+                'label': "{} {}".format(event.year, event.name)
+            })
         self.response.out.write(json.dumps(details))

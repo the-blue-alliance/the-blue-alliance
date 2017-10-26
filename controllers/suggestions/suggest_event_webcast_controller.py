@@ -25,7 +25,9 @@ class SuggestEventWebcastController(LoggedInHandler):
             "event": event,
         })
 
-        self.response.out.write(jinja2_engine.render('suggestions/suggest_event_webcast.html', self.template_values))
+        self.response.out.write(
+            jinja2_engine.render('suggestions/suggest_event_webcast.html',
+                                 self.template_values))
 
     def post(self):
         self._require_registration()
@@ -35,15 +37,24 @@ class SuggestEventWebcastController(LoggedInHandler):
         webcast_date = self.request.get("webcast_date")
 
         if not webcast_url:
-            self.redirect('/suggest/event/webcast?event_key={}&status=blank_webcast'.format(event_key), abort=True)
+            self.redirect(
+                '/suggest/event/webcast?event_key={}&status=blank_webcast'.
+                format(event_key),
+                abort=True)
 
         if ' ' in webcast_url:
             # This is an invalid url
-            self.redirect('/suggest/event/webcast?event_key={}&status=invalid_url'.format(event_key), abort=True)
+            self.redirect(
+                '/suggest/event/webcast?event_key={}&status=invalid_url'.
+                format(event_key),
+                abort=True)
 
         if 'thebluealliance' in webcast_url:
             # TBA doesn't host webcasts, so we can reject this outright
-            self.redirect('/suggest/event/webcast?event_key={}&status=invalid_url'.format(event_key), abort=True)
+            self.redirect(
+                '/suggest/event/webcast?event_key={}&status=invalid_url'.
+                format(event_key),
+                abort=True)
 
         status = SuggestionCreator.createEventWebcastSuggestion(
             author_account_key=self.user_bundle.account.key,
@@ -51,4 +62,5 @@ class SuggestEventWebcastController(LoggedInHandler):
             webcast_date=self.request.get("webcast_date"),
             event_key=event_key)
 
-        self.redirect('/suggest/event/webcast?event_key={}&status={}'.format(event_key, status))
+        self.redirect('/suggest/event/webcast?event_key={}&status={}'.format(
+            event_key, status))

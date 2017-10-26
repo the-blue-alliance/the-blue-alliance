@@ -14,7 +14,8 @@ class DistrictTeam(ndb.Model):
 
     team = ndb.KeyProperty(kind=Team)
     year = ndb.IntegerProperty()
-    district = ndb.IntegerProperty()  # One of DistrictType constants, DEPRECATED, use district_key
+    district = ndb.IntegerProperty(
+    )  # One of DistrictType constants, DEPRECATED, use district_key
     district_key = ndb.KeyProperty(kind=District)
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)

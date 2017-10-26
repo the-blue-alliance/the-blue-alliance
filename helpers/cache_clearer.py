@@ -46,9 +46,14 @@ class CacheClearer(object):
         """
         event_keys = affected_refs['key']
         years = affected_refs['year']
-        event_district_abbrevs = map(lambda x: x.id()[4:], filter(None, affected_refs['district_key']))
+        event_district_abbrevs = map(lambda x: x.id()[4:],
+                                     filter(None,
+                                            affected_refs['district_key']))
 
-        event_team_keys_future = EventTeam.query(EventTeam.event.IN([event_key for event_key in event_keys])).fetch_async(None, keys_only=True)
+        event_team_keys_future = EventTeam.query(
+            EventTeam.event.IN([event_key
+                                for event_key in event_keys])).fetch_async(
+                                    None, keys_only=True)
 
         team_keys = set()
         for et_key in event_team_keys_future.get_result():
@@ -85,7 +90,10 @@ class CacheClearer(object):
             years.add(event.year)
             event_district_abbrevs.add(event.event_district_abbrev)
 
-        event_team_keys_future = EventTeam.query(EventTeam.event.IN([event_key for event_key in event_keys])).fetch_async(None, keys_only=True)
+        event_team_keys_future = EventTeam.query(
+            EventTeam.event.IN([event_key
+                                for event_key in event_keys])).fetch_async(
+                                    None, keys_only=True)
 
         team_keys = set()
         for et_key in event_team_keys_future.get_result():
@@ -180,8 +188,14 @@ class CacheClearer(object):
         """
         team_keys = affected_refs['key']
 
-        event_team_keys_future = EventTeam.query(EventTeam.team.IN([team_key for team_key in team_keys])).fetch_async(None, keys_only=True)
-        district_team_keys_future = DistrictTeam.query(DistrictTeam.team.IN([team_key for team_key in team_keys])).fetch_async(None, keys_only=True)
+        event_team_keys_future = EventTeam.query(
+            EventTeam.team.IN([team_key
+                               for team_key in team_keys])).fetch_async(
+                                   None, keys_only=True)
+        district_team_keys_future = DistrictTeam.query(
+            DistrictTeam.team.IN([team_key
+                                  for team_key in team_keys])).fetch_async(
+                                      None, keys_only=True)
 
         event_keys = set()
         for et_key in event_team_keys_future.get_result():
@@ -203,87 +217,120 @@ class CacheClearer(object):
     def _get_districtlist_cache_keys_and_controllers(cls, years):
         cache_keys_and_controllers = []
         for year in filter(None, years):
-            cache_keys_and_controllers.append((ApiDistrictListController.get_cache_key_from_format(year), ApiDistrictListController))
+            cache_keys_and_controllers.append(
+                (ApiDistrictListController.get_cache_key_from_format(year),
+                 ApiDistrictListController))
         return cache_keys_and_controllers
 
     @classmethod
-    def _get_district_events_cache_keys_and_controllers(cls, district_shorts, years):
+    def _get_district_events_cache_keys_and_controllers(
+            cls, district_shorts, years):
         cache_keys_and_controllers = []
         for district_short in filter(None, district_shorts):
             for year in filter(None, years):
-                cache_keys_and_controllers.append((ApiDistrictEventsController.get_cache_key_from_format(district_short, year), ApiDistrictEventsController))
+                cache_keys_and_controllers.append(
+                    (ApiDistrictEventsController.get_cache_key_from_format(
+                        district_short, year), ApiDistrictEventsController))
         return cache_keys_and_controllers
 
     @classmethod
-    def _get_district_rankings_cache_keys_and_controllers(cls, district_shorts, years):
+    def _get_district_rankings_cache_keys_and_controllers(
+            cls, district_shorts, years):
         cache_keys_and_controllers = []
         for district_short in filter(None, district_shorts):
             for year in filter(None, years):
-                cache_keys_and_controllers.append((ApiDistrictRankingsController.get_cache_key_from_format(district_short, year), ApiDistrictRankingsController))
+                cache_keys_and_controllers.append(
+                    (ApiDistrictRankingsController.get_cache_key_from_format(
+                        district_short, year), ApiDistrictRankingsController))
         return cache_keys_and_controllers
 
     @classmethod
     def _get_event_awards_cache_keys_and_controllers(cls, event_keys):
         cache_keys_and_controllers = []
         for event_key in filter(None, event_keys):
-            cache_keys_and_controllers.append((ApiEventAwardsController.get_cache_key_from_format(event_key.id()), ApiEventAwardsController))
+            cache_keys_and_controllers.append(
+                (ApiEventAwardsController.get_cache_key_from_format(
+                    event_key.id()), ApiEventAwardsController))
         return cache_keys_and_controllers
 
     @classmethod
     def _get_event_district_points_cache_keys_and_controllers(cls, event_keys):
         cache_keys_and_controllers = []
         for event_key in filter(None, event_keys):
-            cache_keys_and_controllers.append((ApiEventDistrictPointsController.get_cache_key_from_format(event_key.id()), ApiEventDistrictPointsController))
+            cache_keys_and_controllers.append(
+                (ApiEventDistrictPointsController.get_cache_key_from_format(
+                    event_key.id()), ApiEventDistrictPointsController))
         return cache_keys_and_controllers
 
     @classmethod
     def _get_events_cache_keys_and_controllers(cls, event_keys):
         cache_keys_and_controllers = []
         for event_key in filter(None, event_keys):
-            cache_keys_and_controllers.append((ApiEventController.get_cache_key_from_format(event_key.id()), ApiEventController))
-            cache_keys_and_controllers.append((ApiEventStatsController.get_cache_key_from_format(event_key.id()), ApiEventStatsController))
-            cache_keys_and_controllers.append((ApiEventRankingsController.get_cache_key_from_format(event_key.id()), ApiEventRankingsController))
+            cache_keys_and_controllers.append(
+                (ApiEventController.get_cache_key_from_format(event_key.id()),
+                 ApiEventController))
+            cache_keys_and_controllers.append(
+                (ApiEventStatsController.get_cache_key_from_format(
+                    event_key.id()), ApiEventStatsController))
+            cache_keys_and_controllers.append(
+                (ApiEventRankingsController.get_cache_key_from_format(
+                    event_key.id()), ApiEventRankingsController))
         return cache_keys_and_controllers
 
     @classmethod
     def _get_eventlist_cache_keys_and_controllers(cls, years):
         cache_keys_and_controllers = []
         for year in filter(None, years):
-            cache_keys_and_controllers.append((ApiEventListController.get_cache_key_from_format(year), ApiEventListController))
+            cache_keys_and_controllers.append(
+                (ApiEventListController.get_cache_key_from_format(year),
+                 ApiEventListController))
         return cache_keys_and_controllers
 
     @classmethod
     def _get_eventteams_cache_keys_and_controllers(cls, event_keys):
         cache_keys_and_controllers = []
         for event_key in filter(None, event_keys):
-            cache_keys_and_controllers.append((ApiEventTeamsController.get_cache_key_from_format(event_key.id()), ApiEventTeamsController))
+            cache_keys_and_controllers.append(
+                (ApiEventTeamsController.get_cache_key_from_format(
+                    event_key.id()), ApiEventTeamsController))
         return cache_keys_and_controllers
 
     @classmethod
-    def _get_districtteams_cache_keys_and_controllers(cls, district_keys, team_keys):
+    def _get_districtteams_cache_keys_and_controllers(cls, district_keys,
+                                                      team_keys):
         cache_keys_and_controllers = []
         for district_key in filter(None, district_keys):
             key_name = district_key.id()
             year = key_name[:4]
             district_short = key_name[4:]
-            cache_keys_and_controllers.append((ApiDistrictTeamsController.get_cache_key_from_format(district_short, year), ApiDistrictTeamsController))
+            cache_keys_and_controllers.append(
+                (ApiDistrictTeamsController.get_cache_key_from_format(
+                    district_short, year), ApiDistrictTeamsController))
         for team_key in filter(None, team_keys):
-            cache_keys_and_controllers.append((ApiTeamHistoryDistrictsController.get_cache_key_from_format(team_key.id()), ApiTeamHistoryDistrictsController))
+            cache_keys_and_controllers.append(
+                (ApiTeamHistoryDistrictsController.get_cache_key_from_format(
+                    team_key.id()), ApiTeamHistoryDistrictsController))
         return cache_keys_and_controllers
 
     @classmethod
     def _get_match_cache_keys_and_controllers(cls, match_keys):
         cache_keys_and_controllers = []
         for match_key in filter(None, match_keys):
-            cache_keys_and_controllers.append((ApiMatchController.get_cache_key_from_format(match_key.id()), ApiMatchController))
+            cache_keys_and_controllers.append(
+                (ApiMatchController.get_cache_key_from_format(match_key.id()),
+                 ApiMatchController))
         return cache_keys_and_controllers
 
     @classmethod
     def _get_matches_cache_keys_and_controllers(cls, event_keys):
         cache_keys_and_controllers = []
         for event_key in filter(None, event_keys):
-            cache_keys_and_controllers.append((ApiEventMatchesController.get_cache_key_from_format(event_key.id()), ApiEventMatchesController))
-            cache_keys_and_controllers.append((ApiEventStatsController.get_cache_key_from_format(event_key.id()), ApiEventStatsController))
+            cache_keys_and_controllers.append(
+                (ApiEventMatchesController.get_cache_key_from_format(
+                    event_key.id()), ApiEventMatchesController))
+            cache_keys_and_controllers.append(
+                (ApiEventStatsController.get_cache_key_from_format(
+                    event_key.id()), ApiEventStatsController))
         return cache_keys_and_controllers
 
     @classmethod
@@ -291,38 +338,54 @@ class CacheClearer(object):
         cache_keys_and_controllers = []
         for team_key in filter(None, team_keys):
             for year in filter(None, years):
-                cache_keys_and_controllers.append((ApiTeamMediaController.get_cache_key_from_format(team_key.id(), year), ApiTeamMediaController))
+                cache_keys_and_controllers.append(
+                    (ApiTeamMediaController.get_cache_key_from_format(
+                        team_key.id(), year), ApiTeamMediaController))
         return cache_keys_and_controllers
 
     @classmethod
     def _get_robots_cache_keys_and_controllers(cls, team_keys):
         cache_keys_and_controllers = []
         for team_key in filter(None, team_keys):
-                cache_keys_and_controllers.append((ApiTeamHistoryRobotsController.get_cache_key_from_format(team_key.id()), ApiTeamHistoryRobotsController))
+            cache_keys_and_controllers.append(
+                (ApiTeamHistoryRobotsController.get_cache_key_from_format(
+                    team_key.id()), ApiTeamHistoryRobotsController))
         return cache_keys_and_controllers
 
     @classmethod
     def _get_teams_cache_keys_and_controllers(cls, team_keys):
         cache_keys_and_controllers = []
         for team_key in filter(None, team_keys):
-            cache_keys_and_controllers.append((ApiTeamController.get_cache_key_from_format(team_key.id()), ApiTeamController))
+            cache_keys_and_controllers.append(
+                (ApiTeamController.get_cache_key_from_format(team_key.id()),
+                 ApiTeamController))
         return cache_keys_and_controllers
 
     @classmethod
-    def _get_team_event_awards_cache_keys_and_controllers(cls, team_keys, event_keys):
+    def _get_team_event_awards_cache_keys_and_controllers(
+            cls, team_keys, event_keys):
         cache_keys_and_controllers = []
         for team_key in filter(None, team_keys):
             for event_key in filter(None, event_keys):
-                cache_keys_and_controllers.append((ApiTeamEventAwardsController.get_cache_key_from_format(team_key.id(), event_key.id()), ApiTeamEventAwardsController))
-            cache_keys_and_controllers.append((ApiTeamHistoryAwardsController.get_cache_key_from_format(team_key.id()), ApiTeamHistoryAwardsController))
+                cache_keys_and_controllers.append(
+                    (ApiTeamEventAwardsController.get_cache_key_from_format(
+                        team_key.id(), event_key.id()),
+                     ApiTeamEventAwardsController))
+            cache_keys_and_controllers.append(
+                (ApiTeamHistoryAwardsController.get_cache_key_from_format(
+                    team_key.id()), ApiTeamHistoryAwardsController))
         return cache_keys_and_controllers
 
     @classmethod
-    def _get_team_event_matches_cache_keys_and_controllers(cls, team_keys, event_keys):
+    def _get_team_event_matches_cache_keys_and_controllers(
+            cls, team_keys, event_keys):
         cache_keys_and_controllers = []
         for team_key in filter(None, team_keys):
             for event_key in filter(None, event_keys):
-                cache_keys_and_controllers.append((ApiTeamEventMatchesController.get_cache_key_from_format(team_key.id(), event_key.id()), ApiTeamEventMatchesController))
+                cache_keys_and_controllers.append(
+                    (ApiTeamEventMatchesController.get_cache_key_from_format(
+                        team_key.id(), event_key.id()),
+                     ApiTeamEventMatchesController))
         return cache_keys_and_controllers
 
     @classmethod
@@ -330,15 +393,22 @@ class CacheClearer(object):
         cache_keys_and_controllers = []
         for team_key in filter(None, team_keys):
             for year in filter(None, years):
-                cache_keys_and_controllers.append((ApiTeamEventsController.get_cache_key_from_format(team_key.id(), year), ApiTeamEventsController))
-            cache_keys_and_controllers.append((ApiTeamHistoryEventsController.get_cache_key_from_format(team_key.id()), ApiTeamHistoryEventsController))
+                cache_keys_and_controllers.append(
+                    (ApiTeamEventsController.get_cache_key_from_format(
+                        team_key.id(), year), ApiTeamEventsController))
+            cache_keys_and_controllers.append(
+                (ApiTeamHistoryEventsController.get_cache_key_from_format(
+                    team_key.id()), ApiTeamHistoryEventsController))
         return cache_keys_and_controllers
 
     @classmethod
-    def _get_team_years_participated_cache_keys_and_controllers(cls, team_keys):
+    def _get_team_years_participated_cache_keys_and_controllers(
+            cls, team_keys):
         cache_keys_and_controllers = []
         for team_key in filter(None, team_keys):
-            cache_keys_and_controllers.append((ApiTeamYearsParticipatedController.get_cache_key_from_format(team_key.id()), ApiTeamYearsParticipatedController))
+            cache_keys_and_controllers.append(
+                (ApiTeamYearsParticipatedController.get_cache_key_from_format(
+                    team_key.id()), ApiTeamYearsParticipatedController))
         return cache_keys_and_controllers
 
     @classmethod
@@ -346,5 +416,7 @@ class CacheClearer(object):
         cache_keys_and_controllers = []
         for team_key in filter(None, team_keys):
             page_num = int(team_key.id()[3:]) / ApiTeamListController.PAGE_SIZE
-            cache_keys_and_controllers.append((ApiTeamListController.get_cache_key_from_format(page_num), ApiTeamListController))
+            cache_keys_and_controllers.append(
+                (ApiTeamListController.get_cache_key_from_format(page_num),
+                 ApiTeamListController))
         return cache_keys_and_controllers

@@ -26,7 +26,8 @@ class ParserBase(object):
         """
         from bs4 import NavigableString
         if node.string is not None:
-            return re.sub('\s+', ' ', node.string.replace(u'\xa0', ' ')).strip()  # remove multiple whitespaces
+            return re.sub('\s+', ' ', node.string.replace(
+                u'\xa0', ' ')).strip()  # remove multiple whitespaces
         if isinstance(node, NavigableString):
             return node
         if hasattr(node, 'contents'):
@@ -34,7 +35,8 @@ class ParserBase(object):
             for content in node.contents:
                 result = self._recurseUntilString(content)
                 if result is not None:
-                    result = result.strip().replace('\r', '').replace('\n', '').replace('  ', ' ')
+                    result = result.strip().replace('\r', '').replace(
+                        '\n', '').replace('  ', ' ')
                 if result is not None and result != "":
                     results.append(result)
             if results != []:

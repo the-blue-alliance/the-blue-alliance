@@ -13,7 +13,8 @@ from models.match import Match
 
 class EventTeamStatusHelper(object):
     @classmethod
-    def generate_team_at_event_alliance_status_string(cls, team_key, status_dict):
+    def generate_team_at_event_alliance_status_string(cls, team_key,
+                                                      status_dict):
         if not status_dict:
             return '--'
         alliance = status_dict.get('alliance')
@@ -23,7 +24,8 @@ class EventTeamStatusHelper(object):
                 pick = 'Captain'
             else:
                 # Convert to ordinal number http://stackoverflow.com/questions/9647202/ordinal-numbers-replacement
-                pick = '{} Pick'.format("%d%s" % (pick,"tsnrhtdd"[(pick/10%10!=1)*(pick%10<4)*pick%10::4]))
+                pick = '{} Pick'.format("%d%s" % (pick, "tsnrhtdd" [(
+                    pick / 10 % 10 != 1) * (pick % 10 < 4) * pick % 10::4]))
             backup = alliance['backup']
             if backup and team_key == backup['in']:
                 pick = 'Backup'
@@ -33,7 +35,8 @@ class EventTeamStatusHelper(object):
             return '--'
 
     @classmethod
-    def generate_team_at_event_playoff_status_string(cls, team_key, status_dict):
+    def generate_team_at_event_playoff_status_string(cls, team_key,
+                                                     status_dict):
         if not status_dict:
             return '--'
         playoff = status_dict.get('playoff')
@@ -45,35 +48,51 @@ class EventTeamStatusHelper(object):
             playoff_average = playoff.get('playoff_average')
 
             if status == 'playing':
-                record_str = '{}-{}-{}'.format(level_record['wins'], level_record['losses'], level_record['ties'])
-                playoff_str = 'Currently <b>{}</b> in the <b>{}</b>'.format(record_str, Match.COMP_LEVELS_VERBOSE_FULL[level])
+                record_str = '{}-{}-{}'.format(level_record['wins'],
+                                               level_record['losses'],
+                                               level_record['ties'])
+                playoff_str = 'Currently <b>{}</b> in the <b>{}</b>'.format(
+                    record_str, Match.COMP_LEVELS_VERBOSE_FULL[level])
             else:
                 if status == 'won':
                     if level == 'f':
                         playoff_str = '<b>Won the event</b>'
                     else:
-                        playoff_str = '<b>Won the {}</b>'.format(Match.COMP_LEVELS_VERBOSE_FULL[level])
+                        playoff_str = '<b>Won the {}</b>'.format(
+                            Match.COMP_LEVELS_VERBOSE_FULL[level])
                 elif status == 'eliminated':
-                    playoff_str = '<b>Eliminated in the {}</b>'.format(Match.COMP_LEVELS_VERBOSE_FULL[level])
+                    playoff_str = '<b>Eliminated in the {}</b>'.format(
+                        Match.COMP_LEVELS_VERBOSE_FULL[level])
                 else:
-                    raise Exception("Unknown playoff status: {}".format(status))
+                    raise Exception(
+                        "Unknown playoff status: {}".format(status))
                 if record:
-                    playoff_str += ' with a playoff record of <b>{}-{}-{}</b>'.format(record['wins'], record['losses'], record['ties'])
+                    playoff_str += ' with a playoff record of <b>{}-{}-{}</b>'.format(
+                        record['wins'], record['losses'], record['ties'])
                 if playoff_average:
-                    playoff_str += ' with a playoff average of <b>{:.1f}</b>'.format(playoff_average)
+                    playoff_str += ' with a playoff average of <b>{:.1f}</b>'.format(
+                        playoff_average)
             return playoff_str
         else:
             return '--'
 
     @classmethod
-    def generate_team_at_event_status_string(cls, team_key, status_dict, formatting=True, event=None, include_team=True, verbose=False):
+    def generate_team_at_event_status_string(cls,
+                                             team_key,
+                                             status_dict,
+                                             formatting=True,
+                                             event=None,
+                                             include_team=True,
+                                             verbose=False):
         """
         Generate a team at event status string from a status dict
         """
         if include_team:
-            default_msg = 'Team {} is waiting for the {} to begin.'.format(team_key[3:], event.normalized_name if event else 'event')
+            default_msg = 'Team {} is waiting for the {} to begin.'.format(
+                team_key[3:], event.normalized_name if event else 'event')
         else:
-            default_msg = 'is waiting for the {} to begin.'.format(event.normalized_name if event else 'event')
+            default_msg = 'is waiting for the {} to begin.'.format(
+                event.normalized_name if event else 'event')
         if not status_dict:
             return default_msg
 
@@ -94,7 +113,8 @@ class EventTeamStatusHelper(object):
 
                 num_teams_str = ''
                 if num_teams:
-                    num_teams_str = ' of {}'.format(num_teams) if verbose else '/{}'.format(num_teams)
+                    num_teams_str = ' of {}'.format(
+                        num_teams) if verbose else '/{}'.format(num_teams)
 
                 if status == 'completed':
                     is_tense = 'was'
@@ -108,16 +128,21 @@ class EventTeamStatusHelper(object):
                     if verbose:
                         record_str = cls._build_verbose_record(record)
                     else:
-                        record_str = '{}-{}-{}'.format(record['wins'], record['losses'], record['ties'])
+                        record_str = '{}-{}-{}'.format(
+                            record['wins'], record['losses'], record['ties'])
                     if rank:
-                        qual_str = '{} <b>Rank {}{}</b> with a record of <b>{}</b> in quals'.format(is_tense, rank, num_teams_str, record_str)
+                        qual_str = '{} <b>Rank {}{}</b> with a record of <b>{}</b> in quals'.format(
+                            is_tense, rank, num_teams_str, record_str)
                     else:
-                        qual_str = '{} a record of <b>{}</b> in quals'.format(has_tense, record_str)
+                        qual_str = '{} a record of <b>{}</b> in quals'.format(
+                            has_tense, record_str)
                 elif qual_average:
                     if rank:
-                        qual_str = '{} <b>Rank {}{}</b> with an average score of <b>{:.1f}</b> in quals'.format(is_tense, rank, num_teams_str, qual_average)
+                        qual_str = '{} <b>Rank {}{}</b> with an average score of <b>{:.1f}</b> in quals'.format(
+                            is_tense, rank, num_teams_str, qual_average)
                     else:
-                        qual_str = '{} an average score of <b>{:.1f}</b> in quals'.format(has_tense, qual_average)
+                        qual_str = '{} an average score of <b>{:.1f}</b> in quals'.format(
+                            has_tense, qual_average)
 
                 if qual_str:
                     components.append(qual_str)
@@ -129,13 +154,15 @@ class EventTeamStatusHelper(object):
                 pick = 'Captain'
             else:
                 # Convert to ordinal number http://stackoverflow.com/questions/9647202/ordinal-numbers-replacement
-                pick = '{} Pick'.format("%d%s" % (pick,"tsnrhtdd"[(pick/10%10!=1)*(pick%10<4)*pick%10::4]))
+                pick = '{} Pick'.format("%d%s" % (pick, "tsnrhtdd" [(
+                    pick / 10 % 10 != 1) * (pick % 10 < 4) * pick % 10::4]))
             backup = alliance['backup']
             if backup and team_key == backup['in']:
                 pick = 'Backup'
 
             if not playoff:
-                alliance_str = 'will be competing in the playoffs as the <b>{}</b> of <b>{}</b>'.format(pick, alliance['name'])
+                alliance_str = 'will be competing in the playoffs as the <b>{}</b> of <b>{}</b>'.format(
+                    pick, alliance['name'])
                 components.append(alliance_str)
 
         if playoff:
@@ -149,28 +176,39 @@ class EventTeamStatusHelper(object):
                 if verbose:
                     record_str = cls._build_verbose_record(level_record)
                 else:
-                    record_str = '{}-{}-{}'.format(level_record['wins'], level_record['losses'], level_record['ties'])
-                playoff_str = 'is <b>{}</b> in the <b>{}</b>'.format(record_str, Match.COMP_LEVELS_VERBOSE_FULL[level])
+                    record_str = '{}-{}-{}'.format(level_record['wins'],
+                                                   level_record['losses'],
+                                                   level_record['ties'])
+                playoff_str = 'is <b>{}</b> in the <b>{}</b>'.format(
+                    record_str, Match.COMP_LEVELS_VERBOSE_FULL[level])
                 if alliance:
-                    playoff_str += ' as the <b>{}</b> of <b>{}</b>'.format(pick, alliance['name'])
+                    playoff_str += ' as the <b>{}</b> of <b>{}</b>'.format(
+                        pick, alliance['name'])
                 components = [playoff_str]
             else:
                 if alliance:
-                    components.append('competed in the playoffs as the <b>{}</b> of <b>{}</b>'.format(pick, alliance['name']))
+                    components.append(
+                        'competed in the playoffs as the <b>{}</b> of <b>{}</b>'.
+                        format(pick, alliance['name']))
 
                 if status == 'won':
                     if level == 'f':
                         playoff_str = '<b>won the event</b>'
                     else:
-                        playoff_str = '<b>won the {}</b>'.format(Match.COMP_LEVELS_VERBOSE_FULL[level])
+                        playoff_str = '<b>won the {}</b>'.format(
+                            Match.COMP_LEVELS_VERBOSE_FULL[level])
                 elif status == 'eliminated':
-                    playoff_str = 'was <b>eliminated in the {}</b>'.format(Match.COMP_LEVELS_VERBOSE_FULL[level])
+                    playoff_str = 'was <b>eliminated in the {}</b>'.format(
+                        Match.COMP_LEVELS_VERBOSE_FULL[level])
                 else:
-                    raise Exception("Unknown playoff status: {}".format(status))
+                    raise Exception(
+                        "Unknown playoff status: {}".format(status))
                 if record:
-                    playoff_str += ' with a playoff record of <b>{}-{}-{}</b>'.format(record['wins'], record['losses'], record['ties'])
+                    playoff_str += ' with a playoff record of <b>{}-{}-{}</b>'.format(
+                        record['wins'], record['losses'], record['ties'])
                 if playoff_average:
-                    playoff_str += ' with a playoff average of <b>{:.1f}</b>'.format(playoff_average)
+                    playoff_str += ' with a playoff average of <b>{:.1f}</b>'.format(
+                        playoff_average)
                 components.append(playoff_str)
 
         if not components:
@@ -184,14 +222,16 @@ class EventTeamStatusHelper(object):
             join_str = ' '
 
         if include_team:
-            final_string = 'Team {} {}'.format(team_key[3:], join_str.join(components))
+            final_string = 'Team {} {}'.format(team_key[3:],
+                                               join_str.join(components))
         else:
             final_string = '{}'.format(join_str.join(components))
         if event:
             final_string += ' at the {}.'.format(event.normalized_name)
         else:
             final_string += '.'
-        return final_string if formatting else final_string.replace('<b>', '').replace('</b>', '')
+        return final_string if formatting else final_string.replace(
+            '<b>', '').replace('</b>', '')
 
     @classmethod
     def generate_team_at_event_status(cls, team_key, event, matches=None):
@@ -208,13 +248,22 @@ class EventTeamStatusHelper(object):
         next_match = MatchHelper.upcomingMatches(team_matches, num=1)
         last_match = MatchHelper.recentMatches(team_matches, num=1)
         matches = MatchHelper.organizeMatches(matches)
-        return copy.deepcopy({
-            'qual': cls._build_qual_info(team_key, event_details, matches, event.year),
-            'alliance': cls._build_alliance_info(team_key, event_details, matches),
-            'playoff': cls._build_playoff_info(team_key, event_details, matches, event.year, event.playoff_type),
-            'last_match_key': last_match[0].key_name if last_match else None,
-            'next_match_key': next_match[0].key_name if next_match else None,
-        })  # TODO: Results are getting mixed unless copied. 2017-02-03 -fangeugene
+        return copy.deepcopy(
+            {
+                'qual':
+                cls._build_qual_info(team_key, event_details, matches,
+                                     event.year),
+                'alliance':
+                cls._build_alliance_info(team_key, event_details, matches),
+                'playoff':
+                cls._build_playoff_info(team_key, event_details, matches,
+                                        event.year, event.playoff_type),
+                'last_match_key':
+                last_match[0].key_name if last_match else None,
+                'next_match_key':
+                next_match[0].key_name if next_match else None,
+            }
+        )  # TODO: Results are getting mixed unless copied. 2017-02-03 -fangeugene
 
     @classmethod
     def _build_qual_info(cls, team_key, event_details, matches, year):
@@ -241,7 +290,9 @@ class EventTeamStatusHelper(object):
 
             if qual_info:
                 qual_info['num_teams'] = len(rankings)
-                qual_info['sort_order_info'] = RankingsHelper.get_sort_order_info(event_details)
+                qual_info[
+                    'sort_order_info'] = RankingsHelper.get_sort_order_info(
+                        event_details)
 
             return qual_info
         else:
@@ -269,7 +320,8 @@ class EventTeamStatusHelper(object):
 
                             qual_score_sum += match.alliances[color]['score']
 
-            qual_average = float(qual_score_sum) / matches_played if matches_played else 0
+            qual_average = float(
+                qual_score_sum) / matches_played if matches_played else 0
 
             if team_key in all_teams:
                 return {
@@ -302,7 +354,8 @@ class EventTeamStatusHelper(object):
             return None
 
         # Calculate the role played by the team on the alliance
-        backup_info = alliance.get('backup', {}) if alliance.get('backup') else {}
+        backup_info = alliance.get('backup',
+                                   {}) if alliance.get('backup') else {}
         pick = -1 if team_key == backup_info.get('in', "") else None
         for i, team in enumerate(alliance['picks']):
             if team == team_key:
@@ -317,7 +370,8 @@ class EventTeamStatusHelper(object):
         }
 
     @classmethod
-    def _build_playoff_info(cls, team_key, event_details, matches, year, playoff_type):
+    def _build_playoff_info(cls, team_key, event_details, matches, year,
+                            playoff_type):
         # Matches needs to be all playoff matches at the event, to properly account for backups
         import numpy as np
         alliance, _ = cls._get_alliance(team_key, event_details, matches)
@@ -342,15 +396,18 @@ class EventTeamStatusHelper(object):
                 for match in matches[comp_level]:
                     for color in ['red', 'blue']:
                         match_alliance = set(match.alliances[color]['teams'])
-                        if len(match_alliance.intersection(complete_alliance)) >= 2:
-                            playoff_scores.append(match.alliances[color]['score'])
+                        if len(match_alliance.intersection(
+                                complete_alliance)) >= 2:
+                            playoff_scores.append(
+                                match.alliances[color]['score'])
                             level_matches += 1
                             if match.has_been_played:
                                 if match.winning_alliance == color:
                                     level_wins += 1
                                     all_wins += 1
                                 elif not match.winning_alliance:
-                                    if not (year == 2015 and comp_level != 'f'):
+                                    if not (year == 2015
+                                            and comp_level != 'f'):
                                         # The match was a tie
                                         level_ties += 1
                                         all_ties += 1
@@ -367,10 +424,7 @@ class EventTeamStatusHelper(object):
                             'level': comp_level,
                         }
                     elif level_losses == (3 if is_bo5 else 2):
-                        status = {
-                            'status': 'eliminated',
-                            'level': comp_level
-                        }
+                        status = {'status': 'eliminated', 'level': comp_level}
                     elif level_matches > 0:
                         if year == 2015:
                             # This only works for past events, but 2015 is in the past so this works
@@ -391,12 +445,13 @@ class EventTeamStatusHelper(object):
                         } if year != 2015 or comp_level == 'f' else None
 
         if status:
-            status['record'] =  {
+            status['record'] = {
                 'wins': all_wins,
                 'losses': all_losses,
                 'ties': all_ties
             } if year != 2015 else None
-            status['playoff_average'] = np.mean(playoff_scores) if year == 2015 else None
+            status['playoff_average'] = np.mean(
+                playoff_scores) if year == 2015 else None
         return status
 
     @classmethod
@@ -411,7 +466,8 @@ class EventTeamStatusHelper(object):
                 if team_key in alliance['picks']:
                     return alliance, alliance_number
 
-                backup_info = alliance.get('backup') if alliance.get('backup') else {}
+                backup_info = alliance.get('backup') if alliance.get(
+                    'backup') else {}
                 if team_key == backup_info.get('in', ""):
                     # If this team came in as a backup team
                     return alliance, alliance_number
@@ -422,17 +478,27 @@ class EventTeamStatusHelper(object):
                 for match in matches[comp_level]:
                     for color in ['red', 'blue']:
                         alliance = copy.copy(match.alliances[color]['teams'])
-                        for i, complete_alliance in enumerate(complete_alliances):  # search for alliance. could be more efficient
-                            if len(set(alliance).intersection(set(complete_alliance))) >= 2:  # if >= 2 teams are the same, then the alliance is the same
-                                backups = list(set(alliance).difference(set(complete_alliance)))
-                                complete_alliances[i] += backups  # ensures that backup robots are listed last
+                        for i, complete_alliance in enumerate(
+                                complete_alliances
+                        ):  # search for alliance. could be more efficient
+                            if len(
+                                    set(alliance).intersection(
+                                        set(complete_alliance))
+                            ) >= 2:  # if >= 2 teams are the same, then the alliance is the same
+                                backups = list(
+                                    set(alliance).difference(
+                                        set(complete_alliance)))
+                                complete_alliances[
+                                    i] += backups  # ensures that backup robots are listed last
                                 break
                         else:
                             complete_alliances.append(alliance)
 
             for complete_alliance in complete_alliances:
                 if team_key in complete_alliance:
-                    return {'picks': complete_alliance}, None  # Alliance number is unknown
+                    return {
+                        'picks': complete_alliance
+                    }, None  # Alliance number is unknown
 
         alliance_number = 0
         return None, alliance_number  # Team didn't make it to elims
@@ -442,7 +508,6 @@ class EventTeamStatusHelper(object):
         win_label = 'wins' if record['wins'] != 1 else 'win'
         loss_label = 'losses' if record['losses'] != 1 else 'loss'
         tie_label = 'ties' if record['ties'] != 1 else 'tie'
-        return '{} {}, {} {}, and {} {}'.format(
-            record['wins'], win_label,
-            record['losses'], loss_label,
-            record['ties'], tie_label)
+        return '{} {}, {} {}, and {} {}'.format(record['wins'], win_label,
+                                                record['losses'], loss_label,
+                                                record['ties'], tie_label)

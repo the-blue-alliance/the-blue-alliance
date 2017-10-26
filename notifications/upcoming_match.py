@@ -29,15 +29,19 @@ class UpcomingMatchNotification(BaseNotification):
         data['message_data']['match_key'] = self.match.key_name
         data['message_data']['team_keys'] = self.match.team_key_names
         if self.match.time:
-            data['message_data']['scheduled_time'] = calendar.timegm(self.match.time.utctimetuple())
-            data['message_data']['predicted_time'] = calendar.timegm(self.match.time.utctimetuple())  # TODO Add in some time predictions
+            data['message_data']['scheduled_time'] = calendar.timegm(
+                self.match.time.utctimetuple())
+            data['message_data']['predicted_time'] = calendar.timegm(
+                self.match.time.utctimetuple()
+            )  # TODO Add in some time predictions
         else:
             data['message_data']['scheduled_time'] = None
             data['message_data']['predicted_time'] = None
 
         current_webcasts = self.event.current_webcasts
         WebcastOnlineHelper.add_online_status(current_webcasts)
-        online_webcasts = filter(lambda x: x.get('status', '') != 'offline', current_webcasts if current_webcasts else [])
+        online_webcasts = filter(lambda x: x.get('status', '') != 'offline',
+                                 current_webcasts if current_webcasts else [])
         if online_webcasts:
             data['message_data']['webcast'] = online_webcasts[0]
         else:

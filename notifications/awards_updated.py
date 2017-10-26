@@ -23,5 +23,8 @@ class AwardsUpdatedNotification(BaseNotification):
         data['message_data'] = {}
         data['message_data']['event_name'] = self.event.name
         data['message_data']['event_key'] = self.event.key_name
-        data['message_data']['awards'] = [ModelToDict.awardConverter(award) for award in AwardHelper.organizeAwards(self.event.awards)]
+        data['message_data']['awards'] = [
+            ModelToDict.awardConverter(award)
+            for award in AwardHelper.organizeAwards(self.event.awards)
+        ]
         return data

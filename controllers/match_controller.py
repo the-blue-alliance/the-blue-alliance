@@ -41,12 +41,16 @@ class MatchDetail(CacheableHandler):
 
         match_breakdown_template = None
         if match.score_breakdown is not None and match.year in self.VALID_BREAKDOWN_YEARS:
-            match_breakdown_template = 'match_partials/match_breakdown/match_breakdown_{}.html'.format(match.year)
+            match_breakdown_template = 'match_partials/match_breakdown/match_breakdown_{}.html'.format(
+                match.year)
 
         self.template_values.update({
-            "event": event,
-            "match": match,
-            "match_breakdown_template": match_breakdown_template,
+            "event":
+            event,
+            "match":
+            match,
+            "match_breakdown_template":
+            match_breakdown_template,
         })
 
         if event.within_a_day:

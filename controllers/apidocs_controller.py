@@ -16,7 +16,8 @@ class ApiDocumentationOverviewHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/apidocs_overview.html")
+        path = os.path.join(
+            os.path.dirname(__file__), "../templates/apidocs_overview.html")
         return template.render(path, self.template_values)
 
 
@@ -29,7 +30,8 @@ class ApiV2DocumentationHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/apidocs_v2.html")
+        path = os.path.join(
+            os.path.dirname(__file__), "../templates/apidocs_v2.html")
         return template.render(path, self.template_values)
 
 
@@ -44,7 +46,8 @@ class ApiV3DocumentationHandler(CacheableHandler):
     def _render(self, *args, **kw):
         self.template_values['title'] = 'APIv3'
         self.template_values['swagger_url'] = '/swagger/api_v3.json'
-        path = os.path.join(os.path.dirname(__file__), "../templates/apidocs_swagger.html")
+        path = os.path.join(
+            os.path.dirname(__file__), "../templates/apidocs_swagger.html")
         return template.render(path, self.template_values)
 
 
@@ -59,7 +62,8 @@ class ApiTrustedDocumentationHandler(CacheableHandler):
     def _render(self, *args, **kw):
         self.template_values['title'] = 'Trusted API'
         self.template_values['swagger_url'] = '/swagger/api_trusted_v1.json'
-        path = os.path.join(os.path.dirname(__file__), "../templates/apidocs_swagger.html")
+        path = os.path.join(
+            os.path.dirname(__file__), "../templates/apidocs_swagger.html")
         return template.render(path, self.template_values)
 
 
@@ -72,9 +76,11 @@ class WebhookDocumentationHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        self.template_values['enabled'] = NotificationType.enabled_notifications
+        self.template_values[
+            'enabled'] = NotificationType.enabled_notifications
         self.template_values['types'] = NotificationType.types
-        path = os.path.join(os.path.dirname(__file__), "../templates/webhookdocs.html")
+        path = os.path.join(
+            os.path.dirname(__file__), "../templates/webhookdocs.html")
         return template.render(path, self.template_values)
 
 

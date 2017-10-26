@@ -32,6 +32,12 @@ class UsfirstAlliancesParser(ParserBase):
             if not alliance_num_str.isdigit():
                 continue
 
-            alliances.append({'picks': ['frc' + self._recurseUntilString(team_td) for team_td in tds[1:]], 'declines': []})
+            alliances.append({
+                'picks': [
+                    'frc' + self._recurseUntilString(team_td)
+                    for team_td in tds[1:]
+                ],
+                'declines': []
+            })
 
         return alliances if alliances != [] else None

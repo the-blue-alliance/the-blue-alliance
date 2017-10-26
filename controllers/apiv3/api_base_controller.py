@@ -23,20 +23,31 @@ def track_call(api_action, api_label, auth_owner):
     """
     analytics_id = Sitevar.get_by_id("google_analytics.id")
     if analytics_id is None:
-        logging.warning("Missing sitevar: google_analytics.id. Can't track API usage.")
+        logging.warning(
+            "Missing sitevar: google_analytics.id. Can't track API usage.")
     else:
         GOOGLE_ANALYTICS_ID = analytics_id.contents['GOOGLE_ANALYTICS_ID']
         payload = urllib.urlencode({
-            'v': 1,
-            'tid': GOOGLE_ANALYTICS_ID,
-            'cid': uuid.uuid3(uuid.NAMESPACE_X500, str(auth_owner)),
-            't': 'event',
-            'ec': 'api-v03',
-            'ea': api_action,
-            'el': api_label,
-            'cd1': auth_owner,  # custom dimension 1
-            'ni': 1,
-            'sc': 'end',  # forces tracking session to end
+            'v':
+            1,
+            'tid':
+            GOOGLE_ANALYTICS_ID,
+            'cid':
+            uuid.uuid3(uuid.NAMESPACE_X500, str(auth_owner)),
+            't':
+            'event',
+            'ec':
+            'api-v03',
+            'ea':
+            api_action,
+            'el':
+            api_label,
+            'cd1':
+            auth_owner,  # custom dimension 1
+            'ni':
+            1,
+            'sc':
+            'end',  # forces tracking session to end
         })
 
         urlfetch.fetch(
@@ -54,14 +65,17 @@ class ApiBaseController(CacheableHandler):
 
     def __init__(self, *args, **kw):
         super(ApiBaseController, self).__init__(*args, **kw)
-        self.response.headers['content-type'] = 'application/json; charset="utf-8"'
+        self.response.headers[
+            'content-type'] = 'application/json; charset="utf-8"'
         self.response.headers['Access-Control-Allow-Origin'] = '*'
 
         # Set cache key based on class name, version, and kwargs
-        kwargs_sorted = sorted([(k, v) for k, v in self.request.route_kwargs.items()], key=lambda x: x[0])
+        kwargs_sorted = sorted(
+            [(k, v) for k, v in self.request.route_kwargs.items()],
+            key=lambda x: x[0])
         self._partial_cache_key = '_'.join([
-            'v{}_{}'.format(self.API_VERSION, self.__class__.__name__)] +
-            [x[1] for x in kwargs_sorted])
+            'v{}_{}'.format(self.API_VERSION, self.__class__.__name__)
+        ] + [x[1] for x in kwargs_sorted])
         self._cache_expiration = self.CACHE_HEADER_LENGTH
 
     def handle_exception(self, exception, debug):
@@ -105,12 +119,19 @@ class ApiBaseController(CacheableHandler):
         Supply an OPTIONS method in order to comply with CORS preflghted requests
         https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests
         """
-        self.response.headers['Access-Control-Allow-Methods'] = "GET, POST, OPTIONS"
-        self.response.headers['Access-Control-Allow-Headers'] = 'X-TBA-Auth-Key'
+        self.response.headers[
+            'Access-Control-Allow-Methods'] = "GET, POST, OPTIONS"
+        self.response.headers[
+            'Access-Control-Allow-Headers'] = 'X-TBA-Auth-Key'
 
     def _track_call_defer(self, api_action, api_label):
         if random.random() < tba_config.GA_RECORD_FRACTION:
-            deferred.defer(track_call, api_action, api_label, '{}:{}'.format(self.auth_owner, self.auth_description), _queue="api-track-call")
+            deferred.defer(
+                track_call,
+                api_action,
+                api_label,
+                '{}:{}'.format(self.auth_owner, self.auth_description),
+                _queue="api-track-call")
 
     def _validate_tba_auth_key(self):
         """
@@ -128,10 +149,14 @@ class ApiBaseController(CacheableHandler):
             if account:
                 self.auth_owner = account.key.id()
                 self.auth_owner_key = account.key
-            elif 'thebluealliance.com' in self.request.headers.get("Origin", ""):
+            elif 'thebluealliance.com' in self.request.headers.get(
+                    "Origin", ""):
                 self.auth_owner = 'The Blue Alliance'
             else:
-                self._errors = {"Error": "X-TBA-Auth-Key is a required header or URL param. Please get an access key at http://www.thebluealliance.com/account."}
+                self._errors = {
+                    "Error":
+                    "X-TBA-Auth-Key is a required header or URL param. Please get an access key at http://www.thebluealliance.com/account."
+                }
                 self.abort(401)
 
         if self.auth_owner:
@@ -143,11 +168,18 @@ class ApiBaseController(CacheableHandler):
                 self.auth_owner_key = auth.owner
                 self.auth_description = auth.description
                 if self.REQUIRE_ADMIN_AUTH and not auth.allow_admin:
-                    self._errors = {"Error": "X-TBA-Auth-Key does not have required permissions"}
+                    self._errors = {
+                        "Error":
+                        "X-TBA-Auth-Key does not have required permissions"
+                    }
                     self.abort(401)
-                logging.info("Auth owner: {}, X-TBA-Auth-Key: {}".format(self.auth_owner, x_tba_auth_key))
+                logging.info("Auth owner: {}, X-TBA-Auth-Key: {}".format(
+                    self.auth_owner, x_tba_auth_key))
             else:
-                self._errors = {"Error": "X-TBA-Auth-Key is invalid. Please get an access key at http://www.thebluealliance.com/account."}
+                self._errors = {
+                    "Error":
+                    "X-TBA-Auth-Key is invalid. Please get an access key at http://www.thebluealliance.com/account."
+                }
                 self.abort(401)
 
 

@@ -73,15 +73,18 @@ class DatafeedFMSAPI(object):
         fms_api_secrets = Sitevar.get_by_id('fmsapi.secrets')
         if fms_api_secrets is None:
             if self._sim_time is None:
-                raise Exception("Missing sitevar: fmsapi.secrets. Can't access FMS API.")
+                raise Exception(
+                    "Missing sitevar: fmsapi.secrets. Can't access FMS API.")
         else:
             fms_api_username = fms_api_secrets.contents['username']
             fms_api_authkey = fms_api_secrets.contents['authkey']
-            self._fms_api_authtoken = base64.b64encode('{}:{}'.format(fms_api_username, fms_api_authkey))
+            self._fms_api_authtoken = base64.b64encode('{}:{}'.format(
+                fms_api_username, fms_api_authkey))
 
         self._is_down_sitevar = Sitevar.get_by_id('apistatus.fmsapi_down')
         if not self._is_down_sitevar:
-            self._is_down_sitevar = Sitevar(id="apistatus.fmsapi_down", description="Is FMSAPI down?")
+            self._is_down_sitevar = Sitevar(
+                id="apistatus.fmsapi_down", description="Is FMSAPI down?")
 
         self.FMS_API_DOMAIN = 'https://frc-api.firstinspires.org/'
         if version == 'v1.0':
@@ -124,12 +127,16 @@ class DatafeedFMSAPI(object):
         context = ndb.get_context()
 
         # Prep for saving/reading raw API response into/from cloudstorage
-        gcs_dir_name = self.SAVED_RESPONSE_DIR_PATTERN.format(url.replace(self.FMS_API_DOMAIN, ''))
+        gcs_dir_name = self.SAVED_RESPONSE_DIR_PATTERN.format(
+            url.replace(self.FMS_API_DOMAIN, ''))
         if self._save_response and tba_config.CONFIG['save-frc-api-response']:
             try:
-                gcs_dir_contents = cloudstorage.listbucket(gcs_dir_name)  # This is async
+                gcs_dir_contents = cloudstorage.listbucket(
+                    gcs_dir_name)  # This is async
             except Exception, exception:
-                logging.error("Error prepping for saving API response for: {}".format(url))
+                logging.error(
+                    "Error prepping for saving API response for: {}".format(
+                        url))
                 logging.error(traceback.format_exc())
                 gcs_dir_contents = []
 
@@ -140,12 +147,15 @@ class DatafeedFMSAPI(object):
             content = None
 
             # Get list of responses
-            file_prefix = 'frc-api-response/{}/'.format(url.replace(self.FMS_API_DOMAIN, ''))
-            bucket_list_url = 'https://www.googleapis.com/storage/v1/b/bucket/o?bucket=tbatv-prod-hrd.appspot.com&prefix={}'.format(file_prefix)
+            file_prefix = 'frc-api-response/{}/'.format(
+                url.replace(self.FMS_API_DOMAIN, ''))
+            bucket_list_url = 'https://www.googleapis.com/storage/v1/b/bucket/o?bucket=tbatv-prod-hrd.appspot.com&prefix={}'.format(
+                file_prefix)
             try:
                 result = yield context.urlfetch(bucket_list_url)
             except Exception, e:
-                logging.error("URLFetch failed for: {}".format(bucket_list_url))
+                logging.error(
+                    "URLFetch failed for: {}".format(bucket_list_url))
                 logging.info(e)
                 raise ndb.Return(None)
 
@@ -153,8 +163,10 @@ class DatafeedFMSAPI(object):
             last_file_url = None
             for item in json.loads(result.content)['items']:
                 filename = item['name']
-                time_str = filename.replace(file_prefix, '').replace('.json', '').strip()
-                file_time = datetime.datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S.%f")
+                time_str = filename.replace(file_prefix, '').replace(
+                    '.json', '').strip()
+                file_time = datetime.datetime.strptime(time_str,
+                                                       "%Y-%m-%d %H:%M:%S.%f")
                 if file_time <= self._sim_time:
                     last_file_url = item['mediaLink']
                 else:
@@ -165,14 +177,18 @@ class DatafeedFMSAPI(object):
                 try:
                     result = yield context.urlfetch(last_file_url)
                 except Exception, e:
-                    logging.error("URLFetch failed for: {}".format(last_file_url))
+                    logging.error(
+                        "URLFetch failed for: {}".format(last_file_url))
                     logging.info(e)
                     raise ndb.Return(None)
                 content = result.content
 
             if content is None:
                 raise ndb.Return(None)
-            result = type('DummyResult', (object,), {"status_code": 200, "content": content})
+            result = type('DummyResult', (object, ), {
+                "status_code": 200,
+                "content": content
+            })
         else:
             """
             Make fetch to FRC API
@@ -194,7 +210,8 @@ class DatafeedFMSAPI(object):
             if old_status == True:
                 self._is_down_sitevar.contents = False
                 self._is_down_sitevar.put()
-            ApiStatusController.clear_cache_if_needed(old_status, self._is_down_sitevar.contents)
+            ApiStatusController.clear_cache_if_needed(
+                old_status, self._is_down_sitevar.contents)
 
             # Save raw API response into cloudstorage
             if self._save_response and tba_config.CONFIG['save-frc-api-response']:
@@ -206,32 +223,39 @@ class DatafeedFMSAPI(object):
 
                     write_new = True
                     if last_item is not None:
-                        with cloudstorage.open(last_item.filename, 'r') as last_json_file:
+                        with cloudstorage.open(last_item.filename,
+                                               'r') as last_json_file:
                             if last_json_file.read() == result.content:
                                 write_new = False  # Do not write if content didn't change
 
                     if write_new:
-                        file_name = gcs_dir_name + '{}.json'.format(datetime.datetime.now())
+                        file_name = gcs_dir_name + '{}.json'.format(
+                            datetime.datetime.now())
                         with cloudstorage.open(file_name, 'w') as json_file:
                             json_file.write(result.content)
                 except Exception, exception:
-                    logging.error("Error saving API response for: {}".format(url))
+                    logging.error(
+                        "Error saving API response for: {}".format(url))
                     logging.error(traceback.format_exc())
 
             if type(parser) == list:
-                raise ndb.Return([p.parse(json.loads(result.content)) for p in parser])
+                raise ndb.Return(
+                    [p.parse(json.loads(result.content)) for p in parser])
             else:
                 raise ndb.Return(parser.parse(json.loads(result.content)))
         elif result.status_code % 100 == 5:
             # 5XX error - something is wrong with the server
-            logging.warning('URLFetch for %s failed; Error code %s' % (url, result.status_code))
+            logging.warning('URLFetch for %s failed; Error code %s' %
+                            (url, result.status_code))
             if old_status == False:
                 self._is_down_sitevar.contents = True
                 self._is_down_sitevar.put()
-            ApiStatusController.clear_cache_if_needed(old_status, self._is_down_sitevar.contents)
+            ApiStatusController.clear_cache_if_needed(
+                old_status, self._is_down_sitevar.contents)
             raise ndb.Return(None)
         else:
-            logging.warning('URLFetch for %s failed; Error code %s' % (url, result.status_code))
+            logging.warning('URLFetch for %s failed; Error code %s' %
+                            (url, result.status_code))
             raise ndb.Return(None)
 
     @ndb.toplevel
@@ -242,16 +266,24 @@ class DatafeedFMSAPI(object):
     def getAwards(self, event):
         awards = []
         if event.event_type_enum == EventType.CMP_DIVISION and event.year >= 2015:  # 8 subdivisions from 2015+ have awards listed under 4 divisions
-            event_team_keys = EventTeam.query(EventTeam.event == event.key).fetch(keys_only=True)
-            valid_team_nums = set([int(etk.id().split('_')[1][3:]) for etk in event_team_keys])
+            event_team_keys = EventTeam.query(
+                EventTeam.event == event.key).fetch(keys_only=True)
+            valid_team_nums = set(
+                [int(etk.id().split('_')[1][3:]) for etk in event_team_keys])
 
             if event.year >= 2017:
                 division = self.SUBDIV_TO_DIV_2017[event.event_short]
             else:
                 division = self.SUBDIV_TO_DIV[event.event_short]
-            awards += self._parse(self.FMS_API_AWARDS_URL_PATTERN % (event.year, self._get_event_short(division)), FMSAPIAwardsParser(event, valid_team_nums))
+            awards += self._parse(self.FMS_API_AWARDS_URL_PATTERN %
+                                  (event.year,
+                                   self._get_event_short(division)),
+                                  FMSAPIAwardsParser(event, valid_team_nums))
 
-        awards += self._parse(self.FMS_API_AWARDS_URL_PATTERN % (event.year, self._get_event_short(event.event_short, event)), FMSAPIAwardsParser(event))
+        awards += self._parse(
+            self.FMS_API_AWARDS_URL_PATTERN %
+            (event.year, self._get_event_short(event.event_short, event)),
+            FMSAPIAwardsParser(event))
         return awards
 
     def getEventAlliances(self, event_key):
@@ -259,7 +291,10 @@ class DatafeedFMSAPI(object):
         event_short = event_key[4:]
 
         event = Event.get_by_id(event_key)
-        alliances = self._parse(self.FMS_API_EVENT_ALLIANCES_URL_PATTERN % (year, self._get_event_short(event_short, event)), FMSAPIEventAlliancesParser())
+        alliances = self._parse(self.FMS_API_EVENT_ALLIANCES_URL_PATTERN %
+                                (year,
+                                 self._get_event_short(event_short, event)),
+                                FMSAPIEventAlliancesParser())
         return alliances
 
     def getMatches(self, event_key):
@@ -269,10 +304,18 @@ class DatafeedFMSAPI(object):
         event = Event.get_by_id(event_key)
         hs_parser = FMSAPIHybridScheduleParser(year, event_short)
         detail_parser = FMSAPIMatchDetailsParser(year, event_short)
-        qual_matches_future = self._parse_async(self.FMS_API_HYBRID_SCHEDULE_QUAL_URL_PATTERN % (year, self._get_event_short(event_short, event)), hs_parser)
-        playoff_matches_future = self._parse_async(self.FMS_API_HYBRID_SCHEDULE_PLAYOFF_URL_PATTERN % (year, self._get_event_short(event_short, event)), hs_parser)
-        qual_details_future = self._parse_async(self.FMS_API_MATCH_DETAILS_QUAL_URL_PATTERN % (year, self._get_event_short(event_short, event)), detail_parser)
-        playoff_details_future = self._parse_async(self.FMS_API_MATCH_DETAILS_PLAYOFF_URL_PATTERN % (year, self._get_event_short(event_short, event)), detail_parser)
+        qual_matches_future = self._parse_async(
+            self.FMS_API_HYBRID_SCHEDULE_QUAL_URL_PATTERN %
+            (year, self._get_event_short(event_short, event)), hs_parser)
+        playoff_matches_future = self._parse_async(
+            self.FMS_API_HYBRID_SCHEDULE_PLAYOFF_URL_PATTERN %
+            (year, self._get_event_short(event_short, event)), hs_parser)
+        qual_details_future = self._parse_async(
+            self.FMS_API_MATCH_DETAILS_QUAL_URL_PATTERN %
+            (year, self._get_event_short(event_short, event)), detail_parser)
+        playoff_details_future = self._parse_async(
+            self.FMS_API_MATCH_DETAILS_PLAYOFF_URL_PATTERN %
+            (year, self._get_event_short(event_short, event)), detail_parser)
 
         matches_by_key = {}
         qual_matches = qual_matches_future.get_result()
@@ -285,13 +328,16 @@ class DatafeedFMSAPI(object):
                 matches_by_key[match.key.id()] = match
 
         qual_details = qual_details_future.get_result()
-        qual_details_items = qual_details.items() if qual_details is not None else []
+        qual_details_items = qual_details.items(
+        ) if qual_details is not None else []
         playoff_details = playoff_details_future.get_result()
-        playoff_details_items = playoff_details.items() if playoff_details is not None else []
+        playoff_details_items = playoff_details.items(
+        ) if playoff_details is not None else []
         for match_key, match_details in qual_details_items + playoff_details_items:
             match_key = playoff_matches[1].get(match_key, match_key)
             if match_key in matches_by_key:
-                matches_by_key[match_key].score_breakdown_json = json.dumps(match_details)
+                matches_by_key[match_key].score_breakdown_json = json.dumps(
+                    match_details)
 
         return filter(
             lambda m: not FMSAPIHybridScheduleParser.is_blank_match(m),
@@ -303,14 +349,19 @@ class DatafeedFMSAPI(object):
 
         event = Event.get_by_id(event_key)
         rankings, rankings2 = self._parse(
-            self.FMS_API_EVENT_RANKINGS_URL_PATTERN % (year, self._get_event_short(event_short, event)),
-            [FMSAPIEventRankingsParser(year), FMSAPIEventRankings2Parser(year)])
+            self.FMS_API_EVENT_RANKINGS_URL_PATTERN %
+            (year, self._get_event_short(event_short, event)), [
+                FMSAPIEventRankingsParser(year),
+                FMSAPIEventRankings2Parser(year)
+            ])
         return rankings, rankings2
 
     def getTeamDetails(self, year, team_key):
         team_number = team_key[3:]  # everything after 'frc'
 
-        result = self._parse(self.FMS_API_TEAM_DETAILS_URL_PATTERN % (year, team_number), FMSAPITeamDetailsParser(year))
+        result = self._parse(
+            self.FMS_API_TEAM_DETAILS_URL_PATTERN % (year, team_number),
+            FMSAPITeamDetailsParser(year))
         if result:
             return result[0]  # (team, districtteam, robot)
         else:
@@ -318,7 +369,8 @@ class DatafeedFMSAPI(object):
 
     # Returns a tuple: (list(Event), list(District))
     def getEventList(self, year):
-        result = self._parse(self.FMS_API_EVENT_LIST_URL_PATTERN % (year), FMSAPIEventListParser(year))
+        result = self._parse(self.FMS_API_EVENT_LIST_URL_PATTERN % (year),
+                             FMSAPIEventListParser(year))
         if result:
             return result
         else:
@@ -331,7 +383,9 @@ class DatafeedFMSAPI(object):
 
         event = Event.get_by_id(event_key)
         api_event_short = self._get_event_short(event_short, event)
-        result = self._parse(self.FMS_API_EVENT_DETAILS_URL_PATTERN % (year, api_event_short), FMSAPIEventListParser(year, short=event_short))
+        result = self._parse(self.FMS_API_EVENT_DETAILS_URL_PATTERN %
+                             (year, api_event_short),
+                             FMSAPIEventListParser(year, short=event_short))
         if result:
             return result
         else:
@@ -345,8 +399,11 @@ class DatafeedFMSAPI(object):
         event = Event.get_by_id(event_key)
         parser = FMSAPITeamDetailsParser(year)
         models = []  # will be list of tuples (team, districtteam, robot) model
-        for page in range(1, 9):  # Ensure this won't loop forever. 8 pages should be more than enough
-            url = self.FMS_API_EVENTTEAM_LIST_URL_PATTERN % (year, self._get_event_short(event_code, event), page)
+        for page in range(
+                1, 9
+        ):  # Ensure this won't loop forever. 8 pages should be more than enough
+            url = self.FMS_API_EVENTTEAM_LIST_URL_PATTERN % (
+                year, self._get_event_short(event_code, event), page)
             result = self._parse(url, parser)
             if result is None:
                 break

@@ -24,7 +24,8 @@ class SuggestionsReviewBaseController(LoggedInHandler):
         """
         This function creates the model from the accepted suggestion and writes it to the ndb
         """
-        raise NotImplementedError("Subclasses should implement create_target_model")
+        raise NotImplementedError(
+            "Subclasses should implement create_target_model")
 
     def was_create_success(self, ret):
         return ret
@@ -64,8 +65,11 @@ class SuggestionsReviewBaseController(LoggedInHandler):
         if not isinstance(reject_keys, list):
             reject_keys = [reject_keys]
 
-        rejected_suggestion_futures = [Suggestion.get_by_id_async(key) for key in reject_keys]
-        rejected_suggestions = map(lambda a: a.get_result(), rejected_suggestion_futures)
+        rejected_suggestion_futures = [
+            Suggestion.get_by_id_async(key) for key in reject_keys
+        ]
+        rejected_suggestions = map(lambda a: a.get_result(),
+                                   rejected_suggestion_futures)
 
         for suggestion in rejected_suggestions:
             self._reject_suggestion(suggestion)

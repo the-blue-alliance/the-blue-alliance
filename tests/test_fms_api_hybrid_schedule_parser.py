@@ -19,7 +19,8 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -35,11 +36,12 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             end_date=datetime(2016, 03, 27),
             official=True,
             start_date=datetime(2016, 03, 24),
-            timezone_id="America/New_York"
-        )
+            timezone_id="America/New_York")
         self.event.put()
-        with open('test_data/fms_api/2016_hybrid_schedule_no_matches.json', 'r') as f:
-            matches, _ = FMSAPIHybridScheduleParser(2016, 'nyny').parse(json.loads(f.read()))
+        with open('test_data/fms_api/2016_hybrid_schedule_no_matches.json',
+                  'r') as f:
+            matches, _ = FMSAPIHybridScheduleParser(2016, 'nyny').parse(
+                json.loads(f.read()))
 
             self.assertTrue(isinstance(matches, list))
             self.assertEqual(len(matches), 0)
@@ -55,11 +57,12 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             end_date=datetime(2016, 03, 27),
             official=True,
             start_date=datetime(2016, 03, 24),
-            timezone_id="America/New_York"
-        )
+            timezone_id="America/New_York")
         self.event.put()
-        with open('test_data/fms_api/2016_nyny_hybrid_schedule_qual.json', 'r') as f:
-            matches, _ = FMSAPIHybridScheduleParser(2016, 'nyny').parse(json.loads(f.read()))
+        with open('test_data/fms_api/2016_nyny_hybrid_schedule_qual.json',
+                  'r') as f:
+            matches, _ = FMSAPIHybridScheduleParser(2016, 'nyny').parse(
+                json.loads(f.read()))
 
             self.assertTrue(isinstance(matches, list))
             self.assertEqual(len(matches), 88)
@@ -79,11 +82,12 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             end_date=datetime(2016, 03, 27),
             official=True,
             start_date=datetime(2016, 03, 24),
-            timezone_id="America/New_York"
-        )
+            timezone_id="America/New_York")
         self.event.put()
-        with open('test_data/fms_api/2016_nyny_hybrid_schedule_playoff.json', 'r') as f:
-            matches, _ = FMSAPIHybridScheduleParser(2016, 'nyny').parse(json.loads(f.read()))
+        with open('test_data/fms_api/2016_nyny_hybrid_schedule_playoff.json',
+                  'r') as f:
+            matches, _ = FMSAPIHybridScheduleParser(2016, 'nyny').parse(
+                json.loads(f.read()))
 
             self.assertTrue(isinstance(matches, list))
             self.assertEqual(len(matches), 15)
@@ -107,12 +111,14 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             official=True,
             start_date=datetime(2016, 03, 24),
             timezone_id="America/New_York",
-            playoff_type=PlayoffType.BRACKET_16_TEAM
-        )
+            playoff_type=PlayoffType.BRACKET_16_TEAM)
         self.event.put()
 
-        with open('test_data/fms_api/2016_micmp_staging_hybrid_schedule_playoff.json', 'r') as f:
-            matches, _ = FMSAPIHybridScheduleParser(2016, 'micmp').parse(json.loads(f.read()))
+        with open(
+                'test_data/fms_api/2016_micmp_staging_hybrid_schedule_playoff.json',
+                'r') as f:
+            matches, _ = FMSAPIHybridScheduleParser(2016, 'micmp').parse(
+                json.loads(f.read()))
 
             self.assertTrue(isinstance(matches, list))
 
@@ -137,11 +143,12 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             official=True,
             start_date=datetime(2015, 03, 24),
             timezone_id="America/New_York",
-            playoff_type=PlayoffType.AVG_SCORE_8_TEAM
-        )
+            playoff_type=PlayoffType.AVG_SCORE_8_TEAM)
         self.event.put()
-        with open('test_data/fms_api/2015nyny_hybrid_schedule_playoff.json', 'r') as f:
-            matches, _ = FMSAPIHybridScheduleParser(2015, 'nyny').parse(json.loads(f.read()))
+        with open('test_data/fms_api/2015nyny_hybrid_schedule_playoff.json',
+                  'r') as f:
+            matches, _ = FMSAPIHybridScheduleParser(2015, 'nyny').parse(
+                json.loads(f.read()))
 
             self.assertTrue(isinstance(matches, list))
             self.assertEqual(len(matches), 17)
@@ -166,12 +173,13 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             official=True,
             start_date=datetime(2017, 03, 24),
             timezone_id="America/New_York",
-            playoff_type=PlayoffType.BRACKET_4_TEAM
-        )
+            playoff_type=PlayoffType.BRACKET_4_TEAM)
         self.event.put()
 
-        with open('test_data/fms_api/2017micmp_playoff_schedule.json', 'r') as f:
-            matches, _ = FMSAPIHybridScheduleParser(2017, 'micmp').parse(json.loads(f.read()))
+        with open('test_data/fms_api/2017micmp_playoff_schedule.json',
+                  'r') as f:
+            matches, _ = FMSAPIHybridScheduleParser(2017, 'micmp').parse(
+                json.loads(f.read()))
 
             self.assertTrue(isinstance(matches, list))
 
@@ -196,12 +204,13 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             official=True,
             start_date=datetime(2017, 03, 24),
             timezone_id="America/New_York",
-            playoff_type=PlayoffType.ROUND_ROBIN_6_TEAM
-        )
+            playoff_type=PlayoffType.ROUND_ROBIN_6_TEAM)
         self.event.put()
 
-        with open('test_data/fms_api/2017cmptx_staging_playoff_schedule.json', 'r') as f:
-            matches, _ = FMSAPIHybridScheduleParser(2017, 'cmptx').parse(json.loads(f.read()))
+        with open('test_data/fms_api/2017cmptx_staging_playoff_schedule.json',
+                  'r') as f:
+            matches, _ = FMSAPIHybridScheduleParser(2017, 'cmptx').parse(
+                json.loads(f.read()))
 
             self.assertTrue(isinstance(matches, list))
 
@@ -227,12 +236,14 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             official=True,
             start_date=datetime(2017, 07, 29),
             timezone_id="America/New_York",
-            playoff_type=PlayoffType.BO5_FINALS
-        )
+            playoff_type=PlayoffType.BO5_FINALS)
         self.event.put()
 
-        with open('test_data/fms_api/2017foc_staging_hybrid_schedule_playoff.json', 'r') as f:
-            matches, _ = FMSAPIHybridScheduleParser(2017, 'nhfoc').parse(json.loads(f.read()))
+        with open(
+                'test_data/fms_api/2017foc_staging_hybrid_schedule_playoff.json',
+                'r') as f:
+            matches, _ = FMSAPIHybridScheduleParser(2017, 'nhfoc').parse(
+                json.loads(f.read()))
 
             self.assertTrue(isinstance(matches, list))
 
@@ -247,4 +258,4 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
 
             for i, match in enumerate(clean_matches['f']):
                 self.assertEqual(match.set_number, 1)
-                self.assertEqual(match.match_number, i+1)
+                self.assertEqual(match.match_number, i + 1)

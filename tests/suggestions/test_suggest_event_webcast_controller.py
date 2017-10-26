@@ -22,11 +22,18 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
         self.testbed.init_user_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
-        app = webapp2.WSGIApplication([
-            RedirectRoute(r'/suggest/event/webcast', SuggestEventWebcastController, 'suggest-webcast', strict_slash=True),
-        ], debug=True)
+        app = webapp2.WSGIApplication(
+            [
+                RedirectRoute(
+                    r'/suggest/event/webcast',
+                    SuggestEventWebcastController,
+                    'suggest-webcast',
+                    strict_slash=True),
+            ],
+            debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.event = Event(
@@ -47,8 +54,7 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
             timezone_id="America/New_York",
             start_date=datetime(2016, 03, 24),
             webcast_json="",
-            website="http://www.firstsv.org"
-        )
+            website="http://www.firstsv.org")
         self.event.put()
 
     def tearDown(self):
@@ -59,17 +65,13 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
             user_email="user@example.com",
             user_id="123",
             user_is_admin='0',
-            overwrite=True
-        )
+            overwrite=True)
 
-        Account.get_or_insert(
-            "123",
-            email="user@example.com",
-            registered=True
-        )
+        Account.get_or_insert("123", email="user@example.com", registered=True)
 
     def getSuggestionForm(self, event_key):
-        response = self.testapp.get('/suggest/event/webcast?event_key={}'.format(event_key))
+        response = self.testapp.get(
+            '/suggest/event/webcast?event_key={}'.format(event_key))
         self.assertEqual(response.status_int, 200)
 
         form = response.forms.get('suggest_webcast', None)
@@ -77,9 +79,11 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
         return form
 
     def test_login_redirect(self):
-        response = self.testapp.get('/suggest/event/webcast?event_key=2016necmp', status='3*')
+        response = self.testapp.get(
+            '/suggest/event/webcast?event_key=2016necmp', status='3*')
         response = response.follow(expect_errors=True)
-        self.assertTrue(response.request.path.startswith("/account/login_required"))
+        self.assertTrue(
+            response.request.path.startswith("/account/login_required"))
 
     def test_no_params(self):
         self.loginUser()
@@ -131,5 +135,6 @@ class TestSuggestEventWebcastController(unittest2.TestCase):
         self.assertIsNotNone(suggestion)
         self.assertEqual(suggestion.review_state, Suggestion.REVIEW_PENDING)
         self.assertEqual(suggestion.target_key, '2016necmp')
-        self.assertEqual(suggestion.contents['webcast_url'], 'https://twitch.tv/frcgamesense')
+        self.assertEqual(suggestion.contents['webcast_url'],
+                         'https://twitch.tv/frcgamesense')
         self.assertIsNotNone(suggestion.contents.get('webcast_dict'))

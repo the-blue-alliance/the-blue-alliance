@@ -30,12 +30,16 @@ class UsfirstMatchesParser(ParserBase):
             if len(tds) == 10 or len(tds) == 11:  # qual has 10, elim has 11
                 if self._recurseUntilString(tds[1]) is not None:
                     time_string = self._recurseUntilString(tds[0])
-                    red_teams = ["frc" + self._recurseUntilString(tds[-8]),
-                                 "frc" + self._recurseUntilString(tds[-7]),
-                                 "frc" + self._recurseUntilString(tds[-6])]
-                    blue_teams = ["frc" + self._recurseUntilString(tds[-5]),
-                                  "frc" + self._recurseUntilString(tds[-4]),
-                                  "frc" + self._recurseUntilString(tds[-3])]
+                    red_teams = [
+                        "frc" + self._recurseUntilString(tds[-8]),
+                        "frc" + self._recurseUntilString(tds[-7]),
+                        "frc" + self._recurseUntilString(tds[-6])
+                    ]
+                    blue_teams = [
+                        "frc" + self._recurseUntilString(tds[-5]),
+                        "frc" + self._recurseUntilString(tds[-4]),
+                        "frc" + self._recurseUntilString(tds[-3])
+                    ]
 
                     try:
                         if self._recurseUntilString(tds[-2]) is None:
@@ -48,7 +52,8 @@ class UsfirstMatchesParser(ParserBase):
                         else:
                             blue_score = int(self._recurseUntilString(tds[-1]))
 
-                        comp_level, match_number, set_number = self.parseMatchNumberInfo(self._recurseUntilString(tds[1]))
+                        comp_level, match_number, set_number = self.parseMatchNumberInfo(
+                            self._recurseUntilString(tds[1]))
 
                         alliances = {
                             "red": {
@@ -62,13 +67,19 @@ class UsfirstMatchesParser(ParserBase):
                         }
 
                         matches.append({
-                            "alliances_json": json.dumps(alliances),
-                            "comp_level": comp_level,
-                            "match_number": match_number,
-                            "set_number": set_number,
-                            "team_key_names": red_teams + blue_teams,
-                            "time_string": time_string
-                            })
+                            "alliances_json":
+                            json.dumps(alliances),
+                            "comp_level":
+                            comp_level,
+                            "match_number":
+                            match_number,
+                            "set_number":
+                            set_number,
+                            "team_key_names":
+                            red_teams + blue_teams,
+                            "time_string":
+                            time_string
+                        })
 
                     except Exception, detail:
                         logging.info('Match Parse Failed: ' + str(detail))

@@ -35,45 +35,52 @@ class FIRSTElasticSearchEventListParser(object):
             state_prov = event.get('event_stateprov', None)
             country = event.get('event_country', None)
             postalcode = event.get('event_postalcode', None)
-            start = datetime.datetime.strptime(event['date_start'], self.DATE_FORMAT_STR)
-            end = datetime.datetime.strptime(event['date_end'], self.DATE_FORMAT_STR) + datetime.timedelta(hours=23, minutes=59, seconds=59)
+            start = datetime.datetime.strptime(event['date_start'],
+                                               self.DATE_FORMAT_STR)
+            end = datetime.datetime.strptime(
+                event['date_end'], self.DATE_FORMAT_STR) + datetime.timedelta(
+                    hours=23, minutes=59, seconds=59)
             venue_address = event['event_venue']
             if 'event_address1' in event and event['event_address1']:
                 venue_address += '\n' + event['event_address1']
             if 'event_address2' in event and event['event_address2']:
                 venue_address += '\n' + event['event_address2']
-            venue_address += '\n{}, {} {}\n{}'.format(event['event_city'], event['event_stateprov'], event['event_postalcode'], event['event_country'])
+            venue_address += '\n{}, {} {}\n{}'.format(
+                event['event_city'], event['event_stateprov'],
+                event['event_postalcode'], event['event_country'])
 
             raw_website = event.get('event_web_url', None)
-            website = urlparse.urlparse(raw_website, 'http').geturl() if raw_website else None
+            website = urlparse.urlparse(
+                raw_website, 'http').geturl() if raw_website else None
 
             # Decide what district (if any) this event is in
             if event_type in EventType.DISTRICT_EVENT_TYPES:
                 district_enum = EventHelper.getDistrictEnumFromEventName(name)
-                district_key = EventHelper.getDistrictKeyFromEventName(name, year_districts_future)
+                district_key = EventHelper.getDistrictKeyFromEventName(
+                    name, year_districts_future)
             else:
                 district_enum = DistrictType.NO_DISTRICT
                 district_key = None
 
-            events.append(Event(
-                id=key,
-                name=name,
-                short_name=short_name,
-                event_short=code,
-                event_type_enum=event_type,
-                official=True,
-                start_date=start,
-                end_date=end,
-                venue=event['event_venue'],
-                city=city,
-                state_prov=state_prov,
-                country=country,
-                postalcode=postalcode,
-                venue_address=venue_address,
-                year=self.season,
-                event_district_enum=district_enum,
-                district_key=district_key,
-                first_eid=first_eid,
-                website=website
-            ))
+            events.append(
+                Event(
+                    id=key,
+                    name=name,
+                    short_name=short_name,
+                    event_short=code,
+                    event_type_enum=event_type,
+                    official=True,
+                    start_date=start,
+                    end_date=end,
+                    venue=event['event_venue'],
+                    city=city,
+                    state_prov=state_prov,
+                    country=country,
+                    postalcode=postalcode,
+                    venue_address=venue_address,
+                    year=self.season,
+                    event_district_enum=district_enum,
+                    district_key=district_key,
+                    first_eid=first_eid,
+                    website=website))
         return events

@@ -36,7 +36,8 @@ def award_updated(affected_refs):
     for event_key in event_keys:
         queries_and_keys.append((EventAwardsQuery(event_key.id())))
         for team_key in team_keys:
-            queries_and_keys.append((TeamEventAwardsQuery(team_key.id(), event_key.id())))
+            queries_and_keys.append((TeamEventAwardsQuery(
+                team_key.id(), event_key.id())))
 
     for team_key in team_keys:
         queries_and_keys.append((TeamAwardsQuery(team_key.id())))
@@ -44,7 +45,8 @@ def award_updated(affected_refs):
             queries_and_keys.append((TeamYearAwardsQuery(team_key.id(), year)))
         for event_type in event_types:
             for award_type in award_types:
-                queries_and_keys.append((TeamEventTypeAwardsQuery(team_key.id(), event_type, award_type)))
+                queries_and_keys.append((TeamEventTypeAwardsQuery(
+                    team_key.id(), event_type, award_type)))
 
     return queries_and_keys
 
@@ -54,7 +56,10 @@ def event_updated(affected_refs):
     years = _filter(affected_refs['year'])
     event_district_keys = _filter(affected_refs['district_key'])
 
-    event_team_keys_future = EventTeam.query(EventTeam.event.IN([event_key for event_key in event_keys])).fetch_async(None, keys_only=True)
+    event_team_keys_future = EventTeam.query(
+        EventTeam.event.IN([event_key
+                            for event_key in event_keys])).fetch_async(
+                                None, keys_only=True)
     events_future = ndb.get_multi_async(event_keys)
 
     queries_and_keys = []
@@ -74,8 +79,11 @@ def event_updated(affected_refs):
         queries_and_keys.append((TeamEventsQuery(team_key)))
         queries_and_keys.append((TeamYearEventsQuery(team_key, year)))
 
-    events_with_parents = filter(lambda e: e.get_result() is not None and e.get_result().parent_event is not None, events_future)
-    parent_keys = set([e.get_result().parent_event for e in events_with_parents])
+    events_with_parents = filter(
+        lambda e: e.get_result() is not None and e.get_result().parent_event is not None,
+        events_future)
+    parent_keys = set(
+        [e.get_result().parent_event for e in events_with_parents])
     for parent_key in parent_keys:
         queries_and_keys.append((EventDivisionsQuery(parent_key.id())))
 
@@ -105,11 +113,13 @@ def match_updated(affected_refs):
     for event_key in event_keys:
         queries_and_keys.append((EventMatchesQuery(event_key.id())))
         for team_key in team_keys:
-            queries_and_keys.append((TeamEventMatchesQuery(team_key.id(), event_key.id())))
+            queries_and_keys.append((TeamEventMatchesQuery(
+                team_key.id(), event_key.id())))
 
     for team_key in team_keys:
         for year in years:
-            queries_and_keys.append((TeamYearMatchesQuery(team_key.id(), year)))
+            queries_and_keys.append((TeamYearMatchesQuery(team_key.id(),
+                                                          year)))
 
     return queries_and_keys
 
@@ -120,15 +130,19 @@ def media_updated(affected_refs):
     media_tags = _filter(affected_refs['media_tag_enum'])
 
     team_keys = filter(lambda x: x.kind() == 'Team', reference_keys)
-    event_team_keys_future = EventTeam.query(EventTeam.team.IN(team_keys)).fetch_async(None, keys_only=True) if team_keys else None
+    event_team_keys_future = EventTeam.query(
+        EventTeam.team.IN(team_keys)).fetch_async(
+            None, keys_only=True) if team_keys else None
 
     queries_and_keys = []
     for reference_key in reference_keys:
         if reference_key.kind() == 'Team':
             for year in years:
-                queries_and_keys.append((TeamYearMediaQuery(reference_key.id(), year)))
+                queries_and_keys.append((TeamYearMediaQuery(
+                    reference_key.id(), year)))
             for media_tag in media_tags:
-                queries_and_keys.append((TeamTagMediasQuery(reference_key.id(), media_tag)))
+                queries_and_keys.append((TeamTagMediasQuery(
+                    reference_key.id(), media_tag)))
             queries_and_keys.append((TeamSocialMediaQuery(reference_key.id())))
         if reference_key.kind() == 'Event':
             queries_and_keys.append((EventMediasQuery(reference_key.id())))
@@ -139,7 +153,8 @@ def media_updated(affected_refs):
             year = int(event_key[:4])
             if year in years:
                 queries_and_keys.append(EventTeamsMediasQuery(event_key))
-                queries_and_keys.append(EventTeamsPreferredMediasQuery(event_key))
+                queries_and_keys.append(
+                    EventTeamsPreferredMediasQuery(event_key))
 
     return queries_and_keys
 
@@ -157,8 +172,13 @@ def robot_updated(affected_refs):
 def team_updated(affected_refs):
     team_keys = _filter(affected_refs['key'])
 
-    event_team_keys_future = EventTeam.query(EventTeam.team.IN([team_key for team_key in team_keys])).fetch_async(None, keys_only=True)
-    district_team_keys_future = DistrictTeam.query(DistrictTeam.team.IN([team_key for team_key in team_keys])).fetch_async(None, keys_only=True)
+    event_team_keys_future = EventTeam.query(
+        EventTeam.team.IN([team_key for team_key in team_keys])).fetch_async(
+            None, keys_only=True)
+    district_team_keys_future = DistrictTeam.query(
+        DistrictTeam.team.IN([team_key
+                              for team_key in team_keys])).fetch_async(
+                                  None, keys_only=True)
 
     queries_and_keys = []
     for team_key in team_keys:
@@ -221,8 +241,12 @@ def district_updated(affected_refs):
     district_abbrevs = _filter(affected_refs['abbreviation'])
     district_keys = _filter(affected_refs['key'])
 
-    district_team_keys_future = DistrictTeam.query(DistrictTeam.district_key.IN(list(district_keys))).fetch_async(None, keys_only=True)
-    district_event_keys_future = Event.query(Event.district_key.IN(list(district_keys))).fetch_async(keys_only=True)
+    district_team_keys_future = DistrictTeam.query(
+        DistrictTeam.district_key.IN(list(district_keys))).fetch_async(
+            None, keys_only=True)
+    district_event_keys_future = Event.query(
+        Event.district_key.IN(
+            list(district_keys))).fetch_async(keys_only=True)
 
     queries_and_keys = []
     for year in years:

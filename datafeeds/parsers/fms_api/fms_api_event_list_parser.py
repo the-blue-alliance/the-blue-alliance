@@ -68,20 +68,28 @@ class FMSAPIEventListParser(object):
 
         for event in response['Events']:
             code = event['code'].lower()
-            event_type = EventType.PRESEASON if code == 'week0' else self.EVENT_TYPES.get(event['type'].lower(), None)
+            event_type = EventType.PRESEASON if code == 'week0' else self.EVENT_TYPES.get(
+                event['type'].lower(), None)
             if event_type is None and not self.event_short:
-                logging.warn("Event type '{}' not recognized!".format(event['type']))
+                logging.warn("Event type '{}' not recognized!".format(
+                    event['type']))
                 continue
             name = event['name']
-            short_name = EventHelper.getShortName(name, district_code=event['districtCode'])
-            district_enum = EventHelper.parseDistrictName(event['districtCode'].lower()) if event['districtCode'] else DistrictType.NO_DISTRICT
-            district_key = District.renderKeyName(self.season, event['districtCode'].lower()) if event['districtCode'] else None
+            short_name = EventHelper.getShortName(
+                name, district_code=event['districtCode'])
+            district_enum = EventHelper.parseDistrictName(
+                event['districtCode'].lower()) if event[
+                    'districtCode'] else DistrictType.NO_DISTRICT
+            district_key = District.renderKeyName(self.season, event[
+                'districtCode'].lower()) if event['districtCode'] else None
             venue = event['venue']
             city = event['city']
             state_prov = event['stateprov']
             country = event['country']
-            start = datetime.datetime.strptime(event['dateStart'], self.DATE_FORMAT_STR)
-            end = datetime.datetime.strptime(event['dateEnd'], self.DATE_FORMAT_STR)
+            start = datetime.datetime.strptime(event['dateStart'],
+                                               self.DATE_FORMAT_STR)
+            end = datetime.datetime.strptime(event['dateEnd'],
+                                             self.DATE_FORMAT_STR)
             website = event.get('website')
 
             # TODO read timezone from API
@@ -102,10 +110,14 @@ class FMSAPIEventListParser(object):
                 # Einstein to simply "Championship" when certain sitevar flags are set
 
                 if code in self.EINSTEIN_CODES:
-                    override = [item for item in event_name_override if item['event'] == "{}{}".format(self.season, code)]
+                    override = [
+                        item for item in event_name_override
+                        if item['event'] == "{}{}".format(self.season, code)
+                    ]
                     if override:
                         name = short_name.format(override[0]['name'])
-                        short_name = short_name.format(override[0]['short_name'])
+                        short_name = short_name.format(
+                            override[0]['short_name'])
                 else:  # Divisions
                     name = '{} Division'.format(short_name)
             elif self.event_short:
@@ -119,25 +131,28 @@ class FMSAPIEventListParser(object):
             if event_key in events_to_change_dates:
                 start = end.replace(hour=0, minute=0, second=0, microsecond=0)
 
-            events.append(Event(
-                id=event_key,
-                name=name,
-                short_name=short_name,
-                event_short=code,
-                event_type_enum=event_type,
-                official=True,
-                start_date=start,
-                end_date=end,
-                venue=venue,
-                city=city,
-                state_prov=state_prov,
-                country=country,
-                venue_address=None,  # Even though FRC API provides address, ElasticSearch is more detailed
-                year=self.season,
-                event_district_enum=district_enum,
-                district_key=ndb.Key(District, district_key) if district_key else None,
-                website=website,
-            ))
+            events.append(
+                Event(
+                    id=event_key,
+                    name=name,
+                    short_name=short_name,
+                    event_short=code,
+                    event_type_enum=event_type,
+                    official=True,
+                    start_date=start,
+                    end_date=end,
+                    venue=venue,
+                    city=city,
+                    state_prov=state_prov,
+                    country=country,
+                    venue_address=
+                    None,  # Even though FRC API provides address, ElasticSearch is more detailed
+                    year=self.season,
+                    event_district_enum=district_enum,
+                    district_key=ndb.Key(District, district_key)
+                    if district_key else None,
+                    website=website,
+                ))
 
             # Build District Model
             if district_key and district_key not in districts:

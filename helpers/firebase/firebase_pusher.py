@@ -25,7 +25,8 @@ class FirebasePusher(object):
     def _get_secret(cls):
         firebase_secrets = Sitevar.get_by_id("firebase.secrets")
         if firebase_secrets is None:
-            logging.error("Missing sitevar: firebase.secrets. Can't write to Firebase.")
+            logging.error(
+                "Missing sitevar: firebase.secrets. Can't write to Firebase.")
             return None
         return firebase_secrets.contents['FIREBASE_SECRET']
 
@@ -42,7 +43,9 @@ class FirebasePusher(object):
         url = tba_config.CONFIG['firebase-url'].format(key, secret)
         result = urlfetch.fetch(url, method='DELETE', deadline=10)
         if result.status_code not in {200, 204}:
-            raise Exception("Error with DELETE data from Firebase: {}. ERROR {}: {}".format(url, result.status_code, result.content))
+            raise Exception(
+                "Error with DELETE data from Firebase: {}. ERROR {}: {}".
+                format(url, result.status_code, result.content))
 
     @classmethod
     def _patch_data(cls, key, data_json):
@@ -55,9 +58,12 @@ class FirebasePusher(object):
         if secret is None:
             return
         url = tba_config.CONFIG['firebase-url'].format(key, secret)
-        result = urlfetch.fetch(url, payload=data_json, method='PATCH', deadline=10)
+        result = urlfetch.fetch(
+            url, payload=data_json, method='PATCH', deadline=10)
         if result.status_code not in {200, 204}:
-            raise Exception("Error with PATCH data to Firebase: {}; {}. ERROR {}: {}".format(url, data_json, result.status_code, result.content))
+            raise Exception(
+                "Error with PATCH data to Firebase: {}; {}. ERROR {}: {}".
+                format(url, data_json, result.status_code, result.content))
 
     @classmethod
     def _put_data(cls, key, data_json):
@@ -70,9 +76,12 @@ class FirebasePusher(object):
         if secret is None:
             return
         url = tba_config.CONFIG['firebase-url'].format(key, secret)
-        result = urlfetch.fetch(url, payload=data_json, method='PUT', deadline=10)
+        result = urlfetch.fetch(
+            url, payload=data_json, method='PUT', deadline=10)
         if result.status_code not in {200, 204}:
-            raise Exception("Error with PUT data to Firebase: {}; {}. ERROR {}: {}".format(url, data_json, result.status_code, result.content))
+            raise Exception(
+                "Error with PUT data to Firebase: {}; {}. ERROR {}: {}".format(
+                    url, data_json, result.status_code, result.content))
 
     @classmethod
     def _push_data(cls, key, data_json):
@@ -86,9 +95,12 @@ class FirebasePusher(object):
         if secret is None:
             return
         url = tba_config.CONFIG['firebase-url'].format(key, secret)
-        result = urlfetch.fetch(url, payload=data_json, method='POST', deadline=10)
+        result = urlfetch.fetch(
+            url, payload=data_json, method='POST', deadline=10)
         if result.status_code not in {200, 204}:
-            raise Exception("Error with POST data to Firebase: {}; {}. ERROR {}: {}".format(url, data_json, result.status_code, result.content))
+            raise Exception(
+                "Error with POST data to Firebase: {}; {}. ERROR {}: {}".
+                format(url, data_json, result.status_code, result.content))
 
     @classmethod
     def delete_match(cls, match):
@@ -114,7 +126,8 @@ class FirebasePusher(object):
 
         match_data = {}
         for match in matches:
-            match_data[match.key.id()] = filter_match_properties([MatchConverter.convert(match, 3)], 'simple')[0]
+            match_data[match.key.id()] = filter_match_properties(
+                [MatchConverter.convert(match, 3)], 'simple')[0]
         deferred.defer(
             cls._put_data,
             'events/{}/matches'.format(event_key),
@@ -129,7 +142,9 @@ class FirebasePusher(object):
         if match.year < 2017:
             return
 
-        match_data_json = json.dumps(filter_match_properties([MatchConverter.convert(match, 3)], 'simple')[0])
+        match_data_json = json.dumps(
+            filter_match_properties([MatchConverter.convert(match, 3)],
+                                    'simple')[0])
 
         deferred.defer(
             cls._patch_data,
@@ -141,7 +156,8 @@ class FirebasePusher(object):
             if match.event.get().event_type_enum in EventType.CMP_EVENT_TYPES:
                 cls.update_champ_numbers()
         except Exception, exception:
-            logging.warning("Update champ numbers failed: {}".format(exception))
+            logging.warning(
+                "Update champ numbers failed: {}".format(exception))
             logging.warning(traceback.format_exc())
 
         # for team_key_name in match.team_key_names:
@@ -159,7 +175,8 @@ class FirebasePusher(object):
         if int(event_details.key.id()[:4]) < 2017:
             return
 
-        event_details_json = json.dumps(EventDetailsConverter.convert(event_details, 3))
+        event_details_json = json.dumps(
+            EventDetailsConverter.convert(event_details, 3))
 
         deferred.defer(
             cls._patch_data,
@@ -202,10 +219,15 @@ class FirebasePusher(object):
         for event_key, event in cls._update_live_events_helper().items():
             converted_event = EventConverter.convert(event, 3)
             # Only what's needed to render webcast
-            partial_event = {key: converted_event[key] for key in ['key', 'name', 'short_name', 'webcasts']}
+            partial_event = {
+                key: converted_event[key]
+                for key in ['key', 'name', 'short_name', 'webcasts']
+            }
             # Hack in district code
             if event.district_key and partial_event.get('short_name'):
-                partial_event['short_name'] = '[{}] {}'.format(event.district_key.id()[4:].upper(), partial_event['short_name'])
+                partial_event['short_name'] = '[{}] {}'.format(
+                    event.district_key.id()[4:].upper(),
+                    partial_event['short_name'])
 
             events_by_key[event_key] = partial_event
 
@@ -238,9 +260,9 @@ class FirebasePusher(object):
 
         # To get Champ events to show up before they are actually going on
         forced_live_events = Sitevar.get_or_insert(
-            'forced_live_events',
-            values_json=json.dumps([]))
-        for event in ndb.get_multi([ndb.Key('Event', ekey) for ekey in forced_live_events.contents]):
+            'forced_live_events', values_json=json.dumps([]))
+        for event in ndb.get_multi(
+            [ndb.Key('Event', ekey) for ekey in forced_live_events.contents]):
             if event.webcast:
                 for webcast in event.webcast:
                     WebcastOnlineHelper.add_online_status_async(webcast)
@@ -258,10 +280,13 @@ class FirebasePusher(object):
 
     @classmethod
     @ndb.toplevel
-    def get_special_webcasts(cls):  # TODO: Break this out of FirebasePusher 2017-03-01 -fangeugene
+    def get_special_webcasts(
+            cls
+    ):  # TODO: Break this out of FirebasePusher 2017-03-01 -fangeugene
         special_webcasts_temp = Sitevar.get_by_id('gameday.special_webcasts')
         if special_webcasts_temp:
-            special_webcasts_temp = special_webcasts_temp.contents.get('webcasts', [])
+            special_webcasts_temp = special_webcasts_temp.contents.get(
+                'webcasts', [])
         else:
             special_webcasts_temp = []
 
@@ -280,19 +305,22 @@ class FirebasePusher(object):
         deferred.defer(
             cls._patch_data,
             'live_events/{}'.format(event.key_name),
-            json.dumps({key: converted_event[key] for key in ['key', 'name', 'short_name', 'webcasts']}),
+            json.dumps({
+                key: converted_event[key]
+                for key in ['key', 'name', 'short_name', 'webcasts']
+            }),
             _queue="firebase")
 
     @classmethod
     def update_champ_numbers(cls):
-        events = Event.query(
-            Event.year==2017,
-            Event.event_type_enum.IN([
-                EventType.CMP_DIVISION,
-                EventType.CMP_FINALS])).fetch()
+        events = Event.query(Event.year == 2017,
+                             Event.event_type_enum.IN([
+                                 EventType.CMP_DIVISION, EventType.CMP_FINALS
+                             ])).fetch()
         matches_futures = []
         for event in events:
-            matches_futures.append(EventMatchesQuery(event.key.id()).fetch_async())
+            matches_futures.append(
+                EventMatchesQuery(event.key.id()).fetch_async())
 
         pressure = 0
         rotors = 0
@@ -311,7 +339,8 @@ class FirebasePusher(object):
                         rotors += 2
                     elif match.score_breakdown[color]['rotor1Engaged']:
                         rotors += 1
-                    climbs += match.score_breakdown[color]['teleopTakeoffPoints'] / 50
+                    climbs += match.score_breakdown[color][
+                        'teleopTakeoffPoints'] / 50
 
         deferred.defer(
             cls._patch_data,

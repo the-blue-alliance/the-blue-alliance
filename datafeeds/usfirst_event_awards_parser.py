@@ -16,19 +16,26 @@ class UsfirstEventAwardsParser(ParserBase):
     """
     # The format of USFIRST award pages is different for 2007-2011 and 2012-present
     # This dict defines which columns of the USFIRST award table name_str, team_number, and individual are.
-    COL_NUM = {'2012-pres': {'name_str': 0,
-                             'team_number': 1,
-                             'individual': 3},
-               '2007-11': {'name_str': 0,
-                           'team_number': 1,
-                           'individual': 2}}
+    COL_NUM = {
+        '2012-pres': {
+            'name_str': 0,
+            'team_number': 1,
+            'individual': 3
+        },
+        '2007-11': {
+            'name_str': 0,
+            'team_number': 1,
+            'individual': 2
+        }
+    }
 
     @classmethod
     def parse(self, html):
         """
         Parse the awards from USFIRST.
         """
-        html = html.decode('utf-8', 'ignore')  # Clean html before feeding itno BeautifulSoup
+        html = html.decode(
+            'utf-8', 'ignore')  # Clean html before feeding itno BeautifulSoup
         soup = BeautifulSoup(html)
         table = soup.findAll('table')[2]
 
@@ -40,14 +47,17 @@ class UsfirstEventAwardsParser(ParserBase):
             else:
                 parser_year = '2007-11'
 
-            name_str = unicode(self._recurseUntilString(tds[self.COL_NUM[parser_year]['name_str']]))
+            name_str = unicode(
+                self._recurseUntilString(
+                    tds[self.COL_NUM[parser_year]['name_str']]))
             award_type_enum = AwardHelper.parse_award_type(name_str)
             if award_type_enum is None:
                 continue
 
             team_number = None
             try:
-                team_number = self._recurseUntilString(tds[self.COL_NUM[parser_year]['team_number']])
+                team_number = self._recurseUntilString(
+                    tds[self.COL_NUM[parser_year]['team_number']])
             except AttributeError:
                 team_number = None
             if team_number and team_number.isdigit():
@@ -58,7 +68,8 @@ class UsfirstEventAwardsParser(ParserBase):
             awardee = None
             if award_type_enum in AwardType.INDIVIDUAL_AWARDS:
                 try:
-                    awardee_str = self._recurseUntilString(tds[self.COL_NUM[parser_year]['individual']])
+                    awardee_str = self._recurseUntilString(
+                        tds[self.COL_NUM[parser_year]['individual']])
                     if awardee_str:
                         awardee = unicode(sanitize(awardee_str))
                 except TypeError:
@@ -78,13 +89,18 @@ class UsfirstEventAwardsParser(ParserBase):
 
             if award_type_enum in awards_by_type:
                 if team_number is not None:
-                    awards_by_type[award_type_enum]['team_number_list'].append(team_number)
-                awards_by_type[award_type_enum]['recipient_json_list'].append(recipient_json)
+                    awards_by_type[award_type_enum]['team_number_list'].append(
+                        team_number)
+                awards_by_type[award_type_enum]['recipient_json_list'].append(
+                    recipient_json)
             else:
                 awards_by_type[award_type_enum] = {
-                    'name_str': strip_number(name_str),
-                    'award_type_enum': award_type_enum,
-                    'team_number_list': [team_number] if team_number is not None else [],
+                    'name_str':
+                    strip_number(name_str),
+                    'award_type_enum':
+                    award_type_enum,
+                    'team_number_list': [team_number]
+                    if team_number is not None else [],
                     'recipient_json_list': [recipient_json],
                 }
 

@@ -13,8 +13,10 @@ class Suggestion(ndb.Model):
     the site. The generally store a model, a key, and then a json blob of
     fields to append or ammend in the model.
     """
-    MODELS = {"event", "match", "media", "social-media", "offseason-event", "api_auth_access",
-              "robot", "event_media"}
+    MODELS = {
+        "event", "match", "media", "social-media", "offseason-event",
+        "api_auth_access", "robot", "event_media"
+    }
     MODEL_NAMES = {
         "event": "Webcasts",
         "match": "Match Videos",
@@ -64,8 +66,7 @@ class Suggestion(ndb.Model):
     @property
     def candidate_media(self):
         team_reference = Media.create_reference(
-            self.contents['reference_type'],
-            self.contents['reference_key'])
+            self.contents['reference_type'], self.contents['reference_key'])
         return MediaCreator.create_media_model(self, team_reference)
 
     @property
@@ -74,12 +75,14 @@ class Suggestion(ndb.Model):
             return self.contents["youtube_videos"][0]
 
     @classmethod
-    def render_media_key_name(cls, year, target_model, target_key, foreign_type, foreign_key):
+    def render_media_key_name(cls, year, target_model, target_key,
+                              foreign_type, foreign_key):
         """
         Keys aren't required for this model. This is only necessary if checking
         for duplicate suggestions is desired.
         """
-        return 'media_{}_{}_{}_{}_{}'.format(year, target_model, target_key, foreign_type, foreign_key)
+        return 'media_{}_{}_{}_{}_{}'.format(year, target_model, target_key,
+                                             foreign_type, foreign_key)
 
     @classmethod
     def render_webcast_key_name(cls, event_key, webcast_dict):
@@ -87,8 +90,7 @@ class Suggestion(ndb.Model):
         Keys aren't required for this model. This is only necessary if checking
         for duplicate suggestions is desired.
         """
-        return 'webcast_{}_{}_{}_{}'.format(
-            event_key,
-            webcast_dict.get('type', None),
-            webcast_dict.get('channel', None),
-            webcast_dict.get('file', None))
+        return 'webcast_{}_{}_{}_{}'.format(event_key,
+                                            webcast_dict.get('type', None),
+                                            webcast_dict.get('channel', None),
+                                            webcast_dict.get('file', None))

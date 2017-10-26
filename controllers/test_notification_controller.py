@@ -15,7 +15,6 @@ from notifications.match_score import MatchScoreNotification
 from notifications.match_video import MatchVideoNotification, EventMatchVideoNotification
 from notifications.schedule_updated import ScheduleUpdatedNotification
 from notifications.upcoming_match import UpcomingMatchNotification
-
 """
 Send out a static notification of each type to
 all of a user's devices. Used to test parsing

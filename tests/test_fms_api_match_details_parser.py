@@ -19,7 +19,8 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
         self.event_nyny = Event(
             id="2016nyny",
@@ -31,8 +32,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             end_date=datetime(2016, 03, 27),
             official=True,
             start_date=datetime(2016, 03, 24),
-            timezone_id="America/New_York"
-        )
+            timezone_id="America/New_York")
         self.event_nyny.put()
 
         self.event_micmp = Event(
@@ -46,8 +46,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             official=True,
             start_date=datetime(2016, 03, 24),
             timezone_id="America/New_York",
-            playoff_type=PlayoffType.BRACKET_16_TEAM
-        )
+            playoff_type=PlayoffType.BRACKET_16_TEAM)
         self.event_micmp.put()
 
     def tearDown(self):
@@ -55,14 +54,16 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
 
     def test_parse_no_matches(self):
         with open('test_data/fms_api/2016_no_score_breakdown.json', 'r') as f:
-            matches = FMSAPIMatchDetailsParser(2016, 'nyny').parse(json.loads(f.read()))
+            matches = FMSAPIMatchDetailsParser(2016, 'nyny').parse(
+                json.loads(f.read()))
 
             self.assertTrue(isinstance(matches, dict))
             self.assertEqual(len(matches), 0)
 
     def test_parse_qual(self):
         with open('test_data/fms_api/2016_nyny_qual_breakdown.json', 'r') as f:
-            matches = FMSAPIMatchDetailsParser(2016, 'nyny').parse(json.loads(f.read()))
+            matches = FMSAPIMatchDetailsParser(2016, 'nyny').parse(
+                json.loads(f.read()))
 
             self.assertTrue(isinstance(matches, dict))
             self.assertEqual(len(matches), 88)
@@ -72,8 +73,10 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEqual(len(clean_matches["qm"]), 88)
 
     def test_parse_playoff(self):
-        with open('test_data/fms_api/2016_nyny_playoff_breakdown.json', 'r') as f:
-            matches = FMSAPIMatchDetailsParser(2016, 'nyny').parse(json.loads(f.read()))
+        with open('test_data/fms_api/2016_nyny_playoff_breakdown.json',
+                  'r') as f:
+            matches = FMSAPIMatchDetailsParser(2016, 'nyny').parse(
+                json.loads(f.read()))
 
             self.assertTrue(isinstance(matches, dict))
             self.assertEqual(len(matches), 15)
@@ -86,8 +89,11 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEqual(len(clean_matches["f"]), 2)
 
     def test_parse_playoff_with_octofinals(self):
-        with open('test_data/fms_api/2016_micmp_staging_playoff_breakdown.json', 'r') as f:
-            matches = FMSAPIMatchDetailsParser(2016, 'micmp').parse(json.loads(f.read()))
+        with open(
+                'test_data/fms_api/2016_micmp_staging_playoff_breakdown.json',
+                'r') as f:
+            matches = FMSAPIMatchDetailsParser(2016, 'micmp').parse(
+                json.loads(f.read()))
 
             self.assertTrue(isinstance(matches, dict))
             self.assertEquals(len(matches), 36)

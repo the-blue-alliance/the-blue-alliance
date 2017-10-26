@@ -17,7 +17,8 @@ class TestUsfirstEventDetailsGet(unittest2.TestCase):
         self.testbed.init_urlfetch_stub()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
     def tearDown(self):
         self.testbed.deactivate()

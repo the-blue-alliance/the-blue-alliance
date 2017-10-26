@@ -9,7 +9,6 @@ from models.match import Match
 
 
 class ApiMatchControllerBase(ApiBaseController):
-
     def __init__(self, *args, **kw):
         super(ApiMatchControllerBase, self).__init__(*args, **kw)
         self.match_key = self.request.route_kwargs["match_key"]
@@ -21,7 +20,10 @@ class ApiMatchControllerBase(ApiBaseController):
     def _set_match(self, match_key):
         self.match = Match.get_by_id(match_key)
         if self.match is None:
-            self._errors = json.dumps({"404": "%s match not found" % self.match_key})
+            self._errors = json.dumps({
+                "404":
+                "%s match not found" % self.match_key
+            })
             self.abort(404)
 
 

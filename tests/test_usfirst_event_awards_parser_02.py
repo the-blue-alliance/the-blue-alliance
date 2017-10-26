@@ -28,7 +28,8 @@ def convert_to_comparable(data):
 @unittest2.skip
 class TestUsfirstEventAwardsParser_02(unittest2.TestCase):
     def test_parse_regional_2002(self):
-        with open('test_data/usfirst_html/usfirst_event_awards_2002sj.html', 'r') as f:
+        with open('test_data/usfirst_html/usfirst_event_awards_2002sj.html',
+                  'r') as f:
             awards, _ = UsfirstEventAwardsParser_02.parse(f.read())
 
         # Check number of parsed awards
@@ -45,7 +46,10 @@ class TestUsfirstEventAwardsParser_02(unittest2.TestCase):
             'name_str': u"Regional Chairmans Award",
             'award_type_enum': AwardType.CHAIRMANS,
             'team_number_list': [192],
-            'recipient_json_list': [{'team_number': 192, 'awardee': None}],
+            'recipient_json_list': [{
+                'team_number': 192,
+                'awardee': None
+            }],
         }
         self.assertTrue(team_award in awards)
 
@@ -53,17 +57,29 @@ class TestUsfirstEventAwardsParser_02(unittest2.TestCase):
             'name_str': "#1 Seed",
             'award_type_enum': AwardType.NUM_1_SEED,
             'team_number_list': [254],
-            'recipient_json_list': [{'team_number': 254, 'awardee': None}],
+            'recipient_json_list': [{
+                'team_number': 254,
+                'awardee': None
+            }],
         }
         self.assertTrue(individual_award in awards)
 
         # Test Multi Team Award
         multi_team_award = {
-            'name_str': "Regional Winner",
-            'award_type_enum': AwardType.WINNER,
+            'name_str':
+            "Regional Winner",
+            'award_type_enum':
+            AwardType.WINNER,
             'team_number_list': [254, 60, 359],
-            'recipient_json_list': [{'team_number': 254, 'awardee': None},
-                                    {'team_number': 60, 'awardee': None},
-                                    {'team_number': 359, 'awardee': None}],
+            'recipient_json_list': [{
+                'team_number': 254,
+                'awardee': None
+            }, {
+                'team_number': 60,
+                'awardee': None
+            }, {
+                'team_number': 359,
+                'awardee': None
+            }],
         }
         self.assertTrue(multi_team_award in awards)

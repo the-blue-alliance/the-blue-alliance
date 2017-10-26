@@ -29,7 +29,10 @@ class OffseasonSpreadsheetParser(ParserBase):
 
             # Check required fields are there
             try:
-                if not row[self.INDEX_TITLE] or not row[self.INDEX_START] or not row[self.INDEX_END]:
+                if not row[self.
+                           INDEX_TITLE] or not row[self.
+                                                   INDEX_START] or not row[self.
+                                                                           INDEX_END]:
                     continue
             except IndexError:
                 continue
@@ -40,11 +43,14 @@ class OffseasonSpreadsheetParser(ParserBase):
             event["venue"] = row[self.INDEX_VENUE]
             event["location"] = row[self.INDEX_LOCATION]
             try:
-                event["start_date"] = datetime.strptime(row[self.INDEX_START], '%m/%d/%Y')
-                event["end_date"] = datetime.strptime(row[self.INDEX_END], '%m/%d/%Y')
+                event["start_date"] = datetime.strptime(
+                    row[self.INDEX_START], '%m/%d/%Y')
+                event["end_date"] = datetime.strptime(row[self.INDEX_END],
+                                                      '%m/%d/%Y')
             except ValueError:
                 # Invalid format date, skip this event
-                logging.warning("Couln't parse dates {} or {}".format(row[self.INDEX_START], row[self.INDEX_END]))
+                logging.warning("Couln't parse dates {} or {}".format(
+                    row[self.INDEX_START], row[self.INDEX_END]))
                 continue
             try:
                 event["website"] = row[self.INDEX_WEBSITE]

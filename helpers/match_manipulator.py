@@ -15,6 +15,7 @@ class MatchManipulator(ManipulatorBase):
     """
     Handle Match database writes.
     """
+
     @classmethod
     def getCacheKeysAndControllers(cls, affected_refs):
         return CacheClearer.get_match_cache_keys_and_controllers(affected_refs)
@@ -38,21 +39,28 @@ class MatchManipulator(ManipulatorBase):
         Only if the match is part of an active event
         '''
         unplayed_match_events = []
-        for (match, updated_attrs, is_new) in zip(matches, updated_attr_list, is_new_list):
+        for (match, updated_attrs, is_new) in zip(matches, updated_attr_list,
+                                                  is_new_list):
             event = match.event.get()
             # Only continue if the event is currently happening
             if event.now:
                 if match.has_been_played:
                     if is_new or 'alliances_json' in updated_attrs:
                         # There is a score update for this match, push a notification
-                        logging.info("Sending push notifications for {}".format(match.key_name))
+                        logging.info(
+                            "Sending push notifications for {}".format(
+                                match.key_name))
                         try:
                             NotificationHelper.send_match_score_update(match)
                         except Exception, exception:
-                            logging.error("Error sending match updates: {}".format(exception))
+                            logging.error(
+                                "Error sending match updates: {}".format(
+                                    exception))
                             logging.error(traceback.format_exc())
                 else:
-                    if is_new or (set(['alliances_json', 'time', 'time_string']).intersection(set(updated_attrs)) != set()):
+                    if is_new or (set([
+                            'alliances_json', 'time', 'time_string'
+                    ]).intersection(set(updated_attrs)) != set()):
                         # The match has not been played and we're changing a property that affects the event's schedule
                         # So send a schedule update notification for the parent event
                         if event not in unplayed_match_events:
@@ -63,26 +71,30 @@ class MatchManipulator(ManipulatorBase):
                 try:
                     NotificationHelper.send_match_video(match)
                 except Exception, exception:
-                    logging.error("Error sending match video updates: {}".format(exception))
+                    logging.error(
+                        "Error sending match video updates: {}".format(
+                            exception))
                     logging.error(traceback.format_exc())
-
         '''
         If we have an unplayed match during an event within a day, send out a schedule update notification
         '''
         for event in unplayed_match_events:
             try:
-                logging.info("Sending schedule updates for: {}".format(event.key_name))
+                logging.info("Sending schedule updates for: {}".format(
+                    event.key_name))
                 NotificationHelper.send_schedule_update(event)
             except Exception, exception:
-                logging.error("Eror sending schedule updates for: {}".format(event.key_name))
-
+                logging.error("Eror sending schedule updates for: {}".format(
+                    event.key_name))
         '''
         Enqueue firebase push
         '''
         affected_stats_event_keys = set()
-        for (match, updated_attrs, is_new) in zip(matches, updated_attr_list, is_new_list):
+        for (match, updated_attrs, is_new) in zip(matches, updated_attr_list,
+                                                  is_new_list):
             # Only attrs that affect stats
-            if is_new or set(['alliances_json', 'score_breakdown_json']).intersection(set(updated_attrs)) != set():
+            if is_new or set(['alliances_json', 'score_breakdown_json'
+                              ]).intersection(set(updated_attrs)) != set():
                 affected_stats_event_keys.add(match.event.id())
             try:
                 FirebasePusher.update_match(match)
@@ -97,25 +109,32 @@ class MatchManipulator(ManipulatorBase):
                     url='/tasks/math/do/event_matchstats/' + event_key,
                     method='GET')
             except Exception:
-                logging.error("Error enqueuing event_matchstats for {}".format(event_key))
+                logging.error("Error enqueuing event_matchstats for {}".format(
+                    event_key))
                 logging.error(traceback.format_exc())
 
             # Enqueue task to calculate district points
             try:
                 taskqueue.add(
-                    url='/tasks/math/do/district_points_calc/{}'.format(event_key),
+                    url='/tasks/math/do/district_points_calc/{}'.format(
+                        event_key),
                     method='GET')
             except Exception:
-                logging.error("Error enqueuing district_points_calc for {}".format(event_key))
+                logging.error(
+                    "Error enqueuing district_points_calc for {}".format(
+                        event_key))
                 logging.error(traceback.format_exc())
 
             # Enqueue task to calculate event team status
             try:
                 taskqueue.add(
-                    url='/tasks/math/do/event_team_status/{}'.format(event_key),
+                    url='/tasks/math/do/event_team_status/{}'.format(
+                        event_key),
                     method='GET')
             except Exception:
-                logging.error("Error enqueuing event_team_status for {}".format(event_key))
+                logging.error(
+                    "Error enqueuing event_team_status for {}".format(
+                        event_key))
                 logging.error(traceback.format_exc())
 
     @classmethod
@@ -149,14 +168,9 @@ class MatchManipulator(ManipulatorBase):
             "score_breakdown_json",
         ]
 
-        list_attrs = [
-            "team_key_names"
-        ]
+        list_attrs = ["team_key_names"]
 
-        auto_union_attrs = [
-            "tba_videos",
-            "youtube_videos"
-        ]
+        auto_union_attrs = ["tba_videos", "youtube_videos"]
 
         old_match._updated_attrs = []
 
@@ -178,16 +192,20 @@ class MatchManipulator(ManipulatorBase):
 
         for attr in json_attrs:
             if getattr(new_match, attr) is not None:
-                if (getattr(old_match, attr) is None) or (json.loads(getattr(new_match, attr)) != json.loads(getattr(old_match, attr))):
+                if (getattr(old_match, attr) is None) or (json.loads(
+                        getattr(new_match, attr)) != json.loads(
+                            getattr(old_match, attr))):
                     setattr(old_match, attr, getattr(new_match, attr))
                     # changinging 'attr_json' doesn't clear lazy-loaded '_attr'
-                    setattr(old_match, '_{}'.format(attr.replace('_json', '')), None)
+                    setattr(old_match, '_{}'.format(attr.replace('_json', '')),
+                            None)
                     old_match._updated_attrs.append(attr)
                     old_match.dirty = True
 
         for attr in list_attrs:
             if len(getattr(new_match, attr)) > 0 or not auto_union:
-                if set(getattr(new_match, attr)) != set(getattr(old_match, attr)):  # lists are treated as sets
+                if set(getattr(new_match, attr)) != set(
+                        getattr(old_match, attr)):  # lists are treated as sets
                     setattr(old_match, attr, getattr(new_match, attr))
                     old_match._updated_attrs.append(attr)
                     old_match.dirty = True

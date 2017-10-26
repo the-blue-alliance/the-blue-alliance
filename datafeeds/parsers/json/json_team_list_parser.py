@@ -19,6 +19,8 @@ class JSONTeamListParser(ParserBase):
 
         for team_key in team_keys:
             if not re.match(r'frc\d+', str(team_key)):
-                raise ParserInputException("Bad team_key: '{}'. Must follow format 'frcXXX' or be null.".format(team_key))
+                raise ParserInputException(
+                    "Bad team_key: '{}'. Must follow format 'frcXXX' or be null.".
+                    format(team_key))
 
         return team_keys

@@ -22,8 +22,18 @@ class AdminMain(LoggedInHandler):
 
         self.template_values['memcache_stats'] = memcache.get_stats()
         self.template_values['databasequery_stats'] = {
-            'hits': sum(filter(None, [memcache.get(key) for key in DatabaseQuery.DATABASE_HITS_MEMCACHE_KEYS])),
-            'misses': sum(filter(None, [memcache.get(key) for key in DatabaseQuery.DATABASE_MISSES_MEMCACHE_KEYS]))
+            'hits':
+            sum(
+                filter(None, [
+                    memcache.get(key)
+                    for key in DatabaseQuery.DATABASE_HITS_MEMCACHE_KEYS
+                ])),
+            'misses':
+            sum(
+                filter(None, [
+                    memcache.get(key)
+                    for key in DatabaseQuery.DATABASE_MISSES_MEMCACHE_KEYS
+                ]))
         }
 
         # Gets the 5 recently created users
@@ -35,11 +45,14 @@ class AdminMain(LoggedInHandler):
 
         # Continuous deployment info
         status_sitevar = Sitevar.get_by_id('apistatus')
-        self.template_values['contbuild_enabled'] = status_sitevar.contents.get('contbuild_enabled') if status_sitevar else None
+        self.template_values[
+            'contbuild_enabled'] = status_sitevar.contents.get(
+                'contbuild_enabled') if status_sitevar else None
 
         # version info
         try:
-            fname = os.path.join(os.path.dirname(__file__), '../../version_info.json')
+            fname = os.path.join(
+                os.path.dirname(__file__), '../../version_info.json')
 
             with open(fname, 'r') as f:
                 data = json.loads(f.read().replace('\r\n', '\n'))
@@ -60,7 +73,8 @@ class AdminMain(LoggedInHandler):
 
         self.template_values['debug'] = tba_config.DEBUG
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/index.html')
+        path = os.path.join(
+            os.path.dirname(__file__), '../../templates/admin/index.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
@@ -68,13 +82,16 @@ class AdminDebugHandler(LoggedInHandler):
     def get(self):
         self._require_admin()
         self.template_values['cur_year'] = datetime.datetime.now().year
-        self.template_values['years'] = range(datetime.datetime.now().year, 2005, -1)
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/debug.html')
+        self.template_values['years'] = range(datetime.datetime.now().year,
+                                              2005, -1)
+        path = os.path.join(
+            os.path.dirname(__file__), '../../templates/admin/debug.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
 class AdminTasksHandler(LoggedInHandler):
     def get(self):
         self._require_admin()
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/tasks.html')
+        path = os.path.join(
+            os.path.dirname(__file__), '../../templates/admin/tasks.html')
         self.response.out.write(template.render(path, self.template_values))

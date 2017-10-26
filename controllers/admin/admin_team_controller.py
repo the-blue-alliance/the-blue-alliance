@@ -20,6 +20,7 @@ class AdminTeamList(LoggedInHandler):
     """
     The view of a list of teams.
     """
+
     def get(self):
         self._require_admin()
 
@@ -29,7 +30,8 @@ class AdminTeamList(LoggedInHandler):
             "teams": teams,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/team_list.html')
+        path = os.path.join(
+            os.path.dirname(__file__), '../../templates/admin/team_list.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
@@ -37,6 +39,7 @@ class AdminTeamDetail(LoggedInHandler):
     """
     The view of a single Team.
     """
+
     def get(self, team_number):
         self._require_admin()
 
@@ -46,8 +49,10 @@ class AdminTeamDetail(LoggedInHandler):
         event_teams = EventTeam.query(EventTeam.team == team.key).fetch(500)
         team_medias = Media.query(Media.references == team.key).fetch(500)
         robots = Robot.query(Robot.team == team.key).fetch()
-        district_teams = DistrictTeam.query(DistrictTeam.team == team.key).fetch()
-        years_participated = sorted(TeamParticipationQuery(team.key_name).fetch())
+        district_teams = DistrictTeam.query(
+            DistrictTeam.team == team.key).fetch()
+        years_participated = sorted(
+            TeamParticipationQuery(team.key_name).fetch())
 
         team_medias_by_year = {}
         for media in team_medias:
@@ -58,16 +63,25 @@ class AdminTeamDetail(LoggedInHandler):
         media_years = sorted(team_medias_by_year.keys(), reverse=True)
 
         self.template_values.update({
-            'event_teams': event_teams,
-            'team': team,
-            'team_media_years': media_years,
-            'team_medias_by_year': team_medias_by_year,
-            'robots': robots,
-            'district_teams': district_teams,
-            'years_participated': years_participated,
+            'event_teams':
+            event_teams,
+            'team':
+            team,
+            'team_media_years':
+            media_years,
+            'team_medias_by_year':
+            team_medias_by_year,
+            'robots':
+            robots,
+            'district_teams':
+            district_teams,
+            'years_participated':
+            years_participated,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/team_details.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/team_details.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
@@ -75,6 +89,7 @@ class AdminTeamCreateTest(LoggedInHandler):
     """
     Create 6 test teams.
     """
+
     def get(self):
         self._require_admin()
 
@@ -82,8 +97,9 @@ class AdminTeamCreateTest(LoggedInHandler):
             TeamTestCreator.createSixTeams()
             self.redirect("/teams/")
         else:
-            logging.error("{} tried to create test teams in prod! No can do.".format(
-                self.user_bundle.user.email()))
+            logging.error(
+                "{} tried to create test teams in prod! No can do.".format(
+                    self.user_bundle.user.email()))
             self.redirect("/admin/")
 
 
@@ -91,6 +107,7 @@ class AdminTeamRobotNameUpdate(LoggedInHandler):
     """
     Updates a robot name for a given team + year
     """
+
     def post(self):
         self._require_admin()
 
@@ -109,7 +126,6 @@ class AdminTeamRobotNameUpdate(LoggedInHandler):
             id=Robot.renderKeyName(team_key, year),
             team=team.key,
             year=year,
-            robot_name=name.strip()
-        )
+            robot_name=name.strip())
         RobotManipulator.createOrUpdate(robot)
         self.redirect('/admin/team/{}'.format(team.team_number))

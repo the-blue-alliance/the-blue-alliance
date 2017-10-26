@@ -12,13 +12,34 @@ path = path("./")
 
 @task
 @cmdopts([
-    optparse.make_option("-p", "--project", help="App Engine project to deploy", default="tbatv-prod-hrd"),
-    optparse.make_option("--yolo", action="store_true", help="Do not wait for the travis build to succeed #yolo", default=False),
-    optparse.make_option("--config", help="gcloud SDK configuration profile to use", default=""),
-    optparse.make_option("--version", help="App engine version to deploy", default=""),
-    optparse.make_option("--modules", help="Comma separated names of module yaml files to deploy", default=""),
-    optparse.make_option("--skip-cron", action="store_true", help="Do not deploy cron.yaml", default=False),
-    optparse.make_option("--app-cfg-dir", help="Place to find appcfg.py [deprecated]", default=""),
+    optparse.make_option(
+        "-p",
+        "--project",
+        help="App Engine project to deploy",
+        default="tbatv-prod-hrd"),
+    optparse.make_option(
+        "--yolo",
+        action="store_true",
+        help="Do not wait for the travis build to succeed #yolo",
+        default=False),
+    optparse.make_option(
+        "--config", help="gcloud SDK configuration profile to use",
+        default=""),
+    optparse.make_option(
+        "--version", help="App engine version to deploy", default=""),
+    optparse.make_option(
+        "--modules",
+        help="Comma separated names of module yaml files to deploy",
+        default=""),
+    optparse.make_option(
+        "--skip-cron",
+        action="store_true",
+        help="Do not deploy cron.yaml",
+        default=False),
+    optparse.make_option(
+        "--app-cfg-dir",
+        help="Place to find appcfg.py [deprecated]",
+        default=""),
 ])
 def deploy(options):
     args = ["python", "deploy.py", "--project", options.deploy.project]
@@ -66,15 +87,18 @@ def jinja2():
 def less():
     """Build and Combine CSS"""
     print("Building and Combining CSS")
-    sh("lessc static/css/less_css/tba_style.main.less static/css/less_css/tba_style.main.css")
-    sh("lessc static/css/less_css/tba_style.gameday.less static/css/less_css/tba_style.gameday.css")
+    sh("lessc static/css/less_css/tba_style.main.less static/css/less_css/tba_style.main.css"
+       )
+    sh("lessc static/css/less_css/tba_style.gameday.less static/css/less_css/tba_style.gameday.css"
+       )
     sh("python do_compress.py css")
 
 
 @task
 @cmdopts([
     ('commit=', 'c', 'Commit hash to lint'),
-    ('base=', 'b', 'Lint all changes between the current HEAD and this base branch'),
+    ('base=', 'b',
+     'Lint all changes between the current HEAD and this base branch'),
 ])
 def lint(options):
     args = ""
@@ -96,16 +120,18 @@ def make():
     build_time = time.ctime()
     travis_job = os.environ.get('TRAVIS_BUILD_ID', '')
     try:
-        git_branch_name = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
+        git_branch_name = subprocess.check_output(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"])
         git_last_commit = subprocess.check_output(["git", "log", "-1"])
     except Exception:
         git_branch_name = 'dev'
         git_last_commit = 'dev'
-    data = {"git_branch_name": git_branch_name,
-            "git_last_commit": git_last_commit,
-            "build_time": build_time,
-            "build_number": travis_job,
-            }
+    data = {
+        "git_branch_name": git_branch_name,
+        "git_last_commit": git_last_commit,
+        "build_time": build_time,
+        "build_number": travis_job,
+    }
     with open("version_info.json", "w") as f:
         f.write(json.dumps(data))
 
@@ -121,7 +147,8 @@ def preflight():
 @task
 def run():
     """Run local dev server"""
-    sh("dev_appserver.py dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml")
+    sh("dev_appserver.py dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml"
+       )
 
 
 @task
@@ -157,9 +184,16 @@ def test_fast():
 
 @task
 @cmdopts([
-    optparse.make_option("--key", help="Event, Team, or Match key to import", default="2016necmp"),
+    optparse.make_option(
+        "--key",
+        help="Event, Team, or Match key to import",
+        default="2016necmp"),
     optparse.make_option("--project", help="App Engine Project", default=""),
-    optparse.make_option("--port", type=int, help="Local port running the API server", default=41017),
+    optparse.make_option(
+        "--port",
+        type=int,
+        help="Local port running the API server",
+        default=41017),
 ])
 def bootstrap(options):
     """Download and import an event or team from apiv3"""
@@ -175,7 +209,8 @@ def bootstrap(options):
 
 @task
 def devserver():
-    sh("dev_appserver.py --skip_sdk_update_check=true --host=0.0.0.0 dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml")
+    sh("dev_appserver.py --skip_sdk_update_check=true --host=0.0.0.0 dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml"
+       )
 
 
 def test_function(args):

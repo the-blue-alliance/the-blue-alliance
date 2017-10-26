@@ -16,4 +16,3 @@ class Favorite(ndb.Model):
 
     def __init__(self, *args, **kw):
         super(Favorite, self).__init__(*args, **kw)
-

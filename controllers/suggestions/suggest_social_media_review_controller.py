@@ -23,17 +23,17 @@ class SuggestSocialMediaReviewController(SuggestionsReviewBaseController):
     """
     View the list of suggestions.
     """
+
     def get(self):
         suggestions = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
-            Suggestion.target_model == "social-media").fetch(limit=50)
+                Suggestion.target_model == "social-media").fetch(limit=50)
 
         reference_keys = []
         for suggestion in suggestions:
             reference_key = suggestion.contents['reference_key']
             reference = Media.create_reference(
-                suggestion.contents['reference_type'],
-                reference_key)
+                suggestion.contents['reference_type'], reference_key)
             reference_keys.append(reference)
 
         reference_futures = ndb.get_multi_async(reference_keys)
@@ -41,10 +41,13 @@ class SuggestSocialMediaReviewController(SuggestionsReviewBaseController):
         suggestions_and_references = zip(suggestions, references)
 
         self.template_values.update({
-            "suggestions_and_references": suggestions_and_references,
+            "suggestions_and_references":
+            suggestions_and_references,
         })
 
-        self.response.out.write(jinja2_engine.render('suggestions/suggest_team_social_review.html', self.template_values))
+        self.response.out.write(
+            jinja2_engine.render('suggestions/suggest_team_social_review.html',
+                                 self.template_values))
 
     def post(self):
         accept_keys = []

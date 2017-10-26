@@ -29,7 +29,8 @@ class NearbyController(CacheableHandler):
             year = datetime.datetime.now().year
         year = int(year)
         location = self.request.get('location', None)
-        range_limit = int(self.request.get('range_limit', self.VALID_RANGES[0]))
+        range_limit = int(
+            self.request.get('range_limit', self.VALID_RANGES[0]))
         if range_limit not in self.VALID_RANGES:
             range_limit = self.VALID_RANGES[0]
         search_type = self.request.get('search_type', self.DEFAULT_SEARCH_TYPE)
@@ -41,7 +42,8 @@ class NearbyController(CacheableHandler):
 
     def get(self):
         year, location, range_limit, search_type, page = self._get_params()
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(year, location, range_limit, search_type, page)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(
+            year, location, range_limit, search_type, page)
         super(NearbyController, self).get()
 
     def _render(self):
@@ -55,8 +57,10 @@ class NearbyController(CacheableHandler):
             if lat_lon:
                 lat, lon = lat_lon
 
-                dist_expr = 'distance(location, geopoint({}, {}))'.format(lat, lon)
-                query_string = '{} < {} AND year={}'.format(dist_expr, range_limit * self.METERS_PER_MILE, year)
+                dist_expr = 'distance(location, geopoint({}, {}))'.format(
+                    lat, lon)
+                query_string = '{} < {} AND year={}'.format(
+                    dist_expr, range_limit * self.METERS_PER_MILE, year)
 
                 offset = self.PAGE_SIZE * page
 
@@ -69,18 +73,13 @@ class NearbyController(CacheableHandler):
                             expressions=[
                                 search.SortExpression(
                                     expression=dist_expr,
-                                    direction=search.SortExpression.ASCENDING
-                                )
-                            ]
-                        ),
+                                    direction=search.SortExpression.ASCENDING)
+                            ]),
                         returned_expressions=[
                             search.FieldExpression(
-                                name='distance',
-                                expression=dist_expr
-                            )
+                                name='distance', expression=dist_expr)
                         ],
-                    )
-                )
+                    ))
                 if search_type == 'teams':
                     search_index = search.Index(name="teamLocation")
                 else:
@@ -95,14 +94,18 @@ class NearbyController(CacheableHandler):
                     if '_' in model_key:
                         model_key = model_key.split('_')[0]
 
-                    distances[model_key] = result.expressions[0].value / self.METERS_PER_MILE
+                    distances[model_key] = result.expressions[
+                        0].value / self.METERS_PER_MILE
                     if search_type == 'teams':
                         keys.append(ndb.Key('Team', model_key))
                     else:
                         keys.append(ndb.Key('Event', model_key))
 
                 result_futures = ndb.get_multi_async(keys)
-                results = [result_future.get_result() for result_future in result_futures]
+                results = [
+                    result_future.get_result()
+                    for result_future in result_futures
+                ]
 
         self.template_values.update({
             'valid_years': self.VALID_YEARS,

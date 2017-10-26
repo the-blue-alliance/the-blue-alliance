@@ -15,12 +15,14 @@ class TestEvent(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.future_event = EventTestCreator.createFutureEvent(only_event=True)
-        self.present_event = EventTestCreator.createPresentEvent(only_event=True)
+        self.present_event = EventTestCreator.createPresentEvent(
+            only_event=True)
         self.past_event = EventTestCreator.createPastEvent(only_event=True)
         self.event_starts_today = Event(
             id="{}teststartstoday".format(datetime.datetime.now().year),
@@ -32,8 +34,7 @@ class TestEvent(unittest2.TestCase):
             start_date=datetime.datetime.today(),
             year=datetime.datetime.now().year,
             venue_address="123 Fake Street, California, USA",
-            website="http://www.google.com"
-        )
+            website="http://www.google.com")
         self.event_ends_today = Event(
             id="{}testendstoday".format(datetime.datetime.now().year),
             end_date=datetime.datetime.today(),
@@ -44,8 +45,7 @@ class TestEvent(unittest2.TestCase):
             start_date=datetime.datetime.today() - datetime.timedelta(days=2),
             year=datetime.datetime.now().year,
             venue_address="123 Fake Street, California, USA",
-            website="http://www.google.com"
-        )
+            website="http://www.google.com")
         self.event_starts_tomorrow = Event(
             id="{}teststartstomorrow".format(datetime.datetime.now().year),
             end_date=datetime.datetime.today() + datetime.timedelta(days=3),
@@ -56,8 +56,7 @@ class TestEvent(unittest2.TestCase):
             start_date=datetime.datetime.today() + datetime.timedelta(days=1),
             year=datetime.datetime.now().year,
             venue_address="123 Fake Street, California, USA",
-            website="http://www.google.com"
-        )
+            website="http://www.google.com")
         self.event_starts_tomorrow_tz = Event(
             id="{}teststartstomorrow".format(datetime.datetime.now().year),
             end_date=datetime.datetime.today() + datetime.timedelta(days=3),

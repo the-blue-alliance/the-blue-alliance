@@ -86,7 +86,8 @@ class ChampSplitHelper(object):
         if team.country in cls.LOCATION_CHAMP_MAP:
             if team.country in {'USA', 'Canada'}:
                 if team.state_prov in cls.LOCATION_CHAMP_MAP[team.country]:
-                    champ = cls.LOCATION_CHAMP_MAP[team.country][team.state_prov]
+                    champ = cls.LOCATION_CHAMP_MAP[team.country][
+                        team.state_prov]
                     return {2017: champ, 2018: champ}
                 elif team.state_prov in {'Kansas', 'Missouri'}:
                     return {2017: cls.STL, 2018: cls.HOU}
@@ -98,5 +99,7 @@ class ChampSplitHelper(object):
                 return cls.LOCATION_CHAMP_MAP[team.country]
         else:
             if team.country is not None:
-                logging.warning("[champ_split_helper.py] Unknown country: {}".format(team.country))
+                logging.warning(
+                    "[champ_split_helper.py] Unknown country: {}".format(
+                        team.country))
             return None

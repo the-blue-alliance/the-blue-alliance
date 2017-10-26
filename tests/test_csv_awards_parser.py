@@ -45,18 +45,30 @@ class TestCSVAwardssParser(unittest2.TestCase):
             'name_str': "Team Spirit Award",
             'award_type_enum': AwardType.SPIRIT,
             'team_number_list': [213],
-            'recipient_json_list': [{'team_number': 213, 'awardee': None}],
+            'recipient_json_list': [{
+                'team_number': 213,
+                'awardee': None
+            }],
         }
         self.assertTrue(award in awards)
 
         award = {
-            'year': 2000,
-            'event_short': 'mi',
-            'name_str': "Best Offensive Round",
-            'award_type_enum': AwardType.BEST_OFFENSIVE_ROUND,
+            'year':
+            2000,
+            'event_short':
+            'mi',
+            'name_str':
+            "Best Offensive Round",
+            'award_type_enum':
+            AwardType.BEST_OFFENSIVE_ROUND,
             'team_number_list': [1, 240],
-            'recipient_json_list': [{'team_number': 1, 'awardee': None},
-                                    {'team_number': 240, 'awardee': None}],
+            'recipient_json_list': [{
+                'team_number': 1,
+                'awardee': None
+            }, {
+                'team_number': 240,
+                'awardee': None
+            }],
         }
         self.assertTrue(award in awards)
 
@@ -74,14 +86,25 @@ class TestCSVAwardssParser(unittest2.TestCase):
         awards = convert_to_comparable(awards)
 
         award = {
-            'year': 2003,
-            'event_short': 'cmp',
-            'name_str': "Championship Finalist",
-            'award_type_enum': AwardType.FINALIST,
+            'year':
+            2003,
+            'event_short':
+            'cmp',
+            'name_str':
+            "Championship Finalist",
+            'award_type_enum':
+            AwardType.FINALIST,
             'team_number_list': [25, 343, 494],
-            'recipient_json_list': [{'team_number': 25, 'awardee': None},
-                                    {'team_number': 343, 'awardee': None},
-                                    {'team_number': 494, 'awardee': None}],
+            'recipient_json_list': [{
+                'team_number': 25,
+                'awardee': None
+            }, {
+                'team_number': 343,
+                'awardee': None
+            }, {
+                'team_number': 494,
+                'awardee': None
+            }],
         }
         self.assertTrue(award in awards)
 
@@ -91,7 +114,10 @@ class TestCSVAwardssParser(unittest2.TestCase):
             'name_str': "#1 Seed",
             'award_type_enum': AwardType.NUM_1_SEED,
             'team_number_list': [121],
-            'recipient_json_list': [{'team_number': 121, 'awardee': None}],
+            'recipient_json_list': [{
+                'team_number': 121,
+                'awardee': None
+            }],
         }
         self.assertTrue(award in awards)
 
@@ -101,6 +127,9 @@ class TestCSVAwardssParser(unittest2.TestCase):
             'name_str': "Play of the Day",
             'award_type_enum': AwardType.PLAY_OF_THE_DAY,
             'team_number_list': [131],
-            'recipient_json_list': [{'team_number': 131, 'awardee': None}],
+            'recipient_json_list': [{
+                'team_number': 131,
+                'awardee': None
+            }],
         }
         self.assertTrue(award in awards)

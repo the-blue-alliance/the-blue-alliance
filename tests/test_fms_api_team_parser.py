@@ -15,14 +15,16 @@ class TestFMSAPITeamParser(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
     def tearDown(self):
         self.testbed.deactivate()
 
     def test_parse_team_with_district(self):
         with open('test_data/fms_api/2015_frc1124.json', 'r') as f:
-            models, more_pages = FMSAPITeamDetailsParser(2015).parse(json.loads(f.read()))
+            models, more_pages = FMSAPITeamDetailsParser(2015).parse(
+                json.loads(f.read()))
 
             self.assertFalse(more_pages)
             self.assertEqual(len(models), 1)
@@ -32,7 +34,8 @@ class TestFMSAPITeamParser(unittest2.TestCase):
             # Ensure we get the proper Team model back
             self.assertEqual(team.key_name, "frc1124")
             self.assertEqual(team.team_number, 1124)
-            self.assertEqual(team.name, "Avon Public Schools/UTC & AVON HIGH SCHOOL")
+            self.assertEqual(team.name,
+                             "Avon Public Schools/UTC & AVON HIGH SCHOOL")
             self.assertEqual(team.nickname, "UberBots")
             self.assertEqual(team.city, "Avon")
             self.assertEqual(team.state_prov, "Connecticut")
@@ -44,7 +47,8 @@ class TestFMSAPITeamParser(unittest2.TestCase):
             self.assertNotEqual(districtTeam, None)
             self.assertEqual(districtTeam.key_name, "2015ne_frc1124")
             self.assertEqual(districtTeam.team.id(), "frc1124")
-            self.assertEqual(districtTeam.district_key, ndb.Key(District, '2015ne'))
+            self.assertEqual(districtTeam.district_key,
+                             ndb.Key(District, '2015ne'))
 
             # Test the Robot model we get back
             self.assertNotEqual(robot, None)
@@ -54,7 +58,8 @@ class TestFMSAPITeamParser(unittest2.TestCase):
 
     def test_parse_team_with_no_district(self):
         with open('test_data/fms_api/2015_frc254.json', 'r') as f:
-            models, more_pages = FMSAPITeamDetailsParser(2015).parse(json.loads(f.read()))
+            models, more_pages = FMSAPITeamDetailsParser(2015).parse(
+                json.loads(f.read()))
 
             self.assertFalse(more_pages)
             self.assertEqual(len(models), 1)
@@ -83,15 +88,21 @@ class TestFMSAPITeamParser(unittest2.TestCase):
 
     def test_parse_team_websites(self):
         # Modify the websites to some known bad ones, and ensure the parser can recover
-        bad_websites = [None, '', 'www.firstinspires.org', 'website.com', 'www.website.com', 'http://website.com',
-                        'https://website.com', 'ftp://website.com']
-        expected_sites = [None, None, None, 'http://website.com', 'http://www.website.com', 'http://website.com',
-                          'https://website.com', None]
+        bad_websites = [
+            None, '', 'www.firstinspires.org', 'website.com',
+            'www.website.com', 'http://website.com', 'https://website.com',
+            'ftp://website.com'
+        ]
+        expected_sites = [
+            None, None, None, 'http://website.com', 'http://www.website.com',
+            'http://website.com', 'https://website.com', None
+        ]
         with open('test_data/fms_api/2015_frc1124.json', 'r') as f:
             team_data = json.loads(f.read())
             for site, expected in zip(bad_websites, expected_sites):
                 team_data['teams'][0]['website'] = site
-                models, more_pages = FMSAPITeamDetailsParser(2015).parse(team_data)
+                models, more_pages = FMSAPITeamDetailsParser(2015).parse(
+                    team_data)
 
                 self.assertFalse(more_pages)
                 self.assertEqual(len(models), 1)
@@ -101,7 +112,8 @@ class TestFMSAPITeamParser(unittest2.TestCase):
                 # Ensure we get the proper Team model back
                 self.assertEqual(team.key_name, "frc1124")
                 self.assertEqual(team.team_number, 1124)
-                self.assertEqual(team.name, "Avon Public Schools/UTC & AVON HIGH SCHOOL")
+                self.assertEqual(team.name,
+                                 "Avon Public Schools/UTC & AVON HIGH SCHOOL")
                 self.assertEqual(team.nickname, "UberBots")
                 self.assertEqual(team.city, "Avon")
                 self.assertEqual(team.state_prov, "Connecticut")
@@ -111,7 +123,8 @@ class TestFMSAPITeamParser(unittest2.TestCase):
 
     def test_parse_2017_team(self):
         with open('test_data/fms_api/2017_frc604.json', 'r') as f:
-            models, more_pages = FMSAPITeamDetailsParser(2017).parse(json.loads(f.read()))
+            models, more_pages = FMSAPITeamDetailsParser(2017).parse(
+                json.loads(f.read()))
 
             self.assertFalse(more_pages)
             self.assertEqual(len(models), 1)
@@ -121,7 +134,10 @@ class TestFMSAPITeamParser(unittest2.TestCase):
             # Ensure we get the proper Team model back
             self.assertEqual(team.key_name, "frc604")
             self.assertEqual(team.team_number, 604)
-            self.assertEqual(team.name, "IBM/Team Grandma/The Brin Wojcicki Foundation/BAE Systems/Boston Scientific - The Argosy Foundation/Qualcomm/Intuitive Surgical/Leland Bridge/Councilman J. Khamis/Almaden Valley Women's Club/NVIDIA/Hurricane Electric/Exatron/MDR Precision/SOLIDWORKS/Hurricane Electric/Dropbox/GitHub&Leland High")
+            self.assertEqual(
+                team.name,
+                "IBM/Team Grandma/The Brin Wojcicki Foundation/BAE Systems/Boston Scientific - The Argosy Foundation/Qualcomm/Intuitive Surgical/Leland Bridge/Councilman J. Khamis/Almaden Valley Women's Club/NVIDIA/Hurricane Electric/Exatron/MDR Precision/SOLIDWORKS/Hurricane Electric/Dropbox/GitHub&Leland High"
+            )
             self.assertEqual(team.nickname, "Quixilver")
             self.assertEqual(team.city, "San Jose")
             self.assertEqual(team.state_prov, "California")

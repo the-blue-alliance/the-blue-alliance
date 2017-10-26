@@ -19,14 +19,20 @@ class AdminApiAuthAdd(LoggedInHandler):
     """
     Create an ApiAuthAccess. POSTs to AdminApiAuthEdit.
     """
+
     def get(self):
         self._require_admin()
 
         self.template_values.update({
-            "auth_id": ''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _ in range(16)),
+            "auth_id":
+            ''.join(
+                random.choice(string.ascii_lowercase + string.ascii_uppercase +
+                              string.digits) for _ in range(16)),
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/api_add_auth.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/api_add_auth.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
@@ -34,25 +40,25 @@ class AdminApiAuthDelete(LoggedInHandler):
     """
     Delete an ApiAuthAccess.
     """
+
     def get(self, auth_id):
         self._require_admin()
 
         auth = ApiAuthAccess.get_by_id(auth_id)
 
-        self.template_values.update({
-            "auth": auth
-        })
+        self.template_values.update({"auth": auth})
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/api_delete_auth.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/api_delete_auth.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self, auth_id):
         self._require_admin()
 
-        logging.warning("Deleting auth: %s at the request of %s / %s" % (
-            auth_id,
-            self.user_bundle.user.user_id(),
-            self.user_bundle.user.email()))
+        logging.warning("Deleting auth: %s at the request of %s / %s" %
+                        (auth_id, self.user_bundle.user.user_id(),
+                         self.user_bundle.user.email()))
 
         auth = ApiAuthAccess.get_by_id(auth_id)
         auth.key.delete()
@@ -64,17 +70,21 @@ class AdminApiAuthEdit(LoggedInHandler):
     """
     Edit an ApiAuthAccess.
     """
+
     def get(self, auth_id):
         self._require_admin()
 
         auth = ApiAuthAccess.get_by_id(auth_id)
-        auth.event_list_str = ','.join([event_key.id() for event_key in auth.event_list])
+        auth.event_list_str = ','.join(
+            [event_key.id() for event_key in auth.event_list])
 
         self.template_values.update({
             "auth": auth,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/api_edit_auth.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/api_edit_auth.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self, auth_id):
@@ -82,7 +92,9 @@ class AdminApiAuthEdit(LoggedInHandler):
 
         auth = ApiAuthAccess.get_by_id(auth_id)
 
-        auth_types_enum = [AuthType.READ_API] if auth and AuthType.READ_API in auth.auth_types_enum else []
+        auth_types_enum = [
+            AuthType.READ_API
+        ] if auth and AuthType.READ_API in auth.auth_types_enum else []
         if self.request.get('allow_edit_teams'):
             auth_types_enum.append(AuthType.EVENT_TEAMS)
         if self.request.get('allow_edit_matches'):
@@ -97,19 +109,23 @@ class AdminApiAuthEdit(LoggedInHandler):
             auth_types_enum.append(AuthType.MATCH_VIDEO)
 
         if self.request.get('owner', None):
-            owner = Account.query(Account.email == self.request.get('owner')).fetch()
+            owner = Account.query(
+                Account.email == self.request.get('owner')).fetch()
             owner_key = owner[0].key if owner else None
         else:
             owner_key = None
 
         if self.request.get('expiration', None):
-            expiration = datetime.strptime(self.request.get('expiration'), '%Y-%m-%d')
+            expiration = datetime.strptime(
+                self.request.get('expiration'), '%Y-%m-%d')
         else:
             expiration = None
 
         if self.request.get('event_list_str'):
             split_events = self.request.get('event_list_str', '').split(',')
-            event_list = [ndb.Key(Event, event_key.strip()) for event_key in split_events]
+            event_list = [
+                ndb.Key(Event, event_key.strip()) for event_key in split_events
+            ]
         else:
             event_list = []
 
@@ -120,7 +136,10 @@ class AdminApiAuthEdit(LoggedInHandler):
                 owner=owner_key,
                 expiration=expiration,
                 allow_admin=True if self.request.get('allow_admin') else False,
-                secret=''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _ in range(64)),
+                secret=''.join(
+                    random.choice(string.ascii_lowercase +
+                                  string.ascii_uppercase + string.digits)
+                    for _ in range(64)),
                 event_list=event_list,
                 auth_types_enum=auth_types_enum,
             )
@@ -130,7 +149,8 @@ class AdminApiAuthEdit(LoggedInHandler):
             auth.auth_types_enum = auth_types_enum
             auth.owner = owner_key
             auth.expiration = expiration
-            auth.allow_admin = True if self.request.get('allow_admin') else False
+            auth.allow_admin = True if self.request.get(
+                'allow_admin') else False
 
         auth.put()
 
@@ -141,6 +161,7 @@ class AdminApiAuthManage(LoggedInHandler):
     """
     List all ApiAuthAccesses
     """
+
     def get(self):
         self._require_admin()
 
@@ -155,5 +176,7 @@ class AdminApiAuthManage(LoggedInHandler):
             'admin_auths': admin_auths,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/api_manage_auth.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/api_manage_auth.html')
         self.response.out.write(template.render(path, self.template_values))

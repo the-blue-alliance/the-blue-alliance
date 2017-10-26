@@ -14,20 +14,23 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
     def tearDown(self):
         self.testbed.deactivate()
 
     def test_parse_no_alliances(self):
         with open('test_data/fms_api/2016_no_alliances.json', 'r') as f:
-            alliances = FMSAPIEventAlliancesParser().parse(json.loads(f.read()))
+            alliances = FMSAPIEventAlliancesParser().parse(
+                json.loads(f.read()))
 
             self.assertIsNone(alliances)
 
     def test_parse_8alliances(self):
         with open('test_data/fms_api/2016_nyny_alliances.json', 'r') as f:
-            alliances = FMSAPIEventAlliancesParser().parse(json.loads(f.read()))
+            alliances = FMSAPIEventAlliancesParser().parse(
+                json.loads(f.read()))
 
             self.assertTrue(isinstance(alliances, list))
             self.assertEqual(len(alliances), 8)
@@ -35,46 +38,54 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             # Ensure that we have the alliances in the proper order and that backup teams propegate
             number = 1
             for alliance in alliances:
-                self.assertEqual(alliance['name'], 'Alliance {}'.format(number))
+                self.assertEqual(alliance['name'],
+                                 'Alliance {}'.format(number))
                 self.assertIsNone(alliance['backup'])
                 number += 1
 
     def test_parse_16alliances(self):
-        with open('test_data/fms_api/2016_micmp_alliances_staging.json', 'r') as f:
-            alliances = FMSAPIEventAlliancesParser().parse(json.loads(f.read()))
+        with open('test_data/fms_api/2016_micmp_alliances_staging.json',
+                  'r') as f:
+            alliances = FMSAPIEventAlliancesParser().parse(
+                json.loads(f.read()))
 
             self.assertTrue(isinstance(alliances, list))
             self.assertEqual(len(alliances), 16)
 
             number = 1
             for alliance in alliances:
-                self.assertEqual(alliance['name'], 'Alliance {}'.format(number))
+                self.assertEqual(alliance['name'],
+                                 'Alliance {}'.format(number))
                 self.assertIsNone(alliance['backup'])
                 number += 1
 
     def test_parse_4team(self):
         with open('test_data/fms_api/2015_curie_alliances.json', 'r') as f:
-            alliances = FMSAPIEventAlliancesParser().parse(json.loads(f.read()))
+            alliances = FMSAPIEventAlliancesParser().parse(
+                json.loads(f.read()))
 
             self.assertTrue(isinstance(alliances, list))
             self.assertEqual(len(alliances), 8)
 
             number = 1
             for alliance in alliances:
-                self.assertEqual(alliance['name'], 'Alliance {}'.format(number))
+                self.assertEqual(alliance['name'],
+                                 'Alliance {}'.format(number))
                 self.assertIsNone(alliance['backup'])
                 number += 1
 
     def test_parse_backup_team_used(self):
         with open('test_data/fms_api/2016_necmp_alliances.json', 'r') as f:
-            alliances = FMSAPIEventAlliancesParser().parse(json.loads(f.read()))
+            alliances = FMSAPIEventAlliancesParser().parse(
+                json.loads(f.read()))
 
             self.assertTrue(isinstance(alliances, list))
             self.assertEqual(len(alliances), 8)
 
             number = 1
             for alliance in alliances:
-                self.assertEqual(alliance['name'], 'Alliance {}'.format(number))
+                self.assertEqual(alliance['name'],
+                                 'Alliance {}'.format(number))
                 if number == 5:
                     self.assertIsNotNone(alliance['backup'])
                     self.assertEqual(alliance['backup']['in'], 'frc4905')

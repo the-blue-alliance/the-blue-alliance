@@ -6,6 +6,7 @@ class MediaManipulator(ManipulatorBase):
     """
     Handle Media database writes.
     """
+
     @classmethod
     def getCacheKeysAndControllers(cls, affected_refs):
         return CacheClearer.get_media_cache_keys_and_controllers(affected_refs)

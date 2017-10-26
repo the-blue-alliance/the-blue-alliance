@@ -24,14 +24,16 @@ class WebcastParser(object):
         elif any(s in url for s in cls.LIVESTREAM_URL_PATTERNS):
             return cls._webcast_dict_from_livestream(url)
         else:
-            logging.warning("Failed to determine webcast type from url: {}".format(url))
+            logging.warning(
+                "Failed to determine webcast type from url: {}".format(url))
             return None
 
     @classmethod
     def _webcast_dict_from_twitch(cls, url):
         channel = cls._parse_twitch_channel(url)
         if channel is None:
-            logging.warning("Failed to determine channel from url: {}".format(url))
+            logging.warning(
+                "Failed to determine channel from url: {}".format(url))
             return None
         webcast_dict = {
             'type': 'twitch',
@@ -43,7 +45,8 @@ class WebcastParser(object):
     def _webcast_dict_from_youtube(cls, url):
         channel = cls._parse_youtube_channel(url)
         if channel is None:
-            logging.warning("Failed to determine channel from url: {}".format(url))
+            logging.warning(
+                "Failed to determine channel from url: {}".format(url))
             return None
         webcast_dict = {
             'type': 'youtube',
@@ -60,7 +63,8 @@ class WebcastParser(object):
 
         channel = cls._parse_ustream_channel(urlfetch_result.content)
         if channel is None:
-            logging.warning("Failed to determine channel from url: {}".format(url))
+            logging.warning(
+                "Failed to determine channel from url: {}".format(url))
             return None
         webcast_dict = {
             'type': 'ustream',
@@ -75,9 +79,12 @@ class WebcastParser(object):
             logging.warning('Unable to retrieve url: {}'.format(url))
             return None
 
-        channel_and_file = cls._parse_livestream_channel(urlfetch_result.content)
+        channel_and_file = cls._parse_livestream_channel(
+            urlfetch_result.content)
         if channel_and_file is None:
-            logging.warning("Failed to determine channel and file from url: {}".format(url))
+            logging.warning(
+                "Failed to determine channel and file from url: {}".format(
+                    url))
             return None
         channel, file = channel_and_file
         webcast_dict = {
@@ -141,7 +148,9 @@ class WebcastParser(object):
         if el is None:
             return None
         else:
-            regex1 = re.match(r'.*livestream.com\/accounts\/(\d+)\/events\/(\d+)', el['content'])
+            regex1 = re.match(
+                r'.*livestream.com\/accounts\/(\d+)\/events\/(\d+)',
+                el['content'])
             if regex1 is not None:
                 return regex1.group(1), regex1.group(2)
             else:
