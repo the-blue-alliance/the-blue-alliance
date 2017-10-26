@@ -488,7 +488,7 @@ class LocationHelper(object):
     def google_maps_geocode_async(cls, location):
         cache_key = u'google_maps_geocode:{}'.format(location)
         results = memcache.get(cache_key)
-        if results is None:
+        if not results:
             context = ndb.get_context()
 
             if not location:

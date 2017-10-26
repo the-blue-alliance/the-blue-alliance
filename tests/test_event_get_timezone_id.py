@@ -36,7 +36,11 @@ class TestEventGetTimezoneId(unittest2.TestCase):
         with open('test_data/usfirst_html/usfirst_event_details_2012ct.html', 'r') as f:
             event, _ = UsfirstEventDetailsParser.parse(f.read())
 
-        location = LocationHelper.get_lat_lng(event['location'])
+        location = None
+        for _ in xrange(5):
+            location = LocationHelper.get_lat_lng(event['location'])
+            if location:
+                break
         self.assertAlmostEqual(location[0], 41.76371109999999, places=6)
         self.assertAlmostEqual(location[1], -72.6850932, places=6)
         self.assertEqual(LocationHelper.get_timezone_id(event['location']), 'America/New_York')
@@ -45,7 +49,11 @@ class TestEventGetTimezoneId(unittest2.TestCase):
         with open('test_data/usfirst_html/usfirst_event_details_2013flbr.html', 'r') as f:
             event, _ = UsfirstEventDetailsParser.parse(f.read())
 
-        location = LocationHelper.get_lat_lng(event['location'])
+        location = None
+        for _ in xrange(5):
+            location = LocationHelper.get_lat_lng(event['location'])
+            if location:
+                break
         self.assertAlmostEqual(location[0], 26.1224386, places=6)
         self.assertAlmostEqual(location[1], -80.13731740000001, places=6)
         self.assertEqual(LocationHelper.get_timezone_id(event['location']), 'America/New_York')
@@ -54,7 +62,11 @@ class TestEventGetTimezoneId(unittest2.TestCase):
         with open('test_data/usfirst_html/usfirst_event_details_2013casj.html', 'r') as f:
             event, _ = UsfirstEventDetailsParser.parse(f.read())
 
-        location = LocationHelper.get_lat_lng(event['location'])
+        location = None
+        for _ in xrange(5):
+            location = LocationHelper.get_lat_lng(event['location'])
+            if location:
+                break
         self.assertAlmostEqual(location[0], 37.3382082, places=6)
         self.assertAlmostEqual(location[1], -121.8863286, places=6)
         self.assertEqual(LocationHelper.get_timezone_id(event['location']), 'America/Los_Angeles')
@@ -63,7 +75,11 @@ class TestEventGetTimezoneId(unittest2.TestCase):
         with open('test_data/usfirst_html/usfirst_event_details_2001ca2.html', 'r') as f:
             event, _ = UsfirstEventDetailsParser.parse(f.read())
 
-        location = LocationHelper.get_lat_lng(event['location'])
+        location = None
+        for _ in xrange(5):
+            location = LocationHelper.get_lat_lng(event['location'])
+            if location:
+                break
         self.assertAlmostEqual(location[0], 37.3382082, places=6)
         self.assertAlmostEqual(location[1], -121.8863286, places=6)
         self.assertEqual(LocationHelper.get_timezone_id(event['location']), 'America/Los_Angeles')
@@ -72,7 +88,11 @@ class TestEventGetTimezoneId(unittest2.TestCase):
         with open('test_data/usfirst_html/usfirst_event_details_2005is.html', 'r') as f:
             event, _ = UsfirstEventDetailsParser.parse(f.read())
 
-        location = LocationHelper.get_lat_lng(event['location'])
+        location = None
+        for _ in xrange(5):
+            location = LocationHelper.get_lat_lng(event['location'])
+            if location:
+                break
         self.assertAlmostEqual(location[0], 32.7940463, places=6)
         self.assertAlmostEqual(location[1], 34.989571, places=6)
         self.assertEqual(LocationHelper.get_timezone_id(event['location']), 'Asia/Jerusalem')
@@ -81,7 +101,11 @@ class TestEventGetTimezoneId(unittest2.TestCase):
         with open('test_data/usfirst_html/usfirst_event_details_2005or.html', 'r') as f:
             event, _ = UsfirstEventDetailsParser.parse(f.read())
 
-        location = LocationHelper.get_lat_lng(event['location'])
+        location = None
+        for _ in xrange(5):
+            location = LocationHelper.get_lat_lng(event['location'])
+            if location:
+                break
         self.assertAlmostEqual(location[0], 45.5230622, places=6)
         self.assertAlmostEqual(location[1], -122.6764816, places=6)
         self.assertEqual(LocationHelper.get_timezone_id(event['location']), 'America/Los_Angeles')
@@ -90,7 +114,11 @@ class TestEventGetTimezoneId(unittest2.TestCase):
         with open('test_data/usfirst_html/usfirst_event_details_1997il.html', 'r') as f:
             event, _ = UsfirstEventDetailsParser.parse(f.read())
 
-        location = LocationHelper.get_lat_lng(event['location'])
+        location = None
+        for _ in xrange(5):
+            location = LocationHelper.get_lat_lng(event['location'])
+            if location:
+                break
         self.assertAlmostEqual(location[0], 41.8781136, places=6)
         self.assertAlmostEqual(location[1], -87.6297982, places=6)
         self.assertEqual(LocationHelper.get_timezone_id(event['location']), 'America/Chicago')
@@ -99,7 +127,11 @@ class TestEventGetTimezoneId(unittest2.TestCase):
         with open('test_data/usfirst_html/usfirst_event_details_2002sj.html', 'r') as f:
             event, _ = UsfirstEventDetailsParser.parse(f.read())
 
-        location = LocationHelper.get_lat_lng(event['location'])
+        location = None
+        for _ in xrange(5):
+            location = LocationHelper.get_lat_lng(event['location'])
+            if location:
+                break
         self.assertAlmostEqual(location[0], 37.3382082, places=6)
         self.assertAlmostEqual(location[1], -121.8863286, places=6)
         self.assertEqual(LocationHelper.get_timezone_id(event['location']), 'America/Los_Angeles')
