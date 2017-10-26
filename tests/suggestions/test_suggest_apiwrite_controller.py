@@ -23,11 +23,18 @@ class TestSuggestApiWriteController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
         self.testbed.init_user_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
-        app = webapp2.WSGIApplication([
-            RedirectRoute(r'/request/apiwrite', SuggestApiWriteController, 'request-apiwrite', strict_slash=True),
-        ], debug=True)
+        app = webapp2.WSGIApplication(
+            [
+                RedirectRoute(
+                    r'/request/apiwrite',
+                    SuggestApiWriteController,
+                    'request-apiwrite',
+                    strict_slash=True),
+            ],
+            debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.event = Event(
@@ -47,9 +54,9 @@ class TestSuggestApiWriteController(unittest2.TestCase):
             venue_address="Some Venue, Hartford, CT, USA",
             timezone_id="America/New_York",
             start_date=datetime(2016, 03, 24),
-            webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
-            website="http://www.firstsv.org"
-        )
+            webcast_json=
+            "[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
+            website="http://www.firstsv.org")
         self.event.put()
 
     def tearDown(self):
@@ -60,14 +67,9 @@ class TestSuggestApiWriteController(unittest2.TestCase):
             user_email="user@example.com",
             user_id="123",
             user_is_admin='0',
-            overwrite=True
-        )
+            overwrite=True)
 
-        Account.get_or_insert(
-            "123",
-            email="user@example.com",
-            registered=True
-        )
+        Account.get_or_insert("123", email="user@example.com", registered=True)
 
     def getSuggestionForm(self):
         response = self.testapp.get('/request/apiwrite')
@@ -80,7 +82,8 @@ class TestSuggestApiWriteController(unittest2.TestCase):
     def test_login_redirect(self):
         response = self.testapp.get('/request/apiwrite', status='3*')
         response = response.follow(expect_errors=True)
-        self.assertTrue(response.request.path.startswith("/account/login_required"))
+        self.assertTrue(
+            response.request.path.startswith("/account/login_required"))
 
     def test_submit_empty_form(self):
         self.loginUser()
@@ -108,7 +111,8 @@ class TestSuggestApiWriteController(unittest2.TestCase):
         self.assertEqual(suggestion.review_state, Suggestion.REVIEW_PENDING)
         self.assertEqual(suggestion.contents['event_key'], '2016necmp')
         self.assertEqual(suggestion.contents['affiliation'], 'Test Code')
-        self.assertListEqual(suggestion.contents['auth_types'], [AuthType.MATCH_VIDEO, AuthType.EVENT_TEAMS])
+        self.assertListEqual(suggestion.contents['auth_types'],
+                             [AuthType.MATCH_VIDEO, AuthType.EVENT_TEAMS])
 
         # Ensure we show a success message on the page
         request = response.request

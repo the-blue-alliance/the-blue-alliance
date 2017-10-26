@@ -21,8 +21,10 @@ class MatchConverter(ConverterBase):
     @classmethod
     def matchConverter_v3(cls, match):
         for alliance in ['red', 'blue']:
-            match.alliances[alliance]['team_keys'] = match.alliances[alliance].pop('teams')
-            match.alliances[alliance]['surrogate_team_keys'] = match.alliances[alliance].pop('surrogates')
+            match.alliances[alliance]['team_keys'] = match.alliances[
+                alliance].pop('teams')
+            match.alliances[alliance]['surrogate_team_keys'] = match.alliances[
+                alliance].pop('surrogates')
 
         match_dict = {
             'key': match.key.id(),
@@ -40,15 +42,18 @@ class MatchConverter(ConverterBase):
         else:
             match_dict['time'] = None
         if match.actual_time is not None:
-            match_dict['actual_time'] = int(time.mktime(match.actual_time.timetuple()))
+            match_dict['actual_time'] = int(
+                time.mktime(match.actual_time.timetuple()))
         else:
             match_dict['actual_time'] = None
         if match.predicted_time is not None:
-            match_dict['predicted_time'] = int(time.mktime(match.predicted_time.timetuple()))
+            match_dict['predicted_time'] = int(
+                time.mktime(match.predicted_time.timetuple()))
         else:
             match_dict['predicted_time'] = None
         if match.post_result_time is not None:
-            match_dict['post_result_time'] = int(time.mktime(match.post_result_time.timetuple()))
+            match_dict['post_result_time'] = int(
+                time.mktime(match.post_result_time.timetuple()))
         else:
             match_dict['post_result_time'] = None
 

@@ -10,6 +10,7 @@ class UserBundle(object):
     UserBundle encapsulates a bunch of Google AppEngine user management stuff
     to make it easier for templates.
     """
+
     def __init__(self):
         self._account = None
 
@@ -18,10 +19,10 @@ class UserBundle(object):
         if self._account is None and self.user:
             self._account = Account.get_or_insert(
                 self.user.user_id(),
-                email = self.user.email(),
-                nickname = self.user.nickname(),
-                registered = False,
-                display_name = self.user.nickname())
+                email=self.user.email(),
+                nickname=self.user.nickname(),
+                registered=False,
+                display_name=self.user.nickname())
         return self._account
 
     @property

@@ -67,10 +67,12 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
         self.testbed.init_taskqueue_stub(root_path=".")
-        self.taskqueue_stub = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
+        self.taskqueue_stub = self.testbed.get_stub(
+            testbed.TASKQUEUE_SERVICE_NAME)
 
         # Enable the cache we're testing
         tba_config.CONFIG['response_cache'] = True
@@ -175,24 +177,46 @@ class TestApiCacheClearer(unittest2.TestCase):
 
         self.match1_1 = Match(
             id='2010sc_qm1',
-            alliances_json=json.dumps({'blue': {'score': -1, 'teams': ['frc1', 'frc2', 'frc3']}, 'red': {'score': -1, 'teams': ['frc4', 'frc5', 'frc6']}}),
+            alliances_json=json.dumps({
+                'blue': {
+                    'score': -1,
+                    'teams': ['frc1', 'frc2', 'frc3']
+                },
+                'red': {
+                    'score': -1,
+                    'teams': ['frc4', 'frc5', 'frc6']
+                }
+            }),
             comp_level='qm',
             event=self.event_2010sc_1.key,
             set_number=1,
             match_number=1,
             year=2010,
-            team_key_names=[u'frc1', u'frc2', u'frc3', u'frc4', u'frc5', u'frc6'],
+            team_key_names=[
+                u'frc1', u'frc2', u'frc3', u'frc4', u'frc5', u'frc6'
+            ],
         )
 
         self.match1_2 = Match(
             id='2010sc_qm1',
-            alliances_json=json.dumps({'blue': {'score': -1, 'teams': ['frc1', 'frc999', 'frc3']}, 'red': {'score': -1, 'teams': ['frc4', 'frc5', 'frc6']}}),
+            alliances_json=json.dumps({
+                'blue': {
+                    'score': -1,
+                    'teams': ['frc1', 'frc999', 'frc3']
+                },
+                'red': {
+                    'score': -1,
+                    'teams': ['frc4', 'frc5', 'frc6']
+                }
+            }),
             comp_level='qm',
             event=self.event_2010sc_1.key,
             set_number=1,
             match_number=1,
             year=2010,
-            team_key_names=[u'frc1', u'frc999', u'frc3', u'frc4', u'frc5', u'frc6'],
+            team_key_names=[
+                u'frc1', u'frc999', u'frc3', u'frc4', u'frc5', u'frc6'
+            ],
         )
 
         self.award1_1 = Award(
@@ -203,7 +227,12 @@ class TestApiCacheClearer(unittest2.TestCase):
             event=self.event_2010sc_1.key,
             event_type_enum=EventType.REGIONAL,
             team_list=[self.team_frc1_1.key],
-            recipient_json_list=[json.dumps({'team_number': 1, 'awardee': None})],
+            recipient_json_list=[
+                json.dumps({
+                    'team_number': 1,
+                    'awardee': None
+                })
+            ],
         )
 
         self.award1_2 = Award(
@@ -214,14 +243,20 @@ class TestApiCacheClearer(unittest2.TestCase):
             event=self.event_2010sc_1.key,
             event_type_enum=EventType.REGIONAL,
             team_list=[self.team_frc2_1.key],
-            recipient_json_list=[json.dumps({'team_number': 2, 'awardee': None})],
+            recipient_json_list=[
+                json.dumps({
+                    'team_number': 2,
+                    'awardee': None
+                })
+            ],
         )
 
         self.media1_1 = Media(
             id='cdphotothread_39894',
             media_type_enum=MediaType.CD_PHOTO_THREAD,
             foreign_key='39894',
-            details_json='{"image_partial": "fe3/fe38d320428adf4f51ac969efb3db32c_l.jpg"}',
+            details_json=
+            '{"image_partial": "fe3/fe38d320428adf4f51ac969efb3db32c_l.jpg"}',
             year=2010,
             references=[self.team_frc1_1.key],
         )
@@ -230,59 +265,85 @@ class TestApiCacheClearer(unittest2.TestCase):
             id='cdphotothread_39894',
             media_type_enum=MediaType.CD_PHOTO_THREAD,
             foreign_key='39894',
-            details_json='{"image_partial": "fe3/fe38d320428adf4f51ac969efb3db32c_l.jpg"}',
+            details_json=
+            '{"image_partial": "fe3/fe38d320428adf4f51ac969efb3db32c_l.jpg"}',
             year=2010,
             references=[self.team_frc2_1.key],
         )
 
-        self.districtlist_2010_cache_key = ApiDistrictListController.get_cache_key_from_format('2010')
-        self.district_events_2010_cache_key = ApiDistrictEventsController.get_cache_key_from_format('fim', '2010')
-        self.district_rankings_2010_cache_key = ApiDistrictRankingsController.get_cache_key_from_format('fim', '2010')
+        self.districtlist_2010_cache_key = ApiDistrictListController.get_cache_key_from_format(
+            '2010')
+        self.district_events_2010_cache_key = ApiDistrictEventsController.get_cache_key_from_format(
+            'fim', '2010')
+        self.district_rankings_2010_cache_key = ApiDistrictRankingsController.get_cache_key_from_format(
+            'fim', '2010')
 
-        self.eventlist_2010_cache_key = ApiEventListController.get_cache_key_from_format('2010')
-        self.event_2010sc_cache_key = ApiEventController.get_cache_key_from_format('2010sc')
-        self.eventteams_2010sc_cache_key = ApiEventTeamsController.get_cache_key_from_format('2010sc')
-        self.eventmatches_2010sc_cache_key = ApiEventMatchesController.get_cache_key_from_format('2010sc')
-        self.eventstats_2010sc_cache_key = ApiEventStatsController.get_cache_key_from_format('2010sc')
-        self.eventrankings_2010sc_cache_key = ApiEventRankingsController.get_cache_key_from_format('2010sc')
-        self.eventawards_2010sc_cache_key = ApiEventAwardsController.get_cache_key_from_format('2010sc')
-        self.eventdistrictpoints_2010sc_cache_key = ApiEventDistrictPointsController.get_cache_key_from_format('2010sc')
+        self.eventlist_2010_cache_key = ApiEventListController.get_cache_key_from_format(
+            '2010')
+        self.event_2010sc_cache_key = ApiEventController.get_cache_key_from_format(
+            '2010sc')
+        self.eventteams_2010sc_cache_key = ApiEventTeamsController.get_cache_key_from_format(
+            '2010sc')
+        self.eventmatches_2010sc_cache_key = ApiEventMatchesController.get_cache_key_from_format(
+            '2010sc')
+        self.eventstats_2010sc_cache_key = ApiEventStatsController.get_cache_key_from_format(
+            '2010sc')
+        self.eventrankings_2010sc_cache_key = ApiEventRankingsController.get_cache_key_from_format(
+            '2010sc')
+        self.eventawards_2010sc_cache_key = ApiEventAwardsController.get_cache_key_from_format(
+            '2010sc')
+        self.eventdistrictpoints_2010sc_cache_key = ApiEventDistrictPointsController.get_cache_key_from_format(
+            '2010sc')
 
-        self.match_cache_key = ApiMatchController.get_cache_key_from_format('2010sc_qm1')
+        self.match_cache_key = ApiMatchController.get_cache_key_from_format(
+            '2010sc_qm1')
 
-        self.team_frc1_cache_key = ApiTeamController.get_cache_key_from_format('frc1', 2010)
-        self.team_frc2_cache_key = ApiTeamController.get_cache_key_from_format('frc2', 2010)
+        self.team_frc1_cache_key = ApiTeamController.get_cache_key_from_format(
+            'frc1', 2010)
+        self.team_frc2_cache_key = ApiTeamController.get_cache_key_from_format(
+            'frc2', 2010)
 
-        self.team_events_frc1_cache_key = ApiTeamEventsController.get_cache_key_from_format('frc1', 2010)
-        self.team_events_frc2_cache_key = ApiTeamEventsController.get_cache_key_from_format('frc2', 2010)
+        self.team_events_frc1_cache_key = ApiTeamEventsController.get_cache_key_from_format(
+            'frc1', 2010)
+        self.team_events_frc2_cache_key = ApiTeamEventsController.get_cache_key_from_format(
+            'frc2', 2010)
 
-        self.team_event_awards_frc1_2010sc_cache_key = ApiTeamEventAwardsController.get_cache_key_from_format('frc1', '2010sc')
-        self.team_event_awards_frc2_2010sc_cache_key = ApiTeamEventAwardsController.get_cache_key_from_format('frc2', '2010sc')
-        self.team_event_matches_frc1_2010sc_cache_key = ApiTeamEventMatchesController.get_cache_key_from_format('frc1', '2010sc')
-        self.team_event_matches_frc2_2010sc_cache_key = ApiTeamEventMatchesController.get_cache_key_from_format('frc2', '2010sc')
+        self.team_event_awards_frc1_2010sc_cache_key = ApiTeamEventAwardsController.get_cache_key_from_format(
+            'frc1', '2010sc')
+        self.team_event_awards_frc2_2010sc_cache_key = ApiTeamEventAwardsController.get_cache_key_from_format(
+            'frc2', '2010sc')
+        self.team_event_matches_frc1_2010sc_cache_key = ApiTeamEventMatchesController.get_cache_key_from_format(
+            'frc1', '2010sc')
+        self.team_event_matches_frc2_2010sc_cache_key = ApiTeamEventMatchesController.get_cache_key_from_format(
+            'frc2', '2010sc')
 
-        self.team_media_frc1_cache_key = ApiTeamMediaController.get_cache_key_from_format('frc1', 2010)
-        self.team_media_frc2_cache_key = ApiTeamMediaController.get_cache_key_from_format('frc2', 2010)
+        self.team_media_frc1_cache_key = ApiTeamMediaController.get_cache_key_from_format(
+            'frc1', 2010)
+        self.team_media_frc2_cache_key = ApiTeamMediaController.get_cache_key_from_format(
+            'frc2', 2010)
 
-        self.team_years_participated_frc1_cache_key = ApiTeamYearsParticipatedController.get_cache_key_from_format('frc1')
-        self.team_years_participated_frc2_cache_key = ApiTeamYearsParticipatedController.get_cache_key_from_format('frc2')
+        self.team_years_participated_frc1_cache_key = ApiTeamYearsParticipatedController.get_cache_key_from_format(
+            'frc1')
+        self.team_years_participated_frc2_cache_key = ApiTeamYearsParticipatedController.get_cache_key_from_format(
+            'frc2')
 
-        self.team_list_page_0_cache_key = ApiTeamListController.get_cache_key_from_format(0)
-        self.team_list_page_1_cache_key = ApiTeamListController.get_cache_key_from_format(1)
+        self.team_list_page_0_cache_key = ApiTeamListController.get_cache_key_from_format(
+            0)
+        self.team_list_page_1_cache_key = ApiTeamListController.get_cache_key_from_format(
+            1)
 
         self.robot1 = Robot(
             id='frc1_2015',
             year=2015,
             team=self.team_frc1_1.key,
-            robot_name='Baymax'
-        )
+            robot_name='Baymax')
         self.robot2 = Robot(
             id='frc1_2015',
             year=2015,
             team=self.team_frc1_1.key,
-            robot_name='Wall-E'
-        )
-        self.robots_cache_key = ApiTeamHistoryRobotsController.get_cache_key_from_format('frc1')
+            robot_name='Wall-E')
+        self.robots_cache_key = ApiTeamHistoryRobotsController.get_cache_key_from_format(
+            'frc1')
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -291,7 +352,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         """
         Cache clearing is done in a deferred task. Force it to run here.
         """
-        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='cache-clearing')
+        tasks = self.taskqueue_stub.get_filtered_tasks(
+            queue_names='cache-clearing')
         queue = taskqueue.Queue('cache-clearing')
         for task in tasks:
             deferred.run(task.payload)
@@ -302,24 +364,40 @@ class TestApiCacheClearer(unittest2.TestCase):
         TeamManipulator.createOrUpdate(self.team_frc1_1)
         RobotManipulator.createOrUpdate(self.robot1)
         self.processDeferred()
-        response = self.testapp.get('/api/v2/team/frc1/history/robots', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.robots_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/team/frc1/history/robots',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.robots_cache_key), None)
 
         RobotManipulator.createOrUpdate(self.robot2)
         self.processDeferred()
 
         self.assertEqual(CachedResponse.get_by_id(self.robots_cache_key), None)
-        response = self.testapp.get('/api/v2/team/frc1/history/robots', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.robots_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/team/frc1/history/robots',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.robots_cache_key), None)
 
     def test_reset_all(self, flushed=False):
-        response = self.testapp.get('/api/v2/events/2010', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/events/2010',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
 
         EventManipulator.createOrUpdate(self.event_2010sc_1)
         self.processDeferred()
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
         TeamManipulator.createOrUpdate(self.team_frc1_1)
         TeamManipulator.createOrUpdate(self.team_frc2_1)
         EventTeamManipulator.createOrUpdate(self.eventteam_2010sc_frc1)
@@ -329,786 +407,1965 @@ class TestApiCacheClearer(unittest2.TestCase):
         MediaManipulator.createOrUpdate(self.media1_1)
         self.processDeferred()
 
-        response = self.testapp.get('/api/v2/events/2010', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/events/2010',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.eventteams_2010sc_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.eventstats_2010sc_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.eventawards_2010sc_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.eventdistrictpoints_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.match_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc2_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_0_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/event/2010sc', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/event/2010sc',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.eventteams_2010sc_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.eventstats_2010sc_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.eventawards_2010sc_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.eventdistrictpoints_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.match_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc2_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_0_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/event/2010sc/teams', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/event/2010sc/teams',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.eventstats_2010sc_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.eventawards_2010sc_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.eventdistrictpoints_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.match_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc2_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_0_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/event/2010sc/matches', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/event/2010sc/matches',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.eventstats_2010sc_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.eventawards_2010sc_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.eventdistrictpoints_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.match_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc2_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_0_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/event/2010sc/stats', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/event/2010sc/stats',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.eventawards_2010sc_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.eventdistrictpoints_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.match_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc2_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_0_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/event/2010sc/rankings', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/event/2010sc/rankings',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.eventawards_2010sc_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.eventdistrictpoints_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.match_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc2_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_0_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/event/2010sc/awards', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/event/2010sc/awards',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.eventdistrictpoints_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.match_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc2_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_0_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/event/2010sc/district_points', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/event/2010sc/district_points',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.match_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc2_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_0_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/match/2010sc_qm1', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/match/2010sc_qm1',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc2_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_0_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/team/frc1', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/team/frc1',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc2_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_0_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/team/frc2', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/team/frc2',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc2_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_0_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/team/frc1/2010/events', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/team/frc1/2010/events',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_events_frc2_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_0_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/team/frc2/2010/events', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/team/frc2/2010/events',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_0_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/team/frc1/event/2010sc/awards', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/team/frc1/event/2010sc/awards',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_awards_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_0_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/team/frc2/event/2010sc/awards', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/team/frc2/event/2010sc/awards',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc1_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_0_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/team/frc1/event/2010sc/matches', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/team/frc1/event/2010sc/matches',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_event_matches_frc2_2010sc_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_0_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/team/frc2/event/2010sc/matches', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/team/frc2/event/2010sc/matches',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_0_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/team/frc1/2010/media', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/team/frc1/2010/media',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_0_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/team/frc2/2010/media', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/team/frc2/2010/media',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_0_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/team/frc1/years_participated', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/team/frc1/years_participated',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc1_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_0_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/team/frc2/years_participated', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/team/frc2/years_participated',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc2_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_0_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/teams/0', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/teams/0',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.team_list_page_1_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/teams/1', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/teams/1',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.districtlist_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/districts/2010', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/districts/2010',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(self.district_events_2010_cache_key),
+                None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/district/fim/2010/events', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/district/fim/2010/events',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_events_2010_cache_key),
+            None)
         if flushed:
-            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+            self.assertEqual(
+                CachedResponse.get_by_id(
+                    self.district_rankings_2010_cache_key), None)
 
-        response = self.testapp.get('/api/v2/district/fim/2010/rankings', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+        response = self.testapp.get(
+            '/api/v2/district/fim/2010/rankings',
+            headers={
+                'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'
+            })
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_events_2010_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_rankings_2010_cache_key),
+            None)
 
     def testApiCacheClear(self):
-        self.assertEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc1_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc2_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.district_events_2010_cache_key),
+            None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.district_rankings_2010_cache_key),
+            None)
 
         self.test_reset_all(flushed=True)
 
@@ -1123,379 +2380,809 @@ class TestApiCacheClearer(unittest2.TestCase):
         MediaManipulator.createOrUpdate(self.media1_1)
         self.processDeferred()
 
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_events_2010_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_rankings_2010_cache_key),
+            None)
 
         # updating an event
         EventManipulator.createOrUpdate(self.event_2010sc_2)
         self.processDeferred()
-        self.assertEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.district_events_2010_cache_key),
+            None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.district_rankings_2010_cache_key),
+            None)
 
         self.test_reset_all()
 
         # updating a team
         TeamManipulator.createOrUpdate(self.team_frc1_2)
         self.processDeferred()
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc2_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_events_2010_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_rankings_2010_cache_key),
+            None)
 
         self.test_reset_all()
 
         # updating a match
         MatchManipulator.createOrUpdate(self.match1_2)
         self.processDeferred()
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_events_2010_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_rankings_2010_cache_key),
+            None)
 
         self.test_reset_all()
 
         # updating an award
         AwardManipulator.createOrUpdate(self.award1_2)
         self.processDeferred()
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_events_2010_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_rankings_2010_cache_key),
+            None)
 
         self.test_reset_all()
 
         # updating a media
         MediaManipulator.createOrUpdate(self.media1_2)
         self.processDeferred()
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_events_2010_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_rankings_2010_cache_key),
+            None)
 
         self.test_reset_all()
 
         # deleting a media
         MediaManipulator.delete(self.media1_2)
         self.processDeferred()
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_events_2010_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_rankings_2010_cache_key),
+            None)
 
         self.test_reset_all()
 
         # deleting an award
         AwardManipulator.delete(self.award1_2)
         self.processDeferred()
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_events_2010_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_rankings_2010_cache_key),
+            None)
 
         self.test_reset_all()
 
         # deleting a match
         MatchManipulator.delete(self.match1_2)
         self.processDeferred()
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_events_2010_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_rankings_2010_cache_key),
+            None)
 
         self.test_reset_all()
 
         # deleting a team
         TeamManipulator.delete(self.team_frc2_2)
         self.processDeferred()
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc2_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_events_2010_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_rankings_2010_cache_key),
+            None)
 
         self.test_reset_all()
 
         # deleting an event
         EventManipulator.delete(self.event_2010sc_2)
         self.processDeferred()
-        self.assertEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.district_events_2010_cache_key),
+            None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.district_rankings_2010_cache_key),
+            None)
 
         self.test_reset_all()
 
         # deleting an eventteam
         EventTeamManipulator.delete(self.eventteam_2010sc_frc1)
         self.processDeferred()
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.match_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
-        self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
-        self.assertNotEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.match_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(
+                self.team_years_participated_frc2_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_events_2010_cache_key),
+            None)
+        self.assertNotEqual(
+            CachedResponse.get_by_id(self.district_rankings_2010_cache_key),
+            None)

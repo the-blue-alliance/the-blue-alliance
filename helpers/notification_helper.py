@@ -24,7 +24,6 @@ from notifications.verification import VerificationNotification
 
 
 class NotificationHelper(object):
-
     """
     Helper class for sending push notifications.
     Methods here should build a Notification object and use their send method
@@ -32,7 +31,8 @@ class NotificationHelper(object):
 
     @classmethod
     def send_match_score_update(cls, match):
-        users = PushHelper.get_users_subscribed_to_match(match, NotificationType.MATCH_SCORE)
+        users = PushHelper.get_users_subscribed_to_match(
+            match, NotificationType.MATCH_SCORE)
         keys = PushHelper.get_client_ids_for_users(users)
 
         notification = MatchScoreNotification(match)
@@ -49,17 +49,20 @@ class NotificationHelper(object):
     def send_subscription_update(cls, user_id, sending_device_key=""):
         clients = PushHelper.get_client_ids_for_users([user_id])
 
-        notification = UpdateSubscriptionsNotification(user_id, sending_device_key)
+        notification = UpdateSubscriptionsNotification(user_id,
+                                                       sending_device_key)
         notification.send(clients)
 
     @classmethod
     def send_upcoming_match_notification(cls, match, event):
-        users = PushHelper.get_users_subscribed_to_match(match, NotificationType.UPCOMING_MATCH)
+        users = PushHelper.get_users_subscribed_to_match(
+            match, NotificationType.UPCOMING_MATCH)
         keys = PushHelper.get_client_ids_for_users(users)
 
         if match.set_number == 1 and match.match_number == 1:
             # First match of a new type, send level starting notifications
-            start_users = PushHelper.get_users_subscribed_to_match(match, NotificationType.LEVEL_STARTING)
+            start_users = PushHelper.get_users_subscribed_to_match(
+                match, NotificationType.LEVEL_STARTING)
             start_keys = PushHelper.get_client_ids_for_users(start_users)
             level_start = CompLevelStartingNotification(match, event)
             level_start.send(start_keys)
@@ -95,24 +98,31 @@ class NotificationHelper(object):
                     if not next_match.push_sent and last_match.time and next_match.time:
                         diff = next_match.time - last_match.time
                         if diff < datetime.timedelta(minutes=10 * (i + 1)):
-                            cls.send_upcoming_match_notification(next_match, event)
+                            cls.send_upcoming_match_notification(
+                                next_match, event)
 
             for match in next_matches:
                 if match and not match.push_sent:
                     # Only continue sending for the next match if a push hasn't already been sent for it
-                    if match.time is None or match.time + datetime.timedelta(minutes=-7) <= now:
+                    if match.time is None or match.time + datetime.timedelta(
+                            minutes=-7) <= now:
                         # Only send notifications for matches no more than 7 minutes (average-ish match cycle time) before it's scheduled to start
                         # Unless, the match has no time info. Then #yolo and send it
                         cls.send_upcoming_match_notification(match, event)
 
             # Determine if event is down
-            if cls.is_event_down(last_matches[0] if last_matches else None, next_matches[0] if next_matches else None):
+            if cls.is_event_down(last_matches[0]
+                                 if last_matches else None, next_matches[0]
+                                 if next_matches else None):
                 down_events.append(event.key_name)
 
         # Update the status sitevar
         status_sitevar = Sitevar.get_by_id('apistatus.down_events')
         if status_sitevar is None:
-            status_sitevar = Sitevar(id="apistatus.down_events", description="A list of down event keys", values_json="[]")
+            status_sitevar = Sitevar(
+                id="apistatus.down_events",
+                description="A list of down event keys",
+                values_json="[]")
         old_status = status_sitevar.contents
 
         status_sitevar.contents = down_events
@@ -123,7 +133,8 @@ class NotificationHelper(object):
 
     @classmethod
     def send_schedule_update(cls, event):
-        users = PushHelper.get_users_subscribed_to_event(event, NotificationType.SCHEDULE_UPDATED)
+        users = PushHelper.get_users_subscribed_to_event(
+            event, NotificationType.SCHEDULE_UPDATED)
         keys = PushHelper.get_client_ids_for_users(users)
 
         notification = ScheduleUpdatedNotification(event)
@@ -131,7 +142,8 @@ class NotificationHelper(object):
 
     @classmethod
     def send_alliance_update(cls, event):
-        users = PushHelper.get_users_subscribed_for_alliances(event, NotificationType.ALLIANCE_SELECTION)
+        users = PushHelper.get_users_subscribed_for_alliances(
+            event, NotificationType.ALLIANCE_SELECTION)
         keys = PushHelper.get_client_ids_for_users(users)
 
         notification = AllianceSelectionNotification(event)
@@ -139,7 +151,8 @@ class NotificationHelper(object):
 
     @classmethod
     def send_award_update(cls, event):
-        users = PushHelper.get_users_subscribed_to_event(event, NotificationType.AWARDS)
+        users = PushHelper.get_users_subscribed_to_event(
+            event, NotificationType.AWARDS)
         keys = PushHelper.get_client_ids_for_users(users)
 
         notification = AwardsUpdatedNotification(event)
@@ -152,10 +165,14 @@ class NotificationHelper(object):
         If the match is current, MatchVideoNotification is sent.
         Otherwise, EventMatchVideoNotification is sent
         """
-        match_users = set(PushHelper.get_users_subscribed_to_match(match, NotificationType.MATCH_VIDEO))
-        event_users = set(PushHelper.get_users_subscribed_to_event(match.event.get(), NotificationType.MATCH_VIDEO))
+        match_users = set(
+            PushHelper.get_users_subscribed_to_match(
+                match, NotificationType.MATCH_VIDEO))
+        event_users = set(
+            PushHelper.get_users_subscribed_to_event(
+                match.event.get(), NotificationType.MATCH_VIDEO))
         users = match_users.union(event_users)
-        if match.within_seconds(60*10):
+        if match.within_seconds(60 * 10):
             user_keys = PushHelper.get_client_ids_for_users(users)
             MatchVideoNotification(match).send(user_keys)
         else:
@@ -200,7 +217,8 @@ class NotificationHelper(object):
         now = datetime.datetime.utcnow()
         threshold = datetime.timedelta(minutes=30)  # we can tune this
         schedule_offset = last_match.actual_time - last_match.time
-        predicted_start = max(next_match.time + schedule_offset, next_match.time)
+        predicted_start = max(next_match.time + schedule_offset,
+                              next_match.time)
 
         if now > predicted_start + threshold:
             # Event is down :(

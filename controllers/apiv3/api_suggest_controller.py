@@ -23,18 +23,10 @@ class ApiSuggestTeamMediaController(ApiBaseController):
                 year_str=year)
 
             if status == 'success':
-                message = {
-                    "success": True
-                }
+                message = {"success": True}
             else:
-                message = {
-                    "success": False,
-                    "message": status
-                }
+                message = {"success": False, "message": status}
         else:
-            message = {
-                "success": False,
-                "message": "missing media_url"
-            }
+            message = {"success": False, "message": "missing media_url"}
 
         return json.dumps(message, ensure_ascii=True, indent=2, sort_keys=True)

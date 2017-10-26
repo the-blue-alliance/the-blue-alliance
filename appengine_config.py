@@ -1,9 +1,7 @@
 import tba_config
 from google.appengine.ext import vendor
 
-
 vendor.add('lib')
-
 
 if tba_config.CONFIG['env'] == 'prod':
     appstats_RECORD_FRACTION = tba_config.RECORD_FRACTION

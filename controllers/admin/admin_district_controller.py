@@ -31,7 +31,9 @@ class AdminDistrictList(LoggedInHandler):
             "districts": districts,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/district_list.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/district_list.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
@@ -48,14 +50,17 @@ class AdminDistrictEdit(LoggedInHandler):
             "district": district,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/district_edit.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/district_edit.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self, district_key):
         self._require_admin()
 
         district = District(
-            id=District.renderKeyName(self.request.get("year"), self.request.get("abbreviation")),
+            id=District.renderKeyName(
+                self.request.get("year"), self.request.get("abbreviation")),
             year=int(self.request.get("year")),
             abbreviation=self.request.get("abbreviation"),
             display_name=self.request.get("display_name"),
@@ -70,8 +75,11 @@ class AdminDistrictCreate(LoggedInHandler):
     """
     Create an District. POSTs to AdminDistrictEdit.
     """
+
     def get(self):
         self._require_admin()
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/district_create.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/district_create.html')
         self.response.out.write(template.render(path, self.template_values))

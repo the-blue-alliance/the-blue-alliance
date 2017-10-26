@@ -20,12 +20,15 @@ class TestEventController(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
         app = webapp2.WSGIApplication([
             RedirectRoute(r'/event/<event_key>', EventDetail, 'event-detail'),
-            RedirectRoute(r'/event/<event_key>/insights', EventInsights, 'event-insights'),
-            RedirectRoute(r'/events/<year:[0-9]+>', EventList, 'event-list-year'),
+            RedirectRoute(r'/event/<event_key>/insights', EventInsights,
+                          'event-insights'),
+            RedirectRoute(r'/events/<year:[0-9]+>', EventList,
+                          'event-list-year'),
             RedirectRoute(r'/events', EventList, 'event-list'),
         ])
         self.testapp = webtest.TestApp(app)
@@ -34,8 +37,7 @@ class TestEventController(unittest2.TestCase):
             id='2016ne',
             abbreviation='ne',
             year=2016,
-            display_name='New England'
-        )
+            display_name='New England')
         self.district.put()
 
         self.event1 = Event(
@@ -55,9 +57,9 @@ class TestEventController(unittest2.TestCase):
             venue_address="Some Venue, Hartford, CT, USA",
             timezone_id="America/New_York",
             start_date=datetime(2016, 03, 24),
-            webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
-            website="http://www.firstsv.org"
-        )
+            webcast_json=
+            "[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
+            website="http://www.firstsv.org")
         self.event1.put()
 
         # To test that /events defaults to current year
@@ -79,21 +81,47 @@ class TestEventController(unittest2.TestCase):
             venue_address="Some Venue, Hartford, CT, USA",
             timezone_id="America/New_York",
             start_date=datetime(this_year, 03, 24),
-            webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
-            website="http://www.firstsv.org"
-        )
+            webcast_json=
+            "[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
+            website="http://www.firstsv.org")
         self.event2.put()
 
         self.event1_details = EventDetails(
             id=self.event1.key.id(),
-            predictions={"ranking_prediction_stats": {'qual': None, 'playoff': None}, "match_predictions": {'qual': None, 'playoff': None}, "ranking_predictions": None, "match_prediction_stats": {'qual': None, 'playoff': None}}
-        )
+            predictions={
+                "ranking_prediction_stats": {
+                    'qual': None,
+                    'playoff': None
+                },
+                "match_predictions": {
+                    'qual': None,
+                    'playoff': None
+                },
+                "ranking_predictions": None,
+                "match_prediction_stats": {
+                    'qual': None,
+                    'playoff': None
+                }
+            })
         self.event1_details.put()
 
         self.event2_details = EventDetails(
             id=self.event2.key.id(),
-            predictions={"ranking_prediction_stats": {'qual': None, 'playoff': None}, "match_predictions": {'qual': None, 'playoff': None}, "ranking_predictions": None, "match_prediction_stats": {'qual': None, 'playoff': None}}
-        )
+            predictions={
+                "ranking_prediction_stats": {
+                    'qual': None,
+                    'playoff': None
+                },
+                "match_predictions": {
+                    'qual': None,
+                    'playoff': None
+                },
+                "ranking_predictions": None,
+                "match_prediction_stats": {
+                    'qual': None,
+                    'playoff': None
+                }
+            })
         self.event2_details.put()
 
     def tearDown(self):

@@ -11,12 +11,16 @@ class AdminGamedayDashboard(LoggedInHandler):
     """
     Configure things about gameday
     """
+
     def get(self):
         self._require_admin()
         gd_sitevar = Sitevar.get_by_id("gameday.special_webcasts")
-        special_webcasts = gd_sitevar.contents.get("webcasts", []) if gd_sitevar else []
-        path_aliases = gd_sitevar.contents.get("aliases", {}) if gd_sitevar else {}
-        default_chat = gd_sitevar.contents.get("default_chat", "") if gd_sitevar else ""
+        special_webcasts = gd_sitevar.contents.get("webcasts",
+                                                   []) if gd_sitevar else []
+        path_aliases = gd_sitevar.contents.get("aliases",
+                                               {}) if gd_sitevar else {}
+        default_chat = gd_sitevar.contents.get("default_chat",
+                                               "") if gd_sitevar else ""
 
         self.template_values.update({
             "webcasts": special_webcasts,
@@ -24,7 +28,9 @@ class AdminGamedayDashboard(LoggedInHandler):
             "default_chat": default_chat,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/gameday_dashboard.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/gameday_dashboard.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self):
@@ -76,7 +82,10 @@ class AdminGamedayDashboard(LoggedInHandler):
             return
 
         sitevar_contents = gd_sitevar.contents
-        sitevar_contents['webcasts'] = [x for x in sitevar_contents.get("webcasts", []) if x['key_name'] != key_to_delete]
+        sitevar_contents['webcasts'] = [
+            x for x in sitevar_contents.get("webcasts", [])
+            if x['key_name'] != key_to_delete
+        ]
         gd_sitevar.contents = sitevar_contents
         gd_sitevar.put()
 

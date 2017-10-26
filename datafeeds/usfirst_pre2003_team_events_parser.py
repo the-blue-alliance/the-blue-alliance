@@ -17,7 +17,9 @@ class UsfirstPre2003TeamEventsParser(ParserBase):
         soup = BeautifulSoup(html)
 
         first_eids = []
-        history_table = soup.find('div', {'class': 'team-history-wrapper'}).findAll('table')[0]
+        history_table = soup.find('div', {
+            'class': 'team-history-wrapper'
+        }).findAll('table')[0]
         for tr in history_table.findAll('tr')[1:]:  # skip table title row
             trs = tr.findAll('td')
             year = int(trs[0].text)

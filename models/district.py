@@ -10,8 +10,10 @@ class District(ndb.Model):
     """
     year = ndb.IntegerProperty()
     abbreviation = ndb.StringProperty()
-    display_name = ndb.StringProperty()  # This is what we'll show on the TBA site
-    elasticsearch_name = ndb.StringProperty()  # These names are in the event's name as returned by FRC Elasticsearch
+    display_name = ndb.StringProperty(
+    )  # This is what we'll show on the TBA site
+    elasticsearch_name = ndb.StringProperty(
+    )  # These names are in the event's name as returned by FRC Elasticsearch
 
     rankings = ndb.JsonProperty()
 
@@ -34,7 +36,8 @@ class District(ndb.Model):
 
     @property
     def render_name(self):
-        return self.display_name if self.display_name else "{}".format(self.abbreviation).upper()
+        return self.display_name if self.display_name else "{}".format(
+            self.abbreviation).upper()
 
     @classmethod
     def validate_key_name(self, district_key):

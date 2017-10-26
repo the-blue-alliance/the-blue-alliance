@@ -45,7 +45,13 @@ class GCMMessage:
     time_to_live = None
     priority = None
 
-    def __init__(self, device_tokens, notification, collapse_key=None, delay_while_idle=None, time_to_live=None, priority=None):
+    def __init__(self,
+                 device_tokens,
+                 notification,
+                 collapse_key=None,
+                 delay_while_idle=None,
+                 time_to_live=None,
+                 priority=None):
         if isinstance(device_tokens, list):
             self.device_tokens = device_tokens
         else:
@@ -58,13 +64,21 @@ class GCMMessage:
         self.priority = priority
 
     def __unicode__(self):
-        return "%s:%s:%s:%s:%s" % (repr(self.device_tokens), repr(self.notification), repr(self.collapse_key), repr(self.delay_while_idle), repr(self.time_to_live))
+        return "%s:%s:%s:%s:%s" % (repr(self.device_tokens),
+                                   repr(self.notification),
+                                   repr(self.collapse_key),
+                                   repr(self.delay_while_idle),
+                                   repr(self.time_to_live))
 
     def json_string(self):
 
         if not self.device_tokens or not isinstance(self.device_tokens, list):
-            logging.error('GCMMessage generate_json_string error. Invalid device tokens: ' + repr(self))
-            raise Exception('GCMMessage generate_json_string error. Invalid device tokens.')
+            logging.error(
+                'GCMMessage generate_json_string error. Invalid device tokens: '
+                + repr(self))
+            raise Exception(
+                'GCMMessage generate_json_string error. Invalid device tokens.'
+            )
 
         json_dict = {}
         json_dict['registration_ids'] = self.device_tokens
@@ -104,7 +118,8 @@ class GCMConnection:
         self.LOCALHOST = False
         self.SERVER_KEY = Sitevar.get_by_id('gcm.serverKey')
         if self.SERVER_KEY is None:
-            raise Exception("Missing sitevar: gcm.serverKey. Can't send GCM messages.")
+            raise Exception(
+                "Missing sitevar: gcm.serverKey. Can't send GCM messages.")
         self.GCM_CONFIG = {'gcm_api_key': self.SERVER_KEY.contents['gcm_key']}
         self.GOOGLE_LOGIN_URL = 'https://www.google.com/accounts/ClientLogin'
         # Can't use https on localhost due to Google cert bug
@@ -125,7 +140,7 @@ class GCMConnection:
 
         elif option == "stats":
             output = ''
-#            resp += "uptime: " + elapsed + " seconds\n"
+            #            resp += "uptime: " + elapsed + " seconds\n"
 
             return output
 
@@ -148,7 +163,14 @@ class GCMConnection:
 
     # Add message to queue
     def _requeue_message(self, message):
-        taskqueue.add(queue_name=self.GCM_QUEUE_NAME, url=self.GCM_QUEUE_CALLBACK_URL, params={'device_token': message.device_tokens, 'collapse_key': message.collapse_key, 'notification': message.notification})
+        taskqueue.add(
+            queue_name=self.GCM_QUEUE_NAME,
+            url=self.GCM_QUEUE_CALLBACK_URL,
+            params={
+                'device_token': message.device_tokens,
+                'collapse_key': message.collapse_key,
+                'notification': message.notification
+            })
 
     # If send message now or add it to the queue
     def _submit_message(self, message, deferred=False):
@@ -161,32 +183,36 @@ class GCMConnection:
     def _send_request(self, message):
         import urllib2
         if message.device_tokens is None or message.notification is None:
-            logging.error('Message must contain device_tokens and notification.')
+            logging.error(
+                'Message must contain device_tokens and notification.')
             return False
 
         # Check for resend_after
         retry_after = None
         if retry_after is not None and retry_after > datetime.now():
-            logging.warning('RETRY_AFTER: ' + repr(retry_after) + ', requeueing message: ' + repr(message))
+            logging.warning('RETRY_AFTER: ' + repr(retry_after) +
+                            ', requeueing message: ' + repr(message))
             self._requeue_message(message)
             return
 
         # Build request
         headers = {
-                   'Authorization': 'key=' + self.GCM_CONFIG['gcm_api_key'],
-                   'Content-Type': 'application/json'
-                   }
+            'Authorization': 'key=' + self.GCM_CONFIG['gcm_api_key'],
+            'Content-Type': 'application/json'
+        }
 
         gcm_post_json_str = ''
         try:
             gcm_post_json_str = message.json_string()
         except:
-            logging.exception('Error generating json string for message: ' + repr(message))
+            logging.exception('Error generating json string for message: ' +
+                              repr(message))
             return
 
         logging.info('Sending gcm_post_body: ' + repr(gcm_post_json_str))
 
-        request = urllib2.Request(self.GOOGLE_GCM_SEND_URL, gcm_post_json_str, headers)
+        request = urllib2.Request(self.GOOGLE_GCM_SEND_URL, gcm_post_json_str,
+                                  headers)
 
         # Post
         try:
@@ -195,8 +221,8 @@ class GCMConnection:
             resp_json = json.loads(resp_json_str)
             logging.info('_send_request() resp_json: ' + repr(resp_json))
 
-#            multicast_id = resp_json['multicast_id']
-#            success = resp_json['success']
+            #            multicast_id = resp_json['multicast_id']
+            #            success = resp_json['success']
             failure = resp_json['failure']
             canonical_ids = resp_json['canonical_ids']
             results = resp_json['results']
@@ -213,9 +239,11 @@ class GCMConnection:
                     if 'message_id' in result and 'registration_id' in result:
                         # Update device token
                         try:
-                            old_device_token = message.device_tokens[result_index]
+                            old_device_token = message.device_tokens[
+                                result_index]
                             new_device_token = result['registration_id']
-                            self.update_token(old_device_token, new_device_token)
+                            self.update_token(old_device_token,
+                                              new_device_token)
                         except:
                             logging.exception('Error updating device token')
 
@@ -226,37 +254,51 @@ class GCMConnection:
                             device_token = message.device_tokens[result_index]
                             self._on_error(device_token, error_msg, message)
                         except:
-                            logging.exception('Error handling GCM error: ' + repr(error_msg))
+                            logging.exception('Error handling GCM error: ' +
+                                              repr(error_msg))
 
                     result_index += 1
 
         except urllib2.HTTPError, e:
 
             if e.code == 400:
-                logging.error('400, Invalid GCM JSON message: ' + repr(gcm_post_json_str))
+                logging.error('400, Invalid GCM JSON message: ' +
+                              repr(gcm_post_json_str))
             elif e.code == 401:
-                logging.error('401, Error authenticating with GCM. Retrying message. Might need to fix auth key!')
+                logging.error(
+                    '401, Error authenticating with GCM. Retrying message. Might need to fix auth key!'
+                )
                 self._requeue_message(message)
             elif e.code == 500:
-                logging.error('500, Internal error in the GCM server while trying to send message: ' + repr(gcm_post_json_str))
+                logging.error(
+                    '500, Internal error in the GCM server while trying to send message: '
+                    + repr(gcm_post_json_str))
             elif e.code == 503:
                 retry_seconds = int(resp.headers.get('Retry-After')) or 10
-                logging.error('503, Throttled. Retry after delay. Requeuing message. Delay in seconds: ' + str(retry_seconds))
-                retry_timestamp = datetime.now() + timedelta(seconds=retry_seconds)
+                logging.error(
+                    '503, Throttled. Retry after delay. Requeuing message. Delay in seconds: '
+                    + str(retry_seconds))
+                retry_timestamp = datetime.now() + timedelta(
+                    seconds=retry_seconds)
                 self._requeue_message(message)
             else:
-                logging.exception('Unexpected HTTPError: ' + str(e.code) + " " + e.msg + " " + e.read())
+                logging.exception('Unexpected HTTPError: ' + str(e.code) + " "
+                                  + e.msg + " " + e.read())
 
     def _on_error(self, device_token, error_msg, message):
 
         if error_msg == "MissingRegistration":
-            logging.error('ERROR: GCM message sent without device token. This should not happen!')
+            logging.error(
+                'ERROR: GCM message sent without device token. This should not happen!'
+            )
 
         elif error_msg == "InvalidRegistration":
             self.delete_bad_token(device_token)
 
         elif error_msg == "MismatchSenderId":
-            logging.error('ERROR: Device token is tied to a different sender id: ' + repr(device_token))
+            logging.error(
+                'ERROR: Device token is tied to a different sender id: ' +
+                repr(device_token))
             self.delete_bad_token(device_token)
 
         elif error_msg == "NotRegistered":
@@ -266,23 +308,26 @@ class GCMConnection:
             logging.error("ERROR: GCM message too big (max 4096 bytes).")
 
         elif error_msg == "InvalidTtl":
-            logging.error("ERROR: GCM Time to Live field must be an integer representing a duration in seconds between 0 and 2,419,200 (4 weeks).")
+            logging.error(
+                "ERROR: GCM Time to Live field must be an integer representing a duration in seconds between 0 and 2,419,200 (4 weeks)."
+            )
 
         elif error_msg == "MessageTooBig":
             logging.error("ERROR: GCM message too big (max 4096 bytes).")
 
         elif error_msg == "Unavailable":
             retry_seconds = 10
-            logging.error('ERROR: GCM Unavailable. Retry after delay. Requeuing message. Delay in seconds: ' + str(retry_seconds))
+            logging.error(
+                'ERROR: GCM Unavailable. Retry after delay. Requeuing message. Delay in seconds: '
+                + str(retry_seconds))
             retry_timestamp = datetime.now() + timedelta(seconds=retry_seconds)
             self._requeue_message(message)
 
         elif error_msg == "InternalServerError":
-            logging.error("ERROR: Internal error in the GCM server while trying to send message: " + repr(message))
+            logging.error(
+                "ERROR: Internal error in the GCM server while trying to send message: "
+                + repr(message))
 
         else:
-            logging.error("Unknown error: %s for device token: %s" % (repr(error_msg), repr(device_token)))
-
-
-
-
+            logging.error("Unknown error: %s for device token: %s" %
+                          (repr(error_msg), repr(device_token)))

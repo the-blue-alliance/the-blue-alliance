@@ -20,26 +20,27 @@ class DatafeedFms(DatafeedBase):
     def getFmsEventList(self):
         events, _ = self.parse(self.FMS_EVENT_LIST_URL, FmsEventListParser)
 
-        return [Event(
-            id="%s%s" % (event.get("year", None), event.get("event_short", None)),
-            end_date=event.get("end_date", None),
-            event_short=event.get("event_short", None),
-            first_eid=event.get("first_eid", None),
-            name=event.get("name", None),
-            official=True,
-            start_date=event.get("start_date", None),
-            venue=event.get("venue", None),
-            year=event.get("year", None)
-            )
-            for event in events]
+        return [
+            Event(
+                id="%s%s" % (event.get("year", None),
+                             event.get("event_short", None)),
+                end_date=event.get("end_date", None),
+                event_short=event.get("event_short", None),
+                first_eid=event.get("first_eid", None),
+                name=event.get("name", None),
+                official=True,
+                start_date=event.get("start_date", None),
+                venue=event.get("venue", None),
+                year=event.get("year", None)) for event in events
+        ]
 
     def getFmsTeamList(self):
         teams, _ = self.parse(self.FMS_TEAM_LIST_URL, FmsTeamListParser)
 
-        return [Team(
-            id="frc%s" % team.get("team_number", None),
-            name=self._shorten(team.get("name", None)),
-            nickname=self._shorten(team.get("nickname", None)),
-            team_number=team.get("team_number", None)
-            )
-            for team in teams]
+        return [
+            Team(
+                id="frc%s" % team.get("team_number", None),
+                name=self._shorten(team.get("name", None)),
+                nickname=self._shorten(team.get("nickname", None)),
+                team_number=team.get("team_number", None)) for team in teams
+        ]

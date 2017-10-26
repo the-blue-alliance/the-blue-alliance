@@ -79,7 +79,8 @@ class TeamCanonical(CacheableHandler):
         if str(int(team_number)) != team_number:
             return self.redirect("/team/%s" % int(team_number))
 
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format("frc{}".format(team_number))
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(
+            "frc{}".format(team_number))
         super(TeamCanonical, self).get(team_number)
 
     def _render(self, team_number):
@@ -89,7 +90,8 @@ class TeamCanonical(CacheableHandler):
 
         year = datetime.datetime.now().year
 
-        rendered_result = TeamRenderer.render_team_details(self, team, year, True)
+        rendered_result = TeamRenderer.render_team_details(
+            self, team, year, True)
         if rendered_result is None:
             return TeamRenderer.render_team_history(self, team, True)
         else:
@@ -111,7 +113,8 @@ class TeamDetail(CacheableHandler):
         if str(int(team_number)) != team_number:
             return self.redirect("/team/%s/%s" % (int(team_number), year))
 
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format("frc{}".format(team_number), year)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(
+            "frc{}".format(team_number), year)
         super(TeamDetail, self).get(team_number, year)
 
     def _render(self, team_number, year):
@@ -119,7 +122,8 @@ class TeamDetail(CacheableHandler):
         if not team:
             self.abort(404)
 
-        rendered_result = TeamRenderer.render_team_details(self, team, int(year), False)
+        rendered_result = TeamRenderer.render_team_details(
+            self, team, int(year), False)
         if rendered_result is None:
             self.abort(404)
         else:
@@ -141,7 +145,8 @@ class TeamHistory(CacheableHandler):
         if str(int(team_number)) != team_number:
             return self.redirect("/team/%s/history" % int(team_number))
 
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format("frc" + team_number)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(
+            "frc" + team_number)
         super(TeamHistory, self).get(team_number)
 
     def _render(self, team_number):

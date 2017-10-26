@@ -15,7 +15,12 @@ from models.match import Match
 
 class TestMatchApiController(unittest2.TestCase):
     def setUp(self):
-        app = webapp2.WSGIApplication([webapp2.Route(r'/<match_key:>', ApiMatchController, methods=['GET'])], debug=True)
+        app = webapp2.WSGIApplication(
+            [
+                webapp2.Route(
+                    r'/<match_key:>', ApiMatchController, methods=['GET'])
+            ],
+            debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.testbed = testbed.Testbed()
@@ -23,7 +28,8 @@ class TestMatchApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
         self.testbed.init_taskqueue_stub(root_path=".")
 
@@ -34,7 +40,9 @@ class TestMatchApiController(unittest2.TestCase):
             comp_level="f",
             set_number=1,
             match_number=1,
-            team_key_names=[u'frc846', u'frc2135', u'frc971', u'254', u'frc1678', u'frc973'],
+            team_key_names=[
+                u'frc846', u'frc2135', u'frc971', u'254', u'frc1678', u'frc973'
+            ],
             time=datetime.datetime.fromtimestamp(1409527874),
             time_string="4:31 PM",
             youtube_videos=["JbwUzl3W9ug", "bHGyTjxbLz8"],
@@ -62,8 +70,7 @@ class TestMatchApiController(unittest2.TestCase):
                     "auto": 70,\
                     "teleop_goal+foul": 50,\
                     "assist": 150,\
-                    "truss+catch": 40}}'
-        )
+                    "truss+catch": 40}}')
         self.match.put()
 
     def tearDown(self):
@@ -85,7 +92,11 @@ class TestMatchApiController(unittest2.TestCase):
             self.assertEqual(match["time"], 1409527874)
 
     def test_match_api(self):
-        response = self.testapp.get('/2014cc_f1m1', headers={"X-TBA-App-Id": "tba-tests:match-controller-test:v01"})
+        response = self.testapp.get(
+            '/2014cc_f1m1',
+            headers={
+                "X-TBA-App-Id": "tba-tests:match-controller-test:v01"
+            })
 
         match_json = json.loads(response.body)
         self.assertMatchJson(match_json)

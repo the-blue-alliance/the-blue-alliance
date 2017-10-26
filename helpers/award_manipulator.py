@@ -12,6 +12,7 @@ class AwardManipulator(ManipulatorBase):
     """
     Handle Award database writes.
     """
+
     @classmethod
     def getCacheKeysAndControllers(cls, affected_refs):
         return CacheClearer.get_award_cache_keys_and_controllers(affected_refs)
@@ -32,12 +33,14 @@ class AwardManipulator(ManipulatorBase):
                 try:
                     NotificationHelper.send_award_update(event.get())
                 except Exception:
-                    logging.error("Error sending award update for {}".format(event.id()))
+                    logging.error("Error sending award update for {}".format(
+                        event.id()))
 
         # Enqueue task to calculate district points
         for event in events:
             taskqueue.add(
-                url='/tasks/math/do/district_points_calc/{}'.format(event.id()),
+                url='/tasks/math/do/district_points_calc/{}'.format(
+                    event.id()),
                 method='GET')
 
     @classmethod
@@ -64,9 +67,7 @@ class AwardManipulator(ManipulatorBase):
             'recipient_json_list',
         ]
 
-        json_attrs = {
-            'recipient_json_list'
-        }
+        json_attrs = {'recipient_json_list'}
 
         # if not auto_union, treat auto_union_attrs as list_attrs
         if not auto_union:

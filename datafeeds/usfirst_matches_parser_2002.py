@@ -17,7 +17,8 @@ class UsfirstMatchesParser2002(ParserBase):
         """
         soup = BeautifulSoup(html)
 
-        match_table = soup.findAll('table')[5].findAll('table')[0].findAll('table')[1]
+        match_table = soup.findAll('table')[5].findAll('table')[0].findAll(
+            'table')[1]
         matches = self.parseMatchResultList(match_table)
 
         return matches, False
@@ -34,9 +35,12 @@ class UsfirstMatchesParser2002(ParserBase):
         mid_match_comp_level = None
         mid_match_number = None
         mid_match_set_number = None
-        mid_match_teams = []  # Teams for the current match, if mid_match. If not mid match, this should be empty.
-        mid_match_scores = []  # Scores for the current match, if mid_match. If not mid match, this should be empty.
-        elim_match_counter = {}  # Keeps track of the last set number. Keys are like "qf1" and values are like "2"
+        mid_match_teams = [
+        ]  # Teams for the current match, if mid_match. If not mid match, this should be empty.
+        mid_match_scores = [
+        ]  # Scores for the current match, if mid_match. If not mid match, this should be empty.
+        elim_match_counter = {
+        }  # Keeps track of the last set number. Keys are like "qf1" and values are like "2"
         for tr in table.findAll('tr')[1:]:  # skip table header
             tds = tr.findAll('td')
             col1 = self._recurseUntilString(tds[0])
@@ -48,24 +52,34 @@ class UsfirstMatchesParser2002(ParserBase):
                         red_teams = mid_match_teams[:len(mid_match_teams) / 2]
                         blue_teams = mid_match_teams[len(mid_match_teams) / 2:]
                         red_score = mid_match_scores[0]
-                        blue_score = mid_match_scores[len(mid_match_scores) / 2]
-                        alliances = {"red": {
-                                        "teams": red_teams,
-                                        "score": red_score
-                                    },
-                                    "blue": {
-                                        "teams": blue_teams,
-                                        "score": blue_score
-                                    }
+                        blue_score = mid_match_scores[len(mid_match_scores) /
+                                                      2]
+                        alliances = {
+                            "red": {
+                                "teams": red_teams,
+                                "score": red_score
+                            },
+                            "blue": {
+                                "teams": blue_teams,
+                                "score": blue_score
+                            }
                         }
-                        matches.append({"alliances_json": json.dumps(alliances),
-                                        "comp_level": mid_match_comp_level,
-                                        "match_number": mid_match_number,
-                                        "set_number": mid_match_set_number,
-                                        "team_key_names": red_teams + blue_teams,
+                        matches.append({
+                            "alliances_json":
+                            json.dumps(alliances),
+                            "comp_level":
+                            mid_match_comp_level,
+                            "match_number":
+                            mid_match_number,
+                            "set_number":
+                            mid_match_set_number,
+                            "team_key_names":
+                            red_teams + blue_teams,
                         })
                     else:
-                        logging.warning("Lengths of mid_match_teams ({}) and mid_match_scores ({}) aren't the same!".format(mid_match_teams, mid_match_scores))
+                        logging.warning(
+                            "Lengths of mid_match_teams ({}) and mid_match_scores ({}) aren't the same!".
+                            format(mid_match_teams, mid_match_scores))
 
                 mid_match = False
                 ignore_match = False
@@ -81,13 +95,14 @@ class UsfirstMatchesParser2002(ParserBase):
                 try:
                     match_or_set_number = int(re.findall(r'\d+', col1)[0])
                 except:
-                    logging.warning("Match/Set number parse for '{}' failed!".format(col1))
+                    logging.warning(
+                        "Match/Set number parse for '{}' failed!".format(col1))
                     ignore_match = True
                     continue
 
                 col1_lower = col1.lower()
-                if (('final' in col1_lower) or ('quarter' in col1_lower) or
-                   ('semi' in col1_lower) or ('champ' in col1_lower)):
+                if (('final' in col1_lower) or ('quarter' in col1_lower)
+                        or ('semi' in col1_lower) or ('champ' in col1_lower)):
 
                     if 'quarter' in col1_lower:
                         mid_match_comp_level = 'qf'
@@ -96,7 +111,8 @@ class UsfirstMatchesParser2002(ParserBase):
                     else:
                         mid_match_comp_level = 'f'
 
-                    match_counter_key = '{}{}'.format(mid_match_comp_level, match_or_set_number)
+                    match_counter_key = '{}{}'.format(mid_match_comp_level,
+                                                      match_or_set_number)
                     if match_counter_key in elim_match_counter:
                         elim_match_counter[match_counter_key] += 1
                     else:
@@ -112,7 +128,8 @@ class UsfirstMatchesParser2002(ParserBase):
                 try:
                     team_key = 'frc{}'.format(int(re.findall(r'\d+', col1)[0]))
                 except:
-                    logging.warning("Team number parse for '{}' failed!".format(col1))
+                    logging.warning(
+                        "Team number parse for '{}' failed!".format(col1))
                     ignore_match = True
                     continue
 
@@ -122,7 +139,8 @@ class UsfirstMatchesParser2002(ParserBase):
                     if match_score is None:
                         match_score = -1
                 except:
-                    logging.warning("Score parse for '{}' failed!".format(score_col))
+                    logging.warning(
+                        "Score parse for '{}' failed!".format(score_col))
                     ignore_match = True
                     continue
 

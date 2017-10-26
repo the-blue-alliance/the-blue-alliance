@@ -20,7 +20,8 @@ class TestEventTeamRepairer(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
         self.testbed.init_taskqueue_stub(root_path=".")
 
@@ -33,16 +34,15 @@ class TestEventTeamRepairer(unittest2.TestCase):
             name="Northeast Utilities FIRST Connecticut Regional",
             start_date=datetime.datetime(2011, 3, 31, 0, 0),
             year=2011,
-            venue_address="Connecticut Convention Center\r\n100 Columbus Blvd\r\nHartford, CT 06103\r\nUSA",
-            website="http://www.ctfirst.org/ctr"
-        )
+            venue_address=
+            "Connecticut Convention Center\r\n100 Columbus Blvd\r\nHartford, CT 06103\r\nUSA",
+            website="http://www.ctfirst.org/ctr")
         event.put()
 
         team = Team(
             id="frc177",
             team_number=177,
-            website="http://www.bobcatrobotics.org"
-        )
+            website="http://www.bobcatrobotics.org")
         team.put()
 
         event_team = EventTeam(
@@ -63,7 +63,8 @@ class TestEventTeamRepairer(unittest2.TestCase):
         self.assertGreater(len(broken_event_teams), 0)
 
         fixed_event_teams = EventTeamRepairer.repair(broken_event_teams)
-        fixed_event_teams = EventTeamManipulator.createOrUpdate(fixed_event_teams)
+        fixed_event_teams = EventTeamManipulator.createOrUpdate(
+            fixed_event_teams)
 
         event_team = EventTeam.get_by_id("2011ct_frc177")
         self.assertEqual(event_team.year, 2011)

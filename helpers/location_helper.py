@@ -34,15 +34,15 @@ class LocationHelper(object):
         b_split = filter(lambda x: x, re.split('\s+|,|-', b))
         a_sorted = ' '.join(sorted(a_split))
         b_sorted = ' '.join(sorted(b_split))
-        a_acr =  ''.join([w[0] if w else '' for w in a_split]).lower()
-        b_acr =  ''.join([w[0] if w else '' for w in b_split]).lower()
+        a_acr = ''.join([w[0] if w else '' for w in a_split]).lower()
+        b_acr = ''.join([w[0] if w else '' for w in b_split]).lower()
 
         sm1 = SequenceMatcher(None, a, b)
         sm2 = SequenceMatcher(None, a_sorted, b_sorted)
         sm3 = SequenceMatcher(None, a_acr, b)
         sm4 = SequenceMatcher(None, a, b_acr)
 
-        return  max([
+        return max([
             sm1.ratio(),
             sm2.ratio(),
             sm3.ratio(),
@@ -68,12 +68,17 @@ class LocationHelper(object):
 
         # Fallback to location only
         if not location_info:
-            logging.warning("Falling back to location only for event {}".format(event.key.id()))
-            geocode_result = cls.google_maps_geocode_async(event.location).get_result()
+            logging.warning(
+                "Falling back to location only for event {}".format(
+                    event.key.id()))
+            geocode_result = cls.google_maps_geocode_async(
+                event.location).get_result()
             if geocode_result:
-                location_info = cls.construct_location_info_async(geocode_result[0]).get_result()
+                location_info = cls.construct_location_info_async(
+                    geocode_result[0]).get_result()
             else:
-                logging.warning("Event {} location failed!".format(event.key.id()))
+                logging.warning("Event {} location failed!".format(
+                    event.key.id()))
 
         # Update event
         if 'lat' in location_info and 'lng' in location_info:
@@ -124,16 +129,21 @@ class LocationHelper(object):
         # Try to find place based on possible queries
         best_score = 0
         best_location_info = {}
-        nearbysearch_results_candidates = []  # More trustworthy candidates are added first
+        nearbysearch_results_candidates = [
+        ]  # More trustworthy candidates are added first
         for j, query in enumerate(possible_queries):
             # Try both searches
-            nearbysearch_places =  cls.google_maps_placesearch_async(query, lat_lng)
-            textsearch_places = cls.google_maps_placesearch_async(query, lat_lng, textsearch=True)
+            nearbysearch_places = cls.google_maps_placesearch_async(
+                query, lat_lng)
+            textsearch_places = cls.google_maps_placesearch_async(
+                query, lat_lng, textsearch=True)
 
             for results_future in [nearbysearch_places, textsearch_places]:
                 for i, place in enumerate(results_future.get_result()[:5]):
-                    location_info = cls.construct_location_info_async(place).get_result()
-                    score = cls.compute_event_location_score(query, location_info, lat_lng)
+                    location_info = cls.construct_location_info_async(
+                        place).get_result()
+                    score = cls.compute_event_location_score(
+                        query, location_info, lat_lng)
                     score *= pow(0.7, j) * pow(0.7, i)  # discount by ranking
                     if score == 1:
                         return location_info, score
@@ -162,16 +172,21 @@ class LocationHelper(object):
         lon2 = math.radians(location_info['lng'])
         dlon = lon2 - lon1
         dlat = lat2 - lat1
-        a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
+        a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(
+            dlon / 2)**2
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
         distance = R * c
         if distance > 100:
             return 0
 
-        if {'point_of_interest', 'premise'}.intersection(set(location_info.get('types', ''))):
-            score = pow(max(
-                cls.get_similarity(query_name, location_info['name']),
-                cls.get_similarity(query_name, location_info['formatted_address'])), 1.0/3)
+        if {'point_of_interest', 'premise'}.intersection(
+                set(location_info.get('types', ''))):
+            score = pow(
+                max(
+                    cls.get_similarity(query_name, location_info['name']),
+                    cls.get_similarity(query_name,
+                                       location_info['formatted_address'])),
+                1.0 / 3)
         else:
             score = 0
 
@@ -207,21 +222,28 @@ class LocationHelper(object):
         # Fallback to location only
         if not location_info:
             # logging.warning("Falling back to location only for team {}".format(team.key.id()))
-            geocode_result = cls.google_maps_geocode_async(team.location).get_result()
+            geocode_result = cls.google_maps_geocode_async(
+                team.location).get_result()
             if geocode_result:
-                location_info = cls.construct_location_info_async(geocode_result[0]).get_result()
+                location_info = cls.construct_location_info_async(
+                    geocode_result[0]).get_result()
 
         # Fallback to city, country
         if not location_info:
-            logging.warning("Falling back to city/country only for team {}".format(team.key.id()))
-            city_country = u'{} {}'.format(
-                team.city if team.city else '',
-                team.country if team.country else '')
-            geocode_result = cls.google_maps_geocode_async(city_country).get_result()
+            logging.warning(
+                "Falling back to city/country only for team {}".format(
+                    team.key.id()))
+            city_country = u'{} {}'.format(team.city
+                                           if team.city else '', team.country
+                                           if team.country else '')
+            geocode_result = cls.google_maps_geocode_async(
+                city_country).get_result()
             if geocode_result:
-                location_info = cls.construct_location_info_async(geocode_result[0]).get_result()
+                location_info = cls.construct_location_info_async(
+                    geocode_result[0]).get_result()
             else:
-                logging.warning("Team {} location failed!".format(team.key.id()))
+                logging.warning("Team {} location failed!".format(
+                    team.key.id()))
 
         # Update team
         if 'lat' in location_info and 'lng' in location_info:
@@ -280,13 +302,18 @@ class LocationHelper(object):
         # Try to find place based on possible queries
         best_score = 0
         best_location_info = {}
-        nearbysearch_results_candidates = []  # More trustworthy candidates are added first
+        nearbysearch_results_candidates = [
+        ]  # More trustworthy candidates are added first
         for j, name in enumerate(possible_names):
-            places =  cls.google_maps_placesearch_async(name, lat_lng, textsearch=textsearch).get_result()
+            places = cls.google_maps_placesearch_async(
+                name, lat_lng, textsearch=textsearch).get_result()
             for i, place in enumerate(places[:5]):
-                location_info = cls.construct_location_info_async(place).get_result()
-                score = cls.compute_team_location_score(name, location_info, lat_lng)
-                score *= pow(0.9, 0 if j < 2 else 1) * pow(0.9, i)  # discount by ranking
+                location_info = cls.construct_location_info_async(
+                    place).get_result()
+                score = cls.compute_team_location_score(
+                    name, location_info, lat_lng)
+                score *= pow(0.9, 0 if j < 2 else 1) * pow(
+                    0.9, i)  # discount by ranking
                 if score == 1:
                     return location_info, score
                 elif score > best_score:
@@ -309,16 +336,21 @@ class LocationHelper(object):
         lon2 = math.radians(location_info['lng'])
         dlon = lon2 - lon1
         dlat = lat2 - lat1
-        a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
+        a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(
+            dlon / 2)**2
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
         distance = R * c
         if distance > 100:
             return 0
 
-        query_name = query_name.lower().replace('school', '').replace('high', '')
-        result_name = location_info['name'].lower().replace('school', '').replace('high', '')
+        query_name = query_name.lower().replace('school', '').replace(
+            'high', '')
+        result_name = location_info['name'].lower().replace('school',
+                                                            '').replace(
+                                                                'high', '')
         score = pow(cls.get_similarity(query_name, result_name), 0.7)
-        if not {'school', 'university'}.intersection(set(location_info.get('types', ''))):
+        if not {'school', 'university'}.intersection(
+                set(location_info.get('types', ''))):
             score *= 0.9
 
         return score
@@ -336,7 +368,8 @@ class LocationHelper(object):
             'name': gmaps_result.get('name'),
             'types': gmaps_result['types'],
         }
-        place_details_result = yield cls.google_maps_place_details_async(gmaps_result['place_id'])
+        place_details_result = yield cls.google_maps_place_details_async(
+            gmaps_result['place_id'])
         if place_details_result:
             has_city = False
             for component in place_details_result['address_components']:
@@ -360,7 +393,8 @@ class LocationHelper(object):
             if not has_city and 'state_prov' in location_info:
                 location_info['city'] = location_info['state_prov']
 
-            location_info['formatted_address'] = place_details_result['formatted_address']
+            location_info['formatted_address'] = place_details_result[
+                'formatted_address']
 
             # Save everything just in case
             location_info['place_details'] = place_details_result
@@ -379,7 +413,9 @@ class LocationHelper(object):
             if GOOGLE_SECRETS:
                 cls.GOOGLE_API_KEY = GOOGLE_SECRETS.contents['api_key']
             else:
-                logging.warning("Must have sitevar google.api_key to use Google Maps nearbysearch")
+                logging.warning(
+                    "Must have sitevar google.api_key to use Google Maps nearbysearch"
+                )
                 raise ndb.Return([])
 
         search_type = 'textsearch' if textsearch else 'nearbysearch'
@@ -400,7 +436,8 @@ class LocationHelper(object):
                 else:
                     search_params['keyword'] = query
 
-                search_url = 'https://maps.googleapis.com/maps/api/place/{}/json?{}'.format(search_type, urllib.urlencode(search_params))
+                search_url = 'https://maps.googleapis.com/maps/api/place/{}/json?{}'.format(
+                    search_type, urllib.urlencode(search_params))
                 try:
                     # Make async urlfetch call
                     context = ndb.get_context()
@@ -410,17 +447,25 @@ class LocationHelper(object):
                     if search_result.status_code == 200:
                         search_dict = json.loads(search_result.content)
                         if search_dict['status'] == 'ZERO_RESULTS':
-                            logging.info('No {} results for query: {}, lat_lng: {}'.format(search_type, query, lat_lng))
+                            logging.info(
+                                'No {} results for query: {}, lat_lng: {}'.
+                                format(search_type, query, lat_lng))
                         elif search_dict['status'] == 'OK':
                             results = search_dict['results']
                         else:
-                            logging.warning(u'{} failed with query: {}, lat_lng: {}'.format(search_type, query, lat_lng))
+                            logging.warning(
+                                u'{} failed with query: {}, lat_lng: {}'.
+                                format(search_type, query, lat_lng))
                             logging.warning(search_dict)
                     else:
-                        logging.warning(u'{} failed with query: {}, lat_lng: {}'.format(search_type, query, lat_lng))
+                        logging.warning(
+                            u'{} failed with query: {}, lat_lng: {}'.format(
+                                search_type, query, lat_lng))
                         logging.warning(search_dict)
                 except Exception, e:
-                    logging.warning(u'urlfetch for {} request failed with query: {}, lat_lng: {}'.format(search_type, query, lat_lng))
+                    logging.warning(
+                        u'urlfetch for {} request failed with query: {}, lat_lng: {}'.
+                        format(search_type, query, lat_lng))
                     logging.warning(e)
 
                 memcache.set(cache_key, results if results else [])
@@ -438,7 +483,9 @@ class LocationHelper(object):
             if GOOGLE_SECRETS:
                 cls.GOOGLE_API_KEY = GOOGLE_SECRETS.contents['api_key']
             else:
-                logging.warning("Must have sitevar google.api_key to use Google Maps PlaceDetails")
+                logging.warning(
+                    "Must have sitevar google.api_key to use Google Maps PlaceDetails"
+                )
                 raise ndb.Return(None)
 
         cache_key = u'google_maps_place_details:{}'.format(place_id)
@@ -448,26 +495,37 @@ class LocationHelper(object):
                 'placeid': place_id,
                 'key': cls.GOOGLE_API_KEY,
             }
-            place_details_url = 'https://maps.googleapis.com/maps/api/place/details/json?%s' % urllib.urlencode(place_details_params)
+            place_details_url = 'https://maps.googleapis.com/maps/api/place/details/json?%s' % urllib.urlencode(
+                place_details_params)
             try:
                 # Make async urlfetch call
                 context = ndb.get_context()
-                place_details_result = yield context.urlfetch(place_details_url)
+                place_details_result = yield context.urlfetch(
+                    place_details_url)
 
                 # Parse urlfetch call
                 if place_details_result.status_code == 200:
-                    place_details_dict = json.loads(place_details_result.content)
+                    place_details_dict = json.loads(
+                        place_details_result.content)
                     if place_details_dict['status'] == 'ZERO_RESULTS':
-                        logging.info('No place_details result for place_id: {}'.format(place_id))
+                        logging.info(
+                            'No place_details result for place_id: {}'.format(
+                                place_id))
                     elif place_details_dict['status'] == 'OK':
                         result = place_details_dict['result']
                     else:
-                        logging.warning('Placedetails failed with place_id: {}.'.format(place_id))
+                        logging.warning(
+                            'Placedetails failed with place_id: {}.'.format(
+                                place_id))
                         logging.warning(place_details_dict)
                 else:
-                    logging.warning('Placedetails failed with place_id: {}.'.format(place_id))
+                    logging.warning(
+                        'Placedetails failed with place_id: {}.'.format(
+                            place_id))
             except Exception, e:
-                logging.warning('urlfetch for place_details request failed with place_id: {}.'.format(place_id))
+                logging.warning(
+                    'urlfetch for place_details request failed with place_id: {}.'.
+                    format(place_id))
                 logging.warning(e)
 
             if tba_config.CONFIG['memcache']:
@@ -479,7 +537,8 @@ class LocationHelper(object):
     def get_lat_lng(cls, location):
         results = cls.google_maps_geocode_async(location).get_result()
         if results:
-            return results[0]['geometry']['location']['lat'], results[0]['geometry']['location']['lng']
+            return results[0]['geometry']['location']['lat'], results[0][
+                'geometry']['location']['lng']
         else:
             return None
 
@@ -499,7 +558,9 @@ class LocationHelper(object):
             google_secrets = Sitevar.get_by_id("google.secrets")
             google_api_key = None
             if google_secrets is None:
-                logging.warning("Missing sitevar: google.api_key. API calls rate limited by IP and may be over rate limit.")
+                logging.warning(
+                    "Missing sitevar: google.api_key. API calls rate limited by IP and may be over rate limit."
+                )
             else:
                 google_api_key = google_secrets.contents['api_key']
 
@@ -509,22 +570,28 @@ class LocationHelper(object):
             }
             if google_api_key:
                 geocode_params['key'] = google_api_key
-            geocode_url = 'https://maps.googleapis.com/maps/api/geocode/json?%s' % urllib.urlencode(geocode_params)
+            geocode_url = 'https://maps.googleapis.com/maps/api/geocode/json?%s' % urllib.urlencode(
+                geocode_params)
             try:
                 geocode_results = yield context.urlfetch(geocode_url)
                 if geocode_results.status_code == 200:
                     geocode_dict = json.loads(geocode_results.content)
                     if geocode_dict['status'] == 'ZERO_RESULTS':
-                        logging.info('No geocode results for location: {}'.format(location))
+                        logging.info(
+                            'No geocode results for location: {}'.format(
+                                location))
                     elif geocode_dict['status'] == 'OK':
                         results = geocode_dict['results']
                     else:
                         logging.warning('Geocoding failed!')
                         logging.warning(geocode_dict)
                 else:
-                    logging.warning('Geocoding failed for location {}.'.format(location))
+                    logging.warning(
+                        'Geocoding failed for location {}.'.format(location))
             except Exception, e:
-                logging.warning('urlfetch for geocode request failed for location {}.'.format(location))
+                logging.warning(
+                    'urlfetch for geocode request failed for location {}.'.
+                    format(location))
                 logging.warning(e)
 
             memcache.set(cache_key, results if results else [])
@@ -545,27 +612,33 @@ class LocationHelper(object):
         google_secrets = Sitevar.get_by_id("google.secrets")
         google_api_key = None
         if google_secrets is None:
-            logging.warning("Missing sitevar: google.api_key. API calls rate limited by IP and may be over rate limit.")
+            logging.warning(
+                "Missing sitevar: google.api_key. API calls rate limited by IP and may be over rate limit."
+            )
         else:
             google_api_key = google_secrets.contents['api_key']
 
         # timezone request
         tz_params = {
             'location': '%s,%s' % (lat, lng),
-            'timestamp': 0,  # we only care about timeZoneId, which doesn't depend on timestamp
+            'timestamp':
+            0,  # we only care about timeZoneId, which doesn't depend on timestamp
             'sensor': 'false',
         }
         if google_api_key is not None:
             tz_params['key'] = google_api_key
-        tz_url = 'https://maps.googleapis.com/maps/api/timezone/json?%s' % urllib.urlencode(tz_params)
+        tz_url = 'https://maps.googleapis.com/maps/api/timezone/json?%s' % urllib.urlencode(
+            tz_params)
         try:
             tz_result = urlfetch.fetch(tz_url)
         except Exception, e:
-            logging.warning('urlfetch for timezone request failed: {}'.format(tz_url))
+            logging.warning(
+                'urlfetch for timezone request failed: {}'.format(tz_url))
             logging.info(e)
             return None
         if tz_result.status_code != 200:
-            logging.warning('TZ lookup for (lat, lng) failed! ({}, {})'.format(lat, lng))
+            logging.warning('TZ lookup for (lat, lng) failed! ({}, {})'.format(
+                lat, lng))
             return None
         tz_dict = json.loads(tz_result.content)
         if 'timeZoneId' not in tz_dict:

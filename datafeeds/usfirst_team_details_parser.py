@@ -13,6 +13,7 @@ class UsfirstTeamDetailsParser(ParserBase):
     """
     Facilitates building TBAVideos store from TBA.
     """
+
     @classmethod
     def parse(self, html):
         """
@@ -33,27 +34,46 @@ class UsfirstTeamDetailsParser(ParserBase):
 
         page_title = soup.find('h1', {'id': 'thepagetitle'}).text
         try:
-            team['team_number'] = int(re.search(team_num_re, page_title).group(1).strip())
+            team['team_number'] = int(
+                re.search(team_num_re, page_title).group(1).strip())
         except AttributeError, details:
-            logging.warning("Team number could not be parsed: {}".format(details))
+            logging.warning(
+                "Team number could not be parsed: {}".format(details))
             return None, False
-        team['nickname'] = re.sub(' +', ' ', unicode(re.search(team_nick_re, page_title).group(1).strip()))
+        team['nickname'] = re.sub(' +', ' ',
+                                  unicode(
+                                      re.search(team_nick_re,
+                                                page_title).group(1).strip()))
 
-        full_address = unicode(soup.find('div', {'class': 'team-address'}).find('div', {'class': 'content'}).text)
+        full_address = unicode(
+            soup.find('div', {
+                'class': 'team-address'
+            }).find('div', {
+                'class': 'content'
+            }).text)
         match = re.match(team_address_re, full_address)
         if match:
-            locality, region, country = match.group(1), match.group(2), match.group(3)
+            locality, region, country = match.group(1), match.group(
+                2), match.group(3)
             team['address'] = '%s, %s, %s' % (locality, region, country)
 
         team['name'] = unicode(soup.find('div', {'class': 'team-name'}).text)
 
         try:
-            website_str = re.sub(r'^/|/$', '', unicode(soup.find('div', {'class': 'team-website'}).find('a')['href']))  # strip starting and trailing slashes
-            if not (website_str.startswith('http://') or website_str.startswith('https://')):
+            website_str = re.sub(
+                r'^/|/$', '',
+                unicode(
+                    soup.find('div', {
+                        'class': 'team-website'
+                    }).find('a')[
+                        'href']))  # strip starting and trailing slashes
+            if not (website_str.startswith('http://')
+                    or website_str.startswith('https://')):
                 website_str = 'http://%s' % website_str
             team['website'] = db.Link(website_str)
         except Exception, details:
-            logging.info("Team website is invalid for team %s." % team['team_number'])
+            logging.info(
+                "Team website is invalid for team %s." % team['team_number'])
             logging.info(details)
 
         self._html_unescape_items(team)

@@ -55,17 +55,23 @@ class EventShortNameCalcEnqueue(webapp.RequestHandler):
     """
     Enqueues Event short_name computation for official events
     """
+
     def get(self, year):
-        event_keys = Event.query(Event.official == True, Event.year == int(year)).fetch(200, keys_only=True)
+        event_keys = Event.query(Event.official == True,
+                                 Event.year == int(year)).fetch(
+                                     200, keys_only=True)
         events = ndb.get_multi(event_keys)
 
         for event in events:
             taskqueue.add(
-                url='/tasks/math/do/event_short_name_calc_do/{}'.format(event.key.id()),
+                url='/tasks/math/do/event_short_name_calc_do/{}'.format(
+                    event.key.id()),
                 method='GET')
 
         template_values = {'events': events}
-        path = os.path.join(os.path.dirname(__file__), '../templates/math/event_short_name_calc_enqueue.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../templates/math/event_short_name_calc_enqueue.html')
         self.response.out.write(template.render(path, template_values))
 
 
@@ -73,13 +79,16 @@ class EventShortNameCalcDo(webapp.RequestHandler):
     """
     Computes Event short_name
     """
+
     def get(self, event_key):
         event = Event.get_by_id(event_key)
         event.short_name = EventHelper.getShortName(event.name)
         EventManipulator.createOrUpdate(event)
 
         template_values = {'event': event}
-        path = os.path.join(os.path.dirname(__file__), '../templates/math/event_short_name_calc_do.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../templates/math/event_short_name_calc_do.html')
         self.response.out.write(template.render(path, template_values))
 
 
@@ -87,8 +96,10 @@ class EventTeamRepairDo(webapp.RequestHandler):
     """
     Repair broken EventTeams.
     """
+
     def get(self):
-        event_teams_keys = EventTeam.query(EventTeam.year == None).fetch(keys_only=True)
+        event_teams_keys = EventTeam.query(EventTeam.year == None).fetch(
+            keys_only=True)
         event_teams = ndb.get_multi(event_teams_keys)
 
         event_teams = EventTeamRepairer.repair(event_teams)
@@ -102,7 +113,9 @@ class EventTeamRepairDo(webapp.RequestHandler):
             'event_teams': event_teams,
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/math/eventteam_repair_do.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../templates/math/eventteam_repair_do.html')
         self.response.out.write(template.render(path, template_values))
 
 
@@ -112,11 +125,13 @@ class EventTeamUpdate(webapp.RequestHandler):
     Can only update or delete EventTeams for unregistered teams.
     ^^^ Does it actually do this? Eugene -- 2013/07/30
     """
+
     def get(self, event_key):
         _, event_teams, et_keys_to_del = EventTeamUpdater.update(event_key)
 
         if event_teams:
-            event_teams = filter(lambda et: et.team.get() is not None, event_teams)
+            event_teams = filter(lambda et: et.team.get() is not None,
+                                 event_teams)
             event_teams = EventTeamManipulator.createOrUpdate(event_teams)
 
         if et_keys_to_del:
@@ -127,8 +142,9 @@ class EventTeamUpdate(webapp.RequestHandler):
             'deleted_event_teams_keys': et_keys_to_del
         }
 
-        path = os.path.join(os.path.dirname(__file__),
-                            '../templates/math/eventteam_update_do.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../templates/math/eventteam_update_do.html')
         self.response.out.write(template.render(path, template_values))
 
 
@@ -136,11 +152,13 @@ class EventTeamUpdateEnqueue(webapp.RequestHandler):
     """
     Handles enqueing building attendance for Events.
     """
+
     def get(self, when):
         if when == "all":
             event_keys = Event.query().fetch(10000, keys_only=True)
         else:
-            event_keys = Event.query(Event.year == int(when)).fetch(10000, keys_only=True)
+            event_keys = Event.query(Event.year == int(when)).fetch(
+                10000, keys_only=True)
 
         for event_key in event_keys:
             taskqueue.add(
@@ -151,7 +169,9 @@ class EventTeamUpdateEnqueue(webapp.RequestHandler):
             'event_keys': event_keys,
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/math/eventteam_update_enqueue.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../templates/math/eventteam_update_enqueue.html')
         self.response.out.write(template.render(path, template_values))
 
 
@@ -161,20 +181,25 @@ class EventMatchstatsDo(webapp.RequestHandler):
     Calculates predictions for an event
     Calculates insights for an event
     """
+
     def get(self, event_key):
         event = Event.get_by_id(event_key)
-        matchstats_dict = MatchstatsHelper.calculate_matchstats(event.matches, event.year)
+        matchstats_dict = MatchstatsHelper.calculate_matchstats(
+            event.matches, event.year)
         if any([v != {} for v in matchstats_dict.values()]):
             pass
         else:
-            logging.warn("Matchstat calculation for {} failed!".format(event_key))
+            logging.warn(
+                "Matchstat calculation for {} failed!".format(event_key))
             matchstats_dict = None
 
         predictions_dict = None
         if event.year >= 2016 and event.event_type_enum in EventType.SEASON_EVENT_TYPES or event.enable_predictions:
             sorted_matches = MatchHelper.play_order_sort_matches(event.matches)
-            match_predictions, match_prediction_stats, stat_mean_vars = PredictionHelper.get_match_predictions(sorted_matches)
-            ranking_predictions, ranking_prediction_stats = PredictionHelper.get_ranking_predictions(sorted_matches, match_predictions)
+            match_predictions, match_prediction_stats, stat_mean_vars = PredictionHelper.get_match_predictions(
+                sorted_matches)
+            ranking_predictions, ranking_prediction_stats = PredictionHelper.get_ranking_predictions(
+                sorted_matches, match_predictions)
 
             predictions_dict = {
                 'match_predictions': match_predictions,
@@ -184,7 +209,8 @@ class EventMatchstatsDo(webapp.RequestHandler):
                 'ranking_prediction_stats': ranking_prediction_stats
             }
 
-        event_insights = EventInsightsHelper.calculate_event_insights(event.matches, event.year)
+        event_insights = EventInsightsHelper.calculate_event_insights(
+            event.matches, event.year)
 
         event_details = EventDetails(
             id=event_key,
@@ -199,7 +225,9 @@ class EventMatchstatsDo(webapp.RequestHandler):
         }
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
-            path = os.path.join(os.path.dirname(__file__), '../templates/math/event_matchstats_do.html')
+            path = os.path.join(
+                os.path.dirname(__file__),
+                '../templates/math/event_matchstats_do.html')
             self.response.out.write(template.render(path, template_values))
 
     def post(self):
@@ -210,6 +238,7 @@ class EventMatchstatsEnqueue(webapp.RequestHandler):
     """
     Enqueues Matchstats calculation
     """
+
     def get(self, when):
         if when == "now":
             events = EventHelper.getEventsWithinADay()
@@ -219,16 +248,16 @@ class EventMatchstatsEnqueue(webapp.RequestHandler):
         EventHelper.sort_events(events)
         for event in events:
             taskqueue.add(
-                queue_name='run-in-order',  # Because predictions depend on past events
+                queue_name=
+                'run-in-order',  # Because predictions depend on past events
                 url='/tasks/math/do/event_matchstats/' + event.key_name,
                 method='GET')
 
-        template_values = {
-            'event_count': len(events),
-            'year': when
-        }
+        template_values = {'event_count': len(events), 'year': when}
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/math/event_matchstats_enqueue.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../templates/math/event_matchstats_enqueue.html')
         self.response.out.write(template.render(path, template_values))
 
 
@@ -236,12 +265,17 @@ class FinalMatchesRepairDo(webapp.RequestHandler):
     """
     Repairs zero-indexed final matches
     """
+
     def get(self, year):
-        year_event_keys = Event.query(Event.year == int(year)).fetch(1000, keys_only=True)
+        year_event_keys = Event.query(Event.year == int(year)).fetch(
+            1000, keys_only=True)
 
         final_match_keys = []
         for event_key in year_event_keys:
-            final_match_keys.extend(Match.query(Match.event == event_key, Match.comp_level == 'f').fetch(100, keys_only=True))
+            final_match_keys.extend(
+                Match.query(Match.event == event_key,
+                            Match.comp_level == 'f').fetch(
+                                100, keys_only=True))
 
         match_keys_to_repair = []
         for match_key in final_match_keys:
@@ -256,19 +290,22 @@ class FinalMatchesRepairDo(webapp.RequestHandler):
 
             event = ndb.get_multi([match.event])[0]
             match.set_number = 1
-            match.key = ndb.Key(Match, Match.renderKeyName(
-                event.key.id(),
-                match.comp_level,
-                match.set_number,
-                match.match_number))
+            match.key = ndb.Key(
+                Match,
+                Match.renderKeyName(event.key.id(), match.comp_level,
+                                    match.set_number, match.match_number))
 
         MatchManipulator.createOrUpdate(matches_to_repair)
         MatchManipulator.delete_keys(deleted_keys)
 
-        template_values = {'deleted_keys': deleted_keys,
-                           'new_matches': matches_to_repair}
+        template_values = {
+            'deleted_keys': deleted_keys,
+            'new_matches': matches_to_repair
+        }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/math/final_matches_repair_do.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../templates/math/final_matches_repair_do.html')
         self.response.out.write(template.render(path, template_values))
 
 
@@ -276,18 +313,18 @@ class YearInsightsEnqueue(webapp.RequestHandler):
     """
     Enqueues Insights calculation of a given kind for a given year
     """
+
     def get(self, kind, year):
         taskqueue.add(
             target='backend-tasks-b2',
             url='/backend-tasks-b2/math/do/insights/{}/{}'.format(kind, year),
             method='GET')
 
-        template_values = {
-            'kind': kind,
-            'year': year
-        }
+        template_values = {'kind': kind, 'year': year}
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/math/year_insights_enqueue.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../templates/math/year_insights_enqueue.html')
         self.response.out.write(template.render(path, template_values))
 
 
@@ -317,7 +354,9 @@ class YearInsightsDo(webapp.RequestHandler):
             'kind': kind,
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/math/year_insights_do.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../templates/math/year_insights_do.html')
         self.response.out.write(template.render(path, template_values))
 
     def post(self):
@@ -328,6 +367,7 @@ class OverallInsightsEnqueue(webapp.RequestHandler):
     """
     Enqueues Overall Insights calculation for a given kind.
     """
+
     def get(self, kind):
         taskqueue.add(
             target='backend-tasks-b2',
@@ -338,7 +378,9 @@ class OverallInsightsEnqueue(webapp.RequestHandler):
             'kind': kind,
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/math/overall_insights_enqueue.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../templates/math/overall_insights_enqueue.html')
         self.response.out.write(template.render(path, template_values))
 
 
@@ -363,7 +405,9 @@ class OverallInsightsDo(webapp.RequestHandler):
             'kind': kind,
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/math/overall_insights_do.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../templates/math/overall_insights_do.html')
         self.response.out.write(template.render(path, template_values))
 
     def post(self):
@@ -374,13 +418,16 @@ class TypeaheadCalcEnqueue(webapp.RequestHandler):
     """
     Enqueues typeahead calculations
     """
+
     def get(self):
         taskqueue.add(
             target='backend-tasks-b2',
             url='/backend-tasks-b2/math/do/typeaheadcalc',
             method='GET')
         template_values = {}
-        path = os.path.join(os.path.dirname(__file__), '../templates/math/typeaheadcalc_enqueue.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../templates/math/typeaheadcalc_enqueue.html')
         self.response.out.write(template.render(path, template_values))
 
 
@@ -388,28 +435,33 @@ class TypeaheadCalcDo(webapp.RequestHandler):
     """
     Calculates typeahead entries
     """
+
     def get(self):
         @ndb.tasklet
         def get_events_async():
-            event_keys = yield Event.query().order(-Event.year).order(Event.name).fetch_async(keys_only=True)
+            event_keys = yield Event.query().order(-Event.year).order(
+                Event.name).fetch_async(keys_only=True)
             events = yield ndb.get_multi_async(event_keys)
             raise ndb.Return(events)
 
         @ndb.tasklet
         def get_teams_async():
-            team_keys = yield Team.query().order(Team.team_number).fetch_async(keys_only=True)
+            team_keys = yield Team.query().order(
+                Team.team_number).fetch_async(keys_only=True)
             teams = yield ndb.get_multi_async(team_keys)
             raise ndb.Return(teams)
 
         @ndb.tasklet
         def get_districts_async():
-            district_keys = yield District.query().order(-District.year).fetch_async(keys_only=True)
+            district_keys = yield District.query().order(
+                -District.year).fetch_async(keys_only=True)
             districts = yield ndb.get_multi_async(district_keys)
             raise ndb.Return(districts)
 
         @ndb.toplevel
         def get_events_teams_districts():
-            events, teams, districts = yield get_events_async(), get_teams_async(), get_districts_async()
+            events, teams, districts = yield get_events_async(
+            ), get_teams_async(), get_districts_async()
             raise ndb.Return((events, teams, districts))
 
         events, teams, districts = get_events_teams_districts()
@@ -427,7 +479,8 @@ class TypeaheadCalcDo(webapp.RequestHandler):
                 results[TypeaheadEntry.ALL_TEAMS_KEY] = [data]
 
         for district in districts:
-            data = '%s District [%s]' % (district.display_name, district.abbreviation.upper())
+            data = '%s District [%s]' % (district.display_name,
+                                         district.abbreviation.upper())
             # all districts
             if TypeaheadEntry.ALL_DISTRICTS_KEY in results:
                 if data not in results[TypeaheadEntry.ALL_DISTRICTS_KEY]:
@@ -436,7 +489,8 @@ class TypeaheadCalcDo(webapp.RequestHandler):
                 results[TypeaheadEntry.ALL_DISTRICTS_KEY] = [data]
 
         for event in events:
-            data = '%s %s [%s]' % (event.year, event.name, event.event_short.upper())
+            data = '%s %s [%s]' % (event.year, event.name,
+                                   event.event_short.upper())
             # all events
             if TypeaheadEntry.ALL_EVENTS_KEY in results:
                 results[TypeaheadEntry.ALL_EVENTS_KEY].append(data)
@@ -444,28 +498,37 @@ class TypeaheadCalcDo(webapp.RequestHandler):
                 results[TypeaheadEntry.ALL_EVENTS_KEY] = [data]
             # events by year
             if TypeaheadEntry.YEAR_EVENTS_KEY.format(event.year) in results:
-                results[TypeaheadEntry.YEAR_EVENTS_KEY.format(event.year)].append(data)
+                results[TypeaheadEntry.YEAR_EVENTS_KEY.format(
+                    event.year)].append(data)
             else:
-                results[TypeaheadEntry.YEAR_EVENTS_KEY.format(event.year)] = [data]
+                results[TypeaheadEntry.YEAR_EVENTS_KEY.format(
+                    event.year)] = [data]
 
         # Prepare to remove old entries
-        old_entry_keys_future = TypeaheadEntry.query().fetch_async(keys_only=True)
+        old_entry_keys_future = TypeaheadEntry.query().fetch_async(
+            keys_only=True)
 
         # Add new entries
         entries = []
         for key_name, data in results.items():
-            entries.append(TypeaheadEntry(id=key_name, data_json=json.dumps(data)))
+            entries.append(
+                TypeaheadEntry(id=key_name, data_json=json.dumps(data)))
         ndb.put_multi(entries)
 
         # Remove old entries
         old_entry_keys = set(old_entry_keys_future.get_result())
-        new_entry_keys = set([ndb.Key(TypeaheadEntry, key_name) for key_name in results.keys()])
+        new_entry_keys = set(
+            [ndb.Key(TypeaheadEntry, key_name) for key_name in results.keys()])
         keys_to_delete = old_entry_keys.difference(new_entry_keys)
-        logging.info("Removing the following unused TypeaheadEntries: {}".format([key.id() for key in keys_to_delete]))
+        logging.info(
+            "Removing the following unused TypeaheadEntries: {}".format(
+                [key.id() for key in keys_to_delete]))
         ndb.delete_multi(keys_to_delete)
 
         template_values = {'results': results}
-        path = os.path.join(os.path.dirname(__file__), '../templates/math/typeaheadcalc_do.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../templates/math/typeaheadcalc_do.html')
         self.response.out.write(template.render(path, template_values))
 
 
@@ -477,11 +540,18 @@ class DistrictPointsCalcEnqueue(webapp.RequestHandler):
     def get(self, year):
         year = int(year)
 
-        event_keys = Event.query(Event.year == year, Event.event_type_enum.IN(EventType.SEASON_EVENT_TYPES)).fetch(None, keys_only=True)
+        event_keys = Event.query(Event.year == year,
+                                 Event.event_type_enum.IN(
+                                     EventType.SEASON_EVENT_TYPES)).fetch(
+                                         None, keys_only=True)
         for event_key in event_keys:
-            taskqueue.add(url='/tasks/math/do/district_points_calc/{}'.format(event_key.id()), method='GET')
+            taskqueue.add(
+                url='/tasks/math/do/district_points_calc/{}'.format(
+                    event_key.id()),
+                method='GET')
 
-        self.response.out.write("Enqueued for: {}".format([event_key.id() for event_key in event_keys]))
+        self.response.out.write("Enqueued for: {}".format(
+            [event_key.id() for event_key in event_keys]))
 
 
 class DistrictPointsCalcDo(webapp.RequestHandler):
@@ -491,18 +561,18 @@ class DistrictPointsCalcDo(webapp.RequestHandler):
 
     def get(self, event_key):
         event = Event.get_by_id(event_key)
-        if event.event_type_enum not in EventType.SEASON_EVENT_TYPES and not self.request.get('allow-offseason', None):
+        if event.event_type_enum not in EventType.SEASON_EVENT_TYPES and not self.request.get(
+                'allow-offseason', None):
             if 'X-Appengine-Taskname' not in self.request.headers:
-                self.response.out.write("Can't calculate district points for a non-season event {}!"
-                                        .format(event.key_name))
+                self.response.out.write(
+                    "Can't calculate district points for a non-season event {}!"
+                    .format(event.key_name))
             return
 
         district_points = DistrictHelper.calculate_event_points(event)
 
         event_details = EventDetails(
-            id=event_key,
-            district_points=district_points
-        )
+            id=event_key, district_points=district_points)
         EventDetailsManipulator.createOrUpdate(event_details)
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
@@ -510,7 +580,10 @@ class DistrictPointsCalcDo(webapp.RequestHandler):
 
         # Enqueue task to update rankings
         if event.district_key:
-            taskqueue.add(url='/tasks/math/do/district_rankings_calc/{}'.format(event.district_key.id()), method='GET')
+            taskqueue.add(
+                url='/tasks/math/do/district_rankings_calc/{}'.format(
+                    event.district_key.id()),
+                method='GET')
 
 
 class DistrictRankingsCalcEnqueue(webapp.RequestHandler):
@@ -522,7 +595,10 @@ class DistrictRankingsCalcEnqueue(webapp.RequestHandler):
         districts = DistrictsInYearQuery(int(year)).fetch()
         district_keys = [district.key.id() for district in districts]
         for district_key in district_keys:
-            taskqueue.add(url='/tasks/math/do/district_rankings_calc/{}'.format(district_key), method='GET')
+            taskqueue.add(
+                url='/tasks/math/do/district_rankings_calc/{}'.format(
+                    district_key),
+                method='GET')
 
         self.response.out.write("Enqueued for: {}".format(district_keys))
 
@@ -535,7 +611,8 @@ class DistrictRankingsCalcDo(webapp.RequestHandler):
     def get(self, district_key):
         district = District.get_by_id(district_key)
         if not district:
-            self.response.out.write("District {} does not exist!".format(district_key))
+            self.response.out.write(
+                "District {} does not exist!".format(district_key))
             return
 
         events_future = DistrictEventsQuery(district_key).fetch_async()
@@ -545,7 +622,8 @@ class DistrictRankingsCalcDo(webapp.RequestHandler):
         for event in events:
             event.prep_details()
         EventHelper.sort_events(events)
-        team_totals = DistrictHelper.calculate_rankings(events, teams_future, district.year)
+        team_totals = DistrictHelper.calculate_rankings(
+            events, teams_future, district.year)
 
         rankings = []
         current_rank = 1
@@ -556,7 +634,8 @@ class DistrictRankingsCalcDo(webapp.RequestHandler):
             point_detail["event_points"] = []
             for event, event_points in points["event_points"]:
                 event_points['event_key'] = event.key.id()
-                event_points['district_cmp'] = True if event.event_type_enum == EventType.DISTRICT_CMP else False
+                event_points[
+                    'district_cmp'] = True if event.event_type_enum == EventType.DISTRICT_CMP else False
                 point_detail["event_points"].append(event_points)
 
             point_detail["rookie_bonus"] = points.get("rookie_bonus", 0)
@@ -569,7 +648,8 @@ class DistrictRankingsCalcDo(webapp.RequestHandler):
             DistrictManipulator.createOrUpdate(district)
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
-            self.response.out.write("Finished calculating rankings for: {}".format(district_key))
+            self.response.out.write(
+                "Finished calculating rankings for: {}".format(district_key))
 
 
 class EventTeamStatusCalcEnqueue(webapp.RequestHandler):
@@ -578,9 +658,15 @@ class EventTeamStatusCalcEnqueue(webapp.RequestHandler):
     """
 
     def get(self, year):
-        event_keys = [e.id() for e in Event.query(Event.year==int(year)).fetch(keys_only=True)]
+        event_keys = [
+            e.id()
+            for e in Event.query(Event.year == int(year)).fetch(
+                keys_only=True)
+        ]
         for event_key in event_keys:
-            taskqueue.add(url='/tasks/math/do/event_team_status/{}'.format(event_key), method='GET')
+            taskqueue.add(
+                url='/tasks/math/do/event_team_status/{}'.format(event_key),
+                method='GET')
 
         self.response.out.write("Enqueued for: {}".format(event_keys))
 
@@ -589,23 +675,30 @@ class EventTeamStatusCalcDo(webapp.RequestHandler):
     """
     Calculates event team statuses for all teams at an event
     """
+
     def get(self, event_key):
         event = Event.get_by_id(event_key)
-        event_teams = EventTeam.query(EventTeam.event==event.key).fetch()
+        event_teams = EventTeam.query(EventTeam.event == event.key).fetch()
         for event_team in event_teams:
-            status = EventTeamStatusHelper.generate_team_at_event_status(event_team.team.id(), event)
+            status = EventTeamStatusHelper.generate_team_at_event_status(
+                event_team.team.id(), event)
             event_team.status = status
-            FirebasePusher.update_event_team_status(event_key, event_team.team.id(), status)
+            FirebasePusher.update_event_team_status(event_key,
+                                                    event_team.team.id(),
+                                                    status)
         EventTeamManipulator.createOrUpdate(event_teams)
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
-            self.response.out.write("Finished calculating event team statuses for: {}".format(event_key))
+            self.response.out.write(
+                "Finished calculating event team statuses for: {}".format(
+                    event_key))
 
 
 class UpcomingNotificationDo(webapp.RequestHandler):
     """
     Sends out notifications for upcoming matches
     """
+
     def get(self):
         live_events = EventHelper.getEventsWithinADay()
         NotificationHelper.send_upcoming_matches(live_events)
@@ -615,6 +708,7 @@ class UpdateLiveEventsDo(webapp.RequestHandler):
     """
     Updates live events
     """
+
     def get(self):
         FirebasePusher.update_live_events()
 
@@ -623,19 +717,24 @@ class MatchTimePredictionsEnqueue(webapp.RequestHandler):
     """
     Enqueue match time predictions for all current events
     """
+
     def get(self):
         live_events = EventHelper.getEventsWithinADay()
         for event in live_events:
-            taskqueue.add(url='/tasks/math/do/predict_match_times/{}'.format(event.key_name),
-                          method='GET')
+            taskqueue.add(
+                url='/tasks/math/do/predict_match_times/{}'.format(
+                    event.key_name),
+                method='GET')
         # taskqueue.add(url='/tasks/do/bluezone_update', method='GET')
-        self.response.out.write("Enqueued time prediction for {} events".format(len(live_events)))
+        self.response.out.write(
+            "Enqueued time prediction for {} events".format(len(live_events)))
 
 
 class MatchTimePredictionsDo(webapp.RequestHandler):
     """
     Predicts match times for a given live event
     """
+
     def get(self, event_key):
         import pytz
 
@@ -649,14 +748,18 @@ class MatchTimePredictionsDo(webapp.RequestHandler):
 
         timezone = pytz.timezone(event.timezone_id)
         played_matches = MatchHelper.recentMatches(matches, num=0)
-        unplayed_matches = MatchHelper.upcomingMatches(matches, num=len(matches))
-        MatchTimePredictionHelper.predict_future_matches(event_key, played_matches, unplayed_matches, timezone, event.within_a_day)
+        unplayed_matches = MatchHelper.upcomingMatches(
+            matches, num=len(matches))
+        MatchTimePredictionHelper.predict_future_matches(
+            event_key, played_matches, unplayed_matches, timezone,
+            event.within_a_day)
 
 
 class BlueZoneUpdateDo(webapp.RequestHandler):
     """
     Update the current "best match"
     """
+
     def get(self):
         live_events = EventHelper.getEventsWithinADay()
         try:
@@ -670,6 +773,7 @@ class SuggestionQueueDailyNag(webapp.RequestHandler):
     """
     Daily job to nag a slack channel about pending suggestions
     """
+
     def get(self):
         hook_sitevars = Sitevar.get_by_id('slack.hookurls')
         if not hook_sitevars:
@@ -677,8 +781,9 @@ class SuggestionQueueDailyNag(webapp.RequestHandler):
         channel_url = hook_sitevars.contents.get('suggestion-nag')
         if not channel_url:
             return
-        counts = map(lambda t: SuggestionFetcher.count(Suggestion.REVIEW_PENDING, t),
-                     Suggestion.MODELS)
+        counts = map(
+            lambda t: SuggestionFetcher.count(Suggestion.REVIEW_PENDING, t),
+            Suggestion.MODELS)
 
         nag_text = "There are pending suggestions!\n"
         suggestions_to_nag = False
@@ -686,9 +791,7 @@ class SuggestionQueueDailyNag(webapp.RequestHandler):
             if count > 0:
                 suggestions_to_nag = True
                 nag_text += "*{0}*: {1} pending suggestions\n".format(
-                    Suggestion.MODEL_NAMES.get(name),
-                    count
-                )
+                    Suggestion.MODEL_NAMES.get(name), count)
 
         if suggestions_to_nag:
             nag_text += "_Review them on <https://www.thebluealliance.com/suggest/review|TBA>_"

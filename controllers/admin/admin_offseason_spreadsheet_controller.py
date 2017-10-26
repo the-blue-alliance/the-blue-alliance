@@ -28,18 +28,25 @@ class AdminOffseasonSpreadsheetController(LoggedInHandler):
         new_events = df.getEventList(self.SHEET_KEY)
         old_events = Event.query().filter(
             Event.event_type_enum == EventType.OFFSEASON).filter(
-            Event.year == datetime.datetime.now().year).fetch(100)
+                Event.year == datetime.datetime.now().year).fetch(100)
 
         old_titles = [event.name for event in old_events]
-        truly_new_events = [event for event in new_events if event.name not in old_titles]
+        truly_new_events = [
+            event for event in new_events if event.name not in old_titles
+        ]
 
         self.template_values.update({
-            "events": truly_new_events,
-            "event_key": self.request.get("event_key"),
-            "success": self.request.get("success"),
+            "events":
+            truly_new_events,
+            "event_key":
+            self.request.get("event_key"),
+            "success":
+            self.request.get("success"),
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/offseasons_spreadsheet.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/offseasons_spreadsheet.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self):
@@ -49,20 +56,25 @@ class AdminOffseasonSpreadsheetController(LoggedInHandler):
 
             # how to do this?
 
-            self.redirect("/admin/offseasons/spreadsheet?success=duplicate&event_key=%s" % self.request.get("duplicate_event_key"))
+            self.redirect(
+                "/admin/offseasons/spreadsheet?success=duplicate&event_key=%s"
+                % self.request.get("duplicate_event_key"))
             return
 
         if self.request.get("submit") == "create":
 
             start_date = None
             if self.request.get("event_start_date"):
-                start_date = datetime.datetime.strptime(self.request.get("event_start_date"), "%Y-%m-%d")
+                start_date = datetime.datetime.strptime(
+                    self.request.get("event_start_date"), "%Y-%m-%d")
 
             end_date = None
             if self.request.get("event_end_date"):
-                end_date = datetime.datetime.strptime(self.request.get("event_end_date"), "%Y-%m-%d")
+                end_date = datetime.datetime.strptime(
+                    self.request.get("event_end_date"), "%Y-%m-%d")
 
-            event_key = str(self.request.get("event_year")) + str.lower(str(self.request.get("event_short")))
+            event_key = str(self.request.get("event_year")) + str.lower(
+                str(self.request.get("event_short")))
 
             event = Event(
                 id=event_key,
@@ -77,7 +89,9 @@ class AdminOffseasonSpreadsheetController(LoggedInHandler):
             )
             event = EventManipulator.createOrUpdate(event)
 
-            self.redirect("/admin/offseasons/spreadsheet?success=create&event_key=%s" % event_key)
+            self.redirect(
+                "/admin/offseasons/spreadsheet?success=create&event_key=%s" %
+                event_key)
             return
 
         self.redirect("/admin/offseasons/spreadsheet")

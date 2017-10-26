@@ -19,22 +19,27 @@ class TestLocationHelper(unittest2.TestCase):
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
         self.testbed.init_search_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
         # Load env vars that contain test keys
-        self.test_google_api_key = os.environ.get('TEST_GOOGLE_API_KEY', '')  # Frome in Travis CI
+        self.test_google_api_key = os.environ.get('TEST_GOOGLE_API_KEY',
+                                                  '')  # Frome in Travis CI
         if not self.test_google_api_key:
             try:
                 with open('test_keys.json') as data_file:
                     test_keys = json.load(data_file)
-                    self.test_google_api_key = test_keys.get('test_google_api_key', '')
+                    self.test_google_api_key = test_keys.get(
+                        'test_google_api_key', '')
             except:
                 # Just go without
                 pass
 
         Sitevar(
             id='google.secrets',
-            values_json=json.dumps({'api_key': self.test_google_api_key})).put()
+            values_json=json.dumps({
+                'api_key': self.test_google_api_key
+            })).put()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -445,12 +450,12 @@ class TestLocationHelper(unittest2.TestCase):
         # Team 604 (generic team)
         team = Team(
             id='frc604',
-            name='Brin Wojcicki Foundation/IBM/Google.org/Qualcomm/Apple/Team Grandma/BAE Systems/Western Digital/WAGIC/Lockheed Martin/TE connectivity/Leland Bridge/Intuitive Surgical/San Jose City Councilman J. Khamis/eBay/Cisco/Dell/MDR Precision/ Benevity /SOLIDWORKS/Sierra Radio Systems/HSC Electronic Supply/Hurricane Electric/Dropbox/STL Shipping by FRC3256/GitHub & Leland High',
+            name=
+            'Brin Wojcicki Foundation/IBM/Google.org/Qualcomm/Apple/Team Grandma/BAE Systems/Western Digital/WAGIC/Lockheed Martin/TE connectivity/Leland Bridge/Intuitive Surgical/San Jose City Councilman J. Khamis/eBay/Cisco/Dell/MDR Precision/ Benevity /SOLIDWORKS/Sierra Radio Systems/HSC Electronic Supply/Hurricane Electric/Dropbox/STL Shipping by FRC3256/GitHub & Leland High',
             city='San Jose',
             state_prov='California',
             postalcode='95120',
-            country='USA'
-        )
+            country='USA')
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -471,12 +476,12 @@ class TestLocationHelper(unittest2.TestCase):
         # Team 456 (Many schools, odd school ordering)
         team = Team(
             id='frc456',
-            name='US Army Engineer Research & Development Center / Vicksburg-Warren School District / National Defense Education Program / NASA / Diane and Donald Cargile / Ginny and Chuck Dickerson & Warren Central High School & Vicksburg Catholic School & Vicksburg High School & Home School',
+            name=
+            'US Army Engineer Research & Development Center / Vicksburg-Warren School District / National Defense Education Program / NASA / Diane and Donald Cargile / Ginny and Chuck Dickerson & Warren Central High School & Vicksburg Catholic School & Vicksburg High School & Home School',
             city='Vicksburg',
             state_prov='Mississippi',
             postalcode='39180',
-            country='USA'
-        )
+            country='USA')
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -497,12 +502,12 @@ class TestLocationHelper(unittest2.TestCase):
         # Team 1868 (Odd Sponsors, multiple schools)
         team = Team(
             id='frc1868',
-            name='NASA Ames Research Center / St. Jude Medical Foundation / Google / Nvidia / Brin Worcicki Foundation / Qualcomm / Intuitive Surgical / Motorola / World Metal Finishing / Applied Welding / Weiss Enterprises / Solidworks / Wildbit / Fiber Internet Center & Girl Scout Troop 62868',
+            name=
+            'NASA Ames Research Center / St. Jude Medical Foundation / Google / Nvidia / Brin Worcicki Foundation / Qualcomm / Intuitive Surgical / Motorola / World Metal Finishing / Applied Welding / Weiss Enterprises / Solidworks / Wildbit / Fiber Internet Center & Girl Scout Troop 62868',
             city='Mountain View',
             state_prov='California',
             postalcode='94035',
-            country='USA'
-        )
+            country='USA')
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -535,12 +540,12 @@ class TestLocationHelper(unittest2.TestCase):
         # Team 3504 (Odd Sponsors, multiple schools)
         team = Team(
             id='frc3504',
-            name='Field Robotics Center, Carnegie Mellon University / American Eagle Outfitters & Fox Chapel Area Hs & Oakland Catholic High School & Pittsburgh Brashear Hs & Pittsburgh Science and Technology Academy 6-12 & Avonworth Hs & Pittsburgh Capa 6-12 & Bishop Canevin High School & Dorseyville Ms & Plum Shs & Winchester Thurston School & North Allegheny Shs & North Allegheny Ihs & Pine-Richland Hs & Seneca Valley Shs & Upper Saint Clair Hs & The Ellis School & PA Cyber Charter School & Aquinas Academy & Penn Hills Shs & Harrold Middle School & Sacred Heart Elementary School & Pittsburgh Obama 6-12 & Hampton Middle School & Hampton Hs & Franklin Regional Ms & Canon-Mcmillan Shs & South Fayette Ms & Community College Allegheny County & Home School & Home School & Home School',
+            name=
+            'Field Robotics Center, Carnegie Mellon University / American Eagle Outfitters & Fox Chapel Area Hs & Oakland Catholic High School & Pittsburgh Brashear Hs & Pittsburgh Science and Technology Academy 6-12 & Avonworth Hs & Pittsburgh Capa 6-12 & Bishop Canevin High School & Dorseyville Ms & Plum Shs & Winchester Thurston School & North Allegheny Shs & North Allegheny Ihs & Pine-Richland Hs & Seneca Valley Shs & Upper Saint Clair Hs & The Ellis School & PA Cyber Charter School & Aquinas Academy & Penn Hills Shs & Harrold Middle School & Sacred Heart Elementary School & Pittsburgh Obama 6-12 & Hampton Middle School & Hampton Hs & Franklin Regional Ms & Canon-Mcmillan Shs & South Fayette Ms & Community College Allegheny County & Home School & Home School & Home School',
             city='Pittsburgh',
             state_prov='Pennsylvania',
             postalcode='15213',
-            country='USA'
-        )
+            country='USA')
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -577,8 +582,7 @@ class TestLocationHelper(unittest2.TestCase):
             city='Highland',
             state_prov='Michigan',
             postalcode='48357',
-            country='USA'
-        )
+            country='USA')
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -587,7 +591,8 @@ class TestLocationHelper(unittest2.TestCase):
         # self.assertEqual(team.normalized_location.formatted_address, '2390 S Milford Rd, Highland, MI 48357, USA')
         # self.assertEqual(team.normalized_location.street_number, '2390')
         # self.assertEqual(team.normalized_location.street, 'South Milford Road')
-        self.assertEqual(team.normalized_location.city, 'Highland Charter Township')
+        self.assertEqual(team.normalized_location.city,
+                         'Highland Charter Township')
         self.assertEqual(team.normalized_location.state_prov, 'Michigan')
         self.assertEqual(team.normalized_location.state_prov_short, 'MI')
         self.assertEqual(team.normalized_location.country, 'United States')
@@ -603,8 +608,7 @@ class TestLocationHelper(unittest2.TestCase):
             city='Lanzhou',
             state_prov='Gansu',
             postalcode='730070',
-            country='China'
-        )
+            country='China')
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -629,8 +633,7 @@ class TestLocationHelper(unittest2.TestCase):
             city='Bossley Park',
             state_prov='New South Wales',
             postalcode='2176',
-            country='Australia'
-        )
+            country='Australia')
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -640,7 +643,8 @@ class TestLocationHelper(unittest2.TestCase):
         # self.assertEqual(team.normalized_location.street_number, '36-44')
         # self.assertEqual(team.normalized_location.street, 'Prairie Vale Road')
         self.assertEqual(team.normalized_location.city, 'Bossley Park')
-        self.assertEqual(team.normalized_location.state_prov, 'New South Wales')
+        self.assertEqual(team.normalized_location.state_prov,
+                         'New South Wales')
         self.assertEqual(team.normalized_location.state_prov_short, 'NSW')
         self.assertEqual(team.normalized_location.country, 'Australia')
         self.assertEqual(team.normalized_location.country_short, 'AU')
@@ -651,12 +655,12 @@ class TestLocationHelper(unittest2.TestCase):
         # Team 2122 (Complicated team name, wrong postal code)
         team = Team(
             id='frc2122',
-            name='Micron Technology, Inc./Hewlett Packard/Boise Schools Educational Foundation/Laura Moore Cunningham Foundation/J.C. Jeker Foundation & Treasure Valley Math/Science',
+            name=
+            'Micron Technology, Inc./Hewlett Packard/Boise Schools Educational Foundation/Laura Moore Cunningham Foundation/J.C. Jeker Foundation & Treasure Valley Math/Science',
             city='Boise',
             state_prov='Idaho',
             postalcode='83709',
-            country='USA'
-        )
+            country='USA')
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -689,12 +693,12 @@ class TestLocationHelper(unittest2.TestCase):
         # Team 3354 (Mexican team, special symbols, odd school name)
         team = Team(
             id='frc3354',
-            name='Mabe/Bombardier Aerospace Mexico/Coca Cola/Grupo Salinas/Fundacion Azteca/Navex/Red Cross/United Nations/Lego Education/Foundation For a Drug Free World & Tec de Monterrey',
+            name=
+            'Mabe/Bombardier Aerospace Mexico/Coca Cola/Grupo Salinas/Fundacion Azteca/Navex/Red Cross/United Nations/Lego Education/Foundation For a Drug Free World & Tec de Monterrey',
             city='Queretaro',
             state_prov=u'Quer\xe9taro',
             postalcode='76130',
-            country='Mexico'
-        )
+            country='Mexico')
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -703,7 +707,8 @@ class TestLocationHelper(unittest2.TestCase):
         # self.assertEqual(team.normalized_location.formatted_address, u'San Pablo, 76130 Santiago de Quer\xe9taro, Qro., Mexico')
         # self.assertEqual(team.normalized_location.street_number, None)
         # self.assertEqual(team.normalized_location.street, None)
-        self.assertEqual(team.normalized_location.city, u'Santiago de Quer\xe9taro')
+        self.assertEqual(team.normalized_location.city,
+                         u'Santiago de Quer\xe9taro')
         self.assertEqual(team.normalized_location.state_prov, u'Quer\xe9taro')
         self.assertEqual(team.normalized_location.state_prov_short, 'Qro.')
         self.assertEqual(team.normalized_location.country, 'Mexico')
@@ -727,12 +732,12 @@ class TestLocationHelper(unittest2.TestCase):
         # Team 3933 (Mexican team, special symbols, odd school name)
         team = Team(
             id='frc3933',
-            name=u'General Motors Mexico & Tecnol\xe1gico de Monterrey Campus Santa Fe',
+            name=
+            u'General Motors Mexico & Tecnol\xe1gico de Monterrey Campus Santa Fe',
             city='Mexico',
             state_prov='Distrito Federal',
             postalcode='01389',
-            country='Mexico'
-        )
+            country='Mexico')
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -765,12 +770,12 @@ class TestLocationHelper(unittest2.TestCase):
         # Team 6227 (Chinese team, odd school name)
         team = Team(
             id='frc6227',
-            name='The Middle School Attached to Northwestern Polytechnical University / ROBOTERRA & Family Friends',
+            name=
+            'The Middle School Attached to Northwestern Polytechnical University / ROBOTERRA & Family Friends',
             city='Xi\'An',
             state_prov='Shaanxi',
             postalcode=None,
-            country='China'
-        )
+            country='China')
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -803,12 +808,12 @@ class TestLocationHelper(unittest2.TestCase):
         # Team 6228 (Turkish team, odd school name)
         team = Team(
             id='frc6228',
-            name='Ministry of Education/Odeabank/Arena Advertising/Trio Machine/Turkish Airlines/Metalinoks/Sisli Municipality/Hisim Group/Fikret Yuksel Foundation/Metal Yapi & Macka Akif Tuncel Vocational and Technical High School',
+            name=
+            'Ministry of Education/Odeabank/Arena Advertising/Trio Machine/Turkish Airlines/Metalinoks/Sisli Municipality/Hisim Group/Fikret Yuksel Foundation/Metal Yapi & Macka Akif Tuncel Vocational and Technical High School',
             city='Istanbul',
             state_prov='Istanbul',
             postalcode='34367',
-            country='Turkey'
-        )
+            country='Turkey')
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -817,9 +822,12 @@ class TestLocationHelper(unittest2.TestCase):
         # self.assertEqual(team.normalized_location.formatted_address, u'Harbiye, 34367 \u015ei\u015fli/\u0130stanbul, Turkey')
         # self.assertEqual(team.normalized_location.street_number, None)
         # self.assertEqual(team.normalized_location.street, None)
-        self.assertTrue(team.normalized_location.city in {'Istanbul', u'\u0130stanbul'})
-        self.assertTrue(team.normalized_location.state_prov in {'Istanbul', u'\u0130stanbul'})
-        self.assertTrue(team.normalized_location.state_prov_short in {'Istanbul', u'\u0130stanbul'})
+        self.assertTrue(
+            team.normalized_location.city in {'Istanbul', u'\u0130stanbul'})
+        self.assertTrue(team.normalized_location.state_prov in
+                        {'Istanbul', u'\u0130stanbul'})
+        self.assertTrue(team.normalized_location.state_prov_short in
+                        {'Istanbul', u'\u0130stanbul'})
         self.assertEqual(team.normalized_location.country, 'Turkey')
         self.assertEqual(team.normalized_location.country_short, 'TR')
         self.assertEqual(team.normalized_location.postal_code, '34367')
@@ -841,12 +849,12 @@ class TestLocationHelper(unittest2.TestCase):
         # Team 6231 (Turkish team, odd school name)
         team = Team(
             id='frc6231',
-            name=u'Haydar Ak\u0131n Mesleki Teknik Anadolu L\u0131ses\u0131 & Immib Bahcelievler Erkan Avci Mesleki ve Teknik Anadolu Lisesi',
+            name=
+            u'Haydar Ak\u0131n Mesleki Teknik Anadolu L\u0131ses\u0131 & Immib Bahcelievler Erkan Avci Mesleki ve Teknik Anadolu Lisesi',
             city='Istanbul',
             state_prov='Istanbul',
             postalcode=None,
-            country='Turkey'
-        )
+            country='Turkey')
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -855,9 +863,12 @@ class TestLocationHelper(unittest2.TestCase):
         # self.assertEqual(team.normalized_location.formatted_address, u'Bah\xe7elievler, K\xfclt\xfcr Sk. No:3, . K\xfclt\xfcr Sk. Bah\xe7elievler/\u0130stanbul, Turkey')
         # self.assertEqual(team.normalized_location.street_number, '3')
         # self.assertEqual(team.normalized_location.street, u'K\xfclt\xfcr Sokak')
-        self.assertTrue(team.normalized_location.city in {'Istanbul', u'\u0130stanbul'})
-        self.assertTrue(team.normalized_location.state_prov in {'Istanbul', u'\u0130stanbul'})
-        self.assertTrue(team.normalized_location.state_prov_short in {'Istanbul', u'\u0130stanbul'})
+        self.assertTrue(
+            team.normalized_location.city in {'Istanbul', u'\u0130stanbul'})
+        self.assertTrue(team.normalized_location.state_prov in
+                        {'Istanbul', u'\u0130stanbul'})
+        self.assertTrue(team.normalized_location.state_prov_short in
+                        {'Istanbul', u'\u0130stanbul'})
         self.assertEqual(team.normalized_location.country, 'Turkey')
         self.assertEqual(team.normalized_location.country_short, 'TR')
         self.assertEqual(team.normalized_location.postal_code, None)
@@ -867,12 +878,12 @@ class TestLocationHelper(unittest2.TestCase):
         # Team 4403 (Turkish team, odd school name)
         team = Team(
             id='frc4403',
-            name=u'MET MEX PE\xd1OLES, S.A. DE C.V. & Tec de Monterrey Campus Laguna',
+            name=
+            u'MET MEX PE\xd1OLES, S.A. DE C.V. & Tec de Monterrey Campus Laguna',
             city='Torreon',
             state_prov='Coahuila',
             postalcode='27250',
-            country='Mexico'
-        )
+            country='Mexico')
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -882,7 +893,8 @@ class TestLocationHelper(unittest2.TestCase):
         # self.assertEqual(team.normalized_location.street_number, None)
         # self.assertEqual(team.normalized_location.street, None)
         self.assertEqual(team.normalized_location.city, u'Torre\xf3n')
-        self.assertEqual(team.normalized_location.state_prov, 'Coahuila de Zaragoza')
+        self.assertEqual(team.normalized_location.state_prov,
+                         'Coahuila de Zaragoza')
         self.assertEqual(team.normalized_location.state_prov_short, 'Coah.')
         self.assertEqual(team.normalized_location.country, 'Mexico')
         self.assertEqual(team.normalized_location.country_short, 'MX')
@@ -905,12 +917,12 @@ class TestLocationHelper(unittest2.TestCase):
         # Team 3211 (odd location)
         team = Team(
             id='frc3211',
-            name='NRCN / Perrigo / The Yeruham Miami partnership / The Jewish federations of north america / Rashi foundation / Ministry of science / Ministry for the Development of the Negev and Galilee / Automation Yeruham / OPC / Perion / Cimatron / Gazit-Globe / Brand industries / The Yeruham Municipality / Matnas Yeruham / Rotem Industries Ltd. / Ben Gurion University department of mechanical engineering / The Jusidman Center for Science Oriented Youth in Ben-Gurion University & The Yeurham science center & Ort Sapir Yeruham & Belevav Shalem & Kama & IAF Technological College, Be\'er Sheva',
+            name=
+            'NRCN / Perrigo / The Yeruham Miami partnership / The Jewish federations of north america / Rashi foundation / Ministry of science / Ministry for the Development of the Negev and Galilee / Automation Yeruham / OPC / Perion / Cimatron / Gazit-Globe / Brand industries / The Yeruham Municipality / Matnas Yeruham / Rotem Industries Ltd. / Ben Gurion University department of mechanical engineering / The Jusidman Center for Science Oriented Youth in Ben-Gurion University & The Yeurham science center & Ort Sapir Yeruham & Belevav Shalem & Kama & IAF Technological College, Be\'er Sheva',
             city='Yeruham',
             state_prov='HaDarom (Southern)',
             postalcode='80500',
-            country='Israel'
-        )
+            country='Israel')
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return
@@ -921,7 +933,8 @@ class TestLocationHelper(unittest2.TestCase):
         # self.assertEqual(team.normalized_location.street, None)
         self.assertEqual(team.normalized_location.city, 'Yeruham')
         self.assertEqual(team.normalized_location.state_prov, 'South District')
-        self.assertEqual(team.normalized_location.state_prov_short, 'South District')
+        self.assertEqual(team.normalized_location.state_prov_short,
+                         'South District')
         self.assertEqual(team.normalized_location.country, 'Israel')
         self.assertEqual(team.normalized_location.country_short, 'IL')
         self.assertEqual(team.normalized_location.postal_code, None)
@@ -935,8 +948,7 @@ class TestLocationHelper(unittest2.TestCase):
             city='Tahlequah',
             state_prov='Oklahoma',
             postalcode='74465',
-            country='USA'
-        )
+            country='USA')
         LocationHelper.update_team_location(team)
         if not self.test_google_api_key:
             return

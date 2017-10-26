@@ -44,20 +44,28 @@ class DatafeedTwitter(DatafeedBase):
         else:
             return json.loads(self.oauth_req(URL))
 
-    def oauth_req(self, url, http_method="GET", post_body=None,
+    def oauth_req(self,
+                  url,
+                  http_method="GET",
+                  post_body=None,
                   http_headers=None):
 
         twitter_secrets = Sitevar.get_by_id("twitter.secrets")
         if not twitter_secrets:
-            raise Exception("Missing sitevar: twitter.secrets. Cant scrape twitter.")
+            raise Exception(
+                "Missing sitevar: twitter.secrets. Cant scrape twitter.")
 
         TWITTER_CONSUMER_KEY = twitter_secrets.contents['TWITTER_CONSUMER_KEY']
-        TWITTER_CONSUMER_SECRET = twitter_secrets.contents['TWITTER_CONSUMER_SECRET']
+        TWITTER_CONSUMER_SECRET = twitter_secrets.contents[
+            'TWITTER_CONSUMER_SECRET']
         TWITTER_ACCESS_TOKEN = twitter_secrets.contents['TWITTER_ACCESS_TOKEN']
-        TWITTER_ACCESS_TOKEN_SECRET = twitter_secrets.contents['TWITTER_ACCESS_TOKEN_SECRET']
+        TWITTER_ACCESS_TOKEN_SECRET = twitter_secrets.contents[
+            'TWITTER_ACCESS_TOKEN_SECRET']
 
-        consumer = oauth2.Consumer(key=TWITTER_CONSUMER_KEY, secret=TWITTER_CONSUMER_SECRET)
-        token = oauth2.Token(key=TWITTER_ACCESS_TOKEN, secret=TWITTER_ACCESS_TOKEN_SECRET)
+        consumer = oauth2.Consumer(
+            key=TWITTER_CONSUMER_KEY, secret=TWITTER_CONSUMER_SECRET)
+        token = oauth2.Token(
+            key=TWITTER_ACCESS_TOKEN, secret=TWITTER_ACCESS_TOKEN_SECRET)
         client = oauth2.Client(consumer, token)
 
         resp, content = client.request(
@@ -65,6 +73,5 @@ class DatafeedTwitter(DatafeedBase):
             method=http_method,
             body=post_body,
             headers=http_headers,
-            force_auth_header=True
-        )
+            force_auth_header=True)
         return content

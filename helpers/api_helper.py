@@ -15,6 +15,7 @@ from models.team import Team
 
 class ApiHelper(object):
     """Helper for api_controller."""
+
     @classmethod
     def getTeamInfo(cls, team_key):
         """
@@ -36,7 +37,9 @@ class ApiHelper(object):
                 event_teams = EventTeam.query(EventTeam.team == team.key,
                                               EventTeam.year == datetime.now().year)\
                                               .fetch(1000, projection=[EventTeam.event])
-                team_dict["events"] = [event_team.event.id() for event_team in event_teams]
+                team_dict["events"] = [
+                    event_team.event.id() for event_team in event_teams
+                ]
 
                 try:
                     team_dict["location"] = team.location
@@ -44,7 +47,9 @@ class ApiHelper(object):
                     team_dict["region"] = team.state_prov
                     team_dict["country_name"] = team.country
                 except Exception, e:
-                    logging.warning("Failed to include Address for api_team_info_%s: %s" % (team_key, e))
+                    logging.warning(
+                        "Failed to include Address for api_team_info_%s: %s" %
+                        (team_key, e))
 
                 # TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
                 if tba_config.CONFIG["memcache"]:
@@ -86,7 +91,9 @@ class ApiHelper(object):
 
                 event.prepTeamsMatches()
                 event_dict["teams"] = [team.key_name for team in event.teams]
-                event_dict["matches"] = [match.key_name for match in event.matches]
+                event_dict["matches"] = [
+                    match.key_name for match in event.matches
+                ]
 
                 if tba_config.CONFIG["memcache"]:
                     memcache.set(memcache_key, event_dict, 60 * 60)
@@ -102,11 +109,16 @@ class ApiHelper(object):
 
         if event_list is None:
             team = Team.get_by_id(team_dict["key"])
-            events = [a.event.get() for a in EventTeam.query(EventTeam.team == team.key, EventTeam.year == int(year)).fetch(1000)]
+            events = [
+                a.event.get()
+                for a in EventTeam.query(EventTeam.team == team.key, EventTeam.
+                                         year == int(year)).fetch(1000)
+            ]
             events = sorted(events, key=lambda event: event.start_date)
             event_list = [cls.getEventInfo(e.key_name) for e in events]
             for event_dict, event in zip(event_list, events):
-                event_dict["team_wlt"] = EventHelper.getTeamWLT(team_dict["key"], event)
+                event_dict["team_wlt"] = EventHelper.getTeamWLT(
+                    team_dict["key"], event)
 
             # TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
             if tba_config.CONFIG["memcache"]:
@@ -129,8 +141,15 @@ class ApiHelper(object):
         if matches_list is None:
             matches = list()
             team = Team.get_by_id(team_dict["key"])
-            for e in [a.event.get() for a in EventTeam.query(EventTeam.team == team.key).fetch(1000) if a.year == year]:
-                match_list = Match.query(Match.event == event.key, Match.team_key_names == team.key_name).fetch(500)
+            for e in [
+                    a.event.get()
+                    for a in EventTeam.query(
+                        EventTeam.team == team.key).fetch(1000)
+                    if a.year == year
+            ]:
+                match_list = Match.query(
+                    Match.event == event.key,
+                    Match.team_key_names == team.key_name).fetch(500)
                 matches.extend(match_list)
             matches_list = list()
             for match in matches:
@@ -175,7 +194,7 @@ class ApiHelper(object):
             match_dict["videos"] = match.videos
             match_dict["time_string"] = match.time_string
             if match.time is not None:
-                match_dict["time"] =  match.time.strftime("%s")
+                match_dict["time"] = match.time.strftime("%s")
             else:
                 match_dict["time"] = None
 

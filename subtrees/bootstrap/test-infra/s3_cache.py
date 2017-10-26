@@ -15,7 +15,6 @@ from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 from boto.exception import S3ResponseError
 
-
 CONFIG_FILE = './S3Cachefile.json'
 UPLOAD_TODO_FILE = './S3CacheTodo.json'
 BYTES_PER_MB = 1024 * 1024
@@ -91,13 +90,22 @@ def _tarball_filename_for(directory):
 def _create_tarball(directory):
     print("Creating tarball of {}...".format(directory))
     with timer():
-        run(['tar', '-czf', _tarball_filename_for(directory), '-C', dirname(directory), basename(directory)])
+        run([
+            'tar', '-czf',
+            _tarball_filename_for(directory), '-C',
+            dirname(directory),
+            basename(directory)
+        ])
 
 
 def _extract_tarball(directory):
     print("Extracting tarball of {}...".format(directory))
     with timer():
-        run(['tar', '-xzf', _tarball_filename_for(directory), '-C', dirname(directory)])
+        run([
+            'tar', '-xzf',
+            _tarball_filename_for(directory), '-C',
+            dirname(directory)
+        ])
 
 
 def download(directory):
@@ -116,7 +124,8 @@ def download(directory):
 
 def upload(directory):
     _create_tarball(directory)
-    print("Uploading {} tarball to S3... ({})".format(cache_name, _tarball_size(directory)))
+    print("Uploading {} tarball to S3... ({})".format(
+        cache_name, _tarball_size(directory)))
     with timer():
         key.set_contents_from_filename(_tarball_filename_for(directory))
     print("{} cache successfully updated.".format(cache_name))
@@ -147,7 +156,9 @@ if __name__ == '__main__':
         directory = expandvars(cache_info["cache"])
     except (TypeError, KeyError) as load_err:
         print(load_err)
-        raise SystemExit("Config for cache named {!r} is missing or malformed!".format(cache_name))
+        raise SystemExit(
+            "Config for cache named {!r} is missing or malformed!".format(
+                cache_name))
 
     try:
         try:
@@ -179,6 +190,7 @@ if __name__ == '__main__':
             raise
         print("Error!:", exc)
         print("Unable to download from cache.")
-        print("Running fallback command to generate cache directory {!r}: {}".format(directory, fallback_cmd))
+        print("Running fallback command to generate cache directory {!r}: {}".
+              format(directory, fallback_cmd))
         with timer():
             run(fallback_cmd, shell=True)

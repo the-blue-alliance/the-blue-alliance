@@ -40,10 +40,8 @@ class NotificationType(object):
         BROADCAST: "broadcast",
         MATCH_VIDEO: "match_video",
         EVENT_MATCH_VIDEO: "event_match_video",
-
         UPDATE_FAVORITES: "update_favorites",
         UPDATE_SUBSCRIPTION: "update_subscriptions",
-
         VERIFICATION: "verification"
     }
 
@@ -73,10 +71,8 @@ class NotificationType(object):
         "final_results": FINAL_RESULTS,
         "match_video": MATCH_VIDEO,
         "event_match_video": EVENT_MATCH_VIDEO,
-
         "update_favorites": UPDATE_FAVORITES,
         "update_subscriptions": UPDATE_SUBSCRIPTION,
-
         "verification": VERIFICATION
     }
 

@@ -14,6 +14,7 @@ class SuggestEventMediaController(LoggedInHandler):
     """
     Allow users to suggest a playlist of YouTube videos for matches
     """
+
     def get(self):
         self._require_registration()
 
@@ -36,7 +37,9 @@ class SuggestEventMediaController(LoggedInHandler):
             "event": event,
         })
 
-        self.response.out.write(jinja2_engine.render('suggestions/suggest_event_media.html', self.template_values))
+        self.response.out.write(
+            jinja2_engine.render('suggestions/suggest_event_media.html',
+                                 self.template_values))
 
     def post(self):
         self._require_registration()
@@ -56,10 +59,11 @@ class SuggestEventMediaController(LoggedInHandler):
                 if slack_url:
                     message_body = "{0} ({1}) has suggested a video for <https://thebluealliance.com/event/{2}|{2}>: https://youtu.be/{3}.\nSee all suggestions at https://www.thebluealliance.com/suggest/event/media/review".format(
                         self.user_bundle.account.display_name,
-                        self.user_bundle.account.email,
-                        event_key,
+                        self.user_bundle.account.email, event_key,
                         suggestion.contents['foreign_key'])
 
-                    OutgoingNotificationHelper.send_slack_alert(slack_url, message_body, [])
+                    OutgoingNotificationHelper.send_slack_alert(
+                        slack_url, message_body, [])
 
-        self.redirect('/suggest/event/media?event_key=%s&status=%s' % (event_key, status))
+        self.redirect('/suggest/event/media?event_key=%s&status=%s' %
+                      (event_key, status))

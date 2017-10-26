@@ -45,12 +45,15 @@ class FMSAPIAwardsEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting awards
     """
+
     def get(self, when):
         if when == "now":
             events = EventHelper.getEventsWithinADay()
             events = filter(lambda e: e.official, events)
         else:
-            event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
+            event_keys = Event.query(Event.official == True).filter(
+                Event.year == int(when)).fetch(
+                    500, keys_only=True)
             events = ndb.get_multi(event_keys)
 
         for event in events:
@@ -63,7 +66,9 @@ class FMSAPIAwardsEnqueue(webapp.RequestHandler):
         }
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
-            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_awards_enqueue.html')
+            path = os.path.join(
+                os.path.dirname(__file__),
+                '../templates/datafeeds/usfirst_awards_enqueue.html')
             self.response.out.write(template.render(path, template_values))
 
 
@@ -71,6 +76,7 @@ class FMSAPIAwardsGet(webapp.RequestHandler):
     """
     Handles updating awards
     """
+
     def get(self, event_key):
         datafeed = DatafeedFMSAPI('v2.0', save_response=True)
 
@@ -87,26 +93,29 @@ class FMSAPIAwardsGet(webapp.RequestHandler):
         for award in new_awards:
             for team in award.team_list:
                 team_ids.add(team.id())
-        teams = TeamManipulator.createOrUpdate([Team(
-            id=team_id,
-            team_number=int(team_id[3:]))
-            for team_id in team_ids])
+        teams = TeamManipulator.createOrUpdate([
+            Team(id=team_id, team_number=int(team_id[3:]))
+            for team_id in team_ids
+        ])
         if teams:
             if type(teams) is not list:
                 teams = [teams]
-            event_teams = EventTeamManipulator.createOrUpdate([EventTeam(
-                id=event_key + "_" + team.key.id(),
-                event=event.key,
-                team=team.key,
-                year=event.year)
-                for team in teams])
+            event_teams = EventTeamManipulator.createOrUpdate([
+                EventTeam(
+                    id=event_key + "_" + team.key.id(),
+                    event=event.key,
+                    team=team.key,
+                    year=event.year) for team in teams
+            ])
 
         template_values = {
             'awards': new_awards,
         }
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
-            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_awards_get.html')
+            path = os.path.join(
+                os.path.dirname(__file__),
+                '../templates/datafeeds/usfirst_awards_get.html')
             self.response.out.write(template.render(path, template_values))
 
 
@@ -114,6 +123,7 @@ class FMSAPIEventAlliancesEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting alliances
     """
+
     def get(self, when):
         if when == "now":
             events = EventHelper.getEventsWithinADay()
@@ -122,7 +132,9 @@ class FMSAPIEventAlliancesEnqueue(webapp.RequestHandler):
             events = EventHelper.getEventsWithinADay()
             events = filter(lambda e: e.official and e.ends_today, events)
         else:
-            event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
+            event_keys = Event.query(Event.official == True).filter(
+                Event.year == int(when)).fetch(
+                    500, keys_only=True)
             events = ndb.get_multi(event_keys)
 
         for event in events:
@@ -131,12 +143,12 @@ class FMSAPIEventAlliancesEnqueue(webapp.RequestHandler):
                 url='/tasks/get/fmsapi_event_alliances/' + event.key_name,
                 method='GET')
 
-        template_values = {
-            'events': events
-        }
+        template_values = {'events': events}
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
-            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_alliances_enqueue.html')
+            path = os.path.join(
+                os.path.dirname(__file__),
+                '../templates/datafeeds/usfirst_event_alliances_enqueue.html')
             self.response.out.write(template.render(path, template_values))
 
 
@@ -144,6 +156,7 @@ class FMSAPIEventAlliancesGet(webapp.RequestHandler):
     """
     Handles updating an event's alliances
     """
+
     def get(self, event_key):
         df = DatafeedFMSAPI('v2.0', save_response=True)
 
@@ -152,16 +165,18 @@ class FMSAPIEventAlliancesGet(webapp.RequestHandler):
         alliance_selections = df.getEventAlliances(event_key)
 
         event_details = EventDetails(
-            id=event_key,
-            alliance_selections=alliance_selections
-        )
+            id=event_key, alliance_selections=alliance_selections)
         EventDetailsManipulator.createOrUpdate(event_details)
 
-        template_values = {'alliance_selections': alliance_selections,
-                           'event_name': event_details.key.id()}
+        template_values = {
+            'alliance_selections': alliance_selections,
+            'event_name': event_details.key.id()
+        }
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
-            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_alliances_get.html')
+            path = os.path.join(
+                os.path.dirname(__file__),
+                '../templates/datafeeds/usfirst_event_alliances_get.html')
             self.response.out.write(template.render(path, template_values))
 
 
@@ -169,12 +184,15 @@ class FMSAPIEventRankingsEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting rankings
     """
+
     def get(self, when):
         if when == "now":
             events = EventHelper.getEventsWithinADay()
             events = filter(lambda e: e.official, events)
         else:
-            event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
+            event_keys = Event.query(Event.official == True).filter(
+                Event.year == int(when)).fetch(
+                    500, keys_only=True)
             events = ndb.get_multi(event_keys)
 
         for event in events:
@@ -188,7 +206,9 @@ class FMSAPIEventRankingsEnqueue(webapp.RequestHandler):
         }
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
-            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_rankings_enqueue.html')
+            path = os.path.join(
+                os.path.dirname(__file__),
+                '../templates/datafeeds/usfirst_event_rankings_enqueue.html')
             self.response.out.write(template.render(path, template_values))
 
 
@@ -196,23 +216,25 @@ class FMSAPIEventRankingsGet(webapp.RequestHandler):
     """
     Handles updating an event's rankings
     """
+
     def get(self, event_key):
         df = DatafeedFMSAPI('v2.0', save_response=True)
 
         rankings, rankings2 = df.getEventRankings(event_key)
 
         event_details = EventDetails(
-            id=event_key,
-            rankings=rankings,
-            rankings2=rankings2
-        )
+            id=event_key, rankings=rankings, rankings2=rankings2)
         EventDetailsManipulator.createOrUpdate(event_details)
 
-        template_values = {'rankings': rankings,
-                           'event_name': event_details.key.id()}
+        template_values = {
+            'rankings': rankings,
+            'event_name': event_details.key.id()
+        }
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
-            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_rankings_get.html')
+            path = os.path.join(
+                os.path.dirname(__file__),
+                '../templates/datafeeds/usfirst_event_rankings_get.html')
             self.response.out.write(template.render(path, template_values))
 
 
@@ -220,12 +242,15 @@ class FMSAPIMatchesEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting match results
     """
+
     def get(self, when):
         if when == "now":
             events = EventHelper.getEventsWithinADay()
             events = filter(lambda e: e.official, events)
         else:
-            event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
+            event_keys = Event.query(Event.official == True).filter(
+                Event.year == int(when)).fetch(
+                    500, keys_only=True)
             events = ndb.get_multi(event_keys)
 
         for event in events:
@@ -239,7 +264,9 @@ class FMSAPIMatchesEnqueue(webapp.RequestHandler):
         }
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
-            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_matches_enqueue.html')
+            path = os.path.join(
+                os.path.dirname(__file__),
+                '../templates/datafeeds/usfirst_matches_enqueue.html')
             self.response.out.write(template.render(path, template_values))
 
 
@@ -247,23 +274,24 @@ class FMSAPIMatchesGet(webapp.RequestHandler):
     """
     Handles updating matches
     """
+
     def get(self, event_key):
         df = DatafeedFMSAPI('v2.0', save_response=True)
 
         new_matches = MatchManipulator.createOrUpdate(
             MatchHelper.deleteInvalidMatches(
-                df.getMatches(event_key),
-                Event.get_by_id(event_key)
-            )
-        )
+                df.getMatches(event_key), Event.get_by_id(event_key)))
 
         template_values = {
             'matches': new_matches,
         }
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
-            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_matches_get.html')
+            path = os.path.join(
+                os.path.dirname(__file__),
+                '../templates/datafeeds/usfirst_matches_get.html')
             self.response.out.write(template.render(path, template_values))
+
 
 # TODO: Currently unused
 
@@ -285,7 +313,6 @@ class FMSAPIMatchesGet(webapp.RequestHandler):
 #         # FIXME omg we're just writing out? -gregmarra 2012 Aug 26
 #         self.response.out.write("%s team gets have been enqueued offset from %s.<br />" % (len(teams), offset))
 #         self.response.out.write("Reload with ?offset=%s to enqueue more." % (offset + len(teams)))
-
 
 # class TeamDetailsRollingEnqueue(webapp.RequestHandler):
 #     """
@@ -324,6 +351,7 @@ class TeamDetailsGet(webapp.RequestHandler):
     Fetches team details
     FMSAPI should be trusted over FIRSTElasticSearch
     """
+
     def get(self, key_name):
         existing_team = Team.get_by_id(key_name)
 
@@ -340,7 +368,8 @@ class TeamDetailsGet(webapp.RequestHandler):
             robot = None
 
         if team:
-            team = TeamManipulator.mergeModels(team, df2.getTeamDetails(existing_team))
+            team = TeamManipulator.mergeModels(
+                team, df2.getTeamDetails(existing_team))
         else:
             team = df2.getTeamDetails(existing_team)
 
@@ -359,7 +388,8 @@ class TeamDetailsGet(webapp.RequestHandler):
         DistrictTeamManipulator.delete_keys(keys_to_delete)
 
         if district_team:
-            district_team = DistrictTeamManipulator.createOrUpdate(district_team)
+            district_team = DistrictTeamManipulator.createOrUpdate(
+                district_team)
 
         if robot:
             robot = RobotManipulator.createOrUpdate(robot)
@@ -373,7 +403,9 @@ class TeamDetailsGet(webapp.RequestHandler):
         }
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
-            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_team_details_get.html')
+            path = os.path.join(
+                os.path.dirname(__file__),
+                '../templates/datafeeds/usfirst_team_details_get.html')
             self.response.out.write(template.render(path, template_values))
 
 
@@ -381,22 +413,21 @@ class EventListEnqueue(webapp.RequestHandler):
     """
     Handles enqueing fetching a year's worth of events from FMSAPI
     """
+
     def get(self, year):
 
         taskqueue.add(
             queue_name='datafeed',
             target='backend-tasks',
             url='/backend-tasks/get/event_list/' + year,
-            method='GET'
-        )
+            method='GET')
 
-        template_values = {
-            'year': year,
-            'event_count': year
-        }
+        template_values = {'year': year, 'event_count': year}
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
-            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_events_details_enqueue.html')
+            path = os.path.join(
+                os.path.dirname(__file__),
+                '../templates/datafeeds/usfirst_events_details_enqueue.html')
             self.response.out.write(template.render(path, template_values))
 
 
@@ -405,13 +436,15 @@ class EventListGet(webapp.RequestHandler):
     Fetch one year of events
     FMSAPI should be trusted over FIRSTElasticSearch
     """
+
     def get(self, year):
         df = DatafeedFMSAPI('v2.0')
         df2 = DatafeedFIRSTElasticSearch()
 
         fmsapi_events, fmsapi_districts = df.getEventList(year)
         elasticsearch_events = df2.getEventList(year)
-        merged_events = EventManipulator.mergeModels(fmsapi_events, elasticsearch_events)
+        merged_events = EventManipulator.mergeModels(fmsapi_events,
+                                                     elasticsearch_events)
         events = EventManipulator.createOrUpdate(merged_events)
         districts = DistrictManipulator.createOrUpdate(fmsapi_districts)
 
@@ -420,9 +453,8 @@ class EventListGet(webapp.RequestHandler):
             taskqueue.add(
                 queue_name='datafeed',
                 target='backend-tasks',
-                url='/backend-tasks/get/event_details/'+event.key_name,
-                method='GET'
-            )
+                url='/backend-tasks/get/event_details/' + event.key_name,
+                method='GET')
 
         template_values = {
             "events": events,
@@ -430,7 +462,9 @@ class EventListGet(webapp.RequestHandler):
         }
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
-            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fms_event_list_get.html')
+            path = os.path.join(
+                os.path.dirname(__file__),
+                '../templates/datafeeds/fms_event_list_get.html')
             self.response.out.write(template.render(path, template_values))
 
 
@@ -438,19 +472,20 @@ class EventDetailsEnqueue(webapp.RequestHandler):
     """
     Handlers enqueueing fetching event details, event teams, and team details
     """
+
     def get(self, event_key):
         taskqueue.add(
             queue_name='datafeed',
             target='backend-tasks',
-            url='/backend-tasks/get/event_details/'+event_key,
+            url='/backend-tasks/get/event_details/' + event_key,
             method='GET')
 
-        template_values = {
-            'event_key': event_key
-        }
+        template_values = {'event_key': event_key}
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
-            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fmsapi_eventteams_enqueue.html')
+            path = os.path.join(
+                os.path.dirname(__file__),
+                '../templates/datafeeds/fmsapi_eventteams_enqueue.html')
             self.response.out.write(template.render(path, template_values))
 
 
@@ -459,6 +494,7 @@ class EventDetailsGet(webapp.RequestHandler):
     Fetch event details, event teams, and team details
     FMSAPI should be trusted over FIRSTElasticSearch
     """
+
     def get(self, event_key):
         df = DatafeedFMSAPI('v2.0')
         df2 = DatafeedFIRSTElasticSearch()
@@ -468,9 +504,8 @@ class EventDetailsGet(webapp.RequestHandler):
         # Update event
         fmsapi_events, fmsapi_districts = df.getEventDetails(event_key)
         elasticsearch_events = df2.getEventDetails(event)
-        updated_event = EventManipulator.mergeModels(
-            fmsapi_events,
-            elasticsearch_events)
+        updated_event = EventManipulator.mergeModels(fmsapi_events,
+                                                     elasticsearch_events)
         if updated_event:
             event = EventManipulator.createOrUpdate(updated_event)
         DistrictManipulator.createOrUpdate(fmsapi_districts)
@@ -508,18 +543,22 @@ class EventDetailsGet(webapp.RequestHandler):
         events_without_eventteams = cmp_hack_sitevar.contents.get('skip_eventteams', []) \
             if cmp_hack_sitevar else []
         skip_eventteams = event_key in events_without_eventteams
-        event_teams = [EventTeam(
-            id=event.key_name + "_" + team.key_name,
-            event=event.key,
-            team=team.key,
-            year=event.year)
-            for team in teams] if not skip_eventteams else []
+        event_teams = [
+            EventTeam(
+                id=event.key_name + "_" + team.key_name,
+                event=event.key,
+                team=team.key,
+                year=event.year) for team in teams
+        ] if not skip_eventteams else []
 
         # Delete eventteams of teams that are no longer registered
         if event_teams and not skip_eventteams:
-            existing_event_team_keys = set(EventTeam.query(EventTeam.event == event.key).fetch(1000, keys_only=True))
+            existing_event_team_keys = set(
+                EventTeam.query(EventTeam.event == event.key).fetch(
+                    1000, keys_only=True))
             event_team_keys = set([et.key for et in event_teams])
-            et_keys_to_delete = existing_event_team_keys.difference(event_team_keys)
+            et_keys_to_delete = existing_event_team_keys.difference(
+                event_team_keys)
             EventTeamManipulator.delete_keys(et_keys_to_delete)
 
             event_teams = EventTeamManipulator.createOrUpdate(event_teams)
@@ -532,7 +571,9 @@ class EventDetailsGet(webapp.RequestHandler):
         }
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
-            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_details_get.html')
+            path = os.path.join(
+                os.path.dirname(__file__),
+                '../templates/datafeeds/usfirst_event_details_get.html')
             self.response.out.write(template.render(path, template_values))
 
 
@@ -540,20 +581,22 @@ class TbaVideosEnqueue(webapp.RequestHandler):
     """
     Handles enqueing grabing tba_videos for Matches at individual Events.
     """
+
     def get(self):
         events = Event.query()
 
         for event in events:
             taskqueue.add(
-                url='/tasks/get/tba_videos/' + event.key_name,
-                method='GET')
+                url='/tasks/get/tba_videos/' + event.key_name, method='GET')
 
         template_values = {
             'event_count': Event.query().count(),
         }
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
-            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_enqueue.html')
+            path = os.path.join(
+                os.path.dirname(__file__),
+                '../templates/datafeeds/tba_videos_enqueue.html')
             self.response.out.write(template.render(path, template_values))
 
 
@@ -561,6 +604,7 @@ class TbaVideosGet(webapp.RequestHandler):
     """
     Handles reading a TBA video listing page and updating the match objects in the datastore as needed.
     """
+
     def get(self, event_key):
         df = DatafeedTba()
 
@@ -586,7 +630,9 @@ class TbaVideosGet(webapp.RequestHandler):
         }
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
-            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_get.html')
+            path = os.path.join(
+                os.path.dirname(__file__),
+                '../templates/datafeeds/tba_videos_get.html')
             self.response.out.write(template.render(path, template_values))
 
 
@@ -594,6 +640,7 @@ class HallOfFameTeamsGet(webapp.RequestHandler):
     """
     Handles scraping the list of Hall of Fame teams from FIRST resource library.
     """
+
     def get(self):
         df = DatafeedResourceLibrary()
 
@@ -601,34 +648,44 @@ class HallOfFameTeamsGet(webapp.RequestHandler):
         if teams:
             media_to_update = []
             for team in teams:
-                team_reference = Media.create_reference('team', team['team_id'])
+                team_reference = Media.create_reference(
+                    'team', team['team_id'])
 
                 video_foreign_key = team['video']
                 if video_foreign_key:
-                    media_to_update.append(Media(id=Media.render_key_name(MediaType.YOUTUBE_VIDEO, video_foreign_key),
-                                                 media_type_enum=MediaType.YOUTUBE_VIDEO,
-                                                 media_tag_enum=[MediaTag.CHAIRMANS_VIDEO],
-                                                 references=[team_reference],
-                                                 year=team['year'],
-                                                 foreign_key=video_foreign_key))
+                    media_to_update.append(
+                        Media(
+                            id=Media.render_key_name(MediaType.YOUTUBE_VIDEO,
+                                                     video_foreign_key),
+                            media_type_enum=MediaType.YOUTUBE_VIDEO,
+                            media_tag_enum=[MediaTag.CHAIRMANS_VIDEO],
+                            references=[team_reference],
+                            year=team['year'],
+                            foreign_key=video_foreign_key))
 
                 presentation_foreign_key = team['presentation']
                 if presentation_foreign_key:
-                    media_to_update.append(Media(id=Media.render_key_name(MediaType.YOUTUBE_VIDEO, presentation_foreign_key),
-                                                 media_type_enum=MediaType.YOUTUBE_VIDEO,
-                                                 media_tag_enum=[MediaTag.CHAIRMANS_PRESENTATION],
-                                                 references=[team_reference],
-                                                 year=team['year'],
-                                                 foreign_key=presentation_foreign_key))
+                    media_to_update.append(
+                        Media(
+                            id=Media.render_key_name(MediaType.YOUTUBE_VIDEO,
+                                                     presentation_foreign_key),
+                            media_type_enum=MediaType.YOUTUBE_VIDEO,
+                            media_tag_enum=[MediaTag.CHAIRMANS_PRESENTATION],
+                            references=[team_reference],
+                            year=team['year'],
+                            foreign_key=presentation_foreign_key))
 
                 essay_foreign_key = team['essay']
                 if essay_foreign_key:
-                    media_to_update.append(Media(id=Media.render_key_name(MediaType.EXTERNAL_LINK, essay_foreign_key),
-                                                 media_type_enum=MediaType.EXTERNAL_LINK,
-                                                 media_tag_enum=[MediaTag.CHAIRMANS_ESSAY],
-                                                 references=[team_reference],
-                                                 year=team['year'],
-                                                 foreign_key=essay_foreign_key))
+                    media_to_update.append(
+                        Media(
+                            id=Media.render_key_name(MediaType.EXTERNAL_LINK,
+                                                     essay_foreign_key),
+                            media_type_enum=MediaType.EXTERNAL_LINK,
+                            media_tag_enum=[MediaTag.CHAIRMANS_ESSAY],
+                            references=[team_reference],
+                            year=team['year'],
+                            foreign_key=essay_foreign_key))
 
             MediaManipulator.createOrUpdate(media_to_update)
         else:
@@ -640,5 +697,7 @@ class HallOfFameTeamsGet(webapp.RequestHandler):
         }
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
-            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/hall_of_fame_teams_get.html')
+            path = os.path.join(
+                os.path.dirname(__file__),
+                '../templates/datafeeds/hall_of_fame_teams_get.html')
             self.response.out.write(template.render(path, template_values))

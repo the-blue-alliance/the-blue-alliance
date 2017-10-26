@@ -1,6 +1,5 @@
 from google.appengine.ext import ndb
 
-
 CACHE_DATA = {}
 
 

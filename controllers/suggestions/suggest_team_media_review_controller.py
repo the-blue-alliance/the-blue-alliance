@@ -25,58 +25,74 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
     """
     View the list of suggestions.
     """
+
     def get(self):
         suggestions = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
-            Suggestion.target_model == "media").fetch(limit=50)
+                Suggestion.target_model == "media").fetch(limit=50)
 
         # Quick and dirty way to group images together
-        suggestions = sorted(suggestions, key=lambda x: 0 if x.contents['media_type_enum'] in MediaType.image_types else 1)
+        suggestions = sorted(
+            suggestions,
+            key=
+            lambda x: 0 if x.contents['media_type_enum'] in MediaType.image_types else 1
+        )
 
         reference_keys = []
         existing_preferred_keys_futures = []
         for suggestion in suggestions:
             reference_key = suggestion.contents['reference_key']
             reference = Media.create_reference(
-                suggestion.contents['reference_type'],
-                reference_key)
+                suggestion.contents['reference_type'], reference_key)
             reference_keys.append(reference)
 
             if 'details_json' in suggestion.contents:
-                suggestion.details = json.loads(suggestion.contents['details_json'])
+                suggestion.details = json.loads(
+                    suggestion.contents['details_json'])
                 if 'image_partial' in suggestion.details:
-                    suggestion.details['thumbnail'] = suggestion.details['image_partial'].replace('_l', '_m')
+                    suggestion.details['thumbnail'] = suggestion.details[
+                        'image_partial'].replace('_l', '_m')
 
             # Find existing preferred images
             existing_preferred_keys_futures.append(
                 Media.query(
                     Media.media_type_enum.IN(MediaType.image_types),
-                    Media.references==reference,
-                    Media.preferred_references==reference,
-                    Media.year==suggestion.contents['year'],
-                ).fetch_async(keys_only=True)
-            )
+                    Media.references == reference,
+                    Media.preferred_references == reference,
+                    Media.year == suggestion.contents['year'],
+                ).fetch_async(keys_only=True))
 
         reference_futures = ndb.get_multi_async(reference_keys)
-        existing_preferred_futures = map(lambda x: ndb.get_multi_async(x.get_result()), existing_preferred_keys_futures)
+        existing_preferred_futures = map(
+            lambda x: ndb.get_multi_async(x.get_result()),
+            existing_preferred_keys_futures)
 
         references = map(lambda r: r.get_result(), reference_futures)
-        existing_preferred = map(lambda l: map(lambda x: x.get_result(), l),  existing_preferred_futures)
+        existing_preferred = map(lambda l: map(lambda x: x.get_result(), l),
+                                 existing_preferred_futures)
 
-        suggestions_and_references_and_preferred = zip(suggestions, references, existing_preferred)
+        suggestions_and_references_and_preferred = zip(suggestions, references,
+                                                       existing_preferred)
 
         self.template_values.update({
-            "suggestions_and_references_and_preferred": suggestions_and_references_and_preferred,
-            "max_preferred": Media.MAX_PREFERRED,
+            "suggestions_and_references_and_preferred":
+            suggestions_and_references_and_preferred,
+            "max_preferred":
+            Media.MAX_PREFERRED,
         })
 
-        self.response.out.write(jinja2_engine.render('suggestions/suggest_team_media_review_list.html', self.template_values))
+        self.response.out.write(
+            jinja2_engine.render(
+                'suggestions/suggest_team_media_review_list.html',
+                self.template_values))
 
     def create_target_model(self, suggestion):
         # Setup
         to_replace = None
-        to_replace_id = self.request.POST.get('replace-preferred-{}'.format(suggestion.key.id()), None)
-        year = int(self.request.POST.get('year-{}'.format(suggestion.key.id())))
+        to_replace_id = self.request.POST.get('replace-preferred-{}'.format(
+            suggestion.key.id()), None)
+        year = int(
+            self.request.POST.get('year-{}'.format(suggestion.key.id())))
 
         # Override year if necessary
         suggestion.contents['year'] = year
@@ -97,10 +113,14 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
         # Add preferred reference to current Media (images only) if explicitly listed in preferred_keys or if to_replace_id exists
         media_type_enum = suggestion.contents['media_type_enum']
         preferred_references = []
-        if media_type_enum in MediaType.image_types and ('preferred::{}'.format(suggestion.key.id()) in self.preferred_keys or to_replace_id):
+        if media_type_enum in MediaType.image_types and (
+                'preferred::{}'.format(
+                    suggestion.key.id()) in self.preferred_keys
+                or to_replace_id):
             preferred_references = [team_reference]
 
-        media = MediaCreator.create_media_model(suggestion, team_reference, preferred_references)
+        media = MediaCreator.create_media_model(suggestion, team_reference,
+                                                preferred_references)
 
         # Do all DB writes
         if to_replace:

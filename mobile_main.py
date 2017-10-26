@@ -54,15 +54,20 @@ if tba_config.DEBUG:
     client_ids.append(endpoints.API_EXPLORER_CLIENT_ID)
 
 
-@endpoints.api(name='tbaMobile', version='v9', description="API for TBA Mobile clients",
-               allowed_client_ids=client_ids,
-               audiences=[ANDROID_AUDIENCE],
-               scopes=[endpoints.EMAIL_SCOPE])
+@endpoints.api(
+    name='tbaMobile',
+    version='v9',
+    description="API for TBA Mobile clients",
+    allowed_client_ids=client_ids,
+    audiences=[ANDROID_AUDIENCE],
+    scopes=[endpoints.EMAIL_SCOPE])
 class MobileAPI(remote.Service):
-
-    @endpoints.method(RegistrationRequest, BaseResponse,
-                      path='register', http_method='POST',
-                      name='register')
+    @endpoints.method(
+        RegistrationRequest,
+        BaseResponse,
+        path='register',
+        http_method='POST',
+        name='register')
     def register_client(self, request):
         current_user = endpoints.get_current_user()
         if current_user is None:
@@ -73,10 +78,9 @@ class MobileAPI(remote.Service):
         name = request.name
         uuid = request.device_uuid
 
-        query = MobileClient.query(
-                MobileClient.user_id == user_id,
-                MobileClient.device_uuid == uuid,
-                MobileClient.client_type == os)
+        query = MobileClient.query(MobileClient.user_id == user_id,
+                                   MobileClient.device_uuid == uuid,
+                                   MobileClient.client_type == os)
         # trying to figure out an elusive dupe bug
         logging.info("DEBUGGING")
         logging.info("User ID: {}".format(user_id))
@@ -100,9 +104,12 @@ class MobileAPI(remote.Service):
             client.put()
             return BaseResponse(code=304, message="Client already exists")
 
-    @endpoints.method(RegistrationRequest, BaseResponse,
-                      path='unregister', http_method='POST',
-                      name='unregister')
+    @endpoints.method(
+        RegistrationRequest,
+        BaseResponse,
+        path='unregister',
+        http_method='POST',
+        name='unregister')
     def unregister_client(self, request):
         current_user = endpoints.get_current_user()
         if current_user is None:
@@ -113,14 +120,18 @@ class MobileAPI(remote.Service):
             .fetch(keys_only=True)
         if len(query) == 0:
             # Record doesn't exist, so we can't remove it
-            return BaseResponse(code=404, message="User doesn't exist. Can't remove it")
+            return BaseResponse(
+                code=404, message="User doesn't exist. Can't remove it")
         else:
             ndb.delete_multi(query)
             return BaseResponse(code=200, message="User deleted")
 
-    @endpoints.method(message_types.VoidMessage, FavoriteCollection,
-                      path='favorites/list', http_method='POST',
-                      name='favorites.list')
+    @endpoints.method(
+        message_types.VoidMessage,
+        FavoriteCollection,
+        path='favorites/list',
+        http_method='POST',
+        name='favorites.list')
     def list_favorites(self, request):
         current_user = endpoints.get_current_user()
         if current_user is None:
@@ -130,16 +141,23 @@ class MobileAPI(remote.Service):
         favorites = Favorite.query(ancestor=ndb.Key(Account, user_id)).fetch()
         output = []
         for favorite in favorites:
-            output.append(FavoriteMessage(model_key=favorite.model_key, model_type=favorite.model_type))
+            output.append(
+                FavoriteMessage(
+                    model_key=favorite.model_key,
+                    model_type=favorite.model_type))
         return FavoriteCollection(favorites=output)
 
-    @endpoints.method(ModelPreferenceMessage, BaseResponse,
-                      path="model/setPreferences", http_method="POST",
-                      name="model.setPreferences")
+    @endpoints.method(
+        ModelPreferenceMessage,
+        BaseResponse,
+        path="model/setPreferences",
+        http_method="POST",
+        name="model.setPreferences")
     def update_model_preferences(self, request):
         current_user = endpoints.get_current_user()
         if current_user is None:
-            return BaseResponse(code=401, message="Unauthorized to update model preferences")
+            return BaseResponse(
+                code=401, message="Unauthorized to update model preferences")
         user_id = PushHelper.user_email_to_id(current_user.email())
         model_key = request.model_key
         model_type = request.model_type
@@ -151,34 +169,43 @@ class MobileAPI(remote.Service):
                 parent=ndb.Key(Account, user_id),
                 user_id=user_id,
                 model_key=model_key,
-                model_type=model_type
-            )
+                model_type=model_type)
             result = MyTBAHelper.add_favorite(fav, request.device_key)
             if result == 200:
-                output['favorite'] = {"code":    200,
-                                      "message": "Favorite added"}
+                output['favorite'] = {"code": 200, "message": "Favorite added"}
                 code += 100
             elif result == 304:
-                output['favorite'] = {"code":    304,
-                                      "message": "Favorite already exists"}
+                output['favorite'] = {
+                    "code": 304,
+                    "message": "Favorite already exists"
+                }
                 code += 304
             else:
-                output['favorite'] = {"code":    500,
-                                      "message": "Unknown error adding favorite"}
+                output['favorite'] = {
+                    "code": 500,
+                    "message": "Unknown error adding favorite"
+                }
                 code += 500
         else:
-            result = MyTBAHelper.remove_favorite(user_id, model_key, model_type, request.device_key)
+            result = MyTBAHelper.remove_favorite(
+                user_id, model_key, model_type, request.device_key)
             if result == 200:
-                output['favorite'] = {"code":    200,
-                                      "message": "Favorite deleted"}
+                output['favorite'] = {
+                    "code": 200,
+                    "message": "Favorite deleted"
+                }
                 code += 100
             elif result == 404:
-                output['favorite'] = {"code":    404,
-                                      "message": "Favorite not found"}
+                output['favorite'] = {
+                    "code": 404,
+                    "message": "Favorite not found"
+                }
                 code += 404
             else:
-                output['favorite'] = {"code":    500,
-                                      "message": "Unknown error removing favorite"}
+                output['favorite'] = {
+                    "code": 500,
+                    "message": "Unknown error removing favorite"
+                }
                 code += 500
 
         if request.notifications:
@@ -187,63 +214,86 @@ class MobileAPI(remote.Service):
                 user_id=user_id,
                 model_key=model_key,
                 model_type=request.model_type,
-                notification_types=PushHelper.notification_enums_from_string(request.notifications)
-            )
+                notification_types=PushHelper.notification_enums_from_string(
+                    request.notifications))
             result = MyTBAHelper.add_subscription(sub, request.device_key)
             if result == 200:
-                output['subscription'] = {"code":    200,
-                                          "message": "Subscription updated"}
+                output['subscription'] = {
+                    "code": 200,
+                    "message": "Subscription updated"
+                }
                 code += 100
             elif result == 304:
-                output['subscription'] = {"code":    304,
-                                          "message": "Subscription already exists"}
+                output['subscription'] = {
+                    "code": 304,
+                    "message": "Subscription already exists"
+                }
                 code += 304
             else:
-                output['subscription'] = {"code":    500,
-                                          "message": "Unknown error adding favorite"}
+                output['subscription'] = {
+                    "code": 500,
+                    "message": "Unknown error adding favorite"
+                }
                 code += 500
         else:
-            result = MyTBAHelper.remove_subscription(user_id, model_key, model_type, request.device_key)
+            result = MyTBAHelper.remove_subscription(
+                user_id, model_key, model_type, request.device_key)
             if result == 200:
-                output['subscription'] = {"code":    200,
-                                          "message": "Subscription removed"}
+                output['subscription'] = {
+                    "code": 200,
+                    "message": "Subscription removed"
+                }
                 code += 100
             elif result == 404:
-                output['subscription'] = {"code":    404,
-                                          "message": "Subscription not found"}
+                output['subscription'] = {
+                    "code": 404,
+                    "message": "Subscription not found"
+                }
                 code += 404
             else:
-                output['subscription'] = {"code":    500,
-                                          "message": "Unknown error removing subscription"}
+                output['subscription'] = {
+                    "code": 500,
+                    "message": "Unknown error removing subscription"
+                }
                 code += 500
 
         return BaseResponse(code=code, message=json.dumps(output))
 
-    @endpoints.method(message_types.VoidMessage, SubscriptionCollection,
-                      path='subscriptions/list', http_method='POST',
-                      name='subscriptions.list')
+    @endpoints.method(
+        message_types.VoidMessage,
+        SubscriptionCollection,
+        path='subscriptions/list',
+        http_method='POST',
+        name='subscriptions.list')
     def list_subscriptions(self, request):
         current_user = endpoints.get_current_user()
         if current_user is None:
             return SubscriptionCollection(subscriptions=[])
         user_id = PushHelper.user_email_to_id(current_user.email())
 
-        subscriptions = Subscription.query(ancestor=ndb.Key(Account, user_id)).fetch()
+        subscriptions = Subscription.query(
+            ancestor=ndb.Key(Account, user_id)).fetch()
         output = []
         for subscription in subscriptions:
-            output.append(SubscriptionMessage(
+            output.append(
+                SubscriptionMessage(
                     model_key=subscription.model_key,
-                    notifications=PushHelper.notification_string_from_enums(subscription.notification_types),
+                    notifications=PushHelper.notification_string_from_enums(
+                        subscription.notification_types),
                     model_type=subscription.model_type))
         return SubscriptionCollection(subscriptions=output)
 
-    @endpoints.method(MediaSuggestionMessage, BaseResponse,
-                      path='team/media/suggest', http_method='POST',
-                      name='team.media.suggestion')
+    @endpoints.method(
+        MediaSuggestionMessage,
+        BaseResponse,
+        path='team/media/suggest',
+        http_method='POST',
+        name='team.media.suggestion')
     def suggest_team_media(self, request):
         current_user = endpoints.get_current_user()
         if current_user is None:
-            return BaseResponse(code=401, message="Unauthorized to make suggestions")
+            return BaseResponse(
+                code=401, message="Unauthorized to make suggestions")
         user_id = PushHelper.user_email_to_id(current_user.email())
 
         # For now, only allow team media suggestions
@@ -257,8 +307,11 @@ class MobileAPI(remote.Service):
             incoming_details = json.loads(request.details_json)
             private_details = None
             if 'deletehash' in incoming_details:
-                private_details = {'deletehash': incoming_details.pop('deletehash')}
-            private_details_json = json.dumps(private_details) if private_details else None
+                private_details = {
+                    'deletehash': incoming_details.pop('deletehash')
+                }
+            private_details_json = json.dumps(
+                private_details) if private_details else None
 
         status = SuggestionCreator.createTeamMediaSuggestion(
             author_account_key=ndb.Key(Account, user_id),
@@ -271,8 +324,10 @@ class MobileAPI(remote.Service):
             if status == 'success':
                 return BaseResponse(code=200, message="Suggestion added")
             else:
-                return BaseResponse(code=304, message="Suggestion already exists")
+                return BaseResponse(
+                    code=304, message="Suggestion already exists")
         else:
             return BaseResponse(code=400, message="Bad suggestion url")
+
 
 app = endpoints.api_server([MobileAPI])

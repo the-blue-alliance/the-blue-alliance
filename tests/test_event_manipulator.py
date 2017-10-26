@@ -17,7 +17,8 @@ class TestEventManipulator(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_taskqueue_stub(root_path=".")
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
         self.maxDiff = None
 
@@ -31,7 +32,8 @@ class TestEventManipulator(unittest2.TestCase):
             name="Northeast Utilities FIRST Connecticut Regional",
             start_date=datetime.datetime(2011, 3, 31, 0, 0),
             year=2011,
-            venue_address="Connecticut Convention Center\r\n100 Columbus Blvd\r\nHartford, CT 06103\r\nUSA",
+            venue_address=
+            "Connecticut Convention Center\r\n100 Columbus Blvd\r\nHartford, CT 06103\r\nUSA",
             website="http://www.ctfirst.org/ctr",
         )
 
@@ -45,10 +47,14 @@ class TestEventManipulator(unittest2.TestCase):
             name="Northeast Utilities FIRST Connecticut Regional",
             start_date=datetime.datetime(2011, 3, 31, 0, 0),
             year=2011,
-            venue_address="Connecticut Convention Center\r\n100 Columbus Blvd\r\nHartford, CT 06103\r\nUSA",
+            venue_address=
+            "Connecticut Convention Center\r\n100 Columbus Blvd\r\nHartford, CT 06103\r\nUSA",
             website="http://www.ctfirst.org/ctr",
             facebook_eid="7",
-            webcast_json=json.dumps([{'type': 'ustream', 'channel': 'foo'}]),
+            webcast_json=json.dumps([{
+                'type': 'ustream',
+                'channel': 'foo'
+            }]),
         )
 
     def tearDown(self):
@@ -62,13 +68,18 @@ class TestEventManipulator(unittest2.TestCase):
 
     def assertOldEvent(self, event):
         self.assertEqual(event.key.id(), "2011ct")
-        self.assertEqual(event.name, "Northeast Utilities FIRST Connecticut Regional")
+        self.assertEqual(event.name,
+                         "Northeast Utilities FIRST Connecticut Regional")
         self.assertEqual(event.event_type_enum, EventType.REGIONAL)
         self.assertEqual(event.district_key, None)
-        self.assertEqual(event.start_date, datetime.datetime(2011, 3, 31, 0, 0))
+        self.assertEqual(event.start_date, datetime.datetime(
+            2011, 3, 31, 0, 0))
         self.assertEqual(event.end_date, datetime.datetime(2011, 4, 2, 0, 0))
         self.assertEqual(event.year, 2011)
-        self.assertEqual(event.venue_address, "Connecticut Convention Center\r\n100 Columbus Blvd\r\nHartford, CT 06103\r\nUSA")
+        self.assertEqual(
+            event.venue_address,
+            "Connecticut Convention Center\r\n100 Columbus Blvd\r\nHartford, CT 06103\r\nUSA"
+        )
         self.assertEqual(event.website, "http://www.ctfirst.org/ctr")
         self.assertEqual(event.event_short, "ct")
 
@@ -83,4 +94,5 @@ class TestEventManipulator(unittest2.TestCase):
         self.assertMergedEvent(EventManipulator.findOrSpawn(self.new_event))
 
     def test_updateMerge(self):
-        self.assertMergedEvent(EventManipulator.updateMerge(self.new_event, self.old_event))
+        self.assertMergedEvent(
+            EventManipulator.updateMerge(self.new_event, self.old_event))

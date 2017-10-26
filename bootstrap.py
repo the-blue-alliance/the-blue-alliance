@@ -60,16 +60,22 @@ def store_event(data):
     event.year = data['year']
     event.timezone_id = data['timezone']
     event.website = data['website']
-    event.start_date = datetime.datetime.strptime(data['start_date'], EVENT_DATE_FORMAT_STR) if data['start_date'] else None
-    event.end_date = datetime.datetime.strptime(data['end_date'], EVENT_DATE_FORMAT_STR) if data['end_date'] else None
+    event.start_date = datetime.datetime.strptime(
+        data['start_date'],
+        EVENT_DATE_FORMAT_STR) if data['start_date'] else None
+    event.end_date = datetime.datetime.strptime(
+        data['end_date'], EVENT_DATE_FORMAT_STR) if data['end_date'] else None
     event.webcast_json = json.dumps(data['webcasts'])
     event.venue = data['location_name']
     event.city = data['city']
     event.state_prov = data['state_prov']
     event.country = data['country']
     event.playoff_type = data['playoff_type']
-    event.parent_event = ndb.Key(Event, data['parent_event_key']) if data['parent_event_key'] else None
-    event.divisions = [ndb.Key(Event, div_key) for div_key in data['division_keys']] if data['division_keys'] else []
+    event.parent_event = ndb.Key(
+        Event, data['parent_event_key']) if data['parent_event_key'] else None
+    event.divisions = [
+        ndb.Key(Event, div_key) for div_key in data['division_keys']
+    ] if data['division_keys'] else []
 
     district = store_district(data['district']) if data['district'] else None
     event.district_key = district.key if district else None
@@ -104,18 +110,23 @@ def store_match(data):
         match.time = datetime.datetime.fromtimestamp(int(data['time']))
 
     if data.get('actual_time'):
-        match.actual_time = datetime.datetime.fromtimestamp(int(data['actual_time']))
+        match.actual_time = datetime.datetime.fromtimestamp(
+            int(data['actual_time']))
 
     if data.get('predicted_time'):
-        match.predicted_time = datetime.datetime.fromtimestamp(int(data['predicted_time']))
+        match.predicted_time = datetime.datetime.fromtimestamp(
+            int(data['predicted_time']))
 
     if data.get('post_result_time'):
-        match.post_result_time = datetime.datetime.fromtimestamp(int(data['post_result_time']))
+        match.post_result_time = datetime.datetime.fromtimestamp(
+            int(data['post_result_time']))
     match.score_breakdown_json = json.dumps(data['score_breakdown'])
 
     for alliance in ['red', 'blue']:
-        data['alliances'][alliance]['teams'] = data['alliances'][alliance].pop('team_keys')
-        data['alliances'][alliance]['surrogates'] = data['alliances'][alliance].pop('surrogate_team_keys')
+        data['alliances'][alliance]['teams'] = data['alliances'][alliance].pop(
+            'team_keys')
+        data['alliances'][alliance]['surrogates'] = data['alliances'][
+            alliance].pop('surrogate_team_keys')
     match.alliances_json = json.dumps(data['alliances'])
 
     return MatchManipulator.createOrUpdate(match)
@@ -138,7 +149,8 @@ def store_eventdetail(event, type, data):
 
 
 def store_award(data, event):
-    award = Award(id=Award.render_key_name(data['event_key'], data['award_type']))
+    award = Award(
+        id=Award.render_key_name(data['event_key'], data['award_type']))
     award.event = ndb.Key(Event, data['event_key'])
     award.award_type_enum = data['award_type']
     award.year = data['year']
@@ -150,10 +162,14 @@ def store_award(data, event):
     for recipient in data['recipient_list']:
         if recipient['team_key']:
             team_keys.append(ndb.Key(Team, recipient['team_key']))
-        recipient_list_fixed.append(json.dumps({
-            'awardee': recipient['awardee'],
-            'team_number': int(recipient['team_key'][3:]) if recipient['team_key'] else None,
-        }))
+        recipient_list_fixed.append(
+            json.dumps({
+                'awardee':
+                recipient['awardee'],
+                'team_number':
+                int(recipient['team_key'][3:])
+                if recipient['team_key'] else None,
+            }))
     award.recipient_json_list = recipient_list_fixed
     return AwardManipulator.createOrUpdate(award)
 
@@ -161,7 +177,12 @@ def store_award(data, event):
 def fetch_endpoint(endpoint):
     full_url = BASE_URL.format(endpoint)
     print "Fetching {}".format(full_url)
-    url = urllib2.Request(full_url, headers={APP_HEADER: AUTH_TOKEN, 'User-agent': 'Mozilla/5.0'})
+    url = urllib2.Request(
+        full_url,
+        headers={
+            APP_HEADER: AUTH_TOKEN,
+            'User-agent': 'Mozilla/5.0'
+        })
     response = urllib2.urlopen(url)
     return json.loads(response.read())
 
@@ -199,7 +220,8 @@ def update_event(key):
     map(store_match, event_matches)
 
     event_rankings = fetch_event_detail(key, 'rankings')
-    store_eventdetail(event, 'rankings2', event_rankings['rankings'] if event_rankings else [])
+    store_eventdetail(event, 'rankings2', event_rankings['rankings']
+                      if event_rankings else [])
 
     event_alliances = fetch_event_detail(key, 'alliances')
     store_eventdetail(event, 'alliance_selections', event_alliances)
@@ -211,7 +233,8 @@ def update_event(key):
 def main(key, url):
     print "Configuring GAE Remote API on {} to import {}".format(url, key)
     if 'localhost' in url:
-        remote_api_stub.ConfigureRemoteApi(None, '/_ah/remote_api', local_auth_func, url)
+        remote_api_stub.ConfigureRemoteApi(None, '/_ah/remote_api',
+                                           local_auth_func, url)
     else:
         remote_api_stub.ConfigureRemoteApiForOAuth(url, '/_ah/remote_api')
 
@@ -232,16 +255,21 @@ def main(key, url):
         team_data = fetch_team(key)
         store_team(team_data)
     elif key.isdigit():
-        event_keys = [event['key'] for event in fetch_endpoint('events/{}'.format(key))]
+        event_keys = [
+            event['key'] for event in fetch_endpoint('events/{}'.format(key))
+        ]
         for event in event_keys:
             update_event(event)
     else:
         print "Unknown key :("
 
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Bootstrap a TBA Development Instance")
+    parser = argparse.ArgumentParser(
+        description="Bootstrap a TBA Development Instance")
     parser.add_argument("key", help="Event, Team, or Match key to import")
-    parser.add_argument("--url", help="App Engine Remote API URL", required=True)
+    parser.add_argument(
+        "--url", help="App Engine Remote API URL", required=True)
     args = parser.parse_args()
 
     main(args.key, args.url)

@@ -18,11 +18,18 @@ class TestSuggestOffseasonEventController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
         self.testbed.init_user_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
-        app = webapp2.WSGIApplication([
-            RedirectRoute(r'/suggest/offseason', SuggestOffseasonEventController, 'request-apiwrite', strict_slash=True),
-        ], debug=True)
+        app = webapp2.WSGIApplication(
+            [
+                RedirectRoute(
+                    r'/suggest/offseason',
+                    SuggestOffseasonEventController,
+                    'request-apiwrite',
+                    strict_slash=True),
+            ],
+            debug=True)
         self.testapp = webtest.TestApp(app)
 
     def tearDown(self):
@@ -35,10 +42,7 @@ class TestSuggestOffseasonEventController(unittest2.TestCase):
             user_is_admin='0',
             overwrite=True)
 
-        Account.get_or_insert(
-            "123",
-            email="user@example.com",
-            registered=True)
+        Account.get_or_insert("123", email="user@example.com", registered=True)
 
     def getSuggestionForm(self):
         response = self.testapp.get('/suggest/offseason')
@@ -51,7 +55,8 @@ class TestSuggestOffseasonEventController(unittest2.TestCase):
     def test_login_redirect(self):
         response = self.testapp.get('/suggest/offseason', status='3*')
         response = response.follow(expect_errors=True)
-        self.assertTrue(response.request.path.startswith("/account/login_required"))
+        self.assertTrue(
+            response.request.path.startswith("/account/login_required"))
 
     def test_submit_empty_form(self):
         self.loginUser()

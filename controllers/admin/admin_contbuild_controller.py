@@ -7,6 +7,7 @@ class AdminContbuildController(LoggedInHandler):
     """
     Manage stuff regarding continuous deployment
     """
+
     def get(self, action):
         self._require_admin()
         # TODO only on prod

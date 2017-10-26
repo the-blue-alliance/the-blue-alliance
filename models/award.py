@@ -15,14 +15,22 @@ class Award(ndb.Model):
     Winner or Dean's List), they show up under the repeated properties.
     """
 
-    name_str = ndb.StringProperty(required=True, indexed=False)  # award name that shows up on USFIRST Pages. May vary for the same award type.
+    name_str = ndb.StringProperty(
+        required=True, indexed=False
+    )  # award name that shows up on USFIRST Pages. May vary for the same award type.
     award_type_enum = ndb.IntegerProperty(required=True)
     year = ndb.IntegerProperty(required=True)  # year the award was awarded
-    event = ndb.KeyProperty(kind=Event, required=True)  # event at which the award was awarded
-    event_type_enum = ndb.IntegerProperty(required=True)  # needed to query for awards from events of a certain event type
+    event = ndb.KeyProperty(
+        kind=Event, required=True)  # event at which the award was awarded
+    event_type_enum = ndb.IntegerProperty(
+        required=True
+    )  # needed to query for awards from events of a certain event type
 
-    team_list = ndb.KeyProperty(kind=Team, repeated=True)  # key of team(s) that won the award (if applicable)
-    recipient_json_list = ndb.StringProperty(repeated=True)  # JSON dict(s) with team_number and/or awardee
+    team_list = ndb.KeyProperty(
+        kind=Team,
+        repeated=True)  # key of team(s) that won the award (if applicable)
+    recipient_json_list = ndb.StringProperty(
+        repeated=True)  # JSON dict(s) with team_number and/or awardee
 
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
@@ -49,8 +57,10 @@ class Award(ndb.Model):
     @property
     def normalized_name(self):
         if self.award_type_enum in AwardType.normalized_name:
-            if self.event_type_enum in AwardType.normalized_name[self.award_type_enum]:
-                return AwardType.normalized_name[self.award_type_enum][self.event_type_enum]
+            if self.event_type_enum in AwardType.normalized_name[
+                    self.award_type_enum]:
+                return AwardType.normalized_name[self.award_type_enum][
+                    self.event_type_enum]
             else:
                 return AwardType.normalized_name[self.award_type_enum][None]
         else:

@@ -24,7 +24,9 @@ class ModelToDict(object):
             team_dict["region"] = team.state_prov
             team_dict["country_name"] = team.country
         except Exception, e:
-            logging.warning("Failed to include Address for api_team_info_%s: %s" % (team.key.id(), e))
+            logging.warning(
+                "Failed to include Address for api_team_info_%s: %s" %
+                (team.key.id(), e))
 
         return team_dict
 
@@ -126,7 +128,8 @@ class ModelToDict(object):
             media_dict["details"] = media.details
         else:
             media_dict["details"] = {}
-        media_dict["preferred"] = True if media.preferred_references != [] else False
+        media_dict[
+            "preferred"] = True if media.preferred_references != [] else False
 
         return media_dict
 

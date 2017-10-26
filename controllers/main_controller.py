@@ -28,7 +28,8 @@ def render_static(page):
     html = memcache.get(memcache_key)
 
     if html is None:
-        path = os.path.join(os.path.dirname(__file__), "../templates/%s.html" % page)
+        path = os.path.join(
+            os.path.dirname(__file__), "../templates/%s.html" % page)
         html = template.render(path, {})
         if tba_config.CONFIG["memcache"]:
             memcache.set(memcache_key, html, 86400)
@@ -56,7 +57,8 @@ class TwoChampsHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24
         self._team_key_a = self.request.get('team_a', None)
         self._team_key_b = self.request.get('team_b', None)
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self._team_key_a, self._team_key_b)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(
+            self._team_key_a, self._team_key_b)
 
     def _render(self, *args, **kw):
         team_a = Team.get_by_id(self._team_key_a) if self._team_key_a else None
@@ -78,17 +80,24 @@ class MainKickoffHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         kickoff_datetime_est = datetime.datetime(2017, 1, 7, 10, 00)
-        kickoff_datetime_utc = kickoff_datetime_est + datetime.timedelta(hours=5)
+        kickoff_datetime_utc = kickoff_datetime_est + datetime.timedelta(
+            hours=5)
 
-        is_kickoff = datetime.datetime.now() >= kickoff_datetime_est - datetime.timedelta(days=1)  # turn on 1 day before
+        is_kickoff = datetime.datetime.now(
+        ) >= kickoff_datetime_est - datetime.timedelta(
+            days=1)  # turn on 1 day before
 
         self.template_values.update({
-            'is_kickoff': is_kickoff,
-            'kickoff_datetime_est': kickoff_datetime_est,
-            'kickoff_datetime_utc': kickoff_datetime_utc,
+            'is_kickoff':
+            is_kickoff,
+            'kickoff_datetime_est':
+            kickoff_datetime_est,
+            'kickoff_datetime_utc':
+            kickoff_datetime_utc,
         })
 
-        path = os.path.join(os.path.dirname(__file__), "../templates/index_kickoff.html")
+        path = os.path.join(
+            os.path.dirname(__file__), "../templates/index_kickoff.html")
         return template.render(path, self.template_values)
 
 
@@ -102,16 +111,21 @@ class MainBuildseasonHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         endbuild_datetime_est = datetime.datetime(2017, 2, 21, 23, 59)
-        endbuild_datetime_utc = endbuild_datetime_est + datetime.timedelta(hours=5)
+        endbuild_datetime_utc = endbuild_datetime_est + datetime.timedelta(
+            hours=5)
         week_events = EventHelper.getWeekEvents()
 
         self.template_values.update({
-            'endbuild_datetime_est': endbuild_datetime_est,
-            'endbuild_datetime_utc': endbuild_datetime_utc,
-            'events': week_events,
+            'endbuild_datetime_est':
+            endbuild_datetime_est,
+            'endbuild_datetime_utc':
+            endbuild_datetime_utc,
+            'events':
+            week_events,
         })
 
-        path = os.path.join(os.path.dirname(__file__), "../templates/index_buildseason.html")
+        path = os.path.join(
+            os.path.dirname(__file__), "../templates/index_buildseason.html")
         return template.render(path, self.template_values)
 
 
@@ -128,22 +142,28 @@ class MainChampsHandler(CacheableHandler):
         hou_event_keys_future = Event.query(
             Event.year == year,
             Event.event_type_enum.IN(EventType.CMP_EVENT_TYPES),
-            Event.start_date <= datetime.datetime(2017, 4, 22)).fetch_async(keys_only=True)
+            Event.start_date <= datetime.datetime(
+                2017, 4, 22)).fetch_async(keys_only=True)
         stl_event_keys_future = Event.query(
             Event.year == year,
             Event.event_type_enum.IN(EventType.CMP_EVENT_TYPES),
-            Event.start_date > datetime.datetime(2017, 4, 22)).fetch_async(keys_only=True)
+            Event.start_date > datetime.datetime(
+                2017, 4, 22)).fetch_async(keys_only=True)
 
-        hou_events_futures = ndb.get_multi_async(hou_event_keys_future.get_result())
-        stl_events_futures = ndb.get_multi_async(stl_event_keys_future.get_result())
+        hou_events_futures = ndb.get_multi_async(
+            hou_event_keys_future.get_result())
+        stl_events_futures = ndb.get_multi_async(
+            stl_event_keys_future.get_result())
 
         self.template_values.update({
             "hou_events": [e.get_result() for e in hou_events_futures],
             "stl_events": [e.get_result() for e in stl_events_futures],
-            "year": year,
+            "year":
+            year,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/index_champs.html')
+        path = os.path.join(
+            os.path.dirname(__file__), '../templates/index_champs.html')
         return template.render(path, self.template_values)
 
 
@@ -160,12 +180,17 @@ class MainCompetitionseasonHandler(CacheableHandler):
         special_webcasts = FirebasePusher.get_special_webcasts()
 
         self.template_values.update({
-            "events": week_events,
-            "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
-            "special_webcasts": special_webcasts,
+            "events":
+            week_events,
+            "any_webcast_online":
+            any(w.get('status') == 'online' for w in special_webcasts),
+            "special_webcasts":
+            special_webcasts,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/index_competitionseason.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../templates/index_competitionseason.html')
         return template.render(path, self.template_values)
 
 
@@ -182,18 +207,26 @@ class MainInsightsHandler(CacheableHandler):
         year = datetime.datetime.now().year
         special_webcasts = FirebasePusher.get_special_webcasts()
         self.template_values.update({
-            "events": week_events,
-            "year": year,
-            "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
-            "special_webcasts": special_webcasts,
+            "events":
+            week_events,
+            "year":
+            year,
+            "any_webcast_online":
+            any(w.get('status') == 'online' for w in special_webcasts),
+            "special_webcasts":
+            special_webcasts,
         })
 
-        insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(year, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
+        insights = ndb.get_multi([
+            ndb.Key(Insight, Insight.renderKeyName(year, insight_name))
+            for insight_name in Insight.INSIGHT_NAMES.values()
+        ])
         for insight in insights:
             if insight:
                 self.template_values[insight.name] = insight
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/index_insights.html')
+        path = os.path.join(
+            os.path.dirname(__file__), '../templates/index_insights.html')
         return template.render(path, self.template_values)
 
 
@@ -211,7 +244,8 @@ class MainOffseasonHandler(CacheableHandler):
             "events": week_events,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/index_offseason.html')
+        path = os.path.join(
+            os.path.dirname(__file__), '../templates/index_offseason.html')
         return template.render(path, self.template_values)
 
 
@@ -224,7 +258,8 @@ class ContactHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/contact.html")
+        path = os.path.join(
+            os.path.dirname(__file__), "../templates/contact.html")
         return template.render(path, self.template_values)
 
 
@@ -249,7 +284,8 @@ class HashtagsHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/hashtags.html")
+        path = os.path.join(
+            os.path.dirname(__file__), "../templates/hashtags.html")
         return template.render(path, self.template_values)
 
 
@@ -263,8 +299,8 @@ class FIRSTHOFHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         awards_future = Award.query(
-            Award.award_type_enum==AwardType.CHAIRMANS,
-            Award.event_type_enum==EventType.CMP_FINALS).fetch_async()
+            Award.award_type_enum == AwardType.CHAIRMANS,
+            Award.event_type_enum == EventType.CMP_FINALS).fetch_async()
 
         teams_by_year = defaultdict(list)
         for award in awards_future.get_result():
@@ -273,9 +309,13 @@ class FIRSTHOFHandler(CacheableHandler):
                     team_key.get_async(),
                     award.event.get_async(),
                     award,
-                    media_query.TeamTagMediasQuery(team_key.id(), MediaTag.CHAIRMANS_VIDEO).fetch_async(),
-                    media_query.TeamTagMediasQuery(team_key.id(), MediaTag.CHAIRMANS_PRESENTATION).fetch_async(),
-                    media_query.TeamTagMediasQuery(team_key.id(), MediaTag.CHAIRMANS_ESSAY).fetch_async(),
+                    media_query.TeamTagMediasQuery(
+                        team_key.id(), MediaTag.CHAIRMANS_VIDEO).fetch_async(),
+                    media_query.TeamTagMediasQuery(
+                        team_key.id(),
+                        MediaTag.CHAIRMANS_PRESENTATION).fetch_async(),
+                    media_query.TeamTagMediasQuery(
+                        team_key.id(), MediaTag.CHAIRMANS_ESSAY).fetch_async(),
                 ))
 
         teams_by_year = sorted(teams_by_year.items(), key=lambda (k, v): -k)
@@ -298,7 +338,8 @@ class AboutHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/about.html")
+        path = os.path.join(
+            os.path.dirname(__file__), "../templates/about.html")
         return template.render(path, self.template_values)
 
 
@@ -311,7 +352,8 @@ class ThanksHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/thanks.html")
+        path = os.path.join(
+            os.path.dirname(__file__), "../templates/thanks.html")
         return template.render(path, self.template_values)
 
 
@@ -337,7 +379,8 @@ class PredictionsHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/predictions.html")
+        path = os.path.join(
+            os.path.dirname(__file__), "../templates/predictions.html")
         return template.render(path, self.template_values)
 
 
@@ -379,7 +422,9 @@ class WebcastsHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         year = datetime.datetime.now().year
-        event_keys = Event.query(Event.year == year).order(Event.start_date).fetch(500, keys_only=True)
+        event_keys = Event.query(Event.year == year).order(
+            Event.start_date).fetch(
+                500, keys_only=True)
         events = ndb.get_multi(event_keys)
 
         self.template_values.update({
@@ -387,7 +432,8 @@ class WebcastsHandler(CacheableHandler):
             'year': year,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/webcasts.html')
+        path = os.path.join(
+            os.path.dirname(__file__), '../templates/webcasts.html')
         return template.render(path, self.template_values)
 
 
@@ -400,7 +446,8 @@ class RecordHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/record.html")
+        path = os.path.join(
+            os.path.dirname(__file__), "../templates/record.html")
         return template.render(path, self.template_values)
 
 
@@ -413,7 +460,8 @@ class ApiWriteHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/apiwrite.html")
+        path = os.path.join(
+            os.path.dirname(__file__), "../templates/apiwrite.html")
         return template.render(path, self.template_values)
 
 
@@ -426,6 +474,6 @@ class MatchInputHandler(CacheableHandler):
         self._cache_expiration = 60 * 60
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/matchinput.html")
+        path = os.path.join(
+            os.path.dirname(__file__), "../templates/matchinput.html")
         return template.render(path, self.template_values)
-

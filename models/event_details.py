@@ -7,7 +7,8 @@ class EventDetails(ndb.Model):
     update often throughout an event. This includes rankings, event stats, etc.
     key_name is the event key, like '2010ct'
     """
-    alliance_selections = ndb.JsonProperty()  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
+    alliance_selections = ndb.JsonProperty(
+    )  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
     district_points = ndb.JsonProperty()
     matchstats = ndb.JsonProperty()  # for OPR, DPR, CCWM, etc.
     insights = ndb.JsonProperty()
@@ -43,12 +44,15 @@ class EventDetails(ndb.Model):
                 rank['extra_stats'] = []
                 if self.year == 2017:
                     rank['extra_stats'] = [
-                        int(round(rank['sort_orders'][0] * rank['matches_played'])),
+                        int(
+                            round(rank['sort_orders'][0] *
+                                  rank['matches_played'])),
                     ]
                     has_extra_stats = True
                 elif rank['qual_average'] is None:
                     rank['extra_stats'] = [
-                        rank['sort_orders'][0] / rank['matches_played'] if rank['matches_played'] > 0 else 0,
+                        rank['sort_orders'][0] / rank['matches_played']
+                        if rank['matches_played'] > 0 else 0,
                     ]
                     has_extra_stats = True
 
@@ -62,8 +66,10 @@ class EventDetails(ndb.Model):
                 }]
             else:
                 extra_stats_info = [{
-                    'name': '{}/Match'.format(sort_order_info[0]['name']),
-                    'precision': 2,
+                    'name':
+                    '{}/Match'.format(sort_order_info[0]['name']),
+                    'precision':
+                    2,
                 }]
 
         return {
@@ -94,15 +100,19 @@ class EventDetails(ndb.Model):
             # for i, item in enumerate(rank['sort_orders']):
             for i, precision in enumerate(precisions):
                 # row.append('%.*f' % (precisions[i], round(item, precisions[i])))
-                row.append('%.*f' % (precision, round(rank['sort_orders'][i], precision)))
+                row.append('%.*f' % (precision,
+                                     round(rank['sort_orders'][i], precision)))
             if rank['record']:
-                row.append('{}-{}-{}'.format(rank['record']['wins'], rank['record']['losses'], rank['record']['ties']))
+                row.append('{}-{}-{}'.format(rank['record']['wins'],
+                                             rank['record']['losses'],
+                                             rank['record']['ties']))
                 has_record = True
             row.append(rank['dq'])
             row.append(rank['matches_played'])
 
             for i, precision in enumerate(extra_precisions):
-                row.append('%.*f' % (precision, round(rank['extra_stats'][i], precision)))
+                row.append('%.*f' % (precision,
+                                     round(rank['extra_stats'][i], precision)))
 
             rankings_table.append(row)
 

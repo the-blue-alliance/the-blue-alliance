@@ -14,6 +14,7 @@ class EventManipulator(ManipulatorBase):
     """
     Handle Event database writes.
     """
+
     @classmethod
     def getCacheKeysAndControllers(cls, affected_refs):
         return CacheClearer.get_event_cache_keys_and_controllers(affected_refs)
@@ -35,7 +36,8 @@ class EventManipulator(ManipulatorBase):
             try:
                 LocationHelper.update_event_location(event)
             except Exception, e:
-                logging.error("update_event_location for {} errored!".format(event.key.id()))
+                logging.error("update_event_location for {} errored!".format(
+                    event.key.id()))
                 logging.exception(e)
 
             try:
@@ -43,19 +45,26 @@ class EventManipulator(ManipulatorBase):
                     timezone_id = LocationHelper.get_timezone_id(
                         None, lat_lng=event.normalized_location.lat_lng)
                     if not timezone_id:
-                        logging.warning("Timezone update for event {} failed!".format(event.key_name))
+                        logging.warning(
+                            "Timezone update for event {} failed!".format(
+                                event.key_name))
                     else:
                         event.timezone_id = timezone_id
                 else:
-                    logging.warning("No Lat/Lng to update timezone_id for event {}!".format(event.key_name))
+                    logging.warning(
+                        "No Lat/Lng to update timezone_id for event {}!".
+                        format(event.key_name))
             except Exception, e:
-                logging.error("Timezone update for {} errored!".format(event.key.id()))
+                logging.error("Timezone update for {} errored!".format(
+                    event.key.id()))
                 logging.exception(e)
 
             try:
                 SearchHelper.update_event_location_index(event)
             except Exception, e:
-                logging.error("update_event_location_index for {} errored!".format(event.key.id()))
+                logging.error(
+                    "update_event_location_index for {} errored!".format(
+                        event.key.id()))
                 logging.exception(e)
         cls.createOrUpdate(events, run_post_update_hook=False)
 
@@ -96,9 +105,7 @@ class EventManipulator(ManipulatorBase):
             "year"
         ]
 
-        allow_none_attrs = {
-            'district_key'
-        }
+        allow_none_attrs = {'district_key'}
 
         list_attrs = [
             "divisions",
@@ -107,7 +114,8 @@ class EventManipulator(ManipulatorBase):
         old_event._updated_attrs = []
 
         for attr in attrs:
-            if getattr(new_event, attr) is not None or attr in allow_none_attrs:
+            if getattr(new_event,
+                       attr) is not None or attr in allow_none_attrs:
                 if getattr(new_event, attr) != getattr(old_event, attr):
                     setattr(old_event, attr, getattr(new_event, attr))
                     old_event._updated_attrs.append(attr)

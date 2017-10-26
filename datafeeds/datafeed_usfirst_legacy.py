@@ -45,7 +45,8 @@ class DatafeedUsfirstLegacy(DatafeedUsfirst):
 
         url = self.SESSION_KEY_GENERATING_PATTERN % year
         try:
-            result = urlfetch.fetch(url, headers={'Referer': 'usfirst.org'}, deadline=10)
+            result = urlfetch.fetch(
+                url, headers={'Referer': 'usfirst.org'}, deadline=10)
         except Exception, e:
             logging.error("URLFetch failed for: {}".format(url))
             logging.info(e)
@@ -67,13 +68,15 @@ class DatafeedUsfirstLegacy(DatafeedUsfirst):
             return None
         else:
             logging.error('HTTP code %s. Unable to retreive url: %s' %
-                (result.status_code, self.SESSION_KEY_GENERATING_PATTERN))
+                          (result.status_code,
+                           self.SESSION_KEY_GENERATING_PATTERN))
 
     def getEventDetails(self, year, first_eid):
         if type(year) is not int:
             raise TypeError("year must be an integer")
         url = self.EVENT_DETAILS_URL_PATTERN % (first_eid)
-        event, _ = self.parse(url, UsfirstLegacyEventDetailsParser, self.getSessionKey(year))
+        event, _ = self.parse(url, UsfirstLegacyEventDetailsParser,
+                              self.getSessionKey(year))
         if event is None:
             return None
 
@@ -89,10 +92,11 @@ class DatafeedUsfirstLegacy(DatafeedUsfirst):
             start_date=event.get("start_date", None),
             venue_address=event.get("venue_address", None),
             location=event.get("location", None),
-            timezone_id=EventHelper.get_timezone_id(event.get("location", None), '{}{}'.format(event['year'], event['event_short'])),
+            timezone_id=EventHelper.get_timezone_id(
+                event.get("location", None), '{}{}'.format(
+                    event['year'], event['event_short'])),
             website=event.get("website", None),
-            year=event.get("year", None)
-        )
+            year=event.get("year", None))
 
     def getEventTeams(self, year, first_eid):
         """
@@ -101,23 +105,26 @@ class DatafeedUsfirstLegacy(DatafeedUsfirst):
         if type(year) is not int:
             raise TypeError("year must be an integer")
         url = self.EVENT_TEAMS_URL_PATTERN % (first_eid)
-        teams, _ = self.parse(url, UsfirstLegacyEventTeamsParser, self.getSessionKey(year))
+        teams, _ = self.parse(url, UsfirstLegacyEventTeamsParser,
+                              self.getSessionKey(year))
         if teams is None:
             return None
 
-        return [Team(
-            id="frc%s" % team.get("team_number", None),
-            first_tpid=team.get("first_tpid", None),
-            first_tpid_year=year,
-            team_number=team.get("team_number", None)
-            )
-            for team in teams]
+        return [
+            Team(
+                id="frc%s" % team.get("team_number", None),
+                first_tpid=team.get("first_tpid", None),
+                first_tpid_year=year,
+                team_number=team.get("team_number", None)) for team in teams
+        ]
 
     def getTeamDetails(self, team):
         if hasattr(team, 'first_tpid'):
             if team.first_tpid:
                 url = self.TEAM_DETAILS_URL_PATTERN % (team.first_tpid)
-                team_dict, _ = self.parse(url, UsfirstLegacyTeamDetailsParser, self.getSessionKey(team.first_tpid_year))
+                team_dict, _ = self.parse(url, UsfirstLegacyTeamDetailsParser,
+                                          self.getSessionKey(
+                                              team.first_tpid_year))
 
                 if team_dict is not None and "team_number" in team_dict:
                     return Team(
@@ -130,7 +137,9 @@ class DatafeedUsfirstLegacy(DatafeedUsfirst):
                         rookie_year=team_dict.get("rookie_year", None),
                     )
                 else:
-                    logging.warning("No team_number found scraping %s, probably retired team" % team.team_number)
+                    logging.warning(
+                        "No team_number found scraping %s, probably retired team"
+                        % team.team_number)
                     return None
 
         logging.warning('Null TPID for team %s' % team.team_number)

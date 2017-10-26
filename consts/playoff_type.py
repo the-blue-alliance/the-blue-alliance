@@ -1,4 +1,3 @@
-
 class PlayoffType(object):
     # Standard Brackets
     BRACKET_8_TEAM = 0

@@ -23,8 +23,11 @@ class AwardConverter(ConverterBase):
         recipient_list_fixed = []
         for recipient in award.recipient_list:
             recipient_list_fixed.append({
-                'awardee': recipient['awardee'],
-                'team_key': 'frc{}'.format(recipient['team_number']) if recipient['team_number'] else None,
+                'awardee':
+                recipient['awardee'],
+                'team_key':
+                'frc{}'.format(recipient['team_number'])
+                if recipient['team_number'] else None,
             })
         return {
             'name': award.name_str,

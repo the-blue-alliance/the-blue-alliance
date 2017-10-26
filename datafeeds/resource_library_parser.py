@@ -42,7 +42,8 @@ class ResourceLibraryParser(ParserBase):
 
             presentation = tds[3].find('a')
             if presentation:
-                presentation = YouTubeVideoHelper.parse_id_from_url(presentation['href'])
+                presentation = YouTubeVideoHelper.parse_id_from_url(
+                    presentation['href'])
 
             essay = tds[4].find('a')
             if essay:

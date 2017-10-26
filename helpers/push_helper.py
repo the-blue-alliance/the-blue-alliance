@@ -16,7 +16,6 @@ from models.user import User
 
 
 class PushHelper(object):
-
     """
     General helper methods for push notifications
     Actual notifications should be built and send from NotificationHelper
@@ -53,26 +52,34 @@ class PushHelper(object):
         if Account.get_by_id(user_id) is None:
             # Create an account for this user
             nickname = user_email.split('@')[0]
-            Account(id=user_id, email=user_email, nickname=nickname, display_name=nickname, registered=False).put()
+            Account(
+                id=user_id,
+                email=user_email,
+                nickname=nickname,
+                display_name=nickname,
+                registered=False).put()
 
         return user_id
 
     @classmethod
     def delete_bad_gcm_token(cls, key):
         logging.info("removing bad GCM token: {}".format(key))
-        to_delete = MobileClient.query(MobileClient.messaging_id == key).fetch(keys_only=True)
+        to_delete = MobileClient.query(MobileClient.messaging_id == key).fetch(
+            keys_only=True)
         ndb.delete_multi(to_delete)
 
     @classmethod
     def update_token(cls, old, new):
-        to_update = MobileClient.query(MobileClient.messaging_id == old).fetch()
+        to_update = MobileClient.query(
+            MobileClient.messaging_id == old).fetch()
         for model in to_update:
             model.messaging_id = new
             model.put()
 
     @classmethod
     def get_users_subscribed(cls, model_key):
-        user_list = Subscription.query(Subscription.model_key == model_key).fetch()
+        user_list = Subscription.query(
+            Subscription.model_key == model_key).fetch()
         output = []
         for user in user_list:
             output.append(user.user_id)
@@ -88,7 +95,9 @@ class PushHelper(object):
         keys.append("{}*".format(match.year))  # key for all events in year
         keys.append(match.key_name)
         keys.append(match.event_key_name)
-        users = Subscription.query(Subscription.model_key.IN(keys), Subscription.notification_types == notification).fetch()
+        users = Subscription.query(
+            Subscription.model_key.IN(keys),
+            Subscription.notification_types == notification).fetch()
         output = []
         for user in users:
             output.append(user.user_id)
@@ -99,7 +108,9 @@ class PushHelper(object):
         keys = []
         keys.append(event.key_name)
         keys.append("{}*".format(event.year))
-        users = Subscription.query(Subscription.model_key.IN(keys), Subscription.notification_types == notification).fetch()
+        users = Subscription.query(
+            Subscription.model_key.IN(keys),
+            Subscription.notification_types == notification).fetch()
         output = []
         for user in users:
             output.append(user.user_id)
@@ -113,7 +124,9 @@ class PushHelper(object):
             keys.append("{}_{}".format(event.key_name, team))  # team@event key
         keys.append("{}*".format(event.year))  # key for all events in year
         keys.append(event.key_name)
-        users = Subscription.query(Subscription.model_key.IN(keys), Subscription.notification_types == notification).fetch()
+        users = Subscription.query(
+            Subscription.model_key.IN(keys),
+            Subscription.notification_types == notification).fetch()
         output = [user.user_id for user in users]
         return output
 
@@ -125,10 +138,14 @@ class PushHelper(object):
 
         if os_types is None:
             os_types = ClientType.names.keys()
-        clients = MobileClient.query(MobileClient.user_id.IN(user_list), MobileClient.client_type.IN(os_types), MobileClient.verified == True).fetch()
+        clients = MobileClient.query(
+            MobileClient.user_id.IN(user_list),
+            MobileClient.client_type.IN(os_types),
+            MobileClient.verified == True).fetch()
         for client in clients:
             if client.client_type == ClientType.WEBHOOK:
-                output[client.client_type].append((client.messaging_id, client.secret))
+                output[client.client_type].append((client.messaging_id,
+                                                   client.secret))
             else:
                 output[client.client_type].append(client.messaging_id)
         return output

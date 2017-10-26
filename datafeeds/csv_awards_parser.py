@@ -19,7 +19,9 @@ class CSVAwardsParser(ParserBase):
         2000,mi,Regional Finalist,45,
         """
         awards_by_key = {}
-        csv_data = list(csv.reader(StringIO.StringIO(data), delimiter=',', skipinitialspace=True))
+        csv_data = list(
+            csv.reader(
+                StringIO.StringIO(data), delimiter=',', skipinitialspace=True))
         for award in csv_data:
             year = int(award[0])
             event_short = award[1]
@@ -51,12 +53,15 @@ class CSVAwardsParser(ParserBase):
             if award_type_enum is None:
                 # If we can't figure it out, fall back to OTHER (good for offseason events)
                 award_type_enum = AwardType.OTHER
-            award_key_name = Award.render_key_name('{}{}'.format(year, event_short), award_type_enum)
+            award_key_name = Award.render_key_name('{}{}'.format(
+                year, event_short), award_type_enum)
 
             if award_key_name in awards_by_key:
                 if team_number is not None:
-                    awards_by_key[award_key_name]['team_number_list'].append(team_number)
-                awards_by_key[award_key_name]['recipient_json_list'].append(recipient_json)
+                    awards_by_key[award_key_name]['team_number_list'].append(
+                        team_number)
+                awards_by_key[award_key_name]['recipient_json_list'].append(
+                    recipient_json)
             else:
                 awards_by_key[award_key_name] = {
                     'year': year,

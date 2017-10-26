@@ -60,16 +60,20 @@ class EventList(CacheableHandler):
         if state_prov == '':
             state_prov = None
 
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(year, explicit_year, state_prov)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(
+            year, explicit_year, state_prov)
         super(EventList, self).get(year, explicit_year)
 
     def _render(self, year=None, explicit_year=False):
         state_prov = self.request.get('state_prov', None)
 
         districts_future = DistrictsInYearQuery(year).fetch_async()
-        all_events_future = event_query.EventListQuery(year).fetch_async()  # Needed for state_prov
+        all_events_future = event_query.EventListQuery(
+            year).fetch_async()  # Needed for state_prov
         if state_prov:
-            events_future = Event.query(Event.year==year, Event.state_prov==state_prov).fetch_async()
+            events_future = Event.query(
+                Event.year == year,
+                Event.state_prov == state_prov).fetch_async()
         else:
             events_future = all_events_future
 
@@ -110,7 +114,10 @@ class EventList(CacheableHandler):
 
     def memcacheFlush(self):
         year = datetime.datetime.now().year
-        keys = [self.CACHE_KEY_FORMAT.format(year, True, None), self.CACHE_KEY_FORMAT.format(year, False, None)]
+        keys = [
+            self.CACHE_KEY_FORMAT.format(year, True, None),
+            self.CACHE_KEY_FORMAT.format(year, False, None)
+        ]
         memcache.delete_multi(keys)
         return keys
 
@@ -144,9 +151,12 @@ class EventDetail(CacheableHandler):
 
         event.prepAwardsMatchesTeams()
         event.prep_details()
-        medias_future = media_query.EventTeamsPreferredMediasQuery(event_key).fetch_async()
-        district_future = DistrictQuery(event.district_key.id()).fetch_async() if event.district_key else None
-        event_medias_future = media_query.EventMediasQuery(event_key).fetch_async()
+        medias_future = media_query.EventTeamsPreferredMediasQuery(
+            event_key).fetch_async()
+        district_future = DistrictQuery(event.district_key.id()).fetch_async(
+        ) if event.district_key else None
+        event_medias_future = media_query.EventMediasQuery(
+            event_key).fetch_async()
 
         event_divisions_future = None
         event_codivisions_future = None
@@ -155,15 +165,18 @@ class EventDetail(CacheableHandler):
             event_divisions_future = ndb.get_multi_async(event.divisions)
         elif event.parent_event:
             parent_event_future = event.parent_event.get_async()
-            event_codivisions_future = EventDivisionsQuery(event.parent_event.id()).fetch_async()
+            event_codivisions_future = EventDivisionsQuery(
+                event.parent_event.id()).fetch_async()
 
         awards = AwardHelper.organizeAwards(event.awards)
-        cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches, event)
+        cleaned_matches = MatchHelper.deleteInvalidMatches(
+            event.matches, event)
         matches = MatchHelper.organizeMatches(cleaned_matches)
         teams = TeamHelper.sortTeams(event.teams)
 
         # Organize medias by team
-        image_medias = MediaHelper.get_images([media for media in medias_future.get_result()])
+        image_medias = MediaHelper.get_images(
+            [media for media in medias_future.get_result()])
         team_medias = defaultdict(list)
         for image_media in image_medias:
             for reference in image_media.references:
@@ -176,9 +189,12 @@ class EventDetail(CacheableHandler):
         middle_value = num_teams / 2
         if num_teams % 2 != 0:
             middle_value += 1
-        teams_a, teams_b = team_and_medias[:middle_value], team_and_medias[middle_value:]
+        teams_a, teams_b = team_and_medias[:middle_value], team_and_medias[
+            middle_value:]
 
-        oprs = [i for i in event.matchstats['oprs'].items()] if (event.matchstats is not None and 'oprs' in event.matchstats) else []
+        oprs = [i for i in event.matchstats['oprs'].items()
+                ] if (event.matchstats is not None
+                      and 'oprs' in event.matchstats) else []
         oprs = sorted(oprs, key=lambda t: t[1], reverse=True)  # sort by OPR
         oprs = oprs[:15]  # get the top 15 OPRs
 
@@ -189,19 +205,22 @@ class EventDetail(CacheableHandler):
             matches_recent = None
             matches_upcoming = None
 
-        bracket_table = MatchHelper.generateBracket(matches, event, event.alliance_selections)
+        bracket_table = MatchHelper.generateBracket(matches, event,
+                                                    event.alliance_selections)
 
         playoff_advancement = None
         playoff_template = None
         double_elim_matches = None
         if EventHelper.is_2015_playoff(event_key):
-            playoff_advancement = MatchHelper.generatePlayoffAdvancement2015(matches, event.alliance_selections)
+            playoff_advancement = MatchHelper.generatePlayoffAdvancement2015(
+                matches, event.alliance_selections)
             playoff_template = 'playoff_table'
             for comp_level in ['qf', 'sf']:
                 if comp_level in bracket_table:
                     del bracket_table[comp_level]
         elif event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM:
-            playoff_advancement = MatchHelper.generatePlayoffAdvancementRoundRobin(matches, event.alliance_selections)
+            playoff_advancement = MatchHelper.generatePlayoffAdvancementRoundRobin(
+                matches, event.alliance_selections)
             playoff_template = 'playoff_round_robin_6_team'
             comp_levels = bracket_table.keys()
             for comp_level in comp_levels:
@@ -213,16 +232,20 @@ class EventDetail(CacheableHandler):
                 if comp_level != 'f':
                     del bracket_table[comp_level]
         elif event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
-            double_elim_matches = MatchHelper.organizeDoubleElimMatches(matches)
+            double_elim_matches = MatchHelper.organizeDoubleElimMatches(
+                matches)
 
         district_points_sorted = None
         if event.district_key and event.district_points:
-            district_points_sorted = sorted(event.district_points['points'].items(), key=lambda (team, points): -points['total'])
+            district_points_sorted = sorted(
+                event.district_points['points'].items(),
+                key=lambda (team, points): -points['total'])
 
         event_insights = event.details.insights if event.details else None
         event_insights_template = None
         if event_insights:
-            event_insights_template = 'event_partials/event_insights_{}.html'.format(event.year)
+            event_insights_template = 'event_partials/event_insights_{}.html'.format(
+                event.year)
 
         district = district_future.get_result() if district_future else None
         event_divisions = None
@@ -231,34 +254,60 @@ class EventDetail(CacheableHandler):
         elif event_codivisions_future:
             event_divisions = event_codivisions_future.get_result()
 
-        medias_by_slugname = MediaHelper.group_by_slugname([media for media in event_medias_future.get_result()])
-        has_time_predictions = matches_upcoming and any(match.predicted_time for match in matches_upcoming)
+        medias_by_slugname = MediaHelper.group_by_slugname(
+            [media for media in event_medias_future.get_result()])
+        has_time_predictions = matches_upcoming and any(
+            match.predicted_time for match in matches_upcoming)
 
         self.template_values.update({
-            "event": event,
-            "district_name": district.display_name if district else None,
-            "district_abbrev": district.abbreviation if district else None,
-            "matches": matches,
-            "matches_recent": matches_recent,
-            "matches_upcoming": matches_upcoming,
-            'has_time_predictions': has_time_predictions,
-            "awards": awards,
-            "teams_a": teams_a,
-            "teams_b": teams_b,
-            "num_teams": num_teams,
-            "oprs": oprs,
-            "bracket_table": bracket_table,
-            "playoff_advancement": playoff_advancement,
-            "playoff_template": playoff_template,
-            "district_points_sorted": district_points_sorted,
-            "event_insights_qual": event_insights['qual'] if event_insights else None,
-            "event_insights_playoff": event_insights['playoff'] if event_insights else None,
-            "event_insights_template": event_insights_template,
-            "medias_by_slugname": medias_by_slugname,
-            "event_divisions": event_divisions,
-            'parent_event': parent_event_future.get_result() if parent_event_future else None,
-            'double_elim_matches': double_elim_matches,
-            'double_elim_playoff_types': PlayoffType.DOUBLE_ELIM_TYPES,
+            "event":
+            event,
+            "district_name":
+            district.display_name if district else None,
+            "district_abbrev":
+            district.abbreviation if district else None,
+            "matches":
+            matches,
+            "matches_recent":
+            matches_recent,
+            "matches_upcoming":
+            matches_upcoming,
+            'has_time_predictions':
+            has_time_predictions,
+            "awards":
+            awards,
+            "teams_a":
+            teams_a,
+            "teams_b":
+            teams_b,
+            "num_teams":
+            num_teams,
+            "oprs":
+            oprs,
+            "bracket_table":
+            bracket_table,
+            "playoff_advancement":
+            playoff_advancement,
+            "playoff_template":
+            playoff_template,
+            "district_points_sorted":
+            district_points_sorted,
+            "event_insights_qual":
+            event_insights['qual'] if event_insights else None,
+            "event_insights_playoff":
+            event_insights['playoff'] if event_insights else None,
+            "event_insights_template":
+            event_insights_template,
+            "medias_by_slugname":
+            medias_by_slugname,
+            "event_divisions":
+            event_divisions,
+            'parent_event':
+            parent_event_future.get_result() if parent_event_future else None,
+            'double_elim_matches':
+            double_elim_matches,
+            'double_elim_playoff_types':
+            PlayoffType.DOUBLE_ELIM_TYPES,
         })
 
         if event.within_a_day:
@@ -293,19 +342,25 @@ class EventInsights(CacheableHandler):
 
         event.get_matches_async()
 
-        match_predictions = event.details.predictions.get('match_predictions', None)
-        match_prediction_stats = event.details.predictions.get('match_prediction_stats', None)
+        match_predictions = event.details.predictions.get(
+            'match_predictions', None)
+        match_prediction_stats = event.details.predictions.get(
+            'match_prediction_stats', None)
 
-        ranking_predictions = event.details.predictions.get('ranking_predictions', None)
-        ranking_prediction_stats = event.details.predictions.get('ranking_prediction_stats', None)
+        ranking_predictions = event.details.predictions.get(
+            'ranking_predictions', None)
+        ranking_prediction_stats = event.details.predictions.get(
+            'ranking_prediction_stats', None)
 
-        cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches, event)
+        cleaned_matches = MatchHelper.deleteInvalidMatches(
+            event.matches, event)
         matches = MatchHelper.organizeMatches(cleaned_matches)
 
         # If no matches but there are match predictions, create fake matches
         # For cases where FIRST doesn't allow posting of match schedule
         fake_matches = False
-        if match_predictions and (not matches['qm'] and match_predictions['qual']):
+        if match_predictions and (not matches['qm']
+                                  and match_predictions['qual']):
             fake_matches = True
             for i in xrange(len(match_predictions['qual'].keys())):
                 match_number = i + 1
@@ -319,19 +374,17 @@ class EventInsights(CacheableHandler):
                         'teams': ['frc?', 'frc?', 'frc?']
                     }
                 }
-                matches['qm'].append(Match(
-                    id=Match.renderKeyName(
-                        event_key,
-                        'qm',
-                        1,
-                        match_number),
-                    event=event.key,
-                    year=event.year,
-                    set_number=1,
-                    match_number=match_number,
-                    comp_level='qm',
-                    alliances_json=json.dumps(alliances),
-                ))
+                matches['qm'].append(
+                    Match(
+                        id=Match.renderKeyName(event_key, 'qm', 1,
+                                               match_number),
+                        event=event.key,
+                        year=event.year,
+                        set_number=1,
+                        match_number=match_number,
+                        comp_level='qm',
+                        alliances_json=json.dumps(alliances),
+                    ))
 
         # Add actual scores to predictions
         distribution_info = {}
@@ -339,37 +392,57 @@ class EventInsights(CacheableHandler):
             level = 'qual' if comp_level == 'qm' else 'playoff'
             for match in matches[comp_level]:
                 distribution_info[match.key.id()] = {
-                    'level': level,
-                    'red_actual_score': match.alliances['red']['score'],
-                    'blue_actual_score': match.alliances['blue']['score'],
-                    'red_mean': match_predictions[level][match.key.id()]['red']['score'],
-                    'blue_mean': match_predictions[level][match.key.id()]['blue']['score'],
-                    'red_var': match_predictions[level][match.key.id()]['red']['score_var'],
-                    'blue_var': match_predictions[level][match.key.id()]['blue']['score_var'],
-            }
+                    'level':
+                    level,
+                    'red_actual_score':
+                    match.alliances['red']['score'],
+                    'blue_actual_score':
+                    match.alliances['blue']['score'],
+                    'red_mean':
+                    match_predictions[level][match.key.id()]['red']['score'],
+                    'blue_mean':
+                    match_predictions[level][match.key.id()]['blue']['score'],
+                    'red_var':
+                    match_predictions[level][match.key.id()]['red'][
+                        'score_var'],
+                    'blue_var':
+                    match_predictions[level][match.key.id()]['blue'][
+                        'score_var'],
+                }
 
         last_played_match_num = None
         if ranking_prediction_stats:
-            last_played_match_key = ranking_prediction_stats.get('last_played_match', None)
+            last_played_match_key = ranking_prediction_stats.get(
+                'last_played_match', None)
             if last_played_match_key:
                 last_played_match_num = last_played_match_key.split('_qm')[1]
 
         self.template_values.update({
-            "event": event,
-            "matches": matches,
-            "fake_matches": fake_matches,
-            "match_predictions": match_predictions,
-            "distribution_info_json": json.dumps(distribution_info),
-            "match_prediction_stats": match_prediction_stats,
-            "ranking_predictions": ranking_predictions,
-            "ranking_prediction_stats": ranking_prediction_stats,
-            "last_played_match_num": last_played_match_num,
+            "event":
+            event,
+            "matches":
+            matches,
+            "fake_matches":
+            fake_matches,
+            "match_predictions":
+            match_predictions,
+            "distribution_info_json":
+            json.dumps(distribution_info),
+            "match_prediction_stats":
+            match_prediction_stats,
+            "ranking_predictions":
+            ranking_predictions,
+            "ranking_prediction_stats":
+            ranking_prediction_stats,
+            "last_played_match_num":
+            last_played_match_num,
         })
 
         if event.within_a_day:
             self._cache_expiration = self.SHORT_CACHE_EXPIRATION
 
-        return jinja2_engine.render('event_insights.html', self.template_values)
+        return jinja2_engine.render('event_insights.html',
+                                    self.template_values)
 
 
 class EventRss(CacheableHandler):
@@ -403,7 +476,8 @@ class EventRss(CacheableHandler):
             "datetime": datetime.datetime.now()
         })
 
-        self.response.headers['content-type'] = 'application/xml; charset=UTF-8'
+        self.response.headers[
+            'content-type'] = 'application/xml; charset=UTF-8'
         return jinja2_engine.render('event_rss.xml', self.template_values)
 
 
@@ -420,22 +494,31 @@ class EventNextMatchHandler(CacheableHandler):
         if not event:
             self.abort(404)
             return
-        medias_future = media_query.EventTeamsPreferredMediasQuery(event_key).fetch_async()
+        medias_future = media_query.EventTeamsPreferredMediasQuery(
+            event_key).fetch_async()
         next_match = MatchHelper.upcomingMatches(event.matches, num=1)
         next_match = next_match[0] if next_match else None
         team_and_medias = []
         if next_match:
             # Organize medias by team
-            teams = ndb.get_multi([ndb.Key(Team, team_key) for team_key in next_match.alliances['red']['teams'] + next_match.alliances['blue']['teams']])
-            image_medias = MediaHelper.get_images([media for media in medias_future.get_result()])
+            teams = ndb.get_multi([
+                ndb.Key(Team, team_key)
+                for team_key in next_match.alliances['red']['teams'] +
+                next_match.alliances['blue']['teams']
+            ])
+            image_medias = MediaHelper.get_images(
+                [media for media in medias_future.get_result()])
             team_medias = defaultdict(list)
             for image_media in image_medias:
                 for reference in image_media.references:
                     team_medias[reference].append(image_media)
 
-            stations = ['Red 1', 'Red 2', 'Red 3', 'Blue 1', 'Blue 2', 'Blue 3']
+            stations = [
+                'Red 1', 'Red 2', 'Red 3', 'Blue 1', 'Blue 2', 'Blue 3'
+            ]
             for i, team in enumerate(teams):
-                team_and_medias.append((team, stations[i], team_medias.get(team.key, [])))
+                team_and_medias.append((team, stations[i], team_medias.get(
+                    team.key, [])))
 
         self.template_values.update({
             'event': event,
@@ -443,5 +526,3 @@ class EventNextMatchHandler(CacheableHandler):
             'teams_and_media': team_and_medias,
         })
         return jinja2_engine.render('nextmatch.html', self.template_values)
-
-

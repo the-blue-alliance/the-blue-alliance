@@ -20,7 +20,8 @@ from models.suggestion import Suggestion
 
 class TestSuggestEventMediaReviewController(unittest2.TestCase):
     def setUp(self):
-        self.policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1)
+        self.policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(
+            probability=1)
         self.testbed = testbed.Testbed()
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub(consistency_policy=self.policy)
@@ -28,11 +29,18 @@ class TestSuggestEventMediaReviewController(unittest2.TestCase):
         self.testbed.init_user_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_taskqueue_stub(_all_queues_valid=True)
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
-        app = webapp2.WSGIApplication([
-            RedirectRoute(r'/suggest/event/media/review', SuggestEventMediaReviewController, 'review-event-media', strict_slash=True),
-        ], debug=True)
+        app = webapp2.WSGIApplication(
+            [
+                RedirectRoute(
+                    r'/suggest/event/media/review',
+                    SuggestEventMediaReviewController,
+                    'review-event-media',
+                    strict_slash=True),
+            ],
+            debug=True)
         self.testapp = webtest.TestApp(app)
 
     def tearDown(self):
@@ -43,23 +51,19 @@ class TestSuggestEventMediaReviewController(unittest2.TestCase):
             user_email="user@example.com",
             user_id="123",
             user_is_admin='0',
-            overwrite=True
-        )
+            overwrite=True)
 
         self.account = Account.get_or_insert(
-            "123",
-            email="user@example.com",
-            registered=True
-        )
+            "123", email="user@example.com", registered=True)
 
     def givePermission(self):
         self.account.permissions.append(AccountPermissions.REVIEW_EVENT_MEDIA)
         self.account.put()
 
     def createSuggestion(self):
-        status = SuggestionCreator.createEventMediaSuggestion(self.account.key,
-                                                              'https://www.youtube.com/watch?v=foobar',
-                                                              '2016nyny')
+        status = SuggestionCreator.createEventMediaSuggestion(
+            self.account.key, 'https://www.youtube.com/watch?v=foobar',
+            '2016nyny')
         self.assertEqual(status[0], 'success')
         return Suggestion.query().fetch(keys_only=True)[0].id()
 
@@ -74,7 +78,8 @@ class TestSuggestEventMediaReviewController(unittest2.TestCase):
     def test_login_redirect(self):
         response = self.testapp.get('/suggest/event/media/review', status='3*')
         response = response.follow(expect_errors=True)
-        self.assertTrue(response.request.path.startswith("/account/login_required"))
+        self.assertTrue(
+            response.request.path.startswith("/account/login_required"))
 
     def test_no_permissions(self):
         self.loginUser()
@@ -93,7 +98,8 @@ class TestSuggestEventMediaReviewController(unittest2.TestCase):
         self.givePermission()
         suggestion_id = self.createSuggestion()
         form = self.getSuggestionForm()
-        form['accept_reject-{}'.format(suggestion_id)] = 'accept::{}'.format(suggestion_id)
+        form['accept_reject-{}'.format(suggestion_id)] = 'accept::{}'.format(
+            suggestion_id)
         response = form.submit().follow()
         self.assertEqual(response.status_int, 200)
 
@@ -114,7 +120,8 @@ class TestSuggestEventMediaReviewController(unittest2.TestCase):
         self.givePermission()
         suggestion_id = self.createSuggestion()
         form = self.getSuggestionForm()
-        form['accept_reject-{}'.format(suggestion_id)] = 'reject::{}'.format(suggestion_id)
+        form['accept_reject-{}'.format(suggestion_id)] = 'reject::{}'.format(
+            suggestion_id)
         response = form.submit().follow()
         self.assertEqual(response.status_int, 200)
 

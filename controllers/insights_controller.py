@@ -29,7 +29,10 @@ class InsightsOverview(CacheableHandler):
             'valid_years': VALID_YEARS,
         })
 
-        insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(0, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
+        insights = ndb.get_multi([
+            ndb.Key(Insight, Insight.renderKeyName(0, insight_name))
+            for insight_name in Insight.INSIGHT_NAMES.values()
+        ])
         last_updated = None
         for insight in insights:
             if insight:
@@ -73,7 +76,10 @@ class InsightsDetail(CacheableHandler):
             'selected_year': year,
         })
 
-        insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(year, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
+        insights = ndb.get_multi([
+            ndb.Key(Insight, Insight.renderKeyName(year, insight_name))
+            for insight_name in Insight.INSIGHT_NAMES.values()
+        ])
         last_updated = None
         for insight in insights:
             if insight:
@@ -83,7 +89,10 @@ class InsightsDetail(CacheableHandler):
                 else:
                     last_updated = max(last_updated, insight.updated)
 
-        self.template_values['year_specific_insights_template'] = 'event_partials/event_insights_{}.html'.format(year)
+        self.template_values[
+            'year_specific_insights_template'] = 'event_partials/event_insights_{}.html'.format(
+                year)
         self.template_values['last_updated'] = last_updated
 
-        return jinja2_engine.render('insights_details.html', self.template_values)
+        return jinja2_engine.render('insights_details.html',
+                                    self.template_values)

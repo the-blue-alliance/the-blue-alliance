@@ -25,4 +25,7 @@ class Subscription(ndb.Model):
 
     @property
     def notification_names(self):
-        return [NotificationType.render_names[index] for index in self.notification_types]
+        return [
+            NotificationType.render_names[index]
+            for index in self.notification_types
+        ]

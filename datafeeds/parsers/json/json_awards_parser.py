@@ -33,22 +33,30 @@ class JSONAwardsParser(ParserBase):
                 raise ParserInputException("Award must have a 'name_str'")
 
             if team_key and not re.match(r'frc\d+', str(team_key)):
-                raise ParserInputException("Bad team_key: '{}'. Must follow format 'frcXXX' or be null.".format(team_key))
+                raise ParserInputException(
+                    "Bad team_key: '{}'. Must follow format 'frcXXX' or be null.".
+                    format(team_key))
 
             award_type_enum = AwardHelper.parse_award_type(name_str)
             if award_type_enum is None:
-                raise ParserInputException("Cannot determine award type from: '{}'. Please contact a www.thebluealliance.com admin.".format(name_str))
+                raise ParserInputException(
+                    "Cannot determine award type from: '{}'. Please contact a www.thebluealliance.com admin.".
+                    format(name_str))
 
             recipient_json = json.dumps({
-                'team_number': int(team_key[3:]) if team_key else None,
-                'awardee': awardee,
+                'team_number':
+                int(team_key[3:]) if team_key else None,
+                'awardee':
+                awardee,
             })
 
             award_key_name = Award.render_key_name(event_key, award_type_enum)
             if award_key_name in awards_by_key:
                 if team_key is not None:
-                    awards_by_key[award_key_name]['team_key_list'].append(team_key)
-                awards_by_key[award_key_name]['recipient_json_list'].append(recipient_json)
+                    awards_by_key[award_key_name]['team_key_list'].append(
+                        team_key)
+                awards_by_key[award_key_name]['recipient_json_list'].append(
+                    recipient_json)
             else:
                 awards_by_key[award_key_name] = {
                     'name_str': name_str,

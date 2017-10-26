@@ -23,7 +23,8 @@ class SuggestMatchVideoController(LoggedInHandler):
             self.redirect("/", abort=True)
 
         match_future = Match.get_by_id_async(self.request.get("match_key"))
-        event_future = Event.get_by_id_async(self.request.get("match_key").split("_")[0])
+        event_future = Event.get_by_id_async(
+            self.request.get("match_key").split("_")[0])
         match = match_future.get_result()
         event = event_future.get_result()
 
@@ -36,7 +37,9 @@ class SuggestMatchVideoController(LoggedInHandler):
             "match": match,
         })
 
-        self.response.out.write(jinja2_engine.render('suggestions/suggest_match_video.html', self.template_values))
+        self.response.out.write(
+            jinja2_engine.render('suggestions/suggest_match_video.html',
+                                 self.template_values))
 
     def post(self):
         self._require_registration()
@@ -45,15 +48,18 @@ class SuggestMatchVideoController(LoggedInHandler):
         youtube_url = self.request.get("youtube_url")
         youtube_id = YouTubeVideoHelper.parse_id_from_url(youtube_url)
 
-        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.user_bundle.account.key, youtube_id, match_key)
+        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(
+            self.user_bundle.account.key, youtube_id, match_key)
 
-        self.redirect('/suggest/match/video?match_key={}&status={}'.format(match_key, status))
+        self.redirect('/suggest/match/video?match_key={}&status={}'.format(
+            match_key, status))
 
 
 class SuggestMatchVideoPlaylistController(LoggedInHandler):
     """
     Allow users to suggest a playlist of YouTube videos for matches
     """
+
     def get(self):
         self._require_registration()
 
@@ -71,7 +77,10 @@ class SuggestMatchVideoPlaylistController(LoggedInHandler):
             "num_added": self.request.get("num_added")
         })
 
-        self.response.out.write(jinja2_engine.render('suggestions/suggest_match_video_playlist.html', self.template_values))
+        self.response.out.write(
+            jinja2_engine.render(
+                'suggestions/suggest_match_video_playlist.html',
+                self.template_values))
 
     def post(self):
         self._require_registration()
@@ -86,7 +95,8 @@ class SuggestMatchVideoPlaylistController(LoggedInHandler):
             self.response.out.write("Invalid event key {}".format(event_key))
             return
 
-        match_futures = Match.query(Match.event == event.key).fetch_async(keys_only=True)
+        match_futures = Match.query(Match.event == event.key).fetch_async(
+            keys_only=True)
         valid_match_keys = [match.id() for match in match_futures.get_result()]
 
         num_videos = int(self.request.get("num_videos", 0))
@@ -101,8 +111,10 @@ class SuggestMatchVideoPlaylistController(LoggedInHandler):
             if match_key not in valid_match_keys:
                 continue
 
-            status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.user_bundle.account.key, yt_id, match_key)
+            status = SuggestionCreator.createMatchVideoYouTubeSuggestion(
+                self.user_bundle.account.key, yt_id, match_key)
             if status == 'success':
                 suggestions_added += 1
 
-        self.redirect('/suggest/event/video?event_key={}&num_added={}'.format(event_key, suggestions_added))
+        self.redirect('/suggest/event/video?event_key={}&num_added={}'.format(
+            event_key, suggestions_added))

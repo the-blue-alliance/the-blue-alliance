@@ -28,7 +28,8 @@ def convert_to_comparable(data):
 @unittest2.skip
 class TestUsfirstEventAwardsParser_05_06(unittest2.TestCase):
     def test_parse_regional_2006sj(self):
-        with open('test_data/usfirst_html/usfirst_event_awards_2006sj.html', 'r') as f:
+        with open('test_data/usfirst_html/usfirst_event_awards_2006sj.html',
+                  'r') as f:
             awards, _ = UsfirstEventAwardsParser_05_06.parse(f.read())
 
         # Check number of parsed awards
@@ -45,32 +46,50 @@ class TestUsfirstEventAwardsParser_05_06(unittest2.TestCase):
             'name_str': "Regional Chairman's Award",
             'award_type_enum': AwardType.CHAIRMANS,
             'team_number_list': [192],
-            'recipient_json_list': [{'team_number': 192, 'awardee': None}],
+            'recipient_json_list': [{
+                'team_number': 192,
+                'awardee': None
+            }],
         }
         self.assertTrue(team_award in awards)
 
         # Test Multi Team Award
         multi_team_award = {
-            'name_str': "Regional Winner",
-            'award_type_enum': AwardType.WINNER,
+            'name_str':
+            "Regional Winner",
+            'award_type_enum':
+            AwardType.WINNER,
             'team_number_list': [254, 581, 766],
-            'recipient_json_list': [{'team_number': 254, 'awardee': None},
-                                    {'team_number': 581, 'awardee': None},
-                                    {'team_number': 766, 'awardee': None}],
+            'recipient_json_list': [{
+                'team_number': 254,
+                'awardee': None
+            }, {
+                'team_number': 581,
+                'awardee': None
+            }, {
+                'team_number': 766,
+                'awardee': None
+            }],
         }
         self.assertTrue(multi_team_award in awards)
 
         # Test Individual Award
         individual_award = {
-            'name_str': "Regional Woodie Flowers Award",
-            'award_type_enum': AwardType.WOODIE_FLOWERS,
+            'name_str':
+            "Regional Woodie Flowers Award",
+            'award_type_enum':
+            AwardType.WOODIE_FLOWERS,
             'team_number_list': [],
-            'recipient_json_list': [{'team_number': None, 'awardee': u"William Dunbar"}],
+            'recipient_json_list': [{
+                'team_number': None,
+                'awardee': u"William Dunbar"
+            }],
         }
         self.assertTrue(individual_award in awards)
 
     def test_parse_regional_2006or(self):
-        with open('test_data/usfirst_html/usfirst_event_awards_2006or.html', 'r') as f:
+        with open('test_data/usfirst_html/usfirst_event_awards_2006or.html',
+                  'r') as f:
             awards, _ = UsfirstEventAwardsParser_05_06.parse(f.read())
 
         # Check number of parsed awards
@@ -87,12 +106,16 @@ class TestUsfirstEventAwardsParser_05_06(unittest2.TestCase):
             'name_str': "Regional Chairman's Award",
             'award_type_enum': AwardType.CHAIRMANS,
             'team_number_list': [492],
-            'recipient_json_list': [{'team_number': 492, 'awardee': None}],
+            'recipient_json_list': [{
+                'team_number': 492,
+                'awardee': None
+            }],
         }
         self.assertTrue(team_award in awards)
 
     def test_parse_regional_2005sj(self):
-        with open('test_data/usfirst_html/usfirst_event_awards_2005sj.html', 'r') as f:
+        with open('test_data/usfirst_html/usfirst_event_awards_2005sj.html',
+                  'r') as f:
             awards, _ = UsfirstEventAwardsParser_05_06.parse(f.read())
 
         # Check number of parsed awards
@@ -109,26 +132,43 @@ class TestUsfirstEventAwardsParser_05_06(unittest2.TestCase):
             'name_str': "Regional Chairmans Winner",
             'award_type_enum': AwardType.CHAIRMANS,
             'team_number_list': [368],
-            'recipient_json_list': [{'team_number': 368, 'awardee': None}],
+            'recipient_json_list': [{
+                'team_number': 368,
+                'awardee': None
+            }],
         }
         self.assertTrue(team_award in awards)
 
         # Test Multi Team Award
         multi_team_award = {
-            'name_str': "Regional Winner",
-            'award_type_enum': AwardType.WINNER,
+            'name_str':
+            "Regional Winner",
+            'award_type_enum':
+            AwardType.WINNER,
             'team_number_list': [980, 254, 22],
-            'recipient_json_list': [{'team_number': 980, 'awardee': None},
-                                    {'team_number': 254, 'awardee': None},
-                                    {'team_number': 22, 'awardee': None}],
+            'recipient_json_list': [{
+                'team_number': 980,
+                'awardee': None
+            }, {
+                'team_number': 254,
+                'awardee': None
+            }, {
+                'team_number': 22,
+                'awardee': None
+            }],
         }
         self.assertTrue(multi_team_award in awards)
 
         # Test Individual Award
         individual_award = {
-            'name_str': "Regional Woodie Flowers Award",
-            'award_type_enum': AwardType.WOODIE_FLOWERS,
+            'name_str':
+            "Regional Woodie Flowers Award",
+            'award_type_enum':
+            AwardType.WOODIE_FLOWERS,
             'team_number_list': [568],
-            'recipient_json_list': [{'team_number': 568, 'awardee': u"AREA/BP/CIRI & Dimond High"}],
+            'recipient_json_list': [{
+                'team_number': 568,
+                'awardee': u"AREA/BP/CIRI & Dimond High"
+            }],
         }
         self.assertTrue(individual_award in awards)

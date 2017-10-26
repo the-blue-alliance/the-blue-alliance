@@ -6,6 +6,7 @@ class RobotManipulator(ManipulatorBase):
     """
     Handle Robot database writes.
     """
+
     @classmethod
     def getCacheKeysAndControllers(cls, affected_refs):
         return CacheClearer.get_robot_cache_keys_and_controllers(affected_refs)

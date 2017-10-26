@@ -48,7 +48,8 @@ class DatafeedUsfirst(DatafeedBase):
     EVENT_RANKINGS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/rankings.html"  # % (year, event_short)
 
     YEAR_MATCH_RESULTS_URL_PATTERN = {
-        2003: "http://www2.usfirst.org/%scomp/events/%s/matchsum.html",  # % (year, event_short)
+        2003:
+        "http://www2.usfirst.org/%scomp/events/%s/matchsum.html",  # % (year, event_short)
     }
     DEFAULT_MATCH_RESULTS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/matchresults.html"  # % (year, event_short)
 
@@ -61,7 +62,8 @@ class DatafeedUsfirst(DatafeedBase):
         "cur": "Curie",
         "gal": "Galileo",
         "new": "Newton",
-        "ein": "Einstein",  # Only used for 2008ein due to FIRST's inconsistent naming
+        "ein":
+        "Einstein",  # Only used for 2008ein due to FIRST's inconsistent naming
     }
 
     ALLIANCES_PARSER = UsfirstAlliancesParser
@@ -89,8 +91,8 @@ class DatafeedUsfirst(DatafeedBase):
 
     def getEventAlliances(self, event):
         alliances_url = self.DEFAULT_ALLIANCES_URL_PATTERN % (
-                event.year, self.EVENT_SHORT_EXCEPTIONS.get(event.event_short,
-                                                            event.event_short))
+            event.year, self.EVENT_SHORT_EXCEPTIONS.get(
+                event.event_short, event.event_short))
 
         alliances, _ = self.parse(alliances_url, self.ALLIANCES_PARSER)
         return alliances
@@ -114,10 +116,11 @@ class DatafeedUsfirst(DatafeedBase):
             venue_address=event.get("venue_address", None),
             venue=event.get("venue", None),
             location=event.get("location", None),
-            timezone_id=EventHelper.get_timezone_id(event.get("location", None), '{}{}'.format(event['year'], event['event_short'])),
+            timezone_id=EventHelper.get_timezone_id(
+                event.get("location", None), '{}{}'.format(
+                    event['year'], event['event_short'])),
             website=event.get("website", None),
-            year=event.get("year", None)
-        )
+            year=event.get("year", None))
 
     def getEventList(self, year):
         if type(year) is not int:
@@ -125,19 +128,20 @@ class DatafeedUsfirst(DatafeedBase):
         url = self.EVENT_LIST_REGIONALS_URL_PATTERN % year
         events, _ = self.parse(url, UsfirstEventListParser)
 
-        return [Event(
-            event_type_enum=event.get("event_type_enum", None),
-            event_district_enum=event.get("event_district_enum", None),
-            event_short="???",
-            first_eid=event.get("first_eid", None),
-            name=event.get("name", None),
-            year=int(year)
-            )
-            for event in events]
+        return [
+            Event(
+                event_type_enum=event.get("event_type_enum", None),
+                event_district_enum=event.get("event_district_enum", None),
+                event_short="???",
+                first_eid=event.get("first_eid", None),
+                name=event.get("name", None),
+                year=int(year)) for event in events
+        ]
 
     def getEventRankings(self, event):
-        url = self.EVENT_RANKINGS_URL_PATTERN % (event.year,
-                                                 self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
+        url = self.EVENT_RANKINGS_URL_PATTERN % (
+            event.year, self.EVENT_SHORT_EXCEPTIONS.get(
+                event.event_short, event.event_short))
         rankings, _ = self.parse(url, UsfirstEventRankingsParser)
         return rankings
 
@@ -146,26 +150,37 @@ class DatafeedUsfirst(DatafeedBase):
         Works reliably for regional events from 2002-present and
         championship events from 2007-present
         """
-        if event.year < 2002 or (event.event_type_enum in EventType.CMP_EVENT_TYPES and event.year < 2007):
+        if event.year < 2002 or (
+                event.event_type_enum in EventType.CMP_EVENT_TYPES
+                and event.year < 2007):
             # award pages malformatted
-            logging.warning("Skipping awards parsing for event: {}".format(event.key_name))
+            logging.warning("Skipping awards parsing for event: {}".format(
+                event.key_name))
             return []
 
-        url = self.EVENT_AWARDS_URL_PATTERN % (event.year,
-                                               self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
-        awards, _ = self.parse(url, self.YEAR_AWARD_PARSER.get(event.year, self.DEFAULT_AWARD_PARSER))
+        url = self.EVENT_AWARDS_URL_PATTERN % (
+            event.year, self.EVENT_SHORT_EXCEPTIONS.get(
+                event.event_short, event.event_short))
+        awards, _ = self.parse(url,
+                               self.YEAR_AWARD_PARSER.get(
+                                   event.year, self.DEFAULT_AWARD_PARSER))
 
-        return [Award(
-            id=Award.render_key_name(event.key_name, award['award_type_enum']),
-            name_str=award['name_str'],
-            award_type_enum=award['award_type_enum'],
-            year=event.year,
-            event=event.key,
-            event_type_enum=event.event_type_enum,
-            team_list=[ndb.Key(Team, 'frc{}'.format(team_number)) for team_number in award['team_number_list']],
-            recipient_json_list=award['recipient_json_list']
-            )
-            for award in awards]
+        return [
+            Award(
+                id=Award.render_key_name(event.key_name,
+                                         award['award_type_enum']),
+                name_str=award['name_str'],
+                award_type_enum=award['award_type_enum'],
+                year=event.year,
+                event=event.key,
+                event_type_enum=event.event_type_enum,
+                team_list=[
+                    ndb.Key(Team, 'frc{}'.format(team_number))
+                    for team_number in award['team_number_list']
+                ],
+                recipient_json_list=award['recipient_json_list'])
+            for award in awards
+        ]
 
     def getEventTeams(self, year, first_eid):
         """
@@ -176,78 +191,96 @@ class DatafeedUsfirst(DatafeedBase):
 
         teams = []
         seen_teams = set()
-        for page in range(8):  # Ensures this won't loop forever. 8 pages should be plenty.
+        for page in range(
+                8
+        ):  # Ensures this won't loop forever. 8 pages should be plenty.
             page_urlparam = 'page=%s&' % page
             url = self.EVENT_TEAMS_URL_PATTERN % (first_eid, page_urlparam)
-            partial_teams, more_pages = self.parse(url, UsfirstEventTeamsParser)
+            partial_teams, more_pages = self.parse(url,
+                                                   UsfirstEventTeamsParser)
             teams.extend(partial_teams)
 
-            partial_seen_teams = set([team['team_number'] for team in partial_teams])
+            partial_seen_teams = set(
+                [team['team_number'] for team in partial_teams])
             new_teams = partial_seen_teams.difference(seen_teams)
             if (not more_pages) or (new_teams == set()):
                 break
 
             seen_teams = seen_teams.union(partial_seen_teams)
 
-        return [Team(
-            id="frc%s" % team.get("team_number", None),
-            first_tpid=team.get("first_tpid", None),
-            first_tpid_year=year,
-            team_number=team.get("team_number", None)
-            )
-            for team in teams]
+        return [
+            Team(
+                id="frc%s" % team.get("team_number", None),
+                first_tpid=team.get("first_tpid", None),
+                first_tpid_year=year,
+                team_number=team.get("team_number", None)) for team in teams
+        ]
 
     def getMatches(self, event):
         matches_url = self.YEAR_MATCH_RESULTS_URL_PATTERN.get(
             event.year, self.DEFAULT_MATCH_RESULTS_URL_PATTERN) % (
-                event.year, self.EVENT_SHORT_EXCEPTIONS.get(event.event_short,
-                                                            event.event_short))
+                event.year, self.EVENT_SHORT_EXCEPTIONS.get(
+                    event.event_short, event.event_short))
 
-        match_dicts, _ = self.parse(matches_url, self.YEAR_MATCH_PARSER.get(event.year, self.DEFAULT_MATCH_PARSER))
+        match_dicts, _ = self.parse(matches_url,
+                                    self.YEAR_MATCH_PARSER.get(
+                                        event.year, self.DEFAULT_MATCH_PARSER))
         if not match_dicts:  # Matches have not been played, but qual match schedule may be out
             # If this is run when there are already matches in the DB, it will overwrite scores!
             # Check to make sure event has no existing matches
-            if len(Match.query(Match.event == event.key).fetch(1, keys_only=True)) == 0:
-                logging.warning("No matches found for {}. Trying to parse qual match schedule.".format(event.key.id()))
+            if len(
+                    Match.query(Match.event == event.key).fetch(
+                        1, keys_only=True)) == 0:
+                logging.warning(
+                    "No matches found for {}. Trying to parse qual match schedule.".
+                    format(event.key.id()))
 
                 qual_match_sched_url = self.MATCH_SCHEDULE_QUAL_URL_PATTERN % (
-                    event.year, self.EVENT_SHORT_EXCEPTIONS.get(event.event_short,
-                                                                event.event_short))
-                match_dicts, _ = self.parse(qual_match_sched_url, self.MATCH_SCHEDULE_PARSER)
+                    event.year, self.EVENT_SHORT_EXCEPTIONS.get(
+                        event.event_short, event.event_short))
+                match_dicts, _ = self.parse(qual_match_sched_url,
+                                            self.MATCH_SCHEDULE_PARSER)
 
         for match_dict in match_dicts:
             alliances = json.loads(match_dict['alliances_json'])
-            if (alliances['red']['score'] == -1 or alliances['blue']['score'] == -1 or
-                match_dict['comp_level'] in Match.ELIM_LEVELS):
+            if (alliances['red']['score'] == -1
+                    or alliances['blue']['score'] == -1
+                    or match_dict['comp_level'] in Match.ELIM_LEVELS):
                 break
         else:  # Only qual matches have been played and they have all been played
             # If this is run when there are already elim matches in the DB, it will overwrite scores!
             # Check to make sure event has no existing elim matches
-            if len(Match.query(Match.event == event.key, Match.comp_level.IN(Match.ELIM_LEVELS)).fetch(1, keys_only=True)) == 0:
-                logging.warning("No elim matches found for {}. Trying to parse elim match schedule.".format(event.key.id()))
+            if len(
+                    Match.query(Match.event == event.key,
+                                Match.comp_level.IN(Match.ELIM_LEVELS)).fetch(
+                                    1, keys_only=True)) == 0:
+                logging.warning(
+                    "No elim matches found for {}. Trying to parse elim match schedule.".
+                    format(event.key.id()))
 
                 elim_match_sched_url = self.MATCH_SCHEDULE_ELIMS_URL_PATTERN % (
-                    event.year, self.EVENT_SHORT_EXCEPTIONS.get(event.event_short,
-                                                                event.event_short))
-                elim_match_dicts, _ = self.parse(elim_match_sched_url, self.MATCH_SCHEDULE_PARSER)
+                    event.year, self.EVENT_SHORT_EXCEPTIONS.get(
+                        event.event_short, event.event_short))
+                elim_match_dicts, _ = self.parse(elim_match_sched_url,
+                                                 self.MATCH_SCHEDULE_PARSER)
                 match_dicts += elim_match_dicts
 
-        matches = [Match(
-            id=Match.renderKeyName(
-                event.key.id(),
-                match_dict.get("comp_level", None),
-                match_dict.get("set_number", 0),
-                match_dict.get("match_number", 0)),
-            event=event.key,
-            year=event.year,
-            set_number=match_dict.get("set_number", 0),
-            match_number=match_dict.get("match_number", 0),
-            comp_level=match_dict.get("comp_level", None),
-            team_key_names=match_dict.get("team_key_names", None),
-            time_string=match_dict.get("time_string", None),
-            alliances_json=match_dict.get("alliances_json", None)
-            )
-            for match_dict in match_dicts]
+        matches = [
+            Match(
+                id=Match.renderKeyName(event.key.id(),
+                                       match_dict.get("comp_level", None),
+                                       match_dict.get("set_number", 0),
+                                       match_dict.get("match_number", 0)),
+                event=event.key,
+                year=event.year,
+                set_number=match_dict.get("set_number", 0),
+                match_number=match_dict.get("match_number", 0),
+                comp_level=match_dict.get("comp_level", None),
+                team_key_names=match_dict.get("team_key_names", None),
+                time_string=match_dict.get("time_string", None),
+                alliances_json=match_dict.get("alliances_json", None))
+            for match_dict in match_dicts
+        ]
 
         MatchHelper.add_match_times(event, matches)
         return matches
@@ -264,10 +297,11 @@ class DatafeedUsfirst(DatafeedBase):
                         name=self._shorten(team_dict.get("name", None)),
                         address=team_dict.get("address", None),
                         nickname=team_dict.get("nickname", None),
-                        website=team_dict.get("website", None)
-                    )
+                        website=team_dict.get("website", None))
                 else:
-                    logging.warning("No team_number found scraping %s, probably retired team" % team.team_number)
+                    logging.warning(
+                        "No team_number found scraping %s, probably retired team"
+                        % team.team_number)
                     return None
 
         logging.warning('Null TPID for team %s' % team.team_number)

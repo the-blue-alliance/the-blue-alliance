@@ -8,6 +8,7 @@ class DatafeedBase(object):
     Provides structure for fetching and parsing pages from websites.
     Other Datafeeds inherit from here.
     """
+
     def parse(self, url, parser, usfirst_session_key=None):
         headers = {
             'Cache-Control': 'no-cache, max-age=10',
@@ -21,9 +22,7 @@ class DatafeedBase(object):
             headers['Cookie'] = usfirst_session_key
 
         try:
-            result = urlfetch.fetch(url,
-                                    headers=headers,
-                                    deadline=10)
+            result = urlfetch.fetch(url, headers=headers, deadline=10)
         except Exception, e:
             logging.error("URLFetch failed for: {}".format(url))
             logging.info(e)

@@ -8,6 +8,7 @@ class TbaVideosParser(ParserBase):
     """
     Facilitates building TBAVideos store from TBA.
     """
+
     @classmethod
     def parse(self, html):
         """

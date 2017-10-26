@@ -13,7 +13,8 @@ class SuggestMatchVideoReviewController(SuggestionsReviewBaseController):
         super(SuggestMatchVideoReviewController, self).__init__(*args, **kw)
 
     def create_target_model(self, suggestion):
-        target_key = self.request.get('key-{}'.format(suggestion.key.id()), suggestion.target_key)
+        target_key = self.request.get('key-{}'.format(suggestion.key.id()),
+                                      suggestion.target_key)
         match = Match.get_by_id(target_key)
         if not match:
             return None
@@ -22,10 +23,11 @@ class SuggestMatchVideoReviewController(SuggestionsReviewBaseController):
     """
     View the list of suggestions.
     """
+
     def get(self):
         suggestions = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
-            Suggestion.target_model == "match").fetch(limit=50)
+                Suggestion.target_model == "match").fetch(limit=50)
 
         # Roughly sort by event and match for easier review
         suggestions = sorted(suggestions, key=lambda s: s.target_key)
@@ -34,11 +36,16 @@ class SuggestMatchVideoReviewController(SuggestionsReviewBaseController):
             "suggestions": suggestions,
         })
 
-        self.response.out.write(jinja2_engine.render('suggestions/suggest_match_video_review_list.html', self.template_values))
+        self.response.out.write(
+            jinja2_engine.render(
+                'suggestions/suggest_match_video_review_list.html',
+                self.template_values))
 
     def post(self):
-        accept_keys = map(lambda x: int(x) if x.isdigit() else x, self.request.POST.getall("accept_keys[]"))
-        reject_keys = map(lambda x: int(x) if x.isdigit() else x, self.request.POST.getall("reject_keys[]"))
+        accept_keys = map(lambda x: int(x) if x.isdigit() else x,
+                          self.request.POST.getall("accept_keys[]"))
+        reject_keys = map(lambda x: int(x) if x.isdigit() else x,
+                          self.request.POST.getall("reject_keys[]"))
 
         for accept_key in accept_keys:
             self._process_accepted(accept_key)

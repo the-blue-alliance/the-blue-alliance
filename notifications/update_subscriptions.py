@@ -31,4 +31,7 @@ class UpdateSubscriptionsNotification(BaseNotification):
             self.keys[ClientType.OS_ANDROID].remove(self.sending_device_key)
 
         data = self._build_dict()
-        return GCMMessage(self.keys[ClientType.OS_ANDROID], data, collapse_key=user_collapse_key)
+        return GCMMessage(
+            self.keys[ClientType.OS_ANDROID],
+            data,
+            collapse_key=user_collapse_key)

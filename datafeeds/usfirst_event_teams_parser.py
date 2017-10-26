@@ -12,7 +12,8 @@ class UsfirstEventTeamsParser(ParserBase):
         Find what Teams are attending an Event, and return their team_numbers.
         """
 
-        teamRe = re.compile(r'whats-going-on\/team\/(\d*)\?ProgramCode=FRC">(\d*)')
+        teamRe = re.compile(
+            r'whats-going-on\/team\/(\d*)\?ProgramCode=FRC">(\d*)')
 
         teams = list()
         for first_tpid, team_number in teamRe.findall(html):

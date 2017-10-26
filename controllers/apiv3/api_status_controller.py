@@ -14,8 +14,10 @@ class ApiStatusController(ApiBaseController):
 
     def _render(self):
         status_sitevar_future = Sitevar.get_by_id_async('apistatus')
-        fmsapi_sitevar_future = Sitevar.get_by_id_async('apistatus.fmsapi_down')
-        down_events_sitevar_future = Sitevar.get_by_id_async('apistatus.down_events')
+        fmsapi_sitevar_future = Sitevar.get_by_id_async(
+            'apistatus.fmsapi_down')
+        down_events_sitevar_future = Sitevar.get_by_id_async(
+            'apistatus.down_events')
 
         # Error out of no sitevar found
         status_sitevar = status_sitevar_future.get_result()
@@ -28,11 +30,14 @@ class ApiStatusController(ApiBaseController):
         down_events_list = down_events_sitevar.contents if down_events_sitevar else None
 
         fmsapi_sitevar = fmsapi_sitevar_future.get_result()
-        status_dict['is_datafeed_down'] = True if fmsapi_sitevar and fmsapi_sitevar.contents == True else False
+        status_dict[
+            'is_datafeed_down'] = True if fmsapi_sitevar and fmsapi_sitevar.contents == True else False
         status_dict['down_events'] = down_events_list if down_events_list is not None else []
 
-        self._last_modified = max([status_sitevar.updated] +
-            [down_events_sitevar.updated] if down_events_sitevar else [] +
-            [fmsapi_sitevar.updated] if fmsapi_sitevar else [])
+        self._last_modified = max([status_sitevar.updated] + [
+            down_events_sitevar.updated
+        ] if down_events_sitevar else [] + [fmsapi_sitevar.updated]
+                                  if fmsapi_sitevar else [])
 
-        return json.dumps(status_dict, ensure_ascii=True, indent=2, sort_keys=True)
+        return json.dumps(
+            status_dict, ensure_ascii=True, indent=2, sort_keys=True)

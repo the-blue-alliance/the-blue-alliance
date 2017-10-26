@@ -15,7 +15,10 @@ class TestBaseNotification(unittest2.TestCase):
         # User a Ping notification to test the render and send classes
         # It's as simple as it gets
         self.notification = PingNotification()
-        self.keys = {ClientType.OS_ANDROID: ["abc123"], ClientType.WEBHOOK: ["123abc"]}
+        self.keys = {
+            ClientType.OS_ANDROID: ["abc123"],
+            ClientType.WEBHOOK: ["123abc"]
+        }
         self.notification.keys = self.keys
 
     def tearDown(self):
@@ -24,7 +27,8 @@ class TestBaseNotification(unittest2.TestCase):
     def test_render_android(self):
         message = self.notification._render_android()
 
-        self.assertEqual(self.keys[ClientType.OS_ANDROID], message.device_tokens)
+        self.assertEqual(self.keys[ClientType.OS_ANDROID],
+                         message.device_tokens)
         self.assertEqual(self.notification._build_dict(), message.notification)
 
     def test_render_webhook(self):

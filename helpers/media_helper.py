@@ -32,11 +32,13 @@ class MediaHelper(object):
 
     @classmethod
     def get_images(cls, medias):
-        return filter(lambda m: m.media_type_enum in MediaType.image_types, medias)
+        return filter(lambda m: m.media_type_enum in MediaType.image_types,
+                      medias)
 
     @classmethod
     def get_socials(cls, medias):
-        return filter(lambda m: m.media_type_enum in MediaType.social_types, medias)
+        return filter(lambda m: m.media_type_enum in MediaType.social_types,
+                      medias)
 
     @classmethod
     def social_media_sorter(cls, media):
@@ -46,7 +48,10 @@ class MediaHelper(object):
 class MediaParser(object):
 
     # Add MediaTypes to this list to indicate that they case case-sensitive (shouldn't be normalized to lower case)
-    CASE_SENSITIVE_FOREIGN_KEYS = [MediaType.YOUTUBE_VIDEO, MediaType.IMGUR, MediaType.CD_PHOTO_THREAD, MediaType.INSTAGRAM_IMAGE]
+    CASE_SENSITIVE_FOREIGN_KEYS = [
+        MediaType.YOUTUBE_VIDEO, MediaType.IMGUR, MediaType.CD_PHOTO_THREAD,
+        MediaType.INSTAGRAM_IMAGE
+    ]
 
     OEMBED_PROVIDERS = [MediaType.INSTAGRAM_IMAGE]
 
@@ -55,15 +60,18 @@ class MediaParser(object):
         MediaType.FACEBOOK_PROFILE: [(r".*facebook.com\/(.*)(\/(.*))?", 1)],
         MediaType.TWITTER_PROFILE: [(r".*twitter.com\/(.*)(\/(.*))?", 1)],
         MediaType.YOUTUBE_CHANNEL: [(r".*youtube.com\/user\/(.*)(\/(.*))?", 1),
-                                    (r".*youtube.com\/c\/(.*)(\/(.*))?", 1),
-                                    (r".*youtube.com\/(.*)(\/(.*))?", 1)],
+                                    (r".*youtube.com\/c\/(.*)(\/(.*))?",
+                                     1), (r".*youtube.com\/(.*)(\/(.*))?", 1)],
         MediaType.GITHUB_PROFILE: [(r".*github.com\/(.*)(\/(.*))?", 1)],
-        MediaType.YOUTUBE_VIDEO: [(r".*youtu\.be\/(.*)", 1), (r".*v=([a-zA-Z0-9_-]*)", 1)],
-        MediaType.IMGUR: [(r".*imgur.com\/(\w+)\/?\Z", 1), (r".*imgur.com\/(\w+)\.\w+\Z", 1)],
+        MediaType.YOUTUBE_VIDEO: [(r".*youtu\.be\/(.*)", 1),
+                                  (r".*v=([a-zA-Z0-9_-]*)", 1)],
+        MediaType.IMGUR: [(r".*imgur.com\/(\w+)\/?\Z", 1),
+                          (r".*imgur.com\/(\w+)\.\w+\Z", 1)],
         MediaType.INSTAGRAM_PROFILE: [(r".*instagram.com\/(.*)(\/(.*))?", 1)],
         MediaType.PERISCOPE_PROFILE: [(r".*periscope.tv\/(.*)(\/(.*))?", 1)],
         MediaType.GRABCAD: [(r".*grabcad.com\/library\/(.*)", 1)],
-        MediaType.INSTAGRAM_IMAGE:  [(r".*instagram.com/p/([^\/]*)(\/(.*))?", 1)],
+        MediaType.INSTAGRAM_IMAGE: [(r".*instagram.com/p/([^\/]*)(\/(.*))?",
+                                     1)],
     }
 
     # Media URL patterns that map a URL -> Profile type (used to determine which type represents a given url)
@@ -94,7 +102,8 @@ class MediaParser(object):
 
     GRABCAD_DETAIL_URL = "https://grabcad.com/community/api/v1/models/{}"  # Format w/ foreign key
     OEMBED_DETAIL_URL = {
-        MediaType.INSTAGRAM_IMAGE: "https://api.instagram.com/oembed/?url=http://instagram.com/p/{}"
+        MediaType.INSTAGRAM_IMAGE:
+        "https://api.instagram.com/oembed/?url=http://instagram.com/p/{}"
     }
 
     @classmethod
@@ -120,7 +129,8 @@ class MediaParser(object):
                     return cls._create_media_dict(media_type, url)
 
         if url:
-            logging.warning("Failed to determine media type from url: {}".format(url))
+            logging.warning(
+                "Failed to determine media type from url: {}".format(url))
         return None
 
     @classmethod
@@ -133,16 +143,20 @@ class MediaParser(object):
         media_dict = {'media_type_enum': media_type}
         foreign_key = cls._parse_foreign_key(media_type, url)
         if foreign_key is None:
-            logging.warning("Failed to determine {} foreign_key from url: {}".format(MediaType.type_names[media_type], url))
+            logging.warning(
+                "Failed to determine {} foreign_key from url: {}".format(
+                    MediaType.type_names[media_type], url))
             return None
-        foreign_key = foreign_key if media_type in cls.CASE_SENSITIVE_FOREIGN_KEYS else foreign_key.lower()
+        foreign_key = foreign_key if media_type in cls.CASE_SENSITIVE_FOREIGN_KEYS else foreign_key.lower(
+        )
         media_dict['media_type'] = media_type
         media_dict['is_social'] = media_type in MediaType.social_types
         media_dict['foreign_key'] = foreign_key
         media_dict['site_name'] = MediaType.type_names[media_type]
 
         if media_type in MediaType.profile_urls:
-            media_dict['profile_url'] = MediaType.profile_urls[media_type].format(foreign_key)
+            media_dict['profile_url'] = MediaType.profile_urls[
+                media_type].format(foreign_key)
 
         return media_dict
 
@@ -160,14 +174,17 @@ class MediaParser(object):
                     # Remove trailing slashes in the URL if necessary
                     return foreign_key.replace('/', '')
 
-        logging.warning("Failed to determine {} foreign_key from url: {}".format(MediaType.type_names[media_type], url))
+        logging.warning(
+            "Failed to determine {} foreign_key from url: {}".format(
+                MediaType.type_names[media_type], url))
         return None
 
     @classmethod
     def _sanitize_media_url(cls, media_type, url):
         media_url = url.strip()
         parsed = urlparse(media_url)
-        clean_url = "{}://{}{}".format(parsed.scheme, parsed.netloc, parsed.path)
+        clean_url = "{}://{}{}".format(parsed.scheme, parsed.netloc,
+                                       parsed.path)
 
         # Add white-listed url params back in
         if media_type in cls.ALLOWED_URLPARAMS:
@@ -175,7 +192,7 @@ class MediaParser(object):
             all_params = parsed.query.split('&')
             allowed_params = {}
             for param in all_params:
-                if any(param.startswith(w+'=') for w in whitelist):
+                if any(param.startswith(w + '=') for w in whitelist):
                     split = param.split('=')
                     allowed_params[split[0]] = split[1]
 
@@ -187,7 +204,8 @@ class MediaParser(object):
         media_dict = {'media_type_enum': MediaType.CD_PHOTO_THREAD}
         foreign_key = cls._parse_cdphotothread_foreign_key(url)
         if foreign_key is None:
-            logging.warning("Failed to determine foreign_key from url: {}".format(url))
+            logging.warning(
+                "Failed to determine foreign_key from url: {}".format(url))
             return None
         media_dict['foreign_key'] = foreign_key
 
@@ -196,11 +214,16 @@ class MediaParser(object):
             logging.warning('Unable to retrieve url: {}'.format(url))
             return None
 
-        image_partial = cls._parse_cdphotothread_image_partial(urlfetch_result.content)
+        image_partial = cls._parse_cdphotothread_image_partial(
+            urlfetch_result.content)
         if image_partial is None:
-            logging.warning("Failed to determine image_partial from the page: {}".format(url))
+            logging.warning(
+                "Failed to determine image_partial from the page: {}".format(
+                    url))
             return None
-        media_dict['details_json'] = json.dumps({'image_partial': image_partial})
+        media_dict['details_json'] = json.dumps({
+            'image_partial': image_partial
+        })
 
         return media_dict
 
@@ -220,10 +243,14 @@ class MediaParser(object):
             return None
 
         media_dict['details_json'] = json.dumps({
-            'model_name': grabcad_data['name'],
-            'model_description': grabcad_data['raw_description'],
-            'model_image': grabcad_data['preview_image'],
-            'model_created': grabcad_data['created_at']
+            'model_name':
+            grabcad_data['name'],
+            'model_description':
+            grabcad_data['raw_description'],
+            'model_image':
+            grabcad_data['preview_image'],
+            'model_created':
+            grabcad_data['created_at']
         })
         return media_dict
 
@@ -233,7 +260,8 @@ class MediaParser(object):
         if not media_dict:
             return None
 
-        url = cls.OEMBED_DETAIL_URL.get(media_type).format(media_dict['foreign_key'])
+        url = cls.OEMBED_DETAIL_URL.get(media_type).format(
+            media_dict['foreign_key'])
         urlfetch_result = urlfetch.fetch(url, deadline=10)
         if urlfetch_result.status_code != 200:
             logging.warning('Unable to retreive url: {}'.format(url))

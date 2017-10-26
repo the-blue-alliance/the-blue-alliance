@@ -40,43 +40,61 @@ class JSONMatchesParser(ParserBase):
             if comp_level is None:
                 raise ParserInputException("Match must have a 'comp_level'")
             if comp_level not in Match.COMP_LEVELS:
-                raise ParserInputException("'comp_level' must be one of: {}".format(Match.COMP_LEVELS))
+                raise ParserInputException(
+                    "'comp_level' must be one of: {}".format(
+                        Match.COMP_LEVELS))
 
             if comp_level == 'qm':
                 set_number = 1
             elif set_number is None or type(set_number) is not int:
-                raise ParserInputException("Match must have an integer 'set_number'")
+                raise ParserInputException(
+                    "Match must have an integer 'set_number'")
 
             if match_number is None or type(match_number) is not int:
-                raise ParserInputException("Match must have an integer 'match_number'")
+                raise ParserInputException(
+                    "Match must have an integer 'match_number'")
 
             if type(alliances) is not dict:
                 raise ParserInputException("'alliances' must be a dict")
             else:
                 for color, details in alliances.items():
                     if color not in {'red', 'blue'}:
-                        raise ParserInputException("Alliance color '{}' not recognized".format(color))
+                        raise ParserInputException(
+                            "Alliance color '{}' not recognized".format(color))
                     if 'teams' not in details:
-                        raise ParserInputException("alliances[color] must have key 'teams'")
+                        raise ParserInputException(
+                            "alliances[color] must have key 'teams'")
                     if 'score' not in details:
-                        raise ParserInputException("alliances[color] must have key 'score'")
+                        raise ParserInputException(
+                            "alliances[color] must have key 'score'")
                     for team_key in details['teams']:
                         if not re.match(r'frc\d+', str(team_key)):
-                            raise ParserInputException("Bad team: '{}'. Must follow format 'frcXXX'.".format(team_key))
-                    if details['score'] is not None and type(details['score']) is not int:
-                        raise ParserInputException("alliances[color]['score'] must be an integer or null")
+                            raise ParserInputException(
+                                "Bad team: '{}'. Must follow format 'frcXXX'.".
+                                format(team_key))
+                    if details['score'] is not None and type(
+                            details['score']) is not int:
+                        raise ParserInputException(
+                            "alliances[color]['score'] must be an integer or null"
+                        )
 
             if score_breakdown is not None:
                 if type(score_breakdown) is not dict:
-                    raise ParserInputException("'score_breakdown' must be a dict")
+                    raise ParserInputException(
+                        "'score_breakdown' must be a dict")
                 else:
                     for color, breakdown in score_breakdown.items():
                         if color not in {'red', 'blue'}:
-                            raise ParserInputException("Alliance color '{}' not recognized".format(color))
+                            raise ParserInputException(
+                                "Alliance color '{}' not recognized".format(
+                                    color))
                         for k in breakdown.keys():
-                            is_valid = MatchHelper.is_valid_score_breakdown_key(k, year)
+                            is_valid = MatchHelper.is_valid_score_breakdown_key(
+                                k, year)
                             if is_valid != True:
-                                raise ParserInputException("Valid score breakdowns for {} are: {}".format(year, is_valid))
+                                raise ParserInputException(
+                                    "Valid score breakdowns for {} are: {}".
+                                    format(year, is_valid))
 
             datetime_utc = None
             if time_utc is not None:
@@ -86,7 +104,9 @@ class JSONMatchesParser(ParserBase):
                     # remove timezone info because DatetimeProperty can't handle timezones
                     datetime_utc = datetime_utc.replace(tzinfo=None)
                 except Exception:
-                    raise ParserInputException("Could not parse 'time_utc'. Check that it is in ISO 8601 format.")
+                    raise ParserInputException(
+                        "Could not parse 'time_utc'. Check that it is in ISO 8601 format."
+                    )
 
             # validation passed. build new dicts to sanitize
             parsed_alliances = {
@@ -100,14 +120,24 @@ class JSONMatchesParser(ParserBase):
                 },
             }
             parsed_match = {
-                'comp_level': comp_level,
-                'set_number': set_number,
-                'match_number': match_number,
-                'alliances_json': json.dumps(parsed_alliances),
-                'score_breakdown_json': json.dumps(score_breakdown) if score_breakdown is not None else None,
-                'time_string': time_string,
-                'time': datetime_utc,
-                'team_key_names': parsed_alliances['red']['teams'] + parsed_alliances['blue']['teams'],
+                'comp_level':
+                comp_level,
+                'set_number':
+                set_number,
+                'match_number':
+                match_number,
+                'alliances_json':
+                json.dumps(parsed_alliances),
+                'score_breakdown_json':
+                json.dumps(score_breakdown)
+                if score_breakdown is not None else None,
+                'time_string':
+                time_string,
+                'time':
+                datetime_utc,
+                'team_key_names':
+                parsed_alliances['red']['teams'] +
+                parsed_alliances['blue']['teams'],
             }
 
             parsed_matches.append(parsed_match)

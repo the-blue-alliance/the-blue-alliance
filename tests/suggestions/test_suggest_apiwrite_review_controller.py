@@ -23,18 +23,26 @@ from models.suggestion import Suggestion
 
 class TestSuggestApiWriteReviewController(unittest2.TestCase):
     def setUp(self):
-        self.policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1)
+        self.policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(
+            probability=1)
         self.testbed = testbed.Testbed()
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub(consistency_policy=self.policy)
         self.testbed.init_memcache_stub()
         self.testbed.init_user_stub()
         self.testbed.init_mail_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
-        app = webapp2.WSGIApplication([
-            RedirectRoute(r'/suggest/apiwrite/review', SuggestApiWriteReviewController, 'review-apiwrite', strict_slash=True),
-        ], debug=True)
+        app = webapp2.WSGIApplication(
+            [
+                RedirectRoute(
+                    r'/suggest/apiwrite/review',
+                    SuggestApiWriteReviewController,
+                    'review-apiwrite',
+                    strict_slash=True),
+            ],
+            debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.event = Event(
@@ -54,9 +62,9 @@ class TestSuggestApiWriteReviewController(unittest2.TestCase):
             venue_address="Some Venue, Hartford, CT, USA",
             timezone_id="America/New_York",
             start_date=datetime(2016, 03, 24),
-            webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
-            website="http://www.firstsv.org"
-        )
+            webcast_json=
+            "[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
+            website="http://www.firstsv.org")
         self.event.put()
 
     def tearDown(self):
@@ -67,37 +75,36 @@ class TestSuggestApiWriteReviewController(unittest2.TestCase):
             user_email="user@example.com",
             user_id="123",
             user_is_admin='0',
-            overwrite=True
-        )
+            overwrite=True)
 
         self.account = Account.get_or_insert(
-            "123",
-            email="user@example.com",
-            registered=True
-        )
+            "123", email="user@example.com", registered=True)
 
     def givePermission(self):
         self.account.permissions.append(AccountPermissions.REVIEW_APIWRITE)
         self.account.put()
 
     def createSuggestion(self):
-        status = SuggestionCreator.createApiWriteSuggestion(self.account.key, '2016necmp', 'Test',
-                                                            [AuthType.EVENT_MATCHES])
+        status = SuggestionCreator.createApiWriteSuggestion(
+            self.account.key, '2016necmp', 'Test', [AuthType.EVENT_MATCHES])
         self.assertEqual(status, 'success')
-        return Suggestion.query(Suggestion.target_key == '2016necmp').fetch(keys_only=True)[0].id()
+        return Suggestion.query(Suggestion.target_key == '2016necmp').fetch(
+            keys_only=True)[0].id()
 
     def getSuggestionForm(self, suggestion_id):
         response = self.testapp.get('/suggest/apiwrite/review')
         self.assertEqual(response.status_int, 200)
 
-        form = response.forms.get('apiwrite_review_{}'.format(suggestion_id), None)
+        form = response.forms.get('apiwrite_review_{}'.format(suggestion_id),
+                                  None)
         self.assertIsNotNone(form)
         return form
 
     def test_login_redirect(self):
         response = self.testapp.get('/suggest/apiwrite/review', status='3*')
         response = response.follow(expect_errors=True)
-        self.assertTrue(response.request.path.startswith("/account/login_required"))
+        self.assertTrue(
+            response.request.path.startswith("/account/login_required"))
 
     def test_no_permissions(self):
         self.loginUser()
@@ -113,7 +120,8 @@ class TestSuggestApiWriteReviewController(unittest2.TestCase):
 
         # Make sure none of the forms on the page are for suggestions
         for form_id in response.forms.keys():
-            self.assertFalse("{}".format(form_id).startswith('apiwrite_review_'))
+            self.assertFalse(
+                "{}".format(form_id).startswith('apiwrite_review_'))
 
     def test_accespt_suggestion(self):
         self.loginUser()
@@ -157,11 +165,12 @@ class TestSuggestApiWriteReviewController(unittest2.TestCase):
         self.loginUser()
         self.givePermission()
 
-        existing_auth = ApiAuthAccess(id='tEsT_id_0',
-                                      secret='321tEsTsEcReT',
-                                      description='test',
-                                      event_list=[ndb.Key(Event, '2016necmp')],
-                                      auth_types_enum=[AuthType.EVENT_TEAMS])
+        existing_auth = ApiAuthAccess(
+            id='tEsT_id_0',
+            secret='321tEsTsEcReT',
+            description='test',
+            event_list=[ndb.Key(Event, '2016necmp')],
+            auth_types_enum=[AuthType.EVENT_TEAMS])
         existing_auth.put()
 
         suggestion_id = self.createSuggestion()
@@ -188,6 +197,8 @@ class TestSuggestApiWriteReviewController(unittest2.TestCase):
         self.assertIsNotNone(auth)
         self.assertEqual(auth.owner, self.account.key)
         self.assertListEqual(auth.event_list, [self.event.key])
-        self.assertSetEqual(set(auth.auth_types_enum), {AuthType.EVENT_TEAMS, AuthType.MATCH_VIDEO})
+        self.assertSetEqual(
+            set(auth.auth_types_enum),
+            {AuthType.EVENT_TEAMS, AuthType.MATCH_VIDEO})
         self.assertIsNotNone(auth.secret)
         self.assertIsNotNone(auth.expiration)

@@ -19,7 +19,8 @@ class UsfirstEventAwardsParser_05_06(ParserBase):
         """
         Parse the awards from USFIRST.
         """
-        html = html.decode('utf-8', 'ignore')  # Clean html before feeding itno BeautifulSoup
+        html = html.decode(
+            'utf-8', 'ignore')  # Clean html before feeding itno BeautifulSoup
         soup = BeautifulSoup(html)
 
         # Bad formatting on some pages makes this necessary
@@ -69,13 +70,18 @@ class UsfirstEventAwardsParser_05_06(ParserBase):
 
             if award_type_enum in awards_by_type:
                 if team_number is not None:
-                    awards_by_type[award_type_enum]['team_number_list'].append(team_number)
-                awards_by_type[award_type_enum]['recipient_json_list'].append(recipient_json)
+                    awards_by_type[award_type_enum]['team_number_list'].append(
+                        team_number)
+                awards_by_type[award_type_enum]['recipient_json_list'].append(
+                    recipient_json)
             else:
                 awards_by_type[award_type_enum] = {
-                    'name_str': strip_number(name_str),
-                    'award_type_enum': award_type_enum,
-                    'team_number_list': [team_number] if team_number is not None else [],
+                    'name_str':
+                    strip_number(name_str),
+                    'award_type_enum':
+                    award_type_enum,
+                    'team_number_list': [team_number]
+                    if team_number is not None else [],
                     'recipient_json_list': [recipient_json],
                 }
 

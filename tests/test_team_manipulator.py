@@ -13,7 +13,8 @@ class TestTeamManipulator(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
         self.testbed.init_taskqueue_stub(root_path=".")
 
@@ -57,14 +58,15 @@ class TestTeamManipulator(unittest2.TestCase):
         self.assertMergedTeam(TeamManipulator.findOrSpawn(self.new_team))
 
     def test_updateMerge(self):
-        self.assertMergedTeam(TeamManipulator.updateMerge(self.new_team, self.old_team))
+        self.assertMergedTeam(
+            TeamManipulator.updateMerge(self.new_team, self.old_team))
 
     def test_create_lots_of_teams(self):
         number = 500
-        teams = [Team(
-            id="frc%s" % team_number,
-            team_number=team_number)
-            for team_number in range(number)]
+        teams = [
+            Team(id="frc%s" % team_number, team_number=team_number)
+            for team_number in range(number)
+        ]
         TeamManipulator.createOrUpdate(teams)
 
         team = Team.get_by_id("frc177")

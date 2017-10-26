@@ -32,12 +32,18 @@ class EventDetailsConverter(ConverterBase):
 
         event_details.matchstats if event_details else None
         event_details_dict = {
-            'alliances': event_details.alliance_selections if event_details else None,
-            'district_points': event_details.district_points if event_details else None,
-            'insights': event_details.insights if event_details else None,
-            'oprs': normalized_oprs if normalized_oprs else None,  # OPRs, DPRs, CCWMs
-            'predictions': event_details.predictions if event_details else None,
-            'rankings': event_details.renderable_rankings if event_details else None,
+            'alliances':
+            event_details.alliance_selections if event_details else None,
+            'district_points':
+            event_details.district_points if event_details else None,
+            'insights':
+            event_details.insights if event_details else None,
+            'oprs':
+            normalized_oprs if normalized_oprs else None,  # OPRs, DPRs, CCWMs
+            'predictions':
+            event_details.predictions if event_details else None,
+            'rankings':
+            event_details.renderable_rankings if event_details else None,
         }
 
         return event_details_dict

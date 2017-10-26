@@ -20,12 +20,16 @@ class TestTeamController(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
         app = webapp2.WSGIApplication([
-            RedirectRoute(r'/team/<team_number:[0-9]+>', TeamCanonical, 'team-canonical'),
-            RedirectRoute(r'/team/<team_number:[0-9]+>/<year:[0-9]+>', TeamDetail, 'team-detail'),
-            RedirectRoute(r'/team/<team_number:[0-9]+>/history', TeamHistory, 'team-history'),
+            RedirectRoute(r'/team/<team_number:[0-9]+>', TeamCanonical,
+                          'team-canonical'),
+            RedirectRoute(r'/team/<team_number:[0-9]+>/<year:[0-9]+>',
+                          TeamDetail, 'team-detail'),
+            RedirectRoute(r'/team/<team_number:[0-9]+>/history', TeamHistory,
+                          'team-history'),
             RedirectRoute(r'/teams/<page:[0-9]+>', TeamList, 'team-list-year'),
             RedirectRoute(r'/teams', TeamList, 'team-list'),
         ])
@@ -41,8 +45,7 @@ class TestTeamController(unittest2.TestCase):
             state_prov="CT",
             country="USA",
             website="www.uberbots.org",
-            motto="This is a motto"
-        )
+            motto="This is a motto")
         self.event = Event(
             id="2016necmp",
             name="New England District Championship",
@@ -58,14 +61,12 @@ class TestTeamController(unittest2.TestCase):
             venue="Some Venue",
             venue_address="Some Venue, Hartford, CT, USA",
             timezone_id="America/New_York",
-            start_date=datetime(2016, 03, 24)
-        )
+            start_date=datetime(2016, 03, 24))
         self.event_team = EventTeam(
             id="2016necmp_frc1124",
             team=self.team.key,
             event=self.event.key,
-            year=2016
-        )
+            year=2016)
         self.event2 = Event(
             id="2015necmp",
             name="New England District Championship",
@@ -81,14 +82,12 @@ class TestTeamController(unittest2.TestCase):
             venue="Some Venue",
             venue_address="Some Venue, Hartford, CT, USA",
             timezone_id="America/New_York",
-            start_date=datetime(2015, 03, 24)
-        )
+            start_date=datetime(2015, 03, 24))
         self.event_team2 = EventTeam(
             id="2015necmp_frc1124",
             team=self.team.key,
             event=self.event2.key,
-            year=2015
-        )
+            year=2015)
         self.event_team.put()
         self.team.put()
         self.event.put()

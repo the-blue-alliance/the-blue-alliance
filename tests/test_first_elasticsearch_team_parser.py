@@ -13,14 +13,17 @@ class TestFIRSTElasticSearchTeamParser(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
     def tearDown(self):
         self.testbed.deactivate()
 
     def test_parse_team(self):
-        with open('test_data/first_elasticsearch/2015casj_event_teams.json', 'r') as f:
-            teams = FIRSTElasticSearchTeamDetailsParser(2015).parse(json.loads(f.read()))
+        with open('test_data/first_elasticsearch/2015casj_event_teams.json',
+                  'r') as f:
+            teams = FIRSTElasticSearchTeamDetailsParser(2015).parse(
+                json.loads(f.read()))
 
             self.assertEqual(len(teams), 58)
 
@@ -44,7 +47,8 @@ class TestFIRSTElasticSearchTeamParser(unittest2.TestCase):
                     self.assertEqual(team.website, "http://604robotics.com")
                     self.assertEqual(team.first_tpid, 357405)
                     self.assertEqual(team.first_tpid_year, 2015)
-                    self.assertEqual(team.motto, "It will work - because it has to.")
+                    self.assertEqual(team.motto,
+                                     "It will work - because it has to.")
 
                 # A team who doesn't have 'http' starting their website
                 if team.key.id() == 'frc4990':
@@ -53,7 +57,8 @@ class TestFIRSTElasticSearchTeamParser(unittest2.TestCase):
                     self.assertEqual(team.nickname, "Gryphon Robotics")
                     self.assertEqual(team.rookie_year, 2014)
                     self.assertEqual(team.postalcode, "94010")
-                    self.assertEqual(team.website, "http:///gryphonrobotics.org")
+                    self.assertEqual(team.website,
+                                     "http:///gryphonrobotics.org")
                     self.assertEqual(team.first_tpid, 361441)
                     self.assertEqual(team.first_tpid_year, 2015)
                     self.assertEqual(team.motto, None)

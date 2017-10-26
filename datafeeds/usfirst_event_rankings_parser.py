@@ -7,6 +7,7 @@ class UsfirstEventRankingsParser(ParserBase):
     """
     Works for official events from 2007-2012
     """
+
     @classmethod
     def parse(self, html):
         """
@@ -23,7 +24,8 @@ class UsfirstEventRankingsParser(ParserBase):
             if len(tds) > 1:
                 row = []
                 for td in tds:
-                    row.append(str(self._html_unescape(self._recurseUntilString(td))))
+                    row.append(
+                        str(self._html_unescape(self._recurseUntilString(td))))
                 rankings.append(row)
 
         return rankings, False

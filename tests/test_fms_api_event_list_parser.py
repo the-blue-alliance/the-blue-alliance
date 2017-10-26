@@ -17,14 +17,16 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
     def tearDown(self):
         self.testbed.deactivate()
 
     def test_parse_event_list(self):
         with open('test_data/fms_api/2015_event_list.json', 'r') as f:
-            events, districts = FMSAPIEventListParser(2015).parse(json.loads(f.read()))
+            events, districts = FMSAPIEventListParser(2015).parse(
+                json.loads(f.read()))
 
             self.assertTrue(isinstance(events, list))
             self.assertTrue(isinstance(districts, list))
@@ -35,7 +37,8 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
 
     def test_parse_regional_event(self):
         with open('test_data/fms_api/2015_event_list.json', 'r') as f:
-            events, districts = FMSAPIEventListParser(2015).parse(json.loads(f.read()))
+            events, districts = FMSAPIEventListParser(2015).parse(
+                json.loads(f.read()))
             event = events[0]
 
             self.assertEquals(event.key_name, "2015nyny")
@@ -43,8 +46,22 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEquals(event.short_name, "New York City")
             self.assertEquals(event.event_short, "nyny")
             self.assertEquals(event.official, True)
-            self.assertEquals(event.start_date, datetime.datetime(year=2015, month=3, day=12, hour=0, minute=0, second=0))
-            self.assertEquals(event.end_date, datetime.datetime(year=2015, month=3, day=15, hour=23, minute=59, second=59))
+            self.assertEquals(event.start_date,
+                              datetime.datetime(
+                                  year=2015,
+                                  month=3,
+                                  day=12,
+                                  hour=0,
+                                  minute=0,
+                                  second=0))
+            self.assertEquals(event.end_date,
+                              datetime.datetime(
+                                  year=2015,
+                                  month=3,
+                                  day=15,
+                                  hour=23,
+                                  minute=59,
+                                  second=59))
             self.assertEquals(event.venue, "Jacob K. Javits Convention Center")
             self.assertEquals(event.city, "New York")
             self.assertEquals(event.state_prov, "NY")
@@ -55,7 +72,8 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
 
     def test_parse_district_event(self):
         with open('test_data/fms_api/2015_event_list.json', 'r') as f:
-            events, districts = FMSAPIEventListParser(2015).parse(json.loads(f.read()))
+            events, districts = FMSAPIEventListParser(2015).parse(
+                json.loads(f.read()))
             event = events[1]
             district = districts[0]
 
@@ -64,8 +82,22 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEquals(event.short_name, "Hartford")
             self.assertEquals(event.event_short, "cthar")
             self.assertEquals(event.official, True)
-            self.assertEquals(event.start_date, datetime.datetime(year=2015, month=3, day=27, hour=0, minute=0, second=0))
-            self.assertEquals(event.end_date, datetime.datetime(year=2015, month=3, day=29, hour=23, minute=59, second=59))
+            self.assertEquals(event.start_date,
+                              datetime.datetime(
+                                  year=2015,
+                                  month=3,
+                                  day=27,
+                                  hour=0,
+                                  minute=0,
+                                  second=0))
+            self.assertEquals(event.end_date,
+                              datetime.datetime(
+                                  year=2015,
+                                  month=3,
+                                  day=29,
+                                  hour=23,
+                                  minute=59,
+                                  second=59))
             self.assertEquals(event.venue, "Hartford Public High School")
             self.assertEquals(event.city, "Hartford")
             self.assertEquals(event.state_prov, "CT")
@@ -80,16 +112,34 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
 
     def test_parse_district_cmp(self):
         with open('test_data/fms_api/2015_event_list.json', 'r') as f:
-            events, districts = FMSAPIEventListParser(2015).parse(json.loads(f.read()))
+            events, districts = FMSAPIEventListParser(2015).parse(
+                json.loads(f.read()))
             event = events[2]
 
             self.assertEquals(event.key_name, "2015necmp")
-            self.assertEquals(event.name, "NE FIRST District Championship presented by United Technologies")
+            self.assertEquals(
+                event.name,
+                "NE FIRST District Championship presented by United Technologies"
+            )
             self.assertEquals(event.short_name, "NE FIRST")
             self.assertEquals(event.event_short, "necmp")
             self.assertEquals(event.official, True)
-            self.assertEquals(event.start_date, datetime.datetime(year=2015, month=4, day=8, hour=0, minute=0, second=0))
-            self.assertEquals(event.end_date, datetime.datetime(year=2015, month=4, day=11, hour=23, minute=59, second=59))
+            self.assertEquals(event.start_date,
+                              datetime.datetime(
+                                  year=2015,
+                                  month=4,
+                                  day=8,
+                                  hour=0,
+                                  minute=0,
+                                  second=0))
+            self.assertEquals(event.end_date,
+                              datetime.datetime(
+                                  year=2015,
+                                  month=4,
+                                  day=11,
+                                  hour=23,
+                                  minute=59,
+                                  second=59))
             self.assertEquals(event.venue, "Sports and Recreation Center, WPI")
             self.assertEquals(event.city, "Worcester")
             self.assertEquals(event.state_prov, "MA")
@@ -100,7 +150,8 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
 
     def test_parse_cmp_subdivision(self):
         with open('test_data/fms_api/2015_event_list.json', 'r') as f:
-            events, districts = FMSAPIEventListParser(2015).parse(json.loads(f.read()))
+            events, districts = FMSAPIEventListParser(2015).parse(
+                json.loads(f.read()))
             event = events[3]
 
             self.assertEquals(event.key_name, "2015tes")
@@ -108,8 +159,22 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEquals(event.short_name, "Tesla")
             self.assertEquals(event.event_short, "tes")
             self.assertEquals(event.official, True)
-            self.assertEquals(event.start_date, datetime.datetime(year=2015, month=4, day=22, hour=0, minute=0, second=0))
-            self.assertEquals(event.end_date, datetime.datetime(year=2015, month=4, day=25, hour=23, minute=59, second=59))
+            self.assertEquals(event.start_date,
+                              datetime.datetime(
+                                  year=2015,
+                                  month=4,
+                                  day=22,
+                                  hour=0,
+                                  minute=0,
+                                  second=0))
+            self.assertEquals(event.end_date,
+                              datetime.datetime(
+                                  year=2015,
+                                  month=4,
+                                  day=25,
+                                  hour=23,
+                                  minute=59,
+                                  second=59))
             self.assertEquals(event.venue, "Edward Jones Dome")
             self.assertEquals(event.city, "St. Louis")
             self.assertEquals(event.state_prov, "MO")
@@ -120,7 +185,8 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
 
     def test_parse_2017_event(self):
         with open('test_data/fms_api/2017_event_list.json', 'r') as f:
-            events, districts = FMSAPIEventListParser(2017).parse(json.loads(f.read()))
+            events, districts = FMSAPIEventListParser(2017).parse(
+                json.loads(f.read()))
             self.assertEqual(len(events), 164)
             self.assertEqual(len(districts), 10)
             event = events[16]
@@ -130,9 +196,24 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEquals(event.short_name, "Silicon Valley")
             self.assertEquals(event.event_short, "casj")
             self.assertEquals(event.official, True)
-            self.assertEquals(event.start_date, datetime.datetime(year=2017, month=3, day=29, hour=0, minute=0, second=0))
-            self.assertEquals(event.end_date, datetime.datetime(year=2017, month=4, day=1, hour=23, minute=59, second=59))
-            self.assertEquals(event.venue, "San Jose State University - The Event Center")
+            self.assertEquals(event.start_date,
+                              datetime.datetime(
+                                  year=2017,
+                                  month=3,
+                                  day=29,
+                                  hour=0,
+                                  minute=0,
+                                  second=0))
+            self.assertEquals(event.end_date,
+                              datetime.datetime(
+                                  year=2017,
+                                  month=4,
+                                  day=1,
+                                  hour=23,
+                                  minute=59,
+                                  second=59))
+            self.assertEquals(event.venue,
+                              "San Jose State University - The Event Center")
             self.assertEquals(event.city, "San Jose")
             self.assertEquals(event.state_prov, "CA")
             self.assertEquals(event.country, "USA")
@@ -146,16 +227,24 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
     def test_parse_2017_events_with_cmp_hacks(self):
         hack_sitevar = Sitevar(id='cmp_registration_hacks')
         hack_sitevar.contents = {
-            "event_name_override": [
-                {"event": "2017cmpmo", "name": "FIRST Championship Event", "short_name": "Championship"},
-                {"event": "2017cmptx", "name": "FIRST Championship Event", "short_name": "Championship"}],
+            "event_name_override": [{
+                "event": "2017cmpmo",
+                "name": "FIRST Championship Event",
+                "short_name": "Championship"
+            }, {
+                "event": "2017cmptx",
+                "name": "FIRST Championship Event",
+                "short_name": "Championship"
+            }],
             "set_start_to_last_day": ["2017cmptx", "2017cmpmo"],
-            "divisions_to_skip": ["2017arc", "2017cars", "2017cur", "2017dal", "2017dar"],
+            "divisions_to_skip":
+            ["2017arc", "2017cars", "2017cur", "2017dal", "2017dar"],
         }
         hack_sitevar.put()
 
         with open('test_data/fms_api/2017_event_list.json', 'r') as f:
-            events, districts = FMSAPIEventListParser(2017).parse(json.loads(f.read()))
+            events, districts = FMSAPIEventListParser(2017).parse(
+                json.loads(f.read()))
             self.assertEqual(len(events), 159)
             self.assertEqual(len(districts), 10)
 
@@ -166,14 +255,45 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
 
             einstein_stl = next(e for e in events if e.key_name == '2017cmpmo')
             self.assertIsNotNone(einstein_stl)
-            self.assertEqual(einstein_stl.name, "FIRST Championship Event (St. Louis)")
-            self.assertEqual(einstein_stl.short_name, "Championship (St. Louis)")
-            self.assertEquals(einstein_stl.start_date, datetime.datetime(year=2017, month=4, day=29, hour=0, minute=0, second=0))
-            self.assertEquals(einstein_stl.end_date, datetime.datetime(year=2017, month=4, day=29, hour=23, minute=59, second=59))
+            self.assertEqual(einstein_stl.name,
+                             "FIRST Championship Event (St. Louis)")
+            self.assertEqual(einstein_stl.short_name,
+                             "Championship (St. Louis)")
+            self.assertEquals(einstein_stl.start_date,
+                              datetime.datetime(
+                                  year=2017,
+                                  month=4,
+                                  day=29,
+                                  hour=0,
+                                  minute=0,
+                                  second=0))
+            self.assertEquals(einstein_stl.end_date,
+                              datetime.datetime(
+                                  year=2017,
+                                  month=4,
+                                  day=29,
+                                  hour=23,
+                                  minute=59,
+                                  second=59))
 
             einstein_hou = next(e for e in events if e.key_name == '2017cmptx')
             self.assertIsNotNone(einstein_hou)
-            self.assertEqual(einstein_hou.name, "FIRST Championship Event (Houston)")
+            self.assertEqual(einstein_hou.name,
+                             "FIRST Championship Event (Houston)")
             self.assertEqual(einstein_hou.short_name, "Championship (Houston)")
-            self.assertEquals(einstein_hou.start_date, datetime.datetime(year=2017, month=4, day=22, hour=0, minute=0, second=0))
-            self.assertEquals(einstein_hou.end_date, datetime.datetime(year=2017, month=4, day=22, hour=23, minute=59, second=59))
+            self.assertEquals(einstein_hou.start_date,
+                              datetime.datetime(
+                                  year=2017,
+                                  month=4,
+                                  day=22,
+                                  hour=0,
+                                  minute=0,
+                                  second=0))
+            self.assertEquals(einstein_hou.end_date,
+                              datetime.datetime(
+                                  year=2017,
+                                  month=4,
+                                  day=22,
+                                  hour=23,
+                                  minute=59,
+                                  second=59))

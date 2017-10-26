@@ -72,23 +72,31 @@ class FmsEventListParser(ParserBase):
             if len(data) > 1:
                 try:
                     events.append({
-                        "first_eid": data[0],
+                        "first_eid":
+                        data[0],
                         #"event_subtype": data[1],
                         #"id_event_subtype": data[2],
                         #"district_code": data[3],
                         #"id_district": data[4],
-                        "name": data[5].strip(),
-                        "venue": data[6],
+                        "name":
+                        data[5].strip(),
+                        "venue":
+                        data[6],
                         #"city": data[7],
                         #"state": data[8],
                         #"country"": data[9],
-                        "start_date": self.splitDate(data[10]),
-                        "end_date": self.splitDate(data[11]),
-                        "year": int(data[12]),
+                        "start_date":
+                        self.splitDate(data[10]),
+                        "end_date":
+                        self.splitDate(data[11]),
+                        "year":
+                        int(data[12]),
                         #"num_teams": int(data[13]),
                         #"url_team_list": data[14],
-                        "event_short": data[15].strip().lower(),
-                        "location": "{}, {}, {}".format(data[7], data[8], data[9])
+                        "event_short":
+                        data[15].strip().lower(),
+                        "location":
+                        "{}, {}, {}".format(data[7], data[8], data[9])
                     })
                 except Exception, e:
                     logging.info("Failed to parse event row: %s" % data)

@@ -23,6 +23,7 @@ class SuggestDesignsReviewController(SuggestionsReviewBaseController):
     """
     View the list of suggestions.
     """
+
     def get(self):
 
         if self.request.get('action') and self.request.get('id'):
@@ -31,14 +32,13 @@ class SuggestDesignsReviewController(SuggestionsReviewBaseController):
 
         suggestions = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
-            Suggestion.target_model == "robot").fetch(limit=50)
+                Suggestion.target_model == "robot").fetch(limit=50)
 
         reference_keys = []
         for suggestion in suggestions:
             reference_key = suggestion.contents['reference_key']
             reference = Media.create_reference(
-                suggestion.contents['reference_type'],
-                reference_key)
+                suggestion.contents['reference_type'], reference_key)
             reference_keys.append(reference)
 
         reference_futures = ndb.get_multi_async(reference_keys)
@@ -46,10 +46,13 @@ class SuggestDesignsReviewController(SuggestionsReviewBaseController):
         suggestions_and_references = zip(suggestions, references)
 
         self.template_values.update({
-            "suggestions_and_references": suggestions_and_references,
+            "suggestions_and_references":
+            suggestions_and_references,
         })
 
-        self.response.out.write(jinja2_engine.render('suggestions/suggest_designs_review.html', self.template_values))
+        self.response.out.write(
+            jinja2_engine.render('suggestions/suggest_designs_review.html',
+                                 self.template_values))
 
     def _fastpath_review(self):
         self.verify_permissions()
@@ -66,8 +69,7 @@ class SuggestDesignsReviewController(SuggestionsReviewBaseController):
                         self.user_bundle.account.email,
                         suggestion.contents['foreign_key'],
                         suggestion.contents['reference_key'][3:],
-                        suggestion.contents['year']
-                    )
+                        suggestion.contents['year'])
                 elif self.request.get('action') == 'reject':
                     self._process_rejected(suggestion.key.id())
                     status = 'rejected'
@@ -76,21 +78,22 @@ class SuggestDesignsReviewController(SuggestionsReviewBaseController):
                         self.user_bundle.account.email,
                         suggestion.contents['foreign_key'],
                         suggestion.contents['reference_key'][3:],
-                        suggestion.contents['year']
-                    )
+                        suggestion.contents['year'])
 
                 if slack_message:
                     slack_sitevar = Sitevar.get_or_insert('slack.hookurls')
                     if slack_sitevar:
                         slack_url = slack_sitevar.contents.get('tbablog', '')
-                        OutgoingNotificationHelper.send_slack_alert(slack_url, slack_message)
+                        OutgoingNotificationHelper.send_slack_alert(
+                            slack_url, slack_message)
             else:
                 status = 'already_reviewed'
         else:
             status = 'bad_suggestion'
 
         if status:
-            self.redirect('/suggest/review?status={}'.format(status), abort=True)
+            self.redirect(
+                '/suggest/review?status={}'.format(status), abort=True)
 
     def post(self):
         self.verify_permissions()

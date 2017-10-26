@@ -17,6 +17,7 @@ class AdminUserList(LoggedInHandler):
     """
     List all Users.
     """
+
     def get(self):
         self._require_admin()
         users = Account.query().order(Account.created).fetch()
@@ -25,7 +26,8 @@ class AdminUserList(LoggedInHandler):
             "users": users,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/user_list.html')
+        path = os.path.join(
+            os.path.dirname(__file__), '../../templates/admin/user_list.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
@@ -33,9 +35,12 @@ class AdminUserLookup(LoggedInHandler):
     """
     Lookup a single user by email
     """
+
     def get(self):
         self._require_admin()
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/user_lookup.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/user_lookup.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self):
@@ -54,16 +59,21 @@ class AdminUserPermissionsList(LoggedInHandler):
     """
     List all Users with Permissions.
     """
+
     def get(self):
         self._require_admin()
         users = Account.query(Account.permissions != None).fetch()
 
         self.template_values.update({
-            "users": users,
-            "permissions": AccountPermissions.permissions,
+            "users":
+            users,
+            "permissions":
+            AccountPermissions.permissions,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/user_permissions_list.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/user_permissions_list.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
@@ -71,16 +81,21 @@ class AdminUserDetail(LoggedInHandler):
     """
     Show a User.
     """
+
     def get(self, user_id):
         self._require_admin()
         user = Account.get_by_id(user_id)
 
         self.template_values.update({
-            "user": user,
-            "permissions": AccountPermissions.permissions
+            "user":
+            user,
+            "permissions":
+            AccountPermissions.permissions
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/user_details.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/user_details.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
@@ -88,15 +103,19 @@ class AdminUserEdit(LoggedInHandler):
     """
     Edit a User.
     """
+
     def get(self, user_id):
         self._require_admin()
         user = Account.get_by_id(user_id)
         self.template_values.update({
-            "user": user,
-            "permissions": AccountPermissions.permissions
+            "user":
+            user,
+            "permissions":
+            AccountPermissions.permissions
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/user_edit.html')
+        path = os.path.join(
+            os.path.dirname(__file__), '../../templates/admin/user_edit.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self, user_id):
@@ -118,6 +137,7 @@ class AdminUserTestSetup(LoggedInHandler):
     """
     Gives the current user all permissions. For testing only.
     """
+
     def get(self):
         self._require_admin()
 
@@ -130,7 +150,7 @@ class AdminUserTestSetup(LoggedInHandler):
 
             self.redirect("/admin/user/" + account.key.id())
         else:
-            logging.error("{} tried to set up a test user in prod! No can do.".format(
-                self.user_bundle.user.email()))
+            logging.error(
+                "{} tried to set up a test user in prod! No can do.".format(
+                    self.user_bundle.user.email()))
             self.redirect("/admin/")
-

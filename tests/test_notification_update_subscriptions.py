@@ -14,8 +14,11 @@ class TestUpdateFavoritesNotification(unittest2.TestCase):
 
         self.test_user = "1124"  # Mock user ID
         self.sending_key = "31415926"
-        self.keys = {ClientType.OS_ANDROID: [self.sending_key, "123456", "abcdefg"]}
-        self.notification = UpdateSubscriptionsNotification(self.test_user, self.sending_key)
+        self.keys = {
+            ClientType.OS_ANDROID: [self.sending_key, "123456", "abcdefg"]
+        }
+        self.notification = UpdateSubscriptionsNotification(
+            self.test_user, self.sending_key)
         self.notification.keys = self.keys
 
     def tearDown(self):
@@ -23,7 +26,8 @@ class TestUpdateFavoritesNotification(unittest2.TestCase):
 
     def test_build(self):
         expected = {}
-        expected['message_type'] = NotificationType.type_names[NotificationType.UPDATE_SUBSCRIPTION]
+        expected['message_type'] = NotificationType.type_names[
+            NotificationType.UPDATE_SUBSCRIPTION]
         data = self.notification._build_dict()
 
         self.assertEqual(expected, data)
@@ -32,6 +36,7 @@ class TestUpdateFavoritesNotification(unittest2.TestCase):
     Because this notification type uses its own render method, we test that implementation here
     We're testing that we have matches on the user list and collapse key (data is tested above)
     """
+
     def test_render_android(self):
         collapse_key = "{}_subscriptions_update".format(self.test_user)
         user_list = ["123456", "abcdefg"]

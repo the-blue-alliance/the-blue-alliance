@@ -38,17 +38,24 @@ class TestKeyNameValidators(unittest2.TestCase):
         self.assertEqual(Event.validate_key_name(self.valid_event_key2), True)
 
     def test_invalid_event_key(self):
-        self.assertEqual(Event.validate_key_name(self.invalid_event_key), False)
-        self.assertEqual(Event.validate_key_name(self.invalid_event_key2), False)
-        self.assertEqual(Event.validate_key_name(self.invalid_event_key3), False)
+        self.assertEqual(
+            Event.validate_key_name(self.invalid_event_key), False)
+        self.assertEqual(
+            Event.validate_key_name(self.invalid_event_key2), False)
+        self.assertEqual(
+            Event.validate_key_name(self.invalid_event_key3), False)
 
     def test_valid_match_key(self):
         self.assertEqual(Match.validate_key_name(self.valid_match_key), True)
 
     def test_invalid_match_key(self):
-        self.assertEqual(Match.validate_key_name(self.invalid_match_key), False)
-        self.assertEqual(Match.validate_key_name(self.invalid_match_key2), False)
-        self.assertEqual(Match.validate_key_name(self.invalid_match_key3), False)
+        self.assertEqual(
+            Match.validate_key_name(self.invalid_match_key), False)
+        self.assertEqual(
+            Match.validate_key_name(self.invalid_match_key2), False)
+        self.assertEqual(
+            Match.validate_key_name(self.invalid_match_key3), False)
+
 
 if __name__ == '__main__':
     unittest.main()

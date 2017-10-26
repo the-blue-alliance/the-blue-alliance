@@ -12,6 +12,7 @@ class AdminSitevarList(LoggedInHandler):
     """
     List all Sitevars.
     """
+
     def get(self):
         self._require_admin()
         sitevars = Sitevar.query().fetch(10000)
@@ -20,7 +21,9 @@ class AdminSitevarList(LoggedInHandler):
             "sitevars": sitevars,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/sitevar_list.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/sitevar_list.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
@@ -28,10 +31,13 @@ class AdminSitevarCreate(LoggedInHandler):
     """
     Create an Sitevar. POSTs to AdminSitevarEdit.
     """
+
     def get(self):
         self._require_admin()
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/sitevar_create.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/sitevar_create.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
@@ -39,6 +45,7 @@ class AdminSitevarEdit(LoggedInHandler):
     """
     Edit a Sitevar.
     """
+
     def get(self, sitevar_key):
         self._require_admin()
         sitevar = Sitevar.get_by_id(sitevar_key)
@@ -50,7 +57,9 @@ class AdminSitevarEdit(LoggedInHandler):
             "success": success,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/sitevar_edit.html')
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '../../templates/admin/sitevar_edit.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self, sitevar_key):
@@ -70,4 +79,5 @@ class AdminSitevarEdit(LoggedInHandler):
         if 'apistatus' in self.request.get("key"):
             ApiStatusController.clear_cache_if_needed(False, True)
 
-        self.redirect("/admin/sitevar/edit/" + sitevar.key.id() + "?success=true")
+        self.redirect("/admin/sitevar/edit/" + sitevar.key.id() +
+                      "?success=true")

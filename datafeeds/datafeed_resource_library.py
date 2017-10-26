@@ -9,7 +9,8 @@ class DatafeedResourceLibrary(DatafeedBase):
         super(DatafeedResourceLibrary, self).__init__(*args, **kw)
 
     def getHallOfFameTeams(self):
-        url = self.RESOURCE_LIBRARY_URL_PATTERN % ("past-winners-of-the-chairmans-award")
+        url = self.RESOURCE_LIBRARY_URL_PATTERN % (
+            "past-winners-of-the-chairmans-award")
         teams, _ = self.parse(url, ResourceLibraryParser)
 
         return teams

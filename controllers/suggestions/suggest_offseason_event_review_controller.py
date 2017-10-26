@@ -17,11 +17,13 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
     REQUIRED_PERMISSIONS = [AccountPermissions.REVIEW_OFFSEASON_EVENTS]
 
     def __init__(self, *args, **kw):
-        super(SuggestOffseasonEventReviewController, self).__init__(*args, **kw)
+        super(SuggestOffseasonEventReviewController, self).__init__(
+            *args, **kw)
 
     def create_target_model(self, suggestion):
         event_id = self.request.get("event_short", None)
-        event_key = str(self.request.get("year")) + str.lower(str(self.request.get("event_short")))
+        event_key = str(self.request.get("year")) + str.lower(
+            str(self.request.get("event_short")))
         if not event_id:
             # Need to supply a key :(
             return 'missing_key', None
@@ -31,11 +33,13 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
 
         start_date = None
         if self.request.get("start_date"):
-            start_date = datetime.strptime(self.request.get("start_date"), "%Y-%m-%d")
+            start_date = datetime.strptime(
+                self.request.get("start_date"), "%Y-%m-%d")
 
         end_date = None
         if self.request.get("end_date"):
-            end_date = datetime.strptime(self.request.get("end_date"), "%Y-%m-%d")
+            end_date = datetime.strptime(
+                self.request.get("end_date"), "%Y-%m-%d")
 
         existing_event = Event.get_by_id(event_key)
         if existing_event:
@@ -73,8 +77,7 @@ If you are the event's organizer and would like to upload teams attending, match
 
 Thanks for helping make TBA better,
 The Blue Alliance Admins
-            """.format(author.nickname, event_key)
-        )
+            """.format(author.nickname, event_key))
 
         return 'success', event_key
 
@@ -84,30 +87,51 @@ The Blue Alliance Admins
     def get(self):
         suggestions = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
-            Suggestion.target_model == "offseason-event")
+                Suggestion.target_model == "offseason-event")
 
         year = datetime.now().year
         year_events_future = EventListQuery(year).fetch_async()
         last_year_events_future = EventListQuery(year - 1).fetch_async()
-        events_and_ids = [self._create_candidate_event(suggestion) for suggestion in suggestions]
+        events_and_ids = [
+            self._create_candidate_event(suggestion)
+            for suggestion in suggestions
+        ]
 
         year_events = year_events_future.get_result()
-        year_offseason_events = [e for e in year_events if e.event_type_enum == EventType.OFFSEASON]
+        year_offseason_events = [
+            e for e in year_events if e.event_type_enum == EventType.OFFSEASON
+        ]
         last_year_events = last_year_events_future.get_result()
-        last_year_offseason_events = [e for e in last_year_events if e.event_type_enum == EventType.OFFSEASON]
+        last_year_offseason_events = [
+            e for e in last_year_events
+            if e.event_type_enum == EventType.OFFSEASON
+        ]
 
-        similar_events = [self._get_similar_events(event[1], year_offseason_events) for event in events_and_ids]
-        similar_last_year = [self._get_similar_events(event[1], last_year_offseason_events) for event in events_and_ids]
+        similar_events = [
+            self._get_similar_events(event[1], year_offseason_events)
+            for event in events_and_ids
+        ]
+        similar_last_year = [
+            self._get_similar_events(event[1], last_year_offseason_events)
+            for event in events_and_ids
+        ]
 
         self.template_values.update({
-            'success': self.request.get("success"),
-            'event_key': self.request.get("event_key"),
-            'events_and_ids': events_and_ids,
-            'similar_events': similar_events,
-            'similar_last_year': similar_last_year,
+            'success':
+            self.request.get("success"),
+            'event_key':
+            self.request.get("event_key"),
+            'events_and_ids':
+            events_and_ids,
+            'similar_events':
+            similar_events,
+            'similar_last_year':
+            similar_last_year,
         })
         self.response.out.write(
-            jinja2_engine.render('suggestions/suggest_offseason_event_review_list.html', self.template_values))
+            jinja2_engine.render(
+                'suggestions/suggest_offseason_event_review_list.html',
+                self.template_values))
 
     def post(self):
         self.verify_permissions()
@@ -115,7 +139,9 @@ The Blue Alliance Admins
         verdict = self.request.get("verdict")
         if verdict == "accept":
             status, event_key = self._process_accepted(suggestion_id)
-            self.redirect("/suggest/offseason/review?success={}&event_key={}".format(status, event_key))
+            self.redirect(
+                "/suggest/offseason/review?success={}&event_key={}".format(
+                    status, event_key))
             return
         elif verdict == "reject":
             self._process_rejected(suggestion_id)
@@ -129,8 +155,10 @@ The Blue Alliance Admins
         start_date = None
         end_date = None
         try:
-            start_date = datetime.strptime(suggestion.contents['start_date'], "%Y-%m-%d")
-            end_date = datetime.strptime(suggestion.contents['end_date'], "%Y-%m-%d")
+            start_date = datetime.strptime(suggestion.contents['start_date'],
+                                           "%Y-%m-%d")
+            end_date = datetime.strptime(suggestion.contents['end_date'],
+                                         "%Y-%m-%d")
         except ValueError:
             pass
 
@@ -139,7 +167,8 @@ The Blue Alliance Admins
         city = suggestion.contents['city']
         state = suggestion.contents['state']
         country = suggestion.contents['country']
-        address = u"{}\n{}\n{}, {}, {}".format(venue, address, city, state, country)
+        address = u"{}\n{}\n{}, {}, {}".format(venue, address, city, state,
+                                               country)
         return suggestion.key.id(), Event(
             end_date=end_date,
             event_type_enum=EventType.OFFSEASON,
@@ -163,7 +192,8 @@ The Blue Alliance Admins
         """
         similar_events = []
         for event in offseason_events:
-            similarity = SequenceMatcher(a=candidate_event.name, b=event.name).ratio()
+            similarity = SequenceMatcher(
+                a=candidate_event.name, b=event.name).ratio()
             if similarity > 0.5:
                 # Somewhat arbitrary cutoff
                 similar_events.append((event.key_name, event.name))

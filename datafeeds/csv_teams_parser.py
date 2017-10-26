@@ -15,7 +15,9 @@ class CSVTeamsParser(ParserBase):
         254, 1114, 100, 604, 148
         """
         teams = set()
-        csv_data = list(csv.reader(StringIO.StringIO(data), delimiter=',', skipinitialspace=True))
+        csv_data = list(
+            csv.reader(
+                StringIO.StringIO(data), delimiter=',', skipinitialspace=True))
         for row in csv_data:
             for team in row:
                 if team.isdigit():

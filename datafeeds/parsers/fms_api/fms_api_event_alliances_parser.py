@@ -17,10 +17,14 @@ class FMSAPIEventAlliancesParser(object):
                 picks.append('frc{}'.format(alliance['round3']))
 
             # If no name is specified (like in 2015), generate one
-            name = alliance['name'] if alliance.get('name', None) else 'Alliance {}'.format(alliance_num)
+            name = alliance['name'] if alliance.get(
+                'name', None) else 'Alliance {}'.format(alliance_num)
 
-            backup = 'frc{}'.format(alliance['backup']) if alliance.get('backup', None) else None
-            backup_replacement = 'frc{}'.format(alliance['backupReplaced']) if alliance.get('backupReplaced', None) else None
+            backup = 'frc{}'.format(alliance['backup']) if alliance.get(
+                'backup', None) else None
+            backup_replacement = 'frc{}'.format(
+                alliance['backupReplaced']) if alliance.get(
+                    'backupReplaced', None) else None
 
             if all_null and picks != []:
                 all_null = False
@@ -28,7 +32,10 @@ class FMSAPIEventAlliancesParser(object):
             alliances.append({
                 'picks': picks,
                 'declines': [],
-                'backup': {'in': backup, 'out': backup_replacement} if backup else None,
+                'backup': {
+                    'in': backup,
+                    'out': backup_replacement
+                } if backup else None,
                 'name': name,
             })
 

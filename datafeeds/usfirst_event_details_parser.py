@@ -26,24 +26,32 @@ class UsfirstEventDetailsParser(ParserBase):
         soup = BeautifulSoup(html)
 
         page_title = soup.find('h1', {'id': 'thepagetitle'}).text
-        result['name'] = unicode(re.sub(r'\([^)]*\)', '', page_title[4:]).strip())
+        result['name'] = unicode(
+            re.sub(r'\([^)]*\)', '', page_title[4:]).strip())
         result['short_name'] = EventHelper.getShortName(result['name'])
-        result['event_type_enum'] = EventHelper.parseEventType(unicode(re.search(event_type_re, page_title).group(1).strip()))
+        result['event_type_enum'] = EventHelper.parseEventType(
+            unicode(re.search(event_type_re, page_title).group(1).strip()))
 
         try:
             event_dates = soup.find('div', {'class': 'event-dates'}).text
-            result['start_date'], result['end_date'] = self._parseEventDates(event_dates)
+            result['start_date'], result['end_date'] = self._parseEventDates(
+                event_dates)
             result['year'] = int(event_dates[-4:])
         except Exception, detail:
             logging.error('Date Parse Failed: ' + str(detail))
 
         address = soup.find('div', {'class': 'event-address'})
         if address is not None:
-            address_lines_stripped = [re.sub('\s+', ' ', line.replace(u'\xa0', ' ')).strip() for line in address.findAll(text=True)]
-            result['venue_address'] = unicode('\r\n'.join(address_lines_stripped)).encode('ascii', 'ignore')
+            address_lines_stripped = [
+                re.sub('\s+', ' ', line.replace(u'\xa0', ' ')).strip()
+                for line in address.findAll(text=True)
+            ]
+            result['venue_address'] = unicode(
+                '\r\n'.join(address_lines_stripped)).encode('ascii', 'ignore')
 
             if len(address_lines_stripped) >= 2:
-                match = re.match(event_locality_region_re, address_lines_stripped[-2])
+                match = re.match(event_locality_region_re,
+                                 address_lines_stripped[-2])
                 locality, region = match.group(1), match.group(2)
                 country = address_lines_stripped[-1]
                 result['location'] = '%s, %s, %s' % (locality, region, country)
@@ -56,8 +64,12 @@ class UsfirstEventDetailsParser(ParserBase):
 
         # http://www2.usfirst.org/2010comp/Events/SDC/matchresults.html
         try:
-            match_results_url = soup.find('div', {'class': 'event-match-results'}).find('a')['href']
-            m = re.match(r"http://www2\.usfirst\.org/%scomp/Events/([a-zA-Z0-9]*)/" % result["year"], match_results_url)
+            match_results_url = soup.find('div', {
+                'class': 'event-match-results'
+            }).find('a')['href']
+            m = re.match(
+                r"http://www2\.usfirst\.org/%scomp/Events/([a-zA-Z0-9]*)/" %
+                result["year"], match_results_url)
             result['event_short'] = unicode(m.group(1).lower())
         except AttributeError, detail:
             logging.warning("Event short parse failed: {}".format(detail))
@@ -73,8 +85,20 @@ class UsfirstEventDetailsParser(ParserBase):
         Parses the date string provided by USFirst into actual event start and stop DateTimes.
         FIRST date strings look like "01-Apr to 03-Apr-2010" or "09-Mar-2005".
         """
-        month_dict = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6,
-                      "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12}
+        month_dict = {
+            "Jan": 1,
+            "Feb": 2,
+            "Mar": 3,
+            "Apr": 4,
+            "May": 5,
+            "Jun": 6,
+            "Jul": 7,
+            "Aug": 8,
+            "Sep": 9,
+            "Oct": 10,
+            "Nov": 11,
+            "Dec": 12
+        }
 
         # "01-Apr to 03-Apr-2010"
         # or "09-Mar-2005"

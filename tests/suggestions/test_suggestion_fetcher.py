@@ -15,12 +15,11 @@ class TestSuggestionFetcher(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
         account = Account.get_or_insert(
-            "123",
-            email="user@example.com",
-            registered=True).put()
+            "123", email="user@example.com", registered=True).put()
 
         Suggestion(
             author=account,
@@ -29,5 +28,7 @@ class TestSuggestionFetcher(unittest2.TestCase):
             target_model="event").put()
 
     def test_count(self):
-        self.assertEqual(SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "event"), 1)
-        self.assertEqual(SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "media"), 0)
+        self.assertEqual(
+            SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "event"), 1)
+        self.assertEqual(
+            SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "media"), 0)

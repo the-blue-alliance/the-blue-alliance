@@ -47,11 +47,15 @@ class JSONRankingsParser(ParserBase):
         for ranking in data['rankings']:
             if type(ranking) is not dict:
                 raise ParserInputException("Ranking must be a dict.")
-            if 'team_key' not in ranking or not re.match(r'frc\d+', str(ranking['team_key'])):
-                raise ParserInputException("Ranking must have a 'team_key' that follows the format 'frcXXX'")
+            if 'team_key' not in ranking or not re.match(
+                    r'frc\d+', str(ranking['team_key'])):
+                raise ParserInputException(
+                    "Ranking must have a 'team_key' that follows the format 'frcXXX'"
+                )
             for attr in ['rank', 'played', 'dqs']:
                 if attr not in ranking or type(ranking[attr]) is not int:
-                    raise ParserInputException("Ranking must have a integer '{}'".format(attr))
+                    raise ParserInputException(
+                        "Ranking must have a integer '{}'".format(attr))
 
             row = [ranking['rank'], ranking['team_key'][3:]]
             for b in data['breakdowns']:
@@ -59,7 +63,11 @@ class JSONRankingsParser(ParserBase):
 
             # Special case for when wlt passed
             if has_record:
-                row.extend(['{}-{}-{}'.format(ranking['wins'], ranking['losses'], ranking['ties']), ranking['dqs'], ranking['played']])
+                row.extend([
+                    '{}-{}-{}'.format(ranking['wins'], ranking['losses'],
+                                      ranking['ties']), ranking['dqs'],
+                    ranking['played']
+                ])
             else:
                 row.extend([ranking['dqs'], ranking['played']])
             rankings.append(row)

@@ -22,7 +22,8 @@ from models.suggestion import Suggestion
 
 class TestSuggestMatchVideoReviewController(unittest2.TestCase):
     def setUp(self):
-        self.policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1)
+        self.policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(
+            probability=1)
         self.testbed = testbed.Testbed()
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub(consistency_policy=self.policy)
@@ -30,11 +31,18 @@ class TestSuggestMatchVideoReviewController(unittest2.TestCase):
         self.testbed.init_user_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_taskqueue_stub(_all_queues_valid=True)
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
-        app = webapp2.WSGIApplication([
-            RedirectRoute(r'/suggest/match/video/review', SuggestMatchVideoReviewController, 'suggest-video', strict_slash=True),
-        ], debug=True)
+        app = webapp2.WSGIApplication(
+            [
+                RedirectRoute(
+                    r'/suggest/match/video/review',
+                    SuggestMatchVideoReviewController,
+                    'suggest-video',
+                    strict_slash=True),
+            ],
+            debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.event = Event(
@@ -55,8 +63,7 @@ class TestSuggestMatchVideoReviewController(unittest2.TestCase):
             timezone_id="America/New_York",
             start_date=datetime(2016, 03, 24),
             webcast_json="",
-            website="http://www.firstsv.org"
-        )
+            website="http://www.firstsv.org")
         self.event.put()
 
         self.match = Match(
@@ -66,7 +73,9 @@ class TestSuggestMatchVideoReviewController(unittest2.TestCase):
             comp_level="f",
             set_number=1,
             match_number=1,
-            team_key_names=['frc846', 'frc2135', 'frc971', 'frc254', 'frc1678', 'frc973'],
+            team_key_names=[
+                'frc846', 'frc2135', 'frc971', 'frc254', 'frc1678', 'frc973'
+            ],
             time=datetime.fromtimestamp(1409527874),
             time_string="4:31 PM",
             tba_videos=[],
@@ -93,8 +102,7 @@ class TestSuggestMatchVideoReviewController(unittest2.TestCase):
                     "auto": 70,\
                     "teleop_goal+foul": 50,\
                     "assist": 150,\
-                    "truss+catch": 40}}'
-        )
+                    "truss+catch": 40}}')
         self.match.put()
 
         self.match2 = Match(
@@ -104,7 +112,9 @@ class TestSuggestMatchVideoReviewController(unittest2.TestCase):
             comp_level="f",
             set_number=1,
             match_number=2,
-            team_key_names=['frc846', 'frc2135', 'frc971', 'frc254', 'frc1678', 'frc973'],
+            team_key_names=[
+                'frc846', 'frc2135', 'frc971', 'frc254', 'frc1678', 'frc973'
+            ],
             time=datetime.fromtimestamp(1409527874),
             time_string="4:31 PM",
             tba_videos=[],
@@ -131,8 +141,7 @@ class TestSuggestMatchVideoReviewController(unittest2.TestCase):
                     "auto": 70,\
                     "teleop_goal+foul": 50,\
                     "assist": 150,\
-                    "truss+catch": 40}}'
-        )
+                    "truss+catch": 40}}')
         self.match2.put()
 
     def tearDown(self):
@@ -143,25 +152,21 @@ class TestSuggestMatchVideoReviewController(unittest2.TestCase):
             user_email="user@example.com",
             user_id="123",
             user_is_admin='0',
-            overwrite=True
-        )
+            overwrite=True)
 
         self.account = Account.get_or_insert(
-            "123",
-            email="user@example.com",
-            registered=True
-        )
+            "123", email="user@example.com", registered=True)
 
     def givePermission(self):
         self.account.permissions.append(AccountPermissions.REVIEW_MEDIA)
         self.account.put()
 
     def createSuggestion(self):
-        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key,
-                                                                     "H-54KMwMKY0",
-                                                                     "2016necmp_f1m1")
+        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(
+            self.account.key, "H-54KMwMKY0", "2016necmp_f1m1")
         self.assertEqual(status, 'success')
-        return Suggestion.render_media_key_name(2016, 'match', '2016necmp_f1m1', 'youtube', 'H-54KMwMKY0')
+        return Suggestion.render_media_key_name(
+            2016, 'match', '2016necmp_f1m1', 'youtube', 'H-54KMwMKY0')
 
     def getSuggestionForm(self):
         response = self.testapp.get('/suggest/match/video/review')
@@ -174,7 +179,8 @@ class TestSuggestMatchVideoReviewController(unittest2.TestCase):
     def test_login_redirect(self):
         response = self.testapp.get('/suggest/match/video/review', status='3*')
         response = response.follow(expect_errors=True)
-        self.assertTrue(response.request.path.startswith("/account/login_required"))
+        self.assertTrue(
+            response.request.path.startswith("/account/login_required"))
 
     def test_no_permissions(self):
         self.loginUser()
@@ -241,7 +247,8 @@ class TestSuggestMatchVideoReviewController(unittest2.TestCase):
         suggestion_id = self.createSuggestion()
         form = self.getSuggestionForm()
         form.set('accept_keys[]', suggestion_id)
-        form.set('key-{}'.format(suggestion_id), '2016necmp_f1m3')  # This match doesn't exist
+        form.set('key-{}'.format(suggestion_id),
+                 '2016necmp_f1m3')  # This match doesn't exist
         response = form.submit().follow()
         self.assertEqual(response.status_int, 200)
 

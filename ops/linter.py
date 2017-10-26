@@ -1,5 +1,4 @@
 #!/usr/bin/python
-
 """
 Based on https://github.com/cbrueffer/pep8-git-hook
 Forked from https://gist.github.com/810399
@@ -14,8 +13,10 @@ import tempfile
 import argparse
 
 # don't fill in both of these
-select_codes = ["E111", "E125", "E203", "E261", "E262", "E301", "E302", "E303",
-                "E502", "E701", "W291", "W293"]
+select_codes = [
+    "E111", "E125", "E203", "E261", "E262", "E301", "E302", "E303", "E502",
+    "E701", "W291", "W293"
+]
 ignore_codes = []
 
 
@@ -34,20 +35,23 @@ def get_modified_files():
 
 def get_files_for_commit(commit_sha):
     modified = re.compile('^(?P<name>.*\.py)', re.MULTILINE)
-    files = system('git', 'diff', '--diff-filter=AMR', '--name-only', commit_sha)
+    files = system('git', 'diff', '--diff-filter=AMR', '--name-only',
+                   commit_sha)
     return modified.findall(files)
 
 
 def get_files_since_branch(branch):
     modified = re.compile('^(?P<name>.*\.py)', re.MULTILINE)
-    files = system('git', 'diff', '--diff-filter=AMR', '--name-only', branch, "HEAD")
+    files = system('git', 'diff', '--diff-filter=AMR', '--name-only', branch,
+                   "HEAD")
     return modified.findall(files)
 
 
 def main():
     parser = argparse.ArgumentParser(description="Lint some files")
     parser.add_argument('--commit', help="Commit has to lint")
-    parser.add_argument('--base', help="Lint changes between now and the base branch")
+    parser.add_argument(
+        '--base', help="Lint changes between now and the base branch")
     args = parser.parse_args()
 
     if args.commit:
@@ -73,9 +77,11 @@ def main():
             print "Error: select and ignore codes are mutually exclusive"
             sys.exit(1)
         elif select_codes:
-            output = system('pep8', '--select', ','.join(select_codes), '.', cwd=tempdir)
+            output = system(
+                'pep8', '--select', ','.join(select_codes), '.', cwd=tempdir)
         elif ignore_codes:
-            output = system('pep8', '--ignore', ','.join(ignore_codes), '.', cwd=tempdir)
+            output = system(
+                'pep8', '--ignore', ','.join(ignore_codes), '.', cwd=tempdir)
         else:
             output = system('pep8', '.', cwd=tempdir)
     except OSError:

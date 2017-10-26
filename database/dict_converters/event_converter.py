@@ -22,24 +22,41 @@ class EventConverter(ConverterBase):
 
     @classmethod
     def eventConverter_v3(cls, event):
-        district_future = event.district_key.get_async() if event.district_key else None
+        district_future = event.district_key.get_async(
+        ) if event.district_key else None
         event_dict = {
-            'key': event.key.id(),
-            'name': event.name,
-            'short_name': event.short_name,
-            'event_code': event.event_short,
-            'event_type': event.event_type_enum,
-            'event_type_string': event.event_type_str,
-            'parent_event_key': event.parent_event.id() if event.parent_event else None,
-            'playoff_type': event.playoff_type,
-            'playoff_type_string': PlayoffType.type_names.get(event.playoff_type),
-            'district': DistrictConverter.convert(district_future.get_result(), 3) if district_future else None,
+            'key':
+            event.key.id(),
+            'name':
+            event.name,
+            'short_name':
+            event.short_name,
+            'event_code':
+            event.event_short,
+            'event_type':
+            event.event_type_enum,
+            'event_type_string':
+            event.event_type_str,
+            'parent_event_key':
+            event.parent_event.id() if event.parent_event else None,
+            'playoff_type':
+            event.playoff_type,
+            'playoff_type_string':
+            PlayoffType.type_names.get(event.playoff_type),
+            'district':
+            DistrictConverter.convert(district_future.get_result(), 3)
+            if district_future else None,
             'division_keys': [key.id() for key in event.divisions],
-            'first_event_id': event.first_eid,
-            'year': event.year,
-            'timezone': event.timezone_id,
-            'week': event.week,
-            'website': event.website,
+            'first_event_id':
+            event.first_eid,
+            'year':
+            event.year,
+            'timezone':
+            event.timezone_id,
+            'week':
+            event.week,
+            'website':
+            event.website,
         }
         event_dict.update(cls.constructLocation_v3(event))
 

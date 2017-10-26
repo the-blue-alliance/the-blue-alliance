@@ -62,8 +62,10 @@ class ApiTeamEventsController(ApiTeamControllerBase):
     def __init__(self, *args, **kw):
         super(ApiTeamEventsController, self).__init__(*args, **kw)
         self.team_key = self.request.route_kwargs["team_key"]
-        self.year = int(self.request.route_kwargs.get("year") or datetime.now().year)
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year)
+        self.year = int(
+            self.request.route_kwargs.get("year") or datetime.now().year)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(
+            self.team_key, self.year)
 
     def _track_call(self, team_key, year=None):
         api_label = team_key
@@ -90,19 +92,25 @@ class ApiTeamEventAwardsController(ApiTeamControllerBase):
         super(ApiTeamEventAwardsController, self).__init__(*args, **kw)
         self.team_key = self.request.route_kwargs["team_key"]
         self.event_key = self.request.route_kwargs["event_key"]
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.event_key)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(
+            self.team_key, self.event_key)
 
     @property
     def _validators(self):
-        return [("team_id_validator", self.team_key), ("event_id_validator", self.event_key)]
+        return [("team_id_validator", self.team_key), ("event_id_validator",
+                                                       self.event_key)]
 
     def _track_call(self, team_key, event_key):
-        self._track_call_defer('team/event/awards', '{}/{}'.format(team_key, event_key))
+        self._track_call_defer('team/event/awards', '{}/{}'.format(
+            team_key, event_key))
 
     def _render(self, team_key, event_key):
         awards = TeamEventAwardsQuery(self.team_key, self.event_key).fetch()
 
-        awards_dicts = [ModelToDict.awardConverter(award) for award in AwardHelper.organizeAwards(awards)]
+        awards_dicts = [
+            ModelToDict.awardConverter(award)
+            for award in AwardHelper.organizeAwards(awards)
+        ]
 
         return json.dumps(awards_dicts, ensure_ascii=True)
 
@@ -116,14 +124,17 @@ class ApiTeamEventMatchesController(ApiTeamControllerBase):
         super(ApiTeamEventMatchesController, self).__init__(*args, **kw)
         self.team_key = self.request.route_kwargs["team_key"]
         self.event_key = self.request.route_kwargs["event_key"]
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.event_key)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(
+            self.team_key, self.event_key)
 
     @property
     def _validators(self):
-        return [("team_id_validator", self.team_key), ("event_id_validator", self.event_key)]
+        return [("team_id_validator", self.team_key), ("event_id_validator",
+                                                       self.event_key)]
 
     def _track_call(self, team_key, event_key):
-        self._track_call_defer('team/event/matches', '{}/{}'.format(team_key, event_key))
+        self._track_call_defer('team/event/matches', '{}/{}'.format(
+            team_key, event_key))
 
     def _render(self, team_key, event_key):
         matches = TeamEventMatchesQuery(self.team_key, self.event_key).fetch()
@@ -141,8 +152,10 @@ class ApiTeamMediaController(ApiTeamControllerBase):
     def __init__(self, *args, **kw):
         super(ApiTeamMediaController, self).__init__(*args, **kw)
         self.team_key = self.request.route_kwargs["team_key"]
-        self.year = int(self.request.route_kwargs.get("year") or datetime.now().year)
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year)
+        self.year = int(
+            self.request.route_kwargs.get("year") or datetime.now().year)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(
+            self.team_key, self.year)
 
     def _track_call(self, team_key, year=None):
         api_label = team_key
@@ -173,7 +186,8 @@ class ApiTeamYearsParticipatedController(ApiTeamControllerBase):
         self._track_call_defer('team/years_participated', team_key)
 
     def _render(self, team_key):
-        years_participated = sorted(TeamParticipationQuery(self.team_key).fetch())
+        years_participated = sorted(
+            TeamParticipationQuery(self.team_key).fetch())
 
         return json.dumps(years_participated, ensure_ascii=True)
 
@@ -281,7 +295,10 @@ class ApiTeamHistoryRobotsController(ApiTeamControllerBase):
 
         robots = TeamRobotsQuery(self.team_key).fetch()
 
-        robots_dict = {robot.year: ModelToDict.robotConverter(robot) for robot in robots}
+        robots_dict = {
+            robot.year: ModelToDict.robotConverter(robot)
+            for robot in robots
+        }
         return json.dumps(robots_dict, ensure_ascii=True)
 
 

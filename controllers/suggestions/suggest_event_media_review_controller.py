@@ -25,26 +25,32 @@ class SuggestEventMediaReviewController(SuggestionsReviewBaseController):
     """
     View the list of suggestions.
     """
+
     def get(self):
         suggestions = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
-            Suggestion.target_model == "event_media").fetch(limit=50)
+                Suggestion.target_model == "event_media").fetch(limit=50)
 
         # Quick and dirty way to group images together
-        suggestions = sorted(suggestions, key=lambda x: 0 if x.contents['media_type_enum'] in MediaType.image_types else 1)
+        suggestions = sorted(
+            suggestions,
+            key=
+            lambda x: 0 if x.contents['media_type_enum'] in MediaType.image_types else 1
+        )
 
         reference_keys = []
         for suggestion in suggestions:
             reference_key = suggestion.contents['reference_key']
             reference = Media.create_reference(
-                suggestion.contents['reference_type'],
-                reference_key)
+                suggestion.contents['reference_type'], reference_key)
             reference_keys.append(reference)
 
             if 'details_json' in suggestion.contents:
-                suggestion.details = json.loads(suggestion.contents['details_json'])
+                suggestion.details = json.loads(
+                    suggestion.contents['details_json'])
                 if 'image_partial' in suggestion.details:
-                    suggestion.details['thumbnail'] = suggestion.details['image_partial'].replace('_l', '_m')
+                    suggestion.details['thumbnail'] = suggestion.details[
+                        'image_partial'].replace('_l', '_m')
 
         reference_futures = ndb.get_multi_async(reference_keys)
         references = map(lambda r: r.get_result(), reference_futures)
@@ -52,10 +58,14 @@ class SuggestEventMediaReviewController(SuggestionsReviewBaseController):
         suggestions_and_references = zip(suggestions, references)
 
         self.template_values.update({
-            "suggestions_and_references": suggestions_and_references,
+            "suggestions_and_references":
+            suggestions_and_references,
         })
 
-        self.response.out.write(jinja2_engine.render('suggestions/suggest_event_media_review_list.html', self.template_values))
+        self.response.out.write(
+            jinja2_engine.render(
+                'suggestions/suggest_event_media_review_list.html',
+                self.template_values))
 
     def create_target_model(self, suggestion):
         # Setup
@@ -65,7 +75,8 @@ class SuggestEventMediaReviewController(SuggestionsReviewBaseController):
             suggestion.contents['reference_type'],
             suggestion.contents['reference_key'])
 
-        media = MediaCreator.create_media_model(suggestion, event_reference, [])
+        media = MediaCreator.create_media_model(suggestion, event_reference,
+                                                [])
 
         # Do all DB writes
         return MediaManipulator.createOrUpdate(media)

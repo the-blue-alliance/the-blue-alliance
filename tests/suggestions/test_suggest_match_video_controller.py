@@ -24,11 +24,18 @@ class TestSuggestMatchVideoController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
         self.testbed.init_user_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
-        app = webapp2.WSGIApplication([
-            RedirectRoute(r'/suggest/match/video', SuggestMatchVideoController, 'suggest-match-video', strict_slash=True),
-        ], debug=True)
+        app = webapp2.WSGIApplication(
+            [
+                RedirectRoute(
+                    r'/suggest/match/video',
+                    SuggestMatchVideoController,
+                    'suggest-match-video',
+                    strict_slash=True),
+            ],
+            debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.event = Event(
@@ -49,8 +56,7 @@ class TestSuggestMatchVideoController(unittest2.TestCase):
             timezone_id="America/New_York",
             start_date=datetime(2016, 03, 24),
             webcast_json="",
-            website="http://www.firstsv.org"
-        )
+            website="http://www.firstsv.org")
         self.event.put()
 
         self.match = Match(
@@ -60,7 +66,9 @@ class TestSuggestMatchVideoController(unittest2.TestCase):
             comp_level="f",
             set_number=1,
             match_number=1,
-            team_key_names=['frc846', 'frc2135', 'frc971', 'frc254', 'frc1678', 'frc973'],
+            team_key_names=[
+                'frc846', 'frc2135', 'frc971', 'frc254', 'frc1678', 'frc973'
+            ],
             time=datetime.fromtimestamp(1409527874),
             time_string="4:31 PM",
             youtube_videos=["JbwUzl3W9ug"],
@@ -88,8 +96,7 @@ class TestSuggestMatchVideoController(unittest2.TestCase):
                     "auto": 70,\
                     "teleop_goal+foul": 50,\
                     "assist": 150,\
-                    "truss+catch": 40}}'
-        )
+                    "truss+catch": 40}}')
         self.match.put()
 
     def tearDown(self):
@@ -100,17 +107,13 @@ class TestSuggestMatchVideoController(unittest2.TestCase):
             user_email="user@example.com",
             user_id="123",
             user_is_admin='0',
-            overwrite=True
-        )
+            overwrite=True)
 
-        Account.get_or_insert(
-            "123",
-            email="user@example.com",
-            registered=True
-        )
+        Account.get_or_insert("123", email="user@example.com", registered=True)
 
     def getSuggestionForm(self, match_key):
-        response = self.testapp.get('/suggest/match/video?match_key={}'.format(match_key))
+        response = self.testapp.get(
+            '/suggest/match/video?match_key={}'.format(match_key))
         self.assertEqual(response.status_int, 200)
 
         form = response.forms.get('suggest_match_video', None)
@@ -118,9 +121,11 @@ class TestSuggestMatchVideoController(unittest2.TestCase):
         return form
 
     def test_login_redirect(self):
-        response = self.testapp.get('/suggest/match/video?match_key=2016necmp_f1m1', status='3*')
+        response = self.testapp.get(
+            '/suggest/match/video?match_key=2016necmp_f1m1', status='3*')
         response = response.follow(expect_errors=True)
-        self.assertTrue(response.request.path.startswith("/account/login_required"))
+        self.assertTrue(
+            response.request.path.startswith("/account/login_required"))
 
     def test_no_params(self):
         self.loginUser()
@@ -162,11 +167,18 @@ class TestSuggestMatchVideoPlaylistController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
         self.testbed.init_user_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
-        app = webapp2.WSGIApplication([
-            RedirectRoute(r'/suggest/event/video', SuggestMatchVideoPlaylistController, 'suggest-event-video', strict_slash=True),
-        ], debug=True)
+        app = webapp2.WSGIApplication(
+            [
+                RedirectRoute(
+                    r'/suggest/event/video',
+                    SuggestMatchVideoPlaylistController,
+                    'suggest-event-video',
+                    strict_slash=True),
+            ],
+            debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.event = Event(
@@ -187,8 +199,7 @@ class TestSuggestMatchVideoPlaylistController(unittest2.TestCase):
             timezone_id="America/New_York",
             start_date=datetime(2016, 03, 24),
             webcast_json="",
-            website="http://www.firstsv.org"
-        )
+            website="http://www.firstsv.org")
         self.event.put()
 
         self.match = Match(
@@ -198,7 +209,9 @@ class TestSuggestMatchVideoPlaylistController(unittest2.TestCase):
             comp_level="f",
             set_number=1,
             match_number=1,
-            team_key_names=['frc846', 'frc2135', 'frc971', 'frc254', 'frc1678', 'frc973'],
+            team_key_names=[
+                'frc846', 'frc2135', 'frc971', 'frc254', 'frc1678', 'frc973'
+            ],
             time=datetime.fromtimestamp(1409527874),
             time_string="4:31 PM",
             youtube_videos=["JbwUzl3W9ug"],
@@ -226,8 +239,7 @@ class TestSuggestMatchVideoPlaylistController(unittest2.TestCase):
                     "auto": 70,\
                     "teleop_goal+foul": 50,\
                     "assist": 150,\
-                    "truss+catch": 40}}'
-        )
+                    "truss+catch": 40}}')
         self.match.put()
 
     def tearDown(self):
@@ -238,17 +250,13 @@ class TestSuggestMatchVideoPlaylistController(unittest2.TestCase):
             user_email="user@example.com",
             user_id="123",
             user_is_admin='0',
-            overwrite=True
-        )
+            overwrite=True)
 
-        Account.get_or_insert(
-            "123",
-            email="user@example.com",
-            registered=True
-        )
+        Account.get_or_insert("123", email="user@example.com", registered=True)
 
     def getSuggestionForm(self, event_key):
-        response = self.testapp.get('/suggest/event/video?event_key={}'.format(event_key))
+        response = self.testapp.get(
+            '/suggest/event/video?event_key={}'.format(event_key))
         self.assertEqual(response.status_int, 200)
 
         form = response.forms.get('event_videos', None)
@@ -256,9 +264,11 @@ class TestSuggestMatchVideoPlaylistController(unittest2.TestCase):
         return form
 
     def test_login_redirect(self):
-        response = self.testapp.get('/suggest/event/video?event_key=2016necmp', status='3*')
+        response = self.testapp.get(
+            '/suggest/event/video?event_key=2016necmp', status='3*')
         response = response.follow(expect_errors=True)
-        self.assertTrue(response.request.path.startswith("/account/login_required"))
+        self.assertTrue(
+            response.request.path.startswith("/account/login_required"))
 
     def test_no_params(self):
         self.loginUser()
@@ -268,7 +278,8 @@ class TestSuggestMatchVideoPlaylistController(unittest2.TestCase):
 
     def test_bad_event(self):
         self.loginUser()
-        response = self.testapp.get('/suggest/event/video?event_key=2016foo', expect_errors=True)
+        response = self.testapp.get(
+            '/suggest/event/video?event_key=2016foo', expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
     def test_submit_empty_form(self):
@@ -282,11 +293,12 @@ class TestSuggestMatchVideoPlaylistController(unittest2.TestCase):
 
     def test_submit_one_video(self):
         self.loginUser()
-        response = self.testapp.post('/suggest/event/video?event_key=2016necmp', {
-            'num_videos': 1,
-            'video_id_0': '37F5tbrFqJQ',
-            'match_partial_0': 'f1m1'
-        }).follow()
+        response = self.testapp.post(
+            '/suggest/event/video?event_key=2016necmp', {
+                'num_videos': 1,
+                'video_id_0': '37F5tbrFqJQ',
+                'match_partial_0': 'f1m1'
+            }).follow()
         self.assertEqual(response.status_int, 200)
 
         request = response.request

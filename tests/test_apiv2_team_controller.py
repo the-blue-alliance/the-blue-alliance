@@ -25,7 +25,12 @@ from models.team import Team
 
 class TestTeamApiController(unittest2.TestCase):
     def setUp(self):
-        app = webapp2.WSGIApplication([webapp2.Route(r'/<team_key:>', ApiTeamController, methods=['GET'])], debug=True)
+        app = webapp2.WSGIApplication(
+            [
+                webapp2.Route(
+                    r'/<team_key:>', ApiTeamController, methods=['GET'])
+            ],
+            debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.testbed = testbed.Testbed()
@@ -33,7 +38,8 @@ class TestTeamApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
         self.testbed.init_taskqueue_stub(root_path=".")
 
@@ -50,8 +56,7 @@ class TestTeamApiController(unittest2.TestCase):
             state_prov="SC",
             country="USA",
             website="www.entech.org",
-            motto="Infiltrating Young Minds One Robot at a Time"
-        )
+            motto="Infiltrating Young Minds One Robot at a Time")
         self.team.put()
 
     def tearDown(self):
@@ -70,7 +75,11 @@ class TestTeamApiController(unittest2.TestCase):
         self.assertEqual(team["motto"], self.team.motto)
 
     def test_team_api(self):
-        response = self.testapp.get('/frc281', headers={"X-TBA-App-Id": "tba-tests:team-controller-test:v01"})
+        response = self.testapp.get(
+            '/frc281',
+            headers={
+                "X-TBA-App-Id": "tba-tests:team-controller-test:v01"
+            })
 
         team_dict = json.loads(response.body)
         self.assertTeamJson(team_dict)
@@ -78,7 +87,14 @@ class TestTeamApiController(unittest2.TestCase):
 
 class TestTeamEventsApiController(unittest2.TestCase):
     def setUp(self):
-        app = webapp2.WSGIApplication([webapp2.Route(r'/<team_key:>/<year:>', ApiTeamEventsController, methods=['GET'])], debug=True)
+        app = webapp2.WSGIApplication(
+            [
+                webapp2.Route(
+                    r'/<team_key:>/<year:>',
+                    ApiTeamEventsController,
+                    methods=['GET'])
+            ],
+            debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.testbed = testbed.Testbed()
@@ -86,7 +102,8 @@ class TestTeamEventsApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
         self.testbed.init_taskqueue_stub(root_path=".")
 
@@ -101,8 +118,7 @@ class TestTeamEventsApiController(unittest2.TestCase):
             city="Greenville",
             state_prov="SC",
             country="USA",
-            website="www.entech.org"
-        )
+            website="www.entech.org")
         self.team.put()
 
         self.event = Event(
@@ -117,15 +133,11 @@ class TestTeamEventsApiController(unittest2.TestCase):
             city='Clemson',
             state_prov='SC',
             country='USA',
-            start_date=datetime(2010, 03, 24)
-        )
+            start_date=datetime(2010, 03, 24))
         self.event.put()
 
         self.event_team = EventTeam(
-            team=self.team.key,
-            event=self.event.key,
-            year=2010
-        )
+            team=self.team.key, event=self.event.key, year=2010)
         self.event_team.put()
 
     def tearDown(self):
@@ -136,13 +148,19 @@ class TestTeamEventsApiController(unittest2.TestCase):
         self.assertEqual(event["name"], self.event.name)
         self.assertEqual(event["short_name"], self.event.short_name)
         self.assertEqual(event["official"], self.event.official)
-        self.assertEqual(event["start_date"], self.event.start_date.date().isoformat())
-        self.assertEqual(event["end_date"], self.event.end_date.date().isoformat())
+        self.assertEqual(event["start_date"],
+                         self.event.start_date.date().isoformat())
+        self.assertEqual(event["end_date"],
+                         self.event.end_date.date().isoformat())
         self.assertEqual(event["event_type_string"], self.event.event_type_str)
         self.assertEqual(event["event_type"], self.event.event_type_enum)
 
     def test_team_api(self):
-        response = self.testapp.get('/frc281/2010', headers={"X-TBA-App-Id": "tba-tests:team-controller-test:v01"})
+        response = self.testapp.get(
+            '/frc281/2010',
+            headers={
+                "X-TBA-App-Id": "tba-tests:team-controller-test:v01"
+            })
 
         event_dict = json.loads(response.body)
         self.assertEventJson(event_dict[0])
@@ -150,7 +168,14 @@ class TestTeamEventsApiController(unittest2.TestCase):
 
 class TestDistrictTeamsApiController(unittest2.TestCase):
     def setUp(self):
-        app = webapp2.WSGIApplication([webapp2.Route(r'/<district_abbrev:>/<year:([0-9]*)>', ApiDistrictTeamsController, methods=['GET'])], debug=True)
+        app = webapp2.WSGIApplication(
+            [
+                webapp2.Route(
+                    r'/<district_abbrev:>/<year:([0-9]*)>',
+                    ApiDistrictTeamsController,
+                    methods=['GET'])
+            ],
+            debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.testbed = testbed.Testbed()
@@ -158,7 +183,8 @@ class TestDistrictTeamsApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
         self.testbed.init_taskqueue_stub(root_path=".")
 
@@ -174,21 +200,15 @@ class TestDistrictTeamsApiController(unittest2.TestCase):
             state_prov="SC",
             country="USA",
             website="www.entech.org",
-            motto="Infiltrating Young Minds One Robot at a Time"
-        )
+            motto="Infiltrating Young Minds One Robot at a Time")
 
-        self.district = District(
-            id='2015ne',
-            year=2015,
-            abbreviation='ne'
-        )
+        self.district = District(id='2015ne', year=2015, abbreviation='ne')
 
         self.district_team = DistrictTeam(
             id="2015ne_frc281",
             team=self.team.key,
             year=2015,
-            district_key=ndb.Key(District, '2015ne')
-        )
+            district_key=ndb.Key(District, '2015ne'))
 
         self.team.put()
         self.district.put()
@@ -210,14 +230,25 @@ class TestDistrictTeamsApiController(unittest2.TestCase):
         self.assertEqual(team["motto"], self.team.motto)
 
     def test_districts_api(self):
-        response = self.testapp.get('/ne/2015', headers={"X-TBA-App-Id": "tba-tests:team-districts-controller-test:v01"})
+        response = self.testapp.get(
+            '/ne/2015',
+            headers={
+                "X-TBA-App-Id": "tba-tests:team-districts-controller-test:v01"
+            })
         teams = json.loads(response.body)
         self.assertTeamJson(teams)
 
 
 class TestTeamMediaApiController(unittest2.TestCase):
     def setUp(self):
-        app = webapp2.WSGIApplication([webapp2.Route(r'/<team_key:>/<year:>', ApiTeamMediaController, methods=['GET'])], debug=True)
+        app = webapp2.WSGIApplication(
+            [
+                webapp2.Route(
+                    r'/<team_key:>/<year:>',
+                    ApiTeamMediaController,
+                    methods=['GET'])
+            ],
+            debug=True)
 
         self.testapp = webtest.TestApp(app)
 
@@ -226,7 +257,8 @@ class TestTeamMediaApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
         self.testbed.init_taskqueue_stub(root_path=".")
 
@@ -237,21 +269,21 @@ class TestTeamMediaApiController(unittest2.TestCase):
             nickname="Teh Chezy Pofs",
             city="Greenville",
             state_prov="SC",
-            country="USA"
-        )
+            country="USA")
         self.team.put()
 
         self.cdmedia = Media(
             key=ndb.Key('Media', 'cdphotothread_39894'),
-            details_json=u'{"image_partial": "fe3/fe38d320428adf4f51ac969efb3db32c_l.jpg"}',
+            details_json=
+            u'{"image_partial": "fe3/fe38d320428adf4f51ac969efb3db32c_l.jpg"}',
             foreign_key=u'39894',
             media_type_enum=1,
             references=[ndb.Key('Team', 'frc254')],
-            year=2014
-        )
+            year=2014)
         self.cdmedia.put()
         self.cddetails = dict()
-        self.cddetails["image_partial"] = "fe3/fe38d320428adf4f51ac969efb3db32c_l.jpg"
+        self.cddetails[
+            "image_partial"] = "fe3/fe38d320428adf4f51ac969efb3db32c_l.jpg"
 
         self.ytmedia = Media(
             key=ndb.Key('Media', 'youtube_aFZy8iibMD0'),
@@ -259,15 +291,18 @@ class TestTeamMediaApiController(unittest2.TestCase):
             foreign_key=u'aFZy8iibMD0',
             media_type_enum=0,
             references=[ndb.Key('Team', 'frc254')],
-            year=2014
-        )
+            year=2014)
         self.ytmedia.put()
 
     def tearDown(self):
         self.testbed.deactivate()
 
     def testTeamMediaApi(self):
-        response = self.testapp.get('/frc254/2014', headers={"X-TBA-App-Id": "tba-tests:team_media-controller-test:v01"})
+        response = self.testapp.get(
+            '/frc254/2014',
+            headers={
+                "X-TBA-App-Id": "tba-tests:team_media-controller-test:v01"
+            })
         media = json.loads(response.body)
 
         self.assertEqual(len(media), 2)
@@ -285,7 +320,14 @@ class TestTeamMediaApiController(unittest2.TestCase):
 
 class TestTeamListApiController(unittest2.TestCase):
     def setUp(self):
-        app = webapp2.WSGIApplication([webapp2.Route(r'/<page_num:([0-9]*)>', ApiTeamListController, methods=['GET'])], debug=True)
+        app = webapp2.WSGIApplication(
+            [
+                webapp2.Route(
+                    r'/<page_num:([0-9]*)>',
+                    ApiTeamListController,
+                    methods=['GET'])
+            ],
+            debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.testbed = testbed.Testbed()
@@ -293,7 +335,8 @@ class TestTeamListApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
         self.testbed.init_taskqueue_stub(root_path=".")
 
@@ -305,8 +348,7 @@ class TestTeamListApiController(unittest2.TestCase):
             city="San Jose",
             state_prov="CA",
             country="USA",
-            website="www.website.com"
-        )
+            website="www.website.com")
 
         self.team2 = Team(
             id="frc4567",
@@ -316,8 +358,7 @@ class TestTeamListApiController(unittest2.TestCase):
             city="San Jose",
             state_prov="CA",
             country="USA",
-            website="www.website.com"
-        )
+            website="www.website.com")
 
         self.team1.put()
         self.team2.put()
@@ -336,22 +377,41 @@ class TestTeamListApiController(unittest2.TestCase):
         self.assertEqual(team["team_number"], self.team2.team_number)
 
     def testTeamListApi(self):
-        response = self.testapp.get('/0', headers={"X-TBA-App-Id": "tba-tests:team_list-controller-test:v01"})
+        response = self.testapp.get(
+            '/0',
+            headers={
+                "X-TBA-App-Id": "tba-tests:team_list-controller-test:v01"
+            })
         team_list = json.loads(response.body)
         self.assertTeam1Json(team_list[0])
 
-        response = self.testapp.get('/9', headers={"X-TBA-App-Id": "tba-tests:team_list-controller-test:v01"})
+        response = self.testapp.get(
+            '/9',
+            headers={
+                "X-TBA-App-Id": "tba-tests:team_list-controller-test:v01"
+            })
         team_list = json.loads(response.body)
         self.assertTeam2Json(team_list[0])
 
-        response = self.testapp.get('/10', headers={"X-TBA-App-Id": "tba-tests:team_list-controller-test:v01"})
+        response = self.testapp.get(
+            '/10',
+            headers={
+                "X-TBA-App-Id": "tba-tests:team_list-controller-test:v01"
+            })
         team_list = json.loads(response.body)
         self.assertEqual(team_list, [])
 
 
 class TestTeamHistoryRobotsApiController(unittest2.TestCase):
     def setUp(self):
-        app = webapp2.WSGIApplication([webapp2.Route(r'/<team_key:>', ApiTeamHistoryRobotsController, methods=['GET'])], debug=True)
+        app = webapp2.WSGIApplication(
+            [
+                webapp2.Route(
+                    r'/<team_key:>',
+                    ApiTeamHistoryRobotsController,
+                    methods=['GET'])
+            ],
+            debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.testbed = testbed.Testbed()
@@ -359,7 +419,8 @@ class TestTeamHistoryRobotsApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
         self.testbed.init_taskqueue_stub(root_path=".")
 
@@ -367,15 +428,13 @@ class TestTeamHistoryRobotsApiController(unittest2.TestCase):
             id="frc1124",
             name="UberBots",
             team_number=1124,
-            nickname="UberBots"
-        )
+            nickname="UberBots")
 
         self.robot = Robot(
             id="frc1124_2015",
             team=self.team.key,
             year=2015,
-            robot_name="Orion"
-        )
+            robot_name="Orion")
 
         self.team.put()
         self.robot.put()
@@ -384,7 +443,11 @@ class TestTeamHistoryRobotsApiController(unittest2.TestCase):
         self.testbed.deactivate()
 
     def testRobotApi(self):
-        response = self.testapp.get('/frc1124', headers={"X-TBA-App-Id": "tba-tests:team_list-controller-test:v01"})
+        response = self.testapp.get(
+            '/frc1124',
+            headers={
+                "X-TBA-App-Id": "tba-tests:team_list-controller-test:v01"
+            })
         robot_dict = json.loads(response.body)
 
         self.assertTrue("2015" in robot_dict)
@@ -398,7 +461,14 @@ class TestTeamHistoryRobotsApiController(unittest2.TestCase):
 
 class TestTeamHistoryDistrictsApiController(unittest2.TestCase):
     def setUp(self):
-        app = webapp2.WSGIApplication([webapp2.Route(r'/<team_key:>', ApiTeamHistoryDistrictsController, methods=['GET'])], debug=True)
+        app = webapp2.WSGIApplication(
+            [
+                webapp2.Route(
+                    r'/<team_key:>',
+                    ApiTeamHistoryDistrictsController,
+                    methods=['GET'])
+            ],
+            debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.testbed = testbed.Testbed()
@@ -406,7 +476,8 @@ class TestTeamHistoryDistrictsApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        ndb.get_context().clear_cache(
+        )  # Prevent data from leaking between tests
 
         self.testbed.init_taskqueue_stub(root_path=".")
 
@@ -414,20 +485,15 @@ class TestTeamHistoryDistrictsApiController(unittest2.TestCase):
             id="frc1124",
             name="UberBots",
             team_number=1124,
-            nickname="UberBots"
-        )
+            nickname="UberBots")
 
         self.district_team = DistrictTeam(
             id="2015ne_frc1124",
             team=self.team.key,
             year=2015,
-            district_key=ndb.Key(District, '2015ne')
-        )
+            district_key=ndb.Key(District, '2015ne'))
 
-        self.district = District(
-            id='2015ne',
-            year=2015
-        )
+        self.district = District(id='2015ne', year=2015)
 
         self.team.put()
         self.district_team.put()
@@ -437,7 +503,12 @@ class TestTeamHistoryDistrictsApiController(unittest2.TestCase):
         self.testbed.deactivate()
 
     def testDistrictsApi(self):
-        response = self.testapp.get('/frc1124', headers={"X-TBA-App-Id": "tba-tests:team-history-districts-controller-test:v01"})
+        response = self.testapp.get(
+            '/frc1124',
+            headers={
+                "X-TBA-App-Id":
+                "tba-tests:team-history-districts-controller-test:v01"
+            })
         district_dict = json.loads(response.body)
 
         self.assertTrue("2015" in district_dict)

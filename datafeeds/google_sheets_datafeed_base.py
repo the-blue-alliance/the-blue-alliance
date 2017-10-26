@@ -25,5 +25,6 @@ class GoogleSheetsDatafeedBase(DatafeedBase):
             return parser.parse(result.content)
         else:
             logging.warning('Unable to retreive url: ' + (url))
-            logging.warning("{}: {}".format(result.status_code, result.content))
+            logging.warning("{}: {}".format(result.status_code,
+                                            result.content))
             return [], False

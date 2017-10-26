@@ -13,6 +13,7 @@ class UsfirstLegacyTeamDetailsParser(ParserBase):
     """
     Facilitates building TBAVideos store from TBA.
     """
+
     @classmethod
     def parse(self, html):
         """
@@ -43,12 +44,17 @@ class UsfirstLegacyTeamDetailsParser(ParserBase):
                     team["nickname"] = unicode(tds[1].string)
                 if field == "Team Website":
                     try:
-                        website_str = re.sub(r'^/|/$', '', unicode(tds[1].a["href"]))  # strip starting and trailing slashes
-                        if not website_str.startswith('http://') and not website_str.startswith('https://'):
+                        website_str = re.sub(
+                            r'^/|/$', '', unicode(tds[1].a["href"])
+                        )  # strip starting and trailing slashes
+                        if not website_str.startswith(
+                                'http://') and not website_str.startswith(
+                                    'https://'):
                             website_str = 'http://%s' % website_str
                         team['website'] = db.Link(website_str)
                     except Exception, details:
-                        logging.info("Team website is invalid for team %s." % team['team_number'])
+                        logging.info("Team website is invalid for team %s." %
+                                     team['team_number'])
                         logging.info(details)
 
         self._html_unescape_items(team)

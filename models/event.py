@@ -23,11 +23,17 @@ class Event(ndb.Model):
     """
     name = ndb.StringProperty()
     event_type_enum = ndb.IntegerProperty(required=True)
-    short_name = ndb.StringProperty(indexed=False)  # Should not contain "Regional" or "Division", like "Hartford"
-    event_short = ndb.StringProperty(required=True, indexed=False)  # Smaller abbreviation like "CT"
-    first_code = ndb.StringProperty()  # Event code used in FIRST's API, if different from event_short
+    short_name = ndb.StringProperty(
+        indexed=False
+    )  # Should not contain "Regional" or "Division", like "Hartford"
+    event_short = ndb.StringProperty(
+        required=True, indexed=False)  # Smaller abbreviation like "CT"
+    first_code = ndb.StringProperty(
+    )  # Event code used in FIRST's API, if different from event_short
     year = ndb.IntegerProperty(required=True)
-    event_district_enum = ndb.IntegerProperty(default=DistrictType.NO_DISTRICT)  # Deprecated, use district_key instead
+    event_district_enum = ndb.IntegerProperty(
+        default=DistrictType.NO_DISTRICT
+    )  # Deprecated, use district_key instead
     district_key = ndb.KeyProperty(kind=District)
     start_date = ndb.DateTimeProperty()
     end_date = ndb.DateTimeProperty()
@@ -35,23 +41,31 @@ class Event(ndb.Model):
 
     # venue, venue_addresss, city, state_prov, country, and postalcode are from FIRST
     venue = ndb.StringProperty(indexed=False)  # Name of the event venue
-    venue_address = ndb.StringProperty(indexed=False)  # Most detailed venue address (includes venue, street, and location separated by \n)
+    venue_address = ndb.StringProperty(
+        indexed=False
+    )  # Most detailed venue address (includes venue, street, and location separated by \n)
     city = ndb.StringProperty()  # Equivalent to locality. From FRCAPI
     state_prov = ndb.StringProperty()  # Equivalent to region. From FRCAPI
     country = ndb.StringProperty()  # From FRCAPI
-    postalcode = ndb.StringProperty()  # From ElasticSearch only. String because it can be like "95126-1215"
+    postalcode = ndb.StringProperty(
+    )  # From ElasticSearch only. String because it can be like "95126-1215"
     # Normalized address from the Google Maps API, constructed using the above
     normalized_location = ndb.StructuredProperty(Location)
 
-    timezone_id = ndb.StringProperty()  # such as 'America/Los_Angeles' or 'Asia/Jerusalem'
-    official = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
+    timezone_id = ndb.StringProperty(
+    )  # such as 'America/Los_Angeles' or 'Asia/Jerusalem'
+    official = ndb.BooleanProperty(
+        default=False)  # Is the event FIRST-official?
     first_eid = ndb.StringProperty()  # from USFIRST
-    parent_event = ndb.KeyProperty()  # This is the division -> event champs relationship
+    parent_event = ndb.KeyProperty(
+    )  # This is the division -> event champs relationship
     divisions = ndb.KeyProperty(repeated=True)  # event champs -> all divisions
     facebook_eid = ndb.StringProperty(indexed=False)  # from Facebook
     custom_hashtag = ndb.StringProperty(indexed=False)  # Custom HashTag
     website = ndb.StringProperty(indexed=False)
-    webcast_json = ndb.TextProperty(indexed=False)  # list of dicts, valid keys include 'type' and 'channel'
+    webcast_json = ndb.TextProperty(
+        indexed=False
+    )  # list of dicts, valid keys include 'type' and 'channel'
     enable_predictions = ndb.BooleanProperty(default=False)
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
@@ -73,14 +87,16 @@ class Event(ndb.Model):
         self._teams = None
         self._venue_address_safe = None
         self._webcast = None
-        self._updated_attrs = []  # Used in EventManipulator to track what changed
+        self._updated_attrs = [
+        ]  # Used in EventManipulator to track what changed
         self._week = None
         super(Event, self).__init__(*args, **kw)
 
     @ndb.tasklet
     def get_awards_async(self):
         from database import award_query
-        self._awards = yield award_query.EventAwardsQuery(self.key_name).fetch_async()
+        self._awards = yield award_query.EventAwardsQuery(
+            self.key_name).fetch_async()
 
     @property
     def alliance_selections(self):
@@ -132,12 +148,14 @@ class Event(ndb.Model):
     def get_matches_async(self):
         if self._matches is None:
             from database import match_query
-            self._matches = yield match_query.EventMatchesQuery(self.key_name).fetch_async()
+            self._matches = yield match_query.EventMatchesQuery(
+                self.key_name).fetch_async()
 
     def prep_matches(self):
         if self._matches is None:
             from database import match_query
-            self._matches = match_query.EventMatchesQuery(self.key_name).fetch_async()
+            self._matches = match_query.EventMatchesQuery(
+                self.key_name).fetch_async()
 
     @property
     def matches(self):
@@ -154,16 +172,20 @@ class Event(ndb.Model):
             tz = pytz.timezone(self.timezone_id)
             try:
                 now = now + tz.utcoffset(now)
-            except (pytz.NonExistentTimeError, pytz.AmbiguousTimeError):  # may happen during DST
-                now = now + tz.utcoffset(now + datetime.timedelta(hours=1))  # add offset to get out of non-existant time
+            except (pytz.NonExistentTimeError,
+                    pytz.AmbiguousTimeError):  # may happen during DST
+                now = now + tz.utcoffset(now + datetime.timedelta(
+                    hours=1))  # add offset to get out of non-existant time
         return now
 
     def withinDays(self, negative_days_before, days_after):
         if not self.start_date or not self.end_date:
             return False
         now = self.local_time()
-        after_start = self.start_date.date() + datetime.timedelta(days=negative_days_before) <= now.date()
-        before_end = self.end_date.date() + datetime.timedelta(days=days_after) >= now.date()
+        after_start = self.start_date.date() + datetime.timedelta(
+            days=negative_days_before) <= now.date()
+        before_end = self.end_date.date() + datetime.timedelta(
+            days=days_after) >= now.date()
 
         return (after_start and before_end)
 
@@ -184,7 +206,8 @@ class Event(ndb.Model):
 
     @property
     def future(self):
-        return self.start_date.date() > self.local_time().date() and not self.now
+        return self.start_date.date() > self.local_time().date(
+        ) and not self.now
 
     @property
     def starts_today(self):
@@ -204,18 +227,21 @@ class Event(ndb.Model):
             return None
 
         # Cache week_start for the same context
-        cache_key = '{}_week_start:{}'.format(self.year, ndb.get_context().__hash__())
+        cache_key = '{}_week_start:{}'.format(self.year,
+                                              ndb.get_context().__hash__())
         week_start = context_cache.get(cache_key)
         if week_start is None:
             e = Event.query(
-                Event.year==self.year,
+                Event.year == self.year,
                 Event.event_type_enum.IN(EventType.NON_CMP_EVENT_TYPES),
-                Event.start_date!=None
-            ).order(Event.start_date).fetch(1, projection=[Event.start_date])
+                Event.start_date != None).order(Event.start_date).fetch(
+                    1, projection=[Event.start_date])
             if e:
                 first_start_date = e[0].start_date
-                diff_from_wed = (first_start_date.weekday() - 2) % 7  # 2 is Wednesday
-                week_start = first_start_date - datetime.timedelta(days=diff_from_wed)
+                diff_from_wed = (
+                    first_start_date.weekday() - 2) % 7  # 2 is Wednesday
+                week_start = first_start_date - datetime.timedelta(
+                    days=diff_from_wed)
             else:
                 week_start = None
         context_cache.set(cache_key, week_start)
@@ -233,7 +259,8 @@ class Event(ndb.Model):
     @ndb.tasklet
     def get_teams_async(self):
         from database import team_query
-        self._teams = yield team_query.EventTeamsQuery(self.key_name).fetch_async()
+        self._teams = yield team_query.EventTeamsQuery(
+            self.key_name).fetch_async()
 
     @property
     def teams(self):
@@ -243,7 +270,8 @@ class Event(ndb.Model):
 
     @ndb.toplevel
     def prepAwardsMatchesTeams(self):
-        yield self.get_awards_async(), self.get_matches_async(), self.get_teams_async()
+        yield self.get_awards_async(), self.get_matches_async(
+        ), self.get_teams_async()
 
     @ndb.toplevel
     def prepTeams(self):
@@ -275,7 +303,8 @@ class Event(ndb.Model):
                 split_location.append(self.city)
             if self.state_prov:
                 if self.postalcode:
-                    split_location.append(self.state_prov + ' ' + self.postalcode)
+                    split_location.append(self.state_prov + ' ' +
+                                          self.postalcode)
                 else:
                     split_location.append(self.state_prov)
             if self.country:
@@ -325,7 +354,8 @@ class Event(ndb.Model):
             if not self.venue or not self.location:
                 self._venue_address_safe = None
             else:
-                self._venue_address_safe = "{}\n{}".format(self.venue.encode('utf-8'), self.location.encode('utf-8'))
+                self._venue_address_safe = "{}\n{}".format(
+                    self.venue.encode('utf-8'), self.location.encode('utf-8'))
         else:
             self._venue_address_safe = self.venue_address.replace('\r\n', '\n')
         return self._venue_address_safe
@@ -364,7 +394,8 @@ class Event(ndb.Model):
         current_webcasts = []
         for webcast in self.webcast:
             if 'date' in webcast:
-                webcast_datetime = datetime.datetime.strptime(webcast['date'], "%Y-%m-%d")
+                webcast_datetime = datetime.datetime.strptime(
+                    webcast['date'], "%Y-%m-%d")
                 if self.local_time().date() == webcast_datetime.date():
                     current_webcasts.append(webcast)
             else:
@@ -467,7 +498,9 @@ class Event(ndb.Model):
             if self.event_type_enum == EventType.OFFSEASON:
                 return self.short_name
             else:
-                return '{} {}'.format(self.short_name, EventType.short_type_names[self.event_type_enum])
+                return '{} {}'.format(
+                    self.short_name,
+                    EventType.short_type_names[self.event_type_enum])
         else:
             return self.name
 

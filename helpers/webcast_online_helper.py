@@ -20,7 +20,8 @@ class WebcastOnlineHelper(object):
     @classmethod
     @ndb.tasklet
     def add_online_status_async(cls, webcast):
-        memcache_key = 'webcast_status:{}:{}:{}'.format(webcast['type'], webcast.get('channel'), webcast.get('file'))
+        memcache_key = 'webcast_status:{}:{}:{}'.format(
+            webcast['type'], webcast.get('channel'), webcast.get('file'))
         cached_webcast = memcache.get(memcache_key)
         if cached_webcast:
             if 'status' in cached_webcast:
@@ -43,7 +44,7 @@ class WebcastOnlineHelper(object):
         # elif webcast['type'] == 'livestream':
         #     yield cls._add_livestream_status_async(webcast)
 
-        memcache.set(memcache_key, webcast, 60*5)
+        memcache.set(memcache_key, webcast, 60 * 5)
 
     @classmethod
     @ndb.tasklet
@@ -54,7 +55,8 @@ class WebcastOnlineHelper(object):
             client_id = twitch_secrets.contents.get('client_id')
         if client_id:
             try:
-                url = 'https://api.twitch.tv/kraken/streams/{}?client_id={}'.format(webcast['channel'], client_id)
+                url = 'https://api.twitch.tv/kraken/streams/{}?client_id={}'.format(
+                    webcast['channel'], client_id)
                 rpc = urlfetch.create_rpc()
                 result = yield urlfetch.make_fetch_call(rpc, url)
             except Exception, e:
@@ -68,11 +70,13 @@ class WebcastOnlineHelper(object):
             response = json.loads(result.content)
             if response['stream']:
                 webcast['status'] = 'online'
-                webcast['stream_title'] = response['stream']['channel']['status']
+                webcast['stream_title'] = response['stream']['channel'][
+                    'status']
             else:
                 webcast['status'] = 'offline'
         else:
-            logging.warning("Twitch status failed with code: {}".format(result.status_code))
+            logging.warning("Twitch status failed with code: {}".format(
+                result.status_code))
             logging.warning(result.content)
 
         raise ndb.Return(None)
@@ -81,7 +85,8 @@ class WebcastOnlineHelper(object):
     @ndb.tasklet
     def _add_ustream_status_async(cls, webcast):
         try:
-            url = 'https://api.ustream.tv/channels/{}.json'.format(webcast['channel'])
+            url = 'https://api.ustream.tv/channels/{}.json'.format(
+                webcast['channel'])
             rpc = urlfetch.create_rpc()
             result = yield urlfetch.make_fetch_call(rpc, url)
         except Exception, e:
@@ -91,12 +96,14 @@ class WebcastOnlineHelper(object):
         if result.status_code == 200:
             response = json.loads(result.content)
             if response['channel']:
-                webcast['status'] = 'online' if response['channel']['status'] == 'live' else 'offline'
+                webcast['status'] = 'online' if response['channel'][
+                    'status'] == 'live' else 'offline'
                 webcast['stream_title'] = response['channel']['title']
             else:
                 webcast['status'] = 'offline'
         else:
-            logging.warning("Ustream status failed with code: {}".format(result.status_code))
+            logging.warning("Ustream status failed with code: {}".format(
+                result.status_code))
             logging.warning(result.content)
 
         raise ndb.Return(None)
@@ -110,7 +117,8 @@ class WebcastOnlineHelper(object):
             api_key = google_secrets.contents.get('api_key')
         if api_key:
             try:
-                url = 'https://www.googleapis.com/youtube/v3/videos?part=snippet&id={}&key={}'.format(webcast['channel'], api_key)
+                url = 'https://www.googleapis.com/youtube/v3/videos?part=snippet&id={}&key={}'.format(
+                    webcast['channel'], api_key)
                 rpc = urlfetch.create_rpc()
                 result = yield urlfetch.make_fetch_call(rpc, url)
             except Exception, e:
@@ -123,12 +131,15 @@ class WebcastOnlineHelper(object):
         if result.status_code == 200:
             response = json.loads(result.content)
             if response['items']:
-                webcast['status'] = 'online' if response['items'][0]['snippet']['liveBroadcastContent'] == 'live' else 'offline'
-                webcast['stream_title'] = response['items'][0]['snippet']['title']
+                webcast['status'] = 'online' if response['items'][0][
+                    'snippet']['liveBroadcastContent'] == 'live' else 'offline'
+                webcast['stream_title'] = response['items'][0]['snippet'][
+                    'title']
             else:
                 webcast['status'] = 'offline'
         else:
-            logging.warning("YouTube status failed with code: {}".format(result.status_code))
+            logging.warning("YouTube status failed with code: {}".format(
+                result.status_code))
             logging.warning(result.content)
 
         raise ndb.Return(None)
@@ -142,13 +153,14 @@ class WebcastOnlineHelper(object):
             api_key = livestream_secrets.contents.get('api_key')
         if api_key:
             try:
-                url = 'https://livestreamapis.com/v2/accounts/{}/events/{}'.format(webcast['channel'], webcast['file'])
-                base64string = base64.encodestring('{}:'.format(api_key)).replace('\n','')
-                headers = {
-                    'Authorization': 'Basic {}'.format(base64string)
-                }
+                url = 'https://livestreamapis.com/v2/accounts/{}/events/{}'.format(
+                    webcast['channel'], webcast['file'])
+                base64string = base64.encodestring(
+                    '{}:'.format(api_key)).replace('\n', '')
+                headers = {'Authorization': 'Basic {}'.format(base64string)}
                 rpc = urlfetch.create_rpc()
-                result = yield urlfetch.make_fetch_call(rpc, url, headers=headers)
+                result = yield urlfetch.make_fetch_call(
+                    rpc, url, headers=headers)
             except Exception, e:
                 logging.error("URLFetch failed for: {}".format(url))
                 raise ndb.Return(None)
@@ -159,12 +171,15 @@ class WebcastOnlineHelper(object):
         if result.status_code == 200:
             response = json.loads(result.content)
             if response['items']:
-                webcast['status'] = 'online' if response['items'][0]['snippet']['liveBroadcastContent'] == 'live' else 'offline'
-                webcast['stream_title'] = response['items'][0]['snippet']['title']
+                webcast['status'] = 'online' if response['items'][0][
+                    'snippet']['liveBroadcastContent'] == 'live' else 'offline'
+                webcast['stream_title'] = response['items'][0]['snippet'][
+                    'title']
             else:
                 webcast['status'] = 'offline'
         else:
-            logging.warning("Livestream status failed with code: {}".format(result.status_code))
+            logging.warning("Livestream status failed with code: {}".format(
+                result.status_code))
             logging.warning(result.content)
 
         raise ndb.Return(None)
