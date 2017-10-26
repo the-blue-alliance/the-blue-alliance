@@ -1,7 +1,7 @@
 import json
 import logging
 
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase
 
@@ -12,8 +12,7 @@ class UsfirstMatchScheduleParser(ParserBase):
         """
         Parse the table that contains the match schedule
         """
-        soup = BeautifulSoup(html,
-                             convertEntities=BeautifulSoup.HTML_ENTITIES)
+        soup = BeautifulSoup(html)
 
         tables = soup.findAll('table')
 

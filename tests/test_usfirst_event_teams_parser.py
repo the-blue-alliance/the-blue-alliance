@@ -3,6 +3,7 @@ import unittest2
 from datafeeds.usfirst_event_teams_parser import UsfirstEventTeamsParser
 
 
+@unittest2.skip
 class TestUsfirstEventTeamsParser(unittest2.TestCase):
     def test_parse(self):
         teams = []

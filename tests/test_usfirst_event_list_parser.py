@@ -5,6 +5,7 @@ from consts.event_type import EventType
 from datafeeds.usfirst_event_list_parser import UsfirstEventListParser
 
 
+@unittest2.skip
 class TestUsfirstEventListParser(unittest2.TestCase):
     def test_parse_2012(self):
         with open('test_data/usfirst_html/usfirst_event_list_2012.html', 'r') as f:

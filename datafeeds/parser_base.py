@@ -24,7 +24,7 @@ class ParserBase(object):
         Digs through HTML that Word made worse.
         Written to deal with http://www2.usfirst.org/2011comp/Events/cmp/matchresults.html
         """
-        from BeautifulSoup import NavigableString
+        from bs4 import NavigableString
         if node.string is not None:
             return re.sub('\s+', ' ', node.string.replace(u'\xa0', ' ')).strip()  # remove multiple whitespaces
         if isinstance(node, NavigableString):

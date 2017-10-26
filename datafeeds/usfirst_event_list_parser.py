@@ -2,7 +2,7 @@ from datetime import datetime
 import urlparse
 import logging
 
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 from consts.district_type import DistrictType
 from consts.event_type import EventType
@@ -18,8 +18,7 @@ class UsfirstEventListParser(ParserBase):
         information about events and is how we first discover them.
         """
         events = list()
-        soup = BeautifulSoup(html,
-                             convertEntities=BeautifulSoup.HTML_ENTITIES)
+        soup = BeautifulSoup(html)
 
         for tr in soup.findAll('tr'):  # Events are in table rows
             event = dict()

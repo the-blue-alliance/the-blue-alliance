@@ -1,4 +1,4 @@
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase
 
@@ -12,8 +12,7 @@ class UsfirstEventRankingsParser(ParserBase):
         """
         Parse the rankings from USFIRST.
         """
-        soup = BeautifulSoup(html,
-                             convertEntities=BeautifulSoup.HTML_ENTITIES)
+        soup = BeautifulSoup(html)
 
         rankings = []
         tables = soup.findAll('table')

@@ -8,7 +8,8 @@ npm install -g gulp-cli uglify-es uglifycss less request --silent
 
 pip install --upgrade pip
 pip install --upgrade -r requirements.txt
-pip install --upgrade -r travis_requirements.txt -t lib
+
+pip install --upgrade -r travis_requirements.txt
 paver install_libs
 npm install
 

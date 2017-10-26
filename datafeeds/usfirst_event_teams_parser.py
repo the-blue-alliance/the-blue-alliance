@@ -1,6 +1,6 @@
 import re
 
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase
 
@@ -21,6 +21,6 @@ class UsfirstEventTeamsParser(ParserBase):
             team["team_number"] = int(team_number)
             teams.append(team)
 
-        soup = BeautifulSoup(html, convertEntities=BeautifulSoup.HTML_ENTITIES)
+        soup = BeautifulSoup(html)
         more_pages = soup.find('a', {'title': 'Go to next page'}) is not None
         return teams, more_pages

@@ -3,3 +3,5 @@
 iso8601==0.1.11
 google-api-python-client==1.6.2
 google-cloud-bigquery==0.25.0
+beautifulsoup4
+GoogleAppEngineCloudStorageClient

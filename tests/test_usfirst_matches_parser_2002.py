@@ -4,6 +4,7 @@ import json
 from datafeeds.usfirst_matches_parser_2002 import UsfirstMatchesParser2002
 
 
+@unittest2.skip
 class TestUsfirstMatchesParser2002(unittest2.TestCase):
     def test_parse_2002sj(self):
         with open('test_data/usfirst_html/usfirst_event_matches_2002sj.html', 'r') as f:

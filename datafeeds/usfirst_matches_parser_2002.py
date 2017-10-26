@@ -2,7 +2,7 @@ import json
 import re
 import logging
 
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase
 
@@ -15,8 +15,7 @@ class UsfirstMatchesParser2002(ParserBase):
         Note that 2002 match tables aren't consistently formatted, and this
         parser takes that into account.
         """
-        soup = BeautifulSoup(html,
-                             convertEntities=BeautifulSoup.HTML_ENTITIES)
+        soup = BeautifulSoup(html)
 
         match_table = soup.findAll('table')[5].findAll('table')[0].findAll('table')[1]
         matches = self.parseMatchResultList(match_table)

@@ -12,7 +12,7 @@ Vagrant.configure("2") do |config|
     rsync__exclude: [
       ".git/",
       "node_modules/",
-      "lib",
+      "lib/",
       "static/compiled/",
     ],
     rsync__auto: true

@@ -3,7 +3,7 @@ import re
 from datafeeds.parser_base import ParserBase
 from helpers.youtube_video_helper import YouTubeVideoHelper
 
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 
 class ResourceLibraryParser(ParserBase):
@@ -12,7 +12,7 @@ class ResourceLibraryParser(ParserBase):
         """
         Parse the Hall of Fame teams table.
         """
-        soup = BeautifulSoup(html, convertEntities=BeautifulSoup.HTML_ENTITIES)
+        soup = BeautifulSoup(html)
 
         tables = soup.findAll('table')
 

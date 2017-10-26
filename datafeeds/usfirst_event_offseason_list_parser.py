@@ -15,11 +15,10 @@ class UsfirstEventOffseasonListParser(ParserBase):
         Parse the list of events from USFIRST. This provides us with basic
         information about events and is how we first discover them.
         """
-        from BeautifulSoup import BeautifulSoup
+        from bs4 import BeautifulSoup
 
         events = list()
-        soup = BeautifulSoup(html,
-                             convertEntities=BeautifulSoup.HTML_ENTITIES)
+        soup = BeautifulSoup(html)
 
         for table in soup.findAll('table'):
             trs = table.find('tbody').findAll('tr')
