@@ -73,7 +73,7 @@
           {% endif %}
         {% endif %}
         {% if event.website %}<br><span class="glyphicon glyphicon-globe"></span> <a href="{{ event.website }}" title="{{ event.name }}" target="_blank">{{ event.website }}</a>{% endif %}
-        {% if event.official %}{% if not event.website %}<br><span class="glyphicon glyphicon-info-sign"></span>{% else %} - {% endif %} details on <a href="http://www.firstinspires.org/team-event-search/event?id={{ event.first_eid }}" target="_blank">firstinspires.org</a>{% endif %}
+        {% if event.first_eid %}{% if not event.website %}<br><span class="glyphicon glyphicon-info-sign"></span>{% else %} - {% endif %} details on <a href="http://www.firstinspires.org/team-event-search/event?id={{ event.first_eid }}" target="_blank">firstinspires.org</a>{% endif %}
         {% if event.facebook_eid %}<br><span class="glyphicon glyphicon-thumbs-up"></span> <a href="{{ event.facebook_event_url }}" title="Facebook Event" target="_blank">RSVP on Facebook</a><br>{% endif %}
       </p>
 
