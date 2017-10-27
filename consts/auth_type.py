@@ -11,6 +11,7 @@ class AuthType(object):
     EVENT_RANKINGS = 4
     EVENT_ALLIANCES = 5
     EVENT_AWARDS = 6
+    EVENT_INFO = 7
 
     # Read Type
     READ_API = 1000
@@ -22,5 +23,6 @@ class AuthType(object):
         EVENT_MATCHES: "event matches",
         EVENT_RANKINGS: "event rankings",
         EVENT_ALLIANCES: "event alliances",
-        EVENT_AWARDS: "event awards"
+        EVENT_AWARDS: "event awards",
+        EVENT_INFO: "event info",
     }

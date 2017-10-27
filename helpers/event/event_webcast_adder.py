@@ -7,10 +7,12 @@ from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
 class EventWebcastAdder(object):
 
     @classmethod
-    def add_webcast(cls, event, webcast):
+    def add_webcast(cls, event, webcast, update=True):
         """Takes a webcast dictionary and adds it to an event"""
 
-        if event.webcast:
+        if isinstance(webcast, list):
+            event.webcast_json = json.dumps(webcast)
+        elif event.webcast:
             webcasts = event.webcast
             if webcast in webcasts:
                 return event
@@ -20,8 +22,10 @@ class EventWebcastAdder(object):
         else:
             event.webcast_json = json.dumps([webcast])
         event.dirty = True
-        EventManipulator.createOrUpdate(event)
-        MemcacheWebcastFlusher.flushEvent(event.key_name)
+
+        if update:
+            EventManipulator.createOrUpdate(event)
+            MemcacheWebcastFlusher.flushEvent(event.key_name)
 
         return event
 
