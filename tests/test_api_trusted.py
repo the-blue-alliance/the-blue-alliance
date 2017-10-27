@@ -617,9 +617,9 @@ class TestApiTrustedController(unittest2.TestCase):
 
         request = {
             'first_code': 'abc123',
-            'official': True,
             'playoff_type': PlayoffType.ROUND_ROBIN_6_TEAM,
             'webcasts': ['https://youtu.be/abc123'],
+            'someother': 'randomstuff',  # This should be ignored
         }
         request_body = json.dumps(request)
         request_path = '/api/trusted/v1/event/2014casj/info/update'

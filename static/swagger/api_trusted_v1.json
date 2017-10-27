@@ -496,10 +496,6 @@
           "description": "Event code used to sync data with FIRST",
           "example": "IRI"
         },
-        "official": {
-          "type": "boolean",
-          "description": "Should TBA automatically sync results for this event?"
-        },
         "playoff_type": {
           "type": "integer",
           "description": "Integer constant representing the playoff format. References constants here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/playoff_type.py",

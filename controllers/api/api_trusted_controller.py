@@ -305,7 +305,6 @@ class ApiTrustedUpdateEventInfo(ApiTrustedBaseController):
 
     ALLOWED_EVENT_PARAMS = {
         "first_code",
-        "official",
         "playoff_type",
         "webcasts",  # this is a list of stream URLs, we'll mutate it ourselves
     }
@@ -339,6 +338,7 @@ class ApiTrustedUpdateEventInfo(ApiTrustedBaseController):
                         {"Error": "Invalid json. Check input"}
                     )
                     self.abort(400)
+                    return
                 webcast_list = [
                     WebcastParser.webcast_dict_from_url(url) for url in value
                 ]
@@ -350,6 +350,8 @@ class ApiTrustedUpdateEventInfo(ApiTrustedBaseController):
             else:
                 try:
                     setattr(event, field, value)
+                    if field == "first_code":
+                        event.official = value is not None
                 except Exception, e:
                     self._errors({
                         "Error": "Unable to set event field",
