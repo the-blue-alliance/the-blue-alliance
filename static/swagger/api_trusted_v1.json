@@ -56,6 +56,28 @@
     "authSig": []
   ],
   "paths": {
+    "/event/{eventKey}/info/update": {
+      "post": {
+        "tags": [
+          "Event Details"
+         ],
+         "summary": "Update top-level properties for the event",
+         "description": "An endpoint to overwrite certain event fields",
+         "operationId": "updateEventInfo",
+         "parameters": [
+           { "$ref": "#/parameters/eventKeyParam" },
+           {
+             "name": "eventInfo",
+             "in": "body",
+             "description": "A JSON dictionary, mapping property name to the new value.",
+             "required": true,
+             "schema": {
+               "$ref": "#/definitions/EventInfo"
+             }
+           }
+         ]
+      }
+    },
      "/event/{eventKey}/alliance_selections/update": {
        "post": {
          "tags": [
@@ -463,6 +485,34 @@
           "type": "string",
           "description": "Name of the individual winning this award. Can be null",
           "example": "Bob Bobby"
+        }
+      }
+    },
+    "EventInfo": {
+      "type": "object",
+      "properties": {
+        "first_code": {
+          "type": "string",
+          "description": "Event code used to sync data with FIRST",
+          "example": "IRI"
+        },
+        "official": {
+          "type": "boolean",
+          "description": "Should TBA automatically sync results for this event?"
+        },
+        "playoff_type": {
+          "type": "integer",
+          "description": "Integer constant representing the playoff format. References constants here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/playoff_type.py",
+          "example": "0"
+        },
+        "webcasts": {
+          "type": "array",
+          "description": "A list of webcast URLs to set for this event",
+          "items": {
+            "type": "string",
+            "description": "A webcast URL",
+            "example": "https://youtu.be/THbUtPIQcOY"
+          }
         }
       }
     },
