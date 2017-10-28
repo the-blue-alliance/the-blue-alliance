@@ -3407,6 +3407,10 @@
           "type": "integer",
           "description": "The FIRST internal Event ID, used to link to the event on the FRC webpage."
         },
+        "first_event_code": {
+          "type": "string",
+          "description": "Public facing event code used by FIRST (on frc-events.firstinspires.org, for example)"
+        },
         "webcasts": {
           "type": "array",
           "items": {

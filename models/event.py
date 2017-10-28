@@ -474,8 +474,8 @@ class Event(ndb.Model):
     @property
     def first_api_code(self):
         if self.first_code is None:
-            return self.event_short
-        return self.first_code
+            return self.event_short.upper()
+        return self.first_code.upper()
 
     @property
     def next_match(self):

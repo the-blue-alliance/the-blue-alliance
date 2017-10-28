@@ -5,7 +5,7 @@ from database.dict_converters.district_converter import DistrictConverter
 
 class EventConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        3: 5,
+        3: 6,
     }
 
     @classmethod
@@ -36,6 +36,7 @@ class EventConverter(ConverterBase):
             'district': DistrictConverter.convert(district_future.get_result(), 3) if district_future else None,
             'division_keys': [key.id() for key in event.divisions],
             'first_event_id': event.first_eid,
+            'first_event_code': event.first_api_code if event.official else None,
             'year': event.year,
             'timezone': event.timezone_id,
             'week': event.week,
