@@ -66,7 +66,6 @@ class EventSelector extends Component {
             placeholder="Select an Event..."
             loadingPlaceholder="Loading Events..."
             clearable={false}
-            cache={false}
             searchable={false}
             value={this.state.eventSelectValue}
             loadOptions={EventSelector.loadEvents}
