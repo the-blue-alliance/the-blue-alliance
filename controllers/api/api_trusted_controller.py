@@ -304,7 +304,7 @@ class ApiTrustedUpdateEventInfo(ApiTrustedBaseController):
     REQUIRED_AUTH_TYPES = {AuthType.EVENT_INFO}
 
     ALLOWED_EVENT_PARAMS = {
-        "first_code",
+        "first_event_code",
         "playoff_type",
         "webcasts",  # this is a list of stream URLs, we'll mutate it ourselves
     }
@@ -362,9 +362,10 @@ class ApiTrustedUpdateEventInfo(ApiTrustedBaseController):
                 )
             else:
                 try:
-                    setattr(event, field, value)
-                    if field == "first_code":
+                    if field == "first_event_code":
                         event.official = value is not None
+                        field = "first_code"  # Internal property is different
+                    setattr(event, field, value)
                 except Exception, e:
                     self._errors({
                         "Error": "Unable to set event field",

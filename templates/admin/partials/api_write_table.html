@@ -6,6 +6,7 @@
     <th>ID</th>
     <th>Secret</th>
     <th>Events</th>
+    <th>Event Info</th>
     <th>Event Teams</th>
     <th>Event Matches</th>
     <th>Event Rankings</th>
@@ -25,6 +26,7 @@
         <a href="/admin/event/{{event_key.id}}">{{event_key.id}}</a>
       {% endfor %}
     </td>
+    <td>{% if auth.can_edit_event_info %}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>
     <td>{% if auth.can_edit_event_teams %}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>
     <td>{% if auth.can_edit_event_matches %}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>
     <td>{% if auth.can_edit_event_rankings %}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>

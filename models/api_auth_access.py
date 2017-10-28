@@ -28,6 +28,10 @@ class ApiAuthAccess(ndb.Model):
     expiration = ndb.DateTimeProperty()
 
     @property
+    def can_edit_event_info(self):
+        return AuthType.EVENT_INFO in self.auth_types_enum
+
+    @property
     def can_edit_event_teams(self):
         return AuthType.EVENT_TEAMS in self.auth_types_enum
 

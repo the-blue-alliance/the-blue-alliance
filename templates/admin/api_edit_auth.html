@@ -31,6 +31,10 @@
             <td><input type="text" name="event_list_str" value="{{auth.event_list_str}}" /></td>
         </tr>
         <tr>
+            <td>Allow Event Info Edit</td>
+            <td><input type="checkbox" name="allow_edit_info" {% if auth.can_edit_event_info %}checked{% endif %}></td>
+        </tr>
+        <tr>
             <td>Allow Event Teams Edit</td>
             <td><input type="checkbox" name="allow_edit_teams" {% if auth.can_edit_event_teams %}checked{% endif %}></td>
         </tr>
