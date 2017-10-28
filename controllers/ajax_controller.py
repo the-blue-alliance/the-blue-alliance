@@ -7,6 +7,7 @@ import datetime
 
 from base_controller import CacheableHandler, LoggedInHandler
 from consts.client_type import ClientType
+from consts.playoff_type import PlayoffType
 from google.appengine.api import memcache
 from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
@@ -330,3 +331,18 @@ class AllowedApiWriteEventsHandler(LoggedInHandler):
         for event in events:
             details.append({'value': event.key_name, 'label': "{} {}".format(event.year, event.name)})
         self.response.out.write(json.dumps(details))
+
+
+class PlayoffTypeGetHandler(CacheableHandler):
+    """
+    Returns the possible playoff types, formatted for EventWizard dropdown
+    """
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "playoff_types"
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
+
+    def get(self):
+        types = []
+        for type_enum, type_name in PlayoffType.type_names.iteritems():
+            types.append({'value': type_enum, 'label': type_name})
+        self.response.out.write(json.dumps(types))
