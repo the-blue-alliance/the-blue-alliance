@@ -24,7 +24,7 @@ const TeamList = (props) => (
 )
 
 TeamList.propTypes = {
-  teams: PropTypes.arrayOf(TEAM_SHAPE).isRequired,
+  teams: PropTypes.arrayOf(PropTypes.shape(TEAM_SHAPE)).isRequired,
 }
 
 export default TeamList
