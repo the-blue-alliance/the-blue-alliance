@@ -1,7 +1,6 @@
 
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import Select from 'react-select'
 
 import WebcastList from './WebcastList'
 import EVENT_SHAPE from '../../constants/ApiEvent'
@@ -11,7 +10,7 @@ class AddRemoveWebcast extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      nextWebcastToAdd: null,
+      nextWebcastToAdd: '',
     }
 
     this.onNextWebcastChange = this.onNextWebcastChange.bind(this)
@@ -19,25 +18,24 @@ class AddRemoveWebcast extends Component {
   }
 
   onNextWebcastChange(event) {
-    this.setState({nextWebcastToAdd: event.target.value})
+    this.setState({ nextWebcastToAdd: event.target.value })
   }
 
-  onAddWebcastClick(event) {
+  onAddWebcastClick() {
     this.props.addWebcast(this.state.nextWebcastToAdd)
-    this.setState({nextWebcastToAdd: ''})
+    this.setState({ nextWebcastToAdd: '' })
   }
 
   render() {
-
     let webcastList = null
     if (this.props.eventInfo && this.props.eventInfo.webcasts.length > 0) {
       webcastList =
-        <WebcastList
+        (<WebcastList
           webcasts={this.props.eventInfo.webcasts}
           removeWebcast={this.props.removeWebcast}
-        />
+        />)
     } else {
-      webcastList = <p>No webcasts found</p>
+      webcastList = (<p>No webcasts found</p>)
     }
 
     return (
@@ -57,7 +55,7 @@ class AddRemoveWebcast extends Component {
             value={this.state.nextWebcastToAdd}
           />
           <button
-            className='btn btn-info'
+            className="btn btn-info"
             onClick={this.onAddWebcastClick}
             disabled={this.props.eventInfo === null}
           >

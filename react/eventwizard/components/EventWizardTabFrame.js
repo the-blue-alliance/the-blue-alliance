@@ -7,7 +7,7 @@ const EventWizardTabFrame = () => (
     <div className="row">
       <div className="col-sm-12">
         <ul className="nav nav-tabs">
-          <li><a href="#info" data-toggle="tab">Event Info</a></li  >
+          <li><a href="#info" data-toggle="tab">Event Info</a></li>
           <li><a href="#teams" data-toggle="tab">Teams</a></li>
           <li><a href="#schedule" data-toggle="tab">FMS Schedule Import</a></li>
           <li><a href="#matches" data-toggle="tab">Match Play</a></li>

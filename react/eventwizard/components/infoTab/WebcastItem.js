@@ -23,9 +23,9 @@ class WebcastItem extends Component {
     }
 
     return (
-        <p>{item} &nbsp;
+      <p>{item} &nbsp;
         <button
-          className='btn btn-danger'
+          className="btn btn-danger"
           onClick={this.onRemoveClick}
         >
           Remove

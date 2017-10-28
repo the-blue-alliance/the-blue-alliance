@@ -5,7 +5,7 @@ const EVENT_SHAPE = {
   key: PropTypes.string.isRequired,
   playoff_type: PropTypes.int,
   first_event_code: PropTypes.string,
-  webcasts: PropTypes.arrayOf(PropTypes.shape(WEBCAST_SHAPE))
+  webcasts: PropTypes.arrayOf(PropTypes.shape(WEBCAST_SHAPE)),
 }
 
 export default EVENT_SHAPE

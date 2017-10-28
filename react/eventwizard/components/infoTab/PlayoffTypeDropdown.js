@@ -11,7 +11,7 @@ class PlayoffTypeDropdown extends Component {
       credentials: 'same-origin',
     })
       .then((response) => (response.json()))
-      .then((types) => ({options: types}))
+      .then((types) => ({ options: types }))
   }
 
   render() {

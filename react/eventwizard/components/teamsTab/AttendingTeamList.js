@@ -72,7 +72,7 @@ class AttendingTeamList extends Component {
 AttendingTeamList.propTypes = {
   selectedEvent: PropTypes.string,
   hasFetchedTeams: PropTypes.bool.isRequired,
-  teams: PropTypes.arrayOf(TEAM_SHAPE).isRequired,
+  teams: PropTypes.arrayOf(PropTypes.shape(TEAM_SHAPE)).isRequired,
   updateTeams: PropTypes.func.isRequired,
   showErrorMessage: PropTypes.func.isRequired,
 }

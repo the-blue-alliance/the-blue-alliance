@@ -14,7 +14,7 @@ class EventInfoTab extends Component {
     this.state = {
       eventInfo: null,
       status: '',
-      buttonClass: 'btn-primary'
+      buttonClass: 'btn-primary',
     }
 
     this.loadEventInfo = this.loadEventInfo.bind(this)
@@ -25,54 +25,63 @@ class EventInfoTab extends Component {
     this.removeWebcast = this.removeWebcast.bind(this)
   }
 
+  componentWillReceiveProps(newProps) {
+    if (newProps.selectedEvent === null) {
+      this.setState({ eventInfo: null, buttonClass: 'btn-primary' })
+    } else if (newProps.selectedEvent !== this.props.selectedEvent) {
+      this.loadEventInfo(newProps.selectedEvent)
+      this.setState({ buttonClass: 'btn-primary' })
+    }
+  }
+
+  onFirstCodeChange(event) {
+    const currentInfo = this.state.eventInfo
+    if (currentInfo !== null) {
+      currentInfo.first_event_code = event.target.value
+      this.setState({ eventInfo: currentInfo })
+    }
+  }
+
+  setPlayoffType(newType) {
+    const currentInfo = this.state.eventInfo
+    if (currentInfo !== null) {
+      currentInfo.playoff_type = newType.value
+      this.setState({ eventInfo: currentInfo })
+    }
+  }
+
   loadEventInfo(newEventKey) {
-    this.setState({status: 'Loading event info...'})
+    this.setState({ status: 'Loading event info...' })
     fetch(`/api/v3/event/${newEventKey}`, {
       credentials: 'same-origin',
     })
     .then(ensureRequestSuccess)
     .then((response) => (response.json()))
-    .then((data) => (this.setState({eventInfo: data, status: ''})))
+    .then((data) => (this.setState({ eventInfo: data, status: '' })))
   }
 
-  setPlayoffType(newType) {
-    let currentInfo = this.state.eventInfo
-    if (currentInfo !== null) {
-      currentInfo.playoff_type = newType.value
-      this.setState({eventInfo: currentInfo})
-    }
-  }
-
-  onFirstCodeChange(event) {
-    let currentInfo = this.state.eventInfo
-    if (currentInfo !== null) {
-      currentInfo.first_event_code = event.target.value
-      this.setState({eventInfo: currentInfo})
-    }
-  }
-
-  addWebcast(webcast_url) {
-    let currentInfo = this.state.eventInfo
+  addWebcast(webcastUrl) {
+    const currentInfo = this.state.eventInfo
     if (currentInfo !== null) {
       currentInfo.webcasts.push({
-        'type': '',
-        'channel': '',
-        'url': webcast_url,
+        type: '',
+        channel: '',
+        url: webcastUrl,
       })
-      this.setState({eventInfo: currentInfo})
+      this.setState({ eventInfo: currentInfo })
     }
   }
 
-  removeWebcast(index_to_remove) {
-    let currentInfo = this.state.eventInfo
+  removeWebcast(indexToRemove) {
+    const currentInfo = this.state.eventInfo
     if (currentInfo !== null) {
-      currentInfo.webcasts.splice(index_to_remove, 1)
-      this.setState({eventInfo: currentInfo})
+      currentInfo.webcasts.splice(indexToRemove, 1)
+      this.setState({ eventInfo: currentInfo })
     }
   }
 
   updateEventInfo() {
-    this.setState({buttonClass: 'btn-warning'})
+    this.setState({ buttonClass: 'btn-warning' })
     this.props.makeTrustedRequest(
       `/api/trusted/v1/event/${this.props.selectedEvent}/info/update`,
       JSON.stringify(this.state.eventInfo),
@@ -81,15 +90,6 @@ class EventInfoTab extends Component {
       },
       (error) => (this.dialog.showAlert(`${error}`))
     )
-  }
-
-  componentWillReceiveProps(newProps) {
-    if (newProps.selectedEvent === null) {
-      this.setState({eventInfo: null, buttonClass: 'btn-primary'})
-    } else if (newProps.selectedEvent !== this.props.selectedEvent) {
-      this.loadEventInfo(newProps.selectedEvent)
-      this.setState({buttonClass: 'btn-primary'})
-    }
   }
 
   render() {

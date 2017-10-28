@@ -130,7 +130,7 @@ AddRemoveSingleTeam.propTypes = {
   selectedEvent: PropTypes.string,
   updateTeamList: PropTypes.func.isRequired,
   hasFetchedTeams: PropTypes.bool.isRequired,
-  currentTeams: PropTypes.arrayOf(TEAM_SHAPE).isRequired,
+  currentTeams: PropTypes.arrayOf(PropTypes.shape(TEAM_SHAPE)).isRequired,
   clearTeams: PropTypes.func,
   showErrorMessage: PropTypes.func.isRequired,
 }
