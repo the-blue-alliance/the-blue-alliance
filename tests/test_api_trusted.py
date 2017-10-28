@@ -616,7 +616,7 @@ class TestApiTrustedController(unittest2.TestCase):
         self.event_info_auth.put()
 
         request = {
-            'first_code': 'abc123',
+            'first_event_code': 'abc123',
             'playoff_type': PlayoffType.ROUND_ROBIN_6_TEAM,
             'webcasts': [{'url': 'https://youtu.be/abc123'},
                          {'type': 'youtube', 'channel': 'cde456'}],
