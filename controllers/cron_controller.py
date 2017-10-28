@@ -644,7 +644,7 @@ class MatchTimePredictionsDo(webapp.RequestHandler):
             self.abort(404)
 
         matches = event.matches
-        if not matches:
+        if not matches or not event.timezone_id:
             return
 
         timezone = pytz.timezone(event.timezone_id)
