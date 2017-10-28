@@ -339,9 +339,22 @@ class ApiTrustedUpdateEventInfo(ApiTrustedBaseController):
                     )
                     self.abort(400)
                     return
-                webcast_list = [
-                    WebcastParser.webcast_dict_from_url(url) for url in value
-                ]
+                webcast_list = []
+                for webcast in value:
+                    if not isinstance(webcast, dict):
+                        self._errors = json.dumps(
+                            {"Error": "Invalid json. Check input"}
+                        )
+                        self.abort(400)
+                        return
+                    if 'url' in webcast:
+                        webcast_list.append(
+                            WebcastParser.webcast_dict_from_url(webcast['url'])
+                        )
+                    elif 'type' in webcast and 'channel' in webcast:
+                        webcast_list.append(webcast)
+
+                webcast_list = [w for w in webcast_list if w is not None]
                 EventWebcastAdder.add_webcast(
                     event,
                     webcast_list,

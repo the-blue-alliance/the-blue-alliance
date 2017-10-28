@@ -503,11 +503,17 @@
         },
         "webcasts": {
           "type": "array",
-          "description": "A list of webcast URLs to set for this event",
+          "description": "A list of webcast URLs to set for this event. This will overwrite the existing webcast list",
           "items": {
-            "type": "string",
-            "description": "A webcast URL",
-            "example": "https://youtu.be/THbUtPIQcOY"
+            "type": "object",
+            "description": "A webcast object",
+            "properties": {
+              "url": {
+                "type": "string",
+                "description": "A webcast url",
+                "example": "https://youtu.be/abc123",
+              }
+            }
           }
         }
       }

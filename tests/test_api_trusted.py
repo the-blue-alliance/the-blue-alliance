@@ -618,7 +618,8 @@ class TestApiTrustedController(unittest2.TestCase):
         request = {
             'first_code': 'abc123',
             'playoff_type': PlayoffType.ROUND_ROBIN_6_TEAM,
-            'webcasts': ['https://youtu.be/abc123'],
+            'webcasts': [{'url': 'https://youtu.be/abc123'},
+                         {'type': 'youtube', 'channel': 'cde456'}],
             'someother': 'randomstuff',  # This should be ignored
         }
         request_body = json.dumps(request)
@@ -633,7 +634,10 @@ class TestApiTrustedController(unittest2.TestCase):
         self.assertEqual(event.official, True)
         self.assertEqual(event.playoff_type, PlayoffType.ROUND_ROBIN_6_TEAM)
         webcasts = event.webcast
-        self.assertEqual(len(webcasts), 1)
+        self.assertEqual(len(webcasts), 2)
         webcast = webcasts[0]
         self.assertEqual(webcast['type'], 'youtube')
         self.assertEqual(webcast['channel'], 'abc123')
+        webcast = webcasts[1]
+        self.assertEqual(webcast['type'], 'youtube')
+        self.assertEqual(webcast['channel'], 'cde456')
