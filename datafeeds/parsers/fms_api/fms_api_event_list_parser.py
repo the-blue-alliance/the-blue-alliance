@@ -42,6 +42,7 @@ class FMSAPIEventListParser(object):
 
         # For Einstein, format with the name "Einstein" or "FIRST Championship" or whatever
         'cmp': ('cmp', '{}'),
+        'cmpmi': ('cmpmi', '{} (Detroit)'),
         'cmpmo': ('cmpmo', '{} (St. Louis)'),
         'cmptx': ('cmptx', '{} (Houston)'),
     }
