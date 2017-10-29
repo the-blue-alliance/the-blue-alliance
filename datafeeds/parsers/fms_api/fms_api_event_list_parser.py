@@ -49,7 +49,7 @@ class FMSAPIEventListParser(object):
 
     EINSTEIN_SHORT_NAME_DEFAULT = 'Einstein'
     EINSTEIN_NAME_DEFAULT = 'Einstein Field'
-    EINSTEIN_CODES = {'cmp', 'cmpmo', 'cmptx'}
+    EINSTEIN_CODES = {'cmp', 'cmpmi', 'cmpmo', 'cmptx'}
 
     def __init__(self, season, short=None):
         self.season = int(season)
