@@ -190,6 +190,10 @@ class AdminEventRemapTeams(LoggedInHandler):
                 for old_team, new_team in remap_teams.items():
                     if row[1] == old_team[3:]:
                         row[1] = new_team[3:]
+        if event.details and event.details.rankings2:
+            for ranking in e.details.rankings2:
+                if ranking['team_key'] in remap_teams:
+                    ranking['team_key'] = remap_teams[ranking['team_key']]
 
         EventDetailsManipulator.createOrUpdate(event.details)
 
