@@ -30,6 +30,7 @@ from helpers.media_manipulator import MediaManipulator
 from helpers.team_manipulator import TeamManipulator
 from helpers.district_team_manipulator import DistrictTeamManipulator
 from helpers.robot_manipulator import RobotManipulator
+from helpers.event.offseason_event_helper import OffseasonEventHelper
 
 from models.district_team import DistrictTeam
 from models.event import Event
@@ -432,6 +433,19 @@ class EventListGet(webapp.RequestHandler):
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
             path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fms_event_list_get.html')
             self.response.out.write(template.render(path, template_values))
+
+
+class OffseasonEventListGet(webapp.RequestHandler):
+    """
+    Fetch one year's sync-enabled offseason events
+    """
+    def get(self, year):
+        df = DatafeedFMSAPI('v2.0')
+        first_events, _ = df.getSyncEnabledOffseasonEvents(year)
+        linked_events, maybed_linked_events, new_events = \
+            OffseasonEventHelper.categorize_offseasons(int(year), first_events)
+
+        logging.info("linked: {}, maybe: {}, new: {}".format(len(linked_events), len(maybed_linked_events), len(new_events)))
 
 
 class EventDetailsEnqueue(webapp.RequestHandler):

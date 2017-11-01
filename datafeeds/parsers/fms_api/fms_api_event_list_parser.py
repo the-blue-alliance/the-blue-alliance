@@ -51,9 +51,11 @@ class FMSAPIEventListParser(object):
     EINSTEIN_NAME_DEFAULT = 'Einstein Field'
     EINSTEIN_CODES = {'cmp', 'cmpmi', 'cmpmo', 'cmptx'}
 
-    def __init__(self, season, short=None):
+    def __init__(self, season, short=None, event_types_override=None):
         self.season = int(season)
         self.event_short = short
+        if event_types_override:
+            self.EVENT_TYPES = event_types_override
 
     def parse(self, response):
         events = []
