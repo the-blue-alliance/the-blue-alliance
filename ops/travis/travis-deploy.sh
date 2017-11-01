@@ -47,7 +47,7 @@ lock $DEPLOY_LOCK
 
 echo "Obtained Lock. Deploying $PROJECT:$VERSION"
 # need more permissiosn for cron.yaml queue.yaml index.yaml, we can come back to them
-for config in dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml; do
+for config in dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml cron.yaml; do
     with_python27 "$GCLOUD --quiet --verbosity warning --project $PROJECT app deploy $config --version $VERSION"
 done
 
