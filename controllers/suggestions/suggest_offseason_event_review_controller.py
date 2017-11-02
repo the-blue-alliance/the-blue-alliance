@@ -113,7 +113,8 @@ The Blue Alliance Admins
 
     def post(self):
         self.verify_permissions()
-        suggestion_id = int(self.request.get("suggestion_id"))
+        id_str = self.request.get("suggestion_id")
+        suggestion_id = int(id_str) if id_str.isdigit() else id_str
         verdict = self.request.get("verdict")
         if verdict == "accept":
             status, event_key = self._process_accepted(suggestion_id)
