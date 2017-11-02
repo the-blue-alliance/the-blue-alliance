@@ -1,6 +1,8 @@
 import logging
 from datetime import datetime
 
+from google.appengine.ext import ndb
+
 from consts.auth_type import AuthType
 from consts.event_type import EventType
 from consts.media_type import MediaType
@@ -8,6 +10,7 @@ from helpers.website_helper import WebsiteHelper
 from helpers.media_helper import MediaParser
 from helpers.webcast_helper import WebcastParser
 
+from models.account import Account
 from models.event import Event
 from models.match import Match
 from models.media import Media
@@ -191,7 +194,52 @@ class SuggestionCreator(object):
             return 'bad_url'
 
     @classmethod
-    def createOffseasonEventSuggestion(cls, author_account_key, name, start_date, end_date, website, venue_name, address, city, state, country, first_code=None):
+    def createDummyOffseasonSuggestions(cls, events_to_suggest):
+        """
+        Create an offseason suggestion from a made up bot.
+        Used to link offseasons with official data sync
+        """
+        keys_to_check = map(
+            lambda event: ndb.Key(Suggestion, 'offseason_with_data_{}'.format(event.key_name)),
+            events_to_suggest,
+        )
+        keys_found = ndb.get_multi(keys_to_check)
+        logging.info("Fetched {} suggestion keys from ndb".format(len(keys_found)))
+
+        # Make sure we have a dummy account to link these suggestions with
+        account = Account.get_or_insert(
+            'tba-bot-account',
+            email='contact@thebluealliance.com',
+            nickname='TBA-Bot',
+            registered=True,
+            permissions=[],
+        )
+
+        for event, suggestion, key in zip(events_to_suggest, keys_found, keys_to_check):
+            if suggestion:
+                # We've already created a suggestion for this event
+                logging.info("Skipping creating a suggestion for {}".format(event.key_name))
+                continue
+            logging.info("Creating suggestion for {}".format(event.key_name))
+            status, failures = cls.createOffseasonEventSuggestion(
+                author_account_key=account.key,
+                name=event.name,
+                start_date=event.start_date.strftime("%Y-%m-%d"),
+                end_date=event.end_date.strftime("%Y-%m-%d"),
+                website=event.website,
+                venue_name=event.venue,
+                address=event.venue_address,
+                city=event.city,
+                state=event.state_prov,
+                country=event.country,
+                first_code=event.event_short.upper(),
+                suggestion_id=key.id(),
+            )
+            if status != 'success':
+                logging.warning("Failed to create suggestion: {}".format(failures))
+
+    @classmethod
+    def createOffseasonEventSuggestion(cls, author_account_key, name, start_date, end_date, website, venue_name, address, city, state, country, first_code=None, suggestion_id=None):
         """
         Create a suggestion for offseason event. Returns (status, failures):
         ('success', None)
@@ -234,15 +282,15 @@ class SuggestionCreator(object):
         if start_datetime and end_datetime and end_datetime < start_datetime:
             failures['end_date'] = "End date must not be before the start date"
 
-        if failures:
+        if failures and not suggestion_id:
+            # Be more lenient with auto-added suggestions
             return 'validation_failure', failures
 
-        # Note that we don't specify an explicit key for event suggestions
+        # Note that we don't typically specify an explicit key for event suggestions
         # We don't trust users to input correct event keys (that's for the moderator to do)
-        suggestion = Suggestion(
-            author=author_account_key,
-            target_model="offseason-event",
-        )
+        suggestion = Suggestion(id=suggestion_id) if suggestion_id else Suggestion()
+        suggestion.author=author_account_key
+        suggestion.target_model="offseason-event"
         suggestion.contents = {
             'name': name,
             'start_date': start_date,

@@ -31,6 +31,7 @@ from helpers.team_manipulator import TeamManipulator
 from helpers.district_team_manipulator import DistrictTeamManipulator
 from helpers.robot_manipulator import RobotManipulator
 from helpers.event.offseason_event_helper import OffseasonEventHelper
+from helpers.suggestions.suggestion_creator import SuggestionCreator
 
 from models.district_team import DistrictTeam
 from models.event import Event
@@ -445,7 +446,43 @@ class OffseasonEventListGet(webapp.RequestHandler):
         linked_events, maybed_linked_events, new_events = \
             OffseasonEventHelper.categorize_offseasons(int(year), first_events)
 
-        logging.info("linked: {}, maybe: {}, new: {}".format(len(linked_events), len(maybed_linked_events), len(new_events)))
+        events_to_update = []
+        events_to_put = []
+
+        # for all events with a first_code linked, ensure official=True
+        logging.info("Found {} already linked events".format(len(linked_events)))
+        for tba, first in linked_events:
+            if tba.first_code != first.event_short or not tba.official:
+                tba.first_code = first.event_short
+                tba.official = True
+                events_to_put.append(tba)
+            events_to_update.append(tba)
+
+        # for all events that we can maybe link, also do that
+        logging.info("Auto-linking {} probably events".format(len(maybed_linked_events)))
+        for tba, first in maybed_linked_events:
+            tba.first_code = first.event_short
+            tba.official = True
+            events_to_put.append(tba)
+            events_to_update.append(tba)
+
+        logging.info("Found {} events to put".format(len(events_to_put)))
+        if events_to_put:
+            EventManipulator.createOrUpdate(events_to_put)
+
+        # Enqueue details updates for these events
+        logging.info("Found {} events to update".format(len(events_to_update)))
+        for event in events_to_update:
+            taskqueue.add(
+                queue_name='datafeed',
+                target='backend-tasks',
+                url='/backend-tasks/get/event_details/'+event.key_name,
+                method='GET'
+            )
+
+        # Event we don't have anything for... Create suggestions
+        logging.info("Found {} new events to link".format(len(new_events)))
+        SuggestionCreator.createDummyOffseasonSuggestions(new_events)
 
 
 class EventDetailsEnqueue(webapp.RequestHandler):
