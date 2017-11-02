@@ -33,7 +33,8 @@ class SuggestOffseasonEventController(LoggedInHandler):
             address=self.request.get("venue_address", None),
             city=self.request.get("venue_city", None),
             state=self.request.get("venue_state", None),
-            country=self.request.get("venue_country", None)
+            country=self.request.get("venue_country", None),
+            first_code=self.request.get("first_code", None)
         )
         if status != 'success':
             # Don't completely wipe form data if validation fails
@@ -45,6 +46,7 @@ class SuggestOffseasonEventController(LoggedInHandler):
                 'end_date': self.request.get('end_date', None),
                 'website': self.request.get('website', None),
                 'venue_address': self.request.get('venue_address', None),
+                'first_code': self.request.get('first_code', None)
             })
             self.response.out.write(
                 jinja2_engine.render('suggestions/suggest_offseason_event.html', self.template_values))

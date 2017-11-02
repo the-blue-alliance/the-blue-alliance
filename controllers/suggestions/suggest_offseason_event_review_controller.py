@@ -41,6 +41,7 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
         if existing_event:
             return 'duplicate_key', None
 
+        first_code = self.request.get("first_code", None)
         event = Event(
             id=event_key,
             end_date=end_date,
@@ -57,7 +58,8 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
             start_date=start_date,
             website=self.request.get("website"),
             year=int(self.request.get("year")),
-            official=False,
+            first_code=first_code,
+            official=(first_code is not None),
         )
         EventManipulator.createOrUpdate(event)
 
@@ -153,6 +155,7 @@ The Blue Alliance Admins
             start_date=start_date,
             website=suggestion.contents['website'],
             year=start_date.year if start_date else None,
+            first_code=suggestion.contents.get('first_code', None),
             official=False)
 
     @classmethod

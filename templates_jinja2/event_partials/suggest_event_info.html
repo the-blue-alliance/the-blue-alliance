@@ -7,6 +7,11 @@
             <td><input type="text" name="event_short" {% if event.event_short %}value="{{ event.event_short }}{% endif %}"/></td>
             <td><p><strong>Example:</strong><br>nyny</p></td>
         </tr>
+        <tr>
+            <td>FIRST Sync Code</td>
+            <td><input type="text" name="first_code" {% if event.first_code%}value="{{ event.first_code }}{% endif %}"/></td>
+            <td><p><strong>Example:</strong><br>IRI</p></td>
+        </tr>
         <tr><td>&nbsp;</td></tr>
         <tr>
             <td>Name</td>
