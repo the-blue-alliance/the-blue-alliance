@@ -318,7 +318,7 @@ class DatafeedFMSAPI(object):
 
     # Returns a tuple: (list(Event), list(District))
     def getEventList(self, year):
-        result = self._parse(self.FMS_API_EVENT_LIST_URL_PATTERN % (year))
+        result = self._parse(self.FMS_API_EVENT_LIST_URL_PATTERN % (year), FMSAPIEventListParser(year))
         if result:
             return result
         else:
