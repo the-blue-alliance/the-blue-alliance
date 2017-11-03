@@ -63,6 +63,9 @@ class ChampSplitHelper(object):
         'India': YELLOW,
         'Colombia': YELLOW,
         'Malaysia': YELLOW,
+        'Ethiopia': YELLOW,
+        'Morocco': YELLOW,
+        'Paraguay': YELLOW,
         'Kazakhstan': BLUE,
         'Germany': BLUE,
         'Spain': BLUE,
@@ -73,12 +76,17 @@ class ChampSplitHelper(object):
         'United Kingdom': BLUE,
         'Japan': BLUE,
         'Taiwan': BLUE,
+        'Chinese Taipei': BLUE,
         'Bosnia-Herzegovina': BLUE,
         'Kingdom': BLUE,
         'Czech Republic': BLUE,
         'France': BLUE,
         'Switzerland': BLUE,
         'Vietnam': BLUE,
+        'Croatia': BLUE,
+        'Sweden': BLUE,
+        'Italy': BLUE,
+        'Greece': BLUE,
     }
 
     @classmethod
