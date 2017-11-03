@@ -100,7 +100,7 @@ class MatchTimePredictionHelper(object):
             to_log += "[TIME PREDICTIONS] Next Match: {}, Schedule: {}, Last Predicted: {}\n"\
                 .format(next_match.key_name, cls.as_local(next_match.time, timezone), cls.as_local(next_match.predicted_time, timezone))
 
-        if not last_match.actual_time:
+        if not last_match or not last_match.actual_time:
             # We can't do this without knowing when matches actually end
             return
 
