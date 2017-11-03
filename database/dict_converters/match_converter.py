@@ -4,7 +4,7 @@ from database.dict_converters.converter_base import ConverterBase
 
 class MatchConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        3: 5,
+        3: 6,
     }
 
     @classmethod
@@ -23,6 +23,7 @@ class MatchConverter(ConverterBase):
         for alliance in ['red', 'blue']:
             match.alliances[alliance]['team_keys'] = match.alliances[alliance].pop('teams')
             match.alliances[alliance]['surrogate_team_keys'] = match.alliances[alliance].pop('surrogates')
+            match.alliances[alliance]['dq_team_keys'] = match.alliances[alliance].pop('dqs')
 
         match_dict = {
             'key': match.key.id(),

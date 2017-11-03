@@ -52,11 +52,13 @@ class Match(ndb.Model):
     #   "red": {
     #     "teams": ["frc177", "frc195", "frc125"], # These are Team keys
     #     "surrogates": ["frc177", "frc195"],
+    #     "dqs": [],
     #     "score": 25
     #   },
     #   "blue": {
     #     "teams": ["frc433", "frc254", "frc222"],
     #     "surrogates": ["frc433"],
+    #     "dqs": ["frc433"],
     #     "score": 12
     #   }
     # }

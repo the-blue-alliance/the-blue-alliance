@@ -4540,6 +4540,14 @@
             "type": "string",
             "description": "Team key of a surrogate team."
           }
+        },
+        "dq_team_keys": {
+          "type": "array",
+          "description": "TBA team keys (eg `frc254`) of any disqualified teams.",
+          "items": {
+            "type": "string",
+            "description": "Team key of a disqualified team."
+          }
         }
       }
     },

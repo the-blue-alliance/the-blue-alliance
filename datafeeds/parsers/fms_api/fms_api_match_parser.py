@@ -74,6 +74,8 @@ class FMSAPIHybridScheduleParser(object):
             blue_teams = []
             red_surrogates = []
             blue_surrogates = []
+            red_dqs = []
+            blue_dqs = []
             team_key_names = []
             null_team = False
             sorted_teams = sorted(match['Teams'], key=lambda team: team['station'])  # Sort by station to ensure correct ordering. Kind of hacky.
@@ -86,10 +88,14 @@ class FMSAPIHybridScheduleParser(object):
                     red_teams.append(team_key)
                     if team['surrogate']:
                         red_surrogates.append(team_key)
+                    if team['dq']:
+                        red_dqs.append(team_key)
                 elif 'Blue' in team['station']:
                     blue_teams.append(team_key)
                     if team['surrogate']:
                         blue_surrogates.append(team_key)
+                    if team['dq']:
+                        blue_dqs.append(team_key)
 
             if null_team and match['scoreRedFinal'] is None and match['scoreBlueFinal'] is None:
                 continue
@@ -98,11 +104,13 @@ class FMSAPIHybridScheduleParser(object):
                 'red': {
                     'teams': red_teams,
                     'surrogates': red_surrogates,
+                    'dqs': red_dqs,
                     'score': match['scoreRedFinal']
                 },
                 'blue': {
                     'teams': blue_teams,
                     'surrogates': blue_surrogates,
+                    'dqs': blue_dqs,
                     'score': match['scoreBlueFinal']
                 },
             }
