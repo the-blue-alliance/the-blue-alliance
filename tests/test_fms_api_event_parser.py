@@ -75,7 +75,7 @@ class TestFMSAPIEventParser(unittest2.TestCase):
         self.assertEqual(match.set_number, 1)
         self.assertEqual(match.match_number, 1)
         self.assertEqual(match.team_key_names, [u'frc4131', u'frc4469', u'frc3663', u'frc3684', u'frc5295', u'frc2976'])
-        self.assertEqual(match.alliances_json, """{"blue": {"surrogates": [], "score": 30, "teams": ["frc4131", "frc4469", "frc3663"]}, "red": {"surrogates": [], "score": 18, "teams": ["frc3684", "frc5295", "frc2976"]}}""")
+        self.assertEqual(match.alliances_json, """{"blue": {"dqs": [], "surrogates": [], "score": 30, "teams": ["frc4131", "frc4469", "frc3663"]}, "red": {"dqs": [], "surrogates": [], "score": 18, "teams": ["frc3684", "frc5295", "frc2976"]}}""")
         self.assertEqual(match.time, datetime.datetime(2015, 2, 27, 0, 0))
         self.assertEqual(match.actual_time, datetime.datetime(2015, 2, 27, 0, 0))
 
@@ -85,7 +85,7 @@ class TestFMSAPIEventParser(unittest2.TestCase):
         self.assertEqual(match.set_number, 1)
         self.assertEqual(match.match_number, 12)
         self.assertEqual(match.team_key_names, [u'frc3663', u'frc5295', u'frc2907', u'frc2046', u'frc3218', u'frc2412'])
-        self.assertEqual(match.alliances_json, """{"blue": {"surrogates": [], "score": null, "teams": ["frc3663", "frc5295", "frc2907"]}, "red": {"surrogates": [], "score": null, "teams": ["frc2046", "frc3218", "frc2412"]}}""")
+        self.assertEqual(match.alliances_json, """{"blue": {"dqs": [], "surrogates": [], "score": null, "teams": ["frc3663", "frc5295", "frc2907"]}, "red": {"dqs": [], "surrogates": [], "score": null, "teams": ["frc2046", "frc3218", "frc2412"]}}""")
         self.assertEqual(match.time, datetime.datetime(2015, 2, 27, 2, 17))
         self.assertEqual(match.actual_time, None)
 
