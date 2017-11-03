@@ -12,7 +12,7 @@ class ResourceLibraryParser(ParserBase):
         """
         Parse the Hall of Fame teams table.
         """
-        soup = BeautifulSoup(html)
+        soup = BeautifulSoup(html, "html.parser")
 
         tables = soup.findAll('table')
 

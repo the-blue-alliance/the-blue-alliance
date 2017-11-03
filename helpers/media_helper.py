@@ -266,12 +266,12 @@ class MediaParser(object):
         html = html.decode("utf-8", "replace")
 
         # parse html for the image url
-        soup = BeautifulSoup(html)
+        soup = BeautifulSoup(html, "html.parser")
 
         # 2014-07-15: CD doesn't properly escape the photo title, which breaks the find() for cdmLargePic element below
         # Fix by removing all instances of the photo title from the HTML
         photo_title = soup.find('div', {'id': 'cdm_single_photo_title'}).text
-        cleaned_soup = BeautifulSoup(html.replace(photo_title, ''))
+        cleaned_soup = BeautifulSoup(html.replace(photo_title, ''), "html.parser")
 
         element = cleaned_soup.find('a', {'target': 'cdmLargePic'})
         if element is not None:

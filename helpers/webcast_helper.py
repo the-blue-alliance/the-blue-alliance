@@ -118,7 +118,7 @@ class WebcastParser(object):
         html = html.decode("utf-8", "replace")
 
         # parse html for the channel id
-        soup = BeautifulSoup(html)
+        soup = BeautifulSoup(html, "html.parser")
         el = soup.find('meta', {'name': 'ustream:channel_id'})
         if el is None:
             return None
@@ -136,7 +136,7 @@ class WebcastParser(object):
         html = html.decode("utf-8", "replace")
 
         # parse html for the channel id
-        soup = BeautifulSoup(html)
+        soup = BeautifulSoup(html, "html.parser")
         el = soup.find('meta', {'name': 'twitter:player'})
         if el is None:
             return None
