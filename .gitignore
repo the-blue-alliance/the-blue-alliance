@@ -86,3 +86,4 @@ test_keys.json
 # Vagrant #
 ###########
 .vagrant/
+dev-datastore/

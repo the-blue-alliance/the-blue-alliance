@@ -175,7 +175,7 @@ def bootstrap(options):
 
 @task
 def devserver():
-    sh("dev_appserver.py --skip_sdk_update_check=true --host=0.0.0.0 dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml")
+    sh("dev_appserver.py --skip_sdk_update_check=true --admin_host=0.0.0.0 --host=0.0.0.0 --datastore_path=/datastore/tba.db dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml")
 
 
 def test_function(args):
