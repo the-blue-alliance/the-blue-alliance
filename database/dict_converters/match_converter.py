@@ -4,7 +4,7 @@ from database.dict_converters.converter_base import ConverterBase
 
 class MatchConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        3: 5,
+        3: 6,
     }
 
     @classmethod
