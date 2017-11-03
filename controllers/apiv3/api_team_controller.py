@@ -3,12 +3,14 @@ import json
 
 from google.appengine.ext import ndb
 
+from consts.media_tag import MediaTag
+
 from controllers.apiv3.api_base_controller import ApiBaseController
 from controllers.apiv3.model_properties import filter_event_properties, filter_team_properties, filter_match_properties
 from database.award_query import TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
 from database.event_query import TeamEventsQuery, TeamYearEventsQuery
 from database.match_query import TeamEventMatchesQuery, TeamYearMatchesQuery
-from database.media_query import TeamYearMediaQuery, TeamSocialMediaQuery
+from database.media_query import TeamYearMediaQuery, TeamSocialMediaQuery, TeamTagMediasQuery, TeamYearTagMediasQuery
 from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, TeamParticipationQuery, TeamDistrictsQuery
 from database.robot_query import TeamRobotsQuery
 from helpers.event_team_status_helper import EventTeamStatusHelper
@@ -246,6 +248,27 @@ class ApiTeamYearMediaController(ApiBaseController):
 
     def _render(self, team_key, year):
         medias, self._last_modified = TeamYearMediaQuery(team_key, int(year)).fetch(dict_version=3, return_updated=True)
+
+        return json.dumps(medias, ensure_ascii=True, indent=2, sort_keys=True)
+
+
+class ApiTeamTagMediaController(ApiBaseController):
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
+
+    def _track_call(self, team_key, tag, year=None):
+        api_label = team_key
+        api_label += '/{}'.format(tag)
+        if year:
+            api_label += '/{}'.format(year)
+        self._track_call_defer('team/media/tag', api_label)
+
+    def _render(self, team_key, tag, year=None):
+        media_tag_enum = MediaTag.get_enum_from_url(tag)
+        if year:
+            medias, self._last_modified = TeamYearTagMediasQuery(team_key, int(year), media_tag_enum).fetch(dict_version=3, return_updated=True)
+        else:
+            medias, self._last_modified = TeamTagMediasQuery(team_key, media_tag_enum).fetch(dict_version=3, return_updated=True)
 
         return json.dumps(medias, ensure_ascii=True, indent=2, sort_keys=True)
 

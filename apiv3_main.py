@@ -8,6 +8,7 @@ from controllers.apiv3 import api_status_controller as asc
 from controllers.apiv3 import api_district_controller as adc
 from controllers.apiv3 import api_event_controller as aec
 from controllers.apiv3 import api_match_controller as amc
+from controllers.apiv3 import api_media_controller as amec
 from controllers.apiv3 import api_team_controller as atc
 from controllers.apiv3 import api_suggest_controller as asgc
 
@@ -67,8 +68,13 @@ app = webapp2.WSGIApplication([
         atc.ApiTeamYearMatchesController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/team/<team_key:>/matches/<year:([0-9]+)>/<model_type:(simple|keys)>',
         atc.ApiTeamYearMatchesController, methods=['GET', 'OPTIONS']),
+    # Team Media
     webapp2.Route(r'/api/v3/team/<team_key:>/media/<year:([0-9]+)>',
         atc.ApiTeamYearMediaController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/team/<team_key:>/media/tag/<tag>',
+        atc.ApiTeamTagMediaController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/team/<team_key:>/media/tag/<tag>/<year:[0-9]+>',
+        atc.ApiTeamTagMediaController, methods=['GET', 'OPTIONS']),
     # Team Media Suggestions
     webapp2.Route(r'/api/v3/suggest/media/team/<team_key:>/<year:([0-9]+)>',
         asgc.ApiSuggestTeamMediaController, methods=['POST', 'OPTIONS']),
@@ -99,6 +105,9 @@ app = webapp2.WSGIApplication([
         amc.ApiMatchController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/match/<match_key:>/<model_type:(simple)>',
         amc.ApiMatchController, methods=['GET', 'OPTIONS']),
+    # Media
+    webapp2.Route(r'/api/v3/media/tags',
+        amec.ApiMediaTagsController, methods=['GET', 'OPTIONS']),
     # District List
     webapp2.Route(r'/api/v3/districts/<year:([0-9]+)>',
         adc.ApiDistrictListController, methods=['GET', 'OPTIONS']),

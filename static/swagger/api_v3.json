@@ -73,6 +73,13 @@
       "type": "number",
       "format": "integer"
     },
+    "media_tag": {
+      "name": "media_tag",
+      "in": "path",
+      "description": "Media Tag which describes the Media.",
+      "required": true,
+      "type": "string"
+    },
     "team_key": {
       "name": "team_key",
       "in": "path",
@@ -1558,6 +1565,113 @@
           },
           {
             "$ref": "#/parameters/team_key"
+          },
+          {
+            "$ref": "#/parameters/year"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Media"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/media/tag/{media_tag}": {
+      "get": {
+        "operationId": "getTeamMediaByTag",
+        "tags": [
+          "team"
+        ],
+        "description": "Gets a list of Media (videos / pictures) for the given team and tag.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          },
+          {
+            "$ref": "#/parameters/media_tag"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Media"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/media/tag/{media_tag}/{year}": {
+      "get": {
+        "operationId": "getTeamMediaByTagYear",
+        "tags": [
+          "team"
+        ],
+        "description": "Gets a list of Media (videos / pictures) for the given team, tag and year.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          },
+          {
+            "$ref": "#/parameters/media_tag"
           },
           {
             "$ref": "#/parameters/year"
