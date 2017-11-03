@@ -1,6 +1,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby:expandtab:tabstop=2:softtabstop=2
 
+Vagrant.require_version "> 1.8.1"
+
 # Install vagrant plugin
 # From: https://github.com/hashicorp/vagrant/issues/1874#issuecomment-165904024
 # @param: plugin type: Array[String] desc: The desired plugin to install

@@ -27,7 +27,7 @@ If you're having trouble getting set up, reach out to us at [our mailing list](h
 
 Setup
 -----
-We have a beta development container setup that uses [`vagrant`](https://www.vagrantup.com/)+[`docker`](https://www.docker.com/). Install those two dependencies for your system, then run `vagrant up --provider=docker && vagrant rsync-auto` to bootstrap the environment and kick off file syncing.
+We have a beta development container setup that uses [`vagrant`](https://www.vagrantup.com/)+[`docker`](https://www.docker.com/). Install those two dependencies for your system (run `vagrant --version` and ensure what you have is newer than 1.8.1), then run `vagrant up --provider=docker && vagrant rsync-auto` to bootstrap the environment and kick off file syncing.
 
 To debug, ssh into the container using `vagrant ssh` and then run `tmux attach` to see the GAE devserver logs (use `^B-D` to detach from tmux).
 
