@@ -1,6 +1,10 @@
 #! /usr/bin/env sh
 set -e
 
+if test "$1" != "DEPLOY" ; then
+    check_clowntown_tag
+fi
+
 case "$1" in
 
     "PYUNIT" | "JSUNIT" | "PYBUILD" )

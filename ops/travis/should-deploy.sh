@@ -31,6 +31,14 @@ check_commit_tag() {
     esac
 }
 
+check_clowntown_tag() {
+    # The most recent commit message
+    msg=$(git log -1 --pretty=%B)
+    case "$msg" in
+        *\[clowntown\]*) echo "Skipping due to [clowntown] tag. You better know what you're doing..."; exit 0 ;;
+    esac
+}
+
 should_deploy() {
     check_commit_tag
     check_killswitch

@@ -9,6 +9,8 @@ fi
 
 if test "$1" = "DEPLOY" ; then
     should_deploy
+else
+    check_clowntown_tag
 fi
 
 pip install -r travis_requirements.txt
