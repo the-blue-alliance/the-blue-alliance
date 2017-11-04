@@ -120,8 +120,8 @@ class TestMatchManipulator(unittest2.TestCase):
 
     def test_junk_whitelist(self):
         MatchManipulator.createOrUpdate(self.old_match)
-        MatchManipulator.createOrUpdate(self.new_match, attr_whitelist=set(''))
-        MatchManipulator.createOrUpdate(self.new_match, attr_whitelist=set('junk'))
+        MatchManipulator.createOrUpdate(self.new_match, attr_whitelist={''})
+        MatchManipulator.createOrUpdate(self.new_match, attr_whitelist={'junk'})
         self.assertOldMatch(Match.get_by_id("2012ct_qm1"))
 
     def test_whitelist_single(self):
