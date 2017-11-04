@@ -11,7 +11,7 @@ class MediaManipulator(ManipulatorBase):
         return CacheClearer.get_media_cache_keys_and_controllers(affected_refs)
 
     @classmethod
-    def updateMerge(self, new_media, old_media, auto_union=True):
+    def updateMerge(self, new_media, old_media, auto_union=True, attr_whitelist=None):
         """
         Given an "old" and a "new" Media object, replace the fields in the
         "old" object that are present in the "new" object, but keep fields from

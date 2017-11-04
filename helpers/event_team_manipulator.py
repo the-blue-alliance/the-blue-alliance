@@ -11,7 +11,7 @@ class EventTeamManipulator(ManipulatorBase):
         return CacheClearer.get_eventteam_cache_keys_and_controllers(affected_refs)
 
     @classmethod
-    def updateMerge(self, new_event_team, old_event_team, auto_union=True):
+    def updateMerge(self, new_event_team, old_event_team, auto_union=True, attr_whitelist=None):
         """
         Update and return EventTeams.
         """
