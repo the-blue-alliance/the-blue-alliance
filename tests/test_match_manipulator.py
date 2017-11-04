@@ -61,7 +61,10 @@ class TestMatchManipulator(unittest2.TestCase):
         self.testbed.deactivate()
 
     def assertMergedMatch(self, match, is_auto_union):
-        self.assertOldMatch(match)
+        self.assertEqual(match.comp_level, "qm")
+        self.assertEqual(match.set_number, 1)
+        self.assertEqual(match.match_number, 1)
+        self.assertEqual(match.team_key_names, [u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073'])
         self.assertEqual(match.alliances_json, """{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""")
         if is_auto_union:
             self.assertEqual(set(match.youtube_videos), {u'P3C2BOtL7e8', u'TqY324xLU4s', u'tst1', u'tst2', u'tst3', u'tst4'})
@@ -74,6 +77,8 @@ class TestMatchManipulator(unittest2.TestCase):
         self.assertEqual(match.set_number, 1)
         self.assertEqual(match.match_number, 1)
         self.assertEqual(match.team_key_names, [u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073'])
+        self.assertEqual(match.alliances_json, """{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""")
+        self.assertEqual(match.score_breakdown['red']['auto'], 20)
 
     def test_createOrUpdate(self):
         MatchManipulator.createOrUpdate(self.old_match)
@@ -107,3 +112,28 @@ class TestMatchManipulator(unittest2.TestCase):
 
     def test_updateMerge_no_auto_union(self):
         self.assertMergedMatch(MatchManipulator.updateMerge(self.new_match, self.old_match, auto_union=False), False)
+
+    def test_empty_whitelist(self):
+        MatchManipulator.createOrUpdate(self.old_match)
+        MatchManipulator.createOrUpdate(self.new_match, attr_whitelist=set())
+        self.assertOldMatch(Match.get_by_id("2012ct_qm1"))
+
+    def test_whitelist_single(self):
+        MatchManipulator.createOrUpdate(self.old_match)
+        MatchManipulator.createOrUpdate(self.new_match, attr_whitelist={'alliances_json'})
+        match = Match.get_by_id("2012ct_qm1")
+        # New attrs
+        self.assertEqual(match.alliances_json, """{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""")
+        # Old attrs
+        self.assertEqual(match.score_breakdown['red']['auto'], 20)
+        self.assertEqual(set(match.youtube_videos), {u'P3C2BOtL7e8', u'tst1', u'tst2', u'tst3'})
+
+    def test_whitelist_multi(self):
+        MatchManipulator.createOrUpdate(self.old_match)
+        MatchManipulator.createOrUpdate(self.new_match, attr_whitelist={'alliances_json', 'youtube_videos'})
+        match = Match.get_by_id("2012ct_qm1")
+        # New attrs
+        self.assertEqual(match.alliances_json, """{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""")
+        self.assertEqual(set(match.youtube_videos), {u'P3C2BOtL7e8', u'TqY324xLU4s', u'tst1', u'tst2', u'tst3', u'tst4'})
+        # Old attrs
+        self.assertEqual(match.score_breakdown['red']['auto'], 20)

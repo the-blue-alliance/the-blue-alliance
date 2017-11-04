@@ -98,13 +98,13 @@ class ManipulatorBase(object):
                     old_model._affected_references[attr] = old_model._affected_references[attr].union(val)
 
     @classmethod
-    def createOrUpdate(self, new_models, auto_union=True, run_post_update_hook=True):
+    def createOrUpdate(self, new_models, auto_union=True, attr_whitelist=None, run_post_update_hook=True):
         """
         Given a model or list of models, either insert them into the database, or update
         existing models with the same key.
         Once inserted or updated, the model can be marked not dirty.
         """
-        models = self.listify(self.findOrSpawn(self.listify(new_models), auto_union=auto_union))
+        models = self.listify(self.findOrSpawn(self.listify(new_models), auto_union=auto_union, attr_whitelist=attr_whitelist))
         models_to_put = [model for model in models if getattr(model, "dirty", False)]
         ndb.put_multi(models_to_put)
         self._clearCache(models)
@@ -116,7 +116,7 @@ class ManipulatorBase(object):
         return self.delistify(models)
 
     @classmethod
-    def findOrSpawn(self, new_models, auto_union=True):
+    def findOrSpawn(self, new_models, auto_union=True, attr_whitelist=None):
         """"
         Check if a model or models currently exists in the database based on
         key_name. Doesn't put models.
@@ -124,11 +124,11 @@ class ManipulatorBase(object):
         """
         new_models = self.listify(new_models)
         old_models = ndb.get_multi([model.key for model in new_models], use_cache=False)
-        new_models = [self.updateMergeBase(new_model, old_model, auto_union=auto_union) for (new_model, old_model) in zip(new_models, old_models)]
+        new_models = [self.updateMergeBase(new_model, old_model, auto_union=auto_union, attr_whitelist=attr_whitelist) for (new_model, old_model) in zip(new_models, old_models)]
         return self.delistify(new_models)
 
     @classmethod
-    def mergeModels(self, new_models, old_models, auto_union=True):
+    def mergeModels(self, new_models, old_models, auto_union=True, attr_whitelist=None):
         """
         Returns a list of models containing the union of new_models and old_models.
         If a model with the same key is in both input lists, the new_model is merged with the old_model.
@@ -152,7 +152,7 @@ class ManipulatorBase(object):
         for model in new_models:
             model_key = model.key.id()
             if model_key in old_models_by_key:
-                merged_models.append(self.updateMergeBase(model, old_models_by_key[model_key], auto_union=auto_union))
+                merged_models.append(self.updateMergeBase(model, old_models_by_key[model_key], auto_union=auto_union, attr_whitelist=attr_whitelist))
                 untouched_old_keys.remove(model_key)
             else:
                 merged_models.append(model)
@@ -163,7 +163,7 @@ class ManipulatorBase(object):
         return self.delistify(merged_models)
 
     @classmethod
-    def updateMergeBase(self, new_model, old_model, auto_union=True):
+    def updateMergeBase(self, new_model, old_model, auto_union=True, attr_whitelist=None):
         """
         Given an "old" and a "new" model object, replace the fields in the
         "old" one that are present in the "new" one, but keep fields from
@@ -176,14 +176,21 @@ class ManipulatorBase(object):
             return new_model
 
         self._computeAndSaveAffectedReferences(old_model, new_model)
-        return self.updateMerge(new_model, old_model, auto_union=auto_union)
+        return self.updateMerge(new_model, old_model, auto_union=auto_union, attr_whitelist=attr_whitelist)
 
     @classmethod
-    def updateMerge(self, new_model, old_model, auto_union=True):
+    def updateMerge(self, new_model, old_model, attr_whitelist=None, auto_union=True):
         """
         Child classes should replace with method with specific merging logic
         """
         raise NotImplementedError("No updateMerge method!")
+
+    @classmethod
+    def _filterAttrs(cls, attrs, whitelist):
+        if whitelist is None:
+            return attrs
+        else:
+            return filter(lambda attr: attr in whitelist, attrs)
 
     @classmethod
     def runPostDeleteHook(cls, models):

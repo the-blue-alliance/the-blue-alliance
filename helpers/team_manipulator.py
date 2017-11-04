@@ -46,7 +46,7 @@ class TeamManipulator(ManipulatorBase):
         cls.createOrUpdate(teams, run_post_update_hook=False)
 
     @classmethod
-    def updateMerge(self, new_team, old_team, auto_union=True):
+    def updateMerge(self, new_team, old_team, auto_union=True, attr_whitelist=None):
         """
         Given an "old" and a "new" Team object, replace the fields in the
         "old" team that are present in the "new" team, but keep fields from

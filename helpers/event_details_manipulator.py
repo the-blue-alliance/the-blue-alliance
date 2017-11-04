@@ -60,7 +60,7 @@ class EventDetailsManipulator(ManipulatorBase):
                 logging.warning("Firebase update_event_details failed!")
 
     @classmethod
-    def updateMerge(self, new_event_details, old_event_details, auto_union=True):
+    def updateMerge(self, new_event_details, old_event_details, auto_union=True, attr_whitelist=None):
         """
         Given an "old" and a "new" EventDetails object, replace the fields in the
         "old" event that are present in the "new" EventDetails, but keep fields from

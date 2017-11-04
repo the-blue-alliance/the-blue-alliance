@@ -60,7 +60,7 @@ class EventManipulator(ManipulatorBase):
         cls.createOrUpdate(events, run_post_update_hook=False)
 
     @classmethod
-    def updateMerge(self, new_event, old_event, auto_union=True):
+    def updateMerge(self, new_event, old_event, auto_union=True, attr_whitelist=None):
         """
         Given an "old" and a "new" Event object, replace the fields in the
         "old" event that are present in the "new" event, but keep fields from

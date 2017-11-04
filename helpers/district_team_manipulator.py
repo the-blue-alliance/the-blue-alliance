@@ -27,7 +27,7 @@ class DistrictTeamManipulator(ManipulatorBase):
                 logging.error(traceback.format_exc())
 
     @classmethod
-    def updateMerge(self, new_district_team, old_district_team, auto_union=True):
+    def updateMerge(self, new_district_team, old_district_team, auto_union=True, attr_whitelist=None):
         """
         Update and return DistrictTeams
         """

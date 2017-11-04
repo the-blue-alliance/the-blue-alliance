@@ -119,7 +119,7 @@ class MatchManipulator(ManipulatorBase):
                 logging.error(traceback.format_exc())
 
     @classmethod
-    def updateMerge(self, new_match, old_match, auto_union=True):
+    def updateMerge(cls, new_match, old_match, auto_union=True, attr_whitelist=None):
         """
         Given an "old" and a "new" Match object, replace the fields in the
         "old" team that are present in the "new" team, but keep fields from
@@ -133,7 +133,7 @@ class MatchManipulator(ManipulatorBase):
             "year",
         ]  # These build key_name, and cannot be changed without deleting the model.
 
-        attrs = [
+        attrs = cls._filterAttrs([
             "no_auto_update",
             "time",
             "time_string",
@@ -142,21 +142,21 @@ class MatchManipulator(ManipulatorBase):
             "post_result_time",
             "push_sent",
             "tiebreak_match_key",
-        ]
+        ], attr_whitelist)
 
-        json_attrs = [
+        json_attrs = cls._filterAttrs([
             "alliances_json",
             "score_breakdown_json",
-        ]
+        ], attr_whitelist)
 
-        list_attrs = [
+        list_attrs = cls._filterAttrs([
             "team_key_names"
-        ]
+        ], attr_whitelist)
 
-        auto_union_attrs = [
+        auto_union_attrs = cls._filterAttrs([
             "tba_videos",
             "youtube_videos"
-        ]
+        ], attr_whitelist)
 
         old_match._updated_attrs = []
 
