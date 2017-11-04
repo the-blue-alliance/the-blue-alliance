@@ -118,6 +118,12 @@ class TestMatchManipulator(unittest2.TestCase):
         MatchManipulator.createOrUpdate(self.new_match, attr_whitelist=set())
         self.assertOldMatch(Match.get_by_id("2012ct_qm1"))
 
+    def test_junk_whitelist(self):
+        MatchManipulator.createOrUpdate(self.old_match)
+        MatchManipulator.createOrUpdate(self.new_match, attr_whitelist=set(''))
+        MatchManipulator.createOrUpdate(self.new_match, attr_whitelist=set('junk'))
+        self.assertOldMatch(Match.get_by_id("2012ct_qm1"))
+
     def test_whitelist_single(self):
         MatchManipulator.createOrUpdate(self.old_match)
         MatchManipulator.createOrUpdate(self.new_match, attr_whitelist={'alliances_json'})
