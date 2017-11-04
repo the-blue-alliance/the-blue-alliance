@@ -1,5 +1,6 @@
 #! /usr/bin/env sh
 set -e
+. $(pwd)/ops/travis/should-deploy.sh
 
 if test "$1" != "DEPLOY" ; then
     check_clowntown_tag
