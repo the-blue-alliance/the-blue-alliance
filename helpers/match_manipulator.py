@@ -130,10 +130,10 @@ class MatchManipulator(ManipulatorBase):
             "event",
             "set_number",
             "match_number",
+            "year",
         ]  # These build key_name, and cannot be changed without deleting the model.
 
         attrs = [
-            "year",
             "no_auto_update",
             "time",
             "time_string",
