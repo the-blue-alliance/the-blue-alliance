@@ -33,6 +33,7 @@ if DEBUG:
         "use-compiled-templates": False,
         "save-frc-api-response": False,
         "update-webcast-online-status": False,
+        "disable_past_event_updates": False,
     }
 else:
     CONFIG = {
@@ -45,6 +46,7 @@ else:
         "use-compiled-templates": True,
         "save-frc-api-response": True,
         "update-webcast-online-status": True,
+        "disable_past_event_updates": True,
     }
 
 CONFIG['landing_handler'] = INSIGHTS

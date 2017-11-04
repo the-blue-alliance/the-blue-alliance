@@ -255,7 +255,7 @@ class FMSAPIMatchesGet(webapp.RequestHandler):
     """
     def get(self, event_key):
         event = Event.get_by_id(event_key)
-        if event.past:
+        if event.past and tba_config.CONFIG['disable_past_event_updates']:
             attr_whitelist = set(self.request.get('attr_whitelist').split(' '))
         else:
             attr_whitelist = None
