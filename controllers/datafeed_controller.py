@@ -221,6 +221,7 @@ class FMSAPIEventRankingsGet(webapp.RequestHandler):
 class FMSAPIMatchesEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting match results
+    Passes attr_whitelist to enqueued tasks
     """
     def get(self, when):
         if when == "now":
@@ -234,6 +235,7 @@ class FMSAPIMatchesEnqueue(webapp.RequestHandler):
             taskqueue.add(
                 queue_name='datafeed',
                 url='/tasks/get/fmsapi_matches/' + event.key_name,
+                params={'attr_whitelist': self.request.get('attr_whitelist')},
                 method='GET')
 
         template_values = {
@@ -247,16 +249,26 @@ class FMSAPIMatchesEnqueue(webapp.RequestHandler):
 
 class FMSAPIMatchesGet(webapp.RequestHandler):
     """
-    Handles updating matches
+    Handles updating matches for an event
+    If event.past, will only updated attrs specified in attr_whitelist
+    e.g. ?attr_whitelist=alliances_json+time
     """
     def get(self, event_key):
+        event = Event.get_by_id(event_key)
+        print set(self.request.get('attr_whitelist').split(' '))
+        if event.past:
+            attr_whitelist = set(self.request.get('attr_whitelist').split(' '))
+        else:
+            attr_whitelist = None
+
         df = DatafeedFMSAPI('v2.0', save_response=True)
 
         new_matches = MatchManipulator.createOrUpdate(
             MatchHelper.deleteInvalidMatches(
                 df.getMatches(event_key),
-                Event.get_by_id(event_key)
-            )
+                event
+            ),
+            attr_whitelist=attr_whitelist
         )
 
         template_values = {
