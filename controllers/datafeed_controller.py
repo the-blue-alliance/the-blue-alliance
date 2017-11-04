@@ -255,7 +255,6 @@ class FMSAPIMatchesGet(webapp.RequestHandler):
     """
     def get(self, event_key):
         event = Event.get_by_id(event_key)
-        print set(self.request.get('attr_whitelist').split(' '))
         if event.past:
             attr_whitelist = set(self.request.get('attr_whitelist').split(' '))
         else:
