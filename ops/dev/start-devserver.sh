@@ -2,12 +2,19 @@
 set -e
 
 source ops/dev/vars.sh
-echo "Starting devserver in tmux session..."
+session=tba
 tmux start-server
-tmux new-session -d -s tba
-tmux new-window -t "tba:1" -n gae "paver devserver; read"
-tmux new-window -t "tba:2" -n gulp "gulp; read"
-tmux select-window -t "tba:0"
+
+if tmux has-session -t $session ; then
+    echo "Found existing session. Killing and recreating..."
+    tmux kill-session -t $session
+fi
+
+echo "Starting devserver in new tmux session..."
+tmux new-session -d -s $session
+tmux new-window -t "$session:1" -n gae "paver devserver; read"
+tmux new-window -t "$session:2" -n gulp "gulp; read"
+tmux select-window -t "$session:0"
 
 tmux list-sessions
 tmux list-windows
