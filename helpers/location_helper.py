@@ -104,15 +104,17 @@ class LocationHelper(object):
         location associated with the event.
         """
         # Possible queries for location that will match yield results
-        if event.venue:
-            possible_queries = [event.venue]
+        if event.venue_address:
+            possible_queries = [event.venue_address.replace('\n', ' ')]
         else:
             possible_queries = []
+
+        if event.venue:
+            possible_queries.append(event.venue)
 
         if event.venue_address:
             split_address = event.venue_address.split('\n')
             # Venue takes up at most 2 lines. Isolate address
-            possible_queries.append(' '.join(split_address))
             possible_queries.append(' '.join(split_address[1:]))
             possible_queries.append(' '.join(split_address[2:]))
 
