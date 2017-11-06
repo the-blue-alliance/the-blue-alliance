@@ -93,12 +93,8 @@ class AdminMigrationBackfillYearDQ(LoggedInHandler):
 class AdminMigrationBackfillEventDQ(LoggedInHandler):
     def get(self, event_key):
         df = DatafeedFMSAPI('v2.0', save_response=True)
-        matches = MatchHelper.deleteInvalidMatches(
-            df.getMatches(event_key),
-            Event.get_by_id(event_key)
-        )
         updated_matches = []
-        for m1 in matches:
+        for m1 in df.getMatches(event_key):
             m2 = m1.key.get()
             # Only update if teams and scores are equal
             if m2 and (m1.alliances['red']['teams'] == m2.alliances['red']['teams'] and
