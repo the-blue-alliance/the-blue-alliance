@@ -134,6 +134,9 @@ class Match(ndb.Model):
                 # add surrogates if not present
                 if 'surrogates' not in self._alliances[color]:
                     self._alliances[color]['surrogates'] = []
+                # add dqs if not present
+                if 'dqs' not in self._alliances[color]:
+                    self._alliances[color]['dqs'] = []
 
         return self._alliances
 
