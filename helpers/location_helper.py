@@ -112,6 +112,7 @@ class LocationHelper(object):
         if event.venue_address:
             split_address = event.venue_address.split('\n')
             # Venue takes up at most 2 lines. Isolate address
+            possible_queries.append(' '.join(split_address))
             possible_queries.append(' '.join(split_address[1:]))
             possible_queries.append(' '.join(split_address[2:]))
 
