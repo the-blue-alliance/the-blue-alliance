@@ -1,5 +1,6 @@
 from google.appengine.ext import ndb
 
+from consts.media_tag import MediaTag
 from controllers.api.api_district_controller import ApiDistrictListController, ApiDistrictEventsController, ApiDistrictRankingsController, ApiDistrictTeamsController
 from controllers.api.api_event_controller import ApiEventController, ApiEventTeamsController, \
                                                  ApiEventMatchesController, ApiEventStatsController, \
