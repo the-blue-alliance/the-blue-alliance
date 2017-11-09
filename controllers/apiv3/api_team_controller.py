@@ -226,7 +226,7 @@ class ApiTeamHistoryAwardsController(ApiBaseController):
     Returns a JSON list of award models won by a team
     """
     CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 60 * 60
+    CACHE_HEADER_LENGTH = 61
 
     def _track_call(self, team_key):
         self._track_call_defer('team/history/awards', team_key)
