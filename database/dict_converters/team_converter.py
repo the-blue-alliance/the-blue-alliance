@@ -3,7 +3,7 @@ from database.dict_converters.converter_base import ConverterBase
 
 class TeamConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        3: 3,
+        3: 4,
     }
 
     @classmethod
@@ -20,11 +20,12 @@ class TeamConverter(ConverterBase):
     @classmethod
     def teamConverter_v3(cls, team):
         has_nl = team.nl and team.nl.city and team.nl.state_prov and team.nl.country
+        default_name = "Team {}".format(team.team_number)
         team_dict = {
             'key': team.key.id(),
             'team_number': team.team_number,
-            'nickname': team.nickname,
-            'name': team.name,
+            'nickname': team.nickname if team.nickname else default_name,
+            'name': team.name if team.name else default_name,
             'website': team.website,
             'rookie_year': team.rookie_year,
             'motto': team.motto,
