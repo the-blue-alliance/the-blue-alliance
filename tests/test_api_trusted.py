@@ -631,6 +631,12 @@ class TestApiTrustedController(unittest2.TestCase):
             'playoff_type': PlayoffType.ROUND_ROBIN_6_TEAM,
             'webcasts': [{'url': 'https://youtu.be/abc123'},
                          {'type': 'youtube', 'channel': 'cde456'}],
+            'remap_teams': {
+                'frc9323': 'frc1323B',
+                'frc9254': 'frc254B',
+                'frc8254': 'frc254C',
+                'frc9000': 'frc6000',
+            },
             'someother': 'randomstuff',  # This should be ignored
         }
         request_body = json.dumps(request)
@@ -652,3 +658,70 @@ class TestApiTrustedController(unittest2.TestCase):
         webcast = webcasts[1]
         self.assertEqual(webcast['type'], 'youtube')
         self.assertEqual(webcast['channel'], 'cde456')
+        self.assertEqual(event.remap_teams, {
+            'frc9323': 'frc1323B',
+            'frc9254': 'frc254B',
+            'frc8254': 'frc254C',
+            'frc9000': 'frc6000',
+        })
+
+        # Test invalid remap_teams
+        request = {
+            'remap_teams': {
+                'frc9323': 'frc1323b',  # lower case
+            }
+        }
+        request_body = json.dumps(request)
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_9', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        self.assertEqual(response.status_code, 400)
+
+        request = {
+            'remap_teams': {
+                'frc9323': 'frc1323A',  # "A" team
+            }
+        }
+        request_body = json.dumps(request)
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_9', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        self.assertEqual(response.status_code, 400)
+
+        request = {
+            'remap_teams': {
+                'frc9323': 'frc1323BB',  # Two letters
+            }
+        }
+        request_body = json.dumps(request)
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_9', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        self.assertEqual(response.status_code, 400)
+
+        request = {
+            'remap_teams': {
+                'frc1323B': 'frc1323',  # Mapping from B team
+            }
+        }
+        request_body = json.dumps(request)
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_9', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        self.assertEqual(response.status_code, 400)
+
+        request = {
+            'remap_teams': {
+                '1323': 'frc1323B',  # Bad starting format
+            }
+        }
+        request_body = json.dumps(request)
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_9', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        self.assertEqual(response.status_code, 400)
+
+        request = {
+            'remap_teams': {
+                'frc1323': '1323B',  # Bad ending format
+            }
+        }
+        request_body = json.dumps(request)
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_9', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        self.assertEqual(response.status_code, 400)

@@ -1,5 +1,6 @@
 import json
 import logging
+import re
 import webapp2
 
 from google.appengine.ext import ndb
@@ -8,6 +9,7 @@ from consts.auth_type import AuthType
 from consts.media_type import MediaType
 from controllers.api.api_base_controller import ApiTrustedBaseController
 
+from datafeeds.parser_base import ParserInputException
 from datafeeds.parsers.json.json_alliance_selections_parser import JSONAllianceSelectionsParser
 from datafeeds.parsers.json.json_awards_parser import JSONAwardsParser
 from datafeeds.parsers.json.json_matches_parser import JSONMatchesParser
@@ -307,6 +309,7 @@ class ApiTrustedUpdateEventInfo(ApiTrustedBaseController):
         "first_event_code",
         "playoff_type",
         "webcasts",  # this is a list of stream URLs, we'll mutate it ourselves
+        "remap_teams",
     }
 
     def _process_request(self, request, event_key):
@@ -360,6 +363,18 @@ class ApiTrustedUpdateEventInfo(ApiTrustedBaseController):
                     webcast_list,
                     False,  # Don't createOrUpdate yet
                 )
+            elif field == "remap_teams":
+                # Validate remap_teams
+                if not isinstance(value, dict):
+                    raise ParserInputException("Invalid reamap_teams. Check input")
+                for temp_team, remapped_team in value.items():
+                    temp_match = re.match(r'frc\d+', str(temp_team))
+                    remapped_match = re.match(r'frc\d+[B-Z]?', str(remapped_team))
+                    if not temp_match or (temp_match and (temp_match.group(0) != str(temp_team))):
+                        raise ParserInputException("Bad team: '{}'. Must follow format 'frcXXX'.".format(temp_team))
+                    if not remapped_match or (remapped_match and (remapped_match.group(0) != str(remapped_team))):
+                        raise ParserInputException("Bad team: '{}'. Must follow format 'frcXXX' or 'frcXXX[B-Z]'.".format(remapped_team))
+                    setattr(event, field, value)
             else:
                 try:
                     if field == "first_event_code":

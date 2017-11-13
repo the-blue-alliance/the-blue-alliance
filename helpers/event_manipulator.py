@@ -93,7 +93,8 @@ class EventManipulator(ManipulatorBase):
             "venue_address",
             "webcast_json",
             "website",
-            "year"
+            "year",
+            "remap_teams",
         ]
 
         allow_none_attrs = {

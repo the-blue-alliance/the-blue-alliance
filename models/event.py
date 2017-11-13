@@ -53,6 +53,7 @@ class Event(ndb.Model):
     website = ndb.StringProperty(indexed=False)
     webcast_json = ndb.TextProperty(indexed=False)  # list of dicts, valid keys include 'type' and 'channel'
     enable_predictions = ndb.BooleanProperty(default=False)
+    remap_teams = ndb.JsonProperty()  # Map of temporary team numbers to pre-rookie and B teams
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
