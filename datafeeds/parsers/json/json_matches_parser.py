@@ -69,9 +69,13 @@ class JSONMatchesParser(ParserBase):
                     for team_key in details.get('surrogates', []):
                         if not re.match(r'frc\d+', str(team_key)):
                             raise ParserInputException("Bad surrogate team: '{}'. Must follow format 'frcXXX'.".format(team_key))
+                        if team_key not in details['teams']:
+                            raise ParserInputException("Bad surrogate team: '{}'. Must be a team in the match.'.".format(team_key))
                     for team_key in details.get('dqs', []):
                         if not re.match(r'frc\d+', str(team_key)):
                             raise ParserInputException("Bad dq team: '{}'. Must follow format 'frcXXX'.".format(team_key))
+                        if team_key not in details['teams']:
+                            raise ParserInputException("Bad dq team: '{}'. Must be a team in the match.'.".format(team_key))
 
             if score_breakdown is not None:
                 if type(score_breakdown) is not dict:
