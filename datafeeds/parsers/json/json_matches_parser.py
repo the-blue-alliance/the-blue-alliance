@@ -14,7 +14,7 @@ class JSONMatchesParser(ParserBase):
         comp_level: String in the set {"qm", "ef", "qf", "sf", "f"}
         set_number: Integer identifying the elim set number. Ignored for qual matches. ex: the 4 in qf4m2
         match_number: Integer identifying the match number within a set. ex: the 2 in qf4m2
-        alliances: Dict of {'red': {'teams': ['frcXXX'...], 'score': S}, 'blue': {...}}. Where scores (S) are integers. Null scores indicate that a match has not yet been played.
+        alliances: Dict of {'red': {'teams': ['frcXXX'...], 'score': S, 'surrogates': ['frcXXX'...], 'dqs': ['frcXXX'...]}, 'blue': {...}}. Where scores (S) are integers. Null scores indicate that a match has not yet been played. surrogates and dqs are optional.
         score_breakdown: Dict of {'red': {K1: V1, K2: V2, ...}, 'blue': {...}}. Where Kn are keys and Vn are values for those keys.
         time_string: String in the format "(H)H:MM AM/PM" for when the match will be played in the event's local timezone. ex: "9:15 AM"
         time: UTC time of the match as a string in ISO 8601 format (YYYY-MM-DDTHH:MM:SS).
@@ -66,6 +66,17 @@ class JSONMatchesParser(ParserBase):
                     if details['score'] is not None and type(details['score']) is not int:
                         raise ParserInputException("alliances[color]['score'] must be an integer or null")
 
+                    for team_key in details.get('surrogates', []):
+                        if not re.match(r'frc\d+', str(team_key)):
+                            raise ParserInputException("Bad surrogate team: '{}'. Must follow format 'frcXXX'.".format(team_key))
+                        if team_key not in details['teams']:
+                            raise ParserInputException("Bad surrogate team: '{}'. Must be a team in the match.'.".format(team_key))
+                    for team_key in details.get('dqs', []):
+                        if not re.match(r'frc\d+', str(team_key)):
+                            raise ParserInputException("Bad dq team: '{}'. Must follow format 'frcXXX'.".format(team_key))
+                        if team_key not in details['teams']:
+                            raise ParserInputException("Bad dq team: '{}'. Must be a team in the match.'.".format(team_key))
+
             if score_breakdown is not None:
                 if type(score_breakdown) is not dict:
                     raise ParserInputException("'score_breakdown' must be a dict")
@@ -93,10 +104,14 @@ class JSONMatchesParser(ParserBase):
                 'red': {
                     'teams': alliances['red']['teams'],
                     'score': alliances['red']['score'],
+                    'surrogates': alliances['red'].get('surrogates', []),
+                    'dqs': alliances['red'].get('dqs', []),
                 },
                 'blue': {
                     'teams': alliances['blue']['teams'],
                     'score': alliances['blue']['score'],
+                    'surrogates': alliances['blue'].get('surrogates', []),
+                    'dqs': alliances['blue'].get('dqs', []),
                 },
             }
             parsed_match = {

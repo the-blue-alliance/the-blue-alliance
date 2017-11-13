@@ -524,6 +524,10 @@
         "teams",
         "score"
       ],
+      "optional": [
+        "surrogates",
+        "dqs"
+      ],
       "properties": {
         "teams": {
           "type": "array",
@@ -538,6 +542,22 @@
           "format": "int32",
           "description": "Score of the match. Null means the match has not been played",
           "example": 10
+        },
+        "surrogates": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Key of a surrogate team on the alliance, in the format `frcXXXX` where `XXXX` is the team number",
+            "example": "frc254"
+          }
+        },
+        "dqs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Key of a disqualified team on the alliance, in the format `frcXXXX` where `XXXX` is the team number",
+            "example": "frc254"
+          }
         }
       }
     },
