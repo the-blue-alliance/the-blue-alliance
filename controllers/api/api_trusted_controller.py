@@ -17,6 +17,7 @@ from datafeeds.parsers.json.json_rankings_parser import JSONRankingsParser
 from datafeeds.parsers.json.json_team_list_parser import JSONTeamListParser
 
 from helpers.award_manipulator import AwardManipulator
+from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
 from helpers.event_details_manipulator import EventDetailsManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
@@ -53,6 +54,9 @@ class ApiTrustedEventAllianceSelectionsUpdate(ApiTrustedBaseController):
             id=event_key,
             alliance_selections=alliance_selections
         )
+
+        if event.remap_teams:
+            EventHelper.remapteams_alliances(event_details.alliance_selections, event.remap_teams)
         EventDetailsManipulator.createOrUpdate(event_details)
 
         self.response.out.write(json.dumps({'Success': "Alliance selections successfully updated"}))
@@ -84,6 +88,8 @@ class ApiTrustedEventAwardsUpdate(ApiTrustedBaseController):
         old_award_keys = Award.query(Award.event == event.key).fetch(None, keys_only=True)
         AwardManipulator.delete_keys(old_award_keys)
 
+        if event.remap_teams:
+            EventHelper.remapteams_awards(awards, event.remap_teams)
         AwardManipulator.createOrUpdate(awards)
 
         self.response.out.write(json.dumps({'Success': "Awards successfully updated"}))
@@ -132,6 +138,8 @@ class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
             except Exception, e:
                 logging.error("Failed to calculate match times")
 
+        if event.remap_teams:
+            EventHelper.remapteams_matches(matches, event.remap_teams)
         MatchManipulator.createOrUpdate(matches)
 
         self.response.out.write(json.dumps({'Success': "Matches successfully updated"}))
@@ -183,14 +191,21 @@ class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
     REQUIRED_AUTH_TYPES = {AuthType.EVENT_RANKINGS}
 
     def _process_request(self, request, event_key):
+        event = Event.get_by_id(event_key)
         rankings = JSONRankingsParser.parse(request.body)
 
         event_details = EventDetails(
             id=event_key,
             rankings=rankings
         )
+
+        if event.remap_teams:
+            EventHelper.remapteams_rankings(event_details.rankings, event.remap_teams)
+            # TODO: Remap rankings2 directly
+
         if event_details.year >= 2017:  # TODO: Temporary fix. Should directly parse request into rankings2
             event_details.rankings2 = RankingsHelper.convert_rankings(event_details)
+
         EventDetailsManipulator.createOrUpdate(event_details)
 
         self.response.out.write(json.dumps({'Success': "Rankings successfully updated"}))
