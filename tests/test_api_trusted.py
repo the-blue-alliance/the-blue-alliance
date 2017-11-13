@@ -379,9 +379,13 @@ class TestApiTrustedController(unittest2.TestCase):
             'match_number': 2,
             'alliances': {
                 'red': {'teams': ['frc1', 'frc2', 'frc3'],
-                        'score': 250},
+                        'score': 250,
+                        'surrogates': ['frc1'],
+                        'dqs': ['frc2']},
                 'blue': {'teams': ['frc4', 'frc5', 'frc6'],
-                         'score': 260},
+                         'score': 260,
+                         'surrogates': [],
+                         'dqs': []},
             },
             'score_breakdown': {
                 'red': {'auto': 20, 'assist': 40, 'truss+catch': 20, 'teleop_goal+foul': 20},
@@ -416,8 +420,15 @@ class TestApiTrustedController(unittest2.TestCase):
         match = Match.get_by_id('2014casj_f1m2')
         self.assertEqual(match.time, datetime.datetime(2014, 8, 31, 18, 0))
         self.assertEqual(match.time_string, '11:00 AM')
+        self.assertEqual(match.alliances['red']['teams'], ['frc1', 'frc2', 'frc3'])
         self.assertEqual(match.alliances['red']['score'], 250)
+        self.assertEqual(match.alliances['red']['surrogates'], ['frc1'])
+        self.assertEqual(match.alliances['red']['dqs'], ['frc2'])
         self.assertEqual(match.score_breakdown['red']['truss+catch'], 20)
+        self.assertEqual(match.alliances['blue']['teams'], ['frc4', 'frc5', 'frc6'])
+        self.assertEqual(match.alliances['blue']['score'], 260)
+        self.assertEqual(match.alliances['blue']['surrogates'], [])
+        self.assertEqual(match.alliances['blue']['dqs'], [])
 
         # test delete all matches
         request_body = ''
