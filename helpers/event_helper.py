@@ -364,14 +364,6 @@ class EventHelper(object):
         """
         for match in matches:
             for old_team, new_team in remap_teams.items():
-                # Update team key names
-                for i, key in enumerate(match.team_key_names):
-                    if key == old_team:
-                        match.dirty = True
-                        if new_team.isdigit():  # Only if non "B" teams
-                            match.team_key_names[i] = new_team
-                        else:
-                            del match.team_key_names[i]
                 # Update alliances
                 for color in ['red', 'blue']:
                     for attr in ['teams', 'surrogates', 'dqs']:
@@ -380,6 +372,11 @@ class EventHelper(object):
                                 match.dirty = True
                                 match.alliances[color][attr][i] = new_team
                                 match.alliances_json = json.dumps(match.alliances)
+
+                # Update team key names
+                match.team_key_names = []
+                for alliance in match.alliances:
+                    match.team_key_names.extend(match.alliances[alliance].get('teams', None))
 
     @classmethod
     def remapteams_alliances(cls, alliance_selections, remap_teams):

@@ -828,6 +828,7 @@ class TestApiTrustedController(unittest2.TestCase):
         self.assertEqual(match.alliances['blue']['score'], 260)
         self.assertEqual(match.alliances['blue']['surrogates'], [])
         self.assertEqual(match.alliances['blue']['dqs'], [])
+        self.assertEqual(set(match.team_key_names), set(['frc101B', 'frc102B', 'frc102C', 'frc104', 'frc5', 'frc6']))
 
         # Test remapped alliances
         alliances = [['frc1', 'frc2', 'frc3'],
@@ -1009,6 +1010,7 @@ class TestApiTrustedController(unittest2.TestCase):
         self.assertEqual(match.alliances['blue']['score'], 260)
         self.assertEqual(match.alliances['blue']['surrogates'], [])
         self.assertEqual(match.alliances['blue']['dqs'], [])
+        self.assertEqual(set(match.team_key_names), set(['frc101B', 'frc102B', 'frc102C', 'frc104', 'frc5', 'frc6']))
 
         # verify remapped alliances
         self.assertEqual(len(self.event.alliance_selections), 3)
