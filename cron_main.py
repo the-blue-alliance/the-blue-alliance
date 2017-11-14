@@ -12,7 +12,7 @@ from controllers.datafeed_controller import FMSAPIAwardsGet, FMSAPIEventAlliance
 from controllers.datafeed_controller import HallOfFameTeamsGet
 
 from controllers.cron_controller import DistrictPointsCalcEnqueue, DistrictPointsCalcDo, \
-    MatchTimePredictionsEnqueue, MatchTimePredictionsDo, BlueZoneUpdateDo, SuggestionQueueDailyNag
+    MatchTimePredictionsEnqueue, MatchTimePredictionsDo, BlueZoneUpdateDo, SuggestionQueueDailyNag, RemapTeamsDo
 from controllers.cron_controller import DistrictRankingsCalcEnqueue, DistrictRankingsCalcDo
 from controllers.cron_controller import EventTeamStatusCalcEnqueue, EventTeamStatusCalcDo
 from controllers.cron_controller import EventShortNameCalcEnqueue, EventShortNameCalcDo
@@ -82,5 +82,6 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/do/update_team_search_index/(.*)', AdminUpdateTeamSearchIndexDo),
                                ('/tasks/do/update_live_events', UpdateLiveEventsDo),
                                ('/tasks/do/nag_suggestions', SuggestionQueueDailyNag),
+                               ('/tasks/do/remap_teams/(.*)', RemapTeamsDo),
                                ],
                               debug=tba_config.DEBUG)

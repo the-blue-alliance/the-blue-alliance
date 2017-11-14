@@ -16,6 +16,7 @@ from consts.event_type import EventType
 from database.district_query import DistrictsInYearQuery
 from database.event_query import DistrictEventsQuery
 from database.team_query import DistrictTeamsQuery
+from helpers.award_manipulator import AwardManipulator
 from helpers.bluezone_helper import BlueZoneHelper
 from helpers.district_helper import DistrictHelper
 from helpers.district_manipulator import DistrictManipulator
@@ -693,3 +694,37 @@ class SuggestionQueueDailyNag(webapp.RequestHandler):
         if suggestions_to_nag:
             nag_text += "_Review them on <https://www.thebluealliance.com/suggest/review|TBA>_"
             OutgoingNotificationHelper.send_slack_alert(channel_url, nag_text)
+
+
+class RemapTeamsDo(webapp.RequestHandler):
+    """
+    Remaps teams within an Event. Useful for offseason events.
+    eg: 9254 -> 254B
+    """
+    def get(self, event_key):
+        event = Event.get_by_id(event_key)
+        if not event:
+            self.abort(404)
+
+        if not event.remap_teams:
+            return
+
+        event.prepAwardsMatchesTeams()
+
+        # Remap matches
+        EventHelper.remapteams_matches(event.matches, event.remap_teams)
+        MatchManipulator.createOrUpdate(event.matches)
+
+        # Remap alliance selections
+        if event.alliance_selections:
+            EventHelper.remapteams_alliances(event.alliance_selections, event.remap_teams)
+        # Remap rankings
+        if event.rankings:
+            EventHelper.remapteams_rankings(event.rankings, event.remap_teams)
+        if event.details and event.details.rankings2:
+            EventHelper.remapteams_rankings2(event.details.rankings2, event.remap_teams)
+        EventDetailsManipulator.createOrUpdate(event.details)
+
+        # Remap awards
+        EventHelper.remapteams_awards(event.awards, event.remap_teams)
+        AwardManipulator.createOrUpdate(event.awards, auto_union=False)

@@ -3,6 +3,7 @@ import json
 import logging
 import os
 
+from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
@@ -149,29 +150,19 @@ class AdminEventRemapTeams(LoggedInHandler):
     def post(self, event_key_id):
         self._require_admin()
         event = Event.get_by_id(event_key_id)
-        event.prepAwardsMatchesTeams()
 
         remap_teams = {}
         for key, value in json.loads(self.request.get('remap_teams')).items():
             remap_teams['frc{}'.format(key)] = 'frc{}'.format(value)
 
-        # Remap matches
-        EventHelper.remapteams_matches(event.matches, remap_teams)
-        MatchManipulator.createOrUpdate(event.matches)
+        event.remap_teams = remap_teams
+        EventManipulator.createOrUpdate(event)
 
-        # Remap alliance selections
-        if event.alliance_selections:
-            EventHelper.remapteams_alliances(event.alliance_selections, remap_teams)
-        # Remap rankings
-        if event.rankings:
-            EventHelper.remapteams_rankings(event.rankings, remap_teams)
-        if event.details and event.details.rankings2:
-            EventHelper.remapteams_rankings2(event.details.rankings2, remap_teams)
-        EventDetailsManipulator.createOrUpdate(event.details)
-
-        # Remap awards
-        EventHelper.remapteams_awards(event.awards, remap_teams)
-        AwardManipulator.createOrUpdate(event.awards, auto_union=False)
+        taskqueue.add(
+            url='/tasks/do/remap_teams/{}'.format(event.key_name),
+            method='GET',
+            queue_name='admin',
+        )
 
         self.redirect("/admin/event/" + event.key_name)
 
