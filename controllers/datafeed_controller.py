@@ -77,7 +77,12 @@ class FMSAPIAwardsGet(webapp.RequestHandler):
         datafeed = DatafeedFMSAPI('v2.0', save_response=True)
 
         event = Event.get_by_id(event_key)
-        new_awards = AwardManipulator.createOrUpdate(datafeed.getAwards(event))
+        awards = datafeed.getAwards(event)
+
+        if event and event.remap_teams:
+            EventHelper.remapteams_awards(awards, event.remap_teams)
+
+        new_awards = AwardManipulator.createOrUpdate(awards)
 
         if new_awards is None:
             new_awards = []
@@ -153,6 +158,9 @@ class FMSAPIEventAlliancesGet(webapp.RequestHandler):
 
         alliance_selections = df.getEventAlliances(event_key)
 
+        if event and event.remap_teams:
+            EventHelper.remapteams_alliances(alliance_selections, event.remap_teams)
+
         event_details = EventDetails(
             id=event_key,
             alliance_selections=alliance_selections
@@ -201,7 +209,13 @@ class FMSAPIEventRankingsGet(webapp.RequestHandler):
     def get(self, event_key):
         df = DatafeedFMSAPI('v2.0', save_response=True)
 
+        event = Event.get_by_id(event_key)
+
         rankings, rankings2 = df.getEventRankings(event_key)
+
+        if event and event.remap_teams:
+            EventHelper.remapteams_rankings(rankings, event.remap_teams)
+            EventHelper.remapteams_rankings2(rankings2, event.remap_teams)
 
         event_details = EventDetails(
             id=event_key,
@@ -251,13 +265,17 @@ class FMSAPIMatchesGet(webapp.RequestHandler):
     """
     def get(self, event_key):
         df = DatafeedFMSAPI('v2.0', save_response=True)
+        event = Event.get_by_id(event_key)
 
-        new_matches = MatchManipulator.createOrUpdate(
-            MatchHelper.deleteInvalidMatches(
-                df.getMatches(event_key),
-                Event.get_by_id(event_key)
-            )
+        matches = MatchHelper.deleteInvalidMatches(
+            df.getMatches(event_key),
+            Event.get_by_id(event_key)
         )
+
+        if event and event.remap_teams:
+            EventHelper.remapteams_matches(matches, event.remap_teams)
+
+        new_matches = MatchManipulator.createOrUpdate(matches)
 
         template_values = {
             'matches': new_matches,

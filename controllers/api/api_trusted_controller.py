@@ -1,13 +1,16 @@
 import json
 import logging
+import re
 import webapp2
 
+from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 
 from consts.auth_type import AuthType
 from consts.media_type import MediaType
 from controllers.api.api_base_controller import ApiTrustedBaseController
 
+from datafeeds.parser_base import ParserInputException
 from datafeeds.parsers.json.json_alliance_selections_parser import JSONAllianceSelectionsParser
 from datafeeds.parsers.json.json_awards_parser import JSONAwardsParser
 from datafeeds.parsers.json.json_matches_parser import JSONMatchesParser
@@ -15,6 +18,7 @@ from datafeeds.parsers.json.json_rankings_parser import JSONRankingsParser
 from datafeeds.parsers.json.json_team_list_parser import JSONTeamListParser
 
 from helpers.award_manipulator import AwardManipulator
+from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
 from helpers.event_details_manipulator import EventDetailsManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
@@ -51,6 +55,9 @@ class ApiTrustedEventAllianceSelectionsUpdate(ApiTrustedBaseController):
             id=event_key,
             alliance_selections=alliance_selections
         )
+
+        if event.remap_teams:
+            EventHelper.remapteams_alliances(event_details.alliance_selections, event.remap_teams)
         EventDetailsManipulator.createOrUpdate(event_details)
 
         self.response.out.write(json.dumps({'Success': "Alliance selections successfully updated"}))
@@ -82,6 +89,8 @@ class ApiTrustedEventAwardsUpdate(ApiTrustedBaseController):
         old_award_keys = Award.query(Award.event == event.key).fetch(None, keys_only=True)
         AwardManipulator.delete_keys(old_award_keys)
 
+        if event.remap_teams:
+            EventHelper.remapteams_awards(awards, event.remap_teams)
         AwardManipulator.createOrUpdate(awards)
 
         self.response.out.write(json.dumps({'Success': "Awards successfully updated"}))
@@ -130,6 +139,8 @@ class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
             except Exception, e:
                 logging.error("Failed to calculate match times")
 
+        if event.remap_teams:
+            EventHelper.remapteams_matches(matches, event.remap_teams)
         MatchManipulator.createOrUpdate(matches)
 
         self.response.out.write(json.dumps({'Success': "Matches successfully updated"}))
@@ -181,14 +192,21 @@ class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
     REQUIRED_AUTH_TYPES = {AuthType.EVENT_RANKINGS}
 
     def _process_request(self, request, event_key):
+        event = Event.get_by_id(event_key)
         rankings = JSONRankingsParser.parse(request.body)
 
         event_details = EventDetails(
             id=event_key,
             rankings=rankings
         )
+
+        if event.remap_teams:
+            EventHelper.remapteams_rankings(event_details.rankings, event.remap_teams)
+            # TODO: Remap rankings2 directly
+
         if event_details.year >= 2017:  # TODO: Temporary fix. Should directly parse request into rankings2
             event_details.rankings2 = RankingsHelper.convert_rankings(event_details)
+
         EventDetailsManipulator.createOrUpdate(event_details)
 
         self.response.out.write(json.dumps({'Success': "Rankings successfully updated"}))
@@ -307,6 +325,7 @@ class ApiTrustedUpdateEventInfo(ApiTrustedBaseController):
         "first_event_code",
         "playoff_type",
         "webcasts",  # this is a list of stream URLs, we'll mutate it ourselves
+        "remap_teams",
     }
 
     def _process_request(self, request, event_key):
@@ -327,6 +346,7 @@ class ApiTrustedUpdateEventInfo(ApiTrustedBaseController):
             )
             self.abort(404)
 
+        do_team_remap = False
         for field, value in event_info.iteritems():
             if field not in self.ALLOWED_EVENT_PARAMS:
                 continue
@@ -360,6 +380,19 @@ class ApiTrustedUpdateEventInfo(ApiTrustedBaseController):
                     webcast_list,
                     False,  # Don't createOrUpdate yet
                 )
+            elif field == "remap_teams":
+                # Validate remap_teams
+                if not isinstance(value, dict):
+                    raise ParserInputException("Invalid reamap_teams. Check input")
+                for temp_team, remapped_team in value.items():
+                    temp_match = re.match(r'frc\d+', str(temp_team))
+                    remapped_match = re.match(r'frc\d+[B-Z]?', str(remapped_team))
+                    if not temp_match or (temp_match and (temp_match.group(0) != str(temp_team))):
+                        raise ParserInputException("Bad team: '{}'. Must follow format 'frcXXX'.".format(temp_team))
+                    if not remapped_match or (remapped_match and (remapped_match.group(0) != str(remapped_team))):
+                        raise ParserInputException("Bad team: '{}'. Must follow format 'frcXXX' or 'frcXXX[B-Z]'.".format(remapped_team))
+                do_team_remap = True
+                setattr(event, field, value)
             else:
                 try:
                     if field == "first_event_code":
@@ -376,3 +409,10 @@ class ApiTrustedUpdateEventInfo(ApiTrustedBaseController):
         EventManipulator.createOrUpdate(event)
         if "webcast" in event_info:
             MemcacheWebcastFlusher.flushEvent(event.key_name)
+
+        if do_team_remap:
+            taskqueue.add(
+                url='/tasks/do/remap_teams/{}'.format(event.key_name),
+                method='GET',
+                queue_name='admin',
+            )

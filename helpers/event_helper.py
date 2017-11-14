@@ -1,3 +1,4 @@
+import json
 import logging
 import collections
 import datetime
@@ -354,3 +355,85 @@ class EventHelper(object):
         year = event_key[:4]
         event_short = event_key[4:]
         return year == '2015' and event_short not in {'cc', 'cacc', 'mttd'}
+
+    @classmethod
+    def remapteams_matches(cls, matches, remap_teams):
+        """
+        Remaps teams in matches
+        Mutates in place
+        """
+        for match in matches:
+            for old_team, new_team in remap_teams.items():
+                # Update team key names
+                for i, key in enumerate(match.team_key_names):
+                    if key == old_team:
+                        match.dirty = True
+                        if new_team.isdigit():  # Only if non "B" teams
+                            match.team_key_names[i] = new_team
+                        else:
+                            del match.team_key_names[i]
+                # Update alliances
+                for color in ['red', 'blue']:
+                    for attr in ['teams', 'surrogates', 'dqs']:
+                        for i, key in enumerate(match.alliances[color][attr]):
+                            if key == old_team:
+                                match.dirty = True
+                                match.alliances[color][attr][i] = new_team
+                                match.alliances_json = json.dumps(match.alliances)
+
+    @classmethod
+    def remapteams_alliances(cls, alliance_selections, remap_teams):
+        """
+        Remaps teams in alliance selections
+        Mutates in place
+        """
+        for row in alliance_selections:
+            for choice in ['picks', 'declines']:
+                for old_team, new_team in remap_teams.items():
+                    for i, key in enumerate(row[choice]):
+                        if key == old_team:
+                            row[choice][i] = new_team
+
+    @classmethod
+    def remapteams_rankings(cls, rankings, remap_teams):
+        """
+        Remaps teams in rankings
+        Mutates in place
+        """
+        for row in rankings:
+            for old_team, new_team in remap_teams.items():
+                if str(row[1]) == old_team[3:]:
+                    row[1] = new_team[3:]
+
+    @classmethod
+    def remapteams_rankings2(cls, rankings2, remap_teams):
+        """
+        Remaps teams in rankings2
+        Mutates in place
+        """
+        for ranking in rankings2:
+            if ranking['team_key'] in remap_teams:
+                ranking['team_key'] = remap_teams[ranking['team_key']]
+
+    @classmethod
+    def remapteams_awards(cls, awards, remap_teams):
+        """
+        Remaps teams in awards
+        Mutates in place
+        """
+        for award in awards:
+            for old_team, new_team in remap_teams.items():
+                # Update team keys
+                for i, key in enumerate(award.team_list):
+                    if key.id() == old_team:
+                        award.dirty = True
+                        if new_team.isdigit():  # Only if non "B" teams
+                            award.team_list[i] = ndb.Key(Team, new_team)
+                        else:
+                            del award.team_list[i]
+                # Update recipient list
+                for recipient in award.recipient_list:
+                    if str(recipient['team_number']) == old_team[3:]:
+                        award.dirty = True
+                        recipient['team_number'] = new_team[3:]
+                        award.recipient_json_list = [json.dumps(r) for r in award.recipient_list]

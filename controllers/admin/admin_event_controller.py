@@ -3,6 +3,7 @@ import json
 import logging
 import os
 
+from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
@@ -149,72 +150,19 @@ class AdminEventRemapTeams(LoggedInHandler):
     def post(self, event_key_id):
         self._require_admin()
         event = Event.get_by_id(event_key_id)
-        event.prepAwardsMatchesTeams()
 
         remap_teams = {}
         for key, value in json.loads(self.request.get('remap_teams')).items():
             remap_teams['frc{}'.format(key)] = 'frc{}'.format(value)
 
-        # Remap matches
-        for match in event.matches:
-            for old_team, new_team in remap_teams.items():
-                # Update team key names
-                for i, key in enumerate(match.team_key_names):
-                    if key == old_team:
-                        match.dirty = True
-                        if new_team.isdigit():  # Only if non "B" teams
-                            match.team_key_names[i] = new_team
-                        else:
-                            del match.team_key_names[i]
-                # Update alliances
-                for color in ['red', 'blue']:
-                    for i, key in enumerate(match.alliances[color]['teams']):
-                        if key == old_team:
-                            match.dirty = True
-                            match.alliances[color]['teams'][i] = new_team
-                            match.alliances_json = json.dumps(match.alliances)
-        MatchManipulator.createOrUpdate(event.matches)
+        event.remap_teams = remap_teams
+        EventManipulator.createOrUpdate(event)
 
-        # Remap alliance selections
-        if event.alliance_selections:
-            for row in event.alliance_selections:
-                for choice in ['picks', 'declines']:
-                    for old_team, new_team in remap_teams.items():
-                        for i, key in enumerate(row[choice]):
-                            if key == old_team:
-                                row[choice][i] = new_team
-
-        # Remap rankings
-        if event.rankings:
-            for row in event.rankings:
-                for old_team, new_team in remap_teams.items():
-                    if row[1] == old_team[3:]:
-                        row[1] = new_team[3:]
-        if event.details and event.details.rankings2:
-            for ranking in event.details.rankings2:
-                if ranking['team_key'] in remap_teams:
-                    ranking['team_key'] = remap_teams[ranking['team_key']]
-
-        EventDetailsManipulator.createOrUpdate(event.details)
-
-        # Remap awards
-        for award in event.awards:
-            for old_team, new_team in remap_teams.items():
-                # Update team keys
-                for i, key in enumerate(award.team_list):
-                    if key.id() == old_team:
-                        award.dirty = True
-                        if new_team.isdigit():  # Only if non "B" teams
-                            award.team_list[i] = ndb.Key(Team, new_team)
-                        else:
-                            del award.team_list[i]
-                # Update recipient list
-                for recipient in award.recipient_list:
-                    if str(recipient['team_number']) == old_team[3:]:
-                        award.dirty = True
-                        recipient['team_number'] = new_team[3:]
-                        award.recipient_json_list = [json.dumps(r) for r in award.recipient_list]
-        AwardManipulator.createOrUpdate(event.awards, auto_union=False)
+        taskqueue.add(
+            url='/tasks/do/remap_teams/{}'.format(event.key_name),
+            method='GET',
+            queue_name='admin',
+        )
 
         self.redirect("/admin/event/" + event.key_name)
 
