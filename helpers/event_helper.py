@@ -402,7 +402,7 @@ class EventHelper(object):
         """
         for row in rankings:
             for old_team, new_team in remap_teams.items():
-                if row[1] == old_team[3:]:
+                if str(row[1]) == old_team[3:]:
                     row[1] = new_team[3:]
 
     @classmethod
