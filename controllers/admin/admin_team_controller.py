@@ -20,13 +20,34 @@ class AdminTeamList(LoggedInHandler):
     """
     The view of a list of teams.
     """
-    def get(self):
-        self._require_admin()
+    MAX_PAGE = 10  # Everything after this will be shown on one page
+    PAGE_SIZE = 1000
 
-        teams = Team.query().order(Team.team_number)
+    def get(self, page_num=0):
+        self._require_admin()
+        page_num = int(page_num)
+
+        if page_num < self.MAX_PAGE:
+            start = self.PAGE_SIZE * page_num
+            end = start + self.PAGE_SIZE
+            teams = Team.query(Team.team_number >= start, Team.team_number < end).order(Team.team_number).fetch()
+        else:
+            start = self.PAGE_SIZE * self.MAX_PAGE
+            teams = Team.query(Team.team_number >= start).order(Team.team_number).fetch()
+
+        page_labels = []
+        for page in xrange(self.MAX_PAGE):
+            if page == 0:
+                page_labels.append('1-999')
+            else:
+                page_labels.append('{}\'s'.format(1000 * page))
+        page_labels.append('{}+'.format(1000 * self.MAX_PAGE))
 
         self.template_values.update({
             "teams": teams,
+            "num_teams": Team.query().count(),
+            "page_num": page_num,
+            "page_labels": page_labels,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/team_list.html')

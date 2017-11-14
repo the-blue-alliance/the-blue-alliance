@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<h1>{{ teams|length }} Teams</h1>
+<h1>{{ num_teams }} Teams</h1>
 
 <form class="form-inline">
     <legend>Jump to Team</legend>
@@ -26,6 +26,12 @@ $("#go_button").click(function() {
     }
 });
 </script>
+
+<ul class="pagination pagination-small">
+    {% for page_label in page_labels %}
+    <li{% if forloop.counter0 == page_num %} class="active"{% endif %}><a href="/admin/teams{% if not forloop.first %}/{{forloop.counter0}}{% endif %}">{{page_label}}</a></li>
+    {% endfor %}
+</ul>
 
 <table class="table table-striped table-hover">
     <thead>
