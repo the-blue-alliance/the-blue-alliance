@@ -308,8 +308,9 @@
 <div class="tab-pane" id="rankings">
 <div class="row">
 <h2>Rankings</h2>
+{% if event.details %}
 <table class="table table-striped table-condensed table-center">
-  {% for row in event.rankings %}
+  {% for row in event.details.rankings_table %}
       <tr>
       {% if forloop.first %}
             {% for element in row %}
@@ -325,6 +326,7 @@
       <p>No ranking data yet</p>
   {% endfor %}
 </table>
+{% endif %}
 </div>
 </div>
 
