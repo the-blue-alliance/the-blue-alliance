@@ -5,6 +5,7 @@ import Dialog from 'react-bootstrap-dialog'
 import PlayoffTypeDropdown from './PlayoffTypeDropdown'
 import SyncCodeInput from './SyncCodeInput'
 import AddRemoveWebcast from './AddRemoveWebcast'
+import AddRemoveTeamMap from './AddRemoveTeamMap'
 import ensureRequestSuccess from '../../net/EnsureRequestSuccess'
 
 class EventInfoTab extends Component {
@@ -23,6 +24,8 @@ class EventInfoTab extends Component {
     this.onFirstCodeChange = this.onFirstCodeChange.bind(this)
     this.addWebcast = this.addWebcast.bind(this)
     this.removeWebcast = this.removeWebcast.bind(this)
+    this.addTeamMap = this.addTeamMap.bind(this)
+    this.removeTeamMap = this.removeTeamMap.bind(this)
   }
 
   componentWillReceiveProps(newProps) {
@@ -57,6 +60,16 @@ class EventInfoTab extends Component {
     })
     .then(ensureRequestSuccess)
     .then((response) => (response.json()))
+    .then((data1) => {
+      // Merge in remap_teams
+      return fetch(`/_/remap_teams/${newEventKey}`)
+      .then(ensureRequestSuccess)
+      .then((response) => (response.json()))
+      .then((data2) => {
+        data1.remap_teams = data2
+        return data1
+      })
+    })
     .then((data) => (this.setState({ eventInfo: data, status: '' })))
   }
 
@@ -76,6 +89,22 @@ class EventInfoTab extends Component {
     const currentInfo = this.state.eventInfo
     if (currentInfo !== null) {
       currentInfo.webcasts.splice(indexToRemove, 1)
+      this.setState({ eventInfo: currentInfo })
+    }
+  }
+
+  addTeamMap(fromTeamKey, toTeamKey) {
+    const currentInfo = this.state.eventInfo
+    if (currentInfo !== null) {
+      currentInfo.remap_teams[fromTeamKey] = toTeamKey
+      this.setState({ eventInfo: currentInfo })
+    }
+  }
+
+  removeTeamMap(keyToRemove) {
+    const currentInfo = this.state.eventInfo
+    if (currentInfo !== null) {
+      delete currentInfo.remap_teams[keyToRemove]
       this.setState({ eventInfo: currentInfo })
     }
   }
@@ -115,6 +144,12 @@ class EventInfoTab extends Component {
             eventInfo={this.state.eventInfo}
             addWebcast={this.addWebcast}
             removeWebcast={this.removeWebcast}
+          />
+
+          <AddRemoveTeamMap
+            eventInfo={this.state.eventInfo}
+            addTeamMap={this.addTeamMap}
+            removeTeamMap={this.removeTeamMap}
           />
 
           <button
