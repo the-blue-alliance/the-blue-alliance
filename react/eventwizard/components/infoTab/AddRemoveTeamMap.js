@@ -12,6 +12,8 @@ class AddRemoveTeamMap extends Component {
     this.state = {
       nextFromTeam: '',
       nextToTeam: '',
+      fromError: false,
+      toError: false,
     }
 
     this.onNextFromTeamChange = this.onNextFromTeamChange.bind(this)
@@ -20,16 +22,18 @@ class AddRemoveTeamMap extends Component {
   }
 
   onNextFromTeamChange(event) {
-    this.setState({ nextFromTeam: event.target.value })
+    const match = event.target.value.match(/\d+/)
+    this.setState({ nextFromTeam: event.target.value, fromError: !match || match[0] !== event.target.value })
   }
 
   onNextToTeamChange(event) {
-    this.setState({ nextToTeam: event.target.value })
+    const match = event.target.value.match(/\d+[b-zB-Z]?/)
+    this.setState({ nextToTeam: event.target.value, toError: !match || match[0] !== event.target.value })
   }
 
   onAddTeamMapClick() {
     this.props.addTeamMap(`frc${this.state.nextFromTeam.toUpperCase()}`, `frc${this.state.nextToTeam.toUpperCase()}`)
-    this.setState({ nextFromTeam: '', nextToTeam: '' })
+    this.setState({ nextFromTeam: '', nextToTeam: '', fromError: false, toError: false })
   }
 
   render() {
@@ -54,7 +58,7 @@ class AddRemoveTeamMap extends Component {
         <div className="col-sm-10" id="team_mappings_list">
           {teamMappingsList}
 
-          <div className="input-group">
+          <div className={this.state.fromError || this.state.toError ? "input-group has-error" : "input-group"}>
             <input
               className="form-control"
               type="text"
@@ -76,7 +80,7 @@ class AddRemoveTeamMap extends Component {
               <button
                 className="btn btn-info"
                 onClick={this.onAddTeamMapClick}
-                disabled={this.props.eventInfo === null}
+                disabled={this.props.eventInfo === null || this.state.fromError || this.state.toError}
               >
                 Add Mapping
               </button>
