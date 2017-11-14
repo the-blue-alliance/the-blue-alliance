@@ -200,6 +200,31 @@ class TypeaheadHandler(CacheableHandler):
             return entry.data_json
 
 
+class EventRemapTeamsHandler(CacheableHandler):
+    """
+    Returns the current team remapping for an event
+    """
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "remap_teams_{}"  # (event_key)
+    CACHE_HEADER_LENGTH = 1
+
+    def __init__(self, *args, **kw):
+        super(EventRemapTeamsHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 1
+
+    def get(self, event_key):
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(event_key)
+        super(EventRemapTeamsHandler, self).get(event_key)
+
+    def _render(self, event_key):
+        self.response.headers.add_header('content-type', 'application/json', charset='utf-8')
+        event = Event.get_by_id(event_key)
+        if not event:
+            return json.dumps(None)
+
+        return json.dumps(event.remap_teams)
+
+
 class WebcastHandler(CacheableHandler):
     """
     Returns the HTML necessary to generate the webcast embed for a given event

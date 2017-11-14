@@ -10,7 +10,7 @@ MyTBAMatchController, MyTBATeamController, AccountAPIReadKeyAdd, AccountAPIReadK
 from controllers.advanced_search_controller import AdvancedSearchController
 from controllers.ajax_controller import AccountInfoHandler, AccountRegisterFCMToken, AccountFavoritesHandler, AccountFavoritesAddHandler, AccountFavoritesDeleteHandler, \
       YouTubePlaylistHandler, AllowedApiWriteEventsHandler, PlayoffTypeGetHandler
-from controllers.ajax_controller import LiveEventHandler, TypeaheadHandler, WebcastHandler
+from controllers.ajax_controller import LiveEventHandler, TypeaheadHandler, EventRemapTeamsHandler, WebcastHandler
 from controllers.apiai_controller import APIAIHandler
 from controllers.apidocs_controller import AddDataHandler, ApiV3DocumentationHandler, \
       ApiV2DocumentationHandler, ApiTrustedDocumentationHandler, WebhookDocumentationHandler, \
@@ -178,6 +178,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/_/nightbot/nextmatch/<arg_str:(.*)>', NightbotTeamNextmatchHandler, 'nightbot-team-nextmatch', strict_slash=True),
       RedirectRoute(r'/_/nightbot/status/<team_number:[0-9]+>', NightbotTeamStatuskHandler, 'nightbot-team-status', strict_slash=True),
       RedirectRoute(r'/_/typeahead/<search_key>', TypeaheadHandler, 'ajax-typeahead', strict_slash=True),
+      RedirectRoute(r'/_/remap_teams/<event_key>', EventRemapTeamsHandler, 'ajax-remap-teams', strict_slash=True),
       RedirectRoute(r'/_/webcast/<event_key>/<webcast_number>', WebcastHandler, 'ajax-webcast', strict_slash=True),
       RedirectRoute(r'/_/yt/playlist/videos', YouTubePlaylistHandler, 'ajex-yt-playlist', strict_slash=True),
       RedirectRoute(r'/<:(frc)?><team_number:[0-9]+>', ShortTeamHandler, 'short-team-canonical'),
