@@ -166,7 +166,7 @@ class DistrictHelper(object):
                 -totals['tiebreakers'][4]] + [-score for score in totals['tiebreakers'][5]]
             )
 
-        return filter(lambda team_key, _: team_key in valid_team_keys, team_totals)
+        return filter(lambda (team_key, _): team_key in valid_team_keys, team_totals)
 
     @classmethod
     def calc_elim_match_points(cls, district_points, matches, POINTS_MULTIPLIER):
