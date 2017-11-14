@@ -5,7 +5,9 @@ import json
 import md5
 
 import api_main
+import cron_main
 
+from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
@@ -27,6 +29,7 @@ from models.team import Team
 class TestApiTrustedController(unittest2.TestCase):
     def setUp(self):
         self.testapp = webtest.TestApp(api_main.app)
+        self.cronapp = webtest.TestApp(cron_main.app)
 
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -37,6 +40,7 @@ class TestApiTrustedController(unittest2.TestCase):
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
         self.testbed.init_taskqueue_stub(root_path=".")
+        self.taskqueue_stub = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
 
         self.teams_auth = ApiAuthAccess(id='tEsT_id_0',
                                         secret='321tEsTsEcReT',
@@ -675,6 +679,12 @@ class TestApiTrustedController(unittest2.TestCase):
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
         response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_9', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 400)
+        self.assertEqual(event.remap_teams, {
+            'frc9323': 'frc1323B',
+            'frc9254': 'frc254B',
+            'frc8254': 'frc254C',
+            'frc9000': 'frc6000',
+        })
 
         request = {
             'remap_teams': {
@@ -685,6 +695,12 @@ class TestApiTrustedController(unittest2.TestCase):
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
         response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_9', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 400)
+        self.assertEqual(event.remap_teams, {
+            'frc9323': 'frc1323B',
+            'frc9254': 'frc254B',
+            'frc8254': 'frc254C',
+            'frc9000': 'frc6000',
+        })
 
         request = {
             'remap_teams': {
@@ -695,6 +711,12 @@ class TestApiTrustedController(unittest2.TestCase):
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
         response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_9', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 400)
+        self.assertEqual(event.remap_teams, {
+            'frc9323': 'frc1323B',
+            'frc9254': 'frc254B',
+            'frc8254': 'frc254C',
+            'frc9000': 'frc6000',
+        })
 
         request = {
             'remap_teams': {
@@ -705,6 +727,12 @@ class TestApiTrustedController(unittest2.TestCase):
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
         response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_9', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 400)
+        self.assertEqual(event.remap_teams, {
+            'frc9323': 'frc1323B',
+            'frc9254': 'frc254B',
+            'frc8254': 'frc254C',
+            'frc9000': 'frc6000',
+        })
 
         request = {
             'remap_teams': {
@@ -715,6 +743,12 @@ class TestApiTrustedController(unittest2.TestCase):
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
         response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_9', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 400)
+        self.assertEqual(event.remap_teams, {
+            'frc9323': 'frc1323B',
+            'frc9254': 'frc254B',
+            'frc8254': 'frc254C',
+            'frc9000': 'frc6000',
+        })
 
         request = {
             'remap_teams': {
@@ -725,6 +759,12 @@ class TestApiTrustedController(unittest2.TestCase):
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
         response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_9', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 400)
+        self.assertEqual(event.remap_teams, {
+            'frc9323': 'frc1323B',
+            'frc9254': 'frc254B',
+            'frc8254': 'frc254C',
+            'frc9000': 'frc6000',
+        })
 
     def test_remapping(self):
         self.event_info_auth.put()
@@ -848,6 +888,144 @@ class TestApiTrustedController(unittest2.TestCase):
         response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_4', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 200)
 
+        for team in Award.get_by_id('2014casj_1').recipient_dict.keys():
+            self.assertTrue(str(team) in {'101B', '102B', '102C'})
+        for team in Award.get_by_id('2014casj_5').recipient_dict.keys():
+            self.assertTrue(str(team) in {'104'})
+        for team in Award.get_by_id('2014casj_0').recipient_dict.keys():
+            self.assertTrue(str(team) in {'5'})
+        for team in Award.get_by_id('2014casj_2').recipient_dict.keys():
+            self.assertTrue(str(team) in {'6'})
+
+    def test_remapping_after(self):
+        self.event_info_auth.put()
+        self.matches_auth.put()
+        self.rankings_auth.put()
+        self.alliances_auth.put()
+        self.awards_auth.put()
+
+        # Test remapped matches
+        matches = [{
+            'comp_level': 'f',
+            'set_number': 1,
+            'match_number': 2,
+            'alliances': {
+                'red': {'teams': ['frc1', 'frc2', 'frc3'],
+                        'score': 250,
+                        'surrogates': ['frc1'],
+                        'dqs': ['frc2']},
+                'blue': {'teams': ['frc4', 'frc5', 'frc6'],
+                         'score': 260,
+                         'surrogates': [],
+                         'dqs': []},
+            },
+            'score_breakdown': {
+                'red': {'auto': 20, 'assist': 40, 'truss+catch': 20, 'teleop_goal+foul': 20},
+                'blue': {'auto': 40, 'assist': 60, 'truss+catch': 10, 'teleop_goal+foul': 40},
+            },
+            'time_string': '11:00 AM',
+            'time_utc': '2014-08-31T18:00:00',
+        }]
+        request_body = json.dumps(matches)
+        request_path = '/api/trusted/v1/event/2014casj/matches/update'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        self.assertEqual(response.status_code, 200)
+
+        # Test remapped alliances
+        alliances = [['frc1', 'frc2', 'frc3'],
+                     ['frc4', 'frc5', 'frc6'],
+                     ['frc7', 'frc8', 'frc9']]
+        request_body = json.dumps(alliances)
+
+        request_path = '/api/trusted/v1/event/2014casj/alliance_selections/update'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_3', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        self.assertEqual(response.status_code, 200)
+
+        # Test remapped rankings
+        rankings = {
+            'breakdowns': ['QS', 'Auton', 'Teleop', 'T&C', 'wins', 'losses', 'ties'],
+            'rankings': [
+                {'team_key': 'frc1', 'rank': 1, 'wins': 10, 'losses': 0, 'ties': 0, 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200},
+                {'team_key': 'frc2', 'rank': 2, 'wins': 10, 'losses': 0, 'ties': 0, 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200},
+                {'team_key': 'frc3', 'rank': 3, 'wins': 10, 'losses': 0, 'ties': 0, 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200},
+                {'team_key': 'frc4', 'rank': 4, 'wins': 10, 'losses': 0, 'ties': 0, 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200},
+                {'team_key': 'frc5', 'rank': 5, 'wins': 10, 'losses': 0, 'ties': 0, 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200},
+                {'team_key': 'frc6', 'rank': 6, 'wins': 10, 'losses': 0, 'ties': 0, 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200},
+            ],
+        }
+        request_body = json.dumps(rankings)
+
+        request_path = '/api/trusted/v1/event/2014casj/rankings/update'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_2', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        self.assertEqual(response.status_code, 200)
+
+        # Test remapped awards
+        awards = [{'name_str': 'Winner', 'team_key': 'frc1'},
+                  {'name_str': 'Winner', 'team_key': 'frc2'},
+                  {'name_str': 'Winner', 'team_key': 'frc3'},
+                  {'name_str': 'Volunteer Blahblah', 'team_key': 'frc4', 'awardee': 'Bob Bobby'},
+                  {'name_str': 'Chairman\'s Blahblah', 'team_key': 'frc5'},
+                  {'name_str': 'Finalist', 'team_key': 'frc6'}]
+        request_body = json.dumps(awards)
+
+        request_path = '/api/trusted/v1/event/2014casj/awards/update'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_4', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        self.assertEqual(response.status_code, 200)
+
+        # Set remapping
+        request = {
+            'remap_teams': {
+                'frc1': 'frc101B',
+                'frc2': 'frc102B',
+                'frc3': 'frc102C',
+                'frc4': 'frc104'
+            },
+        }
+        request_body = json.dumps(request)
+        request_path = '/api/trusted/v1/event/2014casj/info/update'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_9', 'X-TBA-Auth-Sig': sig})
+        self.assertEqual(response.status_code, 200)
+
+        # Run tasks
+        tasks = self.taskqueue_stub.GetTasks('admin')
+        for task in tasks:
+            self.cronapp.get(task["url"])
+
+        # verify remapped match data
+        match = Match.get_by_id('2014casj_f1m2')
+        self.assertEqual(match.time, datetime.datetime(2014, 8, 31, 18, 0))
+        self.assertEqual(match.time_string, '11:00 AM')
+        self.assertEqual(match.alliances['red']['teams'], ['frc101B', 'frc102B', 'frc102C'])
+        self.assertEqual(match.alliances['red']['score'], 250)
+        self.assertEqual(match.alliances['red']['surrogates'], ['frc101B'])
+        self.assertEqual(match.alliances['red']['dqs'], ['frc102B'])
+        self.assertEqual(match.score_breakdown['red']['truss+catch'], 20)
+        self.assertEqual(match.alliances['blue']['teams'], ['frc104', 'frc5', 'frc6'])
+        self.assertEqual(match.alliances['blue']['score'], 260)
+        self.assertEqual(match.alliances['blue']['surrogates'], [])
+        self.assertEqual(match.alliances['blue']['dqs'], [])
+
+        # verify remapped alliances
+        self.assertEqual(len(self.event.alliance_selections), 3)
+        self.assertEqual(self.event.alliance_selections[0]['picks'], ['frc101B', 'frc102B', 'frc102C'])
+        self.assertEqual(self.event.alliance_selections[1]['picks'], ['frc104', 'frc5', 'frc6'])
+        self.assertEqual(self.event.alliance_selections[2]['picks'], ['frc7', 'frc8', 'frc9'])
+
+        # verify remapped rankings
+        self.assertEqual(self.event.rankings[0], ['Rank', 'Team', 'QS', 'Auton', 'Teleop', 'T&C', 'Record (W-L-T)', 'DQ', 'Played'])
+        self.assertEqual(self.event.rankings[1], [1, '101B', 20, 500, 500, 200, '10-0-0', 0, 10])
+        self.assertEqual(self.event.rankings[2], [2, '102B', 20, 500, 500, 200, '10-0-0', 0, 10])
+        self.assertEqual(self.event.rankings[3], [3, '102C', 20, 500, 500, 200, '10-0-0', 0, 10])
+        self.assertEqual(self.event.rankings[4], [4, '104', 20, 500, 500, 200, '10-0-0', 0, 10])
+        self.assertEqual(self.event.rankings[5], [5, '5', 20, 500, 500, 200, '10-0-0', 0, 10])
+        self.assertEqual(self.event.rankings[6], [6, '6', 20, 500, 500, 200, '10-0-0', 0, 10])
+
+        # verify remapped awards
         for team in Award.get_by_id('2014casj_1').recipient_dict.keys():
             self.assertTrue(str(team) in {'101B', '102B', '102C'})
         for team in Award.get_by_id('2014casj_5').recipient_dict.keys():

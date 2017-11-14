@@ -3,6 +3,7 @@ import logging
 import re
 import webapp2
 
+from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 
 from consts.auth_type import AuthType
@@ -345,6 +346,7 @@ class ApiTrustedUpdateEventInfo(ApiTrustedBaseController):
             )
             self.abort(404)
 
+        do_team_remap = False
         for field, value in event_info.iteritems():
             if field not in self.ALLOWED_EVENT_PARAMS:
                 continue
@@ -389,7 +391,8 @@ class ApiTrustedUpdateEventInfo(ApiTrustedBaseController):
                         raise ParserInputException("Bad team: '{}'. Must follow format 'frcXXX'.".format(temp_team))
                     if not remapped_match or (remapped_match and (remapped_match.group(0) != str(remapped_team))):
                         raise ParserInputException("Bad team: '{}'. Must follow format 'frcXXX' or 'frcXXX[B-Z]'.".format(remapped_team))
-                    setattr(event, field, value)
+                do_team_remap = True
+                setattr(event, field, value)
             else:
                 try:
                     if field == "first_event_code":
@@ -406,3 +409,10 @@ class ApiTrustedUpdateEventInfo(ApiTrustedBaseController):
         EventManipulator.createOrUpdate(event)
         if "webcast" in event_info:
             MemcacheWebcastFlusher.flushEvent(event.key_name)
+
+        if do_team_remap:
+            taskqueue.add(
+                url='/tasks/do/remap_teams/{}'.format(event.key_name),
+                method='GET',
+                queue_name='admin',
+            )

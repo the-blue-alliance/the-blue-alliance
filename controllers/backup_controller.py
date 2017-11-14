@@ -23,8 +23,11 @@ from google.appengine.ext import ndb
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
-from google.cloud import bigquery
-from google.cloud.bigquery.job import WriteDisposition
+try:  # Tests fail on import. 2017-11-13
+    from google.cloud import bigquery
+    from google.cloud.bigquery.job import WriteDisposition
+except Exception:
+    logging.error("bigquery import failed")
 
 from helpers.award_manipulator import AwardManipulator
 from helpers.event_manipulator import EventManipulator
