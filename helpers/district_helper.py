@@ -138,6 +138,8 @@ class DistrictHelper(object):
                             team_totals[team_key]['tiebreakers'][5] = heapq.nlargest(3, event.district_points['tiebreakers'][team_key]['highest_qual_scores'] + team_totals[team_key]['tiebreakers'][5])
 
         # adding in rookie bonus
+        # save valid team keys
+        valid_team_keys = set()
         if type(teams) == ndb.tasklets.Future:
             teams = teams.get_result()
         for team in teams:
@@ -152,6 +154,8 @@ class DistrictHelper(object):
                 team_totals[team.key.id()]['rookie_bonus'] = bonus
                 team_totals[team.key.id()]['point_total'] += bonus
 
+            valid_team_keys.add(team.key.id())
+
         team_totals = sorted(team_totals.items(),
             key=lambda (_, totals): [
                 -totals['point_total'],
@@ -162,7 +166,7 @@ class DistrictHelper(object):
                 -totals['tiebreakers'][4]] + [-score for score in totals['tiebreakers'][5]]
             )
 
-        return team_totals
+        return filter(lambda team_key, _: team_key in valid_team_keys, team_totals)
 
     @classmethod
     def calc_elim_match_points(cls, district_points, matches, POINTS_MULTIPLIER):
