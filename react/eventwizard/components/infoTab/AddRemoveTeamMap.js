@@ -58,7 +58,7 @@ class AddRemoveTeamMap extends Component {
         <div className="col-sm-10" id="team_mappings_list">
           {teamMappingsList}
 
-          <div className={this.state.fromError || this.state.toError ? "input-group has-error" : "input-group"}>
+          <div className={this.state.fromError || this.state.toError ? 'input-group has-error' : 'input-group'}>
             <input
               className="form-control"
               type="text"
@@ -67,7 +67,7 @@ class AddRemoveTeamMap extends Component {
               onChange={this.onNextFromTeamChange}
               value={this.state.nextFromTeam}
             />
-            <span className="input-group-addon"><span className="glyphicon glyphicon-arrow-right" aria-hidden="true"></span></span>
+            <span className="input-group-addon"><span className="glyphicon glyphicon-arrow-right" aria-hidden="true" /></span>
             <input
               className="form-control"
               type="text"

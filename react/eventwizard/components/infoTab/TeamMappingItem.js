@@ -14,7 +14,7 @@ class TeamMappingItem extends Component {
 
   render() {
     return (
-      <p>{this.props.fromTeamKey.substr(3)} <span className="glyphicon glyphicon-arrow-right" aria-hidden="true"></span> {this.props.toTeamKey.substr(3)} &nbsp;
+      <p>{this.props.fromTeamKey.substr(3)} <span className="glyphicon glyphicon-arrow-right" aria-hidden="true" /> {this.props.toTeamKey.substr(3)} &nbsp;
         <button
           className="btn btn-danger"
           onClick={this.onRemoveClick}
