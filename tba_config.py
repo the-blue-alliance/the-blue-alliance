@@ -47,5 +47,5 @@ else:
         "update-webcast-online-status": True,
     }
 
-CONFIG['landing_handler'] = INSIGHTS
+CONFIG['landing_handler'] = KICKOFF
 CONFIG["static_resource_version"] = 8
