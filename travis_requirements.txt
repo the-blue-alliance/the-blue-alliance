@@ -13,3 +13,4 @@ requests[security]
 pyOpenSSL
 ndg-httpsclient
 pyasn1
+httpie
