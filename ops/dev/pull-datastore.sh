@@ -17,6 +17,10 @@ host=$(echo -e "${config}" | grep HostName | cut -d " " -f 4)
 port=$(echo -e "${config}" | grep Port | cut -d " " -f 4)
 keyfile=$(echo -e "${config}" | grep IdentityFile | cut -d " " -f 4)
 
+# scp complains when we try to push an empty directory
+# So make sure there's at least something there
+touch $local_dir/.tba
+
 if [ $1 == 'pull' ]; then
   src="root@$host:/datastore/*"
   dst="./$local_dir"

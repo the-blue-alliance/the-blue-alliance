@@ -17,7 +17,10 @@ def ensure_plugins(plugins)
     next if plugin_hash.has_key?(p)
     result = true
     logger.warn("Installing plugin #{p}")
-    pm.install_plugin(p)
+    if not system "vagrant plugin install #{p}"
+      logger.error("Unable to install plugin #{p}")
+      exit -1
+    end
   end
   if result
     logger.warn('Re-run vagrant up now that plugins are installed')

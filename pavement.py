@@ -99,6 +99,7 @@ def make():
         git_branch_name = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
         git_last_commit = subprocess.check_output(["git", "log", "-1"])
     except Exception:
+        print "No git history found, falling back to defaults..."
         git_branch_name = 'dev'
         git_last_commit = 'dev'
     data = {"git_branch_name": git_branch_name,
