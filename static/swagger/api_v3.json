@@ -3756,6 +3756,13 @@
               "record": {
                 "$ref": "#/definitions/WLT_Record"
               },
+              "extra_stats": {
+                "type": "array",
+                "description": "Additional special data on the team's performance calculated by TBA.",
+                "items": {
+                  "type": "number"
+                }
+              },
               "sort_orders": {
                 "type": "array",
                 "description": "Additional year-specific information, may be null. See parent `sort_order_info` for details.",
@@ -3766,6 +3773,27 @@
               "team_key": {
                 "type": "string",
                 "description": "The team with this rank."
+              }
+            }
+          }
+        },
+        "extra_stats_info": {
+          "type": "array",
+          "description": "List of special TBA-generated values provided in the `extra_stats` array for each item.",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "precision"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Name of the field used in the `extra_stats` array."
+              },
+              "precision": {
+                "type": "number",
+                "description": "Integer expressing the number of digits of precision in the number provided in `sort_orders`."
               }
             }
           }
@@ -3808,7 +3836,7 @@
             "elim_points",
             "total"
           ],
-          "description": "Points gained for each team at the event. Stored as a key-value pair with the team key as the key, and an object describing the points as it's value.",
+          "description": "Points gained for each team at the event. Stored as a key-value pair with the team key as the key, and an object describing the points as its value.",
           "additionalProperties": {
             "type": "object",
             "properties": {
@@ -3832,7 +3860,7 @@
         },
         "tiebreakers": {
           "type": "object",
-          "description": "Tiebreaker values for each team at the event. Stored as a key-value pair with the team key as the key, and an object describing the tiebreaker elements as it's value.",
+          "description": "Tiebreaker values for each team at the event. Stored as a key-value pair with the team key as the key, and an object describing the tiebreaker elements as its value.",
           "additionalProperties": {
             "type": "object",
             "properties": {
