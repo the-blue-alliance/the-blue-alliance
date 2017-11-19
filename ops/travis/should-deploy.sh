@@ -32,6 +32,11 @@ check_commit_tag() {
 }
 
 check_clowntown_tag() {
+    # Don't allow for non-pull requests
+    if test "$TRAVIS_PULL_REQUEST" != "false" ; then
+        return
+    fi
+
     # The most recent commit message
     msg=$(git log -1 --pretty=%B)
     case "$msg" in
