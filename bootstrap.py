@@ -152,7 +152,7 @@ def store_award(data, event):
             team_keys.append(ndb.Key(Team, recipient['team_key']))
         recipient_list_fixed.append(json.dumps({
             'awardee': recipient['awardee'],
-            'team_number': int(recipient['team_key'][3:]) if recipient['team_key'] else None,
+            'team_number': recipient['team_key'][3:] if recipient['team_key'] else None,
         }))
     award.recipient_json_list = recipient_list_fixed
     return AwardManipulator.createOrUpdate(award)
