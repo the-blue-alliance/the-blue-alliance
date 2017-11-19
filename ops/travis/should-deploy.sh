@@ -23,6 +23,28 @@ check_killswitch() {
     fi
 }
 
+check_overwrite_old() {
+    echo "Pulling currently deployed commit..."
+    web_status=$(fetch_apiv3_status | jq '.web')
+    commit=$(echo $web_status | jq '.current_commit')
+    prod_time_str=$(echo $web_status | jq '.commit_time')
+    local_time_str=$(git show -s --format=%ci HEAD)
+
+    echo "Prod is currently running $commit, committed at $prod_time_str"
+    echo "Current commit was committed at $local_time_str"
+
+    # Convert time strings to UNIX time
+    prod_time=$(echo $prod_time_str | date +%s)
+    local_time=$(echo $local_time_str | date +%s)
+    msg=$(git log -1 --pretty=%B)
+    if [ "$local_time" -lt "$prod_time" ]; then
+        case "$msg" in
+            *\[clowntown\]*) echo "Commit is older, but [clowntown] found. Be careful..." ;;
+	    *) echo "Not overwriting prod with an older commit, exiting..."; exit 0 ;;
+	esac
+    fi
+}
+
 check_commit_tag() {
     # The most recent commit message
     msg=$(git log -1 --pretty=%B)
@@ -47,4 +69,5 @@ check_clowntown_tag() {
 should_deploy() {
     check_commit_tag
     check_killswitch
+    check_overwrite_old
 }
