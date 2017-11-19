@@ -31,8 +31,12 @@ class ApiStatusController(ApiBaseController):
         status_dict['is_datafeed_down'] = True if fmsapi_sitevar and fmsapi_sitevar.contents == True else False
         status_dict['down_events'] = down_events_list if down_events_list is not None else []
 
-        self._last_modified = max([status_sitevar.updated] +
-            [down_events_sitevar.updated] if down_events_sitevar else [] +
-            [fmsapi_sitevar.updated] if fmsapi_sitevar else [])
+        last_modified_times = [status_sitevar.updated]
+        if down_events_sitevar:
+            last_modified_times.append(down_events_sitevar.updated)
+        if fmsapi_sitevar:
+            last_modified_times.append(fmsapi_sitevar.updated)
+
+        self._last_modified = max(last_modified_times)
 
         return json.dumps(status_dict, ensure_ascii=True, indent=2, sort_keys=True)
