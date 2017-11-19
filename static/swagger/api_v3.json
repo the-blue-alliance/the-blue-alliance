@@ -2,10 +2,10 @@
   "swagger": "2.0",
   "info": {
     "description": "# Overview \n\n Information and statistics about FIRST Robotics Competition teams and events. If you are looking for the old version (v2) of the API, documentation can be found [here](/apidocs/v2). \n\n# Authentication \n\nAll endpoints require an Auth Key to be passed in the header `X-TBA-Auth-Key`. If you do not have an auth key yet, you can obtain one from your [Account Page](/account).",
-    "version": "3.0.2",
+    "version": "3.0.3",
     "title": "The Blue Alliance API v3",
     "x-version-info": "Versions of the API follow the format X.Y.Z, with X being a major version, Y denoting the minor version, and Z the point release. Changes to the spec or API that result in a major version change will significantly impact implementations. Changes to the minor version indicate paths and/or fields in existing models may be added, and any breaking changes will be confined to paths or models listed as in-development in the prior minor version. Changes to the point release indicate no format or structure changes to the paths or models, but updated or clarified documentation. Note that changes to paths and models refer to the actual result from the API, not the documentation.",
-    "x-changes": "3.0.1 - 3.0.2: `Team_Event_Status` and `Event_Ranking` model documentation changed to reflect actual API return. Changes involved W-L-T and ranking properties. --- 3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
+    "x-changes": "3.0.2 - 3.0.3: `extra_stats` and `extra_stats_info` added to `Event_Ranking` model. Corrected match video property claiming to use the `Media` model, which it doesn't. --- 3.0.1 - 3.0.2: `Team_Event_Status` and `Event_Ranking` model documentation changed to reflect actual API return. Changes involved W-L-T and ranking properties. --- 3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
   },
   "host": "www.thebluealliance.com",
   "basePath": "/api/v3",
@@ -3756,6 +3756,13 @@
               "record": {
                 "$ref": "#/definitions/WLT_Record"
               },
+              "extra_stats": {
+                "type": "array",
+                "description": "Additional special data on the team's performance calculated by TBA.",
+                "items": {
+                  "type": "number"
+                }
+              },
               "sort_orders": {
                 "type": "array",
                 "description": "Additional year-specific information, may be null. See parent `sort_order_info` for details.",
@@ -3766,6 +3773,27 @@
               "team_key": {
                 "type": "string",
                 "description": "The team with this rank."
+              }
+            }
+          }
+        },
+        "extra_stats_info": {
+          "type": "array",
+          "description": "List of special TBA-generated values provided in the `extra_stats` array for each item.",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "precision"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Name of the field used in the `extra_stats` array."
+              },
+              "precision": {
+                "type": "number",
+                "description": "Integer expressing the number of digits of precision in the number provided in `sort_orders`."
               }
             }
           }
@@ -3808,7 +3836,7 @@
             "elim_points",
             "total"
           ],
-          "description": "Points gained for each team at the event. Stored as a key-value pair with the team key as the key, and an object describing the points as it's value.",
+          "description": "Points gained for each team at the event. Stored as a key-value pair with the team key as the key, and an object describing the points as its value.",
           "additionalProperties": {
             "type": "object",
             "properties": {
@@ -3832,7 +3860,7 @@
         },
         "tiebreakers": {
           "type": "object",
-          "description": "Tiebreaker values for each team at the event. Stored as a key-value pair with the team key as the key, and an object describing the tiebreaker elements as it's value.",
+          "description": "Tiebreaker values for each team at the event. Stored as a key-value pair with the team key as the key, and an object describing the tiebreaker elements as its value.",
           "additionalProperties": {
             "type": "object",
             "properties": {
@@ -4509,9 +4537,20 @@
         "videos": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Media"
+            "key": {
+              "type": "string",
+              "description": "The key used to identify this media on the video source."
+            },
+            "type": {
+              "type": "string",
+              "description": "Name of video source.",
+              "enum": [
+                "youtube",
+                "tba"
+              ]
+            }
           },
-          "description": "Array of `Media` objects associated with this match."
+          "description": "Array of video objects associated with this match."
         }
       }
     },
