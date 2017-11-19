@@ -5,6 +5,7 @@ import json
 import time
 import optparse
 import os
+import re
 from paver.easy import *
 
 path = path("./")
@@ -164,10 +165,21 @@ def test_fast():
 ])
 def bootstrap(options):
     """Download and import an event or team from apiv3"""
+    log = '/var/log/tba.log'
     key = options.bootstrap.key
+    url = None
     if options.bootstrap.project:
         url = "https://{}.appspot.com".format(options.bootstrap.project)
-    else:
+    elif os.path.exists(log) and os.path.isfile(log):
+        prog = re.compile('Starting API server at: http://localhost:(\d{5})$')
+        with open(log, 'r') as f:
+            for line in f:
+                result = prog.search(line.strip())
+                if result:
+                    url = "localhost:{}".format(result.group(1))
+                    break
+
+    if not url:
         url = "localhost:{}".format(options.bootstrap.port)
     args = ["python", "bootstrap.py", "--url", url, key]
     print "Running {}".format(subprocess.list2cmdline(args))
