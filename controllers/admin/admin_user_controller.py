@@ -26,7 +26,7 @@ class AdminUserList(LoggedInHandler):
         num_users = Account.query().count()
         max_page = num_users / self.PAGE_SIZE
 
-        if page_num < max_page:
+        if page_num <= max_page:
             offset=self.PAGE_SIZE*page_num
         else:
             page_num = 0
