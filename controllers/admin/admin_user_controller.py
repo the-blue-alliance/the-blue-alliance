@@ -17,12 +17,27 @@ class AdminUserList(LoggedInHandler):
     """
     List all Users.
     """
-    def get(self):
+    PAGE_SIZE = 1000
+
+    def get(self, page_num=0):
         self._require_admin()
-        users = Account.query().order(Account.created).fetch()
+        page_num = int(page_num)
+
+        num_users = Account.query().count()
+        max_page = num_users / self.PAGE_SIZE
+
+        if page_num < max_page:
+            offset=self.PAGE_SIZE*page_num
+        else:
+            page_num = 0
+            offset = 0
+        users = Account.query().order(Account.created).fetch(self.PAGE_SIZE, offset=offset)
 
         self.template_values.update({
+            "num_users": num_users,
             "users": users,
+            "page_num": page_num,
+            "page_labels": [p+1 for p in xrange(max_page)],
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/user_list.html')

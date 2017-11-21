@@ -4,9 +4,15 @@
 
 {% block content %}
 
-<h1>All {{ users|length }} Users</h1>
+<h1>{{ num_users }} Users</h1>
+
+<ul class="pagination pagination-small">
+    {% for page_label in page_labels %}
+    <li{% if forloop.counter0 == page_num %} class="active"{% endif %}><a href="/admin/users{% if not forloop.first %}/{{forloop.counter0}}{% endif %}">{{page_label}}</a></li>
+    {% endfor %}
+</ul>
+
 <table class="table table-striped table-hover">
-    <caption>{{ users|length }} total users</caption>
     <thead>
         <th>Display Name</th>
         <th>Email</th>
