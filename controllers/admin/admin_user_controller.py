@@ -37,7 +37,7 @@ class AdminUserList(LoggedInHandler):
             "num_users": num_users,
             "users": users,
             "page_num": page_num,
-            "page_labels": [p+1 for p in xrange(max_page)],
+            "page_labels": [p+1 for p in xrange(max_page+1)],
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/user_list.html')
