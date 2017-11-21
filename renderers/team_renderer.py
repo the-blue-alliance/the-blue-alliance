@@ -1,5 +1,6 @@
 import datetime
 import os
+import tba_config
 
 from google.appengine.ext import ndb
 
@@ -183,6 +184,7 @@ class TeamRenderer(object):
             "district_abbrev": district_abbrev,
             "last_competed": last_competed,
             "current_year": current_year,
+            "max_year": tba_config.MAX_YEAR,
             "hof": hall_of_fame
         })
 
@@ -264,6 +266,7 @@ class TeamRenderer(object):
             "matches_upcoming": matches_upcoming,
             "last_competed": last_competed,
             "current_year": current_year,
+            "max_year": tba_config.MAX_YEAR,
             "hof": hall_of_fame,
         })
 
