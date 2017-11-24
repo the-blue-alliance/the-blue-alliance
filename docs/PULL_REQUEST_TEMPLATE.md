@@ -18,4 +18,4 @@
 <!--- What types of changes does your code introduce? Put an `x` in all the boxes that apply: -->
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would chance API specifications or require data migrations)
+- [ ] Breaking change (fix or feature that would change API specifications or require data migrations)
