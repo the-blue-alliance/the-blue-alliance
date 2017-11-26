@@ -161,7 +161,7 @@ def test_fast():
 @cmdopts([
     optparse.make_option("--key", help="Event, Team, or Match key to import", default="2016necmp"),
     optparse.make_option("--project", help="App Engine Project", default=""),
-    optparse.make_option("--port", type=int, help="Local port running the API server", default=41017),
+    optparse.make_option("--port", type=int, help="Local port running the API server"),
 ])
 def bootstrap(options):
     """Download and import an event or team from apiv3"""
@@ -180,6 +180,9 @@ def bootstrap(options):
                     break
 
     if not url:
+        if not options.bootstrap.port:
+            print "Unable to find GAE remote API port, either tee the log to {} or provide --port".format(log)
+            return
         url = "localhost:{}".format(options.bootstrap.port)
     args = ["python", "bootstrap.py", "--url", url, key]
     print "Running {}".format(subprocess.list2cmdline(args))
