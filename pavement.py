@@ -180,7 +180,7 @@ def bootstrap(options):
                     break
 
     if not url:
-        if not options.bootstrap.port:
+        if "port" not in options.bootstrap or not options.bootstrap.port:
             print "Unable to find GAE remote API port, either tee the log to {} or provide --port".format(log)
             return
         url = "localhost:{}".format(options.bootstrap.port)
