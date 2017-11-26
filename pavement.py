@@ -161,7 +161,7 @@ def test_fast():
 @cmdopts([
     optparse.make_option("--key", help="Event, Team, or Match key to import", default="2016necmp"),
     optparse.make_option("--project", help="App Engine Project", default=""),
-    optparse.make_option("--port", type=int, help="Local port running the API server"),
+    optparse.make_option("--port", type=int, help="Local port running the API server", default=None),
 ])
 def bootstrap(options):
     """Download and import an event or team from apiv3"""
