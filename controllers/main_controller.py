@@ -2,6 +2,7 @@ from collections import defaultdict
 import datetime
 import logging
 import os
+import pytz
 
 import webapp2
 from google.appengine.api import memcache
@@ -78,7 +79,8 @@ class MainKickoffHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         kickoff_datetime_est = datetime.datetime(2018, 1, 6, 10, 00)
-        kickoff_datetime_utc = kickoff_datetime_est + datetime.timedelta(hours=5)
+        kickoff_datetime_utc = pytz.utc.localize(
+            kickoff_datetime_est + datetime.timedelta(hours=5))
 
         is_kickoff = datetime.datetime.now() >= kickoff_datetime_est - datetime.timedelta(days=1)  # turn on 1 day before
         week_events = EventHelper.getWeekEvents()
