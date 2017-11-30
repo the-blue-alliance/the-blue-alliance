@@ -75,7 +75,18 @@
                "$ref": "#/definitions/EventInfo"
              }
            }
-         ]
+         ],
+     	 "responses": {
+           "200": {
+             "$ref": "#/responses/successResponse"
+           },
+           "400": {
+             "$ref": "#/responses/invalidHeadersResponse"
+           },
+           "401": {
+             "$ref": "#/responses/invalidSigResponse"
+           }
+        } 
       }
     },
      "/event/{eventKey}/alliance_selections/update": {
@@ -109,7 +120,7 @@
               "$ref": "#/responses/invalidSigResponse"
             }
           }
-       },
+       }
      },
      "/event/{eventKey}/awards/update": {
        "post": {
@@ -393,7 +404,7 @@
               "$ref": "#/responses/invalidSigResponse"
             }
           }
-       },
+       }
      },
      "/event/{eventKey}/media/add": {
        "post": {
@@ -413,7 +424,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "schema": "string",
+                  "type": "string",
                   "example": "aFZy8iibMD0"
                 }
               }
@@ -511,7 +522,7 @@
               "url": {
                 "type": "string",
                 "description": "A webcast url",
-                "example": "https://youtu.be/abc123",
+                "example": "https://youtu.be/abc123"
               }
             }
           }
@@ -523,10 +534,6 @@
       "required": [
         "teams",
         "score"
-      ],
-      "optional": [
-        "surrogates",
-        "dqs"
       ],
       "properties": {
         "teams": {
@@ -599,6 +606,10 @@
         "alliances": {
           "type": "object",
           "description": "Competing teams and score info for this match",
+	  "required": [
+	    "red",
+	    "blue"
+	  ],
           "properties": {
             "red": { "$ref": "#/definitions/MatchAlliance" },
             "blue": { "$ref": "#/definitions/MatchAlliance" }
@@ -607,20 +618,20 @@
         "score_breakdown": {
           "type": "string",
           "description": "Dict of {'red': {K1: V1, K2: V2, ...}, 'blue': {...}}. Where Kn are keys and Vn are values for those keys. Valid keys Kn vary by year. For 2014, valid keys are: 'auto', 'assist', 'truss+catch', 'teleop_goal+foul'.",
-          "example": {
-            "red": {
-              "auto": 20,
-              "assist": 40,
-              "truss+catch": 20,
-              "teleop_goal+foul": 20
+          "example": "{
+            \"red\": {
+              \"auto\": 20,
+              \"assist\": 40,
+              \"truss+catch\": 20,
+              \"teleop_goal+foul\": 20
             },
-            "blue": {
-              "auto": 40,
-              "assist": 60,
-              "truss+catch": 10,
-              "teleop_goal+foul": 40
+            \"blue\": {
+              \"auto\": 40,
+              \"assist\": 60,
+              \"truss+catch\": 10,
+              \"teleop_goal+foul\": 40
             }
-          }
+          }"
         },
         "time_str": {
           "type": "string",
