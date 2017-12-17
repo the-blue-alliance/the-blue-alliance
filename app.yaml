@@ -16,10 +16,10 @@ libraries:
   version: "1.5"
 - name: numpy
   version: "1.6.1"
+- name: endpoints
+  version: "1.0"
 - name: pycrypto  # for mobile API
   version: "2.6"
-- name: ssl  # for mobile API
-  version: "2.7.11"
 - name: jinja2
   version: "2.6"
 - name: pytz
@@ -70,7 +70,7 @@ handlers:
   script: apiv3_main.app
 - url: /api/.*
   script: api_main.app
-- url: /_ah/api/.* # Endpoints for internal mobile API
+- url: /_ah/spi/.* # Endpoints for internal mobile API
   script: mobile_main.app
 - url: .*
   script: main.app
