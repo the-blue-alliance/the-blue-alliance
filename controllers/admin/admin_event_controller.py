@@ -21,6 +21,7 @@ from helpers.event_manipulator import EventManipulator
 from helpers.event_details_manipulator import EventDetailsManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.team_manipulator import TeamManipulator
+from helpers.location_helper import LocationHelper
 from helpers.match_manipulator import MatchManipulator
 from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
 from helpers.website_helper import WebsiteHelper
@@ -206,6 +207,53 @@ class AdminEventRemoveWebcast(LoggedInHandler):
             file = None
         EventWebcastAdder.remove_webcast(event, index, type, channel, file)
         self.redirect("/admin/event/{}#webcasts".format(event.key_name))
+
+
+class AdminRefetchEventLocation(LoggedInHandler):
+    """
+    Force geocoding an event's location
+    """
+    def get(self, event_key_id):
+        self._require_admin()
+
+        event = Event.get_by_id(event_key_id)
+        if not event:
+            self.abort(404)
+
+        event.normalized_location = None
+        LocationHelper.update_event_location(event)
+        event = EventManipulator.createOrUpdate(event)
+
+        self.response.out.write("New location: {}".format(event.normalized_location))
+
+    def post(self, event_key_id):
+        self._require_admin()
+
+        event = Event.get_by_id(event_key_id)
+        if not event:
+            self.abort(404)
+
+        place_id = self.request.get('place_id')
+        if not place_id:
+            self.abort(400)
+
+        # Construct a mostly empty input struct that'll get filled in
+        location_input = {
+            'place_id': place_id,
+            'geometry': {
+                'location': {
+                    'lat': '',
+                    'lng': '',
+                },
+            },
+            'name': '',
+            'types': [],
+        }
+
+        location_info = LocationHelper.construct_location_info_async(location_input).get_result()
+        event.normalized_location = LocationHelper.build_normalized_location(location_info)
+        EventManipulator.createOrUpdate(event)
+        self.redirect('/admin/event/{}'.format(event_key_id))
 
 
 class AdminEventCreate(LoggedInHandler):

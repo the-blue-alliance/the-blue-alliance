@@ -76,25 +76,7 @@ class LocationHelper(object):
                 logging.warning("Event {} location failed!".format(event.key.id()))
 
         # Update event
-        if 'lat' in location_info and 'lng' in location_info:
-            lat_lng = ndb.GeoPt(location_info['lat'], location_info['lng'])
-        else:
-            lat_lng = None
-        event.normalized_location = Location(
-            name=location_info.get('name'),
-            formatted_address=location_info.get('formatted_address'),
-            lat_lng=lat_lng,
-            street_number=location_info.get('street_number'),
-            street=location_info.get('street'),
-            city=location_info.get('city'),
-            state_prov=location_info.get('state_prov'),
-            state_prov_short=location_info.get('state_prov_short'),
-            country=location_info.get('country'),
-            country_short=location_info.get('country_short'),
-            postal_code=location_info.get('postal_code'),
-            place_id=location_info.get('place_id'),
-            place_details=location_info.get('place_details'),
-        )
+        event.normalized_location = cls.build_normalized_location(location_info)
 
     @classmethod
     def get_event_location_info(cls, event):
@@ -227,11 +209,15 @@ class LocationHelper(object):
                 logging.warning("Team {} location failed!".format(team.key.id()))
 
         # Update team
+        team.normalized_location = cls.build_normalized_location(location_info)
+
+    @classmethod
+    def build_normalized_location(cls, location_info):
+        lat_lng = None
         if 'lat' in location_info and 'lng' in location_info:
             lat_lng = ndb.GeoPt(location_info['lat'], location_info['lng'])
-        else:
-            lat_lng = None
-        team.normalized_location = Location(
+
+        return Location(
             name=location_info.get('name'),
             formatted_address=location_info.get('formatted_address'),
             lat_lng=lat_lng,
@@ -364,6 +350,16 @@ class LocationHelper(object):
                 location_info['city'] = location_info['state_prov']
 
             location_info['formatted_address'] = place_details_result['formatted_address']
+
+            if 'geometry' in place_details_result and 'location' in place_details_result['geometry']:
+                location_info['lat'] = place_details_result['geometry']['location']['lat']
+                location_info['lng'] = place_details_result['geometry']['location']['lng']
+
+            if 'name' in place_details_result:
+                location_info['name'] = place_details_result['name']
+
+            if 'types' in place_details_result:
+                location_info['types'] = place_details_result['types']
 
             # Save everything just in case
             location_info['place_details'] = place_details_result
