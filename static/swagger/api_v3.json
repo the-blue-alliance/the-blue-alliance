@@ -3518,7 +3518,7 @@
           "description": "The event's website, if any."
         },
         "first_event_id": {
-          "type": "integer",
+          "type": "string",
           "description": "The FIRST internal Event ID, used to link to the event on the FRC webpage."
         },
         "first_event_code": {
