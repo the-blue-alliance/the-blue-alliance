@@ -83,10 +83,12 @@ class ApiBaseController(CacheableHandler):
         if self._errors:
             self.abort(404)
 
-        self._track_call(*args, **kw)
         super(ApiBaseController, self).get(*args, **kw)
         self.response.headers['X-TBA-Version'] = '{}'.format(self.API_VERSION)
         self.response.headers['Vary'] = 'Accept-Encoding'
+
+        if not self._errors:
+            self._track_call(*args, **kw)
 
     def post(self, *args, **kw):
         self._validate_tba_auth_key()
@@ -95,10 +97,12 @@ class ApiBaseController(CacheableHandler):
             self.abort(404)
 
         rendered = self._render(*args, **kw)
-        self._track_call(*args, **kw)
         self.response.out.write(rendered)
         self.response.headers['X-TBA-Version'] = '{}'.format(self.API_VERSION)
         self.response.headers['Vary'] = 'Accept-Encoding'
+
+        if not self._errors:
+            self._track_call(*args, **kw)
 
     def options(self, *args, **kw):
         """
