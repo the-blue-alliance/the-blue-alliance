@@ -84,10 +84,12 @@ class ApiBaseController(CacheableHandler):
         if self._errors:
             self.abort(400)
 
-        self._track_call(*args, **kw)
         super(ApiBaseController, self).get(*args, **kw)
         self.response.headers['X-TBA-Version'] = '{}'.format(self.API_VERSION)
         self.response.headers['Vary'] = 'Accept-Encoding'
+
+        if not self._errors:
+            self._track_call(*args, **kw)
 
     def options(self, *args, **kw):
         """
