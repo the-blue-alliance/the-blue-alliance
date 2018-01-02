@@ -56,6 +56,17 @@ def track_call(api_action, api_label, x_tba_app_id):
         )
 
 
+class Apiv2DecommissionedController(webapp2.RequestHandler):
+    def __init__(self, request, response):
+        self.initialize(request, response)
+        self.response.headers.add_header("content-type", "application/json")
+
+    def get(self, _):
+        self.response.out.write(json.dumps({"Error": "As of Jan. 1 2018, v2 of the TBA API has been decommissioned. Please see http://www.thebluealliance.com/apidocs for more info."}))
+        self.response.headers['Cache-Control'] = "public, max-age=%d" % (60*60*24*7)  # 1 week
+        self.response.headers['Pragma'] = 'Public'
+
+
 class ApiBaseController(CacheableHandler):
 
     API_VERSION = 2
