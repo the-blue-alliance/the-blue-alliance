@@ -4008,7 +4008,7 @@
         },
         "breaches": {
           "type": "array",
-          "description": "An array with three values, number of times breached, number of opportunities to breech, and percentage.",
+          "description": "An array with three values, number of times breached, number of opportunities to breach, and percentage.",
           "items": {
             "type": "number",
             "format": "float"
@@ -4715,7 +4715,7 @@
         "teleopPoints": {
           "type": "integer"
         },
-        "breechPoints": {
+        "breachPoints": {
           "type": "integer"
         },
         "foulPoints": {
@@ -4859,9 +4859,6 @@
           "type": "integer"
         },
         "teleopPoints": {
-          "type": "integer"
-        },
-        "breechPoints": {
           "type": "integer"
         },
         "foulPoints": {
