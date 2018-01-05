@@ -3476,7 +3476,7 @@
         },
         "week": {
           "type": "integer",
-          "description": "Week of the competition season this event is in."
+          "description": "Week of the competition season this event is in (0-6)."
         },
         "address": {
           "type": "string",
