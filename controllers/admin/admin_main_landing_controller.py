@@ -6,6 +6,7 @@ from consts.landing_type import LandingType
 from controllers.base_controller import LoggedInHandler
 from models.sitevar import Sitevar
 
+
 class AdminMainLandingEdit(LoggedInHandler):
 
     def get(self):
