@@ -15,11 +15,15 @@
       <div class="btn-group game-manual">
         <a class="btn btn-default" href="http://www.firstinspires.org/resource-library/frc/competition-manual-qa-system" target="_blank"><span class="glyphicon glyphicon-file"></span> FIRST POWER UP Game Manual and Materials</a>
       </div>
-      <p>Encrypted Manual Password: pLaY&amp;4%R3aL!</p>
+      {% if build_handler_show_password != 'False' %}
+      <p>Encrypted Manual Password: {{ manual_password }}</p>
+      {% endif %}
 
+      {% if build_handler_show_ri3d != 'False' %}
       <p>
         <a class="btn btn-lg btn-success btn-block" href="/watch/fun"><span class="glyphicon glyphicon-play"></span> Watch Ri3D Live</a>
       </p>
+      {% endif %}
 
       <div>
         <a class="btn btn-lg btn-block btn-primary" href="/advanced_team_search"><span class="glyphicon glyphicon-search"></span> Search for previous successful robots</a>
@@ -37,7 +41,7 @@
       {% endif %}
       <br>
       <div class="fitvids">
-        <iframe width="420" height="315" src="https://www.youtube.com/embed/HZbdwYiCY74" frameborder="0" allowfullscreen></iframe>
+        <iframe width="420" height="315" src="https://www.youtube.com/embed/{{game_animation_youtube_id}}" frameborder="0" allowfullscreen></iframe>
       </div>
     </div>
   </div>

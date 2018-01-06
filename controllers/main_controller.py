@@ -107,7 +107,8 @@ class MainBuildseasonHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        endbuild_datetime_est = datetime.datetime(2018, 2, 20, 23, 59)
+        endbuild_time_str = self.template_values.get('build_season_end', '2018-2-20T23:59:00')
+        endbuild_datetime_est = datetime.datetime.strptime(endbuild_time_str, '%Y-%m-%dT%H:%M:%S')
         endbuild_datetime_utc = pytz.utc.localize(
             endbuild_datetime_est + datetime.timedelta(hours=5))
         week_events = EventHelper.getWeekEvents()
@@ -240,6 +241,7 @@ class MainLandingHandler(CacheableHandler):
         config_sitevar = Sitevar.get_by_id('landing_config')
         handler = None
         if config_sitevar:
+            self.template_values.update(config_sitevar.contents)
             handler_type = config_sitevar.contents.get('current_landing')
             handler = self.HANDLER_MAP.get(handler_type, None)
         if not handler:
