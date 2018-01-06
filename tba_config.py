@@ -1,4 +1,5 @@
 import os
+from consts.landing_type import LandingType
 
 
 DEBUG = os.environ.get('SERVER_SOFTWARE') is not None and os.getenv('APPLICATION_ID') != 's~tbatv-prod-hrd'
@@ -11,14 +12,6 @@ RECORD_FRACTION = 0.1
 
 # Fraction of requests to send to Google Analytics
 GA_RECORD_FRACTION = 1.0
-
-# For choosing what the main landing page displays
-KICKOFF = 1
-BUILDSEASON = 2
-COMPETITIONSEASON = 3
-OFFSEASON = 4
-INSIGHTS = 5
-CHAMPS = 6
 
 # The CONFIG variables should have exactly the same structure between environments
 # Eventually a test environment should be added. -gregmarra 17 Jul 2012
@@ -47,5 +40,4 @@ else:
         "update-webcast-online-status": True,
     }
 
-CONFIG['landing_handler'] = BUILDSEASON
 CONFIG["static_resource_version"] = 8

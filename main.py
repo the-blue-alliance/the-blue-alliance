@@ -4,6 +4,7 @@ from webapp2_extras.routes import RedirectRoute
 
 import tba_config
 
+from consts.landing_type import LandingType
 from controllers.account_controller import AccountEdit, AccountLoginRequired, AccountLogin, AccountLogout, \
 AccountOverview, AccountRegister, MyTBAController, myTBAAddHotMatchesController, MyTBAEventController, \
 MyTBAMatchController, MyTBATeamController, AccountAPIReadKeyAdd, AccountAPIReadKeyDelete
@@ -21,8 +22,7 @@ from controllers.event_wizard_controller import EventWizardHandler, ReactEventWi
 from controllers.gameday_controller import Gameday2Controller, GamedayHandler, GamedayRedirectHandler
 from controllers.insights_controller import InsightsOverview, InsightsDetail
 from controllers.main_controller import TwoChampsHandler, ContactHandler, HashtagsHandler, FIRSTHOFHandler, \
-    MainKickoffHandler, MainBuildseasonHandler, MainChampsHandler, MainCompetitionseasonHandler, \
-    MainInsightsHandler, MainOffseasonHandler, OprHandler, PredictionsHandler, PrivacyHandler, SearchHandler, \
+    MainLandingHandler, OprHandler, PredictionsHandler, PrivacyHandler, SearchHandler, \
     AboutHandler, ThanksHandler, handle_404, handle_500, \
     WebcastsHandler, RecordHandler, ApiWriteHandler, MatchInputHandler
 from controllers.match_controller import MatchDetail
@@ -62,14 +62,6 @@ from controllers.webhook_controller import WebhookAdd, WebhookDelete, WebhookVer
 from google.appengine.ext.webapp import template
 template.register_template_library('common.my_filters')
 
-landing_handler = {tba_config.KICKOFF: MainKickoffHandler,
-                   tba_config.BUILDSEASON: MainBuildseasonHandler,
-                   tba_config.CHAMPS: MainChampsHandler,
-                   tba_config.COMPETITIONSEASON: MainCompetitionseasonHandler,
-                   tba_config.OFFSEASON: MainOffseasonHandler,
-                   tba_config.INSIGHTS: MainInsightsHandler,
-                   }
-
 
 class Webapp2HandlerAdapter(webapp2.BaseHandlerAdapter):
     def __call__(self, request, response, exception):
@@ -79,7 +71,7 @@ class Webapp2HandlerAdapter(webapp2.BaseHandlerAdapter):
         return handler.get()
 
 app = webapp2.WSGIApplication([
-      RedirectRoute(r'/', landing_handler[tba_config.CONFIG['landing_handler']], 'landing', strict_slash=True),
+      RedirectRoute(r'/', MainLandingHandler, 'landing', strict_slash=True),
       RedirectRoute(r'/2champs', TwoChampsHandler, '2champs', strict_slash=True),
       RedirectRoute(r'/about', AboutHandler, 'about', strict_slash=True),
       RedirectRoute(r'/account', AccountOverview, 'account-overview', strict_slash=True),

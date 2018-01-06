@@ -30,6 +30,7 @@ from controllers.admin.admin_team_controller import AdminTeamCreateTest, AdminTe
     AdminTeamRobotNameUpdate
 from controllers.admin.admin_user_controller import AdminUserDetail, AdminUserEdit, AdminUserTestSetup, AdminUserList, AdminUserPermissionsList, \
     AdminUserLookup
+from controllers.admin.admin_main_landing_controller import AdminMainLandingEdit
 from google.appengine.ext.webapp import template
 template.register_template_library('common.my_filters')
 
@@ -67,6 +68,7 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/award/add/(.*)', AdminAwardAddWithEvent),
                                ('/admin/award/edit/(.*)', AdminAwardEdit),
                                ('/admin/award/delete', AdminAwardDelete),
+                               ('/admin/main_landing', AdminMainLandingEdit),
                                ('/admin/matches', AdminMatchDashboard),
                                ('/admin/match/add', AdminMatchAdd),
                                ('/admin/match/cleanup', AdminMatchCleanup),
