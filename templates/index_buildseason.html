@@ -13,7 +13,7 @@
       <h2><span class="countdown-number countdown-days">--</span><span class="countdown-label day-label"> Days</span> Left to Build! <small>Build Season ends {{endbuild_datetime_est|date:"F jS"}}</small></h2>
       <div id="countdown-finish-time">{{endbuild_datetime_utc|date:"c"}}</div>
       <div class="btn-group game-manual">
-        <a class="btn btn-default" href="http://www.firstinspires.org/resource-library/frc/competition-manual-qa-system" target="_blank"><span class="glyphicon glyphicon-file"></span> FIRST POWER UP Game Manual and Materials</a>
+        <a class="btn btn-default" href="http://www.firstinspires.org/resource-library/frc/competition-manual-qa-system" target="_blank"><span class="glyphicon glyphicon-file"></span> {{game_name}} Game Manual and Materials</a>
       </div>
       {% if build_handler_show_password != 'False' %}
       <p>Encrypted Manual Password: {{ manual_password }}</p>
