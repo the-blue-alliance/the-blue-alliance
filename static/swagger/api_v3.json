@@ -3476,7 +3476,7 @@
         },
         "week": {
           "type": "integer",
-          "description": "Week of the competition season this event is in (0-6)."
+          "description": "Week of the event relative to the first official season event. Only valid for Regionals, Districts, and District Championships. Null otherwise."
         },
         "address": {
           "type": "string",
