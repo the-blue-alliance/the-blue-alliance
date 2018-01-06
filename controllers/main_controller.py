@@ -13,6 +13,7 @@ import tba_config
 from base_controller import CacheableHandler
 from consts.award_type import AwardType
 from consts.event_type import EventType
+from consts.landing_type import LandingType
 from consts.media_tag import MediaTag
 from database import media_query
 from helpers.event_helper import EventHelper
@@ -21,6 +22,7 @@ from models.award import Award
 from models.event import Event
 from models.insight import Insight
 from models.team import Team
+from models.sitevar import Sitevar
 from template_engine import jinja2_engine
 
 
@@ -218,6 +220,39 @@ class MainOffseasonHandler(CacheableHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../templates/index_offseason.html')
         return template.render(path, self.template_values)
+
+
+class MainLandingHandler(CacheableHandler):
+
+    CACHE_VERSION = None
+    CACHE_KEY_FORMAT = None
+
+    HANDLER_MAP = {LandingType.KICKOFF: MainKickoffHandler,
+                   LandingType.BUILDSEASON: MainBuildseasonHandler,
+                   LandingType.CHAMPS: MainChampsHandler,
+                   LandingType.COMPETITIONSEASON: MainCompetitionseasonHandler,
+                   LandingType.OFFSEASON: MainOffseasonHandler,
+                   LandingType.INSIGHTS: MainInsightsHandler,
+                  }
+
+    def __init__(self, *args, **kw):
+        super(MainLandingHandler, self).__init__(*args, **kw)
+        config_sitevar = Sitevar.get_by_id('landing_config')
+        handler = None
+        if config_sitevar:
+            handler_type = config_sitevar.contents.get('handler_type')
+            handler = self.HANDLER_MAP.get(handler_type, None)
+        if not handler:
+            # Default to build season handler
+            handler = MainBuildseasonHandler
+
+        self.handler_instance = handler()
+        self._cache_expiration = self.handler_instance._cache_expiration
+        self._partial_cache_key = self.handler_instance._partial_cache_key
+
+    def _render(self, *args, **kw):
+        self.handler_instance.template_values = self.template_values
+        return self.handler_instance._render(*args, **kw)
 
 
 class ContactHandler(CacheableHandler):
@@ -433,4 +468,3 @@ class MatchInputHandler(CacheableHandler):
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/matchinput.html")
         return template.render(path, self.template_values)
-
