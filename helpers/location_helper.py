@@ -194,7 +194,7 @@ class LocationHelper(object):
             # logging.warning("Falling back to location only for team {}".format(team.key.id()))
             geocode_result = cls.google_maps_geocode_async(team.location).get_result()
             if geocode_result:
-                location_info = cls.construct_location_info_async(geocode_result[0]).get_result()
+                location_info = cls.construct_location_info_async(geocode_result[0], auto_fill=False).get_result()
 
         # Fallback to city, country
         if not location_info:
@@ -204,7 +204,7 @@ class LocationHelper(object):
                 team.country if team.country else '')
             geocode_result = cls.google_maps_geocode_async(city_country).get_result()
             if geocode_result:
-                location_info = cls.construct_location_info_async(geocode_result[0]).get_result()
+                location_info = cls.construct_location_info_async(geocode_result[0], auto_fill=False).get_result()
             else:
                 logging.warning("Team {} location failed!".format(team.key.id()))
 
@@ -314,7 +314,7 @@ class LocationHelper(object):
 
     @classmethod
     @ndb.tasklet
-    def construct_location_info_async(cls, gmaps_result):
+    def construct_location_info_async(cls, gmaps_result, auto_fill=True):
         """
         Gets location info given a gmaps result
         """
@@ -351,15 +351,16 @@ class LocationHelper(object):
 
             location_info['formatted_address'] = place_details_result['formatted_address']
 
-            if 'geometry' in place_details_result and 'location' in place_details_result['geometry']:
-                location_info['lat'] = place_details_result['geometry']['location']['lat']
-                location_info['lng'] = place_details_result['geometry']['location']['lng']
+            if auto_fill:
+                if 'geometry' in place_details_result and 'location' in place_details_result['geometry']:
+                    location_info['lat'] = place_details_result['geometry']['location']['lat']
+                    location_info['lng'] = place_details_result['geometry']['location']['lng']
 
-            if 'name' in place_details_result:
-                location_info['name'] = place_details_result['name']
+                if 'name' in place_details_result:
+                    location_info['name'] = place_details_result['name']
 
-            if 'types' in place_details_result:
-                location_info['types'] = place_details_result['types']
+                if 'types' in place_details_result:
+                    location_info['types'] = place_details_result['types']
 
             # Save everything just in case
             location_info['place_details'] = place_details_result
