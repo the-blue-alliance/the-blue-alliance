@@ -40,5 +40,4 @@ else:
         "update-webcast-online-status": True,
     }
 
-CONFIG['landing_handler'] = LandingType.KICKOFF
 CONFIG["static_resource_version"] = 8
