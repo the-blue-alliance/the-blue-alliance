@@ -4,6 +4,7 @@ from webapp2_extras.routes import RedirectRoute
 
 import tba_config
 
+from consts.landing_type import LandingType
 from controllers.account_controller import AccountEdit, AccountLoginRequired, AccountLogin, AccountLogout, \
 AccountOverview, AccountRegister, MyTBAController, myTBAAddHotMatchesController, MyTBAEventController, \
 MyTBAMatchController, MyTBATeamController, AccountAPIReadKeyAdd, AccountAPIReadKeyDelete
@@ -62,12 +63,12 @@ from controllers.webhook_controller import WebhookAdd, WebhookDelete, WebhookVer
 from google.appengine.ext.webapp import template
 template.register_template_library('common.my_filters')
 
-landing_handler = {tba_config.KICKOFF: MainKickoffHandler,
-                   tba_config.BUILDSEASON: MainBuildseasonHandler,
-                   tba_config.CHAMPS: MainChampsHandler,
-                   tba_config.COMPETITIONSEASON: MainCompetitionseasonHandler,
-                   tba_config.OFFSEASON: MainOffseasonHandler,
-                   tba_config.INSIGHTS: MainInsightsHandler,
+landing_handler = {LandingType.KICKOFF: MainKickoffHandler,
+                   LandingType.BUILDSEASON: MainBuildseasonHandler,
+                   LandingType.CHAMPS: MainChampsHandler,
+                   LandingType.COMPETITIONSEASON: MainCompetitionseasonHandler,
+                   LandingType.OFFSEASON: MainOffseasonHandler,
+                   LandingType.INSIGHTS: MainInsightsHandler,
                    }
 
 
