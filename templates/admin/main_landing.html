@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}TBA - Main Landing Page{% endblock %}
+
+{% block content %}
+
+<h1>TBA Main Landing Page</h1>
+
+<h2>Page Type</h2>
+<p>Choose which landing page to use</p>
+<form id="landing_form"  action="/admin/main_landing" method="post">
+<select name="landing_type">
+  <option value=""></option>
+{% for enum, name in landing_types.items %}
+  <option value="{{enum}}" {% if current_landing == enum %}selected{% endif %}>{{name}}</option>
+{% endfor %}
+</select>
+
+<h2>Page Properties</h2>
+<table class="table table-slanding_typetriped">
+<tr><th>Key</th><th>Value</th></tr>
+{% for key,value in current_config.items %}
+  {% if key != 'current_landing' %}
+  <tr>
+    <td>{{key}}</td>
+    <td><input name="prop_{{key}}" value="{{value}}" placeholder="Value"/></td>
+  </tr>
+  {% endif %}
+{% endfor %}
+<tr>
+  <td><input name="new_key" placeholder="Add a Property" /></td>
+  <td><input name="new_value" placeholder="Value" /></td>
+</tr>
+</table>
+
+<button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
+</form>
+{% endblock %}

@@ -240,7 +240,7 @@ class MainLandingHandler(CacheableHandler):
         config_sitevar = Sitevar.get_by_id('landing_config')
         handler = None
         if config_sitevar:
-            handler_type = config_sitevar.contents.get('handler_type')
+            handler_type = config_sitevar.contents.get('current_landing')
             handler = self.HANDLER_MAP.get(handler_type, None)
         if not handler:
             # Default to build season handler
