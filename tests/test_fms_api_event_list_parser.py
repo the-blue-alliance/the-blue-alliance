@@ -177,3 +177,158 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEqual(einstein_hou.short_name, "Championship (Houston)")
             self.assertEquals(einstein_hou.start_date, datetime.datetime(year=2017, month=4, day=22, hour=0, minute=0, second=0))
             self.assertEquals(einstein_hou.end_date, datetime.datetime(year=2017, month=4, day=22, hour=23, minute=59, second=59))
+
+    def test_parse_2018_event(self):
+        with open('test_data/fms_api/2018_event_list.json', 'r') as f:
+            events, districts = FMSAPIEventListParser(2018).parse(json.loads(f.read()))
+            self.assertEqual(len(events), 178)
+            self.assertEqual(len(districts), 10)
+            event = events[18]
+
+            self.assertEquals(event.key_name, "2018casj")
+            self.assertEquals(event.name, "Silicon Valley Regional")
+            self.assertEquals(event.short_name, "Silicon Valley")
+            self.assertEquals(event.event_short, "casj")
+            self.assertEquals(event.official, True)
+            self.assertEquals(event.start_date, datetime.datetime(year=2018, month=3, day=28, hour=0, minute=0, second=0))
+            self.assertEquals(event.end_date, datetime.datetime(year=2018, month=3, day=31, hour=23, minute=59, second=59))
+            self.assertEquals(event.venue, "San Jose State University - The Event Center")
+            self.assertEquals(event.city, "San Jose")
+            self.assertEquals(event.state_prov, "CA")
+            self.assertEquals(event.country, "USA")
+            self.assertEquals(event.year, 2018)
+            self.assertEquals(event.event_type_enum, EventType.REGIONAL)
+            self.assertEquals(event.district_key, None)
+            self.assertEquals(event.website, "http://www.firstsv.org")
+
+            # New in 2018
+            self.assertEqual(event.webcast, None)  # TODO: make work
+
+    def test_parse_division_parent(self):
+        with open('test_data/fms_api/2017_event_list.json', 'r') as f:
+            events, districts = FMSAPIEventListParser(2017).parse(json.loads(f.read()))
+            self.assertEqual(len(events), 164)
+            self.assertEqual(len(districts), 10)
+
+            # Test division <-> parent associations
+            for event in events:
+                event_key = event.key.id()
+                if event_key == '2017micmp':
+                    self.assertEqual(event.parent_event, None)
+                    self.assertEqual(
+                        event.divisions,
+                        [
+                            ndb.Key('Event', '2017micmp1'),
+                            ndb.Key('Event', '2017micmp2'),
+                            ndb.Key('Event', '2017micmp3'),
+                            ndb.Key('Event', '2017micmp4'),
+                        ]
+                    )
+                elif event_key in {'2017micmp1', '2017micmp2', '2017micmp3', '2017micmp4'}:
+                    self.assertEqual(event.parent_event, ndb.Key('Event', '2017micmp'))
+                    self.assertEqual(event.divisions, [])
+                elif event_key == '2017cmptx':
+                    self.assertEqual(event.parent_event, None)
+                    self.assertEqual(
+                        event.divisions,
+                        [
+                            ndb.Key('Event', '2017carv'),
+                            ndb.Key('Event', '2017gal'),
+                            ndb.Key('Event', '2017hop'),
+                            ndb.Key('Event', '2017new'),
+                            ndb.Key('Event', '2017roe'),
+                            ndb.Key('Event', '2017tur'),
+                        ]
+                    )
+                elif event_key in {'2017carv', '2017gal', '2017hop', '2017new', '2017roe', '2017tur'}:
+                    self.assertEqual(event.parent_event, ndb.Key('Event', '2017cmptx'))
+                    self.assertEqual(event.divisions, [])
+                elif event_key == '2017cmpmo':
+                    self.assertEqual(event.parent_event, None)
+                    self.assertEqual(
+                        event.divisions,
+                        [
+                            ndb.Key('Event', '2017arc'),
+                            ndb.Key('Event', '2017cars'),
+                            ndb.Key('Event', '2017cur'),
+                            ndb.Key('Event', '2017dal'),
+                            ndb.Key('Event', '2017dar'),
+                            ndb.Key('Event', '2017tes'),
+                        ]
+                    )
+                elif event_key in {'2017arc', '2017cars', '2017cur', '2017dal', '2017dar', '2017tes'}:
+                    self.assertEqual(event.parent_event, ndb.Key('Event', '2017cmpmo'))
+                    self.assertEqual(event.divisions, [])
+                else:
+                    self.assertEqual(event.parent_event, None)
+                    self.assertEqual(event.divisions, [])
+
+        with open('test_data/fms_api/2018_event_list.json', 'r') as f:
+            events, districts = FMSAPIEventListParser(2018).parse(json.loads(f.read()))
+            self.assertEqual(len(events), 178)
+            self.assertEqual(len(districts), 10)
+
+            # Test division <-> parent associations
+            for event in events:
+                event_key = event.key.id()
+                if event_key == '2018oncmp':
+                    self.assertEqual(event.parent_event, None)
+                    self.assertEqual(
+                        event.divisions,
+                        [
+                            ndb.Key('Event', '2018oncmp1'),
+                            ndb.Key('Event', '2018oncmp2'),
+                        ]
+                    )
+                elif event_key in {'2018oncmp1', '2018oncmp2'}:
+                    self.assertEqual(event.parent_event, ndb.Key('Event', '2018oncmp'))
+                    self.assertEqual(event.divisions, [])
+                elif event_key == '2018micmp':
+                    self.assertEqual(event.parent_event, None)
+                    self.assertEqual(
+                        event.divisions,
+                        [
+                            ndb.Key('Event', '2018micmp1'),
+                            ndb.Key('Event', '2018micmp2'),
+                            ndb.Key('Event', '2018micmp3'),
+                            ndb.Key('Event', '2018micmp4'),
+                        ]
+                    )
+                elif event_key in {'2018micmp1', '2018micmp2', '2018micmp3', '2018micmp4'}:
+                    self.assertEqual(event.parent_event, ndb.Key('Event', '2018micmp'))
+                    self.assertEqual(event.divisions, [])
+                elif event_key == '2018cmptx':
+                    self.assertEqual(event.parent_event, None)
+                    self.assertEqual(
+                        event.divisions,
+                        [
+                            ndb.Key('Event', '2018carv'),
+                            ndb.Key('Event', '2018gal'),
+                            ndb.Key('Event', '2018hop'),
+                            ndb.Key('Event', '2018new'),
+                            ndb.Key('Event', '2018roe'),
+                            ndb.Key('Event', '2018tur'),
+                        ]
+                    )
+                elif event_key in {'2018carv', '2018gal', '2018hop', '2018new', '2018roe', '2018tur'}:
+                    self.assertEqual(event.parent_event, ndb.Key('Event', '2018cmptx'))
+                    self.assertEqual(event.divisions, [])
+                elif event_key == '2018cmpmi':
+                    self.assertEqual(event.parent_event, None)
+                    self.assertEqual(
+                        event.divisions,
+                        [
+                            ndb.Key('Event', '2018arc'),
+                            ndb.Key('Event', '2018cars'),
+                            ndb.Key('Event', '2018cur'),
+                            ndb.Key('Event', '2018dal'),
+                            ndb.Key('Event', '2018dar'),
+                            ndb.Key('Event', '2018tes'),
+                        ]
+                    )
+                elif event_key in {'2018arc', '2018cars', '2018cur', '2018dal', '2018dar', '2018tes'}:
+                    self.assertEqual(event.parent_event, ndb.Key('Event', '2018cmpmi'))
+                    self.assertEqual(event.divisions, [])
+                else:
+                    self.assertEqual(event.parent_event, None)
+                    self.assertEqual(event.divisions, [])

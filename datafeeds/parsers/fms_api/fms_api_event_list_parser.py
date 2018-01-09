@@ -149,4 +149,36 @@ class FMSAPIEventListParser(object):
                     year=self.season,
                     abbreviation=event['districtCode'].lower(),
                 )
+
+        # Prep for division <-> parent associations
+        district_champs_by_district = {}
+        champ_events = []
+        for event in events:
+            if event.event_type_enum == EventType.DISTRICT_CMP:
+                district_champs_by_district[event.district_key] = event
+            elif event.event_type_enum == EventType.CMP_FINALS:
+                champ_events.append(event)
+
+        # Build district cmp division <-> parent associations based on district
+        # Build cmp division <-> parent associations based on date
+        for event in events:
+            parent_event = None
+            if event.event_type_enum == EventType.DISTRICT_CMP_DIVISION:
+                parent_event = district_champs_by_district.get(event.district_key)
+            elif event.event_type_enum == EventType.CMP_DIVISION:
+                for parent_event in champ_events:
+                    if abs(parent_event.end_date - event.end_date) < datetime.timedelta(days=1):
+                        break
+                else:
+                    parent_event = None
+            else:
+                continue
+
+            if parent_event is None:
+                logging.error("Parent event not found for: {}".format(event.key.id()))
+                continue
+
+            parent_event.divisions = sorted(parent_event.divisions + [event.key])
+            event.parent_event = parent_event.key
+
         return events, list(districts.values())
