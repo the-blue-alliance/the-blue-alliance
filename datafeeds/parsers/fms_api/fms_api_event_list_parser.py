@@ -175,7 +175,6 @@ class FMSAPIEventListParser(object):
                 continue
 
             if parent_event is None:
-                logging.error("Parent event not found for: {}".format(event.key.id()))
                 continue
 
             parent_event.divisions = sorted(parent_event.divisions + [event.key])
