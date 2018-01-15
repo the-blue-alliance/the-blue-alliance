@@ -5003,10 +5003,9 @@
             "instagram-profile",
             "periscope-profile",
             "grabcad",
-            "pinterest-profile",
-            "snapchat-profile",
-            "twitch-channel"
-          ]
+            "instagram-image",
+            "external-link"
+          ] 
         },
         "foreign_key": {
           "type": "string",
