@@ -15,7 +15,7 @@ fi
 
 pip install -r travis_requirements.txt
 paver install_libs
-ENV GAE_VERSION 1.9.66
+GAE_VERSION="1.9.66"
 wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_$GAE_VERSION.zip -nv
 unzip -q google_appengine_$GAE_VERSION.zip -d $HOME
 rm google_appengine_$GAE_VERSION.zip
