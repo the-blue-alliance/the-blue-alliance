@@ -79,11 +79,9 @@ Vagrant.configure("2") do |config|
     privileged: false
 
   # Load in the datastore file, needs to run before devserver start
-  config.vm.provision "trigger", run: "always", :option => "value" do |trigger|
-    trigger.fire do
-      run "./ops/dev/pull-datastore.sh push"
-    end
-  end
+  config.vm.provision "shell",
+    inline: "cd /tba && ./ops/dev/pull-datastore.sh push",
+    privileged: false
 
   # Start the GAE devserver
   config.vm.provision "shell",
@@ -92,7 +90,7 @@ Vagrant.configure("2") do |config|
     run: "always"
 
   # When the container halts, pull the datastore files
-  config.trigger.before [:halt, :destroy] do
-    run "./ops/dev/pull-datastore.sh pull"
-  end
+  config.trigger.before [:halt, :destroy],
+    inline: "cd /tba && ./ops/dev/pull-datastore.sh pull",
+    privileged: false
 end
