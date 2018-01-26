@@ -30,7 +30,7 @@ RUN echo "export VISIBLE=now" >> /etc/profile
 EXPOSE 22
 
 # Get appengine environment
-ENV GAE_VERSION 1.9.61
+ENV GAE_VERSION 1.9.66
 RUN wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_$GAE_VERSION.zip -nv
 RUN unzip -q google_appengine_$GAE_VERSION.zip
 

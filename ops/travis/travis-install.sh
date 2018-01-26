@@ -15,8 +15,9 @@ fi
 
 pip install -r travis_requirements.txt
 paver install_libs
-wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.40.zip -nv
-unzip -q google_appengine_1.9.40.zip -d $HOME
-rm google_appengine_1.9.40.zip
+GAE_VERSION="1.9.66"
+wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_$GAE_VERSION.zip -nv
+unzip -q google_appengine_$GAE_VERSION.zip -d $HOME
+rm google_appengine_$GAE_VERSION.zip
 npm install
 npm install -g gulp-cli uglify-es uglifycss less request swagger-cli
