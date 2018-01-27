@@ -145,14 +145,13 @@ class DistrictHelper(object):
         for team in teams:
             if type(team) == ndb.tasklets.Future:
                 team = team.get_result()
-            bonus = None
+            bonus = 0
             if team.rookie_year == year:
                 bonus = 10
             elif team.rookie_year == year - 1:
                 bonus = 5
-            if bonus is not None:
-                team_totals[team.key.id()]['rookie_bonus'] = bonus
-                team_totals[team.key.id()]['point_total'] += bonus
+            team_totals[team.key.id()]['rookie_bonus'] = bonus
+            team_totals[team.key.id()]['point_total'] += bonus
 
             valid_team_keys.add(team.key.id())
 
