@@ -111,6 +111,7 @@ class ApiBaseController(CacheableHandler):
         """
         self.response.headers['Access-Control-Allow-Methods'] = "GET, POST, OPTIONS"
         self.response.headers['Access-Control-Allow-Headers'] = 'X-TBA-Auth-Key'
+        self.response.headers['Access-Control-Max-Age'] = '604800'  # 1 week
 
     def _track_call_defer(self, api_action, api_label):
         if random.random() < tba_config.GA_RECORD_FRACTION:
