@@ -76,7 +76,7 @@ cron:
 
 - description: District Rankings Calculation
   url: /tasks/math/enqueue/district_rankings_calc/2018
-  schedule: every tuesday
+  schedule: every tuesday 1:00
   timezone: America/Los_Angeles
 
 - description: Upcoming match notification sending
