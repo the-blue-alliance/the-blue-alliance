@@ -76,7 +76,7 @@ cron:
 
 - description: District Rankings Calculation
   url: /tasks/math/enqueue/district_rankings_calc/2018
-  schedule: every 7 days
+  schedule: every tuesday
   timezone: America/Los_Angeles
 
 - description: Upcoming match notification sending
@@ -93,7 +93,7 @@ cron:
 
 - description: Suggestion Queue Nag
   url: /tasks/do/nag_suggestions
-  schedule: every tuesday 12:00
+  schedule: every day 12:00
   timezone: America/Los_Angeles
 
 - description: Backup Cron job
