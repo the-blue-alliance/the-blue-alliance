@@ -65,6 +65,7 @@ class TeamManipulator(ManipulatorBase):
             "website",
             "rookie_year",
             "motto",
+            "encoded_avatar",
         ]
 
         for attr in attrs:
