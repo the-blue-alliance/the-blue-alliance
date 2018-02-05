@@ -28,6 +28,7 @@ class Media(ndb.Model):
         MediaType.GRABCAD: 'grabcad',
         MediaType.INSTAGRAM_IMAGE: 'instagram-image',
         MediaType.EXTERNAL_LINK: 'external-link',
+        MediaType.AVATAR: 'avatar',
     }
 
     REFERENCE_MAP = {

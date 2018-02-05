@@ -564,6 +564,21 @@ class EventDetailsGet(webapp.RequestHandler):
 
         event = Event.get_by_id(event_key)
 
+        # Update avatars of teams at event
+        # TODO: DO THE THING HERE
+        # for team in teams:
+        # media = Media(
+        #     id=Media.render_key_name(media_dict['media_type_enum'], media_dict['foreign_key']),
+        #     foreign_key=media_dict['foreign_key'],
+        #     media_type_enum=media_dict['media_type_enum'],
+        #     details_json=media_dict.get('details_json', None),
+        #     year=year,
+        #     references=[Media.create_reference(
+        #         self.request.get('reference_type'),
+        #         self.request.get('reference_key'))],
+        # )
+        # MediaManipulator.createOrUpdate(media)
+
         # Update event
         fmsapi_events, fmsapi_districts = df.getEventDetails(event_key)
         elasticsearch_events = df2.getEventDetails(event)
