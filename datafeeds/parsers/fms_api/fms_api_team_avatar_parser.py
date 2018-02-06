@@ -20,7 +20,6 @@ class FMSAPITeamAvatarParser(object):
         current_page = response['pageCurrent']
         total_pages = response['pageTotal']
         teams = response['teams']
-        ret_models = []
         media_to_put = []
 
         for teamData in teams:
@@ -29,16 +28,17 @@ class FMSAPITeamAvatarParser(object):
             else:
                 encoded_avatar = teamData['encodedAvatar']
 
-            team_key = "frc{}".format(teamData['teamNumber'])
             team_number = teamData['teamNumber']
+            year_team_key = "{}_frc{}".format(self.year, team_number)
+            media_key = Media.render_key_name(MediaType.AVATAR, year_team_key)
 
             # team_reference = Media.create_reference('team', team_key)
             # temp = Media.create_reference('team', '2018_frc1741')
 
             media = Media(
-                key=ndb.Key('Media', 'avatar_2018_frc1741'),
+                key=ndb.Key('Media', media_key),
                 details_json=u''.format(encoded_avatar),
-                foreign_key=u'avatar_2018_frc1741',
+                foreign_key=media_key,
                 media_type_enum=MediaType.AVATAR,
                 references=[ndb.Key('Team', 'frc1741')],
                 year=2018
@@ -56,14 +56,4 @@ class FMSAPITeamAvatarParser(object):
             # )
             media_to_put.append(media)
 
-            team = Team(
-                id=team_key,
-                team_number=team_number,
-                encoded_avatar=encoded_avatar
-            )
-
-            ret_models.append(team)
-
-        MediaManipulator.createOrUpdate(media_to_put)
-
-        return (ret_models, (current_page < total_pages))
+        return (media_to_put, (current_page < total_pages))
