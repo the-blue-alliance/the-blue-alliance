@@ -34,7 +34,6 @@ class MediaType(object):
         CD_PHOTO_THREAD,
         IMGUR,
         INSTAGRAM_IMAGE,
-        AVATAR,
     ]
 
     social_types = [

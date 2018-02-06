@@ -406,20 +406,16 @@ class TeamAvatarGet(webapp.RequestHandler):
     def get(self, key_name):
         fms_df = DatafeedFMSAPI('v2.0')
         year = datetime.date.today().year
-        fms_details = fms_df.getTeamAvatar(year, key_name)
 
-        if fms_details:
-            team = fms_details[0]
-        else:
-            team = None
+        avatar = fms_df.getTeamAvatar(year, key_name)
 
-        if team:
-            team = TeamManipulator.createOrUpdate(team)
+        if avatar:
+            MediaManipulator.createOrUpdate(avatar)
 
         template_values = {
             'key_name': key_name,
             'team': team,
-            'success': team is not None,
+            'success': avatar is not None,
         }
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
@@ -564,21 +560,6 @@ class EventDetailsGet(webapp.RequestHandler):
 
         event = Event.get_by_id(event_key)
 
-        # Update avatars of teams at event
-        # TODO: DO THE THING HERE
-        # for team in teams:
-        # media = Media(
-        #     id=Media.render_key_name(media_dict['media_type_enum'], media_dict['foreign_key']),
-        #     foreign_key=media_dict['foreign_key'],
-        #     media_type_enum=media_dict['media_type_enum'],
-        #     details_json=media_dict.get('details_json', None),
-        #     year=year,
-        #     references=[Media.create_reference(
-        #         self.request.get('reference_type'),
-        #         self.request.get('reference_key'))],
-        # )
-        # MediaManipulator.createOrUpdate(media)
-
         # Update event
         fmsapi_events, fmsapi_districts = df.getEventDetails(event_key)
         elasticsearch_events = df2.getEventDetails(event)
@@ -639,6 +620,10 @@ class EventDetailsGet(webapp.RequestHandler):
             event_teams = EventTeamManipulator.createOrUpdate(event_teams)
         if type(event_teams) is not list:
             event_teams = [event_teams]
+
+        avatar = df.getTeamAvatar(event.year, event.key_name)
+        if avatar:
+            MediaManipulator.createOrUpdate(avatar)
 
         template_values = {
             'event': event,

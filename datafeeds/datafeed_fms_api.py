@@ -94,6 +94,7 @@ class DatafeedFMSAPI(object):
             self.FMS_API_EVENT_ALLIANCES_URL_PATTERN = FMS_API_URL_BASE + '/alliances/%s/%s'  # (year, event_short)
             self.FMS_API_TEAM_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/teams/%s/?teamNumber=%s'  # (year, teamNumber)
             self.FMS_API_TEAM_AVATAR_URL_PATTERN = FMS_API_URL_BASE + '/%s/avatars/?teamNumber=%s'  # (year, teamNumber)
+            self.FMS_API_EVENT_AVATAR_URL_PATTERN = FMS_API_URL_BASE + '/%s/avatars/?eventCode=%s&page=%s'  # (year, eventCode, page)
             self.FMS_API_EVENT_LIST_URL_PATTERN = FMS_API_URL_BASE + '/events/season=%s'
             self.FMS_API_EVENTTEAM_LIST_URL_PATTERN = FMS_API_URL_BASE + '/teams/?season=%s&eventCode=%s&page=%s'  # (year, eventCode, page)
         elif version == 'v2.0':
@@ -107,6 +108,7 @@ class DatafeedFMSAPI(object):
             self.FMS_API_EVENT_ALLIANCES_URL_PATTERN = FMS_API_URL_BASE + '/%s/alliances/%s'  # (year, event_short)
             self.FMS_API_TEAM_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/%s/teams/?teamNumber=%s'  # (year, teamNumber)
             self.FMS_API_TEAM_AVATAR_URL_PATTERN = FMS_API_URL_BASE + '/%s/avatars/?teamNumber=%s'  # (year, teamNumber)
+            self.FMS_API_EVENT_AVATAR_URL_PATTERN = FMS_API_URL_BASE + '/%s/avatars/?eventCode=%s&page=%s'  # (year, eventCode, page)
             self.FMS_API_EVENT_LIST_URL_PATTERN = FMS_API_URL_BASE + '/%s/events'  # year
             self.FMS_API_EVENT_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/%s/events?eventCode=%s'  # (year, event_short)
             self.FMS_API_EVENTTEAM_LIST_URL_PATTERN = FMS_API_URL_BASE + '/%s/teams/?eventCode=%s&page=%s'  # (year, eventCode, page)
@@ -362,19 +364,27 @@ class DatafeedFMSAPI(object):
         else:
             return [], []
 
-    # TODO: DO THE THINGS HERE
-    # Returns a tuple: (list(Event), list(District))
+    # Returns a list(Media)
     def getEventAvatars(self, event_key):
         year = int(event_key[:4])
         event_short = event_key[4:]
 
         event = Event.get_by_id(event_key)
+        parser = FMSAPITeamAvatarParser(year, short=event_short)
         api_event_short = self._get_event_short(event_short, event)
-        result = self._parse(self.FMS_API_EVENT_DETAILS_URL_PATTERN % (year, api_event_short), FMSAPIEventListParser(year, short=event_short))
-        if result:
-            return result
-        else:
-            return [], []
+        models = []  # will be list of tuples (team, districtteam, robot) model
+        for page in range(1, 9):  # Ensure this won't loop forever. 8 pages should be more than enough
+            url = self.FMS_API_EVENT_AVATAR_URL_PATTERN % (year, api_event_short, page)
+            result = self._parse(url, parser)
+            if result is None:
+                break
+            partial_model, more_pages = result
+            models.extend(partial_model)
+
+            if not more_pages:
+                break
+
+        return models
 
     # Returns list of tuples (team, districtteam, robot)
     def getEventTeams(self, event_key):

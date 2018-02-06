@@ -7,8 +7,9 @@ from helpers.media_manipulator import MediaManipulator
 
 
 class FMSAPITeamAvatarParser(object):
-    def __init__(self, year):
+    def __init__(self, year,  short=None):
         self.year = year
+        self.event_short = short
 
     def parse(self, response):
         """
@@ -23,7 +24,7 @@ class FMSAPITeamAvatarParser(object):
         media_to_put = []
 
         for teamData in teams:
-            if teamData['encodedAvatar'] is u'':
+            if not teamData['encodedAvatar']:
                 encoded_avatar = None
             else:
                 encoded_avatar = teamData['encodedAvatar']
