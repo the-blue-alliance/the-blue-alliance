@@ -621,9 +621,9 @@ class EventDetailsGet(webapp.RequestHandler):
         if type(event_teams) is not list:
             event_teams = [event_teams]
 
-        avatar = df.getTeamAvatar(event.year, event.key_name)
-        if avatar:
-            MediaManipulator.createOrUpdate(avatar)
+        avatars = df.getEventTeamAvatars(event.year, event.key_name)
+        if avatars:
+            MediaManipulator.createOrUpdate(avatars)
 
         template_values = {
             'event': event,

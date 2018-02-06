@@ -20,7 +20,7 @@ class FMSAPITeamAvatarParser(object):
         current_page = response['pageCurrent']
         total_pages = response['pageTotal']
         teams = response['teams']
-        media_to_put = []
+        avatars = []
 
         for teamData in teams:
             if not teamData['encodedAvatar']:
@@ -29,31 +29,19 @@ class FMSAPITeamAvatarParser(object):
                 encoded_avatar = teamData['encodedAvatar']
 
             team_number = teamData['teamNumber']
-            year_team_key = "{}_frc{}".format(self.year, team_number)
-            media_key = Media.render_key_name(MediaType.AVATAR, year_team_key)
 
-            # team_reference = Media.create_reference('team', team_key)
-            # temp = Media.create_reference('team', '2018_frc1741')
+            foreign_key = "avatar_{}_frc{}".format(self.year, team_number)
+            media_key = Media.render_key_name(MediaType.AVATAR, foreign_key)
 
-            media = Media(
+            avatar = Media(
                 key=ndb.Key('Media', media_key),
                 details_json=u''.format(encoded_avatar),
-                foreign_key=media_key,
+                foreign_key=foreign_key,
                 media_type_enum=MediaType.AVATAR,
-                references=[ndb.Key('Team', 'frc1741')],
-                year=2018
+                references=[ndb.Key('Team', "frc{}".format(team_number))],
+                year=self.year
             )
 
-            # media = Media(
-            #     id=Media.render_key_name(MediaType.AVATAR, team_reference),
-            #     foreign_key="{}".format(team_reference),
-            #     media_type_enum=MediaType.AVATAR,
-            #     details_json=None,
-            #     private_details_json=None,
-            #     year=self.year,
-            #     references=[team_reference],
-            #     preferred_references=[],
-            # )
-            media_to_put.append(media)
+            avatars.append(avatar)
 
-        return (media_to_put, (current_page < total_pages))
+        return (avatars, (current_page < total_pages))
