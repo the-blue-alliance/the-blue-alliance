@@ -225,3 +225,8 @@ class Media(ndb.Model):
             return self.instagram_direct_url_sm
         else:
             return ""
+
+    @property
+    def avatar_image_source(self):
+        image = json.loads(self.details_json)
+        return 'data:image/jpeg;base64, {}'.format(image['base64Image'])

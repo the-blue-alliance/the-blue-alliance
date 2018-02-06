@@ -201,7 +201,4 @@ def test_function(args):
     if len(args) > 0:
         test_pattern = " --test_pattern=*%s*" % args[0]
 
-    print(test_pattern)
-
-    # sh("python run_tests.py%s" % test_pattern)
-    sh("python run_tests.py --test_pattern=test_fms_api_team_avatar_parser.py")
+    sh("python run_tests.py%s" % test_pattern)
