@@ -315,18 +315,18 @@ class DatafeedFMSAPI(object):
     def getTeamDetails(self, year, team_key):
         team_number = team_key[3:]  # everything after 'frc'
 
-        avatar = self._parse(self.FMS_API_TEAM_DETAILS_URL_PATTERN % (year, team_number), FMSAPITeamDetailsParser(year))
-        if avatar:
-            return avatar[0]
+        result = self._parse(self.FMS_API_TEAM_DETAILS_URL_PATTERN % (year, team_number), FMSAPITeamDetailsParser(year))
+        if result:
+            return result[0]
         else:
             return None
 
     def getTeamAvatar(self, year, team_key):
         team_number = team_key[3:]  # everything after 'frc'
 
-        result = self._parse(self.FMS_API_TEAM_AVATAR_URL_PATTERN % (year, team_number), FMSAPITeamAvatarParser(year))
-        if result:
-            return result[0]  # (team)
+        avatars = self._parse(self.FMS_API_TEAM_AVATAR_URL_PATTERN % (year, team_number), FMSAPITeamAvatarParser(year))
+        if avatars:
+            return avatars[0]
         else:
             return None
 
@@ -365,7 +365,7 @@ class DatafeedFMSAPI(object):
             return [], []
 
     # Returns a list(Media)
-    def getEventAvatars(self, event_key):
+    def getEventTeamAvatars(self, event_key):
         year = int(event_key[:4])
         event_short = event_key[4:]
 

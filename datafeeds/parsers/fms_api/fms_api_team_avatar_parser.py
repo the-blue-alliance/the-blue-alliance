@@ -1,3 +1,5 @@
+import json
+
 from google.appengine.ext import ndb
 
 from models.media import Media
@@ -35,7 +37,7 @@ class FMSAPITeamAvatarParser(object):
 
             avatar = Media(
                 key=ndb.Key('Media', media_key),
-                details_json=u''.format(encoded_avatar),
+                details_json=json.dumps({'base64Image': encoded_avatar}),
                 foreign_key=foreign_key,
                 media_type_enum=MediaType.AVATAR,
                 references=[ndb.Key('Team', "frc{}".format(team_number))],

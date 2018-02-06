@@ -406,6 +406,7 @@ class TeamAvatarGet(webapp.RequestHandler):
     def get(self, key_name):
         fms_df = DatafeedFMSAPI('v2.0')
         year = datetime.date.today().year
+        team = Team.get_by_id(key_name)
 
         avatar = fms_df.getTeamAvatar(year, key_name)
 
@@ -621,9 +622,10 @@ class EventDetailsGet(webapp.RequestHandler):
         if type(event_teams) is not list:
             event_teams = [event_teams]
 
-        avatars = df.getEventTeamAvatars(event.year, event.key_name)
-        if avatars:
-            MediaManipulator.createOrUpdate(avatars)
+        if event.year == 2018:
+            avatars = df.getEventTeamAvatars(event.key_name)
+            if avatars:
+                MediaManipulator.createOrUpdate(avatars)
 
         template_values = {
             'event': event,
