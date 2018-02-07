@@ -145,6 +145,7 @@ class TeamRenderer(object):
                 offseason_wlt = None
 
         medias_by_slugname = MediaHelper.group_by_slugname([media for media in media_future.get_result()])
+        avatar = MediaHelper.get_avatar(media_future.get_result())
         image_medias = MediaHelper.get_images(media_future.get_result())
         social_medias = sorted(social_media_future.get_result(), key=MediaHelper.social_media_sorter)
         preferred_image_medias = filter(lambda x: team.key in x.preferred_references, image_medias)
@@ -176,6 +177,7 @@ class TeamRenderer(object):
             "current_event": current_event,
             "matches_upcoming": matches_upcoming,
             "medias_by_slugname": medias_by_slugname,
+            "avatar": avatar,
             "social_medias": social_medias,
             "image_medias": image_medias,
             "preferred_image_medias": preferred_image_medias,
