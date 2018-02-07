@@ -31,6 +31,14 @@ class MediaHelper(object):
         return medias_by_slugname
 
     @classmethod
+    def get_avatar(cls, medias):
+        avatars = filter(lambda m: m.media_type_enum == MediaType.AVATAR, medias)
+        if avatars:
+            return avatars[0]
+        else:
+            return None
+
+    @classmethod
     def get_images(cls, medias):
         return filter(lambda m: m.media_type_enum in MediaType.image_types, medias)
 

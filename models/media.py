@@ -229,4 +229,4 @@ class Media(ndb.Model):
     @property
     def avatar_image_source(self):
         image = json.loads(self.details_json)
-        return 'data:image/jpeg;base64, {}'.format(image['base64Image'])
+        return 'data:image/png;base64, {}'.format(image['base64Image'])
