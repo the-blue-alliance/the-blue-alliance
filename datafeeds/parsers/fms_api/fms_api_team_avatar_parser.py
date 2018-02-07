@@ -26,7 +26,7 @@ class FMSAPITeamAvatarParser(object):
 
         for teamData in teams:
             if not teamData['encodedAvatar']:
-                encoded_avatar = None
+                continue
             else:
                 encoded_avatar = teamData['encodedAvatar']
 

@@ -42,34 +42,17 @@ class TestFMSAPITeamAvatarParser(unittest2.TestCase):
             models, more_pages = FMSAPITeamAvatarParser(2018).parse(json.loads(f.read()))
 
             self.assertFalse(more_pages)
-            self.assertEqual(len(models), 1)
-
-            # Ensure we get the proper Media model back
-            media = models[0]
-            self.assertEqual(media.key, ndb.Key('Media', 'avatar_avatar_2018_frc1'))
-            self.assertEqual(media.foreign_key, 'avatar_2018_frc1')
-            self.assertEqual(media.media_type_enum, MediaType.AVATAR)
-            self.assertEqual(media.references, [ndb.Key('Team', 'frc1')])
-            self.assertEqual(media.year, 2018)
-            self.assertEqual(media.details_json, '{"base64Image": null}')
+            self.assertEqual(len(models), 0)
 
     def test_parse_result_with_multiple_teams(self):
         with open('test_data/fms_api/2018_avatars_multiple.json', 'r') as f:
             models, more_pages = FMSAPITeamAvatarParser(2018).parse(json.loads(f.read()))
 
             self.assertFalse(more_pages)
-            self.assertEqual(len(models), 2)
+            self.assertEqual(len(models), 1)
 
             # Ensure we get the proper Media model back
-            media_team_1 = models[0]
-            self.assertEqual(media_team_1.key, ndb.Key('Media', 'avatar_avatar_2018_frc1'))
-            self.assertEqual(media_team_1.foreign_key, 'avatar_2018_frc1')
-            self.assertEqual(media_team_1.media_type_enum, MediaType.AVATAR)
-            self.assertEqual(media_team_1.references, [ndb.Key('Team', 'frc1')])
-            self.assertEqual(media_team_1.year, 2018)
-            self.assertEqual(media_team_1.details_json, '{"base64Image": null}')
-
-            media_team_1741 = models[1]
+            media_team_1741 = models[0]
             self.assertEqual(media_team_1741.key, ndb.Key('Media', 'avatar_avatar_2018_frc1741'))
             self.assertEqual(media_team_1741.foreign_key, 'avatar_2018_frc1741')
             self.assertEqual(media_team_1741.media_type_enum, MediaType.AVATAR)
