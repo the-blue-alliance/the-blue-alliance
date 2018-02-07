@@ -28,6 +28,7 @@ class Media(ndb.Model):
         MediaType.GRABCAD: 'grabcad',
         MediaType.INSTAGRAM_IMAGE: 'instagram-image',
         MediaType.EXTERNAL_LINK: 'external-link',
+        MediaType.AVATAR: 'avatar',
     }
 
     REFERENCE_MAP = {
@@ -224,3 +225,8 @@ class Media(ndb.Model):
             return self.instagram_direct_url_sm
         else:
             return ""
+
+    @property
+    def avatar_image_source(self):
+        image = json.loads(self.details_json)
+        return 'data:image/jpeg;base64, {}'.format(image['base64Image'])

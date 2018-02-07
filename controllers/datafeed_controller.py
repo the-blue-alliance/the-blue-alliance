@@ -397,6 +397,33 @@ class TeamDetailsGet(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
+class TeamAvatarGet(webapp.RequestHandler):
+    """
+    Fetches team avatar
+    Doesn't currently use FIRSTElasticSearch
+    """
+
+    def get(self, key_name):
+        fms_df = DatafeedFMSAPI('v2.0')
+        year = datetime.date.today().year
+        team = Team.get_by_id(key_name)
+
+        avatar = fms_df.getTeamAvatar(year, key_name)
+
+        if avatar:
+            MediaManipulator.createOrUpdate(avatar)
+
+        template_values = {
+            'key_name': key_name,
+            'team': team,
+            'success': avatar is not None,
+        }
+
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_team_avatar_get.html')
+            self.response.out.write(template.render(path, template_values))
+
+
 class EventListEnqueue(webapp.RequestHandler):
     """
     Handles enqueing fetching a year's worth of events from FMSAPI
@@ -594,6 +621,11 @@ class EventDetailsGet(webapp.RequestHandler):
             event_teams = EventTeamManipulator.createOrUpdate(event_teams)
         if type(event_teams) is not list:
             event_teams = [event_teams]
+
+        if event.year == 2018:
+            avatars = df.getEventTeamAvatars(event.key_name)
+            if avatars:
+                MediaManipulator.createOrUpdate(avatars)
 
         template_values = {
             'event': event,

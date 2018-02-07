@@ -12,7 +12,11 @@
         {% if media.slug_name == 'external-link' %}
           <p><a href="{{ media.external_link }}" target="_blank">{{ media.external_link }}</a>
         {% else %}
-          <p><a href="{{ media.social_profile_url }}" target="_blank">{{ media.foreign_key }}</a></p>
+          {% if media.slug_name == 'avatar' %}
+            <img class="team-avatar" src='{{media.avatar_image_source}}'/>
+          {% else %}
+            <p><a href="{{ media.social_profile_url }}" target="_blank">{{ media.foreign_key }}</a></p>
+          {% endif %}
         {% endif %}
       {% endif %}
     {% endif %}

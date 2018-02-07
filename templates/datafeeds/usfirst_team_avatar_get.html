@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}UsfirstTeamAvatarGet{% endblock %}
+
+{% block content %}
+<div class="row">
+    {% if success %}
+    <div class="alert alert-block alert-success">
+        <h4>Got team {{team.team_number}}'s Avatar</h4>
+    </div>
+    <h2>Team {{team.team_number}}</h2>
+    <div class="btn-group">
+        <a href="/team/{{team.team_number}}" class="btn btn-primary" /><span class="glyphicon glyphicon-eye-open"></span> View on TBA</a>
+        <a href="/admin/team/{{team.team_number}}" class="btn" /><span class="glyphicon glyphicon-edit"></span> View in Admin</a>
+    </div>
+    <br>
+    {% else %}
+    <div class="alert alert-block alert-danger">
+        <h4>Team Avatar Fetch Failed.</h4>
+        <p>{{key_name}} may lack a TPID, thus don't know how to scrape FIRST</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

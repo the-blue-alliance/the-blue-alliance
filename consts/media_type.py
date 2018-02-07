@@ -12,6 +12,7 @@ class MediaType(object):
     GRABCAD = 9
     INSTAGRAM_IMAGE = 10
     EXTERNAL_LINK = 11
+    AVATAR = 12
 
     type_names = {
         YOUTUBE_VIDEO: 'YouTube Video',
@@ -26,6 +27,7 @@ class MediaType(object):
         GRABCAD: 'GrabCAD',
         INSTAGRAM_IMAGE: 'Instagram Image',
         EXTERNAL_LINK: 'External Link',
+        AVATAR: 'Avatar',
     }
 
     image_types = [

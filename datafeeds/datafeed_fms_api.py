@@ -21,6 +21,7 @@ from parsers.fms_api.fms_api_event_list_parser import FMSAPIEventListParser
 from parsers.fms_api.fms_api_event_rankings_parser import FMSAPIEventRankingsParser, FMSAPIEventRankings2Parser
 from parsers.fms_api.fms_api_match_parser import FMSAPIHybridScheduleParser, FMSAPIMatchDetailsParser
 from parsers.fms_api.fms_api_team_details_parser import FMSAPITeamDetailsParser
+from parsers.fms_api.fms_api_team_avatar_parser import FMSAPITeamAvatarParser
 
 
 class DatafeedFMSAPI(object):
@@ -92,6 +93,8 @@ class DatafeedFMSAPI(object):
             self.FMS_API_EVENT_RANKINGS_URL_PATTERN = FMS_API_URL_BASE + '/rankings/%s/%s'  # (year, event_short)
             self.FMS_API_EVENT_ALLIANCES_URL_PATTERN = FMS_API_URL_BASE + '/alliances/%s/%s'  # (year, event_short)
             self.FMS_API_TEAM_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/teams/%s/?teamNumber=%s'  # (year, teamNumber)
+            self.FMS_API_TEAM_AVATAR_URL_PATTERN = FMS_API_URL_BASE + '/%s/avatars/?teamNumber=%s'  # (year, teamNumber)
+            self.FMS_API_EVENT_AVATAR_URL_PATTERN = FMS_API_URL_BASE + '/%s/avatars/?eventCode=%s&page=%s'  # (year, eventCode, page)
             self.FMS_API_EVENT_LIST_URL_PATTERN = FMS_API_URL_BASE + '/events/season=%s'
             self.FMS_API_EVENTTEAM_LIST_URL_PATTERN = FMS_API_URL_BASE + '/teams/?season=%s&eventCode=%s&page=%s'  # (year, eventCode, page)
         elif version == 'v2.0':
@@ -104,6 +107,8 @@ class DatafeedFMSAPI(object):
             self.FMS_API_EVENT_RANKINGS_URL_PATTERN = FMS_API_URL_BASE + '/%s/rankings/%s'  # (year, event_short)
             self.FMS_API_EVENT_ALLIANCES_URL_PATTERN = FMS_API_URL_BASE + '/%s/alliances/%s'  # (year, event_short)
             self.FMS_API_TEAM_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/%s/teams/?teamNumber=%s'  # (year, teamNumber)
+            self.FMS_API_TEAM_AVATAR_URL_PATTERN = FMS_API_URL_BASE + '/%s/avatars/?teamNumber=%s'  # (year, teamNumber)
+            self.FMS_API_EVENT_AVATAR_URL_PATTERN = FMS_API_URL_BASE + '/%s/avatars/?eventCode=%s&page=%s'  # (year, eventCode, page)
             self.FMS_API_EVENT_LIST_URL_PATTERN = FMS_API_URL_BASE + '/%s/events'  # year
             self.FMS_API_EVENT_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/%s/events?eventCode=%s'  # (year, event_short)
             self.FMS_API_EVENTTEAM_LIST_URL_PATTERN = FMS_API_URL_BASE + '/%s/teams/?eventCode=%s&page=%s'  # (year, eventCode, page)
@@ -312,7 +317,16 @@ class DatafeedFMSAPI(object):
 
         result = self._parse(self.FMS_API_TEAM_DETAILS_URL_PATTERN % (year, team_number), FMSAPITeamDetailsParser(year))
         if result:
-            return result[0]  # (team, districtteam, robot)
+            return result[0]
+        else:
+            return None
+
+    def getTeamAvatar(self, year, team_key):
+        team_number = team_key[3:]  # everything after 'frc'
+
+        avatars = self._parse(self.FMS_API_TEAM_AVATAR_URL_PATTERN % (year, team_number), FMSAPITeamAvatarParser(year))
+        if avatars:
+            return avatars[0]
         else:
             return None
 
@@ -349,6 +363,28 @@ class DatafeedFMSAPI(object):
             return result
         else:
             return [], []
+
+    # Returns a list(Media)
+    def getEventTeamAvatars(self, event_key):
+        year = int(event_key[:4])
+        event_short = event_key[4:]
+
+        event = Event.get_by_id(event_key)
+        parser = FMSAPITeamAvatarParser(year, short=event_short)
+        api_event_short = self._get_event_short(event_short, event)
+        avatars = []
+        for page in range(1, 9):  # Ensure this won't loop forever. 8 pages should be more than enough
+            url = self.FMS_API_EVENT_AVATAR_URL_PATTERN % (year, api_event_short, page)
+            result = self._parse(url, parser)
+            if result is None:
+                break
+            partial_avatars, more_pages = result
+            avatars.extend(partial_avatars)
+
+            if not more_pages:
+                break
+
+        return avatars
 
     # Returns list of tuples (team, districtteam, robot)
     def getEventTeams(self, event_key):
