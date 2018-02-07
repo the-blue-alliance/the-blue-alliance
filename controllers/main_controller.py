@@ -15,12 +15,14 @@ from consts.award_type import AwardType
 from consts.event_type import EventType
 from consts.landing_type import LandingType
 from consts.media_tag import MediaTag
+from consts.media_type import MediaType
 from database import media_query
 from helpers.event_helper import EventHelper
 from helpers.firebase.firebase_pusher import FirebasePusher
 from models.award import Award
 from models.event import Event
 from models.insight import Insight
+from models.media import Media
 from models.team import Team
 from models.sitevar import Sitevar
 from template_engine import jinja2_engine
@@ -48,6 +50,23 @@ def handle_500(request, response, exception):
     logging.exception(exception)
     response.write(render_static("500"))
     response.set_status(500)
+
+
+class Avatars2018Handler(CacheableHandler):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "avatars_2018"
+
+    def __init__(self, *args, **kw):
+        super(Avatars2018Handler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24
+
+    def _render(self, *args, **kw):
+        avatars_future = Media.query(Media.media_type_enum == MediaType.AVATAR).fetch_async()
+        avatars = sorted(avatars_future.get_result(), key=lambda a: int(a.references[0].id()[3:]))
+        self.template_values.update({
+            'avatars': avatars,
+        })
+        return jinja2_engine.render('avatars2018.html', self.template_values)
 
 
 class TwoChampsHandler(CacheableHandler):
