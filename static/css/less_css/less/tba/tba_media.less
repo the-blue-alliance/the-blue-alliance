@@ -18,10 +18,6 @@
     background-size: cover;
 }
 
-.avatar-container {
-    text-align: center;
-}
-
 .team-avatar {
     margin: 2px;
     image-rendering: optimizeSpeed;             /* STOP SMOOTHING, GIVE ME SPEED  */
@@ -36,10 +32,10 @@
     vertical-align: middle;
 }
 
-.no-hover-underline:hover {
-  text-decoration: none;
-}
+.avatar-link {
+  font-size: 0px;
 
-.no-link-font {
-    font-size: 0px;
+  &:hover {
+    text-decoration: none;
+  }
 }
