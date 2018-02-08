@@ -7,13 +7,13 @@
 {% block content %}
 <div class="container">
   <div class="row">
-    <div class="col-lg-8 col-lg-offset-2">
+    <div class="col-lg-8 col-lg-offset-2 text-center">
       <h1 class="end_header">2018 FIRST POWER UP Avatars</h1>
 
       <p>For more information about submitting avatars, please read the official FRC <a href="https://www.firstinspires.org/robotics/frc/blog/team-avatar-submission-system" target="_blank">blog post</a>.</p>
 
       {% for avatar in avatars %}
-        <a href="/team/{{avatar.references[0].id()[3:]}}/2018" rel="tooltip" title="Team {{avatar.references[0].id()[3:]}}">
+        <a href="/team/{{avatar.references[0].id()[3:]}}/2018" class="avatar-link" rel="tooltip" title="Team {{avatar.references[0].id()[3:]}}">
           <img class="team-avatar" src='{{avatar.avatar_image_source}}'/>
         </a>
       {% endfor %}

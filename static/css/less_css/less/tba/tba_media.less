@@ -19,6 +19,7 @@
 }
 
 .team-avatar {
+    margin: 2px;
     image-rendering: optimizeSpeed;             /* STOP SMOOTHING, GIVE ME SPEED  */
     image-rendering: -moz-crisp-edges;          /* Firefox                        */
     image-rendering: -o-crisp-edges;            /* Opera                          */
@@ -29,4 +30,12 @@
     height: 40px;
     width: 40px;
     vertical-align: middle;
+}
+
+.avatar-link {
+  font-size: 0px;
+
+  &:hover {
+    text-decoration: none;
+  }
 }
