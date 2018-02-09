@@ -41,5 +41,5 @@ class EventWebcastAdder(object):
 
         webcasts.pop(index)
         event.webcast_json = json.dumps(webcasts)
-        EventManipulator.createOrUpdate(event)
+        EventManipulator.createOrUpdate(event, auto_union=False)
         MemcacheWebcastFlusher.flushEvent(event.key_name)
