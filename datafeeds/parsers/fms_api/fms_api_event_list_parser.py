@@ -88,7 +88,7 @@ class FMSAPIEventListParser(object):
             start = datetime.datetime.strptime(event['dateStart'], self.DATE_FORMAT_STR)
             end = datetime.datetime.strptime(event['dateEnd'], self.DATE_FORMAT_STR)
             website = event.get('website')
-            webcasts = [WebcastParser.webcast_dict_from_url(url) for url in event['webcasts']] if event['webcasts'] else None
+            webcasts = [WebcastParser.webcast_dict_from_url(url) for url in event.get('webcasts', [])]
 
             # TODO read timezone from API
 
@@ -143,7 +143,7 @@ class FMSAPIEventListParser(object):
                 event_district_enum=district_enum,
                 district_key=ndb.Key(District, district_key) if district_key else None,
                 website=website,
-                webcast_json=json.dumps(webcasts),
+                webcast_json=json.dumps(webcasts) if webcasts else None,
             ))
 
             # Build District Model
