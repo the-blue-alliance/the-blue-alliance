@@ -17,8 +17,8 @@
       <br><br>
 
       {% for avatar in avatars %}
-        <a href="/team/{{avatar.references[0].id()[3:]}}/2018" class="avatar-link" rel="tooltip" title="Team {{avatar.references[0].id()[3:]}}">
-          <img class="team-avatar blue" src='{{avatar.avatar_image_source}}'/>
+        <a href="/team/{{avatar.references[0].id()[3:]}}/2018" class="avatar-link">
+          <img class="team-avatar blue" src="{{avatar.avatar_image_source}}" rel="tooltip" title="Team {{avatar.references[0].id()[3:]}}"/>
         </a>
       {% endfor %}
     </div>
