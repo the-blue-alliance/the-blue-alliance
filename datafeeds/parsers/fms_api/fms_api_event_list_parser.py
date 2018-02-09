@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 
 from google.appengine.ext import ndb
@@ -6,6 +7,7 @@ from google.appengine.ext import ndb
 from consts.district_type import DistrictType
 from consts.event_type import EventType
 from helpers.event_helper import EventHelper
+from helpers.webcast_helper import WebcastParser
 from models.district import District
 from models.event import Event
 from models.sitevar import Sitevar
@@ -86,6 +88,7 @@ class FMSAPIEventListParser(object):
             start = datetime.datetime.strptime(event['dateStart'], self.DATE_FORMAT_STR)
             end = datetime.datetime.strptime(event['dateEnd'], self.DATE_FORMAT_STR)
             website = event.get('website')
+            webcasts = [WebcastParser.webcast_dict_from_url(url) for url in event.get('webcasts', [])]
 
             # TODO read timezone from API
 
@@ -140,6 +143,7 @@ class FMSAPIEventListParser(object):
                 event_district_enum=district_enum,
                 district_key=ndb.Key(District, district_key) if district_key else None,
                 website=website,
+                webcast_json=json.dumps(webcasts) if webcasts else None,
             ))
 
             # Build District Model

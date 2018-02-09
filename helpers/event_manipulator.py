@@ -1,3 +1,4 @@
+import json
 import logging
 import traceback
 
@@ -91,7 +92,6 @@ class EventManipulator(ManipulatorBase):
             "start_date",
             "venue",
             "venue_address",
-            "webcast_json",
             "website",
             "year",
             "remap_teams",
@@ -125,5 +125,23 @@ class EventManipulator(ManipulatorBase):
                     setattr(old_event, attr, getattr(new_event, attr))
                     old_event._updated_attrs.append(attr)
                     old_event.dirty = True
+
+        # Special case to handle webcast_json
+        if not auto_union and new_event.webcast != old_event.webcast:
+            old_event.webcast_json = new_event.webcast_json
+            old_event.dirty = True
+        else:
+            if new_event.webcast:
+                old_webcasts = old_event.webcast
+                if old_webcasts:
+                    for webcast in new_event.webcast:
+                        if webcast in old_webcasts:
+                            continue
+                        else:
+                            old_webcasts.append(webcast)
+                            old_event.webcast_json = json.dumps(old_webcasts)
+                else:
+                    old_event.webcast_json = new_event.webcast_json
+                old_event.dirty = True
 
         return old_event

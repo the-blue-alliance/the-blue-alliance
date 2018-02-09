@@ -202,7 +202,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEquals(event.website, "http://www.firstsv.org")
 
             # New in 2018
-            self.assertEqual(event.webcast, None)  # TODO: make work
+            self.assertEqual(event.webcast, [{"type": "twitch", "channel": "firstinspires9"}, {"type": "twitch", "channel": "firstinspires10"}])
 
     def test_parse_division_parent(self):
         with open('test_data/fms_api/2017_event_list.json', 'r') as f:
