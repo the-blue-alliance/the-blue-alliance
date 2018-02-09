@@ -24,7 +24,7 @@ class EventWebcastAdder(object):
         event.dirty = True
 
         if update:
-            EventManipulator.createOrUpdate(event)
+            EventManipulator.createOrUpdate(event, auto_union=False)
             MemcacheWebcastFlusher.flushEvent(event.key_name)
 
         return event
