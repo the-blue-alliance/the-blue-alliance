@@ -33,6 +33,7 @@ class TestEventManipulator(unittest2.TestCase):
             year=2011,
             venue_address="Connecticut Convention Center\r\n100 Columbus Blvd\r\nHartford, CT 06103\r\nUSA",
             website="http://www.ctfirst.org/ctr",
+            webcast_json=json.dumps([{'type': 'twitch', 'channel': 'bar'}]),
         )
 
         self.new_event = Event(
@@ -57,8 +58,10 @@ class TestEventManipulator(unittest2.TestCase):
     def assertMergedEvent(self, event):
         self.assertOldEvent(event)
         self.assertEqual(event.facebook_eid, "7")
-        self.assertEqual(event.webcast[0]['type'], 'ustream')
-        self.assertEqual(event.webcast[0]['channel'], 'foo')
+        self.assertEqual(event.webcast[0]['type'], 'twitch')
+        self.assertEqual(event.webcast[0]['channel'], 'bar')
+        self.assertEqual(event.webcast[1]['type'], 'ustream')
+        self.assertEqual(event.webcast[1]['channel'], 'foo')
 
     def assertOldEvent(self, event):
         self.assertEqual(event.key.id(), "2011ct")
