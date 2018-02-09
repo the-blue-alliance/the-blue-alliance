@@ -5,7 +5,7 @@
   <div class="col-xs-12">
     <h2>
     {% if avatar %}
-      <img class="team-avatar" src='{{avatar.avatar_image_source}}'/>
+      <img class="team-avatar blue" src='{{avatar.avatar_image_source}}'/>
     {% endif %}
     Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h2>
     {% if district_name %}<blockquote><em>Part of the <a href="/events/{{district_abbrev}}/{{year}}">{{district_name}} District</a></em></blockquote>{% endif %}
