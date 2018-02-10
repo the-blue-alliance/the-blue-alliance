@@ -123,7 +123,7 @@ class MainBuildseasonHandler(CacheableHandler):
 
     def __init__(self, *args, **kw):
         super(MainBuildseasonHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24 * 7
+        self._cache_expiration = 60 * 5
 
     def _render(self, *args, **kw):
         endbuild_time_str = self.template_values.get('build_season_end', '2018-2-20T23:59:00')
