@@ -408,10 +408,12 @@ class TeamAvatarGet(webapp.RequestHandler):
         year = datetime.date.today().year
         team = Team.get_by_id(key_name)
 
-        avatar = fms_df.getTeamAvatar(year, key_name)
+        avatar, keys_to_delete = fms_df.getTeamAvatar(year, key_name)
 
         if avatar:
             MediaManipulator.createOrUpdate(avatar)
+
+        MediaManipulator.delete_keys(keys_to_delete)
 
         template_values = {
             'key_name': key_name,
@@ -623,9 +625,10 @@ class EventDetailsGet(webapp.RequestHandler):
             event_teams = [event_teams]
 
         if event.year == 2018:
-            avatars = df.getEventTeamAvatars(event.key_name)
+            avatars, keys_to_delete = df.getEventTeamAvatars(event.key_name)
             if avatars:
                 MediaManipulator.createOrUpdate(avatars)
+            MediaManipulator.delete_keys(keys_to_delete)
 
         template_values = {
             'event': event,

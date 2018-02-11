@@ -23,7 +23,7 @@ class TestFMSAPITeamAvatarParser(unittest2.TestCase):
 
     def test_parse_team_with_avatar(self):
         with open('test_data/fms_api/2018_avatars_frc1741.json', 'r') as f:
-            models, more_pages = FMSAPITeamAvatarParser(2018).parse(json.loads(f.read()))
+            models, _, more_pages = FMSAPITeamAvatarParser(2018).parse(json.loads(f.read()))
 
             self.assertFalse(more_pages)
             self.assertEqual(len(models), 1)
@@ -39,14 +39,14 @@ class TestFMSAPITeamAvatarParser(unittest2.TestCase):
 
     def test_parse_team_with_no_avatar(self):
         with open('test_data/fms_api/2018_avatars_frc1.json', 'r') as f:
-            models, more_pages = FMSAPITeamAvatarParser(2018).parse(json.loads(f.read()))
+            models, _, more_pages = FMSAPITeamAvatarParser(2018).parse(json.loads(f.read()))
 
             self.assertFalse(more_pages)
             self.assertEqual(len(models), 0)
 
     def test_parse_result_with_multiple_teams(self):
         with open('test_data/fms_api/2018_avatars_multiple.json', 'r') as f:
-            models, more_pages = FMSAPITeamAvatarParser(2018).parse(json.loads(f.read()))
+            models, _, more_pages = FMSAPITeamAvatarParser(2018).parse(json.loads(f.read()))
 
             self.assertFalse(more_pages)
             self.assertEqual(len(models), 1)

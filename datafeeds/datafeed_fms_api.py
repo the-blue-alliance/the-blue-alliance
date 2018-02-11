@@ -324,11 +324,11 @@ class DatafeedFMSAPI(object):
     def getTeamAvatar(self, year, team_key):
         team_number = team_key[3:]  # everything after 'frc'
 
-        avatars = self._parse(self.FMS_API_TEAM_AVATAR_URL_PATTERN % (year, team_number), FMSAPITeamAvatarParser(year))
+        avatars, keys_to_delete, _ = self._parse(self.FMS_API_TEAM_AVATAR_URL_PATTERN % (year, team_number), FMSAPITeamAvatarParser(year))
         if avatars:
-            return avatars[0]
+            return avatars[0], keys_to_delete
         else:
-            return None
+            return None, keys_to_delete
 
     # Returns a tuple: (list(Event), list(District))
     def getEventList(self, year):
@@ -373,18 +373,20 @@ class DatafeedFMSAPI(object):
         parser = FMSAPITeamAvatarParser(year, short=event_short)
         api_event_short = self._get_event_short(event_short, event)
         avatars = []
+        keys_to_delete = set()
         for page in range(1, 9):  # Ensure this won't loop forever. 8 pages should be more than enough
             url = self.FMS_API_EVENT_AVATAR_URL_PATTERN % (year, api_event_short, page)
             result = self._parse(url, parser)
             if result is None:
                 break
-            partial_avatars, more_pages = result
+            partial_avatars, partial_keys_to_delete, more_pages = result
             avatars.extend(partial_avatars)
+            keys_to_delete = keys_to_delete.union(partial_keys_to_delete)
 
             if not more_pages:
                 break
 
-        return avatars
+        return avatars, keys_to_delete
 
     # Returns list of tuples (team, districtteam, robot)
     def getEventTeams(self, event_key):
