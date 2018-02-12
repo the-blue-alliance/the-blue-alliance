@@ -1,0 +1,127 @@
+.liveEventPanel {
+  .middleCol {
+    padding: 0;
+  }
+
+  .booleanIndicator {
+    border: solid 1px #ccc;
+    border-radius: 3px;
+    margin-bottom: 8px;
+  }
+
+  .powerupsContainer {
+    display: flex;
+    margin-bottom: 8px;
+  }
+
+  .powerupCountContainer {
+    flex: 1;
+    border: solid 1px #ccc;
+    border-radius: 3px;
+    padding: 1px;
+
+    @media (min-width: @screen-sm-min) {
+      padding: 5px;
+    }
+  }
+
+  .powerupCountContainerCenter {
+    margin-left: 3px;
+    margin-right: 3px;
+  }
+
+  .powerupIcon {
+    height: 15px;
+    width: 15px;
+    @media (min-width: @screen-sm-min) {
+      height: 25px;
+      width: 25px;
+    }
+  }
+
+  .powerupCount {
+    margin: 5px auto 0;
+    font-size: 12px;
+    @media (min-width: @screen-sm-min) {
+      font-size: 18px;
+    }
+  }
+
+  .timeRemainingContainer {
+    width: 100%;
+    position: absolute;
+    left: 0;
+  }
+
+  .timeRemaining {
+    background-color: rgba(255; 255; 255; 0.75);
+    padding: 0 5px;
+    border-radius: 3px;
+  }
+
+  .scoreContainer {
+    display: flex;
+    margin-bottom: 8px;
+  }
+
+  .redAlliance {
+    flex: 1;
+    margin-right: 2px;
+  }
+
+  .blueAlliance {
+    flex: 1;
+    margin-left: 2px;
+  }
+
+  .score {
+    border: solid 1px #ccc;
+    border-radius: 3px;
+    font-size: 18px;
+    padding: 1px;
+    margin-top: 8px;
+
+    @media (min-width: @screen-sm-min) {
+      font-size: 24px;
+      padding: 5px;
+    }
+  }
+
+  .currentPowerup {
+    border: solid 1px #ccc;
+    border-radius: 3px;
+    font-size: 14px;
+    margin: 0 auto;
+    padding: 1px;
+    width: 50%;
+
+    @media (min-width: @screen-sm-min) {
+      padding: 5px;
+      font-size: 18px;
+    }
+  }
+
+  .currentPowerupIcon {
+    width: 15px;
+    height: 15px;
+    margin-right: 2px;
+
+    @media (min-width: @screen-sm-min) {
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+    }
+  }
+
+  .blue {
+    background-color: #ddf;
+  }
+
+  .red {
+    background-color: #fdd;
+  }
+
+  .progress {
+    margin-bottom: 8px;
+  }
+}

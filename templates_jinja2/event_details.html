@@ -106,19 +106,21 @@
         </div>
         <div class="clearfix"></div>
 
-        {% if matches_upcoming %}
-        <div class="col-sm-6">
-          <h4>Upcoming Matches</h4>
-          {{ mtm.upcoming_match_table(matches_upcoming) }}
+        <div id="liveevent-content">
+          {% if matches_upcoming %}
+          <div class="col-sm-6">
+            <h4>Upcoming Matches</h4>
+            {{ mtm.upcoming_match_table(matches_upcoming) }}
+          </div>
+          {% endif %}
+          {% if matches_recent %}
+          <div class="col-sm-6">
+            <h4>Recent Matches</h4>
+            {{ mtm.recent_match_table(matches_recent) }}
+          </div>
+          {% endif %}
+          <div class="clearfix"></div>
         </div>
-        {% endif %}
-        {% if matches_recent %}
-        <div class="col-sm-6">
-          <h4>Recent Matches</h4>
-          {{ mtm.recent_match_table(matches_recent) }}
-        </div>
-        {% endif %}
-        <div class="clearfix"></div>
       </div>
     </div>
   </div>
@@ -432,4 +434,8 @@
       </div>
     </div>
 </div>
+{% endblock %}
+
+{% block inline_javascript %}
+  <script type="text/javascript" src="/javascript/liveevent.min.js"></script>
 {% endblock %}
