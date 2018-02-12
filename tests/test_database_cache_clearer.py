@@ -13,7 +13,7 @@ from database.match_query import MatchQuery, EventMatchesQuery, TeamEventMatches
 from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery, \
     EventMediasQuery, TeamTagMediasQuery, TeamYearTagMediasQuery
 from database.robot_query import TeamRobotsQuery
-from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
+from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, EventEventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
 
 from consts.event_type import EventType
 from consts.award_type import AwardType
@@ -281,6 +281,9 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         self.assertTrue(EventTeamsQuery('2015casj').cache_key in cache_keys)
         self.assertTrue(EventTeamsQuery('2015cama').cache_key in cache_keys)
         self.assertTrue(EventTeamsQuery('2010cama').cache_key in cache_keys)
+        self.assertTrue(EventEventTeamsQuery('2015casj').cache_key in cache_keys)
+        self.assertTrue(EventEventTeamsQuery('2015cama').cache_key in cache_keys)
+        self.assertTrue(EventEventTeamsQuery('2010cama').cache_key in cache_keys)
 
     def test_eventteam_updated(self):
         affected_refs = {
@@ -309,6 +312,8 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         self.assertTrue(TeamListYearQuery(2015, 1).cache_key in cache_keys)
         self.assertTrue(EventTeamsQuery('2015casj').cache_key in cache_keys)
         self.assertTrue(EventTeamsQuery('2015cama').cache_key in cache_keys)
+        self.assertTrue(EventEventTeamsQuery('2015casj').cache_key in cache_keys)
+        self.assertTrue(EventEventTeamsQuery('2015cama').cache_key in cache_keys)
         self.assertTrue(EventTeamsMediasQuery('2015cama').cache_key in cache_keys)
         self.assertTrue(EventTeamsMediasQuery('2015casj').cache_key in cache_keys)
         self.assertTrue(EventTeamsPreferredMediasQuery('2015cama').cache_key in cache_keys)

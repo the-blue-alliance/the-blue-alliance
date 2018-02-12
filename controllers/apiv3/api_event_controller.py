@@ -8,7 +8,8 @@ from database.award_query import EventAwardsQuery
 from database.event_query import EventQuery, EventListQuery
 from database.event_details_query import EventDetailsQuery
 from database.match_query import EventMatchesQuery
-from database.team_query import EventTeamsQuery
+from database.team_query import EventTeamsQuery, EventEventTeamsQuery
+from helpers.event_team_status_helper import EventTeamStatusHelper
 from models.event_team import EventTeam
 
 
@@ -128,3 +129,27 @@ class ApiEventAwardsController(ApiBaseController):
         awards, self._last_modified = EventAwardsQuery(event_key).fetch(dict_version=3, return_updated=True)
 
         return json.dumps(awards, ensure_ascii=True, indent=2, sort_keys=True)
+
+
+class ApiEventTeamsStatusesController(ApiBaseController):
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
+
+    def _track_call(self, event_key):
+        action = 'event/teams/statuses'
+        self._track_call_defer(action, event_key)
+
+    def _render(self, event_key):
+        event_teams, self._last_modified = EventEventTeamsQuery(event_key).fetch(return_updated=True)
+        statuses = {}
+        for event_team in event_teams:
+            status = event_team.status
+            team_key = event_team.team.id()
+            if status:
+                status.update({
+                    'alliance_status_str': EventTeamStatusHelper.generate_team_at_event_alliance_status_string(team_key, status),
+                    'playoff_status_str': EventTeamStatusHelper.generate_team_at_event_playoff_status_string(team_key, status),
+                    'overall_status_str': EventTeamStatusHelper.generate_team_at_event_status_string(team_key, status),
+                })
+            statuses[team_key] = status
+        return json.dumps(statuses, ensure_ascii=True, indent=2, sort_keys=True)

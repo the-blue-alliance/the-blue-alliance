@@ -9,7 +9,7 @@ from database.match_query import MatchQuery, EventMatchesQuery, TeamEventMatches
 from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery, \
     EventMediasQuery, TeamTagMediasQuery, TeamYearTagMediasQuery
 from database.robot_query import TeamRobotsQuery
-from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
+from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, EventEventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
 
 from models.district_team import DistrictTeam
 from models.event import Event
@@ -175,6 +175,7 @@ def team_updated(affected_refs):
         page_num = _get_team_page_num(et_key.id().split('_')[1])
         queries_and_keys.append((TeamListYearQuery(year, page_num)))
         queries_and_keys.append((EventTeamsQuery(event_key)))
+        queries_and_keys.append((EventEventTeamsQuery(event_key)))
 
     for dt_key in district_team_keys_future.get_result():
         district_key = dt_key.id().split('_')[0]
@@ -200,6 +201,7 @@ def eventteam_updated(affected_refs):
 
     for event_key in event_keys:
         queries_and_keys.append(EventTeamsQuery(event_key.id()))
+        queries_and_keys.append(EventEventTeamsQuery(event_key.id()))
         queries_and_keys.append(EventTeamsMediasQuery(event_key.id()))
         queries_and_keys.append(EventTeamsPreferredMediasQuery(event_key.id()))
 
