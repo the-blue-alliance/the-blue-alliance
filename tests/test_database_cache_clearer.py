@@ -6,7 +6,7 @@ from google.appengine.ext import testbed
 from database import get_affected_queries
 from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery, TeamEventTypeAwardsQuery
 from database.district_query import DistrictsInYearQuery, DistrictHistoryQuery, DistrictQuery
-from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery, \
+from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery, TeamYearEventTeamsQuery, \
     EventDivisionsQuery
 from database.event_details_query import EventDetailsQuery
 from database.match_query import MatchQuery, EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
@@ -177,6 +177,8 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         self.assertTrue(TeamEventsQuery('frc604').cache_key in cache_keys)
         self.assertTrue(TeamYearEventsQuery('frc254', 2015).cache_key in cache_keys)
         self.assertTrue(TeamYearEventsQuery('frc604', 2015).cache_key in cache_keys)
+        self.assertTrue(TeamYearEventTeamsQuery('frc254', 2015).cache_key in cache_keys)
+        self.assertTrue(TeamYearEventTeamsQuery('frc604', 2015).cache_key in cache_keys)
         self.assertTrue(EventDivisionsQuery('2015casj').cache_key in cache_keys)
         self.assertTrue(EventDivisionsQuery('2015cama').cache_key in cache_keys)
         self.assertTrue(EventDivisionsQuery('2015cafoo').cache_key in cache_keys)
@@ -297,6 +299,10 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         self.assertTrue(TeamYearEventsQuery('frc254', 2015).cache_key in cache_keys)
         self.assertTrue(TeamYearEventsQuery('frc604', 2014).cache_key in cache_keys)
         self.assertTrue(TeamYearEventsQuery('frc604', 2015).cache_key in cache_keys)
+        self.assertTrue(TeamYearEventTeamsQuery('frc254', 2014).cache_key in cache_keys)
+        self.assertTrue(TeamYearEventTeamsQuery('frc254', 2015).cache_key in cache_keys)
+        self.assertTrue(TeamYearEventTeamsQuery('frc604', 2014).cache_key in cache_keys)
+        self.assertTrue(TeamYearEventTeamsQuery('frc604', 2015).cache_key in cache_keys)
         self.assertTrue(TeamListYearQuery(2014, 0).cache_key in cache_keys)
         self.assertTrue(TeamListYearQuery(2014, 1).cache_key in cache_keys)
         self.assertTrue(TeamListYearQuery(2015, 0).cache_key in cache_keys)
@@ -343,4 +349,5 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         self.assertTrue(DistrictEventsQuery('2016ne').cache_key in cache_keys)
         self.assertTrue(TeamEventsQuery('frc125').cache_key in cache_keys)
         self.assertTrue(TeamYearEventsQuery('frc125', 2016).cache_key in cache_keys)
+        self.assertTrue(TeamYearEventTeamsQuery('frc125', 2016).cache_key in cache_keys)
         self.assertTrue(EventDivisionsQuery('2016necmp').cache_key in cache_keys)

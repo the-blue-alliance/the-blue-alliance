@@ -50,6 +50,8 @@ app = webapp2.WSGIApplication([
         atc.ApiTeamEventsController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/team/<team_key:>/events/<year:([0-9]+)>/<model_type:(simple|keys)>',
         atc.ApiTeamEventsController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/team/<team_key:>/events/<year:([0-9]+)>/statuses',
+        atc.ApiTeamYearEventsStatusesController, methods=['GET', 'OPTIONS']),
     # Team @ Event
     webapp2.Route(r'/api/v3/team/<team_key:>/event/<event_key:>/matches',
         atc.ApiTeamEventMatchesController, methods=['GET', 'OPTIONS']),
@@ -64,6 +66,7 @@ app = webapp2.WSGIApplication([
         atc.ApiTeamHistoryAwardsController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/team/<team_key:>/awards/<year:([0-9]+)>',
         atc.ApiTeamYearAwardsController, methods=['GET', 'OPTIONS']),
+    # Team Matches
     webapp2.Route(r'/api/v3/team/<team_key:>/matches/<year:([0-9]+)>',
         atc.ApiTeamYearMatchesController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/team/<team_key:>/matches/<year:([0-9]+)>/<model_type:(simple|keys)>',
