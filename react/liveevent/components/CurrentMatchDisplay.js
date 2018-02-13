@@ -32,6 +32,10 @@ class CurrentMatchDisplay extends PureComponent {
     blueFaceTheBoss: false,
   }
 
+  componentDidMount() {
+    setTimeout(this.updateState, 3000)
+  }
+
   updateState = () => {
     if (this.state.mode === 'pre_match') {
       this.setState({
@@ -47,16 +51,16 @@ class CurrentMatchDisplay extends PureComponent {
         })
       } else {
         if (this.state.redScaleOwned) {
-          this.setState({redScore: this.state.redScore + 2})
+          this.setState({ redScore: this.state.redScore + 2 })
         }
         if (this.state.blueScaleOwned) {
-          this.setState({blueScore: this.state.blueScore + 2})
+          this.setState({ blueScore: this.state.blueScore + 2 })
         }
         if (this.state.redSwitchOwned) {
-          this.setState({redScore: this.state.redScore + 2})
+          this.setState({ redScore: this.state.redScore + 2 })
         }
         if (this.state.blueSwitchOwned) {
-          this.setState({blueScore: this.state.blueScore + 2})
+          this.setState({ blueScore: this.state.blueScore + 2 })
         }
       }
     }
@@ -68,16 +72,16 @@ class CurrentMatchDisplay extends PureComponent {
         })
       } else {
         if (this.state.redScaleOwned) {
-          this.setState({redScore: this.state.redScore + (this.state.redCurrentPowerup === 'boost' ? 2 : 1)})
+          this.setState({ redScore: this.state.redScore + (this.state.redCurrentPowerup === 'boost' ? 2 : 1) })
         }
         if (this.state.blueScaleOwned) {
-          this.setState({blueScore: this.state.blueScore + (this.state.blueCurrentPowerup === 'boost' ? 2 : 1)})
+          this.setState({ blueScore: this.state.blueScore + (this.state.blueCurrentPowerup === 'boost' ? 2 : 1) })
         }
         if (this.state.redSwitchOwned) {
-          this.setState({redScore: this.state.redScore + (this.state.redCurrentPowerup === 'boost' ? 2 : 1)})
+          this.setState({ redScore: this.state.redScore + (this.state.redCurrentPowerup === 'boost' ? 2 : 1) })
         }
         if (this.state.blueSwitchOwned) {
-          this.setState({blueScore: this.state.blueScore + (this.state.blueCurrentPowerup === 'boost' ? 2 : 1)})
+          this.setState({ blueScore: this.state.blueScore + (this.state.blueCurrentPowerup === 'boost' ? 2 : 1) })
         }
       }
     }
@@ -95,7 +99,7 @@ class CurrentMatchDisplay extends PureComponent {
         redPowerupTimeRemaining: this.state.redPowerupTimeRemaining - 1,
       })
     } else {
-      this.setState({redCurrentPowerup: null, redPowerupTimeRemaining: null})
+      this.setState({ redCurrentPowerup: null, redPowerupTimeRemaining: null })
     }
 
     if (this.state.blueCurrentPowerup && this.state.bluePowerupTimeRemaining > 0) {
@@ -103,7 +107,7 @@ class CurrentMatchDisplay extends PureComponent {
         bluePowerupTimeRemaining: this.state.bluePowerupTimeRemaining - 1,
       })
     } else {
-      this.setState({blueCurrentPowerup: null, bluePowerupTimeRemaining: null})
+      this.setState({ blueCurrentPowerup: null, bluePowerupTimeRemaining: null })
     }
 
     // Call again
@@ -113,129 +117,129 @@ class CurrentMatchDisplay extends PureComponent {
 
     // Fake scale/switch events
     if (this.state.mode === 'auto' && this.state.timeRemaining === 12) {
-      this.setState({redScaleOwned: true})
+      this.setState({ redScaleOwned: true })
     }
     if (this.state.mode === 'auto' && this.state.timeRemaining === 10) {
-      this.setState({blueSwitchOwned: true})
+      this.setState({ blueSwitchOwned: true })
     }
     if (this.state.mode === 'auto' && this.state.timeRemaining === 9) {
-      this.setState({redSwitchOwned: true})
+      this.setState({ redSwitchOwned: true })
     }
     if (this.state.mode === 'auto' && this.state.timeRemaining === 7) {
-      this.setState({redAutoQuest: true})
+      this.setState({ redAutoQuest: true })
     }
     if (this.state.mode === 'auto' && this.state.timeRemaining === 3) {
-      this.setState({blueAutoQuest: true})
+      this.setState({ blueAutoQuest: true })
     }
 
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 122) {
-      this.setState({redScaleOwned: false, blueScaleOwned: true})
+      this.setState({ redScaleOwned: false, blueScaleOwned: true })
     }
 
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 110) {
-      this.setState({blueSwitchOwned: false})
+      this.setState({ blueSwitchOwned: false })
     }
 
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 90) {
-      this.setState({blueSwitchOwned: true})
+      this.setState({ blueSwitchOwned: true })
     }
 
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 76) {
-      this.setState({redScaleOwned: true, blueScaleOwned: false})
+      this.setState({ redScaleOwned: true, blueScaleOwned: false })
     }
 
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 51) {
-      this.setState({redSwitchOwned: false,})
+      this.setState({ redSwitchOwned: false })
     }
 
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 48) {
-      this.setState({blueSwitchOwned: false})
+      this.setState({ blueSwitchOwned: false })
     }
 
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 34) {
-      this.setState({redSwitchOwned: true})
+      this.setState({ redSwitchOwned: true })
     }
 
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 25) {
-      this.setState({redScaleOwned: false, blueScaleOwned: true})
+      this.setState({ redScaleOwned: false, blueScaleOwned: true })
     }
 
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 15) {
-      this.setState({redScaleOwned: true, blueScaleOwned: false})
+      this.setState({ redScaleOwned: true, blueScaleOwned: false })
     }
 
     // Fake powerup events
     // Red Boost
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 115) {
-      this.setState({redBoostCount: 1, redScore: this.state.redScore + 5})
+      this.setState({ redBoostCount: 1, redScore: this.state.redScore + 5 })
     }
 
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 105) {
-      this.setState({redBoostCount: 2, redScore: this.state.redScore + 5})
+      this.setState({ redBoostCount: 2, redScore: this.state.redScore + 5 })
     }
 
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 95) {
-      this.setState({redBoostCount: 3, redScore: this.state.redScore + 5})
+      this.setState({ redBoostCount: 3, redScore: this.state.redScore + 5 })
     }
 
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 72) {
-      this.setState({redBoostPlayed: true, redCurrentPowerup: 'boost', redPowerupTimeRemaining: 10})
+      this.setState({ redBoostPlayed: true, redCurrentPowerup: 'boost', redPowerupTimeRemaining: 10 })
     }
 
     // Red Levitate
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 77) {
-      this.setState({redLevitateCount: 1, redScore: this.state.redScore + 5})
+      this.setState({ redLevitateCount: 1, redScore: this.state.redScore + 5 })
     }
 
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 52) {
-      this.setState({redLevitateCount: 2, redScore: this.state.redScore + 5})
+      this.setState({ redLevitateCount: 2, redScore: this.state.redScore + 5 })
     }
 
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 31) {
-      this.setState({redLevitateCount: 3, redScore: this.state.redScore + 5})
+      this.setState({ redLevitateCount: 3, redScore: this.state.redScore + 5 })
     }
 
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 12) {
-      this.setState({redLevitatePlayed: true})
+      this.setState({ redLevitatePlayed: true })
     }
 
     // Blue Boost
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 112) {
-      this.setState({blueBoostCount: 1, blueScore: this.state.blueScore + 5})
+      this.setState({ blueBoostCount: 1, blueScore: this.state.blueScore + 5 })
     }
 
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 82) {
-      this.setState({blueBoostCount: 2, blueScore: this.state.blueScore + 5})
+      this.setState({ blueBoostCount: 2, blueScore: this.state.blueScore + 5 })
     }
 
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 40) {
-      this.setState({blueBoostCount: 3, blueScore: this.state.blueScore + 5})
+      this.setState({ blueBoostCount: 3, blueScore: this.state.blueScore + 5 })
     }
 
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 25) {
-      this.setState({blueBoostPlayed: true, blueCurrentPowerup: 'boost', bluePowerupTimeRemaining: 10})
+      this.setState({ blueBoostPlayed: true, blueCurrentPowerup: 'boost', bluePowerupTimeRemaining: 10 })
     }
 
     // Blue Force
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 60) {
-      this.setState({blueForceCount: 1, blueScore: this.state.blueScore + 5})
+      this.setState({ blueForceCount: 1, blueScore: this.state.blueScore + 5 })
     }
 
     // Blue Levitate
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 50) {
-      this.setState({blueLevitateCount: 1, blueScore: this.state.blueScore + 5})
+      this.setState({ blueLevitateCount: 1, blueScore: this.state.blueScore + 5 })
     }
 
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 47) {
-      this.setState({blueLevitateCount: 2, blueScore: this.state.blueScore + 5})
+      this.setState({ blueLevitateCount: 2, blueScore: this.state.blueScore + 5 })
     }
 
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 33) {
-      this.setState({blueLevitateCount: 3, blueScore: this.state.blueScore + 5})
+      this.setState({ blueLevitateCount: 3, blueScore: this.state.blueScore + 5 })
     }
 
     if (this.state.mode === 'teleop' && this.state.timeRemaining === 15) {
-      this.setState({blueLevitatePlayed: true})
+      this.setState({ blueLevitatePlayed: true })
     }
 
     // Endgame
@@ -246,10 +250,6 @@ class CurrentMatchDisplay extends PureComponent {
         blueFaceTheBoss: true,
       })
     }
-  }
-
-  componentDidMount() {
-    setTimeout(this.updateState, 3000)
   }
 
   render() {
@@ -285,21 +285,21 @@ class CurrentMatchDisplay extends PureComponent {
     } = this.state
 
     let progressColor
-    if (mode == 'post_match' || (timeRemaining === 0 && mode == 'teleop')) {
+    if (mode === 'post_match' || (timeRemaining === 0 && mode === 'teleop')) {
       progressColor = 'progress-bar-danger'
-    } else if (timeRemaining <= 30 && mode == 'teleop') {
+    } else if (timeRemaining <= 30 && mode === 'teleop') {
       progressColor = 'progress-bar-warning'
     } else {
       progressColor = 'progress-bar-success'
     }
 
     let progressWidth
-    if (mode == 'post_match') {
+    if (mode === 'post_match') {
       progressWidth = '100%'
-    } else if (mode == 'teleop') {
-      progressWidth = `${(135 - timeRemaining + 15)*100/150}%`
-    } else if (mode == 'auto') {
-      progressWidth = `${(15 - timeRemaining)*100/150}%`
+    } else if (mode === 'teleop') {
+      progressWidth = `${((150 - timeRemaining) * 100) / 150}%`
+    } else if (mode === 'auto') {
+      progressWidth = `${((15 - timeRemaining) * 100) / 150}%`
     } else {
       progressWidth = '0%'
     }
@@ -318,70 +318,70 @@ class CurrentMatchDisplay extends PureComponent {
     }
 
     return (
-      <div className='row liveEventPanel'>
-        <div className='col-xs-4'>
+      <div className="row liveEventPanel">
+        <div className="col-xs-4">
           <div className={`booleanIndicator ${redScaleOwned && 'red'}`}>Scale</div>
           <div className={`booleanIndicator ${redSwitchOwned && 'red'}`}>Switch</div>
-          <div className='powerupsContainer'>
-            <div className={`powerupCountContainer ${redForcePlayed ? 'red': ''}`}>
-              <img src='/images/2018_force.png' className='powerupIcon' />
-              <div className='powerupCount'>{redForceCount}</div>
+          <div className="powerupsContainer">
+            <div className={`powerupCountContainer ${redForcePlayed ? 'red' : ''}`}>
+              <img src="/images/2018_force.png" className="powerupIcon" role="presentation" />
+              <div className="powerupCount">{redForceCount}</div>
             </div>
             <div className={`powerupCountContainer powerupCountContainerCenter ${redLevitatePlayed && 'red'}`}>
-              <img src='/images/2018_levitate.png' className='powerupIcon' />
-              <div className='powerupCount'>{redLevitateCount}</div>
+              <img src="/images/2018_levitate.png" className="powerupIcon" role="presentation" />
+              <div className="powerupCount">{redLevitateCount}</div>
             </div>
-            <div className={`powerupCountContainer ${redBoostPlayed ? 'red': ''}`}>
-              <img src='/images/2018_boost.png' className='powerupIcon' />
-              <div className='powerupCount'>{redBoostCount}</div>
+            <div className={`powerupCountContainer ${redBoostPlayed ? 'red' : ''}`}>
+              <img src="/images/2018_boost.png" className="powerupIcon" role="presentation" />
+              <div className="powerupCount">{redBoostCount}</div>
             </div>
           </div>
           <div className={`booleanIndicator ${redAutoQuest && 'red'}`}>Auto Quest</div>
           <div className={`booleanIndicator ${redFaceTheBoss && 'red'}`}>Face The Boss</div>
         </div>
-        <div className='col-xs-4 middleCol'>
-          <div className='progress'>
-            <div className={`progress-bar ${progressColor}`} style={{width: progressWidth}}></div>
-            <div className='timeRemainingContainer'>
-              <span className='timeRemaining'>{timeRemaining}</span>
+        <div className="col-xs-4 middleCol">
+          <div className="progress">
+            <div className={`progress-bar ${progressColor}`} style={{ width: progressWidth }} />
+            <div className="timeRemainingContainer">
+              <span className="timeRemaining">{ timeRemaining }</span>
             </div>
           </div>
-          <div className='scoreContainer'>
-            <div className='redAlliance'>
+          <div className="scoreContainer">
+            <div className="redAlliance">
               <div>254</div>
               <div>604</div>
               <div>2135</div>
-              <div className='score red'>{redScore}</div>
+              <div className="score red">{ redScore }</div>
             </div>
-            <div className='blueAlliance'>
+            <div className="blueAlliance">
               <div>846</div>
               <div>971</div>
               <div>8</div>
-              <div className='score blue'>{blueScore}</div>
+              <div className="score blue">{ blueScore }</div>
             </div>
           </div>
           {currentPowerup &&
             <div className={`currentPowerup ${powerupColor}`}>
-              <img src={`/images/2018_${currentPowerup}.png`} className='currentPowerupIcon' />
-              {powerupTimeRemaining}
+              <img src={`/images/2018_${currentPowerup}.png`} className="currentPowerupIcon" role="presentation" />
+              { powerupTimeRemaining }
             </div>
           }
         </div>
-        <div className='col-xs-4'>
+        <div className="col-xs-4">
           <div className={`booleanIndicator ${blueScaleOwned && 'blue'}`}>Scale</div>
           <div className={`booleanIndicator ${blueSwitchOwned && 'blue'}`}>Switch</div>
-          <div className='powerupsContainer'>
-            <div className={`powerupCountContainer ${blueForcePlayed ? 'blue': ''}`}>
-              <img src='/images/2018_force.png' className='powerupIcon' />
-              <div className='powerupCount'>{blueForceCount}</div>
+          <div className="powerupsContainer">
+            <div className={`powerupCountContainer ${blueForcePlayed ? 'blue' : ''}`}>
+              <img src="/images/2018_force.png" className="powerupIcon" role="presentation" />
+              <div className="powerupCount">{blueForceCount}</div>
             </div>
             <div className={`powerupCountContainer powerupCountContainerCenter ${blueLevitatePlayed && 'blue'}`}>
-              <img src='/images/2018_levitate.png' className='powerupIcon' />
-              <div className='powerupCount'>{blueLevitateCount}</div>
+              <img src="/images/2018_levitate.png" className="powerupIcon" role="presentation" />
+              <div className="powerupCount">{blueLevitateCount}</div>
             </div>
-            <div className={`powerupCountContainer ${blueBoostPlayed ? 'blue': ''}`}>
-              <img src='/images/2018_boost.png' className='powerupIcon' />
-              <div className='powerupCount'>{blueBoostCount}</div>
+            <div className={`powerupCountContainer ${blueBoostPlayed ? 'blue' : ''}`}>
+              <img src="/images/2018_boost.png" className="powerupIcon" role="presentation" />
+              <div className="powerupCount">{blueBoostCount}</div>
             </div>
           </div>
           <div className={`booleanIndicator ${blueAutoQuest && 'blue'}`}>Auto Quest</div>
