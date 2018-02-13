@@ -324,15 +324,15 @@ class CurrentMatchDisplay extends PureComponent {
           <div className={`booleanIndicator ${redSwitchOwned && 'red'}`}>Switch</div>
           <div className="powerupsContainer">
             <div className={`powerupCountContainer ${redForcePlayed ? 'red' : ''}`}>
-              <img src="/images/2018_force.png" className="powerupIcon" role="presentation" />
+              <img src="/images/2018_force.png" className="powerupIcon" role="presentation" rel="tooltip" title="Force" />
               <div className="powerupCount">{redForceCount}</div>
             </div>
             <div className={`powerupCountContainer powerupCountContainerCenter ${redLevitatePlayed && 'red'}`}>
-              <img src="/images/2018_levitate.png" className="powerupIcon" role="presentation" />
+              <img src="/images/2018_levitate.png" className="powerupIcon" role="presentation" rel="tooltip" title="Levitate" />
               <div className="powerupCount">{redLevitateCount}</div>
             </div>
             <div className={`powerupCountContainer ${redBoostPlayed ? 'red' : ''}`}>
-              <img src="/images/2018_boost.png" className="powerupIcon" role="presentation" />
+              <img src="/images/2018_boost.png" className="powerupIcon" role="presentation" rel="tooltip" title="Boost" />
               <div className="powerupCount">{redBoostCount}</div>
             </div>
           </div>
@@ -372,15 +372,15 @@ class CurrentMatchDisplay extends PureComponent {
           <div className={`booleanIndicator ${blueSwitchOwned && 'blue'}`}>Switch</div>
           <div className="powerupsContainer">
             <div className={`powerupCountContainer ${blueForcePlayed ? 'blue' : ''}`}>
-              <img src="/images/2018_force.png" className="powerupIcon" role="presentation" />
+              <img src="/images/2018_force.png" className="powerupIcon" role="presentation" rel="tooltip" title="Force" />
               <div className="powerupCount">{blueForceCount}</div>
             </div>
             <div className={`powerupCountContainer powerupCountContainerCenter ${blueLevitatePlayed && 'blue'}`}>
-              <img src="/images/2018_levitate.png" className="powerupIcon" role="presentation" />
+              <img src="/images/2018_levitate.png" className="powerupIcon" role="presentation" rel="tooltip" title="Levitate" />
               <div className="powerupCount">{blueLevitateCount}</div>
             </div>
             <div className={`powerupCountContainer ${blueBoostPlayed ? 'blue' : ''}`}>
-              <img src="/images/2018_boost.png" className="powerupIcon" role="presentation" />
+              <img src="/images/2018_boost.png" className="powerupIcon" role="presentation" rel="tooltip" title="Boost" />
               <div className="powerupCount">{blueBoostCount}</div>
             </div>
           </div>
