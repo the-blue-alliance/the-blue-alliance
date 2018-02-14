@@ -29,16 +29,16 @@ class LiveEventPanel extends React.PureComponent {
   componentDidMount() {
     // TODO: Replace with production settings
     const firebaseApp = Firebase.initializeApp({
-      apiKey: "AIzaSyA829V_3y57gGXIm7iodYHmkeYwXvOjL4c",
-      authDomain: "thebluealliance-dev.firebaseapp.com",
-      databaseURL: "https://thebluealliance-dev.firebaseio.com",
+      apiKey: 'AIzaSyA829V_3y57gGXIm7iodYHmkeYwXvOjL4c',
+      authDomain: 'thebluealliance-dev.firebaseapp.com',
+      databaseURL: 'https://thebluealliance-dev.firebaseio.com',
     })
     firebaseApp.database().ref('/events/2017casj/matches').on('value', (snapshot) => {
-      let matches = Object.values(snapshot.val())
+      const matches = Object.values(snapshot.val())
       matches.sort((match1, match2) => playOrder(match1) - playOrder(match2))
 
-      const playedMatches = matches.filter(match => match.alliances.red.score !== -1 && match.alliances.blue.score !== -1)
-      const unplayedMatches = matches.filter(match => match.alliances.red.score === -1 || match.alliances.blue.score === -1)
+      const playedMatches = matches.filter((match) => match.alliances.red.score !== -1 && match.alliances.blue.score !== -1)
+      const unplayedMatches = matches.filter((match) => match.alliances.red.score === -1 || match.alliances.blue.score === -1)
       this.setState({
         lastMatches: playedMatches.slice(-3),
         currentMatch: unplayedMatches[0],
@@ -47,7 +47,7 @@ class LiveEventPanel extends React.PureComponent {
     })
   }
 
-  render () {
+  render() {
     return (
       <div>
         <div className="col-lg-3 text-center">

@@ -1,4 +1,6 @@
 import React, { PureComponent } from 'react'
+import PropTypes from 'prop-types'
+
 import PowerupCount from './PowerupCount'
 
 class CurrentMatchDisplay extends PureComponent {
@@ -257,7 +259,7 @@ class CurrentMatchDisplay extends PureComponent {
     const { match } = this.props
 
     if (match === null) {
-      return <div><span className="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span></div>
+      return <div><span className="glyphicon glyphicon-refresh glyphicon-refresh-animate" /></div>
     }
 
     const {
@@ -347,16 +349,16 @@ class CurrentMatchDisplay extends PureComponent {
           </div>
           <div className="scoreContainer">
             <div className="redAlliance">
-              {match.alliances.red.team_keys.map(teamKey => {
+              {match.alliances.red.team_keys.map((teamKey) => {
                 const teamNum = teamKey.substring(3)
-                return <div key={ teamKey } ><a href={ `/team/${ teamNum }/${ year }` }>{ teamNum }</a></div>
+                return <div key={teamKey} ><a href={`/team/${teamNum}/${year}`}>{teamNum}</a></div>
               })}
               <div className="score red">{ redScore }</div>
             </div>
             <div className="blueAlliance">
-              {match.alliances.blue.team_keys.map(teamKey => {
+              {match.alliances.blue.team_keys.map((teamKey) => {
                 const teamNum = teamKey.substring(3)
-                return <div key={ teamKey } ><a href={ `/team/${ teamNum }/${ year }` }>{ teamNum }</a></div>
+                return <div key={teamKey} ><a href={`/team/${teamNum}/${year}`}>{teamNum}</a></div>
               })}
               <div className="score blue">{ blueScore }</div>
             </div>
@@ -382,6 +384,10 @@ class CurrentMatchDisplay extends PureComponent {
       </div>
     )
   }
+}
+
+CurrentMatchDisplay.propTypes = {
+  match: PropTypes.object,
 }
 
 export default CurrentMatchDisplay

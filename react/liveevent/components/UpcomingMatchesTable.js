@@ -5,7 +5,7 @@ import { getCompLevelStr, getMatchSetStr } from '../helpers'
 
 class UpcomingMatchesTable extends React.PureComponent {
   state = {
-    currentTime: undefined
+    currentTime: undefined,
   }
 
   componentDidMount() {
@@ -14,18 +14,18 @@ class UpcomingMatchesTable extends React.PureComponent {
   }
 
   updateCurrentTime = () => {
-    this.setState({currentTime: new Date().getTime() / 1000})
+    this.setState({ currentTime: new Date().getTime() / 1000 })
   }
 
   render() {
     if (this.props.matches === null) {
-      return <div><span className="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span></div>
-    } else if (this.props.matches.length == 0) {
+      return <div><span className="glyphicon glyphicon-refresh glyphicon-refresh-animate" /></div>
+    } else if (this.props.matches.length === 0) {
       return <div>There are no more scheduled matches</div>
     }
 
-    let matchRows = []
-    this.props.matches.forEach(match => {
+    const matchRows = []
+    this.props.matches.forEach((match) => {
       let etaStr = '?'
       if (this.state.currentTime && match.predicted_time) {
         const etaMin = (match.predicted_time - this.state.currentTime) / 60
@@ -39,19 +39,19 @@ class UpcomingMatchesTable extends React.PureComponent {
       const year = match.key.substring(0, 4)
       matchRows.push(
         <tr key={`${match.key}_red`}>
-          <td rowSpan="2"><a href={`/match/${match.key}`}>{ getCompLevelStr(match) }<br/>{ getMatchSetStr(match) }</a></td>
-          {match.alliances.red.team_keys.map(teamKey => {
+          <td rowSpan="2"><a href={`/match/${match.key}`}>{getCompLevelStr(match)}<br />{getMatchSetStr(match)}</a></td>
+          {match.alliances.red.team_keys.map((teamKey) => {
             const teamNum = teamKey.substring(3)
-            return <td key={ teamKey } className="red"><a href={ `/team/${ teamNum }/${ year }` }>{ teamNum }</a></td>
+            return <td key={teamKey} className="red"><a href={`/team/${teamNum}/${year}`}>{teamNum}</a></td>
           })}
           <td rowSpan="2">{ etaStr }</td>
         </tr>
       )
       matchRows.push(
         <tr key={`${match.key}_blue`}>
-          {match.alliances.blue.team_keys.map(teamKey => {
+          {match.alliances.red.team_keys.map((teamKey) => {
             const teamNum = teamKey.substring(3)
-            return <td key={ teamKey } className="blue"><a href={ `/team/${ teamNum }/${ year }` }>{ teamNum }</a></td>
+            return <td key={teamKey} className="blue"><a href={`/team/${teamNum}/${year}`}>{teamNum}</a></td>
           })}
         </tr>
       )

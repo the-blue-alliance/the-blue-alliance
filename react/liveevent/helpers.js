@@ -6,10 +6,10 @@ const compLevelStrings = {
   f: 'Finals',
 }
 
-export const getCompLevelStr = (match) => {
-  return compLevelStrings[match.comp_level]
-}
+export const getCompLevelStr = (match) => (
+  compLevelStrings[match.comp_level]
+)
 
-export const getMatchSetStr = (match) => {
-  return (match.comp_level !== 'qm') ? `${match.set_number} - ${match.match_number}` : match.match_number
-}
+export const getMatchSetStr = (match) => (
+  (match.comp_level !== 'qm') ? `${match.set_number} - ${match.match_number}` : match.match_number
+)
