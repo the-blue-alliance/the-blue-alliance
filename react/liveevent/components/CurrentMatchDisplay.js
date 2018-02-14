@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import PowerupCount from './PowerupCount'
 
 class CurrentMatchDisplay extends PureComponent {
   state = {
@@ -323,18 +324,9 @@ class CurrentMatchDisplay extends PureComponent {
           <div className={`booleanIndicator ${redScaleOwned && 'red'}`}>Scale</div>
           <div className={`booleanIndicator ${redSwitchOwned && 'red'}`}>Switch</div>
           <div className="powerupsContainer">
-            <div className={`powerupCountContainer ${redForcePlayed ? 'red' : ''}`}>
-              <img src="/images/2018_force.png" className="powerupIcon" role="presentation" rel="tooltip" title="Force" />
-              <div className="powerupCount">{redForceCount}</div>
-            </div>
-            <div className={`powerupCountContainer powerupCountContainerCenter ${redLevitatePlayed && 'red'}`}>
-              <img src="/images/2018_levitate.png" className="powerupIcon" role="presentation" rel="tooltip" title="Levitate" />
-              <div className="powerupCount">{redLevitateCount}</div>
-            </div>
-            <div className={`powerupCountContainer ${redBoostPlayed ? 'red' : ''}`}>
-              <img src="/images/2018_boost.png" className="powerupIcon" role="presentation" rel="tooltip" title="Boost" />
-              <div className="powerupCount">{redBoostCount}</div>
-            </div>
+            <PowerupCount color='red' type='force' count={redForceCount} played={redForcePlayed} />
+            <PowerupCount color='red' type='levitate' count={redLevitateCount} played={redLevitatePlayed} isCenter />
+            <PowerupCount color='red' type='boost' count={redBoostCount} played={redBoostPlayed} />
           </div>
           <div className={`booleanIndicator ${redAutoQuest && 'red'}`}>Auto Quest</div>
           <div className={`booleanIndicator ${redFaceTheBoss && 'red'}`}>Face The Boss</div>
@@ -371,18 +363,9 @@ class CurrentMatchDisplay extends PureComponent {
           <div className={`booleanIndicator ${blueScaleOwned && 'blue'}`}>Scale</div>
           <div className={`booleanIndicator ${blueSwitchOwned && 'blue'}`}>Switch</div>
           <div className="powerupsContainer">
-            <div className={`powerupCountContainer ${blueForcePlayed ? 'blue' : ''}`}>
-              <img src="/images/2018_force.png" className="powerupIcon" role="presentation" rel="tooltip" title="Force" />
-              <div className="powerupCount">{blueForceCount}</div>
-            </div>
-            <div className={`powerupCountContainer powerupCountContainerCenter ${blueLevitatePlayed && 'blue'}`}>
-              <img src="/images/2018_levitate.png" className="powerupIcon" role="presentation" rel="tooltip" title="Levitate" />
-              <div className="powerupCount">{blueLevitateCount}</div>
-            </div>
-            <div className={`powerupCountContainer ${blueBoostPlayed ? 'blue' : ''}`}>
-              <img src="/images/2018_boost.png" className="powerupIcon" role="presentation" rel="tooltip" title="Boost" />
-              <div className="powerupCount">{blueBoostCount}</div>
-            </div>
+            <PowerupCount color='blue' type='force' count={blueForceCount} played={blueForcePlayed} />
+            <PowerupCount color='blue' type='levitate' count={blueLevitateCount} played={blueLevitatePlayed} isCenter />
+            <PowerupCount color='blue' type='boost' count={blueBoostCount} played={blueBoostPlayed} />
           </div>
           <div className={`booleanIndicator ${blueAutoQuest && 'blue'}`}>Auto Quest</div>
           <div className={`booleanIndicator ${blueFaceTheBoss && 'blue'}`}>Face The Boss</div>
