@@ -1,23 +1,21 @@
-import React, { PureComponent } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 
-class PowerupCount extends PureComponent {
-  render() {
-    const {
-      color,
-      type,
-      count,
-      played,
-      isCenter
-    } = this.props
-    const tooltipTitle = type.charAt(0).toUpperCase() + type.slice(1)
-    return (
-      <div className={`powerupCountContainer ${isCenter ? 'powerupCountContainerCenter' : ''} ${count !== 0 ? `${color}Count${count}` : ''} ${played ? color : ''}`}>
-        <img src={`/images/2018_${type}.png`} className="powerupIcon" role="presentation" rel="tooltip" title={tooltipTitle} />
-        <div className="powerupCount">{count}</div>
-      </div>
-    )
-  }
+const PowerupCount = (props) => {
+  const {
+    color,
+    type,
+    count,
+    played,
+    isCenter,
+  } = props
+  const tooltipTitle = type.charAt(0).toUpperCase() + type.slice(1)
+  return (
+    <div className={`powerupCountContainer ${isCenter ? 'powerupCountContainerCenter' : ''} ${count !== 0 ? `${color}Count${count}` : ''} ${played ? color : ''}`}>
+      <img src={`/images/2018_${type}.png`} className="powerupIcon" role="presentation" rel="tooltip" title={tooltipTitle} />
+      <div className="powerupCount">{count}</div>
+    </div>
+  )
 }
 
 PowerupCount.propTypes = {

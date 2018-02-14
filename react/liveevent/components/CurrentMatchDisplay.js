@@ -324,9 +324,9 @@ class CurrentMatchDisplay extends PureComponent {
           <div className={`booleanIndicator ${redScaleOwned && 'red'}`}>Scale</div>
           <div className={`booleanIndicator ${redSwitchOwned && 'red'}`}>Switch</div>
           <div className="powerupsContainer">
-            <PowerupCount color='red' type='force' count={redForceCount} played={redForcePlayed} />
-            <PowerupCount color='red' type='levitate' count={redLevitateCount} played={redLevitatePlayed} isCenter />
-            <PowerupCount color='red' type='boost' count={redBoostCount} played={redBoostPlayed} />
+            <PowerupCount color="red" type="force" count={redForceCount} played={redForcePlayed} />
+            <PowerupCount color="red" type="levitate" count={redLevitateCount} played={redLevitatePlayed} isCenter />
+            <PowerupCount color="red" type="boost" count={redBoostCount} played={redBoostPlayed} />
           </div>
           <div className={`booleanIndicator ${redAutoQuest && 'red'}`}>Auto Quest</div>
           <div className={`booleanIndicator ${redFaceTheBoss && 'red'}`}>Face The Boss</div>
@@ -363,9 +363,9 @@ class CurrentMatchDisplay extends PureComponent {
           <div className={`booleanIndicator ${blueScaleOwned && 'blue'}`}>Scale</div>
           <div className={`booleanIndicator ${blueSwitchOwned && 'blue'}`}>Switch</div>
           <div className="powerupsContainer">
-            <PowerupCount color='blue' type='force' count={blueForceCount} played={blueForcePlayed} />
-            <PowerupCount color='blue' type='levitate' count={blueLevitateCount} played={blueLevitatePlayed} isCenter />
-            <PowerupCount color='blue' type='boost' count={blueBoostCount} played={blueBoostPlayed} />
+            <PowerupCount color="blue" type="force" count={blueForceCount} played={blueForcePlayed} />
+            <PowerupCount color="blue" type="levitate" count={blueLevitateCount} played={blueLevitatePlayed} isCenter />
+            <PowerupCount color="blue" type="boost" count={blueBoostCount} played={blueBoostPlayed} />
           </div>
           <div className={`booleanIndicator ${blueAutoQuest && 'blue'}`}>Auto Quest</div>
           <div className={`booleanIndicator ${blueFaceTheBoss && 'blue'}`}>Face The Boss</div>
