@@ -254,6 +254,12 @@ class CurrentMatchDisplay extends PureComponent {
   }
 
   render() {
+    const { match } = this.props
+
+    if (match === null) {
+      return <div><span className="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span></div>
+    }
+
     const {
       mode,
       timeRemaining,
@@ -318,6 +324,7 @@ class CurrentMatchDisplay extends PureComponent {
       powerupColor = 'blue'
     }
 
+    const year = match.key.substring(0, 4)
     return (
       <div className="row liveEventPanel">
         <div className="col-xs-4">
@@ -340,15 +347,17 @@ class CurrentMatchDisplay extends PureComponent {
           </div>
           <div className="scoreContainer">
             <div className="redAlliance">
-              <div>254</div>
-              <div>604</div>
-              <div>2135</div>
+              {match.alliances.red.team_keys.map(teamKey => {
+                const teamNum = teamKey.substring(3)
+                return <div key={ teamKey } ><a href={ `/team/${ teamNum }/${ year }` }>{ teamNum }</a></div>
+              })}
               <div className="score red">{ redScore }</div>
             </div>
             <div className="blueAlliance">
-              <div>846</div>
-              <div>971</div>
-              <div>8</div>
+              {match.alliances.blue.team_keys.map(teamKey => {
+                const teamNum = teamKey.substring(3)
+                return <div key={ teamKey } ><a href={ `/team/${ teamNum }/${ year }` }>{ teamNum }</a></div>
+              })}
               <div className="score blue">{ blueScore }</div>
             </div>
           </div>
