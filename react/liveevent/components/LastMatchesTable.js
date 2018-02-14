@@ -1,49 +1,51 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
-const LastMatchesTable = () => (
-  <table className="match-table">
-    <tbody>
-      <tr>
-        <td rowSpan="2">Quals 1</td>
-        <td className="red">red1</td>
-        <td className="red">red2</td>
-        <td className="red">red3</td>
-        <td className="redScore">score</td>
+import { getCompLevelStr, getMatchSetStr } from '../helpers'
+
+const LastMatchesTable = (props) => {
+  let matchRows = []
+  props.matches.forEach(match => {
+    const year = match.key.substring(0, 4)
+    matchRows.push(
+      <tr key={`${match.key}_red`}>
+          <td rowSpan="2"><a href={`/match/${match.key}`}>{ getCompLevelStr(match) }<br/>{ getMatchSetStr(match) }</a></td>
+        {match.alliances.red.team_keys.map(teamKey => {
+          const teamNum = teamKey.substring(3)
+          return <td key={ teamKey } className={`red ${match.winning_alliance === 'red' ? 'winner' : ''}`}><a href={ `/team/${ teamNum }/${ year }` }>{ teamNum }</a></td>
+        })}
+        <td className={`redScore ${match.winning_alliance === 'red' ? 'winner' : ''}`}>{ match.alliances.red.score }</td>
       </tr>
-      <tr>
-        <td className="blue">blue1</td>
-        <td className="blue">blue2</td>
-        <td className="blue">blue3</td>
-        <td className="blueScore">score</td>
+    )
+    matchRows.push(
+      <tr key={`${match.key}_blue`}>
+        {match.alliances.blue.team_keys.map(teamKey => {
+          const teamNum = teamKey.substring(3)
+          return <td key={ teamKey } className={`blue ${match.winning_alliance === 'blue' ? 'winner' : ''}`}><a href={ `/team/${ teamNum }/${ year }` }>{ teamNum }</a></td>
+        })}
+        <td className={`blueScore ${match.winning_alliance === 'blue' ? 'winner' : ''}`}>{ match.alliances.blue.score }</td>
       </tr>
-      <tr>
-        <td rowSpan="2">Quals 2</td>
-        <td className="red">red1</td>
-        <td className="red">red2</td>
-        <td className="red">red3</td>
-        <td className="redScore">score</td>
-      </tr>
-      <tr>
-        <td className="blue">blue1</td>
-        <td className="blue">blue2</td>
-        <td className="blue">blue3</td>
-        <td className="blueScore">score</td>
-      </tr>
-      <tr>
-        <td rowSpan="2">Quals 3</td>
-        <td className="red">red1</td>
-        <td className="red">red2</td>
-        <td className="red">red3</td>
-        <td className="redScore">score</td>
-      </tr>
-      <tr>
-        <td className="blue">blue1</td>
-        <td className="blue">blue2</td>
-        <td className="blue">blue3</td>
-        <td className="blueScore">score</td>
-      </tr>
-    </tbody>
-  </table>
-)
+    )
+  })
+
+  return (
+    <table className="match-table">
+      <thead>
+        <tr className="key">
+          <th>Match</th>
+          <th colSpan="3">Alliances</th>
+          <th>Scores</th>
+        </tr>
+      </thead>
+      <tbody>
+        { matchRows }
+      </tbody>
+    </table>
+  )
+}
+
+LastMatchesTable.propTypes = {
+  matches: PropTypes.array.isRequired,
+}
 
 export default LastMatchesTable

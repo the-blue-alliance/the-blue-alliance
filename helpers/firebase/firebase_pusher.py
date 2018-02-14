@@ -156,16 +156,17 @@ class FirebasePusher(object):
         """
         Updates an event_detail in an event
         """
-        if int(event_details.key.id()[:4]) < 2017:
-            return
+        return
+        # if int(event_details.key.id()[:4]) < 2017:
+        #     return
 
-        event_details_json = json.dumps(EventDetailsConverter.convert(event_details, 3))
+        # event_details_json = json.dumps(EventDetailsConverter.convert(event_details, 3))
 
-        deferred.defer(
-            cls._patch_data,
-            'events/{}/details'.format(event_details.key.id()),
-            event_details_json,
-            _queue="firebase")
+        # deferred.defer(
+        #     cls._patch_data,
+        #     'events/{}/details'.format(event_details.key.id()),
+        #     event_details_json,
+        #     _queue="firebase")
 
     @classmethod
     def update_event_team_status(cls, event_key, team_key, status):
