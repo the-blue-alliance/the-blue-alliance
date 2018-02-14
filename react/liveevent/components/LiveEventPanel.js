@@ -21,9 +21,9 @@ function playOrder(match) {
 
 class LiveEventPanel extends React.PureComponent {
   state = {
-    lastMatches: [],
-    currentMatch: undefined,
-    upcomingMatches: [],
+    lastMatches: null,
+    currentMatch: null,
+    upcomingMatches: null,
   }
 
   componentDidMount() {

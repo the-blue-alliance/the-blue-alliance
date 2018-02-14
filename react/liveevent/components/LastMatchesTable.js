@@ -4,6 +4,12 @@ import PropTypes from 'prop-types'
 import { getCompLevelStr, getMatchSetStr } from '../helpers'
 
 const LastMatchesTable = (props) => {
+  if (props.matches === null) {
+    return <div><span className="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span></div>
+  } else if (props.matches.length == 0) {
+    return <div>No matches have been played</div>
+  }
+
   let matchRows = []
   props.matches.forEach(match => {
     const year = match.key.substring(0, 4)
@@ -45,7 +51,7 @@ const LastMatchesTable = (props) => {
 }
 
 LastMatchesTable.propTypes = {
-  matches: PropTypes.array.isRequired,
+  matches: PropTypes.array,
 }
 
 export default LastMatchesTable

@@ -18,6 +18,12 @@ class UpcomingMatchesTable extends React.PureComponent {
   }
 
   render() {
+    if (this.props.matches === null) {
+      return <div><span className="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span></div>
+    } else if (this.props.matches.length == 0) {
+      return <div>There are no more scheduled matches</div>
+    }
+
     let matchRows = []
     this.props.matches.forEach(match => {
       let etaStr = '?'
@@ -69,7 +75,7 @@ class UpcomingMatchesTable extends React.PureComponent {
 }
 
 UpcomingMatchesTable.propTypes = {
-  matches: PropTypes.array.isRequired,
+  matches: PropTypes.array,
 }
 
 export default UpcomingMatchesTable
