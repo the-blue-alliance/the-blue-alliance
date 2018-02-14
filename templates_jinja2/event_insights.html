@@ -173,11 +173,11 @@
   Chart.defaults.global.maintainAspectRatio = false;
   Chart.defaults.global.tooltips = false;
 
-  var minQualScore = 1;
-  var maxQualScore = 399;
+  var minQualScore = Infinity;
+  var maxQualScore = 0;
   var qualLineHeight = 0;
-  var minPlayoffScore = 1;
-  var maxPlayoffScore = 549;
+  var minPlayoffScore = Infinity;
+  var maxPlayoffScore = 0;
   var playoffLineHeight = 0;
   for (var key in predictions) {
     var redScore = predictions[key]['red_actual_score'];
@@ -189,6 +189,19 @@
         minQualScore = Math.min(minQualScore, blueScore);
         maxQualScore = Math.max(maxQualScore, redScore);
         maxQualScore = Math.max(maxQualScore, blueScore);
+      } else {
+        minQualScore = Math.min(minQualScore,
+                                predictions[key]['red_mean']
+                                - 2*Math.sqrt(predictions[key]['red_var']));
+        minQualScore = Math.min(minQualScore,
+                                predictions[key]['blue_mean']
+                                - 2*Math.sqrt(predictions[key]['blue_var']));
+        maxQualScore = Math.min(maxQualScore,
+                                predictions[key]['red_mean']
+                                + 2*Math.sqrt(predictions[key]['red_var']));
+        maxQualScore = Math.min(maxQualScore,
+                                predictions[key]['blue_mean']
+                                + 2*Math.sqrt(predictions[key]['blue_var']));
       }
       qualLineHeight = Math.max(qualLineHeight,
         Math.max(gaussian(predictions[key]['red_mean'],
@@ -203,6 +216,19 @@
         minPlayoffScore = Math.min(minPlayoffScore, blueScore);
         maxPlayoffScore = Math.max(maxPlayoffScore, redScore);
         maxPlayoffScore = Math.max(maxPlayoffScore, blueScore);
+      } else {
+        minPlayoffScore = Math.min(minPlayoffScore, 
+                                   predictions[key]['red_mean']
+                                   - 2*Math.sqrt(predictions[key]['red_var']));
+        minPlayoffScore = Math.min(minPlayoffScore,
+                                   predictions[key]['blue_mean']
+                                   - 2*Math.sqrt(predictions[key]['blue_var']));
+        maxPlayoffScore = Math.min(maxPlayoffScore,
+                                   predictions[key]['red_mean']
+                                   + 2*Math.sqrt(predictions[key]['red_var']));
+        maxPlayoffScore = Math.min(maxPlayoffScore,
+                                   predictions[key]['blue_mean']
+                                   + 2*Math.sqrt(predictions[key]['blue_var']));
       }
       playoffLineHeight = Math.max(playoffLineHeight,
         Math.max(gaussian(predictions[key]['red_mean'],
@@ -213,6 +239,9 @@
                           Math.sqrt(predictions[key]['blue_var']))));
     }
   }
+
+  minQualScore = Math.max(minQualScore, 0)
+  minPlayoffScore = Math.max(minPlayoffScore, 0)
 
   var xMinQual = minQualScore - (minQualScore % 50);
   var xMaxQual = maxQualScore - (maxQualScore % 50) + 50;
