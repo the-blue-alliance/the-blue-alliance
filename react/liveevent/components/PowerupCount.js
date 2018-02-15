@@ -13,7 +13,9 @@ const PowerupCount = (props) => {
   return (
     <div className={`powerupCountContainer ${isCenter ? 'powerupCountContainerCenter' : ''} ${count !== 0 ? `${color}Count${count}` : ''} ${played ? color : ''}`}>
       <img src={`/images/2018_${type}.png`} className="powerupIcon" role="presentation" rel="tooltip" title={tooltipTitle} />
-      <div className="powerupCount">{count}</div>
+      <div className={`powerCube ${count > 2 ? 'powerCubeActive' : ''}`} />
+      <div className={`powerCube ${count > 1 ? 'powerCubeActive' : ''}`} />
+      <div className={`powerCube ${count > 0 ? 'powerCubeActive' : ''}`} />
     </div>
   )
 }
