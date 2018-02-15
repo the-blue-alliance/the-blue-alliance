@@ -71,7 +71,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             clean_matches = MatchHelper.organizeKeys(matches.keys())
             self.assertEqual(len(clean_matches["qm"]), 88)
 
-    def test_parse_qual_2018update(self):
+        # Changed format in 2018
         with open('test_data/fms_api/2016_nyny_qual_breakdown_2018update.json', 'r') as f:
             matches = FMSAPIMatchDetailsParser(2016, 'nyny').parse(json.loads(f.read()))
 
