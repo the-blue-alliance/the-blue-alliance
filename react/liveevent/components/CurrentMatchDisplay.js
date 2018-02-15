@@ -4,265 +4,269 @@ import PropTypes from 'prop-types'
 import PowerupCount from './PowerupCount'
 
 class CurrentMatchDisplay extends PureComponent {
-  state = {
-    mode: 'pre_match',
-    timeRemaining: 15,
-    redScore: 0,
-    redForceCount: 0,
-    redForcePlayed: false,
-    redLevitateCount: 0,
-    redLevitatePlayed: false,
-    redBoostCount: 0,
-    redBoostPlayed: false,
-    redSwitchOwned: false,
-    redScaleOwned: false,
-    redCurrentPowerup: null,
-    redPowerupTimeRemaining: null,
-    redAutoQuest: false,
-    redFaceTheBoss: false,
-    blueScore: 0,
-    blueForceCount: 0,
-    blueForcePlayed: false,
-    blueLevitateCount: 0,
-    blueLevitatePlayed: false,
-    blueBoostCount: 0,
-    blueBoostPlayed: false,
-    blueSwitchOwned: false,
-    blueScaleOwned: false,
-    blueCurrentPowerup: null,
-    bluePowerupTimeRemaining: null,
-    blueAutoQuest: false,
-    blueFaceTheBoss: false,
-  }
+  // state = {
+  //   mode: 'pre_match',
+  //   timeRemaining: 15,
+  //   redScore: 0,
+  //   redForceCount: 0,
+  //   redForcePlayed: false,
+  //   redLevitateCount: 0,
+  //   redLevitatePlayed: false,
+  //   redBoostCount: 0,
+  //   redBoostPlayed: false,
+  //   redSwitchOwned: false,
+  //   redScaleOwned: false,
+  //   redCurrentPowerup: null,
+  //   redPowerupTimeRemaining: null,
+  //   redAutoQuest: false,
+  //   redFaceTheBoss: false,
+  //   blueScore: 0,
+  //   blueForceCount: 0,
+  //   blueForcePlayed: false,
+  //   blueLevitateCount: 0,
+  //   blueLevitatePlayed: false,
+  //   blueBoostCount: 0,
+  //   blueBoostPlayed: false,
+  //   blueSwitchOwned: false,
+  //   blueScaleOwned: false,
+  //   blueCurrentPowerup: null,
+  //   bluePowerupTimeRemaining: null,
+  //   blueAutoQuest: false,
+  //   blueFaceTheBoss: false,
+  // }
 
-  componentDidMount() {
-    setTimeout(this.updateState, 3000)
-  }
+  // componentDidMount() {
+  //   setTimeout(this.updateState, 3000)
+  // }
 
-  updateState = () => {
-    if (this.state.mode === 'pre_match') {
-      this.setState({
-        mode: 'auto',
-      })
-    }
+  // updateState = () => {
+  //   if (this.state.mode === 'pre_match') {
+  //     this.setState({
+  //       mode: 'auto',
+  //     })
+  //   }
 
-    if (this.state.mode === 'auto') {
-      if (this.state.timeRemaining === 0) {
-        this.setState({
-          mode: 'teleop',
-          timeRemaining: 136,
-        })
-      } else {
-        if (this.state.redScaleOwned) {
-          this.setState({ redScore: this.state.redScore + 2 })
-        }
-        if (this.state.blueScaleOwned) {
-          this.setState({ blueScore: this.state.blueScore + 2 })
-        }
-        if (this.state.redSwitchOwned) {
-          this.setState({ redScore: this.state.redScore + 2 })
-        }
-        if (this.state.blueSwitchOwned) {
-          this.setState({ blueScore: this.state.blueScore + 2 })
-        }
-      }
-    }
+  //   if (this.state.mode === 'auto') {
+  //     if (this.state.timeRemaining === 0) {
+  //       this.setState({
+  //         mode: 'teleop',
+  //         timeRemaining: 136,
+  //       })
+  //     } else {
+  //       if (this.state.redScaleOwned) {
+  //         this.setState({ redScore: this.state.redScore + 2 })
+  //       }
+  //       if (this.state.blueScaleOwned) {
+  //         this.setState({ blueScore: this.state.blueScore + 2 })
+  //       }
+  //       if (this.state.redSwitchOwned) {
+  //         this.setState({ redScore: this.state.redScore + 2 })
+  //       }
+  //       if (this.state.blueSwitchOwned) {
+  //         this.setState({ blueScore: this.state.blueScore + 2 })
+  //       }
+  //     }
+  //   }
 
-    if (this.state.mode === 'teleop') {
-      if (this.state.timeRemaining === 0) {
-        this.setState({
-          mode: 'post_match',
-        })
-      } else {
-        if (this.state.redScaleOwned) {
-          this.setState({ redScore: this.state.redScore + (this.state.redCurrentPowerup === 'boost' ? 2 : 1) })
-        }
-        if (this.state.blueScaleOwned) {
-          this.setState({ blueScore: this.state.blueScore + (this.state.blueCurrentPowerup === 'boost' ? 2 : 1) })
-        }
-        if (this.state.redSwitchOwned) {
-          this.setState({ redScore: this.state.redScore + (this.state.redCurrentPowerup === 'boost' ? 2 : 1) })
-        }
-        if (this.state.blueSwitchOwned) {
-          this.setState({ blueScore: this.state.blueScore + (this.state.blueCurrentPowerup === 'boost' ? 2 : 1) })
-        }
-      }
-    }
+  //   if (this.state.mode === 'teleop') {
+  //     if (this.state.timeRemaining === 0) {
+  //       this.setState({
+  //         mode: 'post_match',
+  //       })
+  //     } else {
+  //       if (this.state.redScaleOwned) {
+  //         this.setState({ redScore: this.state.redScore + (this.state.redCurrentPowerup === 'boost' ? 2 : 1) })
+  //       }
+  //       if (this.state.blueScaleOwned) {
+  //         this.setState({ blueScore: this.state.blueScore + (this.state.blueCurrentPowerup === 'boost' ? 2 : 1) })
+  //       }
+  //       if (this.state.redSwitchOwned) {
+  //         this.setState({ redScore: this.state.redScore + (this.state.redCurrentPowerup === 'boost' ? 2 : 1) })
+  //       }
+  //       if (this.state.blueSwitchOwned) {
+  //         this.setState({ blueScore: this.state.blueScore + (this.state.blueCurrentPowerup === 'boost' ? 2 : 1) })
+  //       }
+  //     }
+  //   }
 
-    // Handle time countdown
-    if (this.state.mode === 'auto' || this.state.mode === 'teleop') {
-      this.setState({
-        timeRemaining: this.state.timeRemaining - 1,
-      })
-    }
+  //   // Handle time countdown
+  //   if (this.state.mode === 'auto' || this.state.mode === 'teleop') {
+  //     this.setState({
+  //       timeRemaining: this.state.timeRemaining - 1,
+  //     })
+  //   }
 
-    // Handle powerup countdown
-    if (this.state.redCurrentPowerup && this.state.redPowerupTimeRemaining > 0) {
-      this.setState({
-        redPowerupTimeRemaining: this.state.redPowerupTimeRemaining - 1,
-      })
-    } else {
-      this.setState({ redCurrentPowerup: null, redPowerupTimeRemaining: null })
-    }
+  //   // Handle powerup countdown
+  //   if (this.state.redCurrentPowerup && this.state.redPowerupTimeRemaining > 0) {
+  //     this.setState({
+  //       redPowerupTimeRemaining: this.state.redPowerupTimeRemaining - 1,
+  //     })
+  //   } else {
+  //     this.setState({ redCurrentPowerup: null, redPowerupTimeRemaining: null })
+  //   }
 
-    if (this.state.blueCurrentPowerup && this.state.bluePowerupTimeRemaining > 0) {
-      this.setState({
-        bluePowerupTimeRemaining: this.state.bluePowerupTimeRemaining - 1,
-      })
-    } else {
-      this.setState({ blueCurrentPowerup: null, bluePowerupTimeRemaining: null })
-    }
+  //   if (this.state.blueCurrentPowerup && this.state.bluePowerupTimeRemaining > 0) {
+  //     this.setState({
+  //       bluePowerupTimeRemaining: this.state.bluePowerupTimeRemaining - 1,
+  //     })
+  //   } else {
+  //     this.setState({ blueCurrentPowerup: null, bluePowerupTimeRemaining: null })
+  //   }
 
-    // Call again
-    if (this.state.mode !== 'post_match') {
-      setTimeout(this.updateState, 100)
-    }
+  //   // Call again
+  //   if (this.state.mode !== 'post_match') {
+  //     setTimeout(this.updateState, 100)
+  //   }
 
-    // Fake scale/switch events
-    if (this.state.mode === 'auto' && this.state.timeRemaining === 12) {
-      this.setState({ redScaleOwned: true })
-    }
-    if (this.state.mode === 'auto' && this.state.timeRemaining === 10) {
-      this.setState({ blueSwitchOwned: true })
-    }
-    if (this.state.mode === 'auto' && this.state.timeRemaining === 9) {
-      this.setState({ redSwitchOwned: true })
-    }
-    if (this.state.mode === 'auto' && this.state.timeRemaining === 7) {
-      this.setState({ redAutoQuest: true })
-    }
-    if (this.state.mode === 'auto' && this.state.timeRemaining === 3) {
-      this.setState({ blueAutoQuest: true })
-    }
+  //   // Fake scale/switch events
+  //   if (this.state.mode === 'auto' && this.state.timeRemaining === 12) {
+  //     this.setState({ redScaleOwned: true })
+  //   }
+  //   if (this.state.mode === 'auto' && this.state.timeRemaining === 10) {
+  //     this.setState({ blueSwitchOwned: true })
+  //   }
+  //   if (this.state.mode === 'auto' && this.state.timeRemaining === 9) {
+  //     this.setState({ redSwitchOwned: true })
+  //   }
+  //   if (this.state.mode === 'auto' && this.state.timeRemaining === 7) {
+  //     this.setState({ redAutoQuest: true })
+  //   }
+  //   if (this.state.mode === 'auto' && this.state.timeRemaining === 3) {
+  //     this.setState({ blueAutoQuest: true })
+  //   }
 
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 122) {
-      this.setState({ redScaleOwned: false, blueScaleOwned: true })
-    }
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 122) {
+  //     this.setState({ redScaleOwned: false, blueScaleOwned: true })
+  //   }
 
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 110) {
-      this.setState({ blueSwitchOwned: false })
-    }
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 110) {
+  //     this.setState({ blueSwitchOwned: false })
+  //   }
 
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 90) {
-      this.setState({ blueSwitchOwned: true })
-    }
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 90) {
+  //     this.setState({ blueSwitchOwned: true })
+  //   }
 
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 76) {
-      this.setState({ redScaleOwned: true, blueScaleOwned: false })
-    }
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 76) {
+  //     this.setState({ redScaleOwned: true, blueScaleOwned: false })
+  //   }
 
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 51) {
-      this.setState({ redSwitchOwned: false })
-    }
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 51) {
+  //     this.setState({ redSwitchOwned: false })
+  //   }
 
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 48) {
-      this.setState({ blueSwitchOwned: false })
-    }
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 48) {
+  //     this.setState({ blueSwitchOwned: false })
+  //   }
 
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 34) {
-      this.setState({ redSwitchOwned: true })
-    }
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 34) {
+  //     this.setState({ redSwitchOwned: true })
+  //   }
 
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 25) {
-      this.setState({ redScaleOwned: false, blueScaleOwned: true })
-    }
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 25) {
+  //     this.setState({ redScaleOwned: false, blueScaleOwned: true })
+  //   }
 
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 15) {
-      this.setState({ redScaleOwned: true, blueScaleOwned: false })
-    }
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 15) {
+  //     this.setState({ redScaleOwned: true, blueScaleOwned: false })
+  //   }
 
-    // Fake powerup events
-    // Red Boost
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 115) {
-      this.setState({ redBoostCount: 1, redScore: this.state.redScore + 5 })
-    }
+  //   // Fake powerup events
+  //   // Red Boost
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 115) {
+  //     this.setState({ redBoostCount: 1, redScore: this.state.redScore + 5 })
+  //   }
 
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 105) {
-      this.setState({ redBoostCount: 2, redScore: this.state.redScore + 5 })
-    }
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 105) {
+  //     this.setState({ redBoostCount: 2, redScore: this.state.redScore + 5 })
+  //   }
 
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 95) {
-      this.setState({ redBoostCount: 3, redScore: this.state.redScore + 5 })
-    }
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 95) {
+  //     this.setState({ redBoostCount: 3, redScore: this.state.redScore + 5 })
+  //   }
 
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 72) {
-      this.setState({ redBoostPlayed: true, redCurrentPowerup: 'boost', redPowerupTimeRemaining: 10 })
-    }
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 72) {
+  //     this.setState({ redBoostPlayed: true, redCurrentPowerup: 'boost', redPowerupTimeRemaining: 10 })
+  //   }
 
-    // Red Levitate
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 77) {
-      this.setState({ redLevitateCount: 1, redScore: this.state.redScore + 5 })
-    }
+  //   // Red Levitate
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 77) {
+  //     this.setState({ redLevitateCount: 1, redScore: this.state.redScore + 5 })
+  //   }
 
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 52) {
-      this.setState({ redLevitateCount: 2, redScore: this.state.redScore + 5 })
-    }
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 52) {
+  //     this.setState({ redLevitateCount: 2, redScore: this.state.redScore + 5 })
+  //   }
 
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 31) {
-      this.setState({ redLevitateCount: 3, redScore: this.state.redScore + 5 })
-    }
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 31) {
+  //     this.setState({ redLevitateCount: 3, redScore: this.state.redScore + 5 })
+  //   }
 
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 12) {
-      this.setState({ redLevitatePlayed: true })
-    }
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 12) {
+  //     this.setState({ redLevitatePlayed: true })
+  //   }
 
-    // Blue Boost
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 112) {
-      this.setState({ blueBoostCount: 1, blueScore: this.state.blueScore + 5 })
-    }
+  //   // Blue Boost
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 112) {
+  //     this.setState({ blueBoostCount: 1, blueScore: this.state.blueScore + 5 })
+  //   }
 
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 82) {
-      this.setState({ blueBoostCount: 2, blueScore: this.state.blueScore + 5 })
-    }
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 82) {
+  //     this.setState({ blueBoostCount: 2, blueScore: this.state.blueScore + 5 })
+  //   }
 
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 40) {
-      this.setState({ blueBoostCount: 3, blueScore: this.state.blueScore + 5 })
-    }
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 40) {
+  //     this.setState({ blueBoostCount: 3, blueScore: this.state.blueScore + 5 })
+  //   }
 
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 25) {
-      this.setState({ blueBoostPlayed: true, blueCurrentPowerup: 'boost', bluePowerupTimeRemaining: 10 })
-    }
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 25) {
+  //     this.setState({ blueBoostPlayed: true, blueCurrentPowerup: 'boost', bluePowerupTimeRemaining: 10 })
+  //   }
 
-    // Blue Force
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 60) {
-      this.setState({ blueForceCount: 1, blueScore: this.state.blueScore + 5 })
-    }
+  //   // Blue Force
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 60) {
+  //     this.setState({ blueForceCount: 1, blueScore: this.state.blueScore + 5 })
+  //   }
 
-    // Blue Levitate
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 50) {
-      this.setState({ blueLevitateCount: 1, blueScore: this.state.blueScore + 5 })
-    }
+  //   // Blue Levitate
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 50) {
+  //     this.setState({ blueLevitateCount: 1, blueScore: this.state.blueScore + 5 })
+  //   }
 
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 47) {
-      this.setState({ blueLevitateCount: 2, blueScore: this.state.blueScore + 5 })
-    }
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 47) {
+  //     this.setState({ blueLevitateCount: 2, blueScore: this.state.blueScore + 5 })
+  //   }
 
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 33) {
-      this.setState({ blueLevitateCount: 3, blueScore: this.state.blueScore + 5 })
-    }
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 33) {
+  //     this.setState({ blueLevitateCount: 3, blueScore: this.state.blueScore + 5 })
+  //   }
 
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 15) {
-      this.setState({ blueLevitatePlayed: true })
-    }
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 15) {
+  //     this.setState({ blueLevitatePlayed: true })
+  //   }
 
-    // Endgame
-    if (this.state.mode === 'teleop' && this.state.timeRemaining === 1) {
-      this.setState({
-        redScore: this.state.redScore + 60,
-        blueScore: this.state.blueScore + 90,
-        blueFaceTheBoss: true,
-      })
-    }
-  }
+  //   // Endgame
+  //   if (this.state.mode === 'teleop' && this.state.timeRemaining === 1) {
+  //     this.setState({
+  //       redScore: this.state.redScore + 60,
+  //       blueScore: this.state.blueScore + 90,
+  //       blueFaceTheBoss: true,
+  //     })
+  //   }
+  // }
 
   render() {
-    const { match } = this.props
+    const { match, matchState } = this.props
 
     if (match === null) {
       return <div><span className="glyphicon glyphicon-refresh glyphicon-refresh-animate" /></div>
     }
+    if (!matchState) {
+      return <div>Live match info not available</div>
+    }
 
     const {
+      matchKey,
       mode,
       timeRemaining,
       redScore,
@@ -291,7 +295,7 @@ class CurrentMatchDisplay extends PureComponent {
       bluePowerupTimeRemaining,
       blueAutoQuest,
       blueFaceTheBoss,
-    } = this.state
+    } = matchState
 
     let progressColor
     if (mode === 'post_match' || (timeRemaining === 0 && mode === 'teleop')) {
@@ -388,6 +392,7 @@ class CurrentMatchDisplay extends PureComponent {
 
 CurrentMatchDisplay.propTypes = {
   match: PropTypes.object,
+  matchState: PropTypes.object,
 }
 
 export default CurrentMatchDisplay

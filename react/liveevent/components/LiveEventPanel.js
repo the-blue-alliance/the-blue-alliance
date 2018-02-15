@@ -24,6 +24,7 @@ class LiveEventPanel extends React.PureComponent {
     lastMatches: null,
     currentMatch: null,
     upcomingMatches: null,
+    matchState: null,
   }
 
   componentDidMount() {
@@ -45,6 +46,11 @@ class LiveEventPanel extends React.PureComponent {
         upcomingMatches: unplayedMatches.slice(1, 4),
       })
     })
+    firebaseApp.database().ref('/events/2017casj/livescore').on('value', (snapshot) => {
+      this.setState({
+        matchState: snapshot.val(),
+      })
+    })
   }
 
   render() {
@@ -56,7 +62,7 @@ class LiveEventPanel extends React.PureComponent {
         </div>
         <div className="col-lg-6 text-center">
           <h4>Current Match: { this.state.currentMatch && `${getCompLevelStr(this.state.currentMatch)} ${getMatchSetStr(this.state.currentMatch)}` }</h4>
-          <CurrentMatchDisplay match={this.state.currentMatch} />
+          <CurrentMatchDisplay match={this.state.currentMatch} matchState={this.state.matchState} />
         </div>
         <div className="col-lg-3 text-center">
           <h4>Upcoming Matches</h4>
