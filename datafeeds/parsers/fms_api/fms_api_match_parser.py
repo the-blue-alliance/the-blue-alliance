@@ -78,7 +78,7 @@ class FMSAPIHybridScheduleParser(object):
             blue_dqs = []
             team_key_names = []
             null_team = False
-            sorted_teams = sorted(match['Teams'], key=lambda team: team['station'])  # Sort by station to ensure correct ordering. Kind of hacky.
+            sorted_teams = sorted(match.get('teams', match.get('Teams', [])), key=lambda team: team['station'])  # Sort by station to ensure correct ordering. Kind of hacky.
             for team in sorted_teams:
                 if team['teamNumber'] is None:
                     null_team = True
@@ -259,7 +259,7 @@ class FMSAPIMatchDetailsParser(object):
                 breakdown['coopertition'] = match['coopertition']
             if 'coopertitionPoints' in match:
                 breakdown['coopertition_points'] = match['coopertitionPoints']
-            for alliance in match['Alliances']:
+            for alliance in match.get('alliances', match.get('Alliances', [])):
                 color = alliance['alliance'].lower()
                 for key, value in alliance.items():
                     if key != 'alliance':
