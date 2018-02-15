@@ -71,6 +71,17 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             clean_matches = MatchHelper.organizeKeys(matches.keys())
             self.assertEqual(len(clean_matches["qm"]), 88)
 
+    def test_parse_qual_2018update(self):
+        with open('test_data/fms_api/2016_nyny_qual_breakdown_2018update.json', 'r') as f:
+            matches = FMSAPIMatchDetailsParser(2016, 'nyny').parse(json.loads(f.read()))
+
+            self.assertTrue(isinstance(matches, dict))
+            self.assertEqual(len(matches), 88)
+
+            # Assert we get enough of each match type
+            clean_matches = MatchHelper.organizeKeys(matches.keys())
+            self.assertEqual(len(clean_matches["qm"]), 88)
+
     def test_parse_playoff(self):
         with open('test_data/fms_api/2016_nyny_playoff_breakdown.json', 'r') as f:
             matches = FMSAPIMatchDetailsParser(2016, 'nyny').parse(json.loads(f.read()))

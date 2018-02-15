@@ -68,6 +68,30 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             clean_matches = MatchHelper.organizeMatches(matches)
             self.assertEqual(len(clean_matches["qm"]), 88)
 
+    def test_parse_qual_2018update(self):
+        self.event = Event(
+            id="2016nyny",
+            name="NYC Regional",
+            event_type_enum=EventType.REGIONAL,
+            short_name="NYC",
+            event_short="nyny",
+            year=2016,
+            end_date=datetime(2016, 03, 27),
+            official=True,
+            start_date=datetime(2016, 03, 24),
+            timezone_id="America/New_York"
+        )
+        self.event.put()
+        with open('test_data/fms_api/2016_nyny_hybrid_schedule_qual_2018update.json', 'r') as f:
+            matches, _ = FMSAPIHybridScheduleParser(2016, 'nyny').parse(json.loads(f.read()))
+
+            self.assertTrue(isinstance(matches, list))
+            self.assertEqual(len(matches), 88)
+
+            # Assert we get enough of each match type
+            clean_matches = MatchHelper.organizeMatches(matches)
+            self.assertEqual(len(clean_matches["qm"]), 88)
+
     def test_parse_playoff(self):
         self.event = Event(
             id="2016nyny",
