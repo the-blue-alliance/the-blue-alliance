@@ -41,7 +41,7 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
         if existing_event:
             return 'duplicate_key', None
 
-        first_code = self.request.get("first_code", None)
+        first_code = self.request.get("first_code", '')
         event = Event(
             id=event_key,
             end_date=end_date,
@@ -59,7 +59,7 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
             website=self.request.get("website"),
             year=int(self.request.get("year")),
             first_code=first_code,
-            official=(first_code is not None),
+            official=(not first_code == ''),
         )
         EventManipulator.createOrUpdate(event)
 
