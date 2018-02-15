@@ -232,11 +232,11 @@
       <td class="blueScore" colspan="2"><b>{%if match.score_breakdown.blue.totalPoints%}{{match.score_breakdown.blue.totalPoints}}{%else%}0{%endif%}</b></td>
     </tr>
 
-    {% if match.score_breakdown.red.get('tba_rpEarned') is not none %}
+    {% if 'rp' in match.score_breakdown.red and match.comp_level == 'qm' %}
     <tr>
-      <td class="red" colspan="2">+{% if match.score_breakdown.red.tba_rpEarned%}{{match.score_breakdown.red.tba_rpEarned}} {%else%}0{%endif%} RP</td>
+      <td class="red" colspan="2">+{{match.score_breakdown.red.rp}} RP</td>
       <td>Ranking Points</td>
-      <td class="blue" colspan="2">+{%if match.score_breakdown.blue.tba_rpEarned%}{{match.score_breakdown.blue.tba_rpEarned}} {%else%}0{%endif%} RP</td>
+      <td class="blue" colspan="2">+{{match.score_breakdown.blue.rp}} RP</td>
     </tr>
     {% endif %}
   </tbody>
