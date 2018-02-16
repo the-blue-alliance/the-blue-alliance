@@ -54,6 +54,13 @@ var config = {
       outputFile: 'eventwizard.min.css',
       watch: ['./react/eventwizard/**/*.less']
     }
+  },
+  liveevent: {
+    js: {
+      src: ['./react/liveevent/liveevent.js'],
+      outputDir: './static/compiled/javascript',
+      outputFile: 'liveevent.min.js'
+    }
   }
 };
 
@@ -134,6 +141,14 @@ gulp.task('gameday-js-watch', function() {
   return compile(true, config.gameday);
 });
 
+gulp.task('liveevent-js', function() {
+  return compile(false, config.liveevent);
+});
+
+gulp.task('liveevent-js-watch', function() {
+  return compile(true, config.liveevent);
+});
+
 gulp.task('apidocs-less', function() {
   return compileLess(config.apidocs)
 });
@@ -152,10 +167,12 @@ gulp.task('gameday-less-watch', function() {
 
 gulp.task('build', ['gameday-js', 'gameday-less',
                     'apidocs-js', 'apidocs-less',
-                    'eventwizard-js', 'eventwizard-less']);
+                    'eventwizard-js', 'eventwizard-less',
+                    'liveevent-js']);
 
 gulp.task('watch', ['gameday-js-watch', 'gameday-less-watch',
                     'apidocs-js-watch',
-                    'eventwizard-js-watch']);
+                    'eventwizard-js-watch',
+                    'liveevent-js-watch']);
 
 gulp.task('default', ['build', 'watch']);

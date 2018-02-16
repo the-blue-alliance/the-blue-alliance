@@ -39,8 +39,10 @@ $(document).ready(function(){
 	// Fancybox
 	$(".fancybox").fancybox();
 
-	// Tooltips
-	$("[rel=tooltip]").tooltip();
+  // Tooltips
+  $('body').tooltip({
+      selector: '[rel=tooltip]'
+  });
 
 	// Fitvids
 	$('.fitvids').fitVids();
