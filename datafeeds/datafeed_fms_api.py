@@ -223,7 +223,7 @@ class DatafeedFMSAPI(object):
                     logging.error("Error saving API response for: {}".format(url))
                     logging.error(traceback.format_exc())
             try:
-                json_content = json.loads(result.content)
+                json_content = json.loads(result.content.lstrip('\xef\xbb\xbf').rstrip('\x00'))
             except Exception, exception:
                 logging.error("Error parsing: {}".format(url))
                 logging.error(traceback.format_exc())
