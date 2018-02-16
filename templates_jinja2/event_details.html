@@ -437,5 +437,7 @@
 {% endblock %}
 
 {% block inline_javascript %}
-  <script type="text/javascript" src="/javascript/liveevent.min.js"></script>
+{% if event.now %}
+<script type="text/javascript" src="/javascript/liveevent.min.js"></script>
+{% endif %}
 {% endblock %}
