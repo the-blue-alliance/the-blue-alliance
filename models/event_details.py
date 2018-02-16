@@ -55,7 +55,7 @@ class EventDetails(ndb.Model):
         sort_order_info = RankingsHelper.get_sort_order_info(self)
         extra_stats_info = []
         if has_extra_stats:
-            if self.year == 2017:
+            if self.year in {2017, 2018}:
                 extra_stats_info = [{
                     'name': 'Total Ranking Points',
                     'precision': 0,

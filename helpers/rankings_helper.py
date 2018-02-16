@@ -20,6 +20,17 @@ class RankingsHelper(object):
     }
 
     SORT_ORDER_INFO = {
+        2018: [
+            {'name': 'Ranking Score',
+             'precision': 2},
+            {'name': 'Park/Climb Points',
+             'precision': 0},
+            {'name': 'Auto',
+             'precision': 0},
+            {'name': 'Ownership',
+             'precision': 0},
+            {'name': 'Vault',
+             'precision': 0}],
         2017: [
             {'name': 'Ranking Score',
              'precision': 2},
