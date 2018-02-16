@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import Firebase from 'firebase'
 
 import { getCompLevelStr, getMatchSetStr } from '../helpers'
@@ -33,7 +34,7 @@ class LiveEventPanel extends React.PureComponent {
       authDomain: 'thebluealliance-dev.firebaseapp.com',
       databaseURL: 'https://thebluealliance-dev.firebaseio.com',
     })
-    firebaseApp.database().ref('/events/2017casj/matches').on('value', (snapshot) => {
+    firebaseApp.database().ref(`/events/${this.props.eventKey}/matches`).on('value', (snapshot) => {
       const matches = Object.values(snapshot.val())
       matches.sort((match1, match2) => playOrder(match1) - playOrder(match2))
 
@@ -44,7 +45,7 @@ class LiveEventPanel extends React.PureComponent {
         unplayedMatches,
       })
     })
-    firebaseApp.database().ref('/events/2017casj/livescore').on('value', (snapshot) => {
+    firebaseApp.database().ref(`/events/${this.props.eventKey}/livescore`).on('value', (snapshot) => {
       this.setState({
         matchState: snapshot.val(),
       })
@@ -96,6 +97,10 @@ class LiveEventPanel extends React.PureComponent {
       </div>
     )
   }
+}
+
+LiveEventPanel.propTypes = {
+  eventKey: PropTypes.string.isRequired,
 }
 
 export default LiveEventPanel
