@@ -21,9 +21,8 @@ function playOrder(match) {
 
 class LiveEventPanel extends React.PureComponent {
   state = {
-    lastMatches: null,
-    currentMatch: null,
-    upcomingMatches: null,
+    playedMatches: null,
+    unplayedMatches: null,
     matchState: null,
   }
 
@@ -41,9 +40,8 @@ class LiveEventPanel extends React.PureComponent {
       const playedMatches = matches.filter((match) => match.alliances.red.score !== -1 && match.alliances.blue.score !== -1)
       const unplayedMatches = matches.filter((match) => match.alliances.red.score === -1 || match.alliances.blue.score === -1)
       this.setState({
-        lastMatches: playedMatches.slice(-3),
-        currentMatch: unplayedMatches[0],
-        upcomingMatches: unplayedMatches.slice(1, 4),
+        playedMatches,
+        unplayedMatches,
       })
     })
     firebaseApp.database().ref('/events/2017casj/livescore').on('value', (snapshot) => {
@@ -54,19 +52,45 @@ class LiveEventPanel extends React.PureComponent {
   }
 
   render() {
+    const { playedMatches, unplayedMatches, matchState } = this.state
+
+    const playedMatchesCopy = playedMatches && playedMatches.slice()
+    const unplayedMatchesCopy = unplayedMatches && unplayedMatches.slice()
+
+    let upcomingMatches = null
+    let currentMatch = null
+    if (unplayedMatchesCopy !== null) {
+      if (matchState === null) {
+        upcomingMatches = unplayedMatchesCopy.slice(1, 4)
+        currentMatch = unplayedMatchesCopy[0]
+      } else {
+        playedMatchesCopy.forEach((match, i) => {
+          if (match.key.split('_')[1] === matchState.matchKey) {
+            currentMatch = playedMatchesCopy.splice(i, 1)[0]
+          }
+        })
+        unplayedMatchesCopy.forEach((match, i) => {
+          if (match.key.split('_')[1] === matchState.matchKey) {
+            currentMatch = unplayedMatchesCopy.splice(i, 1)[0]
+          }
+        })
+        upcomingMatches = unplayedMatchesCopy.slice(0, 3)
+      }
+    }
+
     return (
       <div>
         <div className="col-lg-3 text-center">
           <h4>Last Matches</h4>
-          <LastMatchesTable matches={this.state.lastMatches} />
+          <LastMatchesTable matches={playedMatchesCopy && playedMatchesCopy.slice(-3)} />
         </div>
         <div className="col-lg-6 text-center">
-          <h4>Current Match: { this.state.currentMatch && `${getCompLevelStr(this.state.currentMatch)} ${getMatchSetStr(this.state.currentMatch)}` }</h4>
-          <CurrentMatchDisplay match={this.state.currentMatch} matchState={this.state.matchState} />
+          <h4>Current Match: { currentMatch && `${getCompLevelStr(currentMatch)} ${getMatchSetStr(currentMatch)}` }</h4>
+          <CurrentMatchDisplay match={currentMatch} matchState={matchState} />
         </div>
         <div className="col-lg-3 text-center">
           <h4>Upcoming Matches</h4>
-          <UpcomingMatchesTable matches={this.state.upcomingMatches} />
+          <UpcomingMatchesTable matches={upcomingMatches} />
         </div>
         <div className="clearfix" />
       </div>
