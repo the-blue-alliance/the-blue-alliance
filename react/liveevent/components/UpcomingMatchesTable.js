@@ -49,7 +49,7 @@ class UpcomingMatchesTable extends React.PureComponent {
       )
       matchRows.push(
         <tr key={`${match.key}_blue`}>
-          {match.alliances.red.team_keys.map((teamKey) => {
+          {match.alliances.blue.team_keys.map((teamKey) => {
             const teamNum = teamKey.substring(3)
             return <td key={teamKey} className="blue"><a href={`/team/${teamNum}/${year}`}>{teamNum}</a></td>
           })}
