@@ -41,21 +41,31 @@ class EventInsightsHelper(object):
     def _calculate_event_insights_2018_helper(cls, matches):
         # Auto
         run_points_auto = 0
-        scale_ownership_points_auto = 0
-        switch_ownership_points_auto = 0
+        scale_ownership_time_auto = 0
+        switch_ownership_time_auto = 0
         points_auto = 0
 
         run_counts_auto = 0
         switch_owned_counts_auto = 0
 
         # Teleop
-        scale_ownership_points_teleop = 0
-        switch_ownership_points_teleop = 0
+        scale_ownership_time_teleop = 0
+        switch_ownership_time_teleop = 0
         points_teleop = 0
 
         # Overall
-        scale_ownership_points = 0
-        switch_ownership_points = 0
+        winning_scale_ownership_percentage_auto = 0
+        winning_own_switch_ownership_percentage_auto = 0
+        winning_scale_ownership_percentage_teleop = 0
+        winning_own_switch_ownership_percentage_teleop = 0
+        winning_opp_switch_denial_percentage_teleop = 0
+        winning_scale_ownership_percentage = 0
+        winning_own_switch_ownership_percentage = 0
+
+        scale_neutral_percentage_auto = 0
+        scale_neutral_percentage_teleop = 0
+        scale_neutral_percentage = 0
+
         force_played = 0
         levitate_played = 0
         boost_played = 0
@@ -96,11 +106,13 @@ class EventInsightsHelper(object):
             for alliance_color in ['red', 'blue']:
                 try:
                     alliance_breakdown = match.score_breakdown[alliance_color]
+                    opp_alliance_breakdown = match.score_breakdown['red' if alliance_color == 'blue' else 'red']
+                    alliance_win = alliance_color == match.winning_alliance
 
                     # Auto
                     run_points_auto += alliance_breakdown['autoRunPoints']
-                    scale_ownership_points_auto += alliance_breakdown['autoScaleOwnershipSec'] * 2
-                    switch_ownership_points_auto += alliance_breakdown['autoSwitchOwnershipSec'] * 2
+                    scale_ownership_time_auto += alliance_breakdown['autoScaleOwnershipSec']
+                    switch_ownership_time_auto += alliance_breakdown['autoSwitchOwnershipSec']
                     points_auto += alliance_breakdown['autoPoints']
 
                     switch_owned_counts_auto += 1 if alliance_breakdown['autoSwitchAtZero'] else 0
@@ -110,13 +122,25 @@ class EventInsightsHelper(object):
                     run_counts_auto += alliance_run_counts_auto
 
                     # Teleop
-                    scale_ownership_points_teleop += alliance_breakdown['teleopScaleOwnershipSec']
-                    switch_ownership_points_teleop += alliance_breakdown['teleopSwitchOwnershipSec']
+                    scale_ownership_time_teleop += alliance_breakdown['teleopScaleOwnershipSec']
+                    switch_ownership_time_teleop += alliance_breakdown['teleopSwitchOwnershipSec']
                     points_teleop += alliance_breakdown['teleopPoints']
 
                     # Overall
-                    scale_ownership_points += alliance_breakdown['autoScaleOwnershipSec'] * 2 + alliance_breakdown['teleopScaleOwnershipSec']
-                    switch_ownership_points += alliance_breakdown['autoSwitchOwnershipSec'] * 2 + alliance_breakdown['teleopSwitchOwnershipSec']
+                    if alliance_win:
+                        winning_scale_ownership_percentage_auto += float(alliance_breakdown['autoScaleOwnershipSec']) / 15
+                        winning_own_switch_ownership_percentage_auto += float(alliance_breakdown['autoSwitchOwnershipSec']) / 15
+
+                        winning_scale_ownership_percentage_teleop += float(alliance_breakdown['teleopScaleOwnershipSec']) / 135
+                        winning_own_switch_ownership_percentage_teleop += float(alliance_breakdown['teleopSwitchOwnershipSec']) / 135
+                        winning_opp_switch_denial_percentage_teleop += float(135 - opp_alliance_breakdown['teleopSwitchOwnershipSec']) / 135
+
+                        winning_scale_ownership_percentage += float(alliance_breakdown['autoScaleOwnershipSec'] + alliance_breakdown['teleopScaleOwnershipSec']) / 150
+                        winning_own_switch_ownership_percentage += float(alliance_breakdown['autoSwitchOwnershipSec'] + alliance_breakdown['teleopSwitchOwnershipSec']) / 150
+
+                    scale_neutral_percentage_auto += float(7.5 - alliance_breakdown['autoScaleOwnershipSec']) / 7.5
+                    scale_neutral_percentage_teleop += float(67.5 - alliance_breakdown['teleopScaleOwnershipSec']) / 67.5
+                    scale_neutral_percentage += float(75 - alliance_breakdown['autoScaleOwnershipSec'] - alliance_breakdown['teleopScaleOwnershipSec']) / 75
 
                     force_played += alliance_breakdown['vaultForcePlayed']
                     levitate_played += alliance_breakdown['vaultLevitatePlayed']
@@ -137,7 +161,6 @@ class EventInsightsHelper(object):
                     alliance_face_the_boss_achieved = alliance_climb_levitate_counts == 3
                     auto_quest_achieved += 1 if alliance_auto_quest_achieved else 0
                     face_the_boss_achieved += 1 if alliance_face_the_boss_achieved else 0
-                    alliance_win = alliance_color == match.winning_alliance
                     unicorn_matches += 1 if (alliance_win and alliance_auto_quest_achieved and alliance_face_the_boss_achieved) else 0
 
                     foul_scores += alliance_breakdown['foulPoints']
@@ -163,16 +186,16 @@ class EventInsightsHelper(object):
         event_insights = {
             # Auto
             'average_run_points_auto': float(run_points_auto) / (2 * finished_matches),
-            'average_scale_ownership_points_auto': float(scale_ownership_points_auto) / (2 * finished_matches),
-            'average_switch_ownership_points_auto': float(switch_ownership_points_auto) / (2 * finished_matches),
+            'average_scale_ownership_points_auto': float(scale_ownership_time_auto * 2) / (2 * finished_matches),
+            'average_switch_ownership_points_auto': float(switch_ownership_time_auto * 2) / (2 * finished_matches),
             'average_points_auto': float(points_auto) / (2 * finished_matches),
 
             'run_counts_auto': [run_counts_auto, opportunities_3x, 100.0 * float(run_counts_auto) / opportunities_3x],
             'switch_owned_counts_auto': [switch_owned_counts_auto, opportunities_1x, 100.0 * float(switch_owned_counts_auto) / opportunities_1x],
 
             # Teleop
-            'average_scale_ownership_points_teleop': float(scale_ownership_points_teleop) / (2 * finished_matches),
-            'average_switch_ownership_points_teleop': float(switch_ownership_points_teleop) / (2 * finished_matches),
+            'average_scale_ownership_points_teleop': float(scale_ownership_time_teleop) / (2 * finished_matches),
+            'average_switch_ownership_points_teleop': float(switch_ownership_time_teleop) / (2 * finished_matches),
             'average_points_teleop': float(points_teleop) / (2 * finished_matches),
 
             # Overall
@@ -181,8 +204,20 @@ class EventInsightsHelper(object):
             'levitate_played_counts': [levitate_played_counts, opportunities_1x, 100.0 * float(levitate_played_counts) / opportunities_1x],
             'boost_played_counts': [boost_played_counts, opportunities_1x, 100.0 * float(boost_played_counts) / opportunities_1x],
 
-            'average_scale_ownership_points': float(scale_ownership_points) / (2 * finished_matches),
-            'average_switch_ownership_points': float(switch_ownership_points) / (2 * finished_matches),
+            'average_scale_ownership_points': float(scale_ownership_time_auto * 2 + scale_ownership_time_teleop) / (2 * finished_matches),
+            'average_switch_ownership_points': float(switch_ownership_time_auto * 2 + switch_ownership_time_teleop) / (2 * finished_matches),
+
+            'winning_scale_ownership_percentage_auto': 100.0 * float(winning_scale_ownership_percentage_auto) / finished_matches,
+            'winning_own_switch_ownership_percentage_auto': 100.0 * float(winning_own_switch_ownership_percentage_auto) / finished_matches,
+            'winning_scale_ownership_percentage_teleop': 100.0 * float(winning_scale_ownership_percentage_teleop) / finished_matches,
+            'winning_own_switch_ownership_percentage_teleop': 100.0 * float(winning_own_switch_ownership_percentage_teleop) / finished_matches,
+            'winning_opp_switch_denial_percentage_teleop': 100.0 * float(winning_opp_switch_denial_percentage_teleop) / finished_matches,
+            'winning_scale_ownership_percentage': 100.0 * float(winning_scale_ownership_percentage) / finished_matches,
+            'winning_own_switch_ownership_percentage': 100.0 * float(winning_own_switch_ownership_percentage) / finished_matches,
+
+            'scale_neutral_percentage_auto': 100.0 * float(scale_neutral_percentage_auto) / (2 * finished_matches),
+            'scale_neutral_percentage_teleop': 100.0 * float(scale_neutral_percentage_teleop) / (2 * finished_matches),
+            'scale_neutral_percentage': 100.0 * float(scale_neutral_percentage) / (2 * finished_matches),
 
             'average_force_played': float(force_played) / (2 * finished_matches),
             'average_levitate_played': float(levitate_played) / (2 * finished_matches),
