@@ -219,9 +219,8 @@ class EventInsightsHelper(object):
             'scale_neutral_percentage_teleop': 100.0 * float(scale_neutral_percentage_teleop) / (2 * finished_matches),
             'scale_neutral_percentage': 100.0 * float(scale_neutral_percentage) / (2 * finished_matches),
 
-            'average_force_played': float(force_played) / (2 * finished_matches),
-            'average_levitate_played': float(levitate_played) / (2 * finished_matches),
-            'average_boost_played': float(boost_played) / (2 * finished_matches),
+            'average_force_played': float(force_played) / force_played_counts,
+            'average_boost_played': float(boost_played) / boost_played_counts,
             'average_vault_points': float(vault_points) / (2 * finished_matches),
             'average_endgame_points': float(endgame_points) / (2 * finished_matches),
 
