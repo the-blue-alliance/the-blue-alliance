@@ -126,10 +126,12 @@ class EventInsightsHelper(object):
                         alliance_climb_levitate_counts += 1 if alliance_breakdown['endgameRobot{}'.format(i+1)] in {'Climbing', 'Levitate'} else 0
                     climb_levitate_counts += alliance_climb_levitate_counts
 
-                    auto_quest_achieved += 1 if (alliance_run_counts_auto == 3 and alliance_breakdown['autoSwitchAtZero']) else 0
-                    face_the_boss_achieved += 1 if alliance_climb_levitate_counts == 3 else 0
+                    alliance_auto_quest_achieved = alliance_run_counts_auto == 3 and alliance_breakdown['autoSwitchAtZero']
+                    alliance_face_the_boss_achieved = alliance_climb_levitate_counts == 3
+                    auto_quest_achieved += 1 if alliance_auto_quest_achieved else 0
+                    face_the_boss_achieved += 1 if alliance_face_the_boss_achieved else 0
                     alliance_win = alliance_color == match.winning_alliance
-                    unicorn_matches += 1 if (alliance_win and auto_quest_achieved and face_the_boss_achieved) else 0
+                    unicorn_matches += 1 if (alliance_win and alliance_auto_quest_achieved and alliance_face_the_boss_achieved) else 0
 
                     foul_scores += alliance_breakdown['foulPoints']
                     has_insights = True
