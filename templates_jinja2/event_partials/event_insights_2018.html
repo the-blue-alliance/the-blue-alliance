@@ -1,0 +1,187 @@
+<div class="row">
+  <div class="col-xs-12">
+    <h3>Bonus Objective Statistics</h3>
+    <table class="table table-condensed table-striped text-right">
+      <thead>
+        <tr>
+          <th class="text-right">Objective</th>
+          <th class="text-right">Count</th>
+          <th class="text-right"># Opportunities</th>
+          <th class="text-right">% Success</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Auto Run</td>
+          <td>{{event_insights.run_counts_auto[0]}}</td>
+          <td>{{event_insights.run_counts_auto[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.run_counts_auto[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Auto Switch Owned</td>
+          <td>{{event_insights.switch_owned_counts_auto[0]}}</td>
+          <td>{{event_insights.switch_owned_counts_auto[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.switch_owned_counts_auto[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td><span rel="tooltip" title="Has no real meaning for Playoff matches">Auto Quest *</span></td>
+          <td>{{event_insights.auto_quest_achieved[0]}}</td>
+          <td>{{event_insights.auto_quest_achieved[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.auto_quest_achieved[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Force Played</td>
+          <td>{{event_insights.force_played_counts[0]}}</td>
+          <td>{{event_insights.force_played_counts[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.force_played_counts[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Levitate Played</td>
+          <td>{{event_insights.levitate_played_counts[0]}}</td>
+          <td>{{event_insights.levitate_played_counts[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.levitate_played_counts[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Boost Played</td>
+          <td>{{event_insights.boost_played_counts[0]}}</td>
+          <td>{{event_insights.boost_played_counts[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.boost_played_counts[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Climbs (does not include Levitate)</td>
+          <td>{{event_insights.climb_counts[0]}}</td>
+          <td>{{event_insights.climb_counts[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.climb_counts[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td><span rel="tooltip" title="Has no real meaning for Playoff matches">Face the Boss *</span></td>
+          <td>{{event_insights.face_the_boss_achieved[0]}}</td>
+          <td>{{event_insights.face_the_boss_achieved[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.face_the_boss_achieved[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>"Unicorn Matches"<br/>(Win + Auto Quest + Face the Boss)</td>
+          <td>{% if event_insights.unicorn_matches %}{{event_insights.unicorn_matches[0]}}{% else %}--{% endif %}</td>
+          <td>{% if event_insights.unicorn_matches %}{{event_insights.unicorn_matches[1]}}{% else %}--{% endif %}</td>
+          <td>{% if event_insights.unicorn_matches %}{{'%0.2f' | format(event_insights.unicorn_matches[2]|float)}}%{% else %}--{% endif %}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-xs-12">
+    <h3>Match Statistics</h3>
+
+    <table class="table table-condensed table-striped text-right">
+      <tbody>
+        <tr>
+          <td>High Score</td>
+          <td>{{event_insights.high_score[0]}} in <a href="/match/{{event_insights.high_score[1]}}">{{event_insights.high_score[2]}}</a></td>
+        </tr>
+        <tr>
+          <td>Average Match Score</td>
+          <td>{{'%0.2f' | format(event_insights.average_score|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average Winning Score</td>
+          <td>{{'%0.2f' | format(event_insights.average_win_score|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average Win Margin</td>
+          <td>{{'%0.2f' | format(event_insights.average_win_margin|float)}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="table table-condensed table-striped text-right">
+      <thead>
+        <tr>
+            <th></th>
+            <th class="text-right">Auto</th>
+            <th class="text-right">Teleop</th>
+            <th class="text-right">Overall</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Average Auto Run Points</td>
+          <td>{{'%0.2f' | format(event_insights.average_run_points_auto|float)}}</td>
+          <td>--</td>
+          <td>--</td>
+        </tr>
+        <tr>
+          <td>Average Scale Ownership Points</td>
+          <td>{{'%0.2f' | format(event_insights.average_scale_ownership_points_auto|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_scale_ownership_points_teleop|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_scale_ownership_points|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average Switch Ownership Points</td>
+          <td>{{'%0.2f' | format(event_insights.average_switch_ownership_points_auto|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_switch_ownership_points_teleop|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_switch_ownership_points|float)}}</td>
+        </tr>
+        <tr>
+          <td>Scale Neutral %</td>
+          <td>{{'%0.2f' | format(event_insights.scale_neutral_percentage_auto|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.scale_neutral_percentage_teleop|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.scale_neutral_percentage|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Winner Scale Ownership %</td>
+          <td>{{'%0.2f' | format(event_insights.winning_scale_ownership_percentage_auto|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.winning_scale_ownership_percentage_teleop|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.winning_scale_ownership_percentage|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Winner Switch Ownership %</td>
+          <td>{{'%0.2f' | format(event_insights.winning_own_switch_ownership_percentage_auto|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.winning_own_switch_ownership_percentage_teleop|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.winning_own_switch_ownership_percentage|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Winner Opponent Switch Denial %</td>
+          <td>--</td>
+          <td>{{'%0.2f' | format(event_insights.winning_opp_switch_denial_percentage_teleop|float)}}%</td>
+          <td>--</td>
+        </tr>
+        <tr>
+          <td>Average # Force Played</td>
+          <td>--</td>
+          <td>{{'%0.2f' | format(event_insights.average_force_played|float)}}</td>
+          <td>--</td>
+        </tr>
+        <tr>
+          <td>Average # Boost Played</td>
+          <td>--</td>
+          <td>{{'%0.2f' | format(event_insights.average_boost_played|float)}}</td>
+          <td>--</td>
+        </tr>
+        <tr>
+          <td>Average Vault Points</td>
+          <td>--</td>
+          <td>{{'%0.2f' | format(event_insights.average_vault_points|float)}}</td>
+          <td>--</td>
+        </tr>
+        <tr>
+          <td>Average Endgame Points</td>
+          <td>--</td>
+          <td>{{'%0.2f' | format(event_insights.average_endgame_points|float)}}</td>
+          <td>--</td>
+        </tr>
+        <tr>
+          <td>Average Foul Points</td>
+          <td>--</td>
+          <td>--</td>
+          <td>{{'%0.2f' | format(event_insights.average_foul_score|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average Score</td>
+          <td>{{'%0.2f' | format(event_insights.average_points_auto|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_points_teleop|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_score|float)}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

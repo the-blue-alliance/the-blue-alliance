@@ -11,12 +11,230 @@ class EventInsightsHelper(object):
         INSIGHTS_MAP = {
             2016: cls.calculate_event_insights_2016,
             2017: cls.calculate_event_insights_2017,
+            2018: cls.calculate_event_insights_2018,
         }
 
         if year in INSIGHTS_MAP:
             return INSIGHTS_MAP[year](matches)
         else:
             return None
+
+    @classmethod
+    def calculate_event_insights_2018(cls, matches):
+        qual_matches = []
+        playoff_matches = []
+        for match in matches:
+            if match.comp_level == 'qm':
+                qual_matches.append(match)
+            else:
+                playoff_matches.append(match)
+
+        qual_insights = cls._calculate_event_insights_2018_helper(qual_matches)
+        playoff_insights = cls._calculate_event_insights_2018_helper(playoff_matches)
+
+        return {
+            'qual': qual_insights,
+            'playoff': playoff_insights,
+        }
+
+    @classmethod
+    def _calculate_event_insights_2018_helper(cls, matches):
+        # Auto
+        run_points_auto = 0
+        scale_ownership_time_auto = 0
+        switch_ownership_time_auto = 0
+        points_auto = 0
+
+        run_counts_auto = 0
+        switch_owned_counts_auto = 0
+
+        # Teleop
+        scale_ownership_time_teleop = 0
+        switch_ownership_time_teleop = 0
+        points_teleop = 0
+
+        # Overall
+        winning_scale_ownership_percentage_auto = 0
+        winning_own_switch_ownership_percentage_auto = 0
+        winning_scale_ownership_percentage_teleop = 0
+        winning_own_switch_ownership_percentage_teleop = 0
+        winning_opp_switch_denial_percentage_teleop = 0
+        winning_scale_ownership_percentage = 0
+        winning_own_switch_ownership_percentage = 0
+
+        scale_neutral_percentage_auto = 0
+        scale_neutral_percentage_teleop = 0
+        scale_neutral_percentage = 0
+
+        force_played = 0
+        levitate_played = 0
+        boost_played = 0
+        force_played_counts = 0
+        levitate_played_counts = 0
+        boost_played_counts = 0
+        vault_points = 0
+        endgame_points = 0
+
+        climb_counts = 0
+        auto_quest_achieved = 0
+        face_the_boss_achieved = 0
+        unicorn_matches = 0
+
+        winning_scores = 0
+        win_margins = 0
+        total_scores = 0
+        foul_scores = 0
+        high_score = [0, "", ""]  # score, match key, match name
+
+        finished_matches = 0
+        has_insights = False
+        for match in matches:
+            if not match.has_been_played:
+                continue
+
+            red_score = match.alliances['red']['score']
+            blue_score = match.alliances['blue']['score']
+            win_score = max(red_score, blue_score)
+
+            winning_scores += win_score
+            win_margins += (win_score - min(red_score, blue_score))
+            total_scores += red_score + blue_score
+
+            if win_score > high_score[0]:
+                high_score = [win_score, match.key_name, match.short_name]
+
+            for alliance_color in ['red', 'blue']:
+                try:
+                    alliance_breakdown = match.score_breakdown[alliance_color]
+                    opp_alliance_breakdown = match.score_breakdown['red' if alliance_color == 'blue' else 'red']
+                    alliance_win = alliance_color == match.winning_alliance
+
+                    # Auto
+                    run_points_auto += alliance_breakdown['autoRunPoints']
+                    scale_ownership_time_auto += alliance_breakdown['autoScaleOwnershipSec']
+                    switch_ownership_time_auto += alliance_breakdown['autoSwitchOwnershipSec']
+                    points_auto += alliance_breakdown['autoPoints']
+
+                    switch_owned_counts_auto += 1 if alliance_breakdown['autoSwitchAtZero'] else 0
+                    alliance_run_counts_auto = 0
+                    for i in xrange(3):
+                        alliance_run_counts_auto += 1 if alliance_breakdown['autoRobot{}'.format(i+1)] == 'AutoRun' else 0
+                    run_counts_auto += alliance_run_counts_auto
+
+                    # Teleop
+                    scale_ownership_time_teleop += alliance_breakdown['teleopScaleOwnershipSec']
+                    switch_ownership_time_teleop += alliance_breakdown['teleopSwitchOwnershipSec']
+                    points_teleop += alliance_breakdown['teleopPoints']
+
+                    # Overall
+                    if alliance_win:
+                        winning_scale_ownership_percentage_auto += float(alliance_breakdown['autoScaleOwnershipSec']) / 15
+                        winning_own_switch_ownership_percentage_auto += float(alliance_breakdown['autoSwitchOwnershipSec']) / 15
+
+                        winning_scale_ownership_percentage_teleop += float(alliance_breakdown['teleopScaleOwnershipSec']) / 135
+                        winning_own_switch_ownership_percentage_teleop += float(alliance_breakdown['teleopSwitchOwnershipSec']) / 135
+                        winning_opp_switch_denial_percentage_teleop += float(135 - opp_alliance_breakdown['teleopSwitchOwnershipSec']) / 135
+
+                        winning_scale_ownership_percentage += float(alliance_breakdown['autoScaleOwnershipSec'] + alliance_breakdown['teleopScaleOwnershipSec']) / 150
+                        winning_own_switch_ownership_percentage += float(alliance_breakdown['autoSwitchOwnershipSec'] + alliance_breakdown['teleopSwitchOwnershipSec']) / 150
+
+                    scale_neutral_percentage_auto += float(7.5 - alliance_breakdown['autoScaleOwnershipSec']) / 7.5
+                    scale_neutral_percentage_teleop += float(67.5 - alliance_breakdown['teleopScaleOwnershipSec']) / 67.5
+                    scale_neutral_percentage += float(75 - alliance_breakdown['autoScaleOwnershipSec'] - alliance_breakdown['teleopScaleOwnershipSec']) / 75
+
+                    force_played += alliance_breakdown['vaultForcePlayed']
+                    levitate_played += alliance_breakdown['vaultLevitatePlayed']
+                    boost_played += alliance_breakdown['vaultBoostPlayed']
+                    force_played_counts += alliance_breakdown['vaultForcePlayed'] > 0
+                    levitate_played_counts += alliance_breakdown['vaultLevitatePlayed'] > 0
+                    boost_played_counts += alliance_breakdown['vaultBoostPlayed'] > 0
+
+                    vault_points += alliance_breakdown['vaultPoints']
+                    endgame_points += alliance_breakdown['endgamePoints']
+
+                    alliance_climb_levitate_counts = 0
+                    for i in xrange(3):
+                        alliance_climb_levitate_counts += 1 if alliance_breakdown['endgameRobot{}'.format(i+1)] in {'Climbing', 'Levitate'} else 0
+                        climb_counts += 1 if alliance_breakdown['endgameRobot{}'.format(i+1)] == 'Climbing' else 0
+
+                    alliance_auto_quest_achieved = alliance_run_counts_auto == 3 and alliance_breakdown['autoSwitchAtZero']
+                    alliance_face_the_boss_achieved = alliance_climb_levitate_counts == 3
+                    auto_quest_achieved += 1 if alliance_auto_quest_achieved else 0
+                    face_the_boss_achieved += 1 if alliance_face_the_boss_achieved else 0
+                    unicorn_matches += 1 if (alliance_win and alliance_auto_quest_achieved and alliance_face_the_boss_achieved) else 0
+
+                    foul_scores += alliance_breakdown['foulPoints']
+                    has_insights = True
+                except Exception, e:
+                    msg = "Event insights failed for {}".format(match.key.id())
+                    # event.get() below should be cheap since it's backed by context cache
+                    if match.event.get().event_type_enum in EventType.SEASON_EVENT_TYPES:
+                        logging.warning(msg)
+                        logging.warning(traceback.format_exc())
+                    else:
+                        logging.info(msg)
+            finished_matches += 1
+
+        if not has_insights:
+            return None
+
+        if finished_matches == 0:
+            return {}
+
+        opportunities_1x = 2 * finished_matches  # once per alliance
+        opportunities_3x = 6 * finished_matches  # 3x per alliance
+        event_insights = {
+            # Auto
+            'average_run_points_auto': float(run_points_auto) / (2 * finished_matches),
+            'average_scale_ownership_points_auto': float(scale_ownership_time_auto * 2) / (2 * finished_matches),
+            'average_switch_ownership_points_auto': float(switch_ownership_time_auto * 2) / (2 * finished_matches),
+            'average_points_auto': float(points_auto) / (2 * finished_matches),
+
+            'run_counts_auto': [run_counts_auto, opportunities_3x, 100.0 * float(run_counts_auto) / opportunities_3x],
+            'switch_owned_counts_auto': [switch_owned_counts_auto, opportunities_1x, 100.0 * float(switch_owned_counts_auto) / opportunities_1x],
+
+            # Teleop
+            'average_scale_ownership_points_teleop': float(scale_ownership_time_teleop) / (2 * finished_matches),
+            'average_switch_ownership_points_teleop': float(switch_ownership_time_teleop) / (2 * finished_matches),
+            'average_points_teleop': float(points_teleop) / (2 * finished_matches),
+
+            # Overall
+            'climb_counts': [climb_counts, opportunities_3x, 100.0 * float(climb_counts) / opportunities_3x],
+            'force_played_counts': [force_played_counts, opportunities_1x, 100.0 * float(force_played_counts) / opportunities_1x],
+            'levitate_played_counts': [levitate_played_counts, opportunities_1x, 100.0 * float(levitate_played_counts) / opportunities_1x],
+            'boost_played_counts': [boost_played_counts, opportunities_1x, 100.0 * float(boost_played_counts) / opportunities_1x],
+
+            'average_scale_ownership_points': float(scale_ownership_time_auto * 2 + scale_ownership_time_teleop) / (2 * finished_matches),
+            'average_switch_ownership_points': float(switch_ownership_time_auto * 2 + switch_ownership_time_teleop) / (2 * finished_matches),
+
+            'winning_scale_ownership_percentage_auto': 100.0 * float(winning_scale_ownership_percentage_auto) / finished_matches,
+            'winning_own_switch_ownership_percentage_auto': 100.0 * float(winning_own_switch_ownership_percentage_auto) / finished_matches,
+            'winning_scale_ownership_percentage_teleop': 100.0 * float(winning_scale_ownership_percentage_teleop) / finished_matches,
+            'winning_own_switch_ownership_percentage_teleop': 100.0 * float(winning_own_switch_ownership_percentage_teleop) / finished_matches,
+            'winning_opp_switch_denial_percentage_teleop': 100.0 * float(winning_opp_switch_denial_percentage_teleop) / finished_matches,
+            'winning_scale_ownership_percentage': 100.0 * float(winning_scale_ownership_percentage) / finished_matches,
+            'winning_own_switch_ownership_percentage': 100.0 * float(winning_own_switch_ownership_percentage) / finished_matches,
+
+            'scale_neutral_percentage_auto': 100.0 * float(scale_neutral_percentage_auto) / (2 * finished_matches),
+            'scale_neutral_percentage_teleop': 100.0 * float(scale_neutral_percentage_teleop) / (2 * finished_matches),
+            'scale_neutral_percentage': 100.0 * float(scale_neutral_percentage) / (2 * finished_matches),
+
+            'average_force_played': float(force_played) / force_played_counts,
+            'average_boost_played': float(boost_played) / boost_played_counts,
+            'average_vault_points': float(vault_points) / (2 * finished_matches),
+            'average_endgame_points': float(endgame_points) / (2 * finished_matches),
+
+            'average_win_score': float(winning_scores) / finished_matches,
+            'average_win_margin': float(win_margins) / finished_matches,
+            'average_score': float(total_scores) / (2 * finished_matches),
+            'average_foul_score': float(foul_scores) / (2 * finished_matches),
+            'high_score': high_score,  # [score, match key, match name]
+            'auto_quest_achieved': [auto_quest_achieved, opportunities_1x, 100.0 * float(auto_quest_achieved) / opportunities_1x],
+            'face_the_boss_achieved': [face_the_boss_achieved, opportunities_1x, 100.0 * float(face_the_boss_achieved) / opportunities_1x],
+            'unicorn_matches': [unicorn_matches, opportunities_1x / 2, 100.0 * float(unicorn_matches) / opportunities_1x / 2],
+        }
+
+        return event_insights
 
     @classmethod
     def calculate_event_insights_2017(cls, matches):
