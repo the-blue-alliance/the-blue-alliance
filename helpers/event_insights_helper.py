@@ -59,6 +59,9 @@ class EventInsightsHelper(object):
         force_played = 0
         levitate_played = 0
         boost_played = 0
+        force_played_counts = 0
+        levitate_played_counts = 0
+        boost_played_counts = 0
         vault_points = 0
         endgame_points = 0
 
@@ -118,6 +121,10 @@ class EventInsightsHelper(object):
                     force_played += alliance_breakdown['vaultForcePlayed']
                     levitate_played += alliance_breakdown['vaultLevitatePlayed']
                     boost_played += alliance_breakdown['vaultBoostPlayed']
+                    force_played_counts += alliance_breakdown['vaultForcePlayed'] > 0
+                    levitate_played_counts += alliance_breakdown['vaultLevitatePlayed'] > 0
+                    boost_played_counts += alliance_breakdown['vaultBoostPlayed'] > 0
+
                     vault_points += alliance_breakdown['vaultPoints']
                     endgame_points += alliance_breakdown['endgamePoints']
 
@@ -170,6 +177,9 @@ class EventInsightsHelper(object):
 
             # Overall
             'climb_levitate_counts': [climb_levitate_counts, opportunities_3x, 100.0 * float(climb_levitate_counts) / opportunities_3x],
+            'force_played_counts': [force_played_counts, opportunities_1x, 100.0 * float(force_played_counts) / opportunities_1x],
+            'levitate_played_counts': [levitate_played_counts, opportunities_1x, 100.0 * float(levitate_played_counts) / opportunities_1x],
+            'boost_played_counts': [boost_played_counts, opportunities_1x, 100.0 * float(boost_played_counts) / opportunities_1x],
 
             'average_scale_ownership_points': float(scale_ownership_points) / (2 * finished_matches),
             'average_switch_ownership_points': float(switch_ownership_points) / (2 * finished_matches),
