@@ -75,7 +75,7 @@ class EventInsightsHelper(object):
         vault_points = 0
         endgame_points = 0
 
-        climb_levitate_counts = 0
+        climb_counts = 0
         auto_quest_achieved = 0
         face_the_boss_achieved = 0
         unicorn_matches = 0
@@ -155,7 +155,7 @@ class EventInsightsHelper(object):
                     alliance_climb_levitate_counts = 0
                     for i in xrange(3):
                         alliance_climb_levitate_counts += 1 if alliance_breakdown['endgameRobot{}'.format(i+1)] in {'Climbing', 'Levitate'} else 0
-                    climb_levitate_counts += alliance_climb_levitate_counts
+                        climb_counts += 1 if alliance_breakdown['endgameRobot{}'.format(i+1)] == 'Climbing' else 0
 
                     alliance_auto_quest_achieved = alliance_run_counts_auto == 3 and alliance_breakdown['autoSwitchAtZero']
                     alliance_face_the_boss_achieved = alliance_climb_levitate_counts == 3
@@ -199,7 +199,7 @@ class EventInsightsHelper(object):
             'average_points_teleop': float(points_teleop) / (2 * finished_matches),
 
             # Overall
-            'climb_levitate_counts': [climb_levitate_counts, opportunities_3x, 100.0 * float(climb_levitate_counts) / opportunities_3x],
+            'climb_counts': [climb_counts, opportunities_3x, 100.0 * float(climb_counts) / opportunities_3x],
             'force_played_counts': [force_played_counts, opportunities_1x, 100.0 * float(force_played_counts) / opportunities_1x],
             'levitate_played_counts': [levitate_played_counts, opportunities_1x, 100.0 * float(levitate_played_counts) / opportunities_1x],
             'boost_played_counts': [boost_played_counts, opportunities_1x, 100.0 * float(boost_played_counts) / opportunities_1x],
