@@ -127,6 +127,13 @@ export function setTwitchChat(channel) {
   }
 }
 
+export function setDefaultTwitchChat(channel) {
+  return {
+    type: types.SET_DEFAULT_TWITCH_CHAT,
+    channel,
+  }
+}
+
 export function setFavoriteTeams(favoriteTeams) {
   return {
     type: types.SET_FAVORITE_TEAMS,

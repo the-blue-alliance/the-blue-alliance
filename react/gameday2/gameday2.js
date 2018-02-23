@@ -11,7 +11,7 @@ import { indigo500, indigo700 } from 'material-ui/styles/colors'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import GamedayFrame from './components/GamedayFrame'
 import gamedayReducer, { firedux } from './reducers'
-import { setWebcastsRaw, setLayout, addWebcastAtPosition, setTwitchChat, setFavoriteTeams } from './actions'
+import { setWebcastsRaw, setLayout, addWebcastAtPosition, setTwitchChat, setDefaultTwitchChat, setFavoriteTeams } from './actions'
 import { MAX_SUPPORTED_VIEWS } from './constants/LayoutConstants'
 
 injectTapEventPlugin()
@@ -143,6 +143,7 @@ firedux.ref.child('live_events').on('value', (snapshot) => {
     }
     // Set the default chat channel
     if (defaultChat) {
+      store.dispatch(setDefaultTwitchChat(defaultChat))
       store.dispatch(setTwitchChat(defaultChat))
     }
     // Overwrite default chat with param
