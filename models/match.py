@@ -150,7 +150,7 @@ class Match(ndb.Model):
 
             # Add in RP calculations
             if self.has_been_played:
-                if self.year >= 2016:
+                if self.year in {2016, 2017}:
                     for color in ['red', 'blue']:
                         if self.comp_level == 'qm':
                             rp_earned = 0
