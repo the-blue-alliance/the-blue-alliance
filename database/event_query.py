@@ -77,6 +77,20 @@ class TeamYearEventsQuery(DatabaseQuery):
         raise ndb.Return(events)
 
 
+class TeamYearEventTeamsQuery(DatabaseQuery):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = 'team_year_eventteams_{}_{}'  # (team_key, year)
+
+    @ndb.tasklet
+    def _query_async(self):
+        team_key = self._query_args[0]
+        year = self._query_args[1]
+        event_teams = yield EventTeam.query(
+            EventTeam.team == ndb.Key(Team, team_key),
+            EventTeam.year == year).fetch_async()
+        raise ndb.Return(event_teams)
+
+
 class EventDivisionsQuery(DatabaseQuery):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "event_divisions_{}"  # (event_key)

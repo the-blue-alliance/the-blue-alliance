@@ -8,7 +8,7 @@ from consts.media_tag import MediaTag
 from controllers.apiv3.api_base_controller import ApiBaseController
 from controllers.apiv3.model_properties import filter_event_properties, filter_team_properties, filter_match_properties
 from database.award_query import TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
-from database.event_query import TeamEventsQuery, TeamYearEventsQuery
+from database.event_query import TeamEventsQuery, TeamYearEventsQuery, TeamYearEventTeamsQuery
 from database.match_query import TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.media_query import TeamYearMediaQuery, TeamSocialMediaQuery, TeamTagMediasQuery, TeamYearTagMediasQuery
 from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, TeamParticipationQuery, TeamDistrictsQuery
@@ -206,6 +206,28 @@ class ApiTeamEventStatusController(ApiBaseController):
                 'overall_status_str': EventTeamStatusHelper.generate_team_at_event_status_string(team_key, status),
             })
         return json.dumps(status, ensure_ascii=True, indent=2, sort_keys=True)
+
+
+class ApiTeamYearEventsStatusesController(ApiBaseController):
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
+
+    def _track_call(self, team_key, year):
+        self._track_call_defer('team/events/statuses', '{}/{}'.format(team_key, year))
+
+    def _render(self, team_key, year):
+        event_teams, self._last_modified = TeamYearEventTeamsQuery(team_key, int(year)).fetch(return_updated=True)
+        statuses = {}
+        for event_team in event_teams:
+            status = event_team.status
+            if status:
+                status.update({
+                    'alliance_status_str': EventTeamStatusHelper.generate_team_at_event_alliance_status_string(team_key, status),
+                    'playoff_status_str': EventTeamStatusHelper.generate_team_at_event_playoff_status_string(team_key, status),
+                    'overall_status_str': EventTeamStatusHelper.generate_team_at_event_status_string(team_key, status),
+                })
+            statuses[event_team.event.id()] = status
+        return json.dumps(statuses, ensure_ascii=True, indent=2, sort_keys=True)
 
 
 class ApiTeamYearAwardsController(ApiBaseController):

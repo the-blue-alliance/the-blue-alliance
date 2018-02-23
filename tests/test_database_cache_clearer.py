@@ -6,14 +6,14 @@ from google.appengine.ext import testbed
 from database import get_affected_queries
 from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery, TeamEventTypeAwardsQuery
 from database.district_query import DistrictsInYearQuery, DistrictHistoryQuery, DistrictQuery
-from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery, \
+from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery, TeamYearEventTeamsQuery, \
     EventDivisionsQuery
 from database.event_details_query import EventDetailsQuery
 from database.match_query import MatchQuery, EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery, \
     EventMediasQuery, TeamTagMediasQuery, TeamYearTagMediasQuery
 from database.robot_query import TeamRobotsQuery
-from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
+from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, EventEventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
 
 from consts.event_type import EventType
 from consts.award_type import AwardType
@@ -166,7 +166,7 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         }
         cache_keys = [q.cache_key for q in get_affected_queries.event_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 13)
+        self.assertEqual(len(cache_keys), 15)
         self.assertTrue(EventQuery('2015casj').cache_key in cache_keys)
         self.assertTrue(EventQuery('2015cama').cache_key in cache_keys)
         self.assertTrue(EventListQuery(2014).cache_key in cache_keys)
@@ -177,6 +177,8 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         self.assertTrue(TeamEventsQuery('frc604').cache_key in cache_keys)
         self.assertTrue(TeamYearEventsQuery('frc254', 2015).cache_key in cache_keys)
         self.assertTrue(TeamYearEventsQuery('frc604', 2015).cache_key in cache_keys)
+        self.assertTrue(TeamYearEventTeamsQuery('frc254', 2015).cache_key in cache_keys)
+        self.assertTrue(TeamYearEventTeamsQuery('frc604', 2015).cache_key in cache_keys)
         self.assertTrue(EventDivisionsQuery('2015casj').cache_key in cache_keys)
         self.assertTrue(EventDivisionsQuery('2015cama').cache_key in cache_keys)
         self.assertTrue(EventDivisionsQuery('2015cafoo').cache_key in cache_keys)
@@ -265,7 +267,7 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         }
         cache_keys = [q.cache_key for q in get_affected_queries.team_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 13)
+        self.assertEqual(len(cache_keys), 16)
         self.assertTrue(TeamQuery('frc254').cache_key in cache_keys)
         self.assertTrue(TeamQuery('frc604').cache_key in cache_keys)
         self.assertTrue(TeamListQuery(0).cache_key in cache_keys)
@@ -279,6 +281,9 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         self.assertTrue(EventTeamsQuery('2015casj').cache_key in cache_keys)
         self.assertTrue(EventTeamsQuery('2015cama').cache_key in cache_keys)
         self.assertTrue(EventTeamsQuery('2010cama').cache_key in cache_keys)
+        self.assertTrue(EventEventTeamsQuery('2015casj').cache_key in cache_keys)
+        self.assertTrue(EventEventTeamsQuery('2015cama').cache_key in cache_keys)
+        self.assertTrue(EventEventTeamsQuery('2010cama').cache_key in cache_keys)
 
     def test_eventteam_updated(self):
         affected_refs = {
@@ -288,7 +293,7 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         }
         cache_keys = [q.cache_key for q in get_affected_queries.eventteam_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 18)
+        self.assertEqual(len(cache_keys), 24)
         self.assertTrue(TeamEventsQuery('frc254').cache_key in cache_keys)
         self.assertTrue(TeamEventsQuery('frc604').cache_key in cache_keys)
         self.assertTrue(TeamParticipationQuery('frc254').cache_key in cache_keys)
@@ -297,12 +302,18 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         self.assertTrue(TeamYearEventsQuery('frc254', 2015).cache_key in cache_keys)
         self.assertTrue(TeamYearEventsQuery('frc604', 2014).cache_key in cache_keys)
         self.assertTrue(TeamYearEventsQuery('frc604', 2015).cache_key in cache_keys)
+        self.assertTrue(TeamYearEventTeamsQuery('frc254', 2014).cache_key in cache_keys)
+        self.assertTrue(TeamYearEventTeamsQuery('frc254', 2015).cache_key in cache_keys)
+        self.assertTrue(TeamYearEventTeamsQuery('frc604', 2014).cache_key in cache_keys)
+        self.assertTrue(TeamYearEventTeamsQuery('frc604', 2015).cache_key in cache_keys)
         self.assertTrue(TeamListYearQuery(2014, 0).cache_key in cache_keys)
         self.assertTrue(TeamListYearQuery(2014, 1).cache_key in cache_keys)
         self.assertTrue(TeamListYearQuery(2015, 0).cache_key in cache_keys)
         self.assertTrue(TeamListYearQuery(2015, 1).cache_key in cache_keys)
         self.assertTrue(EventTeamsQuery('2015casj').cache_key in cache_keys)
         self.assertTrue(EventTeamsQuery('2015cama').cache_key in cache_keys)
+        self.assertTrue(EventEventTeamsQuery('2015casj').cache_key in cache_keys)
+        self.assertTrue(EventEventTeamsQuery('2015cama').cache_key in cache_keys)
         self.assertTrue(EventTeamsMediasQuery('2015cama').cache_key in cache_keys)
         self.assertTrue(EventTeamsMediasQuery('2015casj').cache_key in cache_keys)
         self.assertTrue(EventTeamsPreferredMediasQuery('2015cama').cache_key in cache_keys)
@@ -329,7 +340,7 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         }
         cache_keys = [q.cache_key for q in get_affected_queries.district_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 12)
+        self.assertEqual(len(cache_keys), 13)
         self.assertTrue(DistrictsInYearQuery(2015).cache_key in cache_keys)
         self.assertTrue(DistrictsInYearQuery(2016).cache_key in cache_keys)
         self.assertTrue(DistrictHistoryQuery('ne').cache_key in cache_keys)
@@ -343,4 +354,5 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         self.assertTrue(DistrictEventsQuery('2016ne').cache_key in cache_keys)
         self.assertTrue(TeamEventsQuery('frc125').cache_key in cache_keys)
         self.assertTrue(TeamYearEventsQuery('frc125', 2016).cache_key in cache_keys)
+        self.assertTrue(TeamYearEventTeamsQuery('frc125', 2016).cache_key in cache_keys)
         self.assertTrue(EventDivisionsQuery('2016necmp').cache_key in cache_keys)

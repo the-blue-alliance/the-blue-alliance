@@ -2,14 +2,14 @@ from google.appengine.ext import ndb
 
 from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery, TeamEventTypeAwardsQuery
 from database.district_query import DistrictsInYearQuery, DistrictHistoryQuery, DistrictQuery
-from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery, \
+from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery, TeamYearEventTeamsQuery, \
     EventDivisionsQuery
 from database.event_details_query import EventDetailsQuery
 from database.match_query import MatchQuery, EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery, \
     EventMediasQuery, TeamTagMediasQuery, TeamYearTagMediasQuery
 from database.robot_query import TeamRobotsQuery
-from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
+from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, EventEventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
 
 from models.district_team import DistrictTeam
 from models.event import Event
@@ -73,6 +73,7 @@ def event_updated(affected_refs):
         year = int(et_key.id()[:4])
         queries_and_keys.append((TeamEventsQuery(team_key)))
         queries_and_keys.append((TeamYearEventsQuery(team_key, year)))
+        queries_and_keys.append((TeamYearEventTeamsQuery(team_key, year)))
 
     events_with_parents = filter(lambda e: e.get_result() is not None and e.get_result().parent_event is not None, events_future)
     parent_keys = set([e.get_result().parent_event for e in events_with_parents])
@@ -174,6 +175,7 @@ def team_updated(affected_refs):
         page_num = _get_team_page_num(et_key.id().split('_')[1])
         queries_and_keys.append((TeamListYearQuery(year, page_num)))
         queries_and_keys.append((EventTeamsQuery(event_key)))
+        queries_and_keys.append((EventEventTeamsQuery(event_key)))
 
     for dt_key in district_team_keys_future.get_result():
         district_key = dt_key.id().split('_')[0]
@@ -194,10 +196,12 @@ def eventteam_updated(affected_refs):
         page_num = _get_team_page_num(team_key.id())
         for year in years:
             queries_and_keys.append(TeamYearEventsQuery(team_key.id(), year))
+            queries_and_keys.append(TeamYearEventTeamsQuery(team_key.id(), year))
             queries_and_keys.append(TeamListYearQuery(year, page_num))
 
     for event_key in event_keys:
         queries_and_keys.append(EventTeamsQuery(event_key.id()))
+        queries_and_keys.append(EventEventTeamsQuery(event_key.id()))
         queries_and_keys.append(EventTeamsMediasQuery(event_key.id()))
         queries_and_keys.append(EventTeamsPreferredMediasQuery(event_key.id()))
 
