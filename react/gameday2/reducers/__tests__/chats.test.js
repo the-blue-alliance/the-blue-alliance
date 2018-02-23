@@ -4,13 +4,14 @@ import { SET_TWITCH_CHAT } from '../../constants/ActionTypes'
 describe('chats reducer', () => {
   const defaultState = {
     chats: {
-      tbagameday: {
-        name: 'GameDay',
-        channel: 'tbagameday',
+      firstupdatesnow: {
+        name: 'FIRST Updates Now',
+        channel: 'firstupdatesnow',
       },
     },
-    renderedChats: ['tbagameday'],
-    currentChat: 'tbagameday',
+    renderedChats: ['firstupdatesnow'],
+    currentChat: 'firstupdatesnow',
+    defaultChat: 'firstupdatesnow',
   }
 
   it('defaults to the appropriate state', () => {
