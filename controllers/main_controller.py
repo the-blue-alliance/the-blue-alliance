@@ -62,8 +62,8 @@ class Avatars2018Handler(CacheableHandler):
 
     def _render(self, *args, **kw):
         avatars = []
-        shards = memcache.get_multi(['2018avatars_{}'.format(i) for i in xrange(10)])
-        for shard in shards.values():
+        shards = memcache.get_multi(['2018avatars_{}'.format(i) for i in xrange(5)])
+        for _, shard in sorted(shards.items(), key=lambda kv: kv[0]):
             if shard is not None:
                 avatars += shard
             else:
@@ -76,10 +76,10 @@ class Avatars2018Handler(CacheableHandler):
             avatars = sorted(avatars_future.get_result(), key=lambda a: int(a.references[0].id()[3:]))
 
             shards = {}
-            size = len(avatars) / 10 + 1
-            for i in xrange(10):
+            size = len(avatars) / 5 + 1
+            for i in xrange(5):
                 start = i * size
-                end = start + size - 1
+                end = start + size
                 shards['2018avatars_{}'.format(i)] = avatars[start:end]
             memcache.set_multi(shards, 60*60*24)
 
