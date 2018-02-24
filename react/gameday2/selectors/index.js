@@ -77,9 +77,9 @@ export const getTickerMatches = createSelector(
       if (match.alliances.red.score !== -1 && match.alliances.blue.score !== -1) {
         time = 0
       }
-      if (match.predicted_time) {
-        time = match.predicted_time
-      }
+      // if (match.predicted_time) {
+      //   time = match.predicted_time
+      // }
       return (time * 10000000) + (compLevelsPlayOrder[match.comp_level] * 100000) + (match.match_number * 100) + match.set_number
     }
 
