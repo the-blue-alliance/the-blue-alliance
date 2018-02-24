@@ -61,8 +61,28 @@ class Avatars2018Handler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24
 
     def _render(self, *args, **kw):
-        avatars_future = Media.query(Media.media_type_enum == MediaType.AVATAR).fetch_async()
-        avatars = sorted(avatars_future.get_result(), key=lambda a: int(a.references[0].id()[3:]))
+        avatars = []
+        shards = memcache.get_multi(['2018avatars_{}'.format(i) for i in xrange(10)])
+        for shard in shards.values():
+            if shard is not None:
+                avatars += shard
+            else:
+                # Missing a shard, must refetch all
+                avatars = []
+                break
+
+        if not avatars:
+            avatars_future = Media.query(Media.media_type_enum == MediaType.AVATAR).fetch_async()
+            avatars = sorted(avatars_future.get_result(), key=lambda a: int(a.references[0].id()[3:]))
+
+            shards = {}
+            size = len(avatars) / 10 + 1
+            for i in xrange(10):
+                start = i * size
+                end = start + size - 1
+                shards['2018avatars_{}'.format(i)] = avatars[start:end]
+            memcache.set_multi(shards, 60*60*24)
+
         self.template_values.update({
             'avatars': avatars,
         })
