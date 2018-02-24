@@ -50,7 +50,7 @@ class LiveEventPanel extends React.PureComponent {
         unplayedMatches,
       })
     })
-    firebaseApp.database().ref(`/events/${this.props.eventKey}/livescore`).on('value', (snapshot) => {
+    firebaseApp.database().ref(`/le/${this.props.eventKey}`).on('value', (snapshot) => {
       this.setState({
         matchState: snapshot.val(),
       })
@@ -71,12 +71,12 @@ class LiveEventPanel extends React.PureComponent {
         currentMatch = unplayedMatchesCopy[0]
       } else {
         playedMatchesCopy.forEach((match, i) => {
-          if (match.key.split('_')[1] === matchState.matchKey) {
+          if (match.key.split('_')[1] === matchState.mk) {
             currentMatch = playedMatchesCopy.splice(i, 1)[0]
           }
         })
         unplayedMatchesCopy.forEach((match, i) => {
-          if (match.key.split('_')[1] === matchState.matchKey) {
+          if (match.key.split('_')[1] === matchState.mk) {
             currentMatch = unplayedMatchesCopy.splice(i, 1)[0]
           }
         })
