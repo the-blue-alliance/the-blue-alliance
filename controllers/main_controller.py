@@ -63,7 +63,7 @@ class Avatars2018Handler(CacheableHandler):
     def _render(self, *args, **kw):
         avatars = []
         shards = memcache.get_multi(['2018avatars_{}'.format(i) for i in xrange(3)])
-        for shard in shards.values():
+        for _, shard in sorted(shards.items(), key=lambda kv: kv[0]):
             if shard is not None:
                 avatars += shard
             else:
