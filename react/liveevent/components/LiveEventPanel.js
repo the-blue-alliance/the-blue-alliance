@@ -34,7 +34,13 @@ class LiveEventPanel extends React.PureComponent {
       databaseURL: 'https://tbatv-prod-hrd.firebaseio.com',
     })
     firebaseApp.database().ref(`/events/${this.props.eventKey}/matches`).on('value', (snapshot) => {
-      const matches = Object.values(snapshot.val())
+      const val = snapshot.val()
+      let matches
+      if (val) {
+        matches = Object.values(val)
+      } else {
+        matches = []
+      }
       matches.sort((match1, match2) => playOrder(match1) - playOrder(match2))
 
       const playedMatches = matches.filter((match) => match.alliances.red.score !== -1 && match.alliances.blue.score !== -1)
