@@ -136,7 +136,10 @@ class CacheableHandler(webapp2.RequestHandler):
     def _write_cache(self, response):
         if tba_config.CONFIG["memcache"] and not self._is_admin:
             compressed = zlib.compress(cPickle.dumps((response, self._last_modified)))
-            memcache.set(self.cache_key, compressed, self._get_cache_expiration())
+            try:
+                memcache.set(self.cache_key, compressed, self._get_cache_expiration())
+            except ValueError:
+                logging.info("Setting memcache failed for key: {}".format(self.cache_key))
 
     @classmethod
     def delete_cache_multi(cls, cache_keys):
