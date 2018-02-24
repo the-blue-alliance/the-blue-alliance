@@ -64,8 +64,12 @@ class Avatars2018Handler(CacheableHandler):
         avatars = []
         shards = memcache.get_multi(['2018avatars_{}'.format(i) for i in xrange(10)])
         for shard in shards.values():
-            if shard:
+            if shard is not None:
                 avatars += shard
+            else:
+                # Missing a shard, must refetch all
+                avatars = []
+                break
 
         if not avatars:
             avatars_future = Media.query(Media.media_type_enum == MediaType.AVATAR).fetch_async()
