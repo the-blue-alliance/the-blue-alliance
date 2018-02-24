@@ -58,6 +58,10 @@ export default class VideoCell extends React.Component {
     this.onRequestCloseWebcastSelectionDialog()
   }
 
+  onRequestLiveScoresToggle() {
+    this.props.togglePositionLivescore(this.props.position)
+  }
+
   render() {
     const cellStyle = Object.assign({}, LAYOUT_STYLES[this.props.layoutId][this.props.position], {
       paddingBottom: '48px',
@@ -76,13 +80,19 @@ export default class VideoCell extends React.Component {
         <div
           style={cellStyle}
         >
-          <WebcastEmbed webcast={this.props.webcast} />
+          {this.props.livescoreOn ?
+            <div>TODO</div>
+            :
+            <WebcastEmbed webcast={this.props.webcast} />
+          }
           <VideoCellToolbarContainer
             style={toolbarStyle}
             webcast={this.props.webcast}
             isBlueZone={this.props.webcast.key === 'bluezone'}
+            livescoreOn={this.props.livescoreOn}
             onRequestSelectWebcast={() => this.onRequestOpenWebcastSelectionDialog()}
             onRequestSwapPosition={() => this.onRequestSwapPosition()}
+            onRequestLiveScoresToggle={() => this.onRequestLiveScoresToggle()}
           />
           <WebcastSelectionDialogContainer
             open={this.state.webcastSelectionDialogOpen}

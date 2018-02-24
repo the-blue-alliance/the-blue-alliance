@@ -5,8 +5,10 @@ import { MAX_SUPPORTED_VIEWS, NUM_VIEWS_FOR_LAYOUT } from '../constants/LayoutCo
 
 const defaultPositionMap = new Array(MAX_SUPPORTED_VIEWS)
 const defaultDomOrder = new Array(MAX_SUPPORTED_VIEWS)
+const defaultDomOrderLivescoreOn = new Array(MAX_SUPPORTED_VIEWS)
 defaultDomOrder.fill(null)
 defaultPositionMap.fill(-1)
+defaultDomOrderLivescoreOn.fill(null)
 
 const defaultState = {
   layoutId: 0,
@@ -14,6 +16,7 @@ const defaultState = {
   displayed: [],
   domOrder: defaultDomOrder,
   positionMap: defaultPositionMap,
+  domOrderLivescoreOn: defaultDomOrderLivescoreOn,
 }
 
 /**
@@ -24,6 +27,7 @@ const trimToLayout = (state) => {
     displayed,
     domOrder,
     positionMap,
+    domOrderLivescoreOn
   } = state
 
   const layoutId = state.layoutId
@@ -31,6 +35,7 @@ const trimToLayout = (state) => {
   displayed = displayed.slice(0)
   domOrder = domOrder.slice(0)
   positionMap = positionMap.slice(0)
+  domOrderLivescoreOn = domOrderLivescoreOn.slice(0)
 
   const maxViewsForLayout = NUM_VIEWS_FOR_LAYOUT[layoutId]
 
@@ -52,6 +57,7 @@ const trimToLayout = (state) => {
     const domPosition = positionMap.pop()
     const webcastId = domOrder[domPosition]
     domOrder[domPosition] = null
+    domOrderLivescoreOn[domPosition] = null
 
     const index = displayed.indexOf(webcastId)
     if (index >= 0) {
@@ -67,12 +73,14 @@ const trimToLayout = (state) => {
   // Fill in any empty spots in the dom order
   while (domOrder.length < MAX_SUPPORTED_VIEWS) {
     domOrder.push(null)
+    domOrderLivescoreOn.push(null)
   }
 
   return Object.assign({}, state, {
     displayed,
     domOrder,
     positionMap,
+    domOrderLivescoreOn,
   })
 }
 
@@ -89,11 +97,13 @@ const addWebcastAtPosition = (state, webcastId, position, maxSupportedViews) => 
     displayed,
     domOrder,
     positionMap,
+    domOrderLivescoreOn
   } = state
 
   displayed = displayed.slice(0)
   domOrder = domOrder.slice(0)
   positionMap = positionMap.slice(0)
+  domOrderLivescoreOn = domOrderLivescoreOn.slice(0)
 
   // See if there's already a webcast at this position
   const existingIndex = positionMap[position]
@@ -117,6 +127,7 @@ const addWebcastAtPosition = (state, webcastId, position, maxSupportedViews) => 
         // We found an opening!
         domOrder[i] = webcastId
         positionMap[position] = i
+        domOrderLivescoreOn[i] = false
         break
       }
     }
@@ -128,6 +139,7 @@ const addWebcastAtPosition = (state, webcastId, position, maxSupportedViews) => 
     displayed,
     domOrder,
     positionMap,
+    domOrderLivescoreOn,
   }))
 }
 
@@ -159,17 +171,20 @@ const removeWebcast = (state, webcastId) => {
     displayed,
     domOrder,
     positionMap,
+    domOrderLivescoreOn,
   } = state
 
   displayed = displayed.slice(0)
   domOrder = domOrder.slice(0)
   positionMap = positionMap.slice(0)
+  domOrderLivescoreOn = domOrderLivescoreOn.slice(0)
 
   // First, find and remove it from the DOM ordering list
   let domIndex = -1
   for (let i = 0; i < domOrder.length; i++) {
     if (domOrder[i] === webcastId) {
       domOrder[i] = null
+      domOrderLivescoreOn[i] = null
       domIndex = i
     }
   }
@@ -191,6 +206,24 @@ const removeWebcast = (state, webcastId) => {
     displayed,
     domOrder,
     positionMap,
+    domOrderLivescoreOn,
+  })
+}
+
+const toggleLivescore = (state, position) => {
+  let {
+    positionMap,
+    domOrderLivescoreOn,
+  } = state
+
+  domOrderLivescoreOn = domOrderLivescoreOn.slice(0)
+
+  // Toggle livescore at position
+  const index = positionMap[position]
+  domOrderLivescoreOn[index] = !domOrderLivescoreOn[index]
+
+  return Object.assign({}, state, {
+    domOrderLivescoreOn,
   })
 }
 
@@ -217,6 +250,8 @@ const videoGrid = (state = defaultState, action) => {
         domOrder: defaultDomOrder,
         positionMap: defaultPositionMap,
       })
+    case types.TOGGLE_POSITION_LIVESCORE:
+      return toggleLivescore(state, action.position)
     default:
       return state
   }
