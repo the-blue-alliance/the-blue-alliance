@@ -1,0 +1,196 @@
+.livescore-display {
+  width: 100%;
+  height: 100%;
+  padding: 5px;
+  text-align: center;
+  color: white;
+
+  .side-col {
+    float: left;
+    width: 30%;
+    height: 100%;
+  }
+
+  .mid-col {
+    float: left;
+    width: 40%;
+    height: 100%;
+    padding: 0 10px;
+  }
+
+  .booleanIndicator {
+    border: solid 1px #ccc;
+    border-radius: 3px;
+    margin-bottom: 8px;
+  }
+
+  .powerupsContainer {
+    display: flex;
+    margin-bottom: 8px;
+  }
+
+  .powerupCountContainer {
+    flex: 1;
+    border: solid 1px #ccc;
+    border-radius: 3px;
+    padding: 1px;
+  }
+
+  .powerupCountContainerCenter {
+    margin-left: 3px;
+    margin-right: 3px;
+  }
+
+  .powerupIcon {
+    height: 15px;
+    width: 15px;
+    margin-bottom: 5px;
+  }
+
+  .powerCube {
+    width: 15px;
+    height: 15px;
+    margin: 3px auto 0;
+  }
+
+  .powerCubeActive {
+    background-color: #ffcf08;
+    border: 2px solid #333;
+    border-radius: 2px;
+  }
+
+  .timeRemainingContainer {
+    width: 100%;
+    position: absolute;
+    left: 0;
+  }
+
+  .timeRemaining {
+    background-color: rgba(0; 0; 0; 0.75);
+    padding: 0 5px;
+    border-radius: 3px;
+  }
+
+  .scoreContainer {
+    display: flex;
+    margin-bottom: 8px;
+  }
+
+  .redAlliance {
+    flex: 1;
+    margin-right: 2px;
+  }
+
+  .blueAlliance {
+    flex: 1;
+    margin-left: 2px;
+  }
+
+  .score {
+    border: solid 1px #ccc;
+    border-radius: 3px;
+    font-size: 18px;
+    padding: 1px;
+    margin-top: 8px;
+  }
+
+  .currentPowerup {
+    border: solid 1px #ccc;
+    border-radius: 3px;
+    font-size: 14px;
+    margin: 0 auto;
+    padding: 1px;
+    width: 50%;
+  }
+
+  .currentPowerupIcon {
+    width: 15px;
+    height: 15px;
+    margin-right: 2px;
+  }
+
+  .blue {
+    background-color: #0066FF;
+  }
+
+  .red {
+    background-color: #FF0000;
+  }
+
+  .progress {
+    height: 20px;
+    margin-bottom: 8px;
+    border: solid 1px #ccc;
+    border-radius: 3px;
+  }
+
+  .progress-bar {
+    float: left;  // Remove from flow
+    height: 100%;
+  }
+
+  .progress-bar-red {
+    background-color: red;
+  }
+
+  .progress-bar-yellow {
+    background-color: yellow;
+  }
+
+  .progress-bar-green {
+    background-color: green;
+  }
+
+  @keyframes highlightRed1 {
+    0%   { background-color: #FF0000; }
+    100% { background-color: #000; }
+  }
+
+  @keyframes highlightRed2 {
+    0%   { background-color: #FF0000; }
+    100% { background-color: #000; }
+  }
+
+  @keyframes highlightRed3 {
+    0%   { background-color: #FF0000; }
+    100% { background-color: #000; }
+  }
+  @keyframes highlightBlue1 {
+    0%   { background-color: #0066FF; }
+    100% { background-color: #000; }
+  }
+
+  @keyframes highlightBlue2 {
+    0%   { background-color: #0066FF; }
+    100% { background-color: #000; }
+  }
+
+  @keyframes highlightBlue3 {
+    0%   { background-color: #0066FF; }
+    100% { background-color: #000; }
+  }
+
+  .redCount1 {
+    animation: highlightRed1 1s ease-in-out;
+  }
+
+  .redCount2 {
+    animation: highlightRed2 1s ease-in-out;
+  }
+
+  .redCount3 {
+    animation: highlightRed3 1s ease-in-out;
+  }
+
+  .blueCount1 {
+    animation: highlightBlue1 1s ease-in-out;
+  }
+
+  .blueCount2 {
+    animation: highlightBlue2 1s ease-in-out;
+  }
+
+  .blueCount3 {
+    animation: highlightBlue3 1s ease-in-out;
+  }
+}
