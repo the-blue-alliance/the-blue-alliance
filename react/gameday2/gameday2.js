@@ -11,7 +11,7 @@ import { indigo500, indigo700 } from 'material-ui/styles/colors'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import GamedayFrame from './components/GamedayFrame'
 import gamedayReducer, { firedux } from './reducers'
-import { setWebcastsRaw, setLayout, addWebcastAtPosition, setTwitchChat, setFavoriteTeams } from './actions'
+import { setWebcastsRaw, setLayout, addWebcastAtPosition, setTwitchChat, setFavoriteTeams, togglePositionLivescore } from './actions'
 import { MAX_SUPPORTED_VIEWS } from './constants/LayoutConstants'
 
 injectTapEventPlugin()
@@ -136,9 +136,13 @@ firedux.ref.child('live_events').on('value', (snapshot) => {
   // the URL hash. Only run the first time.
   if (isLoad) {
     for (let i = 0; i < MAX_SUPPORTED_VIEWS; i++) {
-      const key = `view_${i}`
-      if (params[key]) {
-        store.dispatch(addWebcastAtPosition(params[key], i))
+      const viewKey = `view_${i}`
+      if (params[viewKey]) {
+        store.dispatch(addWebcastAtPosition(params[viewKey], i))
+      }
+      const livescoreKey = `livescore_${i}`
+      if (params[livescoreKey]) {
+        store.dispatch(togglePositionLivescore(i))
       }
     }
     // Set the default chat channel
@@ -165,6 +169,7 @@ store.subscribe(() => {
       layoutSet,
       positionMap,
       domOrder,
+      domOrderLivescoreOn,
     },
     chats: {
       currentChat,
@@ -183,6 +188,9 @@ store.subscribe(() => {
   for (let i = 0; i < positionMap.length; i++) {
     if (domOrder[positionMap[i]]) {
       newParams[`view_${i}`] = domOrder[positionMap[i]]
+    }
+    if (domOrderLivescoreOn[positionMap[i]]) {
+      newParams[`livescore_${i}`] = true
     }
   }
 
