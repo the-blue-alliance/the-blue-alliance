@@ -9,12 +9,16 @@ import * as types from '../../constants/ActionTypes'
 describe('video grid recuder', () => {
   const defaultPositionMap = new Array(MAX_SUPPORTED_VIEWS)
   const defaultDomOrder = new Array(MAX_SUPPORTED_VIEWS)
+  const defaultDomOrderLivescoreOn = new Array(MAX_SUPPORTED_VIEWS)
   defaultDomOrder.fill(null)
   defaultPositionMap.fill(-1)
+  defaultDomOrderLivescoreOn.fill(null)
 
   const getDefaultPositionMap = () => defaultPositionMap.slice(0)
 
   const getDefaultDomOrder = () => defaultDomOrder.slice(0)
+
+  const getDefaultDomOrderLivescoreOn = () => defaultDomOrderLivescoreOn.slice(0)
 
   const defaultState = {
     layoutId: 0,
@@ -22,6 +26,7 @@ describe('video grid recuder', () => {
     displayed: [],
     domOrder: defaultDomOrder,
     positionMap: defaultPositionMap,
+    domOrderLivescoreOn: defaultDomOrderLivescoreOn,
   }
 
   it('defaults to the default state', () => {
@@ -55,10 +60,14 @@ describe('video grid recuder', () => {
     const positionMap = getDefaultPositionMap()
     positionMap[0] = 0
 
+    const domOrderLivescoreOn = getDefaultDomOrderLivescoreOn()
+    domOrderLivescoreOn[0] = false
+
     const expectedState = Object.assign({}, initialState, {
       displayed: ['webcast1'],
       domOrder,
       positionMap,
+      domOrderLivescoreOn,
     })
 
     const action = {
@@ -77,12 +86,17 @@ describe('video grid recuder', () => {
     const positionMap = getDefaultPositionMap()
     positionMap[0] = 1
 
+    const domOrderLivescoreOn = getDefaultDomOrderLivescoreOn()
+    domOrderLivescoreOn[0] = false
+    domOrderLivescoreOn[1] = false
+
     const initialState = Object.assign({}, defaultState, {
       layoutId: 1,
       layoutSet: true,
       displayed: ['webcast1'],
       domOrder,
       positionMap,
+      domOrderLivescoreOn,
     })
 
     const expectedDomOrder = domOrder.slice(0)
@@ -227,17 +241,20 @@ describe('video grid recuder', () => {
 
       const domOrder = getDefaultDomOrder()
       const positionMap = getDefaultPositionMap()
+      const domOrderLivescoreOn = getDefaultDomOrderLivescoreOn()
       const displayed = []
       for (let j = 0; j < numViewsInLayout; j++) {
         domOrder[j] = `webcast${j}`
         positionMap[j] = j
         displayed.push(`webcast${j}`)
+        domOrderLivescoreOn[j] = false
       }
 
       const expectedState = Object.assign({}, initialState, {
         displayed,
         domOrder,
         positionMap,
+        domOrderLivescoreOn,
       })
 
       let state = initialState
