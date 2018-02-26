@@ -111,3 +111,30 @@ export const getTickerMatches = createSelector(
     return selectedMatches
   }
 )
+
+export const getEventMatches = createSelector(
+  [getFireduxData, getEventKey],
+  (fireduxData, eventKey) => {
+    if (fireduxData &&
+        fireduxData.events &&
+        fireduxData.events[eventKey] &&
+        fireduxData.events[eventKey].matches) {
+      return Object.values(fireduxData.events[eventKey].matches)
+    } else {
+      return []
+    }
+  }
+)
+
+export const getCurrentMatchState = createSelector(
+  [getFireduxData, getEventKey],
+  (fireduxData, eventKey) => {
+    if (fireduxData &&
+        fireduxData.le &&
+        fireduxData.le[eventKey]) {
+      return fireduxData.le[eventKey]
+    } else {
+      return null
+    }
+  }
+)

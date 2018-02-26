@@ -6,53 +6,21 @@ export default class LivescoreDisplay extends React.Component {
   static propTypes = {
   }
 
-  state = {
-    matchState: {
-      m: 'teleop',
-      t: 22,
-      rs: 157,
-      rfc: 2,
-      rfp: true,
-      rlc: 3,
-      rlp: true,
-      rbc: 1,
-      rbp: false,
-      rswo: true,
-      rsco: true,
-      rcp: null,
-      rpt: null,
-      raq: true,
-      rfb: false,
-      bs: 121,
-      bfc: 1,
-      bfp: false,
-      blc: 3,
-      blp: false,
-      bbc: 3,
-      bbp: true,
-      bswo: true,
-      bsco: false,
-      bcp: 'boost',
-      bpt: 7,
-      baq: true,
-      bfb: false,
-    },
-  }
-
   render() {
-    const match = {
-      key: '2018week0',
-      alliances: {
-        'red': {
-          'team_keys': ['frc254', 'frc604', 'frc8'],
-        },
-        'blue': {
-          'team_keys': ['frc971', 'frc100', 'frc1678'],
-        },
-      },
+    const { matches, matchState } = this.props
+
+    if (!matchState) {
+      return (
+        <div className="livescore-wrapper">
+          <div className="livescore-container">
+            <div className="livescore-display">Live match info not available</div>
+          </div>
+        </div>
+      )
     }
 
     const {
+      mk: matchKey,
       m: mode,
       t: timeRemaining,
       rs: redScore,
@@ -81,7 +49,30 @@ export default class LivescoreDisplay extends React.Component {
       bpt: bluePowerupTimeRemaining,
       baq: blueAutoQuest,
       bfb: blueFaceTheBoss,
-    } = this.state.matchState
+    } = matchState
+
+    let match = null
+    for (let m of matches) {
+      if (m.key.split('_')[1] == matchKey) {
+        match = m
+        break
+      }
+    }
+
+    if (!match) {
+      return (
+        <div className="livescore-wrapper">
+          <div className="livescore-container">
+            <div className="livescore-display">Live match info not available</div>
+          </div>
+        </div>
+      )
+    }
+
+    let compLevel = match.comp_level.toUpperCase()
+    compLevel = (compLevel === 'QM') ? 'Q' : compLevel
+    const matchNumber = (compLevel === 'QF' || compLevel === 'SF' || compLevel === 'F') ? `${match.set_number}-${match.match_number}` : match.match_number
+    let matchLabel = `${compLevel}${matchNumber}`
 
     let progressColor
     if (mode === 'post_match' || (timeRemaining === 0 && mode === 'teleop')) {
@@ -116,8 +107,6 @@ export default class LivescoreDisplay extends React.Component {
       powerupColor = 'blue'
     }
 
-    const year = match.key.substring(0, 4)
-
     return (
       <AutoScale
         wrapperClass="livescore-wrapper"
@@ -126,7 +115,7 @@ export default class LivescoreDisplay extends React.Component {
       >
         <div className="livescore-display">
           <h3>
-            Qual 1
+            { matchLabel }
           </h3>
           <div className="col-container">
             <div className="side-col">

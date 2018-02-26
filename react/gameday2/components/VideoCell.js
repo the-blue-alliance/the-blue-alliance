@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react'
 import RaisedButton from 'material-ui/RaisedButton'
 import WebcastEmbed from './WebcastEmbed'
-import LivescoreDisplay from './LivescoreDisplay'
+import LivescoreDisplayContainer from '../containers/LivescoreDisplayContainer'
 import VideoCellToolbarContainer from '../containers/VideoCellToolbarContainer'
 import WebcastSelectionDialogContainer from '../containers/WebcastSelectionDialogContainer'
 import SwapPositionDialogContainer from '../containers/SwapPositionDialogContainer'
@@ -82,7 +82,7 @@ export default class VideoCell extends React.Component {
           style={cellStyle}
         >
           {this.props.livescoreOn ?
-            <LivescoreDisplay />
+            <LivescoreDisplayContainer webcast={this.props.webcast} />
             :
             <WebcastEmbed webcast={this.props.webcast} />
           }

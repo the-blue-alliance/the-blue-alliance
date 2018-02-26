@@ -46,9 +46,11 @@ ReactDOM.render(
   document.getElementById('content')
 )
 
-// Subscribe changes in state.videoGrid.displayed to watch the correct Firebase paths
+// Subscribe to changes in state.videoGrid.displayed to watch the correct Firebase paths
+// Subscribe to changes in state.videoGrid.domOrderLivescoreOn to watch the correct Firebase paths
 let lastDisplayed = []
 const subscribedEvents = new Set()
+const lastLivescores = new Set()
 store.subscribe(() => {
   const state = store.getState()
 
@@ -86,6 +88,26 @@ store.subscribe(() => {
   if (added.size > 0 || removed.size > 0) {
     lastDisplayed = state.videoGrid.displayed
   }
+
+  // Update Livescore subscriptions
+  const currentLivescores = new Set()
+  state.videoGrid.domOrder.forEach((webcastKey, i) => {
+    if (webcastKey && state.videoGrid.domOrderLivescoreOn[i]) {
+      const eventKey = state.webcastsById[webcastKey].key
+      currentLivescores.add(eventKey)
+    }
+  })
+  const addedLivescores = new Set([...currentLivescores].filter((x) => !lastLivescores.has(x)))
+  const removedLivescores = new Set([...lastLivescores].filter((x) => !currentLivescores.has(x)))
+  addedLivescores.forEach((eventKey) => {
+    lastLivescores.add(eventKey)
+    firedux.watch(`le/${eventKey}`)
+  })
+  removedLivescores.forEach((eventKey) => {
+    lastLivescores.delete(eventKey)
+    firedux.ref.child(`le/${eventKey}`).off('value')
+    firedux.watching[`le/${eventKey}`] = false  // To make firedux.watch work again
+  })
 })
 
 // Load any special webcasts
