@@ -3583,7 +3583,7 @@
         },
         "week": {
           "type": "integer",
-          "description": "Week of the event relative to the first official season event. Only valid for Regionals, Districts, and District Championships. Null otherwise."
+          "description": "Week of the event relative to the first official season event, zero-indexed. Only valid for Regionals, Districts, and District Championships. Null otherwise. (Eg. A season with a week 0 'preseason' event does not count, and week 1 events will show 0 here. Seasons with a week 0.5 regional event will show week 0 for those event(s) and week 1 for week 1 events and so on.)"
         },
         "address": {
           "type": "string",
