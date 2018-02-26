@@ -27,7 +27,7 @@ const trimToLayout = (state) => {
     displayed,
     domOrder,
     positionMap,
-    domOrderLivescoreOn
+    domOrderLivescoreOn,
   } = state
 
   const layoutId = state.layoutId
@@ -97,7 +97,7 @@ const addWebcastAtPosition = (state, webcastId, position, maxSupportedViews) => 
     displayed,
     domOrder,
     positionMap,
-    domOrderLivescoreOn
+    domOrderLivescoreOn,
   } = state
 
   displayed = displayed.slice(0)
@@ -212,14 +212,13 @@ const removeWebcast = (state, webcastId) => {
 
 const toggleLivescore = (state, position) => {
   let {
-    positionMap,
     domOrderLivescoreOn,
   } = state
 
   domOrderLivescoreOn = domOrderLivescoreOn.slice(0)
 
   // Toggle livescore at position
-  const index = positionMap[position]
+  const index = state.positionMap[position]
   domOrderLivescoreOn[index] = !domOrderLivescoreOn[index]
 
   return Object.assign({}, state, {

@@ -15,8 +15,10 @@ export default class VideoCell extends React.Component {
     displayedWebcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
     layoutId: PropTypes.number.isRequired,
     position: PropTypes.number.isRequired,
+    livescoreOn: PropTypes.bool.isRequired,
     addWebcastAtPosition: PropTypes.func.isRequired,
     swapWebcasts: PropTypes.func.isRequired,
+    togglePositionLivescore: PropTypes.func.isRequired,
   }
 
   constructor(props) {

@@ -30,13 +30,12 @@ export default class AutoScale extends Component {
   }
 
   componentDidMount() {
-    const { wrapper, content } = this.refs
-    const actualContent = content.children[0]
+    const actualContent = this.content.children[0]
 
     this.updateState({
       ...this.state,
       contentSize: { width: actualContent.offsetWidth, height: actualContent.offsetHeight },
-      wrapperSize: { width: wrapper.offsetWidth, height: wrapper.offsetHeight },
+      wrapperSize: { width: this.wrapper.offsetWidth, height: this.wrapper.offsetHeight },
     })
 
     ere(actualContent, () => {
@@ -46,10 +45,10 @@ export default class AutoScale extends Component {
       })
     })
 
-    ere(wrapper, () => {
+    ere(this.wrapper, () => {
       this.updateState({
         ...this.state,
-        wrapperSize: { width: wrapper.offsetWidth, height: wrapper.offsetHeight },
+        wrapperSize: { width: this.wrapper.offsetWidth, height: this.wrapper.offsetHeight },
       })
     })
   }
@@ -83,9 +82,9 @@ export default class AutoScale extends Component {
     const containerWidth = (scale * contentSize.width)
 
     return (
-      <div ref="wrapper" className={wrapperClass}>
-        <div ref="container" className={containerClass} style={{ maxWidth: '100%', overflow: 'hidden', width: containerWidth + 'px', height: containerHeight + 'px' }}>
-          <div ref="content" className={contentClass} style={{ transform: 'scale(' + scale + ')', transformOrigin: '0 0 0' }}>
+      <div ref={(el) => { this.wrapper = el }} className={wrapperClass}>
+        <div className={containerClass} style={{ maxWidth: '100%', overflow: 'hidden', width: `${containerWidth}px`, height: `${containerHeight}px` }}>
+          <div ref={(el) => { this.content = el }} className={contentClass} style={{ transform: `scale(${scale})`, transformOrigin: '0 0 0' }}>
             {React.Children.only(children)}
           </div>
         </div>

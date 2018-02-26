@@ -7,7 +7,4 @@ const mapStateToProps = (state, props) => ({
   matchState: getCurrentMatchState(state, props),
 })
 
-const mapDispatchToProps = (dispatch) => ({
-})
-
-export default connect(mapStateToProps, mapDispatchToProps)(LivescoreDisplay)
+export default connect(mapStateToProps)(LivescoreDisplay)

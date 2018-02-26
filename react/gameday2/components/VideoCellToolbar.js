@@ -103,7 +103,7 @@ const VideoCellToolbar = (props) => {
           <VideocamIcon color={white} />
         </IconButton>
         <IconButton
-          tooltip={props.livescoreOn ? "Switch to webcast view" : "Switch to live scores view"}
+          tooltip={props.livescoreOn ? 'Switch to webcast view' : 'Switch to live scores view'}
           tooltipPosition="top-center"
           onTouchTap={() => props.onRequestLiveScoresToggle()}
           touch

@@ -120,9 +120,8 @@ export const getEventMatches = createSelector(
         fireduxData.events[eventKey] &&
         fireduxData.events[eventKey].matches) {
       return Object.values(fireduxData.events[eventKey].matches)
-    } else {
-      return []
     }
+    return []
   }
 )
 
@@ -133,8 +132,7 @@ export const getCurrentMatchState = createSelector(
         fireduxData.le &&
         fireduxData.le[eventKey]) {
       return fireduxData.le[eventKey]
-    } else {
-      return null
     }
+    return null
   }
 )
