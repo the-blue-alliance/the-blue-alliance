@@ -32,7 +32,7 @@
       {% if hof.is_hof %}<span class="hall-of-fame"><span class="glyphicon glyphicon-certificate"></span> Hall of Fame ({% for year in hof.years %}{{ year }}{{ ", " if not loop.last }}{% endfor %}){% if hof.media.video or hof.media.presentation or hof.media.essay %}:{% endif %}{% if hof.media.video %} <a href="{{hof.media.video}}">Video</a>{% endif %}{% if hof.media.presentation %}, <a href="{{hof.media.presentation}}">Presentation</a>{% endif %}{% if hof.media.essay %}, <a href="{{hof.media.essay}}">Essay</a>{% endif %}</span><br>{% endif %}
 
       <hr>
-      <a class="btn btn-xs btn-default{% if social_medias %} pull-right{% endif %}" href="/suggest/team/social_media?team_key={{team.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add social media!</a>
+      <a class="btn btn-xs btn-default{% if social_medias %} pull-right{% endif %}" href="/suggest/team/social_media?team_key={{team.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add Social Media!</a>
       {% for media in social_medias %}
         {{smm.social_media_icon_link(media)}}{% if not loop.last %}&middot;{% endif %}
       {% endfor %}
@@ -80,7 +80,7 @@
       {% include "media_partials/image_carousel_partial.html" %}
     {% else %}
       {% if year %}
-        <a class="btn btn-lg btn-success btn-block" href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add robot image!</a>
+        <a class="btn btn-lg btn-success btn-block" href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add Robot Image!</a>
       {% endif %}
     {% endif %}
     <p class="text-center">
@@ -90,7 +90,7 @@
          <span class="glyphicon glyphicon-hdd"></span><a href="#robot-profile"> {{ medias_by_slugname.grabcad|length }} CAD Model{% if medias_by_slugname.grabcad|length > 1 %}s{% endif %}</a>
         {% else %}
           <div class="text-center">
-            <a class="btn btn-xs btn-default text-center" href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add a CAD Model!</a>
+            <a class="btn btn-xs btn-default text-center" href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add CAD Model!</a>
           </div>
         {% endif %}
       {% endif %}
