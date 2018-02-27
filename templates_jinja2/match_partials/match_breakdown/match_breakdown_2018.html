@@ -1,5 +1,31 @@
 <table class="match-table">
   <tbody>
+
+    <!-- Robot 1 Auto Run -->
+    {% if "autoRobot1" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.autoRobot1 %}{% if match.score_breakdown.red.autoRobot1 == 'AutoRun' %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}{% else %}?{% endif %}</td>
+      <td>Robot 1 Auto Run</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.autoRobot1 %}{% if match.score_breakdown.blue.autoRobot1 == 'AutoRun' %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}{% else %}?{% endif %}</td>
+    </tr>
+    {% endif %}
+    <!-- Robot 2 Auto Run -->
+    {% if "autoRobot2" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.autoRobot2 %}{% if match.score_breakdown.red.autoRobot2 == 'AutoRun' %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}{% else %}?{% endif %}</td>
+      <td>Robot 2 Auto Run</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.autoRobot2 %}{% if match.score_breakdown.blue.autoRobot2 == 'AutoRun' %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}{% else %}?{% endif %}</td>
+    </tr>
+    {% endif %}
+    <!-- Robot 3 Auto Run -->
+    {% if "autoRobot3" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.autoRobot3 %}{% if match.score_breakdown.red.autoRobot3 == 'AutoRun' %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}{% else %}?{% endif %}</td>
+      <td>Robot 3 Auto Run</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.autoRobot3 %}{% if match.score_breakdown.blue.autoRobot3 == 'AutoRun' %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}{% else %} ? {% endif %}</td>
+    </tr>
+    {% endif %}
+
     <!-- Auto Run Points -->
     {% if "autoRunPoints" in match.score_breakdown.red %}
     <tr class="key">
