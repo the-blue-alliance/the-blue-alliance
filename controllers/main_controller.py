@@ -21,6 +21,7 @@ from helpers.event_helper import EventHelper
 from helpers.firebase.firebase_pusher import FirebasePusher
 from models.award import Award
 from models.event import Event
+from models.favorite import Favorite
 from models.insight import Insight
 from models.media import Media
 from models.team import Team
@@ -203,12 +204,45 @@ class MainCompetitionseasonHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         week_events = EventHelper.getWeekEvents()
+        for event in week_events:
+            event.prepTeams()  # To count Favorites later
+
         special_webcasts = FirebasePusher.get_special_webcasts()
+
+        # Get popular teams
+        # Get week teams
+        week_teams = []
+        for event in week_events:
+            week_teams += event.teams
+
+        team_keys = []
+        teams = {}
+        for team in week_teams:
+            team_keys.append(team.key.id())
+            teams[team.key.id()] = team
+
+        # Get cached counts
+        team_favorite_counts = memcache.get_multi(team_keys, namespace='team-favorite-counts')
+
+        # Get uncached counts
+        to_count = set(team_keys).difference(team_favorite_counts.keys())
+        count_futures = [(team_key, Favorite.query(Favorite.model_key == team_key).count_async()) for team_key in to_count]
+
+        # Merge cached and uncached counts
+        for team_key, count_future in count_futures:
+            team_favorite_counts[team_key] = count_future.get_result()
+        memcache.set_multi(team_favorite_counts, 60*60*24*7, namespace='team-favorite-counts')
+
+        # Sort to get top popular teams
+        popular_teams = []
+        for team_key, _ in sorted(team_favorite_counts.items(), key=lambda tc: -tc[1])[:25]:
+            popular_teams.append(teams[team_key])
 
         self.template_values.update({
             "events": week_events,
             "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
             "special_webcasts": special_webcasts,
+            "popular_teams": sorted(popular_teams, key=lambda team: team.team_number),
         })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/index_competitionseason.html')
