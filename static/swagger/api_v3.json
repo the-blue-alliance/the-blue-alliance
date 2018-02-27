@@ -1,11 +1,11 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "# Overview \n\n Information and statistics about FIRST Robotics Competition teams and events. If you are looking for the old version (v2) of the API, documentation can be found [here](/apidocs/v2). \n\n# Authentication \n\nAll endpoints require an Auth Key to be passed in the header `X-TBA-Auth-Key`. If you do not have an auth key yet, you can obtain one from your [Account Page](/account). \n\n A `User-Agent` header may need to be set to prevent a 403 Unauthorized error.",
-    "version": "3.0.5",
+    "description": "# Overview \n\n Information and statistics about FIRST Robotics Competition teams and events. \n\n# Authentication \n\nAll endpoints require an Auth Key to be passed in the header `X-TBA-Auth-Key`. If you do not have an auth key yet, you can obtain one from your [Account Page](/account). \n\n A `User-Agent` header may need to be set to prevent a 403 Unauthorized error.",
+    "version": "3.1.0",
     "title": "The Blue Alliance API v3",
     "x-version-info": "Versions of the API follow the format X.Y.Z, with X being a major version, Y denoting the minor version, and Z the point release. Changes to the spec or API that result in a major version change will significantly impact implementations. Changes to the minor version indicate paths and/or fields in existing models may be added, and any breaking changes will be confined to paths or models listed as in-development in the prior minor version. Changes to the point release indicate no format or structure changes to the paths or models, but updated or clarified documentation. Note that changes to paths and models refer to the actual result from the API, not the documentation.",
-    "x-changes": "3.0.4 - 3.0.5: Minor spelling fixes. Remove 2016 fields from `Match_Score_Breakdown_2017_Alliance` model. --- 3.0.3 - 3.0.4: Correct syntax in `Team_Event_Status_playoff` object, include descriptions in `Event_District_Points` and fix the path in `Team_Event_Status_playoff.properties.record` in order to more closely match Swagger spec. Fix syntax of `Match.video` to be correct and accurately reflect what is returned by the API. --- 3.0.2 - 3.0.3: `extra_stats` and `extra_stats_info` added to `Event_Ranking` model. Corrected match video property claiming to use the `Media` model, which it doesn't. --- 3.0.1 - 3.0.2: `Team_Event_Status` and `Event_Ranking` model documentation changed to reflect actual API return. Changes involved W-L-T and ranking properties. --- 3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
+    "x-changes": "3.0.5 - 3.1.0: Version bump for 2018 added fields and endpoints. Models Updated: `Team_Event_Status`, `Media`, 2018 Score Breakdowns. Endpoints Added: `/team/{team_key}/events/{year}/statuses`, `/event/{event_key}/teams/statuses` 3.0.4 - 3.0.5: Minor spelling fixes. Remove 2016 fields from `Match_Score_Breakdown_2017_Alliance` model. Fix `first_event_id` in `Event` model to correct type. Update `Media`.`type` enum. --- 3.0.3 - 3.0.4: Correct syntax in `Team_Event_Status_playoff` object, include descriptions in `Event_District_Points` and fix the path in `Team_Event_Status_playoff.properties.record` in order to more closely match Swagger spec. Fix syntax of `Match.video` to be correct and accurately reflect what is returned by the API. --- 3.0.2 - 3.0.3: `extra_stats` and `extra_stats_info` added to `Event_Ranking` model. Corrected match video property claiming to use the `Media` model, which it doesn't. Added `first_event_code` to the `Event` model. Added `/team/{team_key}/media/tag/{media_tag}` and year endpoints. Added `dq_team_keys` to `Match_alliance` model.  --- 3.0.1 - 3.0.2: `Team_Event_Status` and `Event_Ranking` model documentation changed to reflect actual API return. Changes involved W-L-T and ranking properties. --- 3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
   },
   "host": "www.thebluealliance.com",
   "basePath": "/api/v3",
@@ -998,6 +998,61 @@
               "description": "Array of Event Keys",
               "items": {
                 "type": "string"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/team/{team_key}/events/{year}/statuses": {
+      "get": {
+        "operationId": "getTeamEventsStatusesByYear",
+        "tags": [
+          "list",
+          "team",
+          "event"
+        ],
+        "description": "Gets a key-value list of the event statuses for events this team has competed at in the given year.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/team_key"
+          },
+          {
+            "$ref": "#/parameters/year"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "object",
+              "description": "A key-value pair of `Team_Event_Status` objects with the event key as the key.",
+              "additionalProperties": {
+                "$ref": "#/definitions/Team_Event_Status"
               }
             },
             "headers": {
@@ -2438,6 +2493,58 @@
         ]
       }
     },
+    "/event/{event_key}/teams/statuses": {
+      "get": {
+        "operationId": "getEventTeamsStatuses",
+        "tags": [
+          "event",
+          "team",
+          "list"
+        ],
+        "description": "Gets a key-value list of the event statuses for teams competing at the given event.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "object",
+              "description": "A key-value pair of `Team_Event_Status` objects with the event key as the key.",
+              "additionalProperties": {
+                "$ref": "#/definitions/Team_Event_Status"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
     "/event/{event_key}/matches": {
       "get": {
         "operationId": "getEventMatches",
@@ -3476,7 +3583,7 @@
         },
         "week": {
           "type": "integer",
-          "description": "Week of the event relative to the first official season event. Only valid for Regionals, Districts, and District Championships. Null otherwise."
+          "description": "Week of the event relative to the first official season event, zero-indexed. Only valid for Regionals, Districts, and District Championships. Null otherwise. (Eg. A season with a week 0 'preseason' event does not count, and week 1 events will show 0 here. Seasons with a week 0.5 regional event will show week 0 for those event(s) and week 1 for week 1 events and so on.)"
         },
         "address": {
           "type": "string",
@@ -3575,6 +3682,14 @@
         "overall_status_str": {
           "type": "string",
           "description": "An HTML formatted string suitable for display to the user containing the team's overall status summary of the event."
+        },
+        "next_match_key": {
+          "type": "string",
+          "description": "TBA match key for the next match the team is scheduled to play in at this event, or null."
+        },
+        "last_match_key": {
+          "type": "string",
+          "description": "TBA match key for the last match the team played in at this event, or null."
         }
       }
     },
@@ -4402,7 +4517,7 @@
       "properties": {
         "key": {
           "type": "string",
-          "description": "TBA event key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may append the competition level if more than one match in required per set."
+          "description": "TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may append the competition level if more than one match in required per set."
         },
         "comp_level": {
           "type": "string",
@@ -4475,7 +4590,7 @@
       "properties": {
         "key": {
           "type": "string",
-          "description": "TBA event key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may be appended to the competition level if more than one match in required per set."
+          "description": "TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may be appended to the competition level if more than one match in required per set."
         },
         "comp_level": {
           "type": "string",
@@ -4971,6 +5086,131 @@
         }
       }
     },
+    "Match_Score_Breakdown_2018": {
+      "type": "object",
+      "properties": {
+        "blue": {
+          "$ref": "#/definitions/Match_Score_Breakdown_2018_Alliance"
+        },
+        "red": {
+          "$ref": "#/definitions/Match_Score_Breakdown_2018_Alliance"
+        }
+      },
+      "description": "See the 2018 FMS API documentation for a description of each value."
+    },
+    "Match_Score_Breakdown_2018_Alliance": {
+      "type": "object",
+      "properties": {
+        "adjustPoints": {
+          "type": "integer"
+        },
+        "autoOwnershipPoints": {
+          "type": "integer"
+        },
+        "autoPoints": {
+          "type": "integer"
+        },
+        "autoQuestRankingPoint": {
+          "type": "boolean"
+        },
+        "autoRobot1": {
+          "type": "string"
+        },
+        "autoRobot2": {
+          "type": "string"
+        },
+        "autoRobot3": {
+          "type": "string"
+        },
+        "autoRunPoints": {
+          "type": "integer"
+        },
+        "autoScaleOwnershipSec": {
+          "type": "integer"
+        },
+        "autoSwitchAtZero": {
+          "type": "boolean"
+        },
+        "autoSwitchOwnershipSec": {
+          "type": "integer"
+        },
+        "endgamePoints": {
+          "type": "integer"
+        },
+        "endgameRobot1": {
+          "type": "string"
+        },
+        "endgameRobot2": {
+          "type": "string"
+        },
+        "endgameRobot3": {
+          "type": "string"
+        },
+        "faceTheBossRankingPoint": {
+          "type": "boolean"
+        },
+        "foulCount": {
+          "type": "integer"
+        },
+        "foulPoints": {
+          "type": "integer"
+        },
+        "rp": {
+          "type": "integer"
+        },
+        "techFoulCount": {
+          "type": "integer"
+        },
+        "teleopOwnershipPoints": {
+          "type": "integer"
+        },
+        "teleopPoints": {
+          "type": "integer"
+        },
+        "teleopScaleBoostSec": {
+          "type": "integer"
+        },
+        "teleopScaleForceSec": {
+          "type": "integer"
+        },
+        "teleopScaleOwnershipSec": {
+          "type": "integer"
+        },
+        "teleopSwitchBoostSec": {
+          "type": "integer"
+        },
+        "teleopSwitchForceSec": {
+          "type": "integer"
+        },
+        "teleopSwitchOwnershipSec": {
+          "type": "integer"
+        },
+        "totalPoints": {
+          "type": "integer"
+        },
+        "vaultBoostPlayed": {
+          "type": "integer"
+        },
+        "vaultBoostTotal": {
+          "type": "integer"
+        },
+        "vaultForcePlayed": {
+          "type": "integer"
+        },
+        "vaultForceTotal": {
+          "type": "integer"
+        },
+        "vaultLevitatePlayed": {
+          "type": "integer"
+        },
+        "vaultLevitateTotal": {
+          "type": "integer"
+        },
+        "vaultPoints": {
+          "type": "integer"
+        }
+      }
+    },
     "Media": {
       "type": "object",
       "required": [
@@ -4998,7 +5238,8 @@
             "periscope-profile",
             "grabcad",
             "instagram-image",
-            "external-link"
+            "external-link",
+            "avatar"
           ] 
         },
         "foreign_key": {
