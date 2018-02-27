@@ -50,6 +50,21 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
         )
         self.event_micmp.put()
 
+        self.event_2018week0 = Event(
+            id="2018week0",
+            name="Week 0",
+            event_type_enum=EventType.PRESEASON,
+            short_name="Week 0",
+            event_short="week0",
+            year=2018,
+            end_date=datetime(2018, 02, 17),
+            official=True,
+            start_date=datetime(2018, 02, 17),
+            timezone_id="America/New_York",
+            playoff_type=PlayoffType.BRACKET_8_TEAM
+        )
+        self.event_2018week0.put()
+
     def tearDown(self):
         self.testbed.deactivate()
 
@@ -81,6 +96,27 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             # Assert we get enough of each match type
             clean_matches = MatchHelper.organizeKeys(matches.keys())
             self.assertEqual(len(clean_matches["qm"]), 88)
+
+    def test_parse_qual_2018(self):
+        with open('test_data/fms_api/2018_week0_qual_breakdown.json', 'r') as f:
+            matches = FMSAPIMatchDetailsParser(2018, 'week0').parse(json.loads(f.read()))
+
+            self.assertTrue(isinstance(matches, dict))
+            self.assertEqual(len(matches), 13)
+
+            # Assert we get enough of each match type
+            clean_matches = MatchHelper.organizeKeys(matches.keys())
+            self.assertEqual(len(clean_matches["qm"]), 13)
+
+            # Test gameData
+            self.assertEqual(matches['2018week0_qm1']['red']['tba_gameData'], 'LRL')
+            self.assertEqual(matches['2018week0_qm1']['blue']['tba_gameData'], 'LRL')
+            self.assertEqual(matches['2018week0_qm3']['red']['tba_gameData'], 'RRR')
+            self.assertEqual(matches['2018week0_qm3']['blue']['tba_gameData'], 'RRR')
+            self.assertEqual(matches['2018week0_qm4']['red']['tba_gameData'], 'RLR')
+            self.assertEqual(matches['2018week0_qm4']['blue']['tba_gameData'], 'RLR')
+            self.assertEqual(matches['2018week0_qm8']['red']['tba_gameData'], 'LLL')
+            self.assertEqual(matches['2018week0_qm8']['blue']['tba_gameData'], 'LLL')
 
     def test_parse_playoff(self):
         with open('test_data/fms_api/2016_nyny_playoff_breakdown.json', 'r') as f:
