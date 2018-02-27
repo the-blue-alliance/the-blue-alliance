@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react'
 import RaisedButton from 'material-ui/RaisedButton'
 import WebcastEmbed from './WebcastEmbed'
+import LivescoreDisplayContainer from '../containers/LivescoreDisplayContainer'
 import VideoCellToolbarContainer from '../containers/VideoCellToolbarContainer'
 import WebcastSelectionDialogContainer from '../containers/WebcastSelectionDialogContainer'
 import SwapPositionDialogContainer from '../containers/SwapPositionDialogContainer'
@@ -14,8 +15,10 @@ export default class VideoCell extends React.Component {
     displayedWebcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
     layoutId: PropTypes.number.isRequired,
     position: PropTypes.number.isRequired,
+    livescoreOn: PropTypes.bool.isRequired,
     addWebcastAtPosition: PropTypes.func.isRequired,
     swapWebcasts: PropTypes.func.isRequired,
+    togglePositionLivescore: PropTypes.func.isRequired,
   }
 
   constructor(props) {
@@ -58,6 +61,10 @@ export default class VideoCell extends React.Component {
     this.onRequestCloseWebcastSelectionDialog()
   }
 
+  onRequestLiveScoresToggle() {
+    this.props.togglePositionLivescore(this.props.position)
+  }
+
   render() {
     const cellStyle = Object.assign({}, LAYOUT_STYLES[this.props.layoutId][this.props.position], {
       paddingBottom: '48px',
@@ -76,13 +83,19 @@ export default class VideoCell extends React.Component {
         <div
           style={cellStyle}
         >
-          <WebcastEmbed webcast={this.props.webcast} />
+          {this.props.livescoreOn ?
+            <LivescoreDisplayContainer webcast={this.props.webcast} />
+            :
+            <WebcastEmbed webcast={this.props.webcast} />
+          }
           <VideoCellToolbarContainer
             style={toolbarStyle}
             webcast={this.props.webcast}
             isBlueZone={this.props.webcast.key === 'bluezone'}
+            livescoreOn={this.props.livescoreOn}
             onRequestSelectWebcast={() => this.onRequestOpenWebcastSelectionDialog()}
             onRequestSwapPosition={() => this.onRequestSwapPosition()}
+            onRequestLiveScoresToggle={() => this.onRequestLiveScoresToggle()}
           />
           <WebcastSelectionDialogContainer
             open={this.state.webcastSelectionDialogOpen}

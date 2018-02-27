@@ -133,3 +133,10 @@ export function setFavoriteTeams(favoriteTeams) {
     favoriteTeams,
   }
 }
+
+export function togglePositionLivescore(position) {
+  return {
+    type: types.TOGGLE_POSITION_LIVESCORE,
+    position,
+  }
+}
