@@ -21,6 +21,7 @@ from helpers.event_helper import EventHelper
 from helpers.firebase.firebase_pusher import FirebasePusher
 from models.award import Award
 from models.event import Event
+from models.event_team import EventTeam
 from models.favorite import Favorite
 from models.insight import Insight
 from models.media import Media
@@ -204,39 +205,49 @@ class MainCompetitionseasonHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         week_events = EventHelper.getWeekEvents()
-        for event in week_events:
-            event.prepTeams()  # To count Favorites later
-
         special_webcasts = FirebasePusher.get_special_webcasts()
+        event_keys = [event.key.id() for event in week_events]
 
-        # Get popular teams
-        # Get week teams
-        week_teams = []
-        for event in week_events:
-            week_teams += event.teams
+        # Calculate popular teams
+        # Get cached team keys
+        event_team_keys = memcache.get_multi(event_keys, namespace='event-team-keys')
+
+        # Get uncached team keys
+        to_query = set(event_keys).difference(event_team_keys.keys())
+        event_teams_futures = [(
+            event_key,
+            EventTeam.query(EventTeam.event == ndb.Key(Event, event_key)).fetch_async(projection=[EventTeam.team])
+        ) for event_key in to_query]
+
+        # Merge cached and uncached team keys
+        for event_key, event_teams in event_teams_futures:
+            event_team_keys[event_key] = [et.team.id() for et in event_teams.get_result()]
+        memcache.set_multi(event_team_keys, 60*60*24, namespace='event-team-keys')
 
         team_keys = []
-        teams = {}
-        for team in week_teams:
-            team_keys.append(team.key.id())
-            teams[team.key.id()] = team
+        for event_team_keys in event_team_keys.values():
+            team_keys += event_team_keys
 
         # Get cached counts
         team_favorite_counts = memcache.get_multi(team_keys, namespace='team-favorite-counts')
 
         # Get uncached counts
         to_count = set(team_keys).difference(team_favorite_counts.keys())
-        count_futures = [(team_key, Favorite.query(Favorite.model_key == team_key).count_async()) for team_key in to_count]
+        count_futures = [(
+            team_key,
+            Favorite.query(Favorite.model_key == team_key).count_async()
+        ) for team_key in to_count]
 
         # Merge cached and uncached counts
         for team_key, count_future in count_futures:
             team_favorite_counts[team_key] = count_future.get_result()
-        memcache.set_multi(team_favorite_counts, 60*60*24*7, namespace='team-favorite-counts')
+        memcache.set_multi(team_favorite_counts, 60*60*24, namespace='team-favorite-counts')
 
         # Sort to get top popular teams
-        popular_teams = []
+        popular_team_keys = []
         for team_key, _ in sorted(team_favorite_counts.items(), key=lambda tc: -tc[1])[:25]:
-            popular_teams.append(teams[team_key])
+            popular_team_keys.append(ndb.Key(Team, team_key))
+        popular_teams =  ndb.get_multi(popular_team_keys)
 
         self.template_values.update({
             "events": week_events,
