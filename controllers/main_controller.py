@@ -206,14 +206,16 @@ class MainCompetitionseasonHandler(CacheableHandler):
     def _render(self, *args, **kw):
         week_events = EventHelper.getWeekEvents()
         special_webcasts = FirebasePusher.get_special_webcasts()
-        event_keys = [event.key.id() for event in week_events]
+        events = {}
+        for event in week_events:
+            events[event.key.id()] = event
 
         # Calculate popular teams
         # Get cached team keys
-        event_team_keys = memcache.get_multi(event_keys, namespace='event-team-keys')
+        event_team_keys = memcache.get_multi(events.keys(), namespace='event-team-keys')
 
         # Get uncached team keys
-        to_query = set(event_keys).difference(event_team_keys.keys())
+        to_query = set(events.keys()).difference(event_team_keys.keys())
         event_teams_futures = [(
             event_key,
             EventTeam.query(EventTeam.event == ndb.Key(Event, event_key)).fetch_async(projection=[EventTeam.team])
@@ -225,8 +227,11 @@ class MainCompetitionseasonHandler(CacheableHandler):
         memcache.set_multi(event_team_keys, 60*60*24, namespace='event-team-keys')
 
         team_keys = []
-        for event_team_keys in event_team_keys.values():
+        team_events = {}
+        for event_key, event_team_keys in event_team_keys.items():
             team_keys += event_team_keys
+            for team_key in event_team_keys:
+                team_events[team_key] = events[event_key]
 
         # Get cached counts
         team_favorite_counts = memcache.get_multi(team_keys, namespace='team-favorite-counts')
@@ -247,13 +252,17 @@ class MainCompetitionseasonHandler(CacheableHandler):
         popular_team_keys = []
         for team_key, _ in sorted(team_favorite_counts.items(), key=lambda tc: -tc[1])[:25]:
             popular_team_keys.append(ndb.Key(Team, team_key))
-        popular_teams =  ndb.get_multi(popular_team_keys)
+        popular_teams =  sorted(ndb.get_multi(popular_team_keys), key=lambda team: team.team_number)
+
+        popular_teams_events = []
+        for team in popular_teams:
+            popular_teams_events.append((team, team_events[team.key.id()]))
 
         self.template_values.update({
             "events": week_events,
             "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
             "special_webcasts": special_webcasts,
-            "popular_teams": sorted(popular_teams, key=lambda team: team.team_number),
+            "popular_teams_events": popular_teams_events,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/index_competitionseason.html')
