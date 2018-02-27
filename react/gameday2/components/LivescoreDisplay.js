@@ -128,6 +128,8 @@ class LivescoreDisplay extends React.PureComponent {
         } else {
           etaStr = ` in ~${Math.round(etaMin)} min`
         }
+      } else {
+        etaStr = ' is next'
       }
     }
 
