@@ -62,7 +62,7 @@ export const getFireduxData = (state) => state.firedux.data
 
 export const getEventKey = (state, props) => props.webcast.key
 
-export const getTickerMatches = createSelector(
+export const getEventMatches = createSelector(
   [getFireduxData, getEventKey],
   (fireduxData, eventKey) => {
     const compLevelsPlayOrder = {
@@ -89,9 +89,15 @@ export const getTickerMatches = createSelector(
         fireduxData.events[eventKey] &&
         fireduxData.events[eventKey].matches) {
       matches = Object.values(fireduxData.events[eventKey].matches)
+      matches.sort((match1, match2) => calculateOrder(match1) - calculateOrder(match2))
     }
-    matches.sort((match1, match2) => calculateOrder(match1) - calculateOrder(match2))
+    return matches
+  }
+)
 
+export const getTickerMatches = createSelector(
+  [getFireduxData, getEventMatches],
+  (fireduxData, matches) => {
     let lastMatch = null
     let selectedMatches = []
     matches.forEach((match) => {
@@ -109,19 +115,6 @@ export const getTickerMatches = createSelector(
     }
 
     return selectedMatches
-  }
-)
-
-export const getEventMatches = createSelector(
-  [getFireduxData, getEventKey],
-  (fireduxData, eventKey) => {
-    if (fireduxData &&
-        fireduxData.events &&
-        fireduxData.events[eventKey] &&
-        fireduxData.events[eventKey].matches) {
-      return Object.values(fireduxData.events[eventKey].matches)
-    }
-    return []
   }
 )
 
