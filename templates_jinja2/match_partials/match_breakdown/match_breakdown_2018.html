@@ -1,5 +1,30 @@
 <table class="match-table">
   <tbody>
+    <!-- Robot 1 Auto Run -->
+    {% if "autoRobot1" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.autoRobot1 %}{% if match.score_breakdown.red.autoRobot1 == 'AutoRun' %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}{% else %}?{% endif %}</td>
+      <td>Robot 1 Auto Run</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.autoRobot1 %}{% if match.score_breakdown.blue.autoRobot1 == 'AutoRun' %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}{% else %}?{% endif %}</td>
+    </tr>
+    {% endif %}
+    <!-- Robot 2 Auto Run -->
+    {% if "autoRobot2" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.autoRobot2 %}{% if match.score_breakdown.red.autoRobot2 == 'AutoRun' %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}{% else %}?{% endif %}</td>
+      <td>Robot 2 Auto Run</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.autoRobot2 %}{% if match.score_breakdown.blue.autoRobot2 == 'AutoRun' %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}{% else %}?{% endif %}</td>
+    </tr>
+    {% endif %}
+    <!-- Robot 3 Auto Run -->
+    {% if "autoRobot3" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.autoRobot3 %}{% if match.score_breakdown.red.autoRobot3 == 'AutoRun' %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}{% else %}?{% endif %}</td>
+      <td>Robot 3 Auto Run</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.autoRobot3 %}{% if match.score_breakdown.blue.autoRobot3 == 'AutoRun' %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}{% else %} ? {% endif %}</td>
+    </tr>
+    {% endif %}
+
     <!-- Auto Run Points -->
     {% if "autoRunPoints" in match.score_breakdown.red %}
     <tr class="key">
@@ -115,30 +140,30 @@
     </tr>
     {% endif %}
 
-    <!-- Force Cubes Played -->
+    <!-- Force Cubes Total (Played) -->
     {% if "vaultForcePlayed" in match.score_breakdown.red %}
     <tr>
-      <td class="red" colspan="2">{% if match.score_breakdown.red.vaultForcePlayed %} {{match.score_breakdown.red.vaultForcePlayed}} {% else %} 0 {% endif %}</td>
-      <td>Force Cubes Played</td>
-      <td class="blue" colspan="2">{% if match.score_breakdown.blue.vaultForcePlayed %} {{match.score_breakdown.blue.vaultForcePlayed}} {% else %} 0 {% endif %}</td>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.vaultForceTotal %}{{match.score_breakdown.red.vaultForceTotal}}{% else %}0{% endif %} ({% if match.score_breakdown.red.vaultForcePlayed %}{{match.score_breakdown.red.vaultForcePlayed}}{% else %}0{% endif %})</td>
+      <td>Force Cubes Total (Played)</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.vaultForceTotal%}{{match.score_breakdown.blue.vaultForceTotal}}{% else %}0{% endif %} ({% if match.score_breakdown.blue.vaultForcePlayed %}{{match.score_breakdown.blue.vaultForcePlayed}}{% else %}0{% endif %})</td>
     </tr>
     {% endif %}
 
-    <!-- Levitate Cubes Played -->
+    <!-- Levitate Cubes Total (Played) -->
     {% if "vaultLevitatePlayed" in match.score_breakdown.red %}
     <tr>
-      <td class="red" colspan="2">{% if match.score_breakdown.red.vaultLevitatePlayed %} {{match.score_breakdown.red.vaultLevitatePlayed}} {% else %} 0 {% endif %}</td>
-      <td>Levitate Cubes Played</td>
-      <td class="blue" colspan="2">{% if match.score_breakdown.blue.vaultLevitatePlayed %} {{match.score_breakdown.blue.vaultLevitatePlayed}} {% else %} 0 {% endif %}</td>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.vaultLevitateTotal %}{{match.score_breakdown.red.vaultLevitateTotal}}{% else %}0{% endif %} ({% if match.score_breakdown.red.vaultLevitatePlayed %}{{match.score_breakdown.red.vaultLevitatePlayed}}{% else %}0{% endif %})</td>
+      <td>Levitate Cubes Total (Played)</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.vaultLevitateTotal%}{{match.score_breakdown.blue.vaultLevitateTotal}}{% else %}0{% endif %} ({% if match.score_breakdown.blue.vaultLevitatePlayed %}{{match.score_breakdown.blue.vaultLevitatePlayed}}{% else %}0{% endif %})</td>
     </tr>
     {% endif %}
 
-    <!-- Boost Cubes Played -->
+    <!-- Boost Cubes Total (Played) -->
     {% if "vaultBoostPlayed" in match.score_breakdown.red %}
     <tr>
-      <td class="red" colspan="2">{% if match.score_breakdown.red.vaultBoostPlayed %} {{match.score_breakdown.red.vaultBoostPlayed}} {% else %} 0 {% endif %}</td>
-      <td>Boost Cubes Played</td>
-      <td class="blue" colspan="2">{% if match.score_breakdown.blue.vaultBoostPlayed %} {{match.score_breakdown.blue.vaultBoostPlayed}} {% else %} 0 {% endif %}</td>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.vaultBoostTotal %}{{match.score_breakdown.red.vaultBoostTotal}}{% else %}0{% endif %} ({% if match.score_breakdown.red.vaultBoostPlayed %}{{match.score_breakdown.red.vaultBoostPlayed}}{% else %}0{% endif %})</td>
+      <td>Boost Cubes Total (Played)</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.vaultBoostTotal%}{{match.score_breakdown.blue.vaultBoostTotal}}{% else %}0{% endif %} ({% if match.score_breakdown.blue.vaultBoostPlayed %}{{match.score_breakdown.blue.vaultBoostPlayed}}{% else %}0{% endif %})</td>
     </tr>
     {% endif %}
 
@@ -241,3 +266,6 @@
     {% endif %}
   </tbody>
 </table>
+{% if 'tba_gameData' in match.score_breakdown.red %}
+  <p>Scoring Plate Assignments: {{match.score_breakdown.red.tba_gameData}}</p>
+{% endif %}
