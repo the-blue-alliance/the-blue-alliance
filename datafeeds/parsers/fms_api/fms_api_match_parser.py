@@ -259,11 +259,27 @@ class FMSAPIMatchDetailsParser(object):
                 breakdown['coopertition'] = match['coopertition']
             if 'coopertitionPoints' in match:
                 breakdown['coopertition_points'] = match['coopertitionPoints']
+
+            game_data = None
+            if self.year == 2018:
+                # Switches should be the same, but parse individually in case FIRST change things
+                right_switch_red = match['switchRightNearColor'] == 'Red'
+                scale_red = match['scaleNearColor'] == 'Red'
+                left_switch_red = match['switchLeftNearColor'] == 'Red'
+                game_data = '{}{}{}'.format(
+                    'L' if right_switch_red else 'R',
+                    'L' if scale_red else 'R',
+                    'L' if left_switch_red else 'R',
+                )
+
             for alliance in match.get('alliances', match.get('Alliances', [])):
                 color = alliance['alliance'].lower()
                 for key, value in alliance.items():
                     if key != 'alliance':
                         breakdown[color][key] = value
+
+                if game_data is not None:
+                    breakdown[color]['tba_gameData'] = game_data
 
             match_details_by_key[Match.renderKeyName(
                 '{}{}'.format(self.year, self.event_short),
