@@ -11,7 +11,7 @@ import { indigo500, indigo700 } from 'material-ui/styles/colors'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import GamedayFrame from './components/GamedayFrame'
 import gamedayReducer, { firedux } from './reducers'
-import { setWebcastsRaw, setLayout, addWebcastAtPosition, setTwitchChat, setDefaultTwitchChat, setFavoriteTeams } from './actions'
+import { setWebcastsRaw, setLayout, addWebcastAtPosition, setTwitchChat, setDefaultTwitchChat, setFavoriteTeams, togglePositionLivescore } from './actions'
 import { MAX_SUPPORTED_VIEWS } from './constants/LayoutConstants'
 
 injectTapEventPlugin()
@@ -46,9 +46,11 @@ ReactDOM.render(
   document.getElementById('content')
 )
 
-// Subscribe changes in state.videoGrid.displayed to watch the correct Firebase paths
+// Subscribe to changes in state.videoGrid.displayed to watch the correct Firebase paths
+// Subscribe to changes in state.videoGrid.domOrderLivescoreOn to watch the correct Firebase paths
 let lastDisplayed = []
 const subscribedEvents = new Set()
+const lastLivescores = new Set()
 store.subscribe(() => {
   const state = store.getState()
 
@@ -86,6 +88,26 @@ store.subscribe(() => {
   if (added.size > 0 || removed.size > 0) {
     lastDisplayed = state.videoGrid.displayed
   }
+
+  // Update Livescore subscriptions
+  const currentLivescores = new Set()
+  state.videoGrid.domOrder.forEach((webcastKey, i) => {
+    if (webcastKey && state.videoGrid.domOrderLivescoreOn[i]) {
+      const eventKey = state.webcastsById[webcastKey].key
+      currentLivescores.add(eventKey)
+    }
+  })
+  const addedLivescores = new Set([...currentLivescores].filter((x) => !lastLivescores.has(x)))
+  const removedLivescores = new Set([...lastLivescores].filter((x) => !currentLivescores.has(x)))
+  addedLivescores.forEach((eventKey) => {
+    lastLivescores.add(eventKey)
+    firedux.watch(`le/${eventKey}`)
+  })
+  removedLivescores.forEach((eventKey) => {
+    lastLivescores.delete(eventKey)
+    firedux.ref.child(`le/${eventKey}`).off('value')
+    firedux.watching[`le/${eventKey}`] = false  // To make firedux.watch work again
+  })
 })
 
 // Load any special webcasts
@@ -136,9 +158,13 @@ firedux.ref.child('live_events').on('value', (snapshot) => {
   // the URL hash. Only run the first time.
   if (isLoad) {
     for (let i = 0; i < MAX_SUPPORTED_VIEWS; i++) {
-      const key = `view_${i}`
-      if (params[key]) {
-        store.dispatch(addWebcastAtPosition(params[key], i))
+      const viewKey = `view_${i}`
+      if (params[viewKey]) {
+        store.dispatch(addWebcastAtPosition(params[viewKey], i))
+      }
+      const livescoreKey = `livescore_${i}`
+      if (params[livescoreKey]) {
+        store.dispatch(togglePositionLivescore(i))
       }
     }
     // Set the default chat channel
@@ -166,6 +192,7 @@ store.subscribe(() => {
       layoutSet,
       positionMap,
       domOrder,
+      domOrderLivescoreOn,
     },
     chats: {
       currentChat,
@@ -184,6 +211,9 @@ store.subscribe(() => {
   for (let i = 0; i < positionMap.length; i++) {
     if (domOrder[positionMap[i]]) {
       newParams[`view_${i}`] = domOrder[positionMap[i]]
+    }
+    if (domOrderLivescoreOn[positionMap[i]]) {
+      newParams[`livescore_${i}`] = true
     }
   }
 

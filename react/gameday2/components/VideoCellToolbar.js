@@ -4,7 +4,8 @@ import IconButton from 'material-ui/IconButton'
 import CloseIcon from 'material-ui/svg-icons/navigation/close'
 import SwapIcon from 'material-ui/svg-icons/action/compare-arrows'
 import VideocamIcon from 'material-ui/svg-icons/av/videocam'
-import { white, grey900 } from 'material-ui/styles/colors'
+import EqualizerIcon from 'material-ui/svg-icons/av/equalizer'
+import { white, green500, grey900 } from 'material-ui/styles/colors'
 
 import TickerMatch from './TickerMatch'
 import { NUM_VIEWS_FOR_LAYOUT } from '../constants/LayoutConstants'
@@ -102,6 +103,14 @@ const VideoCellToolbar = (props) => {
           <VideocamIcon color={white} />
         </IconButton>
         <IconButton
+          tooltip={props.livescoreOn ? 'Switch to webcast view' : 'Switch to live scores view'}
+          tooltipPosition="top-center"
+          onTouchTap={() => props.onRequestLiveScoresToggle()}
+          touch
+        >
+          <EqualizerIcon color={props.livescoreOn ? green500 : white} />
+        </IconButton>
+        <IconButton
           onTouchTap={() => props.removeWebcast(props.webcast.id)}
           tooltip="Close webcast"
           tooltipPosition="top-left"
@@ -119,8 +128,10 @@ VideoCellToolbar.propTypes = {
   webcast: PropTypes.object.isRequired,
   /* eslint-disable react/no-unused-prop-types */
   isBlueZone: PropTypes.bool.isRequired,
+  livescoreOn: PropTypes.bool.isRequired,
   onRequestSwapPosition: PropTypes.func.isRequired,
   onRequestSelectWebcast: PropTypes.func.isRequired,
+  onRequestLiveScoresToggle: PropTypes.func.isRequired,
   /* eslint-enable react/no-unused-prop-types */
   removeWebcast: PropTypes.func.isRequired,
   style: PropTypes.object,

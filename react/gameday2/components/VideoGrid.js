@@ -7,6 +7,7 @@ export default class VideoGrid extends React.Component {
   static propTypes = {
     domOrder: PropTypes.arrayOf(PropTypes.string).isRequired,
     positionMap: PropTypes.arrayOf(PropTypes.number).isRequired,
+    domOrderLivescoreOn: PropTypes.arrayOf(PropTypes.bool).isRequired,
     webcastsById: PropTypes.objectOf(webcastPropType).isRequired,
     layoutId: PropTypes.number.isRequired,
   }
@@ -20,6 +21,7 @@ export default class VideoGrid extends React.Component {
     const {
       domOrder,
       positionMap,
+      domOrderLivescoreOn,
     } = this.props
 
     // Set up reverse map between webcast ID and position
@@ -46,11 +48,13 @@ export default class VideoGrid extends React.Component {
       let id = `video-${i}`
       let position = null
       let hasWebcast = true
+      let livescoreOn = false
       if (domOrder[i]) {
         // There's a webcast to display here!
         webcast = this.props.webcastsById[domOrder[i]]
         id = webcast.id
         position = idPositionMap[id]
+        livescoreOn = domOrderLivescoreOn[i]
       } else if (emptyCellPositions.length > 0) {
         position = emptyCellPositions.shift()
       } else {
@@ -62,6 +66,7 @@ export default class VideoGrid extends React.Component {
             position={position}
             key={id}
             webcast={webcast}
+            livescoreOn={livescoreOn}
           />
         )
       } else {

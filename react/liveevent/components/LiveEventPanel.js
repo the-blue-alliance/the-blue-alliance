@@ -34,7 +34,13 @@ class LiveEventPanel extends React.PureComponent {
       databaseURL: 'https://tbatv-prod-hrd.firebaseio.com',
     })
     firebaseApp.database().ref(`/events/${this.props.eventKey}/matches`).on('value', (snapshot) => {
-      const matches = Object.values(snapshot.val())
+      const val = snapshot.val()
+      let matches
+      if (val) {
+        matches = Object.values(val)
+      } else {
+        matches = []
+      }
       matches.sort((match1, match2) => playOrder(match1) - playOrder(match2))
 
       const playedMatches = matches.filter((match) => match.alliances.red.score !== -1 && match.alliances.blue.score !== -1)
@@ -44,7 +50,7 @@ class LiveEventPanel extends React.PureComponent {
         unplayedMatches,
       })
     })
-    firebaseApp.database().ref(`/events/${this.props.eventKey}/livescore`).on('value', (snapshot) => {
+    firebaseApp.database().ref(`/le/${this.props.eventKey}`).on('value', (snapshot) => {
       this.setState({
         matchState: snapshot.val(),
       })
@@ -65,12 +71,12 @@ class LiveEventPanel extends React.PureComponent {
         currentMatch = unplayedMatchesCopy[0]
       } else {
         playedMatchesCopy.forEach((match, i) => {
-          if (match.key.split('_')[1] === matchState.matchKey) {
+          if (match.key.split('_')[1] === matchState.mk) {
             currentMatch = playedMatchesCopy.splice(i, 1)[0]
           }
         })
         unplayedMatchesCopy.forEach((match, i) => {
-          if (match.key.split('_')[1] === matchState.matchKey) {
+          if (match.key.split('_')[1] === matchState.mk) {
             currentMatch = unplayedMatchesCopy.splice(i, 1)[0]
           }
         })
