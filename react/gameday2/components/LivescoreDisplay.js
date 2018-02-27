@@ -70,14 +70,14 @@ class LivescoreDisplay extends React.PureComponent {
       }
     })
 
-    let matchWaiting = false
+    let showETA = false
     if (match && match.alliances.red.score !== -1 && match.alliances.blue.score !== -1) {
       // If match has been played, display next match and ETA
       match = nextMatch
-      matchWaiting = true
+      showETA = true
     } else if (mode === 'pre_match') {
       // If match mode is pre_match, display match and ETA
-      matchWaiting = true
+      showETA = true
     }
 
     if (!match) {
@@ -91,7 +91,7 @@ class LivescoreDisplay extends React.PureComponent {
     }
 
     let etaStr = ''
-    if (matchWaiting) {  // Reset to pre match defaults
+    if (showETA) {  // Reset to pre match defaults
       mode = 'pre_match'
       timeRemaining = 0
       redScore = 0
