@@ -64,15 +64,21 @@ class LivescoreDisplay extends React.PureComponent {
 
     let match
     let nextMatch
-    matches.forEach((m, i) => {
+    matches.forEach((m) => {
+      // Find current match
       if (m.key.split('_')[1] === matchState.mk) {
         match = m
-        nextMatch = matches[i + 1]  // Can be undefined
+      }
+      // Find next unplayed match after current match
+      if (match && !nextMatch) {
+        if (m.alliances.red.score === -1 && m.alliances.blue.score === -1) {
+          nextMatch = m
+        }
       }
     })
 
     let showETA = false
-    if (match && match.alliances.red.score !== -1 && match.alliances.blue.score !== -1) {
+    if (mode === 'post_match' && match && match.alliances.red.score !== -1 && match.alliances.blue.score !== -1) {
       // If match has been played, display next match and ETA
       match = nextMatch
       showETA = true
