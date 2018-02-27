@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import PowerupCount from './PowerupCount'
+import CountWrapper from '../../gameday2/components/CountWrapper'
 
 const CurrentMatchDisplay = (props) => {
   const { match, matchState } = props
@@ -104,14 +105,14 @@ const CurrentMatchDisplay = (props) => {
               const teamNum = teamKey.substring(3)
               return <div key={teamKey} ><a href={`/team/${teamNum}/${year}`}>{teamNum}</a></div>
             })}
-            <div className="score red">{ redScore }</div>
+            <div className="score red"><CountWrapper number={redScore} /></div>
           </div>
           <div className="blueAlliance">
             {match.alliances.blue.team_keys.map((teamKey) => {
               const teamNum = teamKey.substring(3)
               return <div key={teamKey} ><a href={`/team/${teamNum}/${year}`}>{teamNum}</a></div>
             })}
-            <div className="score blue">{ blueScore }</div>
+            <div className="score blue"><CountWrapper number={blueScore} /></div>
           </div>
         </div>
         {currentPowerup &&

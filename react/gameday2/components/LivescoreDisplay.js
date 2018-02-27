@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import AutoScale from './AutoScale/AutoScale'
 import PowerupCount from '../../liveevent/components/PowerupCount'
+import CountWrapper from './CountWrapper'
 
 class LivescoreDisplay extends React.PureComponent {
   state = {
@@ -206,14 +207,14 @@ class LivescoreDisplay extends React.PureComponent {
                     const teamNum = teamKey.substring(3)
                     return <div key={teamKey} >{teamNum}</div>
                   })}
-                  <div className="score red">{ redScore }</div>
+                  <div className="score red"><CountWrapper number={redScore} /></div>
                 </div>
                 <div className="blueAlliance">
                   {match.alliances.blue.team_keys.map((teamKey) => {
                     const teamNum = teamKey.substring(3)
                     return <div key={teamKey} >{teamNum}</div>
                   })}
-                  <div className="score blue">{ blueScore }</div>
+                  <div className="score blue"><CountWrapper number={blueScore} /></div>
                 </div>
               </div>
               {currentPowerup &&
