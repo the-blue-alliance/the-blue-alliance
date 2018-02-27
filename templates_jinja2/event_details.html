@@ -52,7 +52,7 @@
   </div>
   <div class="row">
     <div class="col-sm-12">
-      <a class="btn btn-success pull-right" href="/suggest/event/video?event_key={{event.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add match videos!</a>
+      <a class="btn btn-success pull-right" href="/suggest/event/video?event_key={{event.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add Match Videos!</a>
       <p>
         {% if event.start_date %}
           <span class="glyphicon glyphicon-calendar"></span> <time itemprop="startDate" datetime="{{event.start_date.isoformat()}}">{{ event.start_date|strftime("%B %d") }}{% if event.start_date.date() != event.end_date.date() %}</time> to <time itemprop="endDate" datetime="{{event.end_date.isoformat()}}">{{ event.end_date|strftime("%B %d") }}{% endif %}, {{ event.end_date|strftime("%Y") }}</time>
