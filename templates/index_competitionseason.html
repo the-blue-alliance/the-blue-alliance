@@ -15,12 +15,20 @@
       </div>
       {% include "media_partials/live_special_webcast_partial.html" %}
       {% if events %}
-        <h2>This Week:</h2>
+        {% with events|first as first_event %}
+        {% with events|last as last_event %}
+        {% if first_event.week != None %}
+          <h2>Week {{first_event.week|add:"1"}}{% if first_event.week != last_event.week %} - {{last_event.week|add:"1"}}{% endif %}:</h2>
+        {% else %}
+          <h2>This Week:</h2>
+        {% endif %}
+        {% endwith %}
+        {% endwith %}
 
         <div class="row">
           <div class="col-sm-12">
             <ul class="nav nav-tabs nav-justified">
-              <li class="active"><a href="#events" data-toggle="tab">Events</a></li>
+              <li class="active"><a href="#events" data-toggle="tab">Events This Week</a></li>
               <li><a href="#popular-teams" data-toggle="tab">Popular Teams Competing</a></li>
             </ul>
           </div>
