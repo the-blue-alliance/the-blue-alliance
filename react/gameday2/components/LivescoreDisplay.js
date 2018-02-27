@@ -70,10 +70,13 @@ class LivescoreDisplay extends React.PureComponent {
       }
     })
 
-    // If match has been played, display next match and ETA
     let matchWaiting = false
     if (match && match.alliances.red.score !== -1 && match.alliances.blue.score !== -1) {
+      // If match has been played, display next match and ETA
       match = nextMatch
+      matchWaiting = true
+    } else if (mode === 'pre_match') {
+      // If match mode is pre_match, display match and ETA
       matchWaiting = true
     }
 
