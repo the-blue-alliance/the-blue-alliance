@@ -16,6 +16,7 @@ class ChatSidebar extends React.Component {
     displayOrderChats: PropTypes.arrayOf(chatPropType).isRequired,
     renderedChats: PropTypes.arrayOf(PropTypes.string).isRequired,
     currentChat: PropTypes.string.isRequired,
+    defaultChat: PropTypes.string.isRequired,
     setTwitchChat: PropTypes.func.isRequired,
     muiTheme: PropTypes.object.isRequired,
     setChatSidebarVisibility: PropTypes.object.isRequired,
@@ -151,6 +152,7 @@ class ChatSidebar extends React.Component {
           <ChatSelector
             chats={this.props.displayOrderChats}
             currentChat={this.props.currentChat}
+            defaultChat={this.props.defaultChat}
             setTwitchChat={this.props.setTwitchChat}
             open={this.state.chatSelectorOpen}
             onRequestClose={() => this.onRequestCloseChatSelector()}

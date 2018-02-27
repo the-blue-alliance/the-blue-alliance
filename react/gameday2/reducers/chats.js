@@ -1,5 +1,6 @@
 import {
   SET_TWITCH_CHAT,
+  SET_DEFAULT_TWITCH_CHAT,
   WEBCASTS_UPDATED,
 } from '../constants/ActionTypes'
 
@@ -23,16 +24,17 @@ import {
 
 // Default to having the GameDay chat as the only chat
 const defaultChat = {
-  name: 'GameDay',
-  channel: 'tbagameday',
+  name: 'FIRST Updates Now',
+  channel: 'firstupdatesnow',
 }
 
 const defaultState = {
   chats: {
     [defaultChat.channel]: Object.assign({}, defaultChat),
   },
-  renderedChats: ['tbagameday'],
-  currentChat: 'tbagameday',
+  renderedChats: ['firstupdatesnow'],
+  currentChat: 'firstupdatesnow',
+  defaultChat: 'firstupdatesnow',
 }
 
 const setChatsFromWebcasts = (webcasts, state) => {
@@ -80,12 +82,26 @@ const setTwitchChat = (channel, state) => {
   })
 }
 
+const setDefaultTwitchChat = (channel, state) => {
+  // Verify that the desired chat exists in the list of known chats
+  if (state.chats[channel] === undefined) {
+    // Chat does not exist
+    return state
+  }
+
+  return Object.assign({}, state, {
+    defaultChat: channel,
+  })
+}
+
 const chats = (state = defaultState, action) => {
   switch (action.type) {
     case WEBCASTS_UPDATED:
       return setChatsFromWebcasts(action.webcasts, state)
     case SET_TWITCH_CHAT:
       return setTwitchChat(action.channel, state)
+    case SET_DEFAULT_TWITCH_CHAT:
+      return setDefaultTwitchChat(action.channel, state)
     default:
       return state
   }

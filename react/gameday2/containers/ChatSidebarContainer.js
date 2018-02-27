@@ -10,6 +10,7 @@ const mapStateToProps = (state) => ({
   displayOrderChats: getChatsInDisplayOrder(state),
   renderedChats: state.chats.renderedChats,
   currentChat: state.chats.currentChat,
+  defaultChat: state.chats.defaultChat,
 })
 
 const mapDispatchToProps = (dispatch) => ({

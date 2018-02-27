@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react'
 import ReactTransitionGroup from 'react-addons-transition-group'
 import { List, ListItem } from 'material-ui/List'
 import Paper from 'material-ui/Paper'
+import ActionHome from 'material-ui/svg-icons/action/home'
 import CheckmarkIcon from 'material-ui/svg-icons/navigation/check'
 import { chatPropType } from '../utils/PropTypes'
 import AnimatableContainer from './AnimatableContainer'
@@ -10,6 +11,7 @@ export default class ChatSelector extends React.Component {
   static propTypes = {
     chats: PropTypes.arrayOf(chatPropType).isRequired,
     currentChat: PropTypes.string.isRequired,
+    defaultChat: PropTypes.string.isRequired,
     setTwitchChat: PropTypes.func.isRequired,
     open: PropTypes.bool.isRequired,
     onRequestClose: PropTypes.func.isRequired,
@@ -24,11 +26,13 @@ export default class ChatSelector extends React.Component {
     const chatItems = []
     this.props.chats.forEach((chat) => {
       const isSelected = (chat.channel === this.props.currentChat)
+      const isDefault = (chat.channel === this.props.defaultChat)
       const icon = isSelected ? <CheckmarkIcon /> : null
 
       chatItems.push(
         <ListItem
           primaryText={chat.name}
+          leftIcon={isDefault ? <ActionHome /> : null}
           rightIcon={icon}
           onTouchTap={(e) => this.setTwitchChat(e, chat.channel)}
           key={chat.channel}
