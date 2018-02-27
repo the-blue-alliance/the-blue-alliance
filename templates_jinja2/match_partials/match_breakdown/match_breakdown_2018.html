@@ -1,6 +1,5 @@
 <table class="match-table">
   <tbody>
-
     <!-- Robot 1 Auto Run -->
     {% if "autoRobot1" in match.score_breakdown.red %}
     <tr>
@@ -267,3 +266,6 @@
     {% endif %}
   </tbody>
 </table>
+{% if 'tba_gameData' in match.score_breakdown.red %}
+  <p>Scoring Plate Assignments: {{match.score_breakdown.red.tba_gameData}}</p>
+{% endif %}
