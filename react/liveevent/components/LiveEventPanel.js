@@ -65,13 +65,14 @@ class LiveEventPanel extends React.PureComponent {
 
     let upcomingMatches = null
     let currentMatch = null
+    let forcePreMatch = false
     if (unplayedMatchesCopy !== null) {
       if (matchState === null) {
         upcomingMatches = unplayedMatchesCopy.slice(1, 4)
         currentMatch = unplayedMatchesCopy[0]
       } else {
         playedMatchesCopy.forEach((match, i) => {
-          if (match.key.split('_')[1] === matchState.mk) {
+          if (match.key.split('_')[1] === matchState.mk && matchState.m !== 'post_match') {
             currentMatch = playedMatchesCopy.splice(i, 1)[0]
           }
         })
@@ -80,6 +81,10 @@ class LiveEventPanel extends React.PureComponent {
             currentMatch = unplayedMatchesCopy.splice(i, 1)[0]
           }
         })
+        if (!currentMatch) {  // Must have been in playedMatches, but mode is post_match
+          currentMatch = unplayedMatchesCopy.splice(0, 1)[0]
+          forcePreMatch = true
+        }
         upcomingMatches = unplayedMatchesCopy.slice(0, 3)
       }
     }
@@ -92,7 +97,7 @@ class LiveEventPanel extends React.PureComponent {
         </div>
         <div className="col-lg-6 text-center">
           <h4>Current Match: { currentMatch && `${getCompLevelStr(currentMatch)} ${getMatchSetStr(currentMatch)}` }</h4>
-          <CurrentMatchDisplay match={currentMatch} matchState={matchState} />
+          <CurrentMatchDisplay match={currentMatch} matchState={matchState} forcePreMatch={forcePreMatch} />
         </div>
         <div className="col-lg-3 text-center">
           <h4>Upcoming Matches</h4>

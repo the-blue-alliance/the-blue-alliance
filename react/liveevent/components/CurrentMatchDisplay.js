@@ -2,9 +2,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import PowerupCount from './PowerupCount'
+import CountWrapper from '../../gameday2/components/CountWrapper'
 
 const CurrentMatchDisplay = (props) => {
-  const { match, matchState } = props
+  const { match, matchState, forcePreMatch } = props
 
   if (match === null) {
     return <div><span className="glyphicon glyphicon-refresh glyphicon-refresh-animate" /></div>
@@ -13,7 +14,7 @@ const CurrentMatchDisplay = (props) => {
     return <div>Live match info not available</div>
   }
 
-  const {
+  let {
     m: mode,
     t: timeRemaining,
     rs: redScore,
@@ -43,6 +44,37 @@ const CurrentMatchDisplay = (props) => {
     baq: blueAutoQuest,
     bfb: blueFaceTheBoss,
   } = matchState
+
+  if (forcePreMatch) {
+    mode = 'pre_match'
+    timeRemaining = 0
+    redScore = 0
+    redForceCount = 0
+    redForcePlayed = false
+    redLevitateCount = 0
+    redLevitatePlayed = false
+    redBoostCount = 0
+    redBoostPlayed = false
+    redSwitchOwned = 0
+    redScaleOwned = 0
+    redCurrentPowerup = null
+    redPowerupTimeRemaining = null
+    redAutoQuest = false
+    redFaceTheBoss = false
+    blueScore = 0
+    blueForceCount = 0
+    blueForcePlayed = false
+    blueLevitateCount = 0
+    blueLevitatePlayed = false
+    blueBoostCount = 0
+    blueBoostPlayed = false
+    blueSwitchOwned = false
+    blueScaleOwned = false
+    blueCurrentPowerup = null
+    bluePowerupTimeRemaining = null
+    blueAutoQuest = false
+    blueFaceTheBoss = false
+  }
 
   let progressColor
   if (mode === 'post_match' || (timeRemaining === 0 && mode === 'teleop')) {
@@ -104,14 +136,14 @@ const CurrentMatchDisplay = (props) => {
               const teamNum = teamKey.substring(3)
               return <div key={teamKey} ><a href={`/team/${teamNum}/${year}`}>{teamNum}</a></div>
             })}
-            <div className="score red">{ redScore }</div>
+            <div className="score red"><CountWrapper number={redScore} /></div>
           </div>
           <div className="blueAlliance">
             {match.alliances.blue.team_keys.map((teamKey) => {
               const teamNum = teamKey.substring(3)
               return <div key={teamKey} ><a href={`/team/${teamNum}/${year}`}>{teamNum}</a></div>
             })}
-            <div className="score blue">{ blueScore }</div>
+            <div className="score blue"><CountWrapper number={blueScore} /></div>
           </div>
         </div>
         {currentPowerup &&
@@ -139,6 +171,7 @@ const CurrentMatchDisplay = (props) => {
 CurrentMatchDisplay.propTypes = {
   match: PropTypes.object,
   matchState: PropTypes.object,
+  forcePreMatch: PropTypes.boolean,
 }
 
 export default CurrentMatchDisplay
