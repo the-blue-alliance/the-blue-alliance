@@ -91,15 +91,15 @@ class LiveEventPanel extends React.PureComponent {
 
     return (
       <div>
-        <div className="col-lg-3 text-center">
+        <div className="col-lg-3 text-center livePanelColumn">
           <h4>Last Matches</h4>
           <LastMatchesTable matches={playedMatchesCopy && playedMatchesCopy.slice(-3)} />
         </div>
-        <div className="col-lg-6 text-center">
+        <div className="col-lg-6 text-center livePanelColumn">
           <h4>Current Match: { currentMatch && `${getCompLevelStr(currentMatch)} ${getMatchSetStr(currentMatch)}` }</h4>
           <CurrentMatchDisplay match={currentMatch} matchState={matchState} forcePreMatch={forcePreMatch} />
         </div>
-        <div className="col-lg-3 text-center">
+        <div className="col-lg-3 text-center livePanelColumn">
           <h4>Upcoming Matches</h4>
           <UpcomingMatchesTable matches={upcomingMatches} />
         </div>
