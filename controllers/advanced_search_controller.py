@@ -185,6 +185,7 @@ class AdvancedTeamSearchController(CacheableHandler):
 
         self.template_values.update({
             'valid_years': self.VALID_YEARS,
+            'valid_award_types': self.VALID_AWARD_TYPES,
             'num_special_awards': len(SORT_ORDER),
             'valid_seeds': self.VALID_SEEDS,
             'seed': self._seed,
@@ -269,7 +270,7 @@ class AdvancedMatchSearchController(CacheableHandler):
     def _render(self):
         new_search = not self._year
         if new_search:
-            result_models = []
+            match_results = []
             num_results = 0
             result_expressions = None
         else:
@@ -338,10 +339,6 @@ class AdvancedMatchSearchController(CacheableHandler):
 
             match_result_models = [model_future.get_result() for model_future in match_model_futures]
             event_result_models = [model_future.get_result() for model_future in event_model_futures]
-
-            for n, model in enumerate(event_result_models):
-                model.event_key = model.key.id()
-                event_result_models[n] = model
 
             match_results = []
             for n, model in enumerate(match_result_models):

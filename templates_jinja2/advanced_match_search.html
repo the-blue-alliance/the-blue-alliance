@@ -106,10 +106,10 @@
               {% for match in result_models %}
                 <tr>
                   <td>
-                    <a href="/event/{{match.event.event_key}}" title="{{match.event_model.short_name}}">{{match.event_model.short_name}}</a>
+                    <a href="/event/{{match.event_model.key_name}}" title="{{match.event_model.short_name}}">{{match.event_model.short_name}}</a>
                   </td>
                   <td>
-                    <a href="/match/{{match.match_key}}" title="{{match.match_key}}">{{match.verbose_name}}</a>
+                    <a href="/match/{{match.match_key}}" title="{{match.verbose_name}}">{{match.verbose_name}}</a>
                   </td>
                   <td>
                     {{mtm.single_match_table(match)}}
