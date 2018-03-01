@@ -46,7 +46,7 @@ const VideoCellToolbar = (props) => {
   props.matches.forEach((match) => {
     // See if match has a favorite team
     let hasFavorite = false
-    const teamKeys = match.alliances.red.team_keys.concat(match.alliances.blue.team_keys)
+    const teamKeys = match.rt.concat(match.bt)
     teamKeys.forEach((teamKey) => {
       if (props.favoriteTeams.has(teamKey)) {
         hasFavorite = true

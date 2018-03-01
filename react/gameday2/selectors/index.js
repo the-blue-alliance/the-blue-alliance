@@ -74,21 +74,27 @@ export const getEventMatches = createSelector(
     }
     function calculateOrder(match) {
       let time = 9999999999
-      if (match.alliances.red.score !== -1 && match.alliances.blue.score !== -1) {
+      if (match.r !== -1 && match.b !== -1) {
         time = 0
       }
-      // if (match.predicted_time) {
-      //   time = match.predicted_time
+      // if (match.pt) {
+      //   time = match.pt
       // }
-      return (time * 10000000) + (compLevelsPlayOrder[match.comp_level] * 100000) + (match.match_number * 100) + match.set_number
+      return (time * 10000000) + (compLevelsPlayOrder[match.c] * 100000) + (match.m * 100) + match.s
     }
 
-    let matches = []
+    const matches = []
     if (fireduxData &&
-        fireduxData.events &&
-        fireduxData.events[eventKey] &&
-        fireduxData.events[eventKey].matches) {
-      matches = Object.values(fireduxData.events[eventKey].matches)
+        fireduxData.e &&
+        fireduxData.e[eventKey] &&
+        fireduxData.e[eventKey].m) {
+      Object.keys(fireduxData.e[eventKey].m).forEach((shortKey) => {
+        const match = Object.assign({}, fireduxData.e[eventKey].m[shortKey])
+        match.key = `${eventKey}_${shortKey}`
+        match.shortKey = shortKey
+        matches.push(match)
+      })
+
       matches.sort((match1, match2) => calculateOrder(match1) - calculateOrder(match2))
     }
     return matches
@@ -101,7 +107,7 @@ export const getTickerMatches = createSelector(
     let lastMatch = null
     let selectedMatches = []
     matches.forEach((match) => {
-      if (match.alliances.red.score === -1 || match.alliances.blue.score === -1) {
+      if (match.r === -1 || match.b === -1) {
         selectedMatches.push(match)
       } else {
         lastMatch = match
