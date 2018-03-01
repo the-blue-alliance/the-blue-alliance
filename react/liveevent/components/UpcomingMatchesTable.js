@@ -31,6 +31,8 @@ class UpcomingMatchesTable extends React.PureComponent {
         const etaMin = (match.pt - this.state.currentTime) / 60
         if (etaMin < 5) {
           etaStr = '<5 min'
+        } else if (etaMin > 120) {
+          etaStr = `~${Math.round(etaMin / 60)} h`
         } else {
           etaStr = `~${Math.round(etaMin)} min`
         }
