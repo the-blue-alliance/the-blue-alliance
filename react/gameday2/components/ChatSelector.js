@@ -29,9 +29,14 @@ export default class ChatSelector extends React.Component {
       const isDefault = (chat.channel === this.props.defaultChat)
       const icon = isSelected ? <CheckmarkIcon /> : null
 
+      let chatName = chat.name
+      if (chat.channel == 'firstupdatesnow' && isDefault) {
+        chatName = 'TBA GameDay / FUN'
+      }
+
       chatItems.push(
         <ListItem
-          primaryText={chat.name}
+          primaryText={chatName}
           leftIcon={isDefault ? <ActionHome /> : null}
           rightIcon={icon}
           onTouchTap={(e) => this.setTwitchChat(e, chat.channel)}
