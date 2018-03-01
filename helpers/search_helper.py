@@ -15,6 +15,7 @@ class SearchHelper(object):
     EVENT_LOCATION_INDEX = 'eventLocation'
     TEAM_LOCATION_INDEX = 'teamLocation'
     TEAM_AWARDS_INDEX = 'teamAwards'
+    MATCH_NUMBER_INDEX = 'matchNumber'
 
     @classmethod
     def update_event_location_index(cls, event):
@@ -54,6 +55,25 @@ class SearchHelper(object):
     @classmethod
     def remove_team_location_index(cls, team):
         search.Index(name=cls.TEAM_LOCATION_INDEX).delete(team.key.id())
+
+    @classmethod
+    def update_match_number_index(cls, match):
+        if match.year:
+            fields = [
+                search.NumberField(name='year', value=match.year),
+                search.TextField(name='team1', value=match.team_key_names[0]),
+                search.TextField(name='team2', value=match.team_key_names[1]),
+                search.TextField(name='team3', value=match.team_key_names[2]),
+                search.TextField(name='team4', value=match.team_key_names[3]),
+                search.TextField(name='team5', value=match.team_key_names[4]),
+                search.TextField(name='team6', value=match.team_key_names[5]),
+            ]
+            search.Index(name="matchNumber").put(
+                search.Document(doc_id=match.key.id(), fields=fields))
+
+    @classmethod
+    def remove_match_number_index(cls, match):
+        search.Index(name=cls.MATCH_NUMBER_INDEX).delete(match.key.id())
 
     @classmethod
     def update_team_awards_index(cls, team):

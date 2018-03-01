@@ -1,0 +1,128 @@
+{% import "advanced_search_partials/match_search_macros.html" as sm with context %}
+{% import "match_partials/match_table_macros.html" as mtm %}
+
+{% extends "base.html" %}
+
+{% block title %}Advanced Match Search - The Blue Alliance{% endblock %}
+
+{% block meta_description %}Search for matches using powerful filters{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+      <h1>Advanced Match Search</h1>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-4">
+      <form>
+        <div class="form-group">
+          <label for="input-year">Search for matches</label>
+          <div class="input-group">
+            <div class="input-group-addon">in</div>
+            <select class="form-control selectpicker" data-dropup-auto="false" id="input-year" name="year">
+              {% for valid_year in valid_years %}
+                <option value="{{valid_year}}"{% if valid_year == year %} selected="selected"{% endif %}>{{valid_year}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="input-teams">with team(s)</label>
+          <div class="input-group">
+            <input class="form-control" id="input-own-alliance" name="own_alliance" placeholder="118, 254" value="{{own_alliance}}"></input>
+            <div class="input-group-addon">on one alliance</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="input-teams">and team(s)</label>
+          <div class="input-group">
+            <input class="form-control" id="input-opp-alliance" name="opp_alliance" placeholder="2521" value="{{opp_alliance}}"></input>
+            <div class="input-group-addon">on other alliance</div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-search"></span> Search</button>
+      </form>
+    </div>
+
+    <div class="col-sm-8">
+      {% if new_search %}
+        <p class="well">Add some filters to begin a search.</p>
+      {% else %}
+        {% if result_models %}
+          <p>{{num_results}} result{% if num_results != 1 %}s{% endif %} found.{% if num_results > max_results %} Only the top {{max_results}} are available.{% endif %}</p>
+
+          {% if capped_num_results > page_size %}
+            <nav aria-label="Page navigation">
+              <ul class="pagination">
+                {% if page != 0 %}
+                <li>
+                  <a href="{{sm.search_params(page-1)}}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
+                </li>
+                {% endif %}
+                {% for i in range((capped_num_results / page_size)|ceil) %}
+                  <li {% if i == page %}class="active"{% endif %}>
+                    <a href="{{sm.search_params(i)}}">
+                      {{page_size * i + 1}}-
+                      {%- if loop.last -%}
+                        {{page_size * i + capped_num_results - page_size * i}}
+                      {%- else -%}
+                        {{page_size * i + page_size}}
+                      {% endif %}
+                    </a>
+                  </li>
+                {% endfor %}
+                {% if page != (capped_num_results / page_size)|ceil - 1 %}
+                <li>
+                  <a href="{{sm.search_params(page+1)}}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+                {% elif capped_num_results < num_results %}
+                <li>
+                  <span>More results not available</span>
+                </li>
+                {% endif %}
+              </ul>
+            </nav>
+          {% endif %}
+
+          <table class="event-table">
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Match</th>
+                <th>Information</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for match in result_models %}
+                <tr>
+                  <td>
+                    <a href="/event/{{match.event.event_key}}" title="{{match.event_model.short_name}}">{{match.event_model.short_name}}</a>
+                  </td>
+                  <td>
+                    <a href="/match/{{match.match_key}}" title="{{match.match_key}}">{{match.verbose_name}}</a>
+                  </td>
+                  <td>
+                    {{mtm.single_match_table(match)}}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p class="well">No results were found matching the search criteria. Try choosing less restrictive filters.</p>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

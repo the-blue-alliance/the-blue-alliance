@@ -34,6 +34,7 @@ from models.district import District
 from models.district_team import DistrictTeam
 from models.event import Event
 from models.event_team import EventTeam
+from models.match import Match
 from models.mobile_client import MobileClient
 from models.sitevar import Sitevar
 from models.subscription import Subscription
@@ -535,3 +536,26 @@ class AdminUpdateTeamSearchIndexDo(LoggedInHandler):
         team = Team.get_by_id(team_key)
         SearchHelper.update_team_awards_index(team)
         SearchHelper.update_team_location_index(team)
+
+class AdminUpdateAllMatchSearchIndexEnqueue(LoggedInHandler):
+    def get(self):
+        taskqueue.add(
+            queue_name='match-search-index-update',
+            url='/tasks/do/update_all_match_search_index',
+            method='GET')
+        self.response.out.write("Enqueued update of all match search index")
+
+class AdminUpdateAllMatchSearchIndexDo(LoggedInHandler):
+    def get(self):
+        match_keys = Match.query().fetch(keys_only=True)
+        for match_key in match_keys:
+            taskqueue.add(
+                queue_name='search-index-update',
+                url='/tasks/do/update_match_search_index/' + match_key.id(),
+                method='GET')
+
+
+class AdminUpdateMatchSearchIndexDo(LoggedInHandler):
+    def get(self, match_key):
+        team = Match.get_by_id(match_key)
+        SearchHelper.update_match_number_index(team)

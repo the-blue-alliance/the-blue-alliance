@@ -27,7 +27,7 @@ from controllers.admin.admin_cron_controller import AdminMobileClearEnqueue, Adm
     AdminWebhooksClearEnqueue, AdminWebhooksClear, AdminRegistrationDayEnqueue, \
     AdminClearEventTeamsDo
 from controllers.admin.admin_cron_controller import AdminRunPostUpdateHooksEnqueue, AdminRunPostUpdateHooksDo, AdminRunEventPostUpdateHookDo, AdminRunTeamPostUpdateHookDo, \
-    AdminUpdateAllTeamSearchIndexEnqueue, AdminUpdateAllTeamSearchIndexDo, AdminUpdateTeamSearchIndexDo
+    AdminUpdateAllTeamSearchIndexEnqueue, AdminUpdateAllTeamSearchIndexDo, AdminUpdateTeamSearchIndexDo, AdminUpdateAllMatchSearchIndexDo, AdminUpdateMatchSearchIndexDo
 
 
 app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackupEventsEnqueue),
@@ -83,6 +83,9 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/enqueue/update_all_team_search_index', AdminUpdateAllTeamSearchIndexEnqueue),
                                ('/tasks/do/update_all_team_search_index', AdminUpdateAllTeamSearchIndexDo),
                                ('/tasks/do/update_team_search_index/(.*)', AdminUpdateTeamSearchIndexDo),
+                               ('/tasks/enqueue/update_all_match_search_index', AdminUpdateAllMatchSearchIndexEnqueue),
+                               ('/tasks/do/update_all_match_search_index', AdminUpdateAllMatchSearchIndexDo),
+                               ('/tasks/do/update_match_search_index/(.*)', AdminUpdateMatchSearchIndexDo),
                                ('/tasks/do/update_live_events', UpdateLiveEventsDo),
                                ('/tasks/do/nag_suggestions', SuggestionQueueDailyNag),
                                ('/tasks/do/remap_teams/(.*)', RemapTeamsDo),
