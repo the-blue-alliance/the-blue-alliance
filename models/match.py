@@ -210,6 +210,10 @@ class Match(ndb.Model):
         return self.renderKeyName(self.event_key_name, self.comp_level, self.set_number, self.match_number)
 
     @property
+    def short_key(self):
+        return self.key.id().split('_')[1]
+
+    @property
     def has_been_played(self):
         """If there are scores, it's been played"""
         for alliance in self.alliances:

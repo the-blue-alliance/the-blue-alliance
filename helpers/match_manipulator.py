@@ -88,6 +88,7 @@ class MatchManipulator(ManipulatorBase):
                 FirebasePusher.update_match(match)
             except Exception:
                 logging.warning("Firebase update_match failed!")
+                logging.warning(traceback.format_exc())
 
         # Enqueue statistics
         for event_key in affected_stats_event_keys:

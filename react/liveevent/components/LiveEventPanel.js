@@ -29,11 +29,11 @@ class LiveEventPanel extends React.PureComponent {
 
   componentDidMount() {
     const firebaseApp = Firebase.initializeApp({
-      apiKey: 'AIzaSyDBlFwtAgb2i7hMCQ5vBv44UEKVsA543hs',
-      authDomain: 'tbatv-prod-hrd.firebaseapp.com',
-      databaseURL: 'https://tbatv-prod-hrd.firebaseio.com',
+      apiKey: "AIzaSyA829V_3y57gGXIm7iodYHmkeYwXvOjL4c",
+      authDomain: "thebluealliance-dev.firebaseapp.com",
+      databaseURL: "https://thebluealliance-dev.firebaseio.com",
     })
-    firebaseApp.database().ref(`/events/${this.props.eventKey}/matches`).on('value', (snapshot) => {
+    firebaseApp.database().ref(`/e/${this.props.eventKey}/m`).on('value', (snapshot) => {
       const val = snapshot.val()
       let matches
       if (val) {

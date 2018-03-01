@@ -9,7 +9,6 @@ from google.appengine.ext import ndb
 from google.appengine.api import urlfetch
 
 from consts.event_type import EventType
-from controllers.apiv3.model_properties import filter_match_properties
 from database.dict_converters.match_converter import MatchConverter
 from database.dict_converters.event_converter import EventConverter
 from database.dict_converters.event_details_converter import EventDetailsConverter
@@ -97,7 +96,7 @@ class FirebasePusher(object):
         """
         deferred.defer(
             cls._delete_data,
-            'events/{}/matches/{}'.format(match.event.id(), match.key.id()),
+            'e/{}/m/{}'.format(match.event.id(), match.short_key),
             _queue="firebase")
 
         # for team_key_name in match.team_key_names:
@@ -107,6 +106,25 @@ class FirebasePusher(object):
         #     _queue="firebase")
 
     @classmethod
+    def _construct_match_dict(cls, match):
+        """
+        Minimal amount needed to render
+        """
+        match_dict = {
+            'c': match['comp_level'],
+            's': match['set_number'],
+            'm': match['match_number'],
+            'r': match['alliances']['red']['score'],
+            'rt': match['alliances']['red']['team_keys'],
+            'b': match['alliances']['blue']['score'],
+            'bt': match['alliances']['blue']['team_keys'],
+            't': match['time'],
+            'pt': match['predicted_time'],
+            'w': match['winning_alliance'],
+        }
+        return match_dict
+
+    @classmethod
     def replace_event_matches(cls, event_key, matches):
         """
         Deletes matches from an event and puts these instead
@@ -114,10 +132,10 @@ class FirebasePusher(object):
 
         match_data = {}
         for match in matches:
-            match_data[match.key.id()] = filter_match_properties([MatchConverter.convert(match, 3)], 'simple')[0]
+            match_data[match.short_key] = cls._construct_match_dict(MatchConverter.convert(match, 3))
         deferred.defer(
             cls._put_data,
-            'events/{}/matches'.format(event_key),
+            'e/{}/m'.format(event_key),
             json.dumps(match_data),
             _queue="firebase")
 
@@ -129,11 +147,11 @@ class FirebasePusher(object):
         if match.year < 2017:
             return
 
-        match_data_json = json.dumps(filter_match_properties([MatchConverter.convert(match, 3)], 'simple')[0])
+        match_data_json = json.dumps(cls._construct_match_dict(MatchConverter.convert(match, 3)))
 
         deferred.defer(
             cls._patch_data,
-            'events/{}/matches/{}'.format(match.event.id(), match.key.id()),
+            'e/{}/m/{}'.format(match.event.id(), match.short_key),
             match_data_json,
             _queue="firebase")
 
