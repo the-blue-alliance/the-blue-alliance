@@ -7,9 +7,9 @@ const compLevelStrings = {
 }
 
 export const getCompLevelStr = (match) => (
-  compLevelStrings[match.comp_level]
+  compLevelStrings[match.c]
 )
 
 export const getMatchSetStr = (match) => (
-  (match.comp_level !== 'qm') ? `${match.set_number} - ${match.match_number}` : match.match_number
+  (match.c !== 'qm') ? `${match.s} - ${match.m}` : match.m
 )

@@ -66,19 +66,19 @@ class LivescoreDisplay extends React.PureComponent {
     let nextMatch
     matches.forEach((m) => {
       // Find current match
-      if (m.key.split('_')[1] === matchState.mk) {
+      if (m.shortKey === matchState.mk) {
         match = m
       }
       // Find next unplayed match after current match
       if (match && !nextMatch) {
-        if (m.alliances.red.score === -1 && m.alliances.blue.score === -1) {
+        if (m.r === -1 && m.b === -1) {
           nextMatch = m
         }
       }
     })
 
     let showETA = false
-    if (mode === 'post_match' && match && match.alliances.red.score !== -1 && match.alliances.blue.score !== -1) {
+    if (mode === 'post_match' && match && match.r !== -1 && match.b !== -1) {
       // If match has been played, display next match and ETA
       match = nextMatch
       showETA = true
@@ -128,8 +128,8 @@ class LivescoreDisplay extends React.PureComponent {
       blueAutoQuest = false
       blueFaceTheBoss = false
 
-      if (this.state.currentTime && match.predicted_time) {
-        const etaMin = (match.predicted_time - this.state.currentTime) / 60
+      if (this.state.currentTime && match.pt) {
+        const etaMin = (match.pt - this.state.currentTime) / 60
         if (etaMin < 1) {
           etaStr = ' in <1 min'
         } else {
@@ -140,9 +140,9 @@ class LivescoreDisplay extends React.PureComponent {
       }
     }
 
-    let compLevel = match.comp_level.toUpperCase()
+    let compLevel = match.c.toUpperCase()
     compLevel = (compLevel === 'QM') ? 'Q' : compLevel
-    const matchNumber = (compLevel === 'QF' || compLevel === 'SF' || compLevel === 'F') ? `${match.set_number}-${match.match_number}` : match.match_number
+    const matchNumber = (compLevel === 'QF' || compLevel === 'SF' || compLevel === 'F') ? `${match.s}-${match.m}` : match.m
     const matchLabel = `${compLevel}${matchNumber}${etaStr}`
 
     let progressColor
@@ -209,14 +209,14 @@ class LivescoreDisplay extends React.PureComponent {
               </div>
               <div className="scoreContainer">
                 <div className="redAlliance">
-                  {match.alliances.red.team_keys.map((teamKey) => {
+                  {match.rt.map((teamKey) => {
                     const teamNum = teamKey.substring(3)
                     return <div key={teamKey} >{teamNum}</div>
                   })}
                   <div className="score red"><CountWrapper number={redScore} /></div>
                 </div>
                 <div className="blueAlliance">
-                  {match.alliances.blue.team_keys.map((teamKey) => {
+                  {match.bt.map((teamKey) => {
                     const teamNum = teamKey.substring(3)
                     return <div key={teamKey} >{teamNum}</div>
                   })}

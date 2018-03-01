@@ -4,32 +4,33 @@ import PropTypes from 'prop-types'
 import { getCompLevelStr, getMatchSetStr } from '../helpers'
 
 const LastMatchesTable = (props) => {
-  if (props.matches === null) {
+  const { year, matches } = props
+
+  if (matches === null) {
     return <div><span className="glyphicon glyphicon-refresh glyphicon-refresh-animate" /></div>
-  } else if (props.matches.length === 0) {
+  } else if (matches.length === 0) {
     return <div>No matches have been played</div>
   }
 
   const matchRows = []
-  props.matches.forEach((match) => {
-    const year = match.key.substring(0, 4)
+  matches.forEach((match) => {
     matchRows.push(
       <tr key={`${match.key}_red`}>
         <td rowSpan="2"><a href={`/match/${match.key}`}>{getCompLevelStr(match)}<br />{getMatchSetStr(match)}</a></td>
-        {match.alliances.red.team_keys.map((teamKey) => {
+        {match.rt.map((teamKey) => {
           const teamNum = teamKey.substring(3)
-          return <td key={teamKey} className={`red ${match.winning_alliance === 'red' ? 'winner' : ''}`}><a href={`/team/${teamNum}/${year}`}>{teamNum}</a></td>
+          return <td key={teamKey} className={`red ${match.w === 'red' ? 'winner' : ''}`}><a href={`/team/${teamNum}/${year}`}>{teamNum}</a></td>
         })}
-        <td className={`redScore ${match.winning_alliance === 'red' ? 'winner' : ''}`}>{ match.alliances.red.score }</td>
+        <td className={`redScore ${match.w === 'red' ? 'winner' : ''}`}>{ match.r }</td>
       </tr>
     )
     matchRows.push(
       <tr key={`${match.key}_blue`}>
-        {match.alliances.blue.team_keys.map((teamKey) => {
+        {match.bt.map((teamKey) => {
           const teamNum = teamKey.substring(3)
-          return <td key={teamKey} className={`blue ${match.winning_alliance === 'blue' ? 'winner' : ''}`}><a href={`/team/${teamNum}/${year}`}>{teamNum}</a></td>
+          return <td key={teamKey} className={`blue ${match.w === 'blue' ? 'winner' : ''}`}><a href={`/team/${teamNum}/${year}`}>{teamNum}</a></td>
         })}
-        <td className={`blueScore ${match.winning_alliance === 'blue' ? 'winner' : ''}`}>{ match.alliances.blue.score }</td>
+        <td className={`blueScore ${match.w === 'blue' ? 'winner' : ''}`}>{ match.b }</td>
       </tr>
     )
   })
@@ -51,6 +52,7 @@ const LastMatchesTable = (props) => {
 }
 
 LastMatchesTable.propTypes = {
+  year: PropTypes.number.isRequired,
   matches: PropTypes.array,
 }
 

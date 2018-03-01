@@ -66,7 +66,7 @@ store.subscribe(() => {
     if (!subscribedEvents.has(eventKey)) {
       subscribedEvents.add(eventKey)
 
-      firedux.watch(`events/${eventKey}/matches`)
+      firedux.watch(`e/${eventKey}/m`)
     }
   })
 
@@ -79,8 +79,8 @@ store.subscribe(() => {
     if (!existingEventKeys.has(eventKey)) {
       subscribedEvents.delete(eventKey)
 
-      firedux.ref.child(`events/${eventKey}/matches`).off('value')
-      firedux.watching[`events/${eventKey}/matches`] = false  // To make firedux.watch work again
+      firedux.ref.child(`e/${eventKey}/m`).off('value')
+      firedux.watching[`e/${eventKey}/m`] = false  // To make firedux.watch work again
     }
   })
 

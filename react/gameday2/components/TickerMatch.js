@@ -53,11 +53,11 @@ const TickerMatch = (props) => {
   const match = props.match
 
   // Set backgrounds
-  if (match.winning_alliance === 'red') {  // Red win
+  if (match.w === 'red') {  // Red win
     matchStyle.backgroundColor = '#330000'
-  } else if (match.winning_alliance === 'blue') {  // Blue win
+  } else if (match.w === 'blue') {  // Blue win
     matchStyle.backgroundColor = '#000033'
-  } else if (match.alliances.red.score !== -1 && match.alliances.blue.score !== -1) {  // Tie
+  } else if (match.r !== -1 && match.b !== -1) {  // Tie
     matchStyle.backgroundColor = '#220022'
   } else if (props.hasFavorite) {
     matchStyle.backgroundColor = '#e6c100'
@@ -65,16 +65,16 @@ const TickerMatch = (props) => {
   }
 
   // Generate strings
-  let compLevel = match.comp_level.toUpperCase()
+  let compLevel = match.c.toUpperCase()
   compLevel = (compLevel === 'QM') ? 'Q' : compLevel
-  const matchNumber = (compLevel === 'QF' || compLevel === 'SF' || compLevel === 'F') ? `${match.set_number}-${match.match_number}` : match.match_number
+  const matchNumber = (compLevel === 'QF' || compLevel === 'SF' || compLevel === 'F') ? `${match.s}-${match.m}` : match.m
   let matchLabel = `${compLevel}${matchNumber}`
   if (props.isBlueZone) {
     matchLabel = `${match.event_key.substring(4).toUpperCase()} ${matchLabel}`
   }
 
-  let redScore = match.alliances.red.score
-  let blueScore = match.alliances.blue.score
+  let redScore = match.r
+  let blueScore = match.b
   redScore = (redScore === -1) ? '' : ` - ${redScore}`
   blueScore = (blueScore === -1) ? '' : ` - ${blueScore}`
 
@@ -83,15 +83,15 @@ const TickerMatch = (props) => {
       <div style={matchLabelStyle}>{matchLabel}</div>
       <div style={alliancesStyle}>
         <div style={redAllianceStyle}>
-          {match.alliances.red.team_keys[0].substring(3)},{' '}
-          {match.alliances.red.team_keys[1].substring(3)},{' '}
-          {match.alliances.red.team_keys[2].substring(3)}
+          {match.rt[0].substring(3)},{' '}
+          {match.rt[1].substring(3)},{' '}
+          {match.rt[2].substring(3)}
           {redScore}
         </div>
         <div style={blueAllianceStyle}>
-          {match.alliances.blue.team_keys[0].substring(3)},{' '}
-          {match.alliances.blue.team_keys[1].substring(3)},{' '}
-          {match.alliances.blue.team_keys[2].substring(3)}
+          {match.bt[0].substring(3)},{' '}
+          {match.bt[1].substring(3)},{' '}
+          {match.bt[2].substring(3)}
           {blueScore}
         </div>
       </div>
