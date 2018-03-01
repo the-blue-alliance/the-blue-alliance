@@ -27,8 +27,8 @@ class UpcomingMatchesTable extends React.PureComponent {
     const matchRows = []
     this.props.matches.forEach((match) => {
       let etaStr = '?'
-      if (this.state.currentTime && match.predicted_time) {
-        const etaMin = (match.predicted_time - this.state.currentTime) / 60
+      if (this.state.currentTime && match.pt) {
+        const etaMin = (match.pt - this.state.currentTime) / 60
         if (etaMin < 5) {
           etaStr = '<5 min'
         } else {
@@ -36,22 +36,21 @@ class UpcomingMatchesTable extends React.PureComponent {
         }
       }
 
-      const year = match.key.substring(0, 4)
       matchRows.push(
         <tr key={`${match.key}_red`}>
           <td rowSpan="2"><a href={`/match/${match.key}`}>{getCompLevelStr(match)}<br />{getMatchSetStr(match)}</a></td>
-          {match.alliances.red.team_keys.map((teamKey) => {
+          {match.rt.map((teamKey) => {
             const teamNum = teamKey.substring(3)
-            return <td key={teamKey} className="red"><a href={`/team/${teamNum}/${year}`}>{teamNum}</a></td>
+            return <td key={teamKey} className="red"><a href={`/team/${teamNum}/${this.props.year}`}>{teamNum}</a></td>
           })}
           <td rowSpan="2">{ etaStr }</td>
         </tr>
       )
       matchRows.push(
         <tr key={`${match.key}_blue`}>
-          {match.alliances.blue.team_keys.map((teamKey) => {
+          {match.bt.map((teamKey) => {
             const teamNum = teamKey.substring(3)
-            return <td key={teamKey} className="blue"><a href={`/team/${teamNum}/${year}`}>{teamNum}</a></td>
+            return <td key={teamKey} className="blue"><a href={`/team/${teamNum}/${this.props.year}`}>{teamNum}</a></td>
           })}
         </tr>
       )
@@ -75,6 +74,7 @@ class UpcomingMatchesTable extends React.PureComponent {
 }
 
 UpcomingMatchesTable.propTypes = {
+  year: PropTypes.number.isRequired,
   matches: PropTypes.array,
 }
 

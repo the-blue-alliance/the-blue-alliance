@@ -109,7 +109,6 @@ const CurrentMatchDisplay = (props) => {
     powerupColor = 'blue'
   }
 
-  const year = match.key.substring(0, 4)
   return (
     <div className="row liveEventPanel">
       <div className="col-xs-4">
@@ -132,16 +131,16 @@ const CurrentMatchDisplay = (props) => {
         </div>
         <div className="scoreContainer">
           <div className="redAlliance">
-            {match.alliances.red.team_keys.map((teamKey) => {
+            {match.rt.map((teamKey) => {
               const teamNum = teamKey.substring(3)
-              return <div key={teamKey} ><a href={`/team/${teamNum}/${year}`}>{teamNum}</a></div>
+              return <div key={teamKey} ><a href={`/team/${teamNum}/${props.year}`}>{teamNum}</a></div>
             })}
             <div className="score red"><CountWrapper number={redScore} /></div>
           </div>
           <div className="blueAlliance">
-            {match.alliances.blue.team_keys.map((teamKey) => {
+            {match.bt.map((teamKey) => {
               const teamNum = teamKey.substring(3)
-              return <div key={teamKey} ><a href={`/team/${teamNum}/${year}`}>{teamNum}</a></div>
+              return <div key={teamKey} ><a href={`/team/${teamNum}/${props.year}`}>{teamNum}</a></div>
             })}
             <div className="score blue"><CountWrapper number={blueScore} /></div>
           </div>
@@ -169,6 +168,7 @@ const CurrentMatchDisplay = (props) => {
 }
 
 CurrentMatchDisplay.propTypes = {
+  year: PropTypes.number.isRequired,
   match: PropTypes.object,
   matchState: PropTypes.object,
   forcePreMatch: PropTypes.boolean,
