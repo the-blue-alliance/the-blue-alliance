@@ -37,12 +37,24 @@ class SuggestMatchVideoReviewController(SuggestionsReviewBaseController):
         self.response.out.write(jinja2_engine.render('suggestions/suggest_match_video_review_list.html', self.template_values))
 
     def post(self):
-        accept_keys = map(lambda x: int(x) if x.isdigit() else x, self.request.POST.getall("accept_keys[]"))
-        reject_keys = map(lambda x: int(x) if x.isdigit() else x, self.request.POST.getall("reject_keys[]"))
+        accept_keys = []
+        reject_keys = []
+        for value in self.request.POST.values():
+            split_value = value.split('::')
+            if len(split_value) == 2:
+                key = split_value[1]
+            else:
+                continue
+            if value.startswith('accept'):
+                accept_keys.append(key)
+            elif value.startswith('reject'):
+                reject_keys.append(key)
 
+        # Process accepts
         for accept_key in accept_keys:
             self._process_accepted(accept_key)
 
+        # Process rejects
         self._process_rejected(reject_keys)
 
         self.redirect("/suggest/match/video/review")

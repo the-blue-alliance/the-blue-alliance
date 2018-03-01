@@ -193,7 +193,7 @@ class TestSuggestMatchVideoReviewController(unittest2.TestCase):
         self.givePermission()
         suggestion_id = self.createSuggestion()
         form = self.getSuggestionForm()
-        form.set('accept_keys[]', suggestion_id)
+        form['accept_reject-{}'.format(suggestion_id)] = 'accept::{}'.format(suggestion_id)
         response = form.submit().follow()
         self.assertEqual(response.status_int, 200)
 
@@ -213,8 +213,8 @@ class TestSuggestMatchVideoReviewController(unittest2.TestCase):
         self.givePermission()
         suggestion_id = self.createSuggestion()
         form = self.getSuggestionForm()
-        form.set('accept_keys[]', suggestion_id)
-        form.set('key-{}'.format(suggestion_id), '2016necmp_f1m2')
+        form['accept_reject-{}'.format(suggestion_id)] = 'accept::{}'.format(suggestion_id)
+        form['key-{}'.format(suggestion_id)] = '2016necmp_f1m2'
         response = form.submit().follow()
         self.assertEqual(response.status_int, 200)
 
@@ -240,8 +240,8 @@ class TestSuggestMatchVideoReviewController(unittest2.TestCase):
         self.givePermission()
         suggestion_id = self.createSuggestion()
         form = self.getSuggestionForm()
-        form.set('accept_keys[]', suggestion_id)
-        form.set('key-{}'.format(suggestion_id), '2016necmp_f1m3')  # This match doesn't exist
+        form['accept_reject-{}'.format(suggestion_id)] = 'accept::{}'.format(suggestion_id)
+        form['key-{}'.format(suggestion_id)] = '2016necmp_f1m3'  # This match doesn't exist
         response = form.submit().follow()
         self.assertEqual(response.status_int, 200)
 
@@ -261,7 +261,7 @@ class TestSuggestMatchVideoReviewController(unittest2.TestCase):
         self.givePermission()
         suggestion_id = self.createSuggestion()
         form = self.getSuggestionForm()
-        form.set('reject_keys[]', suggestion_id)
+        form['accept_reject-{}'.format(suggestion_id)] = 'reject::{}'.format(suggestion_id)
         response = form.submit().follow()
         self.assertEqual(response.status_int, 200)
 
