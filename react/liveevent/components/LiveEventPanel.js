@@ -70,7 +70,7 @@ class LiveEventPanel extends React.PureComponent {
     let currentMatch = null
     let forcePreMatch = false
     if (unplayedMatchesCopy !== null) {
-      if (matchState === null) {
+      if (matchState === null || matchState.mk.startsWith('pm')) {
         upcomingMatches = unplayedMatchesCopy.slice(0, 3)
       } else {
         playedMatchesCopy.forEach((match, i) => {
