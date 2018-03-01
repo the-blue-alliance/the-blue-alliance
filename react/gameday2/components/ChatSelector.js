@@ -30,7 +30,7 @@ export default class ChatSelector extends React.Component {
       const icon = isSelected ? <CheckmarkIcon /> : null
 
       let chatName = chat.name
-      if (chat.channel == 'firstupdatesnow' && isDefault) {
+      if (chat.channel === 'firstupdatesnow' && isDefault) {
         chatName = 'TBA GameDay / FUN'
       }
 
