@@ -210,12 +210,19 @@ class AdvancedTeamSearchController(CacheableHandler):
 class AdvancedMatchSearchController(CacheableHandler):
     VALID_YEARS = list(reversed(range(1992, tba_config.MAX_YEAR + 1)))
 
+    VALID_COMP_LEVELS = [
+        ('qm', 'Qualifications'),
+        ('qf', 'Quarterfinals'),
+        ('sf', 'Semifinals'),
+        ('f', 'Finals')
+    ]
+
     PAGE_SIZE = 20
     MAX_RESULTS = 1000
     VALID_SORT_FIELDS = {'event', 'match'}
 
     CACHE_VERSION = 1
-    CACHE_KEY_FORMAT = "advanced_match_search_{}_{}_{}_{}"  # (year, own_alliance, opp_alliance, page)
+    CACHE_KEY_FORMAT = "advanced_match_search_{}_{}_{}_{}_{}"  # (year, own_alliance, opp_alliance, comp_levels, page)
 
     def __init__(self, *args, **kw):
         super(AdvancedMatchSearchController, self).__init__(*args, **kw)
@@ -251,6 +258,8 @@ class AdvancedMatchSearchController(CacheableHandler):
 
         self._opp_alliance = self._parse_alliance('opp_alliance')
 
+        self._comp_levels = self.request.get_all('comp_levels')
+
         self._page = self.request.get('page', 0)
         if not self._page or not self._page.isdigit():
             self._page = 0
@@ -264,7 +273,7 @@ class AdvancedMatchSearchController(CacheableHandler):
     def get(self):
         self._get_params();
         self._partial_cache_key = self.CACHE_KEY_FORMAT.format(
-            self._year, ','.join(self._own_alliance), ','.join(self._opp_alliance), self._page)
+            self._year, ','.join(self._own_alliance), ','.join(self._opp_alliance), ','.join(self._comp_levels), self._page)
         super(AdvancedMatchSearchController, self).get()
 
     def _render(self):
@@ -298,6 +307,11 @@ class AdvancedMatchSearchController(CacheableHandler):
                     partial_queries.append('({own_a} AND {opp_b}) OR ({own_b} AND {opp_a})'.format(own_a=own_alliance_a, own_b=own_alliance_b, opp_a=opp_alliance_a, opp_b=opp_alliance_b))
                 else:
                     partial_queries.append('(({own_a}) OR ({own_b}))'.format(own_a=own_alliance_a, own_b=own_alliance_b))
+
+            if len(self._comp_levels) > 0:
+                comp_levels = ' OR '.join(['comp_level={level}'.format(level=level) for level in self._comp_levels])
+
+                partial_queries.append('({})'.format(comp_levels))
 
             query_string = ' AND ' .join(partial_queries)
 
@@ -350,14 +364,16 @@ class AdvancedMatchSearchController(CacheableHandler):
 
         self.template_values.update({
             'valid_years': self.VALID_YEARS,
+            'valid_comp_levels': self.VALID_COMP_LEVELS,
             'num_special_awards': len(SORT_ORDER),
             'page_size': self.PAGE_SIZE,
             'max_results': self.MAX_RESULTS,
             'page': self._page,
             'year': self._year,
-            'searched_teams': self._own_alliance + self._opp_alliance,
             'own_alliance': ', '.join(self._own_alliance),
             'opp_alliance': ', '.join(self._opp_alliance),
+            'comp_levels': self._comp_levels,
+            'searched_teams': self._own_alliance + self._opp_alliance,
             'new_search': new_search,
             'num_results': num_results,
             'capped_num_results': min(self.MAX_RESULTS, num_results),

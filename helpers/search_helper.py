@@ -61,6 +61,7 @@ class SearchHelper(object):
         if match.year:
             fields = [
                 search.NumberField(name='year', value=match.year),
+                search.TextField(name='comp_level', value=match.comp_level),
                 search.TextField(name='team1', value=match.team1),
                 search.TextField(name='team2', value=match.team2),
                 search.TextField(name='team3', value=match.team3),

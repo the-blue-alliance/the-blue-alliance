@@ -33,7 +33,7 @@
         <div class="form-group">
           <label for="input-teams">with team(s)</label>
           <div class="input-group">
-            <input class="form-control" id="input-own-alliance" name="own_alliance" placeholder="118, 254" value="{{own_alliance}}"></input>
+            <input class="form-control" id="input-own-alliance" name="own_alliance" placeholder="2521" value="{{own_alliance}}"></input>
             <div class="input-group-addon">on one alliance</div>
           </div>
         </div>
@@ -41,9 +41,18 @@
         <div class="form-group">
           <label for="input-teams">and team(s)</label>
           <div class="input-group">
-            <input class="form-control" id="input-opp-alliance" name="opp_alliance" placeholder="2521" value="{{opp_alliance}}"></input>
+            <input class="form-control" id="input-opp-alliance" name="opp_alliance" placeholder="118, 254" value="{{opp_alliance}}"></input>
             <div class="input-group-addon">on other alliance</div>
           </div>
+        </div>
+
+        <div class="form-group">
+          <label for="input-award-type">at competiton level</label>
+          <select class="form-control selectpicker" data-dropup-auto="false" id="input-award-type" name="comp_levels" multiple title="No levels selected" data-live-search="true" data-actions-box="true">
+            {% for valid_comp_level, valid_comp_level_name in valid_comp_levels %}
+              <option value="{{valid_comp_level}}"{% if valid_comp_level in comp_levels %} selected="selected"{% endif %}>{{valid_comp_level_name}}</option>
+            {% endfor %}
+          </select>
         </div>
 
         <button type="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-search"></span> Search</button>
