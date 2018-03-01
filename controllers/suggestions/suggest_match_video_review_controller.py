@@ -1,5 +1,3 @@
-import logging
-
 from consts.account_permissions import AccountPermissions
 from controllers.suggestions.suggestions_review_base_controller import SuggestionsReviewBaseController
 from helpers.suggestions.match_suggestion_accepter import MatchSuggestionAccepter
@@ -42,7 +40,6 @@ class SuggestMatchVideoReviewController(SuggestionsReviewBaseController):
         accept_keys = []
         reject_keys = []
         for value in self.request.POST.values():
-            logging.debug(value)
             split_value = value.split('::')
             if len(split_value) == 2:
                 key = split_value[1]
