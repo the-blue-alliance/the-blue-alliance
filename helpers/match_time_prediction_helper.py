@@ -101,7 +101,12 @@ class MatchTimePredictionHelper(object):
                 .format(next_match.key_name, cls.as_local(next_match.time, timezone), cls.as_local(next_match.predicted_time, timezone))
 
         if not last_match or not last_match.actual_time:
-            # We can't do this without knowing when matches actually end
+            # No matches have been played yet. Set all predicted times to scheduled times
+            to_log += "[TIME PREDICTIONS] Setting predicted_time to scheduled time"
+            for match in unplayed_matches:
+                if match.time:
+                    match.predicted_time = match.time
+            MatchManipulator.createOrUpdate(unplayed_matches)
             return
 
         if len(played_matches) >= 2:
