@@ -71,8 +71,7 @@ class LiveEventPanel extends React.PureComponent {
     let forcePreMatch = false
     if (unplayedMatchesCopy !== null) {
       if (matchState === null) {
-        upcomingMatches = unplayedMatchesCopy.slice(1, 4)
-        currentMatch = unplayedMatchesCopy[0]
+        upcomingMatches = unplayedMatchesCopy.slice(0, 3)
       } else {
         playedMatchesCopy.forEach((match, i) => {
           if (match.shortKey === matchState.mk && matchState.m !== 'post_match') {
@@ -95,15 +94,17 @@ class LiveEventPanel extends React.PureComponent {
     const year = parseInt(this.props.eventKey.substring(0, 4), 10)
     return (
       <div>
-        <div className="col-lg-3 text-center livePanelColumn">
+        <div className={`${currentMatch ? 'col-lg-3' : 'col-lg-6'} text-center livePanelColumn`}>
           <h4>Last Matches</h4>
           <LastMatchesTable year={year} matches={playedMatchesCopy && playedMatchesCopy.slice(-3)} />
         </div>
+        {currentMatch &&
         <div className="col-lg-6 text-center livePanelColumn">
           <h4>Current Match: { currentMatch && `${getCompLevelStr(currentMatch)} ${getMatchSetStr(currentMatch)}` }</h4>
           <CurrentMatchDisplay year={year} match={currentMatch} matchState={matchState} forcePreMatch={forcePreMatch} />
         </div>
-        <div className="col-lg-3 text-center livePanelColumn">
+        }
+        <div className={`${currentMatch ? 'col-lg-3' : 'col-lg-6'} text-center livePanelColumn`}>
           <h4>Upcoming Matches</h4>
           <UpcomingMatchesTable year={year} matches={upcomingMatches} />
         </div>
