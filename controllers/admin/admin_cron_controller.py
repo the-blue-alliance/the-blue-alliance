@@ -537,6 +537,7 @@ class AdminUpdateTeamSearchIndexDo(LoggedInHandler):
         SearchHelper.update_team_awards_index(team)
         SearchHelper.update_team_location_index(team)
 
+
 class AdminUpdateAllMatchSearchIndexEnqueue(LoggedInHandler):
     def get(self):
         taskqueue.add(
@@ -544,6 +545,7 @@ class AdminUpdateAllMatchSearchIndexEnqueue(LoggedInHandler):
             url='/tasks/do/update_all_match_search_index',
             method='GET')
         self.response.out.write("Enqueued update of all match search index")
+
 
 class AdminUpdateAllMatchSearchIndexDo(LoggedInHandler):
     def get(self):
