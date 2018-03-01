@@ -61,12 +61,12 @@ class SearchHelper(object):
         if match.year:
             fields = [
                 search.NumberField(name='year', value=match.year),
-                search.TextField(name='team1', value=match.team_key_names[0]),
-                search.TextField(name='team2', value=match.team_key_names[1]),
-                search.TextField(name='team3', value=match.team_key_names[2]),
-                search.TextField(name='team4', value=match.team_key_names[3]),
-                search.TextField(name='team5', value=match.team_key_names[4]),
-                search.TextField(name='team6', value=match.team_key_names[5]),
+                search.TextField(name='team1', value=match.team1),
+                search.TextField(name='team2', value=match.team2),
+                search.TextField(name='team3', value=match.team3),
+                search.TextField(name='team4', value=match.team4),
+                search.TextField(name='team5', value=match.team5),
+                search.TextField(name='team6', value=match.team6),
             ]
             search.Index(name="matchNumber").put(
                 search.Document(doc_id=match.key.id(), fields=fields))

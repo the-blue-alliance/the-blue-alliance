@@ -112,7 +112,7 @@
                     <a href="/match/{{match.match_key}}" title="{{match.verbose_name}}">{{match.verbose_name}}</a>
                   </td>
                   <td>
-                    {{mtm.single_match_table(match)}}
+                    {{mtm.single_match_table(match, highlighted_teams=searched_teams)}}
                   </td>
                 </tr>
               {% endfor %}

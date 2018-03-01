@@ -95,6 +95,14 @@ class Match(ndb.Model):
     push_sent = ndb.BooleanProperty()  # has an upcoming match notification been sent for this match? None counts as False
     tiebreak_match_key = ndb.KeyProperty(kind='Match')  # Points to a match that was played to tiebreak this one
 
+    team1 = ndb.ComputedProperty(lambda self: self.team_key_names[0])
+    team2 = ndb.ComputedProperty(lambda self: self.team_key_names[1])
+    team3 = ndb.ComputedProperty(lambda self: self.team_key_names[2])
+    team4 = ndb.ComputedProperty(lambda self: self.team_key_names[3])
+    team5 = ndb.ComputedProperty(lambda self: self.team_key_names[4])
+    team6 = ndb.ComputedProperty(lambda self: self.team_key_names[5])
+
+
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True)
 

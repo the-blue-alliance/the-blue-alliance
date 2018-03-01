@@ -224,7 +224,7 @@
 </table>
 {% endmacro %}
 
-{% macro single_match_table(match, force_played=False) %}
+{% macro single_match_table(match, force_played=False, highlighted_teams=[]) %}
 <table class="match-table">
   <thead>
     <tr class="key">
@@ -235,7 +235,7 @@
   <tbody>
     <tr>
       {% for team_key in match.alliances.red.teams %}
-        {{mtcm.match_team_td(match, 'red', team_key, cur_team_key, compact=True)}}
+        {{mtcm.match_team_td(match, 'red', team_key, cur_team_key, compact=True, highlighted=((team_key|digits) in highlighted_teams))}}
       {% endfor %}
 
       {% if match.has_been_played or not match.time %}
@@ -246,7 +246,7 @@
     </tr>
     <tr>
       {% for team_key in match.alliances.blue.teams %}
-        {{mtcm.match_team_td(match, 'blue', team_key, cur_team_key, compact=True)}}
+        {{mtcm.match_team_td(match, 'blue', team_key, cur_team_key, compact=True, highlighted=((team_key|digits) in highlighted_teams))}}
       {% endfor %}
 
       {% if match.has_been_played or not match.time %}

@@ -346,6 +346,8 @@ class AdvancedMatchSearchController(CacheableHandler):
                 model.event_model = event_result_models[n]
                 match_results.append(model)
 
+        print(self._own_alliance + self._opp_alliance)
+
         self.template_values.update({
             'valid_years': self.VALID_YEARS,
             'num_special_awards': len(SORT_ORDER),
@@ -353,6 +355,7 @@ class AdvancedMatchSearchController(CacheableHandler):
             'max_results': self.MAX_RESULTS,
             'page': self._page,
             'year': self._year,
+            'searched_teams': self._own_alliance + self._opp_alliance,
             'own_alliance': ', '.join(self._own_alliance),
             'opp_alliance': ', '.join(self._opp_alliance),
             'new_search': new_search,

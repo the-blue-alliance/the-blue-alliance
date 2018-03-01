@@ -27,7 +27,8 @@ from controllers.admin.admin_cron_controller import AdminMobileClearEnqueue, Adm
     AdminWebhooksClearEnqueue, AdminWebhooksClear, AdminRegistrationDayEnqueue, \
     AdminClearEventTeamsDo
 from controllers.admin.admin_cron_controller import AdminRunPostUpdateHooksEnqueue, AdminRunPostUpdateHooksDo, AdminRunEventPostUpdateHookDo, AdminRunTeamPostUpdateHookDo, \
-    AdminUpdateAllTeamSearchIndexEnqueue, AdminUpdateAllTeamSearchIndexDo, AdminUpdateTeamSearchIndexDo, AdminUpdateAllMatchSearchIndexDo, AdminUpdateMatchSearchIndexDo
+    AdminUpdateAllTeamSearchIndexEnqueue, AdminUpdateAllTeamSearchIndexDo, AdminUpdateTeamSearchIndexDo, AdminUpdateAllMatchSearchIndexEnqueue, AdminUpdateAllMatchSearchIndexDo, \
+    AdminUpdateMatchSearchIndexDo
 
 
 app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackupEventsEnqueue),
