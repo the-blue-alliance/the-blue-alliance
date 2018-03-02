@@ -110,7 +110,7 @@ class ApiBaseController(CacheableHandler):
         https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests
         """
         self.response.headers['Access-Control-Allow-Methods'] = "GET, POST, OPTIONS"
-        self.response.headers['Access-Control-Allow-Headers'] = 'X-TBA-Auth-Key'
+        self.response.headers['Access-Control-Allow-Headers'] = 'X-TBA-Auth-Key, If-Modified-Since'
         self.response.headers['Access-Control-Max-Age'] = '604800'  # 1 week
 
     def _track_call_defer(self, api_action, api_label):
