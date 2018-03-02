@@ -56,7 +56,7 @@
 
         <div class="form-group">
           <label for="input-comp-level">at competiton level</label>
-          <select class="form-control selectpicker" data-dropup-auto="false" id="input-comp-level" name="comp_levels" multiple title="No levels selected" data-live-search="true" data-actions-box="true">
+          <select class="form-control selectpicker" data-dropup-auto="false" id="input-comp-level" name="comp_level" multiple title="No levels selected" data-live-search="true" data-actions-box="true">
             {% for valid_comp_level, valid_comp_level_name in valid_comp_levels %}
               <option value="{{valid_comp_level}}"{% if valid_comp_level in comp_levels %} selected="selected"{% endif %}>{{valid_comp_level_name}}</option>
             {% endfor %}

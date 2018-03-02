@@ -222,7 +222,7 @@ class AdvancedMatchSearchController(CacheableHandler):
     VALID_SORT_FIELDS = {'event', 'match'}
 
     CACHE_VERSION = 1
-    CACHE_KEY_FORMAT = "advanced_match_search_{}_{}_{}_{}_{}"  # (year, own_alliance, opp_alliance, comp_levels, page)
+    CACHE_KEY_FORMAT = "advanced_match_search_{}_{}_{}_{}_{}_{}_{}"  # (year, own_alliance, opp_alliance, event_key, comp_levels, video, page)
 
     def __init__(self, *args, **kw):
         super(AdvancedMatchSearchController, self).__init__(*args, **kw)
@@ -257,7 +257,7 @@ class AdvancedMatchSearchController(CacheableHandler):
         self._own_alliance = self._parse_alliance('own_alliance')
         self._opp_alliance = self._parse_alliance('opp_alliance')
         self._event_key = self.request.get('event_key')
-        self._comp_levels = self.request.get_all('comp_levels')
+        self._comp_levels = self.request.get_all('comp_level')
 
         self._video = self.request.get('video')
         if self._video:
@@ -278,7 +278,8 @@ class AdvancedMatchSearchController(CacheableHandler):
     def get(self):
         self._get_params();
         self._partial_cache_key = self.CACHE_KEY_FORMAT.format(
-            self._year, ','.join(self._own_alliance), ','.join(self._opp_alliance), ','.join(self._comp_levels), self._page)
+            self._year, ','.join(self._own_alliance), ','.join(self._opp_alliance), self._event_key,
+            ','.join(self._comp_levels), self._video, self._page)
         super(AdvancedMatchSearchController, self).get()
 
     def _render(self):
@@ -300,16 +301,21 @@ class AdvancedMatchSearchController(CacheableHandler):
             if len(self._own_alliance) > 0:
                 own_alliance_keys = ['frc{}'.format(team) for team in self._own_alliance]
 
-                own_alliance_a = ' AND '.join(['(team1={team} OR team2={team} OR team3={team})'.format(team=team) for team in own_alliance_keys])
-                own_alliance_b = ' AND '.join(['(team4={team} OR team5={team} OR team6={team})'.format(team=team) for team in own_alliance_keys])
+                own_alliance_a = ' AND '.join(['(team1={team} OR team2={team} OR team3={team})'.format(team=team)
+                    for team in own_alliance_keys])
+                own_alliance_b = ' AND '.join(['(team4={team} OR team5={team} OR team6={team})'.format(team=team)
+                    for team in own_alliance_keys])
 
                 if len(self._opp_alliance) > 0:
                     opp_alliance_keys = ['frc{}'.format(team) for team in self._opp_alliance]
 
-                    opp_alliance_a = ' AND '.join(['(team1={team} OR team2={team} OR team3={team})'.format(team=team) for team in opp_alliance_keys])
-                    opp_alliance_b = ' AND '.join(['(team4={team} OR team5={team} OR team6={team})'.format(team=team) for team in opp_alliance_keys])
+                    opp_alliance_a = ' AND '.join(['(team1={team} OR team2={team} OR team3={team})'.format(team=team)
+                        for team in opp_alliance_keys])
+                    opp_alliance_b = ' AND '.join(['(team4={team} OR team5={team} OR team6={team})'.format(team=team)
+                        for team in opp_alliance_keys])
 
-                    partial_queries.append('({own_a} AND {opp_b}) OR ({own_b} AND {opp_a})'.format(own_a=own_alliance_a, own_b=own_alliance_b, opp_a=opp_alliance_a, opp_b=opp_alliance_b))
+                    partial_queries.append('({own_a} AND {opp_b}) OR ({own_b} AND {opp_a})'.format(own_a=own_alliance_a, own_b=own_alliance_b,
+                                                                                                   opp_a=opp_alliance_a, opp_b=opp_alliance_b))
                 else:
                     partial_queries.append('(({own_a}) OR ({own_b}))'.format(own_a=own_alliance_a, own_b=own_alliance_b))
 

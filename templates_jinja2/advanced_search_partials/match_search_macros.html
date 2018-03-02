@@ -1,3 +1,3 @@
 {% macro search_params(new_page, sort_field_override=None) %}
-?year={{year}}&own_alliance={{own_alliance}}&opp_alliance={{opp_alliance}}&page={{new_page}}
+?year={{year}}&own_alliance={{own_alliance}}&opp_alliance={{opp_alliance}}{% for comp_level in comp_levels %}&comp_level={{comp_level}}{% endfor %}&event_key={{event_key}}{%if video %}&video=on{% endif %}&page={{new_page}}
 {% endmacro %}
