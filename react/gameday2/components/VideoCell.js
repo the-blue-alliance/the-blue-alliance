@@ -122,6 +122,7 @@ export default class VideoCell extends React.Component {
       top: '50%',
       left: '50%',
       transform: 'translateX(-50%) translateY(-50%)',
+      textAlign: 'center',
     }
 
     // All positions in this array which are non-null represent displayed webcasts
@@ -133,12 +134,19 @@ export default class VideoCell extends React.Component {
     return (
       <div style={cellStyle} >
         <div style={emptyContainerStyle}>
-          <RaisedButton
-            label={buttonLabel}
-            style={centerButtonStyle}
-            disabled={!webcastsAreAvailable}
-            onTouchTap={() => this.onRequestOpenWebcastSelectionDialog()}
-          />
+          <div style={centerButtonStyle}>
+            <RaisedButton
+              label={buttonLabel}
+              disabled={!webcastsAreAvailable}
+              onTouchTap={() => this.onRequestOpenWebcastSelectionDialog()}
+            />
+            <br /><br />
+            <RaisedButton
+              label={'View Team Statuses'}
+              disabled={!webcastsAreAvailable}
+              onTouchTap={() => this.onRequestOpenWebcastSelectionDialog()}
+            />
+          </div>
         </div>
         <WebcastSelectionDialogContainer
           open={this.state.webcastSelectionDialogOpen}
