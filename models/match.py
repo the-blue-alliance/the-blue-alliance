@@ -99,12 +99,12 @@ class Match(ndb.Model):
     comp_level_sort = ndb.ComputedProperty(lambda self: self.play_order)
     num_videos = ndb.ComputedProperty(lambda self: len(self.youtube_videos) + len(self.tba_videos))
 
-    team1 = ndb.ComputedProperty(lambda self: self.team_key_names[0])
-    team2 = ndb.ComputedProperty(lambda self: self.team_key_names[1])
-    team3 = ndb.ComputedProperty(lambda self: self.team_key_names[2])
-    team4 = ndb.ComputedProperty(lambda self: self.team_key_names[3])
-    team5 = ndb.ComputedProperty(lambda self: self.team_key_names[4])
-    team6 = ndb.ComputedProperty(lambda self: self.team_key_names[5])
+    team1 = ndb.ComputedProperty(lambda self: self.team_key_names[0] if len(self.team_key_names) > 0 else '')
+    team2 = ndb.ComputedProperty(lambda self: self.team_key_names[1] if len(self.team_key_names) > 1 else '')
+    team3 = ndb.ComputedProperty(lambda self: self.team_key_names[2] if len(self.team_key_names) > 2 else '')
+    team4 = ndb.ComputedProperty(lambda self: self.team_key_names[3] if len(self.team_key_names) > 3 else '')
+    team5 = ndb.ComputedProperty(lambda self: self.team_key_names[4] if len(self.team_key_names) > 4 else '')
+    team6 = ndb.ComputedProperty(lambda self: self.team_key_names[5] if len(self.team_key_names) > 5 else '')
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True)
