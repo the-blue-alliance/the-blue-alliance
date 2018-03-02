@@ -258,6 +258,8 @@ class AdvancedMatchSearchController(CacheableHandler):
 
         self._opp_alliance = self._parse_alliance('opp_alliance')
 
+        self._event_key = self.request.get('event_key')
+
         self._comp_levels = self.request.get_all('comp_levels')
 
         self._page = self.request.get('page', 0)
@@ -312,6 +314,9 @@ class AdvancedMatchSearchController(CacheableHandler):
                 comp_levels = ' OR '.join(['comp_level={level}'.format(level=level) for level in self._comp_levels])
 
                 partial_queries.append('({})'.format(comp_levels))
+
+            if self._event_key:
+                partial_queries.append('event_key={}'.format(self._event_key))
 
             query_string = ' AND ' .join(partial_queries)
 
@@ -372,6 +377,7 @@ class AdvancedMatchSearchController(CacheableHandler):
             'year': self._year,
             'own_alliance': ', '.join(self._own_alliance),
             'opp_alliance': ', '.join(self._opp_alliance),
+            'event_key': self._event_key,
             'comp_levels': self._comp_levels,
             'searched_teams': self._own_alliance + self._opp_alliance,
             'new_search': new_search,
