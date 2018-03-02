@@ -637,6 +637,7 @@ class MatchTimePredictionsDo(webapp.RequestHandler):
     """
     Predicts match times for a given live event
     """
+    @ndb.transactional(xg=True)
     def get(self, event_key):
         import pytz
 
