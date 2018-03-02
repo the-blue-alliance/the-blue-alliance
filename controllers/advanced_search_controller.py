@@ -96,7 +96,7 @@ class AdvancedTeamSearchController(CacheableHandler):
             self._sort_field = 'team'
 
     def get(self):
-        self._get_params();
+        self._get_params()
         self._partial_cache_key = self.CACHE_KEY_FORMAT.format(
             self._year, self._award_types, self._seed, self._playoff_level, self._cad_model, self._page)
         super(AdvancedTeamSearchController, self).get()
@@ -276,7 +276,7 @@ class AdvancedMatchSearchController(CacheableHandler):
             self._sort_field = 'match'
 
     def get(self):
-        self._get_params();
+        self._get_params()
         self._partial_cache_key = self.CACHE_KEY_FORMAT.format(
             self._year, ','.join(self._own_alliance), ','.join(self._opp_alliance), self._event_key,
             ','.join(self._comp_levels), self._video, self._page)
