@@ -152,10 +152,9 @@ class FirebasePusher(object):
             match_dict = {
                 'pt': MatchConverter.convert(match, 3)['predicted_time'],
             }
-
         else:
             match_dict = cls._construct_match_dict(MatchConverter.convert(match, 3))
-        logging.info(json.dumps(match_dict, indent=2))
+
         deferred.defer(
             cls._patch_data,
             'e/{}/m/{}'.format(match.event.id(), match.short_key),
