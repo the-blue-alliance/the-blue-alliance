@@ -217,7 +217,7 @@ class AdvancedMatchSearchController(CacheableHandler):
         ('f', 'Finals')
     ]
 
-    PAGE_SIZE = 20
+    PAGE_SIZE = 50
     MAX_RESULTS = 1000
     VALID_SORT_FIELDS = {'event', 'match'}
 
