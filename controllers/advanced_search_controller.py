@@ -255,12 +255,15 @@ class AdvancedMatchSearchController(CacheableHandler):
         self._year = self._sanitize_int_param('year', 1992, tba_config.MAX_YEAR)
 
         self._own_alliance = self._parse_alliance('own_alliance')
-
         self._opp_alliance = self._parse_alliance('opp_alliance')
-
         self._event_key = self.request.get('event_key')
-
         self._comp_levels = self.request.get_all('comp_levels')
+
+        self._video = self.request.get('video')
+        if self._video:
+            self._video = True
+        else:
+            self._video = False
 
         self._page = self.request.get('page', 0)
         if not self._page or not self._page.isdigit():
@@ -317,6 +320,9 @@ class AdvancedMatchSearchController(CacheableHandler):
 
             if self._event_key:
                 partial_queries.append('event_key={}'.format(self._event_key))
+
+            if self._video:
+                partial_queries.append('num_videos>0')
 
             query_string = ' AND ' .join(partial_queries)
 
@@ -386,6 +392,7 @@ class AdvancedMatchSearchController(CacheableHandler):
             'opp_alliance': ', '.join(self._opp_alliance),
             'event_key': self._event_key,
             'comp_levels': self._comp_levels,
+            'video': self._video,
             'searched_teams': self._own_alliance + self._opp_alliance,
             'new_search': new_search,
             'num_results': num_results,

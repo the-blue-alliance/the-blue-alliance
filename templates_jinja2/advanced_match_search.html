@@ -55,12 +55,21 @@
         </div>
 
         <div class="form-group">
-          <label for="input-award-type">at competiton level</label>
-          <select class="form-control selectpicker" data-dropup-auto="false" id="input-award-type" name="comp_levels" multiple title="No levels selected" data-live-search="true" data-actions-box="true">
+          <label for="input-comp-level">at competiton level</label>
+          <select class="form-control selectpicker" data-dropup-auto="false" id="input-comp-level" name="comp_levels" multiple title="No levels selected" data-live-search="true" data-actions-box="true">
             {% for valid_comp_level, valid_comp_level_name in valid_comp_levels %}
               <option value="{{valid_comp_level}}"{% if valid_comp_level in comp_levels %} selected="selected"{% endif %}>{{valid_comp_level_name}}</option>
             {% endfor %}
           </select>
+        </div>
+
+        <div class="form-group">
+          <label for="video">and have</label>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" name="video"{% if video %} checked{% endif %}> a video
+            </label>
+          </div>
         </div>
 
         <button type="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-search"></span> Search</button>

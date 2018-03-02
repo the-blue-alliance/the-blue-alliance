@@ -96,8 +96,8 @@ class Match(ndb.Model):
     tiebreak_match_key = ndb.KeyProperty(kind='Match')  # Points to a match that was played to tiebreak this one
 
     event_key = ndb.ComputedProperty(lambda self: self.event_key_name)
-
     comp_level_sort = ndb.ComputedProperty(lambda self: self.play_order)
+    num_videos = ndb.ComputedProperty(lambda self: len(self.youtube_videos) + len(self.tba_videos))
 
     team1 = ndb.ComputedProperty(lambda self: self.team_key_names[0])
     team2 = ndb.ComputedProperty(lambda self: self.team_key_names[1])
