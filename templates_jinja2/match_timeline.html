@@ -44,54 +44,55 @@
 
   // Subscribe to Firebase
   for (var i in eventKeys) {
-    var eventRef = firebase.database().ref('events/' + eventKeys[i] + '/matches');
+    const eventKey = eventKeys[i];
+    var eventRef = firebase.database().ref('e/' + eventKey + '/m');
     eventRef.on('value', function(snapshot) {
       var matches = snapshot.val();
-      for (var matchKey in matches) {
-        var match = matches[matchKey];
+      for (var partialKey in matches) {
+        const matchKey = eventKey + '_' + partialKey;
+        var match = matches[partialKey];
         var time;
         var className = 'upcoming';
-        if (match.actual_time) {
-          time = match.actual_time;
-        } else if (match.predicted_time) {
-          time = match.predicted_time;
+        if (match.at) {
+          time = match.at;
+        } else if (match.pt) {
+          time = match.pt;
         } else {
-          time = match.time;
+          time = match.t;
         }
 
-        var eventKey = match.key.split('_')[0];
         var matchShort;
-        if (match.comp_level == 'qm') {
-          matchShort = 'Q' + match.match_number;
+        if (match.c == 'qm') {
+          matchShort = 'Q' + match.m;
         } else {
-          matchShort = match.comp_level.toUpperCase() + match.set_number + '-' + match.match_number;
+          matchShort = match.c.toUpperCase() + match.s + '-' + match.m;
         }
 
         // Format content
-        var content = '<a href="/match/' + match.key +'"><b>' + matchShort + '</b></a>' + '<br>' +
+        var content = '<a href="/match/' + matchKey +'"><b>' + matchShort + '</b></a>' + '<br>' +
           '<table class="match-table" style="margin: 0;">\
             <tbody>\
               <tr>\
-                <td class="red">' + match.alliances.red.team_keys[0].substring(3) +
-                '</td><td class="red">' + match.alliances.red.team_keys[1].substring(3) +
-                '</td><td class="red">' + match.alliances.red.team_keys[2].substring(3) + '</td>'
-        if (match.actual_time) {
-          content += '<td class="redScore">' + match.alliances.red.score + '</td>'
+                <td class="red">' + match.rt[0].substring(3) +
+                '</td><td class="red">' + match.rt[1].substring(3) +
+                '</td><td class="red">' + match.rt[2].substring(3) + '</td>'
+        if (match.t) {
+          content += '<td class="redScore">' + match.r + '</td>'
         }
         content += '</tr>\
               <tr>\
-                <td class="blue">' + match.alliances.blue.team_keys[0].substring(3) +
-                '</td><td class="blue">' + match.alliances.blue.team_keys[1].substring(3) +
-                '</td><td class="blue">' + match.alliances.blue.team_keys[2].substring(3) + '</td>'
-        if (match.actual_time) {
-          content += '<td class="blueScore">' + match.alliances.blue.score + '</td>'
+                <td class="blue">' + match.bt[0].substring(3) +
+                '</td><td class="blue">' + match.bt[1].substring(3) +
+                '</td><td class="blue">' + match.bt[2].substring(3) + '</td>'
+        if (match.t) {
+          content += '<td class="blueScore">' + match.b + '</td>'
         }
         content += '</tr>\
           </tbody>\
         </table>'
 
         var timelineItem = {
-          id: match.key,
+          id: matchKey,
           group: eventKey,
           content: content,
           start: new Date(time * 1000).toISOString(),
@@ -102,8 +103,8 @@
       }
     });
     eventRef.on('child_removed', function(snapshot) {
-      var removedMatch = snapshot.val();
-      timelineItems.remove(removedMatch.key);
+      var removedMatch = snapshot.key();
+      timelineItems.remove(eventKey + '_' + removedMatch);
     });
   }
 </script>
