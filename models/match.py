@@ -97,6 +97,8 @@ class Match(ndb.Model):
 
     event_key = ndb.ComputedProperty(lambda self: self.event_key_name)
 
+    comp_level_sort = ndb.ComputedProperty(lambda self: self.play_order)
+
     team1 = ndb.ComputedProperty(lambda self: self.team_key_names[0])
     team2 = ndb.ComputedProperty(lambda self: self.team_key_names[1])
     team3 = ndb.ComputedProperty(lambda self: self.team_key_names[2])

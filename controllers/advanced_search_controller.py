@@ -320,10 +320,19 @@ class AdvancedMatchSearchController(CacheableHandler):
 
             query_string = ' AND ' .join(partial_queries)
 
-            # Tiebreak sorting by number
             sort_options_expressions.append(
                 search.SortExpression(
-                    expression='number',
+                    expression='event_key',
+                    direction=search.SortExpression.ASCENDING))
+
+            sort_options_expressions.append(
+                search.SortExpression(
+                    expression='comp_level_sort',
+                    direction=search.SortExpression.ASCENDING))
+
+            sort_options_expressions.append(
+                search.SortExpression(
+                    expression='match_number',
                     direction=search.SortExpression.ASCENDING))
 
             # Perform query
@@ -364,8 +373,6 @@ class AdvancedMatchSearchController(CacheableHandler):
                 model.match_key = model.key.id()
                 model.event_model = event_result_models[n]
                 match_results.append(model)
-
-        print(self._own_alliance + self._opp_alliance)
 
         self.template_values.update({
             'valid_years': self.VALID_YEARS,
