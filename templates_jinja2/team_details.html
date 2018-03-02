@@ -25,7 +25,7 @@
 
         <h2 class="visible-xs end_header">
         {% if avatar %}
-          <img class="team-avatar" src='{{avatar.avatar_image_source}}'/>
+          <img class="team-avatar single blue" src='{{avatar.avatar_image_source}}'/>
         {% endif %}
         Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h2>
         {% if team.motto %}<h4 class="visible-xs"><em>&quot;{{team.motto_without_quotes}}&quot;</em></h4>{% endif %}
@@ -225,4 +225,12 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block inline_javascript %}
+<script>
+  $(".team-avatar").click(function(){
+    $(this).toggleClass("red").toggleClass("blue")
+  });
+</script>
 {% endblock %}
