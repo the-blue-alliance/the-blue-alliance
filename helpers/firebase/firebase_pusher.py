@@ -140,19 +140,25 @@ class FirebasePusher(object):
             _queue="firebase")
 
     @classmethod
-    def update_match(cls, match):
+    def update_match(cls, match, updated_attrs):
         """
         Updates a match in an event and event/team
         """
         if match.year < 2017:
             return
 
-        match_data_json = json.dumps(cls._construct_match_dict(MatchConverter.convert(match, 3)))
+        if 'predicted_time' in updated_attrs:
+            # Hacky way of preventing predicted time updates from clobbering scores
+            match_dict = {
+                'pt': MatchConverter.convert(match, 3)['predicted_time'],
+            }
+        else:
+            match_dict = cls._construct_match_dict(MatchConverter.convert(match, 3))
 
         deferred.defer(
             cls._patch_data,
             'e/{}/m/{}'.format(match.event.id(), match.short_key),
-            match_data_json,
+            json.dumps(match_dict),
             _queue="firebase")
 
         try:
