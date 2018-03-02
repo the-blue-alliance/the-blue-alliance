@@ -23,12 +23,13 @@
       {% endfor %}
     </div>
   </div>
-  {% block inline_javascript %}
-  <script>
-    $("#color-switch").click(function(){
-      $(".team-avatar").toggleClass("red").toggleClass("blue")
-    });
-  </script>
-  {% endblock %}
 </div>
+{% endblock %}
+
+{% block inline_javascript %}
+<script>
+  $("#color-switch").click(function(){
+    $(".team-avatar").toggleClass("red").toggleClass("blue")
+  });
+</script>
 {% endblock %}
