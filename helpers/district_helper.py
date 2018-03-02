@@ -60,7 +60,6 @@ class DistrictHelper(object):
                 'highest_qual_scores': [],
             }),
         }
-        single_district_points = copy.deepcopy(district_points)
 
         # match points
         if event.year >= 2015:
@@ -282,13 +281,13 @@ class DistrictHelper(object):
         from helpers.match_helper import MatchHelper  # circular import issue
 
         # qual match points are calculated by rank
-        if event.rankings and len(event.rankings) > 1:
-            rankings = event.rankings[1:]  # skip title row
+        rankings = event.details.rankings2
+        if rankings:
             num_teams = len(rankings)
             alpha = 1.07
-            for row in rankings:
-                rank = int(row[0])
-                team = 'frc{}'.format(row[1])
+            for ranking in rankings:
+                rank = ranking['rank']
+                team = ranking['team_key']
                 qual_points = int(math.ceil(cls.inverf(float(num_teams - 2 * rank + 2) / (alpha * num_teams)) * (
                 10.0 / cls.inverf(1.0 / alpha)) + 12))
                 district_points['points'][team]['qual_points'] = qual_points * POINTS_MULTIPLIER
