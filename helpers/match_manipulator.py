@@ -85,7 +85,7 @@ class MatchManipulator(ManipulatorBase):
             if is_new or set(['alliances_json', 'score_breakdown_json']).intersection(set(updated_attrs)) != set():
                 affected_stats_event_keys.add(match.event.id())
             try:
-                FirebasePusher.update_match(match)
+                FirebasePusher.update_match(match, updated_attrs)
             except Exception:
                 logging.warning("Firebase update_match failed!")
                 logging.warning(traceback.format_exc())
