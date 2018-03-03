@@ -25,9 +25,13 @@ class LiveEventPanel extends React.PureComponent {
     playedMatches: null,
     unplayedMatches: null,
     matchState: null,
+    currentTime: undefined,
   }
 
   componentDidMount() {
+    this.updateCurrentTime()
+    setInterval(this.updateCurrentTime, 10000)
+
     const firebaseApp = Firebase.initializeApp({
       apiKey: 'AIzaSyDBlFwtAgb2i7hMCQ5vBv44UEKVsA543hs',
       authDomain: 'tbatv-prod-hrd.firebaseapp.com',
@@ -58,6 +62,10 @@ class LiveEventPanel extends React.PureComponent {
         matchState: snapshot.val(),
       })
     })
+  }
+
+  updateCurrentTime = () => {
+    this.setState({ currentTime: new Date().getTime() / 1000 })
   }
 
   render() {
@@ -91,6 +99,20 @@ class LiveEventPanel extends React.PureComponent {
       }
     }
 
+    let etaStr = ''
+    if (forcePreMatch && currentMatch) {
+      if (this.state.currentTime && currentMatch.pt) {
+        const etaMin = (currentMatch.pt - this.state.currentTime) / 60
+        if (etaMin < 2) {
+          etaStr = ' in <2 min'
+        } else if (etaMin > 120) {
+          etaStr = ` in ~${Math.round(etaMin / 60)} h`
+        } else {
+          etaStr = ` in ~${Math.round(etaMin)} min`
+        }
+      }
+    }
+
     const year = parseInt(this.props.eventKey.substring(0, 4), 10)
     return (
       <div>
@@ -100,7 +122,11 @@ class LiveEventPanel extends React.PureComponent {
         </div>
         {currentMatch &&
         <div className="col-lg-6 text-center livePanelColumn">
-          <h4>Current Match: { currentMatch && `${getCompLevelStr(currentMatch)} ${getMatchSetStr(currentMatch)}` }</h4>
+          {forcePreMatch ?
+            <h4>Next Match{etaStr}: {`${getCompLevelStr(currentMatch)} ${getMatchSetStr(currentMatch)}`}</h4>
+            :
+            <h4>Current Match: {`${getCompLevelStr(currentMatch)} ${getMatchSetStr(currentMatch)}`}</h4>
+          }
           <CurrentMatchDisplay year={year} match={currentMatch} matchState={matchState} forcePreMatch={forcePreMatch} />
         </div>
         }
