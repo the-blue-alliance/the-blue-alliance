@@ -50,19 +50,19 @@ cron:
   timezone: America/Los_Angeles
 
 - description: Match Insights Calculation
-  url: /backend-tasks-b2/math/enqueue/insights/matches/2017
+  url: /backend-tasks-b2/math/enqueue/insights/matches/2018
   schedule: every day 01:00
   timezone: America/Los_Angeles
 
 - description: Award Insights Calculation
-  url: /backend-tasks-b2/math/enqueue/insights/awards/2017
+  url: /backend-tasks-b2/math/enqueue/insights/awards/2018
   schedule: every day 01:00
   timezone: America/Los_Angeles
 
-- description: Prediction Insights Calculation
-  url: /backend-tasks-b2/math/enqueue/insights/predictions/2017
-  schedule: every day 01:00
-  timezone: America/Los_Angeles
+# - description: Prediction Insights Calculation
+#   url: /backend-tasks-b2/math/enqueue/insights/predictions/2018
+#   schedule: every day 01:00
+#   timezone: America/Los_Angeles
 
 - description: Match Overall Insights Calculation
   url: /backend-tasks-b2/math/enqueue/overallinsights/matches
