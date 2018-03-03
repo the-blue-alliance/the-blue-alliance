@@ -130,8 +130,10 @@ class LivescoreDisplay extends React.PureComponent {
 
       if (this.state.currentTime && match.pt) {
         const etaMin = (match.pt - this.state.currentTime) / 60
-        if (etaMin < 1) {
-          etaStr = ' in <1 min'
+        if (etaMin < 2) {
+          etaStr = ' in <2 min'
+        } else if (etaMin > 120) {
+          etaStr = ` in ~${Math.round(etaMin / 60)} h`
         } else {
           etaStr = ` in ~${Math.round(etaMin)} min`
         }
