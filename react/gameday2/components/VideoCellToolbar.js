@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react'
-import { Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui/Toolbar'
+import { Toolbar, ToolbarGroup } from 'material-ui/Toolbar'
+import FlatButton from 'material-ui/FlatButton'
 import IconButton from 'material-ui/IconButton'
 import CloseIcon from 'material-ui/svg-icons/navigation/close'
 import SwapIcon from 'material-ui/svg-icons/action/compare-arrows'
@@ -19,6 +20,8 @@ const VideoCellToolbar = (props) => {
   const titleStyle = {
     color: white,
     fontSize: 16,
+    marginLeft: 0,
+    marginRight: 0,
   }
 
   const matchTickerGroupStyle = {
@@ -82,9 +85,12 @@ const VideoCellToolbar = (props) => {
   return (
     <Toolbar style={toolbarStyle}>
       <ToolbarGroup>
-        <ToolbarTitle
-          text={props.webcast.name}
+        <FlatButton
+          label={props.webcast.name}
           style={titleStyle}
+          href={`/event/${props.webcast.key}`}
+          target="_blank"
+          disabled={props.specialWebcastIds.has(props.webcast.id)}
         />
       </ToolbarGroup>
       <ToolbarGroup style={matchTickerGroupStyle}>
@@ -126,6 +132,7 @@ const VideoCellToolbar = (props) => {
 VideoCellToolbar.propTypes = {
   matches: PropTypes.arrayOf(PropTypes.object).isRequired,
   webcast: PropTypes.object.isRequired,
+  specialWebcastIds: PropTypes.set.isRequired,
   /* eslint-disable react/no-unused-prop-types */
   isBlueZone: PropTypes.bool.isRequired,
   livescoreOn: PropTypes.bool.isRequired,
