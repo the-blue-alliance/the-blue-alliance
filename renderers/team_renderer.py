@@ -98,10 +98,10 @@ class TeamRenderer(object):
                     display_wlt = wlt
 
             team_rank = None
-            if event.rankings:
-                for element in event.rankings:
-                    if str(element[1]) == str(team.team_number):
-                        team_rank = element[0]
+            if event.details and event.details.rankings2:
+                for ranking in event.details.rankings2:
+                    if ranking['team_key'] == team.key.id():
+                        team_rank = ranking['rank']
                         break
 
             participation.append({"event": event,
