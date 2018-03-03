@@ -73,14 +73,14 @@ export const getEventMatches = createSelector(
       f: 5,
     }
     function calculateOrder(match) {
-      let time = 9999999999
-      if (match.r !== -1 && match.b !== -1) {
-        time = 0
-      }
+      // let time = 9999999999
+      // if (match.r !== -1 && match.b !== -1) {
+      //   time = 0
+      // }
       // if (match.pt) {
       //   time = match.pt
       // }
-      return (time * 10000000) + (compLevelsPlayOrder[match.c] * 100000) + (match.m * 100) + match.s
+      return (compLevelsPlayOrder[match.c] * 100000) + (match.m * 100) + match.s
     }
 
     const matches = []
