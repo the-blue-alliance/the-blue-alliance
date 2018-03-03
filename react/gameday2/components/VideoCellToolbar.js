@@ -132,7 +132,7 @@ const VideoCellToolbar = (props) => {
 VideoCellToolbar.propTypes = {
   matches: PropTypes.arrayOf(PropTypes.object).isRequired,
   webcast: PropTypes.object.isRequired,
-  specialWebcastIds: PropTypes.set.isRequired,
+  specialWebcastIds: PropTypes.instanceOf(Set).isRequired,
   /* eslint-disable react/no-unused-prop-types */
   isBlueZone: PropTypes.bool.isRequired,
   livescoreOn: PropTypes.bool.isRequired,
