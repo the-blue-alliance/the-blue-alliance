@@ -9,6 +9,7 @@ from controllers.apiv3 import api_district_controller as adc
 from controllers.apiv3 import api_event_controller as aec
 from controllers.apiv3 import api_match_controller as amc
 from controllers.apiv3 import api_media_controller as amec
+from controllers.apiv3 import api_realtime_controller as arc
 from controllers.apiv3 import api_team_controller as atc
 from controllers.apiv3 import api_suggest_controller as asgc
 
@@ -99,6 +100,8 @@ app = webapp2.WSGIApplication([
         aec.ApiEventTeamsController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/event/<event_key:>/matches',
         aec.ApiEventMatchesController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/event/<event_key:>/matches/timeseries',
+        arc.ApiRealtimeEventMatchesController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/event/<event_key:>/matches/<model_type:(simple|keys)>',
         aec.ApiEventMatchesController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/event/<event_key:>/awards',
@@ -108,6 +111,8 @@ app = webapp2.WSGIApplication([
     # Match
     webapp2.Route(r'/api/v3/match/<match_key:>',
         amc.ApiMatchController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/match/<match_key:>/timeseries',
+        arc.ApiRealtimeMatchController, methods=['GET', 'OPTOINS']),
     webapp2.Route(r'/api/v3/match/<match_key:>/<model_type:(simple)>',
         amc.ApiMatchController, methods=['GET', 'OPTIONS']),
     # Media

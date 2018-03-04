@@ -9,6 +9,7 @@ from database.district_query import DistrictsInYearQuery, DistrictHistoryQuery, 
 from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery, TeamYearEventTeamsQuery, \
     EventDivisionsQuery
 from database.event_details_query import EventDetailsQuery
+from database.gdcv_data_query import MatchGdcvDataQuery, EventMatchesGdcvDataQuery
 from database.match_query import MatchQuery, EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery, \
     EventMediasQuery, TeamTagMediasQuery, TeamYearTagMediasQuery
@@ -202,11 +203,15 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         }
         cache_keys = [q.cache_key for q in get_affected_queries.match_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 12)
+        self.assertEqual(len(cache_keys), 16)
         self.assertTrue(MatchQuery('2015casj_qm1').cache_key in cache_keys)
         self.assertTrue(MatchQuery('2015casj_qm2').cache_key in cache_keys)
+        self.assertTrue(MatchGdcvDataQuery('2015casj_qm1').cache_key in cache_keys)
+        self.assertTrue(MatchGdcvDataQuery('2015casj_qm2').cache_key in cache_keys)
         self.assertTrue(EventMatchesQuery('2015casj').cache_key in cache_keys)
         self.assertTrue(EventMatchesQuery('2015cama').cache_key in cache_keys)
+        self.assertTrue(EventMatchesGdcvDataQuery('2015casj').cache_key in cache_keys)
+        self.assertTrue(EventMatchesGdcvDataQuery('2015cama').cache_key in cache_keys)
         self.assertTrue(TeamEventMatchesQuery('frc254', '2015casj').cache_key in cache_keys)
         self.assertTrue(TeamEventMatchesQuery('frc254', '2015cama').cache_key in cache_keys)
         self.assertTrue(TeamEventMatchesQuery('frc604', '2015casj').cache_key in cache_keys)
