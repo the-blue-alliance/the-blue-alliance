@@ -20,3 +20,8 @@ npm install
 cp static/javascript/tba_js/tba_keys_template.js static/javascript/tba_js/tba_keys.js
 
 paver make
+
+
+echo "Downloading cloud sql proxy"
+wget -q https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O /cloud_sql_proxy
+chmod +x /cloud_sql_proxy
