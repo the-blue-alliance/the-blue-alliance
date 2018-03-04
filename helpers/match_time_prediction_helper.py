@@ -100,16 +100,8 @@ class MatchTimePredictionHelper(object):
             to_log += "[TIME PREDICTIONS] Next Match: {}, Schedule: {}, Last Predicted: {}\n"\
                 .format(next_match.key_name, cls.as_local(next_match.time, timezone), cls.as_local(next_match.predicted_time, timezone))
 
-        if not last_match or not last_match.actual_time:
-            # No matches have been played yet. Set all predicted times to scheduled times
-            to_log += "[TIME PREDICTIONS] Setting predicted_time to scheduled time"
-            for match in unplayed_matches:
-                if match.time:
-                    match.predicted_time = match.time
-            MatchManipulator.createOrUpdate(unplayed_matches)
-            return
-
         if len(played_matches) >= 2:
+            # Just for some logging
             two_ago = played_matches[-2]
             cycle = last_match.actual_time - two_ago.actual_time
             s = int(cycle.total_seconds())
@@ -137,10 +129,16 @@ class MatchTimePredictionHelper(object):
 
         # Run predictions for all unplayed matches on this day and comp level
         last_comp_level = next_match.comp_level if next_match else None
+        now = datetime.datetime.now(timezone) + cls.MAX_IN_PAST if is_live else cls.as_local(cls.EPOCH, timezone)
+        first_unplayed_timedelta = None
         for i in range(0, len(unplayed_matches)):
             match = unplayed_matches[i]
             if not match.time:
                 continue
+
+            if first_unplayed_timedelta is None:
+                first_unplayed_timedelta = now - cls.as_local(match.time, timezone)
+
             scheduled_time = cls.as_local(match.time, timezone)
             if (scheduled_time.day != last_match_day and last_match_day is not None) \
                     or last_comp_level != match.comp_level:
@@ -157,17 +155,17 @@ class MatchTimePredictionHelper(object):
             if last_predicted and average_cycle_time:
                 predicted = last_predicted + datetime.timedelta(seconds=average_cycle_time)
             else:
-                predicted = match.time
+                # Shift predicted time by the amouont the first match is behind
+                predicted = cls.as_local(match.time, timezone) + first_unplayed_timedelta
 
             # Never predict a match to happen more than 15 minutes ahead of schedule or in the past
             # Except for playoff matches, which we allow to be any amount early (since all schedule
             # bets are off due to canceled tiebreaker matches).
             # However, if the event is not live (we're running the job manually for a single event),
             # then allow predicted times to be in the past.
-            now = datetime.datetime.now(timezone) + cls.MAX_IN_PAST if is_live else cls.as_local(cls.EPOCH, timezone)
             earliest_possible = cls.as_local(match.time + cls.MAX_SCHEDULE_OFFSET, timezone) \
                 if match.comp_level not in Match.ELIM_LEVELS else cls.as_local(cls.EPOCH, timezone)
-            match.predicted_time = max(cls.as_utc(predicted), cls.as_utc(earliest_possible), cls.as_utc(now))
+            match.predicted_time = max(cls.as_utc(predicted), cls.as_utc(earliest_possible))
             last = match
             last_comp_level = match.comp_level
 

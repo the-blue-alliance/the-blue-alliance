@@ -3,7 +3,6 @@ import json
 
 from consts.client_type import ClientType
 from consts.notification_type import NotificationType
-from controllers.api.api_status_controller import ApiStatusController
 
 from helpers.push_helper import PushHelper
 
@@ -78,7 +77,6 @@ class NotificationHelper(object):
         # Causes circular import, otherwise
         # https://github.com/the-blue-alliance/the-blue-alliance/pull/1098#discussion_r25128966
 
-        down_events = []
         now = datetime.datetime.utcnow()
         for event in live_events:
             matches = event.matches
@@ -104,22 +102,6 @@ class NotificationHelper(object):
                         # Only send notifications for matches no more than 7 minutes (average-ish match cycle time) before it's scheduled to start
                         # Unless, the match has no time info. Then #yolo and send it
                         cls.send_upcoming_match_notification(match, event)
-
-            # Determine if event is down
-            if cls.is_event_down(last_matches[0] if last_matches else None, next_matches[0] if next_matches else None):
-                down_events.append(event.key_name)
-
-        # Update the status sitevar
-        status_sitevar = Sitevar.get_by_id('apistatus.down_events')
-        if status_sitevar is None:
-            status_sitevar = Sitevar(id="apistatus.down_events", description="A list of down event keys", values_json="[]")
-        old_status = status_sitevar.contents
-
-        status_sitevar.contents = down_events
-        status_sitevar.put()
-
-        # Clear API Response cache
-        ApiStatusController.clear_cache_if_needed(old_status, down_events)
 
     @classmethod
     def send_schedule_update(cls, event):
@@ -176,33 +158,3 @@ class NotificationHelper(object):
         notification = VerificationNotification(url, secret)
         notification.send(key)
         return notification.verification_key
-
-    @classmethod
-    def is_event_down(cls, last_match, next_match):
-        """
-        Determines if an event's reporting is "down".
-        Conditions should be pretty tight, don't want false positives
-        Both next and last match need to be on the same day.
-        Use scheduled/actual start times for last to determine schedule offset
-        After max(predicted, scheduled) for next + threshold, event is down
-        """
-        if not last_match or not next_match:
-            return False
-
-        if not last_match.time or not last_match.actual_time or not next_match.time:
-            # Don't cause false positives when we're missing data
-            return False
-
-        if not last_match.time.day == next_match.time.day:
-            # Events are on different days, all bets are off
-            return False
-
-        now = datetime.datetime.utcnow()
-        threshold = datetime.timedelta(minutes=30)  # we can tune this
-        schedule_offset = last_match.actual_time - last_match.time
-        predicted_start = max(next_match.time + schedule_offset, next_match.time)
-
-        if now > predicted_start + threshold:
-            # Event is down :(
-            return True
-        return False

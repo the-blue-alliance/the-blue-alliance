@@ -23,6 +23,7 @@ from helpers.media_helper import MediaHelper
 
 from models.event import Event
 from models.match import Match
+from models.sitevar import Sitevar
 from models.team import Team
 from template_engine import jinja2_engine
 
@@ -147,6 +148,7 @@ class EventDetail(CacheableHandler):
         medias_future = media_query.EventTeamsPreferredMediasQuery(event_key).fetch_async()
         district_future = DistrictQuery(event.district_key.id()).fetch_async() if event.district_key else None
         event_medias_future = media_query.EventMediasQuery(event_key).fetch_async()
+        status_sitevar_future = Sitevar.get_by_id_async('apistatus.down_events')
 
         event_divisions_future = None
         event_codivisions_future = None
@@ -234,8 +236,11 @@ class EventDetail(CacheableHandler):
         medias_by_slugname = MediaHelper.group_by_slugname([media for media in event_medias_future.get_result()])
         has_time_predictions = matches_upcoming and any(match.predicted_time for match in matches_upcoming)
 
+        status_sitevar = status_sitevar_future.get_result()
+
         self.template_values.update({
             "event": event,
+            "event_down": status_sitevar and event_key in status_sitevar.contents,
             "district_name": district.display_name if district else None,
             "district_abbrev": district.abbreviation if district else None,
             "matches": matches,

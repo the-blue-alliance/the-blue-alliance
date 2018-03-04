@@ -13,6 +13,7 @@ from google.appengine.ext.webapp import template
 from consts.district_type import DistrictType
 from consts.event_type import EventType
 
+from controllers.api.api_status_controller import ApiStatusController
 from database.district_query import DistrictsInYearQuery
 from database.event_query import DistrictEventsQuery
 from database.team_query import DistrictTeamsQuery
@@ -636,6 +637,7 @@ class MatchTimePredictionsEnqueue(webapp.RequestHandler):
 class MatchTimePredictionsDo(webapp.RequestHandler):
     """
     Predicts match times for a given live event
+    Also handles detection for whether the event is down
     """
     def get(self, event_key):
         import pytz
@@ -652,6 +654,31 @@ class MatchTimePredictionsDo(webapp.RequestHandler):
         played_matches = MatchHelper.recentMatches(matches, num=0)
         unplayed_matches = MatchHelper.upcomingMatches(matches, num=len(matches))
         MatchTimePredictionHelper.predict_future_matches(event_key, played_matches, unplayed_matches, timezone, event.within_a_day)
+
+        # Detect whether the event is down
+        # An event NOT down if ANY unplayed match's predicted time is within its scheduled time by a threshold
+        event_down = True
+        for unplayed_match in unplayed_matches:
+            if (unplayed_match.predicted_time and unplayed_match.time and
+                unplayed_match.predicted_time < unplayed_match.time + datetime.timedelta(minutes=30)):
+                event_down = False
+                break
+
+        status_sitevar = Sitevar.get_by_id('apistatus.down_events')
+        if status_sitevar is None:
+            status_sitevar = Sitevar(id="apistatus.down_events", description="A list of down event keys", values_json="[]")
+        old_status = set(status_sitevar.contents)
+        new_status = old_status.copy()
+        if event_down:
+            new_status.add(event_key)
+        elif event_key in new_status:
+            new_status.remove(event_key)
+
+        status_sitevar.contents = list(new_status)
+        status_sitevar.put()
+
+        # Clear API Response cache
+        ApiStatusController.clear_cache_if_needed(old_status, new_status)
 
 
 class BlueZoneUpdateDo(webapp.RequestHandler):
