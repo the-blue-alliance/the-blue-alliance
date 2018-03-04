@@ -231,7 +231,7 @@ class EventInsightsHelper(object):
             'high_score': high_score,  # [score, match key, match name]
             'auto_quest_achieved': [auto_quest_achieved, opportunities_1x, 100.0 * float(auto_quest_achieved) / opportunities_1x],
             'face_the_boss_achieved': [face_the_boss_achieved, opportunities_1x, 100.0 * float(face_the_boss_achieved) / opportunities_1x],
-            'unicorn_matches': [unicorn_matches, opportunities_1x / 2, 100.0 * float(unicorn_matches) / opportunities_1x / 2],
+            'unicorn_matches': [unicorn_matches, opportunities_1x / 2, 100.0 * float(unicorn_matches) / (opportunities_1x / 2)],
         }
 
         return event_insights
