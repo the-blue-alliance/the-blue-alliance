@@ -631,6 +631,23 @@ class MatchTimePredictionsEnqueue(webapp.RequestHandler):
             taskqueue.add(url='/tasks/math/do/predict_match_times/{}'.format(event.key_name),
                           method='GET')
         # taskqueue.add(url='/tasks/do/bluezone_update', method='GET')
+
+        # Clear down events for events that aren't live
+        status_sitevar = Sitevar.get_by_id('apistatus.down_events')
+        if status_sitevar is not None:
+            live_event_keys = set([e.key.id() for e in live_events])
+
+            old_status = set(status_sitevar.contents)
+            new_status = old_status.copy()
+            for event_key in old_status:
+                if event_key not in live_event_keys:
+                    new_status.remove(event_key)
+            status_sitevar.contents = list(new_status)
+            status_sitevar.put()
+
+            # Clear API Response cache
+            ApiStatusController.clear_cache_if_needed(old_status, new_status)
+
         self.response.out.write("Enqueued time prediction for {} events".format(len(live_events)))
 
 
@@ -657,7 +674,7 @@ class MatchTimePredictionsDo(webapp.RequestHandler):
 
         # Detect whether the event is down
         # An event NOT down if ANY unplayed match's predicted time is within its scheduled time by a threshold
-        event_down = True
+        event_down = len(unplayed_matches) > 0
         for unplayed_match in unplayed_matches:
             if (unplayed_match.predicted_time and unplayed_match.time and
                 unplayed_match.predicted_time < unplayed_match.time + datetime.timedelta(minutes=30)):
