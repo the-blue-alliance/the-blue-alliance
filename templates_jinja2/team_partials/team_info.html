@@ -13,7 +13,7 @@
 </div>
 
 <div class="row">
-  <div class="col-sm-7">
+  <div class="col-sm-6">
     <p>
       {% if team.city_state_country or (team.nl and team.nl.name and team.nl.city_state_country) %}
         <span class="glyphicon glyphicon-map-marker"></span> From
@@ -45,7 +45,7 @@
 
     {% include "team_partials/team_social_media.html" %}
   </div>
-  <div class="col-sm-5">
+  <div class="col-sm-6">
   {% if current_event %}
     <div class="panel panel-default">
       <div class="panel-heading">
