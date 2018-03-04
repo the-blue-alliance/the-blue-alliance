@@ -657,7 +657,7 @@ class MatchTimePredictionsDo(webapp.RequestHandler):
 
         # Detect whether the event is down
         # An event NOT down if ANY unplayed match's predicted time is within its scheduled time by a threshold
-        event_down = True
+        event_down = len(unplayed_matches) > 0
         for unplayed_match in unplayed_matches:
             if (unplayed_match.predicted_time and unplayed_match.time and
                 unplayed_match.predicted_time < unplayed_match.time + datetime.timedelta(minutes=30)):
