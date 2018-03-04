@@ -631,6 +631,23 @@ class MatchTimePredictionsEnqueue(webapp.RequestHandler):
             taskqueue.add(url='/tasks/math/do/predict_match_times/{}'.format(event.key_name),
                           method='GET')
         # taskqueue.add(url='/tasks/do/bluezone_update', method='GET')
+
+        # Clear down events for events that aren't live
+        status_sitevar = Sitevar.get_by_id('apistatus.down_events')
+        if status_sitevar is not None:
+            live_event_keys = set([e.key.id() for e in live_events])
+
+            old_status = set(status_sitevar.contents)
+            new_status = old_status.copy()
+            for event_key in old_status:
+                if event_key not in live_event_keys:
+                    new_status.remove(event_key)
+            status_sitevar.contents = list(new_status)
+            status_sitevar.put()
+
+            # Clear API Response cache
+            ApiStatusController.clear_cache_if_needed(old_status, new_status)
+
         self.response.out.write("Enqueued time prediction for {} events".format(len(live_events)))
 
 
