@@ -19,15 +19,19 @@
             <ul style="list-style-type: none; padding: 0">
             {% for enum, permission in permissions.items %}
                 <li>
-	                <input 
-	                	type="checkbox" 
-	                	name="perm-{{enum}}" 
-	                	{% if enum in user.permissions %}checked{% endif %} />
-                	<strong>{{permission.name}}</strong> – {{permission.description}}
-        		</li>
+                    <input
+                        type="checkbox"
+                        name="perm-{{enum}}"
+                        {% if enum in user.permissions %}checked{% endif %} />
+                    <strong>{{permission.name}}</strong> – {{permission.description}}
+                </li>
             {% endfor %}
             </ul>
         </td>
+        </tr>
+        <tr>
+            <td>Shadow Banned</td>
+            <td><input type="checkbox" name="shadow_banned" {% if user.shadow_banned %}checked{% endif %} /></td>
         </tr>
     </table>
 

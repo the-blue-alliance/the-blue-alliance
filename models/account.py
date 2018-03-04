@@ -11,6 +11,7 @@ class Account(ndb.Model):
     nickname = ndb.StringProperty()
     registered = ndb.BooleanProperty()
     permissions = ndb.IntegerProperty(repeated=True)
+    shadow_banned = ndb.BooleanProperty(default=False)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 

@@ -119,6 +119,7 @@ class AdminUserEdit(LoggedInHandler):
         user = Account.get_by_id(user_id)
 
         user.display_name = self.request.get("display_name")
+        user.shadow_banned = True if self.request.get("shadow_banned") else False
         user.permissions = []
         for enum in AccountPermissions.permissions:
             permcheck = self.request.get("perm-" + str(enum))
