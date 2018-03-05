@@ -589,6 +589,12 @@ class InsightsHelper(object):
             for team in insight.data:
                 world_champions[team] += 1
 
+        year_division_winners = Insight.query(Insight.name == Insight.INSIGHT_NAMES[Insight.DIVISION_WINNERS], Insight.year != 0).fetch(1000)
+        division_winners = defaultdict(int)
+        for insight in year_division_winners:
+            for team in insight.data:
+                division_winners[team] += 1
+
         year_successful_elim_teamups = Insight.query(Insight.name == Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_ELIM_TEAMUPS], Insight.year != 0).fetch(1000)
         successful_elim_teamups = defaultdict(int)
         for insight in year_successful_elim_teamups:
@@ -606,6 +612,7 @@ class InsightsHelper(object):
         blue_banners = self._sortTeamWinsDict(blue_banners)
         rca_winners = self._sortTeamWinsDict(rca_winners)
         world_champions = self._sortTeamWinsDict(world_champions)
+        division_winners = self._sortTeamWinsDict(division_winners)
 
         # Creating Insights
         if regional_winners:
@@ -619,6 +626,9 @@ class InsightsHelper(object):
 
         if world_champions:
             insights.append(self._createInsight(world_champions, Insight.INSIGHT_NAMES[Insight.WORLD_CHAMPIONS], 0))
+
+        if division_winners:
+            insights.append(self._createInsight(division_winners, Insight.INSIGHT_NAMES[Insight.DIVISION_WINNERS], 0))
 
         if year_successful_elim_teamups:
             insights.append(self._createInsight(successful_elim_teamups_sorted, Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_ELIM_TEAMUPS], 0))

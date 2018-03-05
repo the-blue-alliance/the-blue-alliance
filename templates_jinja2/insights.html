@@ -82,6 +82,36 @@
   </div>
   {% endif %}
 
+  {% if division_winners %}
+  <div class="row">
+    <div class="col-xs-12">
+    <h3>Most (Sub)Division Wins</h3>
+      <table class="table table-striped table-condensed table-center insights-table">
+        <thead>
+          <tr>
+            <th>Number</th>
+            <th>Teams</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for number, team_list in division_winners.data %}
+        {% if number != 1 %}
+          <tr>
+            <td>{{number}}</td>
+            <td>
+              {% for team in team_list %}
+              <a href="/team/{{team|digits}}/history">{{team|digits}}</a>{% if not loop.last %},{% endif %}
+              {% endfor %}
+            </td>
+          </tr>
+        {% endif %}
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
   {% if rca_winners %}
   <div class="row">
     <div class="col-xs-12">
