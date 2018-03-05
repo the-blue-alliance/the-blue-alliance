@@ -151,7 +151,12 @@ class MatchTimePredictionHelper(object):
             # Otherwise, use the predicted start time of the previously processed match
             last_predicted = None
             if last_match:
-                last_predicted = cls.as_local(last_match.actual_time if i == 0 else last.predicted_time, timezone)
+                cycle_time = average_cycle_time if average_cycle_time else 60 * 7  # Default to 7 min
+                base_time = max(
+                    cls.as_local(last_match.actual_time, timezone),
+                    now - datetime.timedelta(seconds=cycle_time)
+                )
+                last_predicted = base_time if i == 0 else cls.as_local(last.predicted_time, timezone)
             if last_predicted and average_cycle_time:
                 predicted = last_predicted + datetime.timedelta(seconds=average_cycle_time)
             else:
