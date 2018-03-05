@@ -30,6 +30,14 @@ class TestTeamMediaSuggestionCreator(unittest2.TestCase):
             registered=True)
         self.account.put()
 
+        self.account_banned = Account.get_or_insert(
+            "456",
+            email="user@example.com",
+            registered=True,
+            shadow_banned=True,
+        )
+        self.account_banned.put()
+
     def tearDown(self):
         self.testbed.deactivate()
 
@@ -48,6 +56,24 @@ class TestTeamMediaSuggestionCreator(unittest2.TestCase):
         self.assertIsNotNone(suggestion)
         self.assertEqual(suggestion.review_state, Suggestion.REVIEW_PENDING)
         self.assertEqual(suggestion.author, self.account.key)
+        self.assertEqual(suggestion.target_model, 'media')
+        self.assertDictContainsSubset(expected_dict, suggestion.contents)
+
+    def test_create_suggestion_banned(self):
+        status, _ = SuggestionCreator.createTeamMediaSuggestion(
+            self.account_banned.key,
+            "http://imgur.com/ruRAxDm",
+            "frc1124",
+            "2016")
+        self.assertEqual(status, 'success')
+
+        # Ensure the Suggestion gets created
+        suggestion_id = Suggestion.render_media_key_name('2016', 'team', 'frc1124', 'imgur', 'ruRAxDm')
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        expected_dict = MediaParser.partial_media_dict_from_url("http://imgur.com/ruRAxDm")
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.review_state, Suggestion.REVIEW_AUTOREJECTED)
+        self.assertEqual(suggestion.author, self.account_banned.key)
         self.assertEqual(suggestion.target_model, 'media')
         self.assertDictContainsSubset(expected_dict, suggestion.contents)
 
@@ -138,6 +164,14 @@ class TestEventMediaSuggestionCreator(unittest2.TestCase):
             registered=True)
         self.account.put()
 
+        self.account_banned = Account.get_or_insert(
+            "456",
+            email="user@example.com",
+            registered=True,
+            shadow_banned=True,
+        )
+        self.account_banned.put()
+
     def tearDown(self):
         self.testbed.deactivate()
 
@@ -155,6 +189,23 @@ class TestEventMediaSuggestionCreator(unittest2.TestCase):
         self.assertIsNotNone(suggestion)
         self.assertEqual(suggestion.review_state, Suggestion.REVIEW_PENDING)
         self.assertEqual(suggestion.author, self.account.key)
+        self.assertEqual(suggestion.target_model, 'event_media')
+        self.assertDictContainsSubset(expected_dict, suggestion.contents)
+
+    def test_create_suggestion_banned(self):
+        status, _ = SuggestionCreator.createEventMediaSuggestion(
+            self.account_banned.key,
+            "https://www.youtube.com/watch?v=H-54KMwMKY0",
+            "2016nyny")
+        self.assertEqual(status, 'success')
+
+        # Ensure the Suggestion gets created
+        suggestion_id = Suggestion.render_media_key_name('2016', 'event', '2016nyny', 'youtube', 'H-54KMwMKY0')
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        expected_dict = MediaParser.partial_media_dict_from_url("https://www.youtube.com/watch?v=H-54KMwMKY0")
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.review_state, Suggestion.REVIEW_AUTOREJECTED)
+        self.assertEqual(suggestion.author, self.account_banned.key)
         self.assertEqual(suggestion.target_model, 'event_media')
         self.assertDictContainsSubset(expected_dict, suggestion.contents)
 
@@ -215,6 +266,14 @@ class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
             registered=True)
         self.account.put()
 
+        self.account_banned = Account.get_or_insert(
+            "456",
+            email="user@example.com",
+            registered=True,
+            shadow_banned=True,
+        )
+        self.account_banned.put()
+
     def tearDown(self):
         self.testbed.deactivate()
 
@@ -246,6 +305,36 @@ class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
         self.assertEqual(suggestion.contents['state'], 'NY')
         self.assertEqual(suggestion.contents['country'], 'USA')
         self.assertEqual(suggestion.contents['venue_name'], 'The Venue')
+
+    def test_create_suggestion_banned(self):
+        status, _ = SuggestionCreator.createOffseasonEventSuggestion(
+            self.account_banned.key,
+            "Test Event",
+            "2016-5-1",
+            "2016-5-2",
+            "http://foo.bar.com",
+            "The Venue",
+            "123 Fake Street",
+            "New York", "NY", "USA")
+        self.assertEqual(status, 'success')
+
+        # Ensure the Suggestion gets created
+        suggestions = Suggestion.query().fetch()
+        self.assertIsNotNone(suggestions)
+        self.assertEqual(len(suggestions), 1)
+
+        suggestion = suggestions[0]
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.contents['name'], "Test Event")
+        self.assertEqual(suggestion.contents['start_date'], '2016-5-1')
+        self.assertEqual(suggestion.contents['end_date'], '2016-5-2')
+        self.assertEqual(suggestion.contents['website'], 'http://foo.bar.com')
+        self.assertEqual(suggestion.contents['address'], '123 Fake Street')
+        self.assertEqual(suggestion.contents['city'], 'New York')
+        self.assertEqual(suggestion.contents['state'], 'NY')
+        self.assertEqual(suggestion.contents['country'], 'USA')
+        self.assertEqual(suggestion.contents['venue_name'], 'The Venue')
+        self.assertEqual(suggestion.review_state, Suggestion.REVIEW_AUTOREJECTED)
 
     def test_missing_params(self):
         status, failures = SuggestionCreator.createOffseasonEventSuggestion(
@@ -367,6 +456,14 @@ class TestApiWriteSuggestionCreator(unittest2.TestCase):
             registered=True)
         self.account.put()
 
+        self.account_banned = Account.get_or_insert(
+            "456",
+            email="user@example.com",
+            registered=True,
+            shadow_banned=True,
+        )
+        self.account_banned.put()
+
     def tearDown(self):
         self.testbed.deactivate()
 
@@ -391,6 +488,29 @@ class TestApiWriteSuggestionCreator(unittest2.TestCase):
         self.assertEqual(suggestion.contents['event_key'], "2016test")
         self.assertEqual(suggestion.contents['affiliation'], "Event Organizer")
         self.assertListEqual(suggestion.contents['auth_types'], [1, 2, 3])
+
+    def test_create_suggestion_banned(self):
+        event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
+        event.put()
+
+        status = SuggestionCreator.createApiWriteSuggestion(
+            self.account_banned.key,
+            "2016test",
+            "Event Organizer",
+            [1, 2, 3])
+        self.assertEqual(status, 'success')
+
+        # Ensure the Suggestion gets created
+        suggestions = Suggestion.query().fetch()
+        self.assertIsNotNone(suggestions)
+        self.assertEqual(len(suggestions), 1)
+
+        suggestion = suggestions[0]
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.contents['event_key'], "2016test")
+        self.assertEqual(suggestion.contents['affiliation'], "Event Organizer")
+        self.assertListEqual(suggestion.contents['auth_types'], [1, 2, 3])
+        self.assertEqual(suggestion.review_state, Suggestion.REVIEW_AUTOREJECTED)
 
     def test_official_event(self):
         event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.REGIONAL)
@@ -469,6 +589,14 @@ class TestSuggestEventWebcastCreator(unittest2.TestCase):
             registered=True)
         self.account.put()
 
+        self.account_banned = Account.get_or_insert(
+            "456",
+            email="user@example.com",
+            registered=True,
+            shadow_banned=True,
+        )
+        self.account_banned.put()
+
     def tearDown(self):
         self.testbed.deactivate()
 
@@ -499,6 +627,29 @@ class TestSuggestEventWebcastCreator(unittest2.TestCase):
         self.assertEqual(suggestion.target_key, "2016test")
         self.assertEqual(suggestion.author, self.account.key)
         self.assertEqual(suggestion.review_state, Suggestion.REVIEW_PENDING)
+        self.assertIsNotNone(suggestion.contents)
+        self.assertEqual(suggestion.contents.get('webcast_url'), "http://twitch.tv/frcgamesense")
+        self.assertIsNotNone(suggestion.contents.get('webcast_dict'))
+
+    def test_create_suggestion_banned(self):
+        event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
+        event.put()
+
+        status = SuggestionCreator.createEventWebcastSuggestion(
+            self.account_banned.key,
+            "http://twitch.tv/frcgamesense",
+            "",
+            "2016test")
+        self.assertEqual(status, 'success')
+
+        # Ensure the Suggestion gets created
+        expected_key = "webcast_2016test_twitch_frcgamesense_None"
+        suggestion = Suggestion.get_by_id(expected_key)
+
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.target_key, "2016test")
+        self.assertEqual(suggestion.author, self.account_banned.key)
+        self.assertEqual(suggestion.review_state, Suggestion.REVIEW_AUTOREJECTED)
         self.assertIsNotNone(suggestion.contents)
         self.assertEqual(suggestion.contents.get('webcast_url'), "http://twitch.tv/frcgamesense")
         self.assertIsNotNone(suggestion.contents.get('webcast_dict'))
@@ -643,6 +794,14 @@ class TestSuggestMatchVideoYouTube(unittest2.TestCase):
             registered=True)
         self.account.put()
 
+        self.account_banned = Account.get_or_insert(
+            "456",
+            email="user@example.com",
+            registered=True,
+            shadow_banned=True,
+        )
+        self.account_banned.put()
+
         event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
         event.put()
         self.match = Match(id="2016test_f1m1", event=ndb.Key(Event, "2016test"), year=2016, comp_level="f", set_number=1, match_number=1, alliances_json='')
@@ -670,6 +829,23 @@ class TestSuggestMatchVideoYouTube(unittest2.TestCase):
         self.assertIsNotNone(suggestion.contents.get('youtube_videos'))
         self.assertEqual(len(suggestion.contents.get('youtube_videos')), 1)
         self.assertEqual(suggestion.contents.get('youtube_videos')[0], "37F5tbrFqJQ")
+
+    def test_create_suggestion_banned(self):
+        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account_banned.key, "37F5tbrFqJQ", "2016test_f1m1")
+        self.assertEqual(status, 'success')
+
+        suggestion_id = "media_2016_match_2016test_f1m1_youtube_37F5tbrFqJQ"
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        self.assertIsNotNone(suggestion)
+
+        self.assertEqual(suggestion.author, self.account_banned.key)
+        self.assertEqual(suggestion.target_key, '2016test_f1m1')
+        self.assertEqual(suggestion.target_model, 'match')
+        self.assertIsNotNone(suggestion.contents)
+        self.assertIsNotNone(suggestion.contents.get('youtube_videos'))
+        self.assertEqual(len(suggestion.contents.get('youtube_videos')), 1)
+        self.assertEqual(suggestion.contents.get('youtube_videos')[0], "37F5tbrFqJQ")
+        self.assertEqual(suggestion.review_state, Suggestion.REVIEW_AUTOREJECTED)
 
     def test_existing_video(self):
         self.match.youtube_videos = ["37F5tbrFqJQ"]

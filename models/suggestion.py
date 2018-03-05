@@ -31,6 +31,7 @@ class Suggestion(ndb.Model):
     REVIEW_ACCEPTED = 1
     REVIEW_PENDING = 0
     REVIEW_REJECTED = -1
+    REVIEW_AUTOREJECTED = -2
 
     review_state = ndb.IntegerProperty(default=0)
     reviewed_at = ndb.DateTimeProperty()
@@ -46,6 +47,13 @@ class Suggestion(ndb.Model):
     def __init__(self, *args, **kw):
         self._contents = None
         super(Suggestion, self).__init__(*args, **kw)
+
+    def put(self, *args, **kwargs):
+        if self.review_state == 0:
+            user = self.author.get()
+            if user and user.shadow_banned:
+                self.review_state = self.REVIEW_AUTOREJECTED
+        return super(Suggestion, self).put(*args, **kwargs)
 
     @property
     def contents(self):
