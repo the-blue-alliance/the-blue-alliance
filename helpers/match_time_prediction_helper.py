@@ -142,10 +142,11 @@ class MatchTimePredictionHelper(object):
             scheduled_time = cls.as_local(match.time, timezone)
             if (scheduled_time.day != last_match_day and last_match_day is not None) \
                     or last_comp_level != match.comp_level:
-                # Stop, once we exhaust all unplayed matches on this day or move to a new comp level
                 if i == 0:
                     write_logs = False
-                break
+                # Use predicted = scheduled once we exhaust all unplayed matches on this day or move to a new comp level
+                match.predicted_time = match.time
+                continue
 
             # For the first iteration, base the predictions off the newest known actual start time
             # Otherwise, use the predicted start time of the previously processed match
