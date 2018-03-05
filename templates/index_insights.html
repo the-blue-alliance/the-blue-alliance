@@ -24,7 +24,7 @@
       {% if match_highscore and match_highscore.data.qual %}
         <div class="row">
           <div class="col-xs-12">
-            <h3>Highest Scoring Qual Match{% if match_highscore.data.qual|length > 1 %}es{% endif %} <small>(Penalty Free)</small></h3>
+            <h3>Highest Scoring Qual Match{% if match_highscore.data.qual|length > 1 %}es{% endif %} <small>(Minus Penalties)</small></h3>
             {% for match in  match_highscore.data.qual %}
               <h4><a href="/match/{{match.key_name}}">{{ match.event_name }} <small>{{ match.verbose_name }}</small></a></h4>
               <table class="match-table insights-table">
@@ -53,7 +53,7 @@
       {% if match_highscore and match_highscore.data.playoff %}
         <div class="row">
           <div class="col-xs-12">
-            <h3>Highest Scoring Playoff Match{% if match_highscore.data.playoff|length > 1 %}es{% endif %} <small>(Penalty Free)</small></h3>
+            <h3>Highest Scoring Playoff Match{% if match_highscore.data.playoff|length > 1 %}es{% endif %} <small>(Minus Penalties)</small></h3>
             {% for match in  match_highscore.data.playoff %}
               <h4><a href="/match/{{match.key_name}}">{{ match.event_name }} <small>{{ match.verbose_name }}</small></a></h4>
               <table class="match-table insights-table">
