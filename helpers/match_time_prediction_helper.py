@@ -138,6 +138,8 @@ class MatchTimePredictionHelper(object):
 
             if first_unplayed_timedelta is None:
                 first_unplayed_timedelta = now - cls.as_local(match.time, timezone)
+            if first_unplayed_timedelta < datetime.timedelta(seconds = 0):
+                first_unplayed_timedelta = datetime.timedelta(seconds = 0)
 
             scheduled_time = cls.as_local(match.time, timezone)
             if (scheduled_time.day != last_match_day and last_match_day is not None) \
@@ -145,7 +147,7 @@ class MatchTimePredictionHelper(object):
                 if i == 0:
                     write_logs = False
                 # Use predicted = scheduled once we exhaust all unplayed matches on this day or move to a new comp level
-                match.predicted_time = match.time
+                match.predicted_time = cls.as_utc(cls.as_local(match.time, timezone) + first_unplayed_timedelta)
                 continue
 
             # For the first iteration, base the predictions off the newest known actual start time
