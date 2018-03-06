@@ -192,6 +192,18 @@ class InsightsHelper(object):
         return sorted(temp.items(), key=lambda pair: int(pair[0]), reverse=True)  # Sort by win number
 
     @classmethod
+    def _sortTeamYearWinsDict(self, wins_dict):
+        """
+        Sorts dicts with key: number of wins, value: list of (team, years)
+        by number of wins and by team number
+        """
+        wins_dict = sorted(wins_dict.items(), key=lambda pair: int(pair[0][3:]))  # Sort by team number
+        temp = defaultdict(list)
+        for team, year_wins in wins_dict:
+            temp[len(year_wins)].append((team, sorted(year_wins)))
+        return sorted(temp.items(), key=lambda pair: int(pair[0]), reverse=True)  # Sort by win number
+
+    @classmethod
     def _sortTeamList(self, team_list):
         """
         Sorts list of teams
@@ -584,16 +596,16 @@ class InsightsHelper(object):
                 rca_winners[team] += 1
 
         year_world_champions = Insight.query(Insight.name == Insight.INSIGHT_NAMES[Insight.WORLD_CHAMPIONS], Insight.year != 0).fetch(1000)
-        world_champions = defaultdict(int)
+        world_champions = defaultdict(list)
         for insight in year_world_champions:
             for team in insight.data:
-                world_champions[team] += 1
+                world_champions[team].append(insight.year)
 
         year_division_winners = Insight.query(Insight.name == Insight.INSIGHT_NAMES[Insight.DIVISION_WINNERS], Insight.year != 0).fetch(1000)
-        division_winners = defaultdict(int)
+        division_winners = defaultdict(list)
         for insight in year_division_winners:
             for team in insight.data:
-                division_winners[team] += 1
+                division_winners[team].append(insight.year)
 
         year_successful_elim_teamups = Insight.query(Insight.name == Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_ELIM_TEAMUPS], Insight.year != 0).fetch(1000)
         successful_elim_teamups = defaultdict(int)
@@ -611,8 +623,8 @@ class InsightsHelper(object):
         regional_winners = self._sortTeamWinsDict(regional_winners)
         blue_banners = self._sortTeamWinsDict(blue_banners)
         rca_winners = self._sortTeamWinsDict(rca_winners)
-        world_champions = self._sortTeamWinsDict(world_champions)
-        division_winners = self._sortTeamWinsDict(division_winners)
+        world_champions = self._sortTeamYearWinsDict(world_champions)
+        division_winners = self._sortTeamYearWinsDict(division_winners)
 
         # Creating Insights
         if regional_winners:

@@ -64,13 +64,13 @@
           </tr>
         </thead>
         <tbody>
-        {% for number, team_list in world_champions.data %}
+        {% for number, team_years_list in world_champions.data %}
         {% if number != 1 %}
           <tr>
             <td>{{number}}</td>
             <td>
-              {% for team in team_list %}
-              <a href="/team/{{team|digits}}/history">{{team|digits}}</a>{% if not loop.last %},{% endif %}
+              {% for team, years in team_years_list %}
+              <a href="/team/{{team|digits}}/history" rel="tooltip" title="{{years|join(', ')}}">{{team|digits}}</a>{% if not loop.last %},{% endif %}
               {% endfor %}
             </td>
           </tr>
@@ -94,13 +94,13 @@
           </tr>
         </thead>
         <tbody>
-        {% for number, team_list in division_winners.data %}
+        {% for number, team_years_list in division_winners.data %}
         {% if number != 1 %}
           <tr>
             <td>{{number}}</td>
             <td>
-              {% for team in team_list %}
-              <a href="/team/{{team|digits}}/history">{{team|digits}}</a>{% if not loop.last %},{% endif %}
+              {% for team, years in team_years_list %}
+              <a href="/team/{{team|digits}}/history" rel="tooltip" title="{{years|join(', ')}}">{{team|digits}}</a>{% if not loop.last %},{% endif %}
               {% endfor %}
             </td>
           </tr>
