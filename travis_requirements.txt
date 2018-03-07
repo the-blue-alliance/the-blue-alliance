@@ -14,3 +14,4 @@ pyOpenSSL
 ndg-httpsclient
 pyasn1
 httpie
+mysqlclient
