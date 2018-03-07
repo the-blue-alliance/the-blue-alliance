@@ -37,8 +37,9 @@ jobs:
     deploy:
       skip_cleanup: true
       provider: script
-      script: ./ops/travis/travis-deploy.sh
+      script:
+        ./ops/travis/travis-deploy.sh;
+        ./ops/travis/remove-deploy-lock.sh;
       on:
         repo: the-blue-alliance/the-blue-alliance
         branch: master
-
