@@ -96,7 +96,7 @@ class BaseCloudSqlQuery(DatabaseQuery):
 
 
 class MatchGdcvDataQuery(BaseCloudSqlQuery):
-    CACHE_VERSION = 2
+    CACHE_VERSION = 3
     CACHE_KEY_FORMAT = 'match_timeseries_{}'
 
     def _build_query(self):
@@ -105,7 +105,7 @@ class MatchGdcvDataQuery(BaseCloudSqlQuery):
         match_id = match_key.split('_')[1]
         year = int(event_key[:4])
         query = """SELECT * FROM {}_matches
-            WHERE event_key = '{}' AND match_id = '{}'
+            WHERE event_key = '{}' AND match_id = '{}' AND (mode = 'auto' OR mode = 'teleop')
             ORDER BY wall_time ASC""".format(year, event_key, match_id)
 
         return query
@@ -119,7 +119,7 @@ class EventMatchesGdcvDataQuery(BaseCloudSqlQuery):
         event_key = self._query_args[0]
         year = int(event_key[:4])
         query = """SELECT * FROM {}_matches
-            WHERE event_key = '{}'
+            WHERE event_key = '{}' AND (mode = 'auto' OR mode = 'teleop')
             ORDER BY wall_time ASC""".format(year, event_key)
 
         return query
