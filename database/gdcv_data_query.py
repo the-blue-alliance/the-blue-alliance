@@ -96,7 +96,7 @@ class BaseCloudSqlQuery(DatabaseQuery):
 
 
 class MatchGdcvDataQuery(BaseCloudSqlQuery):
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = 'match_timeseries_{}'
 
     def _build_query(self):
@@ -112,7 +112,7 @@ class MatchGdcvDataQuery(BaseCloudSqlQuery):
 
 
 class EventMatchesGdcvDataQuery(BaseCloudSqlQuery):
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = 'event_matches_timeseries_{}'
 
     def _build_query(self):
