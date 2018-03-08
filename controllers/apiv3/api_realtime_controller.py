@@ -1,6 +1,7 @@
 import json
 import logging
 
+from collections import defaultdict
 from controllers.apiv3.api_base_controller import ApiBaseController
 from database.gdcv_data_query import MatchGdcvDataQuery, EventMatchesGdcvDataQuery
 from database.event_query import EventQuery
@@ -44,15 +45,13 @@ class ApiRealtimeEventMatchesController(ApiBaseController):
             self.abort(404)
         event.get_matches_async()
         realtime_data = EventMatchesGdcvDataQuery(event.key_name).fetch()
-        realtime_by_key = {
-            "{}_{}".format(m['event_key'], m['match_id']): m
-            for m in realtime_data
+        match_played_by_key = {
+            m.key_name: m.has_been_played for m in event.matches
         }
 
-        event_matches = event.matches
-        result = {
-            m.key_name: realtime_by_key[m.key_name]
-            for m in event_matches
-            if m.has_been_played and m.key_name in realtime_by_key
-        }
+        result = defaultdict(list)
+        for gdcv_item in realtime_data:
+            match_key = "{}_{}".format(gdcv_item['event_key'], gdcv_item['match_id'])
+            if match_played_by_key.get(match_key, False):
+                result[match_key].append(gdcv_item)
         return json.dumps(result, ensure_ascii=True, indent=2, sort_keys=True)
