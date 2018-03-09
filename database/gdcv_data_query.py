@@ -66,7 +66,8 @@ class BaseCloudSqlQuery(DatabaseQuery):
 
             # Filter out wall_time because it won't be consistent if we backfill, etc
             for r in result:
-                del r['wall_time']
+                if 'wall_time' in r:
+                    del r['wall_time']
                 yield r
 
         cursor.close()
@@ -112,14 +113,14 @@ class MatchGdcvDataQuery(BaseCloudSqlQuery):
 
 
 class EventMatchesGdcvDataQuery(BaseCloudSqlQuery):
-    CACHE_VERSION = 3
+    CACHE_VERSION = 4
     CACHE_KEY_FORMAT = 'event_matches_timeseries_{}'
 
     def _build_query(self):
         event_key = self._query_args[0]
         year = int(event_key[:4])
-        query = """SELECT * FROM {}_matches
+        query = """SELECT event_key, match_id, COUNT(*) FROM {}_matches
             WHERE event_key = '{}' AND (mode = 'auto' OR mode = 'teleop')
-            ORDER BY wall_time ASC""".format(year, event_key)
+            GROUP BY event_key, match_id""".format(year, event_key)
 
         return query

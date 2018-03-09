@@ -11,7 +11,7 @@ from database.match_query import MatchQuery
 class ApiRealtimeMatchController(ApiBaseController):
 
     CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 61
+    CACHE_HEADER_LENGTH = 60 * 60  # One hour in seconds
 
     def _track_call(self, match_key):
         action = 'realtime_match'
@@ -32,8 +32,8 @@ class ApiRealtimeMatchController(ApiBaseController):
 
 class ApiRealtimeEventMatchesController(ApiBaseController):
 
-    CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 60 * 60  # One hour in seconds
 
     def _track_call(self, event_key):
         action = 'realtime_event_matches'
@@ -49,9 +49,9 @@ class ApiRealtimeEventMatchesController(ApiBaseController):
             m.key_name: m.has_been_played for m in event.matches
         }
 
-        result = defaultdict(list)
+        result = []
         for gdcv_item in realtime_data:
             match_key = "{}_{}".format(gdcv_item['event_key'], gdcv_item['match_id'])
             if match_played_by_key.get(match_key, False):
-                result[match_key].append(gdcv_item)
+                result.append(match_key)
         return json.dumps(result, ensure_ascii=True, indent=2, sort_keys=True)
