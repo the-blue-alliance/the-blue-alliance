@@ -2694,6 +2694,57 @@
         ]
       }
     },
+    "/event/{event_key}/matches/timeseries": {
+      "get": {
+        "operationId": "getEventMatchTimeseries",
+        "tags": [
+          "event",
+          "match"
+        ],
+        "description": "Gets an array of Match Keys for the given event key that have timeseries data. Returns an empty array if no matches have timeseries data.\n*WARNING:* This is *not* official data, and is subject to a significant possibility of error, or missing data. Do not rely on this data for any purpose. In fact, pretend we made it up.\n*WARNING:* This endpoint and corresponding data models are under *active development* and may change at any time, including in breaking ways.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "description": "Match Key",
+                "type": "string"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
     "/event/{event_key}/awards": {
       "get": {
         "operationId": "getEventAwards",
@@ -2841,7 +2892,7 @@
         "tags": [
           "match"
         ],
-        "description": "Gets an array of game-specific Match Timeseries objects for the given match key or an empty array if not available.\n*WARNING:* This is *not* official data, and is subject to a significant possibility of error, or missing data. Do not reply on this data for any purpose. In fact, pretend we made it up.\n*WARNING:* This endpoint and corresponding data models are under *active development* and may change at any time, including in breaking ways.",
+        "description": "Gets an array of game-specific Match Timeseries objects for the given match key or an empty array if not available.\n*WARNING:* This is *not* official data, and is subject to a significant possibility of error, or missing data. Do not rely on this data for any purpose. In fact, pretend we made it up.\n*WARNING:* This endpoint and corresponding data models are under *active development* and may change at any time, including in breaking ways.",
         "parameters": [
           {
             "$ref": "#/parameters/If-Modified-Since"
@@ -5264,7 +5315,7 @@
     },
     "Match_Timeseries_2018": {
       "type": "object",
-      "description": "Timeseries data for the 2018 game _FIRST_ POWER UP.\n*WARNING:* This model is currently under active development and may change at any time, including in breaking ways.",
+      "description": "Timeseries data for the 2018 game *FIRST* POWER UP.\n*WARNING:* This is *not* official data, and is subject to a significant possibility of error, or missing data. Do not rely on this data for any purpose. In fact, pretend we made it up.\n*WARNING:* This model is currently under active development and may change at any time, including in breaking ways.",
       "properties": {
         "event_key": {
           "description": "TBA event key with the format yyyy[EVENT_CODE], where yyyy is the year, and EVENT_CODE is the event code of the event.",
