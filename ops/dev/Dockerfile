@@ -20,7 +20,8 @@ RUN apt-get update && apt-get install -y \
   libssl-dev \
   tmux \
   vim \
-  openssh-server
+  openssh-server \
+  libmysqlclient-dev
 
 # Configure ssh server
 RUN mkdir /var/run/sshd
