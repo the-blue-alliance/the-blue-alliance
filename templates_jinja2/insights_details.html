@@ -155,6 +155,21 @@
     {% endif %}
   {% endif %}
 
+  {% if winning_margin_distribution %}
+  <h3>Winning Margin Distribution <small>Percent of Matches vs. Winning Margin</small></h3>
+    {% if elim_winning_margin_distribution %}
+    <div class="row">
+      <div class="col-sm-6 col-xs-12"><div class="color-key blue-color-key"></div><div class="chart-key-text">All Winning Margins</div></div>
+      <div class="col-sm-6 col-xs-12"><div class="color-key green-color-key"></div><div class="chart-key-text">{% if selected_year >= 2015 %}Playoff{% else %}Elim{% endif %} Winning Margins</div></div>
+    </div>
+    <figure style="width: 90%; height: 300px;" id="elim-match-margin-distribution-chart"></figure>
+    <div id="elim-match-margin-distribution" class="xcharts-data xcharts-bar-data">[{{ winning_margin_distribution.data_json|safe }}, {{ elim_winning_margin_distribution.data_json|safe }}]</div>
+    {% else %}
+    <figure style="width: 90%; height: 300px;" id="match-margin-distribution-chart"></figure>
+    <div id="match-margin-distribution" class="xcharts-data xcharts-bar-data">[{{ winning_margin_distribution.data_json|safe }}]</div>
+    {% endif %}
+  {% endif %}
+
   {% if year_specific_by_week or year_specific %}
   <h3>Year Specific Statistics</h3>
   <ul class="nav nav-tabs nav-justified">
