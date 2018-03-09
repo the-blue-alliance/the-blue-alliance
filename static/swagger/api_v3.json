@@ -2,10 +2,10 @@
   "swagger": "2.0",
   "info": {
     "description": "# Overview \n\n Information and statistics about FIRST Robotics Competition teams and events. \n\n# Authentication \n\nAll endpoints require an Auth Key to be passed in the header `X-TBA-Auth-Key`. If you do not have an auth key yet, you can obtain one from your [Account Page](/account). \n\n A `User-Agent` header may need to be set to prevent a 403 Unauthorized error.",
-    "version": "3.02.1",
+    "version": "3.03.0",
     "title": "The Blue Alliance API v3",
     "x-version-info": "Versions of the API follow the format X.Y.Z, with X being a major version, Y denoting the minor version, and Z the point release. Changes to the spec or API that result in a major version change will significantly impact implementations. Changes to the minor version indicate paths and/or fields in existing models may be added, and any breaking changes will be confined to paths or models listed as in-development in the prior minor version. Changes to the point release indicate no format or structure changes to the paths or models, but updated or clarified documentation. Note that changes to paths and models refer to the actual result from the API, not the documentation.",
-    "x-changes": "3.02.0 - 3.02.1: Fixed the model for `/team/{team_key}/districts` to match return from API. 3.1.0 - 3.02.0: Added `tba_gameData` to score breakdown and a leading zero to the minor version number to allow for easier sorting later. 3.0.5 - 3.1.0: Version bump for 2018 added fields and endpoints. Models Updated: `Team_Event_Status`, `Media`, 2018 Score Breakdowns. Endpoints Added: `/team/{team_key}/events/{year}/statuses`, `/event/{event_key}/teams/statuses` 3.0.4 - 3.0.5: Minor spelling fixes. Remove 2016 fields from `Match_Score_Breakdown_2017_Alliance` model. Fix `first_event_id` in `Event` model to correct type. Update `Media`.`type` enum. --- 3.0.3 - 3.0.4: Correct syntax in `Team_Event_Status_playoff` object, include descriptions in `Event_District_Points` and fix the path in `Team_Event_Status_playoff.properties.record` in order to more closely match Swagger spec. Fix syntax of `Match.video` to be correct and accurately reflect what is returned by the API. --- 3.0.2 - 3.0.3: `extra_stats` and `extra_stats_info` added to `Event_Ranking` model. Corrected match video property claiming to use the `Media` model, which it doesn't. Added `first_event_code` to the `Event` model. Added `/team/{team_key}/media/tag/{media_tag}` and year endpoints. Added `dq_team_keys` to `Match_alliance` model.  --- 3.0.1 - 3.0.2: `Team_Event_Status` and `Event_Ranking` model documentation changed to reflect actual API return. Changes involved W-L-T and ranking properties. --- 3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
+    "x-changes": "3.02.1 - 3.03.0: Added Timeseries models and endpoints. 3.02.0 - 3.02.1: Fixed the model for `/team/{team_key}/districts` to match return from API. 3.1.0 - 3.02.0: Added `tba_gameData` to score breakdown and a leading zero to the minor version number to allow for easier sorting later. 3.0.5 - 3.1.0: Version bump for 2018 added fields and endpoints. Models Updated: `Team_Event_Status`, `Media`, 2018 Score Breakdowns. Endpoints Added: `/team/{team_key}/events/{year}/statuses`, `/event/{event_key}/teams/statuses` 3.0.4 - 3.0.5: Minor spelling fixes. Remove 2016 fields from `Match_Score_Breakdown_2017_Alliance` model. Fix `first_event_id` in `Event` model to correct type. Update `Media`.`type` enum. --- 3.0.3 - 3.0.4: Correct syntax in `Team_Event_Status_playoff` object, include descriptions in `Event_District_Points` and fix the path in `Team_Event_Status_playoff.properties.record` in order to more closely match Swagger spec. Fix syntax of `Match.video` to be correct and accurately reflect what is returned by the API. --- 3.0.2 - 3.0.3: `extra_stats` and `extra_stats_info` added to `Event_Ranking` model. Corrected match video property claiming to use the `Media` model, which it doesn't. Added `first_event_code` to the `Event` model. Added `/team/{team_key}/media/tag/{media_tag}` and year endpoints. Added `dq_team_keys` to `Match_alliance` model.  --- 3.0.1 - 3.0.2: `Team_Event_Status` and `Event_Ranking` model documentation changed to reflect actual API return. Changes involved W-L-T and ranking properties. --- 3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
   },
   "host": "www.thebluealliance.com",
   "basePath": "/api/v3",
@@ -2694,6 +2694,57 @@
         ]
       }
     },
+    "/event/{event_key}/matches/timeseries": {
+      "get": {
+        "operationId": "getEventMatchTimeseries",
+        "tags": [
+          "event",
+          "match"
+        ],
+        "description": "Gets an array of Match Keys for the given event key that have timeseries data. Returns an empty array if no matches have timeseries data.\n*WARNING:* This is *not* official data, and is subject to a significant possibility of error, or missing data. Do not rely on this data for any purpose. In fact, pretend we made it up.\n*WARNING:* This endpoint and corresponding data models are under *active development* and may change at any time, including in breaking ways.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "description": "Match Key",
+                "type": "string"
+              }
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
     "/event/{event_key}/awards": {
       "get": {
         "operationId": "getEventAwards",
@@ -2809,6 +2860,55 @@
             "description": "Successful response",
             "schema": {
               "$ref": "#/definitions/Match_Simple"
+            },
+            "headers": {
+              "Last-Modified": {
+                "type": "string",
+                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
+              },
+              "Cache-Control": {
+                "type": "string",
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/match/{match_key}/timeseries": {
+      "get": {
+        "operationId": "getMatchTimeseries",
+        "tags": [
+          "match"
+        ],
+        "description": "Gets an array of game-specific Match Timeseries objects for the given match key or an empty array if not available.\n*WARNING:* This is *not* official data, and is subject to a significant possibility of error, or missing data. Do not rely on this data for any purpose. In fact, pretend we made it up.\n*WARNING:* This endpoint and corresponding data models are under *active development* and may change at any time, including in breaking ways.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/If-Modified-Since"
+          },
+          {
+            "$ref": "#/parameters/match_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
             },
             "headers": {
               "Last-Modified": {
@@ -5211,6 +5311,135 @@
           "type": "string",
           "description": "Unofficial TBA-computed value of the FMS provided GameData given to the alliance teams at the start of the match. 3 Character String containing `L` and `R` only. The first character represents the near switch, the 2nd the scale, and the 3rd the far, opposing, switch from the alliance's perspective. An `L` in a position indicates the platform on the left will be lit for the alliance while an `R` will indicate the right platform will be lit for the alliance. See also [WPI Screen Steps](https://wpilib.screenstepslive.com/s/currentCS/m/getting_started/l/826278-2018-game-data-details)."
         }
+      }
+    },
+    "Match_Timeseries_2018": {
+      "type": "object",
+      "description": "Timeseries data for the 2018 game *FIRST* POWER UP.\n*WARNING:* This is *not* official data, and is subject to a significant possibility of error, or missing data. Do not rely on this data for any purpose. In fact, pretend we made it up.\n*WARNING:* This model is currently under active development and may change at any time, including in breaking ways.",
+      "properties": {
+        "event_key": {
+          "description": "TBA event key with the format yyyy[EVENT_CODE], where yyyy is the year, and EVENT_CODE is the event code of the event.",
+          "type": "string"
+        },
+        "match_id": {
+          "description": "Match ID consisting of the level, match number, and set number, eg `q45` or `f1m1`.",
+          "type": "string"
+        },
+        "mode": {
+          "description": "Current mode of play, can be `pre_match`, `auto`, `telop`, or `post_match`.",
+          "type": "string"
+        },
+        "play": {
+          "type": "integer"
+        },
+        "time_remaining": {
+          "description": "Amount of time remaining in the match, only valid during `auto` and `teleop` modes.",
+          "type": "integer"
+        },
+        "blue_auto_quest": {
+          "description": "1 if the blue alliance is credited with the AUTO QUEST, 0 if not.",
+          "type": "integer"
+        },
+        "blue_boost_count": {
+          "description": "Number of POWER CUBES in the BOOST section of the blue alliance VAULT.",
+          "type": "integer"
+        },
+        "blue_boost_played": {
+          "description": "Number of POWER CUBES in the BOOST section of the blue alliance VAULT when BOOST was played, or 0 if not played.",
+          "type": "integer"
+        },
+        "blue_current_powerup": {
+          "description": "Name of the current blue alliance POWER UP being played, or `null`.",
+          "type": "string"
+        },
+        "blue_face_the_boss": {
+          "description": "1 if the blue alliance is credited with FACING THE BOSS, 0 if not.",
+          "type": "integer"
+        },
+        "blue_force_count": {
+          "description": "Number of POWER CUBES in the FORCE section of the blue alliance VAULT.",
+          "type": "integer"
+        },
+        "blue_force_played": {
+          "description": "Number of POWER CUBES in the FORCE section of the blue alliance VAULT when FORCE was played, or 0 if not played.",
+          "type": "integer"
+        },
+        "blue_levitate_count": {
+          "description": "Number of POWER CUBES in the LEVITATE section of the blue alliance VAULT.",
+          "type": "integer"
+        },
+        "blue_levitate_played": {
+          "description": "Number of POWER CUBES in the LEVITATE section of the blue alliance VAULT when LEVITATE was played, or 0 if not played.",
+          "type": "integer"
+        },
+        "blue_powerup_time_remaining": {
+          "description": "Number of seconds remaining in the blue alliance POWER UP time, or 0 if none is active.",
+          "type": "string"
+        },
+        "blue_scale_owned": {
+          "description": "1 if the blue alliance owns the SCALE, 0 if not.",
+          "type": "integer"
+        },
+        "blue_score": {
+          "description": "Current score for the blue alliance.",
+          "type": "integer"
+        },
+        "blue_switch_owned": {
+          "description": "1 if the blue alliance owns their SWITCH, 0 if not.",
+          "type": "integer"
+        },
+        "red_auto_quest": {
+          "description": "1 if the red alliance is credited with the AUTO QUEST, 0 if not.",
+          "type": "integer"
+        },
+        "red_boost_count": {
+          "description": "Number of POWER CUBES in the BOOST section of the red alliance VAULT.",
+          "type": "integer"
+        },
+        "red_boost_played": {
+          "description": "Number of POWER CUBES in the BOOST section of the red alliance VAULT when BOOST was played, or 0 if not played.",
+          "type": "integer"
+        },
+        "red_current_powerup": {
+          "description": "Name of the current red alliance POWER UP being played, or `null`.",
+          "type": "string"
+        },
+        "red_face_the_boss": {
+          "description": "1 if the red alliance is credited with FACING THE BOSS, 0 if not.",
+          "type": "integer"
+        },
+        "red_force_count": {
+          "description": "Number of POWER CUBES in the FORCE section of the red alliance VAULT.",
+          "type": "integer"
+        },
+        "red_force_played": {
+          "description": "Number of POWER CUBES in the FORCE section of the red alliance VAULT when FORCE was played, or 0 if not played.",
+          "type": "integer"
+        },
+        "red_levitate_count": {
+          "description": "Number of POWER CUBES in the LEVITATE section of the red alliance VAULT.",
+          "type": "integer"
+        },
+        "red_levitate_played": {
+          "description": "Number of POWER CUBES in the LEVITATE section of the red alliance VAULT when LEVITATE was played, or 0 if not played.",
+          "type": "integer"
+        },
+        "red_powerup_time_remaining": {
+          "description": "Number of seconds remaining in the red alliance POWER UP time, or 0 if none is active.",
+          "type": "string"
+        },
+        "red_scale_owned": {
+          "description": "1 if the red alliance owns the SCALE, 0 if not.",
+          "type": "integer"
+        },
+        "red_score": {
+          "description": "Current score for the red alliance.",
+          "type": "integer"
+        },
+        "red_switch_owned": {
+          "description": "1 if the red alliance owns their SWITCH, 0 if not.",
+          "type": "integer"
+        },
       }
     },
     "Media": {
