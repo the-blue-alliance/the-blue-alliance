@@ -10,8 +10,12 @@ if tmux has-session -t $session ; then
     tmux kill-session -t $session
 fi
 
-instance_name=$(cat ops/dev/conf.json | jq .cloud_sql_instance | jq -r 'select(type == "string")')
-auth_path=$(cat ops/dev/conf.json | jq .auth_file | jq -r 'select(type == "string")')
+instance_name=""
+auth_path=""
+if [ -f /ops/dev/conf.json]; then
+  instance_name=$(cat ops/dev/conf.json | jq .cloud_sql_instance | jq -r 'select(type == "string")')
+  auth_path=$(cat ops/dev/conf.json | jq .auth_file | jq -r 'select(type == "string")')
+fi
 
 echo "Starting devserver in new tmux session..."
 tmux new-session -d -s $session
