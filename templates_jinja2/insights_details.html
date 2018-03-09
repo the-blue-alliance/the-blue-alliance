@@ -129,14 +129,14 @@
   <h3>Average Winning Margin By Week</h3>
     {% if elim_match_average_margins_by_week %}
     <div class="row">
-      <div class="col-sm-6 col-xs-12"><div class="color-key blue-color-key"></div><div class="chart-key-text">All Match Margin Averages</div></div>
-      <div class="col-sm-6 col-xs-12"><div class="color-key green-color-key"></div><div class="chart-key-text">{% if selected_year >= 2015 %}Playoff{% else %}Elim{% endif %} Match Margin Averages</div></div>
+      <div class="col-sm-6 col-xs-12"><div class="color-key blue-color-key"></div><div class="chart-key-text">All Match Averages</div></div>
+      <div class="col-sm-6 col-xs-12"><div class="color-key green-color-key"></div><div class="chart-key-text">{% if selected_year >= 2015 %}Playoff{% else %}Elim{% endif %} Match Averages</div></div>
     </div>
-    <figure style="width: 90%; height: 300px;" id="elim-match-average-chart"></figure>
-    <div id="elim-match-average" class="xcharts-data xcharts-line-data">[{{ match_average_margins_by_week.data_json|safe }}, {{ elim_match_average_margins_by_week.data_json|safe }}]</div>
+    <figure style="width: 90%; height: 300px;" id="elim-match-margin-average-chart"></figure>
+    <div id="elim-match-margin-average" class="xcharts-data xcharts-line-data">[{{ match_average_margins_by_week.data_json|safe }}, {{ elim_match_average_margins_by_week.data_json|safe }}]</div>
     {% else %}
-    <figure style="width: 90%; height: 300px;" id="match-average-chart"></figure>
-    <div id="match-average" class="xcharts-data xcharts-line-data">[{{ match_average_margins_by_week.data_json|safe }}]</div>
+    <figure style="width: 90%; height: 300px;" id="match-margin-average-chart"></figure>
+    <div id="match-margin-average" class="xcharts-data xcharts-line-data">[{{ match_average_margins_by_week.data_json|safe }}]</div>
     {% endif %}
   {% endif %}
 
