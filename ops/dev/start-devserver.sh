@@ -12,7 +12,7 @@ fi
 
 instance_name=""
 auth_path=""
-if [ -f /ops/dev/conf.json]; then
+if [ -f /ops/dev/conf.json ] ; then
   instance_name=$(cat ops/dev/conf.json | jq .cloud_sql_instance | jq -r 'select(type == "string")')
   auth_path=$(cat ops/dev/conf.json | jq .auth_file | jq -r 'select(type == "string")')
 fi
