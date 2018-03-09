@@ -51,6 +51,7 @@ class InsightsHelper(object):
         insights += self._calculateMatchAveragesByWeek(week_event_matches, year)
         insights += self._calculateMatchWinningMarginByWeek(week_event_matches, year)
         insights += self._calculateScoreDistribution(week_event_matches, year)
+        insights += self._calculateWinningMarginDistribution(week_event_matches, year)
         insights += self._calculateNumMatches(week_event_matches, year)
         insights += self._calculateYearSpecific(week_event_matches, year)
         return insights
@@ -429,6 +430,77 @@ class InsightsHelper(object):
                 else:
                     elim_score_distribution_normalized[roundedScore] = contribution
             insights.append(self._createInsight(elim_score_distribution_normalized, Insight.INSIGHT_NAMES[Insight.ELIM_SCORE_DISTRIBUTION], year))
+
+        return insights
+
+    @classmethod
+    def _calculateWinningMarginDistribution(self, week_event_matches, year):
+        """
+        Returns a list of Insights, one for all data and one for elim data
+        The data for each Insight is a dict:
+        Key: Middle score of a bucketed range of scores, Value: % occurrence
+        """
+        winning_margin_distribution = defaultdict(int)
+        elim_winning_margin_distribution = defaultdict(int)
+        overall_high_margin = 0
+        for _, week_events in week_event_matches:
+            for _, matches in week_events:
+                for match in matches:
+                    if not match.has_been_played:
+                        continue
+                    redScore = int(match.alliances['red']['score'])
+                    blueScore = int(match.alliances['blue']['score'])
+
+                    winning_margin = abs(redScore - blueScore)
+
+                    overall_high_margin = max(overall_high_margin, winning_margin)
+
+                    winning_margin_distribution[winning_margin] += 1
+
+                    if match.comp_level in Match.ELIM_LEVELS:
+                        elim_winning_margin_distribution[winning_margin] += 1
+
+        insights = []
+        if winning_margin_distribution != {}:
+            binAmount = math.ceil(float(overall_high_margin) / 20)
+            totalCount = float(sum(winning_margin_distribution.values()))
+            winning_margin_distribution_normalized = {}
+            for margin, amount in winning_margin_distribution.items():
+                roundedScore = margin - int(margin % binAmount) + binAmount / 2  # Round off and then center in the bin
+                contribution = float(amount) * 100 / totalCount
+                if roundedScore in winning_margin_distribution_normalized:
+                    winning_margin_distribution_normalized[roundedScore] += contribution
+                else:
+                    winning_margin_distribution_normalized[roundedScore] = contribution
+
+            insights.append(
+                self._createInsight(
+                    winning_margin_distribution_normalized,
+                    Insight.INSIGHT_NAMES[Insight.WINNING_MARGIN_DISTRIBUTION],
+                    year
+                )
+            )
+
+        if elim_winning_margin_distribution != {}:
+            if binAmount is None:  # Use same binAmount from above if possible
+                binAmount = math.ceil(float(overall_high_margin) / 20)
+            totalCount = float(sum(elim_winning_margin_distribution.values()))
+            elim_winning_margin_distribution_normalized = {}
+            for margin, amount in elim_winning_margin_distribution.items():
+                roundedScore = margin - int(margin % binAmount) + binAmount / 2
+                contribution = float(amount) * 100 / totalCount
+                if roundedScore in elim_winning_margin_distribution_normalized:
+                    elim_winning_margin_distribution_normalized[roundedScore] += contribution
+                else:
+                    elim_winning_margin_distribution_normalized[roundedScore] = contribution
+
+            insights.append(
+                self._createInsight(
+                    elim_winning_margin_distribution_normalized,
+                    Insight.INSIGHT_NAMES[Insight.ELIM_WINNING_MARGIN_DISTRIBUTION],
+                    year
+                )
+            )
 
         return insights
 
