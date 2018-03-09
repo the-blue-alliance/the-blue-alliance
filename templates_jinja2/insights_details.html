@@ -125,6 +125,21 @@
     {% endif %}
   {% endif %}
 
+  {% if match_average_margins_by_week %}
+  <h3>Average Winning Margin By Week</h3>
+    {% if elim_match_average_margins_by_week %}
+    <div class="row">
+      <div class="col-sm-6 col-xs-12"><div class="color-key blue-color-key"></div><div class="chart-key-text">All Match Margin Averages</div></div>
+      <div class="col-sm-6 col-xs-12"><div class="color-key green-color-key"></div><div class="chart-key-text">{% if selected_year >= 2015 %}Playoff{% else %}Elim{% endif %} Match Margin Averages</div></div>
+    </div>
+    <figure style="width: 90%; height: 300px;" id="elim-match-average-chart"></figure>
+    <div id="elim-match-average" class="xcharts-data xcharts-line-data">[{{ match_average_margins_by_week.data_json|safe }}, {{ elim_match_average_margins_by_week.data_json|safe }}]</div>
+    {% else %}
+    <figure style="width: 90%; height: 300px;" id="match-average-chart"></figure>
+    <div id="match-average" class="xcharts-data xcharts-line-data">[{{ match_average_margins_by_week.data_json|safe }}]</div>
+    {% endif %}
+  {% endif %}
+
   {% if score_distribution %}
   <h3>Match Score Distribution <small>Percent of Matches vs. Match Score</small></h3>
     {% if elim_score_distribution %}

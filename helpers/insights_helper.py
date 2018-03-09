@@ -49,6 +49,7 @@ class InsightsHelper(object):
         insights += self._calculateHighscoreMatchesByWeek(week_event_matches, year)
         insights += self._calculateHighscoreMatches(week_event_matches, year)
         insights += self._calculateMatchAveragesByWeek(week_event_matches, year)
+        insights += self._calculateMatchWinningMarginByWeek(week_event_matches, year)
         insights += self._calculateScoreDistribution(week_event_matches, year)
         insights += self._calculateNumMatches(week_event_matches, year)
         insights += self._calculateYearSpecific(week_event_matches, year)
@@ -320,6 +321,59 @@ class InsightsHelper(object):
             insights.append(self._createInsight(match_averages_by_week, Insight.INSIGHT_NAMES[Insight.MATCH_AVERAGES_BY_WEEK], year))
         if elim_match_averages_by_week != []:
             insights.append(self._createInsight(elim_match_averages_by_week, Insight.INSIGHT_NAMES[Insight.ELIM_MATCH_AVERAGES_BY_WEEK], year))
+        return insights
+
+    @classmethod
+    def _calculateMatchWinningMarginByWeek(self, week_event_matches, year):
+        """
+        Returns a list of Insights, one for all data and one for elim data
+        The data for each Insight is a list of tuples:
+        (week string, match average margins)
+        """
+        match_average_margins_by_week = []  # tuples: week, average margin
+        elim_match_average_margins_by_week = []  # tuples: week, average margin
+        for week, week_events in week_event_matches:
+            week_match_margin_sum = 0
+            num_matches_by_week = 0
+            elim_week_match_margin_sum = 0
+            elim_num_matches_by_week = 0
+            for _, matches in week_events:
+                for match in matches:
+                    if not match.has_been_played:
+                        continue
+                    redScore = int(match.alliances['red']['score'])
+                    blueScore = int(match.alliances['blue']['score'])
+                    week_match_margin_sum += abs(redScore - blueScore)
+                    num_matches_by_week += 1
+                    if match.comp_level in Match.ELIM_LEVELS:
+                        elim_week_match_margin_sum += abs(redScore - blueScore)
+                        elim_num_matches_by_week += 1
+
+            if num_matches_by_week != 0:
+                week_average = float(week_match_margin_sum) / num_matches_by_week
+                match_average_margins_by_week.append((week, week_average))
+
+            if elim_num_matches_by_week != 0:
+                elim_week_average = float(elim_week_match_margin_sum) / elim_num_matches_by_week
+                elim_match_average_margins_by_week.append((week, elim_week_average))
+
+        insights = []
+        if match_average_margins_by_week != []:
+            insights.append(
+                self._createInsight(
+                    match_average_margins_by_week,
+                    Insight.INSIGHT_NAMES[Insight.MATCH_AVERAGE_MARGINS_BY_WEEK],
+                    year
+                )
+            )
+        if elim_match_average_margins_by_week != []:
+            insights.append(
+                self._createInsight(
+                    elim_match_average_margins_by_week,
+                    Insight.INSIGHT_NAMES[Insight.ELIM_MATCH_AVERAGE_MARGINS_BY_WEEK],
+                    year
+                )
+            )
         return insights
 
     @classmethod
