@@ -5,6 +5,7 @@ from database.district_query import DistrictsInYearQuery, DistrictHistoryQuery, 
 from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery, TeamYearEventTeamsQuery, \
     EventDivisionsQuery
 from database.event_details_query import EventDetailsQuery
+from database.gdcv_data_query import MatchGdcvDataQuery, EventMatchesGdcvDataQuery
 from database.match_query import MatchQuery, EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery, \
     EventMediasQuery, TeamTagMediasQuery, TeamYearTagMediasQuery
@@ -102,9 +103,11 @@ def match_updated(affected_refs):
     queries_and_keys = []
     for match_key in match_keys:
         queries_and_keys.append((MatchQuery(match_key.id())))
+        queries_and_keys.append((MatchGdcvDataQuery(match_key.id())))
 
     for event_key in event_keys:
         queries_and_keys.append((EventMatchesQuery(event_key.id())))
+        queries_and_keys.append((EventMatchesGdcvDataQuery(event_key.id())))
         for team_key in team_keys:
             queries_and_keys.append((TeamEventMatchesQuery(team_key.id(), event_key.id())))
 

@@ -81,6 +81,8 @@ coverage
 static/javascript/tba_js/tba_keys.js
 ops/deploy_keys.tar
 ops/tbatv-prod-hrd-deploy.json
+ops/dev/conf.json
+ops/dev/*-auth.json
 test_keys.json
 
 # Vagrant #

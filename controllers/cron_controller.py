@@ -673,11 +673,13 @@ class MatchTimePredictionsDo(webapp.RequestHandler):
         MatchTimePredictionHelper.predict_future_matches(event_key, played_matches, unplayed_matches, timezone, event.within_a_day)
 
         # Detect whether the event is down
-        # An event NOT down if ANY unplayed match's predicted time is within its scheduled time by a threshold
+        # An event NOT down if ANY unplayed match's predicted time is within its scheduled time by a threshold and
+        # the last played match (if it exists) wasn't too long ago.
         event_down = len(unplayed_matches) > 0
         for unplayed_match in unplayed_matches:
-            if (unplayed_match.predicted_time and unplayed_match.time and
-                unplayed_match.predicted_time < unplayed_match.time + datetime.timedelta(minutes=30)):
+            if ((unplayed_match.predicted_time and unplayed_match.time and
+                unplayed_match.predicted_time < unplayed_match.time + datetime.timedelta(minutes=30)) or
+                (played_matches == [] or played_matches[-1].actual_time > datetime.datetime.now() - datetime.timedelta(minutes=30))):
                 event_down = False
                 break
 

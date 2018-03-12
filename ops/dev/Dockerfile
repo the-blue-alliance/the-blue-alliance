@@ -14,11 +14,14 @@ RUN apt-get update && apt-get install -y \
   python2.7-dev \
   python-pip \
   build-essential \
+  jq \
+  python-mysqldb \
   checkinstall \
   libssl-dev \
   tmux \
   vim \
-  openssh-server
+  openssh-server \
+  libmysqlclient-dev
 
 # Configure ssh server
 RUN mkdir /var/run/sshd
