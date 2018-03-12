@@ -93,19 +93,6 @@
         <br><br>
       {% endif %}
 
-      {% if score_distribution %}
-        <h3>Match Score Distribution <small>Percent of Matches vs. Match Score</small></h3>
-        {% if elim_score_distribution %}
-          <div class="chart-key"><div class="color-key blue-color-key"></div><div class="chart-key-text">All Match Scores</div></div>
-          <div class="chart-key"><div class="color-key green-color-key"></div><div class="chart-key-text">Elim Match Scores</div></div>
-          <figure style="width: 90%; height: 300px;" id="elim-match-distribution-chart"></figure>
-          <div id="elim-match-distribution" class="xcharts-data xcharts-bar-data">[{{ score_distribution.data_json|safe }}, {{ elim_score_distribution.data_json|safe }}]</div>
-        {% else %}
-          <figure style="width: 90%; height: 300px;" id="match-distribution-chart"></figure>
-          <div id="match-distribution" class="xcharts-data xcharts-bar-data">[{{ score_distribution.data_json|safe }}]</div>
-        {% endif %}
-        <br><br>
-      {% endif %}
     </div>
   </div>
 </div>
