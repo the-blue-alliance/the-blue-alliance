@@ -147,6 +147,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/suggest/team/media/review', SuggestTeamMediaReviewController, 'suggest-team-media-review', strict_slash=True),
       RedirectRoute(r'/suggest/offseason', SuggestOffseasonEventController, 'suggest-offseason-event', strict_slash=True),
       RedirectRoute(r'/suggest/offseason/review', SuggestOffseasonEventReviewController, 'suggest-offseason-event-review', strict_slash=True),
+      RedirectRoute(r'/swag', redirect_to='https://www.amazon.com/s/ref=w_bl_sl_s_ap_web_7141123011?ie=UTF8&node=7141123011&field-brandtextbin=The+Blue+Alliance'),
       RedirectRoute(r'/team/<team_number:[0-9]+>', TeamCanonical, 'team-canonical', strict_slash=True),
       RedirectRoute(r'/team/<team_number:[0-9]+>/<year:[0-9]+>', TeamDetail, 'team-detail', strict_slash=True),
       RedirectRoute(r'/team/<team_number:[0-9]+>/history', TeamHistory, 'team-history', strict_slash=True),
