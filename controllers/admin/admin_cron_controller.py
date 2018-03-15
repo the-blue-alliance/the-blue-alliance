@@ -541,7 +541,7 @@ class AdminUpdateTeamSearchIndexDo(LoggedInHandler):
 class AdminUpdateAllMatchSearchIndexEnqueue(LoggedInHandler):
     def get(self):
         taskqueue.add(
-            queue_name='match-search-index-update',
+            queue_name='search-index-update',
             url='/tasks/do/update_all_match_search_index',
             method='GET')
         self.response.out.write("Enqueued update of all match search index")
@@ -559,5 +559,5 @@ class AdminUpdateAllMatchSearchIndexDo(LoggedInHandler):
 
 class AdminUpdateMatchSearchIndexDo(LoggedInHandler):
     def get(self, match_key):
-        team = Match.get_by_id(match_key)
-        SearchHelper.update_match_number_index(team)
+        match = Match.get_by_id(match_key)
+        SearchHelper.update_match_number_index(match)

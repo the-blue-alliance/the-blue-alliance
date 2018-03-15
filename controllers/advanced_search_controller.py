@@ -212,6 +212,7 @@ class AdvancedMatchSearchController(CacheableHandler):
 
     VALID_COMP_LEVELS = [
         ('qm', 'Qualifications'),
+        ('ef', 'Octofinals'),
         ('qf', 'Quarterfinals'),
         ('sf', 'Semifinals'),
         ('f', 'Finals')

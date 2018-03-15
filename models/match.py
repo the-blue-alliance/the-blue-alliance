@@ -95,17 +95,6 @@ class Match(ndb.Model):
     push_sent = ndb.BooleanProperty()  # has an upcoming match notification been sent for this match? None counts as False
     tiebreak_match_key = ndb.KeyProperty(kind='Match')  # Points to a match that was played to tiebreak this one
 
-    event_key = ndb.ComputedProperty(lambda self: self.event_key_name)
-    comp_level_sort = ndb.ComputedProperty(lambda self: self.play_order)
-    num_videos = ndb.ComputedProperty(lambda self: len(self.youtube_videos) + len(self.tba_videos))
-
-    team1 = ndb.ComputedProperty(lambda self: self.team_key_names[0] if len(self.team_key_names) > 0 else '')
-    team2 = ndb.ComputedProperty(lambda self: self.team_key_names[1] if len(self.team_key_names) > 1 else '')
-    team3 = ndb.ComputedProperty(lambda self: self.team_key_names[2] if len(self.team_key_names) > 2 else '')
-    team4 = ndb.ComputedProperty(lambda self: self.team_key_names[3] if len(self.team_key_names) > 3 else '')
-    team5 = ndb.ComputedProperty(lambda self: self.team_key_names[4] if len(self.team_key_names) > 4 else '')
-    team6 = ndb.ComputedProperty(lambda self: self.team_key_names[5] if len(self.team_key_names) > 5 else '')
-
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True)
 
@@ -230,6 +219,30 @@ class Match(ndb.Model):
         return [ndb.Key(Team, team_key_name) for team_key_name in self.team_key_names]
 
     @property
+    def team1(self):
+        return self.team_key_names[0] if len(self.team_key_names) > 0 else ''
+
+    @property
+    def team2(self):
+        return self.team_key_names[1] if len(self.team_key_names) > 1 else ''
+
+    @property
+    def team3(self):
+        return self.team_key_names[2] if len(self.team_key_names) > 2 else ''
+
+    @property
+    def team4(self):
+        return self.team_key_names[3] if len(self.team_key_names) > 3 else ''
+
+    @property
+    def team5(self):
+        return self.team_key_names[4] if len(self.team_key_names) > 4 else ''
+
+    @property
+    def team6(self):
+        return self.team_key_names[5] if len(self.team_key_names) > 5 else ''
+
+    @property
     def key_name(self):
         return self.renderKeyName(self.event_key_name, self.comp_level, self.set_number, self.match_number)
 
@@ -320,6 +333,10 @@ class Match(ndb.Model):
             if tba_path is not None:
                 videos.append({"type": "tba", "key": tba_path})
         return videos
+
+    @property
+    def num_videos(self):
+        return len(self.videos)
 
     @property
     def prediction_error_str(self):
