@@ -113,10 +113,13 @@ def store_match(data):
         match.post_result_time = datetime.datetime.fromtimestamp(int(data['post_result_time']))
     match.score_breakdown_json = json.dumps(data['score_breakdown'])
 
+    team_key_names = []
     for alliance in ['red', 'blue']:
+        team_key_names += data['alliances'][alliance]['team_keys']
         data['alliances'][alliance]['teams'] = data['alliances'][alliance].pop('team_keys')
         data['alliances'][alliance]['surrogates'] = data['alliances'][alliance].pop('surrogate_team_keys')
     match.alliances_json = json.dumps(data['alliances'])
+    match.team_key_names = team_key_names
 
     return MatchManipulator.createOrUpdate(match)
 
