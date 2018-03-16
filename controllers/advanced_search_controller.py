@@ -9,6 +9,7 @@ from helpers.search_helper import SearchHelper
 from models.event_team import EventTeam
 from template_engine import jinja2_engine
 import tba_config
+from models.match import Match
 
 
 SORT_ORDER = {
@@ -288,101 +289,48 @@ class AdvancedMatchSearchController(CacheableHandler):
         if new_search:
             match_results = []
             num_results = 0
-            result_expressions = None
         else:
             # Construct query string
-            sort_options_expressions = []
-            returned_expressions = []
             partial_queries = []
 
-            search_index = search.Index(name=SearchHelper.MATCH_NUMBER_INDEX)
+            search_1 = []
+            search_2 = []
 
-            partial_queries.append('year={}'.format(self._year))
+            for team in self._own_alliance:
+                search_1.append(Match.blue_alliance_team == 'frc{}'.format(team))
+                search_2.append(Match.red_alliance_team == 'frc{}'.format(team))
 
-            if len(self._own_alliance) > 0:
-                own_alliance_keys = ['frc{}'.format(team) for team in self._own_alliance]
+            for team in self._opp_alliance:
+                search_1.append(Match.red_alliance_team == 'frc{}'.format(team))
+                search_2.append(Match.blue_alliance_team == 'frc{}'.format(team))
 
-                own_alliance_a = ' AND '.join(['(team1={team} OR team2={team} OR team3={team})'.format(team=team)
-                    for team in own_alliance_keys])
-                own_alliance_b = ' AND '.join(['(team4={team} OR team5={team} OR team6={team})'.format(team=team)
-                    for team in own_alliance_keys])
+            if len(search_1) > 0:
+                partial_queries.append(ndb.OR(ndb.AND(*search_1), ndb.AND(*search_2)))
 
-                if len(self._opp_alliance) > 0:
-                    opp_alliance_keys = ['frc{}'.format(team) for team in self._opp_alliance]
+            if self._year is not None:
+                partial_queries.append(Match.year == self._year)
 
-                    opp_alliance_a = ' AND '.join(['(team1={team} OR team2={team} OR team3={team})'.format(team=team)
-                        for team in opp_alliance_keys])
-                    opp_alliance_b = ' AND '.join(['(team4={team} OR team5={team} OR team6={team})'.format(team=team)
-                        for team in opp_alliance_keys])
-
-                    partial_queries.append('({own_a} AND {opp_b}) OR ({own_b} AND {opp_a})'.format(own_a=own_alliance_a, own_b=own_alliance_b,
-                                                                                                   opp_a=opp_alliance_a, opp_b=opp_alliance_b))
-                else:
-                    partial_queries.append('(({own_a}) OR ({own_b}))'.format(own_a=own_alliance_a, own_b=own_alliance_b))
+            if self._event_key is not None:
+                partial_queries.append(Match.event == ndb.Key('Event', self._event_key))
 
             if len(self._comp_levels) > 0:
-                comp_levels = ' OR '.join(['comp_level={level}'.format(level=level) for level in self._comp_levels])
-
-                partial_queries.append('({})'.format(comp_levels))
-
-            if self._event_key:
-                partial_queries.append('event_key={}'.format(self._event_key))
+                partial_queries.append(Match.comp_level.IN(self._comp_levels))
 
             if self._video:
-                partial_queries.append('num_videos>0')
+                partial_queries.append(Match.has_video == True)
 
-            query_string = ' AND ' .join(partial_queries)
+            matches, _, _ = Match.query(*partial_queries).order(Match.play_order_sort).order(Match._key).fetch_page(self.PAGE_SIZE, offset=self.PAGE_SIZE * self._page)
 
-            sort_options_expressions.append(
-                search.SortExpression(
-                    expression='event_key',
-                    direction=search.SortExpression.ASCENDING))
-
-            sort_options_expressions.append(
-                search.SortExpression(
-                    expression='comp_level_sort',
-                    direction=search.SortExpression.ASCENDING))
-
-            sort_options_expressions.append(
-                search.SortExpression(
-                    expression='match_number',
-                    direction=search.SortExpression.ASCENDING))
-
-            # Perform query
-            query = search.Query(
-                query_string=query_string,
-                options=search.QueryOptions(
-                    limit=self.PAGE_SIZE,
-                    number_found_accuracy=10000,  # Larger than the number of possible results
-                    offset=self.PAGE_SIZE * self._page,
-                    sort_options=search.SortOptions(
-                        expressions=sort_options_expressions
-                    ),
-                    returned_expressions=returned_expressions
-                )
-            )
-
-            docs = search_index.search(query)
-            num_results = docs.number_found
-            match_model_keys = []
+            num_results = len(matches)
             event_model_keys = []
-            result_expressions = defaultdict(lambda: defaultdict(float))
-            for result in docs.results:
-                match_key = result.doc_id
-                event_key = result.doc_id.split('_')[0]
-                match_model_keys.append(ndb.Key('Match', match_key))
-                event_model_keys.append(ndb.Key('Event', event_key))
-                for expression in result.expressions:
-                    result_expressions[match_key][expression.name] = expression.value
+            for match in matches:
+                event_model_keys.append(match.event)
 
-            match_model_futures = ndb.get_multi_async(match_model_keys)
             event_model_futures = ndb.get_multi_async(event_model_keys)
-
-            match_result_models = [model_future.get_result() for model_future in match_model_futures]
             event_result_models = [model_future.get_result() for model_future in event_model_futures]
 
             match_results = []
-            for n, model in enumerate(match_result_models):
+            for n, model in enumerate(matches):
                 model.match_key = model.key.id()
                 model.event_model = event_result_models[n]
                 match_results.append(model)
@@ -405,7 +353,6 @@ class AdvancedMatchSearchController(CacheableHandler):
             'num_results': num_results,
             'capped_num_results': min(self.MAX_RESULTS, num_results),
             'result_models': match_results,
-            'result_expressions': result_expressions,
             'sort_field': self._sort_field,
         })
 

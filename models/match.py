@@ -95,6 +95,12 @@ class Match(ndb.Model):
     push_sent = ndb.BooleanProperty()  # has an upcoming match notification been sent for this match? None counts as False
     tiebreak_match_key = ndb.KeyProperty(kind='Match')  # Points to a match that was played to tiebreak this one
 
+    play_order_sort = ndb.ComputedProperty(lambda self: self.play_order)
+    has_video = ndb.ComputedProperty(lambda self: (len(self.youtube_videos) + len(self.tba_videos)) > 0)
+
+    red_alliance_team = ndb.ComputedProperty(lambda self: self.alliances['red']['teams'], repeated=True)
+    blue_alliance_team = ndb.ComputedProperty(lambda self: self.alliances['blue']['teams'], repeated=True)
+
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True)
 
@@ -219,30 +225,6 @@ class Match(ndb.Model):
         return [ndb.Key(Team, team_key_name) for team_key_name in self.team_key_names]
 
     @property
-    def team1(self):
-        return self.team_key_names[0] if len(self.team_key_names) > 0 else ''
-
-    @property
-    def team2(self):
-        return self.team_key_names[1] if len(self.team_key_names) > 1 else ''
-
-    @property
-    def team3(self):
-        return self.team_key_names[2] if len(self.team_key_names) > 2 else ''
-
-    @property
-    def team4(self):
-        return self.team_key_names[3] if len(self.team_key_names) > 3 else ''
-
-    @property
-    def team5(self):
-        return self.team_key_names[4] if len(self.team_key_names) > 4 else ''
-
-    @property
-    def team6(self):
-        return self.team_key_names[5] if len(self.team_key_names) > 5 else ''
-
-    @property
     def key_name(self):
         return self.renderKeyName(self.event_key_name, self.comp_level, self.set_number, self.match_number)
 
@@ -275,10 +257,6 @@ class Match(ndb.Model):
             return "F%s" % self.match_number
         else:
             return "%s%s-%s" % (self.comp_level.upper(), self.set_number, self.match_number)
-
-    @property
-    def has_video(self):
-        return (len(self.youtube_videos) + len(self.tba_videos)) > 0
 
     @property
     def details_url(self):
