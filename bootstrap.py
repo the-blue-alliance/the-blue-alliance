@@ -120,6 +120,12 @@ def store_match(data):
         data['alliances'][alliance]['surrogates'] = data['alliances'][alliance].pop('surrogate_team_keys')
     match.alliances_json = json.dumps(data['alliances'])
     match.team_key_names = team_key_names
+    
+    youtube_videos = []
+    for video in data['videos']:
+        if video['type'] == 'youtube':
+            youtube_videos.append(video['key'])
+    match.youtube_videos = youtube_videos
 
     return MatchManipulator.createOrUpdate(match)
 
