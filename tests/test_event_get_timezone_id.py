@@ -41,8 +41,8 @@ class TestEventGetTimezoneId(unittest2.TestCase):
             location = LocationHelper.get_lat_lng(event['location'])
             if location:
                 break
-        self.assertAlmostEqual(location[0], 41.76371109999999, places=6)
-        self.assertAlmostEqual(location[1], -72.6850932, places=6)
+        self.assertAlmostEqual(location[0], 41.7658043, places=3)
+        self.assertAlmostEqual(location[1], -72.6733723, places=3)
         self.assertEqual(LocationHelper.get_timezone_id(event['location']), 'America/New_York')
 
     def test_2013flbr(self):
