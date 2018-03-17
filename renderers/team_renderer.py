@@ -104,13 +104,25 @@ class TeamRenderer(object):
                         team_rank = ranking['rank']
                         break
 
+            video_ids = ""
+            for lv in Match.COMP_LEVELS:
+                ms = matches_organized[lv] # All matches at this level
+                for m in ms:
+                    vidstr = ""
+                    for v in m.youtube_videos: # All videos for this match
+                        # Split to remove time links, they dont work in playlists
+                        vidstr = vidstr + v.split("?")[0] + ","
+                    video_ids = video_ids + vidstr
+            video_ids = video_ids[:-1] # Remove trailing comma
+
             participation.append({"event": event,
                                   "matches": matches_organized,
                                   "wlt": display_wlt,
                                   "qual_avg": qual_avg,
                                   "elim_avg": elim_avg,
                                   "rank": team_rank,
-                                  "awards": event_awards})
+                                  "awards": event_awards,
+                                  "video_ids" : video_ids})
 
         season_wlt = None
         offseason_wlt = None
