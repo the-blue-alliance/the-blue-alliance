@@ -106,14 +106,12 @@ class TeamRenderer(object):
 
             video_ids = ""
             for lv in Match.COMP_LEVELS:
-                ms = matches_organized[lv] # All matches at this level
+                ms = matches_organized[lv]
                 for m in ms:
                     vidstr = ""
-                    for v in m.youtube_videos: # All videos for this match
-                        # Split to remove time links, they dont work in playlists
-                        vidstr = vidstr + v.split("?")[0] + ","
+                    for v in m.youtube_videos:
+                        if len(v) > 0: vidstr = vidstr + v.split("?")[0] + ","
                     video_ids = video_ids + vidstr
-            video_ids = video_ids[:-1] # Remove trailing comma
 
             participation.append({"event": event,
                                   "matches": matches_organized,
