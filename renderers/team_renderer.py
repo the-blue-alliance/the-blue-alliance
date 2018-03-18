@@ -110,7 +110,8 @@ class TeamRenderer(object):
                 for m in ms:
                     vidstr = ""
                     for v in m.youtube_videos:
-                        if len(v) > 0: vidstr = vidstr + v.split("?")[0] + ","
+                        if len(v) > 0: 
+                            vidstr = vidstr + v.split("?")[0] + ","
                     video_ids = video_ids + vidstr
 
             participation.append({"event": event,
@@ -120,7 +121,7 @@ class TeamRenderer(object):
                                   "elim_avg": elim_avg,
                                   "rank": team_rank,
                                   "awards": event_awards,
-                                  "video_ids" : video_ids})
+                                  "video_ids": video_ids})
 
         season_wlt = None
         offseason_wlt = None
