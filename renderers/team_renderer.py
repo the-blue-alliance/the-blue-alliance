@@ -110,7 +110,7 @@ class TeamRenderer(object):
                 for m in ms:
                     vidstr = ""
                     for v in m.youtube_videos:
-                        if len(v) > 0: 
+                        if len(v) > 0:
                             vidstr = vidstr + v.split("?")[0] + ","
                     video_ids = video_ids + vidstr
 
