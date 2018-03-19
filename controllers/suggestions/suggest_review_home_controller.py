@@ -26,6 +26,7 @@ class SuggestReviewHomeController(SuggestionsReviewBaseController):
     def get(self):
         self.template_values['suggestions'] = dict()
         self.template_values['suggestions']['match'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "match")
+        self.template_values['suggestions']['match-removal'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "match-removal")
         self.template_values['suggestions']['event'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "event")
         self.template_values['suggestions']['media'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "media")
         self.template_values['suggestions']['event_media'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "event_media")

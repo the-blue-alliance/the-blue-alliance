@@ -43,7 +43,7 @@ from controllers.suggestions.suggest_event_media_review_controller import \
       SuggestEventMediaReviewController
 from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController, \
       SuggestMatchVideoPlaylistController
-from controllers.suggestions.suggest_match_video_review_controller import SuggestMatchVideoReviewController
+from controllers.suggestions.suggest_match_video_review_controller import SuggestMatchVideoReviewController, SuggestRemoveMatchVideoReviewController
 from controllers.suggestions.suggest_event_webcast_controller import SuggestEventWebcastController
 from controllers.suggestions.suggest_event_webcast_review_controller import SuggestEventWebcastReviewController
 from controllers.suggestions.suggest_offseason_event_controller import \
@@ -139,6 +139,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/suggest/event/video', SuggestMatchVideoPlaylistController, 'suggest-matches-playlist', strict_slash=True),
       RedirectRoute(r'/suggest/match/video', SuggestMatchVideoController, 'suggest-match-video', strict_slash=True),
       RedirectRoute(r'/suggest/match/video/review', SuggestMatchVideoReviewController, 'suggest-match-video-review', strict_slash=True),
+      RedirectRoute(r'/suggest/remove/match/video/review', SuggestRemoveMatchVideoReviewController, 'suggest-remove-match-video-review', strict_slash=True),
       RedirectRoute(r'/suggest/review', SuggestReviewHomeController, 'suggest-review-home', strict_slash=True),
       RedirectRoute(r'/suggest/event/media/review', SuggestEventMediaReviewController, 'suggest-event-media-review', strict_slash=True),
       RedirectRoute(r'/suggest/team/media', SuggestTeamMediaController, 'suggest-team-media', strict_slash=True),

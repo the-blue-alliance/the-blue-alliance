@@ -6,6 +6,12 @@
             Match Video Suggestions
         </a>
     </li>
+    <li{% if suggestions['match-removal'] %} class="active"{% endif %}>
+        <a href="/suggest/remove/match/video/review">
+            <span class="badge pull-right">{{suggestions['match-removal']}}</span>
+            Match Video Removal Suggestions
+        </a>
+    </li>
     <li{% if suggestions.event %} class="active"{% endif %}>
         <a href="/suggest/event/webcast/review">
             <span class="badge pull-right">{{suggestions.event}}</span>

@@ -58,3 +58,57 @@ class SuggestMatchVideoReviewController(SuggestionsReviewBaseController):
         self._process_rejected(reject_keys)
 
         self.redirect("/suggest/match/video/review")
+
+
+class SuggestRemoveMatchVideoReviewController(SuggestionsReviewBaseController):
+    REQUIRED_PERMISSIONS = [AccountPermissions.REVIEW_MEDIA]
+
+    def __init__(self, *args, **kw):
+        super(SuggestRemoveMatchVideoReviewController, self).__init__(*args, **kw)
+
+    def create_target_model(self, suggestion):
+        target_key = self.request.get('key-{}'.format(suggestion.key.id()), suggestion.target_key)
+        match = Match.get_by_id(target_key)
+        if not match:
+            return None
+        return MatchSuggestionAccepter.accept_suggestion(match, suggestion)
+
+    """
+    View the list of suggestions.
+    """
+    def get(self):
+        suggestions = Suggestion.query().filter(
+            Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
+            Suggestion.target_model == "match-removal").fetch(limit=50)
+
+        # Roughly sort by event and match for easier review
+        suggestions = sorted(suggestions, key=lambda s: s.target_key)
+
+        self.template_values.update({
+            "suggestions": suggestions,
+        })
+
+        self.response.out.write(jinja2_engine.render('suggestions/suggest_remove_match_video_review_list.html', self.template_values))
+
+    def post(self):
+        accept_keys = []
+        reject_keys = []
+        for value in self.request.POST.values():
+            split_value = value.split('::')
+            if len(split_value) == 2:
+                key = split_value[1]
+            else:
+                continue
+            if value.startswith('accept'):
+                accept_keys.append(key)
+            elif value.startswith('reject'):
+                reject_keys.append(key)
+
+        # Process accepts
+        for accept_key in accept_keys:
+            self._process_accepted(accept_key)
+
+        # Process rejects
+        self._process_rejected(reject_keys)
+
+        self.redirect("/suggest/remove/match/video/review")

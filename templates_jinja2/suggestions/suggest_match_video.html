@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}The Blue Alliance - Add Match Video{% endblock %}
+{% block title %}The Blue Alliance - Add or Remove Match Video{% endblock %}
 
-{% block meta_description %}Add match videos to The Blue Alliance.{% endblock %}
+{% block meta_description %}Add or remove match videos to The Blue Alliance.{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -27,6 +27,24 @@
         <h4>Thanks!</h4>
         <p>The video you submitted is already pending review!</p>
       </div>
+      {% elif status == 'removal_success' %}
+      <div class="alert alert-success">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Thanks!</h4>
+        <p>We'll review your suggestion and get the video removed from the site!</p>
+      </div>
+      {% elif status == 'removal_suggestion_exists' %}
+      <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Thanks!</h4>
+        <p>The removal suggestion is already pending review!</p>
+      </div>
+      {% elif status == 'removal_need_reason' %}
+      <div class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Uh-oh!</h4>
+        <p>You must provide a reason for a video to be removed.</p>
+      </div>
       {% else %}
       <div class="alert alert-danger">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -41,10 +59,10 @@
     <div class="col-xs-12 col-lg-6 col-lg-offset-3">
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h1 class="panel-title">Help others by adding videos!</h1>
+          <h1 class="panel-title">Help others by adding or removing videos!</h1>
         </div>
         <div class="panel-body">
-          <p>Thanks for helping make The Blue Alliance better! Let us know about videos so we can add them to the site! Do you have a playlist with many videos for this event? Input them all on <a href="/suggest/event/video?event_key={{ event.key_name }}">this page</a>!</p>
+          <p>Thanks for helping make The Blue Alliance better! Let us know about videos so we can add them to the site or remove incorrect ones. Do you have a playlist with many videos for this event? Input them all on <a href="/suggest/event/video?event_key={{ event.key_name }}">this page</a>.</p>
           <ul>
             <li>Your suggestion will be reviewed by a moderator</li>
             <li>Your account info (like {{user_bundle.user.email()}} and {{user_bundle.user.nickname()}}) will also be submitted. <a href="{{user_bundle.logout_url}}">log in as a different user</a></li>
@@ -54,11 +72,30 @@
           {% if match.youtube_videos %}
           <p>Videos on The Blue Alliance</p>
           {% for youtube_video in match.youtube_videos %}
-            <iframe width="240" height="180" src="https://www.youtube.com/embed/{{youtube_video}}?rel=0" frameborder="0" allowfullscreen></iframe>
+            <div class="row">
+              <div class="col-xs-6">
+                <div class="fitvids">
+                  <iframe width="240" height="180" src="https://www.youtube.com/embed/{{youtube_video}}?rel=0" frameborder="0" allowfullscreen></iframe>
+                </div>
+              </div>
+              <div class="col-xs-6">
+                <form action="/suggest/match/video" method="post" id="suggest_match_video_remove">
+                  <input name="action" type="hidden" value="remove" />
+                  <input name="match_key" type="hidden" value="{{match.key.id()}}" />
+                  <input name="youtube_id" type="hidden" value="{{youtube_video}}" />
+                  <div class="form-group">
+                    <label class="control-label">Reason for removal (required)</label>
+                    <textarea class="form-control" name="reason"></textarea>
+                  </div>
+                  <button class="btn btn-danger" type="submit"><span class="glyphicon glyphicon-minus"></span> Suggest Removal</button>
+                </form>
+              </div>
+            </div>
           {% endfor %}
           <h4>Add another video</h4>
           {% endif %}
           <form action="/suggest/match/video" method="post" id="suggest_match_video">
+            <input name="action" type="hidden" value="add" />
             <input name="match_key" type="hidden" value="{{match.key.id()}}" />
             <div class="input-group">
               <input class="form-control" type="text" name="youtube_url" placeholder="https://www.youtube.com/watch?v=MQ0VNzIvHx0" value="" />

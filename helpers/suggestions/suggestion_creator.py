@@ -194,6 +194,36 @@ class SuggestionCreator(object):
             return 'bad_url'
 
     @classmethod
+    def createMatchVideoYouTubeRemoveSuggestion(cls, author_account_key, youtube_id, match_key, reason):
+        """Create a YouTube Match Video removal suggestion. Returns status (removal_success, removal_suggestion_exists, removal_need_reason)"""
+        if youtube_id:
+            match = Match.get_by_id(match_key)
+            if not match:
+                return 'bad_match'
+            if not reason:
+                return 'removal_need_reason'
+            if youtube_id in match.youtube_videos:
+                year = match_key[:4]
+                suggestion_id = Suggestion.render_media_key_name(year, 'match-removal', match_key, 'youtube', youtube_id)
+                suggestion = Suggestion.get_by_id(suggestion_id)
+                if not suggestion or suggestion.review_state != Suggestion.REVIEW_PENDING:
+                    suggestion = Suggestion(
+                        id=suggestion_id,
+                        author=author_account_key,
+                        target_key=match_key,
+                        target_model="match-removal",
+                        )
+                    suggestion.contents = {"youtube_videos": [youtube_id], "reason": reason}
+                    suggestion.put()
+                    return 'removal_success'
+                else:
+                    return 'removal_suggestion_exists'
+            else:
+                return 'removal_success'
+        else:
+            return 'bad_url'
+
+    @classmethod
     def createDummyOffseasonSuggestions(cls, events_to_suggest):
         """
         Create an offseason suggestion from a made up bot.
