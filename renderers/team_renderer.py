@@ -104,15 +104,16 @@ class TeamRenderer(object):
                         team_rank = ranking['rank']
                         break
 
-            video_ids = ""
-            for lv in Match.COMP_LEVELS:
-                ms = matches_organized[lv]
-                for m in ms:
-                    vidstr = ""
-                    for v in m.youtube_videos:
-                        if len(v) > 0:
-                            vidstr = vidstr + v.split("?")[0] + ","
-                    video_ids = video_ids + vidstr
+            video_ids = []
+            playlist = ""
+            for level in Match.COMP_LEVELS:
+                matches = matches_organized[level]
+                for match in matches:
+                    video_ids += [video.split("?")[0] for video in match.youtube_videos]
+            if video_ids:
+                playlist_title = "{} (Team {})".format(event.name, team.team_number)
+                playlist = "https://www.youtube.com/watch_videos?video_ids={}&title={}"
+                playlist = playlist.format(",".join(video_ids), playlist_title)
 
             participation.append({"event": event,
                                   "matches": matches_organized,
@@ -121,7 +122,7 @@ class TeamRenderer(object):
                                   "elim_avg": elim_avg,
                                   "rank": team_rank,
                                   "awards": event_awards,
-                                  "video_ids": video_ids})
+                                  "playlist": playlist})
 
         season_wlt = None
         offseason_wlt = None
