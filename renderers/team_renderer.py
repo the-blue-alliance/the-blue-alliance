@@ -104,13 +104,25 @@ class TeamRenderer(object):
                         team_rank = ranking['rank']
                         break
 
+            video_ids = []
+            playlist = ""
+            for level in Match.COMP_LEVELS:
+                matches = matches_organized[level]
+                for match in matches:
+                    video_ids += [video.split("?")[0] for video in match.youtube_videos]
+            if video_ids:
+                playlist_title = "{} (Team {})".format(event.name, team.team_number)
+                playlist = "https://www.youtube.com/watch_videos?video_ids={}&title={}"
+                playlist = playlist.format(",".join(video_ids), playlist_title)
+
             participation.append({"event": event,
                                   "matches": matches_organized,
                                   "wlt": display_wlt,
                                   "qual_avg": qual_avg,
                                   "elim_avg": elim_avg,
                                   "rank": team_rank,
-                                  "awards": event_awards})
+                                  "awards": event_awards,
+                                  "playlist": playlist})
 
         season_wlt = None
         offseason_wlt = None

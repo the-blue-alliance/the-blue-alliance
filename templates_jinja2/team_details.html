@@ -141,6 +141,10 @@
                   </ul>
                   {% endif %}
                 </p>
+                {% if comp.playlist %}
+                <a class="btn btn-default" href="{{comp.playlist}}" target="_blank">
+                  <span class="glyphicon glyphicon-play-circle"></span> Watch All Matches</a>
+                {% endif %}
                 {% endif %}
               </div>
               <div class="col-sm-8" style="margin-top: 1em">
