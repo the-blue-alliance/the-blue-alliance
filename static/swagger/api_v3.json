@@ -5322,7 +5322,7 @@
           "type": "string"
         },
         "match_id": {
-          "description": "Match ID consisting of the level, match number, and set number, eg `q45` or `f1m1`.",
+          "description": "Match ID consisting of the level, match number, and set number, eg `qm45` or `f1m1`.",
           "type": "string"
         },
         "mode": {
@@ -5345,7 +5345,7 @@
           "type": "integer"
         },
         "blue_boost_played": {
-          "description": "Number of POWER CUBES in the BOOST section of the blue alliance VAULT when BOOST was played, or 0 if not played.",
+          "description": "Returns 1 if the blue alliance BOOST was played, or 0 if not played.",
           "type": "integer"
         },
         "blue_current_powerup": {
@@ -5361,7 +5361,7 @@
           "type": "integer"
         },
         "blue_force_played": {
-          "description": "Number of POWER CUBES in the FORCE section of the blue alliance VAULT when FORCE was played, or 0 if not played.",
+          "description": "Returns 1 if the blue alliance FORCE was played, or 0 if not played.",
           "type": "integer"
         },
         "blue_levitate_count": {
@@ -5369,7 +5369,7 @@
           "type": "integer"
         },
         "blue_levitate_played": {
-          "description": "Number of POWER CUBES in the LEVITATE section of the blue alliance VAULT when LEVITATE was played, or 0 if not played.",
+          "description": "Returns 1 if the blue alliance LEVITATE was played, or 0 if not played.",
           "type": "integer"
         },
         "blue_powerup_time_remaining": {
@@ -5397,7 +5397,7 @@
           "type": "integer"
         },
         "red_boost_played": {
-          "description": "Number of POWER CUBES in the BOOST section of the red alliance VAULT when BOOST was played, or 0 if not played.",
+          "description": "Returns 1 if the red alliance BOOST was played, or 0 if not played.",
           "type": "integer"
         },
         "red_current_powerup": {
@@ -5413,7 +5413,7 @@
           "type": "integer"
         },
         "red_force_played": {
-          "description": "Number of POWER CUBES in the FORCE section of the red alliance VAULT when FORCE was played, or 0 if not played.",
+          "description": "Returns 1 if the red alliance FORCE was played, or 0 if not played.",
           "type": "integer"
         },
         "red_levitate_count": {
@@ -5421,7 +5421,7 @@
           "type": "integer"
         },
         "red_levitate_played": {
-          "description": "Number of POWER CUBES in the LEVITATE section of the red alliance VAULT when LEVITATE was played, or 0 if not played.",
+          "description": "Returns 1 if the red alliance LEVITATE was played, or 0 if not played.",
           "type": "integer"
         },
         "red_powerup_time_remaining": {
