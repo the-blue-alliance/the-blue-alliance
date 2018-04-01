@@ -34,6 +34,7 @@ EXPOSE 22
 
 # Get appengine environment
 ENV GAE_VERSION 1.9.66
+ENV PYTHONPATH /google_appengine
 RUN wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_$GAE_VERSION.zip -nv
 RUN unzip -q google_appengine_$GAE_VERSION.zip
 
