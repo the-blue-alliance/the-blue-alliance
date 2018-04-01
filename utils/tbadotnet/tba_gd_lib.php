@@ -1,4 +1,4 @@
-<?php
+<?
 
 /**
  * @param    $hex string        6-digit hexadecimal color
@@ -128,12 +128,4 @@ function imageStringoutline(&$im,$size,$x,$y,&$col,&$outlinecol,$text,$width) {
     // Draw the main text
     $text2 = imageString($im,$size,$x,$y,$text,$col);
 }
-
-function tba_api_request($path) {
-	global $key;
-	// TODO: Use curl instead?
-	$json = file_get_contents(
-		"https://www.thebluealliance.com/api/v3/$path?X-TBA-Auth-Key=$key"
-	);
-	return json_decode($json, true);
-}
+?>
