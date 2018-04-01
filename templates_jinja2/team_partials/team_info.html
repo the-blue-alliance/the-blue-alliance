@@ -36,14 +36,7 @@
       {% for media in social_medias %}
         {{smm.social_media_icon_link(media)}}{% if not loop.last %}&middot;{% endif %}
       {% endfor %}
-      <hr>
     </p>
-
-    <p class="pull-right">
-      <span class="image-atc"></span> <a href="http://atthecontrol.com/">Live Data: At The Control</a>
-    </p>
-
-    {% include "team_partials/team_social_media.html" %}
   </div>
   <div class="col-sm-6">
   {% if current_event %}
