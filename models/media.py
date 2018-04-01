@@ -149,11 +149,11 @@ class Media(ndb.Model):
 
     @property
     def instagram_direct_url_med(self):
-        return self.image_direct_url.replace('s640x640', 's320x320').replace('/vp', '')
+        return self.instagram_direct_url
 
     @property
     def instagram_direct_url_sm(self):
-        return self.image_direct_url.replace('s640x640', 's120x120').replace('/vp', '')
+        return self.instagram_direct_url
 
     @property
     def view_image_url(self):
