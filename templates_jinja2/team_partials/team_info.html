@@ -81,10 +81,6 @@
       {% if year %}
         {% if medias_by_slugname and medias_by_slugname.grabcad %}
          <span class="glyphicon glyphicon-hdd"></span><a href="#robot-profile"> {{ medias_by_slugname.grabcad|length }} CAD Model{% if medias_by_slugname.grabcad|length > 1 %}s{% endif %}</a>
-        {% else %}
-          <div class="text-center">
-            <a class="btn btn-xs btn-default text-center" href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add CAD Model!</a>
-          </div>
         {% endif %}
       {% endif %}
     </p>
