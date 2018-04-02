@@ -27,19 +27,22 @@
 <div class="container">
   <div class="row">
     <div class="col-xs-12">
-      <p><a class="btn btn-default" href="/event/{{event.key_name}}"><span class="glyphicon glyphicon-chevron-left"></span> {{ event.year }} {{ event.name }}</a></p>
       <h1>{{match.verbose_name}} <small><a href="/event/{{event.key_name}}">{{ event.year }} {{ event.name }}</a></small></h1>
     </div>
   </div>
   <div class="row">
-    <div class="col-xs-12 col-sm-7 col-md-6">
-      <h3>Match Results</h3>
+    <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
       {{mtm.single_match_table(match)}}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12 col-md-6">
       {% if match_breakdown_template %}
+      <h3>Detailed Results</h3>
         {% include match_breakdown_template %}
       {% endif %}
     </div>
-    <div class="col-xs-12 col-sm-5 col-md-6">
+    <div class="col-sm-12 col-md-6">
       <h3>Video</h3>
       {% if match.tba_video %}
         {% include "video_partials/tbavideo_player.html" %}
@@ -48,13 +51,17 @@
         {% include "video_partials/youtube_video_player.html" %}
       {% endfor %}
       {% if not match.tba_video and not match.youtube_videos %}
-        <p>We don't know about any videos for this match yet. :(</p>
+        <p>We don't know about any videos for this match yet. 🙁</p>
         <p>Help others out by searching YouTube and adding videos!</p>
       {% endif %}
       <p>
         <a class="btn btn-success" href="/suggest/match/video?match_key={{match.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add videos</a>
         <a class="btn btn-primary" href="https://www.youtube.com/results?search_query={{match.short_name|urlencode}}+{{event.year}}+{{event.name|urlencode}}" target="_blank"><span class="glyphicon glyphicon-search"></span> Search YouTube</a>
       </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
       <hr>
       <div class="fb-comments" data-href="http://www.thebluealliance.com/match/{{match.key_name}}" data-num-posts="3" data-width="470"></div>
     </div>
