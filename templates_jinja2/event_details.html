@@ -96,46 +96,6 @@
     </div>
   </div>
 
-  {% if event.now %}
-  <div class="row">
-    <div class="col-sm-12">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <div class="pull-right">
-            {% if event.webcast %}
-              {% if event.webcast_status == 'offline' %}
-                <a class="btn btn-default btn-xs" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Offline</a>
-              {% else %}
-                <a class="btn btn-success btn-xs" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
-              {% endif %}
-            {% else %}
-              <a class="btn btn-xs btn-default" href="/suggest/event/webcast?event_key={{event.key_name}}" target="_blank">Add webcast</a>
-            {% endif %}
-          </div>
-          <h3 class="panel-title">Event in progress</h3>
-        </div>
-        <div class="clearfix"></div>
-
-        <div id="liveevent-content" data-eventkey="{{event.key.id()}}">
-          {% if matches_recent %}
-          <div class="col-sm-6 text-center">
-            <h4>Last Matches</h4>
-            {{ mtm.recent_match_table(matches_recent) }}
-          </div>
-          {% if matches_upcoming %}
-          <div class="col-sm-6 text-center">
-            <h4>Upcoming Matches</h4>
-            {{ mtm.upcoming_match_table(matches_upcoming) }}
-          </div>
-          {% endif %}
-          {% endif %}
-          <div class="clearfix"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-  {% endif %}
-
   <div class="row">
     <div class="col-sm-12">
       <ul class="nav nav-tabs nav-justified">
@@ -144,7 +104,7 @@
         {% if awards %}<li><a href="#awards" data-toggle="tab">Awards</a></li>{% endif %}
         {% if district_points_sorted %}<li><a href="#district-points" data-toggle="tab">District Points</a></li>{% endif %}
         <li class="{% if matches.num == 0 %}active{% endif %}"><a href="#teams" data-toggle="tab">Teams <span class="badge">{{num_teams}}</span></a></li>
-        {% if event_insights_qual or event_insights_playoff %}<li><a href="#event-insights" data-toggle="tab">Insights</a></li>{% endif %}
+        {% if event_insights_qual or event_insights_playoff or oprs|length > 0 %}<li><a href="#event-insights" data-toggle="tab">Insights</a></li>{% endif %}
         <li><a href="#media" data-toggle="tab">Media <span class="badge">{{medias_by_slugname.youtube|length}}</span></a></li>
       </ul>
     </div>
@@ -153,6 +113,47 @@
   <div class="tab-content">
     {% if matches.num > 0 %}
     <div class="tab-pane active" id="results">
+      {% if event.now %}
+      <br />
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <div class="pull-right">
+                {% if event.webcast %}
+                  {% if event.webcast_status == 'offline' %}
+                    <a class="btn btn-default btn-xs" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Offline</a>
+                  {% else %}
+                    <a class="btn btn-success btn-xs" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
+                  {% endif %}
+                {% else %}
+                  <a class="btn btn-xs btn-default" href="/suggest/event/webcast?event_key={{event.key_name}}" target="_blank">Add webcast</a>
+                {% endif %}
+              </div>
+              <h3 class="panel-title">Event in progress</h3>
+            </div>
+            <div class="clearfix"></div>
+
+            <div id="liveevent-content" data-eventkey="{{event.key.id()}}">
+              {% if matches_recent %}
+              <div class="col-sm-6 text-center">
+                <h4>Last Matches</h4>
+                {{ mtm.recent_match_table(matches_recent) }}
+              </div>
+              {% if matches_upcoming %}
+              <div class="col-sm-6 text-center">
+                <h4>Upcoming Matches</h4>
+                {{ mtm.upcoming_match_table(matches_upcoming) }}
+              </div>
+              {% endif %}
+              {% endif %}
+              <div class="clearfix"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
       <div class="row">
         {% if matches.qm %}
         <div class="col-sm-6">
@@ -184,14 +185,11 @@
                 {% include "bracket_partials/bracket_table.html" %}
               {% endif %}
             {% endif %}
-
-            {% include "event_partials/event_opr_table.html" %}
           {% endif %}
         </div>
         {% else %}
           <div class="col-sm-6">
             {% include "event_partials/event_alliances_table.html" %}
-            {% include "event_partials/event_opr_table.html" %}
           </div>
         {% endif %}
 
@@ -398,8 +396,16 @@
     </div>
     {% endif %}
 
-    {% if event_insights_qual or event_insights_playoff %}
+    {% if event_insights_qual or event_insights_playoff or oprs|length > 0 %}
     <div class="tab-pane" id="event-insights">
+      {% if oprs|length > 0 %}
+      <div class="row">
+        <div class="col-sm-12">
+          {% include "event_partials/event_opr_table.html" %}
+        </div>
+      </div>
+      {% endif %}
+
       <div class="row">
         {% if event_insights_qual %}
         <div class="col-sm-6">
