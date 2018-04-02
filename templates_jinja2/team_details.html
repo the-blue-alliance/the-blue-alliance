@@ -42,11 +42,7 @@
               </ul>
             </li>
             <li>
-              <a class="smooth-scroll" href="#media">Media</a>
-              <ul class="nav">
-                <li><a class="smooth-scroll" href="#photos">Photos</a></li>
-                <li><a class="smooth-scroll" href="#videos">Videos</a></li>
-              </ul>
+              <a class="smooth-scroll" href="#media">Photos &amp; Videos</a>
               <li><a class="smooth-scroll" href="#robot-profile">Robot Profile</a></li>
             </li>
           </ul>
@@ -168,37 +164,38 @@
         <div class="col-xs-12">
           <hr>
           <a class="btn btn-success pull-right" href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add Media!</a>
-          <h2 id="media">Media</h2>
+          <h2 id="media">Photos &amp; Videos</h2>
+          {% if image_medias or medias_by_slugname.youtube %}
+            <div class="row">
+              <div class="col-xs-12">
+                {% if image_medias %}
+                  {% for media in image_medias %}
+                    <div class="col-xs-6 col-sm-3">
+                      {% include "media_partials/media_display_partial.html" %}
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  <p>No photos for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add one</a>?</p>
+                {% endif %}
+              </div>
+            </div>
 
-          <div class="row">
-            <div class="col-xs-12">
-              <h3 id="photos">Photos</h3>
-              {% if image_medias %}
-                {% for media in image_medias %}
-                  <div class="col-xs-6 col-sm-3">
+            <div class="row">
+              <div class="col-xs-12">
+                {% if medias_by_slugname.youtube %}
+                  {% for media in medias_by_slugname.youtube %}
+                    <div class="col-xs-12 col-md-6 fitvids">
                     {% include "media_partials/media_display_partial.html" %}
-                  </div>
-                {% endfor %}
-              {% else %}
-                <p>No photos for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add one</a>?</p>
-              {% endif %}
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  <p>No videos for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add one</a>?</p>
+                {% endif %}
+              </div>
             </div>
-          </div>
-
-          <div class="row">
-            <div class="col-xs-12">
-              <h3 id="videos">Videos</h3>
-              {% if medias_by_slugname.youtube %}
-                {% for media in medias_by_slugname.youtube %}
-                  <div class="col-xs-12 col-md-6 fitvids">
-                  {% include "media_partials/media_display_partial.html" %}
-                  </div>
-                {% endfor %}
-              {% else %}
-                <p>No videos for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add one</a>?</p>
-              {% endif %}
-            </div>
-          </div>
+          {% else %}
+            <p>No photos or videos for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add one</a>?</p>
+          {% endif %}
         </div>
       </div>
 

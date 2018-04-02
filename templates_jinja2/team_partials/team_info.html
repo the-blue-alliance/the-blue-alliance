@@ -36,14 +36,7 @@
       {% for media in social_medias %}
         {{smm.social_media_icon_link(media)}}{% if not loop.last %}&middot;{% endif %}
       {% endfor %}
-      <hr>
     </p>
-
-    <p class="pull-right">
-      <span class="image-atc"></span> <a href="http://atthecontrol.com/">Live Data: At The Control</a>
-    </p>
-
-    {% include "team_partials/team_social_media.html" %}
   </div>
   <div class="col-sm-6">
   {% if current_event %}
@@ -88,10 +81,6 @@
       {% if year %}
         {% if medias_by_slugname and medias_by_slugname.grabcad %}
          <span class="glyphicon glyphicon-hdd"></span><a href="#robot-profile"> {{ medias_by_slugname.grabcad|length }} CAD Model{% if medias_by_slugname.grabcad|length > 1 %}s{% endif %}</a>
-        {% else %}
-          <div class="text-center">
-            <a class="btn btn-xs btn-default text-center" href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add CAD Model!</a>
-          </div>
         {% endif %}
       {% endif %}
     </p>
