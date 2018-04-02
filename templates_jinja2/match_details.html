@@ -37,6 +37,12 @@
   </div>
   <div class="row">
     <div class="col-sm-12 col-md-6">
+      {% if match_breakdown_template %}
+      <h3>Detailed Results</h3>
+        {% include match_breakdown_template %}
+      {% endif %}
+    </div>
+    <div class="col-sm-12 col-md-6">
       <h3>Video</h3>
       {% if match.tba_video %}
         {% include "video_partials/tbavideo_player.html" %}
@@ -52,12 +58,6 @@
         <a class="btn btn-success" href="/suggest/match/video?match_key={{match.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add videos</a>
         <a class="btn btn-primary" href="https://www.youtube.com/results?search_query={{match.short_name|urlencode}}+{{event.year}}+{{event.name|urlencode}}" target="_blank"><span class="glyphicon glyphicon-search"></span> Search YouTube</a>
       </p>
-    </div>
-    <div class="col-sm-12 col-md-6">
-      {% if match_breakdown_template %}
-      <h3>Detailed Results</h3>
-        {% include match_breakdown_template %}
-      {% endif %}
     </div>
   </div>
   <div class="row">
