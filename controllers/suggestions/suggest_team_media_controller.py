@@ -42,11 +42,17 @@ class SuggestTeamMediaController(LoggedInHandler):
         medias = [media_future.get_result() for media_future in media_futures]
         medias_by_slugname = MediaHelper.group_by_slugname(medias)
 
+        media_key_futures = Media.query(Media.references == team.key, Media.year == None).fetch_async(500, keys_only=True)
+        media_futures = ndb.get_multi_async(media_key_futures.get_result())
+        medias = [media_future.get_result() for media_future in media_futures]
+        social_medias = [media for media in medias if media.media_type_enum == MediaType.INSTAGRAM_PROFILE] # we only allow IG media, so only show IG profile
+
         self.template_values.update({
+            "medias_by_slugname": medias_by_slugname,
+            "social_medias": social_medias,
             "status": self.request.get("status"),
             "team": team,
             "year": year,
-            "medias_by_slugname": medias_by_slugname,
         })
 
         self.response.out.write(jinja2_engine.render('suggestions/suggest_team_media.html', self.template_values))

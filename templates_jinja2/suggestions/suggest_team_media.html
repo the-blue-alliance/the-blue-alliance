@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import 'media_partials/social_media_macros.html' as smm %}
 
 {% block title %}The Blue Alliance - Add Team Media{% endblock %}
 
@@ -55,31 +56,11 @@
 
           <p><strong>Currently supported formats are:</strong></p>
           <ul>
-            <li>Chief Delphi Images
-              <ul>
-                <li>Example: <code>http://www.chiefdelphi.com/media/photos/36646</code></li>
-              </ul>
-            </li>
-            <li>Imgur Images
-              <ul>
-                <li>Example: <code>http://imgur.com/aF8T5ZE</code></li>
-              </ul>
-            </li>
-            <li>Instagram Images
-              <ul>
-                <li>Example: <code>https://www.instagram.com/p/BUnZiriBYre</code></li>
-              </ul>
-            </li>
-            <li>YouTube Videos
-              <ul>
-                <li>Example: <code>https://www.youtube.com/watch?v=DojyJ9bZ4fk</code></li>
-              </ul>
-            </li>
-            <li>GrabCAD Files
-              <ul>
-                <li>Example: <code>https://grabcad.com/library/cad-stuff</code></li>
-              </ul>
-            </li>
+            <li><strong>Chief Delphi images</strong>, like <code>http://www.chiefdelphi.com/media/photos/36646</code></li>
+            <li><strong>Imgur images</strong>, like <code>http://imgur.com/aF8T5ZE</code></li>
+            <li><strong>Instagram photos and videos</strong>, like <code>https://www.instagram.com/p/BUnZiriBYre</code></li>
+            <li><strong>YouTube videos</strong>, like <code>https://www.youtube.com/watch?v=DojyJ9bZ4fk</code></li>
+            <li><strong>GrabCAD files</strong>, like <code>https://grabcad.com/library/cad-stuff</code></li>
           </ul>
 
           <p><strong>Please do not submit:</strong></p>
@@ -93,6 +74,21 @@
           <hr>
 
           <h3>Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %} ({{year}})</h3>
+
+          <div class="row">
+            {{social_media}}
+            <div class="col-xs-12">
+              {% if social_medias %}
+                <h4>Team {{team.team_number}}'s social media accounts</h4>
+                <p>You may be able to find photos or videos that have been shared on social media.</p>
+                <ul>
+                {% for media in social_medias %}
+                  <li>{{smm.social_media_icon_link(media)}}</li>
+                {% endfor %}
+                </ul>
+              {% endif %}
+            </div>
+          </div>
 
           {% if medias_by_slugname.cdphotothread %}
           <div class="row">
