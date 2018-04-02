@@ -104,3 +104,7 @@ cron:
 # - description: BlueZone Update
 #   url: /tasks/do/bluezone_update
 #   schedule: every 1 minutes
+
+- description: Update Team Search Indexes
+  url: /tasks/enqueue/update_all_team_search_index
+  schedule: every monday 04:00
