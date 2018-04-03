@@ -7,6 +7,8 @@ from google.appengine.ext import ndb
 from consts.media_type import MediaType
 from controllers.base_controller import LoggedInHandler
 
+from database import media_query
+
 from helpers.media_helper import MediaHelper, MediaParser
 from helpers.suggestions.suggestion_creator import SuggestionCreator
 from helpers.outgoing_notification_helper import OutgoingNotificationHelper
@@ -38,15 +40,15 @@ class SuggestTeamMediaController(LoggedInHandler):
             self.redirect("/", abort=True)
 
         media_key_futures = Media.query(Media.references == team.key, Media.year == year).fetch_async(500, keys_only=True)
+        social_media_future = media_query.TeamSocialMediaQuery(team.key.id()).fetch_async()
+
         media_futures = ndb.get_multi_async(media_key_futures.get_result())
         medias = [media_future.get_result() for media_future in media_futures]
         medias_by_slugname = MediaHelper.group_by_slugname(medias)
 
-        media_key_futures = Media.query(Media.references == team.key, Media.year == None).fetch_async(500, keys_only=True)
-        media_futures = ndb.get_multi_async(media_key_futures.get_result())
-        medias = [media_future.get_result() for media_future in media_futures]
-        social_medias = [media for media in medias if media.media_type_enum == MediaType.INSTAGRAM_PROFILE] # we only allow IG media, so only show IG profile
-
+        social_medias = sorted(social_media_future.get_result(), key=MediaHelper.social_media_sorter)
+        social_medias = filter(lambda m: m.media_type_enum == MediaType.INSTAGRAM_PROFILE, social_medias) # we only allow IG media, so only show IG profile
+        
         self.template_values.update({
             "medias_by_slugname": medias_by_slugname,
             "social_medias": social_medias,
