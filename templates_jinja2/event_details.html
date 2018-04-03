@@ -37,8 +37,9 @@
       {% if event.year == 2016 and event.event_type_enum == 3 %}
       <p class="pull-right"><a class="btn btn-primary" href="/event/{{event.key_name}}/insights"><span class="glyphicon glyphicon-align-left"></span> Advanced Insights</a></p>
       {% endif %}
+      <h1 itemprop="summary">{{event.name}} {{event.year}}</h1>
       {% if event_divisions %}
-        <div class="btn-group">
+      <div class="btn-group division-button">
         <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
           {% if event.divisions %}Event Divisions{% elif parent_event %}Other Divisions{% endif %}
           <span class="caret"></span>
@@ -52,7 +53,6 @@
         </ul>
       </div>
       {% endif %}
-      <h1 itemprop="summary">{{event.name}} {{event.year}}</h1>
     </div>
   </div>
   <div class="row">
