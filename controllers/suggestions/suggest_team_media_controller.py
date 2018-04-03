@@ -47,8 +47,8 @@ class SuggestTeamMediaController(LoggedInHandler):
         medias_by_slugname = MediaHelper.group_by_slugname(medias)
 
         social_medias = sorted(social_media_future.get_result(), key=MediaHelper.social_media_sorter)
-        social_medias = filter(lambda m: m.media_type_enum == MediaType.INSTAGRAM_PROFILE, social_medias) # we only allow IG media, so only show IG profile
-        
+        social_medias = filter(lambda m: m.media_type_enum == MediaType.INSTAGRAM_PROFILE, social_medias)  # we only allow IG media, so only show IG profile
+
         self.template_values.update({
             "medias_by_slugname": medias_by_slugname,
             "social_medias": social_medias,
