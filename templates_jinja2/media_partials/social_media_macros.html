@@ -51,6 +51,7 @@
     {% elif suggestion.contents.media_type_enum == 6 %}
         <!-- GitHub profile -->
         <div class="github-card" data-user="{{ suggestion.contents.foreign_key }}"></div>
+        <p><a href="//www.github.com/{{ suggestion.contents.foreign_key }}">github.com/{{ suggestion.contents.foreign_key }}</a></p>
     {% elif suggestion.contents.media_type_enum == 7 %}
         <!-- Instagram profile -->
         {{ suggestion.contents.site_name }}:
