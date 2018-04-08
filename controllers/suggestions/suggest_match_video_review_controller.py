@@ -35,7 +35,6 @@ class SuggestMatchVideoReviewController(SuggestionsReviewBaseController):
         events = [event_future.get_result() for event_future in event_futures]
 
         self.template_values.update({
-            "suggestions": suggestions,
             "suggestions_and_events": zip(suggestions, events),
         })
 
