@@ -6,7 +6,7 @@
 {% block meta_description %}Videos and match results for the {{event.year}} {{event.name}} FIRST Robotics Competition in {{event.location}}.{% endblock %}
 
 {% block more_head_tags %}
-    <meta property="og:title" content="{{ event.year }} {{ event.name }}"
+  <meta property="og:title" content="{{ event.year }} {{ event.name }}"
           xmlns="http://www.w3.org/1999/html"/>
   <meta property="og:type" content="article" />
   <meta property="og:image" content="http://www.thebluealliance.com/images/logo_square_512.png" />
@@ -37,9 +37,9 @@
       {% if event.year == 2016 and event.event_type_enum == 3 %}
       <p class="pull-right"><a class="btn btn-primary" href="/event/{{event.key_name}}/insights"><span class="glyphicon glyphicon-align-left"></span> Advanced Insights</a></p>
       {% endif %}
-      <a class="btn btn-default" href="/events/{{event.year}}"><span class="glyphicon glyphicon-chevron-left"></span> {{event.year}} Events</a>
+      <h1 itemprop="summary">{{event.name}} {{event.year}}</h1>
       {% if event_divisions %}
-        <div class="btn-group">
+      <div class="btn-group division-button">
         <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
           {% if event.divisions %}Event Divisions{% elif parent_event %}Other Divisions{% endif %}
           <span class="caret"></span>
@@ -53,17 +53,18 @@
         </ul>
       </div>
       {% endif %}
-      <h1 itemprop="summary">{{event.name}} {{event.year}}</h1>
-      {% if district_name or parent_event %}<blockquote>
-          {% if district_name %}<p></p><em>Part of the <a href="/events/{{district_abbrev}}/{{event.year}}">{{district_name}} District</a></em></p>{% endif %}
-          {% if parent_event %}<p><em>Winners advance to the <a href="/event/{{ parent_event.key_name }}">{{ parent_event.name }}</a></em></p>{% endif %}
-      </blockquote>{% endif %}
     </div>
   </div>
   <div class="row">
     <div class="col-sm-12">
-      <a class="btn btn-success pull-right" href="/suggest/event/video?event_key={{event.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add Match Videos!</a>
+      <a class="btn btn-success pull-right hidden-xs" href="/suggest/event/video?event_key={{event.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add Match Videos!</a>
       <p>
+        {% if district_name %}
+          <span class="glyphicon glyphicon-globe"></span> <a href="/events/{{district_abbrev}}/{{event.year}}">{{district_name}} District</a> Event<br />
+        {% endif %}
+        {% if parent_event %}
+          <span class="glyphicon glyphicon-circle-arrow-right"></span> Winners advance to the <a href="/event/{{ parent_event.key_name }}">{{ parent_event.name }}</a><br />
+        {% endif %}
         {% if event.start_date %}
           <span class="glyphicon glyphicon-calendar"></span> <time itemprop="startDate" datetime="{{event.start_date.isoformat()}}">{{ event.start_date|strftime("%B %d") }}{% if event.start_date.date() != event.end_date.date() %}</time> to <time itemprop="endDate" datetime="{{event.end_date.isoformat()}}">{{ event.end_date|strftime("%B %d") }}{% endif %}, {{ event.end_date|strftime("%Y") }}</time>
         {% endif %}
@@ -82,16 +83,9 @@
             <a href="http://maps.google.com/maps?q={{ event.location|urlencode }}" target="_blank">{{event.location}}</a>
           {% endif %}
         {% endif %}
-        {% if event.website %}<br><span class="glyphicon glyphicon-globe"></span> <a href="{{ event.website }}" title="{{ event.name }}" target="_blank">{{ event.website }}</a>{% endif %}
+        {% if event.website %}<br><span class="glyphicon glyphicon-link"></span> <a href="{{ event.website }}" title="{{ event.name }}" target="_blank">{{ event.website }}</a>{% endif %}
         {% if event.first_eid %}{% if not event.website %}<br><span class="glyphicon glyphicon-info-sign"></span>{% else %} - {% endif %} details on <a href="http://www.firstinspires.org/team-event-search/event?id={{ event.first_eid }}" target="_blank">firstinspires.org</a>{% endif %}
         {% if event.facebook_eid %}<br><span class="glyphicon glyphicon-thumbs-up"></span> <a href="{{ event.facebook_event_url }}" title="Facebook Event" target="_blank">RSVP on Facebook</a><br>{% endif %}
-      </p>
-
-      <p><strong>#{{ event.hashtag }}</strong> <small><a href="/hashtags" rel="tooltip" title="What are hashtags?">?</a></small> - Search
-        <a class="hashtag-link hashtag-twitter" href="https://twitter.com/search/%23{{ event.hashtag }}" target="_blank" title="Search Twitter">Twitter</a> &middot;
-        <a class="hashtag-link hashtag-youtube" href="http://www.youtube.com/results?search_query=%23{{ event.hashtag }}+OR+%22{{ event.name|urlencode }}%22" target="_blank" title="Search YouTube">YouTube</a> &middot;
-        <a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/{{ event.hashtag }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a> &middot;
-        <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23{{ event.hashtag }}" target="_blank" title="Search Flickr">Flickr</a>
       </p>
     </div>
   </div>
