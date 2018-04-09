@@ -1,6 +1,7 @@
 from consts.account_permissions import AccountPermissions
 from controllers.suggestions.suggestions_review_base_controller import SuggestionsReviewBaseController
 from helpers.suggestions.match_suggestion_accepter import MatchSuggestionAccepter
+from models.event import Event
 from models.match import Match
 from models.suggestion import Suggestion
 from template_engine import jinja2_engine
@@ -30,8 +31,11 @@ class SuggestMatchVideoReviewController(SuggestionsReviewBaseController):
         # Roughly sort by event and match for easier review
         suggestions = sorted(suggestions, key=lambda s: s.target_key)
 
+        event_futures = [Event.get_by_id_async(suggestion.target_key.split("_")[0]) for suggestion in suggestions]
+        events = [event_future.get_result() for event_future in event_futures]
+
         self.template_values.update({
-            "suggestions": suggestions,
+            "suggestions_and_events": zip(suggestions, events),
         })
 
         self.response.out.write(jinja2_engine.render('suggestions/suggest_match_video_review_list.html', self.template_values))
