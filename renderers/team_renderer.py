@@ -58,7 +58,6 @@ class TeamRenderer(object):
         if not events_sorted:
             return None
 
-
         district_name = None
         district_abbrev = None
         team_district_points = None
