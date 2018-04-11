@@ -8,7 +8,6 @@ from consts.district_type import DistrictType
 from consts.award_type import AwardType
 from consts.media_tag import MediaTag
 from database import award_query, event_query, match_query, media_query, team_query
-from database.district_query import DistrictQuery
 from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetcher
 
 from helpers.award_helper import AwardHelper
@@ -58,6 +57,21 @@ class TeamRenderer(object):
         events_sorted, matches_by_event_key, awards_by_event_key, valid_years = TeamDetailsDataFetcher.fetch(team, year, return_valid_years=True)
         if not events_sorted:
             return None
+
+
+        district_name = None
+        district_abbrev = None
+        team_district_points = None
+        team_districts = team_districts_future.get_result()
+        for district in team_districts:
+            if district.year == year:
+                district_abbrev = district.abbreviation
+                district_name = district.display_name
+                if district.rankings:
+                    team_district_points = next(
+                        iter(filter(lambda r: r['team_key'] == team.key_name,
+                               district.rankings)), None)
+                break
 
         participation = []
         season_wlt_list = []
@@ -115,6 +129,12 @@ class TeamRenderer(object):
                 playlist = "https://www.youtube.com/watch_videos?video_ids={}&title={}"
                 playlist = playlist.format(",".join(video_ids), playlist_title)
 
+            district_points = None
+            if team_district_points:
+                import logging
+                logging.info(team_district_points)
+                district_points = next(iter(filter(lambda e: e['event_key'] == event.key_name, team_district_points['event_points'])), None)
+
             participation.append({"event": event,
                                   "matches": matches_organized,
                                   "wlt": display_wlt,
@@ -122,7 +142,9 @@ class TeamRenderer(object):
                                   "elim_avg": elim_avg,
                                   "rank": team_rank,
                                   "awards": event_awards,
-                                  "playlist": playlist})
+                                  "playlist": playlist,
+                                  "district_points": district_points,
+                                 })
 
         season_wlt = None
         offseason_wlt = None
@@ -162,14 +184,6 @@ class TeamRenderer(object):
         social_medias = sorted(social_media_future.get_result(), key=MediaHelper.social_media_sorter)
         preferred_image_medias = filter(lambda x: team.key in x.preferred_references, image_medias)
 
-        district_name = None
-        district_abbrev = None
-        team_districts = team_districts_future.get_result()
-        for district in team_districts:
-            if district.year == year:
-                district_abbrev = district.abbreviation
-                district_name = district.display_name
-
         last_competed = None
         participation_years = participation_future.get_result()
         if len(participation_years) > 0:
@@ -199,7 +213,8 @@ class TeamRenderer(object):
             "last_competed": last_competed,
             "current_year": current_year,
             "max_year": tba_config.MAX_YEAR,
-            "hof": hall_of_fame
+            "hof": hall_of_fame,
+            "team_district_points": team_district_points,
         })
 
         if short_cache:
