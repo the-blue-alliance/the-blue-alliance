@@ -131,20 +131,22 @@ class TeamRenderer(object):
 
             district_points = None
             if team_district_points:
-                import logging
-                logging.info(team_district_points)
-                district_points = next(iter(filter(lambda e: e['event_key'] == event.key_name, team_district_points['event_points'])), None)
+                district_points = next(
+                    iter(
+                        filter(lambda e: e['event_key'] == event.key_name,
+                               team_district_points['event_points'])), None)
 
-            participation.append({"event": event,
-                                  "matches": matches_organized,
-                                  "wlt": display_wlt,
-                                  "qual_avg": qual_avg,
-                                  "elim_avg": elim_avg,
-                                  "rank": team_rank,
-                                  "awards": event_awards,
-                                  "playlist": playlist,
-                                  "district_points": district_points,
-                                 })
+            participation.append({
+                "event": event,
+                "matches": matches_organized,
+                "wlt": display_wlt,
+                "qual_avg": qual_avg,
+                "elim_avg": elim_avg,
+                "rank": team_rank,
+                "awards": event_awards,
+                "playlist": playlist,
+                "district_points": district_points,
+            })
 
         season_wlt = None
         offseason_wlt = None
