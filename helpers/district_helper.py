@@ -121,7 +121,7 @@ class DistrictHelper(object):
             if event.district_points is not None:
                 for team_key in set(event.district_points['points'].keys()).union(set(event.district_points['tiebreakers'].keys())):
                     team_attendance_count[team_key] += 1
-                    if team_attendance_count[team_key] <= 2 or event.event_type_enum == EventType.DISTRICT_CMP:
+                    if team_attendance_count[team_key] <= 2 or event.event_type_enum == EventType.DISTRICT_CMP or event.event_type_enum == EventType.DISTRICT_CMP_DIVISION:
                         if team_key in event.district_points['points']:
                             team_totals[team_key]['event_points'].append((event, event.district_points['points'][team_key]))
                             team_totals[team_key]['point_total'] += event.district_points['points'][team_key]['total']

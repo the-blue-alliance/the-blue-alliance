@@ -558,7 +558,9 @@ class DistrictRankingsCalcDo(webapp.RequestHandler):
             point_detail["event_points"] = []
             for event, event_points in points["event_points"]:
                 event_points['event_key'] = event.key.id()
-                event_points['district_cmp'] = True if event.event_type_enum == EventType.DISTRICT_CMP else False
+                event_points['district_cmp'] = (
+                    event.event_type_enum == EventType.DISTRICT_CMP or
+                    event.event_type_enum == EventType.DISTRICT_CMP_DIVISION)
                 point_detail["event_points"].append(event_points)
 
             point_detail["rookie_bonus"] = points.get("rookie_bonus", 0)
