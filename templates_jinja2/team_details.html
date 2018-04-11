@@ -74,6 +74,9 @@
               in {{year}}.</p>
             {% endif %}
           {% endif %}
+          {% if team_district_points and district_name %}
+            <p>As a memeber of the {{district_name}} district, Team {{team.team_number}} ranked <b>{{team_district_points.rank}}</b> having earned <b>{{team_district_points.point_total}}</b> points.</p>
+          {% endif %}
 
           <div class="text-center">
             {# for 4/1 #}
@@ -141,6 +144,39 @@
                 <a class="btn btn-default" href="{{comp.playlist}}" target="_blank">
                   <span class="glyphicon glyphicon-play-circle"></span> Watch All Matches</a>
                 {% endif %}
+                {% endif %}
+                {% if comp.district_points %}
+                  <h4>District Points Earned</h4>
+                  <table class="table table-condensed table-striped">
+                    <thead>
+                      <tr>
+                        <th>Category</th>
+                        <th>Points</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Qual Points</td>
+                        <td>{{comp.district_points.qual_points}}</td>
+                      </tr>
+                      <tr>
+                        <td>Alliance Points</td>
+                        <td>{{comp.district_points.alliance_points}}</td>
+                      </tr>
+                      <tr>
+                        <td>Playoff Points</td>
+                        <td>{{comp.district_points.elim_points}}</td>
+                      </tr>
+                      <tr>
+                        <td>Award Points</td>
+                        <td>{{comp.district_points.award_points}}</td>
+                      </tr>
+                      <tr>
+                        <th>Total Points</th>
+                        <th>{{comp.district_points.total}}</th>
+                      </tr>
+                    </tbody>
+                  </table>
                 {% endif %}
               </div>
               <div class="col-sm-8" style="margin-top: 1em">
