@@ -173,9 +173,10 @@ firedux.ref.child('live_events').on('value', (snapshot) => {
       store.dispatch(setTwitchChat(defaultChat))
     }
     // Hide the chat if requested
-    if (params.chat == 'hidden') {
+    if (params.chat === 'hidden') {
       store.dispatch(setChatSidebarVisibility(false))
-    } else if (params.chat) { // Overwrite default chat with param
+    } else if (params.chat) {
+      // Overwrite default chat with param
       store.dispatch(setTwitchChat(params.chat))
     }
     isLoad = false
