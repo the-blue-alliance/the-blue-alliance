@@ -72,7 +72,11 @@ class DistrictHelper(object):
             cls.calc_wlt_based_match_points(district_points, event.matches, POINTS_MULTIPLIER)
 
         # alliance points
-        if event.alliance_selections:
+        if event.event_type_enum == EventType.DISTRICT_CMP and event.divisions:
+            # If this is a DCMP that has divisions, there are no alliance points
+            # awarded, since a team would have got them in the division already
+            pass
+        elif event.alliance_selections:
             selection_points = EventHelper.alliance_selections_to_points(event, POINTS_MULTIPLIER, event.alliance_selections)
             for team, points in selection_points.items():
                 district_points['points'][team]['alliance_points'] += points
