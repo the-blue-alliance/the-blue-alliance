@@ -32,6 +32,7 @@ before_deploy:
 jobs:
   include:
   - stage: deploy
+    if: branch = master
     script: skip
     env: JOB=DEPLOY
     deploy:
