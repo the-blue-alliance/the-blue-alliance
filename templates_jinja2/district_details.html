@@ -149,7 +149,7 @@
                   {% if item.event_points[2] %}
                   {{item.event_points[2].total}} <a href="/event/{{item.event_points[2].event_key}}" rel="tooltip" title="{{events_by_key[item.event_points[2].event_key].short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
                   {% if item.event_points[3] %}
-                  / {{item.event_points[3].total}} <a href="/event/{{item.event_points[3].event_key}}" rel="tooltip" title="{{events_by_key[item.event_points[3].event_key].short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
+                  + {{item.event_points[3].total}} <a href="/event/{{item.event_points[3].event_key}}" rel="tooltip" title="{{events_by_key[item.event_points[3].event_key].short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
                   {% endif %}
                   {% else %}
                   --
