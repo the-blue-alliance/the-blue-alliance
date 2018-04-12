@@ -15,6 +15,10 @@ env:
   - JOB=PYBUILD
   - JOB=JSUNIT
   - JOB=LINT
+stages:
+  - name: deploy
+    # require the branch name to be master
+    if: branch = master
 before_install:
 - nvm install 8.0.0
 install:
@@ -32,7 +36,6 @@ before_deploy:
 jobs:
   include:
   - stage: deploy
-    if: branch = master
     script: skip
     env: JOB=DEPLOY
     deploy:
@@ -42,4 +45,3 @@ jobs:
       on:
         repo: the-blue-alliance/the-blue-alliance
         branch: master
-
