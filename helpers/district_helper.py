@@ -45,7 +45,10 @@ class DistrictHelper(object):
         event.get_matches_async()
 
         # Typically 3 for District CMP, 1 otherwise
-        POINTS_MULTIPLIER = DistrictPointValues.DISTRICT_CMP_MULTIPLIER.get(event.year, DistrictPointValues.DISTRICT_CMP_MULIPLIER_DEFAULT) if event.event_type_enum == EventType.DISTRICT_CMP else DistrictPointValues.STANDARD_MULTIPLIER
+        use_dcmp_multiplier = event.event_type_enum == EventType.DISTRICT_CMP or event.event_type == EventType.DISTRICT_CMP_DIVISION
+        POINTS_MULTIPLIER = DistrictPointValues.DISTRICT_CMP_MULTIPLIER.get(
+            event.year, DistrictPointValues.DISTRICT_CMP_MULIPLIER_DEFAULT
+        ) if use_dcmp_multiplier else DistrictPointValues.STANDARD_MULTIPLIER
 
         district_points = {
             'points': defaultdict(lambda: {
