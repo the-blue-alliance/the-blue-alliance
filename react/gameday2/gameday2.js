@@ -11,7 +11,7 @@ import { indigo500, indigo700 } from 'material-ui/styles/colors'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import GamedayFrame from './components/GamedayFrame'
 import gamedayReducer, { firedux } from './reducers'
-import { setWebcastsRaw, setLayout, addWebcastAtPosition, setTwitchChat, setDefaultTwitchChat, setFavoriteTeams, togglePositionLivescore } from './actions'
+import { setWebcastsRaw, setLayout, addWebcastAtPosition, setTwitchChat, setDefaultTwitchChat, setChatSidebarVisibility, setFavoriteTeams, togglePositionLivescore } from './actions'
 import { MAX_SUPPORTED_VIEWS } from './constants/LayoutConstants'
 
 injectTapEventPlugin()
@@ -172,8 +172,11 @@ firedux.ref.child('live_events').on('value', (snapshot) => {
       store.dispatch(setDefaultTwitchChat(defaultChat))
       store.dispatch(setTwitchChat(defaultChat))
     }
-    // Overwrite default chat with param
-    if (params.chat) {
+    // Hide the chat if requested
+    if (params.chat === 'hidden') {
+      store.dispatch(setChatSidebarVisibility(false))
+    } else if (params.chat) {
+      // Overwrite default chat with param
       store.dispatch(setTwitchChat(params.chat))
     }
     isLoad = false
@@ -220,6 +223,8 @@ store.subscribe(() => {
   // Chat sidebar
   if (chatSidebar) {
     newParams.chat = currentChat
+  } else {
+    newParams.chat = 'hidden'
   }
 
   const query = queryString.stringify(newParams)
