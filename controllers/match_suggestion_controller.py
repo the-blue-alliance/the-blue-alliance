@@ -12,18 +12,18 @@ class MatchSuggestionHandler(LoggedInHandler):
 
     def get_qual_bluezone_score(self, prediction):
         return min(100, (
-            min(prediction['red']['auto_points'] * prediction['red']['auto_points'], 3600) / 1200 +
-            min(prediction['blue']['auto_points'] * prediction['blue']['auto_points'], 3600) / 1200 +
-            min(prediction['red']['endgame_points'] * prediction['red']['endgame_points'], 144) / 64 +
-            min(prediction['blue']['endgame_points'] * prediction['blue']['endgame_points'], 144) / 64
+            min(prediction['red']['auto_points'] * prediction['red']['auto_points'], 2000) / 2000 +
+            min(prediction['blue']['auto_points'] * prediction['blue']['auto_points'], 2000) / 2000 +
+            min(prediction['red']['endgame_points'] * prediction['red']['endgame_points'], 8100) / 8100 +
+            min(prediction['blue']['endgame_points'] * prediction['blue']['endgame_points'], 8100) / 8100
         ) * 25)
 
     def get_elim_bluezone_score(self, prediction):
         return min(100, (
-            min(prediction['red']['auto_points'] * prediction['red']['auto_points'], 8000) / 3000 +
-            min(prediction['blue']['auto_points'] * prediction['blue']['auto_points'], 8000) / 3000 +
-            min(prediction['red']['endgame_points'] * prediction['red']['endgame_points'], 144) / 72 +
-            min(prediction['blue']['endgame_points'] * prediction['blue']['endgame_points'], 144) / 72
+            min(prediction['red']['auto_points'] * prediction['red']['auto_points'], 2000) / 2000 +
+            min(prediction['blue']['auto_points'] * prediction['blue']['auto_points'], 2000) / 2000 +
+            min(prediction['red']['endgame_points'] * prediction['red']['endgame_points'], 8100) / 8100 +
+            min(prediction['blue']['endgame_points'] * prediction['blue']['endgame_points'], 8100) / 8100
         ) * 25)
 
     def get(self):
