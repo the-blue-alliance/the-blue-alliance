@@ -114,6 +114,14 @@
       {% elif match.score_breakdown.get(alliance_color).get('rotorRankingPointAchieved') or match.score_breakdown.get(alliance_color).get('rotorBonusPoints') %}R
       {% else %}--{% endif %}
     {% endif %}
+  {% elif match.year == 2018 and match.has_been_played and match.score_breakdown %}
+    {% if match.score_breakdown.get(alliance_color).get('autoQuestRankingPoint') and match.score_breakdown.get(alliance_color).get('faceTheBossRankingPoint') %}
+    AQ / FtB
+    {% else %}
+      {% if match.score_breakdown.get(alliance_color).get('autoQuestRankingPoint') %}AQ
+      {% elif match.score_breakdown.get(alliance_color).get('faceTheBossRankingPoint') %}FTB
+      {% else %}--{% endif %}
+    {% endif %}
   {% else %}
     ?
   {% endif %}
@@ -122,6 +130,8 @@
   <em>{{(predictions.get(match.key.id()).get(alliance_color).prob_breach)|limit_prob}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_capture)|limit_prob}}%</em>
   {% elif match.year == 2017 %}
   <em>{{(predictions.get(match.key.id()).get(alliance_color).prob_pressure)|limit_prob}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_gears)|limit_prob}}%</em>
+  {% elif match.year == 2018 %}
+  <em>{{(predictions.get(match.key.id()).get(alliance_color).prob_auto_quest)|limit_prob}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_face_boss)|limit_prob}}%</em>
   {% endif %}
 </td>
 {% endmacro %}

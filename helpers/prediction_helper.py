@@ -235,6 +235,8 @@ class ContributionCalculator(object):
                     else:
                         num_gears = -1  # Failed to place reserve gear
                     means[color] = num_gears
+                elif self._stat == 'endgame_points':
+                    means[color] = match.score_breakdown[color]['endgamePoints']
                 else:
                     raise Exception("Unknown stat: {}".format(self._stat))
 
@@ -395,6 +397,19 @@ class PredictionHelper(object):
                         prediction[color]['score'] += prob * 100
                         prob_int = int(prob * 100)
                         prediction[color]['score_var'] += np.var([0] * (100 - prob_int) + [100] * prob_int)
+                # 2018
+                if stat == 'auto_points':
+                    required_auto = 25  # 15 auto run + 5 seconds of ownership
+
+                    mu = mean_vars[color][stat]['mean'] - required_auto
+                    prob = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
+                    prediction[color]['prob_auto_quest'] = prob
+                if stat == 'endgame_points':
+                    required_endgame = 60  #
+
+                    mu = mean_vars[color][stat]['mean'] - required_endgame
+                    prob = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
+                    prediction[color]['prob_face_boss'] = prob
 
         # Prob win
         red_score = prediction['red']['score']
@@ -449,6 +464,12 @@ class PredictionHelper(object):
                 ('score', 50, 30**2),
                 ('pressure', 0, 1**2),
                 ('gears', 0, 1**2),
+            ]
+        elif event.year == 2018:
+            relevant_stats = [
+                ('score', 50, 30**2),
+                ('auto_points', 0, 1**2),
+                ('endgame_points', 0, 1**2),
             ]
 
         contribution_calculators = [ContributionCalculator(event, matches, s, m, v) for s, m, v in relevant_stats]
@@ -582,6 +603,10 @@ class PredictionHelper(object):
                             sampled_rp1[alliance_color] = match.score_breakdown[alliance_color]['kPaRankingPointAchieved']
                             sampled_rp2[alliance_color] = match.score_breakdown[alliance_color]['rotorRankingPointAchieved']
                             sampled_tiebreaker[alliance_color] = match.score_breakdown[alliance_color]['totalPoints']
+                        elif match.year == 2018:
+                            sampled_rp1[alliance_color] = match.score_breakdown[alliance_color]['autoQuestRankingPoint']
+                            sampled_rp2[alliance_color] = match.score_breakdown[alliance_color]['faceTheBossRankingPoint']
+                            sampled_tiebreaker[alliance_color] = match.score_breakdown[alliance_color]['totalPoints']
                 else:
                     prediction = match_predictions[match.key.id()]
                     if np.random.uniform(high=1) < prediction['prob']:
@@ -600,6 +625,10 @@ class PredictionHelper(object):
                         elif match.year == 2017:
                             sampled_rp1[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_pressure']
                             sampled_rp2[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_gears']
+                            sampled_tiebreaker[alliance_color] = prediction[alliance_color]['score']
+                        elif match.year == 2018:
+                            sampled_rp1[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_auto_quest']
+                            sampled_rp2[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_face_boss']
                             sampled_tiebreaker[alliance_color] = prediction[alliance_color]['score']
 
                 # Using match results, update RP and tiebreaker
