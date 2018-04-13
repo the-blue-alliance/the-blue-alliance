@@ -374,9 +374,9 @@ class PredictionHelper(object):
                         prediction[color]['score_var'] += np.var([0] * (100 - prob_int) + [20] * prob_int)
                 # 2017
                 if stat == 'pressure':
-                    required_endgame = 40
+                    required_pressure = 40
 
-                    mu = mean_vars[color][stat]['mean'] - required_endgame
+                    mu = mean_vars[color][stat]['mean'] - required_pressure
                     prob = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
                     prediction[color]['prob_pressure'] = prob
 
