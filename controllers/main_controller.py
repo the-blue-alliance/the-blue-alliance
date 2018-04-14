@@ -172,18 +172,18 @@ class MainChampsHandler(CacheableHandler):
         hou_event_keys_future = Event.query(
             Event.year == year,
             Event.event_type_enum.IN(EventType.CMP_EVENT_TYPES),
-            Event.start_date <= datetime.datetime(2017, 4, 22)).fetch_async(keys_only=True)
-        stl_event_keys_future = Event.query(
+            Event.start_date <= datetime.datetime(2018, 4, 21)).fetch_async(keys_only=True)
+        det_event_keys_future = Event.query(
             Event.year == year,
             Event.event_type_enum.IN(EventType.CMP_EVENT_TYPES),
-            Event.start_date > datetime.datetime(2017, 4, 22)).fetch_async(keys_only=True)
+            Event.start_date > datetime.datetime(2018, 4, 21)).fetch_async(keys_only=True)
 
         hou_events_futures = ndb.get_multi_async(hou_event_keys_future.get_result())
-        stl_events_futures = ndb.get_multi_async(stl_event_keys_future.get_result())
+        det_events_futures = ndb.get_multi_async(det_event_keys_future.get_result())
 
         self.template_values.update({
             "hou_events": [e.get_result() for e in hou_events_futures],
-            "stl_events": [e.get_result() for e in stl_events_futures],
+            "det_events": [e.get_result() for e in det_events_futures],
             "year": year,
         })
 
