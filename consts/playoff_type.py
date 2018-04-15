@@ -16,6 +16,7 @@ class PlayoffType(object):
 
     # Festival of Champions
     BO5_FINALS = 6
+    BO3_FINALS = 7
 
     BRACKET_TYPES = [BRACKET_8_TEAM, BRACKET_16_TEAM, BRACKET_4_TEAM]
     DOUBLE_ELIM_TYPES = [DOUBLE_ELIM_8_TEAM]
@@ -28,6 +29,7 @@ class PlayoffType(object):
         AVG_SCORE_8_TEAM: "Average Score (8 Alliances)",
         ROUND_ROBIN_6_TEAM: "Round Robin (6 Alliances)",
         DOUBLE_ELIM_8_TEAM: "Double Elimination Bracket (8 Alliances)",
+        BO3_FINALS: "Best of 3 Finals",
         BO5_FINALS: "Best of 5 Finals",
     }
 
@@ -49,7 +51,7 @@ class PlayoffType(object):
             elif playoff_type == cls.DOUBLE_ELIM_8_TEAM:
                 level, _, _ = cls.DOUBLE_ELIM_MAPPING.get(match_number)
                 return level
-            elif playoff_type == cls.BO5_FINALS:
+            elif playoff_type == cls.BO3_FINALS or playoff_type == cls.BO5_FINALS:
                 return 'f'
             else:
                 if playoff_type == cls.BRACKET_16_TEAM:
@@ -98,7 +100,7 @@ class PlayoffType(object):
                 return set, match
             else:  # qual
                 return 1, match_number
-        elif playoff_type == cls.BO5_FINALS:
+        elif playoff_type == cls.BO3_FINALS or playoff_type == cls.BO5_FINALS:
             return 1, match_number
         else:
             if playoff_type == cls.BRACKET_4_TEAM and comp_level != 'qm' and match_number <= 12:

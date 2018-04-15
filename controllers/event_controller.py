@@ -209,7 +209,7 @@ class EventDetail(CacheableHandler):
             for comp_level in comp_levels:
                 if comp_level != 'f':
                     del bracket_table[comp_level]
-        elif event.playoff_type == PlayoffType.BO5_FINALS:
+        elif event.playoff_type == PlayoffType.BO3_FINALS or event.playoff_type == PlayoffType.BO5_FINALS:
             comp_levels = bracket_table.keys()
             for comp_level in comp_levels:
                 if comp_level != 'f':
@@ -448,5 +448,3 @@ class EventNextMatchHandler(CacheableHandler):
             'teams_and_media': team_and_medias,
         })
         return jinja2_engine.render('nextmatch.html', self.template_values)
-
-
