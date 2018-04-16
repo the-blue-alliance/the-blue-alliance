@@ -265,10 +265,10 @@ class MediaParser(object):
     def _parse_cdphotothread_image_partial(cls, html):
         """
         Input: the HTML from the thread page
-        ex: http://www.chiefdelphi.com/media/photos/38464,
+        ex: https://www.chiefdelphi.com/media/photos/38464,
 
         returns the url of the image in the thread
-        ex: http://www.chiefdelphi.com/media/img/3f5/3f5db241521ae5f2636ff8460f277997_l.jpg
+        ex: https://www.chiefdelphi.com/media/img/3f5/3f5db241521ae5f2636ff8460f277997_l.jpg
         """
         from bs4 import BeautifulSoup
         html = html.decode("utf-8", "replace")

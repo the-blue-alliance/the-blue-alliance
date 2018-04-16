@@ -31,7 +31,7 @@ class TestMediaUrlParser(unittest2.TestCase):
         self.assertEqual(yt_from_playlist['foreign_key'], 'VP992UKFbko')
 
     def test_cdphotothread_parse(self):
-        cd = MediaParser.partial_media_dict_from_url("http://www.chiefdelphi.com/media/photos/41999")
+        cd = MediaParser.partial_media_dict_from_url("https://www.chiefdelphi.com/media/photos/41999")
         self.assertEqual(cd['media_type_enum'], MediaType.CD_PHOTO_THREAD)
         self.assertEqual(cd['foreign_key'], "41999")
         self.assertTrue(cd['details_json'])

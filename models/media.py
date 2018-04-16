@@ -97,7 +97,7 @@ class Media(ndb.Model):
     # URL renderers
     @property
     def cdphotothread_image_url(self):
-        return 'http://www.chiefdelphi.com/media/img/{}'.format(self.details['image_partial'])
+        return 'https://www.chiefdelphi.com/media/img/{}'.format(self.details['image_partial'])
 
     @property
     def cdphotothread_image_url_med(self):
@@ -109,7 +109,7 @@ class Media(ndb.Model):
 
     @property
     def cdphotothread_thread_url(self):
-        return 'http://www.chiefdelphi.com/media/photos/{}'.format(self.foreign_key)
+        return 'https://www.chiefdelphi.com/media/photos/{}'.format(self.foreign_key)
 
     @property
     def external_link(self):
