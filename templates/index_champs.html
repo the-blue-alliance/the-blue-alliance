@@ -10,39 +10,6 @@
       <h2>Welcome to The Blue Alliance's coverage of the {{year}} <i>FIRST</i> Championship!</h2>
       <h4>More info at <a href="https://www.firstchampionship.org">firstchampionship.org</a></h4>
     </div>
-
-    <div class="col-xs-12">
-      <h3>Championship by the Numbers:</h3>
-
-      <div class="col-xs-4">
-        <div class="row">
-          <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
-            <img src="/images/2017_boiler.png" class="img-responsive"/>
-          </div>
-        </div>
-        <h2 id="champ-kpa-accumulated" class="text-center">0</h2>
-        <h4 class="text-center">kPa Accumulated</h4>
-      </div>
-      <div class="col-xs-4">
-        <div class="row">
-          <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
-            <img src="/images/2017_rotors.png" class="img-responsive"/>
-          </div>
-        </div>
-        <h2 id="champ-rotors-engaged" class="text-center">0</h2>
-        <h4 class="text-center">Rotors Engaged</h4>
-      </div>
-      <div class="col-xs-4">
-        <div class="row">
-          <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
-            <img src="/images/2017_touchpad.png" class="img-responsive"/>
-          </div>
-        </div>
-        <h2 id="champ-ready-for-takeoff" class="text-center">0</h2>
-        <h4 class="text-center">Robots Ready for Takeoff</h4>
-      </div>
-      <small class="pull-right">Artwork by: <a href="https://www.facebook.com/WordPlayAllDay">Word Play All Day</a></small>
-    </div>
   </div>
 
   <div class="row">
@@ -84,34 +51,4 @@
     </div>
   </div>
 </div>
-{% endblock %}
-
-{% block inline_javascript %}
-<script src="//cdnjs.cloudflare.com/ajax/libs/countup.js/1.8.3/countUp.min.js"></script>
-<script>
-  var options = {
-    useEasing : true,
-    useGrouping : true,
-    separator : ',',
-    decimal : '.',
-    prefix : '',
-    suffix : ''
-  };
-
-  var counters = {
-    'kpa_accumulated': new CountUp("champ-kpa-accumulated", 0, 0, 0, 1.0, options),
-    'rotors_engaged': new CountUp("champ-rotors-engaged", 0, 0, 0, 1.0, options),
-    'ready_for_takeoff': new CountUp("champ-ready-for-takeoff", 0, 0, 0, 1.0, options),
-  }
-
-  var champNumbersRef = firebase.database().ref('champ_numbers');
-  champNumbersRef.on('value', function(snapshot) {
-    var s = snapshot.val();
-    for (e in s) {
-      if (e in counters) {
-        counters[e].update(s[e]);
-      }
-    }
-  });
-</script>
 {% endblock %}
