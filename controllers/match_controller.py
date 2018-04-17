@@ -63,7 +63,6 @@ class MatchDetail(CacheableHandler):
         return jinja2_engine.render('match_details.html', self.template_values)
 
 
-
 class MatchTimeseries(CacheableHandler):
     """
     Display a Match timeseries chart.
