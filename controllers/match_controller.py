@@ -43,7 +43,7 @@ class MatchDetail(CacheableHandler):
 
         gdcv_data = MatchGdcvDataQuery(match_key).fetch()
         timeseries_data = None
-        if gdcv_data:
+        if gdcv_data and len(gdcv_data) >= 147 and len(gdcv_data) <= 150:  # Santiy checks on data
             timeseries_data = json.dumps(gdcv_data)
 
         match_breakdown_template = None
@@ -97,7 +97,7 @@ class MatchTimeseries(CacheableHandler):
 
         gdcv_data = MatchGdcvDataQuery(match_key).fetch()
         timeseries_data = None
-        if gdcv_data:
+        if gdcv_data and len(gdcv_data) >= 147 and len(gdcv_data) <= 150:  # Santiy checks on data
             timeseries_data = json.dumps(gdcv_data)
 
         self.template_values.update({
