@@ -1,70 +1,32 @@
 {% extends "base.html" %}
-{% import "match_partials/match_table_macros.html" as mtm %}
 
 {% block title %}{{match.verbose_name}} - {{event.year}} {{event.name}} - The Blue Alliance{% endblock %}
 
-{% block meta_description %}Match results and video for {{match.verbose_name}} at the {{event.year}} {{event.name}} FIRST Robotics Competition in {{event.location}}.{% endblock %}
+{% block meta_description %}Match timeseries graph for {{match.verbose_name}} at the {{event.year}} {{event.name}} FIRST Robotics Competition in {{event.location}}.{% endblock %}
 
 {% block more_head_tags %}
   <meta property="og:title" content="{{match.verbose_name}} - {{event.year}} {{event.name}}" />
   <meta property="og:type" content="article" />
-  <meta property="og:url" content="https://www.thebluealliance.com/match/{{match.key_name}}" />
-  {% if match.tba_video.thumbnail_path %}
-    <meta property="og:image" content="{{match.tba_video.thumbnail_path}}" />
-  {% else %}
-    <meta property="og:image" content="https://www.thebluealliance.com/images/logo_square_512.png" />
-  {% endif %}
+  <meta property="og:url" content="https://www.thebluealliance.com/match/{{match.key_name}}/timeseries" />
   <meta property="og:description" content="{{match.verbose_name}} at the {{event.year}} {{event.name}} FIRST Robotics Competition in {{event.location}}."/>
   <meta property="og:site_name" content="The Blue Alliance" />
-  {% if match.youtube_videos_formatted %}
-    <meta property="og:video" content="https://www.youtube.com/v/{{match.youtube_videos_formatted.0}}" />
-  {% else %}
-    {% if match.tba_video.streamable_path %}<meta property="og:video" content="{{ match.tba_video.steamable_path }}" />{% endif %}
-  {% endif %}
 {% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
 
 {% block content %}
 <div class="container">
   <div class="row">
     <div class="col-xs-12">
-      <h1>{{match.verbose_name}} <small><a href="/event/{{event.key_name}}">{{ event.year }} {{ event.name }}</a></small></h1>
+      <h1>{{match.verbose_name}} <small>{{ event.year }} {{ event.name }}</small></h1>
     </div>
   </div>
   <div class="row">
-    <div class="col-xs-12 col-md-6">
-      {{mtm.single_match_table(match)}}
-
+    <div class="col-xs-12">
       {% if timeseries_data %}
       <canvas id="timeseries-chart">{{timeseries_data}}</canvas>
       {% endif %}
-
-      {% if match_breakdown_template %}
-      <h3>Detailed Results</h3>
-        {% include match_breakdown_template %}
-      {% endif %}
-    </div>
-    <div class="col-xs-12 col-md-6">
-      <h3>Video</h3>
-      {% if match.tba_video %}
-        {% include "video_partials/tbavideo_player.html" %}
-      {% endif %}
-      {% for youtube_video in match.youtube_videos_formatted %}
-        {% include "video_partials/youtube_video_player.html" %}
-      {% endfor %}
-      {% if not match.tba_video and not match.youtube_videos %}
-        <p>We don't know about any videos for this match yet. 🙁</p>
-        <p>Help others out by searching YouTube and adding videos!</p>
-      {% endif %}
-      <p>
-        <a class="btn btn-success" href="/suggest/match/video?match_key={{match.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add videos</a>
-        <a class="btn btn-primary" href="https://www.youtube.com/results?search_query={{match.short_name|urlencode}}+{{event.year}}+{{event.name|urlencode}}" target="_blank"><span class="glyphicon glyphicon-search"></span> Search YouTube</a>
-      </p>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-lg-12">
-      <hr>
-      <div class="fb-comments" data-href="http://www.thebluealliance.com/match/{{match.key_name}}" data-num-posts="3" data-width="470"></div>
     </div>
   </div>
 </div>
