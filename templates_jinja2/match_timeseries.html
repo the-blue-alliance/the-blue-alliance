@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block title %}{{match.verbose_name}} - {{event.year}} {{event.name}} - The Blue Alliance{% endblock %}
+
+{% block meta_description %}Match timeseries graph for {{match.verbose_name}} at the {{event.year}} {{event.name}} FIRST Robotics Competition in {{event.location}}.{% endblock %}
+
+{% block more_head_tags %}
+  <meta property="og:title" content="{{match.verbose_name}} - {{event.year}} {{event.name}}" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://www.thebluealliance.com/match/{{match.key_name}}/timeseries" />
+  <meta property="og:description" content="{{match.verbose_name}} at the {{event.year}} {{event.name}} FIRST Robotics Competition in {{event.location}}."/>
+  <meta property="og:site_name" content="The Blue Alliance" />
+{% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+      <h1>{{match.verbose_name}} <small>{{ event.year }} {{ event.name }}</small></h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      {% if timeseries_data %}
+      <canvas id="timeseries-chart">{{timeseries_data}}</canvas>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block inline_javascript %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+<script type="text/javascript">
+  var el = document.getElementById('timeseries-chart');
+  if (el) {
+    var ctx = el.getContext('2d');
+    var data = JSON.parse(el.innerHTML);
+
+    var xLabels = [];
+    var redScores = [];
+    var redScoreDifferentials = [];
+    var redPointRadii = [];
+    var redPointColors = [];
+    var blueScores = [];
+    var blueScoreDifferentials = [];
+    var bluePointRadii = [];
+    var bluePointColors = [];
+    var powerups = [];
+    for (var t=150; t>0; t--) {
+      xLabels.push(t);
+      redScores.push(NaN);
+      redScoreDifferentials.push(0);
+      blueScores.push(NaN);
+      blueScoreDifferentials.push(0);
+      redPointRadii.push(0);
+      bluePointRadii.push(0);
+      redPointColors.push('#ff5555');
+      bluePointColors.push('#5555ff');
+      powerups.push(null);
+    }
+
+    for (var d of data) {
+      var mode = d.mode;
+      var time;
+      if (mode == 'auto') {
+        time = 15 - d.time_remaining;
+      } else if (mode == 'teleop') {
+        time = 150 - d.time_remaining;
+      }
+      redScores[time] = d.red_score;
+      blueScores[time] = d.blue_score;
+
+      redScoreDifferentials[time] = d.red_scale_owned + d.red_switch_owned;
+      blueScoreDifferentials[time] = -(d.blue_scale_owned + d.blue_switch_owned);
+
+      var powerup = null;
+      if (d.red_current_powerup !== null) {
+        redPointRadii[time] = 3;
+        redPointColors[time] = '#ffd600';
+        powerup = d.red_current_powerup;
+      }
+      if (d.blue_current_powerup !== null) {
+        bluePointRadii[time] = 3;
+        bluePointColors[time] = '#ffd600';
+        powerup = d.blue_current_powerup;
+      }
+      if (powerup === 'boost') {
+        powerups[time] = 'Boost';
+      } else if (powerup === 'force') {
+        powerups[time] = 'Force';
+      }
+    }
+
+    var chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: xLabels,
+        datasets: [{
+          type: 'line',
+          label: "Red Score",
+          backgroundColor: ['#ff5555'],
+          borderColor: '#ff5555',
+          pointRadius: redPointRadii,
+          pointBackgroundColor: redPointColors,
+          data: redScores,
+          cubicInterpolationMode: 'monotone',
+          // spanGaps: true,
+          fill: false,
+          yAxisID: 'y-axis-1',
+        },
+        {
+          type: 'line',
+          label: "Blue Score",
+          backgroundColor: ['#5555ff'],
+          borderColor: '#5555ff',
+          pointRadius: bluePointRadii,
+          pointBackgroundColor: bluePointColors,
+          data: blueScores,
+          cubicInterpolationMode: 'monotone',
+          // spanGaps: true,
+          fill: false,
+          yAxisID: 'y-axis-1',
+        },
+        {
+          type: 'bar',
+          label: 'Red Ownership',
+          backgroundColor: '#ff9999',
+          data: redScoreDifferentials,
+          yAxisID: 'y-axis-2',
+        },
+        {
+          type: 'bar',
+          label: 'Blue Ownership',
+          backgroundColor: '#9999ff',
+          data: blueScoreDifferentials,
+          yAxisID: 'y-axis-2',
+        }]
+      },
+      options: {
+        tooltips: {
+          mode: 'index',
+          intersect: false,
+          callbacks: {
+            title: function(tooltipItems, data) {
+              return 'Time Remaining: ' + data.labels[tooltipItems[0].index];
+            },
+            label: function(tooltipItem, data) {
+              var dataset = data.datasets[tooltipItem.datasetIndex];
+              return dataset.label + ': ' + Math.abs(dataset.data[tooltipItem.index]);
+            },
+            footer: function(tooltipItems, data) {
+              var powerup = powerups[tooltipItems[0].index];
+              if (powerup == null) {
+                return null;
+              }
+              return 'Power Up: ' + powerup;
+            },
+          },
+        },
+        hover: {
+          mode: 'nearest',
+          intersect: true
+        },
+        scales: {
+          xAxes: [
+            {
+              scaleLabel: {
+                display: true,
+                labelString: 'Time Remaining'
+              },
+              gridLines: {
+                drawOnChartArea: false,
+              },
+            }
+          ],
+          yAxes: [
+            {
+              id: 'y-axis-1',
+              scaleLabel: {
+                display: true,
+                labelString: 'Total Score'
+              },
+              gridLines: {
+                drawOnChartArea: false,
+              },
+            },
+            {
+              id: 'y-axis-2',
+              position: 'right',
+              scaleLabel: {
+                display: true,
+                labelString: 'Ownership (Red | Blue)'
+              },
+              gridLines: {
+                drawOnChartArea: false,
+              },
+              ticks: {
+                  max: 2,
+                  min: -2,
+                  stepSize: 1,
+                  callback: function(value, index, values) {
+                    return Math.abs(value);
+                  }
+              },
+            }
+          ]
+        }
+      }
+    });
+  }
+</script>
+{% endblock %}

@@ -61,3 +61,53 @@ class MatchDetail(CacheableHandler):
             self._cache_expiration = self.SHORT_CACHE_EXPIRATION
 
         return jinja2_engine.render('match_details.html', self.template_values)
+
+
+
+class MatchTimeseries(CacheableHandler):
+    """
+    Display a Match timeseries chart.
+    """
+    LONG_CACHE_EXPIRATION = 60 * 60 * 24
+    SHORT_CACHE_EXPIRATION = 61
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "match_timeseries_{}"  # (match_key)
+
+    def __init__(self, *args, **kw):
+        super(MatchTimeseries, self).__init__(*args, **kw)
+        self._cache_expiration = self.LONG_CACHE_EXPIRATION
+
+    def get(self, match_key):
+        if not match_key:
+            return self.redirect("/")
+
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(match_key)
+        super(MatchTimeseries, self).get(match_key)
+
+    def _render(self, match_key):
+        try:
+            match_future = Match.get_by_id_async(match_key)
+            event_future = Event.get_by_id_async(match_key.split("_")[0])
+            match = match_future.get_result()
+            event = event_future.get_result()
+        except Exception, e:
+            self.abort(404)
+
+        if not match:
+            self.abort(404)
+
+        gdcv_data = MatchGdcvDataQuery(match_key).fetch()
+        timeseries_data = None
+        if gdcv_data:
+            timeseries_data = json.dumps(gdcv_data)
+
+        self.template_values.update({
+            "event": event,
+            "match": match,
+            "timeseries_data": timeseries_data,
+        })
+
+        if event.within_a_day:
+            self._cache_expiration = self.SHORT_CACHE_EXPIRATION
+
+        return jinja2_engine.render('match_timeseries.html', self.template_values)
