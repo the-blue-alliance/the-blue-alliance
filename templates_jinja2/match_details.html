@@ -186,6 +186,10 @@
             title: function(tooltipItems, data) {
               return 'Time Remaining: ' + data.labels[tooltipItems[0].index];
             },
+            label: function(tooltipItem, data) {
+              var dataset = data.datasets[tooltipItem.datasetIndex];
+              return dataset.label + ': ' + Math.abs(dataset.data[tooltipItem.index]);
+            },
             footer: function(tooltipItems, data) {
               var powerup = powerups[tooltipItems[0].index];
               if (powerup == null) {
@@ -227,7 +231,7 @@
               position: 'right',
               scaleLabel: {
                 display: true,
-                labelString: 'Ownership (Red - Blue)'
+                labelString: 'Ownership (Red | Blue)'
               },
               gridLines: {
                 drawOnChartArea: false,
@@ -236,6 +240,9 @@
                   max: 2,
                   min: -2,
                   stepSize: 1,
+                  callback: function(value, index, values) {
+                    return Math.abs(value);
+                  }
               },
             }
           ]
