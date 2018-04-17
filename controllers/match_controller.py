@@ -1,6 +1,8 @@
+import json
 import os
 
 from base_controller import CacheableHandler
+from database.gdcv_data_query import MatchGdcvDataQuery
 from models.event import Event
 from models.match import Match
 from template_engine import jinja2_engine
@@ -39,6 +41,11 @@ class MatchDetail(CacheableHandler):
         if not match:
             self.abort(404)
 
+        gdcv_data = MatchGdcvDataQuery(match_key).fetch()
+        timeseries_data = None
+        if gdcv_data:
+            timeseries_data = json.dumps(gdcv_data)
+
         match_breakdown_template = None
         if match.score_breakdown is not None and match.year in self.VALID_BREAKDOWN_YEARS:
             match_breakdown_template = 'match_partials/match_breakdown/match_breakdown_{}.html'.format(match.year)
@@ -47,6 +54,7 @@ class MatchDetail(CacheableHandler):
             "event": event,
             "match": match,
             "match_breakdown_template": match_breakdown_template,
+            "timeseries_data": timeseries_data,
         })
 
         if event.within_a_day:
