@@ -116,12 +116,14 @@ class LiveEventPanel extends React.PureComponent {
     const year = parseInt(this.props.eventKey.substring(0, 4), 10)
     return (
       <div>
+        {!this.props.simple &&
         <div className={`${currentMatch ? 'col-lg-3' : 'col-lg-6'} text-center livePanelColumn`}>
           <h4>Last Matches</h4>
           <LastMatchesTable year={year} matches={playedMatchesCopy && playedMatchesCopy.slice(-3)} />
         </div>
+        }
         {currentMatch &&
-        <div className="col-lg-6 text-center livePanelColumn">
+        <div className={`${this.props.simple ? '' : 'col-lg-6'} text-center livePanelColumn`}>
           {forcePreMatch ?
             <h4>Next Match{etaStr}: {`${getCompLevelStr(currentMatch)} ${getMatchSetStr(currentMatch)}`}</h4>
             :
@@ -130,10 +132,17 @@ class LiveEventPanel extends React.PureComponent {
           <CurrentMatchDisplay year={year} match={currentMatch} matchState={matchState} forcePreMatch={forcePreMatch} />
         </div>
         }
+        {!currentMatch && this.props.simple &&
+          <div>
+            No more matches scheduled!
+          </div>
+        }
+        {!this.props.simple &&
         <div className={`${currentMatch ? 'col-lg-3' : 'col-lg-6'} text-center livePanelColumn`}>
           <h4>Upcoming Matches</h4>
           <UpcomingMatchesTable year={year} matches={upcomingMatches} />
         </div>
+        }
         <div className="clearfix" />
       </div>
     )
@@ -142,6 +151,7 @@ class LiveEventPanel extends React.PureComponent {
 
 LiveEventPanel.propTypes = {
   eventKey: PropTypes.string.isRequired,
+  simple: PropTypes.bool.isRequired,
 }
 
 export default LiveEventPanel
