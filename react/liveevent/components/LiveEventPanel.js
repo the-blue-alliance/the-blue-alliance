@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Firebase from 'firebase'
+import FirebaseApp from '../firebaseapp'
 
 import { getCompLevelStr, getMatchSetStr } from '../helpers'
 
@@ -32,12 +32,7 @@ class LiveEventPanel extends React.PureComponent {
     this.updateCurrentTime()
     setInterval(this.updateCurrentTime, 10000)
 
-    const firebaseApp = Firebase.initializeApp({
-      apiKey: 'AIzaSyDBlFwtAgb2i7hMCQ5vBv44UEKVsA543hs',
-      authDomain: 'tbatv-prod-hrd.firebaseapp.com',
-      databaseURL: 'https://tbatv-prod-hrd.firebaseio.com',
-    })
-    firebaseApp.database().ref(`/e/${this.props.eventKey}/m`).on('value', (snapshot) => {
+    FirebaseApp.database().ref(`/e/${this.props.eventKey}/m`).on('value', (snapshot) => {
       const val = snapshot.val()
       const matches = []
       if (val) {
@@ -57,7 +52,7 @@ class LiveEventPanel extends React.PureComponent {
         unplayedMatches,
       })
     })
-    firebaseApp.database().ref(`/le/${this.props.eventKey}`).on('value', (snapshot) => {
+    FirebaseApp.database().ref(`/le/${this.props.eventKey}`).on('value', (snapshot) => {
       this.setState({
         matchState: snapshot.val(),
       })
@@ -131,11 +126,6 @@ class LiveEventPanel extends React.PureComponent {
           }
           <CurrentMatchDisplay year={year} match={currentMatch} matchState={matchState} forcePreMatch={forcePreMatch} />
         </div>
-        }
-        {!currentMatch && this.props.simple &&
-          <div>
-            No more matches scheduled!
-          </div>
         }
         {!this.props.simple &&
         <div className={`${currentMatch ? 'col-lg-3' : 'col-lg-6'} text-center livePanelColumn`}>
