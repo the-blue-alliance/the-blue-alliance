@@ -30,8 +30,8 @@
 
   <div class="row">
     {% for event in hou_events %}
-      {% if event.event_type_enum == 3 %}
-      <div class="col-xs-12 col-md-6 col-lg-4">
+      {% if event.event_type_enum == 4 %}
+      <div class="col-xs-12">
         <h3>
           <a href="/event/{{event.key.id}}">{{event.name}}</a>
           {% if event.webcast %}
@@ -52,7 +52,7 @@
             </div>
           {% endif %}
         </h3>
-        <div class="liveevent-content" data-eventkey="{{event.key.id}}" data-simple></div>
+        <div class="liveevent-content" data-eventkey="{{event.key.id}}"></div>
       </div>
       {% endif %}
     {% endfor %}
