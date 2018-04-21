@@ -329,8 +329,8 @@ class MatchHelper(object):
                                 if match.has_been_played:
                                     champ_points.append(cp)
                                     if year == 2018:
-                                        tiebreaker1.append(match.breakdown[color]['endgamePoints'])
-                                        tiebreaker2.append(match.breakdown[color]['autoPoints'])
+                                        tiebreaker1.append(match.score_breakdown[color]['endgamePoints'])
+                                        tiebreaker2.append(match.score_breakdown[color]['autoPoints'])
                                     else:
                                         tiebreaker1.append(match.alliances[color]['score'])
                                         tiebreaker2.append(0)
@@ -341,8 +341,13 @@ class MatchHelper(object):
                         else:
                             is_new = True
 
-                    tiebreaker1 = match.alliances[color]['score'] if match.has_been_played else 0
-                    tiebreaker2 = 0
+                    if year == 2018:
+                        tiebreaker1 = match.score_breakdown[color]['endgamePoints'] if match.has_been_played else 0
+                        tiebreaker2 = match.score_breakdown[color]['autoPoints'] if match.has_been_played else 0
+                    else:
+                        tiebreaker1 = match.alliances[color]['score'] if match.has_been_played else 0
+                        tiebreaker2 = 0
+
                     record = {'wins': 0, 'losses': 0, 'ties': 0}
                     if not match.has_been_played:
                         cp = 0
