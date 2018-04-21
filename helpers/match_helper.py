@@ -288,10 +288,10 @@ class MatchHelper(object):
         return advancement
 
     @classmethod
-    def generatePlayoffAdvancementRoundRobin(cls, matches, alliance_selections=None):
+    def generatePlayoffAdvancementRoundRobin(cls, matches, year, alliance_selections=None):
         complete_alliances = []
         alliance_names = []
-        advancement = defaultdict(list)  # key: comp level; value: list of [complete_alliance, [champ_points], sum_champ_points, [match_points], sum_match_points
+        advancement = defaultdict(list)  # key: comp level; value: list of [complete_alliance, [champ_points], sum_champ_points, [tiebreaker1], sum_tiebreaker1, [tiebreaker2], sum_tiebreaker2
         for comp_level in ['sf']:  # In case this needs to scale to more levels
             any_unplayed = False
             for match in matches.get(comp_level, []):
@@ -313,7 +313,7 @@ class MatchHelper(object):
 
                     is_new = False
                     if i is not None:
-                        for j, (complete_alliance, champ_points, _, match_points, _, _, record) in enumerate(advancement[comp_level]):  # search for alliance. could be more efficient
+                        for j, (complete_alliance, champ_points, _, tiebreaker1, _, tiebreaker2, _, _, record) in enumerate(advancement[comp_level]):  # search for alliance. could be more efficient
                             if len(set(complete_alliances[i]).intersection(set(complete_alliance))) >= 2:  # if >= 2 teams are the same, then the alliance is the same
                                 if not match.has_been_played:
                                     cp = 0
@@ -328,14 +328,21 @@ class MatchHelper(object):
                                     record['losses'] += 1
                                 if match.has_been_played:
                                     champ_points.append(cp)
-                                    match_points.append(match.alliances[color]['score'])
+                                    if year == 2018:
+                                        tiebreaker1.append(match.breakdown[color]['endgamePoints'])
+                                        tiebreaker2.append(match.breakdown[color]['autoPoints'])
+                                    else:
+                                        tiebreaker1.append(match.alliances[color]['score'])
+                                        tiebreaker2.append(0)
                                     advancement[comp_level][j][2] = sum(champ_points)
-                                    advancement[comp_level][j][4] = sum(match_points)
+                                    advancement[comp_level][j][4] = sum(tiebreaker1)
+                                    advancement[comp_level][j][6] = sum(tiebreaker2)
                                 break
                         else:
                             is_new = True
 
-                    score = match.alliances[color]['score'] if match.has_been_played else 0
+                    tiebreaker1 = match.alliances[color]['score'] if match.has_been_played else 0
+                    tiebreaker2 = 0
                     record = {'wins': 0, 'losses': 0, 'ties': 0}
                     if not match.has_been_played:
                         cp = 0
@@ -349,11 +356,12 @@ class MatchHelper(object):
                         cp = 0
                         record['losses'] += 1
                     if i is None:
-                        advancement[comp_level].append([alliance, [cp], cp, [score], score, alliance_name, record])
+                        advancement[comp_level].append([alliance, [cp], cp, [tiebreaker1], tiebreaker1, [tiebreaker2], tiebreaker2, alliance_name, record])
                     elif is_new:
-                        advancement[comp_level].append([complete_alliances[i], [cp], cp, [score], score, alliance_names[i], record])
+                        advancement[comp_level].append([complete_alliances[i], [cp], cp, [tiebreaker1], tiebreaker1, [tiebreaker2], tiebreaker2, alliance_names[i], record])
 
-            advancement[comp_level] = sorted(advancement[comp_level], key=lambda x: -x[4])  # sort by match points
+            advancement[comp_level] = sorted(advancement[comp_level], key=lambda x: -x[6])  # sort by tiebreaker2
+            advancement[comp_level] = sorted(advancement[comp_level], key=lambda x: -x[4])  # sort by tiebreaker1
             advancement[comp_level] = sorted(advancement[comp_level], key=lambda x: -x[2])  # sort by championship points
             advancement['{}_complete'.format(comp_level)] = not any_unplayed
 

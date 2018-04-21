@@ -203,7 +203,7 @@ class EventDetail(CacheableHandler):
                 if comp_level in bracket_table:
                     del bracket_table[comp_level]
         elif event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM:
-            playoff_advancement = MatchHelper.generatePlayoffAdvancementRoundRobin(matches, event.alliance_selections)
+            playoff_advancement = MatchHelper.generatePlayoffAdvancementRoundRobin(matches, event.year, event.alliance_selections)
             playoff_template = 'playoff_round_robin_6_team'
             comp_levels = bracket_table.keys()
             for comp_level in comp_levels:
