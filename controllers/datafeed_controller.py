@@ -486,6 +486,24 @@ class EventListGet(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
+class DistrictListGet(webapp.RequestHandler):
+    """
+    Fetch one year of districts only from FMS API
+    """
+    def get(self, year):
+        df = DatafeedFMSAPI('v2.0')
+        fmsapi_districts = df.getDistrictList(year)
+        districts = DistrictManipulator.createOrUpdate(fmsapi_districts)
+
+        template_values = {
+            "districts": districts,
+        }
+
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fms_district_list_get.html')
+            self.response.out.write(template.render(path, template_values))
+
+
 class OffseasonEventListGet(webapp.RequestHandler):
     """
     Fetch one year's sync-enabled offseason events
