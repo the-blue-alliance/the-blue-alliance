@@ -16,6 +16,7 @@ from models.event_team import EventTeam
 from models.sitevar import Sitevar
 
 from parsers.fms_api.fms_api_awards_parser import FMSAPIAwardsParser
+from parsers.fms_api.fms_api_district_list_parser import FMSAPIDistrictListParser
 from parsers.fms_api.fms_api_event_alliances_parser import FMSAPIEventAlliancesParser
 from parsers.fms_api.fms_api_event_list_parser import FMSAPIEventListParser
 from parsers.fms_api.fms_api_event_rankings_parser import FMSAPIEventRankingsParser, FMSAPIEventRankings2Parser
@@ -112,6 +113,7 @@ class DatafeedFMSAPI(object):
             self.FMS_API_EVENT_LIST_URL_PATTERN = FMS_API_URL_BASE + '/%s/events'  # year
             self.FMS_API_EVENT_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/%s/events?eventCode=%s'  # (year, event_short)
             self.FMS_API_EVENTTEAM_LIST_URL_PATTERN = FMS_API_URL_BASE + '/%s/teams/?eventCode=%s&page=%s'  # (year, eventCode, page)
+            self.FMS_API_DISTRICT_LIST_URL_PATTERN = FMS_API_URL_BASE + '/%s/districts'  # (year)
         else:
             raise Exception("Unknown FMS API version: {}".format(version))
 
@@ -347,6 +349,12 @@ class DatafeedFMSAPI(object):
             return result
         else:
             return [], []
+
+    # Returns a list of districts
+    def getDistrictList(self, year):
+        result = self._parse(self.FMS_API_DISTRICT_LIST_URL_PATTERN % (year),
+                             FMSAPIDistrictListParser(year))
+        return result
 
     # Returns a list of sync-enabled offseason events
     def getSyncEnabledOffseasonEvents(self, year):

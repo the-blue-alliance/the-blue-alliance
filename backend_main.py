@@ -9,12 +9,13 @@ from controllers.admin.admin_cron_controller import AdminPostEventTasksDo, Admin
 from controllers.backup_controller import DatastoreBackupFull, BigQueryImportEnqueue, \
     BigQueryImportEntity, MainBackupsEnqueue, DatastoreBackupArchive, DatastoreBackupArchiveFile
 from controllers.datafeed_controller import EventListEnqueue, EventDetailsEnqueue
-from controllers.datafeed_controller import EventListGet, EventDetailsGet, TeamDetailsGet, TeamAvatarGet, OffseasonEventListGet
+from controllers.datafeed_controller import EventListGet, EventDetailsGet, TeamDetailsGet, TeamAvatarGet, OffseasonEventListGet, DistrictListGet
 
 
 app = webapp2.WSGIApplication([('/backend-tasks/enqueue/event_list/([0-9]*)', EventListEnqueue),
                                ('/backend-tasks/enqueue/event_details/(.*)', EventDetailsEnqueue),
                                ('/backend-tasks/get/event_list/([0-9]*)', EventListGet),
+                               ('/backend-tasks/get/district_list/([0-9]*)', DistrictListGet),
                                ('/backend-tasks/get/event_details/(.*)', EventDetailsGet),
                                ('/backend-tasks/get/team_details/(.*)', TeamDetailsGet),
                                ('/backend-tasks/get/team_avatar/(.*)', TeamAvatarGet),

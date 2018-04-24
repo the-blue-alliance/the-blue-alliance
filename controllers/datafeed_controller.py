@@ -458,11 +458,14 @@ class EventListGet(webapp.RequestHandler):
         df = DatafeedFMSAPI('v2.0')
         df2 = DatafeedFIRSTElasticSearch()
 
-        fmsapi_events, fmsapi_districts = df.getEventList(year)
+        fmsapi_events, event_list_districts = df.getEventList(year)
         elasticsearch_events = df2.getEventList(year)
         merged_events = EventManipulator.mergeModels(fmsapi_events, elasticsearch_events)
         events = EventManipulator.createOrUpdate(merged_events)
-        districts = DistrictManipulator.createOrUpdate(fmsapi_districts)
+
+        fmsapi_districts = df.getDistrictList(year)
+        merged_districts = DistrictManipulator.mergeModels(fmsapi_districts, event_list_districts)
+        districts = DistrictManipulator.createOrUpdate(merged_districts)
 
         # Fetch event details for each event
         for event in events:
@@ -480,6 +483,24 @@ class EventListGet(webapp.RequestHandler):
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
             path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fms_event_list_get.html')
+            self.response.out.write(template.render(path, template_values))
+
+
+class DistrictListGet(webapp.RequestHandler):
+    """
+    Fetch one year of districts only from FMS API
+    """
+    def get(self, year):
+        df = DatafeedFMSAPI('v2.0')
+        fmsapi_districts = df.getDistrictList(year)
+        districts = DistrictManipulator.createOrUpdate(fmsapi_districts)
+
+        template_values = {
+            "districts": districts,
+        }
+
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fms_district_list_get.html')
             self.response.out.write(template.render(path, template_values))
 
 
