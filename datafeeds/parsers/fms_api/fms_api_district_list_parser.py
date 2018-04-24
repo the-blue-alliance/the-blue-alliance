@@ -1,5 +1,6 @@
 from models.district import District
 
+
 class FMSAPIDistrictListParser(object):
 
     def __init__(self, season):
