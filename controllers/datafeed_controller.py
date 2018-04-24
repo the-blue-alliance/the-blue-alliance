@@ -458,11 +458,14 @@ class EventListGet(webapp.RequestHandler):
         df = DatafeedFMSAPI('v2.0')
         df2 = DatafeedFIRSTElasticSearch()
 
-        fmsapi_events, fmsapi_districts = df.getEventList(year)
+        fmsapi_events, event_list_districts = df.getEventList(year)
         elasticsearch_events = df2.getEventList(year)
         merged_events = EventManipulator.mergeModels(fmsapi_events, elasticsearch_events)
         events = EventManipulator.createOrUpdate(merged_events)
-        districts = DistrictManipulator.createOrUpdate(fmsapi_districts)
+
+        fmsapi_districts = df.getDistrictList(year)
+        merged_districts = DistrictManipulator.mergeModels(fmsapi_districts, event_list_districts)
+        districts = DistrictManipulator.createOrUpdate(merged_districts)
 
         # Fetch event details for each event
         for event in events:
