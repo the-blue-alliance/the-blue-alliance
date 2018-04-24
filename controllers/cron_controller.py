@@ -525,6 +525,7 @@ class DistrictRankingsCalcEnqueue(webapp.RequestHandler):
         district_keys = [district.key.id() for district in districts]
         for district_key in district_keys:
             taskqueue.add(url='/tasks/math/do/district_rankings_calc/{}'.format(district_key), method='GET')
+            taskqueue.add(url='/backend-tasks/get/district_rankings/{}'.format(district_key), method='GET')
 
         self.response.out.write("Enqueued for: {}".format(district_keys))
 

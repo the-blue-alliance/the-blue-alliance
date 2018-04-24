@@ -661,6 +661,28 @@ class EventDetailsGet(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
+class DistrictRankingsGet(webapp.RequestHandler):
+    """
+    Fetch district rankings from FIRST
+    This data does not have full pre-event point breakdowns, but it does contain
+    things like CMP advancement
+    """
+    def get(self, district_key):
+        df = DatafeedFMSAPI('v2.0')
+
+        district_with_rankings = df.getDistrictRankings(district_key)
+        districts = DistrictManipulator.createOrUpdate(district_with_rankings)
+
+        template_values = {
+            "districts": [districts],
+        }
+
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fms_district_list_get.html')
+            self.response.out.write(template.render(path, template_values))
+
+
+
 class TbaVideosEnqueue(webapp.RequestHandler):
     """
     Handles enqueing grabing tba_videos for Matches at individual Events.

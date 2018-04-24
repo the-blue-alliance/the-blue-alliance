@@ -11,12 +11,14 @@ from google.appengine.ext import ndb
 from consts.event_type import EventType
 from controllers.api.api_status_controller import ApiStatusController
 from datafeeds.datafeed_base import DatafeedBase
+from models.district import District
 from models.event import Event
 from models.event_team import EventTeam
 from models.sitevar import Sitevar
 
 from parsers.fms_api.fms_api_awards_parser import FMSAPIAwardsParser
 from parsers.fms_api.fms_api_district_list_parser import FMSAPIDistrictListParser
+from parsers.fms_api.fms_api_district_rankings_parser import FMSAPIDistrictRankingsParser
 from parsers.fms_api.fms_api_event_alliances_parser import FMSAPIEventAlliancesParser
 from parsers.fms_api.fms_api_event_list_parser import FMSAPIEventListParser
 from parsers.fms_api.fms_api_event_rankings_parser import FMSAPIEventRankingsParser, FMSAPIEventRankings2Parser
@@ -114,6 +116,7 @@ class DatafeedFMSAPI(object):
             self.FMS_API_EVENT_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/%s/events?eventCode=%s'  # (year, event_short)
             self.FMS_API_EVENTTEAM_LIST_URL_PATTERN = FMS_API_URL_BASE + '/%s/teams/?eventCode=%s&page=%s'  # (year, eventCode, page)
             self.FMS_API_DISTRICT_LIST_URL_PATTERN = FMS_API_URL_BASE + '/%s/districts'  # (year)
+            self.FMS_API_DISTRICT_RANKINGS_PATTERN = FMS_API_URL_BASE + '%s/rankings/district?districtCode=%s&page=%s'  # (year, district abbreviation, page)
         else:
             raise Exception("Unknown FMS API version: {}".format(version))
 
@@ -355,6 +358,26 @@ class DatafeedFMSAPI(object):
         result = self._parse(self.FMS_API_DISTRICT_LIST_URL_PATTERN % (year),
                              FMSAPIDistrictListParser(year))
         return result
+
+    def getDistrictRankings(self, district_key):
+        district = District.get_by_id(district_key)
+        if not district:
+            return None
+        year = int(district_key[:4])
+        district_short = district_key[4:]
+        rankings = {}
+        for page in range(1, 15):  # Ensure this won't loop forever
+            url = self.FMS_API_DISTRICT_RANKINGS_PATTERN % (year, district_short, page)
+            result = self._parse(url, FMSAPIDistrictRankingsParser(rankings))
+            if not result:
+                break
+            rankings, more_pages = result
+
+            if not more_pages:
+                break
+
+        district.first_rankings = rankings
+        return [district]
 
     # Returns a list of sync-enabled offseason events
     def getSyncEnabledOffseasonEvents(self, year):
