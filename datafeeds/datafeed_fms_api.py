@@ -376,7 +376,7 @@ class DatafeedFMSAPI(object):
             if not more_pages:
                 break
 
-        district.advancement = advancement 
+        district.advancement = advancement
         return [district]
 
     # Returns a list of sync-enabled offseason events

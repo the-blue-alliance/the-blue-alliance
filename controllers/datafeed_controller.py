@@ -684,7 +684,6 @@ class DistrictRankingsGet(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
-
 class TbaVideosEnqueue(webapp.RequestHandler):
     """
     Handles enqueing grabing tba_videos for Matches at individual Events.
