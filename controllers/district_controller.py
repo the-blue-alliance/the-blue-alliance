@@ -139,6 +139,7 @@ class DistrictDetail(CacheableHandler):
             'week_events': week_events,
             'events_by_key': events_by_key,
             'rankings': district.rankings,
+            'advancement': district.advancement,
             'teams_a': teams_a,
             'teams_b': teams_b,
             'live_events_with_teams': live_events_with_teams,

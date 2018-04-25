@@ -28,6 +28,7 @@
         <th>Display Name</th>
         <th>Elasticsearch Name</th>
         <th>Has Rankings</th>
+        <th>Has Advancement</th>
     </thead>
 
     {% for district in districts %}
@@ -38,6 +39,10 @@
         <td>{{ district.display_name }}</td>
         <td>{{ district.elasticsearch_name }}</td>
         <td>{% if district.rankings %}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>
+        <td><div class="row">
+          {% if district.advancement%}<span class="glyphicon glyphicon-ok"><span>{% endif %}
+          <a href="/backend-tasks/get/district_rankings/{{district.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Refresh from FIRST</a>
+        </div></td>
         <td></td>
     </tr>
     {% endfor %}
