@@ -124,6 +124,8 @@
                 <th>District Champ</th>
                 <th>Rookie Bonus</th>
                 <th>Total Points</th>
+                <th>Qualified for DCMP</th>
+                <th>Qualified for CMP</th>
               </tr>
             </thead>
             <tbody>
@@ -163,6 +165,8 @@
                   {% endif %}
                 </td>
                 <td><strong>{{item.point_total}}</strong></td>
+                <td>{% if advancement and advancement[item.team_key].dcmp %}<span class="glyphicon glyphicon-ok"><span>{%endif%}</td>
+                <td>{% if advancement and advancement[item.team_key].cmp %}<span class="glyphicon glyphicon-ok"><span>{%endif%}</td>
               </tr>
               {% endfor %}
             </tbody>
