@@ -1,6 +1,6 @@
 # Calculates OPR/DPR/CCWM
 # For implementation details, see
-# http://www.chiefdelphi.com/forums/showpost.php?p=484220&postcount=19
+# https://www.chiefdelphi.com/forums/showpost.php?p=484220&postcount=19
 
 # M is n x n where n is # of teams
 # s is n x 1 where n is # of teams

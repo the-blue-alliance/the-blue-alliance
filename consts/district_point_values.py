@@ -11,7 +11,7 @@ class DistrictPointValues(object):
      - 2012: http://www.firstinmichigan.org/FRC_2012/2012_Rules_Supplement.pdf
      - 2011: http://www.firstinmichigan.org/FRC_2011/2011_Rules_Supplement.pdf
      - 2010: http://www.firstinmichigan.org/FRC_2010/2010_Update_3.pdf
-     - 2009: http://www.chiefdelphi.com/forums/showpost.php?p=759453&postcount=67
+     - 2009: https://www.chiefdelphi.com/forums/showpost.php?p=759453&postcount=67
     """
 
     STANDARD_MULTIPLIER = 1
