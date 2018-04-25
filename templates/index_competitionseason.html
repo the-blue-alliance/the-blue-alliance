@@ -14,7 +14,7 @@
       {% if events %}
         {% with events|first as first_event %}
         {% with events|last as last_event %}
-        {% if first_event.week != None %}
+        {% if first_event.week != None and last_event.week != None %}
           <h2>Week {{first_event.week|add:"1"}}{% if first_event.week != last_event.week %} - {{last_event.week|add:"1"}}{% endif %}:</h2>
         {% else %}
           <h2>This Week:</h2>
