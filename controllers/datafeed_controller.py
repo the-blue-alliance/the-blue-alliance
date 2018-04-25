@@ -671,7 +671,9 @@ class DistrictRankingsGet(webapp.RequestHandler):
         df = DatafeedFMSAPI('v2.0')
 
         district_with_rankings = df.getDistrictRankings(district_key)
-        districts = DistrictManipulator.createOrUpdate(district_with_rankings)
+        districts = []
+        if district_with_rankings:
+            districts = DistrictManipulator.createOrUpdate(district_with_rankings)
 
         template_values = {
             "districts": [districts],
