@@ -14,9 +14,7 @@ class District(ndb.Model):
     elasticsearch_name = ndb.StringProperty()  # These names are in the event's name as returned by FRC Elasticsearch
 
     rankings = ndb.JsonProperty()  # District rankings as calculated by TBA
-    first_rankings = ndb.JsonProperty()  # Rankings as scraped from FIRST. These
-                                         # won't have full per-event breakdowns
-                                         # but they do have CMP advancement
+    advancement = ndb.JsonProperty()  # Dict of team key -> advancement data
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
