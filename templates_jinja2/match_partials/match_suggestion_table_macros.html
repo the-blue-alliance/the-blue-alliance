@@ -1,4 +1,4 @@
-{% macro match_suggestion_table(matches, ranks) %}
+{% macro match_suggestion_table(matches, ranks, alliances) %}
 <table class="table match-table table-striped">
   <thead>
     <tr>
@@ -8,15 +8,15 @@
       <th>R1</th>
       <th>R2</th>
       <th>R3</th>
-      <th>R1 Rank</th>
-      <th>R2 Rank</th>
-      <th>R3 Rank</th>
+      <th>R1 Rank (Alliance)</th>
+      <th>R2 Rank (Alliance)</th>
+      <th>R3 Rank (Alliance)</th>
       <th>B1</th>
       <th>B2</th>
       <th>B3</th>
-      <th>B1 Rank</th>
-      <th>B2 Rank</th>
-      <th>B3 Rank</th>
+      <th>B1 Rank (Alliance)</th>
+      <th>B2 Rank (Alliance)</th>
+      <th>B3 Rank (Alliance)</th>
       <th>Red Predicted Score</th>
       <th>Blue Predicted Score</th>
       <th>Red Auto Power</th>
@@ -44,7 +44,7 @@
         </td>
         {% endfor %}
         {% for team in match.alliances.red.teams %}
-        <td>{{ranks[team]}}</td>
+        <td>{{ranks[team]}} ({{alliances[team]}})</td>
         {% endfor %}
         {% for team in match.alliances.blue.teams %}
         <td class="blue">
@@ -55,7 +55,7 @@
         </td>
         {% endfor %}
         {% for team in match.alliances.blue.teams %}
-        <td>{{ranks[team]}}</td>
+        <td>{{ranks[team]}} ({{alliances[team]}})</td>
         {% endfor %}
         <td class="red">{{match.prediction.red.score|round|int}}</td>
         <td class="blue">{{match.prediction.blue.score|round|int}}</td>
