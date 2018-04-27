@@ -10,6 +10,7 @@ set -e
 KEYFILE=ops/tbatv-prod-hrd-deploy.json
 PROJECT=tbatv-prod-hrd
 VERSION=prod-1
+SMOKE_VERSION=smoke-test
 DEPLOY_LOCK=tbatv-prod-hrd-deploy-lock
 
 BASE='https://dl.google.com/dl/cloudsdk/channels/rapid/'
@@ -18,6 +19,9 @@ EXT='.tar.gz'
 INSTALL=$HOME
 BOOTSTRAP="$INSTALL/$NAME/bin/bootstrapping/install.py"
 GCLOUD="$INSTALL/$NAME/bin/gcloud"
+
+SMOKE_TEST_CONFIGS="ispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml"
+CONFIGS_TO_DEPLOY="dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml cron.yaml"
 
 with_python27() {
     bash -c "source $HOME/virtualenv/python2.7/bin/activate; $1"
@@ -45,15 +49,19 @@ with_python27 "$GCLOUD -q auth activate-service-account --key-file $KEYFILE"
 echo "Obtaining deploy lock..."
 lock $DEPLOY_LOCK
 
-echo "Obtained Lock. Deploying $PROJECT:$VERSION"
+echo "Obtained Lock. Deploying $PROJECT"
+
+echo "First, running smoke tests"
+for config in $SMOKE_TEST_CONFIGS; do
+    with_python27 "$GCLOUD --quiet --verbosity warning --project $PROJECT app deploy $config --no-promote --version $SMOKE_VERSION"
+done
+
+$(pwd)/ops/travis/run-smoke-tests http://$SMOKE_VERSION.$PROJECT.appspot.com
+
 # need more permissiosn for cron.yaml queue.yaml index.yaml, we can come back to them
-for config in dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml cron.yaml; do
+for config in $CONFIGS_TO_DEPLOY; do
     with_python27 "$GCLOUD --quiet --verbosity warning --project $PROJECT app deploy $config --version $VERSION"
 done
 
 echo "Updating build info..."
 update_build_info
-
-echo "Releasing deploy lock..."
-unlock $DEPLOY_LOCK
-echo "Lock released. Deploy complete."
