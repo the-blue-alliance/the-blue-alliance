@@ -44,7 +44,7 @@
         </td>
         {% endfor %}
         {% for team in match.alliances.red.teams %}
-        <td>{{ranks[team]}} ({{alliances[team]}})</td>
+        <td>{{ranks[team]}}{% if alliances[team] %} ({{alliances[team]}}){% endif %}</td>
         {% endfor %}
         {% for team in match.alliances.blue.teams %}
         <td class="blue">
@@ -55,7 +55,7 @@
         </td>
         {% endfor %}
         {% for team in match.alliances.blue.teams %}
-        <td>{{ranks[team]}} ({{alliances[team]}})</td>
+        <td>{{ranks[team]}}{% if alliances[team] %} ({{alliances[team]}}){% endif %}</td>
         {% endfor %}
         <td class="red">{{match.prediction.red.score|round|int}}</td>
         <td class="blue">{{match.prediction.blue.score|round|int}}</td>
