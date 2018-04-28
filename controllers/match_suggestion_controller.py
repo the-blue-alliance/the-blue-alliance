@@ -39,6 +39,7 @@ class MatchSuggestionHandler(LoggedInHandler):
         current_matches = []
         upcoming_matches = []
         ranks = {}
+        alliances = {}
         for event in current_events:
             if not event.details:
                 continue
@@ -60,6 +61,11 @@ class MatchSuggestionHandler(LoggedInHandler):
             if event.details.rankings2:
                 for rank in event.details.rankings2:
                     ranks[rank['team_key']] = rank['rank']
+            if event.alliance_selections:
+                for i, alliance in enumerate(event.alliance_selections):
+                    for pick in alliance['picks']:
+                        alliances[pick] = i + 1
+
         finished_matches = sorted(finished_matches, key=lambda m: m.actual_time if m.actual_time else m.time)
         current_matches = sorted(current_matches, key=lambda m: m.predicted_time if m.predicted_time else m.time)
         upcoming_matches = sorted(upcoming_matches, key=lambda m: m.predicted_time if m.predicted_time else m.time)
@@ -69,6 +75,7 @@ class MatchSuggestionHandler(LoggedInHandler):
             'current_matches': current_matches,
             'upcoming_matches': upcoming_matches,
             'ranks': ranks,
+            'alliances': alliances,
         })
 
         self.response.out.write(jinja2_engine.render('match_suggestion.html', self.template_values))
