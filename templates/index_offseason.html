@@ -7,22 +7,33 @@
 <div class="container">
   <div class="row">
     <div class="col-xs-12 col-sm-5 col-lg-4">
-      {% include "index_lhc.html" %}
+      {% include "index_lhc_offseason.html" %}
     </div>
     <div class="col-xs-12 col-sm-7 col-lg-8">
-      <h2>2014 Kickoff: <span class="countdown-number countdown-days">--</span><span class="countdown-label day-label"> Days!</span> <small>Water Game?</small></h2>
-      <div id="countdown-finish-time">[2014, 0, 4, 0, 0, 0]</div>
-      <p>Watch the 2014 Kickoff LIVE on GameDay on The Blue Alliance on January 4th!</p>
-      <p><a class="btn btn-primary" href="https://www.facebook.com/events/192845597552272/" target="_blank"><span class="glyphicon glyphicon-calendar"></span> RSVP on Facebook</a></p>
+      {% include "media_partials/live_special_webcast_partial.html" %}
+
       {% if events and events|length > 0%}
+        <h2>This Week's Events</h2>
         {% with events as events %}
           {% include "event_partials/event_table.html" %}
         {% endwith %}
+      <hr>
       {% endif %}
-      <br /><br />
+
+      <h2>Only <span class="countdown-number countdown-days">--</span><span class="countdown-label day-label"> days</span> until {{kickoff_datetime_utc|date:"Y"}} Kickoff!</h2>
+      <div id="countdown-finish-time">{{kickoff_datetime_utc|date:"c"}}</div>
+      <p>Watch the {{kickoff_datetime_utc|date:"Y"}} Kickoff LIVE on GameDay on The Blue Alliance on {{kickoff_datetime_utc|date:"F jS"}}!</p>
+
+      {% if kickoff_facebook_fbid %}
+      <p><a class="btn btn-primary" href="https://www.facebook.com/events/{{kickoff_facebook_fbid}}/" target="_blank"><span class="glyphicon glyphicon-calendar"></span> RSVP on Facebook</a></p>
+      {% endif %}
+
+      {% if game_teaser_youtube_id %}
+      <h2>Watch the <em>{{game_name}}</em> teaser!</h3>
       <div class="fitvids">
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/MQ0VNzIvHx0?rel=0&amp;start=107" frameborder="0" allowfullscreen></iframe>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/{{game_teaser_youtube_id}}" frameborder="0" allowfullscreen></iframe>
       </div>
+      {%endif%}
     </div>
   </div>
 </div>

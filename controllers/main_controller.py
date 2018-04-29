@@ -117,10 +117,13 @@ class MainKickoffHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24
 
     def _render(self, *args, **kw):
-        kickoff_datetime_est = datetime.datetime(2018, 1, 6, 10, 00)
+        kickoff_datetime_est = datetime.datetime.strptime(
+            self.template_values['kickoff_datetime'], "%Y-%m-%dT%H:%M:%S"
+        ) if 'kickoff_datetime' in self.template_values else None
         kickoff_datetime_utc = pytz.utc.localize(
             kickoff_datetime_est + datetime.timedelta(hours=5))
 
+        special_webcasts = FirebasePusher.get_special_webcasts()
         is_kickoff = datetime.datetime.now() >= kickoff_datetime_est - datetime.timedelta(days=1)  # turn on 1 day before
         week_events = EventHelper.getWeekEvents()
 
@@ -129,6 +132,8 @@ class MainKickoffHandler(CacheableHandler):
             'is_kickoff': is_kickoff,
             'kickoff_datetime_est': kickoff_datetime_est,
             'kickoff_datetime_utc': kickoff_datetime_utc,
+            "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
+            "special_webcasts": special_webcasts,
         })
 
         path = os.path.join(os.path.dirname(__file__), "../templates/index_kickoff.html")
@@ -294,7 +299,7 @@ class MainInsightsHandler(CacheableHandler):
 
 
 class MainOffseasonHandler(CacheableHandler):
-    CACHE_VERSION = 2
+    CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "main_offseason"
 
     def __init__(self, *args, **kw):
@@ -302,9 +307,16 @@ class MainOffseasonHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24
 
     def _render(self, *args, **kw):
+        kickoff_datetime_utc = datetime.datetime.strptime(
+            self.template_values['kickoff_datetime'], "%Y-%m-%dT%H:%M:%S"
+        ) if 'kickoff_datetime' in self.template_values else None
         week_events = EventHelper.getWeekEvents()
+        special_webcasts = FirebasePusher.get_special_webcasts()
         self.template_values.update({
             "events": week_events,
+            'kickoff_datetime_utc': kickoff_datetime_utc,
+            "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
+            "special_webcasts": special_webcasts,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/index_offseason.html')
