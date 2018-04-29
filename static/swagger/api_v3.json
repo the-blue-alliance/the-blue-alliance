@@ -2122,8 +2122,7 @@
           "200": {
             "description": "Successful response",
             "schema": {
-              "type": "object",
-              "description": "A year-specific event insight object expressed as a JSON string. See also Event_Insights_2016 & Event_Insights_2017"
+              "$ref": "#/definitions/Event_Insights"
             },
             "headers": {
               "Last-Modified": {
@@ -4094,20 +4093,23 @@
         }
       }
     },
+    "Event_Insights": {
+      "type": "object",
+      "description": "A year-specific event insight object expressed as a JSON string, separated in to `qual` and `playoff` fields. See also Event_Insights_2016 & Event_Insights_2017",
+      "properties": {
+        "qual": {
+          "type": "object",
+          "description": "Inights for the qualification round of an event",
+        },
+        "playoff": {
+          "type": "object",
+          "description": "Insights for the playoff round of an event",
+        },
+      }
+    },
     "Event_Insights_2016": {
       "type": "object",
       "description": "Insights for FIRST Stronghold qualification and elimination matches.",
-      "properties": {
-        "qual": {
-          "$ref": "#/definitions/Event_Insights_2016_Detail"
-        },
-        "playoff": {
-          "$ref": "#/definitions/Event_Insights_2016_Detail"
-        }
-      }
-    },
-    "Event_Insights_2016_Detail": {
-      "type": "object",
       "required": [
         "LowBar",
         "A_ChevalDeFrise",
@@ -4301,17 +4303,6 @@
     "Event_Insights_2017": {
       "type": "object",
       "description": "Insights for FIRST STEAMWORKS qualification and elimination matches.",
-      "properties": {
-        "qual": {
-          "$ref": "#/definitions/Event_Insights_2017_Detail"
-        },
-        "playoff": {
-          "$ref": "#/definitions/Event_Insights_2017_Detail"
-        }
-      }
-    },
-    "Event_Insights_2017_Detail": {
-      "type": "object",
       "required": [
         "average_foul_score",
         "average_fuel_points",
