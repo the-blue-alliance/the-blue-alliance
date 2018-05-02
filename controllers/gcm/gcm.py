@@ -109,10 +109,9 @@ class GCMConnection:
         self.GOOGLE_LOGIN_URL = 'https://www.google.com/accounts/ClientLogin'
         # Can't use https on localhost due to Google cert bug
         self.GOOGLE_GCM_SEND_URL = 'https://fcm.googleapis.com/fcm'
-        self.GOOGLE_GCM_SEND_URL = 'https://fcm.googleapis.com/fcm'
 
         self.GCM_QUEUE_NAME = 'gcm-retries'
-        self.GCM_QUEUE_CALLBACK_URL = '/gae_python_fcm/send_request'
+        self.GCM_QUEUE_CALLBACK_URL = '/gae_python_gcm/send_request'
 
     # Call this to send a push notification
     def notify_device(self, message, deferred=False):
