@@ -5,4 +5,8 @@ google-api-python-client==1.6.2
 google-cloud-bigquery==0.25.0
 beautifulsoup4
 GoogleAppEngineCloudStorageClient
+
+# Cloud Endpoints Stuff
 google-endpoints
+google-apitools==0.5.11
+oauth2client==3.0.0
