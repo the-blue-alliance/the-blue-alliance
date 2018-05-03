@@ -9,7 +9,7 @@ set -e
 
 KEYFILE=ops/tbatv-prod-hrd-deploy.json
 PROJECT=tbatv-prod-hrd
-VERSION=prod-1
+VERSION=prod-2
 DEPLOY_LOCK=tbatv-prod-hrd-deploy-lock
 
 BASE='https://dl.google.com/dl/cloudsdk/channels/rapid/'
