@@ -63,8 +63,8 @@ class GCMMessage:
     def json_string(self):
 
         if not self.device_tokens or not isinstance(self.device_tokens, list):
-            logging.error('GCMMessage generate_json_string error. Invalid device tokens: ' + repr(self))
-            raise Exception('GCMMessage generate_json_string error. Invalid device tokens.')
+            logging.error('FCMMessage generate_json_string error. Invalid device tokens: ' + repr(self))
+            raise Exception('FCMMessage generate_json_string error. Invalid device tokens.')
 
         json_dict = {}
         json_dict['registration_ids'] = self.device_tokens
@@ -104,12 +104,11 @@ class GCMConnection:
         self.LOCALHOST = False
         self.SERVER_KEY = Sitevar.get_by_id('gcm.serverKey')
         if self.SERVER_KEY is None:
-            raise Exception("Missing sitevar: gcm.serverKey. Can't send GCM messages.")
+            raise Exception("Missing sitevar: gcm.serverKey. Can't send FCM messages.")
         self.GCM_CONFIG = {'gcm_api_key': self.SERVER_KEY.contents['gcm_key']}
         self.GOOGLE_LOGIN_URL = 'https://www.google.com/accounts/ClientLogin'
         # Can't use https on localhost due to Google cert bug
-        self.GOOGLE_GCM_SEND_URL = 'https://android.apis.google.com/gcm/send'
-        self.GOOGLE_GCM_SEND_URL = 'https://android.googleapis.com/gcm/send'
+        self.GOOGLE_GCM_SEND_URL = 'https://fcm.googleapis.com/fcm'
 
         self.GCM_QUEUE_NAME = 'gcm-retries'
         self.GCM_QUEUE_CALLBACK_URL = '/gae_python_gcm/send_request'
