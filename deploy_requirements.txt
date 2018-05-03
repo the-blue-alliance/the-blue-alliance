@@ -7,5 +7,5 @@ beautifulsoup4
 GoogleAppEngineCloudStorageClient
 
 # Cloud Endpoints Stuff
+oauth2client==3.0.0
 google-endpoints
-oauth2client
