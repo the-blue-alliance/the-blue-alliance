@@ -8,5 +8,4 @@ GoogleAppEngineCloudStorageClient
 
 # Cloud Endpoints Stuff
 google-endpoints
-google-apitools==0.5.11
-oauth2client==3.0.0
+oauth2client
