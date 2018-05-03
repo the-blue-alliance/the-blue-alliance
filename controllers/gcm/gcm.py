@@ -108,7 +108,7 @@ class GCMConnection:
         self.GCM_CONFIG = {'gcm_api_key': self.SERVER_KEY.contents['gcm_key']}
         self.GOOGLE_LOGIN_URL = 'https://www.google.com/accounts/ClientLogin'
         # Can't use https on localhost due to Google cert bug
-        self.GOOGLE_GCM_SEND_URL = 'https://fcm.googleapis.com/fcm'
+        self.GOOGLE_GCM_SEND_URL = 'https://fcm.googleapis.com/fcm/send'
 
         self.GCM_QUEUE_NAME = 'gcm-retries'
         self.GCM_QUEUE_CALLBACK_URL = '/gae_python_gcm/send_request'
