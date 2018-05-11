@@ -18,6 +18,7 @@
   <div class="row">
     <div class="col-sm-3 col-lg-2">
       <div class="tba-sidenav-affixed">
+	<div class="btn-group-vertical">
         <div class="btn-group">
           <a class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" href="#">
             {{selected_year}}
@@ -44,6 +45,7 @@
             {% endfor %}
           </ul>
         </div>
+	</div>
         {% endif %}
 
         <!-- <label class="sr-only" for="input-state-provs">Filter by state / province</label>
@@ -53,6 +55,7 @@
             <option value="/events{% if explicit_year %}/{{selected_year}}{% endif %}?state_prov={{valid_state_prov}}"{% if valid_state_prov == state_prov %} selected="selected"{% endif %}">{{valid_state_prov}}</option>
           {% endfor %}
         </select> -->
+
 
         {% if week_events %}
         <div class="tba-sidebar">
