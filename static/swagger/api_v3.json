@@ -4099,12 +4099,12 @@
       "properties": {
         "qual": {
           "type": "object",
-          "description": "Inights for the qualification round of an event",
+          "description": "Inights for the qualification round of an event"
         },
         "playoff": {
           "type": "object",
-          "description": "Insights for the playoff round of an event",
-        },
+          "description": "Insights for the playoff round of an event"
+        }
       }
     },
     "Event_Insights_2016": {
@@ -4750,7 +4750,7 @@
         },
         "unicorn_matches": {
           "type": "array",
-          "description": "An array with three values, number of times a unicorn match (Win + Auto Quest + Face the Boss)	 occured, number of opportunities to have a unicorn match, and percentage.",
+          "description": "An array with three values, number of times a unicorn match (Win + Auto Quest + Face the Boss) occurred, number of opportunities to have a unicorn match, and percentage.",
           "items": {
             "type": "number",
             "format": "float"
