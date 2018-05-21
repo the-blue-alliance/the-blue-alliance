@@ -21,7 +21,8 @@ RUN apt-get update && apt-get install -y \
   tmux \
   vim \
   openssh-server \
-  libmysqlclient-dev
+  libmysqlclient-dev \
+  language-pack-en-base
 
 # Configure ssh server
 RUN mkdir /var/run/sshd
