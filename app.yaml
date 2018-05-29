@@ -79,3 +79,7 @@ handlers:
 
 includes:
 - app_shared.yaml
+
+env_variables:
+  ENDPOINTS_SERVICE_NAME: tbatv-prod-hrd.appspot.com
+  ENDPOINTS_SERVICE_VERSION: 2018-05-29r1

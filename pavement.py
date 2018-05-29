@@ -111,6 +111,9 @@ def make():
     with open("version_info.json", "w") as f:
         f.write(json.dumps(data))
 
+@task
+def make_endpoints_config():
+    sh("python lib/endpoints/endpointscfg.py get_openapi_spec mobile_main.MobileAPI --hostname tbatv-prod-hrd.appspot.com")
 
 @task
 def preflight():

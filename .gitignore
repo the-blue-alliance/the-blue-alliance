@@ -65,6 +65,7 @@ $RECYCLE.BIN/
 static/css/less_css/*.css
 static/compiled/*
 version_info.json
+tbaMobilev9openapi.json
 
 # Node.js/npm #
 ###############
