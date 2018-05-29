@@ -58,7 +58,7 @@ if tba_config.DEBUG:
 
 
 @endpoints.api(name='tbaMobile', version='v9', description="API for TBA Mobile clients",
-               # allowed_client_ids=client_ids,
+               allowed_client_ids=client_ids,
                # audiences=[ANDROID_AUDIENCE],
                # scopes=[endpoints.EMAIL_SCOPE],
                issuers={
