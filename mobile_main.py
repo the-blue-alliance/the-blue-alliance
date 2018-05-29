@@ -58,9 +58,16 @@ if tba_config.DEBUG:
                allowed_client_ids=client_ids,
                audiences=[ANDROID_AUDIENCE],
                scopes=[endpoints.EMAIL_SCOPE],
-               issuers={'firebase': endpoints.Issuer(
+               issuers={
+               'firebase': endpoints.Issuer(
                   'https://securetoken.google.com/tbatv-prod-hrd',
-                  'https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com')})
+                  'https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com'
+                ),
+               'google_id_token': endpoints.Issuer(
+                  'https://accounts.google.com',
+                  'https://www.googleapis.com/oauth2/v3/certs'
+                ),
+               })
 class MobileAPI(remote.Service):
 
     @endpoints.method(RegistrationRequest, BaseResponse,
