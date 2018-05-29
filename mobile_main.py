@@ -49,7 +49,7 @@ if not ANDROID_AUDIENCE:
 if not IOS_CLIENT_ID:
     logging.error("iOS client ID is not set, see /admin/authkeys")
 
-client_ids = [WEB_CLIENT_ID, ANDROID_CLIENT_ID, IOS_CLIENT_ID]
+client_ids = [WEB_CLIENT_ID, ANDROID_CLIENT_ID, ANDROID_AUDIENCE, IOS_CLIENT_ID]
 if tba_config.DEBUG:
     '''
     Only allow API Explorer access on dev versions
