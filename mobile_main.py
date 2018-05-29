@@ -33,7 +33,7 @@ IOS_CLIENT_ID = ""
 client_ids_sitevar = Sitevar.get_or_insert('mobile.clientIds')
 if isinstance(client_ids_sitevar.contents, dict):
     WEB_CLIENT_ID = client_ids_sitevar.contents.get("web", "")
-    ANDROID_AUDIENCE = WEB_CLIENT_ID
+    ANDROID_AUDIENCE = client_ids_sitevar.contents.get("android-audience", "")
     ANDROID_CLIENT_ID = client_ids_sitevar.contents.get("android", "")
     IOS_CLIENT_ID = client_ids_sitevar.contents.get("ios", "")
 
@@ -42,7 +42,10 @@ if not WEB_CLIENT_ID:
 
 if not ANDROID_CLIENT_ID:
     logging.error("Android client ID is not set, see /admin/authkeys")
-
+    
+if not ANDROID_AUDIENCE:
+    logging.error("Android Audience is not set, see /admin/authkeys")
+    
 if not IOS_CLIENT_ID:
     logging.error("iOS client ID is not set, see /admin/authkeys")
 
