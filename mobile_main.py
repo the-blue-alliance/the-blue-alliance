@@ -57,21 +57,26 @@ if tba_config.DEBUG:
     client_ids.append(endpoints.API_EXPLORER_CLIENT_ID)
 
 
-@endpoints.api(name='tbaMobile', version='v9', description="API for TBA Mobile clients",
-               # allowed_client_ids=client_ids,
-               # audiences=[ANDROID_AUDIENCE],
-               audiences={"firebase": ["tbatv-prod-hrd"]},
-               # scopes=[endpoints.EMAIL_SCOPE],
-               issuers={
-               'firebase': endpoints.Issuer(
-                  'https://securetoken.google.com/tbatv-prod-hrd',
-                  'https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com'
-                ),
-               # 'google_id_token': endpoints.Issuer(
-               #    'https://accounts.google.com',
-               #    'https://www.googleapis.com/oauth2/v3/certs'
-               #  ),
-               })
+@endpoints.api(
+    name='tbaMobile',
+    version='v9',
+    description="API for TBA Mobile clients",
+    allowed_client_ids=client_ids,
+    audiences={
+        'firebase': ['tbatv-prod-hrd'],
+        'google_id_token': [ANDROID_AUDIENCE],
+    },
+    issuers={
+        'firebase': endpoints.Issuer(
+           'https://securetoken.google.com/tbatv-prod-hrd',
+           'https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com'
+        ),
+        'google_id_token': endpoints.Issuer(
+          'https://accounts.google.com',
+          'https://www.googleapis.com/oauth2/v3/certs'
+        ),
+    }
+)
 class MobileAPI(remote.Service):
 
     @endpoints.method(RegistrationRequest, BaseResponse,
