@@ -489,7 +489,7 @@ class SearchHandler(webapp2.RequestHandler):
             q = self.request.get("q")
             logging.info("search query: %s" % q)
             if q.isdigit():
-                team_id = "frc%s" % q
+                team_id = "frc%s" % int(q)
                 team = Team.get_by_id(team_id)
                 if team:
                     self.redirect(team.details_url)
