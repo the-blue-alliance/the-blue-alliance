@@ -204,7 +204,7 @@ class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
             EventHelper.remapteams_rankings(event_details.rankings, event.remap_teams)
             # TODO: Remap rankings2 directly
 
-        if event_details.year >= 2017:  # TODO: Temporary fix. Should directly parse request into rankings2
+        if event_details.year >= 2018:  # TODO: Temporary fix. Should directly parse request into rankings2
             event_details.rankings2 = RankingsHelper.convert_rankings(event_details)
 
         EventDetailsManipulator.createOrUpdate(event_details)
