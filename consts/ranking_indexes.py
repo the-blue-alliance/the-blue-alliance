@@ -2,6 +2,7 @@ class RankingIndexes(object):
     TEAM_NUMBER = 1
 
     MATCHES_PLAYED = {
+        2018: 9,
         2017: 10,
         2016: 8,
         2015: 8,
@@ -16,6 +17,7 @@ class RankingIndexes(object):
     }
 
     CUMULATIVE_RANKING_SCORE = {
+        2018: 2,
         2017: 2,  # In 2017, this is RP/Match
         2016: 2,
         2015: 2,  # In 2015, this is average qual score
@@ -47,4 +49,5 @@ class RankingIndexes(object):
         2015: None,
         2016: 7,
         2017: 8,
+        2018: 7,
     }

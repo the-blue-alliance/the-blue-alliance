@@ -310,14 +310,19 @@ $('#rankings_file').change(function(){
         //var is_int = [true, true, true, true, true, false, true, true];
 
         // 2017 Headers
-        var headers = ['Rank', 'Team', 'RS', 'TotalPts', 'Auto', 'Rotor', 'Takeoff', 'kPa', 'W-L-T', 'DQ', 'Played'];
-        var display_headers = ['Rank', 'Team', 'Ranking Score', 'Match Points', 'Auto', 'Rotor', 'Takeoff', 'kPa', 'Record (W-L-T)', 'DQ', 'Played'];
+        //var headers = ['Rank', 'Team', 'RS', 'TotalPts', 'Auto', 'Rotor', 'Takeoff', 'kPa', 'W-L-T', 'DQ', 'Played'];
+        //var display_headers = ['Rank', 'Team', 'Ranking Score', 'Match Points', 'Auto', 'Rotor', 'Takeoff', 'kPa', 'Record (W-L-T)', 'DQ', 'Played'];
+        //var is_num = [true, true, true, true, true, true, false, true, true];
+
+        // 2018 Headers
+        var headers = ['Rank', 'Team', 'RS', 'Endgame', 'Auto', 'Ownership', 'Vault', 'W-L-T', 'DQ', 'Played'];
+        var display_headers = ['Rank', 'Team', 'Ranking Score', 'End Game', 'Auto', 'Ownership', 'Vault', 'Record (W-L-T)', 'DQ', 'Played'];
         var is_num = [true, true, true, true, true, true, false, true, true];
 
         $('#rankings_preview').empty();
         $('#rankings_preview').html("<tr><th>" + display_headers.join("</th><th>") + "</th></tr>");
 
-        request_body['breakdowns'] = display_headers.slice(2, 9);
+        request_body['breakdowns'] = display_headers.slice(2, 8);
         request_body['rankings'] = [];
 
         for(var i=0; i<rankings.length; i++){
