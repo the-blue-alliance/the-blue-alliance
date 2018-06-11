@@ -107,7 +107,7 @@ class TestEventGetTimezoneId(unittest2.TestCase):
             if location:
                 break
         self.assertAlmostEqual(location[0], 45.5122308, places=6)
-        self.assertAlmostEqual(location[1], -122.6764816, places=6)
+        self.assertAlmostEqual(location[1], -122.6587185, places=6)
         self.assertEqual(LocationHelper.get_timezone_id(event['location']), 'America/Los_Angeles')
 
     def test_1997il(self):
