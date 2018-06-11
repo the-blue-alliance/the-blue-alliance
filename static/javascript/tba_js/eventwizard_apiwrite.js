@@ -317,7 +317,7 @@ $('#rankings_file').change(function(){
         // 2018 Headers
         var headers = ['Rank', 'Team', 'RS', 'Endgame', 'Auto', 'Ownership', 'Vault', 'W-L-T', 'DQ', 'Played'];
         var display_headers = ['Rank', 'Team', 'Ranking Score', 'End Game', 'Auto', 'Ownership', 'Vault', 'Record (W-L-T)', 'DQ', 'Played'];
-        var is_num = [true, true, true, true, true, true, false, true, true];
+        var is_num = [true, true, true, true, true, false, true, true];
 
         $('#rankings_preview').empty();
         $('#rankings_preview').html("<tr><th>" + display_headers.join("</th><th>") + "</th></tr>");
@@ -329,7 +329,7 @@ $('#rankings_file').change(function(){
             var rank = rankings[i];
 
             // check for invalid row
-            if(!rank['Rank']){
+            if(!rank['Rank'] || isNaN(rank['Rank'])){
                 continue;
             }
 
