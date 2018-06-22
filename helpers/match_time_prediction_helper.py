@@ -103,9 +103,10 @@ class MatchTimePredictionHelper(object):
         if len(played_matches) >= 2:
             # Just for some logging
             two_ago = played_matches[-2]
-            cycle = last_match.actual_time - two_ago.actual_time
-            s = int(cycle.total_seconds())
-            to_log += '[TIME PREDICTIONS] Last Cycle: {:02}:{:02}:{:02}\n'.format(s // 3600, s % 3600 // 60, s % 60)
+            if last_match.actual_time and two_ago.actual_time:
+                cycle = last_match.actual_time - two_ago.actual_time
+                s = int(cycle.total_seconds())
+                to_log += '[TIME PREDICTIONS] Last Cycle: {:02}:{:02}:{:02}\n'.format(s // 3600, s % 3600 // 60, s % 60)
 
         if not next_match:
             # Nothing to predict
