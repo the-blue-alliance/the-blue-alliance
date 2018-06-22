@@ -108,7 +108,7 @@ class MatchTimePredictionHelper(object):
                 s = int(cycle.total_seconds())
                 to_log += '[TIME PREDICTIONS] Last Cycle: {:02}:{:02}:{:02}\n'.format(s // 3600, s % 3600 // 60, s % 60)
 
-        if not next_match:
+        if not next_match or (last_match and not last_match.time):
             # Nothing to predict
             return
 
