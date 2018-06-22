@@ -682,7 +682,7 @@ class MatchTimePredictionsDo(webapp.RequestHandler):
         for unplayed_match in unplayed_matches:
             if ((unplayed_match.predicted_time and unplayed_match.time and
                 unplayed_match.predicted_time < unplayed_match.time + datetime.timedelta(minutes=30)) or
-                (played_matches == [] or played_matches[-1].actual_time > datetime.datetime.now() - datetime.timedelta(minutes=30))):
+                (played_matches == [] or played_matches[-1].actual_time is None or played_matches[-1].actual_time > datetime.datetime.now() - datetime.timedelta(minutes=30))):
                 event_down = False
                 break
 
