@@ -273,6 +273,8 @@ class DistrictHelper(object):
                     for team in match.alliances[color]['teams']:
                         score = match.alliances[color]['score']
                         district_points['tiebreakers'][team]['highest_qual_scores'] = heapq.nlargest(3, district_points['tiebreakers'][team]['highest_qual_scores'] + [score])
+                        # Make sure that teams without wins don't get dropped from 'points'
+                        district_points['points'][team]['qual_points'] += 0
             else:  # Elim match points
                 elim_matches.append(match)
         cls.calc_elim_match_points(district_points, elim_matches, POINTS_MULTIPLIER)
