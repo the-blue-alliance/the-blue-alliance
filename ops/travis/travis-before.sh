@@ -10,6 +10,7 @@ case "$1" in
 
     "PYUNIT" | "JSUNIT" | "PYBUILD" )
         echo "Setting up for unit tests..."
+        cp static/javascript/tba_js/tba_keys_template.js static/javascript/tba_js/tba_keys.js
         paver make
         ;;
     "LINT")
