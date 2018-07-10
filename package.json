@@ -27,6 +27,7 @@
     "redux-thunk": "^2.0.1",
     "reselect": "^2.5.1",
     "swagger-ui": "3.17.1",
+    "swagger-client": "3.8.6",
     "underscore": "^1.8.3"
   },
   "devDependencies": {
@@ -59,7 +60,8 @@
     "react-addons-test-utils": "^15.3.0",
     "react-dom": "^15.3.0",
     "react-test-renderer": "^15.3.0",
-    "swagger-ui": "^3.0.10",
+    "swagger-ui": "3.17.1",
+    "swagger-client": "3.8.6",
     "uglifycss": "0.0.27",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
