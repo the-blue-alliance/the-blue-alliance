@@ -61,7 +61,7 @@
     "react-dom": "^15.3.0",
     "react-test-renderer": "^15.3.0",
     "swagger-ui": "3.17.1",
-    "swagger-client": "3.8.6",
+    "swagger-client": "3.8.8",
     "uglifycss": "0.0.27",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
