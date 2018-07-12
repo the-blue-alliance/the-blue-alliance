@@ -21,3 +21,4 @@ unzip -q google_appengine_$GAE_VERSION.zip -d $HOME
 rm google_appengine_$GAE_VERSION.zip
 npm install
 npm install -g gulp-cli uglify-es uglifycss less request swagger-cli
+npm ls || true
