@@ -68,8 +68,7 @@ var errorHandler = function(err) {
   gutil.log(err);
   this.emit('end');
 
-  //TODO this should actually bail
-  //process.exit(1);
+  process.exit(1);
 };
 
 function compile(watch, config) {
