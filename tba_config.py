@@ -1,11 +1,11 @@
 import os
 from consts.landing_type import LandingType
+from models.sitevar import Sitevar
 
 
 DEBUG = os.environ.get('SERVER_SOFTWARE') is not None and os.getenv('APPLICATION_ID') != 's~tbatv-prod-hrd'
 DEBUG = DEBUG or os.getenv('IS_TBA_TEST') is not None or os.getenv('TRAVIS') is not None
 
-MAX_YEAR = 2018
 
 # Fraction of requests to profile
 RECORD_FRACTION = 0.1
@@ -41,3 +41,16 @@ else:
     }
 
 CONFIG["static_resource_version"] = 8
+
+
+def _get_max_year():
+    DEFAULT_YEAR = 2018
+    try:
+        status_sitevar = Sitevar.get_by_id('apistatus')
+        return status_sitevar.contents.get(
+            'max_season', DEFAULT_YEAR) if status_sitevar else DEFAULT_YEAR
+    except Exception:
+        return DEFAULT_YEAR
+
+
+MAX_YEAR = _get_max_year()
