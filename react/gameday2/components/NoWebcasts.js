@@ -6,7 +6,7 @@ export default () => (
     <h1>No webcasts found</h1>
     <p>Looks like there aren&apos;t any events with webcasts this week. Check on The Blue Alliance for upcoming events!</p>
     <RaisedButton
-      href="https://thebluealliance.com"
+      href="https://www.thebluealliance.com"
       label="Go to The Blue Alliance"
     />
   </div>

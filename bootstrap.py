@@ -225,7 +225,7 @@ def main(key, url):
         remote_api_stub.ConfigureRemoteApiForOAuth(url, '/_ah/remote_api')
 
     print "Loading data from The Blue Alliance requires an API key"
-    print "Please go to https://thebluealliance.com/account and generate a read API key"
+    print "Please go to https://www.thebluealliance.com/account and generate a read API key"
     apiv3_key = raw_input("Enter your API key: ")
 
     global AUTH_TOKEN
