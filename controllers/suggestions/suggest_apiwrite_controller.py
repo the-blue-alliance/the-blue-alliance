@@ -42,8 +42,8 @@ class SuggestApiWriteController(LoggedInHandler):
         subject = "Trusted API Key Request for {}".format(event_key)
         body = """{} ({}) has made a request for trusted API keys for the event {}.
 
-View the event at https://thebluealliance.com/event/{}
+View the event at https://www.thebluealliance.com/event/{}
 
-Review the request at https://thebluealliance.com/suggest/apiwrite/review
+Review the request at https://www.thebluealliance.com/suggest/apiwrite/review
 """.format(user_bundle.account.display_name, user_bundle.account.email, event_key, event_key)
         return subject, body

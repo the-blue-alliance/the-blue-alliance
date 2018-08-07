@@ -55,7 +55,7 @@ const AppBar = (props) => {
       style={tbaBrandingButtonStyle}
       tooltip="Go to The Blue Alliance"
       tooltipPosition="bottom-right"
-      href="https://thebluealliance.com"
+      href="https://www.thebluealliance.com"
     >
       <LampIcon
         width={props.muiTheme.layout.appBarHeight}
