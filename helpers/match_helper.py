@@ -425,6 +425,16 @@ class MatchHelper(object):
             'rotorBonusPoints', 'rotorRankingPointAchieved', 'techFoulCount', 'teleopFuelHigh',
             'teleopFuelLow', 'teleopFuelPoints', 'teleopPoints', 'teleopRotorPoints', 'teleopTakeoffPoints',
             'totalPoints', 'touchpadFar', 'touchpadMiddle', 'touchpadNear']),
+        2018: set([
+            'autoRobot1', 'autoRobot2', 'autoRobot3', 'autoSwitchOwnershipSec', 'autoScaleOwnershipSec',
+            'autoSwitchAtZero', 'autoRunPoints', 'autoOwnershipPoints', 'autoPoints',
+            'teleopSwitchOwnershipSec', 'teleopScaleOwnershipSec', 'teleopSwitchBoostSec',
+            'teleopScaleBoostSec', 'teleopSwitchForceSec', 'teleopScaleForceSec',
+            'vaultForceTotal', 'vaultForcePlayed', 'vaultLevitateTotal', 'vaultLevitatePlayed',
+            'vaultBoostTotal', 'vaultBoostPlayed', 'endgameRobot1', 'endgameRobot2', 'endgameRobot3',
+            'teleopOwnershipPoints', 'vaultPoints', 'endgamePoints', 'teleopPoints',
+            'autoQuestRankingPoint', 'faceTheBossRankingPoint', 'foulCount', 'techFoulCount',
+            'adjustPoints', 'foulPoints', 'rp', 'totalPoints']),
     }
 
     @classmethod
