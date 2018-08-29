@@ -493,43 +493,43 @@ class TestLocationHelper(unittest2.TestCase):
         # self.assertEqual(team.normalized_location.postal_code, '39180')
         # self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(32.3526456, -90.877882))
 
-    def test_team_location_1868(self):
-        # Team 1868 (Odd Sponsors, multiple schools)
-        team = Team(
-            id='frc1868',
-            name='NASA Ames Research Center / St. Jude Medical Foundation / Google / Nvidia / Brin Worcicki Foundation / Qualcomm / Intuitive Surgical / Motorola / World Metal Finishing / Applied Welding / Weiss Enterprises / Solidworks / Wildbit / Fiber Internet Center & Girl Scout Troop 62868',
-            city='Mountain View',
-            state_prov='California',
-            postalcode='94035',
-            country='USA'
-        )
-        LocationHelper.update_team_location(team)
-        if not self.test_google_api_key:
-            return
-        # self.assertEqual(team.normalized_location.name, None)
-        self.assertEqual(team.normalized_location.name, None)
-        # self.assertEqual(team.normalized_location.formatted_address, 'Mountain View, CA 94035, USA')
-        # self.assertEqual(team.normalized_location.street_number, None)
-        # self.assertEqual(team.normalized_location.street, None)
-        self.assertEqual(team.normalized_location.city, 'Mountain View')
-        self.assertEqual(team.normalized_location.state_prov, 'California')
-        self.assertEqual(team.normalized_location.state_prov_short, 'CA')
-        self.assertEqual(team.normalized_location.country, 'United States')
-        self.assertEqual(team.normalized_location.country_short, 'US')
-        self.assertEqual(team.normalized_location.postal_code, '94035')
-        # self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(37.41752, -122.0525))
-        # Disabled until we can get more accurate
-        # self.assertEqual(team.normalized_location.name, 'NASA Ames Research Center')
-        # self.assertEqual(team.normalized_location.formatted_address, 'MOFFETT FIELD, CA 94035, USA')
-        # self.assertEqual(team.normalized_location.street_number, None)
-        # self.assertEqual(team.normalized_location.street, None)
-        # self.assertEqual(team.normalized_location.city, 'MOFFETT FIELD')
-        # self.assertEqual(team.normalized_location.state_prov, 'California')
-        # self.assertEqual(team.normalized_location.state_prov_short, 'CA')
-        # self.assertEqual(team.normalized_location.country, 'United States')
-        # self.assertEqual(team.normalized_location.country_short, 'US')
-        # self.assertEqual(team.normalized_location.postal_code, '94035')
-        # self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(37.4090697, -122.0638253))
+    # def test_team_location_1868(self):
+    #     # Team 1868 (Odd Sponsors, multiple schools)
+    #     team = Team(
+    #         id='frc1868',
+    #         name='NASA Ames Research Center / St. Jude Medical Foundation / Google / Nvidia / Brin Worcicki Foundation / Qualcomm / Intuitive Surgical / Motorola / World Metal Finishing / Applied Welding / Weiss Enterprises / Solidworks / Wildbit / Fiber Internet Center & Girl Scout Troop 62868',
+    #         city='Mountain View',
+    #         state_prov='California',
+    #         postalcode='94035',
+    #         country='USA'
+    #     )
+    #     LocationHelper.update_team_location(team)
+    #     if not self.test_google_api_key:
+    #         return
+    #     # self.assertEqual(team.normalized_location.name, None)
+    #     self.assertEqual(team.normalized_location.name, None)
+    #     # self.assertEqual(team.normalized_location.formatted_address, 'Mountain View, CA 94035, USA')
+    #     # self.assertEqual(team.normalized_location.street_number, None)
+    #     # self.assertEqual(team.normalized_location.street, None)
+    #     self.assertEqual(team.normalized_location.city, 'Mountain View')
+    #     self.assertEqual(team.normalized_location.state_prov, 'California')
+    #     self.assertEqual(team.normalized_location.state_prov_short, 'CA')
+    #     self.assertEqual(team.normalized_location.country, 'United States')
+    #     self.assertEqual(team.normalized_location.country_short, 'US')
+    #     self.assertEqual(team.normalized_location.postal_code, '94035')
+    #     # self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(37.41752, -122.0525))
+    #     # Disabled until we can get more accurate
+    #     # self.assertEqual(team.normalized_location.name, 'NASA Ames Research Center')
+    #     # self.assertEqual(team.normalized_location.formatted_address, 'MOFFETT FIELD, CA 94035, USA')
+    #     # self.assertEqual(team.normalized_location.street_number, None)
+    #     # self.assertEqual(team.normalized_location.street, None)
+    #     # self.assertEqual(team.normalized_location.city, 'MOFFETT FIELD')
+    #     # self.assertEqual(team.normalized_location.state_prov, 'California')
+    #     # self.assertEqual(team.normalized_location.state_prov_short, 'CA')
+    #     # self.assertEqual(team.normalized_location.country, 'United States')
+    #     # self.assertEqual(team.normalized_location.country_short, 'US')
+    #     # self.assertEqual(team.normalized_location.postal_code, '94035')
+    #     # self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(37.4090697, -122.0638253))
 
     def test_team_location_3504(self):
         # Team 3504 (Odd Sponsors, multiple schools)
