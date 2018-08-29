@@ -274,3 +274,5 @@ class TestEventGetShortName(unittest2.TestCase):
         self.assertEqual(EventHelper.getShortName("ISR District Event #1"), "ISR #1")
         # 2018 edge cases
         self.assertEqual(EventHelper.getShortName("PNW District Clackamas Academy Event"), "Clackamas Academy")
+        # 2019 edge cases
+        self.assertEqual(EventHelper.getShortName("FMA District Hatboro-Horsham Event"), "Hatboro-Horsham")

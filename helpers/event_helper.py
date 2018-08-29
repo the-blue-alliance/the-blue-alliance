@@ -232,6 +232,8 @@ class EventHelper(object):
             codes = set([d.id()[4:].upper() for d in District.query().fetch(keys_only=True)])
             if district_code:
                 codes.add(district_code.upper())
+            if 'MAR' in codes:  # MAR renamed to FMA in 2019
+                codes.add('FMA')
             district_keys = '|'.join(codes)
         memcache.set('EventHelper.getShortName():district_keys', district_keys, 60*60)
 
