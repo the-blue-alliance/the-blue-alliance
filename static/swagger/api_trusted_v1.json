@@ -86,7 +86,7 @@
            "401": {
              "$ref": "#/responses/invalidSigResponse"
            }
-        } 
+        }
       }
     },
      "/event/{eventKey}/alliance_selections/update": {
@@ -413,7 +413,7 @@
           ],
           "summary": "Add event videos",
           "description": "Link YouTube videos to an event",
-          "operationId": "updateMatchVideos",
+          "operationId": "updateEventMedia",
           "parameters": [
             { "$ref": "#/parameters/eventKeyParam" },
             {
