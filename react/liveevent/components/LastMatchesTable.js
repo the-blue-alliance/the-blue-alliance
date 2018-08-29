@@ -53,7 +53,7 @@ const LastMatchesTable = (props) => {
 
 LastMatchesTable.propTypes = {
   year: PropTypes.number.isRequired,
-  matches: PropTypes.array,
+  matches: PropTypes.arrayOf(PropTypes.object),
 }
 
 export default LastMatchesTable

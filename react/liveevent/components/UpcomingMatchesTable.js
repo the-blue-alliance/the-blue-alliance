@@ -77,7 +77,7 @@ class UpcomingMatchesTable extends React.PureComponent {
 
 UpcomingMatchesTable.propTypes = {
   year: PropTypes.number.isRequired,
-  matches: PropTypes.array,
+  matches: PropTypes.arrayOf(PropTypes.object),
 }
 
 export default UpcomingMatchesTable
