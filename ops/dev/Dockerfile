@@ -53,3 +53,6 @@ EXPOSE 8080-8089
 
 # Start SSH server
 CMD ["/usr/sbin/sshd", "-D"]
+
+# Add vars to SSH automatically
+RUN echo source /tba/ops/dev/vars.sh >> /root/.bashrc
