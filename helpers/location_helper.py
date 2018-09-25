@@ -481,6 +481,7 @@ class LocationHelper(object):
         if results:
             return results[0]['geometry']['location']['lat'], results[0]['geometry']['location']['lng']
         else:
+            logging.warning('location get_lat_lng failed!')
             return None
 
     @classmethod
