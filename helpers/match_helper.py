@@ -434,7 +434,7 @@ class MatchHelper(object):
             'vaultBoostTotal', 'vaultBoostPlayed', 'endgameRobot1', 'endgameRobot2', 'endgameRobot3',
             'teleopOwnershipPoints', 'vaultPoints', 'endgamePoints', 'teleopPoints',
             'autoQuestRankingPoint', 'faceTheBossRankingPoint', 'foulCount', 'techFoulCount',
-            'adjustPoints', 'foulPoints', 'rp', 'totalPoints']),
+            'adjustPoints', 'foulPoints', 'rp', 'totalPoints', 'tba_gameData']),
     }
 
     @classmethod
