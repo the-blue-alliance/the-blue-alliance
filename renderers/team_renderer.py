@@ -124,9 +124,9 @@ class TeamRenderer(object):
                 for match in matches:
                     video_ids += [video.split("?")[0] for video in match.youtube_videos]
             if video_ids:
-                playlist_title = "{} (Team {})".format(event.name, team.team_number)
-                playlist = "https://www.youtube.com/watch_videos?video_ids={}&title={}"
-                playlist = playlist.format(",".join(video_ids), playlist_title)
+                playlist_title = u"{} (Team {})".format(event.name, team.team_number)
+                playlist = u"https://www.youtube.com/watch_videos?video_ids={}&title={}"
+                playlist = playlist.format(u",".join(video_ids), playlist_title)
 
             district_points = None
             if team_district_points:
