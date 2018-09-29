@@ -49,15 +49,13 @@ class ApiTrustedEventAllianceSelectionsUpdate(ApiTrustedBaseController):
     def _process_request(self, request, event_key):
         alliance_selections = JSONAllianceSelectionsParser.parse(request.body)
 
-        event = Event.get_by_id(event_key)
-
         event_details = EventDetails(
             id=event_key,
             alliance_selections=alliance_selections
         )
 
-        if event.remap_teams:
-            EventHelper.remapteams_alliances(event_details.alliance_selections, event.remap_teams)
+        if self.event.remap_teams:
+            EventHelper.remapteams_alliances(event_details.alliance_selections, self.event.remap_teams)
         EventDetailsManipulator.createOrUpdate(event_details)
 
         self.response.out.write(json.dumps({'Success': "Alliance selections successfully updated"}))
@@ -70,27 +68,25 @@ class ApiTrustedEventAwardsUpdate(ApiTrustedBaseController):
     REQUIRED_AUTH_TYPES = {AuthType.EVENT_AWARDS}
 
     def _process_request(self, request, event_key):
-        event = Event.get_by_id(event_key)
-
         awards = []
         for award in JSONAwardsParser.parse(request.body, event_key):
             awards.append(Award(
-                id=Award.render_key_name(event.key_name, award['award_type_enum']),
+                id=Award.render_key_name(self.event.key_name, award['award_type_enum']),
                 name_str=award['name_str'],
                 award_type_enum=award['award_type_enum'],
-                year=event.year,
-                event=event.key,
-                event_type_enum=event.event_type_enum,
+                year=self.event.year,
+                event=self.event.key,
+                event_type_enum=self.event.event_type_enum,
                 team_list=[ndb.Key(Team, team_key) for team_key in award['team_key_list']],
                 recipient_json_list=award['recipient_json_list']
             ))
 
         # it's easier to clear all awards and add new ones than try to find the difference
-        old_award_keys = Award.query(Award.event == event.key).fetch(None, keys_only=True)
+        old_award_keys = Award.query(Award.event == self.event.key).fetch(None, keys_only=True)
         AwardManipulator.delete_keys(old_award_keys)
 
-        if event.remap_teams:
-            EventHelper.remapteams_awards(awards, event.remap_teams)
+        if self.event.remap_teams:
+            EventHelper.remapteams_awards(awards, self.event.remap_teams)
         AwardManipulator.createOrUpdate(awards)
 
         self.response.out.write(json.dumps({'Success': "Awards successfully updated"}))
@@ -103,20 +99,17 @@ class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
     REQUIRED_AUTH_TYPES = {AuthType.EVENT_MATCHES}
 
     def _process_request(self, request, event_key):
-        event = Event.get_by_id(event_key)
-        year = int(event_key[:4])
-
         matches = []
         needs_time = []
-        for match in JSONMatchesParser.parse(request.body, year):
+        for match in JSONMatchesParser.parse(request.body, self.event.year):
             match = Match(
                 id=Match.renderKeyName(
-                    event.key.id(),
+                    self.event.key.id(),
                     match.get("comp_level", None),
                     match.get("set_number", 0),
                     match.get("match_number", 0)),
-                event=event.key,
-                year=event.year,
+                event=self.event.key,
+                year=self.event.year,
                 set_number=match.get("set_number", 0),
                 match_number=match.get("match_number", 0),
                 comp_level=match.get("comp_level", None),
@@ -135,12 +128,12 @@ class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
         if needs_time:
             try:
                 logging.debug("Calculating time!")
-                MatchHelper.add_match_times(event, needs_time)
+                MatchHelper.add_match_times(self.event, needs_time)
             except Exception, e:
                 logging.error("Failed to calculate match times")
 
-        if event.remap_teams:
-            EventHelper.remapteams_matches(matches, event.remap_teams)
+        if self.event.remap_teams:
+            EventHelper.remapteams_matches(matches, self.event.remap_teams)
         MatchManipulator.createOrUpdate(matches)
 
         self.response.out.write(json.dumps({'Success': "Matches successfully updated"}))
@@ -192,7 +185,6 @@ class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
     REQUIRED_AUTH_TYPES = {AuthType.EVENT_RANKINGS}
 
     def _process_request(self, request, event_key):
-        event = Event.get_by_id(event_key)
         rankings = JSONRankingsParser.parse(request.body)
 
         event_details = EventDetails(
@@ -200,8 +192,8 @@ class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
             rankings=rankings
         )
 
-        if event.remap_teams:
-            EventHelper.remapteams_rankings(event_details.rankings, event.remap_teams)
+        if self.event.remap_teams:
+            EventHelper.remapteams_rankings(event_details.rankings, self.event.remap_teams)
             # TODO: Remap rankings2 directly
 
         if event_details.year >= 2018:  # TODO: Temporary fix. Should directly parse request into rankings2
@@ -221,18 +213,17 @@ class ApiTrustedEventTeamListUpdate(ApiTrustedBaseController):
 
     def _process_request(self, request, event_key):
         team_keys = JSONTeamListParser.parse(request.body)
-        event = Event.get_by_id(event_key)
 
         event_teams = []
         for team_key in team_keys:
             if Team.get_by_id(team_key):  # Don't create EventTeams for teams that don't exist
-                event_teams.append(EventTeam(id=event.key.id() + '_{}'.format(team_key),
-                                             event=event.key,
+                event_teams.append(EventTeam(id=self.event.key.id() + '_{}'.format(team_key),
+                                             event=self.event.key,
                                              team=ndb.Key(Team, team_key),
-                                             year=event.year))
+                                             year=self.event.year))
 
         # delete old eventteams
-        old_eventteam_keys = EventTeam.query(EventTeam.event == event.key).fetch(None, keys_only=True)
+        old_eventteam_keys = EventTeam.query(EventTeam.event == self.event.key).fetch(None, keys_only=True)
         to_delete = set(old_eventteam_keys).difference(set([et.key for et in event_teams]))
         EventTeamManipulator.delete_keys(to_delete)
 
@@ -290,14 +281,8 @@ class ApiTrustedAddEventMedia(ApiTrustedBaseController):
             self.abort(400)
             return
 
-        event = Event.get_by_id(event_key)
-        if not event:
-            self._errors = json.dumps({"Error": "Event {} not found".format(event_key)})
-            self.abort(404)
-            return
-
         media_to_put = []
-        event_reference = Media.create_reference('event', event.key_name)
+        event_reference = Media.create_reference('event', self.event.key_name)
         for youtube_id in video_list:
             media = Media(
                 id=Media.render_key_name(MediaType.YOUTUBE_VIDEO, youtube_id),
@@ -305,7 +290,7 @@ class ApiTrustedAddEventMedia(ApiTrustedBaseController):
                 media_type_enum=MediaType.YOUTUBE_VIDEO,
                 details_json=None,
                 private_details_json=None,
-                year=event.year,
+                year=self.event.year,
                 references=[event_reference],
                 preferred_references=[],
             )
@@ -339,13 +324,6 @@ class ApiTrustedUpdateEventInfo(ApiTrustedBaseController):
             self._errors = json.dumps({"Error": "Invalid json. Check input."})
             self.abort(400)
 
-        event = Event.get_by_id(event_key)
-        if not event:
-            self._errors = json.dumps(
-                {"Error": "Event {} not found".format(event_key)}
-            )
-            self.abort(404)
-
         do_team_remap = False
         for field, value in event_info.iteritems():
             if field not in self.ALLOWED_EVENT_PARAMS:
@@ -376,7 +354,7 @@ class ApiTrustedUpdateEventInfo(ApiTrustedBaseController):
 
                 webcast_list = [w for w in webcast_list if w is not None]
                 EventWebcastAdder.add_webcast(
-                    event,
+                    self.event,
                     webcast_list,
                     False,  # Don't createOrUpdate yet
                 )
@@ -392,13 +370,13 @@ class ApiTrustedUpdateEventInfo(ApiTrustedBaseController):
                     if not remapped_match or (remapped_match and (remapped_match.group(0) != str(remapped_team))):
                         raise ParserInputException("Bad team: '{}'. Must follow format 'frcXXX' or 'frcXXX[B-Z]'.".format(remapped_team))
                 do_team_remap = True
-                setattr(event, field, value)
+                setattr(self.event, field, value)
             else:
                 try:
                     if field == "first_event_code":
-                        event.official = value is not None
+                        self.event.official = value is not None
                         field = "first_code"  # Internal property is different
-                    setattr(event, field, value)
+                    setattr(self.event, field, value)
                 except Exception, e:
                     self._errors({
                         "Error": "Unable to set event field",
@@ -406,13 +384,13 @@ class ApiTrustedUpdateEventInfo(ApiTrustedBaseController):
                     })
                     self.abort(400)
 
-        EventManipulator.createOrUpdate(event)
+        EventManipulator.createOrUpdate(self.event)
         if "webcast" in event_info:
-            MemcacheWebcastFlusher.flushEvent(event.key_name)
+            MemcacheWebcastFlusher.flushEvent(self.event.key_name)
 
         if do_team_remap:
             taskqueue.add(
-                url='/tasks/do/remap_teams/{}'.format(event.key_name),
+                url='/tasks/do/remap_teams/{}'.format(self.event.key_name),
                 method='GET',
                 queue_name='admin',
             )

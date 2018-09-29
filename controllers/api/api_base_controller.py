@@ -13,6 +13,7 @@ from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 
 from consts.auth_type import AuthType
+from consts.event_type import EventType
 from controllers.base_controller import CacheableHandler
 from datafeeds.parser_base import ParserInputException
 from helpers.user_bundle import UserBundle
@@ -207,9 +208,19 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
     def post(self, event_key):
         event_key = event_key.lower()  # Normalize keys to lower case (TBA convention)
 
-        # Start by allowing admins to edit any event
-        user_has_auth = (self._user_bundle.user and self._user_bundle.is_current_user_admin)
+        # Make sure we are processing for a valid event first
+        # (it's fine to do this before auth, since leaking the existence of an
+        # event isn't really that big a deal)
+        self.event = Event.get_by_id(event_key)
+        if not self.event:
+            self._errors = json.dumps({"Error": "Event {} not found".format(event_key)})
+            self.abort(404)
 
+        # Start by allowing admins to edit any event
+        user_is_admin = (self._user_bundle.user and self._user_bundle.is_current_user_admin)
+        user_has_permission = False
+
+        user_has_auth = (user_is_admin or user_has_permission)
         if not user_has_auth and self._user_bundle.user:
             # See if this user has any auth keys granted to its account
             now = datetime.datetime.now()
