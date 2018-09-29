@@ -11,6 +11,7 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
+from consts.account_permissions import AccountPermissions
 from consts.auth_type import AuthType
 from consts.event_type import EventType
 from consts.media_type import MediaType
@@ -124,6 +125,10 @@ class TestApiTrustedController(unittest2.TestCase):
             user_is_admin='1' if is_admin else '0',
             overwrite=True)
 
+    def grantPermission(self, permission):
+        self.account = Account(id="42", permissions=[permission])
+        self.account.put()
+
     def test_auth(self):
         request_path = '/api/trusted/v1/event/2014casj/matches/update'
         request_path_caps_key = '/api/trusted/v1/event/2014CASJ/matches/update'
@@ -221,6 +226,61 @@ class TestApiTrustedController(unittest2.TestCase):
         response = self.testapp.post(request_path, request_body, expect_errors=True)
         self.assertEqual(response.status_code, 400)
         self.assertTrue('Error' in response.json)
+
+    def test_user_permission(self):
+        self.loginUser()
+        self.grantPermission(AccountPermissions.OFFSEASON_EVENTWIZARD)
+
+        # This should only work for current year offseasons
+        self.event.year = datetime.datetime.now().year
+        self.event.event_type_enum = EventType.OFFSEASON
+        self.event.put()
+
+        request_path = '/api/trusted/v1/event/2014casj/matches/update'
+        request_body = json.dumps([])
+        response = self.testapp.post(request_path, request_body, expect_errors=True)
+        self.assertEqual(response.status_code, 200)
+
+    def test_user_permission_fail_not_current_year(self):
+        self.loginUser()
+        self.grantPermission(AccountPermissions.OFFSEASON_EVENTWIZARD)
+
+        # This should only work for current year offseasons
+        self.event.year = 2012  # Unless this runs in a time machine...
+        self.event.event_type_enum = EventType.OFFSEASON
+        self.event.put()
+
+        request_path = '/api/trusted/v1/event/2014casj/matches/update'
+        request_body = json.dumps([])
+        response = self.testapp.post(request_path, request_body, expect_errors=True)
+        self.assertEqual(response.status_code, 400)
+
+    def test_user_permission_fail_not_offseason_event(self):
+        self.loginUser()
+        self.grantPermission(AccountPermissions.OFFSEASON_EVENTWIZARD)
+
+        # This should only work for current year offseasons
+        self.event.year = datetime.datetime.now().year
+        self.event.event_type_enum = EventType.REGIONAL
+        self.event.put()
+
+        request_path = '/api/trusted/v1/event/2014casj/matches/update'
+        request_body = json.dumps([])
+        response = self.testapp.post(request_path, request_body, expect_errors=True)
+        self.assertEqual(response.status_code, 400)
+
+    def test_user_permission_fail_not_granted(self):
+        self.loginUser()
+
+        # This should only work for current year offseasons
+        self.event.year = datetime.datetime.now().year
+        self.event.event_type_enum = EventType.OFFSEASON
+        self.event.put()
+
+        request_path = '/api/trusted/v1/event/2014casj/matches/update'
+        request_body = json.dumps([])
+        response = self.testapp.post(request_path, request_body, expect_errors=True)
+        self.assertEqual(response.status_code, 400)
 
     def test_killswitch(self):
         request_path = '/api/trusted/v1/event/2014casj/matches/update'

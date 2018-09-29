@@ -4,6 +4,7 @@ class AccountPermissions(object):
     REVIEW_APIWRITE = 3
     REVIEW_DESIGNS = 4
     REVIEW_EVENT_MEDIA = 5
+    OFFSEASON_EVENTWIZARD = 6
 
     permissions = {
         REVIEW_MEDIA: {
@@ -25,5 +26,9 @@ class AccountPermissions(object):
         REVIEW_EVENT_MEDIA: {
             "name": "REVIEW_EVENT_MEDIA",
             "description": "Can approve media (non-match video) linked to events"
-        }
+        },
+        OFFSEASON_EVENTWIZARD: {
+            "name": "OFFSEASON_EVENTWIZARD",
+            "description": "Can use the eventwizard for any offseason event",
+        },
     }

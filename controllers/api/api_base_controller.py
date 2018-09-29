@@ -12,6 +12,7 @@ from google.appengine.api import urlfetch
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 
+from consts.account_permissions import AccountPermissions
 from consts.auth_type import AuthType
 from consts.event_type import EventType
 from controllers.base_controller import CacheableHandler
@@ -218,13 +219,20 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
 
         # Start by allowing admins to edit any event
         user_is_admin = (self._user_bundle.user and self._user_bundle.is_current_user_admin)
-        user_has_permission = False
+
+        # Also grant access if the user as the EVENTWIZARD permission and this
+        # is a current year offseason event
+        account = self._user_bundle.account
+        current_year = datetime.datetime.now().year
+        user_has_permission = (self.event.event_type_enum == EventType.OFFSEASON
+            and self.event.year == current_year
+            and AccountPermissions.OFFSEASON_EVENTWIZARD in account.permissions)
 
         user_has_auth = (user_is_admin or user_has_permission)
         if not user_has_auth and self._user_bundle.user:
             # See if this user has any auth keys granted to its account
             now = datetime.datetime.now()
-            auth_tokens = ApiAuthAccess.query(ApiAuthAccess.owner == self._user_bundle.account.key,
+            auth_tokens = ApiAuthAccess.query(ApiAuthAccess.owner == account.key,
                                               ApiAuthAccess.event_list == ndb.Key(Event, event_key),
                                               ndb.OR(ApiAuthAccess.expiration == None, ApiAuthAccess.expiration >= now)).fetch()
             user_has_auth = any(self._validate_auth(auth, event_key) is None for auth in auth_tokens)
