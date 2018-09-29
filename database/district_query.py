@@ -6,17 +6,42 @@ from database.dict_converters.district_converter import DistrictConverter
 from models.district import District
 from models.event import Event
 
+# These district codes are equiavlent due to FIRST renaming districts
+CODE_MAP = {
+    # Old to new
+    'mar': 'fma',
+    'nc': 'fnc',
+    # New to old
+    'fma': 'mar',
+    'fnc': 'nc',
+}
+def get_equivalent_keys(district_key):
+    # Returns a list of equivalent district keys
+    year = int(district_key[:4])
+    code = district_key[4:]
+
+    keys = [district_key]
+    if code in CODE_MAP:
+        keys.append('{}{}'.format(year, CODE_MAP[code]))
+    return keys
+
 
 class DistrictQuery(DatabaseQuery):
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'district_{}'  # (district_key)
     DICT_CONVERTER = None
 
     @ndb.tasklet
     def _query_async(self):
         district_key = self._query_args[0]
-        district = yield District.get_by_id_async(district_key)
-        raise ndb.Return(district)
+        # Fetch all equivalent keys
+        keys = get_equivalent_keys(district_key)
+        districts = yield ndb.get_multi_async([ndb.Key(District, key) for key in keys])
+        for district in districts:
+            if district:
+                # Return first key that exists
+                raise ndb.Return(district)
+        raise ndb.Return(None)
 
 
 class DistrictChampsInYearQuery(DatabaseQuery):
@@ -58,4 +83,3 @@ class DistrictHistoryQuery(DatabaseQuery):
         district_keys = yield District.query(District.abbreviation == abbreviation).fetch_async(keys_only=True)
         districts = yield ndb.get_multi_async(district_keys)
         raise ndb.Return(districts)
-
