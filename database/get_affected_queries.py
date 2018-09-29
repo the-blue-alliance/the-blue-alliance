@@ -69,12 +69,13 @@ def event_updated(affected_refs):
     for event_district_key in event_district_keys:
         queries_and_keys.append((DistrictEventsQuery(event_district_key.id())))
 
-    for et_key in event_team_keys_future.get_result():
-        team_key = et_key.id().split('_')[1]
-        year = int(et_key.id()[:4])
-        queries_and_keys.append((TeamEventsQuery(team_key)))
-        queries_and_keys.append((TeamYearEventsQuery(team_key, year)))
-        queries_and_keys.append((TeamYearEventTeamsQuery(team_key, year)))
+    if event_keys:
+        for et_key in event_team_keys_future.get_result():
+            team_key = et_key.id().split('_')[1]
+            year = int(et_key.id()[:4])
+            queries_and_keys.append((TeamEventsQuery(team_key)))
+            queries_and_keys.append((TeamYearEventsQuery(team_key, year)))
+            queries_and_keys.append((TeamYearEventTeamsQuery(team_key, year)))
 
     events_with_parents = filter(lambda e: e.get_result() is not None and e.get_result().parent_event is not None, events_future)
     parent_keys = set([e.get_result().parent_event for e in events_with_parents])
