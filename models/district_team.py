@@ -1,6 +1,5 @@
 from google.appengine.ext import ndb
 
-from consts.district_type import DistrictType
 from models.district import District
 from models.team import Team
 
@@ -33,9 +32,8 @@ class DistrictTeam(ndb.Model):
 
     @property
     def key_name(self):
-        return self.renderKeyName(self.year, self.district, self.team.id())
+        return self.renderKeyName(self.district_key.id(), self.team.id())
 
     @classmethod
-    def renderKeyName(self, year, districtEnum, teamKey):
-        districtAbbrev = DistrictType.type_abbrevs[districtEnum]
-        return "{}{}_{}".format(year, districtAbbrev, teamKey)
+    def renderKeyName(self, districtKey, teamKey):
+        return "{}_{}".format(districtKey, teamKey)

@@ -287,7 +287,7 @@ class AdminCreateDistrictTeamsDo(LoggedInHandler):
         for team_key, districts in team_districts.iteritems():
             most_frequent_district_key = max(set(districts), key=districts.count)
             logging.info("Assuming team {} belongs to {}".format(team_key, most_frequent_district_key))
-            dt_key = DistrictTeam.renderKeyName(year, most_frequent_district_key[4:], team_key)
+            dt_key = DistrictTeam.renderKeyName(most_frequent_district_key, team_key)
             new_district_teams.append(DistrictTeam(id=dt_key, year=year, team=ndb.Key(Team, team_key), district_key=ndb.Key(District, most_frequent_district_key)))
 
         logging.info("Finishing updating old district teams from event teams")

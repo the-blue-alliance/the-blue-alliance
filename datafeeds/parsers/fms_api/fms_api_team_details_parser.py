@@ -51,13 +51,12 @@ class FMSAPITeamDetailsParser(object):
 
             districtTeam = None
             if teamData['districtCode']:
-                districtAbbrev = DistrictType.abbrevs[teamData['districtCode'].lower()]
+                districtKey = District.renderKeyName(self.year, teamData['districtCode'].lower())
                 districtTeam = DistrictTeam(
-                    id=DistrictTeam.renderKeyName(self.year, districtAbbrev, team.key_name),
+                    id=DistrictTeam.renderKeyName(districtKey, team.key_name),
                     team=ndb.Key(Team, team.key_name),
                     year=self.year,
-                    district=districtAbbrev,
-                    district_key=ndb.Key(District, District.renderKeyName(self.year, teamData['districtCode'].lower())),
+                    district_key=ndb.Key(District, districtKey),
                 )
 
             robot = None
