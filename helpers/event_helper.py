@@ -234,6 +234,8 @@ class EventHelper(object):
                 codes.add(district_code.upper())
             if 'MAR' in codes:  # MAR renamed to FMA in 2019
                 codes.add('FMA')
+            if 'TX' in codes:  # TX and FIT used interchangeably
+                codes.add('FIT')
             district_keys = '|'.join(codes)
         memcache.set('EventHelper.getShortName():district_keys', district_keys, 60*60)
 

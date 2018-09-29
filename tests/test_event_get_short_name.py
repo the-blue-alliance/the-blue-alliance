@@ -19,7 +19,7 @@ class TestEventGetShortName(unittest2.TestCase):
 
         # Create districts
         districts = []
-        for code in ['mar', 'isr', 'nc', 'ne', 'pnw', 'pch', 'chs', 'in', 'ont', 'fim']:
+        for code in ['mar', 'isr', 'nc', 'ne', 'pnw', 'pch', 'chs', 'in', 'ont', 'fim', 'tx']:
             year = 2017
             districts.append(District(
                 id=District.renderKeyName(year, code),
@@ -276,3 +276,4 @@ class TestEventGetShortName(unittest2.TestCase):
         self.assertEqual(EventHelper.getShortName("PNW District Clackamas Academy Event"), "Clackamas Academy")
         # 2019 edge cases
         self.assertEqual(EventHelper.getShortName("FMA District Hatboro-Horsham Event"), "Hatboro-Horsham")
+        self.assertEqual(EventHelper.getShortName("FIT District Austin Event"), "Austin")
