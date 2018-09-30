@@ -226,6 +226,7 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
         current_year = datetime.datetime.now().year
         user_has_permission = (self.event.event_type_enum == EventType.OFFSEASON
             and self.event.year == current_year
+            and account is not None
             and AccountPermissions.OFFSEASON_EVENTWIZARD in account.permissions)
 
         user_has_auth = (user_is_admin or user_has_permission)
