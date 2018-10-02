@@ -527,7 +527,7 @@ function updateRankings(cell) {
                 teamRank['played'] = rankData[i]['Played'];
                 teamRank['dqs'] = 0;
                 for(var j=0; j<breakdowns.length; j++){
-                    teamRank[display[j]] = Number(rankData[i][breakdowns[j]].replace(',',''));
+                    teamRank[display[j]] = Number(rankData[i][breakdowns[j]].toString().replace(',',''));
                 }
                 request_body['rankings'].push(teamRank);
             }
