@@ -37,7 +37,7 @@ function getYoutubeId(url) {
 }
 
 function cleanTeamNum(number) {
-    return number.trim().replace("*", "")
+    return number.toString().trim().replace("*", "")
 }
 
 $('#teams-ok').click(function(){
@@ -310,9 +310,9 @@ $('#rankings_file').change(function(){
         //var is_int = [true, true, true, true, true, false, true, true];
 
         // 2017 Headers
-        //var headers = ['Rank', 'Team', 'RS', 'TotalPts', 'Auto', 'Rotor', 'Takeoff', 'kPa', 'W-L-T', 'DQ', 'Played'];
-        //var display_headers = ['Rank', 'Team', 'Ranking Score', 'Match Points', 'Auto', 'Rotor', 'Takeoff', 'kPa', 'Record (W-L-T)', 'DQ', 'Played'];
-        //var is_num = [true, true, true, true, true, true, false, true, true];
+//      var headers = ['Rank', 'Team', 'RS', 'TotalPts', 'Auto', 'Rotor', 'Takeoff', 'kPa', 'W-L-T', 'DQ', 'Played'];
+//      var display_headers = ['Rank', 'Team', 'Ranking Score', 'Match Points', 'Auto', 'Rotor', 'Takeoff', 'kPa', 'Record (W-L-T)', 'DQ', 'Played'];
+//      var is_num = [true, true, true, true, true, true, false, true, true];
 
         // 2018 Headers
         var headers = ['Rank', 'Team', 'RS', 'Endgame', 'Auto', 'Ownership', 'Vault', 'W-L-T', 'DQ', 'Played'];
@@ -347,7 +347,7 @@ $('#rankings_file').change(function(){
             breakdown['dqs'] = parseInt(rank['DQ']);
             for(var j=0; j<request_body['breakdowns'].length; j++){
                 var val = rank[headers[j + 2]];
-                breakdown[request_body['breakdowns'][j]] = is_num[j] ? Number(val.replace(',','')) : val;
+                breakdown[request_body['breakdowns'][j]] = is_num[j] ? Number(val.toString().replace(',','')) : val;
             }
             request_body['rankings'].push(breakdown);
         }
