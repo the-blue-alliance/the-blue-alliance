@@ -11,6 +11,7 @@ Setup notes:
         appcfg.py --oauth2 --application=<MY_PROJECT_ID> update_dispatch .
 
 * Note that it needs your application's "Project ID", not its "Project name".
+* Make sure you run `paver install_libs` so that all of your dependencies are there
 * The `--oauth2` argument of `appcfg.py` [saves repeating the login steps each time](https://cloud.google.com/appengine/docs/python/tools/uploadinganapp#Python_Password-less_login_with_OAuth2). If you skip it or deploy via the App Engine Launcher, you'll have to enter your name and password each time. If you use 2-Step Verification for your Google account (you should!), that means generating an [App password](https://security.google.com/settings/security/apppasswords) each time.
 * The `cron.yaml` file in master will create cron jobs that use up daily free AE Datastore quotas.
   * To avoid that in a dev server, checkout [a no-op version of cron.yaml](https://github.com/the-blue-alliance/the-blue-alliance/blob/c5d173f23310caf9f2c80d08829083c22ea1c0c3/cron.yaml).
