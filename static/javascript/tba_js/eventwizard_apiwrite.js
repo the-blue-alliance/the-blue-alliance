@@ -37,7 +37,7 @@ function getYoutubeId(url) {
 }
 
 function cleanTeamNum(number) {
-    return number.trim().replace("*", "")
+    return number.toString().trim().replace("*", "")
 }
 
 $('#teams-ok').click(function(){
@@ -347,7 +347,7 @@ $('#rankings_file').change(function(){
             breakdown['dqs'] = parseInt(rank['DQ']);
             for(var j=0; j<request_body['breakdowns'].length; j++){
                 var val = rank[headers[j + 2]];
-                breakdown[request_body['breakdowns'][j]] = is_num[j] ? Number(val.replace(',','')) : val;
+                breakdown[request_body['breakdowns'][j]] = is_num[j] ? Number(val.toString().replace(',','')) : val;
             }
             request_body['rankings'].push(breakdown);
         }
@@ -527,7 +527,7 @@ function updateRankings(cell) {
                 teamRank['played'] = rankData[i]['Played'];
                 teamRank['dqs'] = 0;
                 for(var j=0; j<breakdowns.length; j++){
-                    teamRank[display[j]] = Number(rankData[i][breakdowns[j]].replace(',',''));
+                    teamRank[display[j]] = Number(rankData[i][breakdowns[j]].toString().replace(',',''));
                 }
                 request_body['rankings'].push(teamRank);
             }
