@@ -63,7 +63,7 @@ class TeamRenderer(object):
         team_district_points = None
         team_districts = team_districts_future.get_result()
         for district in team_districts:
-            if district.year == year:
+            if district and district.year == year:
                 district_abbrev = district.abbreviation
                 district_name = district.display_name
                 if district.rankings:
