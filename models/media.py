@@ -145,15 +145,21 @@ class Media(ndb.Model):
 
     @property
     def instagram_direct_url(self):
-        return self.details['thumbnail_url']
+        return self.instagram_url_helper("l")
 
     @property
     def instagram_direct_url_med(self):
-        return self.instagram_direct_url
+        return self.instagram_url_helper("m")
 
     @property
     def instagram_direct_url_sm(self):
-        return self.instagram_direct_url
+        return self.instagram_url_helper("t")
+
+    def instagram_url_helper(self, size):
+        # Supported size values are t (thumbnail), m (medium), l (large)
+        # See the Instagram developer docs for more information:
+        # https://www.instagram.com/developer/embedding/#media_redirect!
+        return "{}/media/?size={}".format(self.instagram_url, size)
 
     @property
     def view_image_url(self):
