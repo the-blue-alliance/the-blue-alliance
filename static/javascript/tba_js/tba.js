@@ -60,7 +60,7 @@ $(document).ready(function(){
 	}
 
   // Featherlight Gallery
-  $('.gallery').featherlightGallery();
+  $('.gallery').featherlightGallery('image');
 
 	// Converting match time to local time
   var weekday = new Array(7);
