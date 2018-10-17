@@ -156,6 +156,9 @@ class Media(ndb.Model):
         return self.instagram_url_helper("t")
 
     def instagram_url_helper(self, size):
+        # Supported size values are t (thumbnail), m (medium), l (large)
+        # See the Instagram developer docs for more information:
+        # https://www.instagram.com/developer/embedding/#media_redirect!
         return "{}/media/?size={}".format(self.instagram_url, size)
 
     @property
