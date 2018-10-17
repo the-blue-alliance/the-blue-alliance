@@ -61,6 +61,12 @@ $(document).ready(function(){
 
   // Featherlight Gallery
   $('.gallery').featherlightGallery('image');
+  // NOTE:
+  // Featherlight supports many types of content, but our specific
+  // useage of Instagram returns an unexpected `content-type`, so in
+  // order to not confuse Featherlight, we're explicitly telling it
+  // to expect images only.
+  // https://github.com/noelboss/featherlight#content-filters
 
 	// Converting match time to local time
   var weekday = new Array(7);
