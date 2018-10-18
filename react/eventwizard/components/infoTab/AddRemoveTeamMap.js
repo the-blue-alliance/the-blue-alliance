@@ -38,7 +38,7 @@ class AddRemoveTeamMap extends Component {
 
   render() {
     let teamMappingsList = null
-    if (this.props.eventInfo && Object.keys(this.props.eventInfo.remap_teams).length > 0) {
+    if (this.props.eventInfo && this.props.eventInfo.remap_teams && Object.keys(this.props.eventInfo.remap_teams).length > 0) {
       teamMappingsList =
         (<TeamMappingsList
           teamMappings={this.props.eventInfo.remap_teams}
