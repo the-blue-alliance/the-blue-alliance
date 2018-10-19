@@ -10,3 +10,5 @@ GoogleAppEngineCloudStorageClient
 oauth2client==3.0.0
 google-endpoints
 google-endpoints-api-management
+# See https://github.com/urllib3/urllib3/issues/1456
+urllib3==1.23
