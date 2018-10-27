@@ -807,7 +807,8 @@ class CheckMediaDo(webapp.RequestHandler):
     """
     Remove unavailable media
     """
-    def get(self, media_key):
+    @ndb.transactional(xg=True)
+    def _check_media(self, media_key):
         media = ndb.Key(Media, media_key).get()
 
         if media.is_image:
@@ -828,3 +829,6 @@ class CheckMediaDo(webapp.RequestHandler):
 
             # .put() is being used instead of MediaManipulator to avoid cache busting.
             media.put()
+
+    def get(self, media_key):
+        _check_media(media_key)
