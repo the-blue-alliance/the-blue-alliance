@@ -36,6 +36,7 @@ from helpers.insights_helper import InsightsHelper
 from helpers.match_helper import MatchHelper
 from helpers.match_time_prediction_helper import MatchTimePredictionHelper
 from helpers.matchstats_helper import MatchstatsHelper
+from helpers.media_manipulator import MediaManipulator
 from helpers.notification_helper import NotificationHelper
 from helpers.outgoing_notification_helper import OutgoingNotificationHelper
 from helpers.prediction_helper import PredictionHelper
@@ -817,9 +818,13 @@ class CheckMediaDo(webapp.RequestHandler):
             url = "https://www.youtube.com/oembed?url={}&format=json".format(media.youtube_url_link)
         elif media.media_type_enum == MediaType.EXTERNAL_LINK:
             url = media.external_link
+        else:
+            return
 
         if not WebsiteHelper.exists(url):
-            media.key.delete()
+            MediaManipulator.delete(media)
         else:
             media.checked = datetime.datetime.now()
+
+            # .put() is being used instead of MediaManipulator to avoid cache busting.
             media.put()

@@ -40,4 +40,4 @@ class WebsiteHelper(object):
 
         result = context.urlfetch(website_url).get_result()
 
-        return int(result.status_code) != 404
+        return result.status_code != 404
