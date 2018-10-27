@@ -1,4 +1,4 @@
-from google.appengine.ext import ndb
+from google.appengine.api import urlfetch
 
 
 class WebsiteHelper(object):
@@ -33,11 +33,9 @@ class WebsiteHelper(object):
         """
         Verify that a given URL exists (returns a non-404 status code)
         """
-        context = ndb.get_context()
-
         if not website_url:
             return False
 
-        result = context.urlfetch(website_url).get_result()
+        result = urlfetch.fetch(website_url)
 
         return result.status_code != 404
