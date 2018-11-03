@@ -7,6 +7,15 @@ from models.team_admin_access import TeamAdminAccess
 from template_engine import jinja2_engine
 
 
+class TeamAdminDashboard(LoggedInHandler):
+    def get(self):
+        self._require_registration()
+
+        self.response.out.write(
+            jinja2_engine.render('team_admin_dashboard.html',
+                                 self.template_values))
+
+
 class TeamAdminRedeem(LoggedInHandler):
     def get(self):
         self._require_registration()
