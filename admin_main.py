@@ -28,6 +28,7 @@ from controllers.admin.admin_sitevar_controller import AdminSitevarCreate, Admin
 from controllers.admin.admin_suggestion_controller import AdminCreateTestSuggestions
 from controllers.admin.admin_team_controller import AdminTeamCreateTest, AdminTeamDetail, AdminTeamList, \
     AdminTeamRobotNameUpdate
+from controllers.admin.admin_team_media_mod import AdminTeamMediaModCodeList, AdminTeamMediaModCodeAdd
 from controllers.admin.admin_user_controller import AdminUserDetail, AdminUserEdit, AdminUserTestSetup, AdminUserList, AdminUserPermissionsList, \
     AdminUserLookup
 from controllers.admin.admin_main_landing_controller import AdminMainLandingEdit
@@ -79,6 +80,10 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/media/add_media', AdminMediaAdd),
                                ('/admin/media/delete_reference/(.*)', AdminMediaDeleteReference),
                                ('/admin/media/make_preferred/(.*)', AdminMediaMakePreferred),
+                               ('/admin/media/modcodes/add', AdminTeamMediaModCodeAdd),
+                               ('/admin/media/modcodes/list', AdminTeamMediaModCodeList),
+                               ('/admin/media/modcodes/list/([0-9]+)', AdminTeamMediaModCodeList),
+                               ('/admin/media/modcodes/list/([0-9]+)/([0-9]*)', AdminTeamMediaModCodeList),
                                ('/admin/media/remove_preferred/(.*)', AdminMediaRemovePreferred),
                                ('/admin/media/import/instagram', AdminMediaInstagramImport),
                                ('/admin/memcache', AdminMemcacheMain),

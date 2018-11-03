@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Import Mod Keys{% endblock %}
+
+{% block content %}
+
+<h1>Import Mod Keys</h1>
+
+<div class="alert alert-warning">
+  <b>Warning!</b> This will clobber any codes that currently exist for these teams!
+</div>
+
+<form class="form-inline" action="/admin/media/modcodes/add" method="post">
+    <legend>Import Keys</legend>
+    <input class="form-control" size="16" name="year" type="text" placeholder="year">
+    <div class="well">team_number, auth_code</div>
+    <textarea class="form-control" name="auth_codes_csv"></textarea><br>
+    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Import</button>
+</form>
+
+{% endblock %}
