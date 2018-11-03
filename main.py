@@ -55,6 +55,7 @@ from controllers.suggestions.suggest_social_media_review_controller import \
       SuggestSocialMediaReviewController
 from controllers.suggestions.suggest_team_media_controller import SuggestTeamMediaController, SuggestTeamSocialMediaController
 from controllers.suggestions.suggest_team_media_review_controller import SuggestTeamMediaReviewController
+from controllers.team_admin_controller import ModHelpHandler
 from controllers.test_notification_controller import TestNotificationController
 from controllers.team_controller import TeamList, TeamCanonical, TeamDetail, TeamHistory
 from controllers.webhook_controller import WebhookAdd, WebhookDelete, WebhookVerify, WebhookVerificationSend
@@ -122,6 +123,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/match_suggestion', MatchSuggestionHandler, 'match-suggestion', strict_slash=True),
       RedirectRoute(r'/match_timeline', MatchTimelineHandler, 'match-timeline', strict_slash=True),
       RedirectRoute(r'/matchinput', MatchInputHandler, 'match-input', strict_slash=True),
+      RedirectRoute(r'/modhelp', ModHelpHandler, 'modhelp', strict_slash=True),
       RedirectRoute(r'/mytba', MyTBALiveController, 'mytba-live', strict_slash=True),
       RedirectRoute(r'/nearby', NearbyController, 'nearby', strict_slash=True),
       RedirectRoute(r'/notifications/broadcast', UserNotificationBroadcast, 'notification-broadcast', strict_slash=True),
