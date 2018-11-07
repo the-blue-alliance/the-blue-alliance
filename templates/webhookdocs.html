@@ -84,7 +84,36 @@
             </pre>
         {% if types.upcoming_match in enabled %}
         <h4>Test Notification</h4>
-            <a href="/notifications/test/{{types.upcoming_match}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Upcoming Match</a>
+            <form method="POST"
+                  action="/notifications/test/{{types.upcoming_match}}"
+                  class="form-horizontal"
+                  role="form"
+                  onsubmit="event.preventDefault()">
+                <div class="row">
+                    <div class="form-group">
+                        <label for="upcomingNotificationEvent" class="col-sm-2 control-label">Event Key</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" required value="2014necmp" name="event_key" id="upcomingNotificationEvent">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="upcomingNotificationMatch" class="col-sm-2 control-label">Match Key</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" required value="2014necmp_f1m1" name="match_key" id="upcomingNotificationMatch">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-10">
+                            <button class="btn btn-info webhook-send-btn" type="submit">Send Test Upcoming Match</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="alert webhook-alert"></div>
+                </div>
+            </form>
+{#            <a href="/notifications/test/{{types.upcoming_match}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Upcoming Match</a>#}
         {% endif %}
 
         <h3 id="notification_match_score">Match Score Notification</h3>
@@ -102,7 +131,36 @@
             </pre>
         {% if types.match_score in enabled %}
         <h4>Test Notification</h4>
-            <a href="/notifications/test/{{types.match_score}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Match Score</a>
+            <form method="POST"
+                  action="/notifications/test/{{types.match_score}}"
+                  class="form-horizontal"
+                  role="form"
+                  onsubmit="event.preventDefault()">
+                <div class="row">
+                    <div class="form-group">
+                        <label for="upcomingNotificationEvent" class="col-sm-2 control-label">Event Key</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" required value="2014necmp" name="event_key" id="upcomingNotificationEvent">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="upcomingNotificationMatch" class="col-sm-2 control-label">Match Key</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" required value="2014necmp_f1m1" name="match_key" id="upcomingNotificationMatch">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-10">
+                            <button class="btn btn-info webhook-send-btn" type="submit">Send Test Match Score</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="alert webhook-alert"></div>
+                </div>
+            </form>
+{#            <a href="/notifications/test/{{types.match_score}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Match Score</a>#}
         {% endif %}
 
         <h3 id="notification_level_starting">Competition Level Starting Notification</h3>
@@ -122,7 +180,36 @@
             </pre>
         {% if types.starting_comp_level in enabled %}
         <h4>Test Notification</h4>
-            <a href="/notifications/test/{{types.starting_comp_level}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Level Starting</a>
+            <form method="POST"
+                  action="/notifications/test/{{types.starting_comp_level}}"
+                  class="form-horizontal"
+                  role="form"
+                  onsubmit="event.preventDefault()">
+                <div class="row">
+                    <div class="form-group">
+                        <label for="upcomingNotificationEvent" class="col-sm-2 control-label">Event Key</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" required value="2014necmp" name="event_key" id="upcomingNotificationEvent">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="upcomingNotificationMatch" class="col-sm-2 control-label">Match Key</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" required value="2014necmp_f1m1" name="match_key" id="upcomingNotificationMatch">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-10">
+                            <button class="btn btn-info webhook-send-btn" type="submit">Send Test Level Starting</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="alert webhook-alert"></div>
+                </div>
+            </form>
+{#            <a href="/notifications/test/{{types.starting_comp_level}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Level Starting</a>#}
         {% endif %}
 
         <h3 id="notification_alliance_selection">Alliance Selection Notification</h3>
@@ -139,7 +226,30 @@
             </pre>
         {% if types.alliance_selection in enabled %}
         <h4>Test Notification</h4>
-            <a href="/notifications/test/{{types.alliance_selection}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Alliance Selection</a>
+            <form method="POST"
+                  action="/notifications/test/{{types.alliance_selection}}"
+                  class="form-horizontal"
+                  role="form"
+                  onsubmit="event.preventDefault()">
+                <div class="row">
+                    <div class="form-group">
+                        <label for="upcomingNotificationEvent" class="col-sm-2 control-label">Event Key</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" required value="2014necmp" name="event_key" id="upcomingNotificationEvent">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-10">
+                            <button class="btn btn-info webhook-send-btn" type="submit">Send Test Alliance Selection</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="alert webhook-alert"></div>
+                </div>
+            </form>
+{#            <a href="/notifications/test/{{types.alliance_selection}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Alliance Selection</a>#}
         {% endif %}
 
         <h3 id="notification_awards">Awards Posted Notification</h3>
@@ -160,7 +270,31 @@
             </pre>
         {% if types.awards_posted in enabled %}
         <h4>Test Notification</h4>
-            <a href="/notifications/test/{{types.awards_posted}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Awards</a>
+            <form method="POST"
+                  action="/notifications/test/{{types.awards_posted}}"
+                  class="form-horizontal"
+                  role="form"
+                  onsubmit="event.preventDefault()">
+                <div class="row">
+                    <div class="form-group">
+                        <label for="upcomingNotificationEvent" class="col-sm-2 control-label">Event Key</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" required value="2014necmp" name="event_key"
+                                   id="upcomingNotificationEvent">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-10">
+                            <button class="btn btn-info webhook-send-btn" type="submit">Send Test Awards</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="alert webhook-alert"></div>
+                </div>
+            </form>
+{#            <a href="/notifications/test/{{types.awards_posted}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Awards</a>#}
         {% endif %}
 
         <h3 id="notification_media_posted">Team Media Posted Notification</h3>
@@ -179,7 +313,8 @@
             </pre>
         {% if types.media_posted in enabled %}
         <h4>Test Notification</h4>
-            <a href="/notifications/test/{{types.media_posted}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Media</a>
+            {# LeoCodes21 - media_posted is unimplemented so there is nothing here for now. #}
+{#            <a href="/notifications/test/{{types.media_posted}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Media</a>#}
         {% endif %}
 
         <h3 id="notification_district_points">District Points Updated Notification</h3>
@@ -197,7 +332,8 @@
             </pre>
         {% if types.disrict_points_updated in enabled %}
         <h4>Test Notification</h4>
-            <a href="/notifications/test/{{types.district_points_updated}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test District Points</a>
+            {# LeoCodes21 - disrict_points_updated is unimplemented so there is nothing here for now. #}
+{#            <a href="/notifications/test/{{types.district_points_updated}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test District Points</a>#}
         {% endif %}
 
         <h3 id="notification_schedule_updated">Event Schedule Updated</h3>
@@ -216,7 +352,36 @@
             </pre>
         {% if types.schedule_updated in enabled %}
         <h4>Test Notification</h4>
-            <a href="/notifications/test/{{types.schedule_updated}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Schedule Update</a>
+            <form method="POST"
+                  action="/notifications/test/{{types.schedule_updated}}"
+                  class="form-horizontal"
+                  role="form"
+                  onsubmit="event.preventDefault()">
+                <div class="row">
+                    <div class="form-group">
+                        <label for="upcomingNotificationEvent" class="col-sm-2 control-label">Event Key</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" required value="2014necmp" name="event_key" id="upcomingNotificationEvent">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="upcomingNotificationMatch" class="col-sm-2 control-label">Match Key</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" required value="2014necmp_f1m1" name="match_key" id="upcomingNotificationMatch">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-10">
+                            <button class="btn btn-info webhook-send-btn" type="submit">Send Test Schedule Update</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="alert webhook-alert"></div>
+                </div>
+            </form>
+{#            <a href="/notifications/test/{{types.schedule_updated}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Schedule Update</a>#}
         {% endif %}
 
         <h3 id="notification_final_results">Final Results Notification</h3>
@@ -236,7 +401,8 @@
           </pre>
         {% if types.final_results in enabled %}
         <h4>Test Notification</h4>
-            <a href="/notifications/test/{{types.final_results}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Final Results</a>
+            {# LeoCodes21 - final_results is unimplemented so there is nothing here for now. #}
+{#            <a href="/notifications/test/{{types.final_results}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Final Results</a>#}
         {% endif %}
 
         <h3 id="notification_ping">Ping Notification</h3>
@@ -312,6 +478,41 @@ $( document ).ready(function() {
         var stringified = JSON.stringify(jsonObject, null, 2)
         $(this).html(stringified);
     });
+
+    $('.webhook-send-btn').click(function(e){
+        e.preventDefault();
+        $(this).attr('disabled', true);
+        $(this).addClass('disabled');
+        $(this.form).find('.webhook-alert').css('display', 'none');
+        $(this.form).find('.webhook-alert').removeClass('alert-success');
+        $(this.form).find('.webhook-alert').removeClass('alert-danger');
+
+        console.log(this.form);
+
+        $.post(this.form.action, $(this.form).serialize()).done(function (data) {
+            if (data === "ok") {
+                $(this.form).find('.webhook-alert').addClass('alert-success');
+            } else {
+                $(this.form).find('.webhook-alert').addClass('alert-danger');
+            }
+
+            $(this.form).find('.webhook-alert').css('display', 'block');
+            $(this.form).find('.webhook-alert').text(data === "ok" ? "Sent webhook!" : data);
+
+            $(this).attr('disabled', false);
+            $(this).removeClass('disabled');
+
+            setTimeout(function() {
+                $(this.form).find('.webhook-alert').css('display', 'none');
+            }.bind(this), 5000)
+        }.bind(this)).fail(function () {
+            alert('Something went horribly wrong. Try again.');
+            $(this).attr('disabled', false);
+            $(this).removeClass('disabled');
+        });
+    });
+
+    $('.webhook-alert').hide();
 });
 </script>
 {% endblock %}
