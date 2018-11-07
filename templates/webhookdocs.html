@@ -312,7 +312,7 @@
             Not yet implemented
             </pre>
         {% if types.media_posted in enabled %}
-        <h4>Test Notification</h4>
+{#        <h4>Test Notification</h4>#}
             {# LeoCodes21 - media_posted is unimplemented so there is nothing here for now. #}
 {#            <a href="/notifications/test/{{types.media_posted}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Media</a>#}
         {% endif %}
@@ -327,13 +327,34 @@
                 <li>“district_name”</li></ul></li>
             </ul>
           <h4>Example JSON</h4>
-            <pre>
-            Not yet implemented
+            <pre class="example-json">
+            {"message_data": {"district_key": "2014ne", "district_name": "New England"}, "message_type": "district_points_updated"}
             </pre>
         {% if types.disrict_points_updated in enabled %}
         <h4>Test Notification</h4>
-            {# LeoCodes21 - disrict_points_updated is unimplemented so there is nothing here for now. #}
-{#            <a href="/notifications/test/{{types.district_points_updated}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test District Points</a>#}
+            <form method="POST"
+                  action="/notifications/test/{{types.disrict_points_updated}}"
+                  class="form-horizontal"
+                  role="form"
+                  onsubmit="event.preventDefault()">
+                <div class="row">
+                    <div class="form-group">
+                        <label for="pointsUpdateDistrict" class="col-sm-2 control-label">District Key</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" required value="2014ne" name="district_key" id="pointsUpdateDistrict">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-10">
+                            <button class="btn btn-info webhook-send-btn" type="submit">Send Test District Points</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="alert webhook-alert"></div>
+                </div>
+            </form>
         {% endif %}
 
         <h3 id="notification_schedule_updated">Event Schedule Updated</h3>
@@ -400,7 +421,7 @@
             <i>Not yet implemented</i>
           </pre>
         {% if types.final_results in enabled %}
-        <h4>Test Notification</h4>
+{#        <h4>Test Notification</h4>#}
             {# LeoCodes21 - final_results is unimplemented so there is nothing here for now. #}
 {#            <a href="/notifications/test/{{types.final_results}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Final Results</a>#}
         {% endif %}
@@ -486,8 +507,6 @@ $( document ).ready(function() {
         $(this.form).find('.webhook-alert').css('display', 'none');
         $(this.form).find('.webhook-alert').removeClass('alert-success');
         $(this.form).find('.webhook-alert').removeClass('alert-danger');
-
-        console.log(this.form);
 
         $.post(this.form.action, $(this.form).serialize()).done(function (data) {
             if (data === "ok") {

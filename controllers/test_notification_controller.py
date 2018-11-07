@@ -31,11 +31,6 @@ class TestNotificationController(LoggedInHandler):
         district_key = self.request.get('district_key')
         user_id = self.user_bundle.account.key.id()
 
-        if event_key == "":
-            logging.info("No event key")
-            self.response.out.write("No event key specified!")
-            return
-
         logging.info("Sending for {}".format(type))
         try:
             type = int(type)
@@ -44,15 +39,20 @@ class TestNotificationController(LoggedInHandler):
             logging.info("Invalid number passed")
             return
 
-        event = Event.get_by_id(event_key)
+        event = None
 
-        if event is None:
-            logging.info("Invalid event key passed")
-            self.response.out.write("Invalid event key!")
-            return
+        if type != NotificationType.DISTRICT_POINTS_UPDATED:
+            if event_key == "":
+                logging.info("No event key")
+                self.response.out.write("No event key specified!")
+                return
 
-        # match = Match.get_by_id('2014necmp_f1m1')
-        # district = District.get_by_id('2014ne')
+            event = Event.get_by_id(event_key)
+
+            if event is None:
+                logging.info("Invalid event key passed")
+                self.response.out.write("Invalid event key!")
+                return
 
         if type == NotificationType.UPCOMING_MATCH:
             if match_key == "":
