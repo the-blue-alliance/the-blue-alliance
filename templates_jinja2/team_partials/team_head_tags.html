@@ -1,4 +1,4 @@
-<meta property="og:title" content="Team {{team.team_number}} - {{team.nickname}}" />
+<meta property="og:title" content="{{team.nickname}} - Team {{team.team_number}}{% if not is_canonical %} ({{year}}){% endif %}" />
 <meta property="og:type" content="sports_team" />
 <meta property="og:url" content="https://www.thebluealliance.com/team/{{team.team_number}}" />
 <meta property="og:image" content="{% if preferred_image_medias %}{{preferred_image_medias[0].image_direct_url_med}}{% else %}https://www.thebluealliance.com/images/logo_square_512.png{% endif %}" />
