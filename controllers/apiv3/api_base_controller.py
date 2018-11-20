@@ -56,6 +56,7 @@ class ApiBaseController(CacheableHandler):
         super(ApiBaseController, self).__init__(*args, **kw)
         self.response.headers['content-type'] = 'application/json; charset="utf-8"'
         self.response.headers['Access-Control-Allow-Origin'] = '*'
+        self.response.headers['X-Robots-Tag'] = 'noindex'
 
         # Set cache key based on class name, version, and kwargs
         kwargs_sorted = sorted([(k, v) for k, v in self.request.route_kwargs.items()], key=lambda x: x[0])

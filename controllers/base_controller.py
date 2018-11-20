@@ -191,6 +191,7 @@ class LoggedInHandler(webapp2.RequestHandler):
         self.response.headers['Pragma'] = 'no-cache'
         self.response.headers['Expires'] = '0'
         self.response.headers['Vary'] = 'Accept-Encoding'
+        self.response.headers['X-Robots-Tag'] = 'noindex'
 
     def _get_login_url(self, target_url):
         return self.user_bundle.create_login_url(target_url)
