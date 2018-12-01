@@ -15,6 +15,10 @@ class RegistrationRequest(messages.Message):
     device_uuid = messages.StringField(4, required=True)
 
 
+class PingRequest(messages.Message):
+    mobile_id = messages.StringField(1, required=True)
+
+
 class FavoriteMessage(messages.Message):
     model_key = messages.StringField(1, required=True)
     device_key = messages.StringField(2)  # So we know which device NOT to push sync notification to

@@ -1,10 +1,9 @@
 from google.appengine.ext import ndb
 
 from base_controller import LoggedInHandler
-from consts.client_type import ClientType
 from models.account import Account
 from models.mobile_client import MobileClient
-from notifications.ping import PingNotification
+from helpers.notification_helper import NotificationHelper
 
 
 class UserNotificationBroadcast(LoggedInHandler):
@@ -24,12 +23,7 @@ class UserNotificationBroadcast(LoggedInHandler):
             client = MobileClient.get_by_id(int(client_id), parent=ndb.Key(Account, current_user_account_id))
             if client is not None:
                 # This makes sure that the client actually exists and that this user owns it
-                if client.client_type == ClientType.WEBHOOK:
-                    keys = {client.client_type: [(client.messaging_id, client.secret)]}
-                else:
-                    keys = {client.client_type: [client.messaging_id]}
-                notification = PingNotification()
-                notification.send(keys)
+                NotificationHelper.send_ping(client)
             self.redirect('/account')
         else:
             self.redirect('/')

@@ -19,6 +19,7 @@ from notifications.schedule_updated import ScheduleUpdatedNotification
 from notifications.upcoming_match import UpcomingMatchNotification
 from notifications.update_favorites import UpdateFavoritesNotification
 from notifications.update_subscriptions import UpdateSubscriptionsNotification
+from notifications.ping import PingNotification
 from notifications.verification import VerificationNotification
 
 
@@ -150,6 +151,16 @@ class NotificationHelper(object):
         keys = PushHelper.get_client_ids_for_users(users)
 
         notification = BroadcastNotification(title, message, url, app_version)
+        notification.send(keys)
+
+    @classmethod
+    def send_ping(cls, client):
+        if client.client_type == ClientType.WEBHOOK:
+            keys = {client.client_type: [(client.messaging_id, client.secret)]}
+        else:
+            keys = {client.client_type: [client.messaging_id]}
+
+        notification = PingNotification()
         notification.send(keys)
 
     @classmethod
