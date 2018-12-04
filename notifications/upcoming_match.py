@@ -28,11 +28,15 @@ class UpcomingMatchNotification(BaseNotification):
         data['message_data']['event_name'] = self.event.name
         data['message_data']['match_key'] = self.match.key_name
         data['message_data']['team_keys'] = self.match.team_key_names
+
         if self.match.time:
             data['message_data']['scheduled_time'] = calendar.timegm(self.match.time.utctimetuple())
-            data['message_data']['predicted_time'] = calendar.timegm(self.match.time.utctimetuple())  # TODO Add in some time predictions
         else:
             data['message_data']['scheduled_time'] = None
+
+        if self.match.predicted_time:
+            data['message_data']['predicted_time'] = calendar.timegm(self.match.predicted_time.utctimetuple())
+        else:
             data['message_data']['predicted_time'] = None
 
         current_webcasts = self.event.current_webcasts
