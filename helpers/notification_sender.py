@@ -14,10 +14,6 @@ class NotificationSender(object):
         gcm_connection.notify_device(notification)
 
     @classmethod
-    def send_ios(cls, notification):
-        pass
-
-    @classmethod
     def send_webhook(cls, message, keys):
         import urllib2
         payload = json.dumps(message, ensure_ascii=True)
