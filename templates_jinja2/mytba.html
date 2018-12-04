@@ -41,12 +41,9 @@
       <p>
         Here you can manage your favorites and subscriptions.<br>
         <strong><span class="glyphicon glyphicon-star"></span> Favorites</strong> are used for personalized content and quick access.<br>
-        <strong><span class="glyphicon glyphicon-bell"></span> Subscriptions</strong> are used for push notifications (Android only).
+        <strong><span class="glyphicon glyphicon-bell"></span> Subscriptions</strong> are used for push notifications.
       </p>
-      <p>
-        These settings will be used whenever you log into your TBA account on the web or our
-        <a href="https://play.google.com/store/apps/details?id=com.thebluealliance.androidclient" target="_blank">Android app</a>.
-      </p>
+      {% include "mytba_partials/mytba_settings.html" %}
 
       <ul class="nav nav-tabs nav-justified">
         <li class="active"><a href="#my-teams" data-toggle="tab">My Teams <span class="badge">{{team_fav_subs|length}}</span></a></li>
