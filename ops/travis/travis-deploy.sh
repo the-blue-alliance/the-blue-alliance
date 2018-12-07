@@ -49,10 +49,16 @@ echo "Obtaining deploy lock..."
 lock $DEPLOY_LOCK
 
 echo "Obtained Lock. Deploying $PROJECT:$VERSION"
-# need more permissiosn for cron.yaml queue.yaml index.yaml, we can come back to them
+# need more permissions for cron.yaml queue.yaml index.yaml, we can come back to them
 for config in dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml cron.yaml; do
     with_python27 "$GCLOUD --quiet --verbosity warning --project $PROJECT app deploy $config --version $VERSION"
 done
+
+# Check if we need to deploy our Endpoints config - cleanup afterwards so it's not in our web deploy
+paver make_endpoints_config
+if check_deploy_endpoints_config; then
+    with_python27 "$GCLOUD endpoints services deploy tbaMobilev9openapi.json"
+fi
 
 echo "Updating build info..."
 update_build_info
