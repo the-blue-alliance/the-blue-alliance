@@ -25,7 +25,9 @@ class TestUpcomingMatchNotification(unittest2.TestCase):
                  team_number=team_number).put()
 
         self.event = EventTestCreator.createPresentEvent()
+
         self.match = self.event.matches[0]
+        self.match.predicted_time = self.match.time
         self.notification = UpcomingMatchNotification(self.match, self.event)
 
     def tearDown(self):
@@ -40,12 +42,14 @@ class TestUpcomingMatchNotification(unittest2.TestCase):
         expected['message_data']['event_name'] = self.event.name
         expected['message_data']['match_key'] = self.match.key_name
         expected['message_data']['team_keys'] = self.match.team_key_names
+
         if self.match.time:
             expected['message_data']['scheduled_time'] = calendar.timegm(self.match.time.utctimetuple())
-            expected['message_data']['predicted_time'] = calendar.timegm(self.match.time.utctimetuple())
         else:
             expected['message_data']['scheduled_time'] = None
-            expected['message_data']['predicted_time'] = None
+
+        expected['message_data']['predicted_time'] = expected['message_data']['scheduled_time']
+
         expected['message_data']['webcast'] = {
             'channel': '6540154',
             'status': 'unknown',

@@ -75,8 +75,8 @@
               <li>“match_key”</li>
               <li>“event_name”</li>
               <li>“team_keys”: list of keys for all teams participating in the match</li>
-              <li>“scheduled_time”: time that the match was originally scheduled for, in UNIX UTC</li>
-              <li>“predicted_time”: time that the match is predicted to start at based on the times that scores were posted for previous events, in UNIX UTC</li></ul></li>
+              <li>“scheduled_time”: time that the match was originally scheduled for, in UNIX UTC. Will be null if the match does not have a scheduled start time.</li>
+              <li>“predicted_time”: time that the match is predicted to start at based on the times that scores were posted for previous events, in UNIX UTC. Will be null if the match start time cannot be predicted.</li></ul></li>
             </ul>
           <h4>Example JSON</h4>
             <pre class="example-json">
