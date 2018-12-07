@@ -17,7 +17,7 @@ class BaseNotification(object):
 
     # List of clients this notification type supports (these are default values)
     # Can be overridden by subclasses to only send to some types
-    _supported_clients = [ClientType.OS_ANDROID, ClientType.WEBHOOK, ClientType.WEB]
+    _supported_clients = [ClientType.OS_ANDROID, ClientType.OS_IOS, ClientType.WEBHOOK, ClientType.WEB]
 
     # If not None, the event feed to post this notification to
     # Typically the event key
@@ -77,18 +77,10 @@ class BaseNotification(object):
             return
 
         for client_type in client_types:
-            if client_type == ClientType.OS_ANDROID and ClientType.OS_ANDROID in self.keys:
-                notification = self._render_android()
-                if len(self.keys[ClientType.OS_ANDROID]) > 0:  # this is after _render because if it's an update fav/subscription notification, then
-                    NotificationSender.send_gcm(notification)  # we remove the client id that sent the update so it doesn't get notified redundantly
-
-            elif client_type == ClientType.OS_IOS and ClientType.OS_IOS in self.keys:
-                notification = self._render_ios()
-                NotificationSender.send_ios(notification)
-
-            if client_type == ClientType.WEB and ClientType.WEB in self.keys:
-                notification = self._render_web()
-                if len(self.keys[ClientType.WEB]) > 0:  # this is after _render because if it's an update fav/subscription notification, then
+            if client_type in [ClientType.WEB, ClientType.OS_ANDROID, ClientType.OS_IOS] and client_type in self.keys:
+                client_render_method = self.render_method(client_type)
+                notification = client_render_method()
+                if len(self.keys[client_type]) > 0:  # this is after _render because if it's an update fav/subscription notification, then
                     NotificationSender.send_gcm(notification)  # we remove the client id that sent the update so it doesn't get notified redundantly
 
             elif client_type == ClientType.WEBHOOK and ClientType.WEBHOOK in self.keys and len(self.keys[ClientType.WEBHOOK]) > 0:
@@ -116,22 +108,34 @@ class BaseNotification(object):
     in order to provide that functionality.
     """
     def _render_android(self):
-        from controllers.gcm.gcm import GCMMessage
-        gcm_keys = self.keys[ClientType.OS_ANDROID]
-        data = self._build_dict()
-        return GCMMessage(gcm_keys, data, priority=self._priority)
+        return self._render_gcm(ClientType.OS_ANDROID)
 
     def _render_ios(self):
-        pass
+        return self._render_gcm(ClientType.OS_IOS)
 
     def _render_web(self):
-        from controllers.gcm.gcm import GCMMessage
-        gcm_keys = self.keys[ClientType.WEB]
-        data = self._build_dict()
-        return GCMMessage(gcm_keys, data, priority=self._priority)
+        return self._render_gcm(ClientType.WEB)
 
     def _render_webhook(self):
         return self._build_dict()
+
+    def _render_gcm(self, client_type):
+        from controllers.gcm.gcm import GCMMessage
+        gcm_keys = self.keys[client_type]
+        data = self._build_dict()
+        return GCMMessage(gcm_keys, data, priority=self._priority)
+
+    def render_method(self, client_type):
+        if client_type == ClientType.OS_ANDROID:
+            return self._render_android
+        elif client_type == ClientType.OS_IOS:
+            return self._render_ios
+        elif client_type == ClientType.WEB:
+            return self._render_web
+        elif client_type == ClientType.WEBHOOK:
+            return self._render_webhook
+        else:
+            return self._render_gcm(client_type)
 
     # used for deferred analytics call
     def track_notification(self, notification_type_enum, num_keys):

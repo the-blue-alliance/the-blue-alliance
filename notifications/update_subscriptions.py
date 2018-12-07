@@ -7,7 +7,7 @@ from notifications.base_notification import BaseNotification
 
 class UpdateSubscriptionsNotification(BaseNotification):
 
-    _supported_clients = [ClientType.OS_ANDROID, ClientType.WEBHOOK]
+    _supported_clients = [ClientType.OS_ANDROID, ClientType.OS_IOS, ClientType.WEBHOOK]
     _track_call = False
 
     def __init__(self, user_id, sending_device_key):

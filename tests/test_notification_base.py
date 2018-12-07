@@ -15,22 +15,42 @@ class TestBaseNotification(unittest2.TestCase):
         # User a Ping notification to test the render and send classes
         # It's as simple as it gets
         self.notification = PingNotification()
-        self.keys = {ClientType.OS_ANDROID: ["abc123"], ClientType.WEBHOOK: ["123abc"]}
+        self.keys = {ClientType.OS_IOS: ["abc123"], ClientType.OS_ANDROID: ["abc123"], ClientType.WEB: ["abc123"], ClientType.WEBHOOK: ["123abc"]}
         self.notification.keys = self.keys
 
     def tearDown(self):
         self.testbed.deactivate()
 
     def test_render_android(self):
-        message = self.notification._render_android()
+        self._test_render_gcm(ClientType.OS_ANDROID)
 
-        self.assertEqual(self.keys[ClientType.OS_ANDROID], message.device_tokens)
-        self.assertEqual(self.notification._build_dict(), message.notification)
+    def test_render_ios(self):
+        self._test_render_gcm(ClientType.OS_IOS)
+
+    def test_render_web(self):
+        self._test_render_gcm(ClientType.WEB)
 
     def test_render_webhook(self):
         message = self.notification._render_webhook()
 
         self.assertEqual(message, self.notification._build_dict())
 
-    def test_render_ios(self):
-        pass
+    def _test_render_gcm(self, client_type):
+        message = self.notification._render_gcm(client_type)
+
+        self.assertEqual(self.keys[client_type], message.device_tokens)
+        self.assertEqual(self.notification._build_dict(), message.notification)
+
+    def test_render_method(self):
+        self.assertEqual(self.notification.render_method(ClientType.OS_ANDROID), self.notification._render_android)
+        self.assertEqual(self.notification.render_method(ClientType.OS_IOS), self.notification._render_ios)
+        self.assertEqual(self.notification.render_method(ClientType.WEB), self.notification._render_web)
+        self.assertEqual(self.notification.render_method(ClientType.WEBHOOK), self.notification._render_webhook)
+
+    def test_render_method_renders(self):
+        client_type = ClientType.OS_IOS
+        client_render_method = self.notification.render_method(client_type)
+
+        message = client_render_method()
+        self.assertEqual(self.keys[client_type], message.device_tokens)
+        self.assertEqual(self.notification._build_dict(), message.notification)
