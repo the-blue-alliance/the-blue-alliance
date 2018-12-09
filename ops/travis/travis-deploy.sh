@@ -2,6 +2,7 @@
 set -e
 . $(pwd)/ops/travis/should-deploy.sh
 . $(pwd)/ops/gcslock.sh
+export BOTO_CONFIG=/dev/null # Hack to fix https://github.com/travis-ci/travis-ci/issues/7940
 
 # Deploy to GAE from travis CI
 # Basically an implementation of:
