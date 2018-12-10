@@ -11,8 +11,9 @@ update_build_info() {
     commit_time="$(git show -s --format=%ci HEAD)"
     deploy_time="$(date)"
     travis_job="$TRAVIS_BUILD_ID"
+    endpoints_sha=$(sha1sum tbaMobilev9openapi.json | awk '{ echo $1 }')
 
-    http $SET_BUILD_STATUS X-TBA-Auth-Key:$APIv3_KEY current_commit="$current_commit" commit_time="$commit_time" deploy_time="$deploy_time" travis_job="$travis_job"
+    http $SET_BUILD_STATUS X-TBA-Auth-Key:$APIv3_KEY current_commit="$current_commit" commit_time="$commit_time" deploy_time="$deploy_time" travis_job="$travis_job" endpoints_sha="$endpoints_sha"
 }
 
 check_killswitch() {
@@ -42,6 +43,22 @@ check_overwrite_old() {
             *\[clowntown\]*) echo "Commit is older, but [clowntown] found. Be careful..." ;;
 	    *) echo "Not overwriting prod with an older commit, exiting..."; exit 0 ;;
 	esac
+    fi
+}
+
+check_deploy_endpoints_config() {
+    endpoints_sha=$(sha1sum tbaMobilev9openapi.json | awk '{ echo $1 }')
+
+    echo "Pulling deployed endpoints sha..."
+    web_status=$(fetch_apiv3_status | jq '.web')
+    deployed_sha=$(echo $web_status | jq '.endpoints_sha')
+
+    echo "Previously deployed endpoints sha is $deployed_sha"
+    echo "New endpoints sha is $endpoints_sha"
+
+    if [ "$deployed_sha" -eq "$endpoints_sha" ]; then
+        echo "Deployed endpoints sha is the same as current endpoints sha. No need to deploy."
+        exit 0
     fi
 }
 
