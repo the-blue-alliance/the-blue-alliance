@@ -24,6 +24,7 @@ before_install:
 install:
 - travis_retry ./ops/travis/travis-install.sh $JOB
 - export PYTHONPATH=${PYTHONPATH}:${HOME}/google_appengine
+- export ENDPOINTS_GAE_SDK=$(gcloud info --format="value(installation.sdk_root)")
 before_script:
 - ./ops/travis/travis-before.sh $JOB
 script:

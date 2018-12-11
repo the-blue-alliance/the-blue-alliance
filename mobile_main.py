@@ -66,7 +66,6 @@ if tba_config.DEBUG:
     audiences={
         'firebase': ['tbatv-prod-hrd'],
         'google_id_token': [ANDROID_AUDIENCE],
-        ANDROID_AUDIENCE: True,  # Hack to get Android auth working
     },
     issuers={
         'firebase': endpoints.Issuer(
