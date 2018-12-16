@@ -235,3 +235,19 @@ class LoggedInHandler(webapp2.RequestHandler):
                 '/account/register?redirect={}'.format(urllib.quote(redirect_url)),
                 abort=True
             )
+
+    def _require_team_admin_access(self, team_number, redirect_url=None):
+        self._require_login(redirect_url)
+        if self.user_bundle.is_current_user_admin:
+            # Admins have this granted
+            return
+
+        user = self.user_bundle.account.key
+
+        existing_access = existing_access = TeamAdminAccess.query(
+            TeamAdminAccess.account == user, TeamAdminAccess.team_number == team_number).fetch()
+        if not existing_access:
+            return self.redirect(
+                "/",
+                abort=True
+            )
