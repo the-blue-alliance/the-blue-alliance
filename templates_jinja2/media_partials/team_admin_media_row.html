@@ -1,0 +1,50 @@
+{% import 'media_partials/social_media_macros.html' as smm %}
+
+<tr>
+  <td>{{media.slug_name}}</td>
+  <td>
+    {% if media.media_type_enum == 12 %}
+      <!-- Team Avatar -->
+      <img class="team-avatar" src='{{media.avatar_image_source}}'/>
+    {% elif media.social_profile_url %}
+      <!-- Social Media -->
+      {{smm.social_media_icon_link(media)}}
+    {% else %}
+      {% include "media_partials/media_display_partial.html" %}
+    {% endif %}
+  </td>
+  <td>
+    <ul>
+      {% for tag_name in media.tag_names %}
+      <li>{{tag_name}}</li>
+      {%else%}
+        <p>--</p>
+      {% endfor %}
+    </ul>
+  </td>
+  <td>
+    <form id="remove_media_{{media.key_name}}" method="post">
+      <input name="action" type="hidden" value="remove_media_reference" />
+      <input name="team_number" type="hidden" value="{{team_link.team_number}}" />
+      <input name="media_key_name" type="hidden" value="{{media.key_name}}" />
+      <button class="btn btn-danger" type="submit">Remove media reference</button>
+    </form>
+
+    {% if media.is_image %}
+      {% if team_link.team_key in media.preferred_references %}
+        <form id="remove_preferred_{{media.key_name}}" method="post">
+          <input name="action" type="hidden" value="remove_media_preferred" />
+          <input name="team_number" type="hidden" value="{{team_link.team_number}}" />
+          <input name="media_key_name" type="hidden" value="{{media.key_name}}" />
+          <button class="btn btn-warning" type="submit">Remove Preferred</button>
+        </form>
+      {% else %}
+      <form id="add_preferred_{{media.key_name}}" method="post">
+        <input name="action" type="hidden" value="add_media_preferred" />
+        <input name="team_number" type="hidden" value="{{team_link.team_number}}" />
+        <input name="media_key_name" type="hidden" value="{{media.key_name}}" />
+        <button class="btn btn-info" type="submit">Make Preferred</button>
+      {% endif %}
+    {% endif %}
+  </td>
+</tr>

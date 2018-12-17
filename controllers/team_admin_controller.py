@@ -3,8 +3,10 @@ import tba_config
 from collections import defaultdict
 
 from base_controller import CacheableHandler, LoggedInHandler
+from database import media_query
 from google.appengine.ext import ndb
 from helpers.media_manipulator import MediaManipulator
+from helpers.media_helper import MediaHelper
 from models.media import Media
 from models.suggestion import Suggestion
 from models.team import Team
@@ -25,9 +27,15 @@ class TeamAdminDashboard(LoggedInHandler):
             ndb.Key(Team, "frc{}".format(access.team_number))
             for access in existing_access
         ]
+        years = set([access.year for access in existing_access])
         teams_future = ndb.get_multi_async(team_keys)
+        social_media_futures = [
+            media_query.TeamSocialMediaQuery(team_key.id()).fetch_async()
+            for team_key in team_keys
+        ]
         team_medias_future = Media.query(
-            Media.references.IN(team_keys)).fetch_async(50)
+            Media.references.IN(team_keys),
+            Media.year.IN(years)).fetch_async(50)
         suggestions_future = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
                 Suggestion.target_model.IN(self.ALLOWED_SUGGESTION_TYPES),
@@ -38,12 +46,21 @@ class TeamAdminDashboard(LoggedInHandler):
             team.get_result().team_number: team.get_result()
             for team in teams_future
         }
-        team_medias = defaultdict(list)
+        team_medias = defaultdict(lambda: defaultdict(list))
         for media in team_medias_future.get_result():
             for reference in media.references:
                 if reference in team_keys:
                     team_num = reference.id()[3:]
-                    team_medias[int(team_num)].append(media)
+                    team_medias[int(team_num)][media.year].append(media)
+
+        team_social_medias = defaultdict(list)
+        for team_social_media_future in social_media_futures:
+            social_medias = team_social_media_future.get_result()
+            for media in social_medias:
+                for reference in media.references:
+                    if reference in team_keys:
+                        team_num = reference.id()[3:]
+                        team_social_medias[int(team_num)].append(media)
 
         suggestions_by_team = defaultdict(list)
         for suggestion in suggestions_future.get_result():
@@ -55,6 +72,7 @@ class TeamAdminDashboard(LoggedInHandler):
             "existing_access": existing_access,
             "teams": team_num_to_team,
             "team_medias": team_medias,
+            "team_social_medias": team_social_medias,
             "suggestions_by_team": suggestions_by_team,
         })
 
