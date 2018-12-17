@@ -48,6 +48,9 @@ PATH=$PATH:$INSTALL/$NAME/bin/
 echo "Building TBA..."
 paver make
 
+# Build React Native bundle
+(cd subtrees/the-blue-alliance-react-native && npm install && react-native bundle --platform ios --dev false --assets-dest ios --entry-file index.ios.js --bundle-output ios/main.jsbundle && zip -r react-native.zip ios/ && mv react-native.zip ../../static/react-native/)
+
 echo "Deploying TBA with the following JS modules"
 npm ls || true
 
