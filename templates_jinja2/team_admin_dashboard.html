@@ -7,8 +7,90 @@
 {% block content %}
 <div class="container">
 <h1>Team Admin Dashboard</h1>
-<p>Coming soon :)</p>
-<p><a class="btn btn-info" href="/mod/help">Help</a></p>
-<p><a class="btn btn-primary" href="mod/redeem">Redeem</a></p>
+<p>
+  <a class="btn btn-info" href="/mod/help">Help</a>
+  <a class="btn btn-primary" href="mod/redeem">Redeem</a>
+</p>
+<h3>Hi {{user_bundle.account.display_name}}, you have moderator access for {{teams|length}} team{% if teams|length > 1%}s{%endif%}</h3>
+
+<div class="row">
+<div class="col-sm-12">
+<ul class="nav nav-tabs">
+  <li class="active"><a href="#queue" data-toggle="tab">Suggestion Queue</a></li>
+  {% for team_link in existing_access %}
+    <li><a href="#frc{{team_link.team_number}}" data-toggle="tab">Team {{team_link.team_number}} - {{teams[team_link.team_number].nickname}}</a></li>
+  {% endfor %}
+</ul>
+</div>
+</div>
+
+<div class="tab-content">
+<div class="tab-pane active" id="queue">
+<div class="row">
+  {% for team_link in existing_access %}
+    <h2><a href="/team/{{team_link.team_number}}">Team {{team_link.team_number}}</a> - Pending Suggestions</h2>
+    {% for suggestion in suggestions_by_team[team_link.team_number] %}
+    {% else %}
+      <p>No suggestions found!</p>
+    {% endfor %}
+  {% endfor %}
+</div>
+</div>
+
+{% for team_link in existing_access %}
+  <div class="tab-pane" id="frc{{team_link.team_number}}">
+  <div class="row">
+    <h2><a href="/team/{{team_link.team_number}}">Team {{team_link.team_number}}</a> - {{team_link.year}} Media</h2>
+    <table class="table table-striped table-hover table-condensed">
+    <tr><th>Type</th><th>Media</th><th>Tags</th><th>Actions</th></tr>
+    {% for media in team_medias[team_link.team_number] %}
+      <tr>
+        <td>{{media.slug_name}}</td>
+        <td>
+          {% include "media_partials/media_display_partial.html" %}
+        </td>
+        <td>
+          <ul>
+            {% for tag_name in media.tag_names %}
+            <li>{{tag_name}}</li>
+            {%else%}
+              <p>--</p>
+            {% endfor %}
+          </ul>
+        </td>
+        <td>
+          <form id="remove_media_{{media.key_name}}" method="post">
+            <input name="action" type="hidden" value="remove_media_reference" />
+            <input name="team_number" type="hidden" value="{{team_link.team_number}}" />
+            <input name="media_key_name" type="hidden" value="{{media.key_name}}" />
+            <button class="btn btn-danger" type="submit">Remove media reference</button>
+          </form>
+
+          {% if media.is_image %}
+            {% if team_link.team_key in media.preferred_references %}
+            <form id="remove_preferred_{{media.key_name}}" method="post">
+              <input name="action" type="hidden" value="remove_media_preferred" />
+              <input name="team_number" type="hidden" value="{{team_link.team_number}}" />
+              <input name="media_key_name" type="hidden" value="{{media.key_name}}" />
+              <button class="btn btn-warning" type="submit">Remove Preferred</button>
+            </form>
+            {% else %}
+            <form id="add_preferred_{{media.key_name}}" method="post">
+              <input name="action" type="hidden" value="add_media_preferred" />
+              <input name="team_number" type="hidden" value="{{team_link.team_number}}" />
+              <input name="media_key_name" type="hidden" value="{{media.key_name}}" />
+              <button class="btn btn-info" type="submit">Make Preferred</button>
+            {% endif %}
+          {% endif %}
+        </td>
+    {% else %}
+      <tr><td>No media found!</td></tr>
+    {% endfor %}
+    </table>
+  </div>
+  </div>
+{% endfor %}
+
+</div>
 </div>
 {% endblock %}

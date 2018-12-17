@@ -1,6 +1,7 @@
 
 from google.appengine.ext import ndb
 from models.account import Account
+from models.team import Team
 
 
 class TeamAdminAccess(ndb.Model):
@@ -24,6 +25,10 @@ class TeamAdminAccess(ndb.Model):
     @property
     def key_name(self):
         return self.renderKeyName(self.team_number, self.year)
+
+    @property
+    def team_key(self):
+        return ndb.Key(Team, "frc{}".format(self.team_number))
 
     @classmethod
     def renderKeyName(cls, teamNumber, year):

@@ -11,4 +11,7 @@
     {% include "media_partials/grabcad_partial.html" %}
 {% elif media.media_type_enum == 10 %}
     {% include "media_partials/instagram_partial.html" %}
+{% elif media.media_type_enum == 12 %}
+    <!-- Team Avatar -->
+    <img class="team-avatar" src='{{media.avatar_image_source}}'/>
 {% endif %}
