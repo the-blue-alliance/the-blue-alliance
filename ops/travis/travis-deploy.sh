@@ -59,7 +59,7 @@ lock $DEPLOY_LOCK
 
 # Now that we have the lock, always try to release it when this script exits
 echo "Installing trap handler to release deploy lock on exit..."
-trap release_lock EXIT ERR INT TERM
+trap release_lock EXIT INT TERM
 
 echo "Obtained Lock. Deploying $PROJECT:$VERSION"
 # need more permissions for cron.yaml queue.yaml index.yaml, we can come back to them
