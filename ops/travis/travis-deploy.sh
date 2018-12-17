@@ -24,6 +24,14 @@ with_python27() {
     bash -c "source $HOME/virtualenv/python2.7/bin/activate; $1"
 }
 
+# Install the lock release function as a trap so it always runs
+# http://tldp.org/LDP/Bash-Beginners-Guide/html/sect_12_02.html
+release_lock() {
+  echo "Releasing deploy lock..."
+  unlock $DEPLOY_LOCK
+  echo "Lock released. Deploy complete."
+}
+
 should_deploy
 
 echo "python 2.7 version:"
@@ -49,6 +57,10 @@ with_python27 "$GCLOUD -q auth activate-service-account --key-file $KEYFILE"
 echo "Obtaining deploy lock..."
 lock $DEPLOY_LOCK
 
+# Now that we have the lock, always try to release it when this script exits
+echo "Installing trap handler to release deploy lock on exit..."
+trap release_lock EXIT ERR INT TERM
+
 echo "Obtained Lock. Deploying $PROJECT:$VERSION"
 # need more permissions for cron.yaml queue.yaml index.yaml, we can come back to them
 for config in dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml cron.yaml; do
@@ -63,7 +75,3 @@ fi
 
 echo "Updating build info..."
 update_build_info
-
-echo "Releasing deploy lock..."
-unlock $DEPLOY_LOCK
-echo "Lock released. Deploy complete."
