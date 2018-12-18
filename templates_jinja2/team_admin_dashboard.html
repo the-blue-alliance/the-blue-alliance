@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import 'media_partials/social_media_macros.html' as smm %}
 
 {% block title %}Team Admin - The Blue Alliance{% endblock %}
 
@@ -14,7 +15,7 @@
 <h3>Hi {{user_bundle.account.display_name}}, you have moderator access for {{teams|length}} team{% if teams|length > 1%}s{%endif%}</h3>
 <ul>
   {% for team_link in existing_access %}
-    <li><a href="/team/{{team_link.team_number}}">Team {{team_link.team_number}} - {{teams[team_link.team_number].nickname}}</a></li>
+    <li><a href="/team/{{team_link.team_number}}/{{team_link.year}}">Team {{team_link.team_number}} - {{teams[team_link.team_number].nickname}} ({{team_link.year}})</a></li>
   {%endfor%}
 </ul>
 
@@ -23,7 +24,7 @@
 <ul class="nav nav-tabs">
   <li class="active"><a href="#queue" data-toggle="tab">Suggestion Queue</a></li>
   {% for team_link in existing_access %}
-    <li><a href="#frc{{team_link.team_number}}" data-toggle="tab">Team {{team_link.team_number}}</a></li>
+    <li><a href="#frc{{team_link.team_number}}" data-toggle="tab">Team {{team_link.team_number}} Media</a></li>
   {% endfor %}
 </ul>
 </div>
@@ -33,8 +34,46 @@
 <div class="tab-pane active" id="queue">
 <div class="row">
   {% for team_link in existing_access %}
-    <h2>Pending Suggestions</h2>
-    {% for suggestion in suggestions_by_team[team_link.team_number] %}
+    <h2>Team {{team_link.team_number}}: Pending Suggestions</h2>
+    {% for suggestion_type, suggestions in suggestions_by_team[team_link.team_number].items() %}
+        <h3>{{suggestions|length}} {{suggestion_names[suggestion_type]}} Suggestion{% if suggestions|length > 1 %}s{%endif%}</h3>
+        <form action="{{suggestion_review_urls[suggestion_types]}}" method="post" id="review_media">
+        <input type="hidden" name="return_url" value="/mod" />
+        {% for suggestion in suggestions %}
+        <div class="row">
+          <div class="well">
+            <div class="col-xs-2">
+              <label class="radio text-success">
+                <input class="accept" type="radio" name="accept_reject-{{suggestion.key.id()}}" value="accept::{{suggestion.key.id()}}"> Accept
+              </label>
+              <label class="radio text-danger">
+                <input class="reject" type="radio" name="accept_reject-{{suggestion.key.id()}}" value="reject::{{suggestion.key.id()}}"> Reject
+              </label>
+              <input type="hidden" class="form-control" name="year-{{suggestion.key.id()}}" value="{{suggestion.contents.year}}">
+            </div>
+            <div class="col-xs-5 fitvids">
+              {% if suggestion_type == "media" or suggestion_type == "robot" %}
+                {% set media = suggestion.candidate_media -%}
+                {% include "media_partials/media_display_partial.html" %}
+              {% elif suggestion_type == "social-media" %}
+                {{smm.social_media_card(suggestion)}}
+              {% endif %}
+            </div>
+            <div class="col-xs-2">
+              {% if suggestion_type == "media" %}
+                <label class="checkbox text-info" for="preferred_{{suggestion.key.id()}}">
+                  <input type="checkbox" name="preferred_keys[]" id="preferred_{{suggestion.key.id()}}" value="preferred::{{suggestion.key.id()}}" {% if suggestion.contents.default_preferred %}checked{% endif %}> Add as Preferred<br>(Doesn't do anything for non-images)
+                </label>
+              {% endif %}
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        </div>
+        {% endfor %}
+        <div class="row">
+            <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-pencil"></span> Act On Selected {{suggestion_names[suggestion_type]}}</button>
+        </div>
+        </form>
     {% else %}
       <p>No suggestions found!</p>
     {% endfor %}

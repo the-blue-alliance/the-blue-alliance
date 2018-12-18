@@ -68,4 +68,5 @@ class SuggestSocialMediaReviewController(SuggestionsReviewBaseController):
         # Process rejects
         self._process_rejected(reject_keys)
 
-        self.redirect("/suggest/team/social/review")
+        return_url = self.request.get('return_url', '/suggest/team/social/review')
+        self.redirect(return_url)
