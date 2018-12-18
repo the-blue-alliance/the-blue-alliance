@@ -1,10 +1,10 @@
 $(document).ready(function(){
   // Disable browser autocompletes
   $('.typeahead').attr('autocomplete', 'off');
-  
+
   // Set up Twitter Typeahead
   $('.typeahead').typeahead([
-	  {
+    {
       name: 'teams',
       prefetch: {
         url: '/_/typeahead/teams-all',
@@ -21,18 +21,18 @@ $(document).ready(function(){
       header: '<div class="tba-typeahead-header">Events</div>'
     },
     {
-	    name: 'districts',
+      name: 'districts',
       prefetch: {
         url: '/_/typeahead/districts-all',
         filter: districtFilter
       },
       header: '<div class="tba-typeahead-header">Districts</div>'
     }
-	]);
+  ]);
 
-	// Go to event and team pages on select or autocomplete
-	function goToPage(obj, datum) {
-	  var event_re = datum.value.match(/(\d*).+\[(.+?)\]/);
+  // Go to event and team pages on select or autocomplete
+  function goToPage(obj, datum) {
+    var event_re = datum.value.match(eventkeyRegex());
     if (event_re != null) {
       event_key = (event_re[1] + event_re[2]).toLowerCase();
       url = "/event/" + event_key;
@@ -50,7 +50,7 @@ $(document).ready(function(){
       url = "/team/" + team_key;
       window.location.href = url;
     }
-	}
+  }
 
   $('.typeahead').bind('typeahead:selected', goToPage);
   $('.typeahead').bind('typeahead:autocompleted', goToPage);
@@ -90,12 +90,17 @@ function teamFilter(data) {
   return to_return;
 }
 
+function eventkeyRegex() { return /(\d*).+\[(.+?)\]/; }
+
 function eventFilter(data) {
   var to_return = [];
   for(var i=0; i<data.length; i++) {
+    var event_re = cleanUnicode(data[i]).match(eventkeyRegex());
+    var tokens = cleanUnicode(data[i]).replace('[', '').replace(']', '').split(' ');
+    tokens.push((event_re[1] + event_re[2]));
     to_return.push({
       value: data[i],
-      tokens: cleanUnicode(data[i]).replace('[', '').replace(']', '').split(' ')
+      tokens: tokens
     });
   }
   return to_return;
