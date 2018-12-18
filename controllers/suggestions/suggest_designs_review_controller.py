@@ -114,4 +114,5 @@ class SuggestDesignsReviewController(SuggestionsReviewBaseController):
         # Process rejects
         self._process_rejected(reject_keys)
 
-        self.redirect("/suggest/cad/review")
+        return_url = self.request.get('return_url', '/suggest/cad/review')
+        self.redirect(return_url)

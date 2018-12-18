@@ -55,6 +55,7 @@ class SuggestionCreator(object):
                         id=suggestion_id,
                         author=author_account_key,
                         target_model=target_model,
+                        target_key=team_key,
                         )
                     suggestion.contents = media_dict
                     suggestion.put()

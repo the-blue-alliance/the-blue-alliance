@@ -16,6 +16,16 @@ from template_engine import jinja2_engine
 
 class TeamAdminDashboard(LoggedInHandler):
     ALLOWED_SUGGESTION_TYPES = ["media", "social-media", "robot"]
+    SUGGESTION_NAMES = {
+        "media": "Media",
+        "social-media": "Social Media",
+        "robot": "Robot CAD",
+    }
+    SUGGESTION_REVIEW_URL = {
+        "media": "/suggest/team/media/review",
+        "social-media": "/suggest/team/social/review",
+        "robot": "/suggest/cad/review",
+    }
 
     def get(self):
         self._require_registration()
@@ -36,11 +46,12 @@ class TeamAdminDashboard(LoggedInHandler):
         team_medias_future = Media.query(
             Media.references.IN(team_keys),
             Media.year.IN(years)).fetch_async(50)
-        suggestions_future = Suggestion.query().filter(
+        suggestions_future = Suggestion.query(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
-                Suggestion.target_model.IN(self.ALLOWED_SUGGESTION_TYPES),
-                Suggestion.target_key.IN(
-                    [k.id() for k in team_keys])).fetch_async(limit=50)
+                Suggestion.target_model.IN(
+                    self.ALLOWED_SUGGESTION_TYPES)).filter(
+                        Suggestion.target_key.IN([k.id() for k in team_keys
+                                                  ])).fetch_async(limit=50)
 
         team_num_to_team = {
             team.get_result().team_number: team.get_result()
@@ -62,11 +73,15 @@ class TeamAdminDashboard(LoggedInHandler):
                         team_num = reference.id()[3:]
                         team_social_medias[int(team_num)].append(media)
 
-        suggestions_by_team = defaultdict(list)
+        suggestions_by_team = defaultdict(lambda: defaultdict(list))
         for suggestion in suggestions_future.get_result():
+            logging.info("SUGGESTION: {}".format(suggestion.key.id()))
+            if not suggestion.target_key:
+                continue
             # Assume all the keys are team keys
             team_num = suggestion.target_key[3:]
-            suggestions_by_team[int(team_num)].append(suggestion)
+            suggestions_by_team[int(team_num)][suggestion.target_model].append(
+                suggestion)
 
         self.template_values.update({
             "existing_access": existing_access,
@@ -74,6 +89,8 @@ class TeamAdminDashboard(LoggedInHandler):
             "team_medias": team_medias,
             "team_social_medias": team_social_medias,
             "suggestions_by_team": suggestions_by_team,
+            "suggestion_names": self.SUGGESTION_NAMES,
+            "suggestion_review_urls": self.SUGGESTION_REVIEW_URL,
         })
 
         self.response.out.write(
