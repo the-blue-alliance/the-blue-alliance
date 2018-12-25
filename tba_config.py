@@ -44,7 +44,7 @@ CONFIG["static_resource_version"] = 8
 
 
 def _get_max_year():
-    DEFAULT_YEAR = 2018
+    DEFAULT_YEAR = 2019
     try:
         status_sitevar = Sitevar.get_by_id('apistatus')
         return status_sitevar.contents.get(

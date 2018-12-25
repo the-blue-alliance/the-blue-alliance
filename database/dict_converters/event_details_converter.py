@@ -31,13 +31,23 @@ class EventDetailsConverter(ConverterBase):
                         normalized_oprs[stat_type][team] = value
 
         event_details.matchstats if event_details else None
+        rankings = {}
+        if event_details:
+            rankings = event_details.renderable_rankings
+        else:
+            rankings = {
+                "extra_stats_info": [],
+                "rankings": None,
+                "sort_order_info": None
+            }
+
         event_details_dict = {
-            'alliances': event_details.alliance_selections if event_details else None,
-            'district_points': event_details.district_points if event_details else None,
-            'insights': event_details.insights if event_details else None,
-            'oprs': normalized_oprs if normalized_oprs else None,  # OPRs, DPRs, CCWMs
-            'predictions': event_details.predictions if event_details else None,
-            'rankings': event_details.renderable_rankings if event_details else None,
+            'alliances': event_details.alliance_selections if event_details else [],
+            'district_points': event_details.district_points if event_details else {},
+            'insights': event_details.insights if event_details else {'qual': {}, 'playoff': {}},
+            'oprs': normalized_oprs if normalized_oprs else {},  # OPRs, DPRs, CCWMs
+            'predictions': event_details.predictions if event_details else {},
+            'rankings': rankings
         }
 
         return event_details_dict
