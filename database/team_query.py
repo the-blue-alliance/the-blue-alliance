@@ -122,4 +122,4 @@ class TeamDistrictsQuery(DatabaseQuery):
         team_key = self._query_args[0]
         district_team_keys = yield DistrictTeam.query(DistrictTeam.team == ndb.Key(Team, team_key)).fetch_async(keys_only=True)
         districts = yield ndb.get_multi_async([ndb.Key(District, dtk.id().split('_')[0]) for dtk in district_team_keys])
-        raise ndb.Return(districts)
+        raise ndb.Return(filter(lambda x: x is not None, districts))
