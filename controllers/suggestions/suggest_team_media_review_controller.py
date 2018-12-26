@@ -17,6 +17,7 @@ from template_engine import jinja2_engine
 
 class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
     REQUIRED_PERMISSIONS = [AccountPermissions.REVIEW_MEDIA]
+    ALLOW_TEAM_ADMIN_ACCESS = True
 
     def __init__(self, *args, **kw):
         self.preferred_keys = []
@@ -26,6 +27,7 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
     View the list of suggestions.
     """
     def get(self):
+        super(SuggestTeamMediaReviewController, self).get()
         suggestions = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
             Suggestion.target_model == "media").fetch(limit=50)
@@ -108,6 +110,7 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
         return MediaManipulator.createOrUpdate(media)
 
     def post(self):
+        super(SuggestTeamMediaReviewController, self).post()
         self.preferred_keys = self.request.POST.getall("preferred_keys[]")
         accept_keys = []
         reject_keys = []
