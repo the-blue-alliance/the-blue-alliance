@@ -38,13 +38,15 @@ $("#go_button").click(function() {
         <th>#</th>
         <th>Code</th>
         <th>Account</th>
+        <th>Expiration</th>
     </thead>
 
     {% for auth_code in auth_codes %}
     <tr>
         <td><a href="/admin/team/{{auth_code.team_number}}">{{ auth_code.team_number }}</a></td>
-        <td>{{ auth_code.access_code }}</td>
+        <td><a href="/admin/media/modcodes/edit/{{auth_code.team_number}}/{{auth_code.year}}">{{ auth_code.access_code }}</a></td>
         <td>{{ auth_code.account }}</td>
+        <td>{{ auth.expiration|date:"Y-m-d" }}</td>
     </tr>
     {% endfor %}
 </table>

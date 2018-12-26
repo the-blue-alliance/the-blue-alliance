@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Mod Keys{% endblock %}
+
+{% block content %}
+
+<h1>Edit Team {{access.team_number}} Auth ({{access.year}})</h1>
+
+<form action="/admin/media/modcodes/edit/{{access.team_number}}/{{access.year}}" method="post">
+  <legend>Edit auth</legend>
+  <table class="table table-striped table-hover table-condensed">
+    <tr>
+      <td>Team Number</td>
+      <td><input type="text" name="team_number" value="{{access.team_number}}" disabled/></td>
+    </tr>
+    <tr>
+      <td>Year</td>
+      <td><input type="text" name="year" value="{{access.year}}" disabled/></td>
+    </tr>
+    <tr>
+      <td>Access Code</td>
+      <td><input type="text" name="access_code" value="{{access.access_code}}"/></td>
+    </tr>
+    <tr>
+      <td>Expiration</td>
+      <td><input type="text" name="expiration" value="{{ access.expiration|date:'Y-m-d' }}"/></td>
+    </tr>
+    <tr>
+      <td>Account</td>
+      <td><input type="text" name="account_email" value="{{account_email}}"/></td>
+  </table>
+  <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Save</button>
+</form>
+
+{% endblock %}
