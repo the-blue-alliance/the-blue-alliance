@@ -1,4 +1,8 @@
 dispatch:
+# Beta PWA
+- url: "beta.thebluealliance.com/*"
+  service: pwa-ssr
+  
 # Send low-frequency long-running tasks to backend module
 - url: "*/backend-tasks/*"
   module: backend-tasks
