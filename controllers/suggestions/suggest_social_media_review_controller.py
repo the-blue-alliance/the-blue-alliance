@@ -12,6 +12,7 @@ from template_engine import jinja2_engine
 
 class SuggestSocialMediaReviewController(SuggestionsReviewBaseController):
     REQUIRED_PERMISSIONS = [AccountPermissions.REVIEW_MEDIA]
+    ALLOW_TEAM_ADMIN_ACCESS = True
 
     def __init__(self, *args, **kw):
         super(SuggestSocialMediaReviewController, self).__init__(*args, **kw)
@@ -24,6 +25,7 @@ class SuggestSocialMediaReviewController(SuggestionsReviewBaseController):
     View the list of suggestions.
     """
     def get(self):
+        super(SuggestSocialMediaReviewController, self).get()
         suggestions = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
             Suggestion.target_model == "social-media").fetch(limit=50)
@@ -47,6 +49,7 @@ class SuggestSocialMediaReviewController(SuggestionsReviewBaseController):
         self.response.out.write(jinja2_engine.render('suggestions/suggest_team_social_review.html', self.template_values))
 
     def post(self):
+        super(SuggestSocialMediaReviewController, self).post()
         accept_keys = []
         reject_keys = []
         for value in self.request.POST.values():

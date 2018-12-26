@@ -94,13 +94,7 @@ class TestSuggestTeamAdminSuggestionReview(unittest2.TestCase):
             expiration=self.now + datetime.timedelta(days=expiration_days),
             account=self.account.key,
         )
-        access.put()
-
-    def giveGlobalPermission(self):
-        # Needed until auth for writes is built
-        self.account.permissions.append(AccountPermissions.REVIEW_MEDIA)
-        self.account.permissions.append(AccountPermissions.REVIEW_DESIGNS)
-        self.account.put()
+        return access.put()
 
     def createMediaSuggestion(self):
         status = SuggestionCreator.createTeamMediaSuggestion(
@@ -167,6 +161,25 @@ class TestSuggestTeamAdminSuggestionReview(unittest2.TestCase):
     """
     Test moderating existing media items (remove reference, manage preferred)
     """
+
+    def test_manage_media_expired_auth(self):
+        self.loginUser()
+        access_key = self.giveTeamAdminAccess()
+
+        team_reference = Media.create_reference('team', 'frc1124')
+        suggestion_id = self.createSocialMediaSuggestion()
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        media = MediaCreator.create_media_model(suggestion, team_reference)
+        media_id = media.put()
+        self.assertTrue(ndb.Key(Team, 'frc1124') in media.references)
+
+        form = self.getMediaAdminForm('remove_media', media_id.id())
+        access = access_key.get()
+        access.expiration += datetime.timedelta(days=-7)
+        access.put()
+
+        response = form.submit(status='403', expect_errors=True)
+        self.assertEqual(response.status_int, 403)
 
     def test_remove_social_media_reference(self):
         self.loginUser()
@@ -250,10 +263,45 @@ class TestSuggestTeamAdminSuggestionReview(unittest2.TestCase):
     sure everything works from both paths
     """
 
+    def test_accept_team_media_expired_auth(self):
+        self.loginUser()
+        access_key = self.giveTeamAdminAccess()
+
+        suggestion_id = self.createMediaSuggestion()
+        form = self.getSuggestionForm('media')
+        form['accept_reject-{}'.format(suggestion_id)] = 'accept::{}'.format(
+            suggestion_id)
+        access = access_key.get()
+        access.expiration += datetime.timedelta(days=-7)
+        access.put()
+        response = form.submit().follow(expect_errors=True)
+        self.assertEqual(response.request.path, "/")
+
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.review_state, Suggestion.REVIEW_PENDING)
+
+    def test_reject_team_media_expired_auth(self):
+        self.loginUser()
+        access_key = self.giveTeamAdminAccess()
+
+        suggestion_id = self.createMediaSuggestion()
+        form = self.getSuggestionForm('media')
+        form['accept_reject-{}'.format(suggestion_id)] = 'reject::{}'.format(
+            suggestion_id)
+        access = access_key.get()
+        access.expiration += datetime.timedelta(days=-7)
+        access.put()
+        response = form.submit().follow(expect_errors=True)
+        self.assertEqual(response.request.path, "/")
+
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.review_state, Suggestion.REVIEW_PENDING)
+
     def test_accept_team_media(self):
         self.loginUser()
         self.giveTeamAdminAccess()
-        self.giveGlobalPermission()
 
         suggestion_id = self.createMediaSuggestion()
         form = self.getSuggestionForm('media')
@@ -277,7 +325,6 @@ class TestSuggestTeamAdminSuggestionReview(unittest2.TestCase):
     def test_accept_team_media_as_preferred(self):
         self.loginUser()
         self.giveTeamAdminAccess()
-        self.giveGlobalPermission()
 
         suggestion_id = self.createMediaSuggestion()
         form = self.getSuggestionForm('media')
@@ -302,7 +349,6 @@ class TestSuggestTeamAdminSuggestionReview(unittest2.TestCase):
     def test_reject_team_media(self):
         self.loginUser()
         self.giveTeamAdminAccess()
-        self.giveGlobalPermission()
 
         suggestion_id = self.createMediaSuggestion()
         form = self.getSuggestionForm('media')
@@ -318,10 +364,45 @@ class TestSuggestTeamAdminSuggestionReview(unittest2.TestCase):
         medias = Media.query().fetch()
         self.assertEqual(len(medias), 0)
 
+    def test_accept_social_media_expired_auth(self):
+        self.loginUser()
+        access_key = self.giveTeamAdminAccess()
+
+        suggestion_id = self.createSocialMediaSuggestion()
+        form = self.getSuggestionForm('social-media')
+        form['accept_reject-{}'.format(suggestion_id)] = 'accept::{}'.format(
+            suggestion_id)
+        access = access_key.get()
+        access.expiration += datetime.timedelta(days=-7)
+        access.put()
+        response = form.submit().follow(expect_errors=True)
+        self.assertEqual(response.request.path, "/")
+
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.review_state, Suggestion.REVIEW_PENDING)
+
+    def test_reject_social_media_expired_auth(self):
+        self.loginUser()
+        access_key = self.giveTeamAdminAccess()
+
+        suggestion_id = self.createSocialMediaSuggestion()
+        form = self.getSuggestionForm('social-media')
+        form['accept_reject-{}'.format(suggestion_id)] = 'reject::{}'.format(
+            suggestion_id)
+        access = access_key.get()
+        access.expiration += datetime.timedelta(days=-7)
+        access.put()
+        response = form.submit().follow(expect_errors=True)
+        self.assertEqual(response.request.path, "/")
+
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.review_state, Suggestion.REVIEW_PENDING)
+
     def test_accept_social_media(self):
         self.loginUser()
         self.giveTeamAdminAccess()
-        self.giveGlobalPermission()
 
         suggestion_id = self.createSocialMediaSuggestion()
         form = self.getSuggestionForm('social-media')
@@ -345,7 +426,6 @@ class TestSuggestTeamAdminSuggestionReview(unittest2.TestCase):
     def test_reject_social_media(self):
         self.loginUser()
         self.giveTeamAdminAccess()
-        self.giveGlobalPermission()
 
         suggestion_id = self.createSocialMediaSuggestion()
         form = self.getSuggestionForm('social-media')
@@ -361,10 +441,45 @@ class TestSuggestTeamAdminSuggestionReview(unittest2.TestCase):
         medias = Media.query().fetch()
         self.assertEqual(len(medias), 0)
 
+    def test_accept_robot_design_expired_auth(self):
+        self.loginUser()
+        access_key = self.giveTeamAdminAccess()
+
+        suggestion_id = self.createDesignSuggestion()
+        form = self.getSuggestionForm('robot')
+        form['accept_reject-{}'.format(suggestion_id)] = 'accept::{}'.format(
+            suggestion_id)
+        access = access_key.get()
+        access.expiration += datetime.timedelta(days=-7)
+        access.put()
+        response = form.submit().follow(expect_errors=True)
+        self.assertEqual(response.request.path, "/")
+
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.review_state, Suggestion.REVIEW_PENDING)
+
+    def test_reject_robot_design_expired_auth(self):
+        self.loginUser()
+        access_key = self.giveTeamAdminAccess()
+
+        suggestion_id = self.createDesignSuggestion()
+        form = self.getSuggestionForm('robot')
+        form['accept_reject-{}'.format(suggestion_id)] = 'reject::{}'.format(
+            suggestion_id)
+        access = access_key.get()
+        access.expiration += datetime.timedelta(days=-7)
+        access.put()
+        response = form.submit().follow(expect_errors=True)
+        self.assertEqual(response.request.path, "/")
+
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.review_state, Suggestion.REVIEW_PENDING)
+
     def test_accept_robot_design(self):
         self.loginUser()
         self.giveTeamAdminAccess()
-        self.giveGlobalPermission()
 
         suggestion_id = self.createDesignSuggestion()
         form = self.getSuggestionForm('robot')
@@ -388,7 +503,6 @@ class TestSuggestTeamAdminSuggestionReview(unittest2.TestCase):
     def test_reject_robot_design(self):
         self.loginUser()
         self.giveTeamAdminAccess()
-        self.giveGlobalPermission()
 
         suggestion_id = self.createDesignSuggestion()
         form = self.getSuggestionForm('robot')

@@ -244,11 +244,10 @@ class LoggedInHandler(webapp2.RequestHandler):
             return
 
         user = self.user_bundle.account.key
-
+        now = datetime.datetime.now()
         existing_access = existing_access = TeamAdminAccess.query(
-            TeamAdminAccess.account == user, TeamAdminAccess.team_number == team_number).fetch()
+            TeamAdminAccess.account == user,
+            TeamAdminAccess.team_number == team_number,
+            TeamAdminAccess.expiration > now).fetch()
         if not existing_access:
-            return self.redirect(
-                "/",
-                abort=True
-            )
+            return self.abort(403)

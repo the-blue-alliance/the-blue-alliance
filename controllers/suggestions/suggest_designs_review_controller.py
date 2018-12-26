@@ -12,6 +12,7 @@ from template_engine import jinja2_engine
 
 class SuggestDesignsReviewController(SuggestionsReviewBaseController):
     REQUIRED_PERMISSIONS = [AccountPermissions.REVIEW_DESIGNS]
+    ALLOW_TEAM_ADMIN_ACCESS = True
 
     def __init__(self, *args, **kw):
         super(SuggestDesignsReviewController, self).__init__(*args, **kw)
@@ -24,7 +25,7 @@ class SuggestDesignsReviewController(SuggestionsReviewBaseController):
     View the list of suggestions.
     """
     def get(self):
-
+        super(SuggestDesignsReviewController, self).get()
         if self.request.get('action') and self.request.get('id'):
             # Fast-path review
             self._fastpath_review()
@@ -52,7 +53,6 @@ class SuggestDesignsReviewController(SuggestionsReviewBaseController):
         self.response.out.write(jinja2_engine.render('suggestions/suggest_designs_review.html', self.template_values))
 
     def _fastpath_review(self):
-        self.verify_permissions()
         suggestion = Suggestion.get_by_id(self.request.get('id'))
         status = None
         if suggestion and suggestion.target_model == 'robot':
@@ -93,7 +93,7 @@ class SuggestDesignsReviewController(SuggestionsReviewBaseController):
             self.redirect('/suggest/review?status={}'.format(status), abort=True)
 
     def post(self):
-        self.verify_permissions()
+        super(SuggestDesignsReviewController, self).post()
         accept_keys = []
         reject_keys = []
         for value in self.request.POST.values():
