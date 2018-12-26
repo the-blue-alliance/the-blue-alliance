@@ -1,3 +1,4 @@
+import datetime
 import logging
 import tba_config
 from collections import defaultdict
@@ -31,12 +32,17 @@ class TeamAdminDashboard(LoggedInHandler):
         self._require_registration()
         user = self.user_bundle.account.key
 
+        now = datetime.datetime.now()
         existing_access = TeamAdminAccess.query(
-            TeamAdminAccess.account == user).fetch()
+            TeamAdminAccess.account == user,
+            TeamAdminAccess.expiration > now).fetch()
         team_keys = [
             ndb.Key(Team, "frc{}".format(access.team_number))
             for access in existing_access
         ]
+        if not team_keys:
+            self.abort(403)
+            return
         years = set([access.year for access in existing_access])
         teams_future = ndb.get_multi_async(team_keys)
         social_media_futures = [
@@ -75,7 +81,6 @@ class TeamAdminDashboard(LoggedInHandler):
 
         suggestions_by_team = defaultdict(lambda: defaultdict(list))
         for suggestion in suggestions_future.get_result():
-            logging.info("SUGGESTION: {}".format(suggestion.key.id()))
             if not suggestion.target_key:
                 continue
             # Assume all the keys are team keys

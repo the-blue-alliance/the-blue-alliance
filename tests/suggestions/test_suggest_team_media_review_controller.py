@@ -108,6 +108,28 @@ class TestSuggestTeamMediaReviewController(unittest2.TestCase):
         self.assertEqual(media.media_type_enum, MediaType.IMGUR)
         self.assertTrue(ndb.Key(Team, 'frc1124') in media.references)
 
+    def test_accept_suggestion_as_preferred(self):
+        self.loginUser()
+        self.givePermission()
+        suggestion_id = self.createSuggestion()
+        form = self.getSuggestionForm()
+        form['accept_reject-{}'.format(suggestion_id)] = 'accept::{}'.format(suggestion_id)
+        form['preferred_keys[]'] = ['preferred::{}'.format(suggestion_id)]
+        response = form.submit().follow()
+        self.assertEqual(response.status_int, 200)
+
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.review_state, Suggestion.REVIEW_ACCEPTED)
+
+        medias = Media.query().fetch()
+        self.assertEqual(len(medias), 1)
+        media = medias[0]
+        self.assertIsNotNone(media)
+        self.assertEqual(media.foreign_key, 'foobar')
+        self.assertEqual(media.media_type_enum, MediaType.IMGUR)
+        self.assertTrue(ndb.Key(Team, 'frc1124') in media.preferred_references)
+
     def test_reject_suggestion(self):
         self.loginUser()
         self.givePermission()

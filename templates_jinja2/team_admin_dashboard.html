@@ -37,7 +37,7 @@
     <h2>Team {{team_link.team_number}}: Pending Suggestions</h2>
     {% for suggestion_type, suggestions in suggestions_by_team[team_link.team_number].items() %}
         <h3>{{suggestions|length}} {{suggestion_names[suggestion_type]}} Suggestion{% if suggestions|length > 1 %}s{%endif%}</h3>
-        <form action="{{suggestion_review_urls[suggestion_types]}}" method="post" id="review_media">
+        <form action="{{suggestion_review_urls[suggestion_type]}}" method="post" id="review_{{suggestion_type}}">
         <input type="hidden" name="return_url" value="/mod" />
         {% for suggestion in suggestions %}
         <div class="row">
