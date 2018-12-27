@@ -31,6 +31,7 @@ class AdminTeamMediaModCodeList(LoggedInHandler):
             start = self.PAGE_SIZE * page_num
             end = start + self.PAGE_SIZE
             auth_codes = TeamAdminAccess.query(
+                TeamAdminAccess.year == year,
                 TeamAdminAccess.team_number >= start,
                 TeamAdminAccess.team_number < end).order(
                     TeamAdminAccess.team_number).fetch()
