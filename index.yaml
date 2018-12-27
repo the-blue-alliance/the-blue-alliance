@@ -148,5 +148,11 @@ indexes:
 
 - kind: TeamAdminAccess
   properties:
+  - name: account
+  - name: team_number
+  - name: expiration
+
+- kind: TeamAdminAccess
+  properties:
   - name: year
   - name: team_number
