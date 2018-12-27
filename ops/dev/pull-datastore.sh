@@ -24,6 +24,9 @@ touch $local_dir/.tba
 if [ $1 == 'pull' ]; then
   src="root@$host:/datastore/*"
   dst="./$local_dir"
+
+  echo "Pulling updated index.yaml"
+  scp -v -P $port -i $keyfile -oStrictHostKeyChecking=no root@$host:/tba/index.yaml ./index.yaml
 else
   dst="root@$host:/datastore"
   src="./$local_dir/*"

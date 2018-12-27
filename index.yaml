@@ -140,3 +140,13 @@ indexes:
   - name: model_type
   - name: notification_types
   - name: model_key
+
+- kind: TeamAdminAccess
+  properties:
+  - name: account
+  - name: expiration
+
+- kind: TeamAdminAccess
+  properties:
+  - name: year
+  - name: team_number
