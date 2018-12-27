@@ -36,6 +36,19 @@ class TeamAdminDashboard(LoggedInHandler):
         existing_access = TeamAdminAccess.query(
             TeamAdminAccess.account == user,
             TeamAdminAccess.expiration > now).fetch()
+
+        # If the current user is an admin, allow them to view this page for any
+        # team/year combination
+        forced_team = self.request.get("team")
+        forced_year = self.request.get("year")
+        if self.user_bundle.is_current_user_admin and forced_team and forced_year:
+            existing_access.append(
+                TeamAdminAccess(
+                    team_number=int(forced_team),
+                    year=int(forced_year),
+                )
+            )
+
         team_keys = [
             ndb.Key(Team, "frc{}".format(access.team_number))
             for access in existing_access
