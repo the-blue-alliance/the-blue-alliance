@@ -102,12 +102,45 @@ class TestTeamAdminRedeem(unittest2.TestCase):
 
         self.assertEqual(response.request.GET['status'], 'invalid_code')
 
+    def test_redeem_no_team(self):
+        self.loginUser()
+        access_key = self.addTeamAdminAccess(account=None)
+
+        form = self.getForm()
+        form['auth_code'] = 'abc123'
+        response = form.submit().follow()
+
+        self.assertEqual(response.request.GET['status'], 'invalid_code')
+
+    def test_redeem_garbage_team(self):
+        self.loginUser()
+        access_key = self.addTeamAdminAccess(account=None)
+
+        form = self.getForm()
+        form['auth_code'] = 'abc123'
+        form['team_number'] = 'meow'
+        response = form.submit().follow()
+
+        self.assertEqual(response.request.GET['status'], 'invalid_code')
+
+    def test_redeem_bad_team(self):
+        self.loginUser()
+        access_key = self.addTeamAdminAccess(account=None)
+
+        form = self.getForm()
+        form['auth_code'] = 'abc123'
+        form['team_number'] = '11245'
+        response = form.submit().follow()
+
+        self.assertEqual(response.request.GET['status'], 'invalid_code')
+
     def test_redeem_code(self):
         self.loginUser()
         access_key = self.addTeamAdminAccess(account=None)
 
         form = self.getForm()
         form['auth_code'] = 'abc123'
+        form['team_number'] = '1124'
         response = form.submit().follow()
 
         access = access_key.get()
@@ -121,6 +154,7 @@ class TestTeamAdminRedeem(unittest2.TestCase):
 
         form = self.getForm()
         form['auth_code'] = 'abc123'
+        form['team_number'] = '1124'
         response = form.submit().follow()
 
         self.assertEqual(response.request.GET['status'], 'code_used')
