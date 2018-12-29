@@ -9,7 +9,6 @@ import traceback
 from google.appengine.ext import ndb
 
 from consts.event_type import EventType
-from controllers.api.api_status_controller import ApiStatusController
 from datafeeds.datafeed_base import DatafeedBase
 from models.district import District
 from models.event import Event
@@ -204,7 +203,6 @@ class DatafeedFMSAPI(object):
             if old_status == True:
                 self._is_down_sitevar.contents = False
                 self._is_down_sitevar.put()
-            ApiStatusController.clear_cache_if_needed(old_status, self._is_down_sitevar.contents)
 
             # Save raw API response into cloudstorage
             if self._save_response and tba_config.CONFIG['save-frc-api-response']:
@@ -245,7 +243,6 @@ class DatafeedFMSAPI(object):
             if old_status == False:
                 self._is_down_sitevar.contents = True
                 self._is_down_sitevar.put()
-            ApiStatusController.clear_cache_if_needed(old_status, self._is_down_sitevar.contents)
             raise ndb.Return(None)
         else:
             logging.warning('URLFetch for %s failed; Error code %s' % (url, result.status_code))

@@ -13,7 +13,6 @@ from google.appengine.ext.webapp import template
 from consts.district_type import DistrictType
 from consts.event_type import EventType
 
-from controllers.api.api_status_controller import ApiStatusController
 from database.district_query import DistrictsInYearQuery
 from database.event_query import DistrictEventsQuery
 from database.team_query import DistrictTeamsQuery
@@ -648,9 +647,6 @@ class MatchTimePredictionsEnqueue(webapp.RequestHandler):
             status_sitevar.contents = list(new_status)
             status_sitevar.put()
 
-            # Clear API Response cache
-            ApiStatusController.clear_cache_if_needed(old_status, new_status)
-
         self.response.out.write("Enqueued time prediction for {} events".format(len(live_events)))
 
 
@@ -698,9 +694,6 @@ class MatchTimePredictionsDo(webapp.RequestHandler):
 
         status_sitevar.contents = list(new_status)
         status_sitevar.put()
-
-        # Clear API Response cache
-        ApiStatusController.clear_cache_if_needed(old_status, new_status)
 
 
 class BlueZoneUpdateDo(webapp.RequestHandler):

@@ -64,6 +64,4 @@ class AdminApiStatus(LoggedInHandler):
         trusted_sitevar.contents = trusted_status
         trusted_sitevar.put()
 
-        ApiStatusController.clear_cache_if_needed(old_value, status)
-
         self.redirect('/admin/apistatus')
