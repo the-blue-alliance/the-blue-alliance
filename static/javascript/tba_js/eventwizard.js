@@ -312,9 +312,8 @@ $('#fetch-matches').click(function(e) {
   e.preventDefault();
   $('#match_play_load_status').html("Loading matches");
   $.ajax({
-    url: '/api/v2/event/' + $('#event_key').val() + '/matches',
+    url: '/api/v3/event/' + $('#event_key').val() + '/matches',
     dataType: 'json',
-    headers: {'X-TBA-App-Id': 'tba-web:match-input:v01'},
     success: function(matches) {
       $("#match-table").empty();
       $('#match_play_load_status').html("Loaded "+matches.length+" matches");
@@ -330,8 +329,8 @@ $('#fetch-matches').click(function(e) {
 
         var trRed = $('<tr>');
         trRed.append($('<td>', {rowspan: 2, text: match.key.split('_')[1], 'style': 'border-top-width: 4px;border-left-width:4px;border-bottom-width:4px;'}));
-        for (j in match.alliances.red.teams) {
-          trRed.append($('<td>', {'class': 'red', 'data-matchKey-redTeam': match.key, 'text': match.alliances.red.teams[j].substring(3), 'style':'border-top-width:4px;'}));
+        for (j in match.alliances.red.team_keys) {
+          trRed.append($('<td>', {'class': 'red', 'data-matchKey-redTeam': match.key, 'text': match.alliances.red.team_keys[j].substring(3), 'style':'border-top-width:4px;'}));
         }
         trRed.append($('<td>', {'style':'background-color: #FF9999;border-top-width:4px;'}).append($('<input>', {'id': match.key + '-redScore', 'type': 'text', 'type': 'number', 'value': match.alliances.red.score, 'tabIndex':tabIndex}).css('max-width', '50px')));
         trRed.append($('<td>', {rowspan: 2, 'style': 'border-top-width: 4px;border-right-width:4px;border-bottom-width:4px;width:17%'}).append($('<input>', {'id': match.key+"_video", 'placeholder': 'YouTube URL'})));
@@ -340,8 +339,8 @@ $('#fetch-matches').click(function(e) {
         $("#match-table").append(trRed);
 
         var trBlue = $('<tr>');
-        for (j in match.alliances.blue.teams) {
-          trBlue.append($('<td>', {'class': 'blue', 'data-matchKey-blueTeam': match.key, 'text': match.alliances.blue.teams[j].substring(3), 'style':'border-bottom-width:4px;'}));
+        for (j in match.alliances.blue.team_keys) {
+          trBlue.append($('<td>', {'class': 'blue', 'data-matchKey-blueTeam': match.key, 'text': match.alliances.blue.team_keys[j].substring(3), 'style':'border-bottom-width:4px;'}));
         }
         trBlue.append($('<td>', {'style':'background-color: #9999FF;border-bottom-width:4px;'}).append($('<input>', {'id': match.key + '-blueScore', 'type': 'text', 'type': 'number', 'value': match.alliances.blue.score,'tabIndex':tabIndex+1}).css('max-width', '50px')));
         $("#match-table").append(trBlue);
