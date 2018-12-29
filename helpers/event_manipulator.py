@@ -4,7 +4,6 @@ import traceback
 
 from google.appengine.ext import ndb
 
-from helpers.cache_clearer import CacheClearer
 from helpers.location_helper import LocationHelper
 from helpers.manipulator_base import ManipulatorBase
 from helpers.notification_helper import NotificationHelper
@@ -12,12 +11,6 @@ from helpers.search_helper import SearchHelper
 
 
 class EventManipulator(ManipulatorBase):
-    """
-    Handle Event database writes.
-    """
-    @classmethod
-    def getCacheKeysAndControllers(cls, affected_refs):
-        return CacheClearer.get_event_cache_keys_and_controllers(affected_refs)
 
     @classmethod
     def postDeleteHook(cls, events):

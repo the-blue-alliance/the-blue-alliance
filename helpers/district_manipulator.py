@@ -1,7 +1,6 @@
 import logging
 
 from database.district_query import DistrictHistoryQuery
-from helpers.cache_clearer import CacheClearer
 from helpers.manipulator_base import ManipulatorBase
 from models.district import District
 
@@ -42,10 +41,6 @@ class DistrictManipulator(ManipulatorBase):
                         other_district.elasticsearch_name = district.elasticsearch_name
                         to_put.append(other_district)
                 cls.createOrUpdate(to_put, run_post_update_hook=False)
-
-    @classmethod
-    def getCacheKeysAndControllers(cls, affected_refs):
-        return CacheClearer.get_district_cache_keys_and_controllers(affected_refs)
 
     @classmethod
     def updateMerge(self, new_district, old_district, auto_union=True):

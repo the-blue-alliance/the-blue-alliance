@@ -3,7 +3,6 @@ import traceback
 
 from google.appengine.api import taskqueue
 
-from helpers.cache_clearer import CacheClearer
 from helpers.firebase.firebase_pusher import FirebasePusher
 from helpers.manipulator_base import ManipulatorBase
 from helpers.notification_helper import NotificationHelper
@@ -13,12 +12,6 @@ from helpers.manipulator_base import ManipulatorBase
 
 
 class EventDetailsManipulator(ManipulatorBase):
-    """
-    Handle EventDetails database writes.
-    """
-    @classmethod
-    def getCacheKeysAndControllers(cls, affected_refs):
-        return CacheClearer.get_event_details_cache_keys_and_controllers(affected_refs)
 
     @classmethod
     def postUpdateHook(cls, event_details_list, updated_attr_list, is_new_list):

@@ -1,7 +1,6 @@
 from collections import defaultdict
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
-from helpers.cache_clearer import CacheClearer
 import tba_config
 
 
@@ -29,13 +28,6 @@ class ManipulatorBase(object):
         if run_post_delete_hook:
             self.runPostDeleteHook(models)
         self._clearCache(models)
-
-    @classmethod
-    def getCacheKeysAndControllers(cls, affected_refs):
-        """
-        Child classes should replace method with appropriate call to CacheClearer.
-        """
-        return []
 
     @classmethod
     def _clearCache(cls, models):

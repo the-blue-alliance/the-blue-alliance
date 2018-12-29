@@ -2,19 +2,12 @@ import logging
 
 from google.appengine.api import search
 
-from helpers.cache_clearer import CacheClearer
 from helpers.location_helper import LocationHelper
 from helpers.manipulator_base import ManipulatorBase
 from helpers.search_helper import SearchHelper
 
 
 class TeamManipulator(ManipulatorBase):
-    """
-    Handle Team database writes.
-    """
-    @classmethod
-    def getCacheKeysAndControllers(cls, affected_refs):
-        return CacheClearer.get_team_cache_keys_and_controllers(affected_refs)
 
     @classmethod
     def postDeleteHook(cls, teams):

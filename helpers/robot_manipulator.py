@@ -1,14 +1,7 @@
-from helpers.cache_clearer import CacheClearer
 from helpers.manipulator_base import ManipulatorBase
 
 
 class RobotManipulator(ManipulatorBase):
-    """
-    Handle Robot database writes.
-    """
-    @classmethod
-    def getCacheKeysAndControllers(cls, affected_refs):
-        return CacheClearer.get_robot_cache_keys_and_controllers(affected_refs)
 
     @classmethod
     def updateMerge(self, new_robot, old_robot, auto_union=True):
