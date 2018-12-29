@@ -2,7 +2,6 @@ import os
 
 from google.appengine.ext.webapp import template
 
-from controllers.api.api_status_controller import ApiStatusController
 from controllers.base_controller import LoggedInHandler
 from models.sitevar import Sitevar
 
