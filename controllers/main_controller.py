@@ -557,16 +557,3 @@ class ApiWriteHandler(CacheableHandler):
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/apiwrite.html")
         return template.render(path, self.template_values)
-
-
-class MatchInputHandler(CacheableHandler):
-    CACHE_VERSION = 1
-    CACHE_KEY_FORMAT = "match_input"
-
-    def __init__(self, *args, **kw):
-        super(MatchInputHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60
-
-    def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/matchinput.html")
-        return template.render(path, self.template_values)
