@@ -218,64 +218,6 @@
 
 <hr>
 
-<h2>Other Cron Tasks</h2>
-
-<h3>Calculate Year Insights</h3>
-<p>Generate Insights by year or overall</p>
-<div class="row">
-    <div class="col-sm-6">
-        <span class="help-block">Enqueue Award Insights</span>
-        <form class="form-inline">
-            <div class="input-group">
-                <input class="form-control" id="enqueue_award_insights_year" type="text" placeholder="2017">
-                <span class="input-group-btn" id="enqueue_award_insights_year_submit">
-                    <button class="btn btn-warning" type="button">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
-                </span>
-            </div>
-        </form>
-        <script>
-        $("#enqueue_award_insights_year_submit").click(function() {
-            window.location = "/tasks/math/enqueue/insights/awards/" + $("#enqueue_award_insights_year").val();
-        });
-        </script>
-    </div>
-    <div class="col-sm-6">
-        <span class="help-block">Enqueue Match Insights</span>
-        <form class="form-inline">
-            <div class="input-group">
-                <input class="form-control" id="enqueue_match_insights_year" type="text" placeholder="2017">
-                <span class="input-group-btn" id="enqueue_match_insights_year_submit">
-                    <button class="btn btn-warning" type="button">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
-                </span>
-            </div>
-        </form>
-        <script>
-        $("#enqueue_match_insights_year_submit").click(function() {
-            window.location = "/tasks/math/enqueue/insights/matches/" + $("#enqueue_match_insights_year").val();
-        });
-        </script>
-    </div>
-</div>
-<h3>Calculate Overall Insights</h3>
-<div class="row">
-    <div class="col-sm-6">
-        <a class="btn btn-warning" href="/tasks/math/enqueue/overallinsights/awards">Enqueue Overall Award Insights</a>
-    </div>
-    <div class="col-sm-6">
-        <a class="btn btn-warning" href="/tasks/math/enqueue/overallinsights/matches">Enqueue Overall Match Insights</a>
-    </div>
-</div>
-
-<h3>Calculate Typeahead</h3>
-<p>Generate TypeaheadEntries</p>
-<div class="row">
-    <div class="col-sm-6">
-        <a class="btn btn-warning" href="/tasks/math/enqueue/typeaheadcalc">Calc Typeahead!</a>
-    </div>
-</div>
-
-<hr>
-
 <h2>Special Tasks<h2>
 <h3>Special Registration Days</h3>
 <div class="row">
