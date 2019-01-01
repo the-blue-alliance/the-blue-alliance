@@ -20,11 +20,18 @@ class MediaConverter(ConverterBase):
 
     @classmethod
     def mediaConverter_v3(cls, media):
-        return {
+        dict = {
             'type': media.slug_name,
             'foreign_key': media.foreign_key,
             'details': media.details if media.details else {},
             'preferred': True if media.preferred_references != [] else False,
-            'view_image_url': media.view_image_url if media.view_image_url else None,
-            'image_direct_url': media.image_direct_url if media.image_direct_url else None,
+            'view_url': None,
+            'direct_url': None,
         }
+        if media.slug_name == "youtube":
+            dict["direct_url"] = media.youtube_url
+            dict["view_url"] = media.youtube_url_link
+        else:
+            dict["direct_url"] = media.image_direct_url
+            dict["view_url"] = media.view_image_url
+        return dict
