@@ -57,6 +57,7 @@
             {"message_type": "verification", "message_data": {"verification_key": "a93774ec6197d456f4aaadfea5fdba6697e71e6a"} }
           </code>
         Once you receive a verification message, go to your <a href="/account">account overview</a>, where you can verify the webhook you just created. If you need to, you can resend a new verification code (keep in mind that only the most recently sent code will properly verify a webhook). Until you have verified your webhook, it will not recieve any notifications from the Blue Alliance. You can still ping a webhook from the account panel without verification in order to make sure it's working properly - but no other notifications will go through. So be sure to verify your webhooks soon after making them!</p>
+        <p>We will periodically prune non-responsive webhooks by checking if a webhook responds to a ping request with a 200 status code. Your webhook should handle responding to a ping to ensure it does not get pruned.</p>
       <h3 id="testing">Testing</h3>
         <p>If you want to test out recieving webhooks on your local computer, you can use a program called <a href="https://ngrok.com/download">ngrok</a> to expose a port on your device to the internet. You can check out <a href="https://developer.github.com/webhooks/configuring/">this page</a> from GitHub's documentation to see a brief overview of testing webhooks using ngrok. There is a small example script with some instructions <a href="https://github.com/phil-lopreiato/tba-webhook-test" target="_blank">here</a>.</p>
         <p>Additionally, each notification type that is enabled will have a section for "testing" where you can send a static instance of that notification type to all of your devices. This feature will use the account you currently have logged in, and send it to every device registered with that account. Every event referenced will be 2014necmp and every match will be 2014necmp_f1m1.</p>
@@ -67,7 +68,7 @@
     <h2 id="notifications">Notification Types</h2>
       <p>Please keep in mind that not all notification types have been implemented or enabled yet. Watch the <code>enabled_notifications</code> enum of <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/notification_type.py#L75">this file</a> to see which types are enabled on the server.</p>
       <h3 id="notification_upcoming_match">Upcoming Match Notification</h3>
-        <p>These notifications are tested for every three minutes. A notification will be sent for the next unplayed match of each currently live event.</p>
+        <p>These notifications are tested for every two minutes. A notification will be sent for the next unplayed match of each currently live event.</p>
         <h4>Structure</h4>
           <ul>
             <li>message_type: “upcoming_match”</li>

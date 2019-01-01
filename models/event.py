@@ -372,6 +372,16 @@ class Event(ndb.Model):
                 current_webcasts.append(webcast)
         return current_webcasts
 
+    # Returns an arbritary online webcast
+    @property
+    def online_webcast(self):
+        WebcastOnlineHelper.add_online_status(self.current_webcasts)
+        online_webcasts = filter(lambda x: x.get('status', '') != 'offline', self.current_webcasts if self.current_webcasts else [])
+        if online_webcasts:
+            return online_webcasts[0]
+        else:
+            return None
+
     @property
     def division_keys_json(self):
         keys = [key.id() for key in self.divisions]

@@ -61,6 +61,17 @@
     </div>
   </div>
   {% endif %}
+  {% if ping_sent %}
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+      <div class="alert alert-success">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Success!</h4>
+        <p>Ping was sent to the webhook</p>
+      </div>
+    </div>
+  </div>
+  {% endif %}
   <div class="row">
     <div class="col-md-10 col-md-offset-1">
       <p class="pull-right">

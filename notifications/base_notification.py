@@ -17,7 +17,7 @@ class BaseNotification(object):
 
     # List of clients this notification type supports (these are default values)
     # Can be overridden by subclasses to only send to some types
-    _supported_clients = [ClientType.OS_ANDROID, ClientType.OS_IOS, ClientType.WEBHOOK, ClientType.WEB]
+    _supported_clients = [ClientType.OS_ANDROID, ClientType.WEBHOOK]
 
     # If not None, the event feed to post this notification to
     # Typically the event key
@@ -77,7 +77,7 @@ class BaseNotification(object):
             return
 
         for client_type in client_types:
-            if client_type in [ClientType.WEB, ClientType.OS_ANDROID, ClientType.OS_IOS] and client_type in self.keys:
+            if client_type is ClientType.OS_ANDROID and client_type in self.keys:
                 client_render_method = self.render_method(client_type)
                 notification = client_render_method()
                 if len(self.keys[client_type]) > 0:  # this is after _render because if it's an update fav/subscription notification, then
@@ -110,12 +110,6 @@ class BaseNotification(object):
     def _render_android(self):
         return self._render_gcm(ClientType.OS_ANDROID)
 
-    def _render_ios(self):
-        return self._render_gcm(ClientType.OS_IOS)
-
-    def _render_web(self):
-        return self._render_gcm(ClientType.WEB)
-
     def _render_webhook(self):
         return self._build_dict()
 
@@ -128,10 +122,6 @@ class BaseNotification(object):
     def render_method(self, client_type):
         if client_type == ClientType.OS_ANDROID:
             return self._render_android
-        elif client_type == ClientType.OS_IOS:
-            return self._render_ios
-        elif client_type == ClientType.WEB:
-            return self._render_web
         elif client_type == ClientType.WEBHOOK:
             return self._render_webhook
         else:

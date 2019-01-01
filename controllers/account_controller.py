@@ -72,6 +72,7 @@ class AccountOverview(LoggedInHandler):
 
         self.template_values['status'] = self.request.get('status')
         self.template_values['webhook_verification_success'] = self.request.get('webhook_verification_success')
+        self.template_values['ping_sent'] = self.request.get('ping_sent')
         self.template_values['ping_enabled'] = ping_enabled
         self.template_values['num_favorites'] = num_favorites
         self.template_values['num_subscriptions'] = num_subscriptions

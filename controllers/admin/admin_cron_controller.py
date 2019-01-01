@@ -24,6 +24,7 @@ from helpers.district_team_manipulator import DistrictTeamManipulator
 from helpers.event_manipulator import EventManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_helper import MatchHelper
+from helpers.tbans_helper import TBANSHelper
 from helpers.notification_sender import NotificationSender
 from helpers.search_helper import SearchHelper
 from helpers.team_manipulator import TeamManipulator
@@ -36,7 +37,6 @@ from models.mobile_client import MobileClient
 from models.sitevar import Sitevar
 from models.subscription import Subscription
 from models.team import Team
-from notifications.ping import PingNotification
 
 
 class AdminMobileClearEnqueue(LoggedInHandler):
@@ -138,11 +138,10 @@ class AdminWebhooksClear(LoggedInHandler):
         webhooks = MobileClient.query(MobileClient.client_type == ClientType.WEBHOOK).fetch()
         failures = []
 
-        notification = PingNotification()._render_webhook()
-
-        for key in webhooks:
-            if not NotificationSender.send_webhook(notification, [(key.messaging_id, key.secret)]):
-                failures.append(key.key)
+        for client in webhooks:
+            response = TBANSHelper.ping_webhook(client)
+            if not response.code == 200:
+                failures.append(client.key)
 
         count = len(failures)
         if failures:

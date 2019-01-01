@@ -1,0 +1,16 @@
+service: tbans
+
+runtime: python27
+api_version: 1
+threadsafe: true
+
+builtins:
+- appstats: on
+- deferred: on
+
+handlers:
+- url: .*
+  script: tbans.tbans_service.app
+
+includes:
+- app_shared.yaml

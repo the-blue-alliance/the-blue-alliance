@@ -76,7 +76,7 @@ def main():
             modules = args.modules.split(",")
         else:
             # Full deploy
-            modules = ["app.yaml", "app-backend-tasks-b2.yaml", "app-backend-tasks.yaml", "cron.yaml", "dispatch.yaml", "index.yaml", "queue.yaml"]
+            modules = ["app.yaml", "app-backend-tasks-b2.yaml", "app-backend-tasks.yaml", "cron.yaml", "dispatch.yaml", "index.yaml", "queue.yaml", "tbans.yaml"]
         if args.skip_cron and "cron.yaml" in modules:
             modules.remove("cron.yaml")
         cmd.extend(modules)
