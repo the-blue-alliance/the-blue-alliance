@@ -3,7 +3,7 @@ from database.dict_converters.converter_base import ConverterBase
 
 class MediaConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        3: 2,
+        3: 3,
     }
 
     @classmethod
@@ -25,4 +25,6 @@ class MediaConverter(ConverterBase):
             'foreign_key': media.foreign_key,
             'details': media.details if media.details else {},
             'preferred': True if media.preferred_references != [] else False,
+            'view_image_url': media.view_image_url if media.view_image_url else None,
+            'image_direct_url': media.image_direct_url if media.image_direct_url else None,
         }
