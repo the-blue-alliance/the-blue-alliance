@@ -29,7 +29,7 @@ class MediaConverter(ConverterBase):
             'direct_url': None,
         }
         if media.slug_name == "youtube":
-            dict["direct_url"] = media.youtube_url
+            dict["direct_url"] = "http://img.youtube.com/vi/{}/hqdefault.jpg".format(media.foreign_key)
             dict["view_url"] = media.youtube_url_link
         else:
             dict["direct_url"] = media.image_direct_url
