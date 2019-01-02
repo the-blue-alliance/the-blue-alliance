@@ -5,7 +5,7 @@ We have a development container setup that uses [`vagrant`](https://www.vagrantu
 
 You should be able to install `docker` and `vagrant` from your system's package manager (Homebrew, `apt`, etc.).
 
-Ensure that the version of `vagrant` is at least `1.8.1` (run `vagrant --version` to confirm). Some linux distributions, like Debian, may not always have the newest version available in the repositories. If that's the case, you may need to install `vagrant` from [the website](https://www.vagrantup.com).
+Ensure that the version of `vagrant` is at least `2.1.0` (run `vagrant --version` to confirm). Some linux distributions, like Debian, may not always have the newest version available in the repositories. If that's the case, you may need to install `vagrant` from [the website](https://www.vagrantup.com).
 
 This is optional, but you may also want to configure running `docker` as a non-root user and to automatically start on system boot. You can find instructions [here](https://docs.docker.com/engine/installation/linux/linux-postinstall/).
 
