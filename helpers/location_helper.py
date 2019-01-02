@@ -500,7 +500,7 @@ class LocationHelper(object):
             google_secrets = Sitevar.get_by_id("google.secrets")
             google_api_key = None
             if google_secrets is None:
-                logging.warning("Missing sitevar: google.api_key. API calls rate limited by IP and may be over rate limit.")
+                raise ndb.Return([])
             else:
                 google_api_key = google_secrets.contents['api_key']
 
@@ -510,6 +510,8 @@ class LocationHelper(object):
             }
             if google_api_key:
                 geocode_params['key'] = google_api_key
+            else:
+                raise ndb.Return([])
             geocode_url = 'https://maps.googleapis.com/maps/api/geocode/json?%s' % urllib.urlencode(geocode_params)
             try:
                 geocode_results = yield context.urlfetch(geocode_url)
