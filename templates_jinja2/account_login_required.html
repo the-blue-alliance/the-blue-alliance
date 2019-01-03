@@ -13,7 +13,7 @@
 
       <div class="row">
         <div class="col-md-6">
-          <p>Your account settings will be accessible both on <a href="/">www.thebluealliance.com</a> and our <a href="https://play.google.com/store/apps/details?id=com.thebluealliance.androidclient" target="_blank">Android app</a>.</p>
+          {% include "mytba_partials/mytba_settings.html" %}
         </div>
         <div class="col-md-6">
           <a href="/login{% if redirect %}?redirect={{redirect|urlencode}}{% endif %}" class="btn btn-success btn-block" role="button">Take me to the login page!</a>
@@ -26,7 +26,7 @@
       <h3>myTBA</h3>
       <p>Signing in enables myTBA, which lets you customize your experience when using The Blue Alliance.</p>
       <p><strong><span class="glyphicon glyphicon-star"></span> Favorites</strong> are used for personalized content and quick access.</p>
-      <p><strong><span class="glyphicon glyphicon-bell"></span> Subscriptions</strong> are used for push notifications (Android only).</p>
+      <p><strong><span class="glyphicon glyphicon-bell"></span> Subscriptions</strong> are used for push notifications.</p>
 
       <hr>
 

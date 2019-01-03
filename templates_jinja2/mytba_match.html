@@ -17,8 +17,7 @@
       <h1>myTBA Match: {{match.key.id()}}</h1>
       <p>
         Favorite this team for personalized content and quick access to it later.<br>
-        Subscribe to this team for push notifications in our
-        <a href="https://play.google.com/store/apps/details?id=com.thebluealliance.androidclient" target="_blank">Android app</a>.
+        {% include "mytba_partials/mytba_push.html" %}
       </p>
 
       <form method="post">
