@@ -54,7 +54,7 @@ class TeamAdminDashboard(LoggedInHandler):
             for access in existing_access
         ]
         if not team_keys:
-            self.abort(403)
+            self.redirect('/mod/redeem')
             return
         years = set([access.year for access in existing_access])
         teams_future = ndb.get_multi_async(team_keys)
@@ -204,15 +204,3 @@ class TeamAdminRedeem(LoggedInHandler):
 
         self.redirect('/mod/redeem?status=success&team={}'.format(
             access.team_number))
-
-
-class ModHelpHandler(CacheableHandler):
-    CACHE_VERSION = 1
-    CACHE_KEY_FORMAT = "mod_help"
-
-    def __init__(self, *args, **kw):
-        super(ModHelpHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24 * 7
-
-    def _render(self, *args, **kw):
-        return jinja2_engine.render('modhelp.html', self.template_values)
