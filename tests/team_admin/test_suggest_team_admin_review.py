@@ -10,7 +10,7 @@ from webapp2_extras.routes import RedirectRoute
 
 from consts.account_permissions import AccountPermissions
 from consts.media_type import MediaType
-from controllers.team_admin_controller import TeamAdminDashboard
+from controllers.team_admin_controller import TeamAdminDashboard, TeamAdminRedeem
 from controllers.suggestions.suggest_designs_review_controller import SuggestDesignsReviewController
 from controllers.suggestions.suggest_team_media_review_controller import \
     SuggestTeamMediaReviewController
@@ -44,6 +44,11 @@ class TestSuggestTeamAdminSuggestionReview(unittest2.TestCase):
                 RedirectRoute(
                     r'/mod',
                     TeamAdminDashboard,
+                    'team-admin',
+                    strict_slash=True),
+                RedirectRoute(
+                    r'/mod/redeem',
+                    TeamAdminRedeem,
                     'team-admin',
                     strict_slash=True),
                 RedirectRoute(
@@ -143,14 +148,16 @@ class TestSuggestTeamAdminSuggestionReview(unittest2.TestCase):
 
     def test_no_access(self):
         self.loginUser()
-        response = self.testapp.get('/mod', status='403', expect_errors=True)
-        self.assertEqual(response.status_int, 403)
+        response = self.testapp.get('/mod', status='3*').follow()
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.request.path, "/mod/redeem")
 
     def test_expired_access(self):
         self.loginUser()
         self.giveTeamAdminAccess(expiration_days=-1)
-        response = self.testapp.get('/mod', status='403', expect_errors=True)
-        self.assertEqual(response.status_int, 403)
+        response = self.testapp.get('/mod', status='3*').follow()
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.request.path, "/mod/redeem")
 
     def test_nothing_to_review(self):
         self.loginUser()
