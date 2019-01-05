@@ -8,11 +8,7 @@
 {% block content %}
 <div class="container">
 <h1>Team Admin Dashboard</h1>
-<p>
-  <a class="btn btn-info" href="/mod/help">Help</a>
-  <a class="btn btn-primary" href="mod/redeem">Redeem</a>
-</p>
-<h3>Hi {{user_bundle.account.display_name}}, you have moderator access for {{teams|length}} team{% if teams|length > 1%}s{%endif%}</h3>
+<h3>Hi, {{user_bundle.account.display_name}}, you have administrative access for {{teams|length}} team{% if teams|length > 1%}s{%endif%}</h3>
 <ul>
   {% for team_link in existing_access %}
     <li><a href="/team/{{team_link.team_number}}/{{team_link.year}}">Team {{team_link.team_number}} - {{teams[team_link.team_number].nickname}} ({{team_link.year}})</a></li>
@@ -26,6 +22,7 @@
   {% for team_link in existing_access %}
     <li><a href="#frc{{team_link.team_number}}" data-toggle="tab">Team {{team_link.team_number}} Media</a></li>
   {% endfor %}
+  <li><a href="#help" data-toggle="tab">Help</a></li>
 </ul>
 </div>
 </div>
@@ -110,6 +107,48 @@
   </div>
   </div>
 {% endfor %}
+
+
+<div class="tab-pane" id="help">
+  <div class="row">
+    <h2>Team Administration Help</h2>
+    <p>Team Administration on The Blue Alliance allows an authorized team member to manage social media links, as well
+    as approve or reject new team media.</p>
+
+    <h3>Team Media Suggestions</h3>
+    <p>Approved team administrators have the ability to approve or reject any team media, images, video, CAD, or social
+    media links pending for the team in the current competition year. Any items pending approval will be shown on the
+    <strong>Suggestion Queue</strong> tab.</p>
+    <p>For images, in addition to approving or rejecting the media, The Blue Alliance allows images to be marked
+    <strong>preferred</strong>. Preferred images are highlighted at the top of your team page, and is shown next to
+    your team in the team event list. Preferred media should be quality pictures of your robot, with nothing else in the
+    foreground. Preferred images will likely be one of the first pictures visitors on TBA see for your team.</p>
+    <p>Please note, if you have multiple kinds of media pending approval, you should make sure to do each section
+    separately, and click the <strong>Act on...</strong> button at the end of each section before continuing.</p>
+
+    <h3>Administering Existing Media</h3>
+    <p>Team administrators can review the existing media for their team on the <strong>Team Media</strong> tab. From
+    this tab media can be removed, or in the case of images, you can toggle whether that image is preferred.</p>
+
+    <h3>Adding Team Media</h3>
+    <p>To add team media, videos, CAD models, or Social Media links, visit your team page and click on one of the
+    <strong>Add Media</strong> buttons to make a suggestion. That suggestion will then appear on the
+    <strong>Suggestion Queue</strong> tab.</p>
+
+    <h3>Content Guidelines</h3>
+    <p>Team administrators are asked to follow The Blue Alliance content guidelines for all approved links and media.</p>
+    <p>For team media, please do not approve:</p>
+    <ul>
+      <li>Full match videos</li>
+      <li>Long, drawn out videos with little to no real content</li>
+      <li>GIFs</li>
+      <li>Images without a robot</li>
+    </ul>
+
+    <h3>Need More Help?</h3>
+    <p>For additional support, please <a href="/contact">contact us</a>.</p>
+  </div>
+</div>
 
 </div>
 </div>
