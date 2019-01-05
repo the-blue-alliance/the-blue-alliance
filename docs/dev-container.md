@@ -39,4 +39,24 @@ Before you submit your code changes, you should run the project test suite to ma
 
 ### Reprovision Your Container
 
-If you run into issues, especially after not working with your dev instance for a while, try reprovisioning and restarting your container with `vagrant destroy && vagrant up`
+If you run into issues, especially after not working with your dev instance for a while, try reprovisioning and restarting your container.
+
+```
+$ vagrant halt
+$ vagrant destroy
+$ vagrant up --provider=docker
+```
+
+If you have problems destroying your container via Vagrant, you can remove the container via Docker.
+
+```
+$ docker stop tba
+$ docker rm tba
+$ vagrant up --provider=docker
+```
+
+The name of your Docker container should always be `tba`. If it's not, you can find it by listing all containers.
+
+```
+$ docker container ls
+```
