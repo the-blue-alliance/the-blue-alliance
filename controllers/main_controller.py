@@ -149,7 +149,9 @@ class MainBuildseasonHandler(CacheableHandler):
         self._cache_expiration = 60 * 5
 
     def _render(self, *args, **kw):
-        endbuild_datetime_est = datetime.datetime(2018, 2, 20, 23, 59)
+        endbuild_datetime_est = datetime.datetime.strptime(
+            self.template_values['build_season_end'], "%Y-%m-%dT%H:%M:%S"
+        ) if 'build_season_end' in self.template_values else None
         endbuild_datetime_utc = pytz.utc.localize(
             endbuild_datetime_est + datetime.timedelta(hours=5))
         week_events = EventHelper.getWeekEvents()
