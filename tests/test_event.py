@@ -114,8 +114,3 @@ class TestEvent(unittest2.TestCase):
     def test_dates_ends_today(self):
         self.assertFalse(self.event_ends_today.starts_today)
         self.assertTrue(self.event_ends_today.ends_today)
-
-    def test_online_webcast(self):
-        self.assertIsNone(self.event_starts_today.online_webcast)
-        self.event_starts_today.webcast_json = "[{\"type\": \"livestream\", \"file\": \"3938197\", \"channel\": \"12224997\"}]"
-        self.assertIsNotNone(self.event_starts_today.online_webcast)

@@ -22,6 +22,7 @@ class UserNotificationBroadcast(LoggedInHandler):
             client_id = self.request.get('client_id')
             client = MobileClient.get_by_id(int(client_id), parent=ndb.Key(Account, current_user_account_id))
             if client is not None:
+                # This makes sure that the client actually exists and that this user owns it
                 NotificationHelper.send_ping(client)
                 return self.redirect('/account?ping_sent=1')
         self.redirect('/')

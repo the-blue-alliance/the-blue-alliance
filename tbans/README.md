@@ -339,9 +339,3 @@ $ curl -X POST -H 'Content-Type: application/json' -d '{
 Notifications are best tested via the web notifications or webhooks. This documentation will be updated when the web supports notifications to provide instructions on how to test. Webhooks can be tested via [ngrok](https://ngrok.com/download), or the steps outlined in the [testing section of our webhook documentation](https://www.thebluealliance.com/apidocs/webhooks#testing).
 
 As a note, until https://issuetracker.google.com/issues/35901176 is solved, only hit HTTP webhooks, unless you're able to do the suggested workaround.
-
-## Running Tests
-
-To test only the TBANS related code, we can point unittest at the specific test directory.
-
-`python -m unittest discover tests.tbans`
