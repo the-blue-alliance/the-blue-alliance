@@ -4,6 +4,7 @@ import json
 from consts.client_type import ClientType
 from consts.notification_type import NotificationType
 
+from helpers.tbans_helper import TBANSHelper
 from helpers.push_helper import PushHelper
 
 from models.event import Event
@@ -20,7 +21,6 @@ from notifications.upcoming_match import UpcomingMatchNotification
 from notifications.update_favorites import UpdateFavoritesNotification
 from notifications.update_subscriptions import UpdateSubscriptionsNotification
 from notifications.ping import PingNotification
-from notifications.verification import VerificationNotification
 
 
 class NotificationHelper(object):
@@ -155,17 +155,9 @@ class NotificationHelper(object):
 
     @classmethod
     def send_ping(cls, client):
-        if client.client_type == ClientType.WEBHOOK:
-            keys = {client.client_type: [(client.messaging_id, client.secret)]}
+        if client.client_type == ClientType.OS_ANDROID:
+            notification = PingNotification()
+            notification.send({client.client_type: [client.messaging_id]})
         else:
-            keys = {client.client_type: [client.messaging_id]}
-
-        notification = PingNotification()
-        notification.send(keys)
-
-    @classmethod
-    def verify_webhook(cls, url, secret):
-        key = {ClientType.WEBHOOK: [(url, secret)]}
-        notification = VerificationNotification(url, secret)
-        notification.send(key)
-        return notification.verification_key
+            # Send iOS/web/webhooks ping via TBANS
+            return TBANSHelper.ping(client)

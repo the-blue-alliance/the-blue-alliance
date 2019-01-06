@@ -24,6 +24,5 @@ class UserNotificationBroadcast(LoggedInHandler):
             if client is not None:
                 # This makes sure that the client actually exists and that this user owns it
                 NotificationHelper.send_ping(client)
-            self.redirect('/account')
-        else:
-            self.redirect('/')
+                return self.redirect('/account?ping_sent=1')
+        self.redirect('/')

@@ -7,7 +7,7 @@ from google.appengine.ext.webapp import template
 from base_controller import LoggedInHandler
 from consts.client_type import ClientType
 from consts.notification_type import NotificationType
-from helpers.notification_helper import NotificationHelper
+from helpers.tbans_helper import TBANSHelper
 from models.account import Account
 from models.mobile_client import MobileClient
 
@@ -31,7 +31,7 @@ class WebhookAdd(LoggedInHandler):
             query = MobileClient.query(MobileClient.messaging_id == url, ancestor=ndb.Key(Account, current_user_account_id))
             if query.count() == 0:
                 # Webhook doesn't exist, add it
-                verification_key = NotificationHelper.verify_webhook(url, secret_key)
+                response = TBANSHelper.verify_webhook(url, secret_key)
                 client = MobileClient(
                     parent=self.user_bundle.account.key,
                     user_id=current_user_account_id,
@@ -40,7 +40,7 @@ class WebhookAdd(LoggedInHandler):
                     secret=secret_key,
                     client_type=ClientType.WEBHOOK,
                     verified=False,
-                    verification_code=verification_key)
+                    verification_code=response.verification_key)
                 client.put()
             else:
                 # Webhook already exists. Update the secret
@@ -111,8 +111,8 @@ class WebhookVerificationSend(LoggedInHandler):
             client_id = self.request.get('client_id')
             webhook = MobileClient.get_by_id(int(client_id), parent=ndb.Key(Account, current_user_account_id))
             if webhook.client_type == ClientType.WEBHOOK and current_user_account_id == webhook.user_id:
-                verification_key = NotificationHelper.verify_webhook(webhook.messaging_id, webhook.secret)
-                webhook.verification_code = verification_key
+                response = TBANSHelper.verify_webhook(webhook.messaging_id, webhook.secret)
+                webhook.verification_code = response.verification_key
                 webhook.verified = False
                 webhook.put()
                 self.redirect('/account')

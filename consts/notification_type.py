@@ -1,6 +1,7 @@
 class NotificationType(object):
     """
     Constants regarding the different types of notification we can send to a device
+
     See https://docs.google.com/document/d/1SV-hNCtgAn2hSMZaC973UdLHCFXCNpvq_RKq0UoY4yg/edit#
     """
 
