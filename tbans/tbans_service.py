@@ -1,6 +1,8 @@
 import logging
 import tba_config
 
+from google.appengine.api.app_identity import app_identity
+
 from protorpc import remote
 from protorpc.wsgi import service
 
