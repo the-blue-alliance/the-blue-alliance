@@ -18,6 +18,7 @@ from consts.media_tag import MediaTag
 from consts.media_type import MediaType
 from database import media_query
 from helpers.event_helper import EventHelper
+from helpers.season_helper import SeasonHelper
 from helpers.firebase.firebase_pusher import FirebasePusher
 from models.award import Award
 from models.event import Event
@@ -151,7 +152,7 @@ class MainBuildseasonHandler(CacheableHandler):
     def _render(self, *args, **kw):
         endbuild_datetime_est = datetime.datetime.strptime(
             self.template_values['build_season_end'], "%Y-%m-%dT%H:%M:%S"
-        ) if 'build_season_end' in self.template_values else None
+        ) if 'build_season_end' in self.template_values else SeasonHelper.stop_build_date()
         endbuild_datetime_utc = pytz.utc.localize(
             endbuild_datetime_est + datetime.timedelta(hours=5))
         week_events = EventHelper.getWeekEvents()
