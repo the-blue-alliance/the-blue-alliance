@@ -60,7 +60,10 @@ class FMSAPITeamDetailsParser(object):
                 )
 
             robot = None
-            if teamData['robotName']:
+            if teamData['robotName'] and self.year not in [2019]:
+                # FIRST did not support entering robot names  in 2019, so the
+                # data returned in the API that year is garbage. So let's not
+                # import it, with the hope that it'll come back in the future
                 robot = Robot(
                     id=Robot.renderKeyName(team.key_name, self.year),
                     team=ndb.Key(Team, team.key_name),
