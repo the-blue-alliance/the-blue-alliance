@@ -20,6 +20,7 @@ from helpers.suggestions.media_creator import MediaCreator
 from helpers.suggestions.suggestion_creator import SuggestionCreator
 from models.account import Account
 from models.media import Media
+from models.robot import Robot
 from models.suggestion import Suggestion
 from models.team import Team
 from models.team_admin_access import TeamAdminAccess
@@ -137,6 +138,14 @@ class TestSuggestTeamAdminSuggestionReview(unittest2.TestCase):
         self.assertEqual(response.status_int, 200)
 
         form = response.forms.get('{}_{}'.format(action, media_key_name), None)
+        self.assertIsNotNone(form)
+        return form
+
+    def getTeamInfoForm(self, team_number):
+        response = self.testapp.get('/mod')
+        self.assertEqual(response.status_int, 200)
+
+        form = response.forms.get('team-info-frc{}'.format(team_number), None)
         self.assertIsNotNone(form)
         return form
 
@@ -262,6 +271,65 @@ class TestSuggestTeamAdminSuggestionReview(unittest2.TestCase):
         media = media_id.get()
         self.assertTrue(team_reference in media.references)
         self.assertFalse(team_reference in media.preferred_references)
+
+    """
+    Test modifying team properties
+    """
+
+    def test_set_robot_name(self):
+        self.loginUser()
+        self.giveTeamAdminAccess()
+
+        # There is no Robot models that exists yet for this team
+        form = self.getTeamInfoForm(1124)
+        form['robot_name'] = 'Test Robot Name'
+        response = form.submit().follow()
+        self.assertEqual(response.status_int, 301)
+
+        robot = Robot.get_by_id(Robot.renderKeyName('frc1124', self.now.year))
+        self.assertIsNotNone(robot)
+        self.assertEqual(robot.robot_name, 'Test Robot Name')
+
+    def test_update_robot_name(self):
+        self.loginUser()
+        self.giveTeamAdminAccess()
+
+        Robot(
+            id=Robot.renderKeyName(self.team.key_name, self.now.year),
+            team=self.team.key,
+            year=self.now.year,
+            robot_name='First Robot Name',
+        ).put()
+
+        form = self.getTeamInfoForm(1124)
+        self.assertEqual(form['robot_name'].value, 'First Robot Name')
+        form['robot_name'] = 'Second Robot Name'
+        response = form.submit().follow()
+        self.assertEqual(response.status_int, 301)
+
+        robot = Robot.get_by_id(Robot.renderKeyName('frc1124', self.now.year))
+        self.assertIsNotNone(robot)
+        self.assertEqual(robot.robot_name, 'Second Robot Name')
+
+    def test_delete_robot_name(self):
+        self.loginUser()
+        self.giveTeamAdminAccess()
+
+        Robot(
+            id=Robot.renderKeyName(self.team.key_name, self.now.year),
+            team=self.team.key,
+            year=self.now.year,
+            robot_name='First Robot Name',
+        ).put()
+
+        form = self.getTeamInfoForm(1124)
+        self.assertEqual(form['robot_name'].value, 'First Robot Name')
+        form['robot_name'] = ''
+        response = form.submit().follow()
+        self.assertEqual(response.status_int, 301)
+
+        robot = Robot.get_by_id(Robot.renderKeyName('frc1124', self.now.year))
+        self.assertIsNone(robot)
 
     """
     Test accepting/rejecting suggestions for the given team

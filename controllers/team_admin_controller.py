@@ -157,14 +157,17 @@ class TeamAdminDashboard(LoggedInHandler):
         elif action == "set_team_info":
             robot_name = self.request.get("robot_name").strip()
             current_year = datetime.datetime.now().year
+            robot_key = Robot.renderKeyName(team.key_name, current_year)
             if robot_name:
                 robot = Robot(
-                    id=Robot.renderKeyName(team.key_name, current_year),
+                    id=robot_key,
                     team=team.key,
                     year=current_year,
                     robot_name=robot_name,
                 )
                 RobotManipulator.createOrUpdate(robot)
+            else:
+                RobotManipulator.delete_keys([ndb.Key(Robot, robot_key)])
         else:
             self.abort(400)
 
