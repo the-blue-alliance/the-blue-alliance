@@ -18,6 +18,7 @@
 <div class="row">
 <div class="col-sm-12">
 <ul class="nav nav-tabs">
+  <li><a href="#team-info" data-toggle="tab">Team Info</a></li>
   <li class="active"><a href="#queue" data-toggle="tab">Suggestion Queue</a></li>
   {% for team_link in existing_access %}
     <li><a href="#frc{{team_link.team_number}}" data-toggle="tab">Team {{team_link.team_number}} Media</a></li>
@@ -29,6 +30,45 @@
 </div>
 
 <div class="tab-content">
+
+<div class="tab-pane" id="team-info">
+<div class="row">
+  <div class="alert alert-info">
+    <p>Most team information is imported directly from <i>FIRST</i> and is unable to be modifed directly on TBA. This data is editable by the team's Lead Mentor 1 or 2 on the
+    <a href="https://my.firstinspires.org/Dashboard/"><i>FIRST</i> Inspires Dashboard</a> for the team.
+  </div>
+  {% for team_link in existing_access %}
+  <h2>Team {{team_link.team_number}}</h2>
+  <form action="/mod" method="post" id="team-info-frc{{team_link.team_number}}">
+    <input type="hidden" name="team_number" value="{{team_link.team_number}}" />
+    <input name="action" type="hidden" value="set_team_info" />
+    <table class="table table-striped table-hover">
+        <tr>
+            <th>Name</th>
+            <td><input class="form-control" value="{{teams[team_link.team_number].name}}" disabled/></td>
+        </tr>
+        <tr>
+            <th>Nickname</th>
+            <td><input class="form-control" value="{{teams[team_link.team_number].nickname}}" disabled/></td>
+        </tr>
+        <tr>
+            <th>Website</th>
+            <td><input class="form-control" value="{{teams[team_link.team_number].website}}" disabled/></td>
+        </tr>
+        <tr>
+            <th>Robot Name</th>
+            <td><input class="form-control" name="robot_name" placeholder="Robot Name" value="{{robot_names_by_team[team_link.team_number]}}"/></td>
+        </tr>
+    </table>
+    <div class="alert alert-warning">
+      <p>Changes may take up to 24 hours to appear everywhere, due to the way web browsers cache pages. Don't be alarmed if changes don't appear on your team page immediately</p>
+    </div>
+    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
+  </form>
+  {% endfor %}
+</div>
+</div>
+
 <div class="tab-pane active" id="queue">
 <div class="row">
   {% for team_link in existing_access %}
@@ -159,10 +199,6 @@
     <p>Currently, accounts can only administer one team per season. We know this is important for several teams and
     mentors. In the meantime, we do not restrict users to one account, so if you have multiple TBA accounts you can
     administer other teams, one per additional account.</p>
-
-    <h5>How do I Update Our Robot Name?</h5>
-    <p>Team Administration functions are limited to the data that is within The Blue Alliance's control. We do not
-    allow team administrators to edit data give to us by <i>FIRST</i>. This includes your robot name.</p>
 
     <h5>Our Website URL Has Changed. How Do I Change it on TBA?</h5>
     <p>Your website link is another piece of data we get directly from <i>FIRST</i> and therefore do not allow you to edit.</p>

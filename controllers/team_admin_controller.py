@@ -7,8 +7,10 @@ from base_controller import CacheableHandler, LoggedInHandler
 from database import media_query
 from google.appengine.ext import ndb
 from helpers.media_manipulator import MediaManipulator
+from helpers.robot_manipulator import RobotManipulator
 from helpers.media_helper import MediaHelper
 from models.media import Media
+from models.robot import Robot
 from models.suggestion import Suggestion
 from models.team import Team
 from models.team_admin_access import TeamAdminAccess
@@ -58,6 +60,10 @@ class TeamAdminDashboard(LoggedInHandler):
             return
         years = set([access.year for access in existing_access])
         teams_future = ndb.get_multi_async(team_keys)
+        robot_keys = [
+            ndb.Key(Robot, Robot.renderKeyName(team.id(), now.year)) for team in team_keys
+        ]
+        robots_future = ndb.get_multi_async(robot_keys)
         social_media_futures = [
             media_query.TeamSocialMediaQuery(team_key.id()).fetch_async()
             for team_key in team_keys
@@ -75,6 +81,10 @@ class TeamAdminDashboard(LoggedInHandler):
         team_num_to_team = {
             team.get_result().team_number: team.get_result()
             for team in teams_future
+        }
+        team_num_to_robot_name = {
+            int(robot.get_result().team.id()[3:]): robot.get_result().robot_name
+            for robot in robots_future if robot.get_result() is not None
         }
         team_medias = defaultdict(lambda: defaultdict(list))
         for media in team_medias_future.get_result():
@@ -104,6 +114,7 @@ class TeamAdminDashboard(LoggedInHandler):
         self.template_values.update({
             "existing_access": existing_access,
             "teams": team_num_to_team,
+            "robot_names_by_team": team_num_to_robot_name,
             "team_medias": team_medias,
             "team_social_medias": team_social_medias,
             "suggestions_by_team": suggestions_by_team,
@@ -120,30 +131,55 @@ class TeamAdminDashboard(LoggedInHandler):
         if not team_number:
             self.abort(400)
         team_number = int(team_number)
+        team = Team.get_by_id("frc{}".format(team_number))
+        if not team:
+            self.abort(400)
         self._require_team_admin_access(team_number)
 
+        action = self.request.get('action')
+        if action == "remove_media_reference":
+            media, team_ref = self.get_media_and_team_ref(team_number)
+            if team_ref in media.references:
+                media.references.remove(team_ref)
+            if team_ref in media.preferred_references:
+                media.preferred_references.remove(team_ref)
+            MediaManipulator.createOrUpdate(media, auto_union=False)
+        elif action == "remove_media_preferred":
+            media, team_ref = self.get_media_and_team_ref(team_number)
+            if team_ref in media.preferred_references:
+                media.preferred_references.remove(team_ref)
+            MediaManipulator.createOrUpdate(media, auto_union=False)
+        elif action == "add_media_preferred":
+            media, team_ref = self.get_media_and_team_ref(team_number)
+            if team_ref not in media.preferred_references:
+                media.preferred_references.append(team_ref)
+            MediaManipulator.createOrUpdate(media, auto_union=False)
+        elif action == "set_team_info":
+            robot_name = self.request.get("robot_name").strip()
+            current_year = datetime.datetime.now().year
+            robot_key = Robot.renderKeyName(team.key_name, current_year)
+            if robot_name:
+                robot = Robot(
+                    id=robot_key,
+                    team=team.key,
+                    year=current_year,
+                    robot_name=robot_name,
+                )
+                RobotManipulator.createOrUpdate(robot)
+            else:
+                RobotManipulator.delete_keys([ndb.Key(Robot, robot_key)])
+        else:
+            self.abort(400)
+
+        self.redirect('/mod/')
+
+    def get_media_and_team_ref(self, team_number):
         media_key_name = self.request.get("media_key_name")
         media = Media.get_by_id(media_key_name)
         if not media:
             self.abort(400)
         team_ref = Media.create_reference('team', 'frc{}'.format(team_number))
-        action = self.request.get('action')
-        if action == "remove_media_reference":
-            if team_ref in media.references:
-                media.references.remove(team_ref)
-            if team_ref in media.preferred_references:
-                media.preferred_references.remove(team_ref)
-        elif action == "remove_media_preferred":
-            if team_ref in media.preferred_references:
-                media.preferred_references.remove(team_ref)
-        elif action == "add_media_preferred":
-            if team_ref not in media.preferred_references:
-                media.preferred_references.append(team_ref)
-        else:
-            self.abort(400)
-
-        MediaManipulator.createOrUpdate(media, auto_union=False)
-        self.redirect('/mod/')
+        return media, team_ref
 
 
 class TeamAdminRedeem(LoggedInHandler):
