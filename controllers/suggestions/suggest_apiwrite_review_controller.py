@@ -44,7 +44,7 @@ class SuggestApiWriteReviewController(SuggestionsReviewBaseController):
             expiration = None
         auth = ApiAuthAccess(
             id=auth_id,
-            description="{} @ {}".format(user.display_name.encode('utf-8'), suggestion.contents['event_key']),
+            description=u"{} @ {}".format(user.display_name, suggestion.contents['event_key']).encode('utf-8'),
             secret=''.join(
                 random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _
                 in range(64)),
@@ -54,7 +54,7 @@ class SuggestApiWriteReviewController(SuggestionsReviewBaseController):
             expiration=expiration
         )
         auth.put()
-        return auth_id, user, event_key, """Hi {},
+        return auth_id, user, event_key, u"""Hi {},
 
 We graciously accept your request for auth tokens so you can add data to the following event: {} {}
 
@@ -64,7 +64,7 @@ If you have any questions, please don't heasitate to reach out to us at contact@
 
 Thanks,
 TBA Admins
-            """.format(user.display_name.encode('utf-8'), event.year, event.name, message)
+            """.format(user.display_name, event.year, event.name, message).encode('utf-8')
 
     def get(self):
         suggestions = Suggestion.query().filter(
@@ -94,12 +94,12 @@ TBA Admins
         if verdict == "accept":
             status = 'accept'
             auth_id, user, event_key, email_body = self._process_accepted(suggestion_id)
-            admin_email_body = """{} ({}) has accepted the request with the following message:
+            admin_email_body = u"""{} ({}) has accepted the request with the following message:
 {}
 
 View the key: https://www.thebluealliance.com/admin/api_auth/edit/{}
 
-""".format(self.user_bundle.account.display_name.encode('utf-8'), self.user_bundle.account.email, message, auth_id)
+""".format(self.user_bundle.account.display_name, self.user_bundle.account.email, message, auth_id).encode('utf-8')
 
         elif verdict == "reject":
             suggestion = Suggestion.get_by_id(suggestion_id)
@@ -109,7 +109,7 @@ View the key: https://www.thebluealliance.com/admin/api_auth/edit/{}
             self._process_rejected(suggestion.key.id())
 
             status = 'reject'
-            email_body = """Hi {},
+            email_body = u"""Hi {},
 
 We have reviewed your request for auth tokens for {} {} and have regretfully declined to issue keys with the following message:
 
@@ -119,11 +119,11 @@ If you have any questions, please don't hesitate to reach out to us at contact@t
 
 Thanks,
 TBA Admins
-""".format(user.display_name.encode('utf-8'), event.year, event.name, message)
+""".format(user.display_name, event.year, event.name, message).encode('utf-8')
 
-            admin_email_body = """{} ({}) has rejected this request with the following reason:
+            admin_email_body = u"""{} ({}) has rejected this request with the following reason:
 {}
-""".format(self.user_bundle.account.display_name.encode('utf-8'), self.user_bundle.account.email, message)
+""".format(self.user_bundle.account.display_name, self.user_bundle.account.email, message).encode('utf-8')
 
         # Notify the user their keys are available
         if email_body:

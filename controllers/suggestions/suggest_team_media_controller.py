@@ -78,11 +78,11 @@ class SuggestTeamMediaController(LoggedInHandler):
                 slack_url = slack_sitevar.contents.get('tbablog', '')
                 if slack_url:
                     model_details = json.loads(suggestion.contents['details_json'])
-                    message_body = "{0} ({1}) has suggested a CAD model for team <https://www.thebluealliance.com/team/{2}/{3}|{2} in {3}>.".format(
-                        self.user_bundle.account.display_name.encode('utf-8'),
+                    message_body = u"{0} ({1}) has suggested a CAD model for team <https://www.thebluealliance.com/team/{2}/{3}|{2} in {3}>.".format(
+                        self.user_bundle.account.display_name,
                         self.user_bundle.account.email,
                         team_key[3:],
-                        year_str)
+                        year_str).encode('utf-8')
                     image_attachment = {
                         "footer": "<https://www.thebluealliance.com/suggest/cad/review|See all suggestions> on The Blue Alliance",
                         "fallback": "CAD model",
