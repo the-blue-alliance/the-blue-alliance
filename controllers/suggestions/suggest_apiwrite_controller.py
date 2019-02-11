@@ -45,5 +45,5 @@ class SuggestApiWriteController(LoggedInHandler):
 View the event at https://www.thebluealliance.com/event/{}
 
 Review the request at https://www.thebluealliance.com/suggest/apiwrite/review
-""".format(user_bundle.account.display_name, user_bundle.account.email, event_key, event_key)
+""".format(user_bundle.account.display_name.encode('utf-8'), user_bundle.account.email, event_key, event_key)
         return subject, body

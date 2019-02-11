@@ -62,7 +62,7 @@ class SuggestDesignsReviewController(SuggestionsReviewBaseController):
                     self._process_accepted(suggestion.key.id())
                     status = 'accepted'
                     slack_message = "{0} ({1}) accepted the <https://grabcad.com/library/{2}|suggestion> for team <https://www.thebluealliance.com/team/{3}/{4}|{3} in {4}>".format(
-                        self.user_bundle.account.display_name,
+                        self.user_bundle.account.display_name.encode('utf-8'),
                         self.user_bundle.account.email,
                         suggestion.contents['foreign_key'],
                         suggestion.contents['reference_key'][3:],
@@ -72,7 +72,7 @@ class SuggestDesignsReviewController(SuggestionsReviewBaseController):
                     self._process_rejected(suggestion.key.id())
                     status = 'rejected'
                     slack_message = "{0} ({1}) rejected the <https://grabcad.com/library/{2}|suggestion> for team <https://www.thebluealliance.com/team/{3}/{4}|{3} in {4}>".format(
-                        self.user_bundle.account.display_name,
+                        self.user_bundle.account.display_name.encode('utf-8'),
                         self.user_bundle.account.email,
                         suggestion.contents['foreign_key'],
                         suggestion.contents['reference_key'][3:],

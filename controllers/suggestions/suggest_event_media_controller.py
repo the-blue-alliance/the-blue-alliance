@@ -55,7 +55,7 @@ class SuggestEventMediaController(LoggedInHandler):
                 slack_url = slack_sitevar.contents.get('fun', '')
                 if slack_url:
                     message_body = "{0} ({1}) has suggested a video for <https://www.thebluealliance.com/event/{2}|{2}>: https://youtu.be/{3}.\nSee all suggestions at https://www.thebluealliance.com/suggest/event/media/review".format(
-                        self.user_bundle.account.display_name,
+                        self.user_bundle.account.display_name.encode('utf-8'),
                         self.user_bundle.account.email,
                         event_key,
                         suggestion.contents['foreign_key'])

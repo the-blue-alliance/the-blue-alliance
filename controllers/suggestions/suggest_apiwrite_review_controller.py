@@ -44,7 +44,7 @@ class SuggestApiWriteReviewController(SuggestionsReviewBaseController):
             expiration = None
         auth = ApiAuthAccess(
             id=auth_id,
-            description="{} @ {}".format(user.display_name, suggestion.contents['event_key']),
+            description="{} @ {}".format(user.display_name.encode('utf-8'), suggestion.contents['event_key']),
             secret=''.join(
                 random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _
                 in range(64)),
@@ -64,7 +64,7 @@ If you have any questions, please don't heasitate to reach out to us at contact@
 
 Thanks,
 TBA Admins
-            """.format(user.display_name, event.year, event.name, message)
+            """.format(user.display_name.encode('utf-8'), event.year, event.name, message)
 
     def get(self):
         suggestions = Suggestion.query().filter(
@@ -99,7 +99,7 @@ TBA Admins
 
 View the key: https://www.thebluealliance.com/admin/api_auth/edit/{}
 
-""".format(self.user_bundle.account.display_name, self.user_bundle.account.email, message, auth_id)
+""".format(self.user_bundle.account.display_name.encode('utf-8'), self.user_bundle.account.email, message, auth_id)
 
         elif verdict == "reject":
             suggestion = Suggestion.get_by_id(suggestion_id)
@@ -119,11 +119,11 @@ If you have any questions, please don't hesitate to reach out to us at contact@t
 
 Thanks,
 TBA Admins
-""".format(user.display_name, event.year, event.name, message)
+""".format(user.display_name.encode('utf-8'), event.year, event.name, message)
 
             admin_email_body = """{} ({}) has rejected this request with the following reason:
 {}
-""".format(self.user_bundle.account.display_name, self.user_bundle.account.email, message)
+""".format(self.user_bundle.account.display_name.encode('utf-8'), self.user_bundle.account.email, message)
 
         # Notify the user their keys are available
         if email_body:
