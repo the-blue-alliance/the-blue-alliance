@@ -14,7 +14,7 @@ basic_scaling:
 
 libraries:
 - name: django
-  version: "1.5"
+  version: "1.11"
 - name: numpy
   version: "1.6.1"
 - name: jinja2
