@@ -152,7 +152,7 @@ class ApiBaseController(CacheableHandler):
                 self.auth_owner = 'The Blue Alliance'
             else:
                 self._errors = {"Error": "X-TBA-Auth-Key is a required header or URL param. Please get an access key at http://www.thebluealliance.com/account."}
-                self.abort(400)
+                self.abort(401)
 
         if self.auth_owner:
             logging.info("Auth owner: {}, LOGGED IN".format(self.auth_owner))
