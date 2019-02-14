@@ -1,5 +1,5 @@
 # Packages that are needed for testing on Travis
-Django==1.4.3
+Django==1.11
 Paver==1.1.1
 WebTest==2.0.28
 unittest2==0.5.1
