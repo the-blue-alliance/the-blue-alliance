@@ -1,3 +1,4 @@
+import datetime
 import json
 import logging
 import random
@@ -63,6 +64,7 @@ class ApiBaseController(CacheableHandler):
         self._partial_cache_key = '_'.join([
             'v{}_{}'.format(self.API_VERSION, self.__class__.__name__)] +
             [x[1] for x in kwargs_sorted])
+
         self._cache_expiration = self.CACHE_HEADER_LENGTH
 
     def handle_exception(self, exception, debug):
@@ -83,6 +85,19 @@ class ApiBaseController(CacheableHandler):
         self._errors = ValidationHelper.validate_request(self)
         if self._errors:
             self.abort(404)
+
+        # Guarantee a fresh response for at a requested time
+        requestTime = self.request.get('time')
+        if requestTime and requestTime.isdigit():
+            requestTime = int(requestTime)
+            t = datetime.datetime.fromtimestamp(requestTime)
+            now = datetime.datetime.now()
+            if t >= now - datetime.timedelta(minutes=1) and t <= now:
+                self._partial_cache_key += '_{}'.format(requestTime)
+                self.CACHE_HEADER_LENGTH = 60 * 60
+            else:
+                self._errors = {"Error": "Bad Request: Requested 'time' must be within the last minute!"}
+                self.abort(400)
 
         super(ApiBaseController, self).get(*args, **kw)
         self.response.headers['X-TBA-Version'] = '{}'.format(self.API_VERSION)
