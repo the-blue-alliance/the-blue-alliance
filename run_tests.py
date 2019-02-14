@@ -60,6 +60,10 @@ def main(sdk_path, test_pattern):
     import dev_appserver
     dev_appserver.fix_sys_path()
 
+    # Set up custom django template filters
+    from google.appengine.ext.webapp import template
+    template.register_template_library('common.my_filters')
+
     suites = unittest2.loader.TestLoader().discover("tests", test_pattern)
 
     fail = False
