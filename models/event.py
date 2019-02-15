@@ -226,7 +226,15 @@ class Event(ndb.Model):
             self._week = days / 7
 
         return self._week
-
+                          
+    @property
+    def week_str(self):
+        if self.week is None:
+            return None
+        if self.year == 2016:
+            return "Week {}".format(0.5 if self.week == 0 else self.week)
+        return "Week {}".format(self.week + 1)
+    
     @property
     def is_season_event(self):
         return self.event_type_enum in EventType.SEASON_EVENT_TYPES
