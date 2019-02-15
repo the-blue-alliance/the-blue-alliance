@@ -404,9 +404,33 @@
 
     {% if 'rp' in match.score_breakdown.red and match.comp_level == 'qm' %}
     <tr>
-      <td class="red" colspan="2">+{{match.score_breakdown.red.rp}} RP</td>
+      <td class="red" colspan="2">
+        {% if match.score_breakdown.red.completeRocketRankingPoint %}
+        <svg class="top-left-dot" rel="tooltip" title="Complete Rocket">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        {% if match.score_breakdown.red.habDockingRankingPoint %}
+        <svg class="top-left-dot-2" rel="tooltip" title="HAB Docking}">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        +{{match.score_breakdown.red.rp}} RP
+      </td>
       <td>Ranking Points</td>
-      <td class="blue" colspan="2">+{{match.score_breakdown.blue.rp}} RP</td>
+      <td class="blue" colspan="2">
+        {% if match.score_breakdown.blue.completeRocketRankingPoint %}
+        <svg class="top-left-dot" rel="tooltip" title="Complete Rocket">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        {% if match.score_breakdown.blue.habDockingRankingPoint %}
+        <svg class="top-left-dot-2" rel="tooltip" title="HAB Docking}">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        +{{match.score_breakdown.blue.rp}} RP
+      </td>
     </tr>
     {% endif %}
   </tbody>
