@@ -41,7 +41,7 @@ class EventDetails(ndb.Model):
         if self.rankings2:
             for rank in self.rankings2:
                 rank['extra_stats'] = []
-                if self.year in {2017, 2018}:
+                if self.year in {2017, 2018, 2019}:
                     rank['extra_stats'] = [
                         int(round(rank['sort_orders'][0] * rank['matches_played'])),
                     ]
@@ -55,7 +55,7 @@ class EventDetails(ndb.Model):
         sort_order_info = RankingsHelper.get_sort_order_info(self)
         extra_stats_info = []
         if has_extra_stats:
-            if self.year in {2017, 2018}:
+            if self.year in {2017, 2018, 2019}:
                 extra_stats_info = [{
                     'name': 'Total Ranking Points',
                     'precision': 0,
