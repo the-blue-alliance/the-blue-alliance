@@ -12,12 +12,217 @@ class EventInsightsHelper(object):
             2016: cls.calculate_event_insights_2016,
             2017: cls.calculate_event_insights_2017,
             2018: cls.calculate_event_insights_2018,
+            2019: cls.calculate_event_insights_2019,
         }
 
         if year in INSIGHTS_MAP:
             return INSIGHTS_MAP[year](matches)
         else:
             return None
+
+    @classmethod
+    def calculate_event_insights_2019(cls, matches):
+        qual_matches = []
+        playoff_matches = []
+        for match in matches:
+            if match.comp_level == 'qm':
+                qual_matches.append(match)
+            else:
+                playoff_matches.append(match)
+
+        qual_insights = cls._calculate_event_insights_2019_helper(qual_matches)
+        playoff_insights = cls._calculate_event_insights_2019_helper(playoff_matches)
+
+        return {
+            'qual': qual_insights,
+            'playoff': playoff_insights,
+        }
+
+    @classmethod
+    def _calculate_event_insights_2019_helper(cls, matches):
+        # Auto
+        sandstorm_bonus_auto = 0
+        points_auto = 0
+
+        # Teleop
+        hab_climb_teleop = 0
+        points_teleop = 0
+
+        # Overall
+        cross_hab_line_count = 0
+        cross_hab_line_sandstorm_count = 0
+        complete_1_rocket_count = 0
+        complete_2_rockets_count = 0
+        cargo_ship_hatch_panel_preload_count = 0
+        cargo_ship_cargo_preload_count = 0
+        cargo_ship_hatch_panel_count = 0
+        cargo_ship_cargo_count = 0
+        rocket_low_hatch_panel_count = 0
+        rocket_low_cargo_count = 0
+        rocket_mid_hatch_panel_count = 0
+        rocket_mid_cargo_count = 0
+        rocket_top_hatch_panel_count = 0
+        rocket_top_cargo_count = 0
+        hatch_panel_points = 0
+        cargo_points = 0
+        level1_climb_count = 0
+        level2_climb_count = 0
+        level3_climb_count = 0
+
+        # kpa_achieved = 0
+        rocket_rp_achieved = 0
+        climb_rp_achieved = 0
+        unicorn_matches = 0
+
+        winning_scores = 0
+        win_margins = 0
+        total_scores = 0
+        foul_scores = 0
+        high_score = [0, "", ""]  # kpa, match key, match name
+
+        finished_matches = 0
+        has_insights = False
+        for match in matches:
+            if not match.has_been_played:
+                continue
+
+            red_score = match.alliances['red']['score']
+            blue_score = match.alliances['blue']['score']
+            win_score = max(red_score, blue_score)
+
+            winning_scores += win_score
+            win_margins += (win_score - min(red_score, blue_score))
+            total_scores += red_score + blue_score
+
+            if win_score > high_score[0]:
+                high_score = [win_score, match.key_name, match.short_name]
+
+            for alliance_color in ['red', 'blue']:
+                try:
+                    alliance_breakdown = match.score_breakdown[alliance_color]
+
+                    # Auto
+                    points_auto += alliance_breakdown['autoPoints']
+
+                    # Teleop
+                    hab_climb_teleop += alliance_breakdown['habClimbPoints']
+                    points_teleop += alliance_breakdown['teleopPoints']
+
+                    # Overall
+                    for i in xrange(3):
+                        hab_line = 'habLineRobot{}'.format(i+1)
+                        if alliance_breakdown[hab_line] == 'CrossedHabLineInTeleop':
+                            cross_hab_line_count += 1
+                        elif alliance_breakdown[hab_line] == 'CrossedHabLineInSandstorm':
+                            cross_hab_line_count += 1
+                            cross_hab_line_sandstorm_count += 1
+
+                        hab_climb = 'endgameRobot{}'.format(i+1)
+                        if alliance_breakdown[hab_climb] == 'HabLevel1':
+                            level1_climb_count += 1
+                        elif alliance_breakdown[hab_climb] == 'HabLevel2':
+                            level1_climb_count += 1
+                            level2_climb_count += 1
+                        elif alliance_breakdown[hab_climb] == 'HabLevel3':
+                            level1_climb_count += 1
+                            level2_climb_count += 1
+                            level3_climb_count += 1
+
+                    complete_1_rocket_count += 1 if alliance_breakdown['completedRocketNear'] or alliance_breakdown['completedRocketFar'] else 0
+                    complete_2_rockets_count += 1 if alliance_breakdown['completedRocketNear'] and alliance_breakdown['completedRocketFar'] else 0
+
+                    for i in xrange(8):
+                        bay = 'bay{}'.format(i+1)
+                        cargo_ship_hatch_panel_count += 1 if 'Panel' in alliance_breakdown[bay] else 0
+                        cargo_ship_cargo_count += 1 if 'Cargo' in alliance_breakdown[bay] else 0
+
+                        preload_bay = 'preMatchBay{}'.format(i+1)
+                        if preload_bay in alliance_breakdown:
+                            if alliance_breakdown[preload_bay] == 'Panel':
+                                cargo_ship_hatch_panel_preload_count += 1
+                            elif alliance_breakdown[preload_bay] == 'Cargo':
+                                cargo_ship_cargo_preload_count += 1
+
+                    for side1 in ['Left', 'Right']:
+                        for side2 in ['Near', 'Far']:
+                            low = 'low{}Rocket{}'.format(side1, side2)
+                            mid = 'mid{}Rocket{}'.format(side1, side2)
+                            top = 'top{}Rocket{}'.format(side1, side2)
+                            rocket_low_hatch_panel_count += 1 if 'Panel' in alliance_breakdown[low] else 0
+                            rocket_low_cargo_count += 1 if 'Cargo' in alliance_breakdown[low] else 0
+                            rocket_mid_hatch_panel_count += 1 if 'Panel' in alliance_breakdown[mid] else 0
+                            rocket_mid_cargo_count += 1 if 'Cargo' in alliance_breakdown[mid] else 0
+                            rocket_top_hatch_panel_count += 1 if 'Panel' in alliance_breakdown[top] else 0
+                            rocket_top_cargo_count += 1 if 'Cargo' in alliance_breakdown[top] else 0
+
+                    hatch_panel_points = alliance_breakdown['hatchPanelPoints']
+                    cargo_points = alliance_breakdown['cargoPoints']
+
+                    alliance_rocket_rp_achieved = alliance_breakdown['completeRocketRankingPoint']
+                    alliance_climb_rp_achieved = alliance_breakdown['habDockingRankingPoint']
+                    rocket_rp_achieved += 1 if alliance_rocket_rp_achieved else 0
+                    climb_rp_achieved += 1 if alliance_climb_rp_achieved else 0
+                    alliance_win = alliance_color == match.winning_alliance
+                    unicorn_matches += 1 if (alliance_win and alliance_rocket_rp_achieved and alliance_climb_rp_achieved) else 0
+
+                    foul_scores += alliance_breakdown['foulPoints']
+                    has_insights = True
+                except Exception, e:
+                    msg = "Event insights failed for {}".format(match.key.id())
+                    # event.get() below should be cheap since it's backed by context cache
+                    if match.event.get().event_type_enum in EventType.SEASON_EVENT_TYPES:
+                        logging.warning(msg)
+                        logging.warning(traceback.format_exc())
+                    else:
+                        logging.info(msg)
+            finished_matches += 1
+
+        if not has_insights:
+            return None
+
+        if finished_matches == 0:
+            return {}
+
+        opportunities_1x = 2 * finished_matches  # once per alliance
+        opportunities_3x = 6 * finished_matches  # 3x per alliance
+        event_insights = {
+            # Auto
+            'average_sandstorm_bonus_auto': float(sandstorm_bonus_auto) / (2 * finished_matches),
+            'average_points_auto': float(points_auto) / (2 * finished_matches),
+            # Teleop
+            'average_hab_climb_teleop': float(hab_climb_teleop) / (2 * finished_matches),
+            'average_points_teleop': float(points_teleop) / (2 * finished_matches),
+            # Overall
+            'cross_hab_line_count': [cross_hab_line_count, opportunities_3x, 100.0 * float(cross_hab_line_count) / opportunities_3x],
+            'cross_hab_line_sandstorm_count': [cross_hab_line_sandstorm_count, opportunities_3x, 100.0 * float(cross_hab_line_sandstorm_count) / opportunities_3x],
+            'level1_climb_count': [level1_climb_count, opportunities_3x, 100.0 * float(level1_climb_count) / opportunities_3x],
+            'level2_climb_count': [level2_climb_count, opportunities_3x, 100.0 * float(level2_climb_count) / opportunities_3x],
+            'level3_climb_count': [level3_climb_count, opportunities_3x, 100.0 * float(level3_climb_count) / opportunities_3x],
+            'complete_1_rocket_count': [complete_1_rocket_count, opportunities_1x, 100.0 * float(complete_1_rocket_count) / opportunities_1x],
+            'complete_2_rockets_count': [complete_2_rockets_count, opportunities_1x, 100.0 * float(complete_2_rockets_count) / opportunities_1x],
+            'average_cargo_ship_hatch_panel_preload_count': float(cargo_ship_hatch_panel_preload_count) / opportunities_1x,
+            'average_cargo_ship_cargo_preload_count': float(cargo_ship_cargo_preload_count) / opportunities_1x,
+            'average_cargo_ship_hatch_panel_count': float(cargo_ship_hatch_panel_count) / opportunities_1x,
+            'average_cargo_ship_cargo_count': float(cargo_ship_cargo_count) / opportunities_1x,
+            'average_rocket_low_hatch_panel_count': float(rocket_low_hatch_panel_count) / opportunities_1x,
+            'average_rocket_low_cargo_count': float(rocket_low_cargo_count) / opportunities_1x,
+            'average_rocket_mid_hatch_panel_count': float(rocket_mid_hatch_panel_count) / opportunities_1x,
+            'average_rocket_mid_cargo_count': float(rocket_mid_cargo_count) / opportunities_1x,
+            'average_rocket_top_hatch_panel_count': float(rocket_top_hatch_panel_count) / opportunities_1x,
+            'average_rocket_top_cargo_count': float(rocket_top_cargo_count) / opportunities_1x,
+            'average_hatch_panel_points': float(hatch_panel_points) / opportunities_1x,
+            'average_cargo_points': float(cargo_points) / opportunities_1x,
+            'rocket_rp_achieved': [rocket_rp_achieved, opportunities_1x, 100.0 * float(rocket_rp_achieved) / opportunities_1x],
+            'climb_rp_achieved': [climb_rp_achieved, opportunities_1x, 100.0 * float(climb_rp_achieved) / opportunities_1x],
+            'unicorn_matches': [unicorn_matches, opportunities_1x, 100.0 * float(unicorn_matches) / opportunities_1x],
+            'average_win_score': float(winning_scores) / finished_matches,
+            'average_win_margin': float(win_margins) / finished_matches,
+            'average_score': float(total_scores) / opportunities_1x,
+            'average_foul_score': float(foul_scores) / opportunities_1x,
+            'high_score': high_score,  # [score, match key, match name]
+        }
+
+        return event_insights
 
     @classmethod
     def calculate_event_insights_2018(cls, matches):
