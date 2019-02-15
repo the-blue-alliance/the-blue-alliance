@@ -66,7 +66,7 @@
           <span class="glyphicon glyphicon-circle-arrow-right"></span> Winners advance to the <a href="/event/{{ parent_event.key_name }}">{{ parent_event.name }}</a><br />
         {% endif %}
         {% if event.start_date %}
-          <span class="glyphicon glyphicon-calendar"></span> <time itemprop="startDate" datetime="{{event.start_date.isoformat()}}">{{ event.start_date|strftime("%B %d") }}{% if event.start_date.date() != event.end_date.date() %}</time> to <time itemprop="endDate" datetime="{{event.end_date.isoformat()}}">{{ event.end_date|strftime("%B %d") }}{% endif %}, {{ event.end_date|strftime("%Y") }}</time>
+          <span class="glyphicon glyphicon-calendar"></span> <time itemprop="startDate" datetime="{{event.start_date.isoformat()}}">{{ event.start_date|strftime("%B %d") }}{% if event.start_date.date() != event.end_date.date() %}</time> to <time itemprop="endDate" datetime="{{event.end_date.isoformat()}}">{{ event.end_date|strftime("%B %d") }}{% endif %}, {{ event.end_date|strftime("%Y") }}</time> {% if event.week is not None %}<span class="badge">Week {% if year == 2016 }{{0.5 if week == 0 else week}}{% else %}{{week+1}}{% endif %}</span>{% endif %}
         {% endif %}
         {% if event.nl and event.nl.name and event.nl.city_state_country %}
           <br><span class="glyphicon glyphicon-map-marker"></span>
