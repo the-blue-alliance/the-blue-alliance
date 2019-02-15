@@ -1,0 +1,416 @@
+<table class="match-table">
+  <tbody>
+    <!-- Robot 1 Sandstorm Bonus -->
+    {% if "preMatchLevelRobot1" in match.score_breakdown.red and
+      "habLineRobot1" in match.score_breakdown.red
+    %}
+    <tr>
+      <td class="red" colspan="2">
+        {% if match.score_breakdown.red.habLineRobot1 == 'CrossedHabLineInSandstorm' %}
+          {% if match.score_breakdown.red.preMatchLevelRobot1 == 'HabLevel1' %}
+            Level 1
+          {% elif match.score_breakdown.red.preMatchLevelRobot1 == 'HabLevel2' %}
+            Level 2
+          {% else %}
+            --
+          {% endif %}
+        {% else %}
+          --
+        {% endif %}
+      </td>
+      <td>Robot 1 Sandstorm Bonus</td>
+      <td class="blue" colspan="2">
+        {% if match.score_breakdown.blue.habLineRobot1 == 'CrossedHabLineInSandstorm' %}
+          {% if match.score_breakdown.blue.preMatchLevelRobot1 == 'HabLevel1' %}
+            Level 1
+          {% elif match.score_breakdown.blue.preMatchLevelRobot1 == 'HabLevel2' %}
+            Level 2
+          {% else %}
+            --
+          {% endif %}
+        {% else %}
+          --
+        {% endif %}
+      </td>
+    </tr>
+    {% endif %}
+    <!-- Robot 2 Sandstorm Bonus -->
+    {% if "preMatchLevelRobot2" in match.score_breakdown.red and
+      "habLineRobot2" in match.score_breakdown.red
+    %}
+    <tr>
+      <td class="red" colspan="2">
+        {% if match.score_breakdown.red.habLineRobot2 == 'CrossedHabLineInSandstorm' %}
+          {% if match.score_breakdown.red.preMatchLevelRobot2 == 'HabLevel1' %}
+            Level 1
+          {% elif match.score_breakdown.red.preMatchLevelRobot2 == 'HabLevel2' %}
+            Level 2
+          {% else %}
+            --
+          {% endif %}
+        {% else %}
+          --
+        {% endif %}
+      </td>
+      <td>Robot 2 Sandstorm Bonus</td>
+      <td class="blue" colspan="2">
+        {% if match.score_breakdown.blue.habLineRobot2 == 'CrossedHabLineInSandstorm' %}
+          {% if match.score_breakdown.blue.preMatchLevelRobot2 == 'HabLevel1' %}
+            Level 1
+          {% elif match.score_breakdown.blue.preMatchLevelRobot2 == 'HabLevel2' %}
+            Level 2
+          {% else %}
+            --
+          {% endif %}
+        {% else %}
+          --
+        {% endif %}
+      </td>
+    </tr>
+    {% endif %}
+    <!-- Robot 3 Sandstorm Bonus -->
+    {% if "preMatchLevelRobot3" in match.score_breakdown.red and
+      "habLineRobot3" in match.score_breakdown.red
+    %}
+    <tr>
+      <td class="red" colspan="2">
+        {% if match.score_breakdown.red.habLineRobot3 == 'CrossedHabLineInSandstorm' %}
+          {% if match.score_breakdown.red.preMatchLevelRobot3 == 'HabLevel1' %}
+            Level 1
+          {% elif match.score_breakdown.red.preMatchLevelRobot3 == 'HabLevel2' %}
+            Level 2
+          {% else %}
+            --
+          {% endif %}
+        {% else %}
+          --
+        {% endif %}
+      </td>
+      <td>Robot 3 Sandstorm Bonus</td>
+      <td class="blue" colspan="2">
+        {% if match.score_breakdown.blue.habLineRobot3 == 'CrossedHabLineInSandstorm' %}
+          {% if match.score_breakdown.blue.preMatchLevelRobot3 == 'HabLevel1' %}
+            Level 1
+          {% elif match.score_breakdown.blue.preMatchLevelRobot3 == 'HabLevel2' %}
+            Level 2
+          {% else %}
+            --
+          {% endif %}
+        {% else %}
+          --
+        {% endif %}
+      </td>
+    </tr>
+    {% endif %}
+    <!-- Sandstorm Bonus -->
+    {% if "sandStormBonusPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2"><b>{% if match.score_breakdown.red.sandStormBonusPoints %}{{match.score_breakdown.red.sandStormBonusPoints}}{%else%}0{%endif%}</b></td>
+      <th>Total Sandstorm Bonus</th>
+      <td class="blueScore" colspan="2"><b>{% if match.score_breakdown.blue.sandStormBonusPoints %}{{match.score_breakdown.blue.sandStormBonusPoints}}{%else%}0{%endif%}</b></td>
+    </tr>
+    {% endif %}
+
+    <!-- Cargo Ship -->
+    {% if "bay1" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{
+          (1 if 'Panel' in match.score_breakdown.red.bay1 else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.bay2 else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.bay3 else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.bay4 else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.bay5 else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.bay6 else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.bay7 else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.bay8 else 0)
+        }}
+        /
+        {{
+          (1 if 'Cargo' in match.score_breakdown.red.bay1 else 0) +
+          (1 if 'Cargo' in match.score_breakdown.red.bay2 else 0) +
+          (1 if 'Cargo' in match.score_breakdown.red.bay3 else 0) +
+          (1 if 'Cargo' in match.score_breakdown.red.bay4 else 0) +
+          (1 if 'Cargo' in match.score_breakdown.red.bay5 else 0) +
+          (1 if 'Cargo' in match.score_breakdown.red.bay6 else 0) +
+          (1 if 'Cargo' in match.score_breakdown.red.bay7 else 0) +
+          (1 if 'Cargo' in match.score_breakdown.red.bay8 else 0)
+        }}
+      </td>
+      <td>Cargo Ship: # Hatch Panels / # Cargo</td>
+      <td class="blue" colspan="2">
+        {{
+          (1 if 'Panel' in match.score_breakdown.blue.bay1 else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.bay2 else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.bay3 else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.bay4 else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.bay5 else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.bay6 else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.bay7 else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.bay8 else 0)
+        }}
+        /
+        {{
+          (1 if 'Cargo' in match.score_breakdown.blue.bay1 else 0) +
+          (1 if 'Cargo' in match.score_breakdown.blue.bay2 else 0) +
+          (1 if 'Cargo' in match.score_breakdown.blue.bay3 else 0) +
+          (1 if 'Cargo' in match.score_breakdown.blue.bay4 else 0) +
+          (1 if 'Cargo' in match.score_breakdown.blue.bay5 else 0) +
+          (1 if 'Cargo' in match.score_breakdown.blue.bay6 else 0) +
+          (1 if 'Cargo' in match.score_breakdown.blue.bay7 else 0) +
+          (1 if 'Cargo' in match.score_breakdown.blue.bay8 else 0)
+        }}
+      </td>
+    </tr>
+    {% endif %}
+    <!-- Rocekt 1 -->
+    <tr>
+      <td class="red" colspan="2">
+        {{
+          (1 if 'Panel' in match.score_breakdown.red.topLeftRocketNear else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.topRightRocketNear else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.midLeftRocketNear else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.midRightRocketNear else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.lowLeftRocketNear else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.lowRightRocketNear else 0)
+        }}
+        /
+        {{
+          (1 if 'Cargo' in match.score_breakdown.red.topLeftRocketNear else 0) +
+          (1 if 'Cargo' in match.score_breakdown.red.topRightRocketNear else 0) +
+          (1 if 'Cargo' in match.score_breakdown.red.midLeftRocketNear else 0) +
+          (1 if 'Cargo' in match.score_breakdown.red.midRightRocketNear else 0) +
+          (1 if 'Cargo' in match.score_breakdown.red.lowLeftRocketNear else 0) +
+          (1 if 'Cargo' in match.score_breakdown.red.lowRightRocketNear else 0)
+        }}
+      </td>
+      <td>Rocket 1: # Hatch Panels / # Cargo</td>
+      <td class="blue" colspan="2">
+        {{
+          (1 if 'Panel' in match.score_breakdown.blue.topLeftRocketNear else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.topRightRocketNear else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.midLeftRocketNear else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.midRightRocketNear else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.lowLeftRocketNear else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.lowRightRocketNear else 0)
+        }}
+        /
+        {{
+          (1 if 'Cargo' in match.score_breakdown.blue.topLeftRocketNear else 0) +
+          (1 if 'Cargo' in match.score_breakdown.blue.topRightRocketNear else 0) +
+          (1 if 'Cargo' in match.score_breakdown.blue.midLeftRocketNear else 0) +
+          (1 if 'Cargo' in match.score_breakdown.blue.midRightRocketNear else 0) +
+          (1 if 'Cargo' in match.score_breakdown.blue.lowLeftRocketNear else 0) +
+          (1 if 'Cargo' in match.score_breakdown.blue.lowRightRocketNear else 0)
+        }}
+      </td>
+    </tr>
+    <!-- Rocekt 2 -->
+    <tr>
+      <td class="red" colspan="2">
+        {{
+          (1 if 'Panel' in match.score_breakdown.red.topLeftRocketFar else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.topRightRocketFar else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.midLeftRocketFar else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.midRightRocketFar else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.lowLeftRocketFar else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.lowRightRocketFar else 0)
+        }}
+        /
+        {{
+          (1 if 'Cargo' in match.score_breakdown.red.topLeftRocketFar else 0) +
+          (1 if 'Cargo' in match.score_breakdown.red.topRightRocketFar else 0) +
+          (1 if 'Cargo' in match.score_breakdown.red.midLeftRocketFar else 0) +
+          (1 if 'Cargo' in match.score_breakdown.red.midRightRocketFar else 0) +
+          (1 if 'Cargo' in match.score_breakdown.red.lowLeftRocketFar else 0) +
+          (1 if 'Cargo' in match.score_breakdown.red.lowRightRocketFar else 0)
+        }}
+      </td>
+      <td>Rocket 2: # Hatch Panels / # Cargo</td>
+      <td class="blue" colspan="2">
+        {{
+          (1 if 'Panel' in match.score_breakdown.blue.topLeftRocketFar else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.topRightRocketFar else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.midLeftRocketFar else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.midRightRocketFar else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.lowLeftRocketFar else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.lowRightRocketFar else 0)
+        }}
+        /
+        {{
+          (1 if 'Cargo' in match.score_breakdown.blue.topLeftRocketFar else 0) +
+          (1 if 'Cargo' in match.score_breakdown.blue.topRightRocketFar else 0) +
+          (1 if 'Cargo' in match.score_breakdown.blue.midLeftRocketFar else 0) +
+          (1 if 'Cargo' in match.score_breakdown.blue.midRightRocketFar else 0) +
+          (1 if 'Cargo' in match.score_breakdown.blue.lowLeftRocketFar else 0) +
+          (1 if 'Cargo' in match.score_breakdown.blue.lowRightRocketFar else 0)
+        }}
+      </td>
+    </tr>
+    <!-- Total Hatch Panels / Cargo -->
+    {% if "hatchPanelPoints" in match.score_breakdown.red and
+      "cargoPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">
+        {{match.score_breakdown.red.hatchPanelPoints}}
+        /
+        {{match.score_breakdown.red.cargoPoints}}
+      </td>
+      <td>Total Points: Hatch Panels / Cargo</td>
+      <td class="blueScore" colspan="2">
+        {{match.score_breakdown.blue.hatchPanelPoints}}
+        /
+        {{match.score_breakdown.blue.cargoPoints}}
+      </td>
+    </tr>
+    {% endif %}
+
+    <!-- Robot 1 HAB Climb -->
+    {% if "endgameRobot1" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {% if match.score_breakdown.red.endgameRobot1 == 'HabLevel1' %}
+          Level 1
+        {% elif match.score_breakdown.red.endgameRobot1 == 'HabLevel2' %}
+          Level 2
+        {% elif match.score_breakdown.red.endgameRobot1 == 'HabLevel3' %}
+          Level 3
+        {% else %}
+          --
+        {% endif %}
+      <td>Robot 1 HAB Climb</td>
+      <td class="blue" colspan="2">
+        {% if match.score_breakdown.red.endgameRobot1 == 'HabLevel1' %}
+          Level 1
+        {% elif match.score_breakdown.red.endgameRobot1 == 'HabLevel2' %}
+          Level 2
+        {% elif match.score_breakdown.red.endgameRobot1 == 'HabLevel3' %}
+          Level 3
+        {% else %}
+          --
+        {% endif %}
+      </td>
+    </tr>
+    {% endif %}
+    <!-- Robot 2 HAB Climb -->
+    {% if "endgameRobot2" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {% if match.score_breakdown.red.endgameRobot2 == 'HabLevel1' %}
+          Level 1
+        {% elif match.score_breakdown.red.endgameRobot2 == 'HabLevel2' %}
+          Level 2
+        {% elif match.score_breakdown.red.endgameRobot2 == 'HabLevel3' %}
+          Level 3
+        {% else %}
+          --
+        {% endif %}
+      <td>Robot 2 HAB Climb</td>
+      <td class="blue" colspan="2">
+        {% if match.score_breakdown.red.endgameRobot2 == 'HabLevel1' %}
+          Level 1
+        {% elif match.score_breakdown.red.endgameRobot2 == 'HabLevel2' %}
+          Level 2
+        {% elif match.score_breakdown.red.endgameRobot2 == 'HabLevel3' %}
+          Level 3
+        {% else %}
+          --
+        {% endif %}
+      </td>
+    </tr>
+    {% endif %}
+    <!-- Robot 3 HAB Climb -->
+    {% if "endgameRobot3" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {% if match.score_breakdown.red.endgameRobot3 == 'HabLevel1' %}
+          Level 1
+        {% elif match.score_breakdown.red.endgameRobot3 == 'HabLevel2' %}
+          Level 2
+        {% elif match.score_breakdown.red.endgameRobot3 == 'HabLevel3' %}
+          Level 3
+        {% else %}
+          --
+        {% endif %}
+      <td>Robot 3 HAB Climb</td>
+      <td class="blue" colspan="2">
+        {% if match.score_breakdown.red.endgameRobot3 == 'HabLevel1' %}
+          Level 1
+        {% elif match.score_breakdown.red.endgameRobot3 == 'HabLevel2' %}
+          Level 2
+        {% elif match.score_breakdown.red.endgameRobot3 == 'HabLevel3' %}
+          Level 3
+        {% else %}
+          --
+        {% endif %}
+      </td>
+    </tr>
+    {% endif %}
+    <!-- HAB Climb Points -->
+    {% if "habClimbPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">{% if match.score_breakdown.red.habClimbPoints %} {{match.score_breakdown.red.habClimbPoints}} {% else %} 0 {% endif %}</td>
+      <td>HAB Climb Points</td>
+      <td class="blueScore" colspan="2">{% if match.score_breakdown.blue.habClimbPoints %} {{match.score_breakdown.blue.habClimbPoints}} {% else %} 0 {% endif %}</td>
+    </tr>
+    {% endif %}
+
+    <!-- Teleop Total -->
+    {% if "teleopPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2"><b>{% if match.score_breakdown.red.teleopPoints %}{{match.score_breakdown.red.teleopPoints}}{%else%}0{%endif%}</b></td>
+      <th>Total Teleop</th>
+      <td class="blueScore" colspan="2"><b>{% if match.score_breakdown.blue.teleopPoints %}{{match.score_breakdown.blue.teleopPoints}}{%else%}0{%endif%}</b></td>
+    </tr>
+    {% endif %}
+
+    <!-- Complete Rocket / HAB Docking RP -->
+    {% if "completeRocketRankingPoint" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.completeRocketRankingPoint%}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}</td>
+      <td>Complete Rocket</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.completeRocketRankingPoint%}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}</td>
+    </tr>
+    {% endif %}
+    {% if "habDockingRankingPoint" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.habDockingRankingPoint%}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}</td>
+      <td>HAB Docking</td>
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.habDockingRankingPoint%}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}</td>
+    </tr>
+    {% endif %}
+
+    <!-- Fouls & Adjustments -->
+    {% if "foulPoints" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">+{%if match.score_breakdown.red.foulPoints%}{{match.score_breakdown.red.foulPoints}}{%else%}0{%endif%}</td>
+      <td>Fouls</td>
+      <td class="blue" colspan="2">+{%if match.score_breakdown.blue.foulPoints%}{{match.score_breakdown.blue.foulPoints}}{%else%}0{%endif%}</td>
+    </tr>
+    {% endif %}
+    {% if "adjustPoints" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.adjustPoints%}{{match.score_breakdown.red.adjustPoints}}{%else%}0{%endif%}</td>
+      <td>Adjustments</td>
+      <td class="blue" colspan="2">{%if match.score_breakdown.blue.adjustPoints%}{{match.score_breakdown.blue.adjustPoints}}{%else%}0{%endif%}</td>
+    </tr>
+    {% endif %}
+
+    <tr class="key">
+      <td class="redScore" colspan="2"><b>{%if match.score_breakdown.red.totalPoints%}{{match.score_breakdown.red.totalPoints}}{%else%}0{%endif%}</b></td>
+      <th>Total Score</th>
+      <td class="blueScore" colspan="2"><b>{%if match.score_breakdown.blue.totalPoints%}{{match.score_breakdown.blue.totalPoints}}{%else%}0{%endif%}</b></td>
+    </tr>
+
+    {% if 'rp' in match.score_breakdown.red and match.comp_level == 'qm' %}
+    <tr>
+      <td class="red" colspan="2">+{{match.score_breakdown.red.rp}} RP</td>
+      <td>Ranking Points</td>
+      <td class="blue" colspan="2">+{{match.score_breakdown.blue.rp}} RP</td>
+    </tr>
+    {% endif %}
+  </tbody>
+</table>
+{% if 'tba_gameData' in match.score_breakdown.red %}
+  <p>Scoring Plate Assignments: {{match.score_breakdown.red.tba_gameData}}</p>
+{% endif %}
