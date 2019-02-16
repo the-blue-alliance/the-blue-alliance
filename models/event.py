@@ -234,7 +234,7 @@ class Event(ndb.Model):
         if self.year == 2016:
             return "Week {}".format(0.5 if self.week == 0 else self.week)
         return "Week {}".format(self.week + 1)
-    
+
     @property
     def is_season_event(self):
         return self.event_type_enum in EventType.SEASON_EVENT_TYPES
