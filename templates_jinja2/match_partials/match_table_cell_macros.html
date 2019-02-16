@@ -74,16 +74,18 @@
     {% if match.score_breakdown.get(alliance_color).teleopDefensesBreached
       or match.score_breakdown.get(alliance_color).kPaRankingPointAchieved
       or match.score_breakdown.get(alliance_color).kPaBonusPoints
-      or match.score_breakdown.get(alliance_color).autoQuestRankingPoint %}
-    <svg class="top-left-dot" rel="tooltip" title="{% if match.year == 2016 %}Defenses Breached{% elif match.year == 2017 %}Pressure Reached{% elif match.year == 2018 %}Auto Quest{% endif %}">
+      or match.score_breakdown.get(alliance_color).autoQuestRankingPoint
+      or match.score_breakdown.get(alliance_color).completeRocketRankingPoint %}
+    <svg class="top-left-dot" rel="tooltip" title="{% if match.year == 2016 %}Defenses Breached{% elif match.year == 2017 %}Pressure Reached{% elif match.year == 2018 %}Auto Quest{% elif match.year == 2019 %}Complete Rocket{% endif %}">
       <circle cx="2" cy="2" r="2"/>
     </svg>
     {% endif %}
     {% if match.score_breakdown.get(alliance_color).teleopTowerCaptured
       or match.score_breakdown.get(alliance_color).rotorRankingPointAchieved
       or match.score_breakdown.get(alliance_color).rotorBonusPoints
-      or match.score_breakdown.get(alliance_color).faceTheBossRankingPoint %}
-    <svg class="top-left-dot-2" rel="tooltip" title="{% if match.year == 2016 %}Tower Captured{% elif match.year == 2017 %}All Rotors Engaged{% elif match.year == 2018 %}Face The Boss{% endif %}">
+      or match.score_breakdown.get(alliance_color).faceTheBossRankingPoint
+      or match.score_breakdown.get(alliance_color).habDockingRankingPoint %}
+    <svg class="top-left-dot-2" rel="tooltip" title="{% if match.year == 2016 %}Tower Captured{% elif match.year == 2017 %}All Rotors Engaged{% elif match.year == 2018 %}Face The Boss{% elif match.year == 2019 %}HAB Docking{% endif %}">
       <circle cx="2" cy="2" r="2"/>
     </svg>
     {% endif %}

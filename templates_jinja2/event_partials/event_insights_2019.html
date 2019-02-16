@@ -1,0 +1,306 @@
+<div class="row">
+  <div class="col-xs-12">
+    <h3>Bonus Objective Statistics</h3>
+    <table class="table table-condensed table-striped text-right">
+      <thead>
+        <tr>
+          <th class="text-right">Objective</th>
+          <th class="text-right">Count</th>
+          <th class="text-right"># Opportunities</th>
+          <th class="text-right">% Success</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Cross HAB Line</td>
+          <td>{{event_insights.cross_hab_line_count[0]}}</td>
+          <td>{{event_insights.cross_hab_line_count[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.cross_hab_line_count[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Cross HAB Line in Sandstorm</td>
+          <td>{{event_insights.cross_hab_line_sandstorm_count[0]}}</td>
+          <td>{{event_insights.cross_hab_line_sandstorm_count[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.cross_hab_line_sandstorm_count[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Complete 1 Rocket</td>
+          <td>{{event_insights.complete_1_rocket_count[0]}}</td>
+          <td>{{event_insights.complete_1_rocket_count[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.complete_1_rocket_count[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Complete 2 Rockets</td>
+          <td>{{event_insights.complete_2_rockets_count[0]}}</td>
+          <td>{{event_insights.complete_2_rockets_count[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.complete_2_rockets_count[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td><span rel="tooltip" title="Has no real meaning for Playoff matches">Complete Rocket RP *</span></td>
+          <td>{{event_insights.rocket_rp_achieved[0]}}</td>
+          <td>{{event_insights.rocket_rp_achieved[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.rocket_rp_achieved[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Level 1 HAB Climb</td>
+          <td>{{event_insights.level1_climb_count[0]}}</td>
+          <td>{{event_insights.level1_climb_count[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.level1_climb_count[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Level 2 HAB Climb</td>
+          <td>{{event_insights.level2_climb_count[0]}}</td>
+          <td>{{event_insights.level2_climb_count[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.level2_climb_count[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Level 3 HAB Climb</td>
+          <td>{{event_insights.level3_climb_count[0]}}</td>
+          <td>{{event_insights.level3_climb_count[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.level3_climb_count[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td><span rel="tooltip" title="Has no real meaning for Playoff matches">HAB Docking RP *</span></td>
+          <td>{{event_insights.climb_rp_achieved[0]}}</td>
+          <td>{{event_insights.climb_rp_achieved[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.climb_rp_achieved[2]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>"Unicorn Matches"<br/>(Win + Complete Rocket + HAB Docking)</td>
+          <td>{% if event_insights.unicorn_matches %}{{event_insights.unicorn_matches[0]}}{% else %}--{% endif %}</td>
+          <td>{% if event_insights.unicorn_matches %}{{event_insights.unicorn_matches[1]}}{% else %}--{% endif %}</td>
+          <td>{% if event_insights.unicorn_matches %}{{'%0.2f' | format(event_insights.unicorn_matches[2]|float)}}%{% else %}--{% endif %}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-xs-12">
+    <h3>Match Statistics</h3>
+
+    <table class="table table-condensed table-striped text-right">
+      <tbody>
+        <tr>
+          <td>High Score</td>
+          <td>{{event_insights.high_score[0]}} in <a href="/match/{{event_insights.high_score[1]}}">{{event_insights.high_score[2]}}</a></td>
+        </tr>
+        <tr>
+          <td>Average Match Score</td>
+          <td>{{'%0.2f' | format(event_insights.average_score|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average Winning Score</td>
+          <td>{{'%0.2f' | format(event_insights.average_win_score|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average Win Margin</td>
+          <td>{{'%0.2f' | format(event_insights.average_win_margin|float)}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="table table-condensed table-striped text-right">
+      <thead>
+        <tr>
+            <th></th>
+            <th class="text-right">Sandstorm</th>
+            <th class="text-right">Teleop</th>
+            <th class="text-right">Overall</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Average Sandstorm Bonus Points</td>
+          <td>{{'%0.2f' | format(event_insights.average_sandstorm_bonus_auto|float)}}</td>
+          <td>--</td>
+          <td>--</td>
+        </tr>
+        <tr>
+          <td>Average Hatch Panel Points</td>
+          <td>--</td>
+          <td>--</td>
+          <td>{{'%0.2f' | format(event_insights.average_hatch_panel_points|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average Cargo Points</td>
+          <td>--</td>
+          <td>--</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_points|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average HAB Climb Points</td>
+          <td>--</td>
+          <td>{{'%0.2f' | format(event_insights.average_hab_climb_teleop|float)}}</td>
+          <td>--</td>
+        </tr>
+        <tr>
+          <td>Average Foul Points</td>
+          <td>--</td>
+          <td>--</td>
+          <td>{{'%0.2f' | format(event_insights.average_foul_score|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average Score</td>
+          <td>{{'%0.2f' | format(event_insights.average_points_auto|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_points_teleop|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_score|float)}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-xs-12">
+    <h3>Detailed Scoring Location Breakdown</h3>
+
+    <h4>Cargo Ship % Preloaded</h4>
+    <table class="table table-condensed table-striped text-right">
+      <thead>
+        <tr>
+            <th></th>
+            <th class="text-center" colspan="2">Left Side</th>
+            <th class="text-center" colspan="2">Right Side</th>
+        </tr>
+        <tr>
+            <th></th>
+            <th class="text-right">Hatch Panel %</th>
+            <th class="text-right">Cargo %</th>
+            <th class="text-right">Hatch Panel %</th>
+            <th class="text-right">Cargo %</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Far</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_hatch_panel_preload_count[0]|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_cargo_preload_count[0]|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_hatch_panel_preload_count[5]|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_cargo_preload_count[5]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Mid</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_hatch_panel_preload_count[1]|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_cargo_preload_count[1]|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_hatch_panel_preload_count[4]|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_cargo_preload_count[4]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Near</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_hatch_panel_preload_count[2]|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_cargo_preload_count[2]|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_hatch_panel_preload_count[3]|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_cargo_preload_count[3]|float)}}%</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4>Cargo Ship % Scored</h4>
+    <table class="table table-condensed table-striped text-right">
+      <thead>
+        <tr>
+            <th></th>
+            <th class="text-center" colspan="2">Left Side</th>
+            <th class="text-center" colspan="2">Right Side</th>
+        </tr>
+        <tr>
+            <th></th>
+            <th class="text-right">Hatch Panel %</th>
+            <th class="text-right">Cargo %</th>
+            <th class="text-right">Hatch Panel %</th>
+            <th class="text-right">Cargo %</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Far</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_hatch_panel_count[0]|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_cargo_count[0]|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_hatch_panel_count[7]|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_cargo_count[7]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Mid</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_hatch_panel_count[1]|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_cargo_count[1]|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_hatch_panel_count[6]|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_cargo_count[6]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Near</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_hatch_panel_count[2]|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_cargo_count[2]|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_hatch_panel_count[5]|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_cargo_count[5]|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Front</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_hatch_panel_count[3]|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_cargo_count[3]|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_hatch_panel_count[4]|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_cargo_ship_cargo_count[4]|float)}}%</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4>Rocket % Scored</h4>
+    <table class="table table-condensed table-striped text-right">
+      <thead>
+        <tr>
+            <th></th>
+            <th class="text-center" colspan="2">Left Rocket</th>
+            <th class="text-center" colspan="2">Right Rocket</th>
+        </tr>
+        <tr>
+            <th></th>
+            <th class="text-right">Hatch Panel %</th>
+            <th class="text-right">Cargo %</th>
+            <th class="text-right">Hatch Panel %</th>
+            <th class="text-right">Cargo %</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Top Far</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_hatch_panel_count.topLeftFar|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_cargo_count.topLeftFar|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_hatch_panel_count.topRightFar|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_cargo_count.topRightFar|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Mid Far</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_hatch_panel_count.midLeftFar|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_cargo_count.midLeftFar|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_hatch_panel_count.midRightFar|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_cargo_count.midRightFar|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Low Far</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_hatch_panel_count.lowLeftFar|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_cargo_count.lowLeftFar|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_hatch_panel_count.lowRightFar|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_cargo_count.lowRightFar|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Top Near</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_hatch_panel_count.topLeftNear|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_cargo_count.topLeftNear|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_hatch_panel_count.topRightNear|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_cargo_count.topRightNear|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Mid Near</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_hatch_panel_count.midLeftNear|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_cargo_count.midLeftNear|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_hatch_panel_count.midRightNear|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_cargo_count.midRightNear|float)}}%</td>
+        </tr>
+        <tr>
+          <td>Low Near</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_hatch_panel_count.lowLeftNear|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_cargo_count.lowLeftNear|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_hatch_panel_count.lowRightNear|float)}}%</td>
+          <td>{{'%0.2f' | format(event_insights.average_rocket_cargo_count.lowRightNear|float)}}%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

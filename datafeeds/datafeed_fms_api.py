@@ -189,6 +189,7 @@ class DatafeedFMSAPI(object):
             """
             headers = {
                 'Authorization': 'Basic {}'.format(self._fms_api_authtoken),
+                'Accept': 'application/json',
                 'Cache-Control': 'no-cache, max-age=10',
                 'Pragma': 'no-cache',
             }
