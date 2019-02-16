@@ -121,11 +121,8 @@ class EventInsightsHelper(object):
                         if alliance_breakdown[hab_climb] == 'HabLevel1':
                             level1_climb_count += 1
                         elif alliance_breakdown[hab_climb] == 'HabLevel2':
-                            level1_climb_count += 1
                             level2_climb_count += 1
                         elif alliance_breakdown[hab_climb] == 'HabLevel3':
-                            level1_climb_count += 1
-                            level2_climb_count += 1
                             level3_climb_count += 1
 
                     complete_1_rocket_count += 1 if alliance_breakdown['completedRocketNear'] or alliance_breakdown['completedRocketFar'] else 0
