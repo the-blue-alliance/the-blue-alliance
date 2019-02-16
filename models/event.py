@@ -226,7 +226,7 @@ class Event(ndb.Model):
             self._week = days / 7
 
         return self._week
-                          
+
     @property
     def week_str(self):
         if self.week is None:
