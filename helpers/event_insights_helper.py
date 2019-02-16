@@ -53,16 +53,13 @@ class EventInsightsHelper(object):
         cross_hab_line_sandstorm_count = 0
         complete_1_rocket_count = 0
         complete_2_rockets_count = 0
-        cargo_ship_hatch_panel_preload_count = 0
-        cargo_ship_cargo_preload_count = 0
-        cargo_ship_hatch_panel_count = 0
-        cargo_ship_cargo_count = 0
-        rocket_low_hatch_panel_count = 0
-        rocket_low_cargo_count = 0
-        rocket_mid_hatch_panel_count = 0
-        rocket_mid_cargo_count = 0
-        rocket_top_hatch_panel_count = 0
-        rocket_top_cargo_count = 0
+
+        cargo_ship_hatch_panel_preload_count = [0] * 6  # 0 starts from far left
+        cargo_ship_cargo_preload_count = [0] * 6  # 0 starts from far left
+        cargo_ship_hatch_panel_count = [0] * 8  # 0 starts from far left
+        cargo_ship_cargo_count = [0] * 8  # 0 starts from far left
+        rocket_hatch_panel_count = defaultdict(int)
+        rocket_cargo_count = defaultdict(int)
         hatch_panel_points = 0
         cargo_points = 0
         level1_climb_count = 0
@@ -98,6 +95,7 @@ class EventInsightsHelper(object):
                 high_score = [win_score, match.key_name, match.short_name]
 
             for alliance_color in ['red', 'blue']:
+                isRed = alliance_color == 'red'
                 try:
                     alliance_breakdown = match.score_breakdown[alliance_color]
 
@@ -128,29 +126,63 @@ class EventInsightsHelper(object):
                     complete_1_rocket_count += 1 if alliance_breakdown['completedRocketNear'] or alliance_breakdown['completedRocketFar'] else 0
                     complete_2_rockets_count += 1 if alliance_breakdown['completedRocketNear'] and alliance_breakdown['completedRocketFar'] else 0
 
+                    if alliance_breakdown['preMatchBay1'] == 'Panel':
+                        cargo_ship_hatch_panel_preload_count[0 if isRed else 5] += 1
+                    else:
+                        cargo_ship_cargo_preload_count[0 if isRed else 5] += 1
+                    if alliance_breakdown['preMatchBay2'] == 'Panel':
+                        cargo_ship_hatch_panel_preload_count[1 if isRed else 4] += 1
+                    else:
+                        cargo_ship_cargo_preload_count[1 if isRed else 4] += 1
+                    if alliance_breakdown['preMatchBay3'] == 'Panel':
+                        cargo_ship_hatch_panel_preload_count[2 if isRed else 3] += 1
+                    else:
+                        cargo_ship_cargo_preload_count[2 if isRed else 3] += 1
+                    if alliance_breakdown['preMatchBay6'] == 'Panel':
+                        cargo_ship_hatch_panel_preload_count[3 if isRed else 2] += 1
+                    else:
+                        cargo_ship_cargo_preload_count[3 if isRed else 2] += 1
+                    if alliance_breakdown['preMatchBay7'] == 'Panel':
+                        cargo_ship_hatch_panel_preload_count[4 if isRed else 1] += 1
+                    else:
+                        cargo_ship_cargo_preload_count[4 if isRed else 1] += 1
+                    if alliance_breakdown['preMatchBay8'] == 'Panel':
+                        cargo_ship_hatch_panel_preload_count[5 if isRed else 0] += 1
+                    else:
+                        cargo_ship_cargo_preload_count[5 if isRed else 0] += 1
+
                     for i in xrange(8):
+                        idx = i if isRed else 7 - i
                         bay = 'bay{}'.format(i+1)
-                        cargo_ship_hatch_panel_count += 1 if 'Panel' in alliance_breakdown[bay] else 0
-                        cargo_ship_cargo_count += 1 if 'Cargo' in alliance_breakdown[bay] else 0
+                        cargo_ship_hatch_panel_count[idx] += 1 if 'Panel' in alliance_breakdown[bay] else 0
+                        cargo_ship_cargo_count[idx] += 1 if 'Cargo' in alliance_breakdown[bay] else 0
 
-                        preload_bay = 'preMatchBay{}'.format(i+1)
-                        if preload_bay in alliance_breakdown:
-                            if alliance_breakdown[preload_bay] == 'Panel':
-                                cargo_ship_hatch_panel_preload_count += 1
-                            elif alliance_breakdown[preload_bay] == 'Cargo':
-                                cargo_ship_cargo_preload_count += 1
+                    for LRSide in ['Left', 'Right']:  # Relative to Field
+                        for NFSide in ['Near', 'Far']:  # Relative to Field
+                            low = 'low{}Rocket{}'.format(LRSide, NFSide)
+                            mid = 'mid{}Rocket{}'.format(LRSide, NFSide)
+                            top = 'top{}Rocket{}'.format(LRSide, NFSide)
 
-                    for side1 in ['Left', 'Right']:
-                        for side2 in ['Near', 'Far']:
-                            low = 'low{}Rocket{}'.format(side1, side2)
-                            mid = 'mid{}Rocket{}'.format(side1, side2)
-                            top = 'top{}Rocket{}'.format(side1, side2)
-                            rocket_low_hatch_panel_count += 1 if 'Panel' in alliance_breakdown[low] else 0
-                            rocket_low_cargo_count += 1 if 'Cargo' in alliance_breakdown[low] else 0
-                            rocket_mid_hatch_panel_count += 1 if 'Panel' in alliance_breakdown[mid] else 0
-                            rocket_mid_cargo_count += 1 if 'Cargo' in alliance_breakdown[mid] else 0
-                            rocket_top_hatch_panel_count += 1 if 'Panel' in alliance_breakdown[top] else 0
-                            rocket_top_cargo_count += 1 if 'Cargo' in alliance_breakdown[top] else 0
+                            # Get alliance-relative sides
+                            if NFSide == 'Near' and LRSide == 'Left':
+                                alLRSide = 'Left' if isRed else 'Right'
+                                alNFSide = 'Near' if isRed else 'Far'
+                            elif NFSide == 'Near' and LRSide == 'Right':
+                                alLRSide = 'Left' if isRed else 'Right'
+                                alNFSide = 'Far' if isRed else 'Near'
+                            elif NFSide == 'Far' and LRSide == 'Left':
+                                alLRSide = 'Right' if isRed else 'Left'
+                                alNFSide = 'Far' if isRed else 'Near'
+                            elif NFSide == 'Far' and LRSide == 'Right':
+                                alLRSide = 'Right' if isRed else 'Left'
+                                alNFSide = 'Near' if isRed else 'Far'
+
+                            rocket_hatch_panel_count['low{}{}'.format(alLRSide, alNFSide)] += 1 if 'Panel' in alliance_breakdown[low] else 0
+                            rocket_hatch_panel_count['mid{}{}'.format(alLRSide, alNFSide)] += 1 if 'Panel' in alliance_breakdown[mid] else 0
+                            rocket_hatch_panel_count['top{}{}'.format(alLRSide, alNFSide)] += 1 if 'Panel' in alliance_breakdown[top] else 0
+                            rocket_cargo_count['low{}{}'.format(alLRSide, alNFSide)] += 1 if 'Cargo' in alliance_breakdown[low] else 0
+                            rocket_cargo_count['mid{}{}'.format(alLRSide, alNFSide)] += 1 if 'Cargo' in alliance_breakdown[mid] else 0
+                            rocket_cargo_count['top{}{}'.format(alLRSide, alNFSide)] += 1 if 'Cargo' in alliance_breakdown[top] else 0
 
                     hatch_panel_points = alliance_breakdown['hatchPanelPoints']
                     cargo_points = alliance_breakdown['cargoPoints']
@@ -182,6 +214,12 @@ class EventInsightsHelper(object):
 
         opportunities_1x = 2 * finished_matches  # once per alliance
         opportunities_3x = 6 * finished_matches  # 3x per alliance
+        average_rocket_hatch_panel_count = {}
+        for key, value in rocket_hatch_panel_count.items():
+            average_rocket_hatch_panel_count[key] = 100 * float(value) / opportunities_1x
+        average_rocket_cargo_count = {}
+        for key, value in rocket_cargo_count.items():
+            average_rocket_cargo_count[key] = 100 * float(value) / opportunities_1x
         event_insights = {
             # Auto
             'average_sandstorm_bonus_auto': float(sandstorm_bonus_auto) / (2 * finished_matches),
@@ -197,16 +235,12 @@ class EventInsightsHelper(object):
             'level3_climb_count': [level3_climb_count, opportunities_3x, 100.0 * float(level3_climb_count) / opportunities_3x],
             'complete_1_rocket_count': [complete_1_rocket_count, opportunities_1x, 100.0 * float(complete_1_rocket_count) / opportunities_1x],
             'complete_2_rockets_count': [complete_2_rockets_count, opportunities_1x, 100.0 * float(complete_2_rockets_count) / opportunities_1x],
-            'average_cargo_ship_hatch_panel_preload_count': float(cargo_ship_hatch_panel_preload_count) / opportunities_1x,
-            'average_cargo_ship_cargo_preload_count': float(cargo_ship_cargo_preload_count) / opportunities_1x,
-            'average_cargo_ship_hatch_panel_count': float(cargo_ship_hatch_panel_count) / opportunities_1x,
-            'average_cargo_ship_cargo_count': float(cargo_ship_cargo_count) / opportunities_1x,
-            'average_rocket_low_hatch_panel_count': float(rocket_low_hatch_panel_count) / opportunities_1x,
-            'average_rocket_low_cargo_count': float(rocket_low_cargo_count) / opportunities_1x,
-            'average_rocket_mid_hatch_panel_count': float(rocket_mid_hatch_panel_count) / opportunities_1x,
-            'average_rocket_mid_cargo_count': float(rocket_mid_cargo_count) / opportunities_1x,
-            'average_rocket_top_hatch_panel_count': float(rocket_top_hatch_panel_count) / opportunities_1x,
-            'average_rocket_top_cargo_count': float(rocket_top_cargo_count) / opportunities_1x,
+            'average_cargo_ship_hatch_panel_preload_count': [100.0 * float(x) / opportunities_1x for x in cargo_ship_hatch_panel_preload_count],
+            'average_cargo_ship_cargo_preload_count': [100.0 * float(x) / opportunities_1x for x in cargo_ship_cargo_preload_count],
+            'average_cargo_ship_hatch_panel_count': [100.0 * float(x) / opportunities_1x for x in cargo_ship_hatch_panel_count],
+            'average_cargo_ship_cargo_count': [100.0 * float(x) / opportunities_1x for x in cargo_ship_cargo_count],
+            'average_rocket_hatch_panel_count': average_rocket_hatch_panel_count,
+            'average_rocket_cargo_count': average_rocket_cargo_count,
             'average_hatch_panel_points': float(hatch_panel_points) / opportunities_1x,
             'average_cargo_points': float(cargo_points) / opportunities_1x,
             'rocket_rp_achieved': [rocket_rp_achieved, opportunities_1x, 100.0 * float(rocket_rp_achieved) / opportunities_1x],
