@@ -435,6 +435,89 @@
     {% endif %}
   </tbody>
 </table>
-{% if 'tba_gameData' in match.score_breakdown.red %}
-  <p>Scoring Plate Assignments: {{match.score_breakdown.red.tba_gameData}}</p>
-{% endif %}
+
+<h4>Scoring Location Breakdown</h4>
+{% macro drawPanelCargoSVG(contents, preMatchContents=None) %}
+<svg width="24px" height="24px" style="display: block; margin: auto;">
+  {% if contents == 'PanelAndCargo' %}
+    <circle cx="12" cy="12" r="10" fill="#ffa500" stroke="{% if preMatchContents == 'Panel' %}#fff{% else %}#f4d941{% endif %}" stroke-width="4"/>
+  {% elif contents == 'Panel' %}
+    <circle cx="12" cy="12" r="10" fill="none" stroke="{% if preMatchContents == 'Panel' %}#fff{% else %}#f4d941{% endif %}" stroke-width="4"/>
+  {% endif %}
+</svg>
+{% endmacro %}
+<table class="match-table">
+  <tbody>
+    <tr>
+      <td class="red">{{drawPanelCargoSVG(match.score_breakdown.red.topLeftRocketNear)}}</td>
+      <td class="red">{{drawPanelCargoSVG(match.score_breakdown.red.topRightRocketNear)}}</td>
+      <td>Rocket 1 Top</td>
+      <td class="blue">{{drawPanelCargoSVG(match.score_breakdown.blue.topLeftRocketNear)}}</td>
+      <td class="blue">{{drawPanelCargoSVG(match.score_breakdown.blue.topRightRocketNear)}}</td>
+    </tr>
+    <tr>
+      <td class="red">{{drawPanelCargoSVG(match.score_breakdown.red.midLeftRocketNear)}}</td>
+      <td class="red">{{drawPanelCargoSVG(match.score_breakdown.red.midRightRocketNear)}}</td>
+      <td>Rocket 1 Mid</td>
+      <td class="blue">{{drawPanelCargoSVG(match.score_breakdown.blue.midLeftRocketNear)}}</td>
+      <td class="blue">{{drawPanelCargoSVG(match.score_breakdown.blue.midRightRocketNear)}}</td>
+    </tr>
+    <tr>
+      <td class="red">{{drawPanelCargoSVG(match.score_breakdown.red.lowLeftRocketNear)}}</td>
+      <td class="red">{{drawPanelCargoSVG(match.score_breakdown.red.lowRightRocketNear)}}</td>
+      <td>Rocket 1 Low</td>
+      <td class="blue">{{drawPanelCargoSVG(match.score_breakdown.blue.lowLeftRocketNear)}}</td>
+      <td class="blue">{{drawPanelCargoSVG(match.score_breakdown.blue.lowRightRocketNear)}}</td>
+    </tr>
+  </tbody>
+</table>
+<table class="match-table">
+  <tbody>
+    <tr>
+      <td class="red">{{drawPanelCargoSVG(match.score_breakdown.red.bay4, match.score_breakdown.red.preMatchBay4)}}</td>
+      <td class="red">{{drawPanelCargoSVG(match.score_breakdown.red.bay3, match.score_breakdown.red.preMatchBay3)}}</td>
+      <td class="red">{{drawPanelCargoSVG(match.score_breakdown.red.bay2, match.score_breakdown.red.preMatchBay2)}}</td>
+      <td class="red">{{drawPanelCargoSVG(match.score_breakdown.red.bay1, match.score_breakdown.red.preMatchBay1)}}</td>
+      <td rowspan="2">Cargo Ship</td>
+      <td class="blue">{{drawPanelCargoSVG(match.score_breakdown.blue.bay1, match.score_breakdown.blue.preMatchBay1)}}</td>
+      <td class="blue">{{drawPanelCargoSVG(match.score_breakdown.blue.bay2, match.score_breakdown.blue.preMatchBay2)}}</td>
+      <td class="blue">{{drawPanelCargoSVG(match.score_breakdown.blue.bay3, match.score_breakdown.blue.preMatchBay3)}}</td>
+      <td class="blue">{{drawPanelCargoSVG(match.score_breakdown.blue.bay4, match.score_breakdown.blue.preMatchBay4)}}</td>
+    </tr>
+    <tr>
+      <td class="red">{{drawPanelCargoSVG(match.score_breakdown.red.bay5, match.score_breakdown.red.preMatchBay5)}}</td>
+      <td class="red">{{drawPanelCargoSVG(match.score_breakdown.red.bay6, match.score_breakdown.red.preMatchBay6)}}</td>
+      <td class="red">{{drawPanelCargoSVG(match.score_breakdown.red.bay7, match.score_breakdown.red.preMatchBay7)}}</td>
+      <td class="red">{{drawPanelCargoSVG(match.score_breakdown.red.bay8, match.score_breakdown.red.preMatchBay8)}}</td>
+      <td class="blue">{{drawPanelCargoSVG(match.score_breakdown.blue.bay8, match.score_breakdown.blue.preMatchBay8)}}</td>
+      <td class="blue">{{drawPanelCargoSVG(match.score_breakdown.blue.bay7, match.score_breakdown.blue.preMatchBay7)}}</td>
+      <td class="blue">{{drawPanelCargoSVG(match.score_breakdown.blue.bay6, match.score_breakdown.blue.preMatchBay6)}}</td>
+      <td class="blue">{{drawPanelCargoSVG(match.score_breakdown.blue.bay5, match.score_breakdown.blue.preMatchBay5)}}</td>
+    </tr>
+  </tbody>
+</table>
+<table class="match-table">
+  <tbody>
+    <tr>
+      <td class="red">{{drawPanelCargoSVG(match.score_breakdown.red.topRightRocketFar)}}</td>
+      <td class="red">{{drawPanelCargoSVG(match.score_breakdown.red.topLeftRocketFar)}}</td>
+      <td>Rocket 2 Top</td>
+      <td class="blue">{{drawPanelCargoSVG(match.score_breakdown.blue.topRightRocketFar)}}</td>
+      <td class="blue">{{drawPanelCargoSVG(match.score_breakdown.blue.topLeftRocketFar)}}</td>
+    </tr>
+    <tr>
+      <td class="red">{{drawPanelCargoSVG(match.score_breakdown.red.midRightRocketFar)}}</td>
+      <td class="red">{{drawPanelCargoSVG(match.score_breakdown.red.midLeftRocketFar)}}</td>
+      <td>Rocket 2 Mid</td>
+      <td class="blue">{{drawPanelCargoSVG(match.score_breakdown.blue.midRightRocketFar)}}</td>
+      <td class="blue">{{drawPanelCargoSVG(match.score_breakdown.blue.midLeftRocketFar)}}</td>
+    </tr>
+    <tr>
+      <td class="red">{{drawPanelCargoSVG(match.score_breakdown.red.lowRightRocketFar)}}</td>
+      <td class="red">{{drawPanelCargoSVG(match.score_breakdown.red.lowLeftRocketFar)}}</td>
+      <td>Rocket 2 Low</td>
+      <td class="blue">{{drawPanelCargoSVG(match.score_breakdown.blue.lowRightRocketFar)}}</td>
+      <td class="blue">{{drawPanelCargoSVG(match.score_breakdown.blue.lowLeftRocketFar)}}</td>
+    </tr>
+  </tbody>
+</table>
