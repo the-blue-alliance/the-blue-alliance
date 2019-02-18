@@ -17,7 +17,6 @@ from models.match import Match
 CHAMPIONSHIP_EVENTS_LABEL = 'FIRST Championship'
 TWO_CHAMPS_LABEL = 'FIRST Championship - {}'
 FOC_LABEL = 'FIRST Festival of Champions'
-REGIONAL_EVENTS_LABEL = 'Week {}'
 WEEKLESS_EVENTS_LABEL = 'Other Official Events'
 OFFSEASON_EVENTS_LABEL = 'Offseason'
 PRESEASON_EVENTS_LABEL = 'Preseason'
@@ -80,11 +79,7 @@ class EventHelper(object):
                    (event.start_date.month == 12 and event.start_date.day == 31)):
                     weekless_events.append(event)
                 else:
-                    week = event.week
-                    if event.year == 2016:  # Special case for 2016 week 0.5
-                        label = REGIONAL_EVENTS_LABEL.format(0.5 if week == 0 else week)
-                    else:
-                        label = REGIONAL_EVENTS_LABEL.format(week + 1)
+                    label = event.week_str
                     if label in to_return:
                         to_return[label].append(event)
                     else:
