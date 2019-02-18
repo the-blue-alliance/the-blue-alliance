@@ -55,23 +55,32 @@ def handle_500(request, response, exception):
     response.set_status(500)
 
 
-class Avatars2018Handler(CacheableHandler):
+class AvatarsHandler(CacheableHandler):
     CACHE_VERSION = 0
-    CACHE_KEY_FORMAT = "avatars_2018"
+    CACHE_KEY_FORMAT = "avatars_{}"
 
     def __init__(self, *args, **kw):
-        super(Avatars2018Handler, self).__init__(*args, **kw)
+        super(AvatarsHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
 
-    def _render(self, *args, **kw):
+    def get(self, year):
+        year = int(year)
+        if year not in {2018, 2019}:
+            self.abort(404)
+
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(year)
+        super(AvatarsHandler, self).get(year)
+
+    def _render(self, year):
+        year = int(year)
         avatars = []
-        shards = memcache.get_multi(['2018avatars_{}'.format(i) for i in xrange(10)])
+        shards = memcache.get_multi(['{}avatars_{}'.format(year, i) for i in xrange(10)])
         if len(shards) == 10:  # If missing a shard, must refetch all
             for _, shard in sorted(shards.items(), key=lambda kv: kv[0]):
                 avatars += shard
 
         if not avatars:
-            avatars_future = Media.query(Media.media_type_enum == MediaType.AVATAR).fetch_async()
+            avatars_future = Media.query(Media.media_type_enum == MediaType.AVATAR, Media.year == year).fetch_async()
             avatars = sorted(avatars_future.get_result(), key=lambda a: int(a.references[0].id()[3:]))
 
             shards = {}
@@ -79,13 +88,14 @@ class Avatars2018Handler(CacheableHandler):
             for i in xrange(10):
                 start = i * size
                 end = start + size
-                shards['2018avatars_{}'.format(i)] = avatars[start:end]
+                shards['{}avatars_{}'.format(year, i)] = avatars[start:end]
             memcache.set_multi(shards, 60*60*24)
 
         self.template_values.update({
+            'year': year,
             'avatars': avatars,
         })
-        return jinja2_engine.render('avatars2018.html', self.template_values)
+        return jinja2_engine.render('avatars.html', self.template_values)
 
 
 class TwoChampsHandler(CacheableHandler):
