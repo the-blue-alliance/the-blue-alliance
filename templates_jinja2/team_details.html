@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% import 'match_partials/match_table_macros.html' as mtm %}
 {% import 'team_partials/blue_banner_macros.html' as bbm %}
+{% import 'event_partials/event_macros.html' as em %}
 
 {% block title %}{% if team.nickname %}{{team.nickname}} - {% endif %}Team {{team.team_number}}{% if not is_canonical %} ({{year}}){% endif %} - The Blue Alliance{% endblock %}
 
@@ -103,7 +104,7 @@
                 <h3><a href="/event/{{ comp.event.key_name }}">{{ comp.event.name }}</a></h3>
                 <p>
                   {% if comp.event.location %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ comp.event.location }}" target="_blank">{{ comp.event.location }}</a><br />{% endif %}
-                  {% if comp.event.start_date %}<span class="glyphicon glyphicon-calendar"></span> {{ comp.event.start_date|strftime("%B %d") }}{% if comp.event.start_date != comp.event.end_date %} - {{ comp.event.end_date|strftime("%B %d") }}{% endif %}, {{ comp.event.end_date|strftime("%Y") }}{% endif %}
+                  {{ em.showEventDates(comp.event) }}
                 </p>
 
                 {% if comp.wlt or comp.rank or comp.awards or comp.qual_avg or comp.elim_avg %}

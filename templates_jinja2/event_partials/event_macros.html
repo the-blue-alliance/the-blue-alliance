@@ -1,0 +1,5 @@
+{% macro showEventDates(event) %}
+{% if event.start_date %}
+  <span class="glyphicon glyphicon-calendar"></span> <time itemprop="startDate" datetime="{{event.start_date.isoformat()}}">{{ event.start_date|strftime("%B %d") }}{% if event.start_date.date() != event.end_date.date() %}</time> to <time itemprop="endDate" datetime="{{event.end_date.isoformat()}}">{{ event.end_date|strftime("%B %d") }}{% endif %}, {{ event.end_date|strftime("%Y") }}</time>{% if event.week_str %} <a href="/events/{{event.year}}#{{event.week_str|slugify}}"><span class="badge">{{event.week_str}}</span></a>{% endif %}
+{% endif %}
+{% endmacro %}
