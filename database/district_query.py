@@ -15,15 +15,21 @@ CODE_MAP = {
     'fma': 'mar',
     'fnc': 'nc',
 }
+
+
+def get_equivalent_codes(code):
+    # Returns a list of equivalent district codes
+    codes = [code]
+    if code in CODE_MAP:
+        codes.append(CODE_MAP[code])
+    return codes
+
+
 def get_equivalent_keys(district_key):
     # Returns a list of equivalent district keys
-    year = int(district_key[:4])
+    year = district_key[:4]
     code = district_key[4:]
-
-    keys = [district_key]
-    if code in CODE_MAP:
-        keys.append('{}{}'.format(year, CODE_MAP[code]))
-    return keys
+    return ['{}{}'.format(year, equiv_code) for equiv_code in get_equivalent_codes(code)]
 
 
 class DistrictQuery(DatabaseQuery):
@@ -73,13 +79,13 @@ class DistrictsInYearQuery(DatabaseQuery):
 
 
 class DistrictHistoryQuery(DatabaseQuery):
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "district_history_{}"  # (abbreviation)
     DICT_CONVERTER = DistrictConverter
 
     @ndb.tasklet
     def _query_async(self):
         abbreviation = self._query_args[0]
-        district_keys = yield District.query(District.abbreviation == abbreviation).fetch_async(keys_only=True)
+        district_keys = yield District.query(District.abbreviation.IN(get_equivalent_codes(abbreviation))).fetch_async(keys_only=True)
         districts = yield ndb.get_multi_async(district_keys)
         raise ndb.Return(districts)
