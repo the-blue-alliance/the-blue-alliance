@@ -16,12 +16,14 @@ CODE_MAP = {
     'fnc': 'nc',
 }
 
+
 def get_equivalent_codes(code):
     # Returns a list of equivalent district codes
     codes = [code]
     if code in CODE_MAP:
         codes.append(CODE_MAP[code])
     return codes
+
 
 def get_equivalent_keys(district_key):
     # Returns a list of equivalent district keys
