@@ -185,8 +185,8 @@ class EventInsightsHelper(object):
                             rocket_cargo_count['mid{}{}'.format(alLRSide, alNFSide)] += 1 if 'Cargo' in alliance_breakdown[mid] else 0
                             rocket_cargo_count['top{}{}'.format(alLRSide, alNFSide)] += 1 if 'Cargo' in alliance_breakdown[top] else 0
 
-                    hatch_panel_points = alliance_breakdown['hatchPanelPoints']
-                    cargo_points = alliance_breakdown['cargoPoints']
+                    hatch_panel_points += alliance_breakdown['hatchPanelPoints']
+                    cargo_points += alliance_breakdown['cargoPoints']
 
                     alliance_rocket_rp_achieved = alliance_breakdown['completeRocketRankingPoint']
                     alliance_climb_rp_achieved = alliance_breakdown['habDockingRankingPoint']
