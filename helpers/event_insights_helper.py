@@ -100,6 +100,7 @@ class EventInsightsHelper(object):
                     alliance_breakdown = match.score_breakdown[alliance_color]
 
                     # Auto
+                    sandstorm_bonus_auto += alliance_breakdown['sandStormBonusPoints']
                     points_auto += alliance_breakdown['autoPoints']
 
                     # Teleop
