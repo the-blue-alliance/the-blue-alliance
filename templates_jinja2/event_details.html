@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% import 'match_partials/match_table_macros.html' as mtm %}
+{% import 'event_partials/event_macros.html' as em %}
 
 {% block title %}{{event.name}} ({{event.year}}) - The Blue Alliance{% endblock %}
 
@@ -65,9 +66,7 @@
         {% if parent_event %}
           <span class="glyphicon glyphicon-circle-arrow-right"></span> Winners advance to the <a href="/event/{{ parent_event.key_name }}">{{ parent_event.name }}</a><br />
         {% endif %}
-        {% if event.start_date %}
-          <span class="glyphicon glyphicon-calendar"></span> <time itemprop="startDate" datetime="{{event.start_date.isoformat()}}">{{ event.start_date|strftime("%B %d") }}{% if event.start_date.date() != event.end_date.date() %}</time> to <time itemprop="endDate" datetime="{{event.end_date.isoformat()}}">{{ event.end_date|strftime("%B %d") }}{% endif %}, {{ event.end_date|strftime("%Y") }}</time> {% if event.week_str %}<span class="badge">{{event.week_str}}</span>{% endif %}
-        {% endif %}
+        {{ em.showEventDates(event) }}
         {% if event.nl and event.nl.name and event.nl.city_state_country %}
           <br><span class="glyphicon glyphicon-map-marker"></span>
           {% if event.nl and event.nl.name %}

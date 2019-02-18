@@ -8,7 +8,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from consts.event_type import EventType
-from helpers.event_helper import EventHelper, REGIONAL_EVENTS_LABEL, CHAMPIONSHIP_EVENTS_LABEL,\
+from helpers.event_helper import EventHelper, CHAMPIONSHIP_EVENTS_LABEL,\
     WEEKLESS_EVENTS_LABEL, OFFSEASON_EVENTS_LABEL, PRESEASON_EVENTS_LABEL
 from models.event import Event
 
@@ -39,7 +39,7 @@ class TestEventGroupByWeek(unittest2.TestCase):
         week_start = datetime.datetime(2013, 2, 27)
         for i in range(1, 7):  # test for 6 weeks
             for _ in range(state.randint(1, 15)):  # random number of events per week
-                week_label = REGIONAL_EVENTS_LABEL.format(i)
+                week_label = 'Week {}'.format(i)
 
                 start_date = week_start + datetime.timedelta(days=state.randint(0, 6))
                 end_date = start_date + datetime.timedelta(days=state.randint(0, 3))
