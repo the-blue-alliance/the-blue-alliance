@@ -93,7 +93,6 @@ class AvatarsHandler(CacheableHandler):
 
         self.template_values.update({
             'year': year,
-            'game_name': 'TEST',
             'avatars': avatars,
         })
         return jinja2_engine.render('avatars.html', self.template_values)
