@@ -22,6 +22,7 @@ function update_countdown() {
   
   if (time_diff < 0) {
       $('.countdown').remove();
+      return;
   }
 
   $('.countdown-days').text(days);
