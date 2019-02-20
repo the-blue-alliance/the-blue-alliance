@@ -5699,6 +5699,176 @@
         }
       }
     },
+    "Match_Score_Breakdown_2019": {
+      "type": "object",
+      "properties": {
+        "blue": {
+          "$ref": "#/definitions/Match_Score_Breakdown_2019_Alliance"
+        },
+        "red": {
+          "$ref": "#/definitions/Match_Score_Breakdown_2019_Alliance"
+        }
+      },
+      "description": "See the 2019 FMS API documentation for a description of each value. https://frcevents2.docs.apiary.io/#reference/match-results/score-details"
+    },
+    "Match_Score_Breakdown_2019_Alliance": {
+      "type": "object",
+      "properties": {
+        "adjustPoints": {
+          "type": "integer"
+        },
+        "autoPoints": {
+          "type": "integer"
+        },
+        "bay1": {
+          "type": "string"
+        },
+        "bay2": {
+          "type": "string"
+        },
+        "bay3": {
+          "type": "string"
+        },
+        "bay4": {
+          "type": "string"
+        },
+        "bay5": {
+          "type": "string"
+        },
+        "bay6": {
+          "type": "string"
+        },
+        "bay7": {
+          "type": "string"
+        },
+        "bay8": {
+          "type": "string"
+        },
+        "cargoPoints": {
+          "type": "integer"
+        },
+        "completeRocketRankingPoint": {
+          "type": "boolean"
+        },
+        "completedRocketFar": {
+          "type": "boolean"
+        },
+        "completedRocketNear": {
+          "type": "boolean"
+        },
+        "endgameRobot1": {
+          "type": "string"
+        },
+        "endgameRobot2": {
+          "type": "string"
+        },
+        "endgameRobot3": {
+          "type": "string"
+        },
+        "foulCount": {
+          "type": "integer"
+        },
+        "foulPoints": {
+          "type": "integer"
+        },
+        "habClimbPoints": {
+          "type": "integer"
+        },
+        "habDockingRankingPoint": {
+          "type": "boolean"
+        },
+        "habLineRobot1": {
+          "type": "string"
+        },
+        "habLineRobot2": {
+          "type": "string"
+        },
+        "habLineRobot3": {
+          "type": "string"
+        },
+        "hatchPanelPoints": {
+          "type": "integer"
+        },
+        "lowLeftRocketFar": {
+          "type": "string"
+        },
+        "lowLeftRocketNear": {
+          "type": "string"
+        },
+        "lowRightRocketFar": {
+          "type": "string"
+        },
+        "lowRightRocketNear": {
+          "type": "string"
+        },
+        "midLeftRocketFar": {
+          "type": "string"
+        },
+        "midLeftRocketNear": {
+          "type": "string"
+        },
+        "midRightRocketFar": {
+          "type": "string"
+        },
+        "midRightRocketNear": {
+          "type": "string"
+        },
+        "preMatchBay1": {
+          "type": "string"
+        },
+        "preMatchBay2": {
+          "type": "string"
+        },
+        "preMatchBay3": {
+          "type": "string"
+        },
+        "preMatchBay6": {
+          "type": "string"
+        },
+        "preMatchBay7": {
+          "type": "string"
+        },
+        "preMatchBay8": {
+          "type": "string"
+        },
+        "preMatchLevelRobot1": {
+          "type": "string"
+        },
+        "preMatchLevelRobot2": {
+          "type": "string"
+        },
+        "preMatchLevelRobot3": {
+          "type": "string"
+        },
+        "rp": {
+          "type": "integer"
+        },
+        "sandStormBonusPoints": {
+          "type": "integer"
+        },
+        "techFoulCount": {
+          "type": "integer"
+        },
+        "teleopPoints": {
+          "type": "integer"
+        },
+        "topLeftRocketFar": {
+          "type": "string"
+        },
+        "topLeftRocketNear": {
+          "type": "string"
+        },
+        "topRightRocketFar": {
+          "type": "string"
+        },
+        "topRightRocketNear": {
+          "type": "string"
+        },
+        "totalPoints": {
+          "type": "integer"
+        }
+      }
+    },
     "Media": {
       "type": "object",
       "required": [
