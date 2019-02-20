@@ -440,9 +440,9 @@
 {% macro drawPanelCargoSVG(contents, preMatchContents=None) %}
 <svg width="24px" height="24px" style="display: block; margin: auto;">
   {% if contents == 'PanelAndCargo' %}
-    <circle cx="12" cy="12" r="10" fill="#ffa500" stroke="{% if preMatchContents == 'Panel' %}#fff{% else %}#f4d941{% endif %}" stroke-width="4"/>
+    <circle cx="12" cy="12" r="10" fill="#ffa500" stroke="{% if preMatchContents == 'Panel' %}#555{% else %}#f4d941{% endif %}" stroke-width="4"/>
   {% elif contents == 'Panel' %}
-    <circle cx="12" cy="12" r="10" fill="none" stroke="{% if preMatchContents == 'Panel' %}#fff{% else %}#f4d941{% endif %}" stroke-width="4"/>
+    <circle cx="12" cy="12" r="10" fill="none" stroke="{% if preMatchContents == 'Panel' %}#555{% else %}#f4d941{% endif %}" stroke-width="4"/>
   {% endif %}
 </svg>
 {% endmacro %}
