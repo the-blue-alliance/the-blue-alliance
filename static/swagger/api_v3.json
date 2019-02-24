@@ -3514,7 +3514,7 @@
         },
         "motto": {
           "type": "string",
-          "description": "Team's motto as provided by FIRST."
+          "description": "Team's motto as provided by FIRST. This field is deprecated and will return null - will be removed at end-of-season in 2019."
         },
         "home_championship": {
           "type": "object",
@@ -5728,7 +5728,7 @@
             "instagram-image",
             "external-link",
             "avatar"
-          ] 
+          ]
         },
         "foreign_key": {
           "type": "string",

@@ -28,7 +28,7 @@ class TeamConverter(ConverterBase):
             'name': team.name if team.name else default_name,
             'website': team.website,
             'rookie_year': team.rookie_year,
-            'motto': team.motto,
+            'motto': None,
             'home_championship': team.championship_location,
         }
         team_dict.update(cls.constructLocation_v3(team))
