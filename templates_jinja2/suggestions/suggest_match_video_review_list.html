@@ -46,7 +46,8 @@
                             <li>{{ suggestion.author.get().email }}</li>
                             <li>{{ suggestion.author.get().nickname }}</li>
                             <li>{{ suggestion.target_model }}:{{ suggestion.target_key }}</li>
-                            <li>{{ suggestion.contents_json }}</li>
+                            <li><a href="#{{suggestion.key.id()}}-contents_json" data-toggle="collapse">Show contents_json</a></li>
+                            <li id="{{suggestion.key.id()}}-contents_json" class="collapse"></li>
                         </ul>
                     </div>
                     <div class="clearfix"></div>
