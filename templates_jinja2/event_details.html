@@ -20,7 +20,6 @@
   {% if event.venue %}<meta property="og:fn" content="{{event.venue}}" />{% endif %}
 {% endblock %}
 
-
 {% block content %}
 {% if event_down %}
   <div id="fixed-alert-container">
@@ -69,18 +68,22 @@
         {{ em.showEventDates(event) }}
         {% if event.nl and event.nl.name and event.nl.city_state_country %}
           <br><span class="glyphicon glyphicon-map-marker"></span>
+          <span itemprop="location">
           {% if event.nl and event.nl.name %}
             <a href="{{event.nl.place_details.url}}" target="_blank">{{event.nl.name}}</a> in {{event.nl.city_state_country}}
           {% else %}
             <a href="//maps.google.com/maps?q={{ event.city_state_country|urlencode }}" target="_blank">{{event.city_state_country}}</a>
           {% endif %}
+          </span>
         {% elif event.location or event.venue_address_safe %}
           <br><span class="glyphicon glyphicon-map-marker"></span>
+          <span itemprop="location">
           {% if event.venue_address_safe %}
             <a href="http://maps.google.com/maps?q={{ event.venue_address_safe|urlencode }}" target="_blank">{{ event.venue_or_venue_from_address }}</a>{% if event.location %} in {{event.location}}{% endif %}
           {% else %}
             <a href="http://maps.google.com/maps?q={{ event.location|urlencode }}" target="_blank">{{event.location}}</a>
           {% endif %}
+          </span>
         {% endif %}
         {% if event.website %}<br><span class="glyphicon glyphicon-link"></span> <a href="{{ event.website }}" title="{{ event.name }}" target="_blank">{{ event.website }}</a>{% endif %}
         {% if event.first_eid or event.official %}{% if not event.website %}<br><span class="glyphicon glyphicon-info-sign"></span>{% else %} - {% endif %} details on <a href="{% if event.first_eid %}https://www.firstinspires.org/team-event-search/event?id={{event.first_eid}}{%elif event.official %}https://frc-events.firstinspires.org/{{event.year}}/{{event.first_api_code}}{%endif%}" target="_blank">firstinspires.org</a>{% endif %}
