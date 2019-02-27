@@ -471,6 +471,10 @@ class PredictionHelper(object):
                 ('auto_points', 0, 1**2),
                 ('endgame_points', 0, 1**2),
             ]
+        elif event.year == 2019:
+            relevant_stats = [
+                ('score', 10, 10**2),
+            ]
 
         contribution_calculators = [ContributionCalculator(event, matches, s, m, v) for s, m, v in relevant_stats]
         qual_matches = filter(lambda m: m.comp_level == 'qm', matches)
@@ -606,6 +610,10 @@ class PredictionHelper(object):
                         elif match.year == 2018:
                             sampled_rp1[alliance_color] = match.score_breakdown[alliance_color]['autoQuestRankingPoint']
                             sampled_rp2[alliance_color] = match.score_breakdown[alliance_color]['faceTheBossRankingPoint']
+                            sampled_tiebreaker[alliance_color] = match.score_breakdown[alliance_color]['totalPoints']
+                        elif match.year == 2019:
+                            sampled_rp1[alliance_color] = match.score_breakdown[alliance_color]['completeRocketRankingPoint']
+                            sampled_rp2[alliance_color] = match.score_breakdown[alliance_color]['habDockingRankingPoint']
                             sampled_tiebreaker[alliance_color] = match.score_breakdown[alliance_color]['totalPoints']
                 else:
                     prediction = match_predictions[match.key.id()]

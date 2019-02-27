@@ -19,11 +19,11 @@
       <th>B3 Rank (Alliance)</th>
       <th>Red Predicted Score</th>
       <th>Blue Predicted Score</th>
-      <th>Red Auto Power</th>
+      {# <th>Red Auto Power</th>
       <th>Blue Auto Power</th>
       <th>Red Endgame Power</th>
       <th>Blue Endgame Power</th>
-      <th>BlueZone Score</th>
+      <th>BlueZone Score</th> #}
     </tr>
   </thead>
   <tbody>
@@ -59,7 +59,7 @@
         {% endfor %}
         <td class="red">{{match.prediction.red.score|round|int}}</td>
         <td class="blue">{{match.prediction.blue.score|round|int}}</td>
-        <td>
+        {# <td>
           <div class="progress" style="margin: 0px;">
             <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{(match.prediction.red.auto_points/35*100)|round|int}}%; color: black;">
               {{(match.prediction.red.auto_points)|round|int}}
@@ -93,7 +93,7 @@
               {{match.bluezone_score|round|int}}
             </div>
           </div>
-        </td>
+        </td> #}
       </tr>
     {% endfor %}
   </tbody>

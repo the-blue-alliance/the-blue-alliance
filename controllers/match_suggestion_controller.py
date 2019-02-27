@@ -11,20 +11,22 @@ from helpers.match_helper import MatchHelper
 class MatchSuggestionHandler(LoggedInHandler):
 
     def get_qual_bluezone_score(self, prediction):
-        return min(100, (
-            min(prediction['red']['auto_points'] * prediction['red']['auto_points'], 2000) / 2000 +
-            min(prediction['blue']['auto_points'] * prediction['blue']['auto_points'], 2000) / 2000 +
-            min(prediction['red']['endgame_points'] * prediction['red']['endgame_points'], 8100) / 8100 +
-            min(prediction['blue']['endgame_points'] * prediction['blue']['endgame_points'], 8100) / 8100
-        ) * 25)
+        return 0
+        # return min(100, (
+        #     min(prediction['red']['auto_points'] * prediction['red']['auto_points'], 2000) / 2000 +
+        #     min(prediction['blue']['auto_points'] * prediction['blue']['auto_points'], 2000) / 2000 +
+        #     min(prediction['red']['endgame_points'] * prediction['red']['endgame_points'], 8100) / 8100 +
+        #     min(prediction['blue']['endgame_points'] * prediction['blue']['endgame_points'], 8100) / 8100
+        # ) * 25)
 
     def get_elim_bluezone_score(self, prediction):
-        return min(100, (
-            min(prediction['red']['auto_points'] * prediction['red']['auto_points'], 2000) / 2000 +
-            min(prediction['blue']['auto_points'] * prediction['blue']['auto_points'], 2000) / 2000 +
-            min(prediction['red']['endgame_points'] * prediction['red']['endgame_points'], 8100) / 8100 +
-            min(prediction['blue']['endgame_points'] * prediction['blue']['endgame_points'], 8100) / 8100
-        ) * 25)
+        return 0
+        # return min(100, (
+        #     min(prediction['red']['auto_points'] * prediction['red']['auto_points'], 2000) / 2000 +
+        #     min(prediction['blue']['auto_points'] * prediction['blue']['auto_points'], 2000) / 2000 +
+        #     min(prediction['red']['endgame_points'] * prediction['red']['endgame_points'], 8100) / 8100 +
+        #     min(prediction['blue']['endgame_points'] * prediction['blue']['endgame_points'], 8100) / 8100
+        # ) * 25)
 
     def get(self):
         self._require_registration()
