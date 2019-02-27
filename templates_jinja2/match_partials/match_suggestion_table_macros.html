@@ -22,8 +22,8 @@
       {# <th>Red Auto Power</th>
       <th>Blue Auto Power</th>
       <th>Red Endgame Power</th>
-      <th>Blue Endgame Power</th>
-      <th>BlueZone Score</th> #}
+      <th>Blue Endgame Power</th> #}
+      <th>BlueZone Score</th>
     </tr>
   </thead>
   <tbody>
@@ -86,14 +86,14 @@
               {{(match.prediction.blue.endgame_points|round(1))}}
             </div>
           </div>
-        </td>
+        </td> #}
         <td>
           <div class="progress" style="margin: 0px;">
             <div class="progress-bar {% if match.bluezone_score < 30 %}progress-bar-danger{% elif match.bluezone_score < 50 %}progress-bar-warning{% else %}progress-bar-success{% endif %}" role="progressbar" style="width: {{match.bluezone_score}}%; color: black;">
               {{match.bluezone_score|round|int}}
             </div>
           </div>
-        </td> #}
+        </td>
       </tr>
     {% endfor %}
   </tbody>

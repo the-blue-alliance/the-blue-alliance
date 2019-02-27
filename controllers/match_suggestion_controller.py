@@ -11,7 +11,11 @@ from helpers.match_helper import MatchHelper
 class MatchSuggestionHandler(LoggedInHandler):
 
     def get_qual_bluezone_score(self, prediction):
-        return 0
+        redScore = prediction['red']['score']
+        blueScore = prediction['blue']['score']
+        winningScore = redScore if redScore > blueScore else blueScore
+        losingScore = redScore if redScore < blueScore else blueScore
+        return float(winningScore + 2 * losingScore) / 130.0 * 100  # Max score ~130
         # return min(100, (
         #     min(prediction['red']['auto_points'] * prediction['red']['auto_points'], 2000) / 2000 +
         #     min(prediction['blue']['auto_points'] * prediction['blue']['auto_points'], 2000) / 2000 +
@@ -20,7 +24,7 @@ class MatchSuggestionHandler(LoggedInHandler):
         # ) * 25)
 
     def get_elim_bluezone_score(self, prediction):
-        return 0
+        return self.get_qual_bluezone_score(prediction)
         # return min(100, (
         #     min(prediction['red']['auto_points'] * prediction['red']['auto_points'], 2000) / 2000 +
         #     min(prediction['blue']['auto_points'] * prediction['blue']['auto_points'], 2000) / 2000 +
