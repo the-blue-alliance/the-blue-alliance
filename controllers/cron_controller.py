@@ -777,3 +777,15 @@ class RemapTeamsDo(webapp.RequestHandler):
         # Remap awards
         EventHelper.remapteams_awards(event.awards, event.remap_teams)
         AwardManipulator.createOrUpdate(event.awards, auto_union=False)
+
+
+class SetGameDayDefaultChat(webapp.RequestHandler):
+    """
+    Sets GameDay default chat
+    """
+    def get(self, chat_channel):
+        gd_sitevar = Sitevar.get_or_insert("gameday.special_webcasts")
+        sitevar_contents = gd_sitevar.contents
+        sitevar_contents['default_chat'] = chat_channel
+        gd_sitevar.contents = sitevar_contents
+        gd_sitevar.put()

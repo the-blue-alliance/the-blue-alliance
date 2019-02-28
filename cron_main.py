@@ -21,6 +21,7 @@ from controllers.cron_controller import EventMatchstatsDo, EventMatchstatsEnqueu
 from controllers.cron_controller import FinalMatchesRepairDo
 from controllers.cron_controller import UpcomingNotificationDo
 from controllers.cron_controller import UpdateLiveEventsDo
+from controllers.cron_controller import SetGameDayDefaultChat
 
 from controllers.admin.admin_cron_controller import AdminMobileClearEnqueue, AdminMobileClear, AdminSubsClearEnqueue, AdminSubsClear, \
     AdminWebhooksClearEnqueue, AdminWebhooksClear, AdminRegistrationDayEnqueue, \
@@ -83,5 +84,6 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/do/update_live_events', UpdateLiveEventsDo),
                                ('/tasks/do/nag_suggestions', SuggestionQueueDailyNag),
                                ('/tasks/do/remap_teams/(.*)', RemapTeamsDo),
+                               ('/tasks/do/set_gameday_default_chat/(.*)', SetGameDayDefaultChat),
                                ],
                               debug=tba_config.DEBUG)
