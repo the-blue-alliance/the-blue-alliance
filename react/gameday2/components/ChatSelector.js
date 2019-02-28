@@ -32,6 +32,8 @@ export default class ChatSelector extends React.Component {
       let chatName = chat.name
       if (chat.channel === 'firstupdatesnow' && isDefault) {
         chatName = 'TBA GameDay / FUN'
+      } else if (chat.channel === 'firstinspires' && isDefault) {
+        chatName = 'TBA GameDay / FIRST'
       }
 
       chatItems.push(

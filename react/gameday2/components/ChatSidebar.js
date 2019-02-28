@@ -123,6 +123,8 @@ class ChatSidebar extends React.Component {
       currentChatName = `${currentChat.name} Chat`
       if (currentChat.channel === 'firstupdatesnow' && this.props.defaultChat === 'firstupdatesnow') {
         currentChatName = 'TBA GameDay / FUN'
+      } else if (currentChat.channel === 'firstinspires' && this.props.defaultChat === 'firstinspires') {
+        currentChatName = 'TBA GameDay / FIRST'
       }
     }
 
