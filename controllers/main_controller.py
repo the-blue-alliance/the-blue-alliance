@@ -379,8 +379,7 @@ class ContactHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/contact.html")
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('contact.html', self.template_values)
 
 
 class PrivacyHandler(CacheableHandler):
