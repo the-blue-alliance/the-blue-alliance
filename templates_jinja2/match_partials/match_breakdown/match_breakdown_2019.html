@@ -1,3 +1,21 @@
+{% macro drawNullPanelSVG() %}
+<svg width="16px" height="16px" style="display: inline-block; vertical-align: middle;" rel="tooltip" title="Null Hatch Panel">
+  <circle cx="8" cy="8" r="6" fill="none" stroke="#555" stroke-width="4"/>
+</svg>
+{% endmacro %}
+
+{% macro drawPanelSVG() %}
+<svg width="16px" height="16px" style="display: inline-block; vertical-align: middle;" rel="tooltip" title="Hatch Panel">
+  <circle cx="8" cy="8" r="6" fill="none" stroke="#f4d941" stroke-width="4"/>
+</svg>
+{% endmacro %}
+
+{% macro drawCargoSVG() %}
+<svg width="16px" height="16px" style="display: inline-block; vertical-align: middle;" rel="tooltip" title="Cargo">
+  <circle cx="8" cy="8" r="8" fill="#ffa500" />
+</svg>
+{% endmacro %}
+
 <table class="match-table">
   <tbody>
     <!-- Robot 1 Sandstorm Bonus -->
@@ -8,28 +26,28 @@
       <td class="red" colspan="2">
         {% if match.score_breakdown.red.habLineRobot1 == 'CrossedHabLineInSandstorm' %}
           {% if match.score_breakdown.red.preMatchLevelRobot1 == 'HabLevel1' %}
-            Level 1
+            Level 1 (+3)
           {% elif match.score_breakdown.red.preMatchLevelRobot1 == 'HabLevel2' %}
-            Level 2
+            Level 2 (+6)
           {% else %}
-            --
+            ?
           {% endif %}
         {% else %}
-          --
+          <span class="glyphicon glyphicon-remove"></span>
         {% endif %}
       </td>
       <td>Robot 1 Sandstorm Bonus</td>
       <td class="blue" colspan="2">
         {% if match.score_breakdown.blue.habLineRobot1 == 'CrossedHabLineInSandstorm' %}
           {% if match.score_breakdown.blue.preMatchLevelRobot1 == 'HabLevel1' %}
-            Level 1
+            Level 1 (+3)
           {% elif match.score_breakdown.blue.preMatchLevelRobot1 == 'HabLevel2' %}
-            Level 2
+            Level 2 (+6)
           {% else %}
-            --
+            ?
           {% endif %}
         {% else %}
-          --
+          <span class="glyphicon glyphicon-remove"></span>
         {% endif %}
       </td>
     </tr>
@@ -42,28 +60,28 @@
       <td class="red" colspan="2">
         {% if match.score_breakdown.red.habLineRobot2 == 'CrossedHabLineInSandstorm' %}
           {% if match.score_breakdown.red.preMatchLevelRobot2 == 'HabLevel1' %}
-            Level 1
+            Level 1 (+3)
           {% elif match.score_breakdown.red.preMatchLevelRobot2 == 'HabLevel2' %}
-            Level 2
+            Level 2 (+6)
           {% else %}
-            --
+            ?
           {% endif %}
         {% else %}
-          --
+          <span class="glyphicon glyphicon-remove"></span>
         {% endif %}
       </td>
       <td>Robot 2 Sandstorm Bonus</td>
       <td class="blue" colspan="2">
         {% if match.score_breakdown.blue.habLineRobot2 == 'CrossedHabLineInSandstorm' %}
           {% if match.score_breakdown.blue.preMatchLevelRobot2 == 'HabLevel1' %}
-            Level 1
+            Level 1 (+3)
           {% elif match.score_breakdown.blue.preMatchLevelRobot2 == 'HabLevel2' %}
-            Level 2
+            Level 2 (+6)
           {% else %}
-            --
+            ?
           {% endif %}
         {% else %}
-          --
+          <span class="glyphicon glyphicon-remove"></span>
         {% endif %}
       </td>
     </tr>
@@ -76,28 +94,28 @@
       <td class="red" colspan="2">
         {% if match.score_breakdown.red.habLineRobot3 == 'CrossedHabLineInSandstorm' %}
           {% if match.score_breakdown.red.preMatchLevelRobot3 == 'HabLevel1' %}
-            Level 1
+            Level 1 (+3)
           {% elif match.score_breakdown.red.preMatchLevelRobot3 == 'HabLevel2' %}
-            Level 2
+            Level 2 (+6)
           {% else %}
-            --
+            ?
           {% endif %}
         {% else %}
-          --
+          <span class="glyphicon glyphicon-remove"></span>
         {% endif %}
       </td>
       <td>Robot 3 Sandstorm Bonus</td>
       <td class="blue" colspan="2">
         {% if match.score_breakdown.blue.habLineRobot3 == 'CrossedHabLineInSandstorm' %}
           {% if match.score_breakdown.blue.preMatchLevelRobot3 == 'HabLevel1' %}
-            Level 1
+            Level 1 (+3)
           {% elif match.score_breakdown.blue.preMatchLevelRobot3 == 'HabLevel2' %}
-            Level 2
+            Level 2 (+6)
           {% else %}
-            --
+            ?
           {% endif %}
         {% else %}
-          --
+          <span class="glyphicon glyphicon-remove"></span>
         {% endif %}
       </td>
     </tr>
@@ -115,17 +133,27 @@
     {% if "bay1" in match.score_breakdown.red %}
     <tr>
       <td class="red" colspan="2">
+        {{drawNullPanelSVG()}}
         {{
-          (1 if 'Panel' in match.score_breakdown.red.bay1 else 0) +
-          (1 if 'Panel' in match.score_breakdown.red.bay2 else 0) +
-          (1 if 'Panel' in match.score_breakdown.red.bay3 else 0) +
-          (1 if 'Panel' in match.score_breakdown.red.bay4 else 0) +
-          (1 if 'Panel' in match.score_breakdown.red.bay5 else 0) +
-          (1 if 'Panel' in match.score_breakdown.red.bay6 else 0) +
-          (1 if 'Panel' in match.score_breakdown.red.bay7 else 0) +
-          (1 if 'Panel' in match.score_breakdown.red.bay8 else 0)
-        }}
-        /
+          (1 if match.score_breakdown.red.preMatchBay1 == 'Panel' else 0) +
+          (1 if match.score_breakdown.red.preMatchBay2 == 'Panel' else 0) +
+          (1 if match.score_breakdown.red.preMatchBay3 == 'Panel' else 0) +
+          (1 if match.score_breakdown.red.preMatchBay6 == 'Panel' else 0) +
+          (1 if match.score_breakdown.red.preMatchBay7 == 'Panel' else 0) +
+          (1 if match.score_breakdown.red.preMatchBay8 == 'Panel' else 0)
+        }}&nbsp;
+        {{drawPanelSVG()}}
+        {{
+          (1 if 'Panel' in match.score_breakdown.red.bay1 and match.score_breakdown.red.preMatchBay1 != 'Panel' else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.bay2 and match.score_breakdown.red.preMatchBay2 != 'Panel' else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.bay3 and match.score_breakdown.red.preMatchBay3 != 'Panel' else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.bay4 and match.score_breakdown.red.preMatchBay4 != 'Panel' else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.bay5 and match.score_breakdown.red.preMatchBay5 != 'Panel' else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.bay6 and match.score_breakdown.red.preMatchBay6 != 'Panel' else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.bay7 and match.score_breakdown.red.preMatchBay7 != 'Panel' else 0) +
+          (1 if 'Panel' in match.score_breakdown.red.bay8 and match.score_breakdown.red.preMatchBay8 != 'Panel' else 0)
+        }}&nbsp;
+        {{drawCargoSVG()}}
         {{
           (1 if 'Cargo' in match.score_breakdown.red.bay1 else 0) +
           (1 if 'Cargo' in match.score_breakdown.red.bay2 else 0) +
@@ -137,19 +165,29 @@
           (1 if 'Cargo' in match.score_breakdown.red.bay8 else 0)
         }}
       </td>
-      <td>Cargo Ship: # Hatch Panels / # Cargo</td>
+      <td>Cargo Ship</td>
       <td class="blue" colspan="2">
+        {{drawNullPanelSVG()}}
         {{
-          (1 if 'Panel' in match.score_breakdown.blue.bay1 else 0) +
-          (1 if 'Panel' in match.score_breakdown.blue.bay2 else 0) +
-          (1 if 'Panel' in match.score_breakdown.blue.bay3 else 0) +
-          (1 if 'Panel' in match.score_breakdown.blue.bay4 else 0) +
-          (1 if 'Panel' in match.score_breakdown.blue.bay5 else 0) +
-          (1 if 'Panel' in match.score_breakdown.blue.bay6 else 0) +
-          (1 if 'Panel' in match.score_breakdown.blue.bay7 else 0) +
-          (1 if 'Panel' in match.score_breakdown.blue.bay8 else 0)
-        }}
-        /
+          (1 if match.score_breakdown.blue.preMatchBay1 == 'Panel' else 0) +
+          (1 if match.score_breakdown.blue.preMatchBay2 == 'Panel' else 0) +
+          (1 if match.score_breakdown.blue.preMatchBay3 == 'Panel' else 0) +
+          (1 if match.score_breakdown.blue.preMatchBay6 == 'Panel' else 0) +
+          (1 if match.score_breakdown.blue.preMatchBay7 == 'Panel' else 0) +
+          (1 if match.score_breakdown.blue.preMatchBay8 == 'Panel' else 0)
+        }}&nbsp;
+        {{drawPanelSVG()}}
+        {{
+          (1 if 'Panel' in match.score_breakdown.blue.bay1 and match.score_breakdown.blue.preMatchBay1 != 'Panel' else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.bay2 and match.score_breakdown.blue.preMatchBay2 != 'Panel' else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.bay3 and match.score_breakdown.blue.preMatchBay3 != 'Panel' else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.bay4 and match.score_breakdown.blue.preMatchBay4 != 'Panel' else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.bay5 and match.score_breakdown.blue.preMatchBay5 != 'Panel' else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.bay6 and match.score_breakdown.blue.preMatchBay6 != 'Panel' else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.bay7 and match.score_breakdown.blue.preMatchBay7 != 'Panel' else 0) +
+          (1 if 'Panel' in match.score_breakdown.blue.bay8 and match.score_breakdown.blue.preMatchBay8 != 'Panel' else 0)
+        }}&nbsp;
+        {{drawCargoSVG()}}
         {{
           (1 if 'Cargo' in match.score_breakdown.blue.bay1 else 0) +
           (1 if 'Cargo' in match.score_breakdown.blue.bay2 else 0) +
@@ -166,6 +204,7 @@
     <!-- Rocekt 1 -->
     <tr>
       <td class="red" colspan="2">
+        {{drawPanelSVG()}}
         {{
           (1 if 'Panel' in match.score_breakdown.red.topLeftRocketNear else 0) +
           (1 if 'Panel' in match.score_breakdown.red.topRightRocketNear else 0) +
@@ -173,8 +212,8 @@
           (1 if 'Panel' in match.score_breakdown.red.midRightRocketNear else 0) +
           (1 if 'Panel' in match.score_breakdown.red.lowLeftRocketNear else 0) +
           (1 if 'Panel' in match.score_breakdown.red.lowRightRocketNear else 0)
-        }}
-        /
+        }}&nbsp;
+        {{drawCargoSVG()}}
         {{
           (1 if 'Cargo' in match.score_breakdown.red.topLeftRocketNear else 0) +
           (1 if 'Cargo' in match.score_breakdown.red.topRightRocketNear else 0) +
@@ -184,8 +223,9 @@
           (1 if 'Cargo' in match.score_breakdown.red.lowRightRocketNear else 0)
         }}
       </td>
-      <td>Rocket 1: # Hatch Panels / # Cargo</td>
+      <td>Rocket 1</td>
       <td class="blue" colspan="2">
+        {{drawPanelSVG()}}
         {{
           (1 if 'Panel' in match.score_breakdown.blue.topLeftRocketNear else 0) +
           (1 if 'Panel' in match.score_breakdown.blue.topRightRocketNear else 0) +
@@ -193,8 +233,8 @@
           (1 if 'Panel' in match.score_breakdown.blue.midRightRocketNear else 0) +
           (1 if 'Panel' in match.score_breakdown.blue.lowLeftRocketNear else 0) +
           (1 if 'Panel' in match.score_breakdown.blue.lowRightRocketNear else 0)
-        }}
-        /
+        }}&nbsp;
+        {{drawCargoSVG()}}
         {{
           (1 if 'Cargo' in match.score_breakdown.blue.topLeftRocketNear else 0) +
           (1 if 'Cargo' in match.score_breakdown.blue.topRightRocketNear else 0) +
@@ -208,6 +248,7 @@
     <!-- Rocekt 2 -->
     <tr>
       <td class="red" colspan="2">
+        {{drawPanelSVG()}}
         {{
           (1 if 'Panel' in match.score_breakdown.red.topLeftRocketFar else 0) +
           (1 if 'Panel' in match.score_breakdown.red.topRightRocketFar else 0) +
@@ -215,8 +256,8 @@
           (1 if 'Panel' in match.score_breakdown.red.midRightRocketFar else 0) +
           (1 if 'Panel' in match.score_breakdown.red.lowLeftRocketFar else 0) +
           (1 if 'Panel' in match.score_breakdown.red.lowRightRocketFar else 0)
-        }}
-        /
+        }}&nbsp;
+        {{drawCargoSVG()}}
         {{
           (1 if 'Cargo' in match.score_breakdown.red.topLeftRocketFar else 0) +
           (1 if 'Cargo' in match.score_breakdown.red.topRightRocketFar else 0) +
@@ -226,8 +267,9 @@
           (1 if 'Cargo' in match.score_breakdown.red.lowRightRocketFar else 0)
         }}
       </td>
-      <td>Rocket 2: # Hatch Panels / # Cargo</td>
+      <td>Rocket 2</td>
       <td class="blue" colspan="2">
+        {{drawPanelSVG()}}
         {{
           (1 if 'Panel' in match.score_breakdown.blue.topLeftRocketFar else 0) +
           (1 if 'Panel' in match.score_breakdown.blue.topRightRocketFar else 0) +
@@ -235,8 +277,8 @@
           (1 if 'Panel' in match.score_breakdown.blue.midRightRocketFar else 0) +
           (1 if 'Panel' in match.score_breakdown.blue.lowLeftRocketFar else 0) +
           (1 if 'Panel' in match.score_breakdown.blue.lowRightRocketFar else 0)
-        }}
-        /
+        }}&nbsp;
+        {{drawCargoSVG()}}
         {{
           (1 if 'Cargo' in match.score_breakdown.blue.topLeftRocketFar else 0) +
           (1 if 'Cargo' in match.score_breakdown.blue.topRightRocketFar else 0) +
@@ -248,19 +290,33 @@
       </td>
     </tr>
     <!-- Total Hatch Panels / Cargo -->
-    {% if "hatchPanelPoints" in match.score_breakdown.red and
-      "cargoPoints" in match.score_breakdown.red %}
+    {% if "hatchPanelPoints" in match.score_breakdown.red %}
     <tr class="key">
       <td class="redScore" colspan="2">
-        {{match.score_breakdown.red.hatchPanelPoints}}
-        /
-        {{match.score_breakdown.red.cargoPoints}}
+        {{drawPanelSVG()}}
+        {{(match.score_breakdown.red.hatchPanelPoints / 2) | int}}
+        (+{{match.score_breakdown.red.hatchPanelPoints}})
       </td>
-      <td>Total Points: Hatch Panels / Cargo</td>
+      <td>Total Hatch Panels</td>
       <td class="blueScore" colspan="2">
-        {{match.score_breakdown.blue.hatchPanelPoints}}
-        /
-        {{match.score_breakdown.blue.cargoPoints}}
+        {{drawPanelSVG()}}
+        {{(match.score_breakdown.blue.hatchPanelPoints / 2) | int}}
+        (+{{match.score_breakdown.blue.hatchPanelPoints}})
+      </td>
+    </tr>
+    {% endif %}
+    {% if "cargoPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">
+        {{drawCargoSVG()}}
+        {{(match.score_breakdown.red.cargoPoints / 3) | int}}
+        (+{{match.score_breakdown.red.cargoPoints}})
+      </td>
+      <td>Total Points Cargo</td>
+      <td class="blueScore" colspan="2">
+        {{drawCargoSVG()}}
+        {{(match.score_breakdown.blue.cargoPoints / 3) | int}}
+        (+{{match.score_breakdown.blue.cargoPoints}})
       </td>
     </tr>
     {% endif %}
@@ -270,24 +326,24 @@
     <tr>
       <td class="red" colspan="2">
         {% if match.score_breakdown.red.endgameRobot1 == 'HabLevel1' %}
-          Level 1
+          Level 1 (+3)
         {% elif match.score_breakdown.red.endgameRobot1 == 'HabLevel2' %}
-          Level 2
+          Level 2 (+6)
         {% elif match.score_breakdown.red.endgameRobot1 == 'HabLevel3' %}
-          Level 3
+          Level 3 (+12)
         {% else %}
-          --
+          <span class="glyphicon glyphicon-remove"></span>
         {% endif %}
       <td>Robot 1 HAB Climb</td>
       <td class="blue" colspan="2">
         {% if match.score_breakdown.blue.endgameRobot1 == 'HabLevel1' %}
-          Level 1
+          Level 1 (+3)
         {% elif match.score_breakdown.blue.endgameRobot1 == 'HabLevel2' %}
-          Level 2
+          Level 2(+6)
         {% elif match.score_breakdown.blue.endgameRobot1 == 'HabLevel3' %}
-          Level 3
+          Level 3 (+12)
         {% else %}
-          --
+          <span class="glyphicon glyphicon-remove"></span>
         {% endif %}
       </td>
     </tr>
@@ -297,24 +353,24 @@
     <tr>
       <td class="red" colspan="2">
         {% if match.score_breakdown.red.endgameRobot2 == 'HabLevel1' %}
-          Level 1
+          Level 1 (+3)
         {% elif match.score_breakdown.red.endgameRobot2 == 'HabLevel2' %}
-          Level 2
+          Level 2 (+6)
         {% elif match.score_breakdown.red.endgameRobot2 == 'HabLevel3' %}
-          Level 3
+          Level 3 (+12)
         {% else %}
-          --
+          <span class="glyphicon glyphicon-remove"></span>
         {% endif %}
       <td>Robot 2 HAB Climb</td>
       <td class="blue" colspan="2">
         {% if match.score_breakdown.blue.endgameRobot2 == 'HabLevel1' %}
-          Level 1
+          Level 1 (+3)
         {% elif match.score_breakdown.blue.endgameRobot2 == 'HabLevel2' %}
-          Level 2
+          Level 2 (+6)
         {% elif match.score_breakdown.blue.endgameRobot2 == 'HabLevel3' %}
-          Level 3
+          Level 3 (+12)
         {% else %}
-          --
+          <span class="glyphicon glyphicon-remove"></span>
         {% endif %}
       </td>
     </tr>
@@ -324,24 +380,24 @@
     <tr>
       <td class="red" colspan="2">
         {% if match.score_breakdown.red.endgameRobot3 == 'HabLevel1' %}
-          Level 1
+          Level 1 (+3)
         {% elif match.score_breakdown.red.endgameRobot3 == 'HabLevel2' %}
-          Level 2
+          Level 2 (+6)
         {% elif match.score_breakdown.red.endgameRobot3 == 'HabLevel3' %}
-          Level 3
+          Level 3 (+12)
         {% else %}
-          --
+          <span class="glyphicon glyphicon-remove"></span>
         {% endif %}
       <td>Robot 3 HAB Climb</td>
       <td class="blue" colspan="2">
         {% if match.score_breakdown.blue.endgameRobot3 == 'HabLevel1' %}
-          Level 1
+          Level 1 (+3)
         {% elif match.score_breakdown.blue.endgameRobot3 == 'HabLevel2' %}
-          Level 2
+          Level 2 (+6)
         {% elif match.score_breakdown.blue.endgameRobot3 == 'HabLevel3' %}
-          Level 3
+          Level 3 (+12)
         {% else %}
-          --
+          <span class="glyphicon glyphicon-remove"></span>
         {% endif %}
       </td>
     </tr>
