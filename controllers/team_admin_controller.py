@@ -223,7 +223,7 @@ class TeamAdminRedeem(LoggedInHandler):
             self.redirect('/mod/redeem?status=invalid_code')
             return
         team_number = int(team_number)
-        auth_code = self.request.get("auth_code")
+        auth_code = self.request.get("auth_code").strip()
         access = TeamAdminAccess.query(
             TeamAdminAccess.team_number == team_number,
             TeamAdminAccess.access_code == auth_code).fetch(1)

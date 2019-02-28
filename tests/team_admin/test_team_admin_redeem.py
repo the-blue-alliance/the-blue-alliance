@@ -147,6 +147,19 @@ class TestTeamAdminRedeem(unittest2.TestCase):
         self.assertEqual(response.request.GET['status'], 'success')
         self.assertEqual(self.account.key, access.account)
 
+    def test_redeem_code_with_whitespace(self):
+        self.loginUser()
+        access_key = self.addTeamAdminAccess(account=None)
+
+        form = self.getForm()
+        form['auth_code'] = ' abc123 '
+        form['team_number'] = '1124'
+        response = form.submit().follow()
+
+        access = access_key.get()
+        self.assertEqual(response.request.GET['status'], 'success')
+        self.assertEqual(self.account.key, access.account)
+
     def test_redeem_used_code(self):
         self.loginUser()
         access_key = self.addTeamAdminAccess(
