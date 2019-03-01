@@ -9,7 +9,7 @@ from models.insight import Insight
 
 from template_engine import jinja2_engine
 
-MAX_YEAR = 2018
+MAX_YEAR = 2019
 VALID_YEARS = list(reversed(range(1992, MAX_YEAR + 1)))
 
 
