@@ -19,10 +19,10 @@
       <th>B3 Rank (Alliance)</th>
       <th>Red Predicted Score</th>
       <th>Blue Predicted Score</th>
-      {# <th>Red Auto Power</th>
-      <th>Blue Auto Power</th>
-      <th>Red Endgame Power</th>
-      <th>Blue Endgame Power</th> #}
+      <th>Red Rocket Power</th>
+      <th>Blue Rocket Power</th>
+      <th>Red HAB Climb Power</th>
+      <th>Blue HAB Climb Power</th>
       <th>BlueZone Score</th>
     </tr>
   </thead>
@@ -59,34 +59,34 @@
         {% endfor %}
         <td class="red">{{match.prediction.red.score|round|int}}</td>
         <td class="blue">{{match.prediction.blue.score|round|int}}</td>
-        {# <td>
+        <td>
           <div class="progress" style="margin: 0px;">
-            <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{(match.prediction.red.auto_points/35*100)|round|int}}%; color: black;">
-              {{(match.prediction.red.auto_points)|round|int}}
+            <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{(match.prediction.red.rocket_pieces_scored/16*100)|round|int}}%; color: black;">
+              {{(match.prediction.red.rocket_pieces_scored)|round|int}}
             </div>
           </div>
         </td>
         <td>
           <div class="progress" style="margin: 0px;">
-            <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{(match.prediction.blue.auto_points/35*100)|round|int}}%; color: black;">
-              {{(match.prediction.blue.auto_points)|round|int}}
+            <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{(match.prediction.blue.rocket_pieces_scored/16*100)|round|int}}%; color: black;">
+              {{(match.prediction.blue.rocket_pieces_scored)|round|int}}
             </div>
           </div>
         </td>
         <td>
           <div class="progress" style="margin: 0px;">
-            <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{(match.prediction.red.endgame_points/90*100)}}%; color: black;">
-              {{(match.prediction.red.endgame_points|round(1))}}
+            <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{(match.prediction.red.hab_climb_points/20*100)}}%; color: black;">
+              {{(match.prediction.red.hab_climb_points|round(1))}}
             </div>
           </div>
         </td>
         <td>
           <div class="progress" style="margin: 0px;">
-            <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{(match.prediction.blue.endgame_points/90*100)}}%; color: black;">
-              {{(match.prediction.blue.endgame_points|round(1))}}
+            <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{(match.prediction.blue.hab_climb_points/20*100)}}%; color: black;">
+              {{(match.prediction.blue.hab_climb_points|round(1))}}
             </div>
           </div>
-        </td> #}
+        </td>
         <td>
           <div class="progress" style="margin: 0px;">
             <div class="progress-bar {% if match.bluezone_score < 30 %}progress-bar-danger{% elif match.bluezone_score < 50 %}progress-bar-warning{% else %}progress-bar-success{% endif %}" role="progressbar" style="width: {{match.bluezone_score}}%; color: black;">

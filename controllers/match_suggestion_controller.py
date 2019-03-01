@@ -15,13 +15,13 @@ class MatchSuggestionHandler(LoggedInHandler):
         blueScore = prediction['blue']['score']
         winningScore = redScore if redScore > blueScore else blueScore
         losingScore = redScore if redScore < blueScore else blueScore
-        return float(winningScore + 2 * losingScore) / (130.0 * 2) * 100  # Max score ~130
-        # return min(100, (
-        #     min(prediction['red']['auto_points'] * prediction['red']['auto_points'], 2000) / 2000 +
-        #     min(prediction['blue']['auto_points'] * prediction['blue']['auto_points'], 2000) / 2000 +
-        #     min(prediction['red']['endgame_points'] * prediction['red']['endgame_points'], 8100) / 8100 +
-        #     min(prediction['blue']['endgame_points'] * prediction['blue']['endgame_points'], 8100) / 8100
-        # ) * 25)
+        scorePower = min(20, float(winningScore + 2 * losingScore) / (130.0 * 2) * 20)  # Max score ~130
+        return min(100, (
+            min(prediction['red']['rocket_pieces_scored'] * prediction['red']['rocket_pieces_scored'], 144) / 144 +
+            min(prediction['blue']['rocket_pieces_scored'] * prediction['blue']['rocket_pieces_scored'], 144) / 144 +
+            min(prediction['red']['hab_climb_points'] * prediction['red']['hab_climb_points'], 225) / 225 +
+            min(prediction['blue']['hab_climb_points'] * prediction['blue']['hab_climb_points'], 225) / 225
+        ) * 20 + scorePower)
 
     def get_elim_bluezone_score(self, prediction):
         return self.get_qual_bluezone_score(prediction)
