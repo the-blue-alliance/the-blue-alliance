@@ -148,6 +148,16 @@ class Event(ndb.Model):
             self._matches = self._matches.get_result()
         return self._matches
 
+    def time_as_utc(self, time):
+        import pytz
+        if self.timezone_id is not None:
+            tz = pytz.timezone(self.timezone_id)
+            try:
+                time = time - tz.utcoffset(time)
+            except (pytz.NonExistentTimeError, pytz.AmbiguousTimeError):  # may happen during DST
+                time = time - tz.utcoffset(time + datetime.timedelta(hours=1))  # add offset to get out of non-existant time
+        return time
+
     def local_time(self):
         import pytz
         now = datetime.datetime.now()

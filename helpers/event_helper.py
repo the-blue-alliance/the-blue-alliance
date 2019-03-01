@@ -110,7 +110,7 @@ class EventHelper(object):
         if not event.start_date:
             return datetime.datetime(2177, 1, 1, 1, 1, 1)
         else:
-            return event.start_date
+            return event.time_as_utc(event.start_date)
 
     @classmethod
     def distantFutureIfNoEndDate(self, event):
