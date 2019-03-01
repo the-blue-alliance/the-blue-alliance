@@ -589,9 +589,18 @@ class PredictionHelper(object):
                     for team in match.alliances[alliance_color]['teams']:
                         num_played[team] += 1
 
-                sampled_rp1 = {}
-                sampled_rp2 = {}
-                sampled_tiebreaker = {}
+                sampled_rp1 = {
+                    'red': False,
+                    'blue': False,
+                }
+                sampled_rp2 = {
+                    'red': False,
+                    'blue': False,
+                }
+                sampled_tiebreaker = {
+                    'red': 0,
+                    'blue': 0,
+                }
                 # Get actual results or sampled results, depending if match has been played
                 if match.has_been_played:
                     if not match.score_breakdown:  # Can't do rankings without score breakdown
