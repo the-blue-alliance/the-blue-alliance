@@ -237,6 +237,19 @@ class ContributionCalculator(object):
                     means[color] = num_gears
                 elif self._stat == 'endgame_points':
                     means[color] = match.score_breakdown[color]['endgamePoints']
+                elif self._stat == 'rocket_pieces_scored':
+                    count = 0
+                    for side1 in ['Far', 'Near']:
+                        for side2 in ['Left', 'Right']:
+                            for level in ['low', 'mid', 'top']:
+                                position = match.score_breakdown[color]['{}{}Rocket{}'.format(level, side2, side1)]
+                                if 'Cargo' in position:
+                                    count += 2
+                                elif 'Panel' in position:
+                                    count += 1
+                    means[color] = count
+                elif self._stat == 'hab_climb_points':
+                    means[color] = match.score_breakdown[color]['habClimbPoints']
                 else:
                     raise Exception("Unknown stat: {}".format(self._stat))
 
@@ -410,6 +423,19 @@ class PredictionHelper(object):
                     mu = mean_vars[color][stat]['mean'] - required_endgame
                     prob = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
                     prediction[color]['prob_face_boss'] = prob
+                # 2019
+                if stat == 'rocket_pieces_scored':
+                    required_pieces = 12
+
+                    mu = mean_vars[color][stat]['mean'] - required_pieces
+                    prob = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
+                    prediction[color]['prob_complete_rocket'] = prob
+                if stat == 'hab_climb_points':
+                    required_points = 15
+
+                    mu = mean_vars[color][stat]['mean'] - required_points
+                    prob = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
+                    prediction[color]['prob_hab_docking'] = prob
 
         # Prob win
         red_score = prediction['red']['score']
@@ -473,7 +499,9 @@ class PredictionHelper(object):
             ]
         elif event.year == 2019:
             relevant_stats = [
-                ('score', 10, 10**2),
+                ('score', 10, 20**2),
+                ('rocket_pieces_scored', 2, 2**2),
+                ('hab_climb_points', 3, 3**2),
             ]
 
         contribution_calculators = [ContributionCalculator(event, matches, s, m, v) for s, m, v in relevant_stats]
@@ -646,6 +674,10 @@ class PredictionHelper(object):
                         elif match.year == 2018:
                             sampled_rp1[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_auto_quest']
                             sampled_rp2[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_face_boss']
+                            sampled_tiebreaker[alliance_color] = prediction[alliance_color]['score']
+                        elif match.year == 2019:
+                            sampled_rp1[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_complete_rocket']
+                            sampled_rp2[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_hab_docking']
                             sampled_tiebreaker[alliance_color] = prediction[alliance_color]['score']
 
                 # Using match results, update RP and tiebreaker
