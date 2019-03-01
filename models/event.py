@@ -392,7 +392,7 @@ class Event(ndb.Model):
 
     @property
     def has_first_official_webcast(self):
-        return any([('firstinspires' in w['channel']) for w in self.webcast])
+        return any([('firstinspires' in w['channel']) for w in self.webcast]) if self.webcast else False
 
     @property
     def division_keys_json(self):
