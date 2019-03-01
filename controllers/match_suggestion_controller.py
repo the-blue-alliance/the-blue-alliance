@@ -15,7 +15,7 @@ class MatchSuggestionHandler(LoggedInHandler):
         blueScore = prediction['blue']['score']
         winningScore = redScore if redScore > blueScore else blueScore
         losingScore = redScore if redScore < blueScore else blueScore
-        return float(winningScore + 2 * losingScore) / 130.0 * 100  # Max score ~130
+        return float(winningScore + 2 * losingScore) / (130.0 * 2) * 100  # Max score ~130
         # return min(100, (
         #     min(prediction['red']['auto_points'] * prediction['red']['auto_points'], 2000) / 2000 +
         #     min(prediction['blue']['auto_points'] * prediction['blue']['auto_points'], 2000) / 2000 +
