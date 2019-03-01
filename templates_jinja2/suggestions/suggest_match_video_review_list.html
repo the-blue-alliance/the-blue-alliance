@@ -28,6 +28,12 @@
             <div class="row">
                 <div class="well">
                     <div class="col-xs-2">
+                        {% if event.has_first_official_webcast %}
+                        <div class="alert alert-danger" role="alert">
+                          This is a FIRST webcasted event.
+                          Please ensure this isn't a stream-ripped video.
+                        </div>
+                        {% endif %}
                         <label class="radio text-success">
                             <input class="accept" type="radio" name="accept_reject-{{suggestion.key.id()}}" value="accept::{{suggestion.key.id()}}"> Accept
                         </label>

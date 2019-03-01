@@ -391,6 +391,10 @@ class Event(ndb.Model):
         return current_webcasts
 
     @property
+    def has_first_official_webcast(self):
+        return any([('firstinspires' in w['channel']) for w in self.webcast])
+
+    @property
     def division_keys_json(self):
         keys = [key.id() for key in self.divisions]
         return json.dumps(keys)
