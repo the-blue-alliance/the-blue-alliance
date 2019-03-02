@@ -62,6 +62,8 @@ export default class ChatSelector extends React.Component {
       bottom: 0,
       transition: 'all 150ms ease-in',
       willChange: 'transform opacity',
+      height: '90%',
+      overflowY: 'auto',
     }
 
     return (
