@@ -90,7 +90,8 @@ class WebhookMessage(Message):
                 url=self.url,
                 payload=message_json,
                 method='POST',
-                headers=headers
+                headers=headers,
+                deadline=2
             )
             return MessageResponse(response.status_code, response.content)
         except Exception, e:
