@@ -85,16 +85,13 @@ class WebhookMessage(Message):
         # Generate checksum
         headers['X-TBA-Checksum'] = self._generate_webhook_checksum(message_json)
 
+        rpc = urlfetch.create_rpc()
+
         try:
-            response = urlfetch.fetch(
-                url=self.url,
-                payload=message_json,
-                method='POST',
-                headers=headers
-            )
-            return MessageResponse(response.status_code, response.content)
+            urlfetch.make_fetch_call(rpc, self.url, payload=message_json, method=urlfetch.POST, headers=headers)
+            return MessageResponse(200, None)
         except Exception, e:
-            # https://cloud.google.com/appengine/docs/standard/python/refdocs/google.appengine.api.urlfetch_errors
+            # https://cloud.google.com/appengine/docs/standard/python/refdocs/google.appengine.api.urlfetch
             return MessageResponse(500, str(e))
 
     def _generate_webhook_checksum(self, payload):
