@@ -6,6 +6,7 @@ from template_engine import jinja2_engine
 
 from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper
+from helpers.team_helper import TeamHelper
 
 
 class MatchSuggestionHandler(LoggedInHandler):
@@ -36,6 +37,11 @@ class MatchSuggestionHandler(LoggedInHandler):
         self._require_registration()
 
         current_events = filter(lambda e: e.now, EventHelper.getEventsWithinADay())
+        popular_teams_events = TeamHelper.getPopularTeamsEvents(current_events)
+
+        popular_team_keys = set()
+        for team, _ in popular_teams_events:
+            popular_team_keys.add(team.key.id())
 
         for event in current_events:
             event.prep_details()
@@ -82,6 +88,7 @@ class MatchSuggestionHandler(LoggedInHandler):
             'upcoming_matches': upcoming_matches,
             'ranks': ranks,
             'alliances': alliances,
+            'popular_team_keys': popular_team_keys,
         })
 
         self.response.out.write(jinja2_engine.render('match_suggestion.html', self.template_values))

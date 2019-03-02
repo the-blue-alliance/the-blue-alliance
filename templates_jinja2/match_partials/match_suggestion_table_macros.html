@@ -1,4 +1,4 @@
-{% macro match_suggestion_table(matches, ranks, alliances) %}
+{% macro match_suggestion_table(matches, ranks, alliances, popular_team_keys) %}
 <table class="table match-table table-striped">
   <thead>
     <tr>
@@ -36,7 +36,7 @@
           <time class="tba-match-time-utc-countdown" datetime="{{match.predicted_time.isoformat() if match.predicted_time else match.time.isoformat()}}+00:00">--</time>
         </td>
         {% for team in match.alliances.red.teams %}
-        <td class="red">
+        <td class="red{% if team in popular_team_keys %} current-team winner{% endif %}">
           <svg class="favorite-team-dot" data-team="{{team}}" data-match="{{match.key_name}}">
             <circle cx="2.5" cy="2.5" r="2.5"/>
           </svg>
@@ -47,7 +47,7 @@
         <td>{{ranks[team]}}{% if alliances[team] %} ({{alliances[team]}}){% endif %}</td>
         {% endfor %}
         {% for team in match.alliances.blue.teams %}
-        <td class="blue">
+        <td class="blue{% if team in popular_team_keys %} current-team winner{% endif %}">
           <svg class="favorite-team-dot" data-team="{{team}}" data-match="{{match.key_name}}">
             <circle cx="2.5" cy="2.5" r="2.5"/>
           </svg>
