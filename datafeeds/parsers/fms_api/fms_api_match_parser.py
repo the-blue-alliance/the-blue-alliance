@@ -281,6 +281,19 @@ class FMSAPIMatchDetailsParser(object):
                 if game_data is not None:
                     breakdown[color]['tba_gameData'] = game_data
 
+                if self.year == 2019:
+                    # Derive incorrect completedRocketFar and completedRocketNear returns from FIRST API
+                    for side1 in ['Near', 'Far']:
+                        completedRocket = True
+                        for side2 in ['Left', 'Right']:
+                            for level in ['low', 'mid', 'top']:
+                                if breakdown[color]['{}{}Rocket{}'.format(level, side2, side1)] != 'PanelAndCargo':
+                                    completedRocket = False
+                                    break
+                            if not completedRocket:
+                                break
+                        breakdown[color]['completedRocket{}'.format(side1)] = completedRocket
+
             match_details_by_key[Match.renderKeyName(
                 '{}{}'.format(self.year, self.event_short),
                 comp_level,
