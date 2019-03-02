@@ -46,7 +46,15 @@ class LiveEventPanel extends React.PureComponent {
       matches.sort((match1, match2) => playOrder(match1) - playOrder(match2))
 
       const playedMatches = matches.filter((match) => match.r !== -1 && match.b !== -1)
-      const unplayedMatches = matches.filter((match) => match.r === -1 || match.b === -1)
+      // Compute next unplayed matches, skipping unplayed matches in the middle of played ones
+      let unplayedMatches = [];
+      matches.forEach(match => {
+        if (match.r !== -1 && match.b !== -1) {
+          unplayedMatches = [];
+        } else {
+          unplayedMatches.push(match);
+        }
+      });
       this.setState({
         playedMatches,
         unplayedMatches,
