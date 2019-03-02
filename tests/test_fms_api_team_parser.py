@@ -17,10 +17,7 @@ class TestFMSAPITeamParser(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
-
-        Sitevar(
-            id='website_blacklist',
-            values_json=json.dumps({'websites': ['http://blacklist.com/']})).put()
+        Sitevar(id='website_blacklist', values_json=json.dumps({'websites': ['http://blacklist.com/']})).put()
 
     def tearDown(self):
         self.testbed.deactivate()

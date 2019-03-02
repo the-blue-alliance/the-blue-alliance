@@ -5,6 +5,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from datafeeds.parsers.first_elasticsearch.first_elasticsearch_team_details_parser import FIRSTElasticSearchTeamDetailsParser
+from models.sitevar import Sitevar
 
 
 class TestFIRSTElasticSearchTeamParser(unittest2.TestCase):
@@ -14,6 +15,7 @@ class TestFIRSTElasticSearchTeamParser(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        Sitevar(id='website_blacklist', values_json=json.dumps({'websites': ['http://blacklist.com/']})).put()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -57,3 +59,7 @@ class TestFIRSTElasticSearchTeamParser(unittest2.TestCase):
                     self.assertEqual(team.first_tpid, 361441)
                     self.assertEqual(team.first_tpid_year, 2015)
                     self.assertEqual(team.motto, None)
+
+                # A team with a blacklisted website
+                if team.key.id() == 'frc221':
+                    self.assertEqual(team.website, None)

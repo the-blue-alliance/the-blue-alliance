@@ -3,6 +3,7 @@ import urlparse
 from google.appengine.ext import ndb
 
 from models.team import Team
+from sitevars.website_blacklist import WebsiteBlacklist
 
 
 class FIRSTElasticSearchTeamDetailsParser(object):
@@ -17,6 +18,9 @@ class FIRSTElasticSearchTeamDetailsParser(object):
 
             raw_website = team.get('team_web_url', None)
             website = urlparse.urlparse(raw_website, 'http').geturl() if raw_website else None
+
+            if WebsiteBlacklist.is_blacklisted(website):
+                website = None
 
             teams.append(Team(
                 id="frc{}".format(team['team_number_yearly']),
