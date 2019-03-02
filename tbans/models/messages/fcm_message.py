@@ -136,7 +136,7 @@ class FCMMessage(Message):
             response = urlfetch.fetch(
                 url=self._fcm_url,
                 payload=message_json,
-                method='POST',
+                method=urlfetch.POST,
                 headers=headers
             )
             return FCMMessage._transform_fcm_response(response)

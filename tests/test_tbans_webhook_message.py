@@ -71,4 +71,4 @@ class TestWebhookMessage(unittest2.TestCase):
         message = WebhookMessage(MockNotification(webhook_payload={'data': 'value'}), 'https://www.thebluealliance.com/', 'secret')
         response = message.send()
         self.assertEqual(response.status_code, 200)
-        self.assertIsNotNone(response.content)
+        self.assertIsNone(response.content)
