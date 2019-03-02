@@ -1,13 +1,15 @@
+import json
 import urlparse
 
 from google.appengine.ext import ndb
 
 from helpers.website_helper import WebsiteHelper
-from consts.district_type import DistrictType
 from models.district import District
 from models.district_team import DistrictTeam
-from models.team import Team
+from consts.district_type import DistrictType
 from models.robot import Robot
+from models.sitevar import Sitevar
+from models.team import Team
 
 
 class FMSAPITeamDetailsParser(object):
@@ -28,12 +30,17 @@ class FMSAPITeamDetailsParser(object):
         teams = response['teams']
         ret_models = []
 
+        # Blacklist websites we want to ignore from TIMS
+        website_blacklist_sitevar = Sitevar.get_or_insert('website_blacklist', values_json=json.dumps({'websites': []}))
+        website_blacklist = website_blacklist_sitevar.contents.get('websites', [])
+
         for teamData in teams:
+            team_website = teamData.get('website', None)
             # Fix issue where FIRST's API returns dummy website for all teams
-            if teamData['website'] is not None and 'www.firstinspires.org' in teamData['website']:
+            if (team_website is not None and 'www.firstinspires.org' in team_website) or team_website in website_blacklist:
                 website = None
             else:
-                website = WebsiteHelper.format_url(teamData.get('website', None))
+                website = WebsiteHelper.format_url(team_website)
 
             team = Team(
                 id="frc{}".format(teamData['teamNumber']),

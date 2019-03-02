@@ -7,6 +7,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from models.district import District
+from models.sitevar import Sitevar
 
 
 class TestFMSAPITeamParser(unittest2.TestCase):
@@ -16,6 +17,10 @@ class TestFMSAPITeamParser(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
+        Sitevar(
+            id='website_blacklist',
+            values_json=json.dumps({'websites': ['http://blacklist.com/']})).put()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -84,9 +89,9 @@ class TestFMSAPITeamParser(unittest2.TestCase):
     def test_parse_team_websites(self):
         # Modify the websites to some known bad ones, and ensure the parser can recover
         bad_websites = [None, '', 'www.firstinspires.org', 'website.com', 'www.website.com', 'http://website.com',
-                        'https://website.com', 'ftp://website.com']
+                        'https://website.com', 'ftp://website.com', 'http://blacklist.com/']
         expected_sites = [None, None, None, 'http://website.com', 'http://www.website.com', 'http://website.com',
-                          'https://website.com', None]
+                          'https://website.com', None, None]
         with open('test_data/fms_api/2015_frc1124.json', 'r') as f:
             team_data = json.loads(f.read())
             for site, expected in zip(bad_websites, expected_sites):
