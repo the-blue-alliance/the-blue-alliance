@@ -218,8 +218,24 @@ class MainCompetitionseasonHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         week_events = EventHelper.getWeekEvents()
-        special_webcasts = FirebasePusher.get_special_webcasts()
         popular_teams_events = TeamHelper.getPopularTeamsEvents(week_events)
+
+        # Only show special webcasts that aren't also hosting an event
+        special_webcasts = []
+        for special_webcast in FirebasePusher.get_special_webcasts():
+            add = True
+            for event in week_events:
+                if event.webcast:
+                    for event_webcast in event.webcast:
+                        if (special_webcast.get('type', '') == event_webcast.get('type', '') and
+                                special_webcast.get('channel', '') == event_webcast.get('channel', '') and
+                                special_webcast.get('file', '') == event_webcast.get('file', '')):
+                            add = False
+                            break
+                if not add:
+                    break
+            if add:
+                special_webcasts.append(special_webcast)
 
         self.template_values.update({
             "events": week_events,
