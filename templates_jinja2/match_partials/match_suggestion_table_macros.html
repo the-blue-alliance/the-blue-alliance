@@ -61,15 +61,15 @@
         <td class="blue">{{match.prediction.blue.score|round|int}}</td>
         <td>
           <div class="progress" style="margin: 0px;">
-            <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{(match.prediction.red.rocket_pieces_scored/16*100)|round|int}}%; color: black;">
-              {{(match.prediction.red.rocket_pieces_scored)|round|int}}
+            <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{match.prediction.red.rocket_pieces_scored/16*100}}%; color: black;">
+              {{(match.prediction.red.rocket_pieces_scored|round(1))}}
             </div>
           </div>
         </td>
         <td>
           <div class="progress" style="margin: 0px;">
-            <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{(match.prediction.blue.rocket_pieces_scored/16*100)|round|int}}%; color: black;">
-              {{(match.prediction.blue.rocket_pieces_scored)|round|int}}
+            <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{match.prediction.blue.rocket_pieces_scored/16*100}}%; color: black;">
+              {{(match.prediction.blue.rocket_pieces_scored|round(1))}}
             </div>
           </div>
         </td>
