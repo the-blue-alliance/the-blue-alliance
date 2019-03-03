@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react'
-import ReactGA from 'react-ga'
 import LayoutAnalyticsTracker from './LayoutAnalyticsTracker'
 import VideoCellContainer from '../containers/VideoCellContainer'
 import { getNumViewsForLayout } from '../utils/layoutUtils'
