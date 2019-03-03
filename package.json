@@ -19,6 +19,7 @@
     "react-dom": "^15.0.1",
     "react-event-listener": "^0.4.0",
     "react-file-input": "^0.2.5",
+    "react-ga": "^2.5.7",
     "react-native-listener": "^1.0.1",
     "react-redux": "^4.4.5",
     "react-select": "^1.0.0-rc.5",
@@ -26,8 +27,8 @@
     "redux": "^3.5.2",
     "redux-thunk": "^2.0.1",
     "reselect": "^2.5.1",
-    "swagger-ui": "3.17.1",
     "swagger-client": "3.8.6",
+    "swagger-ui": "3.17.1",
     "underscore": "^1.8.3"
   },
   "devDependencies": {
