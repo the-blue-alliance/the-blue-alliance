@@ -14,6 +14,14 @@ export default class VideoCellAnalyticsTracker extends React.Component {
     this.elapsedTime = 0 // In minutes
   }
 
+  componentDidMount() {
+    this.sendTracking()
+    this.interval = setInterval(this.sendTracking.bind(this), 60000)
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval)
+  }
 
   sendTracking() {
     const { id, type, channel, file } = this.props.webcast
@@ -29,15 +37,6 @@ export default class VideoCellAnalyticsTracker extends React.Component {
       value: this.elapsedTime === 0 ? 0 : 1,
     })
     this.elapsedTime += 1
-  }
-
-  componentDidMount() {
-    this.sendTracking()
-    this.interval = setInterval(this.sendTracking.bind(this), 60000)
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.interval)
   }
 
   render() {

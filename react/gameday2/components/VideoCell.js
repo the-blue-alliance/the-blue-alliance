@@ -110,7 +110,7 @@ export default class VideoCell extends React.Component {
             position={this.props.position}
             onRequestClose={() => this.onRequestCloseSwapPositionDialog()}
           />
-          <VideoCellAnalyticsTracker webcast={this.props.webcast}/>
+          <VideoCellAnalyticsTracker webcast={this.props.webcast} />
         </div>
       )
     }
