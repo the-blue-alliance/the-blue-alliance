@@ -1,5 +1,6 @@
 import 'babel-polyfill'
 import React from 'react'
+import ReactGA from 'react-ga'
 import { Provider } from 'react-redux'
 import thunk from 'redux-thunk'
 import { createStore, applyMiddleware, compose } from 'redux'
@@ -13,6 +14,8 @@ import GamedayFrame from './components/GamedayFrame'
 import gamedayReducer, { firedux } from './reducers'
 import { setWebcastsRaw, setLayout, addWebcastAtPosition, setTwitchChat, setDefaultTwitchChat, setChatSidebarVisibility, setFavoriteTeams, togglePositionLivescore } from './actions'
 import { MAX_SUPPORTED_VIEWS } from './constants/LayoutConstants'
+
+ReactGA.initialize('UA-1090782-9')
 
 injectTapEventPlugin()
 

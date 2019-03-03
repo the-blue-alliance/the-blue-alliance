@@ -1,4 +1,6 @@
 import React, { PropTypes } from 'react'
+import ReactGA from 'react-ga'
+import { NAME_FOR_LAYOUT } from '../constants/LayoutConstants'
 import VideoCellContainer from '../containers/VideoCellContainer'
 import { getNumViewsForLayout } from '../utils/layoutUtils'
 import { webcastPropType } from '../utils/webcastUtils'
@@ -10,6 +12,42 @@ export default class VideoGrid extends React.Component {
     domOrderLivescoreOn: PropTypes.arrayOf(PropTypes.bool).isRequired,
     webcastsById: PropTypes.objectOf(webcastPropType).isRequired,
     layoutId: PropTypes.number.isRequired,
+  }
+
+  constructor(props) {
+    super(props)
+    this.elapsedTime = 0 // In minutes
+  }
+
+  componentDidMount() {
+    this.beginTracking()
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.layoutId !== this.props.layoutId) {
+      this.elapsedTime = 0
+      clearInterval(this.interval)
+      this.beginTracking()
+    }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval)
+  }
+
+  beginTracking() {
+    this.sendTracking()
+    this.interval = setInterval(this.sendTracking.bind(this), 60000)
+  }
+
+  sendTracking() {
+    ReactGA.event({
+      category: 'Layout Time',
+      action: NAME_FOR_LAYOUT[this.props.layoutId],
+      label: this.elapsedTime.toString(),
+      value: this.elapsedTime === 0 ? 0 : 1,
+    })
+    this.elapsedTime += 1
   }
 
   renderLayout(webcastCount) {
