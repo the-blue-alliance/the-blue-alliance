@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react'
+import React from 'react'
 import ReactGA from 'react-ga'
 import { webcastPropType } from '../utils/webcastUtils'
 
@@ -9,7 +9,11 @@ export default class VideoCellAnalyticsTracker extends React.Component {
     webcast: webcastPropType,
   }
 
-  elapsedTime = 0 // In minutes
+  constructor(props) {
+    super(props)
+    this.elapsedTime = 0 // In minutes
+  }
+
 
   sendTracking() {
     const { key, type, channel, file } = this.props.webcast
@@ -24,7 +28,7 @@ export default class VideoCellAnalyticsTracker extends React.Component {
       label: this.elapsedTime.toString(),
       value: this.elapsedTime === 0 ? 0 : 1,
     })
-    this.elapsedTime++
+    this.elapsedTime += 1
   }
 
   componentDidMount() {
