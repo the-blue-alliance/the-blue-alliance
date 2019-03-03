@@ -2,6 +2,7 @@ import json
 import logging
 import random
 import tba_config
+import time
 import urllib
 import uuid
 import webapp2
@@ -16,7 +17,7 @@ from models.sitevar import Sitevar
 
 
 # used for deferred call
-def track_call(api_action, api_label, auth_owner):
+def track_call(api_action, api_label, auth_owner, request_time):
     """
     For more information about GAnalytics Protocol Parameters, visit
     https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
@@ -26,21 +27,34 @@ def track_call(api_action, api_label, auth_owner):
         logging.warning("Missing sitevar: google_analytics.id. Can't track API usage.")
     else:
         GOOGLE_ANALYTICS_ID = analytics_id.contents['GOOGLE_ANALYTICS_ID']
-        payload = urllib.urlencode({
-            'v': 1,
-            'tid': GOOGLE_ANALYTICS_ID,
-            'cid': uuid.uuid3(uuid.NAMESPACE_X500, str(auth_owner)),
-            't': 'event',
-            'ec': 'api-v03',
-            'ea': api_action,
-            'el': api_label,
-            'cd1': auth_owner,  # custom dimension 1
-            'ni': 1,
-            'sc': 'end',  # forces tracking session to end
-        })
+        cid = uuid.uuid3(uuid.NAMESPACE_X500, str(auth_owner))
+        payloads = [
+            urllib.urlencode({
+                'v': 1,
+                'tid': GOOGLE_ANALYTICS_ID,
+                'cid': cid,
+                't': 'event',
+                'ec': 'api-v03',
+                'ea': api_action,
+                'el': api_label,
+                'cd1': auth_owner,  # custom dimension 1
+                'ni': 1,
+                'sc': 'end',  # forces tracking session to end
+            }),
+            urllib.urlencode({
+                'v': 1,
+                'tid': GOOGLE_ANALYTICS_ID,
+                'cid': cid,
+                't': 'timing',
+                'utc': 'api-v03',
+                'utv': api_action,
+                'utt': request_time,
+            }),
+        ]
 
+        payload = '\n'.join(payloads)
         urlfetch.fetch(
-            url='https://www.google-analytics.com/collect',
+            url='https://www.google-analytics.com/batch',
             validate_certificate=True,
             method=urlfetch.POST,
             deadline=30,
@@ -53,6 +67,7 @@ class ApiBaseController(CacheableHandler):
     REQUIRE_ADMIN_AUTH = False
 
     def __init__(self, *args, **kw):
+        self._request_start = time.time()
         super(ApiBaseController, self).__init__(*args, **kw)
         self.response.headers['content-type'] = 'application/json; charset="utf-8"'
         self.response.headers['Access-Control-Allow-Origin'] = '*'
@@ -116,7 +131,8 @@ class ApiBaseController(CacheableHandler):
 
     def _track_call_defer(self, api_action, api_label):
         if random.random() < tba_config.GA_RECORD_FRACTION:
-            deferred.defer(track_call, api_action, api_label, '{}:{}'.format(self.auth_owner, self.auth_description), _queue="api-track-call")
+            request_time = int(round(1000 * (time.time() - self._request_start)))
+            deferred.defer(track_call, api_action, api_label, '{}:{}'.format(self.auth_owner, self.auth_description), request_time, _queue="api-track-call")
 
     def _validate_tba_auth_key(self):
         """
