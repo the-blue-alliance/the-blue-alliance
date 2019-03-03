@@ -16,8 +16,8 @@ export default class VideoCellAnalyticsTracker extends React.Component {
 
 
   sendTracking() {
-    const { key, type, channel, file } = this.props.webcast
-    let action = `${key}::${type}::${channel}`
+    const { id, type, channel, file } = this.props.webcast
+    let action = `${id}::${type}::${channel}`
     if (file) {
       action += `::${file}`
     }
