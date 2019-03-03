@@ -66,12 +66,12 @@
       <li class="tba-nav-persistent {% block mytba_active %}{% endblock %}"><a href="/mytba"><span><span class="glyphicon glyphicon-star"></span> myTBA</span></a></li>
       <li class="tba-nav-persistent {% block events_active %}{% endblock %}"><a href="/events"><span><span class="glyphicon glyphicon-calendar"></span> Events</span></a></li>
       <li class="tba-nav-persistent hidden-xs {% block teams_active %}{% endblock %}"><a href="/teams"><span><span class="glyphicon glyphicon-user"></span> Teams</span></a></li>
-      <li class="tba-nav-persistent hidden-xs {% block insights_active %}{% endblock %}"><a href="/insights"><span><span class="glyphicon glyphicon-align-left"></span> Insights</span></a></li>
       <li class="tba-nav-persistent hidden-xs"><a href="/gameday"><span><span class="glyphicon glyphicon-facetime-video"></span> GameDay</span></a></li>
-      <li class="tba-nav-persistent hidden-xs"><a href="//blog.thebluealliance.com"><span><span class="glyphicon glyphicon-pencil"></span> Blog</span></a></li>
+      <li class="tba-nav-persistent hidden-xs {% block insights_active %}{% endblock %}"><a href="/insights"><span><span class="glyphicon glyphicon-align-left"></span> Insights</span></a></li>
       <li class="tba-nav-persistent hidden-xs hidden-sm dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-option-vertical"></span> More</a>
           <ul class="dropdown-menu">
+            <li><a href="//blog.thebluealliance.com"><span><span class="glyphicon glyphicon-pencil"></span> Blog</span></a></li>
             <li><a href="/swag"><span class="glyphicon glyphicon-shopping-cart"></span> Swag</a></li>
             <li><a href="/account"><span class="glyphicon glyphicon-cog"></span> Account</a></li>
           </ul>
@@ -83,13 +83,19 @@
         <li class="visible-xs {% block teams_active_collapsed %}{% endblock %}"><a href="/teams"><span><span class="glyphicon glyphicon-user"></span> Teams</span></a></li>
         <li class="visible-xs {% block insights_active_collapsed %}{% endblock %}"><a href="/insights"><span><span class="glyphicon glyphicon-align-left"></span> Insights</span></a></li>
         <li class="visible-xs"><a href="/gameday"><span><span class="glyphicon glyphicon-facetime-video"></span> GameDay</span></a></li>
-        <li class="visible-xs"><a href="//blog.thebluealliance.com"><span><span class="glyphicon glyphicon-pencil"></span> Blog</span></a></li>
+        <li class="visible-xs visible-sm"><a href="//blog.thebluealliance.com"><span><span class="glyphicon glyphicon-pencil"></span> Blog</span></a></li>
         <li class="visible-xs visible-sm"><a href="/account"><span class="glyphicon glyphicon-cog"></span> Account</a></li>
       </ul>
 
       <form class="navbar-form tba-navbar-form" action="/search" >
-        <input type="text" class="form-control typeahead" placeholder="Search teams and events" name="q"/>
+        <input type="text" class="form-control typeahead" placeholder="🔍 Search teams and events" name="q"/>
       </form>
+
+      <ul class="nav navbar-nav visible-xs">
+        <li class="visible-xs"><a href="/nearby"><span class="glyphicon glyphicon-search"></span> Search Nearby</a></li>
+        <li class="visible-xs"><a href="/advanced_team_search"><span class="glyphicon glyphicon-search"></span> Advanced Search</a></li>
+      </ul>
+      <hr class="visible-xs" />
 
       <div class="social-icons">
         <a href="https://www.facebook.com/thebluealliance" title="Like us on Facebook"><i class="fa fa-facebook fa-fw fa-lg"></i></a>

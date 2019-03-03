@@ -1,32 +1,25 @@
-<p class="hidden-xs">The Blue Alliance is the best way to scout, watch, and relive the <i>FIRST</i> Robotics Competition. Learn more about <i>FIRST</i> at <a href="http://www.firstinspires.org/" target="_blank" title="FIRST Robotics">firstinspires.org</a>.</p>
-<form action="/search">
-  <input type="text" class="form-control typeahead" placeholder="Search teams and events" name="q">
-</form>
-<br>
-<div class="btn-group btn-group-block-2">
-  <a class="btn btn-primary btn-lg" href="/events"><span class="glyphicon glyphicon-calendar"></span> Events</a>
-  <a class="btn btn-primary btn-lg" href="/teams"><span class="glyphicon glyphicon-user"></span> Teams</a>
+<p class="hidden-xs">The Blue Alliance is the best way to scout, watch, and relive the <a href="http://www.firstinspires.org/" target="_blank" title="FIRST Robotics"><i>FIRST</i> Robotics Competition</a>.</p>
+<div class="hidden-xs">
+	<div class="btn-group btn-group-block-2">
+    <a class="btn btn-default" href="/nearby"><span class="glyphicon glyphicon-search"></span> Search Nearby</a>
+	  <a class="btn btn-default" href="/advanced_team_search"><span class="glyphicon glyphicon-search"></span> Advanced Search</a>
+  </div>
+  <br><br>
 </div>
-
-<br><br>
-<a class="btn btn-success btn-block" href="/nearby"><span class="glyphicon glyphicon-search"></span> Find Nearby Teams and Events</a>
-<a class="btn btn-block btn-info" href="/advanced_team_search"><span class="glyphicon glyphicon-search"></span> Advanced Team Search</a>
-<a class="btn btn-block btn-primary" href="/avatars/2019"><span class="glyphicon glyphicon-user"></span> View All 2019 Team Avatars</a>
 
 <!-- <a class="btn btn-info btn-block" href="https://sites.google.com/view/firsthelpnow/need-help-now" target="_blank"><span class="glyphicon glyphicon-earphone"></span> Get 24/7 advice from FIRST Help Now</a> -->
 
 <div class="hidden-xs">
-  <br>
   <h4 class="text-center">Help other <i>FIRST</i> teams!</h4>
-<div class="btn-group btn-group-block-2">
-<a class="btn btn-default" href="/add-data"><span class="glyphicon glyphicon-info-sign"></span> Help Add Data</a>
-<a class="btn btn-default" href="https://github.com/the-blue-alliance" target="_blank"><span class="glyphicon glyphicon-wrench"></span> Hack on TBA</a>
+  <div class="btn-group btn-group-block-2">
+    <a class="btn btn-default" href="/add-data"><span class="glyphicon glyphicon-info-sign"></span> Help Add Data</a>
+    <a class="btn btn-default" href="https://github.com/the-blue-alliance" target="_blank"><span class="glyphicon glyphicon-wrench"></span> Hack on TBA</a>
   </div>
+  <br><br>
 </div>
-<br>
-<br class="visible-xs">
 {% include "index_partials/apps.html" %}
 <div class="hidden-xs text-center">
+  <br>
   <p><small>POWERED BY</small><br />
   <a href="https://www.vexrobotics.com/vexpro/"><img class="sponsor-image" src="/images/vexpro_logo_horiz.png" alt="VEXpro"></a></p>
 </div>
