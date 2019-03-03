@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react'
 import RaisedButton from 'material-ui/RaisedButton'
 import WebcastEmbed from './WebcastEmbed'
+import VideoCellAnalyticsTracker from './VideoCellAnalyticsTracker'
 import LivescoreDisplayContainer from '../containers/LivescoreDisplayContainer'
 import VideoCellToolbarContainer from '../containers/VideoCellToolbarContainer'
 import WebcastSelectionDialogContainer from '../containers/WebcastSelectionDialogContainer'
@@ -109,6 +110,7 @@ export default class VideoCell extends React.Component {
             position={this.props.position}
             onRequestClose={() => this.onRequestCloseSwapPositionDialog()}
           />
+          <VideoCellAnalyticsTracker webcast={this.props.webcast} />
         </div>
       )
     }
