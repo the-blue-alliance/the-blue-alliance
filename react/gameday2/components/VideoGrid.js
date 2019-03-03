@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react'
+import LayoutAnalyticsTracker from './LayoutAnalyticsTracker'
 import VideoCellContainer from '../containers/VideoCellContainer'
 import { getNumViewsForLayout } from '../utils/layoutUtils'
 import { webcastPropType } from '../utils/webcastUtils'
@@ -79,6 +80,7 @@ export default class VideoGrid extends React.Component {
     return (
       <div style={videoGridStyle}>
         {videoCells}
+        <LayoutAnalyticsTracker layoutId={this.props.layoutId} />
       </div>
     )
   }

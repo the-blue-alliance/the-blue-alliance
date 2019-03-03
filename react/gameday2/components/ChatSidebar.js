@@ -4,6 +4,7 @@ import IconButton from 'material-ui/IconButton'
 import ArrowDropUp from 'material-ui/svg-icons/navigation/arrow-drop-up'
 import { Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui/Toolbar'
 import { white } from 'material-ui/styles/colors'
+import ChatAnalyticsTracker from './ChatAnalyticsTracker'
 import TwitchChatEmbed from './TwitchChatEmbed'
 import ChatSelector from './ChatSelector'
 import { chatPropType } from '../utils/PropTypes'
@@ -162,6 +163,7 @@ class ChatSidebar extends React.Component {
             open={this.state.chatSelectorOpen}
             onRequestClose={() => this.onRequestCloseChatSelector()}
           />
+          {this.props.enabled && <ChatAnalyticsTracker currentChat={this.props.currentChat} />}
         </div>
       )
     } else {

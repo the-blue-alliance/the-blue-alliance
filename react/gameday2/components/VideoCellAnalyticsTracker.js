@@ -2,8 +2,6 @@ import React from 'react'
 import ReactGA from 'react-ga'
 import { webcastPropType } from '../utils/webcastUtils'
 
-ReactGA.initialize('UA-1090782-9')
-
 export default class VideoCellAnalyticsTracker extends React.Component {
   static propTypes = {
     webcast: webcastPropType,
