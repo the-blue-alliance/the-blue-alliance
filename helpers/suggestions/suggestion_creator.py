@@ -168,11 +168,14 @@ class SuggestionCreator(object):
 
     @classmethod
     def createMatchVideoYouTubeSuggestion(cls, author_account_key, youtube_id, match_key):
-        """Create a YouTube Match Video. Returns status (success, suggestion_exists, video_exists, bad_url)"""
+        """
+        Create a YouTube Match Video.
+        Returns tuple of (status {success, suggestion_exists, video_exists, bad_url}, suggestion)
+        """
         if youtube_id:
             match = Match.get_by_id(match_key)
             if not match:
-                return 'bad_match'
+                return 'bad_match', None
             if youtube_id not in match.youtube_videos:
                 year = match_key[:4]
                 suggestion_id = Suggestion.render_media_key_name(year, 'match', match_key, 'youtube', youtube_id)
@@ -186,13 +189,13 @@ class SuggestionCreator(object):
                         )
                     suggestion.contents = {"youtube_videos": [youtube_id]}
                     suggestion.put()
-                    return 'success'
+                    return 'success', suggestion
                 else:
-                    return 'suggestion_exists'
+                    return 'suggestion_exists', None
             else:
-                return 'video_exists'
+                return 'video_exists', None
         else:
-            return 'bad_url'
+            return 'bad_url', None
 
     @classmethod
     def createDummyOffseasonSuggestions(cls, events_to_suggest):

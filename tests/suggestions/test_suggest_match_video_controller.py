@@ -3,15 +3,19 @@ import webapp2
 import webtest
 from datetime import datetime
 
+
+from google.appengine.datastore import datastore_stub_util
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from webapp2_extras.routes import RedirectRoute
 
+from consts.auth_type import AuthType
 from consts.district_type import DistrictType
 from consts.event_type import EventType
 from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController, \
     SuggestMatchVideoPlaylistController
 from models.account import Account
+from models.api_auth_access import ApiAuthAccess
 from models.event import Event
 from models.match import Match
 from models.suggestion import Suggestion
@@ -19,11 +23,13 @@ from models.suggestion import Suggestion
 
 class TestSuggestMatchVideoController(unittest2.TestCase):
     def setUp(self):
+        self.policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1)
         self.testbed = testbed.Testbed()
         self.testbed.activate()
-        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_datastore_v3_stub(consistency_policy=self.policy)
         self.testbed.init_memcache_stub()
         self.testbed.init_user_stub()
+        self.testbed.init_taskqueue_stub(_all_queues_valid=True)
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
         app = webapp2.WSGIApplication([
@@ -77,7 +83,7 @@ class TestSuggestMatchVideoController(unittest2.TestCase):
                     "teams": [\
                     "frc254",\
                     "frc1678",\
-                    "frc973"]}}',
+                    "frc973"]}}'                                ,
             score_breakdown_json='{\
                 "blue": {\
                     "auto": 70,\
@@ -103,11 +109,22 @@ class TestSuggestMatchVideoController(unittest2.TestCase):
             overwrite=True
         )
 
-        Account.get_or_insert(
+        self.account = Account.get_or_insert(
             "123",
             email="user@example.com",
             registered=True
         )
+
+    def giveApiwrite(self):
+        self.apiwrite = ApiAuthAccess(
+            id='test_id',
+            secret='321tEsTsEcReT',
+            description='test',
+            owner=self.account.key,
+            event_list=[ndb.Key(Event, '2016necmp')],
+            expiration=None,
+            auth_types_enum=[AuthType.MATCH_VIDEO])
+        self.apiwrite.put()
 
     def getSuggestionForm(self, match_key):
         response = self.testapp.get('/suggest/match/video?match_key={}'.format(match_key))
@@ -153,6 +170,24 @@ class TestSuggestMatchVideoController(unittest2.TestCase):
         # Ensure we show a success message on the page
         request = response.request
         self.assertEqual(request.GET.get('status'), 'success')
+
+    def test_submit_video_fastpath_approve(self):
+        self.loginUser()
+        self.giveApiwrite()
+        form = self.getSuggestionForm('2016necmp_f1m1')
+        form['youtube_url'] = "http://youtu.be/bHGyTjxbLz8"
+        response = form.submit().follow()
+        self.assertEqual(response.status_int, 200)
+
+        # Make sure the Suggestion gets created and accepted
+        suggestion_id = "media_2016_match_2016necmp_f1m1_youtube_bHGyTjxbLz8"
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.review_state, Suggestion.REVIEW_ACCEPTED)
+
+        # Ensure we show a success message on the page
+        request = response.request
+        self.assertEqual(request.GET.get('status'), 'approved')
 
 
 class TestSuggestMatchVideoPlaylistController(unittest2.TestCase):
@@ -215,7 +250,7 @@ class TestSuggestMatchVideoPlaylistController(unittest2.TestCase):
                     "teams": [\
                     "frc254",\
                     "frc1678",\
-                    "frc973"]}}',
+                    "frc973"]}}'                                ,
             score_breakdown_json='{\
                 "blue": {\
                     "auto": 70,\
