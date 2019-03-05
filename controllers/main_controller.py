@@ -225,7 +225,7 @@ class MainCompetitionseasonHandler(CacheableHandler):
         for special_webcast in FirebasePusher.get_special_webcasts():
             add = True
             for event in week_events:
-                if event.webcast:
+                if event.now and event.webcast:
                     for event_webcast in event.webcast:
                         if (special_webcast.get('type', '') == event_webcast.get('type', '') and
                                 special_webcast.get('channel', '') == event_webcast.get('channel', '') and
