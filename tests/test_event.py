@@ -114,3 +114,19 @@ class TestEvent(unittest2.TestCase):
     def test_dates_ends_today(self):
         self.assertFalse(self.event_ends_today.starts_today)
         self.assertTrue(self.event_ends_today.ends_today)
+
+    def test_week_str_no_week(self):
+        event = Event(id="week_str_event_no_week", year=datetime.datetime.now().year)
+        self.assertIsNone(event.week_str)
+
+    def test_week_str_2016_week_0(self):
+        event = Event(id="week_str_event_2016_week_0", year=2016, start_date=datetime.datetime.today())
+        self.assertEqual(event.week_str, "Week 0.5")
+
+    def test_week_str_2016(self):
+        event = Event(id="week_str_event_2016", year=datetime.datetime.now().year, start_date=datetime.datetime.today())
+        self.assertEqual(event.week_str, "Week 2")
+
+    def test_week_str(self):
+        event = Event(id="week_str_event", year=datetime.datetime.now().year, start_date=datetime.datetime.today())
+        self.assertEqual(event.week_str, "Week 3")
