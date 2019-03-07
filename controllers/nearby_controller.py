@@ -41,7 +41,7 @@ class NearbyController(CacheableHandler):
 
     def get(self):
         year, location, range_limit, search_type, page = self._get_params()
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(year, location.encode('ascii', 'ignore'), range_limit, search_type, page)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(year, location.encode('ascii', 'ignore') if location else location, range_limit, search_type, page)
         super(NearbyController, self).get()
 
     def _render(self):
