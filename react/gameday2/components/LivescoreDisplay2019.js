@@ -175,7 +175,7 @@ class LivescoreDisplay2019 extends React.PureComponent {
               <div className="progress">
                 <div className={`progress-bar ${progressColor}`} style={{ width: progressWidth }} />
                 <div className="timeRemainingContainer">
-                  <span className="timeRemaining">{ timeRemaining }</span>
+                  <span className="timeRemaining">{timeRemaining}</span>
                 </div>
               </div>
               <div className="scoreContainer">

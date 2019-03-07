@@ -29,8 +29,8 @@ const HatchCargoCount = (props) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', ...style }}>
       <span style={{ fontSize: 9, margin: 'auto' }}>{name}</span>
-      <span>{panelIndicator()} {hatches || 0}</span>
       <span>{cargoIndicator()} {cargo || 0}</span>
+      <span>{panelIndicator()} {hatches || 0}</span>
     </div>
   )
 }
