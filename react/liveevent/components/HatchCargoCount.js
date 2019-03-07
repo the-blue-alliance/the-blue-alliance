@@ -16,7 +16,7 @@ const HatchCargoCount = (props) => {
 
   const panelIndicator = () => (
     <svg width="16px" height="16px" style={svgStyle} rel="tooltip" title="Hatch Panel">
-      <circle cx="8" cy="8" r="6" fill="none" stroke="#f4d941" stroke-width="4" />
+      <circle cx="8" cy="8" r="6" fill="none" stroke="#f4d941" strokeWidth="4" />
     </svg>
   )
 

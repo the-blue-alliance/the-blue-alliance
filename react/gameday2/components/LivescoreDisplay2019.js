@@ -93,6 +93,7 @@ class LivescoreDisplay2019 extends React.PureComponent {
     if (showETA) {  // Reset to pre match defaults
       mode = 'pre_match'
       timeRemaining = 0
+      redScore = 0
       redCargoShipHatchCount = 0
       redCargoShipCargoCount = 0
       redRocket1HatchCount = 0
