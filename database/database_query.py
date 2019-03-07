@@ -54,7 +54,7 @@ class DatabaseQuery(object):
     @ndb.tasklet
     def fetch_async(self, dict_version=None, return_updated=False):
         with TraceContext() as root:
-            with root.span("{}.fetch_async".format(self.__class__.__name__)) as spn:
+            with root.span("{}.fetch_async".format(self.__class__.__name__)):
                 if dict_version:
                     if dict_version not in self.VALID_DICT_VERSIONS:
                         raise Exception("Bad api version for database query: {}".format(dict_version))

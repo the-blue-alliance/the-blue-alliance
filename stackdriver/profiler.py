@@ -33,13 +33,15 @@ def send_trace(projectId, trace_body):
 
 
 class Span(object):
-    def __init__(self, name, kind='SPAN_KIND_UNSPECIFIED'):
+    def __init__(self, name, doTrace, kind='SPAN_KIND_UNSPECIFIED'):
         self.id = str(random.getrandbits(64))
         self.name = name
+        self.doTrace = doTrace
         self.kind = kind
 
     def start(self):
-        logging.info("CREATED SPAN: {}".format(self.name))
+        if self.doTrace:
+            logging.info("CREATED SPAN: {}".format(self.name))
         self.startTime = datetime.now()
 
     def finish(self):
@@ -70,11 +72,12 @@ class TraceContext(object):
     def __init__(self):
         if hasattr(trace_context, 'request'):
             self._tcontext = trace_context.request.headers.get('X-Cloud-Trace-Context', 'NNNN/NNNN;xxxxx')
-            logging.info("Trace Context: {}".format(self._tcontext))
-
             self._doTrace = ';o=1' in self._tcontext
         else:
             self._doTrace = False
+
+        if self._doTrace:
+            logging.info("Trace Context: {}".format(self._tcontext))
 
     def __enter__(self):
         self.start()
@@ -99,7 +102,7 @@ class TraceContext(object):
                 trace_context.spans = []
 
     def span(self, name=""):
-        spn = Span(name)
+        spn = Span(name, self._doTrace)
         if self._doTrace:
             trace_context.spans.append(spn)
         return spn
