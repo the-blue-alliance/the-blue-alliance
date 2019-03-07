@@ -290,7 +290,7 @@ class DistrictHelper(object):
         from helpers.match_helper import MatchHelper  # circular import issue
 
         # qual match points are calculated by rank
-        rankings = event.details.rankings2
+        rankings = event.details and event.details.rankings2
         if rankings:
             num_teams = len(rankings)
             alpha = 1.07
