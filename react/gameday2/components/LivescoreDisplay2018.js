@@ -4,7 +4,7 @@ import AutoScale from './AutoScale/AutoScale'
 import PowerupCount from '../../liveevent/components/PowerupCount'
 import CountWrapper from './CountWrapper'
 
-class LivescoreDisplay extends React.PureComponent {
+class LivescoreDisplay2018 extends React.PureComponent {
   state = {
     currentTime: undefined,
   }
@@ -251,9 +251,9 @@ class LivescoreDisplay extends React.PureComponent {
   }
 }
 
-LivescoreDisplay.propTypes = {
+LivescoreDisplay2018.propTypes = {
   matches: PropTypes.list,
   matchState: PropTypes.object,
 }
 
-export default LivescoreDisplay
+export default LivescoreDisplay2018
