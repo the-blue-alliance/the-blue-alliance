@@ -48,13 +48,13 @@ class DatafeedFIRSTElasticSearch(object):
 
     def getEventDetails(self, event):
         if event.first_eid is None:
-            logging.warning("Cannot get event details for {}! No first_eid.".format(event.key.id()))
+            logging.info("Cannot get event details for {}! No first_eid.".format(event.key.id()))
             return None
         return self._parse(self.EVENT_DETAILS_URL_PATTERN % (event.first_eid), FIRSTElasticSearchEventListParser(event.year))[0]
 
     def getEventTeams(self, event):
         if event.first_eid is None:
-            logging.warning("Cannot get event teams for {}! No first_eid.".format(event.key.id()))
+            logging.info("Cannot get event teams for {}! No first_eid.".format(event.key.id()))
             return []
 
         teams = self._parse(self.EVENT_TEAMS_URL_PATTERN % (event.first_eid, event.year), FIRSTElasticSearchTeamDetailsParser(event.year))
@@ -62,7 +62,7 @@ class DatafeedFIRSTElasticSearch(object):
 
     def getTeamDetails(self, team):
         if team.first_tpid is None or team.first_tpid_year is None:
-            logging.warning("Cannot get team details for {}! No first_tpid or first_tpid_year.".format(team.key.id()))
+            logging.info("Cannot get team details for {}! No first_tpid or first_tpid_year.".format(team.key.id()))
             return None
 
         return self._parse(self.TEAM_DETAILS_URL_PATTERN % (team.first_tpid), FIRSTElasticSearchTeamDetailsParser(team.first_tpid_year))[0]
