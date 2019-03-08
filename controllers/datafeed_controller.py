@@ -608,7 +608,7 @@ class EventDetailsGet(webapp.RequestHandler):
         teams = TeamManipulator.mergeModels(teams, df2.getEventTeams(event))
 
         # Write new models
-        if teams:
+        if teams and event.year == tba_config.MAX_YEAR:  # Only update from latest year
             teams = TeamManipulator.createOrUpdate(teams)
         district_teams = DistrictTeamManipulator.createOrUpdate(district_teams)
         robots = RobotManipulator.createOrUpdate(robots)
