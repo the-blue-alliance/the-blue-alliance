@@ -30,7 +30,8 @@ class CacheableHandler(webapp2.RequestHandler):
 
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
-        trace_context.request = self.request
+        if type(self.request) == webapp2.Request:
+            trace_context.request = self.request
 
         with TraceContext(sendTrace=False) as root:
             with root.span("CacheableHandler.__init__"):
@@ -188,7 +189,8 @@ class LoggedInHandler(webapp2.RequestHandler):
 
     def __init__(self, *args, **kw):
         super(LoggedInHandler, self).__init__(*args, **kw)
-        trace_context.request = self.request
+        if type(self.request) == webapp2.Request:
+            trace_context.request = self.request
 
         self.user_bundle = UserBundle()
         self.template_values = {
