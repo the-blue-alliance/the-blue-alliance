@@ -47,6 +47,10 @@ handlers:
 - url: /swagger
   static_dir: static/swagger
   expiration: "1h"
+- url: /favicon.ico
+  static_files: static/icons/favicon.ico
+  upload: static/icons/favicon.ico
+  expiration: "1d"
 - url: /robots.txt
   static_files: static/robots.txt
   upload: static/robots.txt
