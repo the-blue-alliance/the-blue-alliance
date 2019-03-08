@@ -3,8 +3,8 @@ api_version: 1
 threadsafe: false
 
 instance_class: F1
-# automatic_scaling:
-#   max_idle_instances: 1
+automatic_scaling:
+  max_idle_instances: 1
 
 builtins:
 - appstats: on
