@@ -69,15 +69,22 @@ class Span(object):
 
 
 class TraceContext(object):
-    def __init__(self):
+    def __init__(self, sendTrace=True):
+        """
+        If sendTrace is False, it will rely on a later TraceContext to send trace data.
+        No data will be sent if there is no other TraceContext for this request.
+        """
         if hasattr(trace_context, 'request') and trace_context.request:
             self._tcontext = trace_context.request.headers.get('X-Cloud-Trace-Context', 'NNNN/NNNN;xxxxx')
             self._doTrace = ';o=1' in self._tcontext
         else:
             self._doTrace = False
 
+        self._doTrace = True
         if self._doTrace:
             logging.info("Trace Context: {}".format(self._tcontext))
+
+        self._sendTrace = sendTrace
 
     def __enter__(self):
         self.start()
@@ -87,7 +94,6 @@ class TraceContext(object):
         if self._doTrace:
             if not hasattr(trace_context, '_open_contexts'):
                 trace_context._open_contexts = 0
-            if trace_context._open_contexts == 0:
                 trace_context.spans = []
             trace_context._open_contexts += 1
 
@@ -97,7 +103,7 @@ class TraceContext(object):
     def finish(self):
         if self._doTrace:
             trace_context._open_contexts -= 1
-            if trace_context._open_contexts == 0:
+            if trace_context._open_contexts == 0 and self._sendTrace:
                 self.write()
                 trace_context.spans = []
 

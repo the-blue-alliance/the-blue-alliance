@@ -32,7 +32,7 @@ class CacheableHandler(webapp2.RequestHandler):
         super(CacheableHandler, self).__init__(*args, **kw)
         trace_context.request = self.request
 
-        with TraceContext() as root:
+        with TraceContext(sendTrace=False) as root:
             with root.span("CacheableHandler.__init__"):
                 self._cache_expiration = 0
                 self._last_modified = None  # A datetime object
