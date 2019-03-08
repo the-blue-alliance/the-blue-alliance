@@ -184,7 +184,7 @@ class ContributionCalculator(object):
         ####################################################################
         # Add results for next iter
         match = self._matches[i]
-        if match.has_been_played:
+        if match.has_been_played and match.score_breakdown:
             means = {}
             for color in ['red', 'blue']:
                 if self._stat == 'score':
