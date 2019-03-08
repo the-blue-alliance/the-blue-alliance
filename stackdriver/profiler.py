@@ -70,7 +70,7 @@ class Span(object):
 
 class TraceContext(object):
     def __init__(self):
-        if hasattr(trace_context, 'request'):
+        if hasattr(trace_context, 'request') and trace_context.request:
             self._tcontext = trace_context.request.headers.get('X-Cloud-Trace-Context', 'NNNN/NNNN;xxxxx')
             self._doTrace = ';o=1' in self._tcontext
         else:
