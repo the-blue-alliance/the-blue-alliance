@@ -5,7 +5,7 @@ cron:
   timezone: America/Los_Angeles
 
 - description: FIRST official offseason scraping
-  url: /backend-tasks/get/fms-sync-offseasons/2018
+  url: /backend-tasks/get/fms-sync-offseasons/2019
   schedule: every tuesday,thursday 02:30
   timezone: America/Los_Angeles
 
