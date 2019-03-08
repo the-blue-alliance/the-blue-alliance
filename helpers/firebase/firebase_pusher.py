@@ -97,7 +97,9 @@ class FirebasePusher(object):
         deferred.defer(
             cls._delete_data,
             'e/{}/m/{}'.format(match.event.id(), match.short_key),
-            _queue="firebase")
+            _queue="firebase",
+            _url='/_ah/queue/deferred_firebase_delete_match'
+        )
 
         # for team_key_name in match.team_key_names:
         #     deferred.defer(
@@ -137,7 +139,9 @@ class FirebasePusher(object):
             cls._put_data,
             'e/{}/m'.format(event_key),
             json.dumps(match_data),
-            _queue="firebase")
+            _queue="firebase",
+            _url='/_ah/queue/deferred_firebase_replace_event_matches'
+        )
 
     @classmethod
     def update_match(cls, match, updated_attrs):
@@ -159,7 +163,9 @@ class FirebasePusher(object):
             cls._patch_data,
             'e/{}/m/{}'.format(match.event.id(), match.short_key),
             json.dumps(match_dict),
-            _queue="firebase")
+            _queue="firebase",
+            _url='/_ah/queue/deferred_firebase_update_match'
+        )
 
         try:
             if match.event.get().event_type_enum in EventType.CMP_EVENT_TYPES:
@@ -238,13 +244,17 @@ class FirebasePusher(object):
             cls._put_data,
             'live_events',
             json.dumps(events_by_key),
-            _queue="firebase")
+            _queue="firebase",
+            _url='/_ah/queue/deferred_firebase_update_live_events'
+        )
 
         deferred.defer(
             cls._put_data,
             'special_webcasts',
             json.dumps(cls.get_special_webcasts()),
-            _queue="firebase")
+            _queue="firebase",
+            _url='/_ah/queue/deferred_firebase_update_special_webcasts'
+        )
 
     @classmethod
     @ndb.toplevel
@@ -306,7 +316,9 @@ class FirebasePusher(object):
             cls._patch_data,
             'live_events/{}'.format(event.key_name),
             json.dumps({key: converted_event[key] for key in ['key', 'name', 'short_name', 'webcasts']}),
-            _queue="firebase")
+            _queue="firebase",
+            _url='/_ah/queue/deferred_firebase_update_event'
+        )
 
     @classmethod
     def update_champ_numbers(cls):

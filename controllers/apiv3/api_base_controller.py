@@ -137,7 +137,14 @@ class ApiBaseController(CacheableHandler):
     def _track_call_defer(self, api_action, api_label):
         if random.random() < tba_config.GA_RECORD_FRACTION:
             request_time = int(round(1000 * (time.time() - self._request_start)))
-            deferred.defer(track_call, api_action, api_label, '{}:{}'.format(self.auth_owner, self.auth_description), request_time, _queue="api-track-call")
+            deferred.defer(
+                track_call,
+                api_action, api_label,
+                '{}:{}'.format(self.auth_owner, self.auth_description),
+                request_time,
+                _queue="api-track-call",
+                _url='/_ah/queue/deferred_apiv3_track_call',
+            )
 
     def _validate_tba_auth_key(self):
         """

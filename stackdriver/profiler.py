@@ -137,7 +137,7 @@ class TraceContext(object):
                 'traces': [traces_body]
             }
 
-            deferred.defer(send_trace, projectId, body, _queue="api-track-call")
+            deferred.defer(send_trace, projectId, body, _queue="api-track-call", _url='/_ah/queue/deferred_stackdriver_send_trace')
         except Exception, e:
             logging.warning("TraceContext.write() failed!")
             logging.exception(e)

@@ -57,7 +57,9 @@ class ManipulatorBase(object):
                 all_affected_references,
                 _queue='cache-clearing',
                 _transactional=ndb.in_transaction(),
-                _target='default')
+                _target='default',
+                _url='/_ah/queue/deferred_manipulator_clearCache'
+            )
 
     @classmethod
     def _clearCacheDeferred(cls, all_affected_references):
@@ -193,7 +195,7 @@ class ManipulatorBase(object):
         if models:
             post_delete_hook = getattr(cls, "postDeleteHook", None)
             if callable(post_delete_hook):
-                deferred.defer(post_delete_hook, models, _queue="post-update-hooks")
+                deferred.defer(post_delete_hook, models, _queue="post-update-hooks", _url='/_ah/queue/deferred_manipulator_runPostDeleteHook')
 
     @classmethod
     def runPostUpdateHook(cls, models):
@@ -205,4 +207,4 @@ class ManipulatorBase(object):
             if callable(post_update_hook):
                 updated_attrs = [model._updated_attrs if hasattr(model, '_updated_attrs') else [] for model in models]
                 is_new = [model._is_new if hasattr(model, '_is_new') else False for model in models]
-                deferred.defer(post_update_hook, models, updated_attrs, is_new, _queue="post-update-hooks")
+                deferred.defer(post_update_hook, models, updated_attrs, is_new, _queue="post-update-hooks", _url='/_ah/queue/deferred_manipulator_runPostUpdateHook')
