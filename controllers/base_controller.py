@@ -30,15 +30,19 @@ class CacheableHandler(webapp2.RequestHandler):
 
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 0
-        self._last_modified = None  # A datetime object
-        self._user_bundle = UserBundle()
-        self._is_admin = self._user_bundle.is_current_user_admin
-        if not hasattr(self, '_partial_cache_key'):
-            self._partial_cache_key = self.CACHE_KEY_FORMAT
-        self.template_values = {}
-        if self.response:
-            self.response.headers['Vary'] = 'Accept-Encoding'
+        trace_context.request = self.request
+
+        with TraceContext() as root:
+            with root.span("CacheableHandler.__init__"):
+                self._cache_expiration = 0
+                self._last_modified = None  # A datetime object
+                self._user_bundle = UserBundle()
+                self._is_admin = self._user_bundle.is_current_user_admin
+                if not hasattr(self, '_partial_cache_key'):
+                    self._partial_cache_key = self.CACHE_KEY_FORMAT
+                self.template_values = {}
+                if self.response:
+                    self.response.headers['Vary'] = 'Accept-Encoding'
 
     @property
     def cache_key(self):
@@ -68,22 +72,22 @@ class CacheableHandler(webapp2.RequestHandler):
             return html
 
     def get(self, *args, **kw):
-        trace_context.request = self.request
         with TraceContext() as root:
-            with root.span("CacheableHandler._read_cache"):
-                cached_response = self._read_cache()
+            with root.span("CacheableHandler.get"):
+                with root.span("CacheableHandler._read_cache"):
+                    cached_response = self._read_cache()
 
-            if cached_response is None:
-                self._set_cache_header_length(self.CACHE_HEADER_LENGTH)
-                self.template_values["render_time"] = datetime.datetime.now().replace(second=0, microsecond=0)  # Prevent ETag from changing too quickly
-                with root.span("CacheableHandler._render"):
-                    rendered = self._render(*args, **kw)
-                if self._output_if_modified(self._add_admin_bar(rendered)):
-                    self._write_cache(self.response)
-            else:
-                self.response.headers.update(cached_response.headers)
-                del self.response.headers['Content-Length']  # Content-Length gets set automatically
-                self._output_if_modified(self._add_admin_bar(cached_response.body))
+                if cached_response is None:
+                    self._set_cache_header_length(self.CACHE_HEADER_LENGTH)
+                    self.template_values["render_time"] = datetime.datetime.now().replace(second=0, microsecond=0)  # Prevent ETag from changing too quickly
+                    with root.span("CacheableHandler._render"):
+                        rendered = self._render(*args, **kw)
+                    if self._output_if_modified(self._add_admin_bar(rendered)):
+                        self._write_cache(self.response)
+                else:
+                    self.response.headers.update(cached_response.headers)
+                    del self.response.headers['Content-Length']  # Content-Length gets set automatically
+                    self._output_if_modified(self._add_admin_bar(cached_response.body))
 
     def _output_if_modified(self, content):
         """
@@ -184,6 +188,8 @@ class LoggedInHandler(webapp2.RequestHandler):
 
     def __init__(self, *args, **kw):
         super(LoggedInHandler, self).__init__(*args, **kw)
+        trace_context.request = self.request
+
         self.user_bundle = UserBundle()
         self.template_values = {
             "user_bundle": self.user_bundle

@@ -14,6 +14,7 @@ from controllers.base_controller import CacheableHandler
 from helpers.validation_helper import ValidationHelper
 from models.api_auth_access import ApiAuthAccess
 from models.sitevar import Sitevar
+from stackdriver.profiler import TraceContext
 
 
 # used for deferred call
@@ -94,31 +95,35 @@ class ApiBaseController(CacheableHandler):
             self.response.set_status(500)
 
     def get(self, *args, **kw):
-        self._validate_tba_auth_key()
-        self._errors = ValidationHelper.validate_request(self)
-        if self._errors:
-            self.abort(404)
+        with TraceContext() as root:
+            with root.span("ApiBaseController.get"):
+                self._validate_tba_auth_key()
+                self._errors = ValidationHelper.validate_request(self)
+                if self._errors:
+                    self.abort(404)
 
-        super(ApiBaseController, self).get(*args, **kw)
-        self.response.headers['X-TBA-Version'] = '{}'.format(self.API_VERSION)
-        self.response.headers['Vary'] = 'Accept-Encoding'
+                super(ApiBaseController, self).get(*args, **kw)
+                self.response.headers['X-TBA-Version'] = '{}'.format(self.API_VERSION)
+                self.response.headers['Vary'] = 'Accept-Encoding'
 
         if not self._errors:
             self._track_call(*args, **kw)
 
     def post(self, *args, **kw):
-        self._validate_tba_auth_key()
-        self._errors = ValidationHelper.validate_request(self)
-        if self._errors:
-            self.abort(404)
+        with TraceContext() as root:
+            with root.span("ApiBaseController.post"):
+                self._validate_tba_auth_key()
+                self._errors = ValidationHelper.validate_request(self)
+                if self._errors:
+                    self.abort(404)
 
-        rendered = self._render(*args, **kw)
-        self.response.out.write(rendered)
-        self.response.headers['X-TBA-Version'] = '{}'.format(self.API_VERSION)
-        self.response.headers['Vary'] = 'Accept-Encoding'
+                rendered = self._render(*args, **kw)
+                self.response.out.write(rendered)
+                self.response.headers['X-TBA-Version'] = '{}'.format(self.API_VERSION)
+                self.response.headers['Vary'] = 'Accept-Encoding'
 
-        if not self._errors:
-            self._track_call(*args, **kw)
+                if not self._errors:
+                    self._track_call(*args, **kw)
 
     def options(self, *args, **kw):
         """
@@ -138,39 +143,41 @@ class ApiBaseController(CacheableHandler):
         """
         Tests the presence of a X-TBA-Auth-Key header or URL param.
         """
-        x_tba_auth_key = self.request.headers.get("X-TBA-Auth-Key")
-        if x_tba_auth_key is None:
-            x_tba_auth_key = self.request.get('X-TBA-Auth-Key')
+        with TraceContext() as root:
+            with root.span("ApiBaseController._validate_tba_auth_key"):
+                x_tba_auth_key = self.request.headers.get("X-TBA-Auth-Key")
+                if x_tba_auth_key is None:
+                    x_tba_auth_key = self.request.get('X-TBA-Auth-Key')
 
-        self.auth_owner = None
-        self.auth_owner_key = None
-        self.auth_description = None
-        if not x_tba_auth_key:
-            account = self._user_bundle.account
-            if account:
-                self.auth_owner = account.key.id()
-                self.auth_owner_key = account.key
-            elif 'thebluealliance.com' in self.request.headers.get("Origin", ""):
-                self.auth_owner = 'The Blue Alliance'
-            else:
-                self._errors = {"Error": "X-TBA-Auth-Key is a required header or URL param. Please get an access key at http://www.thebluealliance.com/account."}
-                self.abort(401)
+                self.auth_owner = None
+                self.auth_owner_key = None
+                self.auth_description = None
+                if not x_tba_auth_key:
+                    account = self._user_bundle.account
+                    if account:
+                        self.auth_owner = account.key.id()
+                        self.auth_owner_key = account.key
+                    elif 'thebluealliance.com' in self.request.headers.get("Origin", ""):
+                        self.auth_owner = 'The Blue Alliance'
+                    else:
+                        self._errors = {"Error": "X-TBA-Auth-Key is a required header or URL param. Please get an access key at http://www.thebluealliance.com/account."}
+                        self.abort(401)
 
-        if self.auth_owner:
-            logging.info("Auth owner: {}, LOGGED IN".format(self.auth_owner))
-        else:
-            auth = ApiAuthAccess.get_by_id(x_tba_auth_key)
-            if auth and auth.is_read_key:
-                self.auth_owner = auth.owner.id()
-                self.auth_owner_key = auth.owner
-                self.auth_description = auth.description
-                if self.REQUIRE_ADMIN_AUTH and not auth.allow_admin:
-                    self._errors = {"Error": "X-TBA-Auth-Key does not have required permissions"}
-                    self.abort(401)
-                logging.info("Auth owner: {}, X-TBA-Auth-Key: {}".format(self.auth_owner, x_tba_auth_key))
-            else:
-                self._errors = {"Error": "X-TBA-Auth-Key is invalid. Please get an access key at http://www.thebluealliance.com/account."}
-                self.abort(401)
+                if self.auth_owner:
+                    logging.info("Auth owner: {}, LOGGED IN".format(self.auth_owner))
+                else:
+                    auth = ApiAuthAccess.get_by_id(x_tba_auth_key)
+                    if auth and auth.is_read_key:
+                        self.auth_owner = auth.owner.id()
+                        self.auth_owner_key = auth.owner
+                        self.auth_description = auth.description
+                        if self.REQUIRE_ADMIN_AUTH and not auth.allow_admin:
+                            self._errors = {"Error": "X-TBA-Auth-Key does not have required permissions"}
+                            self.abort(401)
+                        logging.info("Auth owner: {}, X-TBA-Auth-Key: {}".format(self.auth_owner, x_tba_auth_key))
+                    else:
+                        self._errors = {"Error": "X-TBA-Auth-Key is invalid. Please get an access key at http://www.thebluealliance.com/account."}
+                        self.abort(401)
 
 
 def handle_404(request, response, exception):
