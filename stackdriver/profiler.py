@@ -80,7 +80,6 @@ class TraceContext(object):
         else:
             self._doTrace = False
 
-        self._doTrace = True
         if self._doTrace:
             logging.info("Trace Context: {}".format(self._tcontext))
 
