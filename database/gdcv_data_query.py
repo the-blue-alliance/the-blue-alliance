@@ -20,10 +20,10 @@ class BaseCloudSqlQuery(DatabaseQuery):
     # https://cloud.google.com/appengine/docs/standard/python/cloud-sql/using-cloud-sql-mysql
     def _connect_to_cloudsql(self):
         secrets_sitevar = Sitevar.get_by_id('google.secrets')
-        cloudsql_connection = secrets_sitevar.contents.get('sql_connection')
-        cloudsql_db = secrets_sitevar.contents.get('sql_db')
-        cloudsql_user = secrets_sitevar.contents.get('sql_user')
-        cloudsql_pass = secrets_sitevar.contents.get('sql_pass')
+        cloudsql_connection = secrets_sitevar.contents.get('sql_connection', '')
+        cloudsql_db = secrets_sitevar.contents.get('sql_db', '')
+        cloudsql_user = secrets_sitevar.contents.get('sql_user', '')
+        cloudsql_pass = secrets_sitevar.contents.get('sql_pass', '')
         # When deployed to App Engine, the `SERVER_SOFTWARE` environment variable
         # will be set to 'Google App Engine/version'.
         if os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine/'):
@@ -87,7 +87,7 @@ class BaseCloudSqlQuery(DatabaseQuery):
                     del row_dict[column]
                 query_result.append(row_dict)
         except Exception:
-            logging.exception("Error querying CloudSQL")
+            logging.info("Error querying CloudSQL")
         finally:
             if db:
                 db.close()
