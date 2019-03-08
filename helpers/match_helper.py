@@ -544,6 +544,36 @@ class MatchHelper(object):
                 tiebreakers.append((red_pressure, blue_pressure))
             else:
                 tiebreakers.append(None)
+        elif match.year == 2019 and not (match.comp_level == 'f' and match.match_number <= 3):  # Finals can't be tiebroken. Only overtime
+            # Greater number of FOUL points awarded (i.e. the ALLIANCE that played the cleaner MATCH)
+            if 'foulPoints' in red_breakdown and 'foulPoints' in blue_breakdown:
+                tiebreakers.append((red_breakdown['foulPoints'], blue_breakdown['foulPoints']))
+            else:
+                tiebreakers.append(None)
+
+            # Cumulative sum of scored CARGO points
+            if 'cargoPoints' in red_breakdown and 'cargoPoints' in blue_breakdown:
+                tiebreakers.append((red_breakdown['cargoPoints'], blue_breakdown['cargoPoints']))
+            else:
+                tiebreakers.append(None)
+
+            # Cumulative sum of scored HATCH PANEL points
+            if 'hatchPanelPoints' in red_breakdown and 'hatchPanelPoints' in blue_breakdown:
+                tiebreakers.append((red_breakdown['hatchPanelPoints'], blue_breakdown['hatchPanelPoints']))
+            else:
+                tiebreakers.append(None)
+
+            # Cumulative sum of scored HAB CLIMB points
+            if 'habClimbPoints' in red_breakdown and 'habClimbPoints' in blue_breakdown:
+                tiebreakers.append((red_breakdown['habClimbPoints'], blue_breakdown['habClimbPoints']))
+            else:
+                tiebreakers.append(None)
+
+            # Cumulative sum of scored SANDSTORM BONUS points
+            if 'sandStormBonusPoints' in red_breakdown and 'sandStormBonusPoints' in blue_breakdown:
+                tiebreakers.append((red_breakdown['sandStormBonusPoints'], blue_breakdown['sandStormBonusPoints']))
+            else:
+                tiebreakers.append(None)
 
         for tiebreaker in tiebreakers:
             if tiebreaker is None:
