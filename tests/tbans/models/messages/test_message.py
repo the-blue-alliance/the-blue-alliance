@@ -2,7 +2,7 @@ import unittest2
 
 from tbans.models.messages.message import Message
 
-from tests.mock_notification import MockNotification
+from tests.tbans.mocks.notifications.mock_notification import MockNotification
 
 
 class TestMessage(unittest2.TestCase):

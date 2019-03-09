@@ -7,8 +7,10 @@ from consts.notification_type import NotificationType
 from tbans.consts.platform_payload_type import PlatformPayloadType
 from tbans.models.messages.message import Message
 from tbans.models.messages.message_response import MessageResponse
+from tbans.utils.json_utils import json_string_to_dict
 
 
+# TODO: Move these to a constants file
 # Error codes
 INTERNAL_ERROR = 'internal-error'
 UNKNOWN_ERROR = 'unknown-error'
@@ -214,13 +216,7 @@ class FCMMessage(Message):
           "name": "projects/{project_id}/messages/1545762214218984"
         }
         """
-        data = {}
-        try:
-            response_json = json.loads(response.content)
-            if isinstance(response_json, dict):
-                data = response_json
-        except ValueError:
-            pass
+        data = json_string_to_dict(response.content)
 
         error_dict = data.get('error', None)
         # If we didn't error - go ahead and return the original response information

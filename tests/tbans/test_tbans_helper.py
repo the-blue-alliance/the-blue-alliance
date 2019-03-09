@@ -1,5 +1,7 @@
 import unittest2
 
+from tests.tbans.mocks.mock_tbans_service import MockTBANSService
+
 from helpers.tbans_helper import TBANSHelper
 from models.mobile_client import MobileClient
 from consts.client_type import ClientType
@@ -40,12 +42,3 @@ class TestTBANSHelper(unittest2.TestCase):
 
     def _create_mock_service(self):
         return MockTBANSService()
-
-
-class MockTBANSService:
-
-    def ping(self, fcm=None, webhook=None):
-        pass
-
-    def verification(self, webhook):
-        pass

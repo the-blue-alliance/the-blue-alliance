@@ -12,8 +12,9 @@ from tbans.models.notifications.payloads.payload import Payload
 from tbans.models.notifications.payloads.notification_payload import NotificationPayload
 from tbans.models.notifications.payloads.platform_payload import PlatformPayload
 
-from tests.mock_notification import MockNotification
-from tests.mock_payload import MockPayload
+from tests.tbans.mocks.notifications.mock_notification import MockNotification
+from tests.tbans.mocks.mock_payload import MockPayload
+from tests.tbans.mocks.mock_response import MockResponse
 
 
 class TestFCMMessage(unittest2.TestCase):
@@ -175,10 +176,3 @@ class TestFCMMessage(unittest2.TestCase):
         transformed_response = FCMMessage._transform_fcm_response(response)
         self.assertEqual(transformed_response.status_code, _status_code)
         self.assertEqual(transformed_response.content, 'registration-token-not-registered')
-
-
-class MockResponse(object):
-
-    def __init__(self, status_code, content):
-        self.status_code = status_code
-        self.content = content
