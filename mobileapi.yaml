@@ -1,0 +1,30 @@
+service: mobileapi
+
+runtime: python27
+api_version: 1
+threadsafe: true
+
+instance_class: F1
+automatic_scaling:
+  max_idle_instances: 1
+
+builtins:
+- appstats: on
+
+libraries:
+- name: pycrypto  # for Google Cloud Endpoints
+  version: 2.6
+- name: ssl
+  version: 2.7.11
+- name: MySQLdb
+  version: "latest"
+
+handlers:
+- url: .*
+  script: mobileapi.mobileapi_service.app
+
+includes:
+- app_shared.yaml
+
+env_variables:
+  FIREBASE_PROJECT_ID: tbatv-prod-hrd

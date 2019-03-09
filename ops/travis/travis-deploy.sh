@@ -63,7 +63,7 @@ trap release_lock EXIT INT TERM
 
 echo "Obtained Lock. Deploying $PROJECT:$VERSION"
 # need more permissions for cron.yaml queue.yaml index.yaml, we can come back to them
-for config in app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml tbans.yaml cron.yaml dispatch.yaml; do
+for config in app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml tbans.yaml mobileapi.yaml cron.yaml dispatch.yaml; do
     with_python27 "$GCLOUD --quiet --verbosity warning --project $PROJECT app deploy $config --version $VERSION"
 done
 
