@@ -16,6 +16,8 @@ libraries:
   version: 2.6
 - name: ssl
   version: 2.7.11
+- name: MySQLdb
+  version: "latest"
 
 handlers:
 - url: /mobileapi/.*
