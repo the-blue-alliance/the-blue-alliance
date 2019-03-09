@@ -34,7 +34,11 @@ HTTP_REQUEST = google.auth.transport.requests.Request()
 
 
 def get_current_user(headers):
-    id_token = headers['Authorization'].split(' ').pop()
+    auth = headers.get('Authorization')
+    if not auth:
+        return None
+
+    id_token = auth.split(' ').pop()
     try:
         claims = google.oauth2.id_token.verify_firebase_token(id_token, HTTP_REQUEST)
     except ValueError:
