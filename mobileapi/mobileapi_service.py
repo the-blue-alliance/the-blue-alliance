@@ -45,6 +45,7 @@ def get_current_user(headers):
         return None
     return PushHelper.user_email_to_id(claims['email'])
 
+
 @endpoints.api(
     base_path='/mobileapi/',
     name='tbaMobile',
