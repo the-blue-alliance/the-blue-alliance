@@ -2,7 +2,7 @@ dispatch:
 # Beta PWA
 - url: "beta.thebluealliance.com/*"
   service: pwa-ssr
-
+  
 # Send low-frequency long-running tasks to backend module
 - url: "*/backend-tasks/*"
   module: backend-tasks
@@ -15,10 +15,6 @@ dispatch:
 # Send notification requests to TBANS (The Blue Alliance Notification Service)
 - url: "*/tbans/*"
   service: tbans
-
-# Endpoints for internal mobile API
-- url: "*/mobileapi/*"
-  service: mobileapi
 
 # Send everything else to default module
 - url: "*/"

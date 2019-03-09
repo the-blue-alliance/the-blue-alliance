@@ -77,7 +77,7 @@ handlers:
 - url: /api/.*
   script: api_main.app
 - url: /_ah/api/.* # Endpoints for internal mobile API
-  script: mobileapi.mobile_main.app
+  script: mobile_main.app
 - url: /_ah/queue/deferred.*
   script: google.appengine.ext.deferred.deferred.application
   login: admin
