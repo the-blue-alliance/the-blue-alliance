@@ -43,7 +43,11 @@ def get_current_user_id(headers):
         claims = google.oauth2.id_token.verify_firebase_token(id_token, HTTP_REQUEST)
     except ValueError:
         return None
-    return PushHelper.user_email_to_id(claims['email'])
+
+    if not claims:
+        return None
+    else:
+        return PushHelper.user_email_to_id(claims['email'])
 
 
 @endpoints.api(
