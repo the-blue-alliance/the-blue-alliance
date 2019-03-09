@@ -81,6 +81,12 @@ if tba_config.DEBUG:
     }
 )
 class MobileAPI(remote.Service):
+    @endpoints.method(message_types.VoidMessage, BaseResponse,
+                      path='test', http_method='GET',
+                      name='test')
+    def test(self, request):
+        return BaseResponse(code=200, message="This is a test!")
+
     @endpoints.method(RegistrationRequest, BaseResponse,
                       path='register', http_method='POST',
                       name='register')
