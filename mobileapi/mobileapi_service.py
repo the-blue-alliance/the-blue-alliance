@@ -28,6 +28,7 @@ from models.mobile_api_messages import BaseResponse, FavoriteCollection, Favorit
 from models.mobile_client import MobileClient
 from models.suggestion import Suggestion
 
+# See: https://cloud.google.com/appengine/docs/standard/python/authenticating-users-firebase-appengine
 # See: https://github.com/GoogleCloudPlatform/python-docs-samples/blob/6f5f3bcb81779679a24e0964a6c57c0c7deabfac/appengine/standard/firebase/firenotes/backend/main.py#L27
 requests_toolbelt.adapters.appengine.monkeypatch()
 HTTP_REQUEST = google.auth.transport.requests.Request()
