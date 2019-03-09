@@ -2,6 +2,7 @@ import endpoints
 import json
 import logging
 
+from google.appengine.api.modules import modules
 from google.appengine.ext import ndb
 
 from protorpc import remote
@@ -59,6 +60,7 @@ if tba_config.DEBUG:
 
 
 @endpoints.api(
+    base_path='/mobileapi/' if modules.get_current_module_name() == 'mobileapi' else None,  # Temporarily support both default and dedicated service
     name='tbaMobile',
     version='v9',
     description="API for TBA Mobile clients",
@@ -79,7 +81,6 @@ if tba_config.DEBUG:
     }
 )
 class MobileAPI(remote.Service):
-
     @endpoints.method(RegistrationRequest, BaseResponse,
                       path='register', http_method='POST',
                       name='register')
