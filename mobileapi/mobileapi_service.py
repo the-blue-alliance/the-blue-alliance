@@ -33,7 +33,7 @@ requests_toolbelt.adapters.appengine.monkeypatch()
 HTTP_REQUEST = google.auth.transport.requests.Request()
 
 
-def get_current_user(headers):
+def get_current_user_id(headers):
     auth = headers.get('Authorization')
     if not auth:
         return None
@@ -60,7 +60,7 @@ class MobileAPI(remote.Service):
                       path='test', http_method='GET',
                       name='test')
     def test(self, request):
-        user_id = get_current_user(self.headers)
+        user_id = get_current_user_id(self.headers)
         return BaseResponse(code=200, message="User id: {}".format(user_id))
 
     @endpoints.method(RegistrationRequest, BaseResponse,
