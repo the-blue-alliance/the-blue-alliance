@@ -12,13 +12,13 @@ dispatch:
 - url: "*/backend-tasks-b2/*"
   module: backend-tasks-b2
 
+# Endpoints for internal client API
+- url: "*/clientapi/*"
+  service: clientapi
+
 # Send notification requests to TBANS (The Blue Alliance Notification Service)
 - url: "*/tbans/*"
   service: tbans
-
-# Endpoints for internal mobile API
-- url: "*/mobileapi*"
-  service: mobileapi
 
 # Send everything else to default module
 - url: "*/"

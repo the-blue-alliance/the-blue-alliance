@@ -52,12 +52,12 @@ def get_current_user_id(headers):
 
 
 @endpoints.api(
-    base_path='/mobileapi/',
-    name='tbaMobile',
+    base_path='/clientapi/',
+    name='tbaClient',
     version='v9',
     description="API for TBA Mobile clients",
 )
-class MobileAPI(remote.Service):
+class ClientAPI(remote.Service):
     def initialize_request_state(self, state):
         self.headers = state.headers
 
@@ -305,4 +305,4 @@ class MobileAPI(remote.Service):
         else:
             return BaseResponse(code=400, message="Bad suggestion url")
 
-app = endpoints.api_server([MobileAPI])
+app = endpoints.api_server([ClientAPI])

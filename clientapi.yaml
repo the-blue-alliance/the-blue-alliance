@@ -1,4 +1,4 @@
-service: mobileapi
+service: clientapi
 
 runtime: python27
 api_version: 1
@@ -21,7 +21,7 @@ libraries:
 
 handlers:
 - url: .*
-  script: mobileapi.mobileapi_service.app
+  script: clientapi.clientapi_service.app
 
 includes:
 - app_shared.yaml
