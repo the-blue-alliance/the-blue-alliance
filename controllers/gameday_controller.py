@@ -1,6 +1,7 @@
 import datetime
 import os
 import json
+import logging
 
 import webapp2
 from google.appengine.ext.webapp import template
@@ -117,6 +118,7 @@ class GamedayRedirectHandler(webapp2.RequestHandler):
         aliases = special_webcasts.contents.get("aliases", {}) if special_webcasts else {}
 
         if alias in aliases:
+            logging.info("GameDay alias redirect - {}".format(aliases[alias]))
             self.redirect("/gameday{}".format(aliases[alias]))
             return
 
@@ -125,6 +127,7 @@ class GamedayRedirectHandler(webapp2.RequestHandler):
             event = Event.get_by_id(alias)
             if event and event.within_a_day:
                 params = self.get_param_string_for_event(event)
+                logging.info("GameDay event redirect - {}".format(params))
                 self.redirect("/gameday{}".format(params))
                 return
 
@@ -137,9 +140,11 @@ class GamedayRedirectHandler(webapp2.RequestHandler):
             for event in team_events:
                 if event and event.within_a_day:
                     params = self.get_param_string_for_event(event)
+                    logging.info("GameDay team redirect - {}".format(params))
                     self.redirect("/gameday{}".format(params))
                     return
 
+        logging.info("GameDay fallback redirect - {}".format(params))
         self.redirect("/gameday")
         return
 
