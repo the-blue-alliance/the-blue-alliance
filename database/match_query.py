@@ -28,7 +28,7 @@ class EventMatchesQuery(DatabaseQuery):
         event_key = self._query_args[0]
         match_keys = yield Match.query(Match.event == ndb.Key(Event, event_key)).fetch_async(keys_only=True)
         matches = yield ndb.get_multi_async(match_keys)
-        raise ndb.Return(matches)
+        raise ndb.Return(filter(None, matches))
 
 
 class TeamEventMatchesQuery(DatabaseQuery):
@@ -44,7 +44,7 @@ class TeamEventMatchesQuery(DatabaseQuery):
             Match.team_key_names == team_key,
             Match.event == ndb.Key(Event, event_key)).fetch_async(keys_only=True)
         matches = yield ndb.get_multi_async(match_keys)
-        raise ndb.Return(matches)
+        raise ndb.Return(filter(None, matches))
 
 
 class TeamYearMatchesQuery(DatabaseQuery):
@@ -60,4 +60,4 @@ class TeamYearMatchesQuery(DatabaseQuery):
             Match.team_key_names == team_key,
             Match.year == year).fetch_async(keys_only=True)
         matches = yield ndb.get_multi_async(match_keys)
-        raise ndb.Return(matches)
+        raise ndb.Return(filter(None, matches))
