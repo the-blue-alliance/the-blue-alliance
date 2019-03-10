@@ -2,16 +2,16 @@
 import tba_config
 import webapp2
 
-from controllers.apiv3.api_admin_controller import ApiAdminSetBuildInfo
-from controllers.apiv3.api_base_controller import handle_404
-from controllers.apiv3 import api_status_controller as asc
-from controllers.apiv3 import api_district_controller as adc
-from controllers.apiv3 import api_event_controller as aec
-from controllers.apiv3 import api_match_controller as amc
-from controllers.apiv3 import api_media_controller as amec
-from controllers.apiv3 import api_realtime_controller as arc
-from controllers.apiv3 import api_team_controller as atc
-from controllers.apiv3 import api_suggest_controller as asgc
+from api.apiv3.api_admin_controller import ApiAdminSetBuildInfo
+from api.apiv3.api_base_controller import handle_404
+from api.apiv3 import api_status_controller as asc
+from api.apiv3 import api_district_controller as adc
+from api.apiv3 import api_event_controller as aec
+from api.apiv3 import api_match_controller as amc
+from api.apiv3 import api_media_controller as amec
+from api.apiv3 import api_realtime_controller as arc
+from api.apiv3 import api_team_controller as atc
+from api.apiv3 import api_suggest_controller as asgc
 
 # Ensure that APIv3 routes include OPTIONS method for CORS preflight compatibility
 # https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests

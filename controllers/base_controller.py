@@ -27,6 +27,7 @@ class CacheableHandler(webapp2.RequestHandler):
     """
     CACHE_KEY_FORMAT = ''
     CACHE_HEADER_LENGTH = 61
+    SHOULD_ADD_ADMIN_BAR = True
 
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
@@ -61,8 +62,8 @@ class CacheableHandler(webapp2.RequestHandler):
             tba_config.CONFIG["static_resource_version"])
 
     def _add_admin_bar(self, html):
-        from template_engine import jinja2_engine
-        if self._is_admin:
+        if self._is_admin and self.SHOULD_ADD_ADMIN_BAR:
+            from template_engine import jinja2_engine
             self.template_values["cache_key"] = self.cache_key
             self.template_values["return_url"] = self.request.path
             self.template_values["flushed"] = self.request.get("flushed")

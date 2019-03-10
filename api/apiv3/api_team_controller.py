@@ -5,8 +5,8 @@ from google.appengine.ext import ndb
 
 from consts.media_tag import MediaTag
 
-from controllers.apiv3.api_base_controller import ApiBaseController
-from controllers.apiv3.model_properties import filter_event_properties, filter_team_properties, filter_match_properties
+from api.apiv3.api_base_controller import ApiBaseController
+from api.apiv3.model_properties import filter_event_properties, filter_team_properties, filter_match_properties
 from database.award_query import TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
 from database.event_query import TeamEventsQuery, TeamYearEventsQuery, TeamYearEventTeamsQuery
 from database.match_query import TeamEventMatchesQuery, TeamYearMatchesQuery

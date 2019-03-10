@@ -2,7 +2,7 @@ import json
 import logging
 
 from collections import defaultdict
-from controllers.apiv3.api_base_controller import ApiBaseController
+from api.apiv3.api_base_controller import ApiBaseController
 from database.gdcv_data_query import MatchGdcvDataQuery, EventMatchesGdcvDataQuery
 from database.event_query import EventQuery
 from database.match_query import MatchQuery

@@ -1,7 +1,7 @@
 import json
 import logging
 
-from controllers.apiv3.api_base_controller import ApiBaseController
+from api.apiv3.api_base_controller import ApiBaseController
 from models.sitevar import Sitevar
 
 
