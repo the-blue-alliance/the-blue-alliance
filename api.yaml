@@ -10,6 +10,8 @@ automatic_scaling:
   target_cpu_utilization: 0.8
   target_throughput_utilization: 0.8
   max_concurrent_requests: 20
+  min_pending_latency: 200ms
+  max_pending_latency: automatic
 
 builtins:
 - appstats: on
