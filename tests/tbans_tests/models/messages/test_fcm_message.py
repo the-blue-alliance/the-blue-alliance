@@ -12,9 +12,9 @@ from tbans.models.notifications.payloads.payload import Payload
 from tbans.models.notifications.payloads.notification_payload import NotificationPayload
 from tbans.models.notifications.payloads.platform_payload import PlatformPayload
 
-from tests.tbans.mocks.notifications.mock_notification import MockNotification
-from tests.tbans.mocks.mock_payload import MockPayload
-from tests.tbans.mocks.mock_response import MockResponse
+from tests.tbans_tests.mocks.notifications.mock_notification import MockNotification
+from tests.tbans_tests.mocks.mock_payload import MockPayload
+from tests.tbans_tests.mocks.mock_response import MockResponse
 
 
 class TestFCMMessage(unittest2.TestCase):

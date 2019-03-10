@@ -5,7 +5,7 @@ from google.appengine.ext import testbed
 from tbans.models.messages.message import Message
 from tbans.models.messages.webhook_message import WebhookMessage
 
-from tests.tbans.mocks.notifications.mock_notification import MockNotification
+from tests.tbans_tests.mocks.notifications.mock_notification import MockNotification
 
 
 class TestWebhookMessage(unittest2.TestCase):

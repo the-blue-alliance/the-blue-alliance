@@ -7,7 +7,7 @@ from tbans.models.notifications.notification import Notification
 from tbans.models.notifications.payloads.notification_payload import NotificationPayload
 from tbans.models.notifications.payloads.platform_payload import PlatformPayload
 
-from tests.tbans.mocks.notifications.mock_notification import MockNotification
+from tests.tbans_tests.mocks.notifications.mock_notification import MockNotification
 
 
 class TestNotification(unittest2.TestCase):

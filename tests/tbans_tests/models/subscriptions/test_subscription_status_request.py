@@ -8,7 +8,7 @@ from google.appengine.ext import testbed
 from tbans.models.subscriptions.subscription_status import SubscriptionStatus
 from tbans.models.subscriptions.subscription_status_request import SubscriptionStatusRequest
 
-from tests.tbans.mocks.mock_response import MockResponse
+from tests.tbans_tests.mocks.mock_response import MockResponse
 
 
 class TestSubscriptionStatusRequest(unittest2.TestCase):

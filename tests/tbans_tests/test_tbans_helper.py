@@ -1,6 +1,6 @@
 import unittest2
 
-from tests.tbans.mocks.mock_tbans_service import MockTBANSService
+from tests.tbans_tests.mocks.mock_tbans_service import MockTBANSService
 
 from helpers.tbans_helper import TBANSHelper
 from models.mobile_client import MobileClient

@@ -2,7 +2,7 @@ import unittest2
 
 from tbans.models.subscriptions.subscription_response import SubscriptionResponse
 
-from tests.tbans.mocks.mock_response import MockResponse
+from tests.tbans_tests.mocks.mock_response import MockResponse
 
 
 class TestSubscriptionResponse(unittest2.TestCase):

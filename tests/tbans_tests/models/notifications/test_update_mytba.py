@@ -5,7 +5,7 @@ from consts.notification_type import NotificationType
 from tbans.consts.platform_payload_type import PlatformPayloadType
 from tbans.models.notifications.update_mytba import UpdateMyTBANotification
 
-from tests.tbans.mocks.notifications.mock_update_mytba_notification import MockUpdateMyTBANotification
+from tests.tbans_tests.mocks.notifications.mock_update_mytba_notification import MockUpdateMyTBANotification
 
 
 class TestUpdateMyTBANotification(unittest2.TestCase):
