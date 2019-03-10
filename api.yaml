@@ -13,8 +13,6 @@ builtins:
 - deferred: on
 
 libraries:
-- name: jinja2
-  version: "2.6"
 - name: MySQLdb
   version: "latest"
 
