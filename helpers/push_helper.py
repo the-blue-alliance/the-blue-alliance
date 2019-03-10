@@ -5,6 +5,7 @@ from collections import defaultdict
 from google.appengine.ext import db
 from google.appengine.ext import ndb
 from google.appengine.api import users
+from google.appengine.api import memcache
 
 from consts.client_type import ClientType
 from consts.notification_type import NotificationType
@@ -44,11 +45,15 @@ class PushHelper(object):
         workaround for this bug: https://code.google.com/p/googleappengine/issues/detail?id=8848
         solution from: http://stackoverflow.com/questions/816372/how-can-i-determine-a-user-id-based-on-an-email-address-in-app-engine
         """
-        u = users.User(user_email)
-        key = MobileUser(user=u).put()
-        obj = key.get()
-        user_id = obj.user.user_id()
-        key.delete()
+        cache_key = 'PushHelper.user_email_to_id():{}'.format(user_email)
+        user_id = memcache.get(cache_key)
+        if user_id is None:
+            u = users.User(user_email)
+            key = MobileUser(user=u).put()
+            obj = key.get()
+            user_id = obj.user.user_id()
+            key.delete()
+            memcache.set(cache_key, user_id, 60*10)
 
         if Account.get_by_id(user_id) is None:
             # Create an account for this user
