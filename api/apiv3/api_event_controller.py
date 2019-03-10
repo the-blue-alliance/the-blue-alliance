@@ -2,8 +2,8 @@ import json
 
 from google.appengine.ext import ndb
 
-from controllers.apiv3.api_base_controller import ApiBaseController
-from controllers.apiv3.model_properties import filter_event_properties, filter_team_properties, filter_match_properties
+from api.apiv3.api_base_controller import ApiBaseController
+from api.apiv3.model_properties import filter_event_properties, filter_team_properties, filter_match_properties
 from database.award_query import EventAwardsQuery
 from database.event_query import EventQuery, EventListQuery
 from database.event_details_query import EventDetailsQuery

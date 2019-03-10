@@ -2,8 +2,8 @@ import json
 
 from google.appengine.ext import ndb
 
-from controllers.apiv3.api_base_controller import ApiBaseController
-from controllers.apiv3.model_properties import filter_event_properties, filter_team_properties
+from api.apiv3.api_base_controller import ApiBaseController
+from api.apiv3.model_properties import filter_event_properties, filter_team_properties
 from database.district_query import DistrictQuery, DistrictChampsInYearQuery, DistrictsInYearQuery
 from database.event_query import DistrictEventsQuery
 from database.team_query import DistrictTeamsQuery
