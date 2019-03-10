@@ -9,6 +9,7 @@ automatic_scaling:
   max_idle_instances: 1
   target_cpu_utilization: 0.8
   target_throughput_utilization: 0.8
+  max_concurrent_requests: 20
 
 builtins:
 - appstats: on
