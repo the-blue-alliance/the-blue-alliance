@@ -3,6 +3,10 @@ dispatch:
 - url: "beta.thebluealliance.com/*"
   service: pwa-ssr
 
+# Public API
+- url: "*/api/v3/*"
+  service: api
+
 # Send low-frequency long-running tasks to backend module
 - url: "*/backend-tasks/*"
   module: backend-tasks

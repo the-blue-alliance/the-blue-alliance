@@ -66,6 +66,7 @@ def track_call(api_action, api_label, auth_owner, request_time):
 class ApiBaseController(CacheableHandler):
     API_VERSION = 3
     REQUIRE_ADMIN_AUTH = False
+    SHOULD_ADD_ADMIN_BAR = False
 
     def __init__(self, *args, **kw):
         self._request_start = time.time()
@@ -144,6 +145,7 @@ class ApiBaseController(CacheableHandler):
                 request_time,
                 _queue="api-track-call",
                 _url='/_ah/queue/deferred_apiv3_track_call',
+                _target='api',
             )
 
     def _validate_tba_auth_key(self):

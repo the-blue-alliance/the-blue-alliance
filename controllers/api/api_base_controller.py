@@ -59,8 +59,8 @@ def track_call(api_action, api_label, x_tba_app_id):
 
 
 class ApiBaseController(CacheableHandler):
-
     API_VERSION = 2
+    SHOULD_ADD_ADMIN_BAR = False
 
     def __init__(self, *args, **kw):
         super(ApiBaseController, self).__init__(*args, **kw)
