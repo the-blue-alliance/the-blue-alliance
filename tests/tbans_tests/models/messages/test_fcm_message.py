@@ -152,9 +152,6 @@ class TestFCMMessage(unittest2.TestCase):
         message = FCMMessage(MockNotification(), token='abc')
         self.assertEqual(message._fcm_url, 'https://fcm.googleapis.com/v1/projects/testbed-test/messages:send')
 
-    def test_get_access_token(self):
-        self.assertIsNotNone(FCMMessage._get_access_token())
-
     def test_send(self):
         message = FCMMessage(notification=MockNotification(), token='abc')
         response = message.send()

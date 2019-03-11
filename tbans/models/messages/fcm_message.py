@@ -7,6 +7,7 @@ from consts.notification_type import NotificationType
 from tbans.consts.platform_payload_type import PlatformPayloadType
 from tbans.models.messages.message import Message
 from tbans.models.messages.message_response import MessageResponse
+from tbans.utils.auth_utils import get_firebase_messaging_access_token
 from tbans.utils.json_utils import json_string_to_dict
 
 
@@ -129,7 +130,7 @@ class FCMMessage(Message):
         """
         # Build the request
         headers = {
-            'Authorization': 'Bearer ' + FCMMessage._get_access_token(),
+            'Authorization': 'Bearer ' + get_firebase_messaging_access_token(),
             'Content-Type': 'application/json'
         }
         message_json = self.json_string()
@@ -150,12 +151,6 @@ class FCMMessage(Message):
     def _fcm_url(self):
         app_id = app_identity.get_application_id()
         return 'https://fcm.googleapis.com/v1/projects/{}/messages:send'.format(app_id)
-
-    @staticmethod
-    def _get_access_token():
-        # This uses the default service account for this application
-        access_token, _ = app_identity.get_access_token('https://www.googleapis.com/auth/firebase.messaging')
-        return access_token
 
     def _delivery_option(self):
         """ Returns a tuple (type_string, value) for the FCMMessage delivery option """
