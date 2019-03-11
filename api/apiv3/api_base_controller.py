@@ -42,15 +42,15 @@ def track_call(api_action, api_label, auth_owner, request_time):
                 'ni': 1,
                 'sc': 'end',  # forces tracking session to end
             }),
-            urllib.urlencode({
-                'v': 1,
-                'tid': GOOGLE_ANALYTICS_ID,
-                'cid': cid,
-                't': 'timing',
-                'utc': 'api-v03',
-                'utv': api_action,
-                'utt': request_time,
-            }),
+#             urllib.urlencode({
+#                 'v': 1,
+#                 'tid': GOOGLE_ANALYTICS_ID,
+#                 'cid': cid,
+#                 't': 'timing',
+#                 'utc': 'api-v03',
+#                 'utv': api_action,
+#                 'utt': request_time,
+#             }),
         ]
 
         payload = '\n'.join(payloads)
