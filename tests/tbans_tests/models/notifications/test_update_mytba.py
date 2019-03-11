@@ -5,6 +5,8 @@ from consts.notification_type import NotificationType
 from tbans.consts.platform_payload_type import PlatformPayloadType
 from tbans.models.notifications.update_mytba import UpdateMyTBANotification
 
+from tests.tbans_tests.mocks.notifications.mock_update_mytba_notification import MockUpdateMyTBANotification
+
 
 class TestUpdateMyTBANotification(unittest2.TestCase):
 
@@ -47,10 +49,3 @@ class TestUpdateMyTBANotification(unittest2.TestCase):
     def test_platform_payload(self):
         notification = UpdateMyTBANotification('typezor', 'abcd', 'efgh')
         self.assertEquals(notification.platform_payload.platform_payload_dict(PlatformPayloadType.APNS), {'apns-collapse-id': 'abcd_typezor_update'})
-
-
-class MockUpdateMyTBANotification(UpdateMyTBANotification):
-    """ Mock - basically just implements type """
-
-    def _type():
-        return NotificationType.UPDATE_FAVORITES

@@ -2,7 +2,7 @@ import unittest2
 
 from tbans.models.notifications.payloads.payload import Payload
 
-from tests.mock_payload import MockPayload
+from tests.tbans_tests.mocks.mock_payload import MockPayload
 
 
 class TestPayload(unittest2.TestCase):
