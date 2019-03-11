@@ -113,6 +113,7 @@ class GamedayHandler(CacheableHandler):
 class GamedayRedirectHandler(webapp2.RequestHandler):
 
     def get(self, alias):
+        logging.info("[GameDay] host_url: {}".format(self.request.host_url))
         special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
         special_webcasts = special_webcasts_future.get_result()
         aliases = special_webcasts.contents.get("aliases", {}) if special_webcasts else {}
