@@ -33,6 +33,8 @@ class SubscriptionBatchRequest:
         invalid_str = [t for t in tokens if not isinstance(t, basestring) or not t]
         if invalid_str:
             raise ValueError('SubscriptionBatchRequest tokens must be non-empty strings.')
+        if len(tokens) > 1000:
+            raise ValueError('SubscriptionBatchRequest tokens must have no more than 1000 tokens.')
 
         # Ensure our topic is right - format like `/topics/something`
         if not isinstance(topic, basestring) or not topic:
