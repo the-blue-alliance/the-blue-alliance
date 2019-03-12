@@ -111,6 +111,12 @@ class GamedayHandler(CacheableHandler):
 
 
 class GamedayRedirectHandler(webapp2.RequestHandler):
+    def _fix_redirect_location(self):
+        """
+        Hacky fix to deal with Cloudflare SSL redirect issues
+        -fangeugene 2019-03-11
+        """
+        self.response.headers['Location'] = self.response.headers.get('Location').replace('http://', 'https://')
 
     def get(self, alias):
         logging.info("[GameDay] host_url: {}".format(self.request.host_url))
@@ -120,6 +126,7 @@ class GamedayRedirectHandler(webapp2.RequestHandler):
 
         if alias in aliases:
             self.redirect("/gameday{}".format(aliases[alias]))
+            self._fix_redirect_location()
             logging.info("[GameDay] redirecting to: {}".format(self.response.headers.get('Location')))
             return
 
@@ -129,6 +136,7 @@ class GamedayRedirectHandler(webapp2.RequestHandler):
             if event and event.within_a_day:
                 params = self.get_param_string_for_event(event)
                 self.redirect("/gameday{}".format(params))
+                self._fix_redirect_location()
                 logging.info("[GameDay] redirecting to: {}".format(self.response.headers.get('Location')))
                 return
 
@@ -142,10 +150,12 @@ class GamedayRedirectHandler(webapp2.RequestHandler):
                 if event and event.within_a_day:
                     params = self.get_param_string_for_event(event)
                     self.redirect("/gameday{}".format(params))
+                    self._fix_redirect_location()
                     logging.info("[GameDay] redirecting to: {}".format(self.response.headers.get('Location')))
                     return
 
         self.redirect("/gameday")
+        self._fix_redirect_location()
         logging.info("[GameDay] redirecting to: {}".format(self.response.headers.get('Location')))
         return
 
