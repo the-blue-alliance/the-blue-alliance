@@ -1,0 +1,33 @@
+service: tasks
+
+runtime: python27
+api_version: 1
+threadsafe: true
+
+instance_class: F1
+automatic_scaling:
+  max_idle_instances: 1
+  target_cpu_utilization: 0.95
+  target_throughput_utilization: 0.95
+  max_concurrent_requests: 20
+  min_pending_latency: 10000ms
+  max_pending_latency: automatic
+
+builtins:
+- appstats: on
+- deferred: on
+
+libraries:
+- name: MySQLdb
+  version: "latest"
+
+handlers:
+- url: /_ah/queue/deferred.*
+  script: google.appengine.ext.deferred.deferred.application
+  login: admin
+- url: /tasks/.*
+  script: cron_main.app
+  login: admin
+
+includes:
+- app_shared.yaml

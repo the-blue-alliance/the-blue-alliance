@@ -20,6 +20,10 @@ dispatch:
 - url: "*/clientapi/*"
   service: clientapi
 
+# Handles latency-insensive tasks
+- url: "*/tasks/*"
+  service: tasks
+
 # Send notification requests to TBANS (The Blue Alliance Notification Service)
 - url: "*/tbans/*"
   service: tbans
