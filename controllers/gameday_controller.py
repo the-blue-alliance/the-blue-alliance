@@ -1,7 +1,6 @@
 import datetime
 import os
 import json
-import logging
 
 import webapp2
 from google.appengine.ext.webapp import template
@@ -119,7 +118,6 @@ class GamedayRedirectHandler(webapp2.RequestHandler):
         self.response.headers['Location'] = self.response.headers.get('Location').replace('http://', 'https://')
 
     def get(self, alias):
-        logging.info("[GameDay] host_url: {}".format(self.request.host_url))
         special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
         special_webcasts = special_webcasts_future.get_result()
         aliases = special_webcasts.contents.get("aliases", {}) if special_webcasts else {}
@@ -127,7 +125,6 @@ class GamedayRedirectHandler(webapp2.RequestHandler):
         if alias in aliases:
             self.redirect("/gameday{}".format(aliases[alias]))
             self._fix_redirect_location()
-            logging.info("[GameDay] redirecting to: {}".format(self.response.headers.get('Location')))
             return
 
         # Allow an alias to be an event key
@@ -137,7 +134,6 @@ class GamedayRedirectHandler(webapp2.RequestHandler):
                 params = self.get_param_string_for_event(event)
                 self.redirect("/gameday{}".format(params))
                 self._fix_redirect_location()
-                logging.info("[GameDay] redirecting to: {}".format(self.response.headers.get('Location')))
                 return
 
         # Allow an alias to be a team number
@@ -151,12 +147,10 @@ class GamedayRedirectHandler(webapp2.RequestHandler):
                     params = self.get_param_string_for_event(event)
                     self.redirect("/gameday{}".format(params))
                     self._fix_redirect_location()
-                    logging.info("[GameDay] redirecting to: {}".format(self.response.headers.get('Location')))
                     return
 
         self.redirect("/gameday")
         self._fix_redirect_location()
-        logging.info("[GameDay] redirecting to: {}".format(self.response.headers.get('Location')))
         return
 
     @staticmethod
