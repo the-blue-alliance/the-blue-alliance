@@ -10,7 +10,7 @@ automatic_scaling:
   target_cpu_utilization: 0.95
   target_throughput_utilization: 0.95
   max_concurrent_requests: 20
-  min_pending_latency: 10000ms
+  min_pending_latency: 30000ms
   max_pending_latency: automatic
 
 builtins:
