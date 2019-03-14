@@ -10,7 +10,6 @@ automatic_scaling:
   max_pending_latency: automatic
 
 builtins:
-- appstats: on
 - remote_api: on
 - deferred: on
 
