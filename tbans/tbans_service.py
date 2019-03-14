@@ -35,13 +35,19 @@ class TBANSService(remote.Service):
         if not app_identity.get_application_id() == incoming_app_id:
             raise remote.ApplicationError('Unauthenticated')
 
+    def _application_error(self, message):
+        """ Helper method to log and return a 400 TBANSResponse """
+        # TODO: Monitor these
+        logging.error(message)
+        return TBANSResponse(code=400, message=message)
+
     @remote.method(PingRequest, TBANSResponse)
     def ping(self, request):
         """ Immediately dispatch a Ping to either FCM or a webhook """
         self._validate_authentication()
 
         if request.fcm and request.webhook:
-            return TBANSResponse(code=400, message='Cannot ping both FCM and webhook')
+            return self._application_error('Cannot ping both FCM and webhook')
 
         from tbans.models.notifications.ping import PingNotification
         notification = PingNotification()
@@ -63,7 +69,7 @@ class TBANSService(remote.Service):
             logging.info('Ping Response - {}'.format(str(response)))
             return TBANSResponse(code=response.status_code, message=response.content)
         else:
-            return TBANSResponse(code=400, message='Did not specify FCM or webhook to ping')
+            return self._application_error('Did not specify FCM or webhook to ping')
 
     @remote.method(VerificationRequest, VerificationResponse)
     def verification(self, request):
