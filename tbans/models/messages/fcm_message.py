@@ -4,33 +4,12 @@ from google.appengine.api import urlfetch
 from google.appengine.api.app_identity import app_identity
 
 from consts.notification_type import NotificationType
+from tbans.consts.fcm_error import FCMError
 from tbans.consts.platform_payload_type import PlatformPayloadType
 from tbans.models.messages.message import Message
 from tbans.models.messages.message_response import MessageResponse
 from tbans.utils.auth_utils import get_firebase_messaging_access_token
 from tbans.utils.json_utils import json_string_to_dict
-
-
-# TODO: Move these to a constants file
-# Error codes
-INTERNAL_ERROR = 'internal-error'
-UNKNOWN_ERROR = 'unknown-error'
-FCM_ERROR_CODES = {
-    # FCM v1 canonical error codes
-    'NOT_FOUND': 'registration-token-not-registered',
-    'PERMISSION_DENIED': 'mismatched-credential',
-    'RESOURCE_EXHAUSTED': 'message-rate-exceeded',
-    'UNAUTHENTICATED': 'invalid-apns-credentials',
-
-    # FCM v1 new error codes
-    'APNS_AUTH_ERROR': 'invalid-apns-credentials',
-    'INTERNAL': INTERNAL_ERROR,
-    'INVALID_ARGUMENT': 'invalid-argument',
-    'QUOTA_EXCEEDED': 'message-rate-exceeded',
-    'SENDER_ID_MISMATCH': 'mismatched-credential',
-    'UNAVAILABLE': 'server-unavailable',
-    'UNREGISTERED': 'registration-token-not-registered',
-}
 
 
 class FCMMessage(Message):
@@ -231,7 +210,7 @@ class FCMMessage(Message):
         if not error_code:
             error_code = error_dict.get('status')
 
-        fcm_error_code = FCM_ERROR_CODES.get(error_code, UNKNOWN_ERROR)
+        fcm_error_code = FCMError.ERROR_CODES.get(error_code, FCMError.UNKNOWN_ERROR)
         # Note - we lose the `message` field from the response
         return MessageResponse(http_code, fcm_error_code)
 
