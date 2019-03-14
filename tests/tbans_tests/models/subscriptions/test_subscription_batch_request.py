@@ -53,6 +53,12 @@ class TestSubscriptionBatchRequest(unittest2.TestCase):
         with self.assertRaises(ValueError):
             SubscriptionBatchRequest(['abc', 2], 'broadcasts', SubscriptionActionType.ADD)
 
+    def test_token_value_len(self):
+        max = 1000
+        with self.assertRaises(ValueError):
+            SubscriptionBatchRequest(['abc' for _ in xrange(max + 1)], 'broadcasts', SubscriptionActionType.ADD)
+        SubscriptionBatchRequest(['abc' for _ in xrange(max)], 'broadcasts', SubscriptionActionType.ADD)
+
     def test_token_value_none(self):
         with self.assertRaises(ValueError):
             SubscriptionBatchRequest(None, 'broadcasts', SubscriptionActionType.ADD)
