@@ -19,27 +19,26 @@ class TBANSService(remote.Service):
         super(TBANSService, self).__init__()
         self.testing = testing
 
-    @property
-    def _authenticated(self):
+    def _validate_authentication(self):
         # Allow all requests in debug mode
         if tba_config.DEBUG:
-            return True
+            return
 
         # Ignore auth check during tests
         if self.testing:
-            return True
+            return
 
         incoming_app_id = self.request_state.headers.get('X-Appengine-Inbound-Appid', None)
         if incoming_app_id is None:
-            return False
+            raise remote.ApplicationError('Unauthenticated')
 
-        return app_identity.get_application_id() == incoming_app_id
+        if not app_identity.get_application_id() == incoming_app_id:
+            raise remote.ApplicationError('Unauthenticated')
 
     @remote.method(PingRequest, TBANSResponse)
     def ping(self, request):
         """ Immediately dispatch a Ping to either FCM or a webhook """
-        if not self._authenticated:
-            raise remote.ApplicationError('Unauthenticated')
+        self._validate_authentication()
 
         if request.fcm and request.webhook:
             return TBANSResponse(code=400, message='Cannot ping both FCM and webhook')
@@ -69,8 +68,7 @@ class TBANSService(remote.Service):
     @remote.method(VerificationRequest, VerificationResponse)
     def verification(self, request):
         """ Immediately dispatch a Verification to a webhook """
-        if not self._authenticated:
-            raise remote.ApplicationError('Unauthenticated')
+        self._validate_authentication()
 
         from tbans.models.notifications.verification import VerificationNotification
         notification = VerificationNotification(request.webhook.url, request.webhook.secret)
