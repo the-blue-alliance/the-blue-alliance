@@ -1,13 +1,11 @@
 runtime: python27
 api_version: 1
-threadsafe: true
+threadsafe: false
 
 instance_class: F1
 automatic_scaling:
   max_idle_instances: 1
   target_cpu_utilization: 0.8
-  target_throughput_utilization: 0.8
-  max_concurrent_requests: 20
   min_pending_latency: 200ms
   max_pending_latency: automatic
 
