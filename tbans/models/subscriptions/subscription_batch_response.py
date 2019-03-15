@@ -44,8 +44,8 @@ class SubscriptionBatchResponse(SubscriptionResponse):
         if invalid_str:
             raise ValueError('SubscriptionBatchResponse tokens must be non-empty strings.')
 
-        results = self.data.get('results')
-        if not isinstance(results, list) or not results:
+        results = self.data.get('results', [])
+        if not isinstance(results, list) or (not results and not self.error):
             raise ValueError('SubscriptionBatchResponse results must be a non-empty list.')
 
         self.subscribers = [Subscriber(token, result) for token, result in zip(tokens, results)]

@@ -1,5 +1,4 @@
-
-class PlatformPayloadType(object):
+class PlatformPayloadType:
     """
     Constants for the type of platform payloads
     https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages

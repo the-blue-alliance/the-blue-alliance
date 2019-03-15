@@ -7,6 +7,10 @@ from tests.tbans_tests.mocks.mock_response import MockResponse
 
 class TestSubscriptionResponse(unittest2.TestCase):
 
+    def test_response_none(self):
+        with self.assertRaises(ValueError):
+            SubscriptionResponse()
+
     def test_data_response_none_data(self):
         subscription_response = SubscriptionResponse(response=None, error="error")
         self.assertEqual(subscription_response.data, {})

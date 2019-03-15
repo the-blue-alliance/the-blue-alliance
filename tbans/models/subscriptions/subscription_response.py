@@ -10,6 +10,9 @@ class SubscriptionResponse(object):
             response (object, content/status_code/headers): response from urlfetch Instance ID API call (https://cloud.google.com/appengine/docs/standard/python/refdocs/google.appengine.api.urlfetch)
             error (string): Directly pass an error instead of trying to parse the error from the JSON response.
         """
+        if not response and not error:
+            raise ValueError('SubscriptionResponse must be initilized with either a response or an error')
+
         # Check that response looks right
         if response:
             if response.content:
@@ -70,7 +73,7 @@ class SubscriptionResponse(object):
         if self._error:
             return IIDError.UNKNOWN_ERROR
         # If we have a non-200 error code, pull the corresponding IID Error
-        elif status_code is not 200:
+        elif status_code and status_code is not 200:
             return IIDError.ERROR_CODES.get(status_code, IIDError.UNKNOWN_ERROR)
         # Otherwise, no error at all
         else:
@@ -89,7 +92,7 @@ class SubscriptionResponse(object):
         if self._error:
             return self._error
         # If we have a non-200 error code, get the error from the JSON (if possible).
-        elif status_code is not 200:
+        elif status_code and status_code is not 200:
             raw_json = self._raw_data
             json_error = raw_json.pop('error', None)
             if json_error:
