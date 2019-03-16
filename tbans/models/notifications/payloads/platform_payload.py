@@ -52,7 +52,7 @@ class PlatformPayload(Payload):
         """ Validate that the platform_type is supported.
 
         Raises:
-            TypeError if platform_type is not in _supported_clients
+            TypeError: If platform_type is not in _supported_clients.
         """
         if platform_type not in PlatformPayloadType.types:
             raise TypeError("Unsupported PlatformPayload platform_type: {}".format(platform_type))
@@ -68,10 +68,10 @@ class PlatformPayload(Payload):
             platform_type (PlatformPayloadType): Type for the platform payload - can be None when using for default payload.
 
         Returns:
-            dict, or None if no platform payload values exist for this object
+            dict: None if no platform payload values exist for this object.
 
         Raises:
-            TypeError if platform_type is not in _supported_clients
+            TypeError: If platform_type is not in _supported_clients.
         """
         # Validate that platform_type is supported
         PlatformPayload._validate_platform_type(platform_type)

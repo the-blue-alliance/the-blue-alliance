@@ -43,7 +43,7 @@ class Notification(object):
         """ Basic notification template to use across all platforms
 
         Returns:
-            NotificationPayload, or None if no notification payload
+            NotificationPayload: None if no notification payload.
         """
         return None
 
@@ -56,7 +56,7 @@ class Notification(object):
             those values will be used for their specific platforms instead of this one
 
         Returns:
-            PlatformPayload, or None if no platform config is necessary
+            PlatformPayload: None if no platform config is necessary.
         """
         return None
 
@@ -68,7 +68,7 @@ class Notification(object):
             Should return a PlatformPayload with platform_type = PlatformPayloadType.ANDROID
 
         Returns:
-            PlatformPayload, or None if no Android-specific config is necessary
+            PlatformPayload: None if no Android-specific config is necessary.
         """
         return None
 
@@ -80,7 +80,7 @@ class Notification(object):
             Should return a PlatformPayload with platform_type = PlatformPayloadType.APNS
 
         Returns:
-            PlatformPayload, or None if no APNS-specific config is necessary
+            PlatformPayload: None if no APNS-specific config is necessary.
         """
         return None
 
@@ -92,7 +92,7 @@ class Notification(object):
             Should return a PlatformPayload with platform_type = PlatformPayloadType.WEBPUSH
 
         Returns:
-            PlatformPayload, or None if no webpush-specific config is necessary
+            PlatformPayload: None if no webpush-specific config is necessary.
         """
         return None
 
@@ -104,7 +104,7 @@ class Notification(object):
             By default, will fall back to using the data_payload
 
         Returns:
-            dictionary, or None if no webhook data payload
+            dictionary: None if no webhook data payload.
         """
         return self.data_payload
 

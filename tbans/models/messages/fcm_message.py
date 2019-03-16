@@ -104,8 +104,8 @@ class FCMMessage(Message):
     def send(self):
         """ Attempt to send FCMMessage
 
-        Return:
-            MessageResponse, content/status_code
+        Returns:
+            MessageResponse: content/status_code.
         """
         # Build the request
         headers = {

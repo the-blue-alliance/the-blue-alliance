@@ -3,13 +3,13 @@ import json
 
 def json_string_to_dict(content):
     """
-    Attempt to convert a JSON string to a dict
+    Attempt to convert a JSON string to a dict.
 
     Args:
-        content (string): JSON string to parse to a dictionary
+        content (string): JSON string to parse to a dictionary.
 
     Returns:
-        dict, from parsed string
+        dict: Dictionary from parsed string.
     """
     try:
         response_json = json.loads(content)
