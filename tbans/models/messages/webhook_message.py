@@ -74,7 +74,7 @@ class WebhookMessage(Message):
         """ Attempt to send the WebhookMessage
 
         Returns:
-            MessageResponse, content/status_code
+            MessageResponse: content/status_code
         """
         # Build the request
         headers = {

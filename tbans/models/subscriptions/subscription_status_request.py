@@ -33,7 +33,7 @@ class SubscriptionStatusRequest:
     def send(self):
         """ Attempt to send SubscriptionStatusRequest
 
-        Return:
+        Returns:
             SubscriptionStatus
         """
         headers = {

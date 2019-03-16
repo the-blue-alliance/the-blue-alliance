@@ -76,7 +76,7 @@ class SubscriptionBatchRequest:
     def send(self):
         """ Attempt to send SubscriptionBatchRequest
 
-        Return:
+        Returns:
             SubscriptionBatchResponse
         """
         headers = {
