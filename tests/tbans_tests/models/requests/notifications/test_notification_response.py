@@ -6,12 +6,15 @@ from tbans.models.requests.notifications.notification_response import Notificati
 class TestNotificationResponse(unittest2.TestCase):
 
     def test_status_code(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             NotificationResponse(status_code=None)
 
     def test_status_code_type(self):
         with self.assertRaises(TypeError):
             NotificationResponse(status_code='abc')
+
+    def test_status_code_zero(self):
+        NotificationResponse(status_code=0)
 
     def test_content_type(self):
         with self.assertRaises(TypeError):
@@ -31,3 +34,6 @@ class TestNotificationResponse(unittest2.TestCase):
     def test_str_content(self):
         response = NotificationResponse(status_code=400, content='Some content here')
         self.assertEqual(str(response), 'NotificationResponse(code=400 content="Some content here")')
+
+    def test_init_empty(self):
+        NotificationResponse(status_code=0, content='')

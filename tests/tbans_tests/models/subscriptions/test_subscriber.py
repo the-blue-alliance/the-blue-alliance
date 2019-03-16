@@ -7,11 +7,11 @@ from tbans.models.subscriptions.subscriber import Subscriber
 class TestSubscriber(unittest2.TestCase):
 
     def test_token_type(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             Subscriber(token=1, result={})
 
     def test_token_none(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             Subscriber(token=None, result={})
 
     def test_token_empty(self):

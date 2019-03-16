@@ -1,4 +1,3 @@
-from consts.notification_type import NotificationType
 from tbans.models.notifications.update_mytba import UpdateMyTBANotification
 
 
@@ -10,4 +9,5 @@ class UpdateSubscriptionsNotification(UpdateMyTBANotification):
 
     @staticmethod
     def _type():
+        from consts.notification_type import NotificationType
         return NotificationType.UPDATE_SUBSCRIPTION

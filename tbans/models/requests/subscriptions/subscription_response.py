@@ -1,7 +1,3 @@
-from tbans.consts.iid_error import IIDError
-from tbans.utils.json_utils import json_string_to_dict
-
-
 class SubscriptionResponse(object):
     """ Base response object for Instance ID API responses. """
     def __init__(self, response=None, error=None):
@@ -13,27 +9,24 @@ class SubscriptionResponse(object):
         if not response and not error:
             raise ValueError('SubscriptionResponse must be initilized with either a response or an error')
 
+        from tbans.utils.validation_utils import validate_is_string, validate_is_type
+
         # Check that response looks right
         if response:
             if response.content:
-                if not isinstance(response.content, basestring):
-                    raise TypeError('SubscriptionResponse content must be a string')
+                validate_is_string(content=response.content)
             # Check that we have a status_code
-            if response.status_code is None:
-                raise ValueError('SubscriptionResponse response.status_code cannot be None')
-            # Check that our status_code looks right
-            if not isinstance(response.status_code, int):
-                raise TypeError('SubscriptionResponse response.status_code must be an int')
+            validate_is_type(int, not_empty=False, status_code=response.status_code)
         self._response = response
 
         # Check that error looks right
         if error:
-            if not isinstance(error, basestring):
-                raise TypeError('SubscriptionResponse error must be a string')
+            validate_is_string(error=error)
         self._error = error
 
     @property
     def _raw_data(self):
+        from tbans.utils.json_utils import json_string_to_dict
         if self._response:
             return json_string_to_dict(self._response.content)
         return {}
@@ -70,6 +63,7 @@ class SubscriptionResponse(object):
         """
         status_code = self._status_code
         # If we pass an error - we consider this an unknown error, since it probably wasn't caused by the IID API
+        from tbans.consts.iid_error import IIDError
         if self._error:
             return IIDError.UNKNOWN_ERROR
         # If we have a non-200 error code, pull the corresponding IID Error

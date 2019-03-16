@@ -12,20 +12,28 @@ class TestVerificationNotification(unittest2.TestCase):
         self.assertTrue("{'verification_key': " in str(notification))
 
     def test_url(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             VerificationNotification(None, 'password')
 
     def test_url_type(self):
         with self.assertRaises(TypeError):
             VerificationNotification(200, 'password')
 
-    def test_secret(self):
+    def test_url_empty(self):
         with self.assertRaises(ValueError):
+            VerificationNotification('', 'password')
+
+    def test_secret(self):
+        with self.assertRaises(TypeError):
             VerificationNotification('https://thebluealliance.com/', None)
 
     def test_secret_type(self):
         with self.assertRaises(TypeError):
             VerificationNotification('https://thebluealliance.com/', 200)
+
+    def test_secret_empty(self):
+        with self.assertRaises(ValueError):
+            VerificationNotification('https://thebluealliance.com/', '')
 
     def test_type(self):
         self.assertEqual(VerificationNotification._type(), NotificationType.VERIFICATION)

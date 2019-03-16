@@ -1,11 +1,4 @@
-import hashlib
-import json
-
-from google.appengine.api import urlfetch
-
-from consts.notification_type import NotificationType
 from tbans.models.requests.notifications.notification_request import NotificationRequest
-from tbans.models.requests.notifications.notification_response import NotificationResponse
 
 
 WEBHOOK_VERSION = 1
@@ -29,20 +22,14 @@ class WebhookRequest(NotificationRequest):
         """
         super(WebhookRequest, self).__init__(notification)
 
+        from tbans.utils.validation_utils import validate_is_string, validate_is_type
+
         # Check that we have a url
-        if url is None:
-            raise ValueError('WebhookRequest requires a url')
-        # Check that our url looks right
-        if not isinstance(url, basestring):
-            raise TypeError('WebhookRequest url must be a string')
+        validate_is_string(url=url)
         self.url = url
 
         # Check that we have a secret
-        if secret is None:
-            raise ValueError('WebhookRequest requires a secret')
-        # Check that our url looks right
-        if not isinstance(secret, basestring):
-            raise TypeError('WebhookRequest secret must be a string')
+        validate_is_string(secret=secret)
         self.secret = secret
 
     def __str__(self):
@@ -60,7 +47,7 @@ class WebhookRequest(NotificationRequest):
         Returns:
             string: JSON representation of the WebhookRequest.
         """
-
+        from consts.notification_type import NotificationType
         json_dict = {
             'message_type': NotificationType.type_names[type(self.notification)._type()]
         }
@@ -68,6 +55,7 @@ class WebhookRequest(NotificationRequest):
         if self.notification.webhook_payload:
             json_dict['message_data'] = self.notification.webhook_payload
 
+        import json
         return json.dumps(json_dict, ensure_ascii=True)
 
     def send(self):
@@ -85,8 +73,10 @@ class WebhookRequest(NotificationRequest):
         # Generate checksum
         headers['X-TBA-Checksum'] = self._generate_webhook_checksum(message_json)
 
+        from google.appengine.api import urlfetch
         rpc = urlfetch.create_rpc()
 
+        from tbans.models.requests.notifications.notification_response import NotificationResponse
         try:
             urlfetch.make_fetch_call(rpc, self.url, payload=message_json, method=urlfetch.POST, headers=headers)
             return NotificationResponse(200, None)
@@ -95,6 +85,7 @@ class WebhookRequest(NotificationRequest):
             return NotificationResponse(500, str(e))
 
     def _generate_webhook_checksum(self, payload):
+        import hashlib
         ch = hashlib.sha1()
         ch.update(self.secret)
         ch.update(payload)

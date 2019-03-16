@@ -1,6 +1,4 @@
-from consts.notification_type import NotificationType
 from tbans.models.notifications.notification import Notification
-from tbans.models.notifications.payloads.notification_payload import NotificationPayload
 
 
 class PingNotification(Notification):
@@ -11,10 +9,12 @@ class PingNotification(Notification):
 
     @staticmethod
     def _type():
+        from consts.notification_type import NotificationType
         return NotificationType.PING
 
     @property
     def notification_payload(self):
+        from tbans.models.notifications.payloads.notification_payload import NotificationPayload
         return NotificationPayload(title=self._title, body=self._body)
 
     @property

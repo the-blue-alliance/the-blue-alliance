@@ -27,13 +27,17 @@ class TestSubscriptionResponse(unittest2.TestCase):
 
     def test_response_status_code(self):
         response = MockResponse(None, '')
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             SubscriptionResponse(response=response)
 
     def test_response_status_code_type(self):
         response = MockResponse('', '')
         with self.assertRaises(TypeError):
             SubscriptionResponse(response=response)
+
+    def test_response_empty(self):
+        response = MockResponse(0, '')
+        SubscriptionResponse(response=response)
 
     def test_init_error(self):
         response = MockResponse(500, '{"error": "not the same error"}')
@@ -66,6 +70,13 @@ class TestSubscriptionResponse(unittest2.TestCase):
 
     def test_init_garbage(self):
         response = MockResponse(200, 'abcd')
+        subscription_response = SubscriptionResponse(response=response)
+        self.assertEqual(subscription_response.error, None)
+        self.assertEqual(subscription_response.iid_error, None)
+        self.assertEqual(subscription_response.data, {})
+
+    def test_init_empty(self):
+        response = MockResponse(200, '')
         subscription_response = SubscriptionResponse(response=response)
         self.assertEqual(subscription_response.error, None)
         self.assertEqual(subscription_response.iid_error, None)

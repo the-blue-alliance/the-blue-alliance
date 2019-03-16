@@ -4,9 +4,8 @@ from tbans.models.notifications.payloads.payload import Payload
 
 
 class PlatformPayload(Payload):
-
     """
-    Represents platform-specific push notification configuration options
+    Represents platform-specific push notification configuration options.
 
     https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
 
@@ -15,7 +14,6 @@ class PlatformPayload(Payload):
         priority (int): Priority for push notification - may be None.
         collapse_key (string): Collapse key for push notification - may be None.
     """
-
     # TODO: Add ttl
     def __init__(self, platform_type=None, priority=None, collapse_key=None):
         """
@@ -24,24 +22,24 @@ class PlatformPayload(Payload):
             priority (int): Priority for push notification - may be None.
             collapse_key (string): Collapse key for push notification - may be None.
         """
+        from tbans.utils.validation_utils import validate_is_string, validate_is_type
+
         # Check that our platform_type looks right
         if platform_type:
-            if not isinstance(platform_type, int):
-                raise TypeError('PlatformPayload platform_type must be a PlatformPayloadType constant')
+            validate_is_type(int, not_empty=False, platform_type=platform_type)
             PlatformPayload._validate_platform_type(platform_type)
         self.platform_type = platform_type
 
         # Check that our priority looks right
         if priority:
-            if not isinstance(priority, int):
-                raise TypeError('PlatformPayload priority must be a PlatformPayloadPriority constant')
+            validate_is_type(int, not_empty=False, priority=priority)
             if priority not in PlatformPayloadPriority.types:
                 raise TypeError("Unsupported PlatformPayload priority: {}".format(priority))
         self.priority = priority
 
         # Check that our collapse key looks right
-        if collapse_key and not isinstance(collapse_key, basestring):
-            raise TypeError('PlatformPayload collapse_key must be a string')
+        if collapse_key:
+            validate_is_string(collapse_key=collapse_key)
         self.collapse_key = collapse_key
 
     def __str__(self):

@@ -42,8 +42,16 @@ class TestSubscriptionBatchRequest(unittest2.TestCase):
             SubscriptionBatchRequest([], 'broadcasts', SubscriptionActionType.ADD)
 
     def test_tokens_type(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             SubscriptionBatchRequest(2, 'broadcasts', SubscriptionActionType.ADD)
+
+    def test_token_value_none(self):
+        with self.assertRaises(TypeError):
+            SubscriptionBatchRequest(None, 'broadcasts', SubscriptionActionType.ADD)
+
+    def test_tokens_type(self):
+        with self.assertRaises(ValueError):
+            SubscriptionBatchRequest([], 'broadcasts', SubscriptionActionType.ADD)
 
     def test_token_value(self):
         with self.assertRaises(ValueError):
@@ -59,10 +67,6 @@ class TestSubscriptionBatchRequest(unittest2.TestCase):
             SubscriptionBatchRequest(['abc' for _ in xrange(max + 1)], 'broadcasts', SubscriptionActionType.ADD)
         SubscriptionBatchRequest(['abc' for _ in xrange(max)], 'broadcasts', SubscriptionActionType.ADD)
 
-    def test_token_value_none(self):
-        with self.assertRaises(ValueError):
-            SubscriptionBatchRequest(None, 'broadcasts', SubscriptionActionType.ADD)
-
     def test_topic_fixed(self):
         request = SubscriptionBatchRequest('abc', 'broadcasts', SubscriptionActionType.ADD)
         self.assertEqual(request.topic, '/topics/broadcasts')
@@ -72,12 +76,16 @@ class TestSubscriptionBatchRequest(unittest2.TestCase):
         self.assertEqual(request.topic, '/topics/broadcasts')
 
     def test_topic_type(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             SubscriptionBatchRequest('abc', 1, SubscriptionActionType.ADD)
 
     def test_topic_none(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             SubscriptionBatchRequest('abc', None, SubscriptionActionType.ADD)
+
+    def test_topic_empty(self):
+        with self.assertRaises(ValueError):
+            SubscriptionBatchRequest('abc', '', SubscriptionActionType.ADD)
 
     def test_action_type(self):
         SubscriptionBatchRequest('abc', 'broadcasts', SubscriptionActionType.ADD)
