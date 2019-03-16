@@ -84,20 +84,21 @@ class ClientAPI(remote.Service):
                 MobileClient.user_id == user_id,
                 MobileClient.device_uuid == uuid,
                 MobileClient.client_type == os)
-        # trying to figure out an elusive dupe bug
-        logging.info("DEBUGGING")
-        logging.info("User ID: {}".format(user_id))
-        logging.info("UUID: {}".format(uuid))
-        logging.info("Count: {}".format(query.count()))
+
+        from helpers.tbans_helper import TBANSHelper
         if query.count() == 0:
             # Record doesn't exist yet, so add it
-            MobileClient(
+            client = MobileClient(
                 parent=ndb.Key(Account, user_id),
                 user_id=user_id,
                 messaging_id=gcm_id,
                 client_type=os,
                 device_uuid=uuid,
-                display_name=name).put()
+                display_name=name)
+            client.put()
+
+            TBANSHelper.update_client(client=client)
+
             return BaseResponse(code=200, message="Registration successful")
         else:
             # Record already exists, update it
@@ -105,6 +106,9 @@ class ClientAPI(remote.Service):
             client.messaging_id = gcm_id
             client.display_name = name
             client.put()
+
+            TBANSHelper.update_client(client=client)
+
             return BaseResponse(code=304, message="Client already exists")
 
     @endpoints.method(RegistrationRequest, BaseResponse,
@@ -115,13 +119,17 @@ class ClientAPI(remote.Service):
         if user_id is None:
             return BaseResponse(code=401, message="Unauthorized to unregister")
         gcm_id = request.mobile_id
-        query = MobileClient.query(MobileClient.messaging_id == gcm_id, ancestor=ndb.Key(Account, user_id))\
-            .fetch(keys_only=True)
+        query = MobileClient.query(MobileClient.messaging_id == gcm_id, ancestor=ndb.Key(Account, user_id)).fetch()
         if len(query) == 0:
             # Record doesn't exist, so we can't remove it
             return BaseResponse(code=404, message="User doesn't exist. Can't remove it")
         else:
-            ndb.delete_multi(query)
+            client = query[0]
+            ndb.delete_multi([client.key for client in query])
+
+            from helpers.tbans_helper import TBANSHelper
+            TBANSHelper.update_client(client=client)
+
             return BaseResponse(code=200, message="User deleted")
 
     @endpoints.method(PingRequest, BaseResponse,
@@ -249,6 +257,9 @@ class ClientAPI(remote.Service):
                                           "message": "Unknown error removing subscription"}
                 code += 500
 
+        from helpers.tbans_helper import TBANSHelper
+        TBANSHelper.update_subscriptions(user_id=user_id)
+
         return BaseResponse(code=code, message=json.dumps(output))
 
     @endpoints.method(message_types.VoidMessage, SubscriptionCollection,
@@ -259,7 +270,7 @@ class ClientAPI(remote.Service):
         if user_id is None:
             return SubscriptionCollection(subscriptions=[])
 
-        subscriptions = Subscription.query(ancestor=ndb.Key(Account, user_id)).fetch()
+        subscriptions = Subscription.user_subscriptions(user_id)
         output = []
         for subscription in subscriptions:
             output.append(SubscriptionMessage(

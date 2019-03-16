@@ -26,6 +26,15 @@ class PingRequest(messages.Message):
     webhook = messages.MessageField(Webhook, 2)
 
 
+class UpdateClientRequest(messages.Message):
+    user_id = messages.StringField(1, required=True)
+    token = messages.StringField(2, required=True)
+
+
+class UpdateSubscriptionsRequest(messages.Message):
+    user_id = messages.StringField(1, required=True)
+
+
 class VerificationRequest(messages.Message):
     """ Verification - only send to a webhook """
     webhook = messages.MessageField(Webhook, 1, required=True)

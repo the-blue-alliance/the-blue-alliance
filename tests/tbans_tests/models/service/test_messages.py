@@ -1,6 +1,6 @@
 import unittest2
 
-from tbans.models.service.messages import FCM, Webhook, TBANSResponse, PingRequest, VerificationRequest, VerificationResponse
+from tbans.models.service.messages import FCM, Webhook, TBANSResponse, PingRequest, UpdateClientRequest, VerificationRequest, UpdateSubscriptionsRequest, VerificationResponse
 
 
 class TestFCM(unittest2.TestCase):
@@ -83,6 +83,36 @@ class TestPingRequest(unittest2.TestCase):
 
     def test_ping_request(self):
         request = PingRequest(fcm=FCM(), webhook=Webhook(url='abc', secret='def'))
+        self.assertTrue(request.is_initialized())
+
+
+class TestUpdateClientRequest(unittest2.TestCase):
+
+    def test_update_client_request_empty(self):
+        request = UpdateClientRequest()
+        self.assertFalse(request.is_initialized())
+
+    def test_update_client_request_user_id(self):
+        request = UpdateClientRequest(user_id='abc')
+        self.assertFalse(request.is_initialized())
+
+    def test_update_client_request_token(self):
+        request = UpdateClientRequest(token='abc')
+        self.assertFalse(request.is_initialized())
+
+    def test_update_client_request(self):
+        request = UpdateClientRequest(user_id='abc', token='abc')
+        self.assertTrue(request.is_initialized())
+
+
+class TestUpdateSubscriptionsRequest(unittest2.TestCase):
+
+    def test_update_subscriptions_request_empty(self):
+        request = UpdateSubscriptionsRequest()
+        self.assertFalse(request.is_initialized())
+
+    def test_update_subscriptions_request(self):
+        request = UpdateSubscriptionsRequest(user_id='abc')
         self.assertTrue(request.is_initialized())
 
 

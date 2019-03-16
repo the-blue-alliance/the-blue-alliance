@@ -30,6 +30,15 @@ queue:
     min_backoff_seconds: 10
     max_backoff_seconds: 30
 
+- name: tbans-update-subscriptions
+  mode: pull
+
+- name: tbans-notify-worker
+  target: tbans
+  rate: 5/s
+  retry_parameters:
+    min_backoff_seconds: 1
+
 - name: search-index-update
   rate: 10/s
 

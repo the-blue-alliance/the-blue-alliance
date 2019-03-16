@@ -3,7 +3,7 @@ import logging
 from protorpc import remote
 from protorpc.wsgi import service
 
-from tbans.models.service.messages import TBANSResponse, PingRequest, VerificationRequest, VerificationResponse
+from tbans.models.service.messages import TBANSResponse, PingRequest, UpdateClientRequest, UpdateSubscriptionsRequest, VerificationRequest, VerificationResponse
 
 
 package = 'tbans'
@@ -70,6 +70,31 @@ class TBANSService(remote.Service):
         else:
             return self._application_error('Did not specify FCM or webhook to ping')
 
+    @remote.method(UpdateClientRequest, TBANSResponse)
+    def update_client(self, request):
+        """ Queue a task to update the subscription status for a user's device token. """
+        self._validate_authentication()
+
+        user_id = request.user_id
+        token = request.token
+
+        tag = "{}_{}".format(user_id, token)
+        payload = {'user_id': user_id, 'token': token}
+        TBANSService._add_to_tbans_queues(payload, tag)
+
+        return TBANSResponse(code=200)
+
+    @remote.method(UpdateSubscriptionsRequest, TBANSResponse)
+    def update_subscriptions(self, request):
+        """ Queue a task to update the subscription status for a user. """
+        self._validate_authentication()
+
+        user_id = request.user_id
+        payload = {'user_id': user_id}
+        TBANSService._add_to_tbans_queues(payload, user_id)
+
+        return TBANSResponse(code=200)
+
     @remote.method(VerificationRequest, VerificationResponse)
     def verification(self, request):
         """ Immediately dispatch a Verification to a webhook """
@@ -85,6 +110,26 @@ class TBANSService(remote.Service):
         response = webhook_request.send()
         logging.info('Verification Response - {}'.format(str(response)))
         return VerificationResponse(code=response.status_code, message=response.content, verification_key=notification.verification_key)
+
+    @staticmethod
+    def _add_to_tbans_queues(payload, tag):
+        from tbans.workers.subscription_worker import SubscriptionWorkerHandler
+        pull_queue = SubscriptionWorkerHandler.task_queue()
+
+        import json
+        json_payload = json.dumps(payload)
+
+        from google.appengine.api import taskqueue
+        # Add task to our pull queue - we'll pull these off and de-dupe retries.
+        pull_queue.add(taskqueue.Task(payload=json_payload, method='PULL', tag=tag))
+
+        # Notify a worker to check the appropriate queue for tasks.
+        taskqueue.add(
+            queue_name='tbans-notify-worker',
+            url='/notify_subscription_worker',
+            params={'tag': tag},
+            target='tbans'
+        )
 
 
 app = service.service_mappings([('/tbans.*', TBANSService)])

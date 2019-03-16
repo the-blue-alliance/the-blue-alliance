@@ -51,4 +51,4 @@ class SubscriptionBatchResponse(SubscriptionResponse):
         self.subscribers = [Subscriber(token, result) for token, result in zip(tokens, results)]
 
     def __str__(self):
-        return 'SubscriptionResponse(subscribers={})'.format([str(s) for s in self.subscribers])
+        return 'SubscriptionBatchResponse(subscribers={})'.format([str(s) for s in self.subscribers])

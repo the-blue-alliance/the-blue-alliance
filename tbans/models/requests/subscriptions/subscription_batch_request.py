@@ -23,15 +23,22 @@ class SubscriptionBatchRequest:
         # Ensure our tokens are right - non-empty strings, in a list
         if isinstance(tokens, basestring):
             tokens = [tokens]
+        # Ensure our tokens look right - non-empty list.
         validate_is_type(list, tokens=tokens)
+
+        # Validate all tokens are strings.
         invalid_str = [t for t in tokens if not isinstance(t, basestring) or not t]
         if invalid_str:
             raise ValueError('SubscriptionBatchRequest tokens must be non-empty strings.')
+
+        # Validate we don't have more than 1000 tokens (the hard limit in IID API).
         if len(tokens) > 1000:
             raise ValueError('SubscriptionBatchRequest tokens must have no more than 1000 tokens.')
 
         # Ensure our topic is right - format like `/topics/something`
         validate_is_string(topic=topic)
+
+        # Format our topic appropriately.
         if not topic.startswith('/topics/'):
             topic = '/topics/{0}'.format(topic)
 
@@ -68,7 +75,8 @@ class SubscriptionBatchRequest:
         return 'https://iid.googleapis.com/iid/{}'.format(method)
 
     def send(self, api_key):
-        """ Attempt to send SubscriptionBatchRequest.
+        """
+        Attempt to send SubscriptionBatchRequest.
 
         Args:
             api_key (string): FCM API key to use for authorization.

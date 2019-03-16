@@ -30,8 +30,10 @@ class TestSubscriber(unittest2.TestCase):
         subscriber = Subscriber(token='abc', result={})
         self.assertEqual(subscriber.token, 'abc')
         self.assertEqual(subscriber.error, None)
+        self.assertEqual(str(subscriber), 'Subscriber(token=abc, error=None)')
 
     def test_error(self):
         subscriber = Subscriber(token='abc', result={'error': 'TOO_MANY_TOPICS'})
         self.assertEqual(subscriber.token, 'abc')
         self.assertEqual(subscriber.error, SubscriberError.TOO_MANY_TOPICS)
+        self.assertEqual(str(subscriber), 'Subscriber(token=abc, error=TOO_MANY_TOPICS)')

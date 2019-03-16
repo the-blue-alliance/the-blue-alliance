@@ -281,7 +281,3 @@ class GCMConnection:
 
         else:
             logging.error("Unknown error: %s for device token: %s" % (repr(error_msg), repr(device_token)))
-
-
-
-

@@ -13,6 +13,7 @@ class TestWebhookRequest(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
+        self.testbed.init_memcache_stub()
         self.testbed.init_urlfetch_stub(urlmatchers=[(lambda url: True, self._stub_webhook_request)])
 
     def tearDown(self):

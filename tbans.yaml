@@ -8,6 +8,9 @@ builtins:
 - deferred: on
 
 handlers:
+- url: /notify_subscription_worker
+  script: tbans.workers.subscription_worker.app
+  login: admin
 - url: /_ah/queue/deferred.*
   script: google.appengine.ext.deferred.deferred.application
   login: admin

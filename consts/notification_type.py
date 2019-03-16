@@ -90,7 +90,12 @@ class NotificationType(object):
         SCHEDULE_UPDATED: render_names[SCHEDULE_UPDATED],
     }
 
-    enabled_event_notifications = [
+    # Supported = Able to be subscribed to via TBANS
+    # Enabled = Will send notifications when an event is dispatched
+
+    # Event Notifications
+
+    supported_event_notifications = [
         UPCOMING_MATCH,
         MATCH_SCORE,
         LEVEL_STARTING,
@@ -99,8 +104,16 @@ class NotificationType(object):
         SCHEDULE_UPDATED,
         MATCH_VIDEO,
     ]
+    supported_played_event_notifications = [
+        MATCH_VIDEO
+    ]
+    # TODO: EVENT_MATCH_VIDEO needs to be able to be subscribed to by clients
 
-    enabled_team_notifications = [
+    enabled_event_notifications = supported_event_notifications
+
+    # Team Notifications
+
+    supported_team_notifications = [
         UPCOMING_MATCH,
         MATCH_SCORE,
         ALLIANCE_SELECTION,
@@ -108,8 +121,17 @@ class NotificationType(object):
         MATCH_VIDEO,
     ]
 
-    enabled_match_notifications = [
+    enabled_team_notifications = supported_team_notifications
+
+    # Match Notifications
+
+    supported_match_notifications = [
         UPCOMING_MATCH,
         MATCH_SCORE,
         MATCH_VIDEO,
     ]
+    supported_played_match_notifications = [
+        MATCH_VIDEO
+    ]
+
+    enabled_match_notifications = supported_match_notifications

@@ -23,6 +23,7 @@ class TestFCMRequest(unittest2.TestCase):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
         self.testbed.init_app_identity_stub()
+        self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
         self.testbed.init_urlfetch_stub(urlmatchers=[(lambda url: True, self._stub_fcm_request)])
 

@@ -26,7 +26,8 @@ class SubscriptionStatusRequest:
         return "https://iid.googleapis.com/iid/info/{}?details=true".format(self.token)
 
     def send(self, api_key):
-        """ Attempt to send SubscriptionStatusRequest.
+        """
+        Attempt to send SubscriptionStatusRequest.
 
         Args:
             api_key (string): FCM API key to use for authorization.

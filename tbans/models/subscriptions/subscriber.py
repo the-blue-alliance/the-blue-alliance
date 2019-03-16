@@ -21,3 +21,6 @@ class Subscriber:
         # Check that result looks right.
         validate_is_type(dict, not_empty=False, result=result)
         self.error = result.get('error', None)
+
+    def __str__(self):
+        return 'Subscriber(token={}, error={})'.format(self.token, self.error)

@@ -26,3 +26,8 @@ class Subscription(ndb.Model):
     @property
     def notification_names(self):
         return [NotificationType.render_names[index] for index in self.notification_types]
+
+    @staticmethod
+    def user_subscriptions(user_id):
+        from models.account import Account
+        return Subscription.query(ancestor=ndb.Key(Account, user_id)).fetch()

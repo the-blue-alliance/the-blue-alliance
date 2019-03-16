@@ -277,7 +277,7 @@ class MobileAPI(remote.Service):
             return SubscriptionCollection(subscriptions=[])
         user_id = PushHelper.user_email_to_id(current_user.email())
 
-        subscriptions = Subscription.query(ancestor=ndb.Key(Account, user_id)).fetch()
+        subscriptions = Subscription.user_subscriptions(user_id)
         output = []
         for subscription in subscriptions:
             output.append(SubscriptionMessage(

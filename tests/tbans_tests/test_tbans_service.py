@@ -2,9 +2,10 @@ import unittest2
 
 from protorpc import remote
 
+from google.appengine.api import taskqueue
 from google.appengine.ext import testbed
 
-from tbans.models.service.messages import FCM, Webhook, PingRequest, VerificationRequest, VerificationResponse
+from tbans.models.service.messages import FCM, Webhook, PingRequest, UpdateClientRequest, UpdateSubscriptionsRequest, VerificationRequest, VerificationResponse
 from tbans.tbans_service import TBANSService
 
 
@@ -14,8 +15,12 @@ class TestTBANSService(unittest2.TestCase):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
         self.testbed.init_app_identity_stub()
+        self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
         self.testbed.init_urlfetch_stub(urlmatchers=[(lambda url: True, self._stub_request)])
+
+        self.testbed.init_taskqueue_stub(root_path='.')
+        self.taskqueue_stub = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
 
         self.service = TBANSService(testing=True)
 
@@ -49,6 +54,44 @@ class TestTBANSService(unittest2.TestCase):
         response = self.service.ping(request)
         self.assertEqual(response.code, 200)
         self.assertEqual(response.message, None)
+
+    def test_update_client(self):
+        request = UpdateClientRequest(user_id='abc', token='defg')
+        response = self.service.update_client(request)
+        self.assertEqual(response.code, 200)
+        self.assertEqual(response.message, None)
+
+        pull_tasks = self.taskqueue_stub.get_filtered_tasks(queue_names=['tbans-update-subscriptions'])
+        self.assertEqual(len(pull_tasks), 1)
+
+        task = pull_tasks[0]
+        self.assertEqual(task.payload, '{"token": "defg", "user_id": "abc"}')
+        # Note - we can't make sure our tags look right so we should be careful
+
+        push_tasks = self.taskqueue_stub.get_filtered_tasks(queue_names=['tbans-notify-worker'])
+        self.assertEqual(len(push_tasks), 1)
+
+        push_task = push_tasks[0]
+        self.assertEqual(push_task.payload, 'tag=abc_defg')
+
+    def test_update_subscriptions(self):
+        request = UpdateSubscriptionsRequest(user_id='abc')
+        response = self.service.update_subscriptions(request)
+        self.assertEqual(response.code, 200)
+        self.assertEqual(response.message, None)
+
+        pull_tasks = self.taskqueue_stub.get_filtered_tasks(queue_names=['tbans-update-subscriptions'])
+        self.assertEqual(len(pull_tasks), 1)
+
+        pull_task = pull_tasks[0]
+        self.assertEqual(pull_task.payload, '{"user_id": "abc"}')
+        # Note - we can't make sure our tags look right so we should be careful
+
+        push_tasks = self.taskqueue_stub.get_filtered_tasks(queue_names=['tbans-notify-worker'])
+        self.assertEqual(len(push_tasks), 1)
+
+        push_task = push_tasks[0]
+        self.assertEqual(push_task.payload, 'tag=abc')
 
     def test_verification(self):
         self._response_status_code = 200
