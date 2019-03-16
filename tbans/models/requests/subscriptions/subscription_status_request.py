@@ -1,6 +1,6 @@
 from google.appengine.api import urlfetch
 
-from tbans.models.subscriptions.subscription_status import SubscriptionStatus
+from tbans.models.requests.subscriptions.subscription_status_response import SubscriptionStatusResponse
 from tbans.utils.auth_utils import get_firebase_messaging_access_token
 
 
@@ -33,8 +33,8 @@ class SubscriptionStatusRequest:
     def send(self):
         """ Attempt to send SubscriptionStatusRequest
 
-        Returns:
-            SubscriptionStatus
+        Return:
+            SubscriptionStatusResponse
         """
         headers = {
             'Authorization': 'Bearer ' + get_firebase_messaging_access_token(),
@@ -45,7 +45,7 @@ class SubscriptionStatusRequest:
                 method='GET',
                 headers=headers
             )
-            return SubscriptionStatus(response=response)
+            return SubscriptionStatusResponse(response=response)
         except Exception, e:
             # https://cloud.google.com/appengine/docs/standard/python/refdocs/google.appengine.api.urlfetch_errors
-            return SubscriptionStatus(error=str(e))
+            return SubscriptionStatusResponse(error=str(e))

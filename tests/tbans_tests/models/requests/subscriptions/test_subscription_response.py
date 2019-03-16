@@ -1,6 +1,6 @@
 import unittest2
 
-from tbans.models.subscriptions.subscription_response import SubscriptionResponse
+from tbans.models.requests.subscriptions.subscription_response import SubscriptionResponse
 
 from tests.tbans_tests.mocks.mock_response import MockResponse
 

@@ -6,14 +6,14 @@ from google.appengine.api.app_identity import app_identity
 from consts.notification_type import NotificationType
 from tbans.consts.fcm_error import FCMError
 from tbans.consts.platform_payload_type import PlatformPayloadType
-from tbans.models.messages.message import Message
-from tbans.models.messages.message_response import MessageResponse
+from tbans.models.requests.notifications.notification_request import NotificationRequest
+from tbans.models.requests.notifications.notification_response import NotificationResponse
 from tbans.utils.auth_utils import get_firebase_messaging_access_token
 from tbans.utils.json_utils import json_string_to_dict
 
 
-class FCMMessage(Message):
-    """ Represents a notification payload and a delivery option to send to FCM
+class FCMRequest(NotificationRequest):
+    """ Represents a notification payload and a delivery option to send to FCM.
 
     https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
 
@@ -35,18 +35,18 @@ class FCMMessage(Message):
             topic (string): The FCM topic name to send a message to.
             condition (string): The topic condition to send a message.
         """
-        super(FCMMessage, self).__init__(notification)
+        super(FCMRequest, self).__init__(notification)
 
         # Ensure we've only passed one delivery option
         delivery_options = [x for x in [token, topic, condition] if x is not None]
         if len(delivery_options) == 0:
-            raise TypeError('FCMMessage requires a delivery option - token, topic, or condition')
+            raise TypeError('FCMRequest requires a delivery option - token, topic, or condition')
         elif len(delivery_options) > 1:
-            raise TypeError('FCMMessage only accepts one delivery option - token, topic, or condition')
+            raise TypeError('FCMRequest only accepts one delivery option - token, topic, or condition')
 
         # Ensure our delivery option looks right
         if not isinstance(delivery_options[0], basestring):
-            raise ValueError('FCMMessage delivery option must be a string')
+            raise ValueError('FCMRequest delivery option must be a string')
 
         self.token = token
         self.topic = topic
@@ -54,12 +54,12 @@ class FCMMessage(Message):
 
     def __str__(self):
         deliver_option = self._delivery_option()
-        return 'FCMMessage({}="{}", notification={})'.format(deliver_option[0], deliver_option[1], str(self.notification))
+        return 'FCMRequest({}="{}", notification={})'.format(deliver_option[0], deliver_option[1], str(self.notification))
 
     def json_string(self):
-        """ JSON string representation of an FCMMessage object
+        """ JSON string representation of an FCMRequest object.
 
-        JSON for FCMMessage will look like...
+        JSON for FCMRequest will look like...
         {
             'message': {
                 "data": {...},
@@ -76,10 +76,10 @@ class FCMMessage(Message):
             }
         }
 
-        Fields that are not passed (ex - superfluous delivery options) will be excluded
+        Fields that are not passed (ex - superfluous delivery options) will be excluded.
 
         Returns:
-            string: JSON representation of the FCMMessage
+            string: JSON representation of the FCMRequest.
         """
         json_dict = {}
 
@@ -93,19 +93,19 @@ class FCMMessage(Message):
         data_payload['message_type'] = NotificationType.type_names[type(self.notification)._type()]
         json_dict['data'] = data_payload
 
-        FCMMessage._set_payload(json_dict, 'notification', self.notification.notification_payload)
+        FCMRequest._set_payload(json_dict, 'notification', self.notification.notification_payload)
 
-        FCMMessage._set_platform_payload(json_dict, PlatformPayloadType.ANDROID, self.notification.android_payload, self.notification.platform_payload)
-        FCMMessage._set_platform_payload(json_dict, PlatformPayloadType.APNS, self.notification.apns_payload, self.notification.platform_payload)
-        FCMMessage._set_platform_payload(json_dict, PlatformPayloadType.WEBPUSH, self.notification.webpush_payload, self.notification.platform_payload)
+        FCMRequest._set_platform_payload(json_dict, PlatformPayloadType.ANDROID, self.notification.android_payload, self.notification.platform_payload)
+        FCMRequest._set_platform_payload(json_dict, PlatformPayloadType.APNS, self.notification.apns_payload, self.notification.platform_payload)
+        FCMRequest._set_platform_payload(json_dict, PlatformPayloadType.WEBPUSH, self.notification.webpush_payload, self.notification.platform_payload)
 
         return json.dumps({'message': json_dict})
 
     def send(self):
-        """ Attempt to send FCMMessage
+        """ Attempt to send FCMRequest.
 
-        Returns:
-            MessageResponse: content/status_code.
+        Return:
+            NotificationResponse: content/status_code
         """
         # Build the request
         headers = {
@@ -121,10 +121,10 @@ class FCMMessage(Message):
                 method=urlfetch.POST,
                 headers=headers
             )
-            return FCMMessage._transform_fcm_response(response)
+            return FCMRequest._transform_fcm_response(response)
         except Exception, e:
             # https://cloud.google.com/appengine/docs/standard/python/refdocs/google.appengine.api.urlfetch_errors
-            return MessageResponse(500, str(e))
+            return NotificationResponse(500, str(e))
 
     @property
     def _fcm_url(self):
@@ -132,7 +132,7 @@ class FCMMessage(Message):
         return 'https://fcm.googleapis.com/v1/projects/{}/messages:send'.format(app_id)
 
     def _delivery_option(self):
-        """ Returns a tuple (type_string, value) for the FCMMessage delivery option """
+        """ Returns a tuple (type_string, value) for the FCMRequest delivery option. """
         if self.token:
             return ('token', self.token)
         elif self.topic:
@@ -142,7 +142,7 @@ class FCMMessage(Message):
 
     @staticmethod
     def _set_payload(json_dict, key, platform_payload):
-        """ Set a platform_payload.payload_dict for the given key, if it's not None """
+        """ Set a platform_payload.payload_dict for the given key, if it's not None. """
         if platform_payload:
             payload_dict = platform_payload.payload_dict
             if payload_dict:
@@ -150,15 +150,16 @@ class FCMMessage(Message):
 
     @staticmethod
     def _set_platform_payload(json_dict, platform_type, platform_payload, default_platform_payload):
-        """ Default to using the default_platform_payload, if we have one.
-        Use platform_payload (platform-specific payload override) if not-None
+        """
+        Default to using the default_platform_payload, if we have one.
+        Use platform_payload (platform-specific payload override) if not-None.
         """
         key = PlatformPayloadType.key_names.get(platform_type, None)
         if key is None:
             return
 
         if platform_payload:
-            FCMMessage._set_payload(json_dict, key, platform_payload)
+            FCMRequest._set_payload(json_dict, key, platform_payload)
         elif default_platform_payload:
             default_platform_payload_dict = default_platform_payload.platform_payload_dict(platform_type)
             if default_platform_payload_dict:
@@ -166,7 +167,7 @@ class FCMMessage(Message):
 
     @staticmethod
     def _transform_fcm_response(response):
-        """ Transforms a HTTP response from FCM -> a MessageResponse, adding error information
+        """ Transforms a HTTP response from FCM -> a NotificationResponse, adding error information.
 
         Taken from https://github.com/firebase/firebase-admin-python/blob/932cf17a6f222c627dbd1502658f3eb338077250/firebase_admin/messaging.py
 
@@ -195,7 +196,7 @@ class FCMMessage(Message):
         error_dict = data.get('error', None)
         # If we didn't error - go ahead and return the original response information
         if error_dict is None:
-            return MessageResponse(response.status_code, response.content)
+            return NotificationResponse(response.status_code, response.content)
 
         http_code = error_dict.get('code')
 
@@ -212,7 +213,7 @@ class FCMMessage(Message):
 
         fcm_error_code = FCMError.ERROR_CODES.get(error_code, FCMError.UNKNOWN_ERROR)
         # Note - we lose the `message` field from the response
-        return MessageResponse(http_code, fcm_error_code)
+        return NotificationResponse(http_code, fcm_error_code)
 
     # TODO: Add Google Analytics logging
     # https://github.com/the-blue-alliance/the-blue-alliance/blob/master/notifications/base_notification.py#L141

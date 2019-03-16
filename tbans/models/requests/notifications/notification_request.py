@@ -1,8 +1,8 @@
 from tbans.models.notifications.notification import Notification
 
 
-class Message(object):
-    """ Base Message class - used for Connection messages to represent a notification payload
+class NotificationRequest(object):
+    """ Base class used for requests to represent a notification payload.
 
     Attributes:
         notification (Notification): The Notification to send.
@@ -23,14 +23,14 @@ class Message(object):
     def json_string(self):
         """
         Returns:
-            string, representation of message JSON
+            string: representation of message JSON.
         """
-        raise NotImplementedError("Message subclass must implement json_string")
+        raise NotImplementedError("NotificationRequest subclass must implement json_string")
 
     def send(self):
-        """ Messages should understand how to send themselves to wherever they are going
+        """ NotificationRequests should understand how to send themselves to wherever they are going.
 
         Returns:
-            MessageResponse
+            NotificationResponse
         """
-        raise NotImplementedError("Message subclass must implement send")
+        raise NotImplementedError("NotificationRequest subclass must implement send")

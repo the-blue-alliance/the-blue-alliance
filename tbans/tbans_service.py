@@ -1,7 +1,4 @@
 import logging
-import tba_config
-
-from google.appengine.api.app_identity import app_identity
 
 from protorpc import remote
 from protorpc.wsgi import service
@@ -20,6 +17,7 @@ class TBANSService(remote.Service):
         self.testing = testing
 
     def _validate_authentication(self):
+        import tba_config
         # Allow all requests in debug mode
         if tba_config.DEBUG:
             return
@@ -32,6 +30,7 @@ class TBANSService(remote.Service):
         if incoming_app_id is None:
             raise remote.ApplicationError('Unauthenticated')
 
+        from google.appengine.api.app_identity import app_identity
         if not app_identity.get_application_id() == incoming_app_id:
             raise remote.ApplicationError('Unauthenticated')
 
@@ -53,19 +52,19 @@ class TBANSService(remote.Service):
         notification = PingNotification()
 
         if request.fcm:
-            from tbans.models.messages.fcm_message import FCMMessage
-            message = FCMMessage(notification, token=request.fcm.token, topic=request.fcm.topic, condition=request.fcm.condition)
-            logging.info('Ping - {}'.format(str(message)))
+            from tbans.models.requests.notifications.fcm_request import FCMRequest
+            fcm_request = FCMRequest(notification, token=request.fcm.token, topic=request.fcm.topic, condition=request.fcm.condition)
+            logging.info('Ping - {}'.format(str(fcm_request)))
 
-            response = message.send()
+            response = fcm_request.send()
             logging.info('Ping Response - {}'.format(str(response)))
             return TBANSResponse(code=response.status_code, message=response.content)
         elif request.webhook:
-            from tbans.models.messages.webhook_message import WebhookMessage
-            message = WebhookMessage(notification, request.webhook.url, request.webhook.secret)
-            logging.info('Ping - {}'.format(str(message)))
+            from tbans.models.requests.notifications.webhook_request import WebhookRequest
+            webhook_request = WebhookRequest(notification, request.webhook.url, request.webhook.secret)
+            logging.info('Ping - {}'.format(str(webhook_request)))
 
-            response = message.send()
+            response = webhook_request.send()
             logging.info('Ping Response - {}'.format(str(response)))
             return TBANSResponse(code=response.status_code, message=response.content)
         else:
@@ -79,11 +78,11 @@ class TBANSService(remote.Service):
         from tbans.models.notifications.verification import VerificationNotification
         notification = VerificationNotification(request.webhook.url, request.webhook.secret)
 
-        from tbans.models.messages.webhook_message import WebhookMessage
-        message = WebhookMessage(notification, request.webhook.url, request.webhook.secret)
-        logging.info('Verification - {}'.format(str(message)))
+        from tbans.models.requests.notifications.webhook_request import WebhookRequest
+        webhook_request = WebhookRequest(notification, request.webhook.url, request.webhook.secret)
+        logging.info('Verification - {}'.format(str(webhook_request)))
 
-        response = message.send()
+        response = webhook_request.send()
         logging.info('Verification Response - {}'.format(str(response)))
         return VerificationResponse(code=response.status_code, message=response.content, verification_key=notification.verification_key)
 

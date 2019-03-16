@@ -1,5 +1,5 @@
+from tbans.models.requests.subscriptions.subscription_response import SubscriptionResponse
 from tbans.models.subscriptions.subscriber import Subscriber
-from tbans.models.subscriptions.subscription_response import SubscriptionResponse
 from tbans.utils.json_utils import json_string_to_dict
 
 
