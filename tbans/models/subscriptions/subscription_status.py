@@ -32,7 +32,13 @@ class SubscriptionStatus(SubscriptionResponse):
         super(SubscriptionStatus, self).__init__(response=response, error=error)
 
         relations = self.data.get('rel', {})
+        if not isinstance(relations, dict):
+            raise ValueError('SubscriptionStatus relations must be a dict.')
+
         topics = relations.get('topics', {})
+        if not isinstance(topics, dict):
+            raise ValueError('SubscriptionStatus topics must be a dict.')
+
         self.subscriptions = [str(topic) for topic in topics]
 
     def __str__(self):

@@ -1,5 +1,4 @@
-
-class PlatformPayloadPriority(object):
+class PlatformPayloadPriority:
     """
     Constants regarding the priority of a push notification
     """

@@ -28,6 +28,13 @@ class TestSubscriptionBatchResponse(unittest2.TestCase):
         with self.assertRaises(ValueError):
             SubscriptionBatchResponse(tokens=['abc'], response=response)
 
+    def test_result_type_error(self):
+        # init with an empty results but with an error is valid
+        response = MockResponse(400, '{"error": "some error"}')
+        batch_response = SubscriptionBatchResponse(tokens=['abc'], response=response)
+        self.assertEqual(batch_response.error, "some error")
+        self.assertEqual(batch_response.subscribers, [])
+
     def test_init(self):
         response = MockResponse(200, '{"results": [{}]}')
         batch_response = SubscriptionBatchResponse(tokens=['abc'], response=response)

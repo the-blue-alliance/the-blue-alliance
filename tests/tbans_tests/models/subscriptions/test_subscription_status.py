@@ -7,6 +7,16 @@ from tests.tbans_tests.mocks.mock_response import MockResponse
 
 class TestSubscriptionStatus(unittest2.TestCase):
 
+    def test_init_wrong_rel(self):
+        response = MockResponse(200, '{"rel":"abc"}')
+        with self.assertRaises(ValueError):
+            SubscriptionStatus(response=response)
+
+    def test_init_wrong_topics(self):
+        response = MockResponse(200, '{"rel":{"topics": "abc"}}')
+        with self.assertRaises(ValueError):
+            SubscriptionStatus(response=response)
+
     def test_init_topics(self):
         response = MockResponse(200, '{"rel":{"topics":{"broadcasts":{"addDate":"2019-02-15"}}}}')
         subscription_status = SubscriptionStatus(response=response)
@@ -28,3 +38,9 @@ class TestSubscriptionStatus(unittest2.TestCase):
         response = MockResponse(400, '{"error":"some error"}')
         subscription_status = SubscriptionStatus(response=response)
         self.assertEqual(str(subscription_status), "SubscriptionStatus(subscriptions=[], iid_error=invalid-argument, error=some error)")
+
+    def test_error(self):
+        response = MockResponse(400, '{"error":"some error"}')
+        subscription_status = SubscriptionStatus(response=response)
+        self.assertEqual(subscription_status.error, "some error")
+        self.assertEqual(subscription_status.subscriptions, [])
