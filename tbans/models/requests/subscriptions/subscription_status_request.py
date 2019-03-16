@@ -1,6 +1,6 @@
 from google.appengine.api import urlfetch
 
-from tbans.models.subscriptions.subscription_status_response import SubscriptionStatusResponse
+from tbans.models.requests.subscriptions.subscription_status_response import SubscriptionStatusResponse
 from tbans.utils.auth_utils import get_firebase_messaging_access_token
 
 

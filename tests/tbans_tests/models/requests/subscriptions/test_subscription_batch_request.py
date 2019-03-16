@@ -3,8 +3,8 @@ import unittest2
 from google.appengine.ext import testbed
 
 from tbans.consts.subscription_action_type import SubscriptionActionType
-from tbans.models.subscriptions.subscription_batch_request import SubscriptionBatchRequest
-from tbans.models.subscriptions.subscription_batch_response import SubscriptionBatchResponse
+from tbans.models.requests.subscriptions.subscription_batch_request import SubscriptionBatchRequest
+from tbans.models.requests.subscriptions.subscription_batch_response import SubscriptionBatchResponse
 
 
 class TestSubscriptionBatchRequest(unittest2.TestCase):

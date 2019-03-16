@@ -4,15 +4,15 @@ import json
 from google.appengine.api import urlfetch
 
 from consts.notification_type import NotificationType
-from tbans.models.messages.message import Message
-from tbans.models.messages.message_response import MessageResponse
+from tbans.models.requests.notifications.notification_request import NotificationRequest
+from tbans.models.requests.notifications.notification_response import NotificationResponse
 
 
 WEBHOOK_VERSION = 1
 
 
-class WebhookMessage(Message):
-    """ Represents a webhook notification payload
+class WebhookRequest(NotificationRequest):
+    """ Represents a webhook notification payload.
 
     Attributes:
         notification (Notification): The Notification to send.
@@ -27,38 +27,38 @@ class WebhookMessage(Message):
             url (string): The URL to send the notification payload to.
             secret (string): The secret to calculate the payload checksum with.
         """
-        super(WebhookMessage, self).__init__(notification)
+        super(WebhookRequest, self).__init__(notification)
 
         # Check that we have a url
         if url is None:
-            raise ValueError('WebhookMessage requires a url')
+            raise ValueError('WebhookRequest requires a url')
         # Check that our url looks right
         if not isinstance(url, basestring):
-            raise TypeError('WebhookMessage url must be a string')
+            raise TypeError('WebhookRequest url must be a string')
         self.url = url
 
         # Check that we have a secret
         if secret is None:
-            raise ValueError('WebhookMessage requires a secret')
+            raise ValueError('WebhookRequest requires a secret')
         # Check that our url looks right
         if not isinstance(secret, basestring):
-            raise TypeError('WebhookMessage secret must be a string')
+            raise TypeError('WebhookRequest secret must be a string')
         self.secret = secret
 
     def __str__(self):
-        return 'WebhookMessage(notification={})'.format(str(self.notification))
+        return 'WebhookRequest(notification={})'.format(str(self.notification))
 
     def json_string(self):
-        """ JSON string representation of an WebhookMessage object
+        """ JSON string representation of an WebhookRequest object.
 
-        JSON for WebhookMessage will look like...
+        JSON for WebhookRequest will look like...
         {
             'message_data': {...},
             'message_type': ...
         }
 
         Returns:
-            string: JSON representation of the FCMMessage
+            string: JSON representation of the WebhookRequest.
         """
 
         json_dict = {
@@ -71,10 +71,10 @@ class WebhookMessage(Message):
         return json.dumps(json_dict, ensure_ascii=True)
 
     def send(self):
-        """ Attempt to send the WebhookMessage
+        """ Attempt to send the WebhookRequest.
 
         Returns:
-            MessageResponse: content/status_code
+            NotificationResponse: content/status_code
         """
         # Build the request
         headers = {
@@ -89,10 +89,10 @@ class WebhookMessage(Message):
 
         try:
             urlfetch.make_fetch_call(rpc, self.url, payload=message_json, method=urlfetch.POST, headers=headers)
-            return MessageResponse(200, None)
+            return NotificationResponse(200, None)
         except Exception, e:
             # https://cloud.google.com/appengine/docs/standard/python/refdocs/google.appengine.api.urlfetch
-            return MessageResponse(500, str(e))
+            return NotificationResponse(500, str(e))
 
     def _generate_webhook_checksum(self, payload):
         ch = hashlib.sha1()

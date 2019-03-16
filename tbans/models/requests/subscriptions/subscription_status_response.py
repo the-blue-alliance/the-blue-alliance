@@ -1,4 +1,4 @@
-from tbans.models.subscriptions.subscription_response import SubscriptionResponse
+from tbans.models.requests.subscriptions.subscription_response import SubscriptionResponse
 
 
 class SubscriptionStatusResponse(SubscriptionResponse):

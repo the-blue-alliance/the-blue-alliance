@@ -4,7 +4,7 @@ from google.appengine.api import urlfetch
 
 from tbans.consts.subscription_action_type import SubscriptionActionType
 from tbans.consts.iid_error import IIDError
-from tbans.models.subscriptions.subscription_batch_response import SubscriptionBatchResponse
+from tbans.models.requests.subscriptions.subscription_batch_response import SubscriptionBatchResponse
 from tbans.utils.auth_utils import get_firebase_messaging_access_token
 
 
