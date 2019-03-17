@@ -57,8 +57,23 @@ class TestSubscriptionStatusRequest(unittest2.TestCase):
         request = SubscriptionStatusRequest(token=self.token)
         self.assertEqual(request._iid_info_url, 'https://iid.googleapis.com/iid/info/{}?details=true'.format(self.token))
 
+    def test_send_api_key_type(self):
+        request = SubscriptionStatusRequest(token=self.token)
+        with self.assertRaises(TypeError):
+            response = request.send(1)
+
+    def test_send_api_key_none(self):
+        request = SubscriptionStatusRequest(token=self.token)
+        with self.assertRaises(TypeError):
+            response = request.send(None)
+
+    def test_send_api_key_empty(self):
+        request = SubscriptionStatusRequest(token=self.token)
+        with self.assertRaises(ValueError):
+            response = request.send('')
+
     def test_send(self):
         request = SubscriptionStatusRequest(token=self.token)
-        response = request.send()
+        response = request.send('abcd123')
         self.assertEqual(response.subscriptions, ['broadcasts'])
         self.assertIsNone(response.error)

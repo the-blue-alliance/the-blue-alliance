@@ -67,18 +67,22 @@ class SubscriptionBatchRequest:
         method = SubscriptionActionType.BATCH_METHODS[self._action_type]
         return 'https://iid.googleapis.com/iid/{}'.format(method)
 
-    def send(self):
-        """ Attempt to send SubscriptionBatchRequest
+    def send(self, api_key):
+        """ Attempt to send SubscriptionBatchRequest.
+
+        Args:
+            api_key (string): FCM API key to use for authorization.
 
         Returns:
             SubscriptionBatchResponse
         """
         from google.appengine.api import urlfetch
         from tbans.models.requests.subscriptions.subscription_batch_response import SubscriptionBatchResponse
-        from tbans.utils.auth_utils import get_firebase_messaging_access_token
+        from tbans.utils.validation_utils import validate_is_string
 
+        validate_is_string(api_key=api_key)
         headers = {
-            'Authorization': 'Bearer ' + get_firebase_messaging_access_token(),
+            'Authorization': 'key=' + api_key,
             'Content-Type': 'application/json'
         }
         try:
