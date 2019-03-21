@@ -39,6 +39,7 @@ class SubscriptionStatusRequest:
         from tbans.utils.validation_utils import validate_is_string
 
         validate_is_string(api_key=api_key)
+
         headers = {
             'Authorization': 'key=' + api_key
         }

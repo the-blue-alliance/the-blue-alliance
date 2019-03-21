@@ -16,9 +16,9 @@
         {% with events|first as first_event %}
         {% with events|last as last_event %}
         {% if first_event.week != None and last_event.week != None %}
-          <h2>Week {{first_event.week|add:"1"}}{% if first_event.week != last_event.week %} - {{last_event.week|add:"1"}}{% endif %}:</h2>
+          <h2>Week {{first_event.week|add:"1"}}{% if first_event.week != last_event.week %} - {{last_event.week|add:"1"}}{% endif %}</h2>
         {% else %}
-          <h2>This Week:</h2>
+          <h2>This Week</h2>
         {% endif %}
         {% endwith %}
         {% endwith %}
@@ -41,7 +41,7 @@
                 {% endwith %}
                 <div>
                   <a class="btn btn-default" href="/webcasts"><span class="glyphicon glyphicon-info-sign"></span> Add Webcasts</a>
-                  <a class="btn btn-default" href="/contact"><span class="glyphicon glyphicon-upload"></span> Add YouTube Videos</a>
+                  <a class="btn btn-default" href="/add-data"><span class="glyphicon glyphicon-upload"></span> Add YouTube Videos</a>
                 </div>
               </div>
             </div>
