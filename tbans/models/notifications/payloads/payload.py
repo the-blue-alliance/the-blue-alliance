@@ -1,10 +1,7 @@
-
 class Payload(object):
-
     """
-    Abstract class to be subclassed by payload parts for notifications
+    Abstract class to be subclassed by payload parts for notifications.
     """
-
     @property
     def payload_dict(self):
         raise NotImplementedError("Payload subclass must implement payload_dict")

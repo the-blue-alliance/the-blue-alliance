@@ -1,11 +1,6 @@
-from google.appengine.api import urlfetch
-
-from tbans.models.requests.subscriptions.subscription_status_response import SubscriptionStatusResponse
-from tbans.utils.auth_utils import get_firebase_messaging_access_token
-
-
 class SubscriptionStatusRequest:
-    """ Represents a request to Firebase's Instance ID API to get the subscription status for a subscriber
+    """
+    Represents a request to Firebase's Instance ID API to get the subscription status for a subscriber.
 
     https://developers.google.com/instance-id/reference/server#get_information_about_app_instances
 
@@ -18,9 +13,9 @@ class SubscriptionStatusRequest:
         Args:
             token (string): The Instance ID token for the subscriber - this is the same token as FCM tokens.
         """
-        if not isinstance(token, basestring):
-            raise ValueError('SubscriptionStatusRequest token option must be a string')
+        from tbans.utils.validation_utils import validate_is_string
 
+        validate_is_string(token=token)
         self.token = token
 
     def __str__(self):
@@ -36,6 +31,10 @@ class SubscriptionStatusRequest:
         Return:
             SubscriptionStatusResponse
         """
+        from google.appengine.api import urlfetch
+        from tbans.models.requests.subscriptions.subscription_status_response import SubscriptionStatusResponse
+        from tbans.utils.auth_utils import get_firebase_messaging_access_token
+
         headers = {
             'Authorization': 'Bearer ' + get_firebase_messaging_access_token(),
         }

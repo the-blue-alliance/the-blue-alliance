@@ -1,6 +1,4 @@
 from tbans.models.requests.subscriptions.subscription_response import SubscriptionResponse
-from tbans.models.subscriptions.subscriber import Subscriber
-from tbans.utils.json_utils import json_string_to_dict
 
 
 class SubscriptionBatchResponse(SubscriptionResponse):
@@ -37,9 +35,10 @@ class SubscriptionBatchResponse(SubscriptionResponse):
         """
         super(SubscriptionBatchResponse, self).__init__(response=response, error=error)
 
+        from tbans.utils.validation_utils import validate_is_type
+
         # Ensure our tokens are right - non-empty strings, in a list
-        if not isinstance(tokens, list) or not tokens:
-            raise ValueError('SubscriptionBatchResponse tokens must be a non-empty list of strings.')
+        validate_is_type(list, tokens=tokens)
         invalid_str = [t for t in tokens if not isinstance(t, basestring) or not t]
         if invalid_str:
             raise ValueError('SubscriptionBatchResponse tokens must be non-empty strings.')
@@ -48,6 +47,7 @@ class SubscriptionBatchResponse(SubscriptionResponse):
         if not isinstance(results, list) or (not results and not self.error):
             raise ValueError('SubscriptionBatchResponse results must be a non-empty list.')
 
+        from tbans.models.subscriptions.subscriber import Subscriber
         self.subscribers = [Subscriber(token, result) for token, result in zip(tokens, results)]
 
     def __str__(self):

@@ -15,28 +15,40 @@ class TestUpdateMyTBANotification(unittest2.TestCase):
         self.assertEquals(str(notification), 'MockUpdateMyTBANotification(data_payload={\'sending_device_key\': \'efgh\'} platform_payload=PlatformPayload(platform_type=None priority=None collapse_key="abcd_typezor_update") type_name=typezor user_id=abcd sending_device_key=efgh)')
 
     def test_type_name(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             UpdateMyTBANotification(None, 'abcd', 'efgh')
 
     def test_type_name_type(self):
         with self.assertRaises(TypeError):
             UpdateMyTBANotification(200, 'abcd', 'efgh')
 
-    def test_user_id(self):
+    def test_type_name_empty(self):
         with self.assertRaises(ValueError):
+            UpdateMyTBANotification('', 'abcd', 'efgh')
+
+    def test_user_id(self):
+        with self.assertRaises(TypeError):
             UpdateMyTBANotification('abc', None, 'efgh')
 
     def test_user_id_type(self):
         with self.assertRaises(TypeError):
             UpdateMyTBANotification('abc', 200, 'efgh')
 
-    def test_sending_device_key(self):
+    def test_user_id_empty(self):
         with self.assertRaises(ValueError):
+            UpdateMyTBANotification('abc', '', 'efgh')
+
+    def test_sending_device_key(self):
+        with self.assertRaises(TypeError):
             UpdateMyTBANotification('abc', 'def', None)
 
     def test_sending_device_key_type(self):
         with self.assertRaises(TypeError):
             UpdateMyTBANotification('abc', 'def', 200)
+
+    def test_sending_device_key_empty(self):
+        with self.assertRaises(ValueError):
+            UpdateMyTBANotification('abc', 'def', '')
 
     def test_data_payload(self):
         notification = UpdateMyTBANotification('typezor', 'abcd', 'efgh')

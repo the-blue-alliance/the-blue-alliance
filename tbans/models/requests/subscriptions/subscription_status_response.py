@@ -31,13 +31,13 @@ class SubscriptionStatusResponse(SubscriptionResponse):
         """
         super(SubscriptionStatusResponse, self).__init__(response=response, error=error)
 
+        from tbans.utils.validation_utils import validate_is_type
+
         relations = self.data.get('rel', {})
-        if not isinstance(relations, dict):
-            raise ValueError('SubscriptionStatusResponse relations must be a dict.')
+        validate_is_type(dict, not_empty=False, relations=relations)
 
         topics = relations.get('topics', {})
-        if not isinstance(topics, dict):
-            raise ValueError('SubscriptionStatusResponse topics must be a dict.')
+        validate_is_type(dict, not_empty=False, topics=topics)
 
         self.subscriptions = [str(topic) for topic in topics]
 

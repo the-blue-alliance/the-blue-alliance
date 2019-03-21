@@ -8,7 +8,7 @@ from tests.tbans_tests.mocks.notifications.mock_notification import MockNotifica
 class TestNotificationRequest(unittest2.TestCase):
 
     def test_init_notification_none(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             NotificationRequest(notification=None)
 
     def test_init_notification_value(self):

@@ -12,18 +12,15 @@ class NotificationResponse(object):
             status_code (int): The stauts code from the HTTP response
             content (string): The content from the HTTP response - may be None
         """
+        from tbans.utils.validation_utils import validate_is_string, validate_is_type
+
         # Check that we have a status_code
-        if status_code is None:
-            raise ValueError('NotificationResponse requires a status_code')
-        # Check that our status_code looks right
-        if not isinstance(status_code, int):
-            raise TypeError('NotificationResponse status_code must be an int')
+        validate_is_type(int, not_empty=False, status_code=status_code)
         self.status_code = status_code
 
         # Check that content looks right
         if content:
-            if not isinstance(content, basestring):
-                raise TypeError('NotificationResponse content must be a string')
+            validate_is_string(content=content)
         self.content = content
 
     def __str__(self):

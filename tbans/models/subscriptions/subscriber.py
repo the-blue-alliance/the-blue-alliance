@@ -12,13 +12,12 @@ class Subscriber:
             token (string): Instance ID for the subscriber.
             result (dict): Dictionary result for the subscriber.
         """
+        from tbans.utils.validation_utils import validate_is_string, validate_is_type
+
         # Check that token looks right.
-        if not isinstance(token, basestring) or not token:
-            raise ValueError('Subscriber token must be a non-empty string.')
+        validate_is_string(token=token)
         self.token = token
 
         # Check that result looks right.
-        if not isinstance(result, dict):
-            raise TypeError('Subscriber result must be a dictionary.')
-
+        validate_is_type(dict, not_empty=False, result=result)
         self.error = result.get('error', None)

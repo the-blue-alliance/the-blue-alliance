@@ -32,20 +32,28 @@ class TestWebhookRequest(unittest2.TestCase):
         self.assertTrue(isinstance(request, NotificationRequest))
 
     def test_url(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             WebhookRequest(MockNotification(), None, 'secret')
 
     def test_url_type(self):
         with self.assertRaises(TypeError):
             WebhookRequest(MockNotification(), 200, 'secret')
 
-    def test_secret(self):
+    def test_url_empty(self):
         with self.assertRaises(ValueError):
+            WebhookRequest(MockNotification(), '', 'secret')
+
+    def test_secret(self):
+        with self.assertRaises(TypeError):
             WebhookRequest(MockNotification(), 'https://www.thebluealliance.com/', None)
 
     def test_secret_type(self):
         with self.assertRaises(TypeError):
             WebhookRequest(MockNotification(), 'https://www.thebluealliance.com/', 200)
+
+    def test_secret_empty(self):
+        with self.assertRaises(ValueError):
+            WebhookRequest(MockNotification(), 'https://www.thebluealliance.com/', '')
 
     def test_str(self):
         message_str = WebhookRequest(MockNotification(), 'https://www.thebluealliance.com/', 'secret')

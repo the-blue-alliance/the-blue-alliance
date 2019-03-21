@@ -9,13 +9,21 @@ class TestSubscriptionStatusResponse(unittest2.TestCase):
 
     def test_init_wrong_rel(self):
         response = MockResponse(200, '{"rel":"abc"}')
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             SubscriptionStatusResponse(response=response)
 
-    def test_init_wrong_topics(self):
+    def test_init_rel_empty(self):
+        response = MockResponse(200, '{"rel":{}}')
+        SubscriptionStatusResponse(response=response)
+
+    def test_init_topics_type(self):
         response = MockResponse(200, '{"rel":{"topics": "abc"}}')
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             SubscriptionStatusResponse(response=response)
+
+    def test_init_topics_empty(self):
+        response = MockResponse(200, '{"rel":{"topics": {}}}')
+        SubscriptionStatusResponse(response=response)
 
     def test_init_topics(self):
         response = MockResponse(200, '{"rel":{"topics":{"broadcasts":{"addDate":"2019-02-15"}}}}')

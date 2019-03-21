@@ -1,10 +1,7 @@
-
 class Notification(object):
-
     """
-    Base notification classs - represents message, data, and platform config payloads for notifications
+    Base notification classs - represents message, data, and platform config payloads for notifications.
     """
-
     def __str__(self):
         values = [ value for value in
             [(self.data_payload, 'data_payload'),

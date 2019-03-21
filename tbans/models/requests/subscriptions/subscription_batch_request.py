@@ -1,11 +1,4 @@
-import json
-
-from google.appengine.api import urlfetch
-
 from tbans.consts.subscription_action_type import SubscriptionActionType
-from tbans.consts.iid_error import IIDError
-from tbans.models.requests.subscriptions.subscription_batch_response import SubscriptionBatchResponse
-from tbans.utils.auth_utils import get_firebase_messaging_access_token
 
 
 class SubscriptionBatchRequest:
@@ -25,11 +18,12 @@ class SubscriptionBatchRequest:
             topic (string): Name of the topic for the request. May contain the ``/topics/`` prefix.
             action (SubscriptionActionType, int): Action to execute via the request - should be a SubscriptionActionType const
         """
+        from tbans.utils.validation_utils import validate_is_string, validate_is_type
+
         # Ensure our tokens are right - non-empty strings, in a list
         if isinstance(tokens, basestring):
             tokens = [tokens]
-        if not isinstance(tokens, list) or not tokens:
-            raise ValueError('SubscriptionBatchRequest tokens must be a string or a non-empty list of strings.')
+        validate_is_type(list, tokens=tokens)
         invalid_str = [t for t in tokens if not isinstance(t, basestring) or not t]
         if invalid_str:
             raise ValueError('SubscriptionBatchRequest tokens must be non-empty strings.')
@@ -37,8 +31,7 @@ class SubscriptionBatchRequest:
             raise ValueError('SubscriptionBatchRequest tokens must have no more than 1000 tokens.')
 
         # Ensure our topic is right - format like `/topics/something`
-        if not isinstance(topic, basestring) or not topic:
-            raise ValueError('SubscriptionBatchRequest topic must be a non-empty string.')
+        validate_is_string(topic=topic)
         if not topic.startswith('/topics/'):
             topic = '/topics/{0}'.format(topic)
 
@@ -66,6 +59,7 @@ class SubscriptionBatchRequest:
         Returns:
             string: JSON representation of the SubscriptionBatchRequest
         """
+        import json
         return json.dumps({'to': self.topic, 'registration_tokens': self.tokens})
 
     @property
@@ -79,6 +73,10 @@ class SubscriptionBatchRequest:
         Returns:
             SubscriptionBatchResponse
         """
+        from google.appengine.api import urlfetch
+        from tbans.models.requests.subscriptions.subscription_batch_response import SubscriptionBatchResponse
+        from tbans.utils.auth_utils import get_firebase_messaging_access_token
+
         headers = {
             'Authorization': 'Bearer ' + get_firebase_messaging_access_token(),
             'Content-Type': 'application/json'

@@ -1,6 +1,3 @@
-from tbans.models.notifications.notification import Notification
-
-
 class NotificationRequest(object):
     """ Base class used for requests to represent a notification payload.
 
@@ -13,11 +10,10 @@ class NotificationRequest(object):
         Args:
             notification (Notification): The Notification to send.
         """
-        class_name = self.__class__.__name__
-        if notification is None:
-            raise ValueError('{} notification cannot be None'.format(class_name))
-        if not isinstance(notification, Notification):
-            raise TypeError('{} notification must be a Notification subclass'.format(class_name))
+        from tbans.models.notifications.notification import Notification
+        from tbans.utils.validation_utils import validate_is_type
+
+        validate_is_type(Notification, notification=notification)
         self.notification = notification
 
     def json_string(self):

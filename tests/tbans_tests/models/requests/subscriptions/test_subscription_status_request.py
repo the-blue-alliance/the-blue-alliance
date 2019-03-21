@@ -1,5 +1,3 @@
-# test_tbans_subscription_status_request.py
-
 import unittest2
 import uuid
 
@@ -44,8 +42,12 @@ class TestSubscriptionStatusRequest(unittest2.TestCase):
             SubscriptionStatusRequest()
 
     def test_init_token_type(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             SubscriptionStatusRequest(token=1)
+
+    def test_init_token_empty(self):
+        with self.assertRaises(ValueError):
+            SubscriptionStatusRequest(token='')
 
     def test_str(self):
         request = SubscriptionStatusRequest(token=self.token)
