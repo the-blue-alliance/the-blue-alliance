@@ -208,7 +208,7 @@
       <div class="row">
         <div class="col-sm-12">
           {% if has_time_predictions %}<p>Match times listed with a <em>*</em> are unofficial predicted times computed by The Blue Alliance for your convenience.</p>{% endif %}
-          <p><a class="btn btn-default" href="/contact"><span class="glyphicon glyphicon-upload"></span> Tell us about YouTube videos</a></p>
+          <p><a class="btn btn-default" href="/suggest/event/video?event_key={{event.key_name}}"><span class="glyphicon glyphicon-upload"></span> Tell us about YouTube videos</a></p>
           <p><a class="btn btn-default" href="/event/{{ event.key_name }}/feed"><span class="glyphicon glyphicon-barcode"></span> Matches in RSS</a></p>
         </div>
       </div>
