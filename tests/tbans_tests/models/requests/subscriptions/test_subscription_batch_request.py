@@ -104,9 +104,24 @@ class TestSubscriptionBatchRequest(unittest2.TestCase):
             request = SubscriptionBatchRequest('abc', 'broadcasts', action_type)
             self.assertEqual(request._batch_url, 'https://iid.googleapis.com/iid/{}'.format(method))
 
+    def test_send_api_key_type(self):
+        request = SubscriptionBatchRequest('abc', 'broadcasts', SubscriptionActionType.REMOVE)
+        with self.assertRaises(TypeError):
+            response = request.send(1)
+
+    def test_send_api_key_none(self):
+        request = SubscriptionBatchRequest('abc', 'broadcasts', SubscriptionActionType.REMOVE)
+        with self.assertRaises(TypeError):
+            response = request.send(None)
+
+    def test_send_api_key_empty(self):
+        request = SubscriptionBatchRequest('abc', 'broadcasts', SubscriptionActionType.REMOVE)
+        with self.assertRaises(ValueError):
+            response = request.send('')
+
     def test_send(self):
         request = SubscriptionBatchRequest('abc', 'broadcasts', SubscriptionActionType.REMOVE)
-        response = request.send()
+        response = request.send('abcd123')
         self.assertIsNotNone(response.subscribers)
         self.assertEqual(len(response.subscribers), 1)
         self.assertIsNone(response.error)
