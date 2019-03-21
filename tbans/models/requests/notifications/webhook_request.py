@@ -29,7 +29,7 @@ class WebhookRequest(NotificationRequest):
         self.url = url
 
         # Check that we have a secret
-        validate_is_string(secret=secret)
+        validate_is_type(basestring, not_empty=False, secret=secret)
         self.secret = secret
 
     def __str__(self):
