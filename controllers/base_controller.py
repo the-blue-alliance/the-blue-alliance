@@ -260,3 +260,13 @@ class LoggedInHandler(webapp2.RequestHandler):
             TeamAdminAccess.expiration > now).fetch()
         if not existing_access:
             return self.abort(403)
+
+    def _require_user(self):
+        current_user_account_id = self.user_bundle.account.key.id()
+
+        target_account_id = self.request.get('account_id')
+        if not target_account_id:
+            return self.abort(403)
+
+        if target_account_id != current_user_account_id:
+            return self.abort(403)
