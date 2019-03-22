@@ -16,12 +16,12 @@ class VerificationNotification(Notification):
             url (string): The URL to send the notification payload to.
             secret (string): The secret to calculate the payload checksum with.
         """
-        from tbans.utils.validation_utils import validate_is_string
-        # Check url, secret
-        for (key, value) in [('url', url), ('secret', secret)]:
-            # Make sure our value exists
-            args = {key: value}
-            validate_is_string(**args)
+        from tbans.utils.validation_utils import validate_is_string, validate_is_type
+        # Check url
+        validate_is_string(url=url)
+
+        # Check secret
+        validate_is_type(basestring, not_empty=False, secret=secret)
 
         self.url = url
         self.secret = secret

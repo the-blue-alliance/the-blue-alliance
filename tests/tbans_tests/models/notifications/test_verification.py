@@ -32,8 +32,8 @@ class TestVerificationNotification(unittest2.TestCase):
             VerificationNotification('https://thebluealliance.com/', 200)
 
     def test_secret_empty(self):
-        with self.assertRaises(ValueError):
-            VerificationNotification('https://thebluealliance.com/', '')
+        # TODO: Migrate existing users, make this throw again
+        VerificationNotification('https://thebluealliance.com/', '')
 
     def test_type(self):
         self.assertEqual(VerificationNotification._type(), NotificationType.VERIFICATION)
