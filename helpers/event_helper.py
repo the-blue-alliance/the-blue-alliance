@@ -184,7 +184,7 @@ class EventHelper(object):
         two_weeks_of_events_keys_future = Event.query().filter(
           Event.start_date >= (today - datetime.timedelta(days=7))).filter(
           Event.start_date <= (today + datetime.timedelta(days=7))).order(
-          Event.start_date).fetch_async(50, keys_only=True)
+          Event.start_date).fetch_async(keys_only=True)
 
         events = []
         diff_from_wed = 2 - today.weekday()  # 2 is Wednesday. diff_from_wed ranges from 3 to -3 (Monday thru Sunday)
