@@ -24,13 +24,13 @@ class WebhookAdd(LoggedInHandler):
         self._require_request_user_is_bundle_user()
 
         # Name and URL must be non-None
-        url = self.request.get('url')
-        name = self.request.get('name')
+        url = self.request.get('url', None)
+        name = self.request.get('name', None)
         if not url or not name:
             return self.redirect('/webhooks/add?error=1')
 
         # Secret may be none - but we'll generate a secret for the user
-        secret = self.request.get('secret')
+        secret = self.request.get('secret', None)
         if not secret:
             import uuid
             secret = uuid.uuid4().hex
