@@ -261,7 +261,7 @@ class LoggedInHandler(webapp2.RequestHandler):
         if not existing_access:
             return self.abort(403)
 
-    def _require_user(self):
+    def _require_request_user_is_bundle_user(self):
         current_user_account_id = self.user_bundle.account.key.id()
 
         target_account_id = self.request.get('account_id')
