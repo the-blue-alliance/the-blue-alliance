@@ -112,13 +112,13 @@ class TestSubscriptionController(unittest2.TestCase):
 
     def test_subscribe(self):
         # Just test code path doesn't crash
-        self.stub_gcm_sitevar()
+        stub_gcm_sitevar()
         self._mock_response_content = '{"results": [{}, {}]}'
         self.assertTrue(SubscriptionController._subscribe('abc', 'defg'))
 
     def test_unsubscribe(self):
         # Just test code path doesn't crash
-        self.stub_gcm_sitevar()
+        stub_gcm_sitevar()
         self.assertTrue(SubscriptionController._unsubscribe('abc'))
 
     def test_update_subscriptions(self):
@@ -132,17 +132,17 @@ class TestSubscriptionController(unittest2.TestCase):
             device_uuid='abcdef',
             display_name='Max iPhone 8s').put()
 
-        self.stub_gcm_sitevar()
+        stub_gcm_sitevar()
         self._mock_response_content = '{"results": [{}]}'
         self.assertTrue(SubscriptionController.update_subscriptions(user_id))
 
     def test_make_batch_requests(self):
-        self.stub_gcm_sitevar()
+        stub_gcm_sitevar()
         self._mock_response_content = '{"results": [{}, {}]}'
         self.assertTrue(SubscriptionController._make_batch_requests(['abc', 'def'], ['topic_one'], SubscriptionActionType.ADD))
 
     def test_make_batch_requests_error(self):
-        self.stub_gcm_sitevar()
+        stub_gcm_sitevar()
         self._mock_response_content = '{"error": "some error"}'
         self.assertFalse(SubscriptionController._make_batch_requests(['abc', 'def'], ['topic_one'], SubscriptionActionType.ADD))
 
@@ -166,7 +166,7 @@ class TestSubscriptionController(unittest2.TestCase):
         # Sanity check
         self.assertEqual(len(MobileClient.query().fetch()), 2)
 
-        self.stub_gcm_sitevar()
+        stub_gcm_sitevar()
         self._mock_response_content = '{"results": [{}, {"error":"TOO_MANY_TOPICS"}]}'
         self.assertFalse(SubscriptionController._make_batch_requests(['abc', 'defg'], ['topic_one'], SubscriptionActionType.ADD))
         self.assertEqual(len(MobileClient.query().fetch()), 2)
@@ -191,17 +191,17 @@ class TestSubscriptionController(unittest2.TestCase):
         # Sanity check
         self.assertEqual(len(MobileClient.query().fetch()), 2)
 
-        self.stub_gcm_sitevar()
+        stub_gcm_sitevar()
         self._mock_response_content = '{"results": [{}, {"error":"INVALID_ARGUMENT"}]}'
         self.assertTrue(SubscriptionController._make_batch_requests(['abc', 'defg'], ['topic_one'], SubscriptionActionType.ADD))
         self.assertEqual(len(MobileClient.query().fetch()), 1)
 
     def test_make_status_request(self):
-        self.stub_gcm_sitevar()
+        stub_gcm_sitevar()
         self.assertIsNotNone(SubscriptionController._make_status_request('abc'))
 
     def test_make_status_request_error(self):
-        self.stub_gcm_sitevar()
+        stub_gcm_sitevar()
         self._mock_response_code = 500
         self._mock_response_content = '{"error": "some error"}'
         self.assertIsNone(SubscriptionController._make_status_request('abc'))
@@ -210,7 +210,7 @@ class TestSubscriptionController(unittest2.TestCase):
         user_id = 'abc'
         token = 'some-token'
 
-        self.stub_gcm_sitevar()
+        stub_gcm_sitevar()
         MobileClient(
             parent=ndb.Key(Account, user_id),
             user_id=user_id,
@@ -240,5 +240,5 @@ class TestSubscriptionController(unittest2.TestCase):
             SubscriptionController._fcm_api_key()
 
     def test_fcm_api_key(self):
-        self.stub_gcm_sitevar()
+        stub_gcm_sitevar()
         self.assertEqual(SubscriptionController._fcm_api_key(), 'abcd')

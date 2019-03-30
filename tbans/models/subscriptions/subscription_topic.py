@@ -68,7 +68,7 @@ class SubscriptionTopic:
         Get all valid topics for all Subscription objects.
 
         Args:
-            subscriptoins (list, Subscription): List of Subscriptions to get topics for.
+            subscriptions (list, Subscription): List of Subscriptions to get topics for.
 
         Returns:
             list (string): List of valid topics for Subscriptions.
