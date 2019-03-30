@@ -137,12 +137,12 @@ class MediaParser(object):
             return cls._partial_media_dict_from_grabcad(url)
         elif media_type in cls.OEMBED_PROVIDERS:
             return cls._partial_media_dict_from_oembed(media_type, url)
-        else:
+        elif media_type is not None:
             return cls._create_media_dict(media_type, url)
-
-        if url:
-            logging.warning("Failed to determine media type from url: {}".format(url))
-        return None
+        else:
+            if url:
+                logging.warning("Failed to determine media type from url: {}".format(url))
+            return None
 
     @classmethod
     def _create_media_dict(cls, media_type, url):

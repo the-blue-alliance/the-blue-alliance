@@ -190,7 +190,7 @@ class TestSuggestTeamSocialMediaController(unittest2.TestCase):
         form = self.getSuggestionForm('frc177')
         form['media_url'] = 'https://www.youtube.com/user/bobcatrobotics'
         response = form.submit().follow()
-        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.status_int, 302)
 
         request = response.request
         self.assertEqual(request.GET.get('status'), 'success')
@@ -204,7 +204,7 @@ class TestSuggestTeamSocialMediaController(unittest2.TestCase):
         form = self.getSuggestionForm('frc5507')
         form['media_url'] = 'https://www.youtube.com/channel/UCweoyLIzRXPS_JOrwpxX5tA'
         response = form.submit().follow()
-        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.status_int, 302)
 
         request = response.request
         self.assertEqual(request.GET.get('status'), 'illegal_media_type')
