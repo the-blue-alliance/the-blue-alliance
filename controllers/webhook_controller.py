@@ -21,7 +21,7 @@ class WebhookAdd(LoggedInHandler):
 
     def post(self):
         self._require_registration()
-        self._require_user()
+        self._require_request_user_is_bundle_user()
 
         # Name and URL must be non-None
         url = self.request.get('url')
@@ -64,7 +64,7 @@ class WebhookAdd(LoggedInHandler):
 class WebhookDelete(LoggedInHandler):
     def post(self):
         self._require_registration()
-        self._require_user()
+        self._require_request_user_is_bundle_user()
 
         current_user_account_id = self.user_bundle.account.key.id()
         if not current_user_account_id:
@@ -91,7 +91,7 @@ class WebhookVerify(LoggedInHandler):
 
     def post(self, client_id):
         self._require_registration()
-        self._require_user()
+        self._require_request_user_is_bundle_user()
 
         current_user_account_id = self.user_bundle.account.key.id()
         if not current_user_account_id:
@@ -117,7 +117,7 @@ class WebhookVerify(LoggedInHandler):
 class WebhookVerificationSend(LoggedInHandler):
     def post(self):
         self._require_registration()
-        self._require_user()
+        self._require_request_user_is_bundle_user()
 
         current_user_account_id = self.user_bundle.account.key.id()
         if not current_user_account_id:
