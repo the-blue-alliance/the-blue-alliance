@@ -20,7 +20,10 @@ from models.suggestion import Suggestion
 class SuggestionCreator(object):
     @classmethod
     def createTeamMediaSuggestion(cls, author_account_key, media_url, team_key, year_str, private_details_json=None, is_social=False, default_preferred=False):
-        """Create a Team Media Suggestion. Returns status (success, suggestion_exists, media_exists, bad_url)"""
+        """Create a Team Media Suggestion. Returns status (success, illegal_media_type, suggestion_exists, media_exists, bad_url)"""
+
+        if MediaParser.media_type_from_url(media_url) in MediaParser.ILLEGAL_MEDIA_TYPES:
+            return 'illegal_media_type', None
 
         media_dict = MediaParser.partial_media_dict_from_url(media_url)
         if media_dict is not None:

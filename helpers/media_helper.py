@@ -58,6 +58,8 @@ class MediaParser(object):
 
     OEMBED_PROVIDERS = [MediaType.INSTAGRAM_IMAGE]
 
+    ILLEGAL_MEDIA_TYPES = [MediaType.YOUTUBE_CHANNEL_ILLEGAL]
+
     # Dict that maps media types -> list of tuple of regex pattern and group # of foreign key
     FOREIGN_KEY_PATTERNS = {
         MediaType.FACEBOOK_PROFILE: [(r".*facebook.com\/(.*)(\/(.*))?", 1)],
@@ -86,6 +88,7 @@ class MediaParser(object):
         ('chiefdelphi.com/media/photos/', MediaType.CD_PHOTO_THREAD),
         ('youtube.com/watch', MediaType.YOUTUBE_VIDEO),
         ('youtu.be', MediaType.YOUTUBE_VIDEO),
+        ('youtube.com/channel/', MediaType.YOUTUBE_CHANNEL_ILLEGAL),
         ('imgur.com/', MediaType.IMGUR),
         ('grabcad.com/library/', MediaType.GRABCAD),
         ('instagram.com/p/', MediaType.INSTAGRAM_IMAGE),
@@ -106,26 +109,36 @@ class MediaParser(object):
     }
 
     @classmethod
+    def media_type_from_url(cls, url):
+        """
+        Takes a url, and returns the best fitting MediaType
+        """
+        url = url.strip()
+        for s, media_type in cls.URL_PATTERNS:
+            if s in url:
+                return media_type
+        return None
+
+    @classmethod
     def partial_media_dict_from_url(cls, url):
         """
         Takes a url, and turns it into a partial Media object dict
         """
         url = url.strip()
         # Now, we can test for regular media type
-        for s, media_type in cls.URL_PATTERNS:
-            if s in url:
-                if media_type == MediaType.CD_PHOTO_THREAD:
-                    # CD images are special - they need to do an additional urlfetch because the given url
-                    # doesn't contain the foreign key
-                    return cls._partial_media_dict_from_cd_photo_thread(url)
-                elif media_type == MediaType.GRABCAD:
-                    # GrabCAD images are special - we'll need to do a second fetch to a SUPER HACKY
-                    # API so we can get embed images and titles and stuff
-                    return cls._partial_media_dict_from_grabcad(url)
-                elif media_type in cls.OEMBED_PROVIDERS:
-                    return cls._partial_media_dict_from_oembed(media_type, url)
-                else:
-                    return cls._create_media_dict(media_type, url)
+        media_type = cls.media_type_from_url(url)
+        if media_type == MediaType.CD_PHOTO_THREAD:
+            # CD images are special - they need to do an additional urlfetch because the given url
+            # doesn't contain the foreign key
+            return cls._partial_media_dict_from_cd_photo_thread(url)
+        elif media_type == MediaType.GRABCAD:
+            # GrabCAD images are special - we'll need to do a second fetch to a SUPER HACKY
+            # API so we can get embed images and titles and stuff
+            return cls._partial_media_dict_from_grabcad(url)
+        elif media_type in cls.OEMBED_PROVIDERS:
+            return cls._partial_media_dict_from_oembed(media_type, url)
+        else:
+            return cls._create_media_dict(media_type, url)
 
         if url:
             logging.warning("Failed to determine media type from url: {}".format(url))

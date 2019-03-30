@@ -170,7 +170,7 @@ class TestSuggestTeamSocialMediaController(unittest2.TestCase):
         response = response.follow(expect_errors=True)
         self.assertEqual(response.request.path, '/')
 
-    def test_suggest_team(self):
+    def test_suggest_team_github(self):
         self.loginUser()
         self.storeTeam()
         form = self.getSuggestionForm('frc1124')
@@ -183,3 +183,31 @@ class TestSuggestTeamSocialMediaController(unittest2.TestCase):
 
         suggestion = Suggestion.get_by_id('media_None_team_frc1124_github-profile_frc1124')
         self.assertIsNotNone(suggestion)
+
+    def test_suggest_team_youtube(self):
+        self.loginUser()
+        self.storeTeam()
+        form = self.getSuggestionForm('frc177')
+        form['media_url'] = 'https://www.youtube.com/user/bobcatrobotics'
+        response = form.submit().follow()
+        self.assertEqual(response.status_int, 200)
+
+        request = response.request
+        self.assertEqual(request.GET.get('status'), 'success')
+
+        suggestion = Suggestion.get_by_id('media_None_team_frc177_youtube-channel_bobcatrobotics')
+        self.assertIsNotNone(suggestion)
+
+    def test_suggest_team_youtube_illegal(self):
+        self.loginUser()
+        self.storeTeam()
+        form = self.getSuggestionForm('frc5507')
+        form['media_url'] = 'https://www.youtube.com/channel/UCweoyLIzRXPS_JOrwpxX5tA'
+        response = form.submit().follow()
+        self.assertEqual(response.status_int, 200)
+
+        request = response.request
+        self.assertEqual(request.GET.get('status'), 'illegal_media_type')
+
+        suggestion = Suggestion.get_by_id('media_None_team_frc5507_youtube-channel_channelucweoylizrxps_jorwpxx5ta')
+        self.assertIsNone(suggestion)
