@@ -47,8 +47,8 @@ class DatafeedFIRSTElasticSearch(object):
         return events
 
     def getEventDetails(self, event):
-        if event.first_eid is None:
-            logging.info("Cannot get event details for {}! No first_eid.".format(event.key.id()))
+        if event is None or event.first_eid is None:
+            logging.info("Cannot get event details for {}! No first_eid.".format(event.key.id() if event else None))
             return None
         return self._parse(self.EVENT_DETAILS_URL_PATTERN % (event.first_eid), FIRSTElasticSearchEventListParser(event.year))[0]
 

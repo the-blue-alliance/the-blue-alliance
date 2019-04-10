@@ -29,7 +29,7 @@
   <ul class="nav nav-tabs nav-justified">
     <li class="active"><a href="#info" data-toggle="tab">Info</a></li>
     <li><a href="#tasks" data-toggle="tab">Tasks</a></li>
-    <li><a href="#apikeys" data-toggle="tab">API</a></li>
+    <li><a href="#api" data-toggle="tab">API</a></li>
     <li><a href="#webcasts" data-toggle="tab">Webcasts</a></li>
     <li><a href="#rankings" data-toggle="tab">Rankings</a></li>
     <li><a href="#alliances" data-toggle="tab">Alliances</a></li>
@@ -277,9 +277,48 @@
 </div>
 </div>
 
-<div class="tab-pane" id="apikeys">
+<div class="tab-pane" id="api">
 <div class="row">
-<h2>API Keys</h2>
+<h2>FMS API Settings</h2>
+
+<form action="/admin/event/{{event.key_name}}" method="post">
+  <h3>Disable Event Info Sync</h3>
+    <div class="form-group row">
+      <label for="event_sync_disable" class="col-sm-2 col-form-label">Sync Disabled</label>
+      <div class="col-sm-1">
+        <input type="checkbox" class="form-check-input" name="event_sync_disable" id="event_sync_disable" {%if event_sync_disable%}checked{%endif%}/>
+      </div>
+    </div>
+
+  <h3>Set Start Day to Last Day</h3>
+    <div class="form-group row">
+      <label for="set_start_day_to_last" class="col-sm-2 col-form-label">Force Start Day to Last Day</label>
+      <div class="col-sm-1">
+        <input type="checkbox" class="form-check-input" name="set_start_day_to_last" id="set_start_day_to_last"  {%if set_start_day_to_last%}checked{%endif%}/>
+      </div>
+    </div>
+
+  <h3>Skip EventTeams</h3>
+    <div class="form-group row">
+      <label for="skip_eventteams" class="col-sm-2 col-form-label">Skip EventTeams</label>
+      <div class="col-sm-1">
+        <input type="checkbox" class="form-check-input" name="skip_eventteams" id="skip_eventteams" {%if skip_eventteams%}checked{%endif%}/>
+      </div>
+    </div>
+
+  <h3>Override Event Name</h3>
+    <div class="form-group row">
+      <label for="event_name_override" class="col-sm-2 col-form-label">Event Name Override</label>
+      <div class="col-sm-4">
+        <input type="text" class="form-control" name="event_name_override" id="event_name_override" value="{{event_name_override}}"/>
+      </div>
+    </div>
+
+<button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
+</form>
+
+
+<h2>Write API Keys</h2>
 <p>Issue a key <a href="/admin/api_auth/add">here</a></p>
 
 <p>Currently Issued Keys</p>

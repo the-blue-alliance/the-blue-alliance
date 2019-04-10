@@ -32,6 +32,7 @@ from models.event_details import EventDetails
 from models.event_team import EventTeam
 from models.match import Match
 from models.media import Media
+from models.sitevar import Sitevar
 from models.team import Team
 
 import tba_config
@@ -338,6 +339,7 @@ class AdminEventDetail(LoggedInHandler):
             self.abort(404)
         event.prepAwardsMatchesTeams()
 
+        reg_sitevar = Sitevar.get_by_id("cmp_registration_hacks")
         api_keys = ApiAuthAccess.query(ApiAuthAccess.event_list == ndb.Key(Event, event_key)).fetch()
         event_medias = Media.query(Media.references == event.key).fetch(500)
 
@@ -348,10 +350,59 @@ class AdminEventDetail(LoggedInHandler):
             "flushed": self.request.get("flushed"),
             "playoff_types": PlayoffType.type_names,
             "write_auths": api_keys,
+            "event_sync_disable": reg_sitevar and event_key in reg_sitevar.contents.get('divisions_to_skip', []),
+            "set_start_day_to_last": reg_sitevar and event_key in reg_sitevar.contents.get('set_start_to_last_day', []),
+            "skip_eventteams": reg_sitevar and event_key in reg_sitevar.contents.get('skip_eventteams', []),
+            "event_name_override": next(iter(filter(lambda e: e.get("event") == event_key, reg_sitevar.contents.get("event_name_override", []))), {}).get("name", "")
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_details.html')
         self.response.out.write(template.render(path, self.template_values))
+
+    def post(self, event_key):
+        self._require_admin()
+        event = Event.get_by_id(event_key)
+        if not event:
+            self.abort(404)
+
+        reg_sitevar = Sitevar.get_or_insert("cmp_registration_hacks", values_json="{}")
+
+        new_divisions_to_skip = reg_sitevar.contents.get("divisions_to_skip", [])
+        if self.request.get("event_sync_disable"):
+            if event_key not in new_divisions_to_skip:
+                new_divisions_to_skip.append(event_key)
+        else:
+            new_divisions_to_skip = list(filter(lambda e: e != event_key, new_divisions_to_skip))
+
+        new_start_day_to_last = reg_sitevar.contents.get("set_start_to_last_day", [])
+        if self.request.get("set_start_day_to_last"):
+            if event_key not in new_start_day_to_last:
+                new_start_day_to_last.append(event_key)
+        else:
+            new_start_day_to_last= list(filter(lambda e: e != event_key, new_start_day_to_last))
+
+        new_skip_eventteams = reg_sitevar.contents.get("skip_eventteams", [])
+        if self.request.get("skip_eventteams"):
+            if event_key not in new_skip_eventteams:
+                new_skip_eventteams.append(event_key)
+        else:
+            new_skip_eventteams = list(filter(lambda e: e != event_key, new_skip_eventteams))
+
+        new_name_overrides = reg_sitevar.contents.get("event_name_override", [])
+        if self.request.get("event_name_override"):
+            if not any(o["event"] == event_key for o in new_name_overrides):
+                new_name_overrides.append({"event": event_key, "name": self.request.get("event_name_override")})
+        else:
+            new_name_overrides = list(filter(lambda o: o["event"] != event_key, new_name_overrides))
+
+        reg_sitevar.contents = {
+            "divisions_to_skip": new_divisions_to_skip,
+            "set_start_to_last_day": new_start_day_to_last,
+            "skip_eventteams": new_skip_eventteams,
+            "event_name_override": new_name_overrides,
+        }
+        reg_sitevar.put()
+        self.redirect("/admin/event/{}".format(event_key))
 
 
 class AdminEventEdit(LoggedInHandler):
