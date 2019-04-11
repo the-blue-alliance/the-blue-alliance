@@ -108,6 +108,9 @@ class DistrictDetail(CacheableHandler):
                 if team.key.id() in team_keys:
                     has_teams = True
                     event_team = EventTeam.get_by_id('{}_{}'.format(event.key.id(), team.key.id()))  # Should be in context cache
+                    if event_team is None:
+                        logging.info("No EventTeam for {}_{}".format(event.key.id(), team.key.id()))
+                        continue
                     status_str = {
                         'alliance': EventTeamStatusHelper.generate_team_at_event_alliance_status_string(team.key.id(), event_team.status),
                         'playoff': EventTeamStatusHelper.generate_team_at_event_playoff_status_string(team.key.id(), event_team.status),
