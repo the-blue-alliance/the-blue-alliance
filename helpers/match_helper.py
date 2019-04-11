@@ -331,6 +331,9 @@ class MatchHelper(object):
                                     if year == 2018:
                                         tiebreaker1.append(match.score_breakdown[color]['endgamePoints'])
                                         tiebreaker2.append(match.score_breakdown[color]['autoPoints'])
+                                    elif year == 2019:
+                                        tiebreaker1.append(match.score_breakdown[color]['cargoPoints'])
+                                        tiebreaker2.append(match.score_breakdown[color]['hatchPanelPoints'])
                                     else:
                                         tiebreaker1.append(match.alliances[color]['score'])
                                         tiebreaker2.append(0)
@@ -344,6 +347,9 @@ class MatchHelper(object):
                     if year == 2018:
                         tiebreaker1 = match.score_breakdown[color]['endgamePoints'] if match.has_been_played else 0
                         tiebreaker2 = match.score_breakdown[color]['autoPoints'] if match.has_been_played else 0
+                    elif year == 2019:
+                        tiebreaker1 = match.score_breakdown[color]['cargoPoints'] if match.has_been_played else 0
+                        tiebreaker2 = match.score_breakdown[color]['hatchPanelPoints'] if match.has_been_played else 0
                     else:
                         tiebreaker1 = match.alliances[color]['score'] if match.has_been_played else 0
                         tiebreaker2 = 0
