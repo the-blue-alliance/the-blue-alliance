@@ -92,3 +92,13 @@
   </div>
 </div>
 {% endblock %}
+
+{% block inline_javascript %}
+{% if team.team_number == 148 %}
+<script>
+  $(".banner").click(function(){
+    $(".banner").addClass("black");
+  });
+</script>
+{% endif %}
+{% endblock %}

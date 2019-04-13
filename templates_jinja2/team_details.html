@@ -270,4 +270,11 @@
     $(this).toggleClass("red").toggleClass("blue")
   });
 </script>
+{% if team.team_number == 148 %}
+<script>
+  $(".banner").click(function(){
+    $(".banner").addClass("black");
+  });
+</script>
+{% endif %}
 {% endblock %}
