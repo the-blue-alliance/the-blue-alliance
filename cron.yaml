@@ -98,7 +98,7 @@ cron:
 
 - description: Backup Cron job
   url: /backend-tasks/backup/enqueue
-  schedule: 1 of month 03:00
+  schedule: every monday 03:00
   timezone: America/Los_Angeles
 
 # - description: BlueZone Update
