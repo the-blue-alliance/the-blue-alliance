@@ -163,8 +163,8 @@ class FMSAPIHybridScheduleParser(object):
                     if match_key.startswith('{}{}'.format(comp_level, set_number)):
                         match_count += 1
 
-                # Sanity check: Tiebreakers must be played after at least 3 matches, or 6 for finals
-                if match_count < 3 or (match_count < 6 and comp_level == 'f'):
+                # Sanity check: Tiebreakers must be played after at least 3 matches if not finals
+                if match_count < 3 and comp_level != 'f':
                     logging.warning("Match supposedly tied, but existing count is {}! Skipping match.".format(match_count))
                     continue
 
