@@ -233,6 +233,7 @@ class GCMConnection:
 
             if e.code == 400:
                 logging.error('400, Invalid GCM JSON message: ' + repr(gcm_post_json_str))
+                logging.exception(str(e.code) + " " + e.msg + " " + e.read())
             elif e.code == 401:
                 logging.error('401, Error authenticating with GCM. Retrying message. Might need to fix auth key!')
                 self._requeue_message(message)
@@ -281,7 +282,3 @@ class GCMConnection:
 
         else:
             logging.error("Unknown error: %s for device token: %s" % (repr(error_msg), repr(device_token)))
-
-
-
-
