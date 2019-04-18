@@ -101,6 +101,24 @@ function setupViews() {
     setupView(8, $("#2016tes-1"));
   }
 
+  var isChamps = urlvars['champs-fll'];
+  if (isChamps != null) {
+    layout_3();
+    setChat(true);
+    setupView(0, $("#fll1-0"));
+    setupView(1, $("#fll2-0"));
+    setupView(2, $("#fll3-0"));
+    setupView(3, $("#fll4-0"));
+  }
+	
+  var isChamps = urlvars['champs-ftc'];
+  if (isChamps != null) {
+    layout_1();
+    setChat(true);
+    setupView(0, $("#jemison-0"));
+    setupView(1, $("#franklin-0"));
+  }
+	
   var isChamps = urlvars['champs'];
   if (isChamps != null) {
     layout_2();
