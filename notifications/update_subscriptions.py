@@ -20,7 +20,7 @@ class UpdateSubscriptionsNotification(BaseNotification):
 
     def _build_dict(self):
         data = {}
-        data['message_type'] = NotificationType.type_names[self._type]
+        data['notification_type'] = NotificationType.type_names[self._type]
         return data
 
     def _render_android(self):
