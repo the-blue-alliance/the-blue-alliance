@@ -18,7 +18,7 @@ class AllianceSelectionNotification(BaseNotification):
 
     def _build_dict(self):
         data = {}
-        data['message_type'] = NotificationType.type_names[self._type]
+        data['notification_type'] = NotificationType.type_names[self._type]
         data['message_data'] = {}
         data['message_data']['event_name'] = self.event.name
         data['message_data']['event_key'] = self.event.key_name

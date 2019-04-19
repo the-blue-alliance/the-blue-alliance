@@ -26,8 +26,14 @@ class TestBaseNotification(unittest2.TestCase):
 
     def test_render_webhook(self):
         message = self.notification._render_webhook()
-
-        self.assertEqual(message, self.notification._build_dict())
+        expect = {
+            'message_type': 'ping',
+            'message_data': {
+                'title': 'Test Message',
+                'desc': 'This is a test message ensuring your device can recieve push messages from The Blue Alliance.'
+            }
+        }
+        self.assertEqual(message, expect)
 
     def _test_render_gcm(self, client_type):
         message = self.notification._render_gcm(client_type)

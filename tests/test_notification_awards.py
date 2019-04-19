@@ -11,7 +11,7 @@ from models.team import Team
 from notifications.awards_updated import AwardsUpdatedNotification
 
 
-class TestAllianceNotification(unittest2.TestCase):
+class TestAwardsNotification(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -33,7 +33,7 @@ class TestAllianceNotification(unittest2.TestCase):
 
     def test_build(self):
         expected = {}
-        expected['message_type'] = NotificationType.type_names[NotificationType.AWARDS]
+        expected['notification_type'] = NotificationType.type_names[NotificationType.AWARDS]
         expected['message_data'] = {}
         expected['message_data']['event_name'] = self.event.name
         expected['message_data']['event_key'] = self.event.key_name

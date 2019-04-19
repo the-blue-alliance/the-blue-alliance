@@ -14,7 +14,7 @@ class MatchVideoNotification(BaseNotification):
 
     def _build_dict(self):
         data = {}
-        data['message_type'] = NotificationType.type_names[self._type]
+        data['notification_type'] = NotificationType.type_names[self._type]
         data['message_data'] = {}
         data['message_data']['event_name'] = self.event.name
         data['message_data']['match_key'] = self.match.key.id()
@@ -37,7 +37,7 @@ class EventMatchVideoNotification(BaseNotification):
 
     def _build_dict(self):
         data = {}
-        data['message_type'] = NotificationType.type_names[self._type]
+        data['notification_type'] = NotificationType.type_names[self._type]
         data['message_data'] = {}
         data['message_data']['event_key'] = self.event.key.id()
         data['message_data']['event_name'] = self.event.name
