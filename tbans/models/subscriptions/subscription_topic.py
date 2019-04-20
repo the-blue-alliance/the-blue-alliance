@@ -138,11 +138,11 @@ class SubscriptionTopic:
 
         from consts.model_type import ModelType
         if model_type == ModelType.EVENT:
-            return ['event_{}_{}'.format(model_key, _notification_type_name(nt)) for nt in notification_types]
+            return ['{}_{}'.format(model_key, _notification_type_name(nt)) for nt in notification_types]
         elif model_type == ModelType.TEAM:
-            return ['team_{}_{}'.format(model_key, _notification_type_name(nt)) for nt in notification_types]
+            return ['{}_{}'.format(model_key, _notification_type_name(nt)) for nt in notification_types]
         elif model_type == ModelType.MATCH:
-            return ['match_{}_{}'.format(model_key, _notification_type_name(nt)) for nt in notification_types]
+            return ['{}_{}'.format(model_key, _notification_type_name(nt)) for nt in notification_types]
         else:
             return []
 

@@ -163,7 +163,7 @@ class TestSubscriptionTopic(unittest2.TestCase):
         ).put()
 
         topics = SubscriptionTopic.user_subscription_topics(user_id)
-        self.assertEqual(topics, ['broadcast', 'abc_update_favorites', 'abc_update_subscriptions', 'event_3018miket_upcoming_match', 'event_3018miket_match_score', 'event_3018miket_awards_posted', 'event_2018miket_match_video'])
+        self.assertEqual(topics, ['broadcast', 'abc_update_favorites', 'abc_update_subscriptions', '3018miket_upcoming_match', '3018miket_match_score', '3018miket_awards_posted', '2018miket_match_video'])
 
     def test_base_topics(self):
         self.assertEqual(SubscriptionTopic._base_topics(), ['broadcast'])
@@ -221,7 +221,7 @@ class TestSubscriptionTopic(unittest2.TestCase):
         )
         s2.put()
 
-        self.assertEqual(SubscriptionTopic._subscription_topics([s1, s2]), ['event_3018miket_upcoming_match', 'event_3018miket_match_score', 'event_3018miket_awards_posted'])
+        self.assertEqual(SubscriptionTopic._subscription_topics([s1, s2]), ['3018miket_upcoming_match', '3018miket_match_score', '3018miket_awards_posted'])
 
     def test_valid_model_topics_model_type_type(self):
         with self.assertRaises(TypeError):
