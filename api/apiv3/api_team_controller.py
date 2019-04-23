@@ -201,9 +201,9 @@ class ApiTeamEventStatusController(ApiBaseController):
             self._last_modified = datetime.datetime.now()
         if status:
             status.update({
-                'alliance_status_str': EventTeamStatusHelper.generate_team_at_event_alliance_status_string(team_key, status),
-                'playoff_status_str': EventTeamStatusHelper.generate_team_at_event_playoff_status_string(team_key, status),
-                'overall_status_str': EventTeamStatusHelper.generate_team_at_event_status_string(team_key, status),
+                'alliance_status_str': EventTeamStatusHelper.generate_team_at_event_alliance_status_string(team_key, status, formatting=False),
+                'playoff_status_str': EventTeamStatusHelper.generate_team_at_event_playoff_status_string(team_key, status, formatting=False),
+                'overall_status_str': EventTeamStatusHelper.generate_team_at_event_status_string(team_key, status, formatting=False),
             })
         return json.dumps(status, ensure_ascii=True, indent=2, sort_keys=True)
 
@@ -222,9 +222,9 @@ class ApiTeamYearEventsStatusesController(ApiBaseController):
             status = event_team.status
             if status:
                 status.update({
-                    'alliance_status_str': EventTeamStatusHelper.generate_team_at_event_alliance_status_string(team_key, status),
-                    'playoff_status_str': EventTeamStatusHelper.generate_team_at_event_playoff_status_string(team_key, status),
-                    'overall_status_str': EventTeamStatusHelper.generate_team_at_event_status_string(team_key, status),
+                    'alliance_status_str': EventTeamStatusHelper.generate_team_at_event_alliance_status_string(team_key, status, formatting=False),
+                    'playoff_status_str': EventTeamStatusHelper.generate_team_at_event_playoff_status_string(team_key, status, formatting=False),
+                    'overall_status_str': EventTeamStatusHelper.generate_team_at_event_status_string(team_key, status, formatting=False),
                 })
             statuses[event_team.event.id()] = status
         return json.dumps(statuses, ensure_ascii=True, indent=2, sort_keys=True)

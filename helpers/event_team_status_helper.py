@@ -13,7 +13,7 @@ from models.match import Match
 
 class EventTeamStatusHelper(object):
     @classmethod
-    def generate_team_at_event_alliance_status_string(cls, team_key, status_dict):
+    def generate_team_at_event_alliance_status_string(cls, team_key, status_dict, formatting=True):
         if not status_dict:
             return '--'
         alliance = status_dict.get('alliance')
@@ -28,12 +28,13 @@ class EventTeamStatusHelper(object):
             if backup and team_key == backup['in']:
                 pick = 'Backup'
 
-            return '<b>{}</b> of <b>{}</b>'.format(pick, alliance['name'])
+            final_string = '<b>{}</b> of <b>{}</b>'.format(pick, alliance['name'])
+            return final_string if formatting else final_string.replace('<b>', '').replace('</b>', '')
         else:
             return '--'
 
     @classmethod
-    def generate_team_at_event_playoff_status_string(cls, team_key, status_dict):
+    def generate_team_at_event_playoff_status_string(cls, team_key, status_dict, formatting=True):
         if not status_dict:
             return '--'
         playoff = status_dict.get('playoff')
@@ -61,7 +62,7 @@ class EventTeamStatusHelper(object):
                     playoff_str += ' with a playoff record of <b>{}-{}-{}</b>'.format(record['wins'], record['losses'], record['ties'])
                 if playoff_average:
                     playoff_str += ' with a playoff average of <b>{:.1f}</b>'.format(playoff_average)
-            return playoff_str
+            return playoff_str if formatting else playoff_str.replace('<b>', '').replace('</b>', '')
         else:
             return '--'
 
