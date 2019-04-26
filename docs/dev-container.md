@@ -29,7 +29,7 @@ If you make changes to javascript or css files, you may have to recompile them. 
 
 Inside the container, you can run `paver bootstrap` from within the `tba` directory to load production data into your development instance. This will load the 2016 New England District Championship by default (which you can access at localhost:8080/event/2016necmp). You can load a different event by passing it's event key (e.g. `2016necmp`) to `paver bootstrap` (e.g. `paver bootstrap --key=2016necmp`). You will need to provide your TBA APIv3 key in order to load data, you can generate one at https://www.thebluealliance.com/account.
 
-If you have any third-party API keys (such as for the FRC API), you can input them at localhost:8080/admin/authkeys. You can also request FRC API keys [here](https://usfirst.collab.net/sf/projects/first_community_developers/).
+If you have any third-party API keys (such as for the FRC API), you can input them at localhost:8080/admin/authkeys. You can also request FRC API keys [here](https://frc-events.firstinspires.org/services/API).
 
 ## Running Tests/Lint
 
