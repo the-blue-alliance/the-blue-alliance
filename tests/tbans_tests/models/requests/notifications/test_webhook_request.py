@@ -52,8 +52,8 @@ class TestWebhookRequest(unittest2.TestCase):
             WebhookRequest(MockNotification(), 'https://www.thebluealliance.com/', 200)
 
     def test_secret_empty(self):
-        # TODO: Migrate existing users, make this throw again
-        WebhookRequest(MockNotification(), 'https://www.thebluealliance.com/', '')
+        with self.assertRaises(ValueError):
+            WebhookRequest(MockNotification(), 'https://www.thebluealliance.com/', '')
 
     def test_str(self):
         message_str = WebhookRequest(MockNotification(), 'https://www.thebluealliance.com/', 'secret')
