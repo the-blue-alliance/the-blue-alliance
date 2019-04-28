@@ -23,8 +23,8 @@ from controllers.cron_controller import UpcomingNotificationDo
 from controllers.cron_controller import UpdateLiveEventsDo
 
 from controllers.admin.admin_cron_controller import AdminMobileClearEnqueue, AdminMobileClear, AdminSubsClearEnqueue, AdminSubsClear, \
-    AdminWebhooksClearEnqueue, AdminWebhooksClear, AdminWebhooksMigrateSecretlessEnqueue, \
-    AdminWebhooksMigrateSecretless, AdminRegistrationDayEnqueue, AdminClearEventTeamsDo
+    AdminWebhooksClearEnqueue, AdminWebhooksClear, AdminRegistrationDayEnqueue, \
+    AdminClearEventTeamsDo
 from controllers.admin.admin_cron_controller import AdminRunPostUpdateHooksEnqueue, AdminRunPostUpdateHooksDo, AdminRunEventPostUpdateHookDo, AdminRunTeamPostUpdateHookDo, \
     AdminUpdateAllTeamSearchIndexEnqueue, AdminUpdateAllTeamSearchIndexDo, AdminUpdateTeamSearchIndexDo
 
@@ -71,8 +71,6 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/admin/clear_old_subs', AdminSubsClear),
                                ('/tasks/admin/enqueue/clear_old_webhooks', AdminWebhooksClearEnqueue),
                                ('/tasks/admin/clear_old_webhooks', AdminWebhooksClear),
-                               ('/tasks/admin/enqueue/migrate_secretless_webhooks', AdminWebhooksMigrateSecretlessEnqueue),
-                               ('/tasks/admin/migrate_secretless_webhooks', AdminWebhooksMigrateSecretless),
                                ('/tasks/admin/enqueue/registration_day', AdminRegistrationDayEnqueue),
                                ('/tasks/admin/enqueue/run_post_update_hooks/(.*)', AdminRunPostUpdateHooksEnqueue),
                                ('/tasks/admin/do/clear_eventteams/(.*)', AdminClearEventTeamsDo),

@@ -153,31 +153,6 @@ class AdminWebhooksClear(LoggedInHandler):
         self.response.out.write(template.render(path, template_values))
 
 
-class AdminWebhooksMigrateSecretlessEnqueue(LoggedInHandler):
-    """
-    Generate secret keys for webhooks without secrets.
-    """
-    def get(self):
-        self._require_admin()
-        taskqueue.add(
-            queue_name='admin',
-            url='/tasks/admin/migrate_secretless_webhooks',
-            method='GET')
-        self.response.out.write("Migrate secretless webhook task enqueued")
-
-
-class AdminWebhooksMigrateSecretless(LoggedInHandler):
-    def get(self):
-        webhooks = MobileClient.query(MobileClient.client_type == ClientType.WEBHOOK, MobileClient.secret == "").fetch()
-
-        import uuid
-        for webhook in webhooks:
-            webhook.secret = uuid.uuid4().hex
-            webhook.put()
-
-        self.response.out.write("Migrated {} secretless webhooks.".format(len(webhooks)))
-
-
 class AdminCreateDistrictTeamsEnqueue(LoggedInHandler):
     """
     Trying to Enqueue a task to rebuild old district teams from event teams.
