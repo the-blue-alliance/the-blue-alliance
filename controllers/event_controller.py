@@ -17,6 +17,7 @@ from database.district_query import DistrictsInYearQuery, DistrictQuery
 from database.event_query import EventQuery, EventDivisionsQuery
 from helpers.match_helper import MatchHelper
 from helpers.award_helper import AwardHelper
+from helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from helpers.team_helper import TeamHelper
 from helpers.event_helper import EventHelper
 from helpers.media_helper import MediaHelper
@@ -191,31 +192,7 @@ class EventDetail(CacheableHandler):
             matches_recent = None
             matches_upcoming = None
 
-        bracket_table = MatchHelper.generateBracket(matches, event, event.alliance_selections)
-
-        playoff_advancement = None
-        playoff_template = None
-        double_elim_matches = None
-        if EventHelper.is_2015_playoff(event_key):
-            playoff_advancement = MatchHelper.generatePlayoffAdvancement2015(matches, event.alliance_selections)
-            playoff_template = 'playoff_table'
-            for comp_level in ['qf', 'sf']:
-                if comp_level in bracket_table:
-                    del bracket_table[comp_level]
-        elif event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM:
-            playoff_advancement = MatchHelper.generatePlayoffAdvancementRoundRobin(matches, event.year, event.alliance_selections)
-            playoff_template = 'playoff_round_robin_6_team'
-            comp_levels = bracket_table.keys()
-            for comp_level in comp_levels:
-                if comp_level != 'f':
-                    del bracket_table[comp_level]
-        elif event.playoff_type == PlayoffType.BO3_FINALS or event.playoff_type == PlayoffType.BO5_FINALS:
-            comp_levels = bracket_table.keys()
-            for comp_level in comp_levels:
-                if comp_level != 'f':
-                    del bracket_table[comp_level]
-        elif event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
-            double_elim_matches = MatchHelper.organizeDoubleElimMatches(matches)
+        bracket_table, playoff_advancement, double_elim_matches, playoff_template = PlayoffAdvancementHelper.generatePlayoffAdvancement(event, matches)
 
         district_points_sorted = None
         if event.district_key and event.district_points:

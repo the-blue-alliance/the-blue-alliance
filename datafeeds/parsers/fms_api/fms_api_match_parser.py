@@ -6,6 +6,7 @@ from google.appengine.ext import ndb
 
 from consts.playoff_type import PlayoffType
 from helpers.match_helper import MatchHelper
+from helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from models.event import Event
 from models.match import Match
 
@@ -206,7 +207,7 @@ class FMSAPIHybridScheduleParser(object):
             # Should only happen for sf and f matches
             organized_matches = MatchHelper.organizeMatches(parsed_matches)
             for level in ['sf', 'f']:
-                playoff_advancement = MatchHelper.generatePlayoffAdvancement2015(organized_matches)
+                playoff_advancement = PlayoffAdvancementHelper.generatePlayoffAdvancement2015(organized_matches)
                 if playoff_advancement[LAST_LEVEL[level]] != []:
                     for match in organized_matches[level]:
                         if 'frcNone' in match.team_key_names:
