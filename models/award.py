@@ -51,12 +51,14 @@ class Award(ndb.Model):
     def count_banner(self):
         if (self.award_type_enum == AwardType.WOODIE_FLOWERS and
                 self.event_type_enum == EventType.CMP_FINALS and
-                self.year >= 2017 and
-                self.event.id()[4:] != 'cmptx'):
+                self.year >= 2017):
             # Only count WFA banner from the first Championship
-            # Logic will need updating if CMPTX isn't the first Championship
-            # -fangeugene 2019-04-30
-            return False
+            cmp_event_keys = Event.query(
+                Event.year == self.year,
+                Event.event_type_enum == EventType.CMP_FINALS
+            ).order(Event.start_date).fetch(keys_only=True)
+            if cmp_event_keys and cmp_event_keys[0] != self.event:
+                return False
         return True
 
     @property
