@@ -569,7 +569,7 @@ class InsightsHelper(object):
         blue_banner_winners = defaultdict(int)
         for award_future in award_futures:
             award = award_future.get_result()
-            if award.award_type_enum in AwardType.BLUE_BANNER_AWARDS:
+            if award.award_type_enum in AwardType.BLUE_BANNER_AWARDS and award.count_banner:
                 for team_key in award.team_list:
                     team_key_name = team_key.id()
                     blue_banner_winners[team_key_name] += 1
