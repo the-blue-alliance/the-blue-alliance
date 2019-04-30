@@ -232,6 +232,7 @@ class EventDetail(CacheableHandler):
             "bracket_table": bracket_table,
             "playoff_advancement": playoff_advancement,
             "playoff_template": playoff_template,
+            "playoff_advancement_tiebreakers": PlayoffAdvancementHelper.ROUND_ROBIN_TIEBREAKERS.get(event.year),
             "district_points_sorted": district_points_sorted,
             "event_insights_qual": event_insights['qual'] if event_insights else None,
             "event_insights_playoff": event_insights['playoff'] if event_insights else None,

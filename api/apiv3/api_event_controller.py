@@ -4,13 +4,17 @@ from google.appengine.ext import ndb
 
 from api.apiv3.api_base_controller import ApiBaseController
 from api.apiv3.model_properties import filter_event_properties, filter_team_properties, filter_match_properties
+from consts.playoff_type import PlayoffType
 from database.award_query import EventAwardsQuery
 from database.event_query import EventQuery, EventListQuery
 from database.event_details_query import EventDetailsQuery
 from database.match_query import EventMatchesQuery
 from database.team_query import EventTeamsQuery, EventEventTeamsQuery
 from helpers.event_team_status_helper import EventTeamStatusHelper
+from helpers.match_helper import MatchHelper
+from helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from models.event_team import EventTeam
+from models.match import Match
 
 
 class ApiEventListController(ApiBaseController):
@@ -80,6 +84,41 @@ class ApiEventDetailsController(ApiBaseController):
             data = event_details[detail_type]
 
         return json.dumps(data, ensure_ascii=True, indent=2, sort_keys=True)
+
+
+class ApiEventPlayoffAdvancementController(ApiBaseController):
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
+
+    def _track_call(self, event_key):
+        action = 'event/playoff_advancement'
+        self._track_call_defer(action, event_key)
+
+    def _render(self, event_key):
+        event_future = EventQuery(event_key).fetch_async(return_updated=True)
+        matches_future = EventMatchesQuery(event_key).fetch_async(return_updated=True)
+
+        event, event_updated = event_future.get_result()
+        matches, matches_updated = matches_future.get_result()
+        self._last_modified = max(event_updated, matches_updated)
+
+        cleaned_matches = MatchHelper.deleteInvalidMatches(matches, event)
+        matches = MatchHelper.organizeMatches(cleaned_matches)
+        bracket_table, playoff_advancement, _, _ = PlayoffAdvancementHelper.generatePlayoffAdvancement(event, matches)
+
+        output = []
+        for level in Match.ELIM_LEVELS:
+            level_ranks = []
+            if playoff_advancement and playoff_advancement.get(level):
+                if event.playoff_type == PlayoffType.AVG_SCORE_8_TEAM:
+                    level_ranks = PlayoffAdvancementHelper.transform2015AdvancementLevelForApi(event, playoff_advancement, level)
+                else:
+                    level_ranks = PlayoffAdvancementHelper.transformRoundRobinAdvancementLevelForApi(event, playoff_advancement, level)
+            elif bracket_table and bracket_table.get(level):
+                level_ranks = PlayoffAdvancementHelper.transformBracketLevelForApi(event, bracket_table, level)
+            output.extend(level_ranks)
+
+        return json.dumps(output, ensure_ascii=True, indent=2, sort_keys=True)
 
 
 class ApiEventTeamsController(ApiBaseController):

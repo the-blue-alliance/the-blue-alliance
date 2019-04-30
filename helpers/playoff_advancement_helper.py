@@ -4,8 +4,27 @@ from collections import defaultdict
 from consts.playoff_type import PlayoffType
 from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper
+from models.match import Match
+
 
 class PlayoffAdvancementHelper(object):
+
+    OPPONENT = {
+        'red': 'blue',
+        'blue': 'red',
+    }
+
+    ROUND_ROBIN_TIEBREAKERS = {
+        2017: ['Match Points'],
+        2018: ['Park/Climb Points', 'Auto Points'],
+        2019: ['Cargo Points', 'Hatch Panel Points'],
+    }
+
+    ADVANCEMENT_COUNT_2015 = {
+        'ef': 8,
+        'qf': 4,
+        'sf': 2,
+    }
 
     @classmethod
     def generatePlayoffAdvancement(cls, event, matches):
@@ -37,7 +56,6 @@ class PlayoffAdvancementHelper(object):
 
         return bracket_table, playoff_advancement, double_elim_matches, playoff_template
 
-
     @classmethod
     def generateBracket(cls, matches, event, alliance_selections=None):
         complete_alliances = []
@@ -52,9 +70,14 @@ class PlayoffAdvancementHelper(object):
                         'winning_alliance': None,
                         'red_wins': 0,
                         'blue_wins': 0,
+                        'red_record': {'wins': 0, 'losses': 0, 'ties': 0},
+                        'blue_record': {'wins': 0, 'losses': 0, 'ties': 0},
+                        'red_name': None,
+                        'blue_name': None,
                     }
                 for color in ['red', 'blue']:
                     alliance = copy.copy(match.alliances[color]['teams'])
+                    bracket_table[comp_level][set_number]['{}_name'.format(color)] = cls._getAllianceName(alliance, alliance_selections)
                     for i, complete_alliance in enumerate(complete_alliances):  # search for alliance. could be more efficient
                         if len(set(alliance).intersection(set(complete_alliance))) >= 2:  # if >= 2 teams are the same, then the alliance is the same
                             backups = list(set(alliance).difference(set(complete_alliance)))
@@ -71,10 +94,18 @@ class PlayoffAdvancementHelper(object):
                 winner = match.winning_alliance
                 if not winner or winner == '':
                     # if the match is a tie
+                    bracket_table[comp_level][set_number]['red_record']['ties'] = \
+                        bracket_table[comp_level][set_number]['red_record']['ties'] + 1
+                    bracket_table[comp_level][set_number]['blue_record']['ties'] = \
+                        bracket_table[comp_level][set_number]['blue_record']['ties'] + 1
                     continue
 
                 bracket_table[comp_level][set_number]['{}_wins'.format(winner)] = \
                     bracket_table[comp_level][set_number]['{}_wins'.format(winner)] + 1
+                bracket_table[comp_level][set_number]['{}_record'.format(winner)]['wins'] = \
+                    bracket_table[comp_level][set_number]['{}_record'.format(winner)]['wins'] + 1
+                bracket_table[comp_level][set_number]['{}_record'.format(cls.OPPONENT[winner])]['losses'] = \
+                    bracket_table[comp_level][set_number]['{}_record'.format(cls.OPPONENT[winner])]['losses'] + 1
                 n = 3 if event.playoff_type == PlayoffType.BO5_FINALS else 2
                 if bracket_table[comp_level][set_number]['red_wins'] == n:
                     bracket_table[comp_level][set_number]['winning_alliance'] = 'red'
@@ -214,7 +245,6 @@ class PlayoffAdvancementHelper(object):
 
         return advancement
 
-
     @classmethod
     def getOrderedAlliance(cls, team_keys, alliance_selections):
         if alliance_selections:
@@ -231,6 +261,15 @@ class PlayoffAdvancementHelper(object):
             team_nums.append(team[3:])
         return team_nums
 
+    @classmethod
+    def _getAllianceName(cls, team_keys, alliance_selections):
+        if not alliance_selections:
+            return None
+        for alliance_selection in alliance_selections:  # search for alliance. could be more efficient
+            picks = alliance_selection['picks']
+            if len(set(picks).intersection(set(team_keys))) >= 2:  # if >= 2 teams are the same, then the alliance is the same
+                return alliance_selection.get('name')
+        return None
 
     @classmethod
     def getAllianceName(cls, team_keys, alliance_selections):
@@ -241,3 +280,107 @@ class PlayoffAdvancementHelper(object):
                     return alliance_selection.get('name')
 
         return ''
+
+    @classmethod
+    def transformBracketLevelForApi(cls, event, bracket_table, comp_level):
+        level_ranks = []
+        for series, set_bracket in bracket_table[comp_level].iteritems():
+            data = {
+                'level': "{}{}".format(comp_level, series),
+                'level_name': Match.COMP_LEVELS_VERBOSE_FULL[comp_level] + (" %d" % series if comp_level != 'f' else ''),
+                'rankings': None,
+                'type': 'best_of_3',  # TODO handle other playoff types
+            }
+
+            alliances = [cls._makeAllianceRankRow(c, set_bracket) for c in ['red', 'blue']]
+            data['rankings'] = sorted(alliances, key=lambda a: a['record']['wins'], reverse=True)
+
+            level_ranks.append(data)
+
+        return level_ranks
+
+    @classmethod
+    def _makeAllianceRankRow(cls, color, bracket_set):
+        return {
+            'team_keys': map(lambda t: "frc{}".format(t), bracket_set['{}_alliance'.format(color)]),
+            'alliance_name': bracket_set['{}_name'.format(color)],
+            'alliance_color': color,
+            'record': bracket_set['{}_record'.format(color)],
+            'sort_orders': [bracket_set['{}_wins'.format(color)]],
+            'extra_stats': [],
+            'sort_order_info': [{"name": "Wins", "type": "int", "precision": 0}],
+            'extra_stats_info': [],
+        }
+
+    @classmethod
+    def transform2015AdvancementLevelForApi(cls, event, playoff_advancement, comp_level):
+        data = {
+            'level': comp_level,
+            'level_name': Match.COMP_LEVELS_VERBOSE_FULL[comp_level],
+            'rankings': [],
+            'type': 'average_score',
+        }
+        for i, alliance in enumerate(playoff_advancement[comp_level]):
+            rank = i + 1
+            data['rankings'].append(cls._make2015AllianceAdvancementRow(event, alliance, rank, comp_level))
+        return [data]
+
+    @classmethod
+    def transformRoundRobinAdvancementLevelForApi(cls, event, playoff_advancement, comp_level):
+        data = {
+            'level': comp_level,
+            'level_name': 'Round Robin ' + Match.COMP_LEVELS_VERBOSE_FULL[comp_level],
+            'rankings': [],
+            'type': 'round_robin',
+        }
+        for i, alliance in enumerate(playoff_advancement[comp_level]):
+            rank = i + 1
+            data['rankings'].append(cls._makeAllianceAdvancementRow(event, alliance, rank))
+        return [data]
+
+    @classmethod
+    def _makeAllianceAdvancementRow(cls, event, alliance, rank):
+        row = {
+            'team_keys': map(lambda t: "frc{}".format(t), alliance[0]),
+            'alliance_name': alliance[7],  # alliance name
+            'record': alliance[8],
+            'rank': rank,
+            'sort_orders': [alliance[2], alliance[4], alliance[6]],
+            'extra_stats': [(rank <= 2)],  # top 2 teams advance
+            'sort_order_info': [
+                {'name': 'Champ Points', 'type': 'int', 'precision': 0},
+            ],
+            'extra_stats_info': [
+                {'name': 'Advance to Finals', 'type': 'bool'},
+            ],
+        }
+
+        for tiebreaker in cls.ROUND_ROBIN_TIEBREAKERS[event.year]:
+            row['sort_order_info'].append({
+                'name': tiebreaker,
+                'type': 'int',
+                'precision': 0,
+            })
+
+        return row
+
+    @classmethod
+    def _make2015AllianceAdvancementRow(cls, event, alliance, rank, comp_level):
+        level_order = Match.COMP_LEVELS_PLAY_ORDER[comp_level]
+        next_level = Match.COMP_LEVELS_PLAY_ORDER.keys()[Match.COMP_LEVELS_PLAY_ORDER.values().index(level_order + 1)]
+        team_keys = map(lambda t: "frc{}".format(t), alliance[0])
+        row = {
+            'team_keys': team_keys,
+            'alliance_name': cls._getAllianceName(team_keys, event.alliance_selections),
+            'rank': rank,
+            'sort_orders': [alliance[2]],
+            'extra_stats': [(rank <= cls.ADVANCEMENT_COUNT_2015[comp_level])],
+            'sort_order_info': [
+                {'name': 'Average Score', 'type': 'int', 'precision': 2},
+            ],
+            'extra_stats_info': [
+                {'name': 'Advance to {}'.format(Match.COMP_LEVELS_VERBOSE[next_level]), 'type': 'bool'},
+            ],
+        }
+
+        return row

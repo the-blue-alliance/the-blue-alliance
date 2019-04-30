@@ -198,6 +198,7 @@ class DistrictHelper(object):
     @classmethod
     def calc_elim_match_points_2015(cls, district_points, matches, POINTS_MULTIPLIER):
         from helpers.match_helper import MatchHelper  # circular import issue
+        from helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 
         # count number of matches played per team per comp level
         num_played = defaultdict(lambda: defaultdict(int))
@@ -210,7 +211,7 @@ class DistrictHelper(object):
                         num_played[level][team] += 1
 
         # qf and sf points
-        advancement = MatchHelper.generatePlayoffAdvancement2015(matches)
+        advancement = PlayoffAdvancementHelper.generatePlayoffAdvancement2015(matches)
         for last_level, level in [('qf', 'sf'), ('sf', 'f')]:
             for (teams, _, _) in advancement[last_level]:
                 teams = ['frc{}'.format(t) for t in teams]
