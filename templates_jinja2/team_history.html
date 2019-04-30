@@ -76,7 +76,7 @@
           {% for event, awards in event_awards|reverse %}
             {% if event.is_season_event and awards %}
               {% for award in awards %}
-                {% if award.is_blue_banner %}
+                {% if award.is_blue_banner and award.count_banner %}
                   {% for team_number, _ in award.recipient_dict.items() %}
                     {% if team_number|string == team.team_number|string %}
                       {{bbm.blue_banner(award, event)}}

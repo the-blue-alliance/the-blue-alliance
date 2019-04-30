@@ -3,6 +3,7 @@ import json
 from google.appengine.ext import ndb
 
 from consts.award_type import AwardType
+from consts.event_type import EventType
 from models.event import Event
 from models.team import Team
 
@@ -45,6 +46,18 @@ class Award(ndb.Model):
     @property
     def is_blue_banner(self):
         return self.award_type_enum in AwardType.BLUE_BANNER_AWARDS
+
+    @property
+    def count_banner(self):
+        if (self.award_type_enum == AwardType.WOODIE_FLOWERS and
+                self.event_type_enum == EventType.CMP_FINALS and
+                self.year >= 2017 and
+                self.event.id()[4:] != 'cmptx'):
+            # Only count WFA banner from the first Championship
+            # Logic will need updating if CMPTX isn't the first Championship
+            # -fangeugene 2019-04-30
+            return False
+        return True
 
     @property
     def normalized_name(self):

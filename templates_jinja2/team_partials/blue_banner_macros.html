@@ -1,3 +1,18 @@
 {% macro blue_banner(award, event, hidden=False) %}
-<div class="banner{% if hidden %} hidden-banner hidden{% endif %}"><img src="{% if event.event_type_enum == 6 %}/images/first_foc_trophy_icon.svg{% else %}/images/first_icon.svg{% endif %}"><div class="award-name{% if award.normalized_name|length > 18 %}-long{% endif %}"><span>{{award.normalized_name}}</span></div><div class="{% if event.normalized_name|length < 30 %}award-event{% else %}award-event-long{% endif %}"><span>{{award.year}} {{event.normalized_name}}</span></div></div>
+<div class="banner{% if hidden %} hidden-banner hidden{% endif %}">
+    <img src="{% if event.event_type_enum == 6 %}/images/first_foc_trophy_icon.svg{% else %}/images/first_icon.svg{% endif %}"/>
+    <div class="award-name{% if award.normalized_name|length > 18 %}-long{% endif %}">
+        <span>{{award.normalized_name}}</span>
+    </div>
+    {% if event.event_type_enum == 4 and award.award_type_enum == 3 %}
+    {# Only one WFA for both Championsihps #}
+    <div class="award-event">
+        <span>{{award.year}} Championship</span>
+    </div>
+    {% else %}
+    <div class="{% if event.normalized_name|length < 30 %}award-event{% else %}award-event-long{% endif %}">
+        <span>{{award.year}} {{event.normalized_name}}</span>
+    </div>
+    {% endif %}
+</div>
 {% endmacro %}
