@@ -137,6 +137,8 @@ class Match(ndb.Model):
                 # add dqs if not present
                 if 'dqs' not in self._alliances[color]:
                     self._alliances[color]['dqs'] = []
+                if len(self._alliances[color]['dqs']) != 0 and self.comp_level in self.ELIM_LEVELS:
+                    self._alliances[color]['dqs'] = self._alliances[color]['teams']
 
         return self._alliances
 
