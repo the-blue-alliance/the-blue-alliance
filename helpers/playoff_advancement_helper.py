@@ -346,7 +346,7 @@ class PlayoffAdvancementHelper(object):
             'record': alliance[8],
             'rank': rank,
             'sort_orders': [alliance[2], alliance[4], alliance[6]],
-            'extra_stats': [(rank <= 2)],  # top 2 teams advance
+            'extra_stats': [int(rank <= 2)],  # top 2 teams advance
             'sort_order_info': [
                 {'name': 'Champ Points', 'type': 'int', 'precision': 0},
             ],
@@ -374,7 +374,7 @@ class PlayoffAdvancementHelper(object):
             'alliance_name': cls._getAllianceName(team_keys, event.alliance_selections),
             'rank': rank,
             'sort_orders': [alliance[2]],
-            'extra_stats': [(rank <= cls.ADVANCEMENT_COUNT_2015[comp_level])],
+            'extra_stats': [int(rank <= cls.ADVANCEMENT_COUNT_2015[comp_level])],
             'sort_order_info': [
                 {'name': 'Average Score', 'type': 'int', 'precision': 2},
             ],
