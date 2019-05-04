@@ -12,14 +12,15 @@ class TestPingNotification(unittest2.TestCase):
 
     def test_notification_payload(self):
         notification = PingNotification()
-        self.assertIsNotNone(notification.notification_payload)
-        notification_payload = notification.notification_payload
-        self.assertEqual(notification_payload.payload_dict, {'title': notification._title, 'body': notification._body})
+        self.assertIsNotNone(notification.fcm_notification)
+        fcm_notification = notification.fcm_notification
+        self.assertEqual(fcm_notification.title,notification._title)
+        self.assertEqual(fcm_notification.body, notification._body)
 
     def test_data_payload(self):
         notification = PingNotification()
         self.assertIsNone(notification.data_payload)
 
-    def test_webhook_payload(self):
+    def test_webhook_message_data(self):
         notification = PingNotification()
-        self.assertEqual(notification.webhook_payload, {'title': notification._title, 'desc': notification._body})
+        self.assertEqual(notification.webhook_message_data, {'title': notification._title, 'desc': notification._body})

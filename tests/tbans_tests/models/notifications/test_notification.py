@@ -1,11 +1,10 @@
+from firebase_admin import messaging
 import unittest2
 
-from tbans.consts.platform_payload_priority import PlatformPayloadPriority
-from tbans.consts.platform_payload_type import PlatformPayloadType
-
+from tbans.consts.fcm.platform_priority import PlatformPriority
+from tbans.consts.fcm.platform_type import PlatformType
+from tbans.models.fcm.platform_config import PlatformConfig
 from tbans.models.notifications.notification import Notification
-from tbans.models.notifications.payloads.notification_payload import NotificationPayload
-from tbans.models.notifications.payloads.platform_payload import PlatformPayload
 
 from tests.tbans_tests.mocks.notifications.mock_notification import MockNotification
 
@@ -13,26 +12,26 @@ from tests.tbans_tests.mocks.notifications.mock_notification import MockNotifica
 class TestNotification(unittest2.TestCase):
 
     def test_str(self):
-        notification_payload = NotificationPayload(title='Title Here', body='Body here')
+        fcm_notification = messaging.Notification(title='Title Here', body='Body here')
         data_payload = {'data': 'payload'}
-        platform_payload = PlatformPayload(priority=PlatformPayloadPriority.HIGH, collapse_key='general_collapse_key')
-        apns_payload = PlatformPayload(platform_type=PlatformPayloadType.APNS, priority=PlatformPayloadPriority.NORMAL, collapse_key='ios_collapse_key')
+        platform_config = PlatformConfig(priority=PlatformPriority.HIGH, collapse_key='general_collapse_key')
+        apns_config = messaging.APNSConfig(headers={'apns-collapse-id': 'ios_collapse_key'})
 
-        notification = MockNotification(notification_payload=notification_payload, data_payload=data_payload, platform_payload=platform_payload, apns_payload=apns_payload)
-        self.assertEqual(str(notification), 'MockNotification(data_payload={\'data\': \'payload\'} notification_payload=NotificationPayload(title="Title Here" body="Body here") platform_payload=PlatformPayload(platform_type=None priority=1 collapse_key="general_collapse_key") apns_payload=PlatformPayload(platform_type=1 priority=0 collapse_key="ios_collapse_key") webhook_payload={\'data\': \'payload\'})')
+        notification = MockNotification(fcm_notification=fcm_notification, data_payload=data_payload, platform_config=platform_config, apns_config=apns_config)
+        self.assertEqual(str(notification), 'MockNotification(data_payload={\'data\': \'payload\'} fcm_notification.title="Title Here" fcm_notification.body="Body here" platform_config=PlatformConfig(collapse_key="general_collapse_key" priority=1) apns_config={\'apns-collapse-id\': \'ios_collapse_key\'} webhook_message_data={\'data\': \'payload\'})')
 
     def test_type_raises(self):
         with self.assertRaises(NotImplementedError):
             Notification._type()
 
-    def test_webhook_payload_same_data_payload(self):
+    def test_webhook_message_data_same_data_payload(self):
         data_payload = {'data': 'here'}
         notification = MockNotification(data_payload=data_payload)
         self.assertEqual(notification.data_payload, data_payload)
-        self.assertEqual(notification.webhook_payload, data_payload)
+        self.assertEqual(notification.webhook_message_data, data_payload)
 
-    def test_webhook_payload(self):
-        webhook_payload = {'data': 'here'}
-        notification = MockNotification(webhook_payload=webhook_payload)
+    def test_webhook_message_data(self):
+        webhook_message_data = {'data': 'here'}
+        notification = MockNotification(webhook_message_data=webhook_message_data)
         self.assertIsNone(notification.data_payload)
-        self.assertEqual(notification.webhook_payload, webhook_payload)
+        self.assertEqual(notification.webhook_message_data, webhook_message_data)
