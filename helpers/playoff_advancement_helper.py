@@ -320,15 +320,30 @@ class PlayoffAdvancementHelper(object):
         level_order = Match.COMP_LEVELS_PLAY_ORDER[comp_level]
         next_level = Match.COMP_LEVELS_PLAY_ORDER.keys()[Match.COMP_LEVELS_PLAY_ORDER.values().index(level_order + 1)]
         data = {
-            'level': comp_level,
-            'level_name': Match.COMP_LEVELS_VERBOSE_FULL[comp_level],
+            'level':
+            comp_level,
+            'level_name':
+            Match.COMP_LEVELS_VERBOSE_FULL[comp_level],
             'rankings': [],
-            'type': 'average_score',
+            'type':
+            'average_score',
             'sort_order_info': [
-                {'name': 'Average Score', 'type': 'int', 'precision': 2},
+                {
+                    'name': 'Average Score',
+                    'type': 'int',
+                    'precision': 2
+                },
             ],
             'extra_stats_info': [
-                {'name': 'Advance to {}'.format(Match.COMP_LEVELS_VERBOSE[next_level]), 'type': 'bool'},
+                {
+                    'name':
+                    'Advance to {}'.format(
+                        Match.COMP_LEVELS_VERBOSE[next_level]),
+                    'type':
+                    'bool',
+                    'precision':
+                    0
+                },
             ],
         }
         for i, alliance in enumerate(playoff_advancement[comp_level]):
@@ -347,7 +362,7 @@ class PlayoffAdvancementHelper(object):
                 {'name': 'Champ Points', 'type': 'int', 'precision': 0},
             ],
             'extra_stats_info': [
-                {'name': 'Advance to Finals', 'type': 'bool'},
+                {'name': 'Advance to Finals', 'type': 'bool', 'precision': 0},
             ],
         }
 
