@@ -213,7 +213,7 @@ class DistrictHelper(object):
         # qf and sf points
         advancement = PlayoffAdvancementHelper.generatePlayoffAdvancement2015(matches)
         for last_level, level in [('qf', 'sf'), ('sf', 'f')]:
-            for (teams, _, _) in advancement[last_level]:
+            for (teams, _, _, _) in advancement[last_level]:
                 teams = ['frc{}'.format(t) for t in teams]
                 done = False
                 for match in matches[level]:

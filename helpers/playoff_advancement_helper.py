@@ -135,7 +135,7 @@ class PlayoffAdvancementHelper(object):
 
                     is_new = False
                     if i is not None:
-                        for j, (complete_alliance, scores, _) in enumerate(advancement[comp_level]):  # search for alliance. could be more efficient
+                        for j, (complete_alliance, scores, _, _) in enumerate(advancement[comp_level]):  # search for alliance. could be more efficient
                             if len(set(complete_alliances[i]).intersection(set(complete_alliance))) >= 2:  # if >= 2 teams are the same, then the alliance is the same
                                 complete_alliance = complete_alliances[i]
                                 scores.append(match.alliances[color]['score'])
