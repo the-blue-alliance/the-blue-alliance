@@ -7,7 +7,7 @@ from models.match import Match
 
 
 class MatchQuery(DatabaseQuery):
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = 'match_{}'  # (match_key)
     DICT_CONVERTER = MatchConverter
 
@@ -19,7 +19,7 @@ class MatchQuery(DatabaseQuery):
 
 
 class EventMatchesQuery(DatabaseQuery):
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = 'event_matches_{}'  # (event_key)
     DICT_CONVERTER = MatchConverter
 
@@ -32,7 +32,7 @@ class EventMatchesQuery(DatabaseQuery):
 
 
 class TeamEventMatchesQuery(DatabaseQuery):
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = 'team_event_matches_{}_{}'  # (team_key, event_key)
     DICT_CONVERTER = MatchConverter
 
@@ -48,7 +48,7 @@ class TeamEventMatchesQuery(DatabaseQuery):
 
 
 class TeamYearMatchesQuery(DatabaseQuery):
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = 'team_year_matches_{}_{}'  # (team_key, year)
     DICT_CONVERTER = MatchConverter
 
