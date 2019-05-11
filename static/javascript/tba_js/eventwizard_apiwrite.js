@@ -297,7 +297,6 @@ $('#rankings_file').change(function(){
 
         //parse the excel to array of matches
         var rankings = XLSX.utils.sheet_to_json(sheet, {range:4});
-        console.log(JSON.stringify(rankings))
 
         var request_body = {};
 
@@ -321,7 +320,7 @@ $('#rankings_file').change(function(){
 
         // 2019 Headers
         var headers = ['Rank', 'Team', 'RS', 'Cargo Pts', 'Panel Pts', 'HAB Pts', 'Sandstorm', 'W-L-T', 'DQ', 'Played'];
-        var display_headers = ['Rank', 'Team', 'Ranking Score', 'Cargo Points', 'Panel Points', 'HAB Points', 'Sandstorm', 'Record (W-L-T)', 'DQ', 'Played'];
+        var display_headers = ['Rank', 'Team', 'Ranking Score', 'Cargo', 'Hatch Panel', 'HAB Climb', 'Sandstorm Bonus', 'Record (W-L-T)', 'DQ', 'Played'];
         var is_num = [true, true, true, true, true, false, true, true];
 
         $('#rankings_preview').empty();
