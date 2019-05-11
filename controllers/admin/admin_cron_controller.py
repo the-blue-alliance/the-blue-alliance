@@ -26,6 +26,7 @@ from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_helper import MatchHelper
 from helpers.tbans_helper import TBANSHelper
 from helpers.notification_sender import NotificationSender
+from helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from helpers.search_helper import SearchHelper
 from helpers.team_manipulator import TeamManipulator
 from models.award import Award
@@ -378,7 +379,7 @@ class AdminPostEventTasksDo(LoggedInHandler):
         event = event_future.get_result()
         if event.event_type_enum in {EventType.OFFSEASON, EventType.FOC}:
             matches = MatchHelper.organizeMatches(matches_future.get_result())
-            bracket = MatchHelper.generateBracket(matches, event, event.alliance_selections)
+            bracket = PlayoffAdvancementHelper.generateBracket(matches, event, event.alliance_selections)
             if 'f' in bracket:
                 winning_alliance = '{}_alliance'.format(bracket['f'][1]['winning_alliance'])
                 if winning_alliance == 'red_alliance':
