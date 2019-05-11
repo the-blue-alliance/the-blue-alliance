@@ -10,7 +10,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for alliance, scores, average_score in playoff_advancement.ef %}
+      {% for alliance, scores, average_score, num_played in playoff_advancement.ef %}
         <tr>
           <td>{{loop.index}}</td>
           <td>{% for team in alliance %}<a href="/team/{{ team|digits }}/{{ event.year }}">{{ team }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</td>
@@ -34,7 +34,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for alliance, scores, average_score in playoff_advancement.qf %}
+      {% for alliance, scores, average_score, num_played in playoff_advancement.qf %}
         <tr>
           <td>{{loop.index}}</td>
           <td>{% for team in alliance %}<a href="/team/{{ team|digits }}/{{ event.year }}">{{ team }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</td>
@@ -58,7 +58,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for alliance, scores, average_score in playoff_advancement.sf %}
+      {% for alliance, scores, average_score, num_played in playoff_advancement.sf %}
         <tr>
           <td>{{loop.index}}</td>
           <td>{% for team in alliance %}<a href="/team/{{ team|digits }}/{{ event.year }}">{{ team }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</td>
