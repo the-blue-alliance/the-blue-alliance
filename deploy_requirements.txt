@@ -6,6 +6,9 @@ google-cloud-bigquery==0.25.0
 beautifulsoup4
 GoogleAppEngineCloudStorageClient
 
+# TBANS
+firebase-admin==2.16.0
+
 # Cloud Endpoints Stuff
 oauth2client==3.0.0
 google-auth

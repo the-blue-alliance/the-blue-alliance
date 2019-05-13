@@ -36,14 +36,14 @@ class VerificationNotification(Notification):
         ch.update(self.secret)
         self.verification_key = ch.hexdigest()
 
-    @staticmethod
-    def _type():
+    @classmethod
+    def _type(cls):
         from consts.notification_type import NotificationType
         return NotificationType.VERIFICATION
 
-    # Only webhook payload is defined - because we'll only ever send verification to webhooks
+    # Only webhook message data is defined - because we'll only ever send verification to webhooks
     @property
-    def webhook_payload(self):
+    def webhook_message_data(self):
         return {'verification_key': self.verification_key}
 
     def _additional_logging_values(self):

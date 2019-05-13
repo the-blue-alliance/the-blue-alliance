@@ -12,18 +12,17 @@ package = 'tbans'
 class TBANSService(remote.Service):
     """ The Blue Alliance Notification Service.... Service """
 
-    def __init__(self, testing=False):
-        super(TBANSService, self).__init__()
-        self.testing = testing
+    def __init__(self):
+        import firebase_admin
+        try:
+            self._firebase_app = firebase_admin.get_app('tbans')
+        except ValueError:
+            self._firebase_app = firebase_admin.initialize_app(name='tbans')
 
     def _validate_authentication(self):
         import tba_config
         # Allow all requests in debug mode
         if tba_config.DEBUG:
-            return
-
-        # Ignore auth check during tests
-        if self.testing:
             return
 
         incoming_app_id = self.request_state.headers.get('X-Appengine-Inbound-Appid', None)
@@ -52,21 +51,23 @@ class TBANSService(remote.Service):
         notification = PingNotification()
 
         if request.fcm:
-            from tbans.models.requests.notifications.fcm_request import FCMRequest
-            fcm_request = FCMRequest(notification, token=request.fcm.token, topic=request.fcm.topic, condition=request.fcm.condition)
+            # An FCM request can still exist, I believe. It can take some notification and delivery options
+            from tbans.requests.fcm_request import FCMRequest
+            fcm_request = FCMRequest(self._firebase_app, notification, token=request.fcm.token, topic=request.fcm.topic, condition=request.fcm.condition)
             logging.info('Ping - {}'.format(str(fcm_request)))
 
-            response = fcm_request.send()
-            logging.info('Ping Response - {}'.format(str(response)))
-            return TBANSResponse(code=response.status_code, message=response.content)
+            message_id = fcm_request.send()
+            logging.info('Ping Sent - {}'.format(str(message_id)))
+            return TBANSResponse(code=200, message=message_id)
         elif request.webhook:
-            from tbans.models.requests.notifications.webhook_request import WebhookRequest
+            from tbans.requests.webhook_request import WebhookRequest
             webhook_request = WebhookRequest(notification, request.webhook.url, request.webhook.secret)
             logging.info('Ping - {}'.format(str(webhook_request)))
 
-            response = webhook_request.send()
-            logging.info('Ping Response - {}'.format(str(response)))
-            return TBANSResponse(code=response.status_code, message=response.content)
+            webhook_request.send()
+            logging.info('Ping Sent')
+
+            return TBANSResponse(code=200)
         else:
             return self._application_error('Did not specify FCM or webhook to ping')
 
@@ -78,13 +79,14 @@ class TBANSService(remote.Service):
         from tbans.models.notifications.verification import VerificationNotification
         notification = VerificationNotification(request.webhook.url, request.webhook.secret)
 
-        from tbans.models.requests.notifications.webhook_request import WebhookRequest
+        from tbans.requests.webhook_request import WebhookRequest
         webhook_request = WebhookRequest(notification, request.webhook.url, request.webhook.secret)
         logging.info('Verification - {}'.format(str(webhook_request)))
 
-        response = webhook_request.send()
-        logging.info('Verification Response - {}'.format(str(response)))
-        return VerificationResponse(code=response.status_code, message=response.content, verification_key=notification.verification_key)
+        webhook_request.send()
+        logging.info('Verification Key - {}'.format(notification.verification_key))
+
+        return VerificationResponse(code=200, verification_key=notification.verification_key)
 
 
 app = service.service_mappings([('/tbans.*', TBANSService)])

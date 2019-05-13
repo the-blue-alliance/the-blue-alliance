@@ -42,8 +42,8 @@ class TestVerificationNotification(unittest2.TestCase):
         notification = VerificationNotification('https://thebluealliance.com/', 'password')
         self.assertIsNone(notification.data_payload)
 
-    def test_webhook_payload(self):
+    def test_webhook_message_data(self):
         notification = VerificationNotification('https://thebluealliance.com/', 'password')
-        self.assertIsNotNone(notification.webhook_payload)
-        verification_key = notification.webhook_payload.get('verification_key', None)
+        self.assertIsNotNone(notification.webhook_message_data)
+        verification_key = notification.webhook_message_data.get('verification_key', None)
         self.assertIsNotNone(verification_key)
