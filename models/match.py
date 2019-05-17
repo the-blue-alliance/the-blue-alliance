@@ -198,6 +198,17 @@ class Match(ndb.Model):
         return self._winning_alliance
 
     @property
+    def losing_alliance(self):
+        winning_alliance = self.winning_alliance
+        # No winning alliance means no losing alliance - either a tie, or 2015
+        if winning_alliance == '':
+            return ''
+
+        alliances = ['red', 'blue']
+        alliances.remove(winning_alliance)
+        return alliances[0]
+
+    @property
     def event_key_name(self):
         return self.event.id()
 
@@ -261,6 +272,10 @@ class Match(ndb.Model):
     @property
     def name(self):
         return "%s" % (self.COMP_LEVELS_VERBOSE[self.comp_level])
+
+    @property
+    def full_name(self):
+        return "%s" % (self.COMP_LEVELS_VERBOSE_FULL[self.comp_level])
 
     @property
     def youtube_videos_formatted(self):

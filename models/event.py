@@ -391,6 +391,12 @@ class Event(ndb.Model):
         return current_webcasts
 
     @property
+    def online_webcasts(self):
+        current_webcasts = self.current_webcasts
+        WebcastOnlineHelper.add_online_status(current_webcasts)
+        return filter(lambda x: x.get('status', '') != 'offline', current_webcasts if current_webcasts else [])
+
+    @property
     def has_first_official_webcast(self):
         return any([('firstinspires' in w['channel']) for w in self.webcast]) if self.webcast else False
 
