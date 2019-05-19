@@ -97,7 +97,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/apidocs/webhooks', WebhookDocumentationHandler, 'webhook-documentation', strict_slash=True),
       RedirectRoute(r'/apiwrite', ApiWriteHandler, 'api-write', strict_slash=True),
       RedirectRoute(r'/avatars/<year:[0-9]+>', AvatarsHandler, 'avatars', strict_slash=True),
-      RedirectRoute(r'/bigquery', redirect_to='https://bigquery.cloud.google.com/dataset/tbatv-prod-hrd:the_blue_alliance'),
+      RedirectRoute(r'/bigquery', redirect_to='https://console.cloud.google.com/bigquery?project=tbatv-prod-hrd&p=tbatv-prod-hrd&d=the_blue_alliance&page=dataset'),
       RedirectRoute(r'/contact', ContactHandler, 'contact', strict_slash=True),
       RedirectRoute(r'/event/<event_key>', EventDetail, 'event-detail', strict_slash=True),
       RedirectRoute(r'/event/<event_key>/insights', EventInsights, 'event-insights', strict_slash=True),
