@@ -487,7 +487,7 @@ class TestApiTrustedController(unittest2.TestCase):
         self.assertEqual(match.alliances['red']['teams'], ['frc1', 'frc2', 'frc3'])
         self.assertEqual(match.alliances['red']['score'], 250)
         self.assertEqual(match.alliances['red']['surrogates'], ['frc1'])
-        self.assertEqual(match.alliances['red']['dqs'], ['frc2'])
+        self.assertEqual(match.alliances['red']['dqs'], ['frc1', 'frc2', 'frc3'])
         self.assertEqual(match.score_breakdown['red']['truss+catch'], 20)
         self.assertEqual(match.alliances['blue']['teams'], ['frc4', 'frc5', 'frc6'])
         self.assertEqual(match.alliances['blue']['score'], 260)
@@ -856,7 +856,7 @@ class TestApiTrustedController(unittest2.TestCase):
                 'red': {'teams': ['frc1', 'frc2', 'frc3'],
                         'score': 250,
                         'surrogates': ['frc1'],
-                        'dqs': ['frc2']},
+                        'dqs': ['frc1', 'frc2', 'frc3']},
                 'blue': {'teams': ['frc4', 'frc5', 'frc6'],
                          'score': 260,
                          'surrogates': [],
@@ -882,7 +882,7 @@ class TestApiTrustedController(unittest2.TestCase):
         self.assertEqual(match.alliances['red']['teams'], ['frc101B', 'frc102B', 'frc102C'])
         self.assertEqual(match.alliances['red']['score'], 250)
         self.assertEqual(match.alliances['red']['surrogates'], ['frc101B'])
-        self.assertEqual(match.alliances['red']['dqs'], ['frc102B'])
+        self.assertEqual(match.alliances['red']['dqs'], ['frc101B', 'frc102B', 'frc102C'])
         self.assertEqual(match.score_breakdown['red']['truss+catch'], 20)
         self.assertEqual(match.alliances['blue']['teams'], ['frc104', 'frc5', 'frc6'])
         self.assertEqual(match.alliances['blue']['score'], 260)
@@ -974,7 +974,7 @@ class TestApiTrustedController(unittest2.TestCase):
                 'red': {'teams': ['frc1', 'frc2', 'frc3'],
                         'score': 250,
                         'surrogates': ['frc1'],
-                        'dqs': ['frc2']},
+                        'dqs': ['frc1', 'frc2', 'frc3']},
                 'blue': {'teams': ['frc4', 'frc5', 'frc6'],
                          'score': 260,
                          'surrogates': [],
@@ -1064,7 +1064,7 @@ class TestApiTrustedController(unittest2.TestCase):
         self.assertEqual(match.alliances['red']['teams'], ['frc101B', 'frc102B', 'frc102C'])
         self.assertEqual(match.alliances['red']['score'], 250)
         self.assertEqual(match.alliances['red']['surrogates'], ['frc101B'])
-        self.assertEqual(match.alliances['red']['dqs'], ['frc102B'])
+        self.assertEqual(match.alliances['red']['dqs'], ['frc101B', 'frc102B', 'frc102C'])
         self.assertEqual(match.score_breakdown['red']['truss+catch'], 20)
         self.assertEqual(match.alliances['blue']['teams'], ['frc104', 'frc5', 'frc6'])
         self.assertEqual(match.alliances['blue']['score'], 260)
