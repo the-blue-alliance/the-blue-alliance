@@ -455,26 +455,6 @@
             <pre class="example-json">
             {"message_data": {"title": "Test", "desc": "Test Broadcast", "url": "http://foo.bar", "app_version": "2.0.0"}, "message_type": "broadcast"}
             </pre>
-        <h3 id="notification_update_favorites">Update Favorites Notification</h3>
-          <p>This notification is sent out to a user's devices when favorites are updated on their account, telling that device to re-sync the list from the server.</p>
-          <h4>Structure</h4>
-            <ul>
-              <li>"message_type": "update_favorites"</li>
-            </ul>
-          <h4>Example JSON</h4>
-            <pre class="example-json">
-            {"message_type": "update_favorites"}
-            </pre>
-        <h3 id="notification_update_subscriptions">Update Subscriptions Notification</h3>
-          <p>This notification is sent out to a user's devices when their subscriptions are updated for the account, telling that device to re-sync the list from the server.</p>
-          <h4>Structure</h4>
-            <ul>
-              <li>"message_type": "update_subscriptions"</li>
-            </ul>
-          <h4>Example JSON</h4>
-            <pre class="example-json">
-            {"message_type": "update_subscriptions"}
-            </pre>
         <h3 id="notification_verification">Webhook Verification Notifications</h3>
           <p>This notification is sent when a new webhook is created. It contains a verification code that needs to be entered in the <a href="/account">Account Overview</a> page for the webhook before it recieves live updates.</p>
           <h4>Structure</h4>

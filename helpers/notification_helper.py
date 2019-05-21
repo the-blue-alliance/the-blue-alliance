@@ -40,14 +40,14 @@ class NotificationHelper(object):
 
     @classmethod
     def send_favorite_update(cls, user_id, sending_device_key=""):
-        clients = PushHelper.get_client_ids_for_users([user_id])
+        clients = PushHelper.get_client_ids_for_users([user_id], os_types=[ClientType.OS_ANDROID])
 
         notification = UpdateFavoritesNotification(user_id, sending_device_key)
         notification.send(clients)
 
     @classmethod
     def send_subscription_update(cls, user_id, sending_device_key=""):
-        clients = PushHelper.get_client_ids_for_users([user_id])
+        clients = PushHelper.get_client_ids_for_users([user_id], os_types=[ClientType.OS_ANDROID])
 
         notification = UpdateSubscriptionsNotification(user_id, sending_device_key)
         notification.send(clients)
