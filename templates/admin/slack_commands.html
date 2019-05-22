@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}TBA - Slack Slash Commands{% endblock %}
+
+{% block content %}
+
+<h1>Slack Slash Commands</h1>
+
+<table class="table">
+<tr><th>Command</th><th>Token</th></tr>
+{% for key,value in commands.items %}
+  <tr>
+    <td>/{{key}}</td>
+    <td>
+      <form action="/admin/slack_commands" method="post" id="update-{{key}}">
+        <input name="command" type="hidden" value="{{key}}" />
+        <input name="previous_token" type="hidden" value="{{value}}"/>
+        <input name="token" value="{{value}}" placeholder="Token"/>
+        <button type="submit" class="btn btn-primary btn-small"><span class="glyphicon glyphicon-floppy-disk"></span> Update</button>
+      </form>
+    </td>
+    <td>
+      <form action="/admin/slack_commands/delete/{{key}}" method="post" id="delete-{{key}}">
+        <input name="token" value="{{value}}" type="hidden"/>
+        <button type="submit" class="btn btn-danger btn-small"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+      </form>
+    </td>
+  </tr>
+{% endfor %}
+</table>
+<form action="/admin/slack_commands" method="post" id="add-command">
+  <input name="command" placeholder="Add a Command" />
+  <input name="token" placeholder="Token" />
+  <button type="submit" class="btn btn-primary btn-small"><span class="glyphicon glyphicon glyphicon-plus-sign"></span> Add</button>
+</form>
+{% endblock %}

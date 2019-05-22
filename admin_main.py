@@ -25,6 +25,7 @@ from controllers.admin.admin_mobile_controller import AdminMobile, AdminBroadcas
 from controllers.admin.admin_offseason_scraper_controller import AdminOffseasonScraperController
 from controllers.admin.admin_offseason_spreadsheet_controller import AdminOffseasonSpreadsheetController
 from controllers.admin.admin_sitevar_controller import AdminSitevarCreate, AdminSitevarEdit, AdminSitevarList
+from controllers.admin.admin_slack_controller import AdminSlackCommandsList, AdminSlackCommandsDelete
 from controllers.admin.admin_suggestion_controller import AdminCreateTestSuggestions
 from controllers.admin.admin_team_controller import AdminTeamCreateTest, AdminTeamDetail, AdminTeamList, \
     AdminTeamRobotNameUpdate
@@ -99,6 +100,8 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/sitevars', AdminSitevarList),
                                ('/admin/sitevar/create', AdminSitevarCreate),
                                ('/admin/sitevar/edit/(.*)', AdminSitevarEdit),
+                               ('/admin/slack_commands', AdminSlackCommandsList),
+                               ('/admin/slack_commands/delete/(.*)', AdminSlackCommandsDelete),
                                ('/admin/suggestions/create/test', AdminCreateTestSuggestions),
                                ('/admin/tasks', AdminTasksHandler),
                                ('/admin/teams/([0-9]*)', AdminTeamList),
