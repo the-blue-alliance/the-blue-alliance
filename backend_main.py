@@ -9,7 +9,7 @@ from controllers.admin.admin_cron_controller import AdminPostEventTasksDo, Admin
 from controllers.backup_controller import DatastoreBackupFull, BigQueryImportEnqueue, \
     BigQueryImportEntity, MainBackupsEnqueue, DatastoreBackupArchive, DatastoreBackupArchiveFile
 from controllers.datafeed_controller import EventListEnqueue, EventDetailsEnqueue
-from controllers.datafeed_controller import EventListGet, EventDetailsGet, TeamDetailsGet, TeamAvatarGet, OffseasonEventListGet, DistrictListGet, DistrictRankingsGet
+from controllers.datafeed_controller import EventListGet, EventDetailsGet, TeamDetailsGet, TeamAvatarGet, OffseasonEventListGet, DistrictListGet, DistrictRankingsGet, TeamBlacklistWebsiteDo
 
 
 app = webapp2.WSGIApplication([('/backend-tasks/enqueue/event_list/([0-9]*)', EventListEnqueue),
@@ -19,6 +19,7 @@ app = webapp2.WSGIApplication([('/backend-tasks/enqueue/event_list/([0-9]*)', Ev
                                ('/backend-tasks/get/event_details/(.*)', EventDetailsGet),
                                ('/backend-tasks/get/team_details/(.*)', TeamDetailsGet),
                                ('/backend-tasks/get/team_avatar/(.*)', TeamAvatarGet),
+                               ('/backend-tasks/do/team_blacklist_website/(.*)', TeamBlacklistWebsiteDo),
                                ('/backend-tasks/get/district_rankings/(.*)', DistrictRankingsGet),
                                ('/backend-tasks/get/fms-sync-offseasons/(.*)', OffseasonEventListGet),
                                ('/backend-tasks/do/post_event_tasks/(.*)', AdminPostEventTasksDo),

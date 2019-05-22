@@ -20,6 +20,13 @@ class TestWebsiteBlacklist(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def test_blacklist(self):
+    def test_is_blacklisted(self):
         self.assertTrue(self.website_blacklist.is_blacklisted('http://blacklist.com/'))
         self.assertFalse(self.website_blacklist.is_blacklisted('https://www.thebluealliance.com/'))
+
+    def test_blacklist(self):
+        website = 'https://www.thebluealliance.com/'
+        self.assertFalse(self.website_blacklist.is_blacklisted(website))
+        self.website_blacklist.blacklist(website)
+        self.assertTrue(self.website_blacklist.is_blacklisted(website))
+        self.assertTrue(self.website_blacklist.is_blacklisted('http://blacklist.com/'))
