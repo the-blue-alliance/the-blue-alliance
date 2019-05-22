@@ -88,7 +88,7 @@ class TestFMSAPITeamParser(unittest2.TestCase):
         bad_websites = [None, '', 'www.firstinspires.org', 'website.com', 'www.website.com', 'http://website.com',
                         'https://website.com', 'ftp://website.com', 'http://blacklist.com/']
         expected_sites = [None, None, None, 'http://website.com', 'http://www.website.com', 'http://website.com',
-                          'https://website.com', None, None]
+                          'https://website.com', None, '']
         with open('test_data/fms_api/2015_frc1124.json', 'r') as f:
             team_data = json.loads(f.read())
             for site, expected in zip(bad_websites, expected_sites):
