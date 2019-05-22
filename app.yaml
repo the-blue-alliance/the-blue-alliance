@@ -65,6 +65,8 @@ handlers:
   upload: static/manifest.json
   expiration: "1d"
 
+- url: /slack/.*
+  script: slack_main.app
 - url: /tasks/.* # Here to take care of requests until new dispatch.yaml kicks in
   script: cron_main.app
   login: admin
