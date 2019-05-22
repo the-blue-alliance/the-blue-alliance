@@ -42,6 +42,8 @@ from models.robot import Robot
 from models.sitevar import Sitevar
 from models.team import Team
 
+from sitevars.website_blacklist import WebsiteBlacklist
+
 
 class FMSAPIAwardsEnqueue(webapp.RequestHandler):
     """
@@ -787,3 +789,16 @@ class HallOfFameTeamsGet(webapp.RequestHandler):
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
             path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/hall_of_fame_teams_get.html')
             self.response.out.write(template.render(path, template_values))
+
+
+class TeamBlacklistWebsiteDo(webapp.RequestHandler):
+    """
+    Blacklist the current website for a team
+    """
+    def get(self, key_name):
+        team = Team.get_by_id(key_name)
+
+        if team.website:
+            WebsiteBlacklist.blacklist(team.website)
+
+        self.redirect('/backend-tasks/get/team_details/{}'.format(key_name))
