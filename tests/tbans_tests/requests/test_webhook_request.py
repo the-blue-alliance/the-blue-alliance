@@ -78,12 +78,10 @@ class TestWebhookRequest(unittest2.TestCase):
     def test_send(self):
         message = WebhookRequest(MockNotification(webhook_message_data={'data': 'value'}), 'https://www.thebluealliance.com/', 'secret')
         response = message.send()
-        result = response.get_result()
-        self.assertEqual(result.status_code, 200)
-        self.assertEqual(result.content, 'Some content here')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'Some content here')
 
     def test_send_fail(self):
         message = WebhookRequest(MockNotification(webhook_message_data={'data': 'some new value value'}), 'https://somenewwebsite.com', 'somenewsecret')
-        response = message.send()
         with self.assertRaises(AssertionError):
-            response.get_result()
+            response = message.send()
