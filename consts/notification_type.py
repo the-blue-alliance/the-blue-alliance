@@ -22,7 +22,7 @@ class NotificationType(object):
 
     # These aren't notifications, but used for upstream API calls
     UPDATE_FAVORITES = 100
-    UPDATE_SUBSCRIPTION = 101
+    UPDATE_SUBSCRIPTIONS = 101
 
     # This is used for verification that the proper people are in control
     VERIFICATION = 200
@@ -43,7 +43,7 @@ class NotificationType(object):
         EVENT_MATCH_VIDEO: "event_match_video",
 
         UPDATE_FAVORITES: "update_favorites",
-        UPDATE_SUBSCRIPTION: "update_subscriptions",
+        UPDATE_SUBSCRIPTIONS: "update_subscriptions",
 
         VERIFICATION: "verification"
     }
@@ -76,7 +76,7 @@ class NotificationType(object):
         "event_match_video": EVENT_MATCH_VIDEO,
 
         "update_favorites": UPDATE_FAVORITES,
-        "update_subscriptions": UPDATE_SUBSCRIPTION,
+        "update_subscriptions": UPDATE_SUBSCRIPTIONS,
 
         "verification": VERIFICATION
     }
