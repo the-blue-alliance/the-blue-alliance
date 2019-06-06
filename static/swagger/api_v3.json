@@ -48,12 +48,7 @@
         "operationId": "getStatus",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           }
         ],
         "responses": {
@@ -82,12 +77,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -107,21 +100,10 @@
         "operationId": "getTeams",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "page_num",
-            "in": "path",
-            "description": "Page number of results to return, zero-indexed",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/page_num"
           }
         ],
         "responses": {
@@ -153,12 +135,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -178,21 +158,10 @@
         "operationId": "getTeamsSimple",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "page_num",
-            "in": "path",
-            "description": "Page number of results to return, zero-indexed",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/page_num"
           }
         ],
         "responses": {
@@ -224,12 +193,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -250,21 +217,10 @@
         "operationId": "getTeamsKeys",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "page_num",
-            "in": "path",
-            "description": "Page number of results to return, zero-indexed",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/page_num"
           }
         ],
         "responses": {
@@ -296,12 +252,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -321,30 +275,13 @@
         "operationId": "getTeamsByYear",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "year",
-            "in": "path",
-            "description": "Competition Year (or Season). Must be 4 digits.",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/year"
           },
           {
-            "name": "page_num",
-            "in": "path",
-            "description": "Page number of results to return, zero-indexed",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/page_num"
           }
         ],
         "responses": {
@@ -376,12 +313,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -401,30 +336,13 @@
         "operationId": "getTeamsByYearSimple",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "year",
-            "in": "path",
-            "description": "Competition Year (or Season). Must be 4 digits.",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/year"
           },
           {
-            "name": "page_num",
-            "in": "path",
-            "description": "Page number of results to return, zero-indexed",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/page_num"
           }
         ],
         "responses": {
@@ -456,12 +374,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -481,30 +397,13 @@
         "operationId": "getTeamsByYearKeys",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "year",
-            "in": "path",
-            "description": "Competition Year (or Season). Must be 4 digits.",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/year"
           },
           {
-            "name": "page_num",
-            "in": "path",
-            "description": "Page number of results to return, zero-indexed",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/page_num"
           }
         ],
         "responses": {
@@ -537,12 +436,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -561,21 +458,10 @@
         "operationId": "getTeam",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           }
         ],
         "responses": {
@@ -604,12 +490,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -628,21 +512,10 @@
         "operationId": "getTeamSimple",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           }
         ],
         "responses": {
@@ -671,12 +544,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -695,21 +566,10 @@
         "operationId": "getTeamYearsParticipated",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           }
         ],
         "responses": {
@@ -741,12 +601,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -766,21 +624,10 @@
         "operationId": "getTeamDistricts",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           }
         ],
         "responses": {
@@ -812,12 +659,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -836,21 +681,10 @@
         "operationId": "getTeamRobots",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           }
         ],
         "responses": {
@@ -882,12 +716,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -907,21 +739,10 @@
         "operationId": "getTeamEvents",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           }
         ],
         "responses": {
@@ -953,12 +774,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -978,21 +797,10 @@
         "operationId": "getTeamEventsSimple",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           }
         ],
         "responses": {
@@ -1024,12 +832,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1049,21 +855,10 @@
         "operationId": "getTeamEventsKeys",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           }
         ],
         "responses": {
@@ -1096,12 +891,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1121,30 +914,13 @@
         "operationId": "getTeamEventsByYear",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           },
           {
-            "name": "year",
-            "in": "path",
-            "description": "Competition Year (or Season). Must be 4 digits.",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/year"
           }
         ],
         "responses": {
@@ -1176,12 +952,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1201,30 +975,13 @@
         "operationId": "getTeamEventsByYearSimple",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           },
           {
-            "name": "year",
-            "in": "path",
-            "description": "Competition Year (or Season). Must be 4 digits.",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/year"
           }
         ],
         "responses": {
@@ -1256,12 +1013,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1281,30 +1036,13 @@
         "operationId": "getTeamEventsByYearKeys",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           },
           {
-            "name": "year",
-            "in": "path",
-            "description": "Competition Year (or Season). Must be 4 digits.",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/year"
           }
         ],
         "responses": {
@@ -1337,12 +1075,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1363,30 +1099,13 @@
         "operationId": "getTeamEventsStatusesByYear",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           },
           {
-            "name": "year",
-            "in": "path",
-            "description": "Competition Year (or Season). Must be 4 digits.",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/year"
           }
         ],
         "responses": {
@@ -1419,12 +1138,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1445,30 +1162,13 @@
         "operationId": "getTeamEventMatches",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           },
           {
-            "name": "event_key",
-            "in": "path",
-            "description": "TBA Event Key, eg `2016nytr`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/event_key"
           }
         ],
         "responses": {
@@ -1500,12 +1200,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1526,30 +1224,13 @@
         "operationId": "getTeamEventMatchesSimple",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           },
           {
-            "name": "event_key",
-            "in": "path",
-            "description": "TBA Event Key, eg `2016nytr`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/event_key"
           }
         ],
         "responses": {
@@ -1581,12 +1262,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1607,30 +1286,13 @@
         "operationId": "getTeamEventMatchesKeys",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           },
           {
-            "name": "event_key",
-            "in": "path",
-            "description": "TBA Event Key, eg `2016nytr`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/event_key"
           }
         ],
         "responses": {
@@ -1663,12 +1325,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1688,30 +1348,13 @@
         "operationId": "getTeamEventAwards",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           },
           {
-            "name": "event_key",
-            "in": "path",
-            "description": "TBA Event Key, eg `2016nytr`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/event_key"
           }
         ],
         "responses": {
@@ -1743,12 +1386,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1768,30 +1409,13 @@
         "operationId": "getTeamEventStatus",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           },
           {
-            "name": "event_key",
-            "in": "path",
-            "description": "TBA Event Key, eg `2016nytr`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/event_key"
           }
         ],
         "responses": {
@@ -1820,12 +1444,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1844,21 +1466,10 @@
         "operationId": "getTeamAwards",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           }
         ],
         "responses": {
@@ -1890,12 +1501,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1914,30 +1523,13 @@
         "operationId": "getTeamAwardsByYear",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           },
           {
-            "name": "year",
-            "in": "path",
-            "description": "Competition Year (or Season). Must be 4 digits.",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/year"
           }
         ],
         "responses": {
@@ -1969,12 +1561,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -1994,30 +1584,13 @@
         "operationId": "getTeamMatchesByYear",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           },
           {
-            "name": "year",
-            "in": "path",
-            "description": "Competition Year (or Season). Must be 4 digits.",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/year"
           }
         ],
         "responses": {
@@ -2049,12 +1622,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -2074,30 +1645,13 @@
         "operationId": "getTeamMatchesByYearSimple",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           },
           {
-            "name": "year",
-            "in": "path",
-            "description": "Competition Year (or Season). Must be 4 digits.",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/year"
           }
         ],
         "responses": {
@@ -2129,12 +1683,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -2154,30 +1706,13 @@
         "operationId": "getTeamMatchesByYearKeys",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           },
           {
-            "name": "year",
-            "in": "path",
-            "description": "Competition Year (or Season). Must be 4 digits.",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/year"
           }
         ],
         "responses": {
@@ -2210,12 +1745,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -2234,30 +1767,13 @@
         "operationId": "getTeamMediaByYear",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           },
           {
-            "name": "year",
-            "in": "path",
-            "description": "Competition Year (or Season). Must be 4 digits.",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/year"
           }
         ],
         "responses": {
@@ -2289,12 +1805,10 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
           }
         },
         "security": [
@@ -2313,30 +1827,13 @@
         "operationId": "getTeamMediaByTag",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           },
           {
-            "name": "media_tag",
-            "in": "path",
-            "description": "Media Tag which describes the Media.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/media_tag"
           }
         ],
         "responses": {
@@ -2368,12 +1865,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -2392,39 +1888,16 @@
         "operationId": "getTeamMediaByTagYear",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           },
           {
-            "name": "media_tag",
-            "in": "path",
-            "description": "Media Tag which describes the Media.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/media_tag"
           },
           {
-            "name": "year",
-            "in": "path",
-            "description": "Competition Year (or Season). Must be 4 digits.",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/year"
           }
         ],
         "responses": {
@@ -2456,12 +1929,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -2480,21 +1952,10 @@
         "operationId": "getTeamSocialMedia",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "team_key",
-            "in": "path",
-            "description": "TBA Team Key, eg `frc254`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/team_key"
           }
         ],
         "responses": {
@@ -2526,12 +1987,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -2551,21 +2011,10 @@
         "operationId": "getEventsByYear",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "year",
-            "in": "path",
-            "description": "Competition Year (or Season). Must be 4 digits.",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/year"
           }
         ],
         "responses": {
@@ -2597,12 +2046,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -2622,21 +2070,10 @@
         "operationId": "getEventsByYearSimple",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "year",
-            "in": "path",
-            "description": "Competition Year (or Season). Must be 4 digits.",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/year"
           }
         ],
         "responses": {
@@ -2668,12 +2105,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -2693,21 +2129,10 @@
         "operationId": "getEventsByYearKeys",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "year",
-            "in": "path",
-            "description": "Competition Year (or Season). Must be 4 digits.",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/year"
           }
         ],
         "responses": {
@@ -2740,12 +2165,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -2764,21 +2188,10 @@
         "operationId": "getEvent",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "event_key",
-            "in": "path",
-            "description": "TBA Event Key, eg `2016nytr`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/event_key"
           }
         ],
         "responses": {
@@ -2807,12 +2220,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -2831,21 +2243,10 @@
         "operationId": "getEventSimple",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "event_key",
-            "in": "path",
-            "description": "TBA Event Key, eg `2016nytr`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/event_key"
           }
         ],
         "responses": {
@@ -2874,12 +2275,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -2898,21 +2298,10 @@
         "operationId": "getEventAlliances",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "event_key",
-            "in": "path",
-            "description": "TBA Event Key, eg `2016nytr`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/event_key"
           }
         ],
         "responses": {
@@ -2944,12 +2333,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -2968,21 +2356,10 @@
         "operationId": "getEventInsights",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "event_key",
-            "in": "path",
-            "description": "TBA Event Key, eg `2016nytr`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/event_key"
           }
         ],
         "responses": {
@@ -3011,12 +2388,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -3035,21 +2411,10 @@
         "operationId": "getEventOPRs",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "event_key",
-            "in": "path",
-            "description": "TBA Event Key, eg `2016nytr`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/event_key"
           }
         ],
         "responses": {
@@ -3078,12 +2443,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -3102,21 +2466,10 @@
         "operationId": "getEventPredictions",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "event_key",
-            "in": "path",
-            "description": "TBA Event Key, eg `2016nytr`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/event_key"
           }
         ],
         "responses": {
@@ -3145,12 +2498,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -3169,21 +2521,10 @@
         "operationId": "getEventRankings",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "event_key",
-            "in": "path",
-            "description": "TBA Event Key, eg `2016nytr`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/event_key"
           }
         ],
         "responses": {
@@ -3212,12 +2553,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -3237,21 +2577,10 @@
         "operationId": "getEventDistrictPoints",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "event_key",
-            "in": "path",
-            "description": "TBA Event Key, eg `2016nytr`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/event_key"
           }
         ],
         "responses": {
@@ -3280,12 +2609,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -3306,21 +2634,10 @@
         "operationId": "getEventTeams",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "event_key",
-            "in": "path",
-            "description": "TBA Event Key, eg `2016nytr`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/event_key"
           }
         ],
         "responses": {
@@ -3352,12 +2669,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -3378,21 +2694,10 @@
         "operationId": "getEventTeamsSimple",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "event_key",
-            "in": "path",
-            "description": "TBA Event Key, eg `2016nytr`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/event_key"
           }
         ],
         "responses": {
@@ -3424,12 +2729,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -3450,21 +2754,10 @@
         "operationId": "getEventTeamsKeys",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "event_key",
-            "in": "path",
-            "description": "TBA Event Key, eg `2016nytr`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/event_key"
           }
         ],
         "responses": {
@@ -3497,12 +2790,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -3523,21 +2815,10 @@
         "operationId": "getEventTeamsStatuses",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "event_key",
-            "in": "path",
-            "description": "TBA Event Key, eg `2016nytr`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/event_key"
           }
         ],
         "responses": {
@@ -3570,12 +2851,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -3595,21 +2875,10 @@
         "operationId": "getEventMatches",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "event_key",
-            "in": "path",
-            "description": "TBA Event Key, eg `2016nytr`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/event_key"
           }
         ],
         "responses": {
@@ -3641,12 +2910,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -3666,21 +2934,10 @@
         "operationId": "getEventMatchesSimple",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "event_key",
-            "in": "path",
-            "description": "TBA Event Key, eg `2016nytr`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/event_key"
           }
         ],
         "responses": {
@@ -3712,12 +2969,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -3737,21 +2993,10 @@
         "operationId": "getEventMatchesKeys",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "event_key",
-            "in": "path",
-            "description": "TBA Event Key, eg `2016nytr`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/event_key"
           }
         ],
         "responses": {
@@ -3784,12 +3029,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -3809,21 +3053,10 @@
         "operationId": "getEventMatchTimeseries",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "event_key",
-            "in": "path",
-            "description": "TBA Event Key, eg `2016nytr`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/event_key"
           }
         ],
         "responses": {
@@ -3856,12 +3089,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -3880,21 +3112,10 @@
         "operationId": "getEventAwards",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "event_key",
-            "in": "path",
-            "description": "TBA Event Key, eg `2016nytr`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/event_key"
           }
         ],
         "responses": {
@@ -3926,12 +3147,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -3950,21 +3170,10 @@
         "operationId": "getMatch",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "match_key",
-            "in": "path",
-            "description": "TBA Match Key, eg `2016nytr_qm1`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/match_key"
           }
         ],
         "responses": {
@@ -3993,12 +3202,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -4017,21 +3225,10 @@
         "operationId": "getMatchSimple",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "match_key",
-            "in": "path",
-            "description": "TBA Match Key, eg `2016nytr_qm1`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/match_key"
           }
         ],
         "responses": {
@@ -4060,12 +3257,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -4084,21 +3280,10 @@
         "operationId": "getMatchTimeseries",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "match_key",
-            "in": "path",
-            "description": "TBA Match Key, eg `2016nytr_qm1`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/match_key"
           }
         ],
         "responses": {
@@ -4131,12 +3316,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -4155,21 +3339,10 @@
         "operationId": "getDistrictsByYear",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "year",
-            "in": "path",
-            "description": "Competition Year (or Season). Must be 4 digits.",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/parameters/year"
           }
         ],
         "responses": {
@@ -4201,12 +3374,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -4227,21 +3399,10 @@
         "operationId": "getDistrictEvents",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "district_key",
-            "in": "path",
-            "description": "TBA District Key, eg `2016fim`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/district_key"
           }
         ],
         "responses": {
@@ -4273,12 +3434,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -4299,12 +3459,7 @@
         "operationId": "getDistrictEventsSimple",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
             "name": "district_key",
@@ -4345,12 +3500,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -4371,21 +3525,10 @@
         "operationId": "getDistrictEventsKeys",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "district_key",
-            "in": "path",
-            "description": "TBA District Key, eg `2016fim`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/district_key"
           }
         ],
         "responses": {
@@ -4418,12 +3561,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -4444,21 +3586,10 @@
         "operationId": "getDistrictTeams",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "district_key",
-            "in": "path",
-            "description": "TBA District Key, eg `2016fim`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/district_key"
           }
         ],
         "responses": {
@@ -4490,12 +3621,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -4516,21 +3646,10 @@
         "operationId": "getDistrictTeamsSimple",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "district_key",
-            "in": "path",
-            "description": "TBA District Key, eg `2016fim`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/district_key"
           }
         ],
         "responses": {
@@ -4562,12 +3681,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -4588,21 +3706,10 @@
         "operationId": "getDistrictTeamsKeys",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "district_key",
-            "in": "path",
-            "description": "TBA District Key, eg `2016fim`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/district_key"
           }
         ],
         "responses": {
@@ -4635,12 +3742,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -4661,21 +3767,10 @@
         "operationId": "getDistrictRankings",
         "parameters": [
           {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/If-Modified-Since"
           },
           {
-            "name": "district_key",
-            "in": "path",
-            "description": "TBA District Key, eg `2016fim`",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/parameters/district_key"
           }
         ],
         "responses": {
@@ -4707,12 +3802,11 @@
             }
           },
           "304": {
-            "description": "Not Modified - Use Local Cached Value",
-            "content": {}
+            "$ref": "#/responses/NotModified"
           },
           "401": {
-            "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-            "content": {}
+            "$ref": "#/responses/Unauthorized"
+            
           }
         },
         "security": [
@@ -7548,12 +6642,11 @@
     },
     "responses": {
       "Unauthorized": {
-        "description": "Not Authorized - No TBA v3 API Key was provided, or it is not valid.",
-        "content": {}
+        "$ref": "#/responses/Unauthorized"
+        
       },
       "NotModified": {
-        "description": "Not Modified - Use Local Cached Value",
-        "content": {}
+        "description": "Not Modified - Use Local Cached Value"
       }
     },
     "parameters": {
