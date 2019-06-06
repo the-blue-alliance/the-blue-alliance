@@ -48,7 +48,7 @@
         "operationId": "getStatus",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           }
         ],
         "responses": {
@@ -100,10 +100,10 @@
         "operationId": "getTeams",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/page_num"
+            "$ref": "#/components/parameters/page_num"
           }
         ],
         "responses": {
@@ -158,10 +158,10 @@
         "operationId": "getTeamsSimple",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/page_num"
+            "$ref": "#/components/parameters/page_num"
           }
         ],
         "responses": {
@@ -217,10 +217,10 @@
         "operationId": "getTeamsKeys",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/page_num"
+            "$ref": "#/components/parameters/page_num"
           }
         ],
         "responses": {
@@ -275,13 +275,13 @@
         "operationId": "getTeamsByYear",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/year"
+            "$ref": "#/components/parameters/year"
           },
           {
-            "$ref": "#/parameters/page_num"
+            "$ref": "#/components/parameters/page_num"
           }
         ],
         "responses": {
@@ -336,13 +336,13 @@
         "operationId": "getTeamsByYearSimple",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/year"
+            "$ref": "#/components/parameters/year"
           },
           {
-            "$ref": "#/parameters/page_num"
+            "$ref": "#/components/parameters/page_num"
           }
         ],
         "responses": {
@@ -397,13 +397,13 @@
         "operationId": "getTeamsByYearKeys",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/year"
+            "$ref": "#/components/parameters/year"
           },
           {
-            "$ref": "#/parameters/page_num"
+            "$ref": "#/components/parameters/page_num"
           }
         ],
         "responses": {
@@ -458,10 +458,10 @@
         "operationId": "getTeam",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           }
         ],
         "responses": {
@@ -512,10 +512,10 @@
         "operationId": "getTeamSimple",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           }
         ],
         "responses": {
@@ -566,10 +566,10 @@
         "operationId": "getTeamYearsParticipated",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           }
         ],
         "responses": {
@@ -624,10 +624,10 @@
         "operationId": "getTeamDistricts",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           }
         ],
         "responses": {
@@ -681,10 +681,10 @@
         "operationId": "getTeamRobots",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           }
         ],
         "responses": {
@@ -739,10 +739,10 @@
         "operationId": "getTeamEvents",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           }
         ],
         "responses": {
@@ -797,10 +797,10 @@
         "operationId": "getTeamEventsSimple",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           }
         ],
         "responses": {
@@ -855,10 +855,10 @@
         "operationId": "getTeamEventsKeys",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           }
         ],
         "responses": {
@@ -914,13 +914,13 @@
         "operationId": "getTeamEventsByYear",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           },
           {
-            "$ref": "#/parameters/year"
+            "$ref": "#/components/parameters/year"
           }
         ],
         "responses": {
@@ -975,13 +975,13 @@
         "operationId": "getTeamEventsByYearSimple",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           },
           {
-            "$ref": "#/parameters/year"
+            "$ref": "#/components/parameters/year"
           }
         ],
         "responses": {
@@ -1036,13 +1036,13 @@
         "operationId": "getTeamEventsByYearKeys",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           },
           {
-            "$ref": "#/parameters/year"
+            "$ref": "#/components/parameters/year"
           }
         ],
         "responses": {
@@ -1099,13 +1099,13 @@
         "operationId": "getTeamEventsStatusesByYear",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           },
           {
-            "$ref": "#/parameters/year"
+            "$ref": "#/components/parameters/year"
           }
         ],
         "responses": {
@@ -1162,13 +1162,13 @@
         "operationId": "getTeamEventMatches",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           },
           {
-            "$ref": "#/parameters/event_key"
+            "$ref": "#/components/parameters/event_key"
           }
         ],
         "responses": {
@@ -1224,13 +1224,13 @@
         "operationId": "getTeamEventMatchesSimple",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           },
           {
-            "$ref": "#/parameters/event_key"
+            "$ref": "#/components/parameters/event_key"
           }
         ],
         "responses": {
@@ -1286,13 +1286,13 @@
         "operationId": "getTeamEventMatchesKeys",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           },
           {
-            "$ref": "#/parameters/event_key"
+            "$ref": "#/components/parameters/event_key"
           }
         ],
         "responses": {
@@ -1348,13 +1348,13 @@
         "operationId": "getTeamEventAwards",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           },
           {
-            "$ref": "#/parameters/event_key"
+            "$ref": "#/components/parameters/event_key"
           }
         ],
         "responses": {
@@ -1409,13 +1409,13 @@
         "operationId": "getTeamEventStatus",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           },
           {
-            "$ref": "#/parameters/event_key"
+            "$ref": "#/components/parameters/event_key"
           }
         ],
         "responses": {
@@ -1466,10 +1466,10 @@
         "operationId": "getTeamAwards",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           }
         ],
         "responses": {
@@ -1523,13 +1523,13 @@
         "operationId": "getTeamAwardsByYear",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           },
           {
-            "$ref": "#/parameters/year"
+            "$ref": "#/components/parameters/year"
           }
         ],
         "responses": {
@@ -1584,13 +1584,13 @@
         "operationId": "getTeamMatchesByYear",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           },
           {
-            "$ref": "#/parameters/year"
+            "$ref": "#/components/parameters/year"
           }
         ],
         "responses": {
@@ -1645,13 +1645,13 @@
         "operationId": "getTeamMatchesByYearSimple",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           },
           {
-            "$ref": "#/parameters/year"
+            "$ref": "#/components/parameters/year"
           }
         ],
         "responses": {
@@ -1706,13 +1706,13 @@
         "operationId": "getTeamMatchesByYearKeys",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           },
           {
-            "$ref": "#/parameters/year"
+            "$ref": "#/components/parameters/year"
           }
         ],
         "responses": {
@@ -1767,13 +1767,13 @@
         "operationId": "getTeamMediaByYear",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           },
           {
-            "$ref": "#/parameters/year"
+            "$ref": "#/components/parameters/year"
           }
         ],
         "responses": {
@@ -1827,13 +1827,13 @@
         "operationId": "getTeamMediaByTag",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           },
           {
-            "$ref": "#/parameters/media_tag"
+            "$ref": "#/components/parameters/media_tag"
           }
         ],
         "responses": {
@@ -1888,16 +1888,16 @@
         "operationId": "getTeamMediaByTagYear",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           },
           {
-            "$ref": "#/parameters/media_tag"
+            "$ref": "#/components/parameters/media_tag"
           },
           {
-            "$ref": "#/parameters/year"
+            "$ref": "#/components/parameters/year"
           }
         ],
         "responses": {
@@ -1952,10 +1952,10 @@
         "operationId": "getTeamSocialMedia",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/team_key"
+            "$ref": "#/components/parameters/team_key"
           }
         ],
         "responses": {
@@ -2011,10 +2011,10 @@
         "operationId": "getEventsByYear",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/year"
+            "$ref": "#/components/parameters/year"
           }
         ],
         "responses": {
@@ -2070,10 +2070,10 @@
         "operationId": "getEventsByYearSimple",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/year"
+            "$ref": "#/components/parameters/year"
           }
         ],
         "responses": {
@@ -2129,10 +2129,10 @@
         "operationId": "getEventsByYearKeys",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/year"
+            "$ref": "#/components/parameters/year"
           }
         ],
         "responses": {
@@ -2188,10 +2188,10 @@
         "operationId": "getEvent",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/event_key"
+            "$ref": "#/components/parameters/event_key"
           }
         ],
         "responses": {
@@ -2243,10 +2243,10 @@
         "operationId": "getEventSimple",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/event_key"
+            "$ref": "#/components/parameters/event_key"
           }
         ],
         "responses": {
@@ -2298,10 +2298,10 @@
         "operationId": "getEventAlliances",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/event_key"
+            "$ref": "#/components/parameters/event_key"
           }
         ],
         "responses": {
@@ -2356,10 +2356,10 @@
         "operationId": "getEventInsights",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/event_key"
+            "$ref": "#/components/parameters/event_key"
           }
         ],
         "responses": {
@@ -2411,10 +2411,10 @@
         "operationId": "getEventOPRs",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/event_key"
+            "$ref": "#/components/parameters/event_key"
           }
         ],
         "responses": {
@@ -2466,10 +2466,10 @@
         "operationId": "getEventPredictions",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/event_key"
+            "$ref": "#/components/parameters/event_key"
           }
         ],
         "responses": {
@@ -2521,10 +2521,10 @@
         "operationId": "getEventRankings",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/event_key"
+            "$ref": "#/components/parameters/event_key"
           }
         ],
         "responses": {
@@ -2577,10 +2577,10 @@
         "operationId": "getEventDistrictPoints",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/event_key"
+            "$ref": "#/components/parameters/event_key"
           }
         ],
         "responses": {
@@ -2634,10 +2634,10 @@
         "operationId": "getEventTeams",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/event_key"
+            "$ref": "#/components/parameters/event_key"
           }
         ],
         "responses": {
@@ -2694,10 +2694,10 @@
         "operationId": "getEventTeamsSimple",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/event_key"
+            "$ref": "#/components/parameters/event_key"
           }
         ],
         "responses": {
@@ -2754,10 +2754,10 @@
         "operationId": "getEventTeamsKeys",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/event_key"
+            "$ref": "#/components/parameters/event_key"
           }
         ],
         "responses": {
@@ -2815,10 +2815,10 @@
         "operationId": "getEventTeamsStatuses",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/event_key"
+            "$ref": "#/components/parameters/event_key"
           }
         ],
         "responses": {
@@ -2875,10 +2875,10 @@
         "operationId": "getEventMatches",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/event_key"
+            "$ref": "#/components/parameters/event_key"
           }
         ],
         "responses": {
@@ -2934,10 +2934,10 @@
         "operationId": "getEventMatchesSimple",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/event_key"
+            "$ref": "#/components/parameters/event_key"
           }
         ],
         "responses": {
@@ -2993,10 +2993,10 @@
         "operationId": "getEventMatchesKeys",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/event_key"
+            "$ref": "#/components/parameters/event_key"
           }
         ],
         "responses": {
@@ -3053,10 +3053,10 @@
         "operationId": "getEventMatchTimeseries",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/event_key"
+            "$ref": "#/components/parameters/event_key"
           }
         ],
         "responses": {
@@ -3112,10 +3112,10 @@
         "operationId": "getEventAwards",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/event_key"
+            "$ref": "#/components/parameters/event_key"
           }
         ],
         "responses": {
@@ -3170,10 +3170,10 @@
         "operationId": "getMatch",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/match_key"
+            "$ref": "#/components/parameters/match_key"
           }
         ],
         "responses": {
@@ -3225,10 +3225,10 @@
         "operationId": "getMatchSimple",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/match_key"
+            "$ref": "#/components/parameters/match_key"
           }
         ],
         "responses": {
@@ -3280,10 +3280,10 @@
         "operationId": "getMatchTimeseries",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/match_key"
+            "$ref": "#/components/parameters/match_key"
           }
         ],
         "responses": {
@@ -3339,10 +3339,10 @@
         "operationId": "getDistrictsByYear",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/year"
+            "$ref": "#/components/parameters/year"
           }
         ],
         "responses": {
@@ -3399,10 +3399,10 @@
         "operationId": "getDistrictEvents",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/district_key"
+            "$ref": "#/components/parameters/district_key"
           }
         ],
         "responses": {
@@ -3459,7 +3459,7 @@
         "operationId": "getDistrictEventsSimple",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
             "name": "district_key",
@@ -3525,10 +3525,10 @@
         "operationId": "getDistrictEventsKeys",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/district_key"
+            "$ref": "#/components/parameters/district_key"
           }
         ],
         "responses": {
@@ -3586,10 +3586,10 @@
         "operationId": "getDistrictTeams",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/district_key"
+            "$ref": "#/components/parameters/district_key"
           }
         ],
         "responses": {
@@ -3646,10 +3646,10 @@
         "operationId": "getDistrictTeamsSimple",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/district_key"
+            "$ref": "#/components/parameters/district_key"
           }
         ],
         "responses": {
@@ -3706,10 +3706,10 @@
         "operationId": "getDistrictTeamsKeys",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/district_key"
+            "$ref": "#/components/parameters/district_key"
           }
         ],
         "responses": {
@@ -3767,10 +3767,10 @@
         "operationId": "getDistrictRankings",
         "parameters": [
           {
-            "$ref": "#/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-Modified-Since"
           },
           {
-            "$ref": "#/parameters/district_key"
+            "$ref": "#/components/parameters/district_key"
           }
         ],
         "responses": {
