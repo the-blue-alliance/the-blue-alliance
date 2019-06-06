@@ -14,3 +14,4 @@ ndg-httpsclient
 pyasn1
 httpie
 mysqlclient==1.3.14
+openapi-spec-validator
