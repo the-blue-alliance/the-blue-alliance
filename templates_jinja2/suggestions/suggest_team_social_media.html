@@ -9,7 +9,7 @@
 <div class="container">
   {% if status %}
   <div class="row">
-    <div class="col-xs-12 col-lg-6 col-lg-offset-3">
+    <div class="col-xs-12 col-lg-8 col-lg-offset-2">
       {% if status == 'success' %}
       <div class="alert alert-success">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -28,6 +28,12 @@
         <h4>Thanks!</h4>
         <p>The URL you submitted is already pending review!</p>
       </div>
+      {% elif status == 'illegal_media_type' %}
+      <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Uh oh!</h4>
+        <p>The URL you submitted is not the right type for the service you submitted. See below for currently supported formats.</p>
+      </div>
       {% else %}
       <div class="alert alert-danger">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -39,7 +45,7 @@
   </div>
   {% endif %}
   <div class="row">
-    <div class="col-xs-12 col-lg-6 col-lg-offset-3">
+    <div class="col-xs-12 col-lg-8 col-lg-offset-2">
       <div class="panel panel-default">
         <div class="panel-heading">
           <h1 class="panel-title">Help others by adding social media!</h1>
@@ -69,6 +75,7 @@
               <p>Please note that we can only accept YouTube channels with custom urls, if you do not have one, please create one by following <a href="https://support.google.com/youtube/answer/2657968?hl=en" target="_blank">these instructions</a>.</p>
               <ul>
                 <li>Example: <code>https://www.youtube.com/user/Uberbots1124</code></li>
+                <li>Invalid Example: <code><strike>https://www.youtube.com/channel/UCweoyLIzRXPS_JOrwpxX5tA</strike></code></li>
               </ul>
             </li>
             <li>GitHub Accounts
