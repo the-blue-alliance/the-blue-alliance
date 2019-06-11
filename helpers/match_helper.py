@@ -239,6 +239,22 @@ class MatchHelper(object):
             'teleopOwnershipPoints', 'vaultPoints', 'endgamePoints', 'teleopPoints',
             'autoQuestRankingPoint', 'faceTheBossRankingPoint', 'foulCount', 'techFoulCount',
             'adjustPoints', 'foulPoints', 'rp', 'totalPoints', 'tba_gameData']),
+        2019: set([
+            'adjustPoints', 'autoPoints', 'bay1', 'bay2', 'bay3', 'bay4',
+            'bay5', 'bay6', 'bay7', 'bay8', 'cargoPoints',
+            'completeRocketRankingPoint', 'completedRocketFar',
+            'completedRocketNear', 'endgameRobot1', 'endgameRobot2',
+            'endgameRobot3', 'foulCount', 'foulPoints', 'habClimbPoints',
+            'habDockingRankingPoint', 'habLineRobot1', 'habLineRobot2',
+            'habLineRobot3', 'hatchPanelPoints', 'lowLeftRocketFar',
+            'lowLeftRocketNear', 'lowRightRocketFar', 'lowRightRocketNear',
+            'midLeftRocketFar', 'midLeftRocketNear', 'midRightRocketFar',
+            'midRightRocketNear', 'preMatchBay1', 'preMatchBay2',
+            'preMatchBay3', 'preMatchBay6', 'preMatchBay7', 'preMatchBay8',
+            'preMatchLevelRobot1', 'preMatchLevelRobot2', 'preMatchLevelRobot3',
+            'rp', 'sandStormBonusPoints', 'techFoulCount', 'teleopPoints',
+            'topLeftRocketFar', 'topLeftRocketNear', 'topRightRocketFar',
+            'topRightRocketNear', 'totalPoints']),
     }
 
     @classmethod
