@@ -3,7 +3,7 @@
   "info": {
     "title": "The Blue Alliance Trusted APIv1",
     "description": "# Overview\nImport FIRST Robotics Competition Data to The Blue Alliance. The API is accessed through POST requests made to the endpoints described below. To simplify the removal of incorrect data, most endpoints must be called with the full dataset. For example, there is no endpoint to add a single award-- only to update all awards. It must be called with all awards, and the ones that are no longer present will be deleted. **The exception to this is the matches endpoint**, where there are separate endpoints to update and delete matches. Also, the **match videos endpoint** only allows the addition (and not the removal) of videos.\n# Authentication\nThe X-TBA-Auth-Id and X-TBA-Auth-Sig must be included as request headers in all requests.\n\n*auth_id*: ``  *auth_secret*: ``\n\n*X-TBA-Auth-Id*: `auth_id`  *X-TBA-Auth-Sig*: `md5_hexdigest()`\n\nFor example, an X-TBA-Auth-Sig may look like `md5_hexdigest(ExqeZK3Gbo9v95YnqmsiADzESo9HNgyhIOYSMyRpqJqYv13EazNRaDIPPJuOXrQp/api/trusted/v1/event/2014casj/matches/delete[\"qm1\"])`\n\nWhich, after hashing, becomes: `ca5c3e5c1b0e7132e4af13f805eca0be`",
-    "version": "3"
+    "version": "3.1"
   },
   "security": [
     {
