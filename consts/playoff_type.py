@@ -18,6 +18,9 @@ class PlayoffType(object):
     BO5_FINALS = 6
     BO3_FINALS = 7
 
+    # Custom
+    CUSTOM = 8
+
     BRACKET_TYPES = [BRACKET_8_TEAM, BRACKET_16_TEAM, BRACKET_4_TEAM]
     DOUBLE_ELIM_TYPES = [DOUBLE_ELIM_8_TEAM]
 

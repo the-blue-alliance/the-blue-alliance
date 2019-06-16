@@ -33,6 +33,9 @@ class PlayoffAdvancementHelper(object):
         playoff_advancement = None
         playoff_template = None
         double_elim_matches = None
+
+        if event.playoff_type == PlayoffType.CUSTOM:
+            playoff_template = 'custom'
         if event.playoff_type == PlayoffType.AVG_SCORE_8_TEAM:
             playoff_advancement = cls.generatePlayoffAdvancement2015(matches, event.alliance_selections)
             playoff_template = 'playoff_table'
