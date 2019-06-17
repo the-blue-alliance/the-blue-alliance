@@ -176,7 +176,7 @@
               {% if playoff_advancement %}
                 <h3>Playoff Advancement</h3>
                 {% include "playoff_partials/{}.html".format(playoff_template) %}
-              {% else %}
+              {% elif playoff_template != 'custom' %}
                 <h3>{% if event.year >= 2015 %}Playoff{% else %}Elimination{% endif %} Bracket</h3>
                 {% include "bracket_partials/bracket_table.html" %}
               {% endif %}
