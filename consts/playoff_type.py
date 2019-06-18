@@ -34,6 +34,7 @@ class PlayoffType(object):
         DOUBLE_ELIM_8_TEAM: "Double Elimination Bracket (8 Alliances)",
         BO3_FINALS: "Best of 3 Finals",
         BO5_FINALS: "Best of 5 Finals",
+        CUSTOM: "Custom",
     }
 
     @classmethod
