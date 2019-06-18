@@ -44,7 +44,7 @@ class AddTeamsFMSReport extends Component {
     // parse the excel to array of matches
     // headers start on 2nd row
     // eslint-disable-next-line no-undef
-    const teamsInFile = XLSX.utils.sheet_to_json(sheet, { range: 2 })
+    const teamsInFile = XLSX.utils.sheet_to_json(sheet, { range: 3 })
     const teams = []
     for (let i = 0; i < teamsInFile.length; i++) {
       const team = teamsInFile[i]
@@ -118,7 +118,7 @@ class AddTeamsFMSReport extends Component {
         }
         <FileInput
           name="fmsTeamsReport"
-          accept=".xlsx"
+          accept=".xlsx,.xls,.csv"
           placeholder="Click to choose file"
           onChange={this.onFileChange}
           disabled={!this.props.selectedEvent}
