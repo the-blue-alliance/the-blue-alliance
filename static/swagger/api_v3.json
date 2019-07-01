@@ -6626,7 +6626,8 @@
               "iframe",
               "html5",
               "rtmp",
-              "livestream"
+              "livestream",
+              "direct_link"
             ]
           },
           "channel": {
