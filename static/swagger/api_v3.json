@@ -3916,7 +3916,6 @@
         "required": [
           "key",
           "name",
-          "rookie_year",
           "team_number"
         ],
         "type": "object",
