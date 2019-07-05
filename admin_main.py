@@ -20,7 +20,10 @@ from controllers.admin.admin_match_controller import AdminVideosAdd, AdminMatchC
 from controllers.admin.admin_media_controller import AdminMediaDashboard, AdminMediaDeleteReference, AdminMediaMakePreferred, AdminMediaRemovePreferred, AdminMediaAdd, \
     AdminMediaInstagramImport
 from controllers.admin.admin_memcache_controller import AdminMemcacheMain
-from controllers.admin.admin_migration_controller import AdminMigration, AdminMigrationCreateEventDetails, AdminMigrationRankings, AdminMigrationAddSurrogates, AdminMigrationBackfillYearDQ, AdminMigrationBackfillEventDQ
+from controllers.admin.admin_migration_controller import AdminMigration,
+    AdminMigrationCreateEventDetails, AdminMigrationRankings, AdminMigrationAddSurrogates, \
+    AdminMigrationBackfillYearDQ, AdminMigrationBackfillEventDQ, \
+    AdminMigrationPlayoffAdvancement, AdminMigrationPlayoffAdvancementAll
 from controllers.admin.admin_mobile_controller import AdminMobile, AdminBroadcast, AdminMobileWebhooks
 from controllers.admin.admin_offseason_scraper_controller import AdminOffseasonScraperController
 from controllers.admin.admin_offseason_spreadsheet_controller import AdminOffseasonSpreadsheetController
@@ -94,6 +97,8 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/migration/add_surrogates/([0-9]*)', AdminMigrationAddSurrogates),
                                ('/admin/migration/backfill_year_dq/([0-9]*)', AdminMigrationBackfillYearDQ),
                                ('/admin/migration/backfill_event_dq/(.*)', AdminMigrationBackfillEventDQ),
+                               ('/admin/migration/backfill_playoff_advancement', AdminMigrationPlayoffAdvancementAll),
+                               ('/admin/migration/backfill_playoff_advancement/(.*)', AdminMigrationPlayoffAdvancement),
                                ('/admin/offseasons', AdminOffseasonScraperController),
                                ('/admin/offseasons/spreadsheet', AdminOffseasonSpreadsheetController),
                                ('/admin/sitevars', AdminSitevarList),
