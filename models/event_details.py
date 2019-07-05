@@ -15,6 +15,10 @@ class EventDetails(ndb.Model):
     rankings = ndb.JsonProperty()
     rankings2 = ndb.JsonProperty()
 
+    # Based on the output of PlayoffAdvancementHelper.generatePlayoffAdvancement
+    # Dict with keys for: bracket, playoff_advancement
+    playoff_advancement = ndb.JsonProperty()
+
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
 
