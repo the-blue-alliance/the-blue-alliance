@@ -24,6 +24,7 @@ from helpers.team_manipulator import TeamManipulator
 from helpers.location_helper import LocationHelper
 from helpers.match_manipulator import MatchManipulator
 from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
+from helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from helpers.website_helper import WebsiteHelper
 from models.api_auth_access import ApiAuthAccess
 from models.district import District
@@ -34,6 +35,7 @@ from models.match import Match
 from models.media import Media
 from models.sitevar import Sitevar
 from models.team import Team
+from template_engine import jinja2_engine
 
 import tba_config
 
@@ -342,6 +344,18 @@ class AdminEventDetail(LoggedInHandler):
         reg_sitevar = Sitevar.get_by_id("cmp_registration_hacks")
         api_keys = ApiAuthAccess.query(ApiAuthAccess.event_list == ndb.Key(Event, event_key)).fetch()
         event_medias = Media.query(Media.references == event.key).fetch(500)
+        playoff_template = PlayoffAdvancementHelper.getPlayoffTemplate(event)
+        elim_bracket_html = jinja2_engine.render(
+            "bracket_partials/bracket_table.html", {
+                "bracket_table": event.playoff_bracket,
+                "event": event
+            })
+        advancement_html = jinja2_engine.render(
+            "playoff_partials/{}.html".format(playoff_template), {
+                "event": event,
+                "playoff_advancement": event.playoff_advancement,
+                "bracket_table": event.playoff_bracket
+            }) if playoff_template else "None"
 
         self.template_values.update({
             "event": event,
@@ -353,7 +367,9 @@ class AdminEventDetail(LoggedInHandler):
             "event_sync_disable": reg_sitevar and event_key in reg_sitevar.contents.get('divisions_to_skip', []),
             "set_start_day_to_last": reg_sitevar and event_key in reg_sitevar.contents.get('set_start_to_last_day', []),
             "skip_eventteams": reg_sitevar and event_key in reg_sitevar.contents.get('skip_eventteams', []),
-            "event_name_override": next(iter(filter(lambda e: e.get("event") == event_key, reg_sitevar.contents.get("event_name_override", []))), {}).get("name", "")
+            "event_name_override": next(iter(filter(lambda e: e.get("event") == event_key, reg_sitevar.contents.get("event_name_override", []))), {}).get("name", ""),
+            "elim_bracket_html": elim_bracket_html,
+            "advancement_html": advancement_html,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_details.html')

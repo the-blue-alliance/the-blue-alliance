@@ -27,24 +27,41 @@ class PlayoffAdvancementHelper(object):
     }
 
     @classmethod
-    def generatePlayoffAdvancement(cls, event, matches):
-        bracket_table = cls.generateBracket(matches, event, event.alliance_selections)
-
-        playoff_advancement = None
+    def getPlayoffTemplate(cls, event):
         playoff_template = None
-        double_elim_matches = None
 
         if event.playoff_type == PlayoffType.CUSTOM:
             playoff_template = 'custom'
         if event.playoff_type == PlayoffType.AVG_SCORE_8_TEAM:
-            playoff_advancement = cls.generatePlayoffAdvancement2015(matches, event.alliance_selections)
             playoff_template = 'playoff_table'
+        elif event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM:
+            playoff_template = 'playoff_round_robin_6_team'
+
+        return playoff_template
+
+    @classmethod
+    def getDoubleElimMatches(cls, event, matches):
+        double_elim_matches = None
+        if event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
+            double_elim_matches = MatchHelper.organizeDoubleElimMatches(matches)
+        return double_elim_matches
+
+    @classmethod
+    def generatePlayoffAdvancement(cls, event, matches):
+        bracket_table = cls.generateBracket(matches, event, event.alliance_selections)
+
+        playoff_advancement = None
+
+        playoff_template = cls.getPlayoffTemplate(event)
+        double_elim_matches = cls.getDoubleElimMatches(event, matches)
+
+        if event.playoff_type == PlayoffType.AVG_SCORE_8_TEAM:
+            playoff_advancement = cls.generatePlayoffAdvancement2015(matches, event.alliance_selections)
             for comp_level in ['qf', 'sf']:
                 if comp_level in bracket_table:
                     del bracket_table[comp_level]
         elif event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM:
             playoff_advancement = cls.generatePlayoffAdvancementRoundRobin(matches, event.year, event.alliance_selections)
-            playoff_template = 'playoff_round_robin_6_team'
             comp_levels = bracket_table.keys()
             for comp_level in comp_levels:
                 if comp_level != 'f':
@@ -54,8 +71,6 @@ class PlayoffAdvancementHelper(object):
             for comp_level in comp_levels:
                 if comp_level != 'f':
                     del bracket_table[comp_level]
-        elif event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
-            double_elim_matches = MatchHelper.organizeDoubleElimMatches(matches)
 
         return bracket_table, playoff_advancement, double_elim_matches, playoff_template
 
@@ -65,9 +80,9 @@ class PlayoffAdvancementHelper(object):
         bracket_table = defaultdict(lambda: defaultdict(dict))
         for comp_level in ['qf', 'sf', 'f']:
             for match in matches[comp_level]:
-                set_number = match.set_number
-                if set_number not in bracket_table[comp_level]:
-                    bracket_table[comp_level][set_number] = {
+                set_key = "{}{}".format(comp_level, match.set_number)
+                if set_key not in bracket_table[comp_level]:
+                    bracket_table[comp_level][set_key] = {
                         'red_alliance': [],
                         'blue_alliance': [],
                         'winning_alliance': None,
@@ -80,15 +95,15 @@ class PlayoffAdvancementHelper(object):
                     }
                 for color in ['red', 'blue']:
                     alliance = copy.copy(match.alliances[color]['teams'])
-                    bracket_table[comp_level][set_number]['{}_name'.format(color)] = cls._getAllianceName(alliance, alliance_selections)
+                    bracket_table[comp_level][set_key]['{}_name'.format(color)] = cls._getAllianceName(alliance, alliance_selections)
                     for i, complete_alliance in enumerate(complete_alliances):  # search for alliance. could be more efficient
                         if len(set(alliance).intersection(set(complete_alliance))) >= 2:  # if >= 2 teams are the same, then the alliance is the same
                             backups = list(set(alliance).difference(set(complete_alliance)))
                             complete_alliances[i] += backups  # ensures that backup robots are listed last
 
                             for team_num in cls.getOrderedAlliance(complete_alliances[i], alliance_selections):
-                                if team_num not in bracket_table[comp_level][set_number]['{}_alliance'.format(color)]:
-                                    bracket_table[comp_level][set_number]['{}_alliance'.format(color)].append(team_num)
+                                if team_num not in bracket_table[comp_level][set_key]['{}_alliance'.format(color)]:
+                                    bracket_table[comp_level][set_key]['{}_alliance'.format(color)].append(team_num)
 
                             break
                     else:
@@ -97,23 +112,23 @@ class PlayoffAdvancementHelper(object):
                 winner = match.winning_alliance
                 if not winner or winner == '':
                     # if the match is a tie
-                    bracket_table[comp_level][set_number]['red_record']['ties'] = \
-                        bracket_table[comp_level][set_number]['red_record']['ties'] + 1
-                    bracket_table[comp_level][set_number]['blue_record']['ties'] = \
-                        bracket_table[comp_level][set_number]['blue_record']['ties'] + 1
+                    bracket_table[comp_level][set_key]['red_record']['ties'] = \
+                        bracket_table[comp_level][set_key]['red_record']['ties'] + 1
+                    bracket_table[comp_level][set_key]['blue_record']['ties'] = \
+                        bracket_table[comp_level][set_key]['blue_record']['ties'] + 1
                     continue
 
-                bracket_table[comp_level][set_number]['{}_wins'.format(winner)] = \
-                    bracket_table[comp_level][set_number]['{}_wins'.format(winner)] + 1
-                bracket_table[comp_level][set_number]['{}_record'.format(winner)]['wins'] = \
-                    bracket_table[comp_level][set_number]['{}_record'.format(winner)]['wins'] + 1
-                bracket_table[comp_level][set_number]['{}_record'.format(cls.OPPONENT[winner])]['losses'] = \
-                    bracket_table[comp_level][set_number]['{}_record'.format(cls.OPPONENT[winner])]['losses'] + 1
+                bracket_table[comp_level][set_key]['{}_wins'.format(winner)] = \
+                    bracket_table[comp_level][set_key]['{}_wins'.format(winner)] + 1
+                bracket_table[comp_level][set_key]['{}_record'.format(winner)]['wins'] = \
+                    bracket_table[comp_level][set_key]['{}_record'.format(winner)]['wins'] + 1
+                bracket_table[comp_level][set_key]['{}_record'.format(cls.OPPONENT[winner])]['losses'] = \
+                    bracket_table[comp_level][set_key]['{}_record'.format(cls.OPPONENT[winner])]['losses'] + 1
                 n = 3 if event.playoff_type == PlayoffType.BO5_FINALS else 2
-                if bracket_table[comp_level][set_number]['red_wins'] == n:
-                    bracket_table[comp_level][set_number]['winning_alliance'] = 'red'
-                if bracket_table[comp_level][set_number]['blue_wins'] == n:
-                    bracket_table[comp_level][set_number]['winning_alliance'] = 'blue'
+                if bracket_table[comp_level][set_key]['red_wins'] == n:
+                    bracket_table[comp_level][set_key]['winning_alliance'] = 'red'
+                if bracket_table[comp_level][set_key]['blue_wins'] == n:
+                    bracket_table[comp_level][set_key]['winning_alliance'] = 'blue'
 
         return bracket_table
 
@@ -288,7 +303,8 @@ class PlayoffAdvancementHelper(object):
     @classmethod
     def transformBracketLevelForApi(cls, event, bracket_table, comp_level):
         level_ranks = []
-        for series, set_bracket in bracket_table[comp_level].iteritems():
+        for series_level, set_bracket in bracket_table[comp_level].iteritems():
+            series = int(''.join(c for c in series_level if c.isdigit()))
             data = {
                 'level': "{}{}".format(comp_level, series),
                 'level_name': Match.COMP_LEVELS_VERBOSE_FULL[comp_level] + (" %d" % series if comp_level != 'f' else ''),

@@ -33,6 +33,7 @@
     <li><a href="#webcasts" data-toggle="tab">Webcasts</a></li>
     <li><a href="#rankings" data-toggle="tab">Rankings</a></li>
     <li><a href="#alliances" data-toggle="tab">Alliances</a></li>
+    <li><a href="#advancement" data-toggle="tab">Playoff Advancement</a></li>
     <li><a href="#awards" data-toggle="tab">Awards</a></li>
     <li><a href="#matches" data-toggle="tab">Matches</a></li>
     <li><a href="#media" data-toggle="tab">Media</a></li>
@@ -374,6 +375,26 @@
       <p>No ranking data yet</p>
   {% endfor %}
 </table>
+{% endif %}
+</div>
+</div>
+
+
+<div class="tab-pane" id="advancement">
+<div class="row">
+<h2>Rankings</h2>
+{% if event.details and event.details.playoff_advancement %}
+<h3>Elim Bracket</h3>
+{% autoescape off %}
+  {{elim_bracket_html}}
+{% endautoescape %}
+
+<h3>Playoff Advancement</h3>
+{% autoescape off %}
+  {{advancement_html}}
+{% endautoescape %}
+{% else %}
+  <p>No advancement details yet</p>
 {% endif %}
 </div>
 </div>

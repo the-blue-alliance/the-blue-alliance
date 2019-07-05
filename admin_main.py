@@ -20,7 +20,7 @@ from controllers.admin.admin_match_controller import AdminVideosAdd, AdminMatchC
 from controllers.admin.admin_media_controller import AdminMediaDashboard, AdminMediaDeleteReference, AdminMediaMakePreferred, AdminMediaRemovePreferred, AdminMediaAdd, \
     AdminMediaInstagramImport
 from controllers.admin.admin_memcache_controller import AdminMemcacheMain
-from controllers.admin.admin_migration_controller import AdminMigration,
+from controllers.admin.admin_migration_controller import AdminMigration, \
     AdminMigrationCreateEventDetails, AdminMigrationRankings, AdminMigrationAddSurrogates, \
     AdminMigrationBackfillYearDQ, AdminMigrationBackfillEventDQ, \
     AdminMigrationPlayoffAdvancement, AdminMigrationPlayoffAdvancementAll

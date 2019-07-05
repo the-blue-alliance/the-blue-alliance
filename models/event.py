@@ -129,6 +129,22 @@ class Event(ndb.Model):
         else:
             return self.details.district_points
 
+    @property
+    def playoff_advancement(self):
+        if self.details is None:
+            return None
+        else:
+            return self.details.playoff_advancement.get(
+                "advancement") if self.details.playoff_advancement else None
+
+    @property
+    def playoff_bracket(self):
+        if self.details is None:
+            return None
+        else:
+            return self.details.playoff_advancement.get(
+                "bracket") if self.details.playoff_advancement else None
+
     @ndb.tasklet
     def get_matches_async(self):
         if self._matches is None:

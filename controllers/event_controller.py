@@ -192,7 +192,16 @@ class EventDetail(CacheableHandler):
             matches_recent = None
             matches_upcoming = None
 
-        bracket_table, playoff_advancement, double_elim_matches, playoff_template = PlayoffAdvancementHelper.generatePlayoffAdvancement(event, matches)
+        bracket_table = event.playoff_bracket
+        playoff_advancement = event.playoff_advancement
+        double_elim_matches = PlayoffAdvancementHelper.getDoubleElimMatches(event, matches)
+        playoff_template = PlayoffAdvancementHelper.getPlayoffTemplate(event)
+
+        # Lazy handle the case when we haven't backfilled the event details
+        if not bracket_table or not playoff_advancement:
+            bracket_table2, playoff_advancement2, _, _ = PlayoffAdvancementHelper.generatePlayoffAdvancement(event, matches)
+            bracket_table = bracket_table or bracket_table2
+            playoff_advancement = playoff_advancement or playoff_advancement2
 
         district_points_sorted = None
         if event.district_key and event.district_points:
