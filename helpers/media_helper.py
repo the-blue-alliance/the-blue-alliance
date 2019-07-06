@@ -71,6 +71,7 @@ class MediaParser(object):
         MediaType.INSTAGRAM_PROFILE: [(r".*instagram.com\/(.*)(\/(.*))?", 1)],
         MediaType.PERISCOPE_PROFILE: [(r".*periscope.tv\/(.*)(\/(.*))?", 1)],
         MediaType.GRABCAD: [(r".*grabcad.com\/library\/(.*)", 1)],
+        MediaType.ONSHAPE: [(r".*cad.onshape.com\/documents\/(.*)", 1)],
         MediaType.INSTAGRAM_IMAGE:  [(r".*instagram.com/p/([^\/]*)(\/(.*))?", 1)],
     }
 
@@ -88,6 +89,7 @@ class MediaParser(object):
         ('youtu.be', MediaType.YOUTUBE_VIDEO),
         ('imgur.com/', MediaType.IMGUR),
         ('grabcad.com/library/', MediaType.GRABCAD),
+        ('cad.onshape.com/documents/', MediaType.ONSHAPE),
         ('instagram.com/p/', MediaType.INSTAGRAM_IMAGE),
 
         # Keep these last, so they don't greedy match over other more specific urls
