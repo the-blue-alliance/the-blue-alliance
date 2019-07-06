@@ -171,7 +171,7 @@ class Media(ndb.Model):
         elif self.media_type_enum == MediaType.GRABCAD:
             return "https://grabcad.com/library/{}".format(self.foreign_key)
         elif self.media_type_enum == MediaType.ONSHAPE:
-            return self.details['model_image']
+            return "https://cad.onshape.com/documents/{}".format(self.foreign_key)
         elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
             return self.instagram_url
         else:
