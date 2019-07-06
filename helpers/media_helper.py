@@ -71,7 +71,7 @@ class MediaParser(object):
         MediaType.INSTAGRAM_PROFILE: [(r".*instagram.com\/(.*)(\/(.*))?", 1)],
         MediaType.PERISCOPE_PROFILE: [(r".*periscope.tv\/(.*)(\/(.*))?", 1)],
         MediaType.GRABCAD: [(r".*grabcad.com\/library\/(.*)", 1)],
-        MediaType.ONSHAPE: [(r".*cad.onshape.com\/documents\/(.*)", 1)],
+        MediaType.ONSHAPE: [(r".*cad.onshape.com\/documents\/(.*)\/e\/", 1)],
         MediaType.INSTAGRAM_IMAGE:  [(r".*instagram.com/p/([^\/]*)(\/(.*))?", 1)],
     }
 
@@ -124,6 +124,8 @@ class MediaParser(object):
                     # GrabCAD images are special - we'll need to do a second fetch to a SUPER HACKY
                     # API so we can get embed images and titles and stuff
                     return cls._partial_media_dict_from_grabcad(url)
+                elif media_type == MediaType.ONSHAPE:
+                    return cls._partial_media_dict_from_onshape(url)
                 elif media_type in cls.OEMBED_PROVIDERS:
                     return cls._partial_media_dict_from_oembed(media_type, url)
                 else:
@@ -168,7 +170,7 @@ class MediaParser(object):
                 foreign_key = regex.group(pattern[1])
                 if foreign_key is not None:
                     # Remove trailing slashes in the URL if necessary
-                    return foreign_key.replace('/', '')
+                    return foreign_key.strip('/')
 
         logging.warning("Failed to determine {} foreign_key from url: {}".format(MediaType.type_names[media_type], url))
         return None
@@ -212,6 +214,20 @@ class MediaParser(object):
             return None
         media_dict['details_json'] = json.dumps({'image_partial': image_partial})
 
+        return media_dict
+
+    @classmethod
+    def _partial_media_dict_from_onshape(cls, url):
+        media_dict = cls._create_media_dict(MediaType.ONSHAPE, url)
+        if not media_dict:
+            return None
+
+        image_url_base = 'https://cad.onshape.com/api/thumbnails/d/{}/s/{}'
+        image_url = image_url_base.format(media_dict['foreign_key'], '300x300')
+
+        media_dict['details_json'] = json.dumps({
+            'model_image': image_url
+        })
         return media_dict
 
     @classmethod
