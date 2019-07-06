@@ -103,6 +103,8 @@ class MediaParser(object):
     }
 
     GRABCAD_DETAIL_URL = "https://grabcad.com/community/api/v1/models/{}"  # Format w/ foreign key
+    ONSHAPE_DETAIL_URL = "https://cad.onshape.com/api/documents/{}"  # Format w/ stripped foreign key
+
     OEMBED_DETAIL_URL = {
         MediaType.INSTAGRAM_IMAGE: "https://api.instagram.com/oembed/?url=http://instagram.com/p/{}"
     }
@@ -222,11 +224,27 @@ class MediaParser(object):
         if not media_dict:
             return None
 
+        # 5481081f48161555332968ff/w/a466cec29af372ec09c44333 -> 5481081f48161555332968ff
+        document_key = media_dict['foreign_key'].split("/")[0]
+
+        # send request to onshape api for document details
+        # as of now, it can only fetch data from documents that are visible to anyone with a link and do not require to be logged in to an onshape account
+        # to fetch data from documents that require users to be logged in, we will need to include api keys
+        url = cls.ONSHAPE_DETAIL_URL.format(document_key)
+        urlfetch_result = urlfetch.fetch(url, deadline=10)
+
+        if urlfetch_result.status_code != 200:
+            logging.warning('Unable to retreive url: {}'.format(url))
+
+        onshape_data = json.loads(urlfetch_result.content)
         image_url_base = 'https://cad.onshape.com/api/thumbnails/d/{}/s/{}'
         image_url = image_url_base.format(media_dict['foreign_key'], '300x300')
 
         media_dict['details_json'] = json.dumps({
-            'model_image': image_url
+            'model_name': onshape_data['name'],
+            'model_description': onshape_data['description'],
+            'model_image': image_url,
+            'model_created': onshape_data['createdAt']
         })
         return media_dict
 
