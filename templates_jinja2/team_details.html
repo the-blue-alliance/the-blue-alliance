@@ -247,12 +247,7 @@
             <div class="col-xs-12">
               <h3 id="photos">CAD Models</h3>
               {% if medias_by_slugname.grabcad or medias_by_slugname.onshape %}
-                  {% for media in medias_by_slugname.grabcad %}
-                    <div class="col-xs-6 col-sm-3">
-                      {% include "media_partials/media_display_partial.html" %}
-                    </div>
-                  {% endfor %}
-                  {% for media in medias_by_slugname.onshape %}
+                  {% for media in medias_by_slugname.grabcad + medias_by_slugname.onshape %}
                     <div class="col-xs-6 col-sm-3">
                       {% include "media_partials/media_display_partial.html" %}
                     </div>

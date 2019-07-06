@@ -129,11 +129,11 @@
           </div>
           {% endif %}
 
-          {% if medias_by_slugname.grabcad %}
+          {% if medias_by_slugname.grabcad or medias_by_slugname.onshape %}
           <div class="row">
             <div class="col-xs-12">
               <h4>Existing CAD Models</h4>
-              {% for media in medias_by_slugname.grabcad%}
+              {% for media in medias_by_slugname.grabcad + medias_by_slugname.onshape %}
                 <div class="col-xs-12 col-md-6">
                 {% include "media_partials/grabcad_partial.html" %}
                 </div>
