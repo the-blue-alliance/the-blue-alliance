@@ -33,6 +33,7 @@
     <li><a href="#webcasts" data-toggle="tab">Webcasts</a></li>
     <li><a href="#rankings" data-toggle="tab">Rankings</a></li>
     <li><a href="#alliances" data-toggle="tab">Alliances</a></li>
+    <li><a href="#advancement" data-toggle="tab">Playoff Advancement</a></li>
     <li><a href="#awards" data-toggle="tab">Awards</a></li>
     <li><a href="#matches" data-toggle="tab">Matches</a></li>
     <li><a href="#media" data-toggle="tab">Media</a></li>
@@ -180,6 +181,7 @@
   <h2>Math Tasks</h2>
   <div class="btn-group">
     <a href="/tasks/math/do/eventteam_update/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-user"></span> Rebuild EventTeams</a>
+    <a href="/tasks/math/do/playoff_advancement_update/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-user"></span> Rebuild Playoff Advancement</a>
     <a href="/backend-tasks/do/post_event_tasks/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-play"></span> Run Post-Event Tasks</a>
     <a href="/tasks/math/do/district_points_calc/{{event.key_name}}?allow-offseason=true" class="btn btn-warning"><span class="glyphicon glyphicon-tasks"></span> District Points</a>
     <a href="/tasks/math/do/event_team_status/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-stats"></span> Team@Event Status</a>
@@ -255,6 +257,22 @@
   <textarea class="form-control" name="matches_csv"></textarea><br>
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Matches</button>
 </form>
+
+{% if event.playoff_type == 4 %}
+<!-- Round robin -->
+<h2>Add Round Robin Playoff Advancement</h2>
+<p>Add playoff advancement (round robin event types only) formatted as CSV. This requires having alliance data set</p>
+<p>Example:</p>
+<div class="well">
+  <p>alliance_number, cmp_points_m1, cmp_points_m2 ..., tiebreak1_m1, tiebreak2_m2 ...,  tiebreak2_m1, tiebreak2_m2 ..., wins, losses, ties
+</div>
+<form action="/admin/playoff_advancement/add" method="post">
+  <input name="event_key" type="hidden" value="{{ event.key_name }}" />
+  <p>Number of Round Robin matches per team: <input name="num_matches" value="5" /></p>
+  <p><textarea class="form-control" name="advancement_csv"></textarea></p>
+  <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Advancement</button>
+</form>
+{% endif %}
 
 <h2>Add Awards</h2>
 <p>Add awards formatted as a CSV.</p>
@@ -373,6 +391,26 @@
       <p>No ranking data yet</p>
   {% endfor %}
 </table>
+{% endif %}
+</div>
+</div>
+
+
+<div class="tab-pane" id="advancement">
+<div class="row">
+<h2>Rankings</h2>
+{% if event.details and event.details.playoff_advancement %}
+<h3>Elim Bracket</h3>
+{% autoescape off %}
+  {{elim_bracket_html}}
+{% endautoescape %}
+
+<h3>Playoff Advancement</h3>
+{% autoescape off %}
+  {{advancement_html}}
+{% endautoescape %}
+{% else %}
+  <p>No advancement details yet</p>
 {% endif %}
 </div>
 </div>
