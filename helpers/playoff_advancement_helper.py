@@ -75,6 +75,42 @@ class PlayoffAdvancementHelper(object):
         return bracket_table, playoff_advancement, double_elim_matches, playoff_template
 
     @classmethod
+    def generatePlayoffAdvancementFromCSV(cls, event, csv_advancement):
+        """
+        Generate properly formatted advancement info from the output of CSVAdvancementParser
+        The output will be of the same format as generatePlayoffAdvancementRoundRobin
+        """
+        if event.playoff_type != PlayoffType.ROUND_ROBIN_6_TEAM:
+            return {}
+
+        advancement = []
+        for alliance_advancement in csv_advancement:
+            alliance = event.alliance_selections[alliance_advancement['alliance_number'] - 1]
+            advancement.append([
+                map(lambda p: int(p[3:]), alliance['picks']),
+                alliance_advancement['cmp_points_matches'],
+                sum(alliance_advancement['cmp_points_matches']),
+                alliance_advancement['tiebreak1_matches'],
+                sum(alliance_advancement['tiebreak1_matches']),
+                alliance_advancement['tiebreak2_matches'],
+                sum(alliance_advancement['tiebreak2_matches']),
+                alliance.get('name'),
+                {
+                    'wins': alliance_advancement['wins'],
+                    'losses': alliance_advancement['losses'],
+                    'ties': alliance_advancement['ties'],
+                }
+            ])
+
+        advancement = sorted(advancement, key=lambda x: -x[6])  # sort by tiebreaker2
+        advancement = sorted(advancement, key=lambda x: -x[4])  # sort by tiebreaker1
+        advancement = sorted(advancement, key=lambda x: -x[2])  # sort by championship points
+        return {
+            "sf": advancement,
+            "sf_complete": True,
+        }
+
+    @classmethod
     def generateBracket(cls, matches, event, alliance_selections=None):
         complete_alliances = []
         bracket_table = defaultdict(lambda: defaultdict(dict))

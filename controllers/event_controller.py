@@ -4,6 +4,7 @@ import datetime
 import json
 import os
 import tba_config
+import logging
 
 from google.appengine.api import memcache
 from google.appengine.ext import ndb

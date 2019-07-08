@@ -258,6 +258,22 @@
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Matches</button>
 </form>
 
+{% if event.playoff_type == 4 %}
+<!-- Round robin -->
+<h2>Add Round Robin Playoff Advancement</h2>
+<p>Add playoff advancement (round robin event types only) formatted as CSV. This requires having alliance data set</p>
+<p>Example:</p>
+<div class="well">
+  <p>alliance_number, cmp_points_m1, cmp_points_m2 ..., tiebreak1_m1, tiebreak2_m2 ...,  tiebreak2_m1, tiebreak2_m2 ..., wins, losses, ties
+</div>
+<form action="/admin/playoff_advancement/add" method="post">
+  <input name="event_key" type="hidden" value="{{ event.key_name }}" />
+  <p>Number of Round Robin matches per team: <input name="num_matches" value="5" /></p>
+  <p><textarea class="form-control" name="advancement_csv"></textarea></p>
+  <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Advancement</button>
+</form>
+{% endif %}
+
 <h2>Add Awards</h2>
 <p>Add awards formatted as a CSV.</p>
 <p>Format:</p>

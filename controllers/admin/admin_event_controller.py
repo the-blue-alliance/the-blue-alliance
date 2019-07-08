@@ -11,6 +11,7 @@ from consts.event_type import EventType
 from consts.playoff_type import PlayoffType
 from controllers import event_controller
 from controllers.base_controller import LoggedInHandler
+from datafeeds.csv_advancement_parser import CSVAdvancementParser
 from datafeeds.csv_alliance_selections_parser import CSVAllianceSelectionsParser
 from datafeeds.csv_teams_parser import CSVTeamsParser
 from helpers.award_manipulator import AwardManipulator
@@ -22,6 +23,7 @@ from helpers.event_details_manipulator import EventDetailsManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.team_manipulator import TeamManipulator
 from helpers.location_helper import LocationHelper
+from helpers.match_helper import MatchHelper
 from helpers.match_manipulator import MatchManipulator
 from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
 from helpers.playoff_advancement_helper import PlayoffAdvancementHelper
@@ -94,6 +96,47 @@ class AdminAddAllianceBackup(LoggedInHandler):
                 alliance['backup']['out'] = team_out
                 EventDetailsManipulator.createOrUpdate(event_details)
                 break
+
+        self.redirect("/admin/event/" + event.key_name)
+        return
+
+
+class AdminPlayoffAdvancementAddController(LoggedInHandler):
+    def post(self):
+        self._require_admin()
+
+        event_key = self.request.get("event_key").strip()
+        event = Event.get_by_id(event_key)
+        if not event:
+            self.redirect("/admin/event/" + event.key_name)
+            return
+
+        if event.playoff_type != PlayoffType.ROUND_ROBIN_6_TEAM:
+            logging.warning("Can't set advancement for non-round robin events")
+            self.redirect("/admin/event/" + event.key_name)
+            return
+
+        advancement_csv = self.request.get("advancement_csv")
+        matches_per_team = int(self.request.get("num_matches"))
+        parsed_advancement = CSVAdvancementParser.parse(advancement_csv, matches_per_team)
+        advancement = PlayoffAdvancementHelper.generatePlayoffAdvancementFromCSV(event, parsed_advancement)
+
+        cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches, event)
+        matches = MatchHelper.organizeMatches(cleaned_matches)
+        bracket_table = PlayoffAdvancementHelper.generateBracket(matches, event, event.alliance_selections)
+        comp_levels = bracket_table.keys()
+        for comp_level in comp_levels:
+            if comp_level != 'f':
+                del bracket_table[comp_level]
+
+        event_details = EventDetails(
+            id=event.key_name,
+            playoff_advancement={
+                'advancement': advancement,
+                'bracket': bracket_table,
+            },
+        )
+        EventDetailsManipulator.createOrUpdate(event_details)
 
         self.redirect("/admin/event/" + event.key_name)
         return
@@ -354,6 +397,7 @@ class AdminEventDetail(LoggedInHandler):
             "playoff_partials/{}.html".format(playoff_template), {
                 "event": event,
                 "playoff_advancement": event.playoff_advancement,
+                "playoff_advancement_tiebreakers": PlayoffAdvancementHelper.ROUND_ROBIN_TIEBREAKERS.get(event.year),
                 "bracket_table": event.playoff_bracket
             }) if playoff_template else "None"
 
