@@ -99,12 +99,20 @@ class ApiEventPlayoffAdvancementController(ApiBaseController):
         matches_future = EventMatchesQuery(event_key).fetch_async(return_updated=True)
 
         event, event_updated = event_future.get_result()
+        event.prep_details()
         matches, matches_updated = matches_future.get_result()
         self._last_modified = max(event_updated, matches_updated)
 
         cleaned_matches = MatchHelper.deleteInvalidMatches(matches, event)
         matches = MatchHelper.organizeMatches(cleaned_matches)
-        bracket_table, playoff_advancement, _, _ = PlayoffAdvancementHelper.generatePlayoffAdvancement(event, matches)
+        bracket_table = event.playoff_bracket
+        playoff_advancement = event.playoff_advancement
+
+        # Lazy handle the case when we haven't backfilled the event details
+        if not bracket_table or not playoff_advancement:
+            bracket_table2, playoff_advancement2, _, _ = PlayoffAdvancementHelper.generatePlayoffAdvancement(event, matches)
+            bracket_table = bracket_table or bracket_table2
+            playoff_advancement = playoff_advancement or playoff_advancement2
 
         output = []
         for level in Match.ELIM_LEVELS:
