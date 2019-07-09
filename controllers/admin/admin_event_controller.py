@@ -117,9 +117,14 @@ class AdminPlayoffAdvancementAddController(LoggedInHandler):
             return
 
         advancement_csv = self.request.get("advancement_csv")
+        comp_level = self.request.get("comp_level")
         matches_per_team = int(self.request.get("num_matches"))
+        if comp_level not in Match.ELIM_LEVELS:
+            logging.warning("Bad comp level: {}".format(comp_level))
+            self.redirect("/admin/event/" + event.key_name)
+            return
         parsed_advancement = CSVAdvancementParser.parse(advancement_csv, matches_per_team)
-        advancement = PlayoffAdvancementHelper.generatePlayoffAdvancementFromCSV(event, parsed_advancement)
+        advancement = PlayoffAdvancementHelper.generatePlayoffAdvancementFromCSV(event, parsed_advancement, comp_level)
 
         cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches, event)
         matches = MatchHelper.organizeMatches(cleaned_matches)
@@ -129,10 +134,13 @@ class AdminPlayoffAdvancementAddController(LoggedInHandler):
             if comp_level != 'f':
                 del bracket_table[comp_level]
 
+        existing_details = EventDetails.get_by_id(event.key_name)
+        new_advancement = existing_details.playoff_advancement if existing_details and existing_details.playoff_advancement else {}
+        new_advancement.update(advancement)
         event_details = EventDetails(
             id=event.key_name,
             playoff_advancement={
-                'advancement': advancement,
+                'advancement': new_advancement,
                 'bracket': bracket_table,
             },
         )
