@@ -150,6 +150,24 @@ class AdminPlayoffAdvancementAddController(LoggedInHandler):
         return
 
 
+class AdminPlayoffAdvancementPurgeController(LoggedInHandler):
+    def post(self, event_key):
+        self._require_admin()
+
+        event = Event.get_by_id(event_key)
+        if not event:
+            self.redirect("/admin/event/" + event.key_name)
+            return
+
+        details = EventDetails.get_by_id(event.key_name)
+        if details:
+            details.playoff_advancement = {}
+            EventDetailsManipulator.createOrUpdate(details)
+
+        self.redirect("/admin/event/" + event.key_name)
+        return
+
+
 class AdminEventAddTeams(LoggedInHandler):
     """
     Add a teams to an Event. Useful for legacy and offseason events.
