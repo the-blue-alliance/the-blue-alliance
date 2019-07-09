@@ -6626,7 +6626,11 @@
               "html5",
               "rtmp",
               "livestream",
-              "direct_link"
+              "direct_link",
+              "mms",
+              "justin",
+              "stemtv",
+              "dacast"
             ]
           },
           "channel": {
