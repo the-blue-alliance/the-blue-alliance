@@ -75,7 +75,7 @@ class PlayoffAdvancementHelper(object):
         return bracket_table, playoff_advancement, double_elim_matches, playoff_template
 
     @classmethod
-    def generatePlayoffAdvancementFromCSV(cls, event, csv_advancement):
+    def generatePlayoffAdvancementFromCSV(cls, event, csv_advancement, comp_level):
         """
         Generate properly formatted advancement info from the output of CSVAdvancementParser
         The output will be of the same format as generatePlayoffAdvancementRoundRobin
@@ -106,8 +106,8 @@ class PlayoffAdvancementHelper(object):
         advancement = sorted(advancement, key=lambda x: -x[4])  # sort by tiebreaker1
         advancement = sorted(advancement, key=lambda x: -x[2])  # sort by championship points
         return {
-            "sf": advancement,
-            "sf_complete": True,
+            comp_level: advancement,
+            "{}_complete".format(comp_level): True,
         }
 
     @classmethod
