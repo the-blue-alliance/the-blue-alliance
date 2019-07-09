@@ -399,8 +399,13 @@
 
 <div class="tab-pane" id="advancement">
 <div class="row">
-<h2>Rankings</h2>
+<h2>Playoff Advancement</h2>
 {% if event.details and event.details.playoff_advancement %}
+
+<form action="/admin/playoff_advancement/purge/{{event.key_name}}" method="post">
+  <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Purge Advancement</button>
+</form>
+
 <h3>Elim Bracket</h3>
 {% autoescape off %}
   {{elim_bracket_html}}
