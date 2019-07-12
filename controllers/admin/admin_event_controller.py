@@ -430,7 +430,6 @@ class AdminEventDetail(LoggedInHandler):
         self.template_values.update({
             "event": event,
             "medias": event_medias,
-            "cache_key": event_controller.EventDetail('2016nyny').cache_key.format(event.key_name),
             "flushed": self.request.get("flushed"),
             "playoff_types": PlayoffType.type_names,
             "write_auths": api_keys,

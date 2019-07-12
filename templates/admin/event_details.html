@@ -13,7 +13,7 @@
 </div>
 
 <form action="/admin/memcache" method="post" id="event_cache_clear">
-  <input name="memcache_key" value="{{cache_key}}" type="hidden" />
+  <input name="event_key" value="{{event.key_name}}" type="hidden" />
   <input name="return_url" value="/admin/event/{{ event.key_name }}" type="hidden" />
 </form>
 
