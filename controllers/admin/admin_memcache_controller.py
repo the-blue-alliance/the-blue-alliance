@@ -42,7 +42,7 @@ class AdminMemcacheMain(LoggedInHandler):
                     TeamCanonical().cache_key.format(team.key.id())
                 )
 
-            # memcache.delete_multi(memcache_keys_to_delete)
+            memcache.delete_multi(memcache_keys_to_delete)
             flushed += memcache_keys_to_delete
 
         if self.request.get('return_url') is not "":
