@@ -30,7 +30,7 @@
         {% endfor %}
       </td>
       {% endif %}
-      {% if bracket_table.sf %}
+      {% if bracket_table.sf and bracket_table.sf.sf2 %}
       <td class="rightAlliance {% if bracket_table.sf.sf2.winning_alliance == 'blue' %}winnerR{% endif %}" rowspan="2">
         {% for team in bracket_table.sf.sf2.blue_alliance %}
           <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
@@ -77,10 +77,12 @@
           <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
         {% endfor %}
       </td>
-      <td class="rightAlliance {% if bracket_table.sf.sf2.winning_alliance == 'red' %}winnerR{% endif %}" rowspan="2">
+      <td class="rightAlliance {% if bracket_table.sf.sf2 and bracket_table.sf.sf2.winning_alliance == 'red' %}winnerR{% endif %}" rowspan="2">
+        {% if bracket_table.sf.sf2 %}
         {% for team in bracket_table.sf.sf2.red_alliance %}
           <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
         {% endfor %}
+        {% endif %}
       </td>
       {% endif %}
       {% if bracket_table.qf %}
