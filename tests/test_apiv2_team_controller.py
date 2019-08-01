@@ -67,7 +67,6 @@ class TestTeamApiController(unittest2.TestCase):
         self.assertEqual(team["region"], "SC")
         self.assertEqual(team["website"], self.team.website)
         self.assertEqual(team["rookie_year"], self.team.rookie_year)
-        self.assertEqual(team["motto"], None)
 
     def test_team_api(self):
         response = self.testapp.get('/frc281', headers={"X-TBA-App-Id": "tba-tests:team-controller-test:v01"})
@@ -207,7 +206,6 @@ class TestDistrictTeamsApiController(unittest2.TestCase):
         self.assertEqual(team["country_name"], "USA")
         self.assertEqual(team["region"], "SC")
         self.assertEqual(team["website"], self.team.website)
-        self.assertEqual(team["motto"], None)
 
     def test_districts_api(self):
         response = self.testapp.get('/ne/2015', headers={"X-TBA-App-Id": "tba-tests:team-districts-controller-test:v01"})

@@ -3,7 +3,7 @@ from database.dict_converters.converter_base import ConverterBase
 
 class TeamConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        3: 4,
+        3: 5,
     }
 
     @classmethod
@@ -28,7 +28,6 @@ class TeamConverter(ConverterBase):
             'name': team.name if team.name else default_name,
             'website': team.website,
             'rookie_year': team.rookie_year,
-            'motto': None,
             'home_championship': team.championship_location,
         }
         team_dict.update(cls.constructLocation_v3(team))
