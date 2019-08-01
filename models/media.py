@@ -26,6 +26,7 @@ class Media(ndb.Model):
         MediaType.INSTAGRAM_PROFILE: 'instagram-profile',
         MediaType.PERISCOPE_PROFILE: 'periscope-profile',
         MediaType.GRABCAD: 'grabcad',
+        MediaType.ONSHAPE: 'onshape',
         MediaType.INSTAGRAM_IMAGE: 'instagram-image',
         MediaType.EXTERNAL_LINK: 'external-link',
         MediaType.AVATAR: 'avatar',
@@ -169,6 +170,8 @@ class Media(ndb.Model):
             return self.imgur_url
         elif self.media_type_enum == MediaType.GRABCAD:
             return "https://grabcad.com/library/{}".format(self.foreign_key)
+        elif self.media_type_enum == MediaType.ONSHAPE:
+            return "https://cad.onshape.com/documents/{}".format(self.foreign_key)
         elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
             return self.instagram_url
         else:
@@ -183,6 +186,8 @@ class Media(ndb.Model):
             return self.imgur_direct_url
         elif self.media_type_enum == MediaType.GRABCAD:
             return self.details['model_image'].replace('card.jpg', 'large.png')
+        elif self.media_type_enum == MediaType.ONSHAPE:
+            return self.details['model_image'].replace('300x300', '600x340')
         elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
             return self.instagram_direct_url
         else:
@@ -214,6 +219,8 @@ class Media(ndb.Model):
             return self.imgur_direct_url_med
         elif self.media_type_enum == MediaType.GRABCAD:
             return self.details['model_image']
+        elif self.media_type_enum == MediaType.ONSHAPE:
+            return self.details['model_image']
         elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
             return self.instagram_direct_url_med
         else:
@@ -227,6 +234,8 @@ class Media(ndb.Model):
             return self.imgur_direct_url_sm
         elif self.media_type_enum == MediaType.GRABCAD:
             return self.details['model_image'].replace('large.jpg', 'tiny.jpg')
+        elif self.media_type_enum == MediaType.ONSHAPE:
+            return self.details['model_image'].replace('300x300', '300x170')
         elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
             return self.instagram_direct_url_sm
         else:

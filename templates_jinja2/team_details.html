@@ -246,12 +246,21 @@
           <div class="row">
             <div class="col-xs-12">
               <h3 id="photos">CAD Models</h3>
-              {% if medias_by_slugname.grabcad %}
+              {% if medias_by_slugname.grabcad or medias_by_slugname.onshape %}
+                {% if medias_by_slugname.grabcad %}
                   {% for media in medias_by_slugname.grabcad %}
                     <div class="col-xs-6 col-sm-3">
                       {% include "media_partials/media_display_partial.html" %}
                     </div>
                   {% endfor %}
+                {% endif %}
+                {% if medias_by_slugname.onshape %}
+                  {% for media in medias_by_slugname.onshape %}
+                    <div class="col-xs-6 col-sm-3">
+                      {% include "media_partials/media_display_partial.html" %}
+                    </div>
+                  {% endfor %}
+                {% endif %}
               {% else %}
                   <p>No CAD for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add some</a>?</p>
               {% endif %}

@@ -61,6 +61,10 @@
             <li><strong>Instagram photos and videos</strong>, like <code>https://www.instagram.com/p/BUnZiriBYre</code></li>
             <li><strong>YouTube videos</strong>, like <code>https://www.youtube.com/watch?v=DojyJ9bZ4fk</code></li>
             <li><strong>GrabCAD files</strong>, like <code>https://grabcad.com/library/cad-stuff</code></li>
+            <li><strong>Onshape documents that are publically accessible via link</strong>, like <code>https://cad.onshape.com/documents/cfb3e7b1e271d7a73b4fb21e<br>/w/d7248be0d0967489a13c9fd1/e/53d949eaf719f64b688351ad</code>
+            <br>
+            Onshape documents that are public but require an onshape account are not supported at this moment. To make them publically accessible via link, select <code>Share</code>, <code>Link Sharing</code>, then <code>Turn on link sharing</code>.
+            </li>
           </ul>
 
           <p><strong>Please do not submit:</strong></p>
@@ -129,15 +133,20 @@
           </div>
           {% endif %}
 
-          {% if medias_by_slugname.grabcad %}
+          {% if medias_by_slugname.grabcad or medias_by_slugname.onshape %}
           <div class="row">
             <div class="col-xs-12">
               <h4>Existing CAD Models</h4>
-              {% for media in medias_by_slugname.grabcad%}
+              {% for media in medias_by_slugname.grabcad %}
                 <div class="col-xs-12 col-md-6">
                 {% include "media_partials/grabcad_partial.html" %}
                 </div>
               {% endfor %}
+              {% for media in medias_by_slugname.onshape %}
+                <div class="col-xs-12 col-md-6">
+                {% include "media_partials/onshape_partial.html" %}
+                </div>
+                {% endfor %}
             </div>
           </div>
           {% endif %}

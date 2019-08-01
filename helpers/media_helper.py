@@ -71,6 +71,7 @@ class MediaParser(object):
         MediaType.INSTAGRAM_PROFILE: [(r".*instagram.com\/(.*)(\/(.*))?", 1)],
         MediaType.PERISCOPE_PROFILE: [(r".*periscope.tv\/(.*)(\/(.*))?", 1)],
         MediaType.GRABCAD: [(r".*grabcad.com\/library\/(.*)", 1)],
+        MediaType.ONSHAPE: [(r".*cad.onshape.com\/documents\/(.*)\/e\/", 1)],
         MediaType.INSTAGRAM_IMAGE:  [(r".*instagram.com/p/([^\/]*)(\/(.*))?", 1)],
     }
 
@@ -88,6 +89,7 @@ class MediaParser(object):
         ('youtu.be', MediaType.YOUTUBE_VIDEO),
         ('imgur.com/', MediaType.IMGUR),
         ('grabcad.com/library/', MediaType.GRABCAD),
+        ('cad.onshape.com/documents/', MediaType.ONSHAPE),
         ('instagram.com/p/', MediaType.INSTAGRAM_IMAGE),
 
         # Keep these last, so they don't greedy match over other more specific urls
@@ -101,6 +103,8 @@ class MediaParser(object):
     }
 
     GRABCAD_DETAIL_URL = "https://grabcad.com/community/api/v1/models/{}"  # Format w/ foreign key
+    ONSHAPE_DETAIL_URL = "https://cad.onshape.com/api/documents/{}"  # Format w/ stripped foreign key
+
     OEMBED_DETAIL_URL = {
         MediaType.INSTAGRAM_IMAGE: "https://api.instagram.com/oembed/?url=http://instagram.com/p/{}"
     }
@@ -122,6 +126,8 @@ class MediaParser(object):
                     # GrabCAD images are special - we'll need to do a second fetch to a SUPER HACKY
                     # API so we can get embed images and titles and stuff
                     return cls._partial_media_dict_from_grabcad(url)
+                elif media_type == MediaType.ONSHAPE:
+                    return cls._partial_media_dict_from_onshape(url)
                 elif media_type in cls.OEMBED_PROVIDERS:
                     return cls._partial_media_dict_from_oembed(media_type, url)
                 else:
@@ -166,7 +172,7 @@ class MediaParser(object):
                 foreign_key = regex.group(pattern[1])
                 if foreign_key is not None:
                     # Remove trailing slashes in the URL if necessary
-                    return foreign_key.replace('/', '')
+                    return foreign_key.strip('/')
 
         logging.warning("Failed to determine {} foreign_key from url: {}".format(MediaType.type_names[media_type], url))
         return None
@@ -210,6 +216,36 @@ class MediaParser(object):
             return None
         media_dict['details_json'] = json.dumps({'image_partial': image_partial})
 
+        return media_dict
+
+    @classmethod
+    def _partial_media_dict_from_onshape(cls, url):
+        media_dict = cls._create_media_dict(MediaType.ONSHAPE, url)
+        if not media_dict:
+            return None
+
+        # 5481081f48161555332968ff/w/a466cec29af372ec09c44333 -> 5481081f48161555332968ff
+        document_key = media_dict['foreign_key'].split("/")[0]
+
+        # send request to onshape api for document details
+        # as of now, it can only fetch data from documents that are visible to anyone with a link and do not require to be logged in to an onshape account
+        # to fetch data from documents that require users to be logged in, we will need to include api keys
+        url = cls.ONSHAPE_DETAIL_URL.format(document_key)
+        urlfetch_result = urlfetch.fetch(url, deadline=10)
+
+        if urlfetch_result.status_code != 200:
+            logging.warning('Unable to retreive url: {}'.format(url))
+
+        onshape_data = json.loads(urlfetch_result.content)
+        image_url_base = 'https://cad.onshape.com/api/thumbnails/d/{}/s/{}'
+        image_url = image_url_base.format(media_dict['foreign_key'], '300x300')
+
+        media_dict['details_json'] = json.dumps({
+            'model_name': onshape_data['name'],
+            'model_description': onshape_data['description'],
+            'model_image': image_url,
+            'model_created': onshape_data['createdAt']
+        })
         return media_dict
 
     @classmethod
