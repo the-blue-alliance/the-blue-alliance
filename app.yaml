@@ -83,7 +83,7 @@ handlers:
 - url: /_ah/queue/deferred.*
   script: google.appengine.ext.deferred.deferred.application
   login: admin
-- url: /clientapi/*
+- url: /clientapi/.*
   script: clientapi.clientapi_service.app
 - url: .*
   script: main.app
