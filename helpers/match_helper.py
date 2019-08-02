@@ -33,7 +33,7 @@ class MatchHelper(object):
         last_match_time = None
         cur_date = event.end_date + datetime.timedelta(hours=23, minutes=59, seconds=59)  # end_date is specified at midnight of the last day
         for match in matches_reversed:
-            r = re.match(r'(\d+):(\d+) (am|pm)', match.time_string.lower())
+            r = re.search(r'(\d+):(\d+) (am|pm)', match.time_string.lower())
             hour = int(r.group(1))
             minute = int(r.group(2))
             if hour == 12:
