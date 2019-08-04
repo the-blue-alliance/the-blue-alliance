@@ -38,7 +38,7 @@ class VerificationNotification(Notification):
 
     @classmethod
     def _type(cls):
-        from consts.notification_type import NotificationType
+        from tba.consts.notification_type import NotificationType
         return NotificationType.VERIFICATION
 
     # Only webhook message data is defined - because we'll only ever send verification to webhooks

@@ -1,4 +1,4 @@
-from consts.notification_type import NotificationType
+from tba.consts.notification_type import NotificationType
 from helpers.award_helper import AwardHelper
 from helpers.model_to_dict import ModelToDict
 from notifications.base_notification import BaseNotification

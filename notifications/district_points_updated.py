@@ -1,5 +1,5 @@
-from consts.district_type import DistrictType
-from consts.notification_type import NotificationType
+from tba.consts.district_type import DistrictType
+from tba.consts.notification_type import NotificationType
 from notifications.base_notification import BaseNotification
 
 

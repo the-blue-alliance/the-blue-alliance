@@ -6,8 +6,8 @@ import unittest2
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from consts.event_type import EventType
-from consts.playoff_type import PlayoffType
+from tba.consts.event_type import EventType
+from tba.consts.playoff_type import PlayoffType
 from datafeeds.parsers.fms_api.fms_api_match_parser import FMSAPIMatchDetailsParser
 from helpers.match_helper import MatchHelper
 from models.event import Event

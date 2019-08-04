@@ -4,8 +4,8 @@ import unittest2
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from consts.award_type import AwardType
-from consts.event_type import EventType
+from tba.consts.award_type import AwardType
+from tba.consts.event_type import EventType
 from helpers.award_manipulator import AwardManipulator
 from models.award import Award
 from models.event import Event

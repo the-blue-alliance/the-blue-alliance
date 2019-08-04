@@ -4,7 +4,7 @@ import unittest2
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 from datafeeds.usfirst_matches_parser import UsfirstMatchesParser
 from helpers.event_team_updater import EventTeamUpdater
 from models.event import Event

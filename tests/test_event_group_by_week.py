@@ -7,7 +7,7 @@ import logging
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 from helpers.event_helper import EventHelper, CHAMPIONSHIP_EVENTS_LABEL,\
     WEEKLESS_EVENTS_LABEL, OFFSEASON_EVENTS_LABEL, PRESEASON_EVENTS_LABEL
 from models.event import Event

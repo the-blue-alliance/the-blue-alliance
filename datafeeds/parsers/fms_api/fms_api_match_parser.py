@@ -4,7 +4,7 @@ import logging
 
 from google.appengine.ext import ndb
 
-from consts.playoff_type import PlayoffType
+from tba.consts.playoff_type import PlayoffType
 from helpers.match_helper import MatchHelper
 from helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from models.event import Event

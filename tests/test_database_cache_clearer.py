@@ -16,9 +16,9 @@ from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, Event
 from database.robot_query import TeamRobotsQuery
 from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, EventEventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
 
-from consts.event_type import EventType
-from consts.award_type import AwardType
-from consts.media_tag import MediaTag
+from tba.consts.event_type import EventType
+from tba.consts.award_type import AwardType
+from tba.consts.media_tag import MediaTag
 from models.district import District
 from models.district_team import DistrictTeam
 from models.event import Event

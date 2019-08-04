@@ -1,7 +1,7 @@
 import calendar
 import datetime
 
-from consts.notification_type import NotificationType
+from tba.consts.notification_type import NotificationType
 from helpers.webcast_online_helper import WebcastOnlineHelper
 from notifications.base_notification import BaseNotification
 

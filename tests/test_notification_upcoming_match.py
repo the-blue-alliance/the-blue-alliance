@@ -4,7 +4,7 @@ import unittest2
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from consts.notification_type import NotificationType
+from tba.consts.notification_type import NotificationType
 from helpers.event.event_test_creator import EventTestCreator
 from models.team import Team
 from notifications.upcoming_match import UpcomingMatchNotification

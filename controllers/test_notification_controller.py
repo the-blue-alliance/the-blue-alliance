@@ -1,6 +1,6 @@
 import logging
 
-from consts.notification_type import NotificationType
+from tba.consts.notification_type import NotificationType
 from base_controller import LoggedInHandler
 from helpers.push_helper import PushHelper
 from models.district import District

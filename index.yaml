@@ -134,6 +134,12 @@ indexes:
   - name: set_number
   - name: match_number
 
+- kind: MobileClient
+  ancestor: yes
+  properties:
+  - name: client_type
+  - name: messaging_id
+
 - kind: Subscription
   ancestor: yes
   properties:

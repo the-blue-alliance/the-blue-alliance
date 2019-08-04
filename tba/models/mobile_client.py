@@ -1,7 +1,8 @@
 import urllib
+
 from google.appengine.ext import ndb
 
-from consts.client_type import ClientType
+from tba.consts.client_type import ClientType
 
 
 class MobileClient(ndb.Model):
@@ -42,3 +43,32 @@ class MobileClient(ndb.Model):
     @property
     def short_id(self):
         return self.messaging_id if len(self.messaging_id)<=50 else self.messaging_id[0:50]+'...'
+
+    @staticmethod
+    def device_push_tokens(user_id):
+        """
+        Get device tokens for clients that support push notifications for a given user.
+
+        Args:
+            user_id (string): The User ID to fetch device tokens for.
+
+        Returns:
+            list (string): List of device tokens for the user.
+        """
+        from models.account import Account
+        clients = MobileClient.query(
+            MobileClient.client_type.IN(ClientType.FCM_CLIENTS),
+            ancestor=ndb.Key(Account, user_id)
+        ).fetch(projection=[MobileClient.messaging_id])
+        return [c.messaging_id for c in clients]
+
+    @staticmethod
+    def delete_for_token(token):
+        """
+        Delete the mobile client(s) with the associated messaging_id.
+
+        Args:
+            token (string): The messaging_id to filter for.
+        """
+        to_delete = MobileClient.query(MobileClient.messaging_id == token).fetch(keys_only=True)
+        ndb.delete_multi(to_delete)

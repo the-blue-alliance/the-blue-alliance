@@ -25,58 +25,45 @@ class TestFCMRequest(unittest2.TestCase):
             self._app = firebase_admin.get_app('tbans')
         except ValueError:
             self._app = firebase_admin.initialize_app(name='tbans')
-        messaging._get_messaging_service(self._app).send = self._stub_send
+
+        messaging._get_messaging_service(self._app).send_all = self._stub_send_all
 
     def tearDown(self):
         self.testbed.deactivate()
 
-    def _stub_send(self, message, dry_run):
+    def _stub_send_all(self, message, dry_run):
         self.assertFalse(dry_run)
         self.assertIsNotNone(message)
-        return 'message-id'
 
     def test_subclass(self):
-        request = FCMRequest(self._app, MockNotification(), token='abcd')
+        request = FCMRequest(self._app, MockNotification(), tokens=['abcd'])
         self.assertTrue(isinstance(request, Request))
 
     def test_init_app_none(self):
         with self.assertRaises(ValueError):
-            FCMRequest(None, MockNotification(), token='abcd')
+            FCMRequest(None, MockNotification(), tokens=['abcd'])
 
     def test_init_app_type(self):
         with self.assertRaises(ValueError):
-            FCMRequest('abc', MockNotification(), token='abcd')
+            FCMRequest('abc', MockNotification(), tokens=['abcd'])
 
     def test_init_app(self):
-        FCMRequest(self._app, MockNotification(), token='abcd')
+        FCMRequest(self._app, MockNotification(), tokens=['abcd'])
 
     def test_init_delivery_none(self):
         with self.assertRaises(TypeError):
             FCMRequest(self._app, notification=MockNotification())
 
-    def test_init_delivery_multiple(self):
-        with self.assertRaises(TypeError):
-            FCMRequest(self._app, notification=MockNotification(), token='abc', topic='def')
-
-    def test_str_token(self):
-        request = FCMRequest(self._app, MockNotification(), token='abc')
-        self.assertTrue('FCMRequest(token="abc", notification=' in str(request))
-
-    def test_str_topic(self):
-        request = FCMRequest(self._app, MockNotification(), topic='def')
-        self.assertTrue('FCMRequest(topic="def", notification=' in str(request))
-
-    def test_str_condition(self):
-        request = FCMRequest(self._app, MockNotification(), condition='hij')
-        self.assertTrue('FCMRequest(condition="hij", notification=' in str(request))
+    def test_str(self):
+        request = FCMRequest(self._app, MockNotification(), tokens=['abc'])
+        self.assertEqual("FCMRequest(tokens=['abc'], notification=MockNotification())", str(request))
 
     def test_send(self):
-        request = FCMRequest(self._app, notification=MockNotification(), token='abc')
-        message_id = request.send()
-        self.assertEqual(message_id, 'message-id')
+        request = FCMRequest(self._app, notification=MockNotification(), tokens=['abc'])
+        request.send()  # Mostly just hit this code path
 
     def test_fcm_message_empty(self):
-        request = FCMRequest(self._app, notification=MockNotification(), token='abc')
+        request = FCMRequest(self._app, notification=MockNotification(), tokens=['abc'])
         message = request._fcm_message()
         self.assertIsNotNone(message)
         self.assertIsNotNone(message.data)
@@ -84,13 +71,11 @@ class TestFCMRequest(unittest2.TestCase):
         self.assertIsNone(message.android)
         self.assertIsNone(message.apns)
         self.assertIsNone(message.webpush)
-        self.assertEqual(message.token, 'abc')
-        self.assertIsNone(message.topic)
-        self.assertIsNone(message.condition)
+        self.assertEqual(message.tokens, ['abc'])
 
     def test_fcm_message_platform_config(self):
         platform_config = PlatformConfig(priority=PlatformPriority.HIGH, collapse_key='collapse_key')
-        request = FCMRequest(self._app, notification=MockNotification(platform_config=platform_config), topic='abc')
+        request = FCMRequest(self._app, notification=MockNotification(platform_config=platform_config), tokens=['abc'])
         message = request._fcm_message()
         self.assertIsNotNone(message)
         self.assertIsNotNone(message.data)
@@ -98,14 +83,12 @@ class TestFCMRequest(unittest2.TestCase):
         self.assertTrue(isinstance(message.android, messaging.AndroidConfig))
         self.assertTrue(isinstance(message.apns, messaging.APNSConfig))
         self.assertTrue(isinstance(message.webpush, messaging.WebpushConfig))
-        self.assertIsNone(message.token)
-        self.assertEqual(message.topic, 'abc')
-        self.assertIsNone(message.condition)
+        self.assertEqual(message.tokens, ['abc'])
 
     def test_fcm_message_platform_config_override(self):
         platform_config = PlatformConfig(priority=PlatformPriority.HIGH, collapse_key='collapse_key')
         apns_config = messaging.APNSConfig(headers={'apns-collapse-id': 'ios_collapse_key'})
-        request = FCMRequest(self._app, notification=MockNotification(platform_config=platform_config, apns_config=apns_config), topic='abc')
+        request = FCMRequest(self._app, notification=MockNotification(platform_config=platform_config, apns_config=apns_config), tokens=['abc'])
         message = request._fcm_message()
         self.assertIsNotNone(message)
         self.assertIsNotNone(message.data)
@@ -115,13 +98,11 @@ class TestFCMRequest(unittest2.TestCase):
         self.assertEqual(message.apns.headers, {'apns-collapse-id': 'ios_collapse_key'})
         self.assertTrue(isinstance(message.webpush, messaging.WebpushConfig))
         self.assertEqual(message.webpush.headers, {'Topic': 'collapse_key', 'Urgency': 'high'})
-        self.assertIsNone(message.token)
-        self.assertEqual(message.topic, 'abc')
-        self.assertIsNone(message.condition)
+        self.assertEqual(message.tokens, ['abc'])
 
     def test_fcm_message_data_payload_default(self):
         platform_config = PlatformConfig(priority=PlatformPriority.HIGH, collapse_key='collapse_key')
-        request = FCMRequest(self._app, notification=MockNotification(), condition='abc')
+        request = FCMRequest(self._app, notification=MockNotification(), tokens=['abc'])
         message = request._fcm_message()
         self.assertIsNotNone(message)
         self.assertEqual(message.data, {'notification_type': 'verification'})
@@ -129,13 +110,11 @@ class TestFCMRequest(unittest2.TestCase):
         self.assertIsNone(message.android)
         self.assertIsNone(message.apns)
         self.assertIsNone(message.webpush)
-        self.assertIsNone(message.token)
-        self.assertIsNone(message.topic)
-        self.assertEqual(message.condition, 'abc')
+        self.assertEqual(message.tokens, ['abc'])
 
     def test_fcm_message_data_payload(self):
         platform_config = PlatformConfig(priority=PlatformPriority.HIGH, collapse_key='collapse_key')
-        request = FCMRequest(self._app, notification=MockNotification(data_payload={'some_data': 'some test data'}), condition='abc')
+        request = FCMRequest(self._app, notification=MockNotification(data_payload={'some_data': 'some test data'}), tokens=['abc'])
         message = request._fcm_message()
         self.assertIsNotNone(message)
         self.assertEqual(message.data, {'notification_type': 'verification', 'some_data': 'some test data'})
@@ -143,13 +122,11 @@ class TestFCMRequest(unittest2.TestCase):
         self.assertIsNone(message.android)
         self.assertIsNone(message.apns)
         self.assertIsNone(message.webpush)
-        self.assertIsNone(message.token)
-        self.assertIsNone(message.topic)
-        self.assertEqual(message.condition, 'abc')
+        self.assertEqual(message.tokens, ['abc'])
 
     def test_fcm_message_notification(self):
         platform_config = PlatformConfig(priority=PlatformPriority.HIGH, collapse_key='collapse_key')
-        request = FCMRequest(self._app, notification=MockNotification(fcm_notification=messaging.Notification(title='Title', body='Some body message')), condition='abc')
+        request = FCMRequest(self._app, notification=MockNotification(fcm_notification=messaging.Notification(title='Title', body='Some body message')), tokens=['abc'])
         message = request._fcm_message()
         self.assertIsNotNone(message)
         self.assertIsNotNone(message.data)
@@ -157,6 +134,4 @@ class TestFCMRequest(unittest2.TestCase):
         self.assertIsNone(message.android)
         self.assertIsNone(message.apns)
         self.assertIsNone(message.webpush)
-        self.assertIsNone(message.token)
-        self.assertIsNone(message.topic)
-        self.assertEqual(message.condition, 'abc')
+        self.assertEqual(message.tokens, ['abc'])

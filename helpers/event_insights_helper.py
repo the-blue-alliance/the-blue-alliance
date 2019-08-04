@@ -2,7 +2,7 @@ import logging
 import traceback
 
 from collections import defaultdict
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 
 
 class EventInsightsHelper(object):

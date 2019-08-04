@@ -1,7 +1,7 @@
 import unittest2
 import datetime
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 from datafeeds.usfirst_legacy_event_details_parser import UsfirstLegacyEventDetailsParser
 
 

@@ -30,6 +30,13 @@ queue:
     min_backoff_seconds: 10
     max_backoff_seconds: 30
 
+- name: tbans-notifications
+  rate: 100/s
+  retry_parameters:
+    task_age_limit: 3m
+    min_backoff_seconds: 10
+    max_backoff_seconds: 30
+
 - name: search-index-update
   rate: 10/s
 

@@ -2,7 +2,7 @@ import os
 
 from google.appengine.ext.webapp import template
 
-from consts.landing_type import LandingType
+from tba.consts.landing_type import LandingType
 from controllers.base_controller import LoggedInHandler
 from models.sitevar import Sitevar
 

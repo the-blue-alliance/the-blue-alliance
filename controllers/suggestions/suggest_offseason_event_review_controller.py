@@ -1,8 +1,8 @@
 from datetime import datetime
 from difflib import SequenceMatcher
 
-from consts.account_permissions import AccountPermissions
-from consts.event_type import EventType
+from tba.consts.account_permissions import AccountPermissions
+from tba.consts.event_type import EventType
 from controllers.suggestions.suggestions_review_base_controller import \
     SuggestionsReviewBaseController
 from database.event_query import EventListQuery

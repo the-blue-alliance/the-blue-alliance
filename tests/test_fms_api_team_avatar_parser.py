@@ -7,7 +7,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from models.district import District
-from consts.media_type import MediaType
+from tba.consts.media_type import MediaType
 
 
 class TestFMSAPITeamAvatarParser(unittest2.TestCase):

@@ -9,9 +9,9 @@ from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from webapp2_extras.routes import RedirectRoute
 
-from consts.account_permissions import AccountPermissions
-from consts.district_type import DistrictType
-from consts.event_type import EventType
+from tba.consts.account_permissions import AccountPermissions
+from tba.consts.district_type import DistrictType
+from tba.consts.event_type import EventType
 from controllers.suggestions.suggest_event_webcast_review_controller import \
     SuggestEventWebcastReviewController
 from helpers.suggestions.suggestion_creator import SuggestionCreator

@@ -3,7 +3,7 @@ import csv
 import json
 import StringIO
 
-from consts.award_type import AwardType
+from tba.consts.award_type import AwardType
 from helpers.award_helper import AwardHelper
 
 

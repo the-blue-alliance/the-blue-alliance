@@ -7,8 +7,8 @@ import re
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
 
-from consts.district_type import DistrictType
-from consts.event_type import EventType
+from tba.consts.district_type import DistrictType
+from tba.consts.event_type import EventType
 
 from models.district import District
 from models.event import Event

@@ -1,4 +1,4 @@
-from consts.playoff_type import PlayoffType
+from tba.consts.playoff_type import PlayoffType
 from database.dict_converters.converter_base import ConverterBase
 from database.dict_converters.district_converter import DistrictConverter
 

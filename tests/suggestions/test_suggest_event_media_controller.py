@@ -6,7 +6,7 @@ from google.appengine.ext import testbed
 from google.appengine.ext import ndb
 from webapp2_extras.routes import RedirectRoute
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 from controllers.suggestions.suggest_event_media_controller import SuggestEventMediaController
 from models.account import Account
 from models.event import Event

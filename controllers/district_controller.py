@@ -6,8 +6,8 @@ from google.appengine.ext import ndb
 
 from controllers.base_controller import CacheableHandler
 
-from consts.district_type import DistrictType
-from consts.event_type import EventType
+from tba.consts.district_type import DistrictType
+from tba.consts.event_type import EventType
 from database.district_query import DistrictQuery, DistrictHistoryQuery, DistrictsInYearQuery
 from database.event_query import DistrictEventsQuery
 from database.team_query import DistrictTeamsQuery, EventTeamsQuery

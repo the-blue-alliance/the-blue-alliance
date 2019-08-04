@@ -11,7 +11,7 @@ import requests_toolbelt.adapters.appengine
 
 import tba_config
 
-from consts.client_type import ClientType
+from tba.consts.client_type import ClientType
 from helpers.media_helper import MediaParser
 from helpers.push_helper import PushHelper
 from helpers.notification_helper import NotificationHelper
@@ -25,7 +25,7 @@ from models.subscription import Subscription
 from models.mobile_api_messages import BaseResponse, FavoriteCollection, FavoriteMessage, RegistrationRequest, \
                                        SubscriptionCollection, SubscriptionMessage, ModelPreferenceMessage, \
                                        MediaSuggestionMessage, PingRequest
-from models.mobile_client import MobileClient
+from tba.models.mobile_client import MobileClient
 from models.suggestion import Suggestion
 
 # See: https://cloud.google.com/appengine/docs/standard/python/authenticating-users-firebase-appengine

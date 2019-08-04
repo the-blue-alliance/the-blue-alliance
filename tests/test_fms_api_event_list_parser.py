@@ -7,7 +7,7 @@ from datafeeds.parsers.fms_api.fms_api_event_list_parser import FMSAPIEventListP
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 from models.sitevar import Sitevar
 
 

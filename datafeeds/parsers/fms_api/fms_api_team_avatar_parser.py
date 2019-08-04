@@ -4,7 +4,7 @@ from google.appengine.ext import ndb
 
 from models.media import Media
 from models.team import Team
-from consts.media_type import MediaType
+from tba.consts.media_type import MediaType
 from helpers.media_manipulator import MediaManipulator
 
 

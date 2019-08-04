@@ -7,8 +7,8 @@ from google.appengine.ext import deferred
 from google.appengine.api import memcache
 from google.appengine.api import urlfetch
 
-from consts.client_type import ClientType
-from consts.notification_type import NotificationType
+from tba.consts.client_type import ClientType
+from tba.consts.notification_type import NotificationType
 from helpers.notification_sender import NotificationSender
 from models.sitevar import Sitevar
 

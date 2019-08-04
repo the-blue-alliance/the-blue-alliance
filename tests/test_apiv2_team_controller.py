@@ -8,7 +8,7 @@ from datetime import datetime
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 from controllers.api.api_district_controller import ApiDistrictTeamsController
 from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController, ApiTeamMediaController,\
                                                 ApiTeamListController, ApiTeamHistoryRobotsController,\

@@ -1,6 +1,6 @@
 import logging
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 from database.event_query import EventListQuery
 
 

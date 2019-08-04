@@ -1,9 +1,9 @@
 from collections import defaultdict
 from google.appengine.api import search
 
-from consts.award_type import AwardType
-from consts.event_type import EventType
-from consts.media_type import MediaType
+from tba.consts.award_type import AwardType
+from tba.consts.event_type import EventType
+from tba.consts.media_type import MediaType
 from database.award_query import TeamAwardsQuery
 from database.event_query import TeamEventsQuery
 from database.match_query import TeamYearMatchesQuery

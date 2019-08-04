@@ -22,7 +22,7 @@ class WebhookRequest(Request):
         """
         super(WebhookRequest, self).__init__(notification)
 
-        from tbans.utils.validation_utils import validate_is_string, validate_is_type
+        from tbans.utils.validation_utils import validate_is_string
 
         # Check that we have a url
         validate_is_string(url=url)
@@ -61,7 +61,7 @@ class WebhookRequest(Request):
         Returns:
             string: JSON representation of the WebhookRequest.
         """
-        from consts.notification_type import NotificationType
+        from tba.consts.notification_type import NotificationType
         json_dict = {
             'message_type': NotificationType.type_names[self.notification.__class__._type()]
         }

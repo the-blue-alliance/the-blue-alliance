@@ -4,10 +4,10 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from base_controller import LoggedInHandler
-from consts.client_type import ClientType
-from consts.notification_type import NotificationType
+from tba.consts.client_type import ClientType
+from tba.consts.notification_type import NotificationType
 from models.account import Account
-from models.mobile_client import MobileClient
+from tba.models.mobile_client import MobileClient
 
 
 class WebhookAdd(LoggedInHandler):

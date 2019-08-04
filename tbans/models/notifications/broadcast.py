@@ -11,7 +11,7 @@ class BroadcastNotification(Notification):
 
     @classmethod
     def _type(cls):
-        from consts.notification_type import NotificationType
+        from tba.consts.notification_type import NotificationType
         return NotificationType.BROADCAST
 
     @property

@@ -7,7 +7,7 @@ from datafeeds.parsers.first_elasticsearch.first_elasticsearch_event_list_parser
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 from models.district import District
 
 

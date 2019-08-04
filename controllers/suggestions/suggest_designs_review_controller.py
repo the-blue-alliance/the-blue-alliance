@@ -1,6 +1,6 @@
 from google.appengine.ext import ndb
 
-from consts.account_permissions import AccountPermissions
+from tba.consts.account_permissions import AccountPermissions
 from controllers.suggestions.suggestions_review_base_controller import SuggestionsReviewBaseController
 from helpers.suggestions.media_creator import MediaCreator
 from helpers.outgoing_notification_helper import OutgoingNotificationHelper

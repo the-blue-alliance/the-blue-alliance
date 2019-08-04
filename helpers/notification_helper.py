@@ -1,8 +1,8 @@
 import datetime
 import json
 
-from consts.client_type import ClientType
-from consts.notification_type import NotificationType
+from tba.consts.client_type import ClientType
+from tba.consts.notification_type import NotificationType
 
 from helpers.tbans_helper import TBANSHelper
 from helpers.push_helper import PushHelper
@@ -45,12 +45,16 @@ class NotificationHelper(object):
         notification = UpdateFavoritesNotification(user_id, sending_device_key)
         notification.send(clients)
 
+        TBANSHelper.update_favorites(user_id, sending_device_key if sending_device_key else None)
+
     @classmethod
     def send_subscription_update(cls, user_id, sending_device_key=""):
         clients = PushHelper.get_client_ids_for_users([user_id], os_types=[ClientType.OS_ANDROID])
 
         notification = UpdateSubscriptionsNotification(user_id, sending_device_key)
         notification.send(clients)
+
+        TBANSHelper.update_subscriptions(user_id, sending_device_key if sending_device_key else None)
 
     @classmethod
     def send_upcoming_match_notification(cls, match, event):

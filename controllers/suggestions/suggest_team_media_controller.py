@@ -4,7 +4,7 @@ import os
 
 from google.appengine.ext import ndb
 
-from consts.media_type import MediaType
+from tba.consts.media_type import MediaType
 from controllers.base_controller import LoggedInHandler
 
 from database import media_query

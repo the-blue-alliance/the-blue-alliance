@@ -6,7 +6,7 @@ from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
-from consts.account_permissions import AccountPermissions
+from tba.consts.account_permissions import AccountPermissions
 from controllers.suggestions.suggestions_review_base_controller import SuggestionsReviewBaseController
 from helpers.event.event_webcast_adder import EventWebcastAdder
 from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher

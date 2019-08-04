@@ -6,10 +6,10 @@ from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
-from consts.client_type import ClientType
+from tba.consts.client_type import ClientType
 from controllers.base_controller import LoggedInHandler
 from helpers.notification_helper import NotificationHelper
-from models.mobile_client import MobileClient
+from tba.models.mobile_client import MobileClient
 from models.sitevar import Sitevar
 
 

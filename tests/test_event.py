@@ -4,7 +4,7 @@ import unittest2
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 from helpers.event.event_test_creator import EventTestCreator
 from models.event import Event
 

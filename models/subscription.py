@@ -2,7 +2,7 @@ import json
 
 from google.appengine.ext import ndb
 
-from consts.notification_type import NotificationType
+from tba.consts.notification_type import NotificationType
 
 
 class Subscription(ndb.Model):

@@ -3,7 +3,7 @@ import logging
 import StringIO
 from datetime import datetime
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 from datafeeds.parser_base import ParserBase
 
 

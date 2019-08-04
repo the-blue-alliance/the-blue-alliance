@@ -1,7 +1,7 @@
 import unittest2
 
-from consts.district_type import DistrictType
-from consts.event_type import EventType
+from tba.consts.district_type import DistrictType
+from tba.consts.event_type import EventType
 from datafeeds.usfirst_event_list_parser import UsfirstEventListParser
 
 

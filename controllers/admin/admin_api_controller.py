@@ -8,7 +8,7 @@ from datetime import datetime
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
-from consts.auth_type import AuthType
+from tba.consts.auth_type import AuthType
 from controllers.base_controller import LoggedInHandler
 from models.account import Account
 from models.api_auth_access import ApiAuthAccess

@@ -1,4 +1,4 @@
-from consts.auth_type import AuthType
+from tba.consts.auth_type import AuthType
 from controllers.base_controller import LoggedInHandler
 from helpers.suggestions.suggestion_creator import SuggestionCreator
 from helpers.outgoing_notification_helper import OutgoingNotificationHelper

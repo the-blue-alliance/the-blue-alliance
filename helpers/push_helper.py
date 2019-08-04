@@ -7,10 +7,10 @@ from google.appengine.ext import ndb
 from google.appengine.api import users
 from google.appengine.api import memcache
 
-from consts.client_type import ClientType
-from consts.notification_type import NotificationType
+from tba.consts.client_type import ClientType
+from tba.consts.notification_type import NotificationType
 from models.account import Account
-from models.mobile_client import MobileClient
+from tba.models.mobile_client import MobileClient
 from models.mobile_user import MobileUser
 from models.subscription import Subscription
 from models.user import User

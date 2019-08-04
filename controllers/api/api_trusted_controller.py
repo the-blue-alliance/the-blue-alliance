@@ -6,8 +6,8 @@ import webapp2
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 
-from consts.auth_type import AuthType
-from consts.media_type import MediaType
+from tba.consts.auth_type import AuthType
+from tba.consts.media_type import MediaType
 from controllers.api.api_base_controller import ApiTrustedBaseController
 
 from datafeeds.parser_base import ParserInputException

@@ -1,4 +1,5 @@
-from consts.award_type import AwardType
+from tba.consts.award_type import AwardType
+
 
 class DistrictPointValues(object):
     """

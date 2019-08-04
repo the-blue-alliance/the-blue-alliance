@@ -15,7 +15,7 @@ import tba_config
 
 from collections import defaultdict
 
-from consts.media_type import MediaType
+from tba.consts.media_type import MediaType
 
 from google.appengine.api import taskqueue
 from google.appengine.api import urlfetch

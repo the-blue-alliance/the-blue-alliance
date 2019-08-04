@@ -1,6 +1,6 @@
 import calendar
 
-from consts.notification_type import NotificationType
+from tba.consts.notification_type import NotificationType
 from notifications.base_notification import BaseNotification
 
 

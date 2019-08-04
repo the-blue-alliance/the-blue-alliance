@@ -7,9 +7,9 @@ from google.appengine.ext import testbed
 from google.appengine.ext import ndb
 from webapp2_extras.routes import RedirectRoute
 
-from consts.auth_type import AuthType
-from consts.district_type import DistrictType
-from consts.event_type import EventType
+from tba.consts.auth_type import AuthType
+from tba.consts.district_type import DistrictType
+from tba.consts.event_type import EventType
 from controllers.suggestions.suggest_apiwrite_controller import SuggestApiWriteController
 from models.account import Account
 from models.event import Event

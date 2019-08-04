@@ -7,8 +7,8 @@ from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from webapp2_extras.routes import RedirectRoute
 
-from consts.district_type import DistrictType
-from consts.event_type import EventType
+from tba.consts.district_type import DistrictType
+from tba.consts.event_type import EventType
 from controllers.suggestions.suggest_event_webcast_controller import SuggestEventWebcastController
 from models.account import Account
 from models.event import Event

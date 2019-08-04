@@ -10,11 +10,11 @@ from google.appengine.ext import ndb
 
 from base_controller import LoggedInHandler
 
-from consts.account_permissions import AccountPermissions
-from consts.auth_type import AuthType
-from consts.client_type import ClientType
-from consts.model_type import ModelType
-from consts.notification_type import NotificationType
+from tba.consts.account_permissions import AccountPermissions
+from tba.consts.auth_type import AuthType
+from tba.consts.client_type import ClientType
+from tba.consts.model_type import ModelType
+from tba.consts.notification_type import NotificationType
 
 from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper

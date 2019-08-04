@@ -2,7 +2,7 @@ from google.appengine.ext import ndb
 from google.appengine.api import users
 
 from models.account import Account
-from models.mobile_client import MobileClient
+from tba.models.mobile_client import MobileClient
 
 
 class UserBundle(object):

@@ -3,9 +3,9 @@ from datetime import datetime
 
 from google.appengine.ext import ndb
 
-from consts.auth_type import AuthType
-from consts.event_type import EventType
-from consts.media_type import MediaType
+from tba.consts.auth_type import AuthType
+from tba.consts.event_type import EventType
+from tba.consts.media_type import MediaType
 from helpers.website_helper import WebsiteHelper
 from helpers.media_helper import MediaParser
 from helpers.webcast_helper import WebcastParser

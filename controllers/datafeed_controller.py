@@ -10,9 +10,9 @@ from google.appengine.ext import ndb
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
-from consts.event_type import EventType
-from consts.media_type import MediaType
-from consts.media_tag import MediaTag
+from tba.consts.event_type import EventType
+from tba.consts.media_type import MediaType
+from tba.consts.media_tag import MediaTag
 
 from datafeeds.datafeed_fms_api import DatafeedFMSAPI
 from datafeeds.datafeed_first_elasticsearch import DatafeedFIRSTElasticSearch

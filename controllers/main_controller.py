@@ -11,11 +11,11 @@ from google.appengine.ext.webapp import template
 
 import tba_config
 from base_controller import CacheableHandler
-from consts.award_type import AwardType
-from consts.event_type import EventType
-from consts.landing_type import LandingType
-from consts.media_tag import MediaTag
-from consts.media_type import MediaType
+from tba.consts.award_type import AwardType
+from tba.consts.event_type import EventType
+from tba.consts.landing_type import LandingType
+from tba.consts.media_tag import MediaTag
+from tba.consts.media_type import MediaType
 from database import media_query
 from helpers.event_helper import EventHelper
 from helpers.season_helper import SeasonHelper

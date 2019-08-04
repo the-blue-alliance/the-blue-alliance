@@ -4,8 +4,8 @@ import logging
 
 from bs4 import BeautifulSoup
 
-from consts.district_type import DistrictType
-from consts.event_type import EventType
+from tba.consts.district_type import DistrictType
+from tba.consts.event_type import EventType
 from datafeeds.parser_base import ParserBase
 from helpers.event_helper import EventHelper
 

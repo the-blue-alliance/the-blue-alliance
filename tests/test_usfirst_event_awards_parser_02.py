@@ -1,7 +1,7 @@
 import unittest2
 import json
 
-from consts.award_type import AwardType
+from tba.consts.award_type import AwardType
 from datafeeds.usfirst_event_awards_parser_02 import UsfirstEventAwardsParser_02
 
 

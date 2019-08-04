@@ -1,6 +1,7 @@
 import unittest2
 
-from tbans.models.service.messages import FCM, Webhook, TBANSResponse, PingRequest, VerificationRequest, VerificationResponse
+from tbans.models.service.messages import FCM, Webhook, TBANSResponse, PingRequest, \
+    UpdateMyTBARequest, VerificationRequest, VerificationResponse
 
 
 class TestFCM(unittest2.TestCase):
@@ -11,18 +12,6 @@ class TestFCM(unittest2.TestCase):
 
     def test_fcm_token(self):
         fcm = FCM(token='abcd')
-        self.assertTrue(fcm.is_initialized())
-
-    def test_fcm_topic(self):
-        fcm = FCM(topic='abcd')
-        self.assertTrue(fcm.is_initialized())
-
-    def test_fcm_condition(self):
-        fcm = FCM(condition='abcd')
-        self.assertTrue(fcm.is_initialized())
-
-    def test_fcm_mutli(self):
-        fcm = FCM(token='abc', topic='def', condition='ghi')
         self.assertTrue(fcm.is_initialized())
 
 
@@ -83,6 +72,25 @@ class TestPingRequest(unittest2.TestCase):
 
     def test_ping_request(self):
         request = PingRequest(fcm=FCM(), webhook=Webhook(url='abc', secret='def'))
+        self.assertTrue(request.is_initialized())
+
+
+class TestUpdateMyTBARequest(unittest2.TestCase):
+
+    def test_update_mytba_request_empty(self):
+        request = UpdateMyTBARequest()
+        self.assertFalse(request.is_initialized())
+
+    def test_update_mytba_request_user_id(self):
+        request = UpdateMyTBARequest(user_id='abcd')
+        self.assertTrue(request.is_initialized())
+
+    def test_update_mytba_request_sending_device_key(self):
+        request = UpdateMyTBARequest(sending_device_key='abcd')
+        self.assertFalse(request.is_initialized())
+
+    def test_update_mytba_request(self):
+        request = UpdateMyTBARequest(user_id='abcd', sending_device_key='abcd')
         self.assertTrue(request.is_initialized())
 
 

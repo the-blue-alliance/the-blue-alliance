@@ -7,7 +7,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from webapp2_extras.routes import RedirectRoute
 
-from consts.account_permissions import AccountPermissions
+from tba.consts.account_permissions import AccountPermissions
 from controllers.suggestions.suggest_offseason_event_review_controller import \
     SuggestOffseasonEventReviewController
 from models.account import Account

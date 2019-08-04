@@ -1,6 +1,6 @@
 import logging
 
-from consts.award_type import AwardType
+from tba.consts.award_type import AwardType
 
 
 # Prioritized sort order for certain awards

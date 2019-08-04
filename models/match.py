@@ -6,8 +6,8 @@ import re
 import time
 from google.appengine.ext import ndb
 
-from consts.event_type import EventType
-from consts.playoff_type import PlayoffType
+from tba.consts.event_type import EventType
+from tba.consts.playoff_type import PlayoffType
 from helpers.tbavideo_helper import TBAVideoHelper
 from helpers.youtube_video_helper import YouTubeVideoHelper
 from models.event import Event

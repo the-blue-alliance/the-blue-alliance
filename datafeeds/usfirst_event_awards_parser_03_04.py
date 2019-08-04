@@ -4,7 +4,7 @@ import re
 
 from bs4 import BeautifulSoup
 
-from consts.award_type import AwardType
+from tba.consts.award_type import AwardType
 from datafeeds.parser_base import ParserBase
 from helpers.award_helper import AwardHelper
 

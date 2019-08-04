@@ -3,7 +3,7 @@ import json
 
 from google.appengine.ext import ndb
 
-from consts.media_tag import MediaTag
+from tba.consts.media_tag import MediaTag
 
 from api.apiv3.api_base_controller import ApiBaseController
 from api.apiv3.model_properties import filter_event_properties, filter_team_properties, filter_match_properties

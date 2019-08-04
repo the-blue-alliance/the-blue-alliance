@@ -3,7 +3,7 @@ import unittest2
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 from helpers.suggestions.match_suggestion_accepter import MatchSuggestionAccepter
 from models.account import Account
 from models.event import Event

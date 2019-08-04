@@ -7,8 +7,8 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
-from consts.event_type import EventType
-from consts.playoff_type import PlayoffType
+from tba.consts.event_type import EventType
+from tba.consts.playoff_type import PlayoffType
 from controllers import event_controller
 from controllers.base_controller import LoggedInHandler
 from datafeeds.csv_advancement_parser import CSVAdvancementParser

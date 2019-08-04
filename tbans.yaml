@@ -11,6 +11,9 @@ handlers:
 - url: /_ah/queue/deferred.*
   script: google.appengine.ext.deferred.deferred.application
   login: admin
+- url: /notify
+  script: tbans.controllers.notification_controller.app
+  login: admin
 - url: .*
   script: tbans.tbans_service.app
 

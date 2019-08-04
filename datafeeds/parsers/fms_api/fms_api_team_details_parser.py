@@ -3,7 +3,7 @@ import urlparse
 
 from google.appengine.ext import ndb
 
-from consts.district_type import DistrictType
+from tba.consts.district_type import DistrictType
 from helpers.website_helper import WebsiteHelper
 from models.district import District
 from models.district_team import DistrictTeam

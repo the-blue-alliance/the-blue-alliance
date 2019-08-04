@@ -1,6 +1,6 @@
 from protorpc import transport
 
-from consts.client_type import ClientType
+from tba.consts.client_type import ClientType
 
 from google.appengine.api.app_identity import app_identity
 
@@ -32,6 +32,16 @@ class TBANSHelper(object):
     def ping_client(client):
         service = TBANSHelper._create_service()
         return service.ping(fcm=FCM(token=client.messaging_id))
+
+    @staticmethod
+    def update_favorites(user_id, sending_device_key=None):
+        service = TBANSHelper._create_service()
+        return service.update_favorites(user_id=user_id, sending_device_key=sending_device_key)
+
+    @staticmethod
+    def update_subscriptions(user_id, sending_device_key=None):
+        service = TBANSHelper._create_service()
+        return service.update_subscriptions(user_id=user_id, sending_device_key=sending_device_key)
 
     @staticmethod
     def ping_webhook(client):

@@ -4,7 +4,7 @@ from webapp2_extras.routes import RedirectRoute
 
 import tba_config
 
-from consts.landing_type import LandingType
+from tba.consts.landing_type import LandingType
 from controllers.account_controller import AccountEdit, AccountLoginRequired, AccountLogin, AccountLogout, \
 AccountOverview, AccountRegister, MyTBAController, myTBAAddHotMatchesController, MyTBAEventController, \
 MyTBAMatchController, MyTBATeamController, AccountAPIReadKeyAdd, AccountAPIReadKeyDelete

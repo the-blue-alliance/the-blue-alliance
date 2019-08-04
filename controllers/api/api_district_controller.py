@@ -2,8 +2,8 @@ import json
 import webapp2
 
 from controllers.api.api_base_controller import ApiBaseController
-from consts.district_type import DistrictType
-from consts.event_type import EventType
+from tba.consts.district_type import DistrictType
+from tba.consts.event_type import EventType
 
 from datetime import datetime
 

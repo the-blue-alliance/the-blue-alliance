@@ -1,7 +1,7 @@
 import copy
 from collections import defaultdict
 
-from consts.playoff_type import PlayoffType
+from tba.consts.playoff_type import PlayoffType
 from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper
 from models.match import Match

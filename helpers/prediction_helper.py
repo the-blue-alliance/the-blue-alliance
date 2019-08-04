@@ -4,7 +4,7 @@ import math
 import numpy as np
 import time
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 from database.event_query import TeamYearEventsQuery
 from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper

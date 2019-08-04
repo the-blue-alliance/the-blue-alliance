@@ -3,7 +3,7 @@ import copy
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb.tasklets import Future
 
-from consts.playoff_type import PlayoffType
+from tba.consts.playoff_type import PlayoffType
 from helpers.match_helper import MatchHelper
 from helpers.rankings_helper import RankingsHelper
 from helpers.team_helper import TeamHelper

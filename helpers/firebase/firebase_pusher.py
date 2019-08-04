@@ -8,7 +8,7 @@ from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from google.appengine.api import urlfetch
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 from database.dict_converters.match_converter import MatchConverter
 from database.dict_converters.event_converter import EventConverter
 from database.dict_converters.event_details_converter import EventDetailsConverter

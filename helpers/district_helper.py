@@ -7,9 +7,9 @@ from collections import defaultdict
 
 from google.appengine.ext import ndb
 
-from consts.award_type import AwardType
-from consts.district_point_values import DistrictPointValues
-from consts.event_type import EventType
+from tba.consts.award_type import AwardType
+from tba.consts.district_point_values import DistrictPointValues
+from tba.consts.event_type import EventType
 
 from database.team_query import DistrictTeamsQuery
 

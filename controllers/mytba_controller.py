@@ -5,7 +5,7 @@ import os
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
-from consts.model_type import ModelType
+from tba.consts.model_type import ModelType
 from controllers.base_controller import LoggedInHandler
 from database.award_query import TeamYearAwardsQuery
 from database.event_query import TeamYearEventsQuery

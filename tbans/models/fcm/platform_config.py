@@ -42,7 +42,8 @@ class PlatformConfig(object):
             platform_type (PlatformType): Type for the platform config.
 
         Returns:
-            object: Either a AndroidConfig, ApnsConfig, or WebpushConfig depending on the platform_type.
+            object: Either a ApnsConfig or WebpushConfig depending on the platform_type. AndroidConfig should come later
+                    once TBANS supports Android.
         """
         # Validate that platform_type is supported
         PlatformType.validate(platform_type)
@@ -70,7 +71,10 @@ class PlatformConfig(object):
             headers = headers if headers else None
 
             if platform_type == PlatformType.APNS:
-                return messaging.APNSConfig(headers=headers)
+                # Create an empty `payload` as a workaround for an FCM bug
+                # https://github.com/the-blue-alliance/the-blue-alliance/pull/2557#discussion_r310365295
+                payload = messaging.APNSPayload(aps=messaging.Aps(content_available=True)) if headers else None
+                return messaging.APNSConfig(headers=headers, payload=payload)
             elif platform_type == PlatformType.WEBPUSH:
                 return messaging.WebpushConfig(headers=headers)
             else:

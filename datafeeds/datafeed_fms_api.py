@@ -8,7 +8,7 @@ import traceback
 
 from google.appengine.ext import ndb
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 from controllers.api.api_status_controller import ApiStatusController
 from datafeeds.datafeed_base import DatafeedBase
 from models.district import District

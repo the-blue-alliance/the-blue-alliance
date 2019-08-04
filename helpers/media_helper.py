@@ -6,7 +6,7 @@ from urlparse import urlparse
 
 from google.appengine.api import urlfetch
 
-from consts.media_type import MediaType
+from tba.consts.media_type import MediaType
 
 
 class MediaHelper(object):

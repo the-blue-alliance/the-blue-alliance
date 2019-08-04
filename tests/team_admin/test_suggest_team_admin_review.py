@@ -8,8 +8,8 @@ from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from webapp2_extras.routes import RedirectRoute
 
-from consts.account_permissions import AccountPermissions
-from consts.media_type import MediaType
+from tba.consts.account_permissions import AccountPermissions
+from tba.consts.media_type import MediaType
 from controllers.team_admin_controller import TeamAdminDashboard, TeamAdminRedeem
 from controllers.suggestions.suggest_designs_review_controller import SuggestDesignsReviewController
 from controllers.suggestions.suggest_team_media_review_controller import \

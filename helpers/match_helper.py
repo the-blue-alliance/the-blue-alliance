@@ -6,8 +6,8 @@ import json
 import re
 
 from collections import defaultdict
-from consts.event_type import EventType
-from consts.playoff_type import PlayoffType
+from tba.consts.event_type import EventType
+from tba.consts.playoff_type import PlayoffType
 
 from helpers.match_manipulator import MatchManipulator
 

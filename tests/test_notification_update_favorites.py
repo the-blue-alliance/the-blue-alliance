@@ -2,8 +2,8 @@ import unittest2
 
 from google.appengine.ext import testbed
 
-from consts.client_type import ClientType
-from consts.notification_type import NotificationType
+from tba.consts.client_type import ClientType
+from tba.consts.notification_type import NotificationType
 from notifications.update_favorites import UpdateFavoritesNotification
 
 

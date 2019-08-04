@@ -1,6 +1,6 @@
 import unittest2
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 from helpers.event_helper import EventHelper
 
 

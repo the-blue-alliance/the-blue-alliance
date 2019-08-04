@@ -4,9 +4,9 @@ import tba_config
 
 from google.appengine.ext import ndb
 
-from consts.district_type import DistrictType
-from consts.award_type import AwardType
-from consts.media_tag import MediaTag
+from tba.consts.district_type import DistrictType
+from tba.consts.award_type import AwardType
+from tba.consts.media_tag import MediaTag
 from database import award_query, event_query, match_query, media_query, team_query
 from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetcher
 
@@ -23,7 +23,7 @@ from models.robot import Robot
 
 from template_engine import jinja2_engine
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 
 
 class TeamRenderer(object):

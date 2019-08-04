@@ -3,7 +3,7 @@ import unittest2
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from consts.notification_type import NotificationType
+from tba.consts.notification_type import NotificationType
 from notifications.ping import PingNotification
 
 

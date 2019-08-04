@@ -2,7 +2,7 @@ from google.appengine.ext import ndb
 
 from base_controller import LoggedInHandler
 from models.account import Account
-from models.mobile_client import MobileClient
+from tba.models.mobile_client import MobileClient
 from helpers.notification_helper import NotificationHelper
 
 

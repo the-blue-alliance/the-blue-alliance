@@ -8,7 +8,7 @@ from google.appengine.ext import ndb
 
 import tba_config
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 
 from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper

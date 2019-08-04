@@ -2,7 +2,7 @@ import datetime
 import json
 import unittest2
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 
 from datafeeds.parsers.fms_api.fms_api_awards_parser import FMSAPIAwardsParser
 from datafeeds.parsers.fms_api.fms_api_event_alliances_parser import FMSAPIEventAlliancesParser

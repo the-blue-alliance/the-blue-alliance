@@ -1,4 +1,4 @@
-from consts.account_permissions import AccountPermissions
+from tba.consts.account_permissions import AccountPermissions
 from controllers.suggestions.suggestions_review_base_controller import SuggestionsReviewBaseController
 from helpers.suggestions.match_suggestion_accepter import MatchSuggestionAccepter
 from models.event import Event

@@ -2,7 +2,7 @@ import os
 
 from google.appengine.ext.webapp import template
 
-from consts.notification_type import NotificationType
+from tba.consts.notification_type import NotificationType
 from controllers.base_controller import CacheableHandler
 from template_engine import jinja2_engine
 

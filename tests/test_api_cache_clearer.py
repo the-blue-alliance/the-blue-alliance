@@ -11,9 +11,9 @@ from google.appengine.ext import testbed
 
 import api_main
 import tba_config
-from consts.award_type import AwardType
-from consts.event_type import EventType
-from consts.media_type import MediaType
+from tba.consts.award_type import AwardType
+from tba.consts.event_type import EventType
+from tba.consts.media_type import MediaType
 
 from controllers.api.api_district_controller import ApiDistrictListController
 from controllers.api.api_district_controller import ApiDistrictEventsController

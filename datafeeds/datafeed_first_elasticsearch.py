@@ -4,7 +4,7 @@ import logging
 
 from google.appengine.api import urlfetch
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 from datafeeds.datafeed_base import DatafeedBase
 
 from models.event_team import EventTeam

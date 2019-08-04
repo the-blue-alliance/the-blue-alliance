@@ -11,11 +11,11 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from consts.account_permissions import AccountPermissions
-from consts.auth_type import AuthType
-from consts.event_type import EventType
-from consts.media_type import MediaType
-from consts.playoff_type import PlayoffType
+from tba.consts.account_permissions import AccountPermissions
+from tba.consts.auth_type import AuthType
+from tba.consts.event_type import EventType
+from tba.consts.media_type import MediaType
+from tba.consts.playoff_type import PlayoffType
 from models.account import Account
 from models.api_auth_access import ApiAuthAccess
 from models.award import Award

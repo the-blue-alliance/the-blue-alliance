@@ -1,6 +1,6 @@
 import unittest2
 
-from consts.district_type import DistrictType
+from tba.consts.district_type import DistrictType
 from helpers.event_helper import EventHelper
 
 

@@ -1,6 +1,6 @@
 from google.appengine.ext import ndb
 
-from consts.district_type import DistrictType
+from tba.consts.district_type import DistrictType
 from database.database_query import DatabaseQuery
 from database.dict_converters.event_converter import EventConverter
 from models.district import District

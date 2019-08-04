@@ -5,9 +5,9 @@ import datetime
 import json
 import re
 
-from consts.playoff_type import PlayoffType
-from consts.district_type import DistrictType
-from consts.event_type import EventType
+from tba.consts.playoff_type import PlayoffType
+from tba.consts.district_type import DistrictType
+from tba.consts.event_type import EventType
 from context_cache import context_cache
 from helpers.location_helper import LocationHelper
 from helpers.webcast_online_helper import WebcastOnlineHelper

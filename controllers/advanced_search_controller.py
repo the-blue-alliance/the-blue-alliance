@@ -3,7 +3,7 @@ from collections import defaultdict
 from google.appengine.api import search
 from google.appengine.ext import ndb
 
-from consts.award_type import AwardType
+from tba.consts.award_type import AwardType
 from controllers.base_controller import CacheableHandler
 from helpers.search_helper import SearchHelper
 from models.event_team import EventTeam

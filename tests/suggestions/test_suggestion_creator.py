@@ -3,9 +3,9 @@ import unittest2
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from consts.auth_type import AuthType
-from consts.event_type import EventType
-from consts.media_type import MediaType
+from tba.consts.auth_type import AuthType
+from tba.consts.event_type import EventType
+from tba.consts.media_type import MediaType
 from helpers.media_helper import MediaParser
 from helpers.suggestions.suggestion_creator import SuggestionCreator
 from models.account import Account

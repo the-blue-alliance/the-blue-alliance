@@ -5,7 +5,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from google.appengine.ext.webapp import Response
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 from controllers.cron_controller import EventTeamUpdate
 from models.event import Event
 from models.event_team import EventTeam

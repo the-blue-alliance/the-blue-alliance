@@ -1,4 +1,4 @@
-from consts.district_type import DistrictType
+from tba.consts.district_type import DistrictType
 from models.district import District
 from models.event import Event
 from models.match import Match

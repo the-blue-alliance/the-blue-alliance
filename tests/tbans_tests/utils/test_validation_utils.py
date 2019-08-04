@@ -1,7 +1,7 @@
 import unittest2
 
-from consts.model_type import ModelType
-from consts.notification_type import NotificationType
+from tba.consts.model_type import ModelType
+from tba.consts.notification_type import NotificationType
 
 from tbans.utils.validation_utils import *
 

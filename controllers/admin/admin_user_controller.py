@@ -7,7 +7,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
-from consts.account_permissions import AccountPermissions
+from tba.consts.account_permissions import AccountPermissions
 from models.account import Account
 
 import tba_config

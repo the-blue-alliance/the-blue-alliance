@@ -12,9 +12,9 @@ from google.appengine.api import urlfetch
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 
-from consts.account_permissions import AccountPermissions
-from consts.auth_type import AuthType
-from consts.event_type import EventType
+from tba.consts.account_permissions import AccountPermissions
+from tba.consts.auth_type import AuthType
+from tba.consts.event_type import EventType
 from controllers.base_controller import CacheableHandler
 from datafeeds.parser_base import ParserInputException
 from helpers.user_bundle import UserBundle

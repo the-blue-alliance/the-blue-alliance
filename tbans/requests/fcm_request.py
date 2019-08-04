@@ -8,12 +8,10 @@ class FCMRequest(Request):
 
     Attributes:
         notification (Notification): The Notification to send.
-        token (string): The FCM registration token to send a message to.
-        topic (string): The FCM topic name to send a message to.
-        condition (string): The topic condition to send a message.
+        tokens (list, string): The FCM registration tokens (up to 100) to send a message to.
     """
 
-    def __init__(self, app, notification, token=None, topic=None, condition=None):
+    def __init__(self, app, notification, tokens=None):
         """
         Note:
             Should only supply one delivery method - either token, topic, or connection.
@@ -21,9 +19,7 @@ class FCMRequest(Request):
         Args:
             app (firebase_admin.App): The Firebase app to send to.
             notification (Notification): The Notification to send.
-            token (string): The FCM registration token to send a message to.
-            topic (string): The FCM topic name to send a message to.
-            condition (string): The topic condition to send a message.
+            tokens (list, string): The FCM registration tokens (up to 100) to send a message to.
         """
         super(FCMRequest, self).__init__(notification)
 
@@ -32,42 +28,30 @@ class FCMRequest(Request):
             raise ValueError('FCMRequest requires an app.')
         self._app = app
 
-        # Ensure we've only passed one delivery option
-        delivery_options = [x for x in [token, topic, condition] if x is not None]
-        if len(delivery_options) == 0:
-            raise TypeError('FCMRequest requires a delivery option - token, topic, or condition')
-        elif len(delivery_options) > 1:
-            raise TypeError('FCMRequest only accepts one delivery option - token, topic, or condition')
+        from tbans.utils.validation_utils import validate_is_type
 
         # Ensure our delivery option looks right
-        if not isinstance(delivery_options[0], basestring):
-            raise ValueError('FCMRequest delivery option must be a string')
+        validate_is_type(list, tokens=tokens)
+        # Ensure our tokens look right
+        invalid_tokens = [t for t in tokens if not isinstance(t, basestring)]
+        if invalid_tokens:
+            raise ValueError('FCMRequest tokens must be a list of strings')
+        if len(tokens) > 100:
+            raise ValueError('FCMRequest tokens must contain less than 100 tokens')
 
-        self.token = token
-        self.topic = topic
-        self.condition = condition
+        self.tokens = tokens
 
     def __str__(self):
-        if self.token:
-            delivery_name = 'token'
-            delivery_value = self.token
-        elif self.topic:
-            delivery_name = 'topic'
-            delivery_value = self.topic
-        elif self.condition:
-            delivery_name = 'condition'
-            delivery_value = self.condition
-
-        return 'FCMRequest({}="{}", notification={})'.format(delivery_name, delivery_value, str(self.notification))
+        return 'FCMRequest(tokens={}, notification={})'.format(self.tokens, str(self.notification))
 
     def send(self):
         """ Attempt to send the notification.
 
         Returns:
-            string: ID for the sent message.
+            messaging.BatchResponse - Batch response object for the messages sent.
         """
         from firebase_admin import messaging
-        return messaging.send(self._fcm_message(), app=self._app)
+        return messaging.send_multicast(self._fcm_message(), app=self._app)
 
     def _fcm_message(self):
         platform_config = self.notification.platform_config
@@ -83,17 +67,15 @@ class FCMRequest(Request):
 
         # Add `notification_type` to data payload
         data_payload = self.notification.data_payload if self.notification.data_payload else {}
-        from consts.notification_type import NotificationType
+        from tba.consts.notification_type import NotificationType
         data_payload['notification_type'] = NotificationType.type_names[self.notification.__class__._type()]
 
         from firebase_admin import messaging
-        return messaging.Message(
+        return messaging.MulticastMessage(
+            tokens=self.tokens,
             data=data_payload,
             notification=self.notification.fcm_notification,
             android=android_config,
             webpush=webpush_config,
-            apns=apns_config,
-            token=self.token,
-            topic=self.topic,
-            condition=self.condition
+            apns=apns_config
         )

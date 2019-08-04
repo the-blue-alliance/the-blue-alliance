@@ -3,7 +3,7 @@ import unittest2
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from consts.notification_type import NotificationType
+from tba.consts.notification_type import NotificationType
 from helpers.event.event_test_creator import EventTestCreator
 from helpers.award_helper import AwardHelper
 from helpers.model_to_dict import ModelToDict

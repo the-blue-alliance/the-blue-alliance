@@ -8,7 +8,7 @@ from google.appengine.ext.webapp import template
 from controllers.base_controller import LoggedInHandler
 from datafeeds.datafeed_usfirst_offseason import DatafeedUsfirstOffseason
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 from helpers.event_manipulator import EventManipulator
 from models.event import Event
 

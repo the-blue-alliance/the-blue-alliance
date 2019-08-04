@@ -12,7 +12,7 @@ from collections import defaultdict
 
 from google.appengine.api import memcache
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 from database import event_query
 from models.event_team import EventTeam
 

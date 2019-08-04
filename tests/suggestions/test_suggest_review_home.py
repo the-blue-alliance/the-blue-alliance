@@ -7,7 +7,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from webapp2_extras.routes import RedirectRoute
 
-from consts.account_permissions import AccountPermissions
+from tba.consts.account_permissions import AccountPermissions
 from controllers.suggestions.suggest_review_home_controller import SuggestReviewHomeController
 from models.account import Account
 

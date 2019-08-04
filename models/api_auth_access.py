@@ -1,6 +1,6 @@
 from google.appengine.ext import ndb
 
-from consts.auth_type import AuthType
+from tba.consts.auth_type import AuthType
 from models.account import Account
 from models.event import Event
 

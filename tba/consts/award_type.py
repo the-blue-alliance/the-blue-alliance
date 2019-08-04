@@ -1,4 +1,4 @@
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 
 
 class AwardType(object):

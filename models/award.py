@@ -2,8 +2,8 @@ import json
 
 from google.appengine.ext import ndb
 
-from consts.award_type import AwardType
-from consts.event_type import EventType
+from tba.consts.award_type import AwardType
+from tba.consts.event_type import EventType
 from models.event import Event
 from models.team import Team
 

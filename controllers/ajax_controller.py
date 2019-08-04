@@ -6,8 +6,8 @@ import time
 import datetime
 
 from base_controller import CacheableHandler, LoggedInHandler
-from consts.client_type import ClientType
-from consts.playoff_type import PlayoffType
+from tba.consts.client_type import ClientType
+from tba.consts.playoff_type import PlayoffType
 from google.appengine.api import memcache
 from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
@@ -18,7 +18,7 @@ from models.account import Account
 from models.api_auth_access import ApiAuthAccess
 from models.event import Event
 from models.favorite import Favorite
-from models.mobile_client import MobileClient
+from tba.models.mobile_client import MobileClient
 from models.sitevar import Sitevar
 from models.typeahead_entry import TypeaheadEntry
 

@@ -3,7 +3,11 @@ import logging
 from protorpc import remote
 from protorpc.wsgi import service
 
-from tbans.models.service.messages import TBANSResponse, PingRequest, VerificationRequest, VerificationResponse
+from tba.consts.notification_type import NotificationType
+
+from tbans.consts.vertical_type import VerticalType
+from tbans.models.service.messages import TBANSResponse, PingRequest, \
+    UpdateMyTBARequest, VerificationRequest, VerificationResponse
 
 
 package = 'tbans'
@@ -53,12 +57,13 @@ class TBANSService(remote.Service):
         if request.fcm:
             # An FCM request can still exist, I believe. It can take some notification and delivery options
             from tbans.requests.fcm_request import FCMRequest
-            fcm_request = FCMRequest(self._firebase_app, notification, token=request.fcm.token, topic=request.fcm.topic, condition=request.fcm.condition)
+            fcm_request = FCMRequest(self._firebase_app, notification, tokens=[request.fcm.token])
             logging.info('Ping - {}'.format(str(fcm_request)))
 
-            message_id = fcm_request.send()
-            logging.info('Ping Sent - {}'.format(str(message_id)))
-            return TBANSResponse(code=200, message=message_id)
+            fcm_request.send()
+            logging.info('Ping Sent')
+
+            return TBANSResponse(code=200)
         elif request.webhook:
             from tbans.requests.webhook_request import WebhookRequest
             webhook_request = WebhookRequest(notification, request.webhook.url, request.webhook.secret)
@@ -70,6 +75,16 @@ class TBANSService(remote.Service):
             return TBANSResponse(code=200)
         else:
             return self._application_error('Did not specify FCM or webhook to ping')
+
+    @remote.method(UpdateMyTBARequest, TBANSResponse)
+    def update_favorites(self, request):
+        """ Send a notification to all mobile clients for a user to update myTBA favorites """
+        return self._update_mytba(request, NotificationType.UPDATE_FAVORITES)
+
+    @remote.method(UpdateMyTBARequest, TBANSResponse)
+    def update_subscriptions(self, request):
+        """ Send a notification to all mobile clients for a user to update myTBA favorites """
+        return self._update_mytba(request, NotificationType.UPDATE_SUBSCRIPTIONS)
 
     @remote.method(VerificationRequest, VerificationResponse)
     def verification(self, request):
@@ -87,6 +102,33 @@ class TBANSService(remote.Service):
         logging.info('Verification Key - {}'.format(notification.verification_key))
 
         return VerificationResponse(code=200, verification_key=notification.verification_key)
+
+    def _update_mytba(self, request, notification_type):
+        """ Shared method to queue a myTBA notification """
+        self._validate_authentication()
+
+        payload = {
+            'user_id': request.user_id,
+            'notification_type': notification_type
+        }
+
+        if request.sending_device_key:
+            payload['sending_device_key'] = request.sending_device_key
+
+        TBANSService._add_to_tbans_queue(payload, vertical_types=[VerticalType.FCM])
+        return TBANSResponse(code=200)
+
+    @staticmethod
+    def _add_to_tbans_queue(payload, vertical_types=VerticalType.ENABLED_VERTICALS):
+        from google.appengine.api import taskqueue
+        for vertical_type in vertical_types:
+            payload['vertical_type'] = vertical_type
+            taskqueue.add(
+                queue_name='tbans-notifications',
+                url='/notify',
+                params=payload,
+                target='tbans'
+            )
 
 
 app = service.service_mappings([('/tbans.*', TBANSService)])

@@ -8,8 +8,8 @@ from google.appengine.api.app_identity import app_identity
 from google.appengine.ext import ndb
 
 import tba_config
-from consts.account_permissions import AccountPermissions
-from consts.auth_type import AuthType
+from tba.consts.account_permissions import AccountPermissions
+from tba.consts.auth_type import AuthType
 from controllers.suggestions.suggestions_review_base_controller import \
     SuggestionsReviewBaseController
 from helpers.outgoing_notification_helper import OutgoingNotificationHelper

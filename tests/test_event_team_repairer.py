@@ -1,7 +1,7 @@
 import datetime
 import unittest2
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed

@@ -10,8 +10,8 @@ from google.appengine.ext import ndb
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
-from consts.district_type import DistrictType
-from consts.event_type import EventType
+from tba.consts.district_type import DistrictType
+from tba.consts.event_type import EventType
 
 from controllers.api.api_status_controller import ApiStatusController
 from database.district_query import DistrictsInYearQuery

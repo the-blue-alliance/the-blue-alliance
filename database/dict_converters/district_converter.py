@@ -1,4 +1,4 @@
-from consts.district_type import DistrictType
+from tba.consts.district_type import DistrictType
 from database.dict_converters.converter_base import ConverterBase
 
 

@@ -7,8 +7,8 @@ from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from webapp2_extras.routes import RedirectRoute
 
-from consts.account_permissions import AccountPermissions
-from consts.media_type import MediaType
+from tba.consts.account_permissions import AccountPermissions
+from tba.consts.media_type import MediaType
 from controllers.suggestions.suggest_designs_review_controller import SuggestDesignsReviewController
 from controllers.suggestions.suggest_review_home_controller import SuggestReviewHomeController
 from helpers.suggestions.suggestion_creator import SuggestionCreator

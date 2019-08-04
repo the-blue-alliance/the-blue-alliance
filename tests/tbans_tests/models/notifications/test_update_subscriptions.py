@@ -1,6 +1,6 @@
 import unittest2
 
-from consts.notification_type import NotificationType
+from tba.consts.notification_type import NotificationType
 
 from tbans.models.notifications.update_subscriptions import UpdateSubscriptionsNotification
 

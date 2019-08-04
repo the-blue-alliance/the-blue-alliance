@@ -1,7 +1,7 @@
 import json
 
 from api.apiv3.api_base_controller import ApiBaseController
-from consts.media_tag import MediaTag
+from tba.consts.media_tag import MediaTag
 
 
 class ApiMediaTagsController(ApiBaseController):

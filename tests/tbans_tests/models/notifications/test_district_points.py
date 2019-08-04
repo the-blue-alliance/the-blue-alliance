@@ -1,6 +1,6 @@
 import unittest2
 
-from consts.notification_type import NotificationType
+from tba.consts.notification_type import NotificationType
 from models.district import District
 
 from tbans.models.notifications.district_points import DistrictPointsNotification

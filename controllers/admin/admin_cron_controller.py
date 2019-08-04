@@ -9,11 +9,11 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
-from consts.award_type import AwardType
-from consts.client_type import ClientType
-from consts.district_type import DistrictType
-from consts.event_type import EventType
-from consts.playoff_type import PlayoffType
+from tba.consts.award_type import AwardType
+from tba.consts.client_type import ClientType
+from tba.consts.district_type import DistrictType
+from tba.consts.event_type import EventType
+from tba.consts.playoff_type import PlayoffType
 from controllers.base_controller import LoggedInHandler
 from database import match_query
 from database.event_query import DistrictEventsQuery, EventListQuery
@@ -34,7 +34,7 @@ from models.district import District
 from models.district_team import DistrictTeam
 from models.event import Event
 from models.event_team import EventTeam
-from models.mobile_client import MobileClient
+from tba.models.mobile_client import MobileClient
 from models.sitevar import Sitevar
 from models.subscription import Subscription
 from models.team import Team

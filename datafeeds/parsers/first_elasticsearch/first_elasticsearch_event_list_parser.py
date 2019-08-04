@@ -1,8 +1,8 @@
 import datetime
 import urlparse
 
-from consts.district_type import DistrictType
-from consts.event_type import EventType
+from tba.consts.district_type import DistrictType
+from tba.consts.event_type import EventType
 from database.district_query import DistrictsInYearQuery
 from helpers.event_helper import EventHelper
 

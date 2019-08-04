@@ -65,24 +65,34 @@ class TestPlatformConfig(unittest2.TestCase):
         apns_config = config.platform_config(PlatformType.APNS)
         self.assertTrue(isinstance(apns_config, messaging.APNSConfig))
         self.assertIsNone(apns_config.headers)
+        self.assertIsNone(apns_config.payload)
 
     def test_platform_config_apns_collapse_key(self):
         config = PlatformConfig(collapse_key='apns_collapse_key')
         apns_config = config.platform_config(PlatformType.APNS)
         self.assertTrue(isinstance(apns_config, messaging.APNSConfig))
         self.assertEqual(apns_config.headers, {'apns-collapse-id': 'apns_collapse_key'})
+        self.assertTrue(isinstance(apns_config.payload, messaging.APNSPayload))
+        self.assertTrue(isinstance(apns_config.payload.aps, messaging.Aps))
+        self.assertTrue(apns_config.payload.aps.content_available)
 
     def test_platform_config_apns_priority(self):
         config = PlatformConfig(priority=PlatformPriority.HIGH)
         apns_config = config.platform_config(PlatformType.APNS)
         self.assertTrue(isinstance(apns_config, messaging.APNSConfig))
         self.assertEqual(apns_config.headers, {'apns-priority': '10'})
+        self.assertTrue(isinstance(apns_config.payload, messaging.APNSPayload))
+        self.assertTrue(isinstance(apns_config.payload.aps, messaging.Aps))
+        self.assertTrue(apns_config.payload.aps.content_available)
 
     def test_platform_config_apns(self):
         config = PlatformConfig(priority=PlatformPriority.NORMAL, collapse_key='collapse_key')
         apns_config = config.platform_config(PlatformType.APNS)
         self.assertTrue(isinstance(apns_config, messaging.APNSConfig))
         self.assertEqual(apns_config.headers, {'apns-collapse-id': 'collapse_key', 'apns-priority': '5'})
+        self.assertTrue(isinstance(apns_config.payload, messaging.APNSPayload))
+        self.assertTrue(isinstance(apns_config.payload.aps, messaging.Aps))
+        self.assertTrue(apns_config.payload.aps.content_available)
 
     def test_platform_config_webpush_empty(self):
         config = PlatformConfig()

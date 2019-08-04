@@ -1,6 +1,6 @@
 import logging
 
-from consts.ranking_indexes import RankingIndexes
+from tba.consts.ranking_indexes import RankingIndexes
 from models.event_details import EventDetails
 
 

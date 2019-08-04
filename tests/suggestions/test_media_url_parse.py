@@ -3,7 +3,7 @@ import unittest2
 
 from google.appengine.ext import testbed
 
-from consts.media_type import MediaType
+from tba.consts.media_type import MediaType
 from helpers.media_helper import MediaParser
 from helpers.webcast_helper import WebcastParser
 

@@ -1,6 +1,6 @@
 import datetime
 
-from consts.event_type import EventType
+from tba.consts.event_type import EventType
 from helpers.event_manipulator import EventManipulator
 from helpers.event_team.event_team_test_creator import EventTeamTestCreator
 from helpers.match.match_test_creator import MatchTestCreator

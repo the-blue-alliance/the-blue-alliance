@@ -1,5 +1,5 @@
 import os
-from consts.landing_type import LandingType
+from tba.consts.landing_type import LandingType
 from models.sitevar import Sitevar
 
 
