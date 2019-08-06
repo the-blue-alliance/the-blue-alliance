@@ -5,7 +5,6 @@ import Dialog from 'react-bootstrap-dialog'
 import TeamList from './TeamList'
 
 class AddTeamsFMSReport extends Component {
-
   constructor(props) {
     super(props)
     this.state = {

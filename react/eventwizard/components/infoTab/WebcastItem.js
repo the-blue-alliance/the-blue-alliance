@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 import WEBCAST_SHAPE from '../../constants/ApiWebcast'
 
 class WebcastItem extends Component {
-
   constructor(props) {
     super(props)
     this.onRemoveClick = this.onRemoveClick.bind(this)
@@ -33,7 +32,6 @@ class WebcastItem extends Component {
       </p>
     )
   }
-
 }
 
 WebcastItem.propTypes = {

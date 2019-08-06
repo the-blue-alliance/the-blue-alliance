@@ -8,7 +8,6 @@ import AddTeamsFMSReport from './AddTeamsFMSReport'
 import AttendingTeamList from './AttendingTeamList'
 
 class TeamListTab extends Component {
-
   constructor(props) {
     super(props)
     this.state = {
