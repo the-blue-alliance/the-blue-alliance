@@ -28,7 +28,7 @@ case "$1" in
 
         # Lint swagger files
         echo "Linting swagger specs..."
-        find $(pwd)/static/swagger -type f -name "*.json" | xargs -n 1 openapi-spec-validator
+        find $(pwd)/static/swagger -type f -name "*.json" | xargs -n 1 swagger-cli validate
 
         # Test we can generate our mobile API configuration - needed for deploys
         echo "Verifying our endpoints configuration..."
