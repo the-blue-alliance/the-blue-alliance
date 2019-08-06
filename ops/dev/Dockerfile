@@ -39,7 +39,7 @@ RUN unzip -q google_appengine_$GAE_VERSION.zip
 
 # Set up nvm and nodejs
 ENV NVM_DIR /nvm
-ENV NODE_VERSION 8.0.0
+ENV NODE_VERSION 8.16.0
 RUN wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash \
     && . $NVM_DIR/nvm.sh \
     && nvm install $NODE_VERSION --silent \
