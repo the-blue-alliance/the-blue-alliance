@@ -1,21 +1,20 @@
-var gulp = require('gulp');
-var source = require('vinyl-source-stream');
-var browserify = require('browserify');
-var watchify = require('watchify');
-var gutil = require('gulp-util');
-var debug = require('gulp-debug');
-var less = require('gulp-less');
-var rename = require('gulp-rename');
-var sourcemaps = require('gulp-sourcemaps');
-var cleanCSS = require('gulp-clean-css');
-var babelify = require('babelify');
-var uglify = require('gulp-uglify');
-var buffer = require('vinyl-buffer');
-var gulpif = require('gulp-if');
+const gulp = require('gulp');
+const source = require('vinyl-source-stream');
+const browserify = require('browserify');
+const watchify = require('watchify');
+const gutil = require('gulp-util');
+const debug = require('gulp-debug');
+const less = require('gulp-less');
+const rename = require('gulp-rename');
+const sourcemaps = require('gulp-sourcemaps');
+const cleanCSS = require('gulp-clean-css');
+const uglify = require('gulp-uglify');
+const buffer = require('vinyl-buffer');
+const gulpif = require('gulp-if');
 
-var args = require('yargs').argv;
+const args = require('yargs').argv;
 
-var config = {
+const configs = {
   gameday: {
     js: {
       src: ['./react/gameday2/gameday2.js'],
@@ -64,7 +63,7 @@ var config = {
   }
 };
 
-var errorHandler = function(err) {
+const errorHandler = function(err) {
   gutil.log(err);
   this.emit('end');
 
@@ -75,7 +74,7 @@ function compile(watch, config) {
   if (args.production) {
     process.env.NODE_ENV = 'production';
   }
-  var bundler = browserify({
+  const bundler = browserify({
     entries: config.js.src,
     debug: true, // Gives us sourcemapping
     cache: {},
@@ -98,7 +97,7 @@ function compile(watch, config) {
   }
 
   if (watch) {
-    var watcher = watchify(bundler);
+    const watcher = watchify(bundler);
     watcher.on('update', function() {
       rebundle();
     });
@@ -119,62 +118,74 @@ function compileLess(config) {
     .pipe(gulp.dest(config.less.outputDir));
 }
 
-gulp.task('apidocs-js', function() {
-  return compile(false, config.apidocs);
+gulp.task('apidocs-js', (done) => {
+  compile(false, configs.apidocs);
+  done();
 });
 
-gulp.task('apidocs-js-watch', function() {
-  return compile(true, config.apidocs);
+gulp.task('apidocs-js-watch', (done) => {
+  compile(true, configs.apidocs);
+  done();
 });
 
-gulp.task('eventwizard-js', function() {
-  return compile(false, config.eventwizard);
+gulp.task('eventwizard-js', (done) => {
+  compile(false, configs.eventwizard);
+  done();
 });
 
-gulp.task('eventwizard-js-watch', function() {
-  return compile(true, config.eventwizard);
+gulp.task('eventwizard-js-watch', (done) => {
+  compile(true, configs.eventwizard);
+  done();
 });
 
-gulp.task('gameday-js', function() {
-  return compile(false, config.gameday);
+gulp.task('gameday-js', (done) => {
+  compile(false, configs.gameday);
+  done();
 });
 
-gulp.task('gameday-js-watch', function() {
-  return compile(true, config.gameday);
+gulp.task('gameday-js-watch', (done) => {
+  compile(true, configs.gameday);
+  done();
 });
 
-gulp.task('liveevent-js', function() {
-  return compile(false, config.liveevent);
+gulp.task('liveevent-js', (done) => {
+  compile(false, configs.liveevent);
+  done();
 });
 
-gulp.task('liveevent-js-watch', function() {
-  return compile(true, config.liveevent);
+gulp.task('liveevent-js-watch', (done) => {
+  compile(true, configs.liveevent);
+  done();
 });
 
-gulp.task('apidocs-less', function() {
-  return compileLess(config.apidocs)
+gulp.task('apidocs-less', (done) => {
+  compileLess(configs.apidocs)
+  done();
 });
 
-gulp.task('gameday-less', function() {
-  return compileLess(config.gameday)
+gulp.task('gameday-less', (done) => {
+  compileLess(configs.gameday)
+  done();
 });
 
-gulp.task('eventwizard-less', function() {
-  return compileLess(config.eventwizard)
+gulp.task('eventwizard-less', (done) => {
+  compileLess(configs.eventwizard)
+  done();
 });
 
-gulp.task('gameday-less-watch', function() {
-  gulp.watch(config.gameday.less.watch, ['gameday-less']);
+gulp.task('gameday-less-watch', (done) => {
+  gulp.watch(configs.gameday.less.watch, gulp.series('gameday-less'));
+  done();
 });
 
-gulp.task('build', ['gameday-js', 'gameday-less',
+gulp.task('build', gulp.series('gameday-js', 'gameday-less',
                     'apidocs-js', 'apidocs-less',
                     'eventwizard-js', 'eventwizard-less',
-                    'liveevent-js']);
+                    'liveevent-js'));
 
-gulp.task('watch', ['gameday-js-watch', 'gameday-less-watch',
+gulp.task('watch', gulp.series('gameday-js-watch', 'gameday-less-watch',
                     'apidocs-js-watch',
                     'eventwizard-js-watch',
-                    'liveevent-js-watch']);
+                    'liveevent-js-watch'));
 
-gulp.task('default', ['build', 'watch']);
+gulp.task('default', gulp.series('build', 'watch'));

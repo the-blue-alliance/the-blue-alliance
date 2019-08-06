@@ -61,7 +61,7 @@
     "react-test-renderer": "^15.3.0",
     "uglifycss": "0.0.27",
     "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0",
+    "vinyl-source-stream": "^2.0.0",
     "watchify": "^3.7.0",
     "yargs": "^6.5.0"
   },
