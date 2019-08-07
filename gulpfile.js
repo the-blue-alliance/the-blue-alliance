@@ -2,7 +2,7 @@ const gulp = require('gulp');
 const source = require('vinyl-source-stream');
 const browserify = require('browserify');
 const watchify = require('watchify');
-const gutil = require('gulp-util');
+const log = require('fancy-log');
 const debug = require('gulp-debug');
 const less = require('gulp-less');
 const rename = require('gulp-rename');
@@ -64,7 +64,7 @@ const configs = {
 };
 
 const errorHandler = function(err) {
-  gutil.log(err);
+  log.error(err);
   this.emit('end');
 
   process.exit(1);
