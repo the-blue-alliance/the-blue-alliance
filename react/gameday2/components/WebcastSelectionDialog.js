@@ -13,7 +13,6 @@ import WebcastSelectionDialogItem from './WebcastSelectionDialogItem'
 import { webcastPropType } from '../utils/webcastUtils'
 
 export default class WebcastSelectionDialog extends React.Component {
-
   static propTypes = {
     open: PropTypes.bool.isRequired,
     webcasts: PropTypes.arrayOf(PropTypes.string).isRequired,

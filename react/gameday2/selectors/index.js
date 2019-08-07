@@ -8,8 +8,8 @@ export const getWebcastIds = createSelector(
   (webcastsById) => {
     const webcastIds = []
     Object.keys(webcastsById)
-    .filter((key) => ({}.hasOwnProperty.call(webcastsById, key)))
-    .forEach((key) => webcastIds.push(key))
+      .filter((key) => ({}.hasOwnProperty.call(webcastsById, key)))
+      .forEach((key) => webcastIds.push(key))
     return webcastIds
   }
 )
@@ -22,8 +22,8 @@ export const getWebcastIdsInDisplayOrder = createSelector(
     // Flatten the map of id->webcast to an array of webcast objects
     const webcastsArray = []
     Object.keys(webcastsById)
-    .filter((key) => ({}.hasOwnProperty.call(webcastsById, key)))
-    .forEach((key) => webcastsArray.push(webcastsById[key]))
+      .filter((key) => ({}.hasOwnProperty.call(webcastsById, key)))
+      .forEach((key) => webcastsArray.push(webcastsById[key]))
 
     // First, select all webcasts that have a designated sort order
     // This is usually assigned for all special webcasts; we want to maintain
@@ -51,8 +51,8 @@ export const getChatsInDisplayOrder = createSelector(
   (chats) => {
     const displayOrderChats = []
     Object.keys(chats.chats)
-    .filter((key) => ({}.hasOwnProperty.call(chats.chats, key)))
-    .forEach((key) => displayOrderChats.push(chats.chats[key]))
+      .filter((key) => ({}.hasOwnProperty.call(chats.chats, key)))
+      .forEach((key) => displayOrderChats.push(chats.chats[key]))
 
     return displayOrderChats.sort((a, b) => a.name.localeCompare(b.name))
   }
@@ -111,7 +111,7 @@ export const getTickerMatches = createSelector(
         selectedMatches.push(match)
       } else {
         lastMatch = match
-        selectedMatches = []  // Reset selectedMatches if matches get skipped
+        selectedMatches = [] // Reset selectedMatches if matches get skipped
       }
     })
 

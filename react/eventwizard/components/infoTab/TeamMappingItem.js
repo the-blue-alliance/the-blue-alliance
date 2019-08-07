@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
 class TeamMappingItem extends Component {
-
   constructor(props) {
     super(props)
     this.onRemoveClick = this.onRemoveClick.bind(this)
@@ -24,7 +23,6 @@ class TeamMappingItem extends Component {
       </p>
     )
   }
-
 }
 
 TeamMappingItem.propTypes = {

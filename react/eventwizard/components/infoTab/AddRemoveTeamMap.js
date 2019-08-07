@@ -6,7 +6,6 @@ import TeamMappingsList from './TeamMappingsList'
 import EVENT_SHAPE from '../../constants/ApiEvent'
 
 class AddRemoveTeamMap extends Component {
-
   constructor(props) {
     super(props)
     this.state = {

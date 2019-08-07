@@ -98,7 +98,7 @@ class LivescoreDisplay extends React.PureComponent {
     }
 
     let etaStr = ''
-    if (showETA) {  // Reset to pre match defaults
+    if (showETA) { // Reset to pre match defaults
       mode = 'pre_match'
       timeRemaining = 0
       redScore = 0

@@ -83,7 +83,7 @@ store.subscribe(() => {
       subscribedEvents.delete(eventKey)
 
       firedux.ref.child(`e/${eventKey}/m`).off('value')
-      firedux.watching[`e/${eventKey}/m`] = false  // To make firedux.watch work again
+      firedux.watching[`e/${eventKey}/m`] = false // To make firedux.watch work again
     }
   })
 
@@ -109,7 +109,7 @@ store.subscribe(() => {
   removedLivescores.forEach((eventKey) => {
     lastLivescores.delete(eventKey)
     firedux.ref.child(`le/${eventKey}`).off('value')
-    firedux.watching[`le/${eventKey}`] = false  // To make firedux.watch work again
+    firedux.watching[`le/${eventKey}`] = false // To make firedux.watch work again
   })
 })
 
