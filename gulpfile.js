@@ -79,9 +79,7 @@ function compile(watch, config) {
     debug: true, // Gives us sourcemapping
     cache: {},
     packageCache: {},
-  }).transform('babelify', {
-    presets: ['es2015', 'react', 'stage-2']
-  });
+  }).transform('babelify');
 
   function rebundle() {
     bundler.bundle()

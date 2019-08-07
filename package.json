@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "dependencies": {
     "@babel/core": "^7.5.5",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
     "@babel/preset-react": "^7.0.0",
     "babel-polyfill": "^6.8.0",
@@ -37,7 +38,7 @@
   "devDependencies": {
     "babel-eslint": "^7.1.1",
     "babel-jest": "^24.8.0",
-    "babelify": "^7.2.0",
+    "babelify": "^10.0.0",
     "browserify": "^13.0.0",
     "enzyme": "^2.4.1",
     "eslint": "^4.19.1",
