@@ -1,4 +1,3 @@
-import cloudstorage
 import datetime
 import logging
 import os
@@ -15,8 +14,6 @@ from consts.district_type import DistrictType
 from consts.event_type import EventType
 
 from controllers.api.api_status_controller import ApiStatusController
-from database.dict_converters.team_converter import TeamConverter
-from database.dict_converters.event_converter import EventConverter
 from database.district_query import DistrictsInYearQuery
 from database.event_query import DistrictEventsQuery, EventQuery
 from database.match_query import EventMatchesQuery
@@ -470,12 +467,6 @@ class TypeaheadCalcDo(webapp.RequestHandler):
         keys_to_delete = old_entry_keys.difference(new_entry_keys)
         logging.info("Removing the following unused TypeaheadEntries: {}".format([key.id() for key in keys_to_delete]))
         ndb.delete_multi(keys_to_delete)
-
-        # Save APIv3 index to cloudstorage
-        with cloudstorage.open('/tbatv-prod-hrd.appspot.com/apiv3-index/all-events.json', 'w') as json_file:
-            json.dump(EventConverter.convert(events, 3), json_file, indent=2, sort_keys=True)
-        with cloudstorage.open('/tbatv-prod-hrd.appspot.com/apiv3-index/all-teams.json', 'w') as json_file:
-            json.dump(TeamConverter.convert(teams, 3), json_file, indent=2, sort_keys=True)
 
         template_values = {'results': results}
         path = os.path.join(os.path.dirname(__file__), '../templates/math/typeaheadcalc_do.html')
