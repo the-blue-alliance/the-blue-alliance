@@ -473,9 +473,9 @@ class TypeaheadCalcDo(webapp.RequestHandler):
 
         # Save APIv3 index to cloudstorage
         with cloudstorage.open('/tbatv-prod-hrd.appspot.com/apiv3-index/all-events.json', 'w') as json_file:
-            json.dump(EventConverter.convert(events, 3), json_file)
+            json.dump(EventConverter.convert(events, 3), json_file, indent=2, sort_keys=True)
         with cloudstorage.open('/tbatv-prod-hrd.appspot.com/apiv3-index/all-teams.json', 'w') as json_file:
-            json.dump(TeamConverter.convert(teams, 3), json_file)
+            json.dump(TeamConverter.convert(teams, 3), json_file, indent=2, sort_keys=True)
 
         template_values = {'results': results}
         path = os.path.join(os.path.dirname(__file__), '../templates/math/typeaheadcalc_do.html')

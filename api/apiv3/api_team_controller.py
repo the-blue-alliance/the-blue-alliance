@@ -1,3 +1,4 @@
+import cloudstorage
 import datetime
 import json
 
@@ -17,6 +18,19 @@ from helpers.event_team_status_helper import EventTeamStatusHelper
 from models.event_team import EventTeam
 from models.team import Team
 
+
+class ApiTeamListAllController(ApiBaseController):
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
+
+    def _track_call(self):
+        self._track_call_defer('team/list', 'all')
+
+    def _render(self):
+        file = cloudstorage.open('/tbatv-prod-hrd.appspot.com/apiv3-index/all-teams.json')
+        contents = file.read()
+        file.close()
+        return contents
 
 class ApiTeamListController(ApiBaseController):
     """

@@ -20,6 +20,8 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/v3/status',
         asc.ApiStatusController, methods=['GET', 'OPTIONS']),
     # Team List
+    webapp2.Route(r'/api/v3/teams/all',
+        atc.ApiTeamListAllController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/teams/<page_num:([0-9]+)>',
         atc.ApiTeamListController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/teams/<page_num:([0-9]+)>/<model_type:(simple|keys)>',
@@ -83,6 +85,8 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/v3/suggest/media/team/<team_key:>/<year:([0-9]+)>',
         asgc.ApiSuggestTeamMediaController, methods=['POST', 'OPTIONS']),
     # Event List
+    webapp2.Route(r'/api/v3/events/all',
+        aec.ApiEventListAllController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/events/<year:([0-9]+)>',
         aec.ApiEventListController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/events/<year:([0-9]+)>/<model_type:(simple|keys)>',

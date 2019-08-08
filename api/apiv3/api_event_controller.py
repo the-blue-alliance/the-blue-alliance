@@ -1,3 +1,4 @@
+import cloudstorage
 import json
 
 from google.appengine.ext import ndb
@@ -15,6 +16,20 @@ from helpers.match_helper import MatchHelper
 from helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from models.event_team import EventTeam
 from models.match import Match
+
+
+class ApiEventListAllController(ApiBaseController):
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
+
+    def _track_call(self):
+        self._track_call_defer('event/list', 'all')
+
+    def _render(self):
+        file = cloudstorage.open('/tbatv-prod-hrd.appspot.com/apiv3-index/all-events.json')
+        contents = file.read()
+        file.close()
+        return contents
 
 
 class ApiEventListController(ApiBaseController):
