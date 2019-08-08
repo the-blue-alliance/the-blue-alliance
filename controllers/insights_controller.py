@@ -10,7 +10,7 @@ from models.insight import Insight
 
 from template_engine import jinja2_engine
 
-VALID_YEARS = list(reversed(range(tba_config.MIN_YEAR, tba_config.MAX_YEAR + 1)))
+VALID_YEARS = list(reversed(tba_config.VALID_YEARS))
 
 
 class InsightsOverview(CacheableHandler):

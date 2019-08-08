@@ -19,7 +19,7 @@ SORT_ORDER = {
 
 
 class AdvancedSearchController(CacheableHandler):
-    VALID_YEARS = list(reversed(range(tba_config.MIN_YEAR, tba_config.MAX_YEAR + 1)))
+    VALID_YEARS = list(reversed(tba_config.VALID_YEARS))
 
     VALID_AWARD_TYPES = [kv for kv in AwardType.SEARCHABLE.items()]
     VALID_AWARD_TYPES = sorted(

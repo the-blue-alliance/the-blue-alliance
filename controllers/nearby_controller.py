@@ -11,7 +11,7 @@ from template_engine import jinja2_engine
 
 
 class NearbyController(CacheableHandler):
-    VALID_YEARS = list(reversed(range(tba_config.MIN_YEAR, tba_config.MAX_YEAR + 1)))
+    VALID_YEARS = list(reversed(tba_config.VALID_YEARS))
     VALID_RANGES = [100, 250, 500, 2500]
     DEFAULT_SEARCH_TYPE = 'teams'
     PAGE_SIZE = 20

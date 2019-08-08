@@ -1,5 +1,6 @@
 import json
 import logging
+import tba_config
 import webapp2
 
 from datetime import datetime
@@ -15,7 +16,6 @@ from helpers.model_to_dict import ModelToDict
 
 from models.event import Event
 
-import tba_config
 
 class ApiEventController(ApiBaseController):
     CACHE_KEY_FORMAT = "apiv2_event_controller_{}"  # (event_key)

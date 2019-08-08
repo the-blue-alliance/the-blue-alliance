@@ -578,8 +578,6 @@ class AdminEventList(LoggedInHandler):
     """
     List all Events.
     """
-    VALID_YEARS = range(tba_config.MIN_YEAR, tba_config.MAX_YEAR + 1)
-
     def get(self, year=None):
         self._require_admin()
 
@@ -591,7 +589,7 @@ class AdminEventList(LoggedInHandler):
         events = Event.query(Event.year == year).order(Event.start_date).fetch(10000)
 
         self.template_values.update({
-            "valid_years": self.VALID_YEARS,
+            "valid_years": tba_config.VALID_YEARS,
             "selected_year": year,
             "events": events,
         })
