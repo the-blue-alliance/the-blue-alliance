@@ -76,8 +76,8 @@ class ValidationHelper(object):
                 district_future = District.get_by_id_async(district_key)
         if 'year' in kwargs:
             year = int(kwargs['year'])
-            if year > tba_config.MAX_YEAR or year < 1992:
-                error_dict['Errors'].append({'year': 'Invalid year: {}. Must be between 1992 and {} inclusive.'.format(year, tba_config.MAX_YEAR)})
+            if year > tba_config.MAX_YEAR or year < tba_config.MIN_YEAR:
+                error_dict['Errors'].append({'year': 'Invalid year: {}. Must be between {} and {} inclusive.'.format(year, tba_config.MIN_YEAR, tba_config.MAX_YEAR)})
                 valid = False
 
         # Check if keys exist

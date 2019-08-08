@@ -578,7 +578,7 @@ class AdminEventList(LoggedInHandler):
     """
     List all Events.
     """
-    VALID_YEARS = range(1992, tba_config.MAX_YEAR + 1)
+    VALID_YEARS = range(tba_config.MIN_YEAR, tba_config.MAX_YEAR + 1)
 
     def get(self, year=None):
         self._require_admin()

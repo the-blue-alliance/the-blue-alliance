@@ -412,7 +412,7 @@ class MyTBAEventController(LoggedInHandler):
                 year = int(event_key[:-1])
             except:
                 year = None
-            if year and year >= 1992 and year <= tba_config.MAX_YEAR:
+            if year and year >= tba_config.MIN_YEAR and year <= tba_config.MAX_YEAR:
                 event = Event(  # fake event for rendering
                     name="ALL {} EVENTS".format(year),
                     year=year,

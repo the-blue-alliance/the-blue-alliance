@@ -15,6 +15,7 @@ from helpers.model_to_dict import ModelToDict
 
 from models.event import Event
 
+import tba_config
 
 class ApiEventController(ApiBaseController):
     CACHE_KEY_FORMAT = "apiv2_event_controller_{}"  # (event_key)
@@ -196,7 +197,7 @@ class ApiEventListController(ApiBaseController):
         self._track_call_defer('event/list', self.year)
 
     def _render(self, year=None):
-        if self.year < 1992 or self.year > datetime.now().year + 1:
+        if self.year < tba_config.MIN_YEAR or self.year > datetime.now().year + 1:
             self._errors = json.dumps({"404": "No events found for %s" % self.year})
             self.abort(404)
 

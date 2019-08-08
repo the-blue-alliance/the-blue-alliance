@@ -36,7 +36,7 @@ class EventList(CacheableHandler):
     """
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
-    VALID_YEARS = list(reversed(range(1992, tba_config.MAX_YEAR + 1)))
+    VALID_YEARS = list(reversed(range(tba_config.MIN_YEAR, tba_config.MAX_YEAR + 1)))
     CACHE_VERSION = 4
     CACHE_KEY_FORMAT = "event_list_{}_{}_{}"  # (year, explicit_year, state_prov)
 
