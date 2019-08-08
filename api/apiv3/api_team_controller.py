@@ -30,7 +30,7 @@ class ApiTeamListAllController(ApiBaseController):
 
     def _render(self, model_type=None):
         futures = []
-        for page_num in xrange(20):
+        for page_num in xrange(20):  # TODO: don't hardcode
             futures.append(TeamListQuery(page_num).fetch_async(dict_version=3, return_updated=True))
 
         team_list = []
@@ -42,7 +42,6 @@ class ApiTeamListAllController(ApiBaseController):
 
         if model_type is not None:
             team_list = filter_team_properties(team_list, model_type)
-
         return json.dumps(team_list, ensure_ascii=True, indent=2, sort_keys=True)
 
 
