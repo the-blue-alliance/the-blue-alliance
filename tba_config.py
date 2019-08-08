@@ -52,5 +52,5 @@ def _get_max_year():
     except Exception:
         return DEFAULT_YEAR
 
-
+MIN_YEAR = 1992
 MAX_YEAR = _get_max_year()
