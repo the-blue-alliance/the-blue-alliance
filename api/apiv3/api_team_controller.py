@@ -29,8 +29,12 @@ class ApiTeamListAllController(ApiBaseController):
         self._track_call_defer(action, 'all')
 
     def _render(self, model_type=None):
+        max_team_key = Team.query().order(-Team.team_number).fetch(1, keys_only=True)[0]
+        max_team_num = int(max_team_key.id()[3:])
+        max_team_page = int(max_team_num / 500)
+
         futures = []
-        for page_num in xrange(20):  # TODO: don't hardcode
+        for page_num in xrange(max_team_page + 1):
             futures.append(TeamListQuery(page_num).fetch_async(dict_version=3, return_updated=True))
 
         team_list = []
