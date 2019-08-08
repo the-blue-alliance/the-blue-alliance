@@ -1,5 +1,5 @@
-import cloudstorage
 import json
+import tba_config
 
 from google.appengine.ext import ndb
 
@@ -22,14 +22,27 @@ class ApiEventListAllController(ApiBaseController):
     CACHE_VERSION = 0
     CACHE_HEADER_LENGTH = 61
 
-    def _track_call(self):
-        self._track_call_defer('event/list', 'all')
+    def _track_call(self, model_type=None):
+        action = 'event/list'
+        if model_type:
+            action += '/{}'.format(model_type)
+        self._track_call_defer(action, 'all')
 
-    def _render(self):
-        file = cloudstorage.open('/tbatv-prod-hrd.appspot.com/apiv3-index/all-events.json')
-        contents = file.read()
-        file.close()
-        return contents
+    def _render(self, model_type=None):
+        futures = []
+        for year in xrange(1992, tba_config.MAX_YEAR + 1):
+            futures.append(EventListQuery(year).fetch_async(dict_version=3, return_updated=True))
+
+        events = []
+        for future in futures:
+            partial_events, last_modified = future.get_result()
+            events += partial_events
+            if self._last_modified is None or last_modified > self._last_modified:
+                self._last_modified = last_modified
+
+        if model_type is not None:
+            events = filter_event_properties(events, model_type)
+        return json.dumps(events, ensure_ascii=True, indent=True, sort_keys=True)
 
 
 class ApiEventListController(ApiBaseController):
