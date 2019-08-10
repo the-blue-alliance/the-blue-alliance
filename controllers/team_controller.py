@@ -105,7 +105,7 @@ class TeamCanonical(CacheableHandler):
 
         rendered_result = TeamRenderer.render_team_details(self, team, "frc{}".format(team_number), year, True)
         if rendered_result is None:
-            return TeamRenderer.render_team_history(self, team, True)
+            return TeamRenderer.render_team_history(self, team, "frc{}".format(team_number), True)
         else:
             return rendered_result
 
