@@ -224,14 +224,14 @@ class TeamRenderer(object):
         return jinja2_engine.render("team_details.html", handler.template_values)
 
     @classmethod
-    def render_team_history(cls, handler, team, is_canonical):
+    def render_team_history(cls, handler, team, team_key, is_canonical):
         hof_award_future = award_query.TeamEventTypeAwardsQuery(team.key.id(), EventType.CMP_FINALS, AwardType.CHAIRMANS).fetch_async()
         hof_video_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_VIDEO).fetch_async()
         hof_presentation_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_PRESENTATION).fetch_async()
         hof_essay_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_ESSAY).fetch_async()
-        award_futures = award_query.TeamAwardsQuery(team.key.id()).fetch_async()
+        award_futures = award_query.TeamAwardsQuery(team_key).fetch_async()
         event_futures = event_query.TeamEventsQuery(team.key.id()).fetch_async()
-        participation_future = team_query.TeamParticipationQuery(team.key.id()).fetch_async()
+        participation_future = team_query.TeamParticipationQuery(team_key).fetch_async()
         social_media_future = media_query.TeamSocialMediaQuery(team.key.id()).fetch_async()
 
         hof_awards = hof_award_future.get_result()
@@ -263,13 +263,21 @@ class TeamRenderer(object):
         years = set()
         for event in event_futures.get_result():
             years.add(event.year)
+            matches = None
             if event.now:
                 current_event = event
-                matches = match_query.TeamEventMatchesQuery(team.key.id(), event.key.id()).fetch()
+                matches = match_query.TeamEventMatchesQuery(team_key, event.key.id()).fetch()
                 matches_upcoming = MatchHelper.upcomingMatches(matches)
 
             if event.within_a_day:
                 short_cache = True
+
+            if team.key.id() != team_key:
+                # verify that B teams actually attended this event
+                if matches is None:
+                    matches = match_query.TeamEventMatchesQuery(team_key, event.key.id()).fetch()
+                if not matches:
+                    continue
 
             if event.key_name in awards_by_event:
                 sorted_awards = AwardHelper.organizeAwards(awards_by_event[event.key_name])

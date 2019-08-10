@@ -161,8 +161,8 @@ class TeamHistory(CacheableHandler):
         super(TeamHistory, self).get(team_number)
 
     def _render(self, team_number):
-        team = Team.get_by_id("frc" + team_number)
+        team = Team.get_by_id("frc{}".format(base_team_number(team_number)))
         if not team:
             self.abort(404)
 
-        return TeamRenderer.render_team_history(self, team, False)
+        return TeamRenderer.render_team_history(self, team, "frc{}".format(team_number), False)
