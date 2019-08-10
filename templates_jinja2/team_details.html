@@ -182,7 +182,7 @@
               </div>
               <div class="col-sm-8" style="margin-top: 1em">
                 {% if comp.matches.num %}
-                  {{mtm.full_match_table(comp.matches, cur_team_key=team.key.id())}}
+                  {{mtm.full_match_table(comp.matches, cur_team_key='frc' + team_number)}}
                 {% else %}
                   {% if comp.event.past %}
                     <p class="muted">No matches played.</p>
