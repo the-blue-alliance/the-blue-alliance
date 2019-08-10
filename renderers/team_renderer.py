@@ -113,7 +113,7 @@ class TeamRenderer(object):
             team_rank = None
             if event.details and event.details.rankings2:
                 for ranking in event.details.rankings2:
-                    if ranking['team_key'] == team.key.id():
+                    if ranking['team_key'] == team_key:
                         team_rank = ranking['rank']
                         break
 
