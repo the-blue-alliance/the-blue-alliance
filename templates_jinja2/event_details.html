@@ -234,7 +234,7 @@
                 {% for element in row %}
                 <td>
                   {% if loop.index0 == 1 %}
-                    <a href="/team/{{ element|digits }}/{{event.year}}">{{ element }}</a>
+                    <a href="/team/{{ element }}/{{event.year}}">{{ element }}</a>
                   {% else %}
                     {{ element }}
                   {% endif %}
@@ -336,10 +336,10 @@
                 <td>
                 {% if awardee %}
                   {{ awardee }}
-                  {% if team_number %}(<a href="/team/{{team_number|digits}}/{{event.year}}">{{team_number}}</a>){% endif %}
+                  {% if team_number %}(<a href="/team/{{team_number}}/{{event.year}}">{{team_number}}</a>){% endif %}
                 {% else %}
                   {% if team_number %}
-                  <a href="/team/{{team_number|digits}}/{{event.year}}">{{team_number}}</a>
+                  <a href="/team/{{team_number}}/{{event.year}}">{{team_number}}</a>
                   {% else %}
                   --
                   {% endif %}

@@ -18,7 +18,7 @@
     <tr>
       <td>{% if alliance.name %}{{alliance.name}}{% else %}Alliance {{loop.index}}{% endif %}</td>
       {% for team in alliance.picks %}
-        <td><a href="/team/{{ team|digits }}/{{event.year}}">{{ team|strip_frc }}</a>{% if alliance.backup and alliance.backup.out == team %} (<a href="/team/{{ alliance.backup.in|digits }}/{{event.year}}" rel="tooltip" title="This team was called as a backup for Team {{team|strip_frc}}">{{alliance.backup.in|strip_frc}}</a>){% endif %}</td>
+        <td><a href="/team/{{ team|strip_frc }}/{{event.year}}">{{ team|strip_frc }}</a>{% if alliance.backup and alliance.backup.out == team %} (<a href="/team/{{ alliance.backup.in|strip_frc }}/{{event.year}}" rel="tooltip" title="This team was called as a backup for Team {{team|strip_frc}}">{{alliance.backup.in|strip_frc}}</a>){% endif %}</td>
       {% endfor %}
     </tr>
   {% endfor %}
