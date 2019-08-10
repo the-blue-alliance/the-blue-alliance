@@ -194,6 +194,7 @@ class TeamRenderer(object):
         handler.template_values.update({
             "is_canonical": is_canonical,
             "team": team,
+            "team_number": team_key.lstrip("frc"),
             "participation": participation,
             "year": year,
             "years": valid_years,
@@ -297,6 +298,7 @@ class TeamRenderer(object):
         handler.template_values.update({
             "is_canonical": is_canonical,
             "team": team,
+            "team_number": team_key.lstrip("frc"),
             "event_awards": event_awards,
             "years": sorted(years),
             "social_medias": social_medias,

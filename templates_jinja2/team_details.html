@@ -3,7 +3,7 @@
 {% import 'team_partials/blue_banner_macros.html' as bbm %}
 {% import 'event_partials/event_macros.html' as em %}
 
-{% block title %}{% if team.nickname %}{{team.nickname}} - {% endif %}Team {{team.team_number}}{% if not is_canonical %} ({{year}}){% endif %} - The Blue Alliance{% endblock %}
+{% block title %}{% if team.nickname %}{{team.nickname}} - {% endif %}Team {{team_number}}{% if not is_canonical %} ({{year}}){% endif %} - The Blue Alliance{% endblock %}
 
 {% block meta_description %}{% if team.location %}From {{team.location}}{% endif %}. Team information, match results, and match videos from the{% if not is_canonical %} {{year}}{% endif %} FIRST Robotics Competition.{% endblock %}
 
@@ -28,7 +28,7 @@
         {% if avatar %}
           <img class="team-avatar single blue" src='{{avatar.avatar_image_source}}'/>
         {% endif %}
-        Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h2>
+        Team {{team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h2>
         {% if district_name %}<blockquote class="visible-xs"><em>Part of the <a href="/events/{{district_abbrev}}/{{year}}">{{district_name}} District</a></em></blockquote>{% endif %}
 
         <div class="tba-sidebar">
@@ -59,14 +59,14 @@
           <hr>
           <h2 id="event-results">Event Results</h2>
           {% if season_wlt %}
-            <p>Team {{team.team_number}} was <strong>{{season_wlt.win}}-{{season_wlt.loss}}-{{season_wlt.tie}}</strong> in official play
+            <p>Team {{team_number}} was <strong>{{season_wlt.win}}-{{season_wlt.loss}}-{{season_wlt.tie}}</strong> in official play
             {% if offseason_wlt %}and <strong>{{season_wlt.win+offseason_wlt.win}}-{{season_wlt.loss+offseason_wlt.loss}}-{{season_wlt.tie+offseason_wlt.tie}}</strong> overall
             {% endif %} in {{year}}.</p>
           {% elif offseason_wlt %}
-            <p>Team {{team.team_number}} was <strong>{{offseason_wlt.win}}-{{offseason_wlt.loss}}-{{offseason_wlt.tie}}</strong> during the {{year}} offseason.</p>
+            <p>Team {{team_number}} was <strong>{{offseason_wlt.win}}-{{offseason_wlt.loss}}-{{offseason_wlt.tie}}</strong> during the {{year}} offseason.</p>
           {% else %}
             {% if year_qual_avg or year_elim_avg %}
-              <p>Overall, Team {{team.team_number}} had
+              <p>Overall, Team {{team_number}} had
               {% if year_qual_avg %}an average qual score of <strong>{{year_qual_avg|floatformat(2)}}</strong>{% endif %}
               {% if year_qual_avg and year_elim_avg %}
                 and
@@ -76,7 +76,7 @@
             {% endif %}
           {% endif %}
           {% if team_district_points and district_name %}
-            <p>As a member of the {{district_name}} district, Team {{team.team_number}} ranked <b>{{team_district_points.rank}}</b> having earned <b>{{team_district_points.point_total}}</b> points.</p>
+            <p>As a member of the {{district_name}} district, Team {{team_number}} ranked <b>{{team_district_points.rank}}</b> having earned <b>{{team_district_points.point_total}}</b> points.</p>
           {% endif %}
 
           <div class="text-center">
@@ -87,8 +87,8 @@
               {% if comp.event.is_season_event and comp.awards %}
                 {% for award in comp.awards %}
                   {% if award.is_blue_banner and award.count_banner %}
-                    {% for team_number, _ in award.recipient_dict.items() %}
-                      {% if team_number|string == team.team_number|string %}
+                    {% for award_team_number, _ in award.recipient_dict.items() %}
+                      {% if award_team_number|string == team_number|string %}
                         {{bbm.blue_banner(award, comp.event)}}
                       {% endif %}
                     {% endfor %}
@@ -108,7 +108,7 @@
                 </p>
 
                 {% if comp.wlt or comp.rank or comp.awards or comp.qual_avg or comp.elim_avg %}
-                <p>Team {{ team.team_number }}
+                <p>Team {{ team_number }}
                   {% if comp.rank %}was <strong>Rank {{ comp.rank }}</strong>{% endif %}
                   {% if comp.wlt %}
                     {% if comp.rank %}with a record of{% else %}had a record of{% endif %}
@@ -130,8 +130,8 @@
                   {% if comp.rank or comp.wlt %}and{% endif %} won the following awards:
                   <ul>
                   {% for award in comp.awards %}
-                  {% for team_number, awardees in award.recipient_dict.items() %}
-                  {% if team_number|string == team.team_number|string %}
+                  {% for award_team_number, awardees in award.recipient_dict.items() %}
+                  {% if award_team_number|string == team_number|string %}
                     {% for awardee in awardees %}
                     <li>{{ award.name_str }}{% if awardee %} ({{ awardee }}){% endif %}</li>
                     {% endfor %}
@@ -212,7 +212,7 @@
                     </div>
                   {% endfor %}
                 {% else %}
-                  <p>No photos for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add one</a>?</p>
+                  <p>No photos for team {{team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add one</a>?</p>
                 {% endif %}
               </div>
             </div>
@@ -226,12 +226,12 @@
                     </div>
                   {% endfor %}
                 {% else %}
-                  <p>No videos for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add one</a>?</p>
+                  <p>No videos for team {{team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add one</a>?</p>
                 {% endif %}
               </div>
             </div>
           {% else %}
-            <p>No photos or videos for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add one</a>?</p>
+            <p>No photos or videos for team {{team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add one</a>?</p>
           {% endif %}
         </div>
       </div>
@@ -262,7 +262,7 @@
                   {% endfor %}
                 {% endif %}
               {% else %}
-                  <p>No CAD for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add some</a>?</p>
+                  <p>No CAD for team {{team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add some</a>?</p>
               {% endif %}
             </div>
           </div>
@@ -279,7 +279,7 @@
     $(this).toggleClass("red").toggleClass("blue")
   });
 </script>
-{% if team.team_number == 148 %}
+{% if team_number == 148 %}
 <script>
   $(".banner").click(function(){
     $(".banner").addClass("black");

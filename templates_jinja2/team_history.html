@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% import 'team_partials/blue_banner_macros.html' as bbm %}
 
-{% block title %}{% if team.nickname %}{{team.nickname}} - {% endif %}Team {{team.team_number}} (History) - The Blue Alliance{% endblock %}
+{% block title %}{% if team.nickname %}{{team.nickname}} - {% endif %}Team {{team_number}} (History) - The Blue Alliance{% endblock %}
 
 {% block meta_description %}{% if team.location %}From {{team.location}}{% endif %}. Team history from the FIRST Robotics Competition.{% endblock %}
 
@@ -16,7 +16,7 @@
       {% set dropdown_label = "History" %}
       {% include "team_partials/team_year_dropdown.html" %}
 
-      <h2 class="visible-xs end_header">Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h2>
+      <h2 class="visible-xs end_header">Team {{team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h2>
 
       {% if participation|length > 1 %}
       <div class="tba-sidebar">
@@ -46,13 +46,13 @@
           <tbody>
             {% for event, awards in event_awards|reverse %}
             <tr>
-              <td><a href="/team/{{team.team_number}}/{{event.year}}">{{event.year}}</a></td>
+              <td><a href="/team/{{team_number}}/{{event.year}}">{{event.year}}</a></td>
               <td><a href="/event/{{event.key_name}}">{{event.name}}</a></td>
               <td>
               {% if awards %}
               {% for award in awards %}
-                {% for team_number, awardees in award.recipient_dict.items() %}
-                {% if team_number|int == team.team_number %}
+                {% for award_team_number, awardees in award.recipient_dict.items() %}
+                {% if award_team_number|int == team_number %}
                 {% for awardee in awardees %}
                   {{ award.name_str }}{% if awardee %} ({{ awardee }}){% endif %}<br>
                 {% endfor %}
@@ -77,8 +77,8 @@
             {% if event.is_season_event and awards %}
               {% for award in awards %}
                 {% if award.is_blue_banner and award.count_banner %}
-                  {% for team_number, _ in award.recipient_dict.items() %}
-                    {% if team_number|string == team.team_number|string %}
+                  {% for award_team_number, _ in award.recipient_dict.items() %}
+                    {% if award_team_number|string == team_number|string %}
                       {{bbm.blue_banner(award, event)}}
                     {% endif %}
                   {% endfor %}
@@ -94,7 +94,7 @@
 {% endblock %}
 
 {% block inline_javascript %}
-{% if team.team_number == 148 %}
+{% if team_number == 148 %}
 <script>
   $(".banner").click(function(){
     $(".banner").addClass("black");

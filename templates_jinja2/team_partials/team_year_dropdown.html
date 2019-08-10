@@ -5,9 +5,9 @@
       <span class="caret"></span>
     </a>
     <ul class="dropdown-menu tba-dropdown-menu-limited">
-      <li><a href="/team/{{team.team_number}}/history">History</a></li>
+      <li><a href="/team/{{team_number or team.team_number}}/history">History</a></li>
       {% for a_year in years|reverse %}
-        <li><a href="/team/{{team.team_number}}/{{a_year}}">{{a_year}} Season</a></li>
+        <li><a href="/team/{{team_number or team.team_number}}/{{a_year}}">{{a_year}} Season</a></li>
       {% endfor %}
     </ul>
   </div>
