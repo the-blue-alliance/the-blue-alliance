@@ -16,7 +16,7 @@ class TeamDetailsDataFetcher(object):
         events_future = event_query.TeamYearEventsQuery(team.key.id(), year).fetch_async()
         matches_future = match_query.TeamYearMatchesQuery(team_key, year).fetch_async()
         if return_valid_years:
-            valid_years_future = team_query.TeamParticipationQuery(team_key).fetch_async()
+            valid_years_future = team_query.TeamParticipationQuery(team.key.id()).fetch_async()
 
         events_sorted = sorted(events_future.get_result(), key=lambda e: e.start_date if e.start_date else datetime.datetime(year, 12, 31))  # unknown goes last
 
@@ -32,6 +32,11 @@ class TeamDetailsDataFetcher(object):
                 awards_by_event_key[award.event].append(award)
             else:
                 awards_by_event_key[award.event] = [award]
+
+        if team_key != team.key.id():
+            # for B teams, filter out events where they didn't play any matches or win any awards
+            events_sorted = [event for event in events_sorted
+                if event.key in matches_by_event_key or event.key in awards_by_event_key]
 
         if return_valid_years:
             valid_years = sorted(valid_years_future.get_result())
