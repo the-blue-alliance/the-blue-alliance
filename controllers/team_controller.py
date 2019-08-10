@@ -1,5 +1,6 @@
 import datetime
 import os
+import string
 
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
@@ -10,6 +11,18 @@ from models.team import Team
 
 from renderers.team_renderer import TeamRenderer
 from template_engine import jinja2_engine
+
+
+def normalize_team_number(team_number):
+    """Remove leading 0s from a team number, keeping any suffixes."""
+    suffix = team_number.lstrip(string.digits)
+    number = team_number[:len(team_number) - len(suffix)]
+    return str(int(number)) + suffix
+
+
+def base_team_number(team_number):
+    """Strip any suffixes from a team number."""
+    return "".join(filter(str.isdigit, team_number))
 
 
 class TeamList(CacheableHandler):
@@ -76,20 +89,21 @@ class TeamCanonical(CacheableHandler):
 
     def get(self, team_number):
         # /team/0201 should redirect to /team/201
-        if str(int(team_number)) != team_number:
-            return self.redirect("/team/%s" % int(team_number))
+        normalized_team = normalize_team_number(team_number)
+        if normalized_team != team_number:
+            return self.redirect("/team/%s" % normalized_team)
 
         self._partial_cache_key = self.CACHE_KEY_FORMAT.format("frc{}".format(team_number))
         super(TeamCanonical, self).get(team_number)
 
     def _render(self, team_number):
-        team = Team.get_by_id("frc{}".format(team_number))
+        team = Team.get_by_id("frc{}".format(base_team_number(team_number)))
         if not team:
             self.abort(404)
 
         year = datetime.datetime.now().year
 
-        rendered_result = TeamRenderer.render_team_details(self, team, year, True)
+        rendered_result = TeamRenderer.render_team_details(self, team, "frc{}".format(team_number), year, True)
         if rendered_result is None:
             return TeamRenderer.render_team_history(self, team, True)
         else:
@@ -108,18 +122,19 @@ class TeamDetail(CacheableHandler):
 
     def get(self, team_number, year):
         # /team/0201 should redirect to /team/201
-        if str(int(team_number)) != team_number:
-            return self.redirect("/team/%s/%s" % (int(team_number), year))
+        normalized_team = normalize_team_number(team_number)
+        if normalized_team != team_number:
+            return self.redirect("/team/%s/%s" % (normalized_team, year))
 
         self._partial_cache_key = self.CACHE_KEY_FORMAT.format("frc{}".format(team_number), year)
         super(TeamDetail, self).get(team_number, year)
 
     def _render(self, team_number, year):
-        team = Team.get_by_id("frc{}".format(team_number))
+        team = Team.get_by_id("frc{}".format(base_team_number(team_number)))
         if not team:
             self.abort(404)
 
-        rendered_result = TeamRenderer.render_team_details(self, team, int(year), False)
+        rendered_result = TeamRenderer.render_team_details(self, team, "frc{}".format(team_number), int(year), False)
         if rendered_result is None:
             self.abort(404)
         else:
@@ -138,8 +153,9 @@ class TeamHistory(CacheableHandler):
 
     def get(self, team_number):
         # /team/0604/history should redirect to /team/604/history
-        if str(int(team_number)) != team_number:
-            return self.redirect("/team/%s/history" % int(team_number))
+        normalized_team = normalize_team_number(team_number)
+        if normalized_team != team_number:
+            return self.redirect("/team/%s/history" % normalized_team)
 
         self._partial_cache_key = self.CACHE_KEY_FORMAT.format("frc" + team_number)
         super(TeamHistory, self).get(team_number)

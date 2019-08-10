@@ -28,7 +28,7 @@ from consts.event_type import EventType
 
 class TeamRenderer(object):
     @classmethod
-    def render_team_details(cls, handler, team, year, is_canonical):
+    def render_team_details(cls, handler, team, team_key, year, is_canonical):
         hof_award_future = award_query.TeamEventTypeAwardsQuery(team.key.id(), EventType.CMP_FINALS, AwardType.CHAIRMANS).fetch_async()
         hof_video_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_VIDEO).fetch_async()
         hof_presentation_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_PRESENTATION).fetch_async()
@@ -54,7 +54,7 @@ class TeamRenderer(object):
             },
         }
 
-        events_sorted, matches_by_event_key, awards_by_event_key, valid_years = TeamDetailsDataFetcher.fetch(team, year, return_valid_years=True)
+        events_sorted, matches_by_event_key, awards_by_event_key, valid_years = TeamDetailsDataFetcher.fetch(team, team_key, year, return_valid_years=True)
         if not events_sorted:
             return None
 
