@@ -1,7 +1,7 @@
 import os
 import json
 import logging
-from tba_config import MAX_YEAR
+import tba_config
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from google.appengine.ext import deferred
@@ -64,10 +64,11 @@ class AdminMigrationRankings(LoggedInHandler):
 
 class AdminMigrationPlayoffAdvancementAll(LoggedInHandler):
     def get(self):
-        for year in range(1992, MAX_YEAR + 1):
+        VALID_YEARS = tba_config.VALID_YEARS
+        for year in VALID_YEARS:
                         taskqueue.add(url='/admin/migration/backfill_playoff_advancement/{}'.format(year),
                                       method='GET')
-        self.response.out.write("Enqueued migrations for 1992 - {}".format(MAX_YEAR))
+        self.response.out.write("Enqueued migrations for {} - {}".format(VALID_YEARS[0], VALID_YEARS[-1]))
 
 
 class AdminMigrationPlayoffAdvancement(LoggedInHandler):

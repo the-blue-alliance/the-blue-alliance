@@ -54,3 +54,4 @@ def _get_max_year():
 
 MIN_YEAR = 1992
 MAX_YEAR = _get_max_year()
+VALID_YEARS = range(MIN_YEAR, MAX_YEAR + 1)

@@ -30,7 +30,7 @@ class ApiEventListAllController(ApiBaseController):
 
     def _render(self, model_type=None):
         futures = []
-        for year in xrange(tba_config.MIN_YEAR, tba_config.MAX_YEAR + 1):
+        for year in tba_config.VALID_YEARS:
             futures.append(EventListQuery(year).fetch_async(dict_version=3, return_updated=True))
 
         events = []
