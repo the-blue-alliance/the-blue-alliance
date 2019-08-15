@@ -510,8 +510,8 @@ class OffseasonEventListGet(webapp.RequestHandler):
     def get(self, year):
         df = DatafeedFMSAPI('v2.0')
         first_events, _ = df.getSyncEnabledOffseasonEvents(year)
-        linked_events, maybed_linked_events, new_events = \
-            OffseasonEventHelper.categorize_offseasons(int(year), first_events)
+        linked_events, maybed_linked_events, new_events = [], [], []
+        # OffseasonEventHelper.categorize_offseasons(int(year), first_events)
 
         events_to_update = []
         events_to_put = []
