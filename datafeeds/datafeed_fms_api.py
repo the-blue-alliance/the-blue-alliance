@@ -380,19 +380,6 @@ class DatafeedFMSAPI(object):
         district.advancement = advancement
         return [district]
 
-    # Returns a list of sync-enabled offseason events
-    def getSyncEnabledOffseasonEvents(self, year):
-        result = self._parse(
-            self.FMS_API_EVENT_LIST_URL_PATTERN % (year),
-            FMSAPIEventListParser(
-                year,
-                event_types_override={
-                    'offseasonwithazuresync': EventType.OFFSEASON,
-                },
-            )
-        )
-        return result
-
     # Returns a tuple: (list(Event), list(District))
     def getEventDetails(self, event_key):
         year = int(event_key[:4])
