@@ -19,31 +19,26 @@ class OffseasonEventHelper(object):
                and tba_event.state_prov == first_event.state_prov
 
     @classmethod
-    def categorize_offseasons(cls, year, first_events):
+    def categorize_offseasons(cls, year, first_events_offseasons):
         """
-        Takes a list of sync-enabled offseasons from FIRST and sorts them
-        Returns a tuple of events (linked to TBA, candidates to link, new)
+        Takes a list of offseason events from FIRST and sorts them in to two groups -
+        events that directly or indirectly match TBA events, and events that do not
+        match existing TBA events.
+
+        Returns a tuple of events (TBA/FIRST event tuples, new FIRST events)
         """
         year_events_future = EventListQuery(year).fetch_async()
         year_events = year_events_future.get_result()
-        year_offseasons = [e for e in year_events if e.event_type_enum == EventType.OFFSEASON or e.event_type_enum == EventType.PRESEASON]
+        tba_events_offseasons = [e for e in year_events if e.is_offseason]
 
         matched_events = []
-        likely_matched_events = []
         new_events = []
 
-        logging.info("Categorizing {} events from FIRST".format(len(first_events)))
-        for event in first_events:
-            matching_tba_event_by_key = next((e for e in year_offseasons if cls.is_direct_match(e, event)), None)
-            if matching_tba_event_by_key:
-                matched_events.append((matching_tba_event_by_key, event))
-                continue
+        for first_event in first_events_offseasons:
+            tba_event = next((e for e in tba_events_offseasons if cls.is_direct_match(e, first_event) or cls.is_maybe_match(e, first_event)), None)
+            if tba_event:
+                matched_events.append((tba_event, first_event))
+            else:
+                new_events.append(first_event)
 
-            likely_match = next((e for e in year_offseasons if cls.is_maybe_match(e, event)), None)
-            if likely_match:
-                likely_matched_events.append((likely_match, event))
-                continue
-
-            new_events.append(event)
-
-        return (matched_events, likely_matched_events, new_events)
+        return (matched_events, new_events)

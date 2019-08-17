@@ -132,6 +132,22 @@ class TestEvent(unittest2.TestCase):
         event_week_1_year_2022 = MockEvent(week=1, year=2022)
         self.assertEqual(event_week_1_year_2022.week_str, "Week 2")
 
+    def test_in_season(self):
+        for event_type in EventType.type_names.keys():
+            event = Event(event_type_enum=event_type)
+            if event_type in EventType.SEASON_EVENT_TYPES:
+                self.assertTrue(event.is_in_season)
+            else:
+                self.assertFalse(event.is_in_season)
+
+    def test_offseason(self):
+        for event_type in EventType.type_names.keys():
+            event = Event(event_type_enum=event_type)
+            if event_type in EventType.SEASON_EVENT_TYPES:
+                self.assertFalse(event.is_offseason)
+            else:
+                self.assertTrue(event.is_offseason)
+
 
 class MockEvent(Event):
 
@@ -141,7 +157,6 @@ class MockEvent(Event):
 
     @property
     def week(self):
-        print(self._week)
         return self._week
 
     @property

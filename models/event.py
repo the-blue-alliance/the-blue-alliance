@@ -523,6 +523,20 @@ class Event(ndb.Model):
         return self.first_code.upper()
 
     @property
+    def is_in_season(self):
+        """
+        If the Event is of a regular season type.
+        """
+        return self.event_type_enum in EventType.SEASON_EVENT_TYPES
+
+    @property
+    def is_offseason(self):
+        """
+        'Offseason' events include preseason, offseason, unlabeled events.
+        """
+        return not self.is_in_season
+
+    @property
     def next_match(self):
         from helpers.match_helper import MatchHelper
         upcoming_matches = MatchHelper.upcomingMatches(self.matches, 1)

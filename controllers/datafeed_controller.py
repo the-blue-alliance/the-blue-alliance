@@ -453,14 +453,29 @@ class EventListEnqueue(webapp.RequestHandler):
 
 class EventListGet(webapp.RequestHandler):
     """
-    Fetch one year of events
-    FMSAPI should be trusted over FIRSTElasticSearch
+    Fetch all events for a given year via the FRC Events API.
     """
     def get(self, year):
         df = DatafeedFMSAPI('v2.0')
 
         fmsapi_events, event_list_districts = df.getEventList(year)
-        events = EventManipulator.createOrUpdate(fmsapi_events)
+        # All regular-season events can be inserted without any work involved.
+        # We need to de-duplicate offseason events from the FRC Events API with a different code than the TBA event code
+        fmsapi_events_offseason = [e for e in fmsapi_events if e.is_offseason]
+        events_to_put = set(fmsapi_events) - set(fmsapi_events_offseason)
+
+        matched_offseason_events, new_offseason_events = \
+            OffseasonEventHelper.categorize_offseasons(int(year), fmsapi_events_offseason)
+
+        # For all matched offseason events, make sure the FIRST code matches the TBA FIRST code
+        for tba_event, first_event in matched_offseason_events:
+            tba_event.first_code = first_event.event_short
+            events_to_put.append(tba_event)  # Update TBA events - discard the FIRST event
+
+        # For all new offseason events we can't automatically match, create suggestions
+        SuggestionCreator.createDummyOffseasonSuggestions(new_offseason_events)
+
+        events = EventManipulator.createOrUpdate(events_to_put)
 
         fmsapi_districts = df.getDistrictList(year)
         merged_districts = DistrictManipulator.mergeModels(fmsapi_districts, event_list_districts)
@@ -501,55 +516,6 @@ class DistrictListGet(webapp.RequestHandler):
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
             path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fms_district_list_get.html')
             self.response.out.write(template.render(path, template_values))
-
-
-class OffseasonEventListGet(webapp.RequestHandler):
-    """
-    Fetch one year's sync-enabled offseason events
-    """
-    def get(self, year):
-        df = DatafeedFMSAPI('v2.0')
-        first_events, _ = df.getSyncEnabledOffseasonEvents(year)
-        linked_events, maybed_linked_events, new_events = [], [], []
-        # OffseasonEventHelper.categorize_offseasons(int(year), first_events)
-
-        events_to_update = []
-        events_to_put = []
-
-        # for all events with a first_code linked, ensure official=True
-        logging.info("Found {} already linked events".format(len(linked_events)))
-        for tba, first in linked_events:
-            if tba.first_code != first.event_short or not tba.official:
-                tba.first_code = first.event_short
-                tba.official = True
-                events_to_put.append(tba)
-            events_to_update.append(tba)
-
-        # for all events that we can maybe link, also do that
-        logging.info("Auto-linking {} probably events".format(len(maybed_linked_events)))
-        for tba, first in maybed_linked_events:
-            tba.first_code = first.event_short
-            tba.official = True
-            events_to_put.append(tba)
-            events_to_update.append(tba)
-
-        logging.info("Found {} events to put".format(len(events_to_put)))
-        if events_to_put:
-            EventManipulator.createOrUpdate(events_to_put)
-
-        # Enqueue details updates for these events
-        logging.info("Found {} events to update".format(len(events_to_update)))
-        for event in events_to_update:
-            taskqueue.add(
-                queue_name='datafeed',
-                target='backend-tasks',
-                url='/backend-tasks/get/event_details/'+event.key_name,
-                method='GET'
-            )
-
-        # Event we don't have anything for... Create suggestions
-        logging.info("Found {} new events to link".format(len(new_events)))
-        SuggestionCreator.createDummyOffseasonSuggestions(new_events)
 
 
 class EventDetailsEnqueue(webapp.RequestHandler):
