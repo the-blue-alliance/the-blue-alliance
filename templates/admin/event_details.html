@@ -480,6 +480,32 @@
 
 <div class="tab-pane" id="matches">
 <div class="row">
+
+{% if deleted_count %}
+  <div class="row">
+    <div class="alert alert-danger" role="alert">
+      <p>Deleted {{deleted_count}} matches</p>
+    </div>
+  </div>
+{% endif %}
+
+<h2>Match Stats</h2>
+{% if match_stats %}
+  <table class="table table-striped table-condensed table-center">
+  <tr><th>Comp Level</th><th>Total</th><th>Played</th><th>Unplayed</th></tr>
+  {% for stats in match_stats %}
+    <tr>
+      <td>{{stats.level_name}}</td>
+      <td>{{stats.total}}</td>
+      <td>{{stats.played}}</td>
+      <td>{{stats.unplayed}}</td>
+      <td><p><a class="btn btn-danger btn-small" href="/admin/event/delete_matches/{{event.key_name}}/{{stats.comp_level}}/all"><span class="glyphicon glyphicon-trash"></span> Delete All</a></p></td>
+      <td><p><a class="btn btn-warning btn-small" href="/admin/event/delete_matches/{{event.key_name}}/{{stats.comp_level}}/unplayed"><span class="glyphicon glyphicon-trash"></span> Delete Unplayed</a></p></td>
+    </tr>
+  {% endfor %}
+  </table>
+{% endif %}
+
 <h2>Match Listing</h2>
 
 <table class="table table-striped table-condensed table-center">
