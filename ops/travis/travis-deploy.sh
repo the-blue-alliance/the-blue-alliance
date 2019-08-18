@@ -48,8 +48,10 @@ PATH=$PATH:$INSTALL/$NAME/bin/
 echo "Building TBA..."
 paver make
 
-echo "Deploying TBA with the following JS modules"
-npm ls || true
+if [ "$TBA_DEPLOY_VERBOSE" = "1"]; then
+  echo "Deploying TBA with the following JS modules"
+  npm ls || true
+fi
 
 echo "Configuring service account auth..."
 with_python27 "$GCLOUD -q auth activate-service-account --key-file $KEYFILE"
