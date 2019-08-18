@@ -398,6 +398,35 @@ class AdminEventDelete(LoggedInHandler):
         self.redirect("/admin/events?deleted=%s" % event_key_id)
 
 
+class AdminEventDeleteMatches(LoggedInHandler):
+    """
+    Remove a comp level's matches
+    """
+    def get(self, event_key, comp_level, to_delete):
+        self._require_admin()
+
+        event = Event.get_by_id(event_key)
+        if not event:
+            self.abort(404)
+
+        organized_matches = MatchHelper.organizeMatches(event.matches)
+        if comp_level not in organized_matches:
+            self.abort(400)
+            return
+
+        matches_to_delete = []
+        if to_delete == 'all':
+            matches_to_delete = [m for m in organized_matches[comp_level]]
+        elif to_delete == 'unplayed':
+            matches_to_delete = [m for m in organized_matches[comp_level] if not m.has_been_played]
+
+        delete_count = len(matches_to_delete)
+        if matches_to_delete:
+            MatchManipulator.delete(matches_to_delete)
+
+        self.redirect("/admin/event/{}?deleted={}#matches".format(event_key, delete_count))
+
+
 class AdminEventDetail(LoggedInHandler):
     """
     Show an Event.
@@ -427,6 +456,20 @@ class AdminEventDetail(LoggedInHandler):
                 "bracket_table": event.playoff_bracket
             }) if playoff_template else "None"
 
+        organized_matches = MatchHelper.organizeMatches(event.matches)
+        match_stats = []
+        for comp_level in Match.COMP_LEVELS:
+            level_matches = organized_matches[comp_level]
+            if not level_matches:
+                continue
+            match_stats.append({
+                'comp_level': comp_level,
+                'level_name': Match.COMP_LEVELS_VERBOSE_FULL[comp_level],
+                'total': len(level_matches),
+                'played': len(filter(lambda m: m.has_been_played, level_matches)),
+                'unplayed': len(filter(lambda m: not m.has_been_played, level_matches)),
+            })
+
         self.template_values.update({
             "event": event,
             "medias": event_medias,
@@ -439,6 +482,8 @@ class AdminEventDetail(LoggedInHandler):
             "event_name_override": next(iter(filter(lambda e: e.get("event") == event_key, reg_sitevar.contents.get("event_name_override", []))), {}).get("name", ""),
             "elim_bracket_html": elim_bracket_html,
             "advancement_html": advancement_html,
+            'match_stats': match_stats,
+            'deleted_count': self.request.get('deleted'),
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_details.html')
