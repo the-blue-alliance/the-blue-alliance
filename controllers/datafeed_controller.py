@@ -457,8 +457,10 @@ class EventListGet(webapp.RequestHandler):
     """
     def get(self, year):
         df = DatafeedFMSAPI('v2.0')
+        df2 = DatafeedFIRSTElasticSearch()
 
         fmsapi_events, event_list_districts = df.getEventList(year)
+        elasticsearch_events = df2.getEventList(year)
         # All regular-season events can be inserted without any work involved.
         # We need to de-duplicate offseason events from the FRC Events API with a different code than the TBA event code
         fmsapi_events_offseason = [e for e in fmsapi_events if e.is_offseason]
@@ -475,11 +477,15 @@ class EventListGet(webapp.RequestHandler):
         # For all new offseason events we can't automatically match, create suggestions
         SuggestionCreator.createDummyOffseasonSuggestions(new_offseason_events)
 
-        events = EventManipulator.createOrUpdate(events_to_put)
+        merged_events = EventManipulator.mergeModels(list(events_to_put), elasticsearch_events)
+        events = EventManipulator.createOrUpdate(merged_events)
 
         fmsapi_districts = df.getDistrictList(year)
         merged_districts = DistrictManipulator.mergeModels(fmsapi_districts, event_list_districts)
-        districts = DistrictManipulator.createOrUpdate(merged_districts)
+        if merged_districts:
+            districts = DistrictManipulator.createOrUpdate(merged_districts)
+        else:
+            districts = []
 
         # Fetch event details for each event
         for event in events:
