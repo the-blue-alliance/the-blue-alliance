@@ -289,11 +289,18 @@ class EventHelper(object):
     def getDistrictKeyFromEventName(cls, event_name, year_districts_future):
         year_districts = year_districts_future.get_result()
         for district in year_districts:
-            if '{} district'.format(district.abbreviation) in event_name.lower():
+            if '{} district'.format(
+                    district.abbreviation) in event_name.lower():
+                return district.key
+            if district.display_name and '{} district'.format(
+                    district.display_name.lower()) in event_name.lower():
                 return district.key
 
-            if district.elasticsearch_name and district.elasticsearch_name in event_name:
-                return district.key
+            if district.elasticsearch_name:
+                search_names = district.elasticsearch_name.split(",")
+                for s in search_names:
+                    if s and '{} district'.format(s) in event_name.lower():
+                        return district.key
 
         return None
 
