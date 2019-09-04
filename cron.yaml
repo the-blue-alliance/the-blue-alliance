@@ -1,6 +1,6 @@
 cron:
 - description: FIRST event list scraping. Also includes event details/event teams/team details scraping.
-  url: /backend-tasks/get/event_list/2019
+  url: /backend-tasks/get/event_list/current
   schedule: every day 02:00
   timezone: America/Los_Angeles
 

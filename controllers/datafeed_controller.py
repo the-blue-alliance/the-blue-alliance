@@ -428,6 +428,27 @@ class TeamAvatarGet(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
+class EventListCurrentEnqueue(webapp.RequestHandler):
+    """
+    Enqueue fetching events for years between current year and max year
+    """
+    def get(self):
+        sv = Sitevar.get_by_id('apistatus')
+        current_year = sv.contents['current_season']
+        max_year = sv.contents['max_season']
+        years = range(current_year, max_year + 1)
+        for year in years:
+            taskqueue.add(
+                queue_name='datafeed',
+                target='backend-tasks',
+                url='/backend-tasks/get/event_list/%d' % year,
+                method='GET'
+            )
+
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            self.response.out.write("Enqueued fetching events for {}".format(years))
+
+
 class EventListEnqueue(webapp.RequestHandler):
     """
     Handles enqueing fetching a year's worth of events from FMSAPI
