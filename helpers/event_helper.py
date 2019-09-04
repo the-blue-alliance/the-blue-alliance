@@ -299,7 +299,7 @@ class EventHelper(object):
             if district.elasticsearch_name:
                 search_names = district.elasticsearch_name.split(",")
                 for s in search_names:
-                    if s and event_name.lower().startswith(s):
+                    if s and event_name.lower().startswith(s.lower()):
                         return district.key
 
         return None
