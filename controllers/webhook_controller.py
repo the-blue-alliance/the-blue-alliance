@@ -1,4 +1,5 @@
 import os
+import urllib
 
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
@@ -37,10 +38,14 @@ class WebhookAdd(LoggedInHandler):
 
         current_user_account_id = self.user_bundle.account.key.id()
         query = MobileClient.query(MobileClient.messaging_id == url, ancestor=ndb.Key(Account, current_user_account_id))
+        webhook_error = None
         if query.count() == 0:
             # Webhook doesn't exist, add it
             from helpers.tbans_helper import TBANSHelper
             response = TBANSHelper.verify_webhook(url, secret)
+
+            if response.message:
+                webhook_error = response.message
 
             client = MobileClient(
                 parent=self.user_bundle.account.key,
@@ -58,7 +63,10 @@ class WebhookAdd(LoggedInHandler):
             current.secret = secret
             current.put()
 
-        self.redirect('/account')
+        if webhook_error:
+            return self.redirect('/account?webhook_error={}'.format(urllib.quote(webhook_error)))
+        else:
+            self.redirect('/account')
 
 
 class WebhookDelete(LoggedInHandler):
@@ -138,4 +146,7 @@ class WebhookVerificationSend(LoggedInHandler):
         webhook.verified = False
         webhook.put()
 
-        return self.redirect('/account')
+        if response.message:
+            return self.redirect('/account?webhook_error={}'.format(urllib.quote(response.message)))
+        else:
+            return self.redirect('/account')

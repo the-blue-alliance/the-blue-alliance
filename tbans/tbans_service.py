@@ -83,10 +83,13 @@ class TBANSService(remote.Service):
         webhook_request = WebhookRequest(notification, request.webhook.url, request.webhook.secret)
         logging.info('Verification - {}'.format(str(webhook_request)))
 
-        webhook_request.send()
-        logging.info('Verification Key - {}'.format(notification.verification_key))
-
-        return VerificationResponse(code=200, verification_key=notification.verification_key)
+        error = webhook_request.send()
+        if error:
+            logging.error('Error verifying webhook - {}'.format(error))
+            return VerificationResponse(code=400, message=error, verification_key=notification.verification_key)
+        else:
+            logging.info('Verification Key - {}'.format(notification.verification_key))
+            return VerificationResponse(code=200, verification_key=notification.verification_key)
 
 
 app = service.service_mappings([('/tbans.*', TBANSService)])

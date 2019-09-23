@@ -70,6 +70,7 @@ class AccountOverview(LoggedInHandler):
         write_keys = filter(lambda key: key.is_write_key, api_keys)
         read_keys = filter(lambda key: key.is_read_key, api_keys)
 
+        self.template_values['webhook_error'] = self.request.get('webhook_error')
         self.template_values['status'] = self.request.get('status')
         self.template_values['webhook_verification_success'] = self.request.get('webhook_verification_success')
         self.template_values['ping_sent'] = self.request.get('ping_sent')

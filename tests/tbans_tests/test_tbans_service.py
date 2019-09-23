@@ -19,6 +19,7 @@ class TestTBANSService(unittest2.TestCase):
         self.testbed.init_urlfetch_stub(urlmatchers=[(lambda url: True, self._stub_request)])
         # Stub the FCM admin module
         messaging.send = self._stub_send
+        self.should_error = False
 
         self.service = TBANSService()
 
@@ -26,7 +27,10 @@ class TestTBANSService(unittest2.TestCase):
         return 'message-id'
 
     def _stub_request(self, url, payload, method, headers, request, response, follow_redirects=False, deadline=None, validate_certificate=None, http_proxy=None):
-        pass
+        if self.should_error:
+            raise Exception('Some error message here')
+        else:
+            pass
 
     def test_init_fcm(self):
         self.assertIsNotNone(self.service._firebase_app)
@@ -65,4 +69,14 @@ class TestTBANSService(unittest2.TestCase):
         self.assertTrue(isinstance(response, VerificationResponse))
         self.assertEqual(response.code, 200)
         self.assertEqual(response.message, None)
+        self.assertIsNotNone(response.verification_key)
+
+    def test_verification_error(self):
+        request = VerificationRequest(webhook=Webhook(url='https://www.thebluealliance.com', secret='password'))
+        self.should_error = True
+
+        response = self.service.verification(request)
+        self.assertTrue(isinstance(response, VerificationResponse))
+        self.assertEqual(response.code, 400)
+        self.assertEqual(response.message, 'Some error message here')
         self.assertIsNotNone(response.verification_key)

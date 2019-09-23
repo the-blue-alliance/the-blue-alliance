@@ -14,6 +14,7 @@ class TestWebhookRequest(unittest2.TestCase):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
         self.testbed.init_urlfetch_stub(urlmatchers=[(lambda url: True, self._stub_webhook_request)])
+        self.should_error = False
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -24,8 +25,11 @@ class TestWebhookRequest(unittest2.TestCase):
         self.assertEqual({header.key(): header.value() for header in headers}, {'X-TBA-Checksum': 'dbecd85ae53d221c387647085912d2107fa04cd5', 'Content-Type': 'application/json', 'X-TBA-Version': '1'})
         self.assertEqual(payload, '{"message_data": {"data": "value"}, "message_type": "verification"}')
         self.assertEqual(method, 'POST')
-        response.set_statuscode(200)
-        response.set_content('Some content here')
+        if self.should_error:
+            raise Exception('Some error')
+        else:
+            response.set_statuscode(200)
+            response.set_content('Some content here')
 
     def test_subclass(self):
         request = WebhookRequest(MockNotification(), 'https://www.thebluealliance.com/', 'secret')
@@ -78,10 +82,10 @@ class TestWebhookRequest(unittest2.TestCase):
     def test_send(self):
         message = WebhookRequest(MockNotification(webhook_message_data={'data': 'value'}), 'https://www.thebluealliance.com/', 'secret')
         response = message.send()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'Some content here')
+        self.assertIsNone(response)
 
     def test_send_fail(self):
-        message = WebhookRequest(MockNotification(webhook_message_data={'data': 'some new value value'}), 'https://somenewwebsite.com', 'somenewsecret')
-        with self.assertRaises(AssertionError):
-            response = message.send()
+        self.should_error = True
+        message = WebhookRequest(MockNotification(webhook_message_data={'data': 'value'}), 'https://www.thebluealliance.com/', 'secret')
+        response = message.send()
+        self.assertEqual(response, 'Some error')

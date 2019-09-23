@@ -47,7 +47,10 @@ class WebhookRequest(Request):
         headers['X-TBA-Checksum'] = self._generate_webhook_checksum(message_json)
 
         from google.appengine.api import urlfetch
-        return urlfetch.fetch(url=self.url, payload=message_json, method=urlfetch.POST, headers=headers)
+        try:
+            urlfetch.fetch(url=self.url, payload=message_json, method=urlfetch.POST, headers=headers, deadline=2)
+        except Exception, e:
+            return str(e)
 
     def _json_string(self):
         """ JSON string representation of an WebhookRequest object.
