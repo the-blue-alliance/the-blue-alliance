@@ -1,13 +1,10 @@
-import logging
 import random
 import string
 from datetime import datetime, timedelta
 
 from google.appengine.api import mail
-from google.appengine.api.app_identity import app_identity
 from google.appengine.ext import ndb
 
-import tba_config
 from consts.account_permissions import AccountPermissions
 from consts.auth_type import AuthType
 from controllers.suggestions.suggestions_review_base_controller import \
