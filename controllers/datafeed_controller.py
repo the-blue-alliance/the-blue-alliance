@@ -490,7 +490,9 @@ class EventListGet(webapp.RequestHandler):
         # All regular-season events can be inserted without any work involved.
         # We need to de-duplicate offseason events from the FRC Events API with a different code than the TBA event code
         fmsapi_events_offseason = [e for e in fmsapi_events if e.is_offseason]
-        events_to_put = set(fmsapi_events) - set(fmsapi_events_offseason)
+        event_keys_to_put = set([e.key_name for e in fmsapi_events]) - set(
+            [e.key_name for e in fmsapi_events_offseason])
+        events_to_put = [e for e in fmsapi_events if e.key_name in event_keys_to_put]
 
         matched_offseason_events, new_offseason_events = \
             OffseasonEventHelper.categorize_offseasons(int(year), fmsapi_events_offseason)
