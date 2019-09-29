@@ -1,6 +1,7 @@
 import json
 import unittest2
 
+from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from models.sitevar import Sitevar
@@ -14,6 +15,8 @@ class TestWebsiteBlacklist(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         Sitevar(id='website_blacklist', values_json=json.dumps({'websites': ['http://blacklist.com/']})).put()
         self.website_blacklist = WebsiteBlacklist()
 
