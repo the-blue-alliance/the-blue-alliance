@@ -3,7 +3,7 @@ import json
 from models.sitevar import Sitevar
 
 
-class WebsiteBlacklist(object):
+class WebsiteBlacklist:
 
     @staticmethod
     def is_blacklisted(website):
