@@ -3,7 +3,6 @@ import webapp2
 
 import tba_config
 
-from controllers.api_controller import ApiDeprecatedController, CsvTeamsAll
 from controllers.api.api_district_controller import ApiDistrictListController, ApiDistrictTeamsController, ApiDistrictRankingsController, \
      ApiDistrictEventsController
 from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController, ApiTeamEventAwardsController, \
@@ -24,11 +23,7 @@ from controllers.api.api_trusted_controller import ApiTrustedEventAllianceSelect
 
 # Ensure that APIv2 routes include OPTIONS method for CORS preflight compatibility
 # https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests
-app = webapp2.WSGIApplication([webapp2.Route(r'/api/v1/<:.*>',
-                                             ApiDeprecatedController,
-                                             methods=['GET']),
-                               ('/api/csv/teams/all', CsvTeamsAll),
-                               webapp2.Route(r'/api/v2/team/<team_key:>',
+app = webapp2.WSGIApplication([webapp2.Route(r'/api/v2/team/<team_key:>',
                                              ApiTeamController,
                                              methods=['GET', 'OPTIONS']),
                                webapp2.Route(r'/api/v2/team/<team_key:>/events',
