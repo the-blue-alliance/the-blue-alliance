@@ -24,10 +24,6 @@ dispatch:
 # - url: "*/tasks/*"
 #   service: tasks
 
-# Send notification requests to TBANS (The Blue Alliance Notification Service)
-- url: "*/tbans/*"
-  service: tbans
-
 # Send everything else to default module
 - url: "*/"
   service: default

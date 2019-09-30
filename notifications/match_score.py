@@ -10,8 +10,6 @@ class MatchScoreNotification(BaseNotification):
     def __init__(self, match):
         self.match = match
         self.event = match.event.get()
-        self._event_feed = self.event.key_name
-        self._district_feed = self.event.event_district_enum
 
     @property
     def _type(self):
