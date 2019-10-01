@@ -136,7 +136,7 @@
                   </td>
                   {% if search_type == 'events' %}
                   <td>
-                    {% if result.start_date %}<time itemprop="startDate" datetime="{{result.start_date|strftime("%c")}}">{{ result.start_date|strftime("%b %d") }}{% if result.start_date.date() != result.end_date.date() %}</time> to <time itemprop="endDate" datetime="{{result.end_date|strftime("%c")}}">{{ result.end_date|strftime("%b %d") }}{% endif %}{{ result.end_date|strftime(", %Y") }}</time>{% endif %}
+                    {% if result.start_date %}<time itemprop="startDate" datetime="{{result.start_date|isoformat}}">{{ result.start_date|strftime("%b %d") }}{% if result.start_date.date() != result.end_date.date() %}</time> to <time itemprop="endDate" datetime="{{result.end_date|isoformat}}">{{ result.end_date|strftime("%b %d") }}{% endif %}{{ result.end_date|strftime(", %Y") }}</time>{% endif %}
                   </td>
                   {% endif %}
                   <td>

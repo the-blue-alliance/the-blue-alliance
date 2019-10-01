@@ -8,18 +8,18 @@
 <div class="container">
   <div class="row">
     <div class="col-sm-5 col-lg-4">
-      {% include "index_lhc.html" %}
+      {% include "index_partials/index_lhc.html" %}
     </div>
     <div class="col-sm-7 col-lg-8">
       <h2>
-        <div id="countdown-finish-time">{{endbuild_datetime_utc|date:"c"}}</div>
+        <div id="countdown-finish-time">{{endbuild_datetime_utc|isoformat}}</div>
         <span class="countdown-number countdown-days">--</span><span class="countdown-label day-label">D </span>
         <span class="countdown-number countdown-hours">--</span><span class="countdown-label">H </span>
         <span class="countdown-number countdown-minutes">--</span><span class="countdown-label">M </span>
         <span class="countdown-number countdown-seconds">--</span><span class="countdown-label">S</span>
        Left to Build!
        <br>
-       <small>Build Season ends {{endbuild_datetime_est|date:"F jS H:i"}} EST</small></h2>
+       <small>Build Season ends {{endbuild_datetime_est|strftime("%B %-d%t %H:%-M")}} EST</small></h2>
       <div class="btn-group game-manual">
         <a class="btn btn-default" href="http://www.firstinspires.org/resource-library/frc/competition-manual-qa-system" target="_blank"><span class="glyphicon glyphicon-file"></span> {{game_name}} Game Manual and Materials</a>
       </div>
@@ -45,9 +45,7 @@
 
       {% if events %}
         <h2>This Week's Events</h2>
-        {% with events as events %}
-          {% include "event_partials/event_table.html" %}
-        {% endwith %}
+        {% include "event_partials/event_table.html" %}
         <div>
           <a class="btn btn-default" href="/webcasts"><span class="glyphicon glyphicon-info-sign"></span> Add Webcasts</a>
           <a class="btn btn-default" href="/add-data"><span class="glyphicon glyphicon-upload"></span> Add YouTube Videos</a>

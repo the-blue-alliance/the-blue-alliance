@@ -25,7 +25,7 @@
           {% for event in events %}
           <tr>
             <td><a href="/event/{{event.key_name}}">{{event.name}}</a></td>
-            <td>{{ event.start_date|date:"M d, Y" }}</td>
+            <td>{{ event.start_date|strftime("%b %d, %Y") }}</td>
             <td>
               {% if event.webcast_json %}
                 <a href="/suggest/event/webcast?event_key={{event.key_name}}" target="_blank">Add webcast</a>

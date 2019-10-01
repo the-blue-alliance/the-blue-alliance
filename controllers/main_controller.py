@@ -1,13 +1,10 @@
 from collections import defaultdict
 import datetime
 import logging
-import os
-import pytz
 
 import webapp2
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
-from google.appengine.ext.webapp import template
 
 import tba_config
 from base_controller import CacheableHandler
@@ -35,8 +32,7 @@ def render_static(page):
     html = memcache.get(memcache_key)
 
     if html is None:
-        path = os.path.join(os.path.dirname(__file__), "../templates/%s.html" % page)
-        html = template.render(path, {})
+        html = jinja2_engine.render('%s.html' % page, {})
         if tba_config.CONFIG["memcache"]:
             memcache.set(memcache_key, html, 86400)
 
@@ -127,27 +123,18 @@ class MainKickoffHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24
 
     def _render(self, *args, **kw):
-        kickoff_datetime_est = datetime.datetime.strptime(
-            self.template_values['kickoff_datetime'], "%Y-%m-%dT%H:%M:%S"
-        ) if 'kickoff_datetime' in self.template_values else None
-        kickoff_datetime_utc = pytz.utc.localize(
-            kickoff_datetime_est + datetime.timedelta(hours=5))
-
         special_webcasts = FirebasePusher.get_special_webcasts()
-        is_kickoff = datetime.datetime.now() >= kickoff_datetime_est - datetime.timedelta(days=1)  # turn on 1 day before
-        week_events = EventHelper.getWeekEvents()
 
         self.template_values.update({
-            'events': week_events,
-            'is_kickoff': is_kickoff,
-            'kickoff_datetime_est': kickoff_datetime_est,
-            'kickoff_datetime_utc': kickoff_datetime_utc,
+            'events': EventHelper.getWeekEvents(),
+            'is_kickoff': SeasonHelper.is_kickoff_at_least_one_day_away(),
+            'kickoff_datetime_est': SeasonHelper.kickoff_datetime_est(),
+            'kickoff_datetime_utc': SeasonHelper.kickoff_datetime_utc(),
             "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
             "special_webcasts": special_webcasts,
         })
 
-        path = os.path.join(os.path.dirname(__file__), "../templates/index_kickoff.html")
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('index/index_kickoff.html', self.template_values)
 
 
 class MainBuildseasonHandler(CacheableHandler):
@@ -159,21 +146,13 @@ class MainBuildseasonHandler(CacheableHandler):
         self._cache_expiration = 60 * 5
 
     def _render(self, *args, **kw):
-        endbuild_datetime_est = datetime.datetime.strptime(
-            self.template_values['build_season_end'], "%Y-%m-%dT%H:%M:%S"
-        ) if 'build_season_end' in self.template_values else SeasonHelper.stop_build_date()
-        endbuild_datetime_utc = pytz.utc.localize(
-            endbuild_datetime_est + datetime.timedelta(hours=5))
-        week_events = EventHelper.getWeekEvents()
-
         self.template_values.update({
-            'endbuild_datetime_est': endbuild_datetime_est,
-            'endbuild_datetime_utc': endbuild_datetime_utc,
-            'events': week_events,
+            'endbuild_datetime_est': SeasonHelper.stop_build_datetime_est(),
+            'endbuild_datetime_utc': SeasonHelper.stop_build_datetime_utc(),
+            'events': EventHelper.getWeekEvents(),
         })
 
-        path = os.path.join(os.path.dirname(__file__), "../templates/index_buildseason.html")
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('index/index_buildseason.html', self.template_values)
 
 
 class MainChampsHandler(CacheableHandler):
@@ -204,8 +183,7 @@ class MainChampsHandler(CacheableHandler):
             "year": year,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/index_champs.html')
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('index/index_champs.html', self.template_values)
 
 
 class MainCompetitionseasonHandler(CacheableHandler):
@@ -244,8 +222,7 @@ class MainCompetitionseasonHandler(CacheableHandler):
             "popular_teams_events": popular_teams_events,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/index_competitionseason.html')
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('index/index_competitionseason.html', self.template_values)
 
 
 class MainInsightsHandler(CacheableHandler):
@@ -272,8 +249,7 @@ class MainInsightsHandler(CacheableHandler):
             if insight:
                 self.template_values[insight.name] = insight
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/index_insights.html')
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('index/index_insights.html', self.template_values)
 
 
 class MainOffseasonHandler(CacheableHandler):
@@ -285,20 +261,16 @@ class MainOffseasonHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24
 
     def _render(self, *args, **kw):
-        kickoff_datetime_utc = datetime.datetime.strptime(
-            self.template_values['kickoff_datetime'], "%Y-%m-%dT%H:%M:%S"
-        ) if 'kickoff_datetime' in self.template_values else None
-        week_events = EventHelper.getWeekEvents()
         special_webcasts = FirebasePusher.get_special_webcasts()
+
         self.template_values.update({
-            "events": week_events,
-            'kickoff_datetime_utc': kickoff_datetime_utc,
+            "events": EventHelper.getWeekEvents(),
+            'kickoff_datetime_utc': SeasonHelper.kickoff_datetime_utc(),
             "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
             "special_webcasts": special_webcasts,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/index_offseason.html')
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('index/index_offseason.html', self.template_values)
 
 
 class MainLandingHandler(CacheableHandler):
@@ -344,8 +316,7 @@ class ContactHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/contact.html")
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('contact.html', self.template_values)
 
 
 class PrivacyHandler(CacheableHandler):
@@ -369,8 +340,7 @@ class HashtagsHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/hashtags.html")
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('hashtags.html', self.template_values)
 
 
 class FIRSTHOFHandler(CacheableHandler):
@@ -418,8 +388,7 @@ class AboutHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/about.html")
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('about.html', self.template_values)
 
 
 class ThanksHandler(CacheableHandler):
@@ -431,8 +400,7 @@ class ThanksHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/thanks.html")
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('thanks.html', self.template_values)
 
 
 class OprHandler(CacheableHandler):
@@ -444,8 +412,7 @@ class OprHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/opr.html")
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('opr.html', self.template_values)
 
 
 class PredictionsHandler(CacheableHandler):
@@ -457,8 +424,7 @@ class PredictionsHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/predictions.html")
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('predictions.html', self.template_values)
 
 
 class SearchHandler(webapp2.RequestHandler):
@@ -507,8 +473,7 @@ class WebcastsHandler(CacheableHandler):
             'year': year,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/webcasts.html')
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('webcasts.html', self.template_values)
 
 
 class RecordHandler(CacheableHandler):
@@ -520,8 +485,7 @@ class RecordHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/record.html")
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('record.html', self.template_values)
 
 
 class ApiWriteHandler(CacheableHandler):
@@ -533,8 +497,7 @@ class ApiWriteHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/apiwrite.html")
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('apiwrite.html', self.template_values)
 
 
 class MatchInputHandler(CacheableHandler):
@@ -546,5 +509,4 @@ class MatchInputHandler(CacheableHandler):
         self._cache_expiration = 60 * 60
 
     def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/matchinput.html")
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('matchinput.html', self.template_values)
