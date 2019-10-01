@@ -13,7 +13,7 @@ from template_engine import jinja2_engine
 
 
 class TeamList(CacheableHandler):
-    VALID_PAGES = [1, 2, 3, 4, 5, 6, 7, 8]
+    VALID_PAGES = range(1, (8000 // 1000) + 2)
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "team_list_{}"  # (page)
 
