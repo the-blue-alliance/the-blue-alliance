@@ -24,7 +24,7 @@ from controllers.insights_controller import InsightsOverview, InsightsDetail
 from controllers.main_controller import AvatarsHandler, TwoChampsHandler, ContactHandler, HashtagsHandler, FIRSTHOFHandler, \
     MainLandingHandler, OprHandler, PredictionsHandler, PrivacyHandler, SearchHandler, \
     AboutHandler, ThanksHandler, handle_404, handle_500, \
-    WebcastsHandler, RecordHandler, ApiWriteHandler, MatchInputHandler
+    WebcastsHandler, RecordHandler, ApiWriteHandler
 from controllers.match_controller import MatchDetail, MatchTimeseries
 from controllers.match_suggestion_controller import MatchSuggestionHandler
 from controllers.match_timeline_controller import MatchTimelineHandler
@@ -122,7 +122,6 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/match/<match_key>/timeseries', MatchTimeseries, 'match-timeseries', strict_slash=True),
       RedirectRoute(r'/match_suggestion', MatchSuggestionHandler, 'match-suggestion', strict_slash=True),
       RedirectRoute(r'/match_timeline', MatchTimelineHandler, 'match-timeline', strict_slash=True),
-      RedirectRoute(r'/matchinput', MatchInputHandler, 'match-input', strict_slash=True),
       RedirectRoute(r'/mod', TeamAdminDashboard, 'mod-dash', strict_slash=True),
       RedirectRoute(r'/mod/redeem', TeamAdminRedeem, 'mod-redeem', strict_slash=True),
       RedirectRoute(r'/mytba', MyTBALiveController, 'mytba-live', strict_slash=True),
