@@ -29,12 +29,12 @@
               <table class="match-table insights-table">
                 <thead>
                   <tr class="key">
-                    <th colspan="{{match.alliances.items.0.1.teams|length}}">Teams</th>
+                    <th colspan="{{match.alliances.items().0.1.teams|length}}">Teams</th>
                     <th>Score</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {% for items in match.alliances.items|reverse %}
+                  {% for items in match.alliances.items()|reverse %}
                   <tr>
                     {% for team in items.1.teams %}
                     <td class="{{items.0}}{% if match.winning_alliance == items.0 %} winner{% endif %}"><a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a></td>
@@ -58,12 +58,12 @@
               <table class="match-table insights-table">
                 <thead>
                   <tr class="key">
-                    <th colspan="{{match.alliances.items.0.1.teams|length}}">Teams</th>
+                    <th colspan="{{match.alliances.items().0.1.teams|length}}">Teams</th>
                     <th>Score</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {% for items in match.alliances.items|reverse %}
+                  {% for items in match.alliances.items()|reverse %}
                   <tr>
                     {% for team in items.1.teams %}
                     <td class="{{items.0}}{% if match.winning_alliance == items.0 %} winner{% endif %}"><a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a></td>
