@@ -498,15 +498,3 @@ class ApiWriteHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         return jinja2_engine.render('apiwrite.html', self.template_values)
-
-
-class MatchInputHandler(CacheableHandler):
-    CACHE_VERSION = 1
-    CACHE_KEY_FORMAT = "match_input"
-
-    def __init__(self, *args, **kw):
-        super(MatchInputHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60
-
-    def _render(self, *args, **kw):
-        return jinja2_engine.render('matchinput.html', self.template_values)
