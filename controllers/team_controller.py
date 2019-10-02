@@ -1,4 +1,5 @@
 import datetime
+import math
 import os
 
 from google.appengine.ext import ndb
@@ -13,7 +14,9 @@ from template_engine import jinja2_engine
 
 
 class TeamList(CacheableHandler):
-    VALID_PAGES = [1, 2, 3, 4, 5, 6, 7, 8]
+    MAX_TEAM_NUMBER = 8999
+    TEAMS_PER_PAGE = 1000
+    VALID_PAGES = range(1, int(math.ceil(float(MAX_TEAM_NUMBER) / TEAMS_PER_PAGE) + 1))
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "team_list_{}"  # (page)
 
@@ -37,7 +40,7 @@ class TeamList(CacheableHandler):
             if curPage == 1:
                 label = '1-999'
             else:
-                label = "{}'s".format((curPage - 1) * 1000)
+                label = "{}'s".format((curPage - 1) * self.TEAMS_PER_PAGE)
             page_labels.append(label)
             if curPage == page:
                 cur_page_label = label
