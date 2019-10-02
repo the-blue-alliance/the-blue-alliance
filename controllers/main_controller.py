@@ -124,12 +124,13 @@ class MainKickoffHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         special_webcasts = FirebasePusher.get_special_webcasts()
+        effective_season_year = SeasonHelper.effective_season_year()
 
         self.template_values.update({
             'events': EventHelper.getWeekEvents(),
             'is_kickoff': SeasonHelper.is_kickoff_at_least_one_day_away(),
-            'kickoff_datetime_est': SeasonHelper.kickoff_datetime_est(),
-            'kickoff_datetime_utc': SeasonHelper.kickoff_datetime_utc(),
+            'kickoff_datetime_est': SeasonHelper.kickoff_datetime_est(effective_season_year),
+            'kickoff_datetime_utc': SeasonHelper.kickoff_datetime_utc(effective_season_year),
             "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
             "special_webcasts": special_webcasts,
         })
@@ -146,9 +147,11 @@ class MainBuildseasonHandler(CacheableHandler):
         self._cache_expiration = 60 * 5
 
     def _render(self, *args, **kw):
+        effective_season_year = SeasonHelper.effective_season_year()
+
         self.template_values.update({
-            'endbuild_datetime_est': SeasonHelper.stop_build_datetime_est(),
-            'endbuild_datetime_utc': SeasonHelper.stop_build_datetime_utc(),
+            'endbuild_datetime_est': SeasonHelper.stop_build_datetime_est(effective_season_year),
+            'endbuild_datetime_utc': SeasonHelper.stop_build_datetime_utc(effective_season_year),
             'events': EventHelper.getWeekEvents(),
         })
 
@@ -262,10 +265,11 @@ class MainOffseasonHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         special_webcasts = FirebasePusher.get_special_webcasts()
+        effective_season_year = SeasonHelper.effective_season_year()
 
         self.template_values.update({
             "events": EventHelper.getWeekEvents(),
-            'kickoff_datetime_utc': SeasonHelper.kickoff_datetime_utc(),
+            'kickoff_datetime_utc': SeasonHelper.kickoff_datetime_utc(effective_season_year),
             "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
             "special_webcasts": special_webcasts,
         })
