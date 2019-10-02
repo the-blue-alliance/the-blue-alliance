@@ -1,5 +1,4 @@
 import datetime
-import math
 import os
 
 from google.appengine.ext import ndb
@@ -14,9 +13,9 @@ from template_engine import jinja2_engine
 
 
 class TeamList(CacheableHandler):
-    MAX_TEAM_NUMBER = 8999
+    MAX_TEAM_NUMBER_EXCLUSIVE = 9000  # Support between Team 0 and Team MAX_TEAM_NUMBER_EXCLUSIVE - 1
     TEAMS_PER_PAGE = 1000
-    VALID_PAGES = range(1, int(math.ceil(float(MAX_TEAM_NUMBER) / TEAMS_PER_PAGE) + 1))
+    VALID_PAGES = range(1, (MAX_TEAM_NUMBER_EXCLUSIVE // TEAMS_PER_PAGE) + 1)  # + 1 to make range inclusive
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "team_list_{}"  # (page)
 
