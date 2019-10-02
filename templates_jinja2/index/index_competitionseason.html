@@ -8,15 +8,15 @@
 <div class="container">
   <div class="row">
     <div class="col-sm-4">
-      {% include "index_lhc.html" %}
+      {% include "index_partials/index_lhc.html" %}
     </div>
     <div class="col-sm-8">
       {% include "media_partials/live_special_webcast_partial.html" %}
       {% if events %}
-        {% with events|first as first_event %}
-        {% with events|last as last_event %}
+        {% with first_event = events|first %}
+        {% with last_event = events|last %}
         {% if first_event.week != None and last_event.week != None %}
-          <h2>Week {{first_event.week|add:"1"}}{% if first_event.week != last_event.week %} - {{last_event.week|add:"1"}}{% endif %}</h2>
+          <h2>Week {{first_event.week + 1}}{% if first_event.week != last_event.week %} - {{last_event.week + 1}}{% endif %}</h2>
         {% else %}
           <h2>This Week</h2>
         {% endif %}
@@ -36,9 +36,7 @@
           <div class="tab-pane active" id="events">
             <div class="row">
               <div class="col-sm-12">
-                {% with events as events %}
-                  {% include "event_partials/event_table.html" %}
-                {% endwith %}
+                {% include "event_partials/event_table.html" %}
                 <div>
                   <a class="btn btn-default" href="/webcasts"><span class="glyphicon glyphicon-info-sign"></span> Add Webcasts</a>
                   <a class="btn btn-default" href="/add-data"><span class="glyphicon glyphicon-upload"></span> Add YouTube Videos</a>

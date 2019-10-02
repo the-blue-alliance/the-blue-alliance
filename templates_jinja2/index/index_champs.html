@@ -29,7 +29,7 @@
     </div>
   </div>
 
-  {% comment %}
+  {#
   <div class="row">
     {% for event in det_events %}
       {% if event.event_type_enum == 3 %}
@@ -59,7 +59,7 @@
       {% endif %}
     {% endfor %}
   </div>
-  {% endcomment %}
+  #}
 
   <div class="row">
     <div class="col-xs-12">
@@ -69,7 +69,7 @@
             <span class="glyphicon glyphicon-map-marker"></span> Houston
             <!-- <a class="btn btn-default btn-sm pull-right" href="https://www.facebook.com/events/2094138704199526/"><span class="glyphicon glyphicon-calendar"></span> RSVP on Facebook</a> -->
           </h3>
-          {% with hou_events as events %}
+          {% with events = hou_events %}
             {% include "event_partials/event_table.html" %}
           {% endwith %}
         </div>
@@ -78,7 +78,7 @@
             <span class="glyphicon glyphicon-map-marker"></span> Detroit
             <!-- <a class="btn btn-default btn-sm pull-right" href="https://www.facebook.com/events/343931669448597/"><span class="glyphicon glyphicon-calendar"></span> RSVP on Facebook</a> -->
           </h3>
-          {% with det_events as events %}
+          {% with events = det_events %}
             {% include "event_partials/event_table.html" %}
           {% endwith %}
         </div>
