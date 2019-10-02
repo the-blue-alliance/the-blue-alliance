@@ -1,4 +1,4 @@
-service:backend-tasks
+service: backend-tasks
 
 runtime: python27
 api_version: 1
