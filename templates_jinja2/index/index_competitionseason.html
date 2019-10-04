@@ -15,8 +15,8 @@
       {% if events %}
         {% with first_event = events|first %}
         {% with last_event = events|last %}
-        {% if first_event.week != None and last_event.week != None %}
-          <h2>Week {{first_event.week + 1}}{% if first_event.week != last_event.week %} - {{last_event.week + 1}}{% endif %}</h2>
+        {% if first_event._legacy_week_deprecated != None and last_event._legacy_week_deprecated != None %}
+          <h2>Week {{first_event._legacy_week_deprecated + 1}}{% if first_event._legacy_week_deprecated != last_event._legacy_week_deprecated %} - {{last_event._legacy_week_deprecated + 1}}{% endif %}</h2>
         {% else %}
           <h2>This Week</h2>
         {% endif %}

@@ -156,7 +156,7 @@ class MockEvent(Event):
         self._year = year
 
     @property
-    def week(self):
+    def _legacy_week_deprecated(self):
         return self._week
 
     @property

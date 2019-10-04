@@ -39,7 +39,7 @@ class EventConverter(ConverterBase):
             'first_event_code': event.first_api_code if event.official else None,
             'year': event.year,
             'timezone': event.timezone_id,
-            'week': event.week,
+            'week': event._legacy_week_deprecated,
             'website': event.website,
         }
         event_dict.update(cls.constructLocation_v3(event))

@@ -222,7 +222,7 @@ class Event(ndb.Model):
         return self.end_date.date() == self.local_time().date()
 
     @property
-    def week(self):
+    def _legacy_week_deprecated(self):
         """
         Returns the week of the event relative to the first official season event as an integer
         Returns None if the event is not of type NON_CMP_EVENT_TYPES or is not official
@@ -255,11 +255,11 @@ class Event(ndb.Model):
 
     @property
     def week_str(self):
-        if self.week is None:
+        if self._legacy_week_deprecated is None:
             return None
         if self.year == 2016:
-            return "Week {}".format(0.5 if self.week == 0 else self.week)
-        return "Week {}".format(self.week + 1)
+            return "Week {}".format(0.5 if self._legacy_week_deprecated == 0 else self._legacy_week_deprecated)
+        return "Week {}".format(self._legacy_week_deprecated + 1)
 
     @property
     def is_season_event(self):
