@@ -172,7 +172,7 @@ class EventHelper(object):
         An event shows up in this query iff:
         a) The event is within_a_day
         OR
-        b) The event.start_date is on or within 4 days after the closest Wednesday
+        b) The event.start_date is on or within 4 days after the closest Wednesday/Monday (pre-2020/post-2020)
         """
         event_keys = memcache.get('EventHelper.getWeekEvents():event_keys')
         if event_keys is not None:
@@ -187,8 +187,13 @@ class EventHelper(object):
           Event.start_date).fetch_async(keys_only=True)
 
         events = []
-        diff_from_wed = 2 - today.weekday()  # 2 is Wednesday. diff_from_wed ranges from 3 to -3 (Monday thru Sunday)
-        closest_wednesday = today + datetime.timedelta(days=diff_from_wed)
+
+        days_diff = 0
+        # Before 2020, event weeks start on Wednesdays
+        if today.year < 2020:
+            days_diff = 2  # 2 is Wednesday. diff_from_week_start ranges from 3 to -3 (Monday thru Sunday)
+        diff_from_week_start = days_diff - today.weekday()
+        closest_wednesday = today + datetime.timedelta(days=diff_from_week_start)
 
         two_weeks_of_event_futures = ndb.get_multi_async(two_weeks_of_events_keys_future.get_result())
         for event_future in two_weeks_of_event_futures:

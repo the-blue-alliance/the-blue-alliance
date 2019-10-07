@@ -241,8 +241,13 @@ class Event(ndb.Model):
             ).order(Event.start_date).fetch(1, projection=[Event.start_date])
             if e:
                 first_start_date = e[0].start_date
-                diff_from_wed = (first_start_date.weekday() - 2) % 7  # 2 is Wednesday
-                week_start = first_start_date - datetime.timedelta(days=diff_from_wed)
+
+                days_diff = 0
+                # Before 2020, event weeks start on Wednesdays
+                if self.year < 2020:
+                    days_diff = 2  # 2 is Wednesday
+                diff_from_week_start = (first_start_date.weekday() - days_diff) % 7
+                week_start = first_start_date - datetime.timedelta(days=diff_from_week_start)
             else:
                 week_start = None
         context_cache.set(cache_key, week_start)
