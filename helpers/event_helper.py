@@ -430,18 +430,18 @@ class EventHelper(object):
         Mutates in place
         """
         for award in awards:
-            for old_team, new_team in remap_teams.items():
-                # Update team keys
-                for i, key in enumerate(award.team_list):
-                    if key.id() == old_team:
-                        award.dirty = True
-                        if new_team.isdigit():  # Only if non "B" teams
-                            award.team_list[i] = ndb.Key(Team, new_team)
-                        else:
-                            del award.team_list[i]
-                # Update recipient list
-                for recipient in award.recipient_list:
+            new_recipient_json_list = []
+            new_team_list = []
+            # Compute new recipient list and team list
+            for recipient in award.recipient_list:
+                for old_team, new_team in remap_teams.items():
                     if str(recipient['team_number']) == old_team[3:]:
                         award.dirty = True
                         recipient['team_number'] = new_team[3:]
-                        award.recipient_json_list = [json.dumps(r) for r in award.recipient_list]
+
+                new_recipient_json_list.append(json.dumps(recipient))
+                new_team_list.append(ndb.Key('Team', 'frc{}'.format(recipient['team_number'])))
+
+            # Update
+            award.recipient_json_list = new_recipient_json_list
+            award.team_list = new_team_list
