@@ -121,6 +121,7 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.MOST_IMPROVED_TEAM, (["most improved team"], [])),
     (AwardType.WILDCARD, (["wildcard"], [])),
     (AwardType.AUTONOMOUS, (["autonomous"], [])),
+	(AwardType.OTHER, (["other"], ["offseason award"], ["offseason event award"] [])),
 ]
 
 
