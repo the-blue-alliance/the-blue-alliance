@@ -381,7 +381,7 @@ class AdminPostEventTasksDo(LoggedInHandler):
             matches = MatchHelper.organizeMatches(matches_future.get_result())
             bracket = PlayoffAdvancementHelper.generateBracket(matches, event, event.alliance_selections)
             if 'f' in bracket:
-                winning_alliance = '{}_alliance'.format(bracket['f'][1]['winning_alliance'])
+                winning_alliance = '{}_alliance'.format(bracket['f']['f1']['winning_alliance'])
                 if winning_alliance == 'red_alliance':
                     losing_alliance = 'blue_alliance'
                 else:
