@@ -4,7 +4,7 @@
 {% for webcast in special_webcasts %}
   {% if webcast.status == 'online' %}
     <h3>
-      <a class="btn btn-md btn-success float-right"
+      <a class="btn btn-md btn-success pull-right"
          href="/gameday#layout=0&view_0={{ webcast.key_name }}-0{% if webcast.type == 'twitch' %}&chat={{ webcast.channel }}{% endif %}">
         <span class="glyphicon glyphicon-facetime-video"></span> Watch Now
       </a> 
