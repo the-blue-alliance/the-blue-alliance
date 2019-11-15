@@ -5357,7 +5357,8 @@
             "description": "The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie.",
             "enum": [
               "red",
-              "blue"
+              "blue",
+              ""
             ]
           },
           "event_key": {
@@ -5428,7 +5429,12 @@
           },
           "winning_alliance": {
             "type": "string",
-            "description": "The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie."
+            "description": "The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie.",
+            "enum": [
+              "red",
+              "blue",
+              ""
+            ]
           },
           "event_key": {
             "type": "string",
