@@ -68,6 +68,7 @@ class AccountOverview(LoggedInHandler):
         # Fetch trusted API keys
         api_keys = ApiAuthAccess.query(ApiAuthAccess.owner == user).fetch()
         write_keys = filter(lambda key: key.is_write_key, api_keys)
+        write_keys.sort(key=lambda key: key.event_list[0])
         read_keys = filter(lambda key: key.is_read_key, api_keys)
 
         self.template_values['status'] = self.request.get('status')
