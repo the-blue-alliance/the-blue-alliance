@@ -1,4 +1,5 @@
 import hashlib
+import hmac
 import json
 import logging
 
@@ -24,15 +25,20 @@ class NotificationSender(object):
             url = client[0]
             secret = client[1]
 
+            # This checksum is insecure and has been deprecated in favor of an HMAC
             ch = hashlib.sha1()
             ch.update(secret)
             ch.update(payload)
             checksum = ch.hexdigest()
 
+            mac = hmac.new(secret, payload, hashlib.sha256).hexdigest()
+
             request = urllib2.Request(url, payload)
             request.add_header("Content-Type", 'application/json; charset="utf-8"')
             request.add_header("X-TBA-Checksum", checksum)
+            request.add_header("X-TBA-HMAC", mac)
             request.add_header("X-TBA-Version", '{}'.format(cls.WEBHOOK_VERSION))
+
             try:
                 resp = urllib2.urlopen(request)
             except urllib2.HTTPError, e:
