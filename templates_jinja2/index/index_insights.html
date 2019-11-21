@@ -82,7 +82,7 @@
         <h3>Average Match Score By Week</h3>
         {% if elim_match_averages_by_week %}
           <div class="chart-key"><div class="color-key blue-color-key"></div><div class="chart-key-text">All Match Averages</div></div>
-          <div class="chart-key"><div class="color-key green-color-key"></div><div class="chart-key-text">Elim Match Averages</div></div>
+          <div class="chart-key"><div class="color-key green-color-key"></div><div class="chart-key-text">Playoff Match Averages</div></div>
           <figure style="width: 90%; height: 300px;" id="elim-match-average-chart"></figure>
           <div id="elim-match-average" class="xcharts-data xcharts-line-data">[{{ match_averages_by_week.data_json|safe }}, {{ elim_match_averages_by_week.data_json|safe }}]</div>
         {% else %}
