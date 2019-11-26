@@ -43,10 +43,8 @@ class WebhookRequest(Request):
             'X-TBA-Version': '{}'.format(WEBHOOK_VERSION)
         }
         message_json = self._json_string()
-        # This checksum is insecure and has been deprecated in favor of an HMAC
+        # Generate checksum
         headers['X-TBA-Checksum'] = self._generate_webhook_checksum(message_json)
-        # Generate hmac
-        headers['X-TBA-HMAC'] = self._generate_webhook_hmac(message_json)
 
         from google.appengine.api import urlfetch
         return urlfetch.fetch(url=self.url, payload=message_json, method=urlfetch.POST, headers=headers)
@@ -74,16 +72,9 @@ class WebhookRequest(Request):
         import json
         return json.dumps(json_dict, ensure_ascii=True)
 
-    # This checksum is insecure and has been deprecated in favor of an HMAC
     def _generate_webhook_checksum(self, payload):
         import hashlib
         ch = hashlib.sha1()
         ch.update(self.secret)
         ch.update(payload)
         return ch.hexdigest()
-
-    def _generate_webhook_hmac(self, payload):
-        import hashlib
-        import hmac
-
-        return hmac.new(self.secret, payload, hashlib.sha256).hexdigest()

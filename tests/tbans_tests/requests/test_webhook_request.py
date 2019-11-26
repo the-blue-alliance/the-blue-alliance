@@ -21,7 +21,7 @@ class TestWebhookRequest(unittest2.TestCase):
     def _stub_webhook_request(self, url, payload, method, headers, request, response, follow_redirects=False, deadline=None, validate_certificate=None, http_proxy=None):
         # While we're here - check that our request looks right
         self.assertEqual(url, 'https://www.thebluealliance.com/')
-        self.assertEqual({header.key(): header.value() for header in headers}, {'X-TBA-Checksum': 'dbecd85ae53d221c387647085912d2107fa04cd5', 'X-TBA-HMAC': 'fb2b61d55884a648b35801688754924778b3e71ea2bf8f5effb0f3ffecb5c940', 'Content-Type': 'application/json', 'X-TBA-Version': '1'})
+        self.assertEqual({header.key(): header.value() for header in headers}, {'X-TBA-Checksum': 'dbecd85ae53d221c387647085912d2107fa04cd5', 'Content-Type': 'application/json', 'X-TBA-Version': '1'})
         self.assertEqual(payload, '{"message_data": {"data": "value"}, "message_type": "verification"}')
         self.assertEqual(method, 'POST')
         response.set_statuscode(200)
