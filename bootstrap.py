@@ -118,6 +118,7 @@ def store_match(data):
         team_key_names += data['alliances'][alliance]['team_keys']
         data['alliances'][alliance]['teams'] = data['alliances'][alliance].pop('team_keys')
         data['alliances'][alliance]['surrogates'] = data['alliances'][alliance].pop('surrogate_team_keys')
+        data['alliances'][alliance]['dqs'] = data['alliances'][alliance].pop('dq_team_keys')
     match.alliances_json = json.dumps(data['alliances'])
     match.team_key_names = team_key_names
 

@@ -93,7 +93,7 @@ class BaseNotification(object):
 
     """
     Subclasses should override this method and return a dict containing the payload of the notification.
-    The dict should have two entries: 'message_type' (should be one of NotificationType, string) and 'message_data'
+    The dict should have two entries: 'notification_type' (should be one of NotificationType, string) and 'message_data'
     """
     def _build_dict(self):
         raise NotImplementedError("Subclasses must implement this method to build JSON data to send")
@@ -111,7 +111,11 @@ class BaseNotification(object):
         return self._render_gcm(ClientType.OS_ANDROID)
 
     def _render_webhook(self):
-        return self._build_dict()
+        # Note: webhooks use `message_type` instead of the `notification_type`
+        data = self._build_dict()
+        message_type = data.pop('notification_type')
+        data['message_type'] = message_type
+        return data
 
     def _render_gcm(self, client_type):
         from controllers.gcm.gcm import GCMMessage

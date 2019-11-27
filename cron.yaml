@@ -1,12 +1,7 @@
 cron:
 - description: FIRST event list scraping. Also includes event details/event teams/team details scraping.
-  url: /backend-tasks/get/event_list/2019
+  url: /backend-tasks/enqueue/event_list/current
   schedule: every day 02:00
-  timezone: America/Los_Angeles
-
-- description: FIRST official offseason scraping
-  url: /backend-tasks/get/fms-sync-offseasons/2019
-  schedule: every tuesday,thursday 02:30
   timezone: America/Los_Angeles
 
 # - description: FIRST event detail scraping
@@ -98,7 +93,7 @@ cron:
 
 - description: Backup Cron job
   url: /backend-tasks/backup/enqueue
-  schedule: 1 of month 03:00
+  schedule: every monday 03:00
   timezone: America/Los_Angeles
 
 # - description: BlueZone Update

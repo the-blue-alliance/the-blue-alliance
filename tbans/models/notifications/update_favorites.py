@@ -1,13 +1,17 @@
-from consts.notification_type import NotificationType
-from tbans.models.notifications.update_mytba import UpdateMyTBANotification
+from tbans.models.notifications.notification import Notification
 
 
-class UpdateFavoritesNotification(UpdateMyTBANotification):
-    """ Notification dispatched to clients/webhooks when a user updates their favorites """
+class UpdateFavoritesNotification(Notification):
 
-    def __init__(self, user_id, sending_device_key):
-        super(UpdateFavoritesNotification, self).__init__(type_name='favorite', user_id=user_id, sending_device_key=sending_device_key)
+    def __init__(self, user_id):
+        self.user_id = user_id
 
-    @staticmethod
-    def _type():
+    @classmethod
+    def _type(cls):
+        from consts.notification_type import NotificationType
         return NotificationType.UPDATE_FAVORITES
+
+    @property
+    def platform_config(self):
+        from tbans.models.fcm.platform_config import PlatformConfig
+        return PlatformConfig(collapse_key='{}_favorite_update'.format(self.user_id))

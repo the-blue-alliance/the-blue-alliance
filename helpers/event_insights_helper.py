@@ -188,8 +188,9 @@ class EventInsightsHelper(object):
                     hatch_panel_points += alliance_breakdown['hatchPanelPoints']
                     cargo_points += alliance_breakdown['cargoPoints']
 
-                    alliance_rocket_rp_achieved = alliance_breakdown['completeRocketRankingPoint']
-                    alliance_climb_rp_achieved = alliance_breakdown['habDockingRankingPoint']
+                    completed_rocket = alliance_breakdown['completedRocketNear'] or alliance_breakdown['completedRocketFar']
+                    alliance_rocket_rp_achieved = alliance_breakdown['completeRocketRankingPoint'] or completed_rocket
+                    alliance_climb_rp_achieved = alliance_breakdown['habDockingRankingPoint'] or (alliance_breakdown['habClimbPoints'] >= 15)
                     rocket_rp_achieved += 1 if alliance_rocket_rp_achieved else 0
                     climb_rp_achieved += 1 if alliance_climb_rp_achieved else 0
                     alliance_win = alliance_color == match.winning_alliance

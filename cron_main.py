@@ -12,7 +12,8 @@ from controllers.datafeed_controller import FMSAPIAwardsGet, FMSAPIEventAlliance
 from controllers.datafeed_controller import HallOfFameTeamsGet
 
 from controllers.cron_controller import DistrictPointsCalcEnqueue, DistrictPointsCalcDo, \
-    MatchTimePredictionsEnqueue, MatchTimePredictionsDo, BlueZoneUpdateDo, SuggestionQueueDailyNag, RemapTeamsDo
+    MatchTimePredictionsEnqueue, MatchTimePredictionsDo, BlueZoneUpdateDo, SuggestionQueueDailyNag, RemapTeamsDo, \
+    RebuildPlayoffAdvancementEnqueue, RebuildPlayoffAdvancementDo
 from controllers.cron_controller import DistrictRankingsCalcEnqueue, DistrictRankingsCalcDo
 from controllers.cron_controller import EventTeamStatusCalcEnqueue, EventTeamStatusCalcDo
 from controllers.cron_controller import EventShortNameCalcEnqueue, EventShortNameCalcDo
@@ -64,6 +65,8 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/math/do/final_matches_repair/([0-9]*)', FinalMatchesRepairDo),
                                ('/tasks/math/enqueue/predict_match_times', MatchTimePredictionsEnqueue),
                                ('/tasks/math/do/predict_match_times/(.*)', MatchTimePredictionsDo),
+                               ('/tasks/math/enqueue/playoff_advancement_update/(.*)', RebuildPlayoffAdvancementEnqueue),
+                               ('/tasks/math/do/playoff_advancement_update/(.*)', RebuildPlayoffAdvancementDo),
                                ('/tasks/notifications/upcoming_match', UpcomingNotificationDo),
                                ('/tasks/admin/enqueue/clear_mobile_duplicates', AdminMobileClearEnqueue),
                                ('/tasks/admin/clear_mobile_duplicates', AdminMobileClear),

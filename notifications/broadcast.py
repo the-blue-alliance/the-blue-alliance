@@ -18,7 +18,7 @@ class BroadcastNotification(BaseNotification):
 
     def _build_dict(self):
         data = {}
-        data['message_type'] = NotificationType.type_names[self._type]
+        data['notification_type'] = NotificationType.type_names[self._type]
         data['message_data'] = {
             'title': self.title,
             'desc': self.message,

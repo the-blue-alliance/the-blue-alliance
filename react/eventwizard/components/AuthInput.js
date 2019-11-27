@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
 class AuthInput extends Component {
-
   constructor(props) {
     super(props)
     this.onAuthIdChange = this.onAuthIdChange.bind(this)

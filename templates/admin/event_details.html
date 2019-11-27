@@ -13,7 +13,7 @@
 </div>
 
 <form action="/admin/memcache" method="post" id="event_cache_clear">
-  <input name="memcache_key" value="{{cache_key}}" type="hidden" />
+  <input name="event_key" value="{{event.key_name}}" type="hidden" />
   <input name="return_url" value="/admin/event/{{ event.key_name }}" type="hidden" />
 </form>
 
@@ -29,10 +29,11 @@
   <ul class="nav nav-tabs nav-justified">
     <li class="active"><a href="#info" data-toggle="tab">Info</a></li>
     <li><a href="#tasks" data-toggle="tab">Tasks</a></li>
-    <li><a href="#apikeys" data-toggle="tab">API</a></li>
+    <li><a href="#api" data-toggle="tab">API</a></li>
     <li><a href="#webcasts" data-toggle="tab">Webcasts</a></li>
     <li><a href="#rankings" data-toggle="tab">Rankings</a></li>
     <li><a href="#alliances" data-toggle="tab">Alliances</a></li>
+    <li><a href="#advancement" data-toggle="tab">Playoff Advancement</a></li>
     <li><a href="#awards" data-toggle="tab">Awards</a></li>
     <li><a href="#matches" data-toggle="tab">Matches</a></li>
     <li><a href="#media" data-toggle="tab">Media</a></li>
@@ -180,6 +181,7 @@
   <h2>Math Tasks</h2>
   <div class="btn-group">
     <a href="/tasks/math/do/eventteam_update/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-user"></span> Rebuild EventTeams</a>
+    <a href="/tasks/math/do/playoff_advancement_update/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-user"></span> Rebuild Playoff Advancement</a>
     <a href="/backend-tasks/do/post_event_tasks/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-play"></span> Run Post-Event Tasks</a>
     <a href="/tasks/math/do/district_points_calc/{{event.key_name}}?allow-offseason=true" class="btn btn-warning"><span class="glyphicon glyphicon-tasks"></span> District Points</a>
     <a href="/tasks/math/do/event_team_status/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-stats"></span> Team@Event Status</a>
@@ -256,6 +258,23 @@
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Matches</button>
 </form>
 
+{% if event.playoff_type == 4 %}
+<!-- Round robin -->
+<h2>Add Round Robin Playoff Advancement</h2>
+<p>Add playoff advancement (round robin event types only) formatted as CSV. This requires having alliance data set</p>
+<p>Example:</p>
+<div class="well">
+  <p>alliance_number, cmp_points_m1, cmp_points_m2 ..., tiebreak1_m1, tiebreak2_m2 ...,  tiebreak2_m1, tiebreak2_m2 ..., wins, losses, ties
+</div>
+<form action="/admin/playoff_advancement/add" method="post">
+  <input name="event_key" type="hidden" value="{{ event.key_name }}" />
+  <p>Comp Level <input name="comp_level" value="sf" /></p>
+  <p>Number of Round Robin matches per team: <input name="num_matches" value="5" /></p>
+  <p><textarea class="form-control" name="advancement_csv"></textarea></p>
+  <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Advancement</button>
+</form>
+{% endif %}
+
 <h2>Add Awards</h2>
 <p>Add awards formatted as a CSV.</p>
 <p>Format:</p>
@@ -277,9 +296,48 @@
 </div>
 </div>
 
-<div class="tab-pane" id="apikeys">
+<div class="tab-pane" id="api">
 <div class="row">
-<h2>API Keys</h2>
+<h2>FMS API Settings</h2>
+
+<form action="/admin/event/{{event.key_name}}" method="post">
+  <h3>Disable Event Info Sync</h3>
+    <div class="form-group row">
+      <label for="event_sync_disable" class="col-sm-2 col-form-label">Sync Disabled</label>
+      <div class="col-sm-1">
+        <input type="checkbox" class="form-check-input" name="event_sync_disable" id="event_sync_disable" {%if event_sync_disable%}checked{%endif%}/>
+      </div>
+    </div>
+
+  <h3>Set Start Day to Last Day</h3>
+    <div class="form-group row">
+      <label for="set_start_day_to_last" class="col-sm-2 col-form-label">Force Start Day to Last Day</label>
+      <div class="col-sm-1">
+        <input type="checkbox" class="form-check-input" name="set_start_day_to_last" id="set_start_day_to_last"  {%if set_start_day_to_last%}checked{%endif%}/>
+      </div>
+    </div>
+
+  <h3>Skip EventTeams</h3>
+    <div class="form-group row">
+      <label for="skip_eventteams" class="col-sm-2 col-form-label">Skip EventTeams</label>
+      <div class="col-sm-1">
+        <input type="checkbox" class="form-check-input" name="skip_eventteams" id="skip_eventteams" {%if skip_eventteams%}checked{%endif%}/>
+      </div>
+    </div>
+
+  <h3>Override Event Name</h3>
+    <div class="form-group row">
+      <label for="event_name_override" class="col-sm-2 col-form-label">Event Name Override</label>
+      <div class="col-sm-4">
+        <input type="text" class="form-control" name="event_name_override" id="event_name_override" value="{{event_name_override}}"/>
+      </div>
+    </div>
+
+<button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
+</form>
+
+
+<h2>Write API Keys</h2>
 <p>Issue a key <a href="/admin/api_auth/add">here</a></p>
 
 <p>Currently Issued Keys</p>
@@ -334,6 +392,31 @@
       <p>No ranking data yet</p>
   {% endfor %}
 </table>
+{% endif %}
+</div>
+</div>
+
+
+<div class="tab-pane" id="advancement">
+<div class="row">
+<h2>Playoff Advancement</h2>
+{% if event.details and event.details.playoff_advancement %}
+
+<form action="/admin/playoff_advancement/purge/{{event.key_name}}" method="post">
+  <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Purge Advancement</button>
+</form>
+
+<h3>Elim Bracket</h3>
+{% autoescape off %}
+  {{elim_bracket_html}}
+{% endautoescape %}
+
+<h3>Playoff Advancement</h3>
+{% autoescape off %}
+  {{advancement_html}}
+{% endautoescape %}
+{% else %}
+  <p>No advancement details yet</p>
 {% endif %}
 </div>
 </div>
@@ -397,6 +480,32 @@
 
 <div class="tab-pane" id="matches">
 <div class="row">
+
+{% if deleted_count %}
+  <div class="row">
+    <div class="alert alert-danger" role="alert">
+      <p>Deleted {{deleted_count}} matches</p>
+    </div>
+  </div>
+{% endif %}
+
+<h2>Match Stats</h2>
+{% if match_stats %}
+  <table class="table table-striped table-condensed table-center">
+  <tr><th>Comp Level</th><th>Total</th><th>Played</th><th>Unplayed</th></tr>
+  {% for stats in match_stats %}
+    <tr>
+      <td>{{stats.level_name}}</td>
+      <td>{{stats.total}}</td>
+      <td>{{stats.played}}</td>
+      <td>{{stats.unplayed}}</td>
+      <td><p><a class="btn btn-danger btn-small" href="/admin/event/delete_matches/{{event.key_name}}/{{stats.comp_level}}/all"><span class="glyphicon glyphicon-trash"></span> Delete All</a></p></td>
+      <td><p><a class="btn btn-warning btn-small" href="/admin/event/delete_matches/{{event.key_name}}/{{stats.comp_level}}/unplayed"><span class="glyphicon glyphicon-trash"></span> Delete Unplayed</a></p></td>
+    </tr>
+  {% endfor %}
+  </table>
+{% endif %}
+
 <h2>Match Listing</h2>
 
 <table class="table table-striped table-condensed table-center">

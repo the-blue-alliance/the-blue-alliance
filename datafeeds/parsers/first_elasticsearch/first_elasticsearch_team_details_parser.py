@@ -20,7 +20,7 @@ class FIRSTElasticSearchTeamDetailsParser(object):
             website = urlparse.urlparse(raw_website, 'http').geturl() if raw_website else None
 
             if WebsiteBlacklist.is_blacklisted(website):
-                website = None
+                website = ''
 
             teams.append(Team(
                 id="frc{}".format(team['team_number_yearly']),

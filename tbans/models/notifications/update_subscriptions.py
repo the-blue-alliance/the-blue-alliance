@@ -1,13 +1,17 @@
-from consts.notification_type import NotificationType
-from tbans.models.notifications.update_mytba import UpdateMyTBANotification
+from tbans.models.notifications.notification import Notification
 
 
-class UpdateSubscriptionsNotification(UpdateMyTBANotification):
-    """ Notification dispatched to clients/webhooks when a user updates their subscriptions """
+class UpdateSubscriptionsNotification(Notification):
 
-    def __init__(self, user_id, sending_device_key):
-        super(UpdateSubscriptionsNotification, self).__init__(type_name='subscription', user_id=user_id, sending_device_key=sending_device_key)
+    def __init__(self, user_id):
+        self.user_id = user_id
 
-    @staticmethod
-    def _type():
-        return NotificationType.UPDATE_SUBSCRIPTION
+    @classmethod
+    def _type(cls):
+        from consts.notification_type import NotificationType
+        return NotificationType.UPDATE_SUBSCRIPTIONS
+
+    @property
+    def platform_config(self):
+        from tbans.models.fcm.platform_config import PlatformConfig
+        return PlatformConfig(collapse_key='{}_subscriptions_update'.format(self.user_id))

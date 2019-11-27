@@ -1,7 +1,3 @@
-import hashlib
-import time
-
-from consts.notification_type import NotificationType
 from tbans.models.notifications.notification import Notification
 
 
@@ -20,33 +16,34 @@ class VerificationNotification(Notification):
             url (string): The URL to send the notification payload to.
             secret (string): The secret to calculate the payload checksum with.
         """
+        from tbans.utils.validation_utils import validate_is_string
         # Check url, secret
-        for (value, name) in [(url, 'url'), (secret, 'secret')]:
+        for (key, value) in [('url', url), ('secret', secret)]:
             # Make sure our value exists
-            if value is None:
-                raise ValueError('VerificationNotification requires a {}'.format(name))
-            # Check that our value looks right
-            if not isinstance(value, basestring):
-                raise TypeError('VerificationNotification {} must be an string'.format(name))
+            args = {key: value}
+            validate_is_string(**args)
 
         self.url = url
         self.secret = secret
         self._generate_key()
 
     def _generate_key(self):
+        import hashlib
         ch = hashlib.sha1()
+        import time
         ch.update(str(time.time()))
         ch.update(self.url)
         ch.update(self.secret)
         self.verification_key = ch.hexdigest()
 
-    @staticmethod
-    def _type():
+    @classmethod
+    def _type(cls):
+        from consts.notification_type import NotificationType
         return NotificationType.VERIFICATION
 
-    # Only webhook payload is defined - because we'll only ever send verification to webhooks
+    # Only webhook message data is defined - because we'll only ever send verification to webhooks
     @property
-    def webhook_payload(self):
+    def webhook_message_data(self):
         return {'verification_key': self.verification_key}
 
     def _additional_logging_values(self):

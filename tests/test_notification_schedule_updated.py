@@ -33,7 +33,7 @@ class TestMatchScoreNotification(unittest2.TestCase):
 
     def test_build(self):
         expected = {}
-        expected['message_type'] = NotificationType.type_names[NotificationType.SCHEDULE_UPDATED]
+        expected['notification_type'] = NotificationType.type_names[NotificationType.SCHEDULE_UPDATED]
         expected['message_data'] = {}
         expected['message_data']['event_key'] = self.event.key_name
         expected['message_data']['event_name'] = self.event.name

@@ -17,7 +17,7 @@ class DistrictPointsUpdatedNotification(BaseNotification):
 
     def _build_dict(self):
         data = {}
-        data['message_type'] = NotificationType.type_names[self._type]
+        data['notification_type'] = NotificationType.type_names[self._type]
         data['message_data'] = {}
         data['message_data']['district_key'] = self.district_key
         data['message_data']['district_name'] = self.district_name

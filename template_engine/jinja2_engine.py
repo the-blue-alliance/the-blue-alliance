@@ -12,18 +12,19 @@ def get_jinja_env(force_filesystemloader=False):
         env = jinja2.Environment(
             auto_reload=False,
             loader=jinja2.ModuleLoader(os.path.join(os.path.dirname(__file__), '../templates_jinja2_compiled.zip')),
-            extensions=['jinja2.ext.autoescape'],
+            extensions=['jinja2.ext.autoescape', 'jinja2.ext.with_'],
             autoescape=True)
     else:
         logging.info("Using jinja2.FileSystemLoader")
         env = jinja2.Environment(
             loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), '../templates_jinja2')),
-            extensions=['jinja2.ext.autoescape'],
+            extensions=['jinja2.ext.autoescape', 'jinja2.ext.with_'],
             autoescape=True)
     env.filters['ceil'] = jinja2_filters.ceil
     env.filters['defense_name'] = jinja2_filters.defense_name
     env.filters['digits'] = jinja2_filters.digits
     env.filters['floatformat'] = jinja2_filters.floatformat
+    env.filters['isoformat'] = jinja2_filters.isoformat
     env.filters['limit_prob'] = jinja2_filters.limit_prob
     env.filters['strftime'] = jinja2_filters.strftime
     env.filters['strip_frc'] = jinja2_filters.strip_frc

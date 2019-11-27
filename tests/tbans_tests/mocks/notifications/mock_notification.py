@@ -5,34 +5,35 @@ from tbans.models.notifications.notification import Notification
 
 class MockNotification(Notification):
 
-    def __init__(self, notification_payload=None, data_payload=None, webhook_payload=None, platform_payload=None, apns_payload=None):
-        super(Notification, self).__init__()
-        self._notification_payload = notification_payload
+    def __init__(self, fcm_notification=None, data_payload=None, platform_config=None, apns_config=None, webhook_message_data=None):
+        super(MockNotification, self).__init__()
+        self._fcm_notification = fcm_notification
         self._data_payload = data_payload
-        self._webhook_payload = webhook_payload
-        self._platform_payload = platform_payload
-        self._apns_payload = apns_payload
+        self._platform_config = platform_config
+        self._apns_config = apns_config
+        self._webhook_message_data = webhook_message_data
 
     @staticmethod
     def _type():
         return NotificationType.VERIFICATION
 
     @property
-    def notification_payload(self):
-        return self._notification_payload
+    def fcm_notification(self):
+        return self._fcm_notification
 
     @property
     def data_payload(self):
         return self._data_payload
 
     @property
-    def platform_payload(self):
-        return self._platform_payload
+    def platform_config(self):
+        return self._platform_config
 
     @property
-    def apns_payload(self):
-        return self._apns_payload
+    def apns_config(self):
+        return self._apns_config
 
     @property
-    def webhook_payload(self):
-        return self._webhook_payload if self._webhook_payload else super(MockNotification, self).webhook_payload
+    def webhook_message_data(self):
+        return self._webhook_message_data if self._webhook_message_data\
+            else super(MockNotification, self).webhook_message_data

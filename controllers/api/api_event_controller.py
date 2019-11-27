@@ -1,5 +1,6 @@
 import json
 import logging
+import tba_config
 import webapp2
 
 from datetime import datetime
@@ -196,7 +197,7 @@ class ApiEventListController(ApiBaseController):
         self._track_call_defer('event/list', self.year)
 
     def _render(self, year=None):
-        if self.year < 1992 or self.year > datetime.now().year + 1:
+        if self.year < tba_config.MIN_YEAR or self.year > datetime.now().year + 1:
             self._errors = json.dumps({"404": "No events found for %s" % self.year})
             self.abort(404)
 

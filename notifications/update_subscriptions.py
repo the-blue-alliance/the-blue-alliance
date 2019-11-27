@@ -16,11 +16,11 @@ class UpdateSubscriptionsNotification(BaseNotification):
 
     @property
     def _type(self):
-        return NotificationType.UPDATE_SUBSCRIPTION
+        return NotificationType.UPDATE_SUBSCRIPTIONS
 
     def _build_dict(self):
         data = {}
-        data['message_type'] = NotificationType.type_names[self._type]
+        data['notification_type'] = NotificationType.type_names[self._type]
         return data
 
     def _render_android(self):

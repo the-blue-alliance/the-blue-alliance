@@ -107,20 +107,27 @@ $('#schedule_file').change(function(){
             var match = matches[i];
 
             // check for invalid match
-            if(!match['Match'] || !match['Red 1']){
+            if(!match['Description'] || !match['Red 1']){
                 continue;
             }
 
-            var compLevel, setNumber, matchNumber, matchKey;
+            var compLevel, setNumber, matchNumber, rawMatchNumber, matchKey;
             var has_octo = $('input[name="alliance-count-schedule"]:checked').val() == "16";
-            matchNumber = parseInt(match['Match']);
+            if (match['Match']) {
+                rawMatchNumber = parseInt(match['Match']);
+            } else if (match['Description'].indexOf('#') >= 0) {
+                rawMatchNumber = parseInt(match['Description'].split('#')[1]);
+            } else {
+                rawMatchNumber = parseInt(match['Description'].split(' ')[1]);
+            }
             if(!match.hasOwnProperty('Description') || match['Description'].indexOf("Qualification") == 0){
+                matchNumber = parseInt(match['Description'].split(' ')[1]);
                 compLevel = "qm";
                 setNumber = 1;
                 matchKey = "qm" + matchNumber;
             }else{
-                compLevel = playoffTypeFromNumber(matchNumber, has_octo);
-                var setAndMatch = playoffMatchAndSet(matchNumber, has_octo);
+                compLevel = playoffTypeFromNumber(rawMatchNumber, has_octo);
+                var setAndMatch = playoffMatchAndSet(rawMatchNumber, has_octo);
                 setNumber = setAndMatch[0];
                 matchNumber = setAndMatch[1];
                 matchKey = compLevel + setNumber + "m" + matchNumber;
@@ -134,7 +141,7 @@ $('#schedule_file').change(function(){
             var row = $('<tr>');
             row.append($('<td>').html(match['Time']));
             row.append($('<td>').html(match['Description']));
-            row.append($('<td>').html(match['Match']));
+            row.append($('<td>').html(rawMatchNumber));
             row.append($('<td>').html($('#event_key').val() + "_" + matchKey));
             row.append($('<td>').html(cleanTeamNum(match['Blue 1'])));
             row.append($('<td>').html(cleanTeamNum(match['Blue 2'])));
@@ -296,8 +303,7 @@ $('#rankings_file').change(function(){
         var sheet = workbook.Sheets[first_sheet];
 
         //parse the excel to array of matches
-        //headers start on 5th row
-        var rankings = XLSX.utils.sheet_to_json(sheet, {range:3});
+        var rankings = XLSX.utils.sheet_to_json(sheet, {range:4});
 
         var request_body = {};
 
@@ -315,8 +321,13 @@ $('#rankings_file').change(function(){
         //var is_num = [true, true, true, true, true, true, false, true, true];
 
         // 2018 Headers
-        var headers = ['Rank', 'Team', 'RS', 'Endgame', 'Auto', 'Ownership', 'Vault', 'W-L-T', 'DQ', 'Played'];
-        var display_headers = ['Rank', 'Team', 'Ranking Score', 'End Game', 'Auto', 'Ownership', 'Vault', 'Record (W-L-T)', 'DQ', 'Played'];
+        //var headers = ['Rank', 'Team', 'RS', 'Endgame', 'Auto', 'Ownership', 'Vault', 'W-L-T', 'DQ', 'Played'];
+        //var display_headers = ['Rank', 'Team', 'Ranking Score', 'End Game', 'Auto', 'Ownership', 'Vault', 'Record (W-L-T)', 'DQ', 'Played'];
+        //var is_num = [true, true, true, true, true, false, true, true];
+
+        // 2019 Headers
+        var headers = ['Rank', 'Team', 'RS', 'Cargo Pts', 'Panel Pts', 'HAB Pts', 'Sandstorm', 'W-L-T', 'DQ', 'Played'];
+        var display_headers = ['Rank', 'Team', 'Ranking Score', 'Cargo', 'Hatch Panel', 'HAB Climb', 'Sandstorm Bonus', 'Record (W-L-T)', 'DQ', 'Played'];
         var is_num = [true, true, true, true, true, false, true, true];
 
         $('#rankings_preview').empty();

@@ -18,7 +18,7 @@ class TestUserPingNotification(unittest2.TestCase):
 
     def test_build(self):
         expected = {}
-        expected['message_type'] = NotificationType.type_names[NotificationType.PING]
+        expected['notification_type'] = NotificationType.type_names[NotificationType.PING]
         expected['message_data'] = {'title': "Test Message",
                                     'desc': "This is a test message ensuring your device can recieve push messages from The Blue Alliance."}
 

@@ -2,10 +2,19 @@
 
 {% block title %}The Blue Alliance - Add Webhook{% endblock %}
 
-{% block meta_description %}Create a webhook so TBA can notify your server on live events.{% endblock %}
-
 {% block content %}
 <div class="container">
+  {% if error %}
+  <div class="row">
+    <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
+      <div class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Error</h4>
+        <p>Missing url or name</p>
+      </div>
+    </div>
+  </div>
+  {% endif %}
   <div class="row">
     <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
       <h1>Add Webhook</h1>
@@ -14,11 +23,11 @@
           <tbody>
             <tr>
               <td>URL</td>
-              <td><input class="form-control" type="text" name="url" placeholder="http://yoursite.com"/></td>
+              <td><input class="form-control" type="text" required="required" name="url" placeholder="http://yoursite.com"/></td>
             </tr>
             <tr>
               <td>Name</td>
-              <td><input class="form-control" type="text" name="name" placeholder="My Webhook" /></td>
+              <td><input class="form-control" type="text" required="required" name="name" placeholder="My Webhook" /></td>
             </tr>
             <tr>
               <td>Secret Key</td>

@@ -15,7 +15,8 @@ from consts.event_type import EventType
 
 from controllers.api.api_status_controller import ApiStatusController
 from database.district_query import DistrictsInYearQuery
-from database.event_query import DistrictEventsQuery
+from database.event_query import DistrictEventsQuery, EventQuery
+from database.match_query import EventMatchesQuery
 from database.team_query import DistrictTeamsQuery
 from helpers.award_manipulator import AwardManipulator
 from helpers.bluezone_helper import BlueZoneHelper
@@ -36,6 +37,7 @@ from helpers.match_time_prediction_helper import MatchTimePredictionHelper
 from helpers.matchstats_helper import MatchstatsHelper
 from helpers.notification_helper import NotificationHelper
 from helpers.outgoing_notification_helper import OutgoingNotificationHelper
+from helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from helpers.prediction_helper import PredictionHelper
 
 from helpers.insight_manipulator import InsightManipulator
@@ -701,6 +703,53 @@ class MatchTimePredictionsDo(webapp.RequestHandler):
 
         # Clear API Response cache
         ApiStatusController.clear_cache_if_needed(old_status, new_status)
+
+
+class RebuildPlayoffAdvancementEnqueue(webapp.RequestHandler):
+    """
+    Enqueue rebuilding playoff advancement details for an event
+    """
+    def get(self, event_key):
+        event = Event.get_by_id(event_key)
+        if not event:
+            self.abort(404)
+            return
+
+        taskqueue.add(url='/tasks/math/do/playoff_advancement_update/{}'.format(event.key_name),
+                      method='GET')
+
+        self.response.out.write("Enqueued time prediction for {}".format(event.key_name))
+
+
+class RebuildPlayoffAdvancementDo(webapp.RequestHandler):
+    """
+    Rebuilds playoff advancement for a given event
+    """
+    def get(self, event_key):
+        event = Event.get_by_id(event_key)
+        if not event:
+            self.abort(404)
+
+        event_future = EventQuery(event_key).fetch_async(return_updated=True)
+        matches_future = EventMatchesQuery(event_key).fetch_async(return_updated=True)
+
+        event, _ = event_future.get_result()
+        matches, _ = matches_future.get_result()
+
+        cleaned_matches = MatchHelper.deleteInvalidMatches(matches, event)
+        matches = MatchHelper.organizeMatches(cleaned_matches)
+        bracket_table, playoff_advancement, _, _ = PlayoffAdvancementHelper.generatePlayoffAdvancement(event, matches)
+
+        event_details = EventDetails(
+            id=event.key_name,
+            playoff_advancement={
+                'advancement': playoff_advancement,
+                'bracket': bracket_table,
+            },
+        )
+        EventDetailsManipulator.createOrUpdate(event_details)
+
+        self.response.out.write("New playoff advancement for {}\n{}".format(event.key_name, json.dumps(event_details.playoff_advancement, indent=2, sort_keys=True)))
 
 
 class BlueZoneUpdateDo(webapp.RequestHandler):

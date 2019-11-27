@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance{% endblock %}
+{% block schema_org_markup %}{% include "index_partials/schema_org_markup.html" %}{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-5 col-lg-4">
+      {% include "index_partials/index_lhc_offseason.html" %}
+    </div>
+    <div class="col-sm-7 col-lg-8">
+      {% include "media_partials/live_special_webcast_partial.html" %}
+
+      {% if events and events|length > 0 %}
+        <h2>This Week's Events</h2>
+        {% include "event_partials/event_table.html" %}
+        <hr>
+      {% endif %}
+
+      <h2>Kickoff {{kickoff_datetime_est|strftime("%Y")}}!</h2>
+      <div id="countdown-finish-time">{{kickoff_datetime_utc|isoformat}}</div>
+      <h3 class="countdown">
+        <span class="countdown-number countdown-days">--</span><span class="countdown-label day-label">D </span>
+        <span class="countdown-number countdown-hours">--</span><span class="countdown-label">H </span>
+        <span class="countdown-number countdown-minutes">--</span><span class="countdown-label">M </span>
+        <span class="countdown-number countdown-seconds">--</span><span class="countdown-label">S</span>
+        <small>until Kickoff</small>
+      </h3>
+      {% if is_kickoff %}
+      <p>
+        <a class="btn btn-lg btn-success btn-block" href="/watch/kickoff"><span class="glyphicon glyphicon-play"></span> Watch Kickoff Live</a>
+      </p>
+      {% else %}
+        <p>Come back at {{kickoff_datetime_est|strftime("%-I:%M%p")}} EST on {{kickoff_datetime_est|strftime("%B %-d%t, %Y")}} to watch live!</p>
+      {% endif %}
+      {% if kickoff_facebook_fbid %}
+      <p><a class="btn btn-default btn-block" href="https://www.facebook.com/events/{{kickoff_facebook_fbid}}" target="_blank"><span class="glyphicon glyphicon-calendar"></span> RSVP on Facebook</a></p>
+      {% endif %}
+      <div>
+        <!--<span class="glyphicon glyphicon-globe"></span> <a href="http://www.firstinspires.org/2018-frc-teaser" target="_blank" title="FIRST Kickoff Page"><em>FIRST</em> Kickoff Page</a><br> -->
+        <!-- <a class="hashtag-link hashtag-cd" href="https://www.chiefdelphi.com/forums/showthread.php?threadid=138575" target="_blank" title="Chief Delphi Discussion Thread">Chief Delphi Game Hint Thread</a><br> -->
+        <!--<span class="glyphicon glyphicon-info-sign"></span> <a href="#" target="_blank">Download {{kickoff_datetime_est|strftime("%Y")}} Game Manual</a><br />-->
+        <br>
+        <div class="fitvids">
+          <iframe width="420" height="315" src="https://www.youtube.com/embed/{{game_teaser_youtube_id}}" frameborder="0" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="col-sm-4">
+      <h2>{{kickoff_datetime_est|strftime("%Y")}} Game Info</h2>
+      <p><em>More coming soon!</em></p>
+      <p><a class="btn btn-default disabled" href="#"><span class="glyphicon glyphicon-film"></span> {{kickoff_datetime_est|strftime("%Y")}} Game Video</a></p>
+      <h4>{{kickoff_datetime_est|strftime("%Y")}} Game Manual</h4>
+      <div class="btn-group-vertical game-manual">
+        <a class="btn btn-default" href="http://frc-manual.usfirst.org/" target="_blank"><span class="glyphicon glyphicon-file"></span> PDF Version</a>
+        <a class="btn btn-default" href="https://itunes.apple.com/us/app/frc-manual/id488793605" target="_blank"><span class="glyphicon glyphicon-download"></span> iPhone App</a>
+        <a class="btn btn-default" href="https://play.google.com/store/apps/details?id=org.usfirst.manual.frc" target="_blank"><span class="glyphicon glyphicon-download"></span> Android App</a>
+      </div>
+    </div> -->
+  </div>
+  <!--TODO: Make these real CSS classes instead of inline styles -gregmarra 11/27/12
+  <div class="row">
+    <div class="col-xs-12">
+      <h2>#omgrobots <small><a href="http://searchinstagram.com/omgrobots" title="Instagram Search">Instagram</a> + <a href="https://twitter.com/search/realtime?q=%23omgrobots" target="_blank">Twitter</a></small></h2>
+      <img alt="#omgrobots" src="" style="float: left; margin: 14px; background-color: grey; margin: 6px; height: 148px; width: 222px;" />
+      <img alt="#omgrobots" src="" style="float: left; margin: 14px; background-color: grey; margin: 6px; height: 148px; width: 222px;" />
+      <img alt="#omgrobots" src="" style="float: left; margin: 14px; background-color: grey; margin: 6px; height: 148px; width: 222px;" />
+      <img alt="#omgrobots" src="" style="float: left; margin: 14px; background-color: grey; margin: 6px; height: 148px; width: 222px;" />
+      <img alt="#omgrobots" src="" style="float: left; margin: 14px; background-color: grey; margin: 6px; height: 148px; width: 222px;" />
+    </div>
+  </div>-->
+</div>
+{% endblock %}

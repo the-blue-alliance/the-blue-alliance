@@ -8,12 +8,9 @@
         <th>Teams</th>
         <th>Record</th>
         <th>Champ Points</th>
-        {% if event.year == 2018 %}
-          <th>Park/Climb Points</th>
-          <th>Auto Points</th>
-        {% else %}
-          <th>Match Points</th>
-        {% endif %}
+        {% for tiebreaker in playoff_advancement_tiebreakers %}
+          <th>{{tiebreaker}}</th>
+        {% endfor %}
         <th>Advance to Finals</th>
       </tr>
     </thead>
@@ -26,7 +23,7 @@
           <td>{{ record.wins }}-{{ record.losses }}-{{ record.ties }}</td>
           <td>{{ champ_points }}</td>
           <td>{{ tiebreaker1 }}</td>
-          {% if event.year == 2018 %}
+          {% if playoff_advancement_tiebreakers|length == 2 %}
             <td>{{ tiebreaker2 }}</td>
           {% endif %}
           <td>{% if playoff_advancement.sf_complete and loop.index0 < 2 %}<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>{% endif %}</td>
@@ -41,15 +38,15 @@
   <table class="brackettable">
     <tbody>
       <tr>
-        <td class="{% if bracket_table.f.1.winning_alliance == 'red' %}winnerC{% else %}{% if bracket_table.f.1.winning_alliance == 'blue' %}secondC{% endif %}{% endif %}">
+        <td class="{% if bracket_table.f.f1.winning_alliance == 'red' %}winnerC{% else %}{% if bracket_table.f.f1.winning_alliance == 'blue' %}secondC{% endif %}{% endif %}">
           <br>
-          {% for team in bracket_table.f.1.red_alliance %}
+          {% for team in bracket_table.f.f1.red_alliance %}
             <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
           {% endfor %}
         </td>
-        <td class="{% if bracket_table.f.1.winning_alliance == 'blue' %}winnerC{% else %}{% if bracket_table.f.1.winning_alliance == 'red' %}secondC{% endif %}{% endif %}">
+        <td class="{% if bracket_table.f.f1.winning_alliance == 'blue' %}winnerC{% else %}{% if bracket_table.f.f1.winning_alliance == 'red' %}secondC{% endif %}{% endif %}">
           <br>
-          {% for team in bracket_table.f.1.blue_alliance %}
+          {% for team in bracket_table.f.f1.blue_alliance %}
             <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
           {% endfor %}
         </td>

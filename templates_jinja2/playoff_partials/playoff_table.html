@@ -10,7 +10,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for alliance, scores, average_score in playoff_advancement.ef %}
+      {% for alliance, scores, average_score, num_played in playoff_advancement.ef %}
         <tr>
           <td>{{loop.index}}</td>
           <td>{% for team in alliance %}<a href="/team/{{ team|digits }}/{{ event.year }}">{{ team }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</td>
@@ -34,7 +34,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for alliance, scores, average_score in playoff_advancement.qf %}
+      {% for alliance, scores, average_score, num_played in playoff_advancement.qf %}
         <tr>
           <td>{{loop.index}}</td>
           <td>{% for team in alliance %}<a href="/team/{{ team|digits }}/{{ event.year }}">{{ team }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</td>
@@ -58,7 +58,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for alliance, scores, average_score in playoff_advancement.sf %}
+      {% for alliance, scores, average_score, num_played in playoff_advancement.sf %}
         <tr>
           <td>{{loop.index}}</td>
           <td>{% for team in alliance %}<a href="/team/{{ team|digits }}/{{ event.year }}">{{ team }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</td>
@@ -75,15 +75,15 @@
   <table class="brackettable">
     <tbody>
       <tr>
-        <td class="{% if bracket_table.f.1.winning_alliance == 'red' %}winnerC{% else %}{% if bracket_table.f.1.winning_alliance == 'blue' %}secondC{% endif %}{% endif %}">
+        <td class="{% if bracket_table.f.f1.winning_alliance == 'red' %}winnerC{% else %}{% if bracket_table.f.f1.winning_alliance == 'blue' %}secondC{% endif %}{% endif %}">
           <br>
-          {% for team in bracket_table.f.1.red_alliance %}
+          {% for team in bracket_table.f.f1.red_alliance %}
             <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
           {% endfor %}
         </td>
-        <td class="{% if bracket_table.f.1.winning_alliance == 'blue' %}winnerC{% else %}{% if bracket_table.f.1.winning_alliance == 'red' %}secondC{% endif %}{% endif %}">
+        <td class="{% if bracket_table.f.f1.winning_alliance == 'blue' %}winnerC{% else %}{% if bracket_table.f.f1.winning_alliance == 'red' %}secondC{% endif %}{% endif %}">
           <br>
-          {% for team in bracket_table.f.1.blue_alliance %}
+          {% for team in bracket_table.f.f1.blue_alliance %}
             <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
           {% endfor %}
         </td>

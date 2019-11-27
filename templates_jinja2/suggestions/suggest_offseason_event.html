@@ -45,7 +45,7 @@
                                         href="{{ user_bundle.logout_url }}">log in as a different
                                     user</a></li>
                             <li>You can only suggest offseason events, please <a href="/contact">contact
-                                us</a> you find errors with official regional and district events on
+                                us</a> if you find errors with official regional or district events on
                                 the site
                             </li>
                         </ul>
@@ -55,7 +55,7 @@
                         <form action="/suggest/offseason" method="post" id="suggest_offseason">
                             <table class="table table-striped table-hover table-condensed">
                                 <tr>
-                                    <td>Name</td>
+                                    <td>Event Name</td>
                                     <td>
                                         <span{% if 'name' in failures %} class="has-error"{% endif %}>
                                             <input class="form-control" type="text" name="name"  placeholder="BattleCry@WPI"{% if name %} value="{{name}}"{% endif %}/>

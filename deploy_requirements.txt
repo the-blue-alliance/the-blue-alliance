@@ -6,6 +6,9 @@ google-cloud-bigquery==0.25.0
 beautifulsoup4
 GoogleAppEngineCloudStorageClient
 
+# TBANS
+firebase-admin==2.16.0
+
 # Cloud Endpoints Stuff
 oauth2client==3.0.0
 google-auth
@@ -13,4 +16,4 @@ google-endpoints
 google-endpoints-api-management
 requests-toolbelt
 # See https://github.com/urllib3/urllib3/issues/1456
-urllib3==1.23
+urllib3==1.24.2

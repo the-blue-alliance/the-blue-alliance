@@ -23,7 +23,7 @@ class TestUpdateFavoritesNotification(unittest2.TestCase):
 
     def test_build(self):
         expected = {}
-        expected['message_type'] = NotificationType.type_names[NotificationType.UPDATE_SUBSCRIPTION]
+        expected['notification_type'] = NotificationType.type_names[NotificationType.UPDATE_SUBSCRIPTIONS]
         data = self.notification._build_dict()
 
         self.assertEqual(expected, data)

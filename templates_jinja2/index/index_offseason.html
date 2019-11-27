@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance{% endblock %}
+{% block schema_org_markup %}{% include "index_partials/schema_org_markup.html" %}{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12 col-sm-5 col-lg-4">
+      {% include "index_partials/index_lhc_offseason.html" %}
+    </div>
+    <div class="col-xs-12 col-sm-7 col-lg-8">
+      {% include "media_partials/live_special_webcast_partial.html" %}
+
+      {% if events and events|length > 0 %}
+        <h2>This Week's Events</h2>
+        {% include "event_partials/event_table.html" %}
+      <hr>
+      {% endif %}
+
+      <h2>Only <span class="countdown-number countdown-days">--</span><span class="countdown-label day-label"> days</span> until {{kickoff_datetime_utc|strftime("%Y")}} Kickoff!</h2>
+      <div id="countdown-finish-time">{{kickoff_datetime_utc|isoformat}}</div>
+      <p>Watch the {{kickoff_datetime_utc|strftime("%Y")}} Kickoff LIVE on GameDay on The Blue Alliance on {{kickoff_datetime_utc|strftime("%B %-d%t")}}!</p>
+
+      {% if kickoff_facebook_fbid %}
+      <p><a class="btn btn-primary" href="https://www.facebook.com/events/{{kickoff_facebook_fbid}}/" target="_blank"><span class="glyphicon glyphicon-calendar"></span> RSVP on Facebook</a></p>
+      {% endif %}
+
+      {% if game_teaser_youtube_id %}
+      <h2>Watch the <em>{{game_name}}</em> teaser!</h3>
+      <div class="fitvids">
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/{{game_teaser_youtube_id}}" frameborder="0" allowfullscreen></iframe>
+      </div>
+      {%endif%}
+    </div>
+  </div>
+</div>
+{% endblock %}

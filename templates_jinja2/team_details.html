@@ -86,7 +86,7 @@
             {% for comp in participation %}
               {% if comp.event.is_season_event and comp.awards %}
                 {% for award in comp.awards %}
-                  {% if award.is_blue_banner %}
+                  {% if award.is_blue_banner and award.count_banner %}
                     {% for team_number, _ in award.recipient_dict.items() %}
                       {% if team_number|string == team.team_number|string %}
                         {{bbm.blue_banner(award, comp.event)}}
@@ -246,12 +246,21 @@
           <div class="row">
             <div class="col-xs-12">
               <h3 id="photos">CAD Models</h3>
-              {% if medias_by_slugname.grabcad %}
+              {% if medias_by_slugname.grabcad or medias_by_slugname.onshape %}
+                {% if medias_by_slugname.grabcad %}
                   {% for media in medias_by_slugname.grabcad %}
                     <div class="col-xs-6 col-sm-3">
                       {% include "media_partials/media_display_partial.html" %}
                     </div>
                   {% endfor %}
+                {% endif %}
+                {% if medias_by_slugname.onshape %}
+                  {% for media in medias_by_slugname.onshape %}
+                    <div class="col-xs-6 col-sm-3">
+                      {% include "media_partials/media_display_partial.html" %}
+                    </div>
+                  {% endfor %}
+                {% endif %}
               {% else %}
                   <p>No CAD for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add some</a>?</p>
               {% endif %}
@@ -270,4 +279,11 @@
     $(this).toggleClass("red").toggleClass("blue")
   });
 </script>
+{% if team.team_number == 148 %}
+<script>
+  $(".banner").click(function(){
+    $(".banner").addClass("black");
+  });
+</script>
+{% endif %}
 {% endblock %}

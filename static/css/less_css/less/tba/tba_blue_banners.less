@@ -78,3 +78,11 @@
     -webkit-filter: drop-shadow(0 5px 5px rgba(0, 0, 0, .1));
     filter: drop-shadow(0 5px 5px rgba(0, 0, 0, .1));
 }
+.banner.black {
+    background: black;
+    &:after {
+        border: @banner_width/2 solid black;
+        border-top-width: 5px;
+        border-bottom: 20px transparent solid;
+    }
+}

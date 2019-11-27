@@ -29,8 +29,8 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertTrue(isinstance(events, list))
             self.assertTrue(isinstance(districts, list))
 
-            # File has 5 events, but we ignore CMP divisions (only subdivisions), so only 4 are expected back
-            self.assertEquals(len(events), 4)
+            # File has 6 events, but we ignore CMP divisions (only subdivisions), so only 5 are expected back
+            self.assertEquals(len(events), 5)
             self.assertEquals(len(districts), 1)
 
     def test_parse_regional_event(self):
@@ -118,10 +118,30 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEquals(event.event_type_enum, EventType.CMP_DIVISION)
             self.assertEquals(event.district_key, None)
 
+    def test_parse_offseason(self):
+        with open('test_data/fms_api/2015_event_list.json', 'r') as f:
+            events, districts = FMSAPIEventListParser(2015).parse(json.loads(f.read()))
+            event = events[4]
+
+            self.assertEquals(event.key_name, "2015iri")
+            self.assertEquals(event.name, "Indiana Robotics Invitational")
+            self.assertEquals(event.short_name, "Indiana Robotics Invitational")
+            self.assertEquals(event.event_short, "iri")
+            self.assertEquals(event.official, False)
+            self.assertEquals(event.start_date, datetime.datetime(year=2015, month=7, day=17, hour=0, minute=0, second=0))
+            self.assertEquals(event.end_date, datetime.datetime(year=2015, month=7, day=18, hour=23, minute=59, second=59))
+            self.assertEquals(event.venue, "Lawrence North HS")
+            self.assertEquals(event.city, "Indianapolis")
+            self.assertEquals(event.state_prov, "IN")
+            self.assertEquals(event.country, "USA")
+            self.assertEquals(event.year, 2015)
+            self.assertEquals(event.event_type_enum, EventType.OFFSEASON)
+            self.assertEquals(event.district_key, None)
+
     def test_parse_2017_event(self):
         with open('test_data/fms_api/2017_event_list.json', 'r') as f:
             events, districts = FMSAPIEventListParser(2017).parse(json.loads(f.read()))
-            self.assertEqual(len(events), 164)
+            self.assertEqual(len(events), 165)
             self.assertEqual(len(districts), 10)
             event = events[16]
 
@@ -156,7 +176,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
 
         with open('test_data/fms_api/2017_event_list.json', 'r') as f:
             events, districts = FMSAPIEventListParser(2017).parse(json.loads(f.read()))
-            self.assertEqual(len(events), 159)
+            self.assertEqual(len(events), 160)
             self.assertEqual(len(districts), 10)
 
             non_einstein_types = EventType.CMP_EVENT_TYPES
@@ -177,6 +197,30 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEqual(einstein_hou.short_name, "Championship (Houston)")
             self.assertEquals(einstein_hou.start_date, datetime.datetime(year=2017, month=4, day=22, hour=0, minute=0, second=0))
             self.assertEquals(einstein_hou.end_date, datetime.datetime(year=2017, month=4, day=22, hour=23, minute=59, second=59))
+
+    def test_parse_2017_official_offseason(self):
+        with open('test_data/fms_api/2017_event_list.json', 'r') as f:
+            events, districts = FMSAPIEventListParser(2017).parse(json.loads(f.read()))
+            self.assertEqual(len(events), 165)
+            self.assertEqual(len(districts), 10)
+            event = next(e for e in events if e.key_name == "2017iri")
+
+            self.assertEquals(event.key_name, "2017iri")
+            self.assertEquals(event.name, "Indiana Robotics Invitational")
+            self.assertEquals(event.short_name, "Indiana Robotics Invitational")
+            self.assertEquals(event.event_short, "iri")
+            self.assertEquals(event.official, True)
+            self.assertEquals(event.start_date, datetime.datetime(year=2017, month=7, day=14, hour=0, minute=0, second=0))
+            self.assertEquals(event.end_date, datetime.datetime(year=2017, month=7, day=15, hour=23, minute=59, second=59))
+            self.assertEquals(event.venue, "Lawrence North High School")
+            self.assertEquals(event.city, "Indianapolis")
+            self.assertEquals(event.state_prov, "IN")
+            self.assertEquals(event.country, "USA")
+            self.assertEquals(event.year, 2017)
+            self.assertEquals(event.event_type_enum, EventType.OFFSEASON)
+            self.assertEquals(event.district_key, None)
+            self.assertEquals(event.website, "http://indianaroboticsinvitational.org/")
+            self.assertIsNone(event.webcast)
 
     def test_parse_2018_event(self):
         with open('test_data/fms_api/2018_event_list.json', 'r') as f:
@@ -207,7 +251,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
     def test_parse_division_parent(self):
         with open('test_data/fms_api/2017_event_list.json', 'r') as f:
             events, districts = FMSAPIEventListParser(2017).parse(json.loads(f.read()))
-            self.assertEqual(len(events), 164)
+            self.assertEqual(len(events), 165)
             self.assertEqual(len(districts), 10)
 
             # Test division <-> parent associations

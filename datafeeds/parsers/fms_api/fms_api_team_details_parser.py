@@ -33,8 +33,10 @@ class FMSAPITeamDetailsParser(object):
         for teamData in teams:
             team_website = teamData.get('website', None)
             # Fix issue where FIRST's API returns dummy website for all teams
-            if (team_website is not None and 'www.firstinspires.org' in team_website) or WebsiteBlacklist.is_blacklisted(team_website):
+            if (team_website is not None and 'www.firstinspires.org' in team_website):
                 website = None
+            elif WebsiteBlacklist.is_blacklisted(team_website):
+                website = ''
             else:
                 website = WebsiteHelper.format_url(team_website)
 

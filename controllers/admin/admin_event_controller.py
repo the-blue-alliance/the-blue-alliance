@@ -11,6 +11,7 @@ from consts.event_type import EventType
 from consts.playoff_type import PlayoffType
 from controllers import event_controller
 from controllers.base_controller import LoggedInHandler
+from datafeeds.csv_advancement_parser import CSVAdvancementParser
 from datafeeds.csv_alliance_selections_parser import CSVAllianceSelectionsParser
 from datafeeds.csv_teams_parser import CSVTeamsParser
 from helpers.award_manipulator import AwardManipulator
@@ -22,8 +23,10 @@ from helpers.event_details_manipulator import EventDetailsManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.team_manipulator import TeamManipulator
 from helpers.location_helper import LocationHelper
+from helpers.match_helper import MatchHelper
 from helpers.match_manipulator import MatchManipulator
 from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
+from helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from helpers.website_helper import WebsiteHelper
 from models.api_auth_access import ApiAuthAccess
 from models.district import District
@@ -32,7 +35,9 @@ from models.event_details import EventDetails
 from models.event_team import EventTeam
 from models.match import Match
 from models.media import Media
+from models.sitevar import Sitevar
 from models.team import Team
+from template_engine import jinja2_engine
 
 import tba_config
 
@@ -91,6 +96,73 @@ class AdminAddAllianceBackup(LoggedInHandler):
                 alliance['backup']['out'] = team_out
                 EventDetailsManipulator.createOrUpdate(event_details)
                 break
+
+        self.redirect("/admin/event/" + event.key_name)
+        return
+
+
+class AdminPlayoffAdvancementAddController(LoggedInHandler):
+    def post(self):
+        self._require_admin()
+
+        event_key = self.request.get("event_key").strip()
+        event = Event.get_by_id(event_key)
+        if not event:
+            self.redirect("/admin/event/" + event.key_name)
+            return
+
+        if event.playoff_type != PlayoffType.ROUND_ROBIN_6_TEAM:
+            logging.warning("Can't set advancement for non-round robin events")
+            self.redirect("/admin/event/" + event.key_name)
+            return
+
+        advancement_csv = self.request.get("advancement_csv")
+        comp_level = self.request.get("comp_level")
+        matches_per_team = int(self.request.get("num_matches"))
+        if comp_level not in Match.ELIM_LEVELS:
+            logging.warning("Bad comp level: {}".format(comp_level))
+            self.redirect("/admin/event/" + event.key_name)
+            return
+        parsed_advancement = CSVAdvancementParser.parse(advancement_csv, matches_per_team)
+        advancement = PlayoffAdvancementHelper.generatePlayoffAdvancementFromCSV(event, parsed_advancement, comp_level)
+
+        cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches, event)
+        matches = MatchHelper.organizeMatches(cleaned_matches)
+        bracket_table = PlayoffAdvancementHelper.generateBracket(matches, event, event.alliance_selections)
+        comp_levels = bracket_table.keys()
+        for comp_level in comp_levels:
+            if comp_level != 'f':
+                del bracket_table[comp_level]
+
+        existing_details = EventDetails.get_by_id(event.key_name)
+        new_advancement = existing_details.playoff_advancement if existing_details and existing_details.playoff_advancement else {}
+        new_advancement.update(advancement)
+        event_details = EventDetails(
+            id=event.key_name,
+            playoff_advancement={
+                'advancement': new_advancement,
+                'bracket': bracket_table,
+            },
+        )
+        EventDetailsManipulator.createOrUpdate(event_details)
+
+        self.redirect("/admin/event/" + event.key_name)
+        return
+
+
+class AdminPlayoffAdvancementPurgeController(LoggedInHandler):
+    def post(self, event_key):
+        self._require_admin()
+
+        event = Event.get_by_id(event_key)
+        if not event:
+            self.redirect("/admin/event/" + event.key_name)
+            return
+
+        details = EventDetails.get_by_id(event.key_name)
+        if details:
+            details.playoff_advancement = {}
+            EventDetailsManipulator.createOrUpdate(details)
 
         self.redirect("/admin/event/" + event.key_name)
         return
@@ -326,6 +398,35 @@ class AdminEventDelete(LoggedInHandler):
         self.redirect("/admin/events?deleted=%s" % event_key_id)
 
 
+class AdminEventDeleteMatches(LoggedInHandler):
+    """
+    Remove a comp level's matches
+    """
+    def get(self, event_key, comp_level, to_delete):
+        self._require_admin()
+
+        event = Event.get_by_id(event_key)
+        if not event:
+            self.abort(404)
+
+        organized_matches = MatchHelper.organizeMatches(event.matches)
+        if comp_level not in organized_matches:
+            self.abort(400)
+            return
+
+        matches_to_delete = []
+        if to_delete == 'all':
+            matches_to_delete = [m for m in organized_matches[comp_level]]
+        elif to_delete == 'unplayed':
+            matches_to_delete = [m for m in organized_matches[comp_level] if not m.has_been_played]
+
+        delete_count = len(matches_to_delete)
+        if matches_to_delete:
+            MatchManipulator.delete(matches_to_delete)
+
+        self.redirect("/admin/event/{}?deleted={}#matches".format(event_key, delete_count))
+
+
 class AdminEventDetail(LoggedInHandler):
     """
     Show an Event.
@@ -338,20 +439,100 @@ class AdminEventDetail(LoggedInHandler):
             self.abort(404)
         event.prepAwardsMatchesTeams()
 
+        reg_sitevar = Sitevar.get_by_id("cmp_registration_hacks")
         api_keys = ApiAuthAccess.query(ApiAuthAccess.event_list == ndb.Key(Event, event_key)).fetch()
         event_medias = Media.query(Media.references == event.key).fetch(500)
+        playoff_template = PlayoffAdvancementHelper.getPlayoffTemplate(event)
+        elim_bracket_html = jinja2_engine.render(
+            "bracket_partials/bracket_table.html", {
+                "bracket_table": event.playoff_bracket,
+                "event": event
+            })
+        advancement_html = jinja2_engine.render(
+            "playoff_partials/{}.html".format(playoff_template), {
+                "event": event,
+                "playoff_advancement": event.playoff_advancement,
+                "playoff_advancement_tiebreakers": PlayoffAdvancementHelper.ROUND_ROBIN_TIEBREAKERS.get(event.year),
+                "bracket_table": event.playoff_bracket
+            }) if playoff_template else "None"
+
+        organized_matches = MatchHelper.organizeMatches(event.matches)
+        match_stats = []
+        for comp_level in Match.COMP_LEVELS:
+            level_matches = organized_matches[comp_level]
+            if not level_matches:
+                continue
+            match_stats.append({
+                'comp_level': comp_level,
+                'level_name': Match.COMP_LEVELS_VERBOSE_FULL[comp_level],
+                'total': len(level_matches),
+                'played': len(filter(lambda m: m.has_been_played, level_matches)),
+                'unplayed': len(filter(lambda m: not m.has_been_played, level_matches)),
+            })
 
         self.template_values.update({
             "event": event,
             "medias": event_medias,
-            "cache_key": event_controller.EventDetail('2016nyny').cache_key.format(event.key_name),
             "flushed": self.request.get("flushed"),
             "playoff_types": PlayoffType.type_names,
             "write_auths": api_keys,
+            "event_sync_disable": reg_sitevar and event_key in reg_sitevar.contents.get('divisions_to_skip', []),
+            "set_start_day_to_last": reg_sitevar and event_key in reg_sitevar.contents.get('set_start_to_last_day', []),
+            "skip_eventteams": reg_sitevar and event_key in reg_sitevar.contents.get('skip_eventteams', []),
+            "event_name_override": next(iter(filter(lambda e: e.get("event") == event_key, reg_sitevar.contents.get("event_name_override", []))), {}).get("name", ""),
+            "elim_bracket_html": elim_bracket_html,
+            "advancement_html": advancement_html,
+            'match_stats': match_stats,
+            'deleted_count': self.request.get('deleted'),
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_details.html')
         self.response.out.write(template.render(path, self.template_values))
+
+    def post(self, event_key):
+        self._require_admin()
+        event = Event.get_by_id(event_key)
+        if not event:
+            self.abort(404)
+
+        reg_sitevar = Sitevar.get_or_insert("cmp_registration_hacks", values_json="{}")
+
+        new_divisions_to_skip = reg_sitevar.contents.get("divisions_to_skip", [])
+        if self.request.get("event_sync_disable"):
+            if event_key not in new_divisions_to_skip:
+                new_divisions_to_skip.append(event_key)
+        else:
+            new_divisions_to_skip = list(filter(lambda e: e != event_key, new_divisions_to_skip))
+
+        new_start_day_to_last = reg_sitevar.contents.get("set_start_to_last_day", [])
+        if self.request.get("set_start_day_to_last"):
+            if event_key not in new_start_day_to_last:
+                new_start_day_to_last.append(event_key)
+        else:
+            new_start_day_to_last= list(filter(lambda e: e != event_key, new_start_day_to_last))
+
+        new_skip_eventteams = reg_sitevar.contents.get("skip_eventteams", [])
+        if self.request.get("skip_eventteams"):
+            if event_key not in new_skip_eventteams:
+                new_skip_eventteams.append(event_key)
+        else:
+            new_skip_eventteams = list(filter(lambda e: e != event_key, new_skip_eventteams))
+
+        new_name_overrides = reg_sitevar.contents.get("event_name_override", [])
+        if self.request.get("event_name_override"):
+            if not any(o["event"] == event_key for o in new_name_overrides):
+                new_name_overrides.append({"event": event_key, "name": self.request.get("event_name_override")})
+        else:
+            new_name_overrides = list(filter(lambda o: o["event"] != event_key, new_name_overrides))
+
+        reg_sitevar.contents = {
+            "divisions_to_skip": new_divisions_to_skip,
+            "set_start_to_last_day": new_start_day_to_last,
+            "skip_eventteams": new_skip_eventteams,
+            "event_name_override": new_name_overrides,
+        }
+        reg_sitevar.put()
+        self.redirect("/admin/event/{}".format(event_key))
 
 
 class AdminEventEdit(LoggedInHandler):
@@ -442,8 +623,6 @@ class AdminEventList(LoggedInHandler):
     """
     List all Events.
     """
-    VALID_YEARS = range(1992, tba_config.MAX_YEAR + 1)
-
     def get(self, year=None):
         self._require_admin()
 
@@ -455,7 +634,7 @@ class AdminEventList(LoggedInHandler):
         events = Event.query(Event.year == year).order(Event.start_date).fetch(10000)
 
         self.template_values.update({
-            "valid_years": self.VALID_YEARS,
+            "valid_years": tba_config.VALID_YEARS,
             "selected_year": year,
             "events": events,
         })

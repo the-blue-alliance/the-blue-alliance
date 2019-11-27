@@ -19,7 +19,7 @@ SORT_ORDER = {
 
 
 class AdvancedSearchController(CacheableHandler):
-    VALID_YEARS = list(reversed(range(1992, tba_config.MAX_YEAR + 1)))
+    VALID_YEARS = list(reversed(tba_config.VALID_YEARS))
 
     VALID_AWARD_TYPES = [kv for kv in AwardType.SEARCHABLE.items()]
     VALID_AWARD_TYPES = sorted(
@@ -59,7 +59,7 @@ class AdvancedSearchController(CacheableHandler):
 
     def _get_params(self):
         # Parse and sanitize inputs
-        self._year = self._sanitize_int_param('year', 1992, tba_config.MAX_YEAR)
+        self._year = self._sanitize_int_param('year', tba_config.MIN_YEAR, tba_config.MAX_YEAR)
 
         self._award_types = self.request.get_all('award_type')
         if self._award_types:

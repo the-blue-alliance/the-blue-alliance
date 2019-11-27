@@ -328,7 +328,7 @@ class TbaCSVBackupEventsEnqueue(webapp.RequestHandler):
     """
     def get(self, year=None):
         if year is None:
-            years = range(1992, datetime.datetime.now().year + 1)
+            years = range(tba_config.MIN_YEAR, datetime.datetime.now().year + 1)
             for y in years:
                 taskqueue.add(
                     url='/tasks/enqueue/csv_backup_events/{}'.format(y),
@@ -420,7 +420,7 @@ class TbaCSVRestoreEventsEnqueue(webapp.RequestHandler):
             return
 
         if year is None:
-            years = range(1992, datetime.datetime.now().year + 1)
+            years = range(tba_config.MIN_YEAR, datetime.datetime.now().year + 1)
             for y in years:
                 taskqueue.add(
                     url='/tasks/enqueue/csv_restore_events/{}'.format(y),

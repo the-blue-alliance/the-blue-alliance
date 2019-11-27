@@ -196,10 +196,10 @@
         minQualScore = Math.min(minQualScore,
                                 predictions[key]['blue_mean']
                                 - 2*Math.sqrt(predictions[key]['blue_var']));
-        maxQualScore = Math.min(maxQualScore,
+        maxQualScore = Math.max(maxQualScore,
                                 predictions[key]['red_mean']
                                 + 2*Math.sqrt(predictions[key]['red_var']));
-        maxQualScore = Math.min(maxQualScore,
+        maxQualScore = Math.max(maxQualScore,
                                 predictions[key]['blue_mean']
                                 + 2*Math.sqrt(predictions[key]['blue_var']));
       }
@@ -223,10 +223,10 @@
         minPlayoffScore = Math.min(minPlayoffScore,
                                    predictions[key]['blue_mean']
                                    - 2*Math.sqrt(predictions[key]['blue_var']));
-        maxPlayoffScore = Math.min(maxPlayoffScore,
+        maxPlayoffScore = Math.max(maxPlayoffScore,
                                    predictions[key]['red_mean']
                                    + 2*Math.sqrt(predictions[key]['red_var']));
-        maxPlayoffScore = Math.min(maxPlayoffScore,
+        maxPlayoffScore = Math.max(maxPlayoffScore,
                                    predictions[key]['blue_mean']
                                    + 2*Math.sqrt(predictions[key]['blue_var']));
       }

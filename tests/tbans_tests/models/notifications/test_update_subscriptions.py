@@ -7,5 +7,11 @@ from tbans.models.notifications.update_subscriptions import UpdateSubscriptionsN
 
 class TestUpdateSubscriptionsNotification(unittest2.TestCase):
 
+    def setUp(self):
+        self.notification = UpdateSubscriptionsNotification('abcd')
+
     def test_type(self):
-        self.assertEquals(UpdateSubscriptionsNotification._type(), NotificationType.UPDATE_SUBSCRIPTION)
+        self.assertEqual(UpdateSubscriptionsNotification._type(), NotificationType.UPDATE_SUBSCRIPTIONS)
+
+    def test_platform_config(self):
+        self.assertEqual(self.notification.platform_config.collapse_key, 'abcd_subscriptions_update')

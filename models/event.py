@@ -129,6 +129,22 @@ class Event(ndb.Model):
         else:
             return self.details.district_points
 
+    @property
+    def playoff_advancement(self):
+        if self.details is None:
+            return None
+        else:
+            return self.details.playoff_advancement.get(
+                "advancement") if self.details.playoff_advancement else None
+
+    @property
+    def playoff_bracket(self):
+        if self.details is None:
+            return None
+        else:
+            return self.details.playoff_advancement.get(
+                "bracket") if self.details.playoff_advancement else None
+
     @ndb.tasklet
     def get_matches_async(self):
         if self._matches is None:
@@ -225,15 +241,25 @@ class Event(ndb.Model):
             ).order(Event.start_date).fetch(1, projection=[Event.start_date])
             if e:
                 first_start_date = e[0].start_date
-                diff_from_wed = (first_start_date.weekday() - 2) % 7  # 2 is Wednesday
-                week_start = first_start_date - datetime.timedelta(days=diff_from_wed)
+
+                days_diff = 0
+                # Before 2020, event weeks start on Wednesdays
+                if self.year < 2020:
+                    days_diff = 2  # 2 is Wednesday
+                diff_from_week_start = (first_start_date.weekday() - days_diff) % 7
+                week_start = first_start_date - datetime.timedelta(days=diff_from_week_start)
             else:
                 week_start = None
         context_cache.set(cache_key, week_start)
 
         if self._week is None and week_start is not None:
             days = (self.start_date - week_start).days
-            self._week = days / 7
+            week = days / 7
+            # In 2020 there's an empty week in between Week 8 and Week 9 - mathmatically it's Week 10, but we treat it
+            # as Week 9 - we should make sure we take that in to account. We look for > 7 because weeks are zero-indexed
+            if self.year == 2020 and week > 7:
+                week -= 1
+            self._week = week
 
         return self._week
 
@@ -391,6 +417,12 @@ class Event(ndb.Model):
         return current_webcasts
 
     @property
+    def online_webcasts(self):
+        current_webcasts = self.current_webcasts
+        WebcastOnlineHelper.add_online_status(current_webcasts)
+        return filter(lambda x: x.get('status', '') != 'offline', current_webcasts if current_webcasts else [])
+
+    @property
     def has_first_official_webcast(self):
         return any([('firstinspires' in w['channel']) for w in self.webcast]) if self.webcast else False
 
@@ -499,6 +531,20 @@ class Event(ndb.Model):
         if self.first_code is None:
             return self.event_short.upper()
         return self.first_code.upper()
+
+    @property
+    def is_in_season(self):
+        """
+        If the Event is of a regular season type.
+        """
+        return self.event_type_enum in EventType.SEASON_EVENT_TYPES
+
+    @property
+    def is_offseason(self):
+        """
+        'Offseason' events include preseason, offseason, unlabeled events.
+        """
+        return not self.is_in_season
 
     @property
     def next_match(self):

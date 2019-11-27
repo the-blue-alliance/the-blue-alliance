@@ -4,6 +4,7 @@ import datetime
 import json
 import os
 import tba_config
+import logging
 
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
@@ -17,6 +18,7 @@ from database.district_query import DistrictsInYearQuery, DistrictQuery
 from database.event_query import EventQuery, EventDivisionsQuery
 from helpers.match_helper import MatchHelper
 from helpers.award_helper import AwardHelper
+from helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from helpers.team_helper import TeamHelper
 from helpers.event_helper import EventHelper
 from helpers.media_helper import MediaHelper
@@ -34,7 +36,7 @@ class EventList(CacheableHandler):
     """
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
-    VALID_YEARS = list(reversed(range(1992, tba_config.MAX_YEAR + 1)))
+    VALID_YEARS = list(reversed(tba_config.VALID_YEARS))
     CACHE_VERSION = 4
     CACHE_KEY_FORMAT = "event_list_{}_{}_{}"  # (year, explicit_year, state_prov)
 
@@ -191,31 +193,16 @@ class EventDetail(CacheableHandler):
             matches_recent = None
             matches_upcoming = None
 
-        bracket_table = MatchHelper.generateBracket(matches, event, event.alliance_selections)
+        bracket_table = event.playoff_bracket
+        playoff_advancement = event.playoff_advancement
+        double_elim_matches = PlayoffAdvancementHelper.getDoubleElimMatches(event, matches)
+        playoff_template = PlayoffAdvancementHelper.getPlayoffTemplate(event)
 
-        playoff_advancement = None
-        playoff_template = None
-        double_elim_matches = None
-        if EventHelper.is_2015_playoff(event_key):
-            playoff_advancement = MatchHelper.generatePlayoffAdvancement2015(matches, event.alliance_selections)
-            playoff_template = 'playoff_table'
-            for comp_level in ['qf', 'sf']:
-                if comp_level in bracket_table:
-                    del bracket_table[comp_level]
-        elif event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM:
-            playoff_advancement = MatchHelper.generatePlayoffAdvancementRoundRobin(matches, event.year, event.alliance_selections)
-            playoff_template = 'playoff_round_robin_6_team'
-            comp_levels = bracket_table.keys()
-            for comp_level in comp_levels:
-                if comp_level != 'f':
-                    del bracket_table[comp_level]
-        elif event.playoff_type == PlayoffType.BO3_FINALS or event.playoff_type == PlayoffType.BO5_FINALS:
-            comp_levels = bracket_table.keys()
-            for comp_level in comp_levels:
-                if comp_level != 'f':
-                    del bracket_table[comp_level]
-        elif event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
-            double_elim_matches = MatchHelper.organizeDoubleElimMatches(matches)
+        # Lazy handle the case when we haven't backfilled the event details
+        if not bracket_table or not playoff_advancement:
+            bracket_table2, playoff_advancement2, _, _ = PlayoffAdvancementHelper.generatePlayoffAdvancement(event, matches)
+            bracket_table = bracket_table or bracket_table2
+            playoff_advancement = playoff_advancement or playoff_advancement2
 
         district_points_sorted = None
         if event.district_key and event.district_points:
@@ -255,6 +242,7 @@ class EventDetail(CacheableHandler):
             "bracket_table": bracket_table,
             "playoff_advancement": playoff_advancement,
             "playoff_template": playoff_template,
+            "playoff_advancement_tiebreakers": PlayoffAdvancementHelper.ROUND_ROBIN_TIEBREAKERS.get(event.year),
             "district_points_sorted": district_points_sorted,
             "event_insights_qual": event_insights['qual'] if event_insights else None,
             "event_insights_playoff": event_insights['playoff'] if event_insights else None,

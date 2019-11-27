@@ -5,7 +5,6 @@ import Select from 'react-select'
 import EVENT_SHAPE from '../../constants/ApiEvent'
 
 class PlayoffTypeDropdown extends Component {
-
   static loadPlayoffTypes() {
     return fetch('/_/playoff_types', {
       credentials: 'same-origin',

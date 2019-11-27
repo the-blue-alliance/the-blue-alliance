@@ -82,3 +82,10 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
                 else:
                     self.assertIsNone(alliance['backup'])
                 number += 1
+
+    def test_parse_ignore_no_picks(self):
+        with open('test_data/fms_api/2019_ohwa2_alliances.json', 'r') as f:
+            alliances = FMSAPIEventAlliancesParser().parse(json.loads(f.read()))
+
+            self.assertTrue(isinstance(alliances, list))
+            self.assertEqual(len(alliances), 7)

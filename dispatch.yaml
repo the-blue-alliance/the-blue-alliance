@@ -9,20 +9,20 @@ dispatch:
 
 # Send low-frequency long-running tasks to backend module
 - url: "*/backend-tasks/*"
-  module: backend-tasks
+  service: backend-tasks
 
 # Send low-frequency long-running tasks to backend module
 # Uses B2 instance for higher CPU/memory limits
 - url: "*/backend-tasks-b2/*"
-  module: backend-tasks-b2
+  service: backend-tasks-b2
 
 # Endpoints for internal client API
-- url: "*/clientapi/*"
-  service: clientapi
+# - url: "*/clientapi/*"
+#   service: clientapi
 
 # Handles latency-insensive tasks
-- url: "*/tasks/*"
-  service: tasks
+# - url: "*/tasks/*"
+#   service: tasks
 
 # Send notification requests to TBANS (The Blue Alliance Notification Service)
 - url: "*/tbans/*"
@@ -30,4 +30,4 @@ dispatch:
 
 # Send everything else to default module
 - url: "*/"
-  module: default
+  service: default

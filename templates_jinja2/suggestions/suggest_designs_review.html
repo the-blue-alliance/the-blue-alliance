@@ -37,7 +37,11 @@
                   </div>
                   <div class="col-xs-5">
                       <p><strong><a href="/team/{{reference.team_number}}/{{suggestion.contents.year}}" target="_blank">Team {{reference.team_number}}{% if reference.nickname %} - {{reference.nickname}}{% endif %} ({{suggestion.contents.year}})</a></strong></p>
-                      <p><a href="https://grabcad.com/library/{{ suggestion.contents.foreign_key }}" target="_blank">https://grabcad.com/library/{{ suggestion.contents.foreign_key }}</a></p>
+                      {% if suggestion.contents.site_name == "Onshape" %}
+                        <p><a href="https://cad.onshape.com/documents/{{ suggestion.contents.foreign_key }}" target="_blank">https://cad.onshape.com/documents/{{ suggestion.contents.foreign_key }}</a></p>
+                      {% elif suggestion.contents.site_name == "GrabCAD" %}
+                        <p><a href="https://grabcad.com/library/{{ suggestion.contents.foreign_key }}" target="_blank">https://grabcad.com/library/{{ suggestion.contents.foreign_key }}</a></p>
+                      {% endif %}
                       {% set media = suggestion.candidate_media -%}
                       {% include "media_partials/media_display_partial.html" %}
                   </div>

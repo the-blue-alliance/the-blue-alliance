@@ -26,6 +26,7 @@ from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_helper import MatchHelper
 from helpers.tbans_helper import TBANSHelper
 from helpers.notification_sender import NotificationSender
+from helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from helpers.search_helper import SearchHelper
 from helpers.team_manipulator import TeamManipulator
 from models.award import Award
@@ -378,9 +379,9 @@ class AdminPostEventTasksDo(LoggedInHandler):
         event = event_future.get_result()
         if event.event_type_enum in {EventType.OFFSEASON, EventType.FOC}:
             matches = MatchHelper.organizeMatches(matches_future.get_result())
-            bracket = MatchHelper.generateBracket(matches, event, event.alliance_selections)
+            bracket = PlayoffAdvancementHelper.generateBracket(matches, event, event.alliance_selections)
             if 'f' in bracket:
-                winning_alliance = '{}_alliance'.format(bracket['f'][1]['winning_alliance'])
+                winning_alliance = '{}_alliance'.format(bracket['f']['f1']['winning_alliance'])
                 if winning_alliance == 'red_alliance':
                     losing_alliance = 'blue_alliance'
                 else:
@@ -393,8 +394,8 @@ class AdminPostEventTasksDo(LoggedInHandler):
                     year=event.year,
                     event=event.key,
                     event_type_enum=event.event_type_enum,
-                    team_list=[ndb.Key(Team, 'frc{}'.format(team)) for team in bracket['f'][1][winning_alliance] if team.isdigit()],
-                    recipient_json_list=[json.dumps({'team_number': team, 'awardee': None}) for team in bracket['f'][1][winning_alliance]],
+                    team_list=[ndb.Key(Team, 'frc{}'.format(team)) for team in bracket['f']['f1'][winning_alliance] if team.isdigit()],
+                    recipient_json_list=[json.dumps({'team_number': team, 'awardee': None}) for team in bracket['f']['f1'][winning_alliance]],
                 ))
 
                 awards.append(Award(
@@ -404,8 +405,8 @@ class AdminPostEventTasksDo(LoggedInHandler):
                     year=event.year,
                     event=event.key,
                     event_type_enum=event.event_type_enum,
-                    team_list=[ndb.Key(Team, 'frc{}'.format(team)) for team in bracket['f'][1][losing_alliance] if team.isdigit()],
-                    recipient_json_list=[json.dumps({'team_number': team, 'awardee': None}) for team in bracket['f'][1][losing_alliance]],
+                    team_list=[ndb.Key(Team, 'frc{}'.format(team)) for team in bracket['f']['f1'][losing_alliance] if team.isdigit()],
+                    recipient_json_list=[json.dumps({'team_number': team, 'awardee': None}) for team in bracket['f']['f1'][losing_alliance]],
                 ))
                 AwardManipulator.createOrUpdate(awards)
 

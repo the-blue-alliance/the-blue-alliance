@@ -137,6 +137,8 @@ class Match(ndb.Model):
                 # add dqs if not present
                 if 'dqs' not in self._alliances[color]:
                     self._alliances[color]['dqs'] = []
+                if len(self._alliances[color]['dqs']) != 0 and self.comp_level in self.ELIM_LEVELS:
+                    self._alliances[color]['dqs'] = self._alliances[color]['teams']
 
         return self._alliances
 
@@ -196,6 +198,17 @@ class Match(ndb.Model):
                 else:
                     self._winning_alliance = MatchHelper.tiebreak_winner(self)
         return self._winning_alliance
+
+    @property
+    def losing_alliance(self):
+        winning_alliance = self.winning_alliance
+        # No winning alliance means no losing alliance - either a tie, or 2015
+        if winning_alliance == '':
+            return ''
+
+        alliances = ['red', 'blue']
+        alliances.remove(winning_alliance)
+        return alliances[0]
 
     @property
     def event_key_name(self):
@@ -261,6 +274,10 @@ class Match(ndb.Model):
     @property
     def name(self):
         return "%s" % (self.COMP_LEVELS_VERBOSE[self.comp_level])
+
+    @property
+    def full_name(self):
+        return "%s" % (self.COMP_LEVELS_VERBOSE_FULL[self.comp_level])
 
     @property
     def youtube_videos_formatted(self):

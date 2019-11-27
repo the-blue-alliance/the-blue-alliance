@@ -5,7 +5,6 @@ import { Typeahead } from 'react-bootstrap-typeahead'
 import TEAM_SHAPE from '../../constants/ApiTeam'
 
 class AddRemoveSingleTeam extends Component {
-
   constructor(props) {
     super(props)
     this.state = {

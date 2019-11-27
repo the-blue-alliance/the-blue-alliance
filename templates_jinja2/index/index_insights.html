@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance{% endblock %}
+{% block schema_org_markup %}{% include "index_partials/schema_org_markup.html" %}{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12 col-sm-5 col-lg-4">
+      {% include "index_partials/index_lhc_offseason.html" %}
+    </div>
+    <div class="col-xs-12 col-sm-7 col-lg-8">
+      {% include "media_partials/live_special_webcast_partial.html" %}
+      {% if events and events|length > 0 %}
+        <h2>This Week's Events</h2>
+        {% include "event_partials/event_table.html" %}
+        <hr>
+      {% endif %}
+
+      <h2 class="end_header">{{year}} Stats Recap{% if num_matches %} <small>{{num_matches.data}} Matches Played</small>{% endif %}</h2>
+
+      {% if match_highscore and match_highscore.data.qual %}
+        <div class="row">
+          <div class="col-xs-12">
+            <h3>Highest Scoring Qual Match{% if match_highscore.data.qual|length > 1 %}es{% endif %} <small>(Minus Penalties)</small></h3>
+            {% for match in  match_highscore.data.qual %}
+              <h4><a href="/match/{{match.key_name}}">{{ match.event_name }} <small>{{ match.verbose_name }}</small></a></h4>
+              <table class="match-table insights-table">
+                <thead>
+                  <tr class="key">
+                    <th colspan="{{match.alliances.items().0.1.teams|length}}">Teams</th>
+                    <th>Score</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for items in match.alliances.items()|reverse %}
+                  <tr>
+                    {% for team in items.1.teams %}
+                    <td class="{{items.0}}{% if match.winning_alliance == items.0 %} winner{% endif %}"><a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a></td>
+                    {% endfor %}
+                    <td class="{{items.0}}Score{% if match.winning_alliance == items.0 %} winner{% endif %}">{% if items.1.score == "-1" %}?{% else %}{{ items.1.score }}{% endif %}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      {% if match_highscore and match_highscore.data.playoff %}
+        <div class="row">
+          <div class="col-xs-12">
+            <h3>Highest Scoring Playoff Match{% if match_highscore.data.playoff|length > 1 %}es{% endif %} <small>(Minus Penalties)</small></h3>
+            {% for match in  match_highscore.data.playoff %}
+              <h4><a href="/match/{{match.key_name}}">{{ match.event_name }} <small>{{ match.verbose_name }}</small></a></h4>
+              <table class="match-table insights-table">
+                <thead>
+                  <tr class="key">
+                    <th colspan="{{match.alliances.items().0.1.teams|length}}">Teams</th>
+                    <th>Score</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for items in match.alliances.items()|reverse %}
+                  <tr>
+                    {% for team in items.1.teams %}
+                    <td class="{{items.0}}{% if match.winning_alliance == items.0 %} winner{% endif %}"><a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a></td>
+                    {% endfor %}
+                    <td class="{{items.0}}Score{% if match.winning_alliance == items.0 %} winner{% endif %}">{% if items.1.score == "-1" %}?{% else %}{{ items.1.score }}{% endif %}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      {% if match_averages_by_week %}
+        <h3>Average Match Score By Week</h3>
+        {% if elim_match_averages_by_week %}
+          <div class="chart-key"><div class="color-key blue-color-key"></div><div class="chart-key-text">All Match Averages</div></div>
+          <div class="chart-key"><div class="color-key green-color-key"></div><div class="chart-key-text">Playoff Match Averages</div></div>
+          <figure style="width: 90%; height: 300px;" id="elim-match-average-chart"></figure>
+          <div id="elim-match-average" class="xcharts-data xcharts-line-data">[{{ match_averages_by_week.data_json|safe }}, {{ elim_match_averages_by_week.data_json|safe }}]</div>
+        {% else %}
+          <figure style="width: 90%; height: 300px;" id="match-average-chart"></figure>
+          <div id="match-average" class="xcharts-data xcharts-line-data">[{{ match_averages_by_week.data_json|safe }}]</div>
+        {% endif %}
+        <br><br>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+{% endblock %}
