@@ -1,5 +1,6 @@
 from consts.award_type import AwardType
 
+
 class DistrictPointValues(object):
     """
     A class that contains various district point constants over the years:
