@@ -29,11 +29,9 @@ class WebhookAdd(LoggedInHandler):
         if not url or not name:
             return self.redirect('/webhooks/add?error=1')
 
-        # Secret may be none - but we'll generate a secret for the user
-        secret = self.request.get('secret', None)
-        if not secret:
-            import uuid
-            secret = uuid.uuid4().hex
+        # Always generate secret server-side; previously allowed clients to set the secret
+        import uuid
+        secret = uuid.uuid4().hex
 
         current_user_account_id = self.user_bundle.account.key.id()
         query = MobileClient.query(MobileClient.messaging_id == url, ancestor=ndb.Key(Account, current_user_account_id))
