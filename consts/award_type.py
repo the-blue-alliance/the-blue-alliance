@@ -33,7 +33,7 @@ class AwardType(object):
     JUDGES = 13
     HIGHEST_ROOKIE_SEED = 14
     ROOKIE_INSPIRATION = 15
-    INDUSTRIAL_DEESIGN = 16
+    INDUSTRIAL_DESIGN = 16
     QUALITY = 17
     SAFETY = 18
     SPORTSMANSHIP = 19
@@ -132,7 +132,7 @@ class AwardType(object):
         GRACIOUS_PROFESSIONALISM: 'Gracious Professionalism',
         HIGHEST_ROOKIE_SEED: 'Highest Rookie Seed',
         IMAGERY: 'Imagery',
-        INDUSTRIAL_DEESIGN: 'Industrial Design',
+        INDUSTRIAL_DESIGN: 'Industrial Design',
         SAFETY: 'Safety',
         INNOVATION_IN_CONTROL: 'Innovation in Control',
         QUALITY: 'Quality',
