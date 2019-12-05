@@ -3,17 +3,13 @@ import logging
 import random
 import tba_config
 import time
-import urllib
-import uuid
 import webapp2
 
-from google.appengine.api import urlfetch
 from google.appengine.ext import deferred
 
 from controllers.base_controller import CacheableHandler
 from helpers.validation_helper import ValidationHelper
 from models.api_auth_access import ApiAuthAccess
-from models.sitevar import Sitevar
 from stackdriver.profiler import TraceContext
 
 
@@ -23,16 +19,19 @@ def track_call(api_action, api_label, auth_owner, request_time):
     For more information about GAnalytics Protocol Parameters, visit
     https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
     """
-    analytics_id = Sitevar.get_by_id("google_analytics.id")
-    if analytics_id is None:
+    from sitevars.google_analytics_id import GoogleAnalyticsID
+    google_analytics_id = GoogleAnalyticsID.google_analytics_id()
+    if not google_analytics_id:
         logging.warning("Missing sitevar: google_analytics.id. Can't track API usage.")
     else:
-        GOOGLE_ANALYTICS_ID = analytics_id.contents['GOOGLE_ANALYTICS_ID']
+        import uuid
         cid = uuid.uuid3(uuid.NAMESPACE_X500, str(auth_owner))
+
+        from urllib import urlencode
         payloads = [
-            urllib.urlencode({
+            urlencode({
                 'v': 1,
-                'tid': GOOGLE_ANALYTICS_ID,
+                'tid': google_analytics_id,
                 'cid': cid,
                 't': 'event',
                 'ec': 'api-v03',
@@ -42,18 +41,20 @@ def track_call(api_action, api_label, auth_owner, request_time):
                 'ni': 1,
                 'sc': 'end',  # forces tracking session to end
             }),
-#             urllib.urlencode({
-#                 'v': 1,
-#                 'tid': GOOGLE_ANALYTICS_ID,
-#                 'cid': cid,
-#                 't': 'timing',
-#                 'utc': 'api-v03',
-#                 'utv': api_action,
-#                 'utt': request_time,
-#             }),
+            # urlencode({
+            #     'v': 1,
+            #     'tid': google_analytics_id,
+            #     'cid': cid,
+            #     't': 'timing',
+            #     'utc': 'api-v03',
+            #     'utv': api_action,
+            #     'utt': request_time,
+            # }),
         ]
 
         payload = '\n'.join(payloads)
+
+        from google.appengine.api import urlfetch
         urlfetch.fetch(
             url='https://www.google-analytics.com/batch',
             validate_certificate=True,

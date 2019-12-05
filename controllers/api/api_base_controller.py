@@ -4,11 +4,8 @@ import logging
 import md5
 import random
 import tba_config
-import urllib
-import uuid
 import webapp2
 
-from google.appengine.api import urlfetch
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 
@@ -31,15 +28,19 @@ def track_call(api_action, api_label, x_tba_app_id):
     For more information about GAnalytics Protocol Parameters, visit
     https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
     """
-    analytics_id = Sitevar.get_by_id("google_analytics.id")
-    if analytics_id is None:
+    from sitevars.google_analytics_id import GoogleAnalyticsID
+    google_analytics_id = GoogleAnalyticsID.google_analytics_id()
+    if not google_analytics_id:
         logging.warning("Missing sitevar: google_analytics.id. Can't track API usage.")
     else:
-        GOOGLE_ANALYTICS_ID = analytics_id.contents['GOOGLE_ANALYTICS_ID']
-        payload = urllib.urlencode({
+        import uuid
+        cid = uuid.uuid3(uuid.NAMESPACE_X500, str(x_tba_app_id))
+
+        from urllib import urlencode
+        payload = urlencode({
             'v': 1,
-            'tid': GOOGLE_ANALYTICS_ID,
-            'cid': uuid.uuid3(uuid.NAMESPACE_X500, str(x_tba_app_id)),
+            'tid': google_analytics_id,
+            'cid': cid,
             't': 'event',
             'ec': 'api-v02',
             'ea': api_action,
@@ -49,6 +50,7 @@ def track_call(api_action, api_label, x_tba_app_id):
             'sc': 'end',  # forces tracking session to end
         })
 
+        from google.appengine.api import urlfetch
         urlfetch.fetch(
             url='https://www.google-analytics.com/collect',
             validate_certificate=True,

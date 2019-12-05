@@ -1,11 +1,9 @@
 import logging
 import random
 import tba_config
-import uuid
 
 from google.appengine.ext import deferred
 from google.appengine.api import memcache
-from google.appengine.api import urlfetch
 
 from consts.client_type import ClientType
 from consts.notification_type import NotificationType
@@ -136,16 +134,19 @@ class BaseNotification(object):
         For more information about GAnalytics Protocol Parameters, visit
         https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
         """
-        import urllib
-        analytics_id = Sitevar.get_by_id("google_analytics.id")
-        if analytics_id is None:
+        from sitevars.google_analytics_id import GoogleAnalyticsID
+        google_analytics_id = GoogleAnalyticsID.google_analytics_id()
+        if not google_analytics_id:
             logging.warning("Missing sitevar: google_analytics.id. Can't track API usage.")
         else:
-            GOOGLE_ANALYTICS_ID = analytics_id.contents['GOOGLE_ANALYTICS_ID']
-            params = urllib.urlencode({
+            import uuid
+            cid = uuid.uuid3(uuid.NAMESPACE_X500, str('tba-notification-tracking'))
+
+            from urllib import urlencode
+            params = urlencode({
                 'v': 1,
-                'tid': GOOGLE_ANALYTICS_ID,
-                'cid': uuid.uuid3(uuid.NAMESPACE_X500, str('tba-notification-tracking')),
+                'tid': google_analytics_id,
+                'cid': cid,
                 't': 'event',
                 'ec': 'notification',
                 'ea': NotificationType.type_names[notification_type_enum],
@@ -154,6 +155,7 @@ class BaseNotification(object):
                 'sc': 'end',  # forces tracking session to end
             })
 
+            from google.appengine.api import urlfetch
             analytics_url = 'http://www.google-analytics.com/collect?%s' % params
             urlfetch.fetch(
                 url=analytics_url,
