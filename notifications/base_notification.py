@@ -10,7 +10,7 @@ from google.appengine.api import urlfetch
 from consts.client_type import ClientType
 from consts.notification_type import NotificationType
 from helpers.notification_sender import NotificationSender
-from models.sitevar import Sitevar
+from sitevars.notifications_enable import NotificationsEnable
 
 
 class BaseNotification(object):
@@ -88,8 +88,7 @@ class BaseNotification(object):
                 NotificationSender.send_webhook(notification, self.keys[ClientType.WEBHOOK])
 
     def check_enabled(self):
-        var = Sitevar.get_by_id('notifications.enable')
-        return var is None or var.values_json == "true"
+        return NotificationsEnable.notifications_enabled()
 
     """
     Subclasses should override this method and return a dict containing the payload of the notification.

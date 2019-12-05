@@ -27,10 +27,11 @@ from models.api_auth_access import ApiAuthAccess
 from models.event import Event
 from models.favorite import Favorite
 from models.match import Match
-from models.sitevar import Sitevar
 from models.subscription import Subscription
 from models.suggestion import Suggestion
 from models.team import Team
+
+from sitevars.notifications_enable import NotificationsEnable
 
 from template_engine import jinja2_engine
 
@@ -41,8 +42,8 @@ class AccountOverview(LoggedInHandler):
     def get(self):
         self._require_registration()
 
-        push_sitevar = Sitevar.get_by_id('notifications.enable')
-        if push_sitevar is None or not push_sitevar.values_json == "true":
+        notifications_enabled = NotificationsEnable.notifications_enabled()
+        if not notifications_enabled:
             ping_enabled = "disabled"
         else:
             ping_enabled = ""
