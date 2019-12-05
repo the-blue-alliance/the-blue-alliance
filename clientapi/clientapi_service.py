@@ -232,7 +232,7 @@ class ClientAPI(remote.Service):
                 code += 304
             else:
                 output['subscription'] = {"code":    500,
-                                          "message": "Unknown error adding favorite"}
+                                          "message": "Unknown error adding subscription"}
                 code += 500
         else:
             result = MyTBAHelper.remove_subscription(user_id, model_key, model_type, request.device_key)
