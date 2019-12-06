@@ -31,7 +31,7 @@ class NotificationSender(object):
             ch.update(payload)
             checksum = ch.hexdigest()
 
-            mac = hmac.new(secret, payload, hashlib.sha256).hexdigest()
+            mac = hmac.new(str(secret), str(payload), hashlib.sha256).hexdigest()
 
             request = urllib2.Request(url, payload)
             request.add_header("Content-Type", 'application/json; charset="utf-8"')
