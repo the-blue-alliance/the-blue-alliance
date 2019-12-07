@@ -1,5 +1,10 @@
-from datetime import datetime, timedelta, tzinfo
+from calendar import monthrange
+from datetime import datetime, timedelta, tzinfo, date
+from google.appengine.ext import ndb
 from pytz import timezone, UTC
+
+from consts.event_type import EventType
+from models.event import Event
 
 
 EST = timezone('EST')
@@ -7,6 +12,32 @@ EST = timezone('EST')
 
 class SeasonHelper:
     """ General season-information helper methods """
+
+    @staticmethod
+    def effective_season_year(date=datetime.now()):
+        """
+        Given a date, find the "effective season" year for the date. If all official events have been played, it's
+        effectively next season.
+        """
+        effective_season_year = date.year
+        last_event_end_date = None
+
+        last_event_list = Event.query(
+            Event.year==int(date.year),
+            Event.event_type_enum.IN(EventType.SEASON_EVENT_TYPES)
+        ).order(-Event.end_date).fetch(1, projection=[Event.end_date])
+        if last_event_list:
+            last_event = last_event_list[0]
+            last_event_end_date = last_event.end_date
+
+        if last_event_end_date is None:
+            # No events for year - assume current year is effective season year
+            return effective_season_year
+
+        if date > last_event_end_date:
+            # All events for current season have been played - effective season is next year
+            return effective_season_year + 1
+        return effective_season_year
 
     @staticmethod
     def is_kickoff_at_least_one_day_away(date=datetime.now(UTC), year=datetime.now().year):

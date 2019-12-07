@@ -1,12 +1,95 @@
-from mock import patch
-import unittest2
 from datetime import datetime, timedelta
 from pytz import timezone, UTC
+import unittest2
 
+from google.appengine.ext import ndb
+from google.appengine.ext import testbed
+
+from consts.event_type import EventType
 from helpers.season_helper import SeasonHelper
+from models.event import Event
 
 
 class TestSeasonHelper(unittest2.TestCase):
+
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def test_effective_season_year_no_events(self):
+        now = datetime.now()
+        self.assertEqual(SeasonHelper.effective_season_year(), now.year)
+
+    def test_effective_season_year_this_year(self):
+        # Effective season should be this year
+        today = datetime.today()
+        Event(
+            id="{}testendstomorrow".format(today.year),
+            end_date=today + timedelta(days=1),
+            event_short="testendstomorrow",
+            event_type_enum=EventType.REGIONAL,
+            first_eid="5561",
+            name="Test Event (Ends Tomorrow)",
+            start_date=today,
+            year=today.year,
+            venue_address="123 Fake Street, Anytown, MI, USA",
+            website="http://www.google.com"
+        ).put()
+        self.assertEqual(SeasonHelper.effective_season_year(), today.year)
+
+    def test_effective_season_year_next_year(self):
+        # Effective season should be next year
+        today = datetime.today()
+        Event(
+            id="{}testended".format(today.year),
+            end_date=today - timedelta(days=1),
+            event_short="testended",
+            event_type_enum=EventType.REGIONAL,
+            first_eid="5561",
+            name="Test Event (Ends Tomorrow)",
+            start_date=today - timedelta(days=2),
+            year=today.year,
+            venue_address="123 Fake Street, Anytown, MI, USA",
+            website="http://www.google.com"
+        ).put()
+        self.assertEqual(SeasonHelper.effective_season_year(), today.year + 1)
+
+    def test_effective_season_year_next_year_ignore_non_official(self):
+        # Effective season should be next year
+        today = datetime.today()
+        # Insert an event that has already happened - otherwise we'll default to the current season
+        # This is to simulate offseason
+        Event(
+            id="{}testended".format(today.year),
+            end_date=today - timedelta(days=1),
+            event_short="testended",
+            event_type_enum=EventType.REGIONAL,
+            first_eid="5561",
+            name="Test Event (Ends Tomorrow)",
+            start_date=today - timedelta(days=2),
+            year=today.year,
+            venue_address="123 Fake Street, Anytown, MI, USA",
+            website="http://www.google.com"
+        ).put()
+        Event(
+            id="{}testendstomorrow".format(today.year),
+            end_date=today + timedelta(days=1),
+            event_short="testendstomorrow",
+            event_type_enum=EventType.OFFSEASON,
+            first_eid="5561",
+            name="Test Event (Ends Tomorrow)",
+            start_date=today,
+            year=today.year,
+            venue_address="123 Fake Street, Anytown, MI, USA",
+            website="http://www.google.com"
+        ).put()
+        self.assertEqual(SeasonHelper.effective_season_year(), today.year + 1)
 
     def test_is_kickoff_at_least_one_day_away(self):
         a = datetime(2020, 1, 3, 14, 30, 00, tzinfo=UTC)  # False - over one day
