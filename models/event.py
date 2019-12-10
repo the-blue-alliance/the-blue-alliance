@@ -254,12 +254,7 @@ class Event(ndb.Model):
 
         if self._week is None and week_start is not None:
             days = (self.start_date - week_start).days
-            week = days / 7
-            # In 2020 there's an empty week in between Week 8 and Week 9 - mathmatically it's Week 10, but we treat it
-            # as Week 9 - we should make sure we take that in to account. We look for > 7 because weeks are zero-indexed
-            if self.year == 2020 and week > 7:
-                week -= 1
-            self._week = week
+            self._week = days / 7
 
         return self._week
 
