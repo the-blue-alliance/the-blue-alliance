@@ -128,7 +128,7 @@ class MainKickoffHandler(CacheableHandler):
 
         self.template_values.update({
             'events': EventHelper.getWeekEvents(),
-            'is_kickoff': SeasonHelper.is_kickoff_at_least_one_day_away(),
+            'is_kickoff': SeasonHelper.is_kickoff_at_least_one_day_away(year=effective_season_year),
             'kickoff_datetime_est': SeasonHelper.kickoff_datetime_est(effective_season_year),
             'kickoff_datetime_utc': SeasonHelper.kickoff_datetime_utc(effective_season_year),
             "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
