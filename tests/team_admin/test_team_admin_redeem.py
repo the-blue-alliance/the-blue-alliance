@@ -58,12 +58,15 @@ class TestTeamAdminRedeem(unittest2.TestCase):
         self.account = Account.get_or_insert(
             "123", email="user@example.com", registered=True)
 
-    def addTeamAdminAccess(self, account, team_number=1124):
+    def addTeamAdminAccess(self, account, team_number=1124,
+                           year=None, access_code="abc123"):
+        if not year:
+            year = self.now.year
         access = TeamAdminAccess(
-            id="test_access",
-            access_code="abc123",
+            id="test_access_{}".format(year),
+            access_code=access_code,
             team_number=team_number,
-            year=self.now.year,
+            year=year,
             expiration=self.now + datetime.timedelta(days=1),
             account=account,
         )
@@ -82,16 +85,6 @@ class TestTeamAdminRedeem(unittest2.TestCase):
         response = response.follow(expect_errors=True)
         self.assertTrue(
             response.request.path.startswith("/account/login_required"))
-
-    def test_cant_redeem_with_code_linked(self):
-        self.loginUser()
-        access_key = self.addTeamAdminAccess(account=self.account.key)
-        response = self.testapp.get('/mod/redeem')
-        self.assertEqual(response.status_int, 200)
-
-        # If there's an existing code linked, the form shouldn't render
-        form = response.forms.get('redeem', None)
-        self.assertIsNone(form)
 
     def test_redeem_bad_code(self):
         self.loginUser()
@@ -172,17 +165,19 @@ class TestTeamAdminRedeem(unittest2.TestCase):
 
         self.assertEqual(response.request.GET['status'], 'code_used')
 
-    def test_redeem_code_existing_link(self):
+    def test_redeem_code_after_redeeming_last_year(self):
         self.loginUser()
-        access_key = self.addTeamAdminAccess(account=None)
+        access_key = self.addTeamAdminAccess(account=None, year=self.now.year)
+        last_year_access_key = self.addTeamAdminAccess(
+            account=self.account.key,
+            year=self.now.year - 1,
+            access_code="abc123_old")
 
         form = self.getForm()
         form['auth_code'] = 'abc123'
-
-        access = access_key.get()
-        access.account = self.account.key
-        access.put()
-
+        form['team_number'] = '1124'
         response = form.submit().follow()
 
-        self.assertEqual(response.request.GET['status'], 'already_linked')
+        access = access_key.get()
+        self.assertEqual(response.request.GET['status'], 'success')
+        self.assertEqual(self.account.key, access.account)
