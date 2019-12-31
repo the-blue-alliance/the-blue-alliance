@@ -212,12 +212,6 @@ class TeamAdminRedeem(LoggedInHandler):
         self._require_registration()
         user = self.user_bundle.account.key
 
-        existing_access = TeamAdminAccess.query(
-            TeamAdminAccess.account == user).count(1)
-        if existing_access > 0:
-            self.redirect('/mod/redeem?status=already_linked')
-            return
-
         team_number = self.request.get("team_number")
         if not team_number or not team_number.isdigit():
             self.redirect('/mod/redeem?status=invalid_code')

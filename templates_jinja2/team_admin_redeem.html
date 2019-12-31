@@ -12,10 +12,6 @@
   <div class="alert alert-danger">
     Invalid auth code!
   </div>
-{% elif status == "alread_linked" %}
-  <div class="alert alert-danger">
-    This account is already linked to a team!
-  </div>
 {% elif status == "code_used" %}
   <div class="alert alert-danger">
     This access code has already been used!
@@ -34,23 +30,22 @@
     {% endfor %}
   </ul>
   <a class="btn btn-primary" href="/mod"><span class="glyphicon glyphicon-eye-open"></span> View Team Admin Dashboard</a>
-{% else %}
-  <p>Redeem an access code to administer your team's media on The Blue Alliance. Having administrative access allows you to manage media linked to your team's TBA profile as well as accept or reject suggestions for additional media links.</p>
-
-  <p>Only one account can be linked per team and the administration access will expire at the end of the competition season. For additional support, please <a href="/contact">contact us</a>.</p>
-  <form class="form-inline" acount="/mod/redeem" method="post" id="redeem">
-    <legend>Redeem</legend>
-    <div class="input-group">
-      <span class="input-group-addon">Team Number: </span>
-      <input class="form-control" size="16" name="team_number">
-    </div>
-    <div class="input-group">
-      <span class="input-group-addon">Admin Code: </span>
-      <input class="form-control" size="16" name="auth_code">
-    </div>
-    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-link"></span> Link</button>
-  </form>
 {% endif %}
+<p>Redeem an access code to administer your team's media on The Blue Alliance. Having administrative access allows you to manage media linked to your team's TBA profile as well as accept or reject suggestions for additional media links.</p>
+
+<p>Only one account can be linked per team for each year and the administration access will expire at the end of the competition season. For additional support, please <a href="/contact">contact us</a>.</p>
+<form class="form-inline" acount="/mod/redeem" method="post" id="redeem">
+  <legend>Redeem</legend>
+  <div class="input-group">
+    <span class="input-group-addon">Team Number: </span>
+    <input class="form-control" size="16" name="team_number">
+  </div>
+  <div class="input-group">
+    <span class="input-group-addon">Admin Code: </span>
+    <input class="form-control" size="16" name="auth_code">
+  </div>
+  <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-link"></span> Link</button>
+</form>
 
 </div>
 {% endblock %}
