@@ -33,7 +33,7 @@
         <div class="form-group">
           <label for="input-own-alliance">with team(s)</label>
           <div class="input-group">
-            <input class="form-control" id="input-own-alliance" name="own_alliance" placeholder="2521" value="{{own_alliance}}"></input>
+            <input class="form-control" id="input-own-alliance" name="own_alliance" placeholder="179" value="{{own_alliance}}"></input>
             <div class="input-group-addon">on one alliance</div>
           </div>
         </div>
@@ -41,7 +41,7 @@
         <div class="form-group">
           <label for="input-opp-alliance">and team(s)</label>
           <div class="input-group">
-            <input class="form-control" id="input-opp-alliance" name="opp_alliance" placeholder="118, 254" value="{{opp_alliance}}"></input>
+            <input class="form-control" id="input-opp-alliance" name="opp_alliance" placeholder="1323, 2521" value="{{opp_alliance}}"></input>
             <div class="input-group-addon">on other alliance</div>
           </div>
         </div>
@@ -49,7 +49,7 @@
         <div class="form-group">
           <label for="input-event-key">at event</label>
           <div class="input-group">
-            <input class="form-control" id="input-event-key" name="event_key" placeholder="2017orwil" value="{{event_key}}"></input>
+            <input class="form-control" id="input-event-key" name="event_key" placeholder="2018roe" value="{{event_key}}"></input>
             <div class="input-group-addon">during season</div>
           </div>
         </div>
@@ -132,7 +132,7 @@
               {% for match in result_models %}
                 <tr>
                   <td>
-                    <a href="/event/{{match.event_model.key_name}}" title="{{match.event_model.short_name}}">{{match.event_model.short_name}}</a>
+                    <a href="/event/{{match.event_model.key_name}}" title="{{match.event_model.name}}">{{match.event_model.key_name}}</a>
                   </td>
                   <td>
                     <a href="/match/{{match.match_key}}" title="{{match.verbose_name}}">{{match.verbose_name}}</a>

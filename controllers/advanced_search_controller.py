@@ -261,11 +261,7 @@ class AdvancedMatchSearchController(CacheableHandler):
         self._event_key = self.request.get('event_key')
         self._comp_levels = self.request.get_all('comp_level')
 
-        self._video = self.request.get('video')
-        if self._video:
-            self._video = True
-        else:
-            self._video = False
+        self._video = True if self.request.get('video') else False
 
         self._page = self.request.get('page', 0)
         if not self._page or not self._page.isdigit():
@@ -285,7 +281,7 @@ class AdvancedMatchSearchController(CacheableHandler):
         super(AdvancedMatchSearchController, self).get()
 
     def _render(self):
-        new_search = not self._year
+        new_search = len(self._own_alliance) == 0
         if new_search:
             match_results = []
             num_results = 0
@@ -307,10 +303,10 @@ class AdvancedMatchSearchController(CacheableHandler):
             if len(search_1) > 0:
                 partial_queries.append(ndb.OR(ndb.AND(*search_1), ndb.AND(*search_2)))
 
-            if self._year is not None:
+            if self._year > 0:
                 partial_queries.append(Match.year == self._year)
 
-            if self._event_key is not None:
+            if self._event_key:
                 partial_queries.append(Match.event == ndb.Key('Event', self._event_key))
 
             if len(self._comp_levels) > 0:

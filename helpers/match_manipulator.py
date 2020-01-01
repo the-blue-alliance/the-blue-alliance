@@ -26,6 +26,15 @@ class MatchManipulator(ManipulatorBase):
         '''
         for match in matches:
             try:
+                taskqueue.add(
+                    queue_name='search-index-update',
+                    url='/tasks/do/update_match_search_index/{}'.format(match.key_name),
+                    method='GET')
+            except Exception:
+                logging.error("Error enqueuing update_match_search_index for {}".format(match.key_name))
+                logging.error(traceback.format_exc())
+
+            try:
                 FirebasePusher.delete_match(match)
             except Exception:
                 logging.warning("Firebase delete_match failed!")
@@ -84,6 +93,16 @@ class MatchManipulator(ManipulatorBase):
             # Only attrs that affect stats
             if is_new or set(['alliances_json', 'score_breakdown_json']).intersection(set(updated_attrs)) != set():
                 affected_stats_event_keys.add(match.event.id())
+
+            try:
+                taskqueue.add(
+                    queue_name='search-index-update',
+                    url='/tasks/do/update_match_search_index/{}'.format(match.key_name),
+                    method='GET')
+            except Exception:
+                logging.error("Error enqueuing update_match_search_index for {}".format(match.key_name))
+                logging.error(traceback.format_exc())
+
             try:
                 FirebasePusher.update_match(match, updated_attrs)
             except Exception:

@@ -110,6 +110,14 @@ indexes:
 
 - kind: Match
   properties:
+  - name: blue_alliance_team
+  - name: event
+  - name: red_alliance_team
+  - name: year
+  - name: play_order_sort
+
+- kind: Match
+  properties:
   - name: event
   - name: comp_level
   - name: match_number
