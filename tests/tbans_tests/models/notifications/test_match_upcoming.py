@@ -114,8 +114,8 @@ class TestMatchUpcomingNotification(unittest2.TestCase):
         # No `event_name`
         payload = self.notification.data_payload
         self.assertEqual(len(payload), 6)
-        self.assertEqual(payload['event_key'], '2019testpresent')
-        self.assertEqual(payload['match_key'], '2019testpresent_qm1')
+        self.assertEqual(payload['event_key'], '2020testpresent')
+        self.assertEqual(payload['match_key'], '2020testpresent_qm1')
         self.assertIsNotNone(payload['team_keys'])
         self.assertIsNotNone(payload['scheduled_time'])
         self.assertIsNotNone(payload['predicted_time'])
@@ -125,8 +125,8 @@ class TestMatchUpcomingNotification(unittest2.TestCase):
         # No `event_name`
         payload = self.notification.data_payload
         self.assertEqual(len(payload), 6)
-        self.assertEqual(payload['event_key'], '2019testpresent')
-        self.assertEqual(payload['match_key'], '2019testpresent_qm1')
+        self.assertEqual(payload['event_key'], '2020testpresent')
+        self.assertEqual(payload['match_key'], '2020testpresent_qm1')
         self.assertIsNotNone(payload['team_keys'])
         self.assertIsNone(payload['predicted_time'])
         self.assertIsNotNone(payload['scheduled_time'])
@@ -139,8 +139,8 @@ class TestMatchUpcomingNotification(unittest2.TestCase):
         # No `event_name`
         payload = self.notification.data_payload
         self.assertEqual(len(payload), 6)
-        self.assertEqual(payload['event_key'], '2019testpresent')
-        self.assertEqual(payload['match_key'], '2019testpresent_qm1')
+        self.assertEqual(payload['event_key'], '2020testpresent')
+        self.assertEqual(payload['match_key'], '2020testpresent_qm1')
         self.assertIsNotNone(payload['team_keys'])
         self.assertIsNone(payload['scheduled_time'])
         self.assertIsNotNone(payload['predicted_time'])
@@ -152,8 +152,8 @@ class TestMatchUpcomingNotification(unittest2.TestCase):
         # No `event_name`
         payload = self.notification.data_payload
         self.assertEqual(len(payload), 6)
-        self.assertEqual(payload['event_key'], '2019testpresent')
-        self.assertEqual(payload['match_key'], '2019testpresent_qm1')
+        self.assertEqual(payload['event_key'], '2020testpresent')
+        self.assertEqual(payload['match_key'], '2020testpresent_qm1')
         self.assertIsNotNone(payload['team_keys'])
         self.assertIsNone(payload['scheduled_time'])
         self.assertIsNone(payload['predicted_time'])
@@ -167,8 +167,8 @@ class TestMatchUpcomingNotification(unittest2.TestCase):
         # No `event_name`
         payload = self.notification.data_payload
         self.assertEqual(len(payload), 6)
-        self.assertEqual(payload['event_key'], '2019testpresent')
-        self.assertEqual(payload['match_key'], '2019testpresent_qm1')
+        self.assertEqual(payload['event_key'], '2020testpresent')
+        self.assertEqual(payload['match_key'], '2020testpresent_qm1')
         self.assertIsNotNone(payload['team_keys'])
         self.assertIsNotNone(payload['scheduled_time'])
         self.assertIsNotNone(payload['predicted_time'])
@@ -180,8 +180,8 @@ class TestMatchUpcomingNotification(unittest2.TestCase):
         # No `event_name`
         payload = self.notification.data_payload
         self.assertEqual(len(payload), 6)
-        self.assertEqual(payload['event_key'], '2019testpresent')
-        self.assertEqual(payload['match_key'], '2019testpresent_qm1')
+        self.assertEqual(payload['event_key'], '2020testpresent')
+        self.assertEqual(payload['match_key'], '2020testpresent_qm1')
         self.assertIsNotNone(payload['team_keys'])
         self.assertIsNone(payload['predicted_time'])
         self.assertIsNotNone(payload['scheduled_time'])
@@ -195,8 +195,8 @@ class TestMatchUpcomingNotification(unittest2.TestCase):
         # No `event_name`
         payload = self.notification.data_payload
         self.assertEqual(len(payload), 6)
-        self.assertEqual(payload['event_key'], '2019testpresent')
-        self.assertEqual(payload['match_key'], '2019testpresent_qm1')
+        self.assertEqual(payload['event_key'], '2020testpresent')
+        self.assertEqual(payload['match_key'], '2020testpresent_qm1')
         self.assertIsNotNone(payload['team_keys'])
         self.assertIsNone(payload['scheduled_time'])
         self.assertIsNotNone(payload['predicted_time'])
@@ -209,8 +209,8 @@ class TestMatchUpcomingNotification(unittest2.TestCase):
         # No `event_name`
         payload = self.notification.data_payload
         self.assertEqual(len(payload), 6)
-        self.assertEqual(payload['event_key'], '2019testpresent')
-        self.assertEqual(payload['match_key'], '2019testpresent_qm1')
+        self.assertEqual(payload['event_key'], '2020testpresent')
+        self.assertEqual(payload['match_key'], '2020testpresent_qm1')
         self.assertIsNotNone(payload['team_keys'])
         self.assertIsNone(payload['scheduled_time'])
         self.assertIsNone(payload['predicted_time'])
@@ -223,9 +223,9 @@ class TestMatchUpcomingNotification(unittest2.TestCase):
         # Has `event_name`
         payload = self.notification.webhook_message_data
         self.assertEqual(len(payload), 7)
-        self.assertEqual(payload['event_key'], '2019testpresent')
+        self.assertEqual(payload['event_key'], '2020testpresent')
         self.assertEqual(payload['event_name'], 'Present Test Event')
-        self.assertEqual(payload['match_key'], '2019testpresent_qm1')
+        self.assertEqual(payload['match_key'], '2020testpresent_qm1')
         self.assertIsNotNone(payload['team_keys'])
         self.assertIsNotNone(payload['scheduled_time'])
         self.assertIsNotNone(payload['predicted_time'])
@@ -235,9 +235,9 @@ class TestMatchUpcomingNotification(unittest2.TestCase):
         # Has `event_name`
         payload = self.notification.webhook_message_data
         self.assertEqual(len(payload), 7)
-        self.assertEqual(payload['event_key'], '2019testpresent')
+        self.assertEqual(payload['event_key'], '2020testpresent')
         self.assertEqual(payload['event_name'], 'Present Test Event')
-        self.assertEqual(payload['match_key'], '2019testpresent_qm1')
+        self.assertEqual(payload['match_key'], '2020testpresent_qm1')
         self.assertIsNotNone(payload['team_keys'])
         self.assertIsNone(payload['predicted_time'])
         self.assertIsNotNone(payload['scheduled_time'])
@@ -250,9 +250,9 @@ class TestMatchUpcomingNotification(unittest2.TestCase):
         # Has `event_name`
         payload = self.notification.webhook_message_data
         self.assertEqual(len(payload), 7)
-        self.assertEqual(payload['event_key'], '2019testpresent')
+        self.assertEqual(payload['event_key'], '2020testpresent')
         self.assertEqual(payload['event_name'], 'Present Test Event')
-        self.assertEqual(payload['match_key'], '2019testpresent_qm1')
+        self.assertEqual(payload['match_key'], '2020testpresent_qm1')
         self.assertIsNotNone(payload['team_keys'])
         self.assertIsNone(payload['scheduled_time'])
         self.assertIsNotNone(payload['predicted_time'])
@@ -264,9 +264,9 @@ class TestMatchUpcomingNotification(unittest2.TestCase):
         # Has `event_name`
         payload = self.notification.webhook_message_data
         self.assertEqual(len(payload), 7)
-        self.assertEqual(payload['event_key'], '2019testpresent')
+        self.assertEqual(payload['event_key'], '2020testpresent')
         self.assertEqual(payload['event_name'], 'Present Test Event')
-        self.assertEqual(payload['match_key'], '2019testpresent_qm1')
+        self.assertEqual(payload['match_key'], '2020testpresent_qm1')
         self.assertIsNotNone(payload['team_keys'])
         self.assertIsNone(payload['scheduled_time'])
         self.assertIsNone(payload['predicted_time'])
@@ -280,9 +280,9 @@ class TestMatchUpcomingNotification(unittest2.TestCase):
         # Has `event_name`
         payload = self.notification.webhook_message_data
         self.assertEqual(len(payload), 7)
-        self.assertEqual(payload['event_key'], '2019testpresent')
+        self.assertEqual(payload['event_key'], '2020testpresent')
         self.assertEqual(payload['event_name'], 'Present Test Event')
-        self.assertEqual(payload['match_key'], '2019testpresent_qm1')
+        self.assertEqual(payload['match_key'], '2020testpresent_qm1')
         self.assertIsNotNone(payload['team_keys'])
         self.assertIsNotNone(payload['scheduled_time'])
         self.assertIsNotNone(payload['predicted_time'])
@@ -294,9 +294,9 @@ class TestMatchUpcomingNotification(unittest2.TestCase):
         # Has `event_name`
         payload = self.notification.webhook_message_data
         self.assertEqual(len(payload), 7)
-        self.assertEqual(payload['event_key'], '2019testpresent')
+        self.assertEqual(payload['event_key'], '2020testpresent')
         self.assertEqual(payload['event_name'], 'Present Test Event')
-        self.assertEqual(payload['match_key'], '2019testpresent_qm1')
+        self.assertEqual(payload['match_key'], '2020testpresent_qm1')
         self.assertIsNotNone(payload['team_keys'])
         self.assertIsNone(payload['predicted_time'])
         self.assertIsNotNone(payload['scheduled_time'])
@@ -310,9 +310,9 @@ class TestMatchUpcomingNotification(unittest2.TestCase):
         # Has `event_name`
         payload = self.notification.webhook_message_data
         self.assertEqual(len(payload), 7)
-        self.assertEqual(payload['event_key'], '2019testpresent')
+        self.assertEqual(payload['event_key'], '2020testpresent')
         self.assertEqual(payload['event_name'], 'Present Test Event')
-        self.assertEqual(payload['match_key'], '2019testpresent_qm1')
+        self.assertEqual(payload['match_key'], '2020testpresent_qm1')
         self.assertIsNotNone(payload['team_keys'])
         self.assertIsNone(payload['scheduled_time'])
         self.assertIsNotNone(payload['predicted_time'])
@@ -325,9 +325,9 @@ class TestMatchUpcomingNotification(unittest2.TestCase):
         # Has `event_name`
         payload = self.notification.webhook_message_data
         self.assertEqual(len(payload), 7)
-        self.assertEqual(payload['event_key'], '2019testpresent')
+        self.assertEqual(payload['event_key'], '2020testpresent')
         self.assertEqual(payload['event_name'], 'Present Test Event')
-        self.assertEqual(payload['match_key'], '2019testpresent_qm1')
+        self.assertEqual(payload['match_key'], '2020testpresent_qm1')
         self.assertIsNotNone(payload['team_keys'])
         self.assertIsNone(payload['scheduled_time'])
         self.assertIsNone(payload['predicted_time'])

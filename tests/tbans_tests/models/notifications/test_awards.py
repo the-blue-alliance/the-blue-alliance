@@ -54,13 +54,13 @@ class TestAwardsNotification(unittest2.TestCase):
         # No `event_name`
         payload = self.notification.data_payload
         self.assertEqual(len(payload), 2)
-        self.assertEqual(payload['event_key'], '2019testpresent')
+        self.assertEqual(payload['event_key'], '2020testpresent')
         self.assertIsNotNone(payload['awards'])
 
     def test_webhook_message_data(self):
         # Has `event_name`
         payload = self.notification.webhook_message_data
         self.assertEqual(len(payload), 3)
-        self.assertEqual(payload['event_key'], '2019testpresent')
+        self.assertEqual(payload['event_key'], '2020testpresent')
         self.assertEqual(payload['event_name'], 'Present Test Event')
         self.assertIsNotNone(payload['awards'])
