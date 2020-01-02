@@ -31,11 +31,11 @@ class TestEventScheduleNotification(unittest2.TestCase):
             Team(id="frc%s" % team_number,
                  team_number=team_number).put()
 
-        self.event = EventTestCreator.createPresentEvent()
+        self.event = EventTestCreator.createPresentEvent(id="2020testpresent")
         self.notification = EventScheduleNotification(self.event)
 
     def test_init(self):
-        just_event = EventTestCreator.createPresentEvent(only_event=True)
+        just_event = EventTestCreator.createPresentEvent(id="2020testpresent", only_event=True)
         just_event_notification = EventScheduleNotification(just_event)
         self.assertEqual(just_event_notification.event, just_event)
         self.assertIsNone(just_event_notification.next_match)

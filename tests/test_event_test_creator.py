@@ -36,3 +36,16 @@ class TestEventTeamCreator(unittest2.TestCase):
         self.events.append(EventTestCreator.createPresentEvent())
 
         # TODO: assert the events got created properly -gregmarra 20130416
+
+    def test_with_id(self):
+        event = EventTestCreator.createPastEvent(id="2017testevent", only_event=True)
+        self.assertEqual(event.key.id(), "2017testevent")
+        self.assertEqual(event.name, "Past Test Event")
+
+        event = EventTestCreator.createFutureEvent(id="2099testevent", only_event=True)
+        self.assertEqual(event.key.id(), "2099testevent")
+        self.assertEqual(event.name, "Future Test Event")
+
+        event = EventTestCreator.createPresentEvent(id="2020testevent", only_event=True)
+        self.assertEqual(event.key.id(), "2020testevent")
+        self.assertEqual(event.name, "Present Test Event")

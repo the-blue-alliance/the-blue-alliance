@@ -9,9 +9,10 @@ from models.event import Event
 
 class EventTestCreator(object):
     @classmethod
-    def createFutureEvent(self, only_event=False):
+    def createFutureEvent(self, id=None, only_event=False):
+        id_string = "{}testfuture".format(datetime.datetime.now().year)
         event = Event(
-            id="{}testfuture".format(datetime.datetime.now().year),
+            id=id if id is not None else id_string,
             end_date=datetime.datetime.today() + datetime.timedelta(days=12),
             event_short="testfuture",
             event_type_enum=EventType.REGIONAL,
@@ -28,10 +29,10 @@ class EventTestCreator(object):
         return event
 
     @classmethod
-    def createPresentEvent(self, only_event=False):
+    def createPresentEvent(self, id=None, only_event=False):
         id_string = "{}testpresent".format(datetime.datetime.now().year)
         event = Event(
-            id=id_string,
+            id=id if id is not None else id_string,
             end_date=datetime.datetime.today() + datetime.timedelta(days=1),
             event_short="testpresent",
             event_type_enum=EventType.REGIONAL,
@@ -52,9 +53,10 @@ class EventTestCreator(object):
         return event
 
     @classmethod
-    def createPastEvent(self, only_event=False):
+    def createPastEvent(self, id=None, only_event=False):
+        id_string = "{}testpast".format(datetime.datetime.now().year)
         event = Event(
-            id="{}testpast".format(datetime.datetime.now().year),
+            id=id if id is not None else id_string,
             end_date=datetime.datetime.today() - datetime.timedelta(days=8),
             event_short="testpast",
             event_type_enum=EventType.REGIONAL,

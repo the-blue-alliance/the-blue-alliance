@@ -26,7 +26,7 @@ class TestAwardsNotification(unittest2.TestCase):
             Team(id="frc%s" % team_number,
                  team_number=team_number).put()
 
-        self.event = EventTestCreator.createPresentEvent()
+        self.event = EventTestCreator.createPresentEvent(id="2020testpresent")
         self.notification = AwardsNotification(self.event)
 
     def tearDown(self):
