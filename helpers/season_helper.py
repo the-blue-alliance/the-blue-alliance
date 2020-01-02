@@ -4,6 +4,7 @@ from google.appengine.ext import ndb
 from pytz import timezone, UTC
 
 from consts.event_type import EventType
+from database import event_query
 from models.event import Event
 
 
@@ -74,3 +75,16 @@ class SeasonHelper:
     def stop_build_datetime_utc(year=datetime.now().year):
         """ Converts stop_build_date to a UTC datetime """
         return SeasonHelper.stop_build_datetime_est(year).astimezone(UTC)
+
+    @staticmethod
+    def first_event_datetime_utc(year=datetime.now().year):
+        """ Computes day the first in-season event begins """
+        events = event_query.EventListQuery(year).fetch()
+        earliest_start = None
+        timezone = None
+        for event in events:
+            if event.is_season_event and (earliest_start is None or event.start_date < earliest_start):
+                earliest_start = event.start_date
+                timezone = event.timezone_id
+        print earliest_start, timezone
+        return earliest_start

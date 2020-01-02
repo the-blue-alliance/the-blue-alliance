@@ -150,8 +150,7 @@ class MainBuildseasonHandler(CacheableHandler):
         effective_season_year = SeasonHelper.effective_season_year()
 
         self.template_values.update({
-            'endbuild_datetime_est': SeasonHelper.stop_build_datetime_est(effective_season_year),
-            'endbuild_datetime_utc': SeasonHelper.stop_build_datetime_utc(effective_season_year),
+            'seasonstart_datetime_utc': SeasonHelper.first_event_datetime_utc(effective_season_year),
             'events': EventHelper.getWeekEvents(),
         })
 
