@@ -111,7 +111,7 @@ class TestEventScheduleNotification(unittest2.TestCase):
         # No `event_name`
         payload = self.notification.data_payload
         self.assertEqual(len(payload), 2)
-        self.assertEqual(payload['event_key'], '2019testpresent')
+        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
         self.assertIsNone(payload['first_match_time'])
 
     def test_data_payload_first_match_time(self):
@@ -120,7 +120,7 @@ class TestEventScheduleNotification(unittest2.TestCase):
         # No `event_name`
         payload = self.notification.data_payload
         self.assertEqual(len(payload), 2)
-        self.assertEqual(payload['event_key'], '2019testpresent')
+        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
         self.assertIsNotNone(payload['first_match_time'])
 
     def test_webhook_message_data(self):
@@ -132,7 +132,7 @@ class TestEventScheduleNotification(unittest2.TestCase):
         # Has `event_name`
         payload = self.notification.webhook_message_data
         self.assertEqual(len(payload), 3)
-        self.assertEqual(payload['event_key'], '2019testpresent')
+        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
         self.assertEqual(payload['event_name'], 'Present Test Event')
         self.assertIsNone(payload['first_match_time'])
 
@@ -142,6 +142,6 @@ class TestEventScheduleNotification(unittest2.TestCase):
         # Has `event_name`
         payload = self.notification.webhook_message_data
         self.assertEqual(len(payload), 3)
-        self.assertEqual(payload['event_key'], '2019testpresent')
+        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
         self.assertEqual(payload['event_name'], 'Present Test Event')
         self.assertIsNotNone(payload['first_match_time'])
