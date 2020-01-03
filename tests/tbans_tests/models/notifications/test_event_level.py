@@ -82,14 +82,14 @@ class TestEventLevelNotification(unittest2.TestCase):
         payload = self.notification.data_payload
         self.assertEqual(len(payload), 3)
         self.assertEqual(payload['comp_level'], 'qm')
-        self.assertEqual(payload['event_key'], '2019testpresent')
+        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
         self.assertIsNone(payload['scheduled_time'])
 
     def test_data_payload_scheduled_time(self):
         payload = self.notification.data_payload
         self.assertEqual(len(payload), 3)
         self.assertEqual(payload['comp_level'], 'qm')
-        self.assertEqual(payload['event_key'], '2019testpresent')
+        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
         self.assertIsNotNone(payload['scheduled_time'])
 
     def test_webhook_message_data(self):
@@ -99,7 +99,7 @@ class TestEventLevelNotification(unittest2.TestCase):
         payload = self.notification.webhook_message_data
         self.assertEqual(len(payload), 4)
         self.assertEqual(payload['comp_level'], 'qm')
-        self.assertEqual(payload['event_key'], '2019testpresent')
+        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
         self.assertEqual(payload['event_name'], 'Present Test Event')
         self.assertIsNone(payload['scheduled_time'])
 
@@ -107,6 +107,6 @@ class TestEventLevelNotification(unittest2.TestCase):
         payload = self.notification.webhook_message_data
         self.assertEqual(len(payload), 4)
         self.assertEqual(payload['comp_level'], 'qm')
-        self.assertEqual(payload['event_key'], '2019testpresent')
+        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
         self.assertEqual(payload['event_name'], 'Present Test Event')
         self.assertIsNotNone(payload['scheduled_time'])
