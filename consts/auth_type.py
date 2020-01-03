@@ -12,6 +12,7 @@ class AuthType(object):
     EVENT_ALLIANCES = 5
     EVENT_AWARDS = 6
     EVENT_INFO = 7
+    ZEBRA_MOTIONWORKS = 8
 
     # Read Type
     READ_API = 1000
@@ -25,4 +26,5 @@ class AuthType(object):
         EVENT_ALLIANCES: "event alliances",
         EVENT_AWARDS: "event awards",
         EVENT_INFO: "event info",
+        ZEBRA_MOTIONWORKS: "zebra motionworks",
     }

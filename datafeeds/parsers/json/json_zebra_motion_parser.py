@@ -9,7 +9,8 @@ class JSONZebraMotionParser(ParserBase):
         """
         Parse JSON that contains Zebra MotionWorks data
         Format is as follows:
-        {
+        [{
+            key: '2020casj_qm1',
             times: [<elapsed time (float seconds)>, 0.0, 0.5, 1.0, 1.5, ...],
             red: [
                 {
@@ -25,33 +26,36 @@ class JSONZebraMotionParser(ParserBase):
                 ...
             ],
             blue: [...],
-        }
+        }]
         """
         try:
-            zebra_data = json.loads(zebra_motion_json)
+            data = json.loads(zebra_motion_json)
         except Exception:
             raise ParserInputException("Invalid JSON. Please check input.")
 
-        # Check 'times' is an array of floats
-        times = zebra_data.get('times', [])
-        if not isinstance(times, list):
-            raise ParserInputException("Zebra MotionWorks data must have a array of 'times'.")
-        data_length = len(times)
-        if data_length == 0:
-            raise ParserInputException("Length of 'times' must be non-zero.")
-        for time in times:
-            if not isinstance(time, float):
-                raise ParserInputException("'times' must be an array of floats.")
+        parsed_data = []
+        for zebra_data in data:
+            # Check 'times' is an array of floats
+            times = zebra_data.get('times', [])
+            if not isinstance(times, list):
+                raise ParserInputException("Zebra MotionWorks data must have a array of 'times'.")
+            data_length = len(times)
+            if data_length == 0:
+                raise ParserInputException("Length of 'times' must be non-zero.")
+            for time in times:
+                if not isinstance(time, float):
+                    raise ParserInputException("'times' must be an array of floats.")
 
-        # Check 'red' alliance
-        red = cls._parse_alliance(zebra_data.get('red', []), data_length)
-        blue = cls._parse_alliance(zebra_data.get('blue', []), data_length)
+            # Check 'red' alliance
+            red = cls._parse_alliance(zebra_data.get('red', []), data_length)
+            blue = cls._parse_alliance(zebra_data.get('blue', []), data_length)
 
-        parsed_data = {
-            'times': times,
-            'red': red,
-            'blue': blue,
-        }
+            parsed_data.append({
+                'key': zebra_data.get('key'),
+                'times': times,
+                'red': red,
+                'blue': blue,
+            })
         return parsed_data
 
     @classmethod
