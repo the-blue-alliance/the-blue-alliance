@@ -3,7 +3,6 @@ import json
 import datetime
 import re
 
-import time
 from google.appengine.ext import ndb
 
 from consts.event_type import EventType
