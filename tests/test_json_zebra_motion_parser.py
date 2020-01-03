@@ -10,7 +10,8 @@ class TestJSONZebraMotionParser(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
-        self.data = {
+        self.data = [{
+            "key": "2020casj_qm1",
             "times": [0.0, 0.5, 1.0, 1.5],
             "red": [
                 {
@@ -46,7 +47,7 @@ class TestJSONZebraMotionParser(unittest2.TestCase):
                     "ys": [0.1, 0.1, None, 0.1],
                 },
             ],
-        }
+        }]
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -56,46 +57,46 @@ class TestJSONZebraMotionParser(unittest2.TestCase):
         self.assertEqual(parsed, self.data)
 
     def testMissingTimes(self):
-        del self.data['times']
+        del self.data[0]['times']
         with self.assertRaises(ParserInputException):
             JSONZebraMotionParser.parse(json.dumps(self.data))
 
     def testEmptyTimes(self):
-        self.data['times'] = []
+        self.data[0]['times'] = []
         with self.assertRaises(ParserInputException):
             JSONZebraMotionParser.parse(json.dumps(self.data))
 
     def testNullTimes(self):
-        self.data['times'][0] = None
+        self.data[0]['times'][0] = None
         with self.assertRaises(ParserInputException):
             JSONZebraMotionParser.parse(json.dumps(self.data))
 
     def testIntTimes(self):
-        self.data['times'][0] = 0
+        self.data[0]['times'][0] = 0
         with self.assertRaises(ParserInputException):
             JSONZebraMotionParser.parse(json.dumps(self.data))
 
     def testMissingTeamKey(self):
-        del self.data['red'][0]['team_key']
+        del self.data[0]['red'][0]['team_key']
         with self.assertRaises(ParserInputException):
             JSONZebraMotionParser.parse(json.dumps(self.data))
 
     def testMalformattedTeamKey(self):
-        self.data['red'][0]['team_key'] = '254'
+        self.data[0]['red'][0]['team_key'] = '254'
         with self.assertRaises(ParserInputException):
             JSONZebraMotionParser.parse(json.dumps(self.data))
 
     def testMissingCoords(self):
-        del self.data['red'][0]['xs']
+        del self.data[0]['red'][0]['xs']
         with self.assertRaises(ParserInputException):
             JSONZebraMotionParser.parse(json.dumps(self.data))
 
     def testIntCoords(self):
-        self.data['red'][0]['xs'][0] = 0
+        self.data[0]['red'][0]['xs'][0] = 0
         with self.assertRaises(ParserInputException):
             JSONZebraMotionParser.parse(json.dumps(self.data))
 
     def testMismatchedNullCoords(self):
-        self.data['red'][0]['xs'][1] = None
+        self.data[0]['red'][0]['xs'][1] = None
         with self.assertRaises(ParserInputException):
             JSONZebraMotionParser.parse(json.dumps(self.data))
