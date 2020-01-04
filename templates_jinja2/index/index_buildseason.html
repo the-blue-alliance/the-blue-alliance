@@ -24,21 +24,25 @@
       <p>Encrypted Manual Password: {{ manual_password }}</p>
       {% endif %}
 
+      {% include "media_partials/live_special_webcast_partial.html" %}
+
       {% if build_handler_show_ri3d != 'False' %}
       <p>
         <a class="btn btn-lg btn-success btn-block" href="/watch/ri3d"><span class="glyphicon glyphicon-play"></span> Watch Ri3D Live</a>
       </p>
       {% endif %}
 
-      <!--
+      {% if build_handler_show_teameventsearch == 'True' %}
       <div>
         <a class="btn btn-lg btn-block btn-primary" href="/advanced_team_search"><span class="glyphicon glyphicon-search"></span> Search for Previous Successful Robots</a>
       </div>
       <br>
+      {% endif %}
+      {% if build_handler_show_avatars == 'True' %}
       <div>
-        <a class="btn btn-lg btn-block btn-primary" href="/avatars/2018"><span class="glyphicon glyphicon-user"></span> View All 2018 Team Avatars</a>
+        <a class="btn btn-lg btn-block btn-primary" href="/avatars/{{endbuild_datetime_est|strftime("%Y")}}"><span class="glyphicon glyphicon-user"></span> View All {{endbuild_datetime_est|strftime("%Y")}} Team Avatars</a>
       </div>
-      -->
+      {% endif %}
 
       {% if events %}
         <h2>This Week's Events</h2>
