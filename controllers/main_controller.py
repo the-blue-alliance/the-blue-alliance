@@ -148,10 +148,13 @@ class MainBuildseasonHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         effective_season_year = SeasonHelper.effective_season_year()
+        special_webcasts = FirebasePusher.get_special_webcasts()
 
         self.template_values.update({
             'seasonstart_datetime_utc': SeasonHelper.first_event_datetime_utc(effective_season_year),
             'events': EventHelper.getWeekEvents(),
+            "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
+            "special_webcasts": special_webcasts,
         })
 
         return jinja2_engine.render('index/index_buildseason.html', self.template_values)
