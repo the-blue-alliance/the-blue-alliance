@@ -1,5 +1,5 @@
 {% macro social_media_icon_link(media) %}
-<a href="{{ media.social_profile_url }}" target="_blank">
+<a href="{{ media.social_profile_url }}" class="hashtag-link-wrapper" target="_blank">
 {% if media.media_type_enum == 3 %}
   <span class="hashtag-link hashtag-facebook"></span>
 {% elif media.media_type_enum == 4 %}
