@@ -128,13 +128,7 @@ def preflight():
 @task
 def run():
     """Run local dev server"""
-    sh("dev_appserver.py dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml api.yaml clientapi.yaml tasks.yaml tbans.yaml")
-
-
-@task
-def run_tbans():
-    """Run local TBANS dev server"""
-    sh("dev_appserver.py tbans.yaml")
+    sh("dev_appserver.py dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml api.yaml clientapi.yaml tasks.yaml")
 
 
 @task
@@ -202,7 +196,7 @@ def bootstrap(options):
 
 @task
 def devserver():
-    sh("dev_appserver.py --skip_sdk_update_check=true --admin_host=0.0.0.0 --host=0.0.0.0 --datastore_path=/datastore/tba.db dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml api.yaml clientapi.yaml tasks.yaml tbans.yaml")
+    sh("dev_appserver.py --skip_sdk_update_check=true --admin_host=0.0.0.0 --host=0.0.0.0 --datastore_path=/datastore/tba.db dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml api.yaml clientapi.yaml tasks.yaml")
 
 
 def test_function(args):

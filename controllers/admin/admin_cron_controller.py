@@ -24,7 +24,6 @@ from helpers.district_team_manipulator import DistrictTeamManipulator
 from helpers.event_manipulator import EventManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_helper import MatchHelper
-from helpers.tbans_helper import TBANSHelper
 from helpers.notification_sender import NotificationSender
 from helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from helpers.search_helper import SearchHelper
@@ -139,9 +138,9 @@ class AdminWebhooksClear(LoggedInHandler):
         webhooks = MobileClient.query(MobileClient.client_type == ClientType.WEBHOOK).fetch()
         failures = []
 
+        from helpers.tbans_helper import TBANSHelper
         for client in webhooks:
-            response = TBANSHelper.ping_webhook(client)
-            if not response.code == 200:
+            if not TBANSHelper.ping(client):
                 failures.append(client.key)
 
         count = len(failures)

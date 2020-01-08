@@ -7,6 +7,10 @@ class ClientType:
     WEBHOOK = 2
     WEB = 3
 
+    # List of ClientType that are able to subscribe to push notifications via TBANS
+    # TODO: Move Android from old notification code to new notification code
+    FCM_CLIENTS = [OS_IOS, WEB]
+
     names = {
         OS_ANDROID: 'android',
         OS_IOS: 'ios',

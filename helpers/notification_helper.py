@@ -1,10 +1,11 @@
+# TODO: Kill notification helper in favor of TBANS
+
 import datetime
 import json
 
 from consts.client_type import ClientType
 from consts.notification_type import NotificationType
 
-from helpers.tbans_helper import TBANSHelper
 from helpers.push_helper import PushHelper
 
 from models.event import Event
@@ -152,12 +153,3 @@ class NotificationHelper(object):
 
         notification = BroadcastNotification(title, message, url, app_version)
         notification.send(keys)
-
-    @classmethod
-    def send_ping(cls, client):
-        if client.client_type == ClientType.OS_ANDROID:
-            notification = PingNotification()
-            notification.send({client.client_type: [client.messaging_id]})
-        else:
-            # Send iOS/web/webhooks ping via TBANS
-            return TBANSHelper.ping(client)
