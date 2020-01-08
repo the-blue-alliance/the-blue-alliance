@@ -37,6 +37,7 @@ class Request(object):
             import uuid
             cid = uuid.uuid3(uuid.NAMESPACE_X500, str('tba-notification-tracking'))
 
+            from consts.notification_type import NotificationType
             from urllib import urlencode
             params = urlencode({
                 'v': 1,
