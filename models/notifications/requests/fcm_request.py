@@ -3,6 +3,9 @@ from firebase_admin import messaging
 from models.notifications.requests.request import Request
 
 
+MAXIMUM_TOKENS = 500
+
+
 class FCMRequest(Request):
     """ Represents a notification payload and a delivery option to send to FCM.
     https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
@@ -24,8 +27,8 @@ class FCMRequest(Request):
 
         self._app = app
 
-        if len(tokens) > 500:
-            raise ValueError('FCMRequest tokens must contain less than 100 tokens')
+        if len(tokens) > MAXIMUM_TOKENS:
+            raise ValueError('FCMRequest tokens must contain less than {} tokens'.format(MAXIMUM_TOKENS))
 
         self.tokens = tokens
 
@@ -37,9 +40,6 @@ class FCMRequest(Request):
         Returns:
             messaging.BatchResponse - Batch response object for the messages sent.
         """
-        from sitevars.notifications_enable import NotificationsEnable
-        if not NotificationsEnable.notifications_enabled():
-            return messaging.BatchResponse([])
         response = messaging.send_multicast(self._fcm_message(), app=self._app)
         if response.success_count > 0:
             self.defer_track_notification(response.success_count)
@@ -59,6 +59,8 @@ class FCMRequest(Request):
 
         # Add `notification_type` to data payload
         data_payload = self.notification.data_payload if self.notification.data_payload else {}
+        # Remove `None` from data payload, since FCM won't accept them
+        data_payload = {k: v for k, v in data_payload.items() if v is not None}
         from consts.notification_type import NotificationType
         data_payload['notification_type'] = NotificationType.type_names[self.notification.__class__._type()]
 

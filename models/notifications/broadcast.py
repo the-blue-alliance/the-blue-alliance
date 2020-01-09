@@ -3,7 +3,7 @@ from models.notifications.notification import Notification
 
 class BroadcastNotification(Notification):
 
-    def __init__(self, title, message, url, app_version=''):
+    def __init__(self, title, message, url=None, app_version=None):
         self.title = title
         self.message = message
         self.url = url
@@ -21,9 +21,11 @@ class BroadcastNotification(Notification):
 
     @property
     def data_payload(self):
-        payload = {
-            'url': self.url
-        }
+        payload = {}
+        if self.url:
+            payload['url'] = self.url
+        else:
+            payload['url'] = None
 
         if self.app_version:
             payload['app_version'] = self.app_version

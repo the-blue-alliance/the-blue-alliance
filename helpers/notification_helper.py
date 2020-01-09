@@ -13,7 +13,6 @@ from models.sitevar import Sitevar
 
 from notifications.alliance_selections import AllianceSelectionNotification
 from notifications.level_starting import CompLevelStartingNotification
-from notifications.broadcast import BroadcastNotification
 from notifications.match_score import MatchScoreNotification
 from notifications.match_video import MatchVideoNotification, EventMatchVideoNotification
 from notifications.awards_updated import AwardsUpdatedNotification
@@ -21,7 +20,6 @@ from notifications.schedule_updated import ScheduleUpdatedNotification
 from notifications.upcoming_match import UpcomingMatchNotification
 from notifications.update_favorites import UpdateFavoritesNotification
 from notifications.update_subscriptions import UpdateSubscriptionsNotification
-from notifications.ping import PingNotification
 
 
 class NotificationHelper(object):
@@ -145,11 +143,3 @@ class NotificationHelper(object):
         else:
             user_keys = PushHelper.get_client_ids_for_users(users)
             EventMatchVideoNotification(match).send(user_keys)
-
-    @classmethod
-    def send_broadcast(cls, client_types, title, message, url, app_version=''):
-        users = PushHelper.get_all_mobile_clients(client_types)
-        keys = PushHelper.get_client_ids_for_users(users)
-
-        notification = BroadcastNotification(title, message, url, app_version)
-        notification.send(keys)
