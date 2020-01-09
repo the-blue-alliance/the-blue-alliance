@@ -16,6 +16,9 @@ class TestRequest(unittest2.TestCase):
         self.testbed.init_taskqueue_stub(root_path='.')
         self.taskqueue_stub = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
 
+    def tearDown(self):
+        self.testbed.deactivate()
+
     def test_init(self):
         Request(MockNotification())
 
