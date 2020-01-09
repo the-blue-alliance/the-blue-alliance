@@ -48,8 +48,8 @@ class WebhookRequest(Request):
         # https://github.com/the-blue-alliance/the-blue-alliance/issues/2576
         valid_url = True
         try:
-            self.defer_track_notification(1)
             urllib2.urlopen(request)
+            self.defer_track_notification(1)
         except urllib2.HTTPError, e:
             if e.code == 400:
                 logging.warning('400, Bad request for URL: {}'.format(self.url))

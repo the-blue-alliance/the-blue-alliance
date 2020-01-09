@@ -40,8 +40,10 @@ class FCMRequest(Request):
         from sitevars.notifications_enable import NotificationsEnable
         if not NotificationsEnable.notifications_enabled():
             return messaging.BatchResponse([])
-        self.defer_track_notification(len(self.tokens))
-        return messaging.send_multicast(self._fcm_message(), app=self._app)
+        response = messaging.send_multicast(self._fcm_message(), app=self._app)
+        if response.success_count > 0:
+            self.defer_track_notification(response.success_count)
+        return response
 
     def _fcm_message(self):
         platform_config = self.notification.platform_config

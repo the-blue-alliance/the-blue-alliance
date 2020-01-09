@@ -54,6 +54,24 @@ class TestFCMRequest(unittest2.TestCase):
         mock_track.assert_called_once_with(1)
         self.assertEqual(response, batch_response)
 
+    def test_send_failed(self):
+        batch_response = messaging.BatchResponse([messaging.SendResponse(None, 'a')])
+        request = FCMRequest(app=self.app, notification=MockNotification(), tokens=['abc', 'def'])
+        with patch.object(messaging, 'send_multicast', return_value=batch_response) as mock_send, patch.object(request, 'defer_track_notification') as mock_track:
+            response = request.send()
+        mock_send.assert_called_once()
+        mock_track.assert_not_called()
+        self.assertEqual(response, batch_response)
+
+    def test_send_failed_partial(self):
+        batch_response = messaging.BatchResponse([messaging.SendResponse({'name': 'abc'}, None), messaging.SendResponse(None, 'a')])
+        request = FCMRequest(app=self.app, notification=MockNotification(), tokens=['abc', 'def'])
+        with patch.object(messaging, 'send_multicast', return_value=batch_response) as mock_send, patch.object(request, 'defer_track_notification') as mock_track:
+            response = request.send()
+        mock_send.assert_called_once()
+        mock_track.assert_called_once_with(1)
+        self.assertEqual(response, batch_response)
+
     def test_send_disabled(self):
         NotificationsEnable.enable_notifications(False)
 

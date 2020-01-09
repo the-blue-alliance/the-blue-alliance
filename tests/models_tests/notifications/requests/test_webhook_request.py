@@ -20,6 +20,9 @@ class TestWebhookRequest(unittest2.TestCase):
         self.testbed.init_taskqueue_stub(root_path='.')
         self.taskqueue_stub = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
 
+    def tearDown(self):
+        self.testbed.deactivate()
+
     def test_subclass(self):
         request = WebhookRequest(MockNotification(), 'https://www.thebluealliance.com', 'secret')
         self.assertTrue(isinstance(request, Request))
@@ -88,7 +91,7 @@ class TestWebhookRequest(unittest2.TestCase):
             with patch.object(urllib2, 'urlopen', error_mock) as mock_urlopen, patch.object(message, 'defer_track_notification') as mock_track:
                 success = message.send()
             mock_urlopen.assert_called_once()
-            mock_track.assert_called_once_with(1)
+            mock_track.assert_not_called()
             self.assertTrue(success)
 
     def test_send_error_unknown(self):
@@ -100,7 +103,7 @@ class TestWebhookRequest(unittest2.TestCase):
         with patch.object(urllib2, 'urlopen', error_mock) as mock_urlopen, patch.object(message, 'defer_track_notification') as mock_track:
             success = message.send()
         mock_urlopen.assert_called_once()
-        mock_track.assert_called_once_with(1)
+        mock_track.assert_not_called()
         self.assertTrue(success)
 
     def test_send_fail_404(self):
@@ -112,7 +115,7 @@ class TestWebhookRequest(unittest2.TestCase):
         with patch.object(urllib2, 'urlopen', error_mock) as mock_urlopen, patch.object(message, 'defer_track_notification') as mock_track:
             success = message.send()
         mock_urlopen.assert_called_once()
-        mock_track.assert_called_once_with(1)
+        mock_track.assert_not_called()
         self.assertFalse(success)
 
     def test_send_fail_url_error(self):
@@ -124,7 +127,7 @@ class TestWebhookRequest(unittest2.TestCase):
         with patch.object(urllib2, 'urlopen', error_mock) as mock_urlopen, patch.object(message, 'defer_track_notification') as mock_track:
             success = message.send()
         mock_urlopen.assert_called_once()
-        mock_track.assert_called_once_with(1)
+        mock_track.assert_not_called()
         self.assertFalse(success)
 
     def test_send_error_other(self):
@@ -136,5 +139,5 @@ class TestWebhookRequest(unittest2.TestCase):
         with patch.object(urllib2, 'urlopen', error_mock) as mock_urlopen, patch.object(message, 'defer_track_notification') as mock_track:
             success = message.send()
         mock_urlopen.assert_called_once()
-        mock_track.assert_called_once_with(1)
+        mock_track.assert_not_called()
         self.assertTrue(success)
