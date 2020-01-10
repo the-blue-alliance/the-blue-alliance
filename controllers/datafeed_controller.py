@@ -647,7 +647,7 @@ class EventDetailsGet(webapp.RequestHandler):
         if type(event_teams) is not list:
             event_teams = [event_teams]
 
-        if event.year in {2018, 2019}:
+        if event.year in {2018, 2019, 2020}:
             avatars, keys_to_delete = df.getEventTeamAvatars(event.key_name)
             if avatars:
                 MediaManipulator.createOrUpdate(avatars)
