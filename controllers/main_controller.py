@@ -60,7 +60,7 @@ class AvatarsHandler(CacheableHandler):
 
     def get(self, year):
         year = int(year)
-        if year not in {2018, 2019}:
+        if year not in {2018, 2019, 2020}:
             self.abort(404)
 
         self._partial_cache_key = self.CACHE_KEY_FORMAT.format(year)
