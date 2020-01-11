@@ -7,7 +7,7 @@ beautifulsoup4
 GoogleAppEngineCloudStorageClient
 
 # TBANS
-firebase-admin==3.2.1
+firebase-admin==3.2.1 # DO NOT BUMP - 3.2.1 is the last version that supports Python 2
 
 # Cloud Endpoints Stuff
 oauth2client==3.0.0
