@@ -428,5 +428,5 @@ class ApiTrustedAddMatchZebraMotionWorks(ApiTrustedBaseController):
                     self._errors = json.dumps({"Error": "Match {} teams are not valid!".format(match_key)})
                     self.abort(400)
 
-            to_put.append(ZebraMotionWorks(id=match_key, data=zebra_data))
+            to_put.append(ZebraMotionWorks(id=match_key, event=ndb.Key(Event, event_key), data=zebra_data))
         ndb.put_multi(to_put)
