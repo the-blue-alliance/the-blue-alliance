@@ -16,6 +16,7 @@ from datafeeds.parsers.json.json_awards_parser import JSONAwardsParser
 from datafeeds.parsers.json.json_matches_parser import JSONMatchesParser
 from datafeeds.parsers.json.json_rankings_parser import JSONRankingsParser
 from datafeeds.parsers.json.json_team_list_parser import JSONTeamListParser
+from datafeeds.parsers.json.json_zebra_motionworks_parser import JSONZebraMotionWorksParser
 
 from helpers.award_manipulator import AwardManipulator
 from helpers.event_helper import EventHelper
@@ -36,8 +37,8 @@ from models.event_details import EventDetails
 from models.event_team import EventTeam
 from models.match import Match
 from models.media import Media
-from models.sitevar import Sitevar
 from models.team import Team
+from models.zebra_motionworks import ZebraMotionWorks
 
 
 class ApiTrustedEventAllianceSelectionsUpdate(ApiTrustedBaseController):
@@ -394,3 +395,38 @@ class ApiTrustedUpdateEventInfo(ApiTrustedBaseController):
                 method='GET',
                 queue_name='admin',
             )
+
+
+class ApiTrustedAddMatchZebraMotionWorks(ApiTrustedBaseController):
+    """
+    Add Zebra MotionWorks data linked to a match
+    """
+
+    REQUIRED_AUTH_TYPES = {AuthType.ZEBRA_MOTIONWORKS}
+
+    def _process_request(self, request, event_key):
+        to_put = []
+        for zebra_data in JSONZebraMotionWorksParser.parse(request.body):
+            match_key = zebra_data['key']
+
+            # Check that match_key matches event_key
+            if match_key.split('_')[0] != event_key:
+                self._errors = json.dumps({"Error": "Match key {} does not match Event key {}!".format(match_key, event_key)})
+                self.abort(400)
+
+            # Check that match exists
+            match = Match.get_by_id(match_key)
+            if match is None:
+                self._errors = json.dumps({"Error": "Match {} does not exist!".format(match_key)})
+                self.abort(400)
+
+            # Check that teams in Zebra data and teams in Match are the same
+            for color in ['red', 'blue']:
+                match_teams = match.alliances[color]['teams']
+                zebra_teams = [team['team_key'] for team in zebra_data[color]]
+                if match_teams != zebra_teams:
+                    self._errors = json.dumps({"Error": "Match {} teams are not valid!".format(match_key)})
+                    self.abort(400)
+
+            to_put.append(ZebraMotionWorks(id=match_key, data=zebra_data))
+        ndb.put_multi(to_put)
