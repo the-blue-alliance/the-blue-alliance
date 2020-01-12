@@ -61,6 +61,14 @@
       </p>
     </div>
   </div>
+  {% if zebra_data %}
+  <div class="row">
+    <div class="col-xs-12">
+      <h3>Zebra MotionWorks&trade; (?)</h3>
+      <div class="zebramotionworks-content" data-zebramotionworks="{{zebra_data}}"></div>
+    </div>
+  </div>
+  {% endif %}
   <div class="row">
     <div class="col-lg-12">
       <hr>
@@ -71,6 +79,9 @@
 {% endblock %}
 
 {% block inline_javascript %}
+{% if zebra_data %}
+<script type="text/javascript" src="/javascript/zebramotionworks.min.js"></script>
+{% endif %}
 <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
 <script type="text/javascript">
   var el = document.getElementById('timeseries-chart');
