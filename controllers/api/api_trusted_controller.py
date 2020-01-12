@@ -16,7 +16,7 @@ from datafeeds.parsers.json.json_awards_parser import JSONAwardsParser
 from datafeeds.parsers.json.json_matches_parser import JSONMatchesParser
 from datafeeds.parsers.json.json_rankings_parser import JSONRankingsParser
 from datafeeds.parsers.json.json_team_list_parser import JSONTeamListParser
-from datafeeds.parsers.json.json_zebra_motion_parser import JSONZebraMotionWorksParser
+from datafeeds.parsers.json.json_zebra_motionworks_parser import JSONZebraMotionWorksParser
 
 from helpers.award_manipulator import AwardManipulator
 from helpers.event_helper import EventHelper

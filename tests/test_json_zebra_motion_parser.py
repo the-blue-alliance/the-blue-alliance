@@ -2,7 +2,7 @@ import json
 import unittest2
 
 from datafeeds.parser_base import ParserInputException
-from datafeeds.parsers.json.json_zebra_motion_parser import JSONZebraMotionWorksParser
+from datafeeds.parsers.json.json_zebra_motionworks_parser import JSONZebraMotionWorksParser
 from google.appengine.ext import testbed
 
 
