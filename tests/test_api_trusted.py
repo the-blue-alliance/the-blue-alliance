@@ -1108,13 +1108,13 @@ class TestApiTrustedController(unittest2.TestCase):
         self.event_zebra_motionworks.put()
         match1 = Match(
             id="2014casj_qm1",
-            alliances_json="""{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""",
+            alliances_json="""{"blue": {"score": -1, "teams": ["frc1", "frc2", "frc3"]}, "red": {"score": -1, "teams": ["frc254", "frc971", "frc604"]}}""",
             comp_level="qm",
             event=ndb.Key(Event, '2014casj'),
             year=2014,
             set_number=1,
             match_number=1,
-            team_key_names=[u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073'],
+            team_key_names=[u'frc254', u'frc971', u'frc604', u'frc1', u'frc2', u'frc3'],
             youtube_videos=["abcdef"]
         )
         match1.put()

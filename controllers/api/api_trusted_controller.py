@@ -408,13 +408,25 @@ class ApiTrustedAddMatchZebraMotionWorks(ApiTrustedBaseController):
         to_put = []
         for zebra_data in JSONZebraMotionWorksParser.parse(request.body):
             match_key = zebra_data['key']
+
+            # Check that match_key matches event_key
             if match_key.split('_')[0] != event_key:
                 self._errors = json.dumps({"Error": "Match key {} does not match Event key {}!".format(match_key, event_key)})
                 self.abort(400)
+
+            # Check that match exists
             match = Match.get_by_id(match_key)
             if match is None:
                 self._errors = json.dumps({"Error": "Match {} does not exist!".format(match_key)})
                 self.abort(400)
+
+            # Check that teams in Zebra data and teams in Match are the same
+            for color in ['red', 'blue']:
+                match_teams = match.alliances[color]['teams']
+                zebra_teams = [team['team_key'] for team in zebra_data[color]]
+                if match_teams != zebra_teams:
+                    self._errors = json.dumps({"Error": "Match {} teams are not valid!".format(match_key)})
+                    self.abort(400)
 
             to_put.append(ZebraMotionWorks(id=match_key, data=zebra_data))
         ndb.put_multi(to_put)
