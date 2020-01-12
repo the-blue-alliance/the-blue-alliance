@@ -17,14 +17,6 @@ class BaseNotification(object):
     # Can be overridden by subclasses to only send to some types
     _supported_clients = [ClientType.OS_ANDROID, ClientType.WEBHOOK]
 
-    # If not None, the event feed to post this notification to
-    # Typically the event key
-    _event_feed = None
-
-    # If not None, the district feed to post this notificatoin to
-    # Typically, district abbreviation from consts/district_type
-    _district_feed = None
-
     # Send analytics updates for this notification?
     # Can be overridden by subclasses if not
     _track_call = True

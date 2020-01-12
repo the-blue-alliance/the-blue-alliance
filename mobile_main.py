@@ -156,16 +156,12 @@ class MobileAPI(remote.Service):
             return BaseResponse(code=404, message="Invalid push token for user")
         else:
             client = clients[0]
-            response = NotificationHelper.send_ping(client)
-            # If we got a response from the send_ping method, it was sent via TBANS
-            # We'll bubble up any errors we got back
-            if response:
-                if response.code == 200:
-                    return BaseResponse(code=200, message="Ping sent")
-                else:
-                    return BaseResponse(code=response.code, message="Error pinging client - {}".format(response.message))
-            else:
+            from helpers.tbans_helper import TBANSHelper
+            success = TBANSHelper.ping(client)
+            if success:
                 return BaseResponse(code=200, message="Ping sent")
+            else:
+                return BaseResponse(code=500, message="Failed to ping client")
 
     @endpoints.method(message_types.VoidMessage, FavoriteCollection,
                       path='favorites/list', http_method='POST',

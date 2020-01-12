@@ -7,9 +7,11 @@
       <a class="btn btn-md btn-success pull-right"
          href="/gameday#layout=0&view_0={{ webcast.key_name }}-0{% if webcast.type == 'twitch' %}&chat={{ webcast.channel }}{% endif %}">
         <span class="glyphicon glyphicon-facetime-video"></span> Watch Now
-      </a> 
+      </a>
       {{ webcast.name }}
-      <small>{{ webcast.stream_title }}</small>
+      {% if webcast.stream_title %}
+        <small>{{ webcast.stream_title }}</small>
+      {% endif %}
     </h3>
     <hr>
   {% endif %}
