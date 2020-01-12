@@ -53,9 +53,14 @@
         <tr>
             <td>Allow Event Awards Edit</td>
             <td><input type="checkbox" name="allow_edit_awards" {% if auth.can_edit_event_awards %}checked{% endif %}></td>
-        </tr>        <tr>
+        </tr>
+        <tr>
             <td>Allow Match Video Edit</td>
             <td><input type="checkbox" name="allow_edit_match_video" {% if auth.can_edit_match_video %}checked{% endif %}></td>
+        </tr>
+        <tr>
+            <td>Allow Zebra MotionWorks Edit</td>
+            <td><input type="checkbox" name="allow_edit_zebra_motionworks" {% if auth.can_edit_zebra_motionworks %}checked{% endif %}></td>
         </tr>
     </table>
 

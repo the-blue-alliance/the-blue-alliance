@@ -97,6 +97,8 @@ class AdminApiAuthEdit(LoggedInHandler):
             auth_types_enum.append(AuthType.MATCH_VIDEO)
         if self.request.get('allow_edit_info'):
             auth_types_enum.append(AuthType.EVENT_INFO)
+        if self.request.get('allow_edit_zebra_motionworks'):
+            auth_types_enum.append(AuthType.ZEBRA_MOTIONWORKS)
 
         if self.request.get('owner', None):
             owner = Account.query(Account.email == self.request.get('owner')).fetch()
