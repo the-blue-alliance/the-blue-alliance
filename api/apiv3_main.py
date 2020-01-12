@@ -113,8 +113,6 @@ app = webapp2.WSGIApplication([
         aec.ApiEventMatchesController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/event/<event_key:>/matches/timeseries',
         arc.ApiRealtimeEventMatchesController, methods=['GET', 'OPTIONS']),
-    webapp2.Route(r'/api/v3/event/<event_key:>/matches/zebra_motionworks',
-        azc.ApiZebraMotionworksEventMatchesController, methods=['GET', 'OPTOINS']),
     webapp2.Route(r'/api/v3/event/<event_key:>/matches/<model_type:(simple|keys)>',
         aec.ApiEventMatchesController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/event/<event_key:>/awards',
