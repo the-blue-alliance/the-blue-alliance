@@ -16,7 +16,7 @@ from datafeeds.parsers.json.json_awards_parser import JSONAwardsParser
 from datafeeds.parsers.json.json_matches_parser import JSONMatchesParser
 from datafeeds.parsers.json.json_rankings_parser import JSONRankingsParser
 from datafeeds.parsers.json.json_team_list_parser import JSONTeamListParser
-from datafeeds.parsers.json.json_zebra_motion_parser import JSONZebraMotionParser
+from datafeeds.parsers.json.json_zebra_motion_parser import JSONZebraMotionWorksParser
 
 from helpers.award_manipulator import AwardManipulator
 from helpers.event_helper import EventHelper
@@ -38,7 +38,7 @@ from models.event_team import EventTeam
 from models.match import Match
 from models.media import Media
 from models.team import Team
-from models.zebra_motion import ZebraMotion
+from models.zebra_motionworks import ZebraMotionWorks
 
 
 class ApiTrustedEventAllianceSelectionsUpdate(ApiTrustedBaseController):
@@ -406,7 +406,7 @@ class ApiTrustedAddMatchZebraMotionWorks(ApiTrustedBaseController):
 
     def _process_request(self, request, event_key):
         to_put = []
-        for zebra_data in JSONZebraMotionParser.parse(request.body):
+        for zebra_data in JSONZebraMotionWorksParser.parse(request.body):
             match_key = zebra_data['key']
             if match_key.split('_')[0] != event_key:
                 self._errors = json.dumps({"Error": "Match key {} does not match Event key {}!".format(match_key, event_key)})
@@ -416,5 +416,5 @@ class ApiTrustedAddMatchZebraMotionWorks(ApiTrustedBaseController):
                 self._errors = json.dumps({"Error": "Match {} does not exist!".format(match_key)})
                 self.abort(400)
 
-            to_put.append(ZebraMotion(id=match_key, data=zebra_data))
+            to_put.append(ZebraMotionWorks(id=match_key, data=zebra_data))
         ndb.put_multi(to_put)

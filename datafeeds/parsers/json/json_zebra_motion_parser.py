@@ -3,7 +3,7 @@ import re
 from datafeeds.parser_base import ParserInputException, ParserBase
 
 
-class JSONZebraMotionParser(ParserBase):
+class JSONZebraMotionWorksParser(ParserBase):
     @classmethod
     def parse(cls, zebra_motion_json):
         """

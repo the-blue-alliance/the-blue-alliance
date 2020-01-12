@@ -25,7 +25,7 @@ from models.match import Match
 from models.media import Media
 from models.sitevar import Sitevar
 from models.team import Team
-from models.zebra_motion import ZebraMotion
+from models.zebra_motionworks import ZebraMotionWorks
 
 
 class TestApiTrustedController(unittest2.TestCase):
@@ -1164,4 +1164,4 @@ class TestApiTrustedController(unittest2.TestCase):
         response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_10', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(ZebraMotion.get_by_id('2014casj_qm1').data, data[0])
+        self.assertEqual(ZebraMotionWorks.get_by_id('2014casj_qm1').data, data[0])
