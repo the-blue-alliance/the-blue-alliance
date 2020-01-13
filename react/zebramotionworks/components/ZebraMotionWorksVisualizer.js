@@ -9,9 +9,9 @@ class ZebraMotionWorksVisualizer extends React.Component {
       if (teamData.xs[i] !== null && teamData.ys[i] !== null) {
         if (first) {
           first = false
-          path = `M ${teamData.xs[i]} ${teamData.ys[i]}`
+          path = `M ${teamData.xs[i]} ${27 - teamData.ys[i]}`
         }
-        path += ` L ${teamData.xs[i]} ${teamData.ys[i]}`
+        path += ` L ${teamData.xs[i]} ${27 - teamData.ys[i]}`
       }
     }
     return path
