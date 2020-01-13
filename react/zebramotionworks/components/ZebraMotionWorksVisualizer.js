@@ -34,7 +34,7 @@ class ZebraMotionWorksVisualizer extends React.Component {
   }
 
   handleShowEntireMatch = () => {
-    this.setState({ showAll: true })
+    this.setState({ showAll: true, autoPlay: false, curTime: 0 })
   }
 
   handlePlayPause = () => {
