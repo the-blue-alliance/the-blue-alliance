@@ -11,8 +11,7 @@ class ZebraMotionWorksVisualizer extends React.Component {
     this.state = {
       showAll: true,
       autoPlay: false,
-      playStartTime: null,
-      playOffset: null,
+      playSpeed: 2,
       curTime: 0,
       maxTime: props.data.times.length,
     }
@@ -20,15 +19,33 @@ class ZebraMotionWorksVisualizer extends React.Component {
 
   componentDidMount() {
     this.displayFrame()
+    this.lastFrameTime = null
+  }
+
+  getTruePlaybackSpeed = (playSpeed) => {
+    switch (playSpeed) {
+      case 2:
+        return 5
+      case 3:
+        return 10
+      default:
+        return 1
+    }
   }
 
   displayFrame = () => {
-    const { autoPlay, playStartTime, playOffset } = this.state
-    if (autoPlay) {
-      const elapsedTime = Date.now() - playStartTime
+    const { autoPlay, playSpeed } = this.state
+    if (autoPlay && this.lastFrameTime) {
+      const elapsedTime = Date.now() - this.lastFrameTime
+      this.lastFrameTime = Date.now()
+
+      const timeDiff =
+        (elapsedTime / 1000) * 10 * this.getTruePlaybackSpeed(playSpeed)
       this.setState((state) => ({
-        curTime: (Math.round(elapsedTime / 10) + playOffset) % state.maxTime,
+        curTime: (state.curTime + timeDiff) % state.maxTime,
       }))
+    } else {
+      this.lastFrameTime = Date.now()
     }
     requestAnimationFrame(() => this.displayFrame())
   }
@@ -41,25 +58,40 @@ class ZebraMotionWorksVisualizer extends React.Component {
     this.setState((state) => ({
       showAll: false,
       autoPlay: !state.autoPlay,
-      playStartTime: state.autoPlay ? null : Date.now(),
-      playOffset: state.autoPlay ? null : state.curTime,
+    }))
+  }
+
+  handleSlowDown = () => {
+    this.setState((state) => ({
+      playSpeed: Math.max(1, state.playSpeed - 1),
+    }))
+  }
+
+  handleSpeedUp = () => {
+    this.setState((state) => ({
+      playSpeed: Math.min(3, state.playSpeed + 1),
     }))
   }
 
   handleSliderChange = (event) => {
-    if (!this.state.autoPlay) {
-      this.setState({
-        showAll: false,
-        curTime: parseInt(event.target.value, 10),
-      })
-    }
+    this.setState({
+      autoPlay: false,
+      showAll: false,
+      curTime: parseInt(event.target.value, 10),
+    })
   }
 
   render() {
     const { data } = this.props
-    const { showAll, autoPlay, curTime, maxTime } = this.state
-    const startTime = showAll ? 0 : curTime
-    const endTime = showAll ? maxTime : startTime + pathTimeLength
+    const { showAll, autoPlay, playSpeed, curTime, maxTime } = this.state
+    const startTime = showAll ? 0 : Math.max(curTime - pathTimeLength, 0)
+    const endTime = showAll ? maxTime : curTime
+    const mm = Math.floor(curTime / 10 / 60)
+      .toString()
+      .padStart(2, '0')
+    const ss = Math.floor((curTime / 10) % 60)
+      .toString()
+      .padStart(2, '0')
 
     return (
       <div>
@@ -113,7 +145,7 @@ class ZebraMotionWorksVisualizer extends React.Component {
             indicatorAtStart={showAll}
           />
         </svg>
-        <div style={{ width: '100%', display: 'flex' }}>
+        <div style={{ width: '100%', display: 'flex', alignItems: 'center' }}>
           <button
             className="btn btn-tiny"
             style={{ marginRight: 8 }}
@@ -133,14 +165,40 @@ class ZebraMotionWorksVisualizer extends React.Component {
               <span className="glyphicon glyphicon-play" />
             )}
           </button>
+          <div
+            className="btn-group"
+            role="group"
+            style={{ display: 'flex', marginRight: 8 }}
+          >
+            <button
+              type="button"
+              className="btn btn-tiny"
+              onClick={this.handleSlowDown}
+              disabled={playSpeed === 1}
+            >
+              <span className="glyphicon glyphicon-backward" />
+            </button>
+            <button type="button" className="btn btn-tiny" disabled>
+              {`${this.getTruePlaybackSpeed(playSpeed)}x`}
+            </button>
+            <button
+              type="button"
+              className="btn btn-tiny"
+              onClick={this.handleSpeedUp}
+              disabled={playSpeed === 3}
+            >
+              <span className="glyphicon glyphicon-forward" />
+            </button>
+          </div>
           <input
             type="range"
             min={0}
-            max={maxTime - pathTimeLength}
+            max={maxTime}
             step={1}
-            value={startTime}
+            value={curTime}
             onChange={this.handleSliderChange}
           />
+          <div style={{ marginLeft: 8 }}>{`${mm}:${ss}`}</div>
         </div>
       </div>
     )

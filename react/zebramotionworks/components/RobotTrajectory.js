@@ -2,6 +2,19 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 class RobotTrajectory extends React.PureComponent {
+  getInterpolatedVal = (vals, time) => {
+    const timeFloor = Math.floor(time)
+    const timeCeil = Math.ceil(time)
+    const a = vals[timeFloor]
+    const b = vals[timeCeil]
+    if (a === null || b === null) {
+      return null
+    }
+    const slope = b - a
+    const delta = (time - timeFloor) * slope
+    return a + delta
+  }
+
   generatePath = (teamData, startTime, endTime) => {
     let path = ''
     let first = true
@@ -19,24 +32,35 @@ class RobotTrajectory extends React.PureComponent {
 
   render() {
     const { teamData, startTime, endTime, color, indicatorAtStart } = this.props
+    const startTimeCeil = Math.ceil(startTime)
+    const endTimeFloor = Math.floor(endTime)
 
-    // Find first non-null entry
     let x = null
     let y = null
     if (indicatorAtStart) {
-      for (let i = startTime; i <= endTime; i++) {
-        x = teamData.xs[i]
-        y = teamData.ys[i]
-        if (x !== null && y !== null) {
-          break
+      x = this.getInterpolatedVal(teamData.xs, startTime)
+      y = this.getInterpolatedVal(teamData.ys, startTime)
+      // Find first non-null entry if interpolated time is null
+      if (x === null || y === null) {
+        for (let i = startTimeCeil; i <= endTimeFloor; i++) {
+          x = teamData.xs[i]
+          y = teamData.ys[i]
+          if (x !== null && y !== null) {
+            break
+          }
         }
       }
     } else {
-      for (let i = endTime; i >= startTime; i--) {
-        x = teamData.xs[i]
-        y = teamData.ys[i]
-        if (x !== null && y !== null) {
-          break
+      x = this.getInterpolatedVal(teamData.xs, endTime)
+      y = this.getInterpolatedVal(teamData.ys, endTime)
+      // Find first non-null entry if interpolated time is null
+      if (x === null || y === null) {
+        for (let i = endTimeFloor; i >= startTimeCeil; i--) {
+          x = teamData.xs[i]
+          y = teamData.ys[i]
+          if (x !== null && y !== null) {
+            break
+          }
         }
       }
     }
@@ -44,7 +68,7 @@ class RobotTrajectory extends React.PureComponent {
     return (
       <g>
         <path
-          d={this.generatePath(teamData, startTime, endTime)}
+          d={this.generatePath(teamData, startTimeCeil, endTimeFloor)}
           fill="none"
           stroke={color}
           strokeWidth={0.2}
@@ -81,7 +105,7 @@ RobotTrajectory.propTypes = {
   startTime: PropTypes.number.isRequired,
   endTime: PropTypes.number.isRequired,
   color: PropTypes.string.isRequired,
-  indicatorAtStart: PropTypes.boolean,
+  indicatorAtStart: PropTypes.bool,
 }
 
 export default RobotTrajectory
