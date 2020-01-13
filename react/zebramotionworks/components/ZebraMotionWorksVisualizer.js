@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import RobotTrajectory from './RobotTrajectory'
+
 const pathTimeLength = 50
 
 class ZebraMotionWorksVisualizer extends React.Component {
@@ -28,21 +30,6 @@ class ZebraMotionWorksVisualizer extends React.Component {
       }))
     }
     requestAnimationFrame(() => this.displayFrame())
-  }
-
-  generatePath = (teamData, startTime, endTime) => {
-    let path = ''
-    let first = true
-    for (let i = startTime; i < Math.min(teamData.xs.length, endTime); i++) {
-      if (teamData.xs[i] !== null && teamData.ys[i] !== null) {
-        if (first) {
-          first = false
-          path = `M ${teamData.xs[i]} ${27 - teamData.ys[i]}`
-        }
-        path += ` L ${teamData.xs[i]} ${27 - teamData.ys[i]}`
-      }
-    }
-    return path
   }
 
   handlePlayPause = () => {
@@ -73,41 +60,41 @@ class ZebraMotionWorksVisualizer extends React.Component {
             backgroundSize: 'cover',
           }}
         >
-          <path
-            d={this.generatePath(data.red[0], startTime, endTime)}
-            fill="none"
-            stroke="#FF0000"
-            strokeWidth={0.2}
+          <RobotTrajectory
+            teamData={data.red[0]}
+            startTime={startTime}
+            endTime={endTime}
+            color="#FF0000"
           />
-          <path
-            d={this.generatePath(data.red[1], startTime, endTime)}
-            fill="none"
-            stroke="#800000"
-            strokeWidth={0.2}
+          <RobotTrajectory
+            teamData={data.red[1]}
+            startTime={startTime}
+            endTime={endTime}
+            color="#800000"
           />
-          <path
-            d={this.generatePath(data.red[2], startTime, endTime)}
-            fill="none"
-            stroke="#FF8080"
-            strokeWidth={0.2}
+          <RobotTrajectory
+            teamData={data.red[2]}
+            startTime={startTime}
+            endTime={endTime}
+            color="#FF8080"
           />
-          <path
-            d={this.generatePath(data.blue[0], startTime, endTime)}
-            fill="none"
-            stroke="#0000FF"
-            strokeWidth={0.2}
+          <RobotTrajectory
+            teamData={data.blue[0]}
+            startTime={startTime}
+            endTime={endTime}
+            color="#0000FF"
           />
-          <path
-            d={this.generatePath(data.blue[1], startTime, endTime)}
-            fill="none"
-            stroke="#000080"
-            strokeWidth={0.2}
+          <RobotTrajectory
+            teamData={data.blue[1]}
+            startTime={startTime}
+            endTime={endTime}
+            color="#000080"
           />
-          <path
-            d={this.generatePath(data.blue[2], startTime, endTime)}
-            fill="none"
-            stroke="#8080FF"
-            strokeWidth={0.2}
+          <RobotTrajectory
+            teamData={data.blue[2]}
+            startTime={startTime}
+            endTime={endTime}
+            color="#8080FF"
           />
         </svg>
         <div style={{ width: '100%', display: 'flex' }}>
