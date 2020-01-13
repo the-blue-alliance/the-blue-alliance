@@ -9,6 +9,7 @@ class ZebraMotionWorksVisualizer extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
+      showAll: true,
       autoPlay: false,
       playStartTime: null,
       playOffset: null,
@@ -32,8 +33,13 @@ class ZebraMotionWorksVisualizer extends React.Component {
     requestAnimationFrame(() => this.displayFrame())
   }
 
+  handleShowEntireMatch = () => {
+    this.setState({ showAll: true })
+  }
+
   handlePlayPause = () => {
     this.setState((state) => ({
+      showAll: false,
       autoPlay: !state.autoPlay,
       playStartTime: state.autoPlay ? null : Date.now(),
       playOffset: state.autoPlay ? null : state.curTime,
@@ -42,14 +48,18 @@ class ZebraMotionWorksVisualizer extends React.Component {
 
   handleSliderChange = (event) => {
     if (!this.state.autoPlay) {
-      this.setState({ curTime: parseInt(event.target.value, 10) })
+      this.setState({
+        showAll: false,
+        curTime: parseInt(event.target.value, 10),
+      })
     }
   }
 
   render() {
     const { data } = this.props
-    const { autoPlay, curTime: startTime, maxTime } = this.state
-    const endTime = startTime + pathTimeLength
+    const { showAll, autoPlay, curTime, maxTime } = this.state
+    const startTime = showAll ? 0 : curTime
+    const endTime = showAll ? maxTime : startTime + pathTimeLength
 
     return (
       <div>
@@ -98,6 +108,14 @@ class ZebraMotionWorksVisualizer extends React.Component {
           />
         </svg>
         <div style={{ width: '100%', display: 'flex' }}>
+          <button
+            className="btn btn-tiny"
+            style={{ marginRight: 8 }}
+            onClick={this.handleShowEntireMatch}
+            disabled={showAll}
+          >
+            <span className="glyphicon glyphicon-eye-open" />
+          </button>
           <button
             className="btn btn-tiny"
             style={{ marginRight: 8 }}
