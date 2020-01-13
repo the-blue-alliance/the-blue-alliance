@@ -423,7 +423,7 @@ class ApiTrustedAddMatchZebraMotionWorks(ApiTrustedBaseController):
             # Check that teams in Zebra data and teams in Match are the same
             for color in ['red', 'blue']:
                 match_teams = match.alliances[color]['teams']
-                zebra_teams = [team['team_key'] for team in zebra_data[color]]
+                zebra_teams = [team['team_key'] for team in zebra_data['alliances'][color]]
                 if match_teams != zebra_teams:
                     self._errors = json.dumps({"Error": "Match {} teams are not valid!".format(match_key)})
                     self.abort(400)

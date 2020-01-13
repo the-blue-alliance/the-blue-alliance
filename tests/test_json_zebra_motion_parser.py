@@ -13,40 +13,42 @@ class TestJSONZebraMotionWorksParser(unittest2.TestCase):
         self.data = [{
             "key": "2020casj_qm1",
             "times": [0.0, 0.5, 1.0, 1.5],
-            "red": [
-                {
-                    "team_key": "frc254",
-                    "xs": [None, 1.2, 1.3, 1.4],
-                    "ys": [None, 0.1, 0.1, 0.1],
-                },
-                {
-                    "team_key": "frc971",
-                    "xs": [1.1, 1.2, 1.3, 1.4],
-                    "ys": [0.1, 0.1, 0.1, 0.1],
-                },
-                {
-                    "team_key": "frc604",
-                    "xs": [1.1, 1.2, 1.3, 1.4],
-                    "ys": [0.1, 0.1, 0.1, 0.1],
-                },
-            ],
-            "blue": [
-                {
-                    "team_key": "frc1",
-                    "xs": [None, 1.2, 1.3, 1.4],
-                    "ys": [None, 0.1, 0.1, 0.1],
-                },
-                {
-                    "team_key": "frc2",
-                    "xs": [1.1, 1.2, 1.3, 1.4],
-                    "ys": [0.1, 0.1, 0.1, 0.1],
-                },
-                {
-                    "team_key": "frc3",
-                    "xs": [1.1, 1.2, None, 1.4],
-                    "ys": [0.1, 0.1, None, 0.1],
-                },
-            ],
+            "alliances": {
+                "red": [
+                    {
+                        "team_key": "frc254",
+                        "xs": [None, 1.2, 1.3, 1.4],
+                        "ys": [None, 0.1, 0.1, 0.1],
+                    },
+                    {
+                        "team_key": "frc971",
+                        "xs": [1.1, 1.2, 1.3, 1.4],
+                        "ys": [0.1, 0.1, 0.1, 0.1],
+                    },
+                    {
+                        "team_key": "frc604",
+                        "xs": [1.1, 1.2, 1.3, 1.4],
+                        "ys": [0.1, 0.1, 0.1, 0.1],
+                    },
+                ],
+                "blue": [
+                    {
+                        "team_key": "frc1",
+                        "xs": [None, 1.2, 1.3, 1.4],
+                        "ys": [None, 0.1, 0.1, 0.1],
+                    },
+                    {
+                        "team_key": "frc2",
+                        "xs": [1.1, 1.2, 1.3, 1.4],
+                        "ys": [0.1, 0.1, 0.1, 0.1],
+                    },
+                    {
+                        "team_key": "frc3",
+                        "xs": [1.1, 1.2, None, 1.4],
+                        "ys": [0.1, 0.1, None, 0.1],
+                    },
+                ],
+            }
         }]
 
     def tearDown(self):
@@ -77,26 +79,26 @@ class TestJSONZebraMotionWorksParser(unittest2.TestCase):
             JSONZebraMotionWorksParser.parse(json.dumps(self.data))
 
     def testMissingTeamKey(self):
-        del self.data[0]['red'][0]['team_key']
+        del self.data[0]['alliances']['red'][0]['team_key']
         with self.assertRaises(ParserInputException):
             JSONZebraMotionWorksParser.parse(json.dumps(self.data))
 
     def testMalformattedTeamKey(self):
-        self.data[0]['red'][0]['team_key'] = '254'
+        self.data[0]['alliances']['red'][0]['team_key'] = '254'
         with self.assertRaises(ParserInputException):
             JSONZebraMotionWorksParser.parse(json.dumps(self.data))
 
     def testMissingCoords(self):
-        del self.data[0]['red'][0]['xs']
+        del self.data[0]['alliances']['red'][0]['xs']
         with self.assertRaises(ParserInputException):
             JSONZebraMotionWorksParser.parse(json.dumps(self.data))
 
     def testIntCoords(self):
-        self.data[0]['red'][0]['xs'][0] = 0
+        self.data[0]['alliances']['red'][0]['xs'][0] = 0
         with self.assertRaises(ParserInputException):
             JSONZebraMotionWorksParser.parse(json.dumps(self.data))
 
     def testMismatchedNullCoords(self):
-        self.data[0]['red'][0]['xs'][1] = None
+        self.data[0]['alliances']['red'][0]['xs'][1] = None
         with self.assertRaises(ParserInputException):
             JSONZebraMotionWorksParser.parse(json.dumps(self.data))

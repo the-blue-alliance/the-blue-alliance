@@ -1122,40 +1122,42 @@ class TestApiTrustedController(unittest2.TestCase):
         data = [{
             "key": "2014casj_qm1",
             "times": [0.0, 0.5, 1.0, 1.5],
-            "red": [
-                {
-                    "team_key": "frc254",
-                    "xs": [None, 1.2, 1.3, 1.4],
-                    "ys": [None, 0.1, 0.1, 0.1],
-                },
-                {
-                    "team_key": "frc971",
-                    "xs": [1.1, 1.2, 1.3, 1.4],
-                    "ys": [0.1, 0.1, 0.1, 0.1],
-                },
-                {
-                    "team_key": "frc604",
-                    "xs": [1.1, 1.2, 1.3, 1.4],
-                    "ys": [0.1, 0.1, 0.1, 0.1],
-                },
-            ],
-            "blue": [
-                {
-                    "team_key": "frc1",
-                    "xs": [None, 1.2, 1.3, 1.4],
-                    "ys": [None, 0.1, 0.1, 0.1],
-                },
-                {
-                    "team_key": "frc2",
-                    "xs": [1.1, 1.2, 1.3, 1.4],
-                    "ys": [0.1, 0.1, 0.1, 0.1],
-                },
-                {
-                    "team_key": "frc3",
-                    "xs": [1.1, 1.2, None, 1.4],
-                    "ys": [0.1, 0.1, None, 0.1],
-                },
-            ],
+            "alliances": {
+                "red": [
+                    {
+                        "team_key": "frc254",
+                        "xs": [None, 1.2, 1.3, 1.4],
+                        "ys": [None, 0.1, 0.1, 0.1],
+                    },
+                    {
+                        "team_key": "frc971",
+                        "xs": [1.1, 1.2, 1.3, 1.4],
+                        "ys": [0.1, 0.1, 0.1, 0.1],
+                    },
+                    {
+                        "team_key": "frc604",
+                        "xs": [1.1, 1.2, 1.3, 1.4],
+                        "ys": [0.1, 0.1, 0.1, 0.1],
+                    },
+                ],
+                "blue": [
+                    {
+                        "team_key": "frc1",
+                        "xs": [None, 1.2, 1.3, 1.4],
+                        "ys": [None, 0.1, 0.1, 0.1],
+                    },
+                    {
+                        "team_key": "frc2",
+                        "xs": [1.1, 1.2, 1.3, 1.4],
+                        "ys": [0.1, 0.1, 0.1, 0.1],
+                    },
+                    {
+                        "team_key": "frc3",
+                        "xs": [1.1, 1.2, None, 1.4],
+                        "ys": [0.1, 0.1, None, 0.1],
+                    },
+                ],
+            }
         }]
 
         # Verify failure if Match doesn't exist
@@ -1194,7 +1196,7 @@ class TestApiTrustedController(unittest2.TestCase):
 
         # Verify teams must be the same
         bad_data = copy.deepcopy(data)
-        bad_data[0]['red'][0]['team_key'] = 'frc9999'
+        bad_data[0]['alliances']['red'][0]['team_key'] = 'frc9999'
         request_body = json.dumps(bad_data)
         request_path = '/api/trusted/v1/event/2014casj/zebra_motionworks/add'
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
