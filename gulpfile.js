@@ -60,6 +60,13 @@ const configs = {
       outputDir: './static/compiled/javascript',
       outputFile: 'liveevent.min.js'
     }
+  },
+  zebramotionworks: {
+    js: {
+      src: ['./react/zebramotionworks/zebramotionworks.js'],
+      outputDir: './static/compiled/javascript',
+      outputFile: 'zebramotionworks.min.js'
+    }
   }
 };
 
@@ -156,6 +163,17 @@ gulp.task('liveevent-js-watch', (done) => {
   done();
 });
 
+
+gulp.task('zebramotionworks-js', (done) => {
+  compile(false, configs.zebramotionworks);
+  done();
+});
+
+gulp.task('zebramotionworks-js-watch', (done) => {
+  compile(true, configs.zebramotionworks);
+  done();
+});
+
 gulp.task('apidocs-less', (done) => {
   compileLess(configs.apidocs)
   done();
@@ -179,11 +197,11 @@ gulp.task('gameday-less-watch', (done) => {
 gulp.task('build', gulp.series('gameday-js', 'gameday-less',
                     'apidocs-js', 'apidocs-less',
                     'eventwizard-js', 'eventwizard-less',
-                    'liveevent-js'));
+                    'liveevent-js', 'zebramotionworks-js'));
 
 gulp.task('watch', gulp.series('gameday-js-watch', 'gameday-less-watch',
                     'apidocs-js-watch',
                     'eventwizard-js-watch',
-                    'liveevent-js-watch'));
+                    'liveevent-js-watch', 'zebramotionworks-js-watch'));
 
 gulp.task('default', gulp.series('build', 'watch'));
