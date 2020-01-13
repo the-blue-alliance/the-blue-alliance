@@ -75,36 +75,42 @@ class ZebraMotionWorksVisualizer extends React.Component {
             startTime={startTime}
             endTime={endTime}
             color="#FF0000"
+            indicatorAtStart={showAll}
           />
           <RobotTrajectory
             teamData={data.red[1]}
             startTime={startTime}
             endTime={endTime}
             color="#800000"
+            indicatorAtStart={showAll}
           />
           <RobotTrajectory
             teamData={data.red[2]}
             startTime={startTime}
             endTime={endTime}
             color="#FF8080"
+            indicatorAtStart={showAll}
           />
           <RobotTrajectory
             teamData={data.blue[0]}
             startTime={startTime}
             endTime={endTime}
             color="#0000FF"
+            indicatorAtStart={showAll}
           />
           <RobotTrajectory
             teamData={data.blue[1]}
             startTime={startTime}
             endTime={endTime}
             color="#000080"
+            indicatorAtStart={showAll}
           />
           <RobotTrajectory
             teamData={data.blue[2]}
             startTime={startTime}
             endTime={endTime}
             color="#8080FF"
+            indicatorAtStart={showAll}
           />
         </svg>
         <div style={{ width: '100%', display: 'flex' }}>
