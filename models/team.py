@@ -48,7 +48,7 @@ class Team(ndb.Model):
         from models.event import Event
         if self.home_cmp and self.updated:
             event = Event.get_by_id("{}{}".format(self.updated.year, self.home_cmp))
-            if event:
+            if event and event.city:
                 return {self.updated.year: event.city}
         return None
 
