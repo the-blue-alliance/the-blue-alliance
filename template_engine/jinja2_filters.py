@@ -45,6 +45,10 @@ def isoformat(datetime):
     return datetime.isoformat()
 
 
+def union(one, two):
+    return set(one) | set(two)
+
+
 def limit_prob(prob):
     prob *= 100
     prob = min(95, max(prob, 5))

@@ -26,6 +26,7 @@ def get_jinja_env(force_filesystemloader=False):
     env.filters['floatformat'] = jinja2_filters.floatformat
     env.filters['isoformat'] = jinja2_filters.isoformat
     env.filters['limit_prob'] = jinja2_filters.limit_prob
+    env.filters['union'] = jinja2_filters.union
     env.filters['strftime'] = jinja2_filters.strftime
     env.filters['strip_frc'] = jinja2_filters.strip_frc
     env.filters['urlencode'] = jinja2_filters.urlencode
