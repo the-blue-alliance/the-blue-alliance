@@ -44,6 +44,8 @@ def floatformat(num, num_decimals):
 def isoformat(datetime):
     return datetime.isoformat()
 
+def union(one, two):
+    return set(one) | set(two)
 
 def limit_prob(prob):
     prob *= 100
