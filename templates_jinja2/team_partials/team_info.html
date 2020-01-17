@@ -28,7 +28,7 @@
       {% if team.rookie_year %}<span class="glyphicon glyphicon-calendar"></span> Rookie Year: {{ team.rookie_year }}<br>{% endif %}
       {% if last_competed and last_competed < max_year %}<span class="glyphicon glyphicon-time"></span> Last competed in {{ last_competed }}<br>{% endif %}
       {% if team.website %}<span class="glyphicon glyphicon-globe"></span> <a href="{{team.website}}" target="_blank">{{ team.website }}</a><br>{% endif %}
-      {% if team.championship_location[year] %}<span class="glyphicon glyphicon-flag"></span> Home Championship: {{team.championship_location[year]}}<br>{% endif %}
+      {% if team.championship_location and team.championship_location[year] %}<span class="glyphicon glyphicon-flag"></span> Home Championship: {{team.championship_location[year]}}<br>{% endif %}
       {% if hof.is_hof %}<span class="hall-of-fame"><span class="glyphicon glyphicon-certificate"></span> Hall of Fame ({% for year in hof.years %}{{ year }}{{ ", " if not loop.last }}{% endfor %}){% if hof.media.video or hof.media.presentation or hof.media.essay %}:{% endif %}{% if hof.media.video %} <a href="{{hof.media.video}}">Video</a>{% endif %}{% if hof.media.presentation %}, <a href="{{hof.media.presentation}}">Presentation</a>{% endif %}{% if hof.media.essay %}, <a href="{{hof.media.essay}}">Essay</a>{% endif %}</span><br>{% endif %}
 
       <hr>
