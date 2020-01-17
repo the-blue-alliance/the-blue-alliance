@@ -2,7 +2,6 @@ import logging
 import re
 
 from google.appengine.ext import ndb
-from helpers.champ_split_helper import ChampSplitHelper
 from models.location import Location
 
 
@@ -46,7 +45,12 @@ class Team(ndb.Model):
 
     @property
     def championship_location(self):
-        return ChampSplitHelper.get_champ(self)
+        from models.event import Event
+        if self.home_cmp and self.updated:
+            event = Event.get_by_id("{}{}".format(self.updated.year, self.home_cmp))
+            if event:
+                return {self.updated.year: event.city}
+        return None
 
     @property
     def location(self):
