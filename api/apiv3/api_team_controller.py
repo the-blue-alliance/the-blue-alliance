@@ -19,7 +19,7 @@ from models.team import Team
 
 
 class ApiTeamListAllController(ApiBaseController):
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 61
 
     def _track_call(self, model_type=None):
@@ -57,7 +57,7 @@ class ApiTeamListController(ApiBaseController):
     page_num = 2 returns teams from 1000-1499
     etc.
     """
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 61
     PAGE_SIZE = 500
 
@@ -80,7 +80,7 @@ class ApiTeamListController(ApiBaseController):
 
 
 class ApiTeamController(ApiBaseController):
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 61
 
     def _track_call(self, team_key, model_type=None):

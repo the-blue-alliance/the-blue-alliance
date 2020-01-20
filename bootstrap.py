@@ -88,6 +88,7 @@ def store_team(data):
     team.city = data['city']
     team.state_prov = data['state_prov']
     team.country = data['country']
+    team.school_name = data['school_name']
 
     TeamManipulator.createOrUpdate(team)
     return team
