@@ -30,6 +30,7 @@ class TeamConverter(ConverterBase):
             'rookie_year': team.rookie_year,
             'motto': None,
             'home_championship': team.championship_location,
+            'school_name': team.school_name,
         }
         team_dict.update(cls.constructLocation_v3(team))
         return team_dict
