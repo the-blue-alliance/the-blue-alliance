@@ -7,7 +7,7 @@ from consts.notification_type import NotificationType
 from notifications.update_subscriptions import UpdateSubscriptionsNotification
 
 
-class TestUpdateFavoritesNotification(unittest2.TestCase):
+class TestUpdateSubscriptionsNotification(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
