@@ -44,6 +44,24 @@ class MobileClient(ndb.Model):
         return self.messaging_id if len(self.messaging_id)<=50 else self.messaging_id[0:50]+'...'
 
     @staticmethod
+    def clients(user_id, client_types=ClientType.names.keys()):
+        """
+        Get Mobile Clients for a given user.
+
+        Args:
+            user_id (string): The User ID to fetch clients for.
+            client_types (list, ClientType): The client types to filter for.
+
+        Returns:
+            list (MobileClient): List of Mobile Clients for the user.
+        """
+        from models.account import Account
+        return MobileClient.query(
+            MobileClient.client_type.IN(client_types),
+            ancestor=ndb.Key(Account, user_id)
+        ).fetch()
+
+    @staticmethod
     def fcm_messaging_ids(user_id):
         """
         Get messaging IDs for FCM clients for a given user.
