@@ -20,6 +20,44 @@ class TestMobileClient(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
+    def test_clients(self):
+        user_id_one = 'user_id_one'
+        token_one = 'token1'
+        token_two = 'token2'
+
+        user_id_two = 'user_id_two'
+        token_three = 'token3'
+
+        user_id_three = 'user_id_three'
+
+        for (user_id, tokens) in [(user_id_one, [token_one, token_two]), (user_id_two, [token_three])]:
+            clients = [MobileClient(
+                        parent=ndb.Key(Account, user_id),
+                        user_id=user_id,
+                        messaging_id=token,
+                        client_type=ClientType.OS_IOS,
+                        device_uuid=token[::-1],
+                        display_name='Phone') for token in tokens]
+            for client in clients:
+                client.put()
+
+        self.assertEqual([client.messaging_id for client in MobileClient.clients(user_id_one)], [token_one, token_two])
+        self.assertEqual([client.messaging_id for client in MobileClient.clients(user_id_two)], [token_three])
+        self.assertEqual([client.messaging_id for client in MobileClient.clients(user_id_three)], [])
+
+    def test_clients_type(self):
+        clients = [MobileClient(
+                    parent=ndb.Key(Account, 'user_id'),
+                    user_id='user_id',
+                    messaging_id='messaging_id_{}'.format(client_type),
+                    client_type=client_type) for client_type in ClientType.names.keys()]
+        for client in clients:
+            client.put()
+
+        self.assertEqual([client.messaging_id for client in MobileClient.clients('user_id', client_types=[ClientType.OS_ANDROID])], ['messaging_id_0'])
+        self.assertEqual([client.messaging_id for client in MobileClient.clients('user_id', client_types=ClientType.FCM_CLIENTS)], ['messaging_id_1', 'messaging_id_3'])
+        self.assertEqual([client.messaging_id for client in MobileClient.clients('user_id', client_types=[ClientType.WEBHOOK])], ['messaging_id_2'])
+
     def test_fcm_messaging_ids(self):
         user_id_one = 'user_id_one'
         token_one = 'token1'
