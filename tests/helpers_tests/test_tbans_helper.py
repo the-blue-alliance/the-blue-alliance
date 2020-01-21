@@ -603,6 +603,27 @@ class TestTBANSHelper(unittest2.TestCase):
             mock_init.assert_called_once_with(ANY, expected, ANY)
             self.assertEqual(exit_code, 0)
 
+    def test_send_webhook_filter_webhook_clients_verified(self):
+        clients = [
+            MobileClient(
+                parent=ndb.Key(Account, 'user_id'),
+                user_id='user_id',
+                messaging_id='unverified',
+                client_type=ClientType.WEBHOOK,
+                verified=False),
+            MobileClient(
+                parent=ndb.Key(Account, 'user_id'),
+                user_id='user_id',
+                messaging_id='verified',
+                client_type=ClientType.WEBHOOK,
+                verified=True)
+        ]
+
+        with patch('models.notifications.requests.webhook_request.WebhookRequest', autospec=True) as mock_init:
+            exit_code = TBANSHelper._send_webhook(clients, MockNotification())
+            mock_init.assert_called_once_with(ANY, 'verified', ANY)
+            self.assertEqual(exit_code, 0)
+
     def test_send_webhook_multiple(self):
         clients = [MobileClient(
                     parent=ndb.Key(Account, 'user_id'),
