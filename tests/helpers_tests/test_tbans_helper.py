@@ -74,8 +74,6 @@ class TestTBANSHelper(unittest2.TestCase):
             self.assertEqual(len(tasks), 0)
 
     def test_broadcast_fcm(self):
-        from notifications.base_notification import BaseNotification
-
         for client_type in ClientType.FCM_CLIENTS:
             client = MobileClient(
                 parent=ndb.Key(Account, 'user_id'),
@@ -86,6 +84,7 @@ class TestTBANSHelper(unittest2.TestCase):
                 display_name='Phone')
             client_key = client.put()
 
+            from notifications.base_notification import BaseNotification
             with patch.object(BaseNotification, 'send') as mock_send:
                 TBANSHelper.broadcast([client_type], 'Broadcast', 'Test broadcast')
                 # Make sure we didn't send to Android
@@ -161,8 +160,8 @@ class TestTBANSHelper(unittest2.TestCase):
             display_name='Phone')
         client.put()
 
-        from notifications.base_notification import BaseNotification
-        with patch.object(BaseNotification, 'send') as mock_send:
+        from notifications.broadcast import BroadcastNotification
+        with patch.object(BroadcastNotification, 'send') as mock_send:
             TBANSHelper.broadcast([client_type], 'Broadcast', 'Test broadcast')
             mock_send.assert_called_once_with({client_type: [messaging_id]})
 
@@ -240,8 +239,8 @@ class TestTBANSHelper(unittest2.TestCase):
             device_uuid='uuid',
             display_name='Phone')
 
-        from notifications.base_notification import BaseNotification
-        with patch.object(BaseNotification, 'send') as mock_send:
+        from notifications.ping import PingNotification
+        with patch.object(PingNotification, 'send') as mock_send:
             success = TBANSHelper._ping_client(client)
             mock_send.assert_called_once_with({client_type: [messaging_id]})
             self.assertTrue(success)
