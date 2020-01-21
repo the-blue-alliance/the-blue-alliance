@@ -1,5 +1,6 @@
 import unittest2
 
+from consts.fcm.platform_priority import PlatformPriority
 from consts.notification_type import NotificationType
 
 from models.notifications.broadcast import BroadcastNotification
