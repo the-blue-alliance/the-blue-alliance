@@ -204,6 +204,8 @@ class TBANSHelper:
 
         # Make sure we're only sending to webhook clients
         clients = [client for client in clients if client.client_type == ClientType.WEBHOOK]
+        # Only send to verified webhooks
+        clients = [client for client in clients if client.verified]
 
         from models.notifications.requests.webhook_request import WebhookRequest
         for client in clients:
