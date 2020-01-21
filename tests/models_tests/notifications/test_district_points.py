@@ -20,6 +20,9 @@ class TestDistrictPointsNotification(unittest2.TestCase):
         self.assertEqual(self.notification.fcm_notification.title, 'FIM District Points Updated')
         self.assertEqual(self.notification.fcm_notification.body, 'FIRST In Michigan district point calculations have been updated.')
 
+    def test_platform_config(self):
+        self.assertEqual(self.notification.platform_config.priority, PlatformPriority.HIGH)
+
     def test_data_payload(self):
         self.assertEqual(self.notification.data_payload, {'district_key': '2015fim'})
 
