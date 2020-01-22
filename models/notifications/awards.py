@@ -20,12 +20,6 @@ class AwardsNotification(Notification):
         )
 
     @property
-    def platform_config(self):
-        from consts.fcm.platform_priority import PlatformPriority
-        from models.fcm.platform_config import PlatformConfig
-        return PlatformConfig(priority=PlatformPriority.HIGH)
-
-    @property
     def data_payload(self):
         from helpers.award_helper import AwardHelper
         from helpers.model_to_dict import ModelToDict

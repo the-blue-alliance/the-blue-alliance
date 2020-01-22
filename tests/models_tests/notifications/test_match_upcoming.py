@@ -9,7 +9,6 @@ from consts.notification_type import NotificationType
 from helpers.event.event_test_creator import EventTestCreator
 from models.team import Team
 
-from consts.fcm.platform_priority import PlatformPriority
 from models.notifications.match_upcoming import MatchUpcomingNotification
 
 
@@ -38,9 +37,6 @@ class TestMatchUpcomingNotification(unittest2.TestCase):
 
     def test_type(self):
         self.assertEqual(MatchUpcomingNotification._type(), NotificationType.UPCOMING_MATCH)
-
-    def test_platform_config(self):
-        self.assertEqual(self.notification.platform_config.priority, PlatformPriority.HIGH)
 
     def test_fcm_notification(self):
         # Set times for testing

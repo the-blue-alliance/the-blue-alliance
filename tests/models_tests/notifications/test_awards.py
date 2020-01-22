@@ -7,7 +7,6 @@ from consts.notification_type import NotificationType
 from helpers.event.event_test_creator import EventTestCreator
 from models.team import Team
 
-from consts.fcm.platform_priority import PlatformPriority
 from models.notifications.awards import AwardsNotification
 
 
@@ -46,9 +45,6 @@ class TestAwardsNotification(unittest2.TestCase):
         self.assertIsNotNone(self.notification.fcm_notification)
         self.assertEqual(self.notification.fcm_notification.title, 'TESTPRESENT Awards Updated')
         self.assertEqual(self.notification.fcm_notification.body, 'Arizona North Regional awards have been updated.')
-
-    def test_platform_config(self):
-        self.assertEqual(self.notification.platform_config.priority, PlatformPriority.HIGH)
 
     def test_data_payload(self):
         # No `event_name`

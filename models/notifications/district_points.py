@@ -22,12 +22,6 @@ class DistrictPointsNotification(Notification):
         )
 
     @property
-    def platform_config(self):
-        from consts.fcm.platform_priority import PlatformPriority
-        from models.fcm.platform_config import PlatformConfig
-        return PlatformConfig(priority=PlatformPriority.HIGH)
-
-    @property
     def data_payload(self):
         return {
             'district_key': self.district.key_name
