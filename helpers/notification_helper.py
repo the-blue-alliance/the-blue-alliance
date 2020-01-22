@@ -18,8 +18,6 @@ from notifications.match_video import MatchVideoNotification, EventMatchVideoNot
 from notifications.awards_updated import AwardsUpdatedNotification
 from notifications.schedule_updated import ScheduleUpdatedNotification
 from notifications.upcoming_match import UpcomingMatchNotification
-from notifications.update_favorites import UpdateFavoritesNotification
-from notifications.update_subscriptions import UpdateSubscriptionsNotification
 
 
 class NotificationHelper(object):
@@ -36,20 +34,6 @@ class NotificationHelper(object):
 
         notification = MatchScoreNotification(match)
         notification.send(keys)
-
-    @classmethod
-    def send_favorite_update(cls, user_id, sending_device_key=""):
-        clients = PushHelper.get_client_ids_for_users([user_id], os_types=[ClientType.OS_ANDROID])
-
-        notification = UpdateFavoritesNotification(user_id, sending_device_key)
-        notification.send(clients)
-
-    @classmethod
-    def send_subscription_update(cls, user_id, sending_device_key=""):
-        clients = PushHelper.get_client_ids_for_users([user_id], os_types=[ClientType.OS_ANDROID])
-
-        notification = UpdateSubscriptionsNotification(user_id, sending_device_key)
-        notification.send(clients)
 
     @classmethod
     def send_upcoming_match_notification(cls, match, event):

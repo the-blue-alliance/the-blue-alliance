@@ -12,7 +12,7 @@ class UpdateSubscriptionsNotification(BaseNotification):
 
     def __init__(self, user_id, sending_device_key):
         self.user_id = user_id
-        self.sending_device_key = sending_device_key
+        self.sending_device_key = sending_device_key if sending_device_key else ""
 
     @property
     def _type(self):

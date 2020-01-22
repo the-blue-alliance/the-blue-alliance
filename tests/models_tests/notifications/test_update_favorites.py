@@ -14,4 +14,4 @@ class TestUpdateFavoritesNotification(unittest2.TestCase):
         self.assertEqual(UpdateFavoritesNotification._type(), NotificationType.UPDATE_FAVORITES)
 
     def test_platform_config(self):
-        self.assertEqual(self.notification.platform_config.collapse_key, 'abcd_favorite_update')
+        self.assertEqual(self.notification.platform_config.collapse_key, 'abcd_update_favorites')

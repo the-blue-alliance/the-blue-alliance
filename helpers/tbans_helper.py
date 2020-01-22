@@ -132,6 +132,57 @@ class TBANSHelper:
         return notification.verification_key
 
     @classmethod
+    def update_favorites(cls, user_id, sending_device_key=None):
+        from models.notifications.update_favorites import UpdateFavoritesNotification
+        notification = UpdateFavoritesNotification(user_id)
+        cls._update_mytba(notification, sending_device_key)
+
+        # Send to Android
+        android_clients = MobileClient.clients(user_id, client_types=[ClientType.OS_ANDROID])
+        # Filter out our sending_device_key client
+        if sending_device_key:
+            android_clients = [client for client in android_clients if not client.messaging_id == sending_device_key]
+        if android_clients:
+            from notifications.update_favorites import UpdateFavoritesNotification
+            notification = UpdateFavoritesNotification(user_id, sending_device_key)
+            notification.send({ClientType.OS_ANDROID: [client.messaging_id for client in android_clients]})
+
+    @classmethod
+    def update_subscriptions(cls, user_id, sending_device_key=None):
+        from models.notifications.update_subscriptions import UpdateSubscriptionsNotification
+        notification = UpdateSubscriptionsNotification(user_id)
+        cls._update_mytba(notification, sending_device_key)
+
+        # Send to Android
+        android_clients = MobileClient.clients(user_id, client_types=[ClientType.OS_ANDROID])
+        # Filter out our sending_device_key client
+        if sending_device_key:
+            android_clients = [client for client in android_clients if not client.messaging_id == sending_device_key]
+        if android_clients:
+            from notifications.update_subscriptions import UpdateSubscriptionsNotification
+            notification = UpdateSubscriptionsNotification(user_id, sending_device_key)
+            notification.send({ClientType.OS_ANDROID: [client.messaging_id for client in android_clients]})
+
+    @classmethod
+    def _update_mytba(cls, notification, sending_device_key=None):
+        from models.account import Account
+        clients = MobileClient.clients(notification.user_id, client_types=ClientType.FCM_CLIENTS)
+        # Filter out our sending_device_key client
+        if sending_device_key:
+            clients = [client for client in clients if not client.messaging_id == sending_device_key]
+
+        if not clients:
+            return
+
+        deferred.defer(
+            cls._send_fcm,
+            clients,
+            notification,
+            _queue="push-notifications",
+            _url='/_ah/queue/deferred_notification_send'
+        )
+
+    @classmethod
     def _send_fcm(cls, clients, notification, backoff_iteration=0):
         # Only send to FCM clients if notifications are enabled
         if not cls._notifications_enabled():

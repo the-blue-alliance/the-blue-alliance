@@ -16,6 +16,8 @@ from helpers.tbans_helper import TBANSHelper, _firebase_app
 from models.account import Account
 from models.mobile_client import MobileClient
 from models.notifications.broadcast import BroadcastNotification
+from models.notifications.update_favorites import UpdateFavoritesNotification
+from models.notifications.update_subscriptions import UpdateSubscriptionsNotification
 from models.notifications.requests.fcm_request import FCMRequest
 from models.notifications.requests.webhook_request import WebhookRequest
 
@@ -293,6 +295,268 @@ class TestTBANSHelper(unittest2.TestCase):
             verification_key = TBANSHelper.verify_webhook('https://thebluealliance.com', 'secret')
             mock_send.assert_called_once()
             self.assertIsNotNone(verification_key)
+
+    def test_update_favorites_fcm(self):
+        clients = [MobileClient(
+                    parent=ndb.Key(Account, 'user_id'),
+                    user_id='user_id',
+                    messaging_id='client_type_{}'.format(client_type),
+                    client_type=client_type) for client_type in ClientType.names.keys()]
+        # Remove our Android client - we'll test this later
+        clients = [client for client in clients if not client.client_type == ClientType.OS_ANDROID]
+
+        for client in clients:
+            client.put()
+
+        fcm_clients = [client for client in clients if client.client_type in ClientType.FCM_CLIENTS]
+
+        TBANSHelper.update_favorites('user_id')
+
+        # Make sure we'll send to FCM clients
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
+        self.assertEqual(len(tasks), 1)
+
+        # Make sure our taskqueue tasks execute what we expect
+        with patch.object(TBANSHelper, '_send_fcm') as mock_send_fcm:
+            deferred.run(tasks[0].payload)
+            mock_send_fcm.assert_called_once_with(fcm_clients, ANY)
+            # Make sure the notification is a UpdateFavoritesNotification
+            notification = mock_send_fcm.call_args[0][1]
+            self.assertTrue(isinstance(notification, UpdateFavoritesNotification))
+
+        self.taskqueue_stub.FlushQueue('push-notifications')
+
+    def test_update_favorites_fcm_none(self):
+        TBANSHelper.update_favorites('user_id')
+        # No FCM clients - shouldn't send
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
+        self.assertEqual(len(tasks), 0)
+
+    def test_update_favorites_fcm_sending_device_key(self):
+        clients = [MobileClient(
+                    parent=ndb.Key(Account, 'user_id'),
+                    user_id='user_id',
+                    messaging_id='client_type_{}'.format(i),
+                    client_type=ClientType.OS_IOS) for i in range(2)]
+        expected_client = clients[-1]
+
+        for client in clients:
+            client.put()
+
+        TBANSHelper.update_favorites('user_id', 'client_type_0')
+
+        # Make sure we'll send to FCM clients
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
+        self.assertEqual(len(tasks), 1)
+
+        # Make sure our taskqueue tasks execute what we expect
+        with patch.object(TBANSHelper, '_send_fcm') as mock_send_fcm:
+            deferred.run(tasks[0].payload)
+            mock_send_fcm.assert_called_once_with([expected_client], ANY)
+            # Make sure the notification is a UpdateFavoritesNotification
+            notification = mock_send_fcm.call_args[0][1]
+            self.assertTrue(isinstance(notification, UpdateFavoritesNotification))
+
+        self.taskqueue_stub.FlushQueue('push-notifications')
+
+    def test_update_favorites_fcm_sending_device_key_none(self):
+        client = MobileClient(
+                    parent=ndb.Key(Account, 'user_id'),
+                    user_id='user_id',
+                    messaging_id='messaging_id',
+                    client_type=ClientType.OS_IOS)
+        client.put()
+
+        TBANSHelper.update_favorites('user_id', 'messaging_id')
+
+        # Make sure we'll send to FCM clients
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
+        self.assertEqual(len(tasks), 0)
+
+    def test_update_favorites_android(self):
+        clients = [MobileClient(
+                    parent=ndb.Key(Account, 'user_id'),
+                    user_id='user_id',
+                    messaging_id='client_type_{}'.format(client_type),
+                    client_type=client_type) for client_type in ClientType.names.keys()]
+
+        for client in clients:
+            client.put()
+
+        # Make sure we're sending to Android clients
+        from notifications.update_favorites import UpdateFavoritesNotification
+        with patch.object(UpdateFavoritesNotification, 'send') as mock_send:
+            TBANSHelper.update_favorites('user_id')
+            mock_send.assert_called_with({ClientType.OS_ANDROID: ['client_type_0']})
+
+    def test_update_favorites_android_none(self):
+        # No clients - shouldn't send
+        from notifications.update_favorites import UpdateFavoritesNotification
+        with patch.object(UpdateFavoritesNotification, 'send') as mock_send:
+            mock_send.assert_not_called()
+
+    def test_update_favorites_android_sending_device_key(self):
+        clients = [MobileClient(
+                    parent=ndb.Key(Account, 'user_id'),
+                    user_id='user_id',
+                    messaging_id='client_type_{}'.format(i),
+                    client_type=ClientType.OS_ANDROID) for i in range(2)]
+
+        for client in clients:
+            client.put()
+
+        # Make sure we don't send to client_type_0 - only client_type_1
+        from notifications.update_favorites import UpdateFavoritesNotification
+        with patch.object(UpdateFavoritesNotification, 'send') as mock_send:
+            TBANSHelper.update_favorites('user_id', 'client_type_0')
+            mock_send.assert_called_with({ClientType.OS_ANDROID: ['client_type_1']})
+
+    def test_update_favorites_android_sending_device_key_none(self):
+        clients = [MobileClient(
+                    parent=ndb.Key(Account, 'user_id'),
+                    user_id='user_id',
+                    messaging_id='client_type_{}'.format(client_type),
+                    client_type=client_type) for client_type in ClientType.names.keys()]
+
+        for client in clients:
+            client.put()
+
+        # Make sure iff there are no clients to send to we don't send
+        from notifications.update_favorites import UpdateFavoritesNotification
+        with patch.object(UpdateFavoritesNotification, 'send') as mock_send:
+            TBANSHelper.update_favorites('user_id', 'client_type_0')
+            mock_send.assert_not_called()
+
+    def test_update_subscriptions_fcm(self):
+        clients = [MobileClient(
+                    parent=ndb.Key(Account, 'user_id'),
+                    user_id='user_id',
+                    messaging_id='client_type_{}'.format(client_type),
+                    client_type=client_type) for client_type in ClientType.names.keys()]
+        # Remove our Android client - we'll test this later
+        clients = [client for client in clients if not client.client_type == ClientType.OS_ANDROID]
+
+        for client in clients:
+            client.put()
+
+        fcm_clients = [client for client in clients if client.client_type in ClientType.FCM_CLIENTS]
+
+        TBANSHelper.update_subscriptions('user_id')
+
+        # Make sure we'll send to FCM clients
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
+        self.assertEqual(len(tasks), 1)
+
+        # Make sure our taskqueue tasks execute what we expect
+        with patch.object(TBANSHelper, '_send_fcm') as mock_send_fcm:
+            deferred.run(tasks[0].payload)
+            mock_send_fcm.assert_called_once_with(fcm_clients, ANY)
+            # Make sure the notification is a UpdateSubscriptionsNotification
+            notification = mock_send_fcm.call_args[0][1]
+            self.assertTrue(isinstance(notification, UpdateSubscriptionsNotification))
+
+        self.taskqueue_stub.FlushQueue('push-notifications')
+
+    def test_update_subscriptions_fcm_none(self):
+        TBANSHelper.update_subscriptions('user_id')
+        # No FCM clients - shouldn't send
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
+        self.assertEqual(len(tasks), 0)
+
+    def test_update_subscriptions_fcm_sending_device_key(self):
+        clients = [MobileClient(
+                    parent=ndb.Key(Account, 'user_id'),
+                    user_id='user_id',
+                    messaging_id='client_type_{}'.format(i),
+                    client_type=ClientType.OS_IOS) for i in range(2)]
+        expected_client = clients[-1]
+
+        for client in clients:
+            client.put()
+
+        TBANSHelper.update_subscriptions('user_id', 'client_type_0')
+
+        # Make sure we'll send to FCM clients
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
+        self.assertEqual(len(tasks), 1)
+
+        # Make sure our taskqueue tasks execute what we expect
+        with patch.object(TBANSHelper, '_send_fcm') as mock_send_fcm:
+            deferred.run(tasks[0].payload)
+            mock_send_fcm.assert_called_once_with([expected_client], ANY)
+            # Make sure the notification is a UpdateSubscriptionsNotification
+            notification = mock_send_fcm.call_args[0][1]
+            self.assertTrue(isinstance(notification, UpdateSubscriptionsNotification))
+
+        self.taskqueue_stub.FlushQueue('push-notifications')
+
+    def test_update_subscriptions_fcm_sending_device_key_none(self):
+        client = MobileClient(
+                    parent=ndb.Key(Account, 'user_id'),
+                    user_id='user_id',
+                    messaging_id='messaging_id',
+                    client_type=ClientType.OS_IOS)
+        client.put()
+
+        TBANSHelper.update_subscriptions('user_id', 'messaging_id')
+
+        # Make sure we'll send to FCM clients
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
+        self.assertEqual(len(tasks), 0)
+
+    def test_update_subscriptions_android(self):
+        clients = [MobileClient(
+                    parent=ndb.Key(Account, 'user_id'),
+                    user_id='user_id',
+                    messaging_id='client_type_{}'.format(client_type),
+                    client_type=client_type) for client_type in ClientType.names.keys()]
+
+        for client in clients:
+            client.put()
+
+        # Make sure we're sending to Android clients
+        from notifications.update_subscriptions import UpdateSubscriptionsNotification
+        with patch.object(UpdateSubscriptionsNotification, 'send') as mock_send:
+            TBANSHelper.update_subscriptions('user_id')
+            mock_send.assert_called_with({ClientType.OS_ANDROID: ['client_type_0']})
+
+    def test_update_subscriptions_android_none(self):
+        # No clients - shouldn't send
+        from notifications.update_subscriptions import UpdateSubscriptionsNotification
+        with patch.object(UpdateSubscriptionsNotification, 'send') as mock_send:
+            mock_send.assert_not_called()
+
+    def test_update_subscriptions_android_sending_device_key(self):
+        clients = [MobileClient(
+                    parent=ndb.Key(Account, 'user_id'),
+                    user_id='user_id',
+                    messaging_id='client_type_{}'.format(i),
+                    client_type=ClientType.OS_ANDROID) for i in range(2)]
+
+        for client in clients:
+            client.put()
+
+        # Make sure we don't send to client_type_0 - only client_type_1
+        from notifications.update_subscriptions import UpdateSubscriptionsNotification
+        with patch.object(UpdateSubscriptionsNotification, 'send') as mock_send:
+            TBANSHelper.update_subscriptions('user_id', 'client_type_0')
+            mock_send.assert_called_with({ClientType.OS_ANDROID: ['client_type_1']})
+
+    def test_update_subscriptions_android_sending_device_key_none(self):
+        clients = [MobileClient(
+                    parent=ndb.Key(Account, 'user_id'),
+                    user_id='user_id',
+                    messaging_id='client_type_{}'.format(client_type),
+                    client_type=client_type) for client_type in ClientType.names.keys()]
+
+        for client in clients:
+            client.put()
+
+        # Make sure iff there are no clients to send to we don't send
+        from notifications.update_subscriptions import UpdateSubscriptionsNotification
+        with patch.object(UpdateSubscriptionsNotification, 'send') as mock_send:
+            TBANSHelper.update_subscriptions('user_id', 'client_type_0')
+            mock_send.assert_not_called()
 
     def test_send_fcm_disabled(self):
         from sitevars.notifications_enable import NotificationsEnable
