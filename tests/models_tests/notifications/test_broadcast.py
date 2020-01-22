@@ -1,6 +1,5 @@
 import unittest2
 
-from consts.fcm.platform_priority import PlatformPriority
 from consts.notification_type import NotificationType
 
 from models.notifications.broadcast import BroadcastNotification
@@ -18,9 +17,6 @@ class TestBroadcastNotification(unittest2.TestCase):
         self.assertIsNotNone(self.notification.fcm_notification)
         self.assertEqual(self.notification.fcm_notification.title, 'Title Here')
         self.assertEqual(self.notification.fcm_notification.body, 'Some body message ya dig')
-
-    def test_platform_config(self):
-        self.assertEqual(self.notification.platform_config.priority, PlatformPriority.HIGH)
 
     def test_data_payload(self):
         self.assertEqual(self.notification.data_payload, {'url': None, 'app_version': None})

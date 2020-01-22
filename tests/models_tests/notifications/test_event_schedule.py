@@ -8,7 +8,6 @@ from consts.notification_type import NotificationType
 from helpers.event.event_test_creator import EventTestCreator
 from models.team import Team
 
-from consts.fcm.platform_priority import PlatformPriority
 from models.notifications.event_schedule import EventScheduleNotification
 
 
@@ -55,10 +54,6 @@ class TestEventScheduleNotification(unittest2.TestCase):
 
     def test_type(self):
         self.assertEqual(EventScheduleNotification._type(), NotificationType.SCHEDULE_UPDATED)
-
-    def test_platform_config(self):
-        self._setup_notification()
-        self.assertEqual(self.notification.platform_config.priority, PlatformPriority.HIGH)
 
     def test_fcm_notification(self):
         self._setup_notification()
