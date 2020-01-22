@@ -23,8 +23,8 @@ class TestPlatformPriority(unittest2.TestCase):
             PlatformPriority.platform_priority(PlatformType.ANDROID, -1)
 
     def test_platform_priority_android(self):
-        self.assertEqual(PlatformPriority.platform_priority(PlatformType.ANDROID, PlatformPriority.HIGH), 'HIGH')
-        self.assertEqual(PlatformPriority.platform_priority(PlatformType.ANDROID, PlatformPriority.NORMAL), 'NORMAL')
+        self.assertEqual(PlatformPriority.platform_priority(PlatformType.ANDROID, PlatformPriority.HIGH), 'high')
+        self.assertEqual(PlatformPriority.platform_priority(PlatformType.ANDROID, PlatformPriority.NORMAL), 'normal')
 
     def test_platform_priority_apns(self):
         self.assertEqual(PlatformPriority.platform_priority(PlatformType.APNS, PlatformPriority.HIGH), '10')

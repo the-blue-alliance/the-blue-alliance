@@ -10,8 +10,8 @@ class PlatformPriority:
 
     # https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#androidmessagepriority
     _android = {
-        NORMAL: 'NORMAL',
-        HIGH: 'HIGH',
+        NORMAL: 'normal',
+        HIGH: 'high',
     }
 
     # https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html#//apple_ref/doc/uid/TP40008194-CH11-SW1

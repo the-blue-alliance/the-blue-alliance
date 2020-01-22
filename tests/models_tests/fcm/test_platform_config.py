@@ -55,14 +55,14 @@ class TestPlatformConfig(unittest2.TestCase):
         android_config = config.platform_config(PlatformType.ANDROID)
         self.assertTrue(isinstance(android_config, messaging.AndroidConfig))
         self.assertIsNone(android_config.collapse_key)
-        self.assertEqual(android_config.priority, 'HIGH')
+        self.assertEqual(android_config.priority, 'high')
 
     def test_platform_config_android(self):
         config = PlatformConfig(priority=PlatformPriority.NORMAL, collapse_key='collapse_key')
         android_config = config.platform_config(PlatformType.ANDROID)
         self.assertTrue(isinstance(android_config, messaging.AndroidConfig))
         self.assertEqual(android_config.collapse_key, 'collapse_key')
-        self.assertEqual(android_config.priority, 'NORMAL')
+        self.assertEqual(android_config.priority, 'normal')
 
     def test_platform_config_apns_empty(self):
         config = PlatformConfig()
