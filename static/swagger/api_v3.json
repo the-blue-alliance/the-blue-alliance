@@ -5621,8 +5621,7 @@
                   "$ref": "#/components/schemas/Zebra_team"
                 }
               }
-            },
-            "description": "A list of alliances, the teams on the alliances, and their score."
+            }
           },
         }
       },
