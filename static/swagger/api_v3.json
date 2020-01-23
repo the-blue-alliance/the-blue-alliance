@@ -5593,7 +5593,7 @@
           },
           "times": {
             "type": "array",
-            "description": "A list of relative timestamps for each data point.",
+            "description": "A list of relative timestamps for each data point. Each timestamp will correspond to the X and Y value at the same index in a team xs and ys arrays.",
             "items": {
               "type": "number",
               "format": "double"
@@ -5604,14 +5604,14 @@
             "properties": {
               "red": {
                 "type": "array",
-                "description": "Red",
+                "description": "Zebra data for teams on the red alliance",
                 "items": {
                   "$ref": "#/components/schemas/Zebra_team"
                 }
               },
               "blue": {
                 "type": "array",
-                "description": "Blue",
+                "description": "Zebra data for teams on the blue alliance",
                 "items": {
                   "$ref": "#/components/schemas/Zebra_team"
                 }
@@ -5635,7 +5635,7 @@
           },
           "xs": {
             "type": "array",
-            "description": "A list of points for a team's X position at a given timestamp.",
+            "description": "A list of doubles representing a teams X position in feet at the corresponding timestamp. May contain some points that are null.",
             "items": {
               "type": "number",
               "format": "double"
@@ -5643,7 +5643,7 @@
           },
           "ys": {
             "type": "array",
-            "description": "A list of points for a team's Y position at a given timestamp.",
+            "description": "A list of doubles representing a teams Y position in feet at the corresponding timestamp. May contain some points that are null.",
             "items": {
               "type": "number",
               "format": "double"
