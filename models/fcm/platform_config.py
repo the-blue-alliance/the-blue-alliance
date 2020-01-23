@@ -66,7 +66,7 @@ class PlatformConfig(object):
             if platform_type == PlatformType.APNS:
                 # Create an empty `payload` as a workaround for an FCM bug
                 # https://github.com/the-blue-alliance/the-blue-alliance/pull/2557#discussion_r310365295
-                payload = messaging.APNSPayload(aps=messaging.Aps(content_available=True)) if headers else None
+                payload = messaging.APNSPayload(aps=messaging.Aps())
                 return messaging.APNSConfig(headers=headers, payload=payload)
             elif platform_type == PlatformType.WEBPUSH:
                 return messaging.WebpushConfig(headers=headers)
