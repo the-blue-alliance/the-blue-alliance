@@ -57,6 +57,19 @@ class FCMRequest(Request):
             else platform_config and platform_config.platform_config(platform_type=PlatformType.WEBPUSH)
         # `platform_config and platform_config` is to short circuit execution if platform_config is None
 
+        # Additional APNS-specific configuration - make sure we have some payload
+        if not apns_config:
+            apns_config = messaging.APNSConfig()
+        if not apns_config.payload:
+            apns_config.payload = messaging.APNSPayload(aps=messaging.Aps())
+
+        if self.notification.fcm_notification:
+            # Set sound
+            apns_config.payload.aps.sound = 'default'
+        else:
+            # Set content_available
+            apns_config.payload.aps.content_available = True
+
         # Add `notification_type` to data payload
         data_payload = self.notification.data_payload if self.notification.data_payload else {}
         # Remove `None` from data payload, since FCM won't accept them
