@@ -20,7 +20,8 @@ from models.team import Team
 
 class ApiTeamListAllController(ApiBaseController):
     CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 61
+    # `all` endpoints have a longer-than-usual edge cache of one hour
+    CACHE_HEADER_LENGTH = 60 * 60
 
     def _track_call(self, model_type=None):
         action = 'team/list'
