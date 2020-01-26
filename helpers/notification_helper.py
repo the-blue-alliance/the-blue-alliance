@@ -10,6 +10,7 @@ from helpers.push_helper import PushHelper
 
 from models.event import Event
 from models.sitevar import Sitevar
+from models.subscription import Subscription
 
 from notifications.alliance_selections import AllianceSelectionNotification
 from notifications.level_starting import CompLevelStartingNotification
@@ -105,7 +106,7 @@ class NotificationHelper(object):
 
     @classmethod
     def send_schedule_update(cls, event):
-        users = PushHelper.get_users_subscribed_to_event(event, NotificationType.SCHEDULE_UPDATED)
+        users = Subscription.users_subscribed_to_event(event, NotificationType.SCHEDULE_UPDATED)
         keys = PushHelper.get_client_ids_for_users(users)
 
         notification = ScheduleUpdatedNotification(event)
@@ -121,7 +122,7 @@ class NotificationHelper(object):
 
     @classmethod
     def send_award_update(cls, event):
-        users = PushHelper.get_users_subscribed_to_event(event, NotificationType.AWARDS)
+        users = Subscription.users_subscribed_to_event(event, NotificationType.AWARDS)
         keys = PushHelper.get_client_ids_for_users(users)
 
         notification = AwardsUpdatedNotification(event)
@@ -135,7 +136,7 @@ class NotificationHelper(object):
         Otherwise, EventMatchVideoNotification is sent
         """
         match_users = set(PushHelper.get_users_subscribed_to_match(match, NotificationType.MATCH_VIDEO))
-        event_users = set(PushHelper.get_users_subscribed_to_event(match.event.get(), NotificationType.MATCH_VIDEO))
+        event_users = set(Subscription.users_subscribed_to_event(match.event.get(), NotificationType.MATCH_VIDEO))
         users = match_users.union(event_users)
         if match.within_seconds(60*10):
             user_keys = PushHelper.get_client_ids_for_users(users)
