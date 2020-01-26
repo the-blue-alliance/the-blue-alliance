@@ -64,6 +64,8 @@ handlers:
   static_files: static/manifest.json
   upload: static/manifest.json
   expiration: "1d"
+- url: /.well-known
+  static_dir: static/well-known
 
 - url: /tasks/.* # Here to take care of requests until new dispatch.yaml kicks in
   script: cron_main.app
