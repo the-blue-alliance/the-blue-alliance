@@ -100,17 +100,6 @@ class PushHelper(object):
         return output
 
     @classmethod
-    def get_users_subscribed_to_event(cls, event, notification):
-        keys = []
-        keys.append(event.key_name)
-        keys.append("{}*".format(event.year))
-        users = Subscription.query(Subscription.model_key.IN(keys), Subscription.notification_types == notification).fetch()
-        output = []
-        for user in users:
-            output.append(user.user_id)
-        return output
-
-    @classmethod
     def get_users_subscribed_for_alliances(cls, event, notification):
         keys = []
         for team in event.alliance_teams:
