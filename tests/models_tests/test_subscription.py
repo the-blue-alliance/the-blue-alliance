@@ -9,6 +9,8 @@ from consts.notification_type import NotificationType
 from models.account import Account
 from models.subscription import Subscription
 
+from mocks.models.mock_event import MockEvent
+
 
 class TestSubscription(unittest2.TestCase):
 
@@ -39,7 +41,7 @@ class TestSubscription(unittest2.TestCase):
             notification_types=[NotificationType.MATCH_SCORE]
         ).put()
 
-        users = Subscription.users_subscribed_to_event(MockEvent("2020miket", 2020), NotificationType.UPCOMING_MATCH)
+        users = Subscription.users_subscribed_to_event(MockEvent(key_name="2020miket", year=2020), NotificationType.UPCOMING_MATCH)
         self.assertEqual(users, ['user_id_1'])
 
     def test_users_subscribed_to_event_key(self):
@@ -59,7 +61,7 @@ class TestSubscription(unittest2.TestCase):
             notification_types=[NotificationType.MATCH_SCORE]
         ).put()
 
-        users = Subscription.users_subscribed_to_event(MockEvent("2020miket", 2020), NotificationType.UPCOMING_MATCH)
+        users = Subscription.users_subscribed_to_event(MockEvent(key_name="2020miket", year=2020), NotificationType.UPCOMING_MATCH)
         self.assertEqual(users, ['user_id_1'])
 
     def test_users_subscribed_to_event_year_key(self):
@@ -79,7 +81,7 @@ class TestSubscription(unittest2.TestCase):
             notification_types=[NotificationType.UPCOMING_MATCH]
         ).put()
 
-        users = Subscription.users_subscribed_to_event(MockEvent("2020miket", 2020), NotificationType.UPCOMING_MATCH)
+        users = Subscription.users_subscribed_to_event(MockEvent(key_name="2020miket", year=2020), NotificationType.UPCOMING_MATCH)
         self.assertItemsEqual(users, ['user_id_1', 'user_id_2'])
 
     def test_users_subscribed_to_event_unique(self):
@@ -99,12 +101,5 @@ class TestSubscription(unittest2.TestCase):
             notification_types=[NotificationType.UPCOMING_MATCH]
         ).put()
 
-        users = Subscription.users_subscribed_to_event(MockEvent("2020miket", 2020), NotificationType.UPCOMING_MATCH)
+        users = Subscription.users_subscribed_to_event(MockEvent(key_name="2020miket", year=2020), NotificationType.UPCOMING_MATCH)
         self.assertEqual(users, ['user_id_1'])
-
-
-class MockEvent:
-
-    def __init__(self, key_name, year):
-        self.key_name = key_name
-        self.year = year

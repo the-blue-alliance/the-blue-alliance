@@ -29,6 +29,7 @@ from controllers.admin.admin_offseason_scraper_controller import AdminOffseasonS
 from controllers.admin.admin_offseason_spreadsheet_controller import AdminOffseasonSpreadsheetController
 from controllers.admin.admin_sitevar_controller import AdminSitevarCreate, AdminSitevarEdit, AdminSitevarList
 from controllers.admin.admin_suggestion_controller import AdminCreateTestSuggestions
+from controllers.admin.admin_tbans_controller import AdminTBANS
 from controllers.admin.admin_team_controller import AdminTeamCreateTest, AdminTeamDetail, AdminTeamList, \
     AdminTeamRobotNameUpdate
 from controllers.admin.admin_team_media_mod import AdminTeamMediaModCodeList, AdminTeamMediaModCodeAdd, AdminTeamMediaModCodeEdit
@@ -122,6 +123,7 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/user/create/test', AdminUserTestSetup),
                                ('/admin/user/(.*)', AdminUserDetail),
                                ('/admin/videos/add', AdminVideosAdd),
+                               ('/admin/tbans', AdminTBANS),
                                ('/admin/mobile', AdminMobile),
                                ('/admin/mobile/broadcast', AdminBroadcast),
                                ('/admin/mobile/webhooks', AdminMobileWebhooks),

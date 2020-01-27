@@ -36,25 +36,24 @@ class TestAwardsNotification(unittest2.TestCase):
 
     def test_fcm_notification(self):
         self.assertIsNotNone(self.notification.fcm_notification)
-        self.assertEqual(self.notification.fcm_notification.title, 'TESTPRESENT Awards Updated')
-        self.assertEqual(self.notification.fcm_notification.body, 'Present Test Event awards have been updated.')
+        self.assertEqual(self.notification.fcm_notification.title, 'Awards Updated')
+        self.assertEqual(self.notification.fcm_notification.body, '{} Present Test Event awards have been updated.'.format(self.event.year))
 
     def test_fcm_notification_short_name(self):
         self.notification.event.short_name = 'Arizona North'
 
         self.assertIsNotNone(self.notification.fcm_notification)
-        self.assertEqual(self.notification.fcm_notification.title, 'TESTPRESENT Awards Updated')
-        self.assertEqual(self.notification.fcm_notification.body, 'Arizona North Regional awards have been updated.')
+        self.assertEqual(self.notification.fcm_notification.title, 'Awards Updated')
+        self.assertEqual(self.notification.fcm_notification.body, '{} Arizona North Regional awards have been updated.'.format(self.event.year))
 
     def test_data_payload(self):
         # No `event_name`
         payload = self.notification.data_payload
-        self.assertEqual(len(payload), 2)
+        self.assertEqual(len(payload), 1)
         self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
-        self.assertIsNotNone(payload['awards'])
 
     def test_webhook_message_data(self):
-        # Has `event_name`
+        # Has `event_name` and `awards`
         payload = self.notification.webhook_message_data
         self.assertEqual(len(payload), 3)
         self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))

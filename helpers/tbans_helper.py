@@ -2,10 +2,12 @@ import firebase_admin
 import logging
 
 from consts.client_type import ClientType
+from consts.notification_type import NotificationType
 
 from google.appengine.ext import deferred
 
 from models.mobile_client import MobileClient
+from models.subscription import Subscription
 
 
 MAXIMUM_BACKOFF = 32
@@ -28,6 +30,17 @@ class TBANSHelper:
     """
 
     @classmethod
+    def awards(cls, event, user_id=None):
+        if user_id:
+            users = [user_id]
+        else:
+            users = Subscription.users_subscribed_to_event(event, NotificationType.AWARDS)
+
+        from models.notifications.awards import AwardsNotification
+        # Send to FCM/webhooks
+        cls._send(users, AwardsNotification(event))
+
+    @classmethod
     def broadcast(cls, client_types, title, message, url=None, app_version=None):
         from models.notifications.broadcast import BroadcastNotification
         notification = BroadcastNotification(title, message, url, app_version)
@@ -37,30 +50,18 @@ class TBANSHelper:
         if fcm_client_types:
             clients = MobileClient.query(MobileClient.client_type.IN(fcm_client_types)).fetch()
             if clients:
-                deferred.defer(
-                    cls._send_fcm,
-                    clients,
-                    notification,
-                    _queue="push-notifications",
-                    _url='/_ah/queue/deferred_notification_send'
-                )
+                cls._defer_fcm(clients, notification)
 
         # Send to webhooks
         if ClientType.WEBHOOK in client_types:
             clients = MobileClient.query(MobileClient.client_type == ClientType.WEBHOOK).fetch()
             if clients:
-                deferred.defer(
-                    cls._send_webhook,
-                    clients,
-                    notification,
-                    _queue="push-notifications",
-                    _url='/_ah/queue/deferred_notification_send'
-                )
+                cls._defer_webhook(clients, notification)
 
         if ClientType.OS_ANDROID in client_types:
+            clients = MobileClient.query(MobileClient.client_type == ClientType.OS_ANDROID).fetch()
             from helpers.push_helper import PushHelper
-            users = PushHelper.get_all_mobile_clients([ClientType.OS_ANDROID])
-            keys = PushHelper.get_client_ids_for_users(users)
+            keys = PushHelper.get_client_ids_for_clients(clients)
 
             from notifications.broadcast import BroadcastNotification
             notification = BroadcastNotification(title, message, url, app_version)
@@ -130,6 +131,38 @@ class TBANSHelper:
         logging.info('Verification Key - {}'.format(notification.verification_key))
 
         return notification.verification_key
+
+    @classmethod
+    def _send(cls, users, notification):
+        # Send to FCM clients
+        fcm_clients = MobileClient.clients(users, client_types=ClientType.FCM_CLIENTS)
+        if fcm_clients:
+            cls._defer_fcm(fcm_clients, notification)
+
+        # Send to webhooks
+        webhook_clients = MobileClient.clients(users, client_types=[ClientType.WEBHOOK])
+        if webhook_clients:
+            cls._defer_webhook(webhook_clients, notification)
+
+    @classmethod
+    def _defer_fcm(cls, clients, notification):
+        deferred.defer(
+            cls._send_fcm,
+            clients,
+            notification,
+            _queue="push-notifications",
+            _url='/_ah/queue/deferred_notification_send'
+        )
+
+    @classmethod
+    def _defer_webhook(cls, clients, notification):
+        deferred.defer(
+            cls._send_webhook,
+            clients,
+            notification,
+            _queue="push-notifications",
+            _url='/_ah/queue/deferred_notification_send'
+        )
 
     @classmethod
     def _send_fcm(cls, clients, notification, backoff_iteration=0):
