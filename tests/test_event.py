@@ -8,6 +8,8 @@ from consts.event_type import EventType
 from helpers.event.event_test_creator import EventTestCreator
 from models.event import Event
 
+from mocks.models.mock_event import MockEvent
+
 
 class TestEvent(unittest2.TestCase):
 
@@ -147,18 +149,3 @@ class TestEvent(unittest2.TestCase):
                 self.assertFalse(event.is_offseason)
             else:
                 self.assertTrue(event.is_offseason)
-
-
-class MockEvent(Event):
-
-    def __init__(self, week, year):
-        self._week = week
-        self._year = year
-
-    @property
-    def week(self):
-        return self._week
-
-    @property
-    def year(self):
-        return self._year

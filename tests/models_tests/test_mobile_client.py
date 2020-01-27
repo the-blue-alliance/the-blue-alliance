@@ -20,6 +20,58 @@ class TestMobileClient(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
+    def test_clients_empty(self):
+        abc = MobileClient(
+            parent=ndb.Key(Account, 'abc'),
+            user_id='abc',
+            messaging_id='token',
+            client_type=ClientType.OS_IOS,
+            device_uuid='uuid',
+            display_name='Phone'
+        )
+        abc.put()
+        unverified = MobileClient(
+            parent=ndb.Key(Account, 'efg'),
+            user_id='efg',
+            messaging_id='token',
+            client_type=ClientType.OS_IOS,
+            device_uuid='uuid',
+            display_name='Phone',
+            verified=False
+        )
+        unverified.put()
+        # Test empty users returns empty
+        self.assertEqual(MobileClient.clients(users=[]), [])
+        # Test empty client types return empty
+        self.assertEqual(MobileClient.clients(users=['abc'], client_types=[]), [])
+        # Test empty users and client types returns empty
+        self.assertEqual(MobileClient.clients(users=[], client_types=[]), [])
+        # Test client type + users does not return empty
+        self.assertEqual(MobileClient.clients(users=['abc']), [abc])
+        # Test fetching for only verified
+        self.assertEqual(MobileClient.clients(users=['efg']), [])
+
+    def test_clients_multiple(self):
+        abc = MobileClient(
+            parent=ndb.Key(Account, 'abc'),
+            user_id='abc',
+            messaging_id='token',
+            client_type=ClientType.OS_IOS,
+            device_uuid='uuid',
+            display_name='Phone'
+        )
+        abc.put()
+        efg = MobileClient(
+            parent=ndb.Key(Account, 'efg'),
+            user_id='efg',
+            messaging_id='token',
+            client_type=ClientType.OS_IOS,
+            device_uuid='uuid',
+            display_name='Phone'
+        )
+        efg.put()
+        self.assertEqual(MobileClient.clients(['abc', 'efg']), [abc, efg])
+
     def test_clients(self):
         user_id_one = 'user_id_one'
         token_one = 'token1'
@@ -41,9 +93,10 @@ class TestMobileClient(unittest2.TestCase):
             for client in clients:
                 client.put()
 
-        self.assertEqual([client.messaging_id for client in MobileClient.clients(user_id_one)], [token_one, token_two])
-        self.assertEqual([client.messaging_id for client in MobileClient.clients(user_id_two)], [token_three])
-        self.assertEqual([client.messaging_id for client in MobileClient.clients(user_id_three)], [])
+        self.assertEqual([client.messaging_id for client in MobileClient.clients([user_id_one])], [token_one, token_two])
+        self.assertEqual([client.messaging_id for client in MobileClient.clients([user_id_two])], [token_three])
+        self.assertEqual([client.messaging_id for client in MobileClient.clients([user_id_one, user_id_two])], [token_one, token_two, token_three])
+        self.assertEqual([client.messaging_id for client in MobileClient.clients([user_id_three])], [])
 
     def test_clients_type(self):
         clients = [MobileClient(
@@ -54,47 +107,9 @@ class TestMobileClient(unittest2.TestCase):
         for client in clients:
             client.put()
 
-        self.assertEqual([client.messaging_id for client in MobileClient.clients('user_id', client_types=[ClientType.OS_ANDROID])], ['messaging_id_0'])
-        self.assertEqual([client.messaging_id for client in MobileClient.clients('user_id', client_types=ClientType.FCM_CLIENTS)], ['messaging_id_1', 'messaging_id_3'])
-        self.assertEqual([client.messaging_id for client in MobileClient.clients('user_id', client_types=[ClientType.WEBHOOK])], ['messaging_id_2'])
-
-    def test_fcm_messaging_ids(self):
-        user_id_one = 'user_id_one'
-        token_one = 'token1'
-        token_two = 'token2'
-
-        user_id_two = 'user_id_two'
-        token_three = 'token3'
-
-        user_id_three = 'user_id_three'
-
-        for (user_id, tokens) in [(user_id_one, [token_one, token_two]), (user_id_two, [token_three])]:
-            for token in tokens:
-                MobileClient(
-                    parent=ndb.Key(Account, user_id),
-                    user_id=user_id,
-                    messaging_id=token,
-                    client_type=ClientType.OS_IOS,
-                    device_uuid=token[::-1],
-                    display_name='Phone').put()
-
-        self.assertEqual(MobileClient.fcm_messaging_ids(user_id_one), [token_one, token_two])
-        self.assertEqual(MobileClient.fcm_messaging_ids(user_id_two), [token_three])
-        self.assertEqual(MobileClient.fcm_messaging_ids(user_id_three), [])
-
-    def test_fcm_messaging_ids_unsupported_type(self):
-        user_id = 'user_id'
-
-        for (token, os) in [('a', ClientType.OS_ANDROID), ('b', ClientType.OS_IOS), ('c', ClientType.WEBHOOK), ('d', ClientType.WEB)]:
-            MobileClient(
-                parent=ndb.Key(Account, user_id),
-                user_id=user_id,
-                messaging_id=token,
-                client_type=os,
-                device_uuid=token,
-                display_name=token).put()
-
-        self.assertEqual(MobileClient.fcm_messaging_ids(user_id), ['b', 'd'])
+        self.assertEqual([client.messaging_id for client in MobileClient.clients(['user_id'], client_types=[ClientType.OS_ANDROID])], ['messaging_id_0'])
+        self.assertEqual([client.messaging_id for client in MobileClient.clients(['user_id'], client_types=ClientType.FCM_CLIENTS)], ['messaging_id_1', 'messaging_id_3'])
+        self.assertEqual([client.messaging_id for client in MobileClient.clients(['user_id'], client_types=[ClientType.WEBHOOK])], ['messaging_id_2'])
 
     def test_delete_for_messaging_id(self):
         user_id_one = 'user_id_one'
@@ -116,12 +131,18 @@ class TestMobileClient(unittest2.TestCase):
 
         MobileClient.delete_for_messaging_id(messaging_id_one)
 
-        self.assertEqual(MobileClient.fcm_messaging_ids(user_id_one), [messaging_id_two])
-        self.assertEqual(MobileClient.fcm_messaging_ids(user_id_two), [messaging_id_three])
+        clients_one = [client.messaging_id for client in MobileClient.query(MobileClient.user_id == 'user_id_one').fetch()]
+        clients_two = [client.messaging_id for client in MobileClient.query(MobileClient.user_id == 'user_id_two').fetch()]
+
+        self.assertEqual(clients_one, [messaging_id_two])
+        self.assertEqual(clients_two, [messaging_id_three])
 
         MobileClient.delete_for_messaging_id(messaging_id_two)
 
-        self.assertEqual(MobileClient.fcm_messaging_ids(user_id_one), [])
-        self.assertEqual(MobileClient.fcm_messaging_ids(user_id_two), [messaging_id_three])
+        clients_one = [client.messaging_id for client in MobileClient.query(MobileClient.user_id == 'user_id_one').fetch()]
+        clients_two = [client.messaging_id for client in MobileClient.query(MobileClient.user_id == 'user_id_two').fetch()]
+
+        self.assertEqual(clients_one, [])
+        self.assertEqual(clients_two, [messaging_id_three])
 
         MobileClient.delete_for_messaging_id('does_not_exist')

@@ -12,14 +12,24 @@ from google.appengine.ext import testbed
 
 from consts.client_type import ClientType
 import helpers.tbans_helper
+from helpers.event.event_test_creator import EventTestCreator
 from helpers.tbans_helper import TBANSHelper, _firebase_app
 from models.account import Account
 from models.mobile_client import MobileClient
+from models.notifications.awards import AwardsNotification
 from models.notifications.broadcast import BroadcastNotification
 from models.notifications.requests.fcm_request import FCMRequest
 from models.notifications.requests.webhook_request import WebhookRequest
 
 from tests.mocks.notifications.mock_notification import MockNotification
+
+
+def fcm_messaging_ids(user_id):
+    clients = MobileClient.query(
+        MobileClient.client_type.IN(ClientType.FCM_CLIENTS),
+        ancestor=ndb.Key(Account, user_id)
+    ).fetch(projection=[MobileClient.messaging_id])
+    return [c.messaging_id for c in clients]
 
 
 class TestTBANSHelper(unittest2.TestCase):
@@ -33,6 +43,7 @@ class TestTBANSHelper(unittest2.TestCase):
         self.testbed.init_taskqueue_stub(root_path='.')
         self.taskqueue_stub = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+        self.event = EventTestCreator.createFutureEvent()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -48,6 +59,16 @@ class TestTBANSHelper(unittest2.TestCase):
         self.assertEqual(app_two.name, 'tbans')
         # Should be the same object
         self.assertEqual(app_one, app_two)
+
+    def test_awards(self):
+        from notifications.awards_updated import AwardsUpdatedNotification
+        with patch.object(TBANSHelper, '_send') as mock_send:
+            TBANSHelper.awards(self.event)
+            # Make sure we sent to FCM/webhooks
+            mock_send.assert_called_once()
+            notification = mock_send.call_args[0][1]
+            self.assertTrue(isinstance(notification, AwardsNotification))
+            self.assertEqual(notification.event, self.event)
 
     def test_broadcast_none(self):
         from notifications.base_notification import BaseNotification
@@ -294,6 +315,78 @@ class TestTBANSHelper(unittest2.TestCase):
             mock_send.assert_called_once()
             self.assertIsNotNone(verification_key)
 
+    def test_send_empty(self):
+        notification = MockNotification()
+        with patch.object(TBANSHelper, '_defer_fcm') as mock_fcm, patch.object(TBANSHelper, '_defer_webhook') as mock_webhook:
+            TBANSHelper._send([], notification)
+            mock_fcm.assert_not_called()
+            mock_webhook.assert_not_called()
+
+    def test_send(self):
+        expected = ['client_type_{}'.format(client_type) for client_type in ClientType.FCM_CLIENTS]
+        clients = [MobileClient(
+                    parent=ndb.Key(Account, 'user_id'),
+                    user_id='user_id',
+                    messaging_id='client_type_{}'.format(client_type),
+                    client_type=client_type) for client_type in ClientType.names.keys()]
+        # Insert an unverified webhook, just to test
+        unverified = MobileClient(
+            parent=ndb.Key(Account, 'user_id'),
+            user_id='user_id',
+            messaging_id='client_type_2',
+            client_type=ClientType.WEBHOOK,
+            verified=False)
+        unverified.put()
+        for c in clients:
+            c.put()
+
+        expected_fcm = [c for c in clients if c.client_type in ClientType.FCM_CLIENTS]
+        expected_webhook = [c for c in clients if c.client_type == ClientType.WEBHOOK]
+
+        notification = MockNotification()
+        with patch.object(TBANSHelper, '_defer_fcm') as mock_fcm, patch.object(TBANSHelper, '_defer_webhook') as mock_webhook:
+            TBANSHelper._send(['user_id'], notification)
+            mock_fcm.assert_called_once_with(expected_fcm, notification)
+            mock_webhook.assert_called_once_with(expected_webhook, notification)
+
+    def test_defer_fcm(self):
+        client = MobileClient(
+            parent=ndb.Key(Account, 'user_id'),
+            user_id='user_id',
+            messaging_id='messaging_id',
+            client_type=ClientType.OS_IOS)
+        client.put()
+        notification = MockNotification()
+        TBANSHelper._defer_fcm([client], notification)
+
+        # Make sure we'll send to FCM clients
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
+        self.assertEqual(len(tasks), 1)
+
+        # Make sure our taskqueue tasks execute what we expect
+        with patch.object(TBANSHelper, '_send_fcm') as mock_send_fcm:
+            deferred.run(tasks[0].payload)
+            mock_send_fcm.assert_called_once_with([client], ANY)
+
+    def test_defer_webhook(self):
+        client = MobileClient(
+            parent=ndb.Key(Account, 'user_id'),
+            user_id='user_id',
+            messaging_id='messaging_id',
+            client_type=ClientType.WEBHOOK)
+        client.put()
+        notification = MockNotification()
+        TBANSHelper._defer_webhook([client], notification)
+
+        # Make sure we'll send to FCM clients
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
+        self.assertEqual(len(tasks), 1)
+
+        # Make sure our taskqueue tasks execute what we expect
+        with patch.object(TBANSHelper, '_send_webhook') as mock_send_webhook:
+            deferred.run(tasks[0].payload)
+            mock_send_webhook.assert_called_once_with([client], ANY)
+
     def test_send_fcm_disabled(self):
         from sitevars.notifications_enable import NotificationsEnable
         NotificationsEnable.enable_notifications(False)
@@ -347,7 +440,7 @@ class TestTBANSHelper(unittest2.TestCase):
         client.put()
 
         # Sanity check
-        self.assertEqual(MobileClient.fcm_messaging_ids('user_id'), ['messaging_id'])
+        self.assertEqual(fcm_messaging_ids('user_id'), ['messaging_id'])
 
         batch_response = messaging.BatchResponse([messaging.SendResponse(None, UnregisteredError('code', 'message'))])
         with patch.object(FCMRequest, 'send', return_value=batch_response), \
@@ -361,7 +454,7 @@ class TestTBANSHelper(unittest2.TestCase):
         # TODO: Check logging?
 
         # Sanity check
-        self.assertEqual(MobileClient.fcm_messaging_ids('user_id'), [])
+        self.assertEqual(fcm_messaging_ids('user_id'), [])
 
         # Make sure we haven't queued for a retry
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
@@ -376,7 +469,7 @@ class TestTBANSHelper(unittest2.TestCase):
         client.put()
 
         # Sanity check
-        self.assertEqual(MobileClient.fcm_messaging_ids('user_id'), ['messaging_id'])
+        self.assertEqual(fcm_messaging_ids('user_id'), ['messaging_id'])
 
         batch_response = messaging.BatchResponse([messaging.SendResponse(None, SenderIdMismatchError('code', 'message'))])
         with patch.object(FCMRequest, 'send', return_value=batch_response), \
@@ -388,7 +481,7 @@ class TestTBANSHelper(unittest2.TestCase):
                     mock_info.assert_called_with('Deleting mismatched client with ID: messaging_id')
 
         # Sanity check
-        self.assertEqual(MobileClient.fcm_messaging_ids('user_id'), [])
+        self.assertEqual(fcm_messaging_ids('user_id'), [])
 
         # Make sure we haven't queued for a retry
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
@@ -403,7 +496,7 @@ class TestTBANSHelper(unittest2.TestCase):
         client.put()
 
         # Sanity check
-        self.assertEqual(MobileClient.fcm_messaging_ids('user_id'), ['messaging_id'])
+        self.assertEqual(fcm_messaging_ids('user_id'), ['messaging_id'])
 
         batch_response = messaging.BatchResponse([messaging.SendResponse(None, QuotaExceededError('code', 'message'))])
         with patch.object(FCMRequest, 'send', return_value=batch_response), patch('logging.error') as mock_error:
@@ -412,7 +505,7 @@ class TestTBANSHelper(unittest2.TestCase):
             mock_error.assert_called_once_with('Qutoa exceeded - retrying client...')
 
         # Sanity check
-        self.assertEqual(MobileClient.fcm_messaging_ids('user_id'), ['messaging_id'])
+        self.assertEqual(fcm_messaging_ids('user_id'), ['messaging_id'])
 
         # Check that we queue'd for a retry
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
@@ -432,7 +525,7 @@ class TestTBANSHelper(unittest2.TestCase):
         client.put()
 
         # Sanity check
-        self.assertEqual(MobileClient.fcm_messaging_ids('user_id'), ['messaging_id'])
+        self.assertEqual(fcm_messaging_ids('user_id'), ['messaging_id'])
 
         batch_response = messaging.BatchResponse([messaging.SendResponse(None, ThirdPartyAuthError('code', 'message'))])
         with patch.object(FCMRequest, 'send', return_value=batch_response), patch('logging.critical') as mock_critical:
@@ -441,7 +534,7 @@ class TestTBANSHelper(unittest2.TestCase):
             mock_critical.assert_called_once_with('Third party error sending to FCM - code')
 
         # Sanity check
-        self.assertEqual(MobileClient.fcm_messaging_ids('user_id'), ['messaging_id'])
+        self.assertEqual(fcm_messaging_ids('user_id'), ['messaging_id'])
 
         # Make sure we haven't queued for a retry
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
@@ -456,7 +549,7 @@ class TestTBANSHelper(unittest2.TestCase):
         client.put()
 
         # Sanity check
-        self.assertEqual(MobileClient.fcm_messaging_ids('user_id'), ['messaging_id'])
+        self.assertEqual(fcm_messaging_ids('user_id'), ['messaging_id'])
 
         batch_response = messaging.BatchResponse([messaging.SendResponse(None, InvalidArgumentError('code', 'message'))])
         with patch.object(FCMRequest, 'send', return_value=batch_response), patch('logging.critical') as mock_critical:
@@ -465,7 +558,7 @@ class TestTBANSHelper(unittest2.TestCase):
             mock_critical.assert_called_once_with('Invalid argument when sending to FCM - code')
 
         # Sanity check
-        self.assertEqual(MobileClient.fcm_messaging_ids('user_id'), ['messaging_id'])
+        self.assertEqual(fcm_messaging_ids('user_id'), ['messaging_id'])
 
         # Make sure we haven't queued for a retry
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
@@ -480,7 +573,7 @@ class TestTBANSHelper(unittest2.TestCase):
         client.put()
 
         # Sanity check
-        self.assertEqual(MobileClient.fcm_messaging_ids('user_id'), ['messaging_id'])
+        self.assertEqual(fcm_messaging_ids('user_id'), ['messaging_id'])
 
         batch_response = messaging.BatchResponse([messaging.SendResponse(None, InternalError('code', 'message'))])
         with patch.object(FCMRequest, 'send', return_value=batch_response), patch('logging.error') as mock_error:
@@ -489,7 +582,7 @@ class TestTBANSHelper(unittest2.TestCase):
             mock_error.assert_called_once_with('Interal FCM error - retrying client...')
 
         # Sanity check
-        self.assertEqual(MobileClient.fcm_messaging_ids('user_id'), ['messaging_id'])
+        self.assertEqual(fcm_messaging_ids('user_id'), ['messaging_id'])
 
         # Check that we queue'd for a retry
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
@@ -509,7 +602,7 @@ class TestTBANSHelper(unittest2.TestCase):
         client.put()
 
         # Sanity check
-        self.assertEqual(MobileClient.fcm_messaging_ids('user_id'), ['messaging_id'])
+        self.assertEqual(fcm_messaging_ids('user_id'), ['messaging_id'])
 
         batch_response = messaging.BatchResponse([messaging.SendResponse(None, UnavailableError('code', 'message'))])
         with patch.object(FCMRequest, 'send', return_value=batch_response), patch('logging.error') as mock_error:
@@ -518,7 +611,7 @@ class TestTBANSHelper(unittest2.TestCase):
             mock_error.assert_called_once_with('FCM unavailable - retrying client...')
 
         # Sanity check
-        self.assertEqual(MobileClient.fcm_messaging_ids('user_id'), ['messaging_id'])
+        self.assertEqual(fcm_messaging_ids('user_id'), ['messaging_id'])
 
         # Check that we queue'd for a retry
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
@@ -538,7 +631,7 @@ class TestTBANSHelper(unittest2.TestCase):
         client.put()
 
         # Sanity check
-        self.assertEqual(MobileClient.fcm_messaging_ids('user_id'), ['messaging_id'])
+        self.assertEqual(fcm_messaging_ids('user_id'), ['messaging_id'])
 
         batch_response = messaging.BatchResponse([messaging.SendResponse(None, FirebaseError('code', 'message'))])
         with patch.object(FCMRequest, 'send', return_value=batch_response), patch('logging.error') as mock_error:
@@ -547,7 +640,7 @@ class TestTBANSHelper(unittest2.TestCase):
             mock_error.assert_called_once_with('Unhandled FCM error for messaging_id - code / message')
 
         # Sanity check
-        self.assertEqual(MobileClient.fcm_messaging_ids('user_id'), ['messaging_id'])
+        self.assertEqual(fcm_messaging_ids('user_id'), ['messaging_id'])
 
         # Check that we didn't queue for a retry
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
@@ -561,7 +654,7 @@ class TestTBANSHelper(unittest2.TestCase):
                     client_type=ClientType.OS_IOS)
         client.put()
 
-        import time, math
+        import time
 
         batch_response = messaging.BatchResponse([messaging.SendResponse(None, QuotaExceededError('code', 'message'))])
         for i in range(0, 6):
@@ -571,7 +664,8 @@ class TestTBANSHelper(unittest2.TestCase):
 
                 # Check that we queue'd for a retry with the proper countdown time
                 tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
-                self.assertEqual(math.ceil(tasks[0].eta_posix - call_time), 2 ** i)
+                if i > 0:
+                    self.assertGreater(tasks[0].eta_posix - call_time, 0)
 
                 # Make sure our taskqueue tasks execute what we expect
                 with patch.object(TBANSHelper, '_send_fcm') as mock_send_fcm:

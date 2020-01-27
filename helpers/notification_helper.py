@@ -123,7 +123,7 @@ class NotificationHelper(object):
     @classmethod
     def send_award_update(cls, event):
         users = Subscription.users_subscribed_to_event(event, NotificationType.AWARDS)
-        keys = PushHelper.get_client_ids_for_users(users)
+        keys = PushHelper.get_client_ids_for_users(users, os_types=[ClientType.OS_ANDROID])
 
         notification = AwardsUpdatedNotification(event)
         notification.send(keys)

@@ -44,40 +44,25 @@ class MobileClient(ndb.Model):
         return self.messaging_id if len(self.messaging_id)<=50 else self.messaging_id[0:50]+'...'
 
     @staticmethod
-    def clients(user_id, client_types=ClientType.names.keys()):
+    def clients(users, client_types=ClientType.names.keys()):
         """
-        Get Mobile Clients for a given user.
+        Get all clients for a list of users.
 
         Args:
-            user_id (string): The User ID to fetch clients for.
+            users (list, string): A list of User ID to fetch clients for.
             client_types (list, ClientType): The client types to filter for.
 
         Returns:
             list (MobileClient): List of Mobile Clients for the user.
         """
+        if not users or not client_types:
+            return []
         from models.account import Account
         return MobileClient.query(
+            MobileClient.user_id.IN(users),
             MobileClient.client_type.IN(client_types),
-            ancestor=ndb.Key(Account, user_id)
+            MobileClient.verified == True
         ).fetch()
-
-    @staticmethod
-    def fcm_messaging_ids(user_id):
-        """
-        Get messaging IDs for FCM clients for a given user.
-
-        Args:
-            user_id (string): The User ID to fetch device tokens for.
-
-        Returns:
-            list (string): List of device tokens for the user.
-        """
-        from models.account import Account
-        clients = MobileClient.query(
-            MobileClient.client_type.IN(ClientType.FCM_CLIENTS),
-            ancestor=ndb.Key(Account, user_id)
-        ).fetch(projection=[MobileClient.messaging_id])
-        return [c.messaging_id for c in clients]
 
     @staticmethod
     def delete_for_messaging_id(messaging_id):
