@@ -18,6 +18,38 @@ from models.event_team import EventTeam
 from models.team import Team
 
 
+class ApiTeamListAllController(ApiBaseController):
+    CACHE_VERSION = 0
+    # `all` endpoints have a longer-than-usual edge cache of one hour
+    CACHE_HEADER_LENGTH = 60 * 60
+
+    def _track_call(self, model_type=None):
+        action = 'team/list'
+        if model_type:
+            action += '/{}'.format(model_type)
+        self._track_call_defer(action, 'all')
+
+    def _render(self, model_type=None):
+        max_team_key = Team.query().order(-Team.team_number).fetch(1, keys_only=True)[0]
+        max_team_num = int(max_team_key.id()[3:])
+        max_team_page = int(max_team_num / 500)
+
+        futures = []
+        for page_num in xrange(max_team_page + 1):
+            futures.append(TeamListQuery(page_num).fetch_async(dict_version=3, return_updated=True))
+
+        team_list = []
+        for future in futures:
+            partial_team_list, last_modified = future.get_result()
+            team_list += partial_team_list
+            if self._last_modified is None or last_modified > self._last_modified:
+                self._last_modified = last_modified
+
+        if model_type is not None:
+            team_list = filter_team_properties(team_list, model_type)
+        return json.dumps(team_list, ensure_ascii=True, indent=2, sort_keys=True)
+
+
 class ApiTeamListController(ApiBaseController):
     """
     Returns a JSON list of teams, paginated by team number in sets of 500

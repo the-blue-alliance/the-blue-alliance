@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import Dialog from 'react-bootstrap-dialog'
 
 class AuthTools extends Component {
-
   constructor(props) {
     super(props)
     this.storeAuth = this.storeAuth.bind(this)

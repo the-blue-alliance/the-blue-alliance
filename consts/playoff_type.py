@@ -18,6 +18,9 @@ class PlayoffType(object):
     BO5_FINALS = 6
     BO3_FINALS = 7
 
+    # Custom
+    CUSTOM = 8
+
     BRACKET_TYPES = [BRACKET_8_TEAM, BRACKET_16_TEAM, BRACKET_4_TEAM]
     DOUBLE_ELIM_TYPES = [DOUBLE_ELIM_8_TEAM]
 
@@ -31,6 +34,7 @@ class PlayoffType(object):
         DOUBLE_ELIM_8_TEAM: "Double Elimination Bracket (8 Alliances)",
         BO3_FINALS: "Best of 3 Finals",
         BO5_FINALS: "Best of 5 Finals",
+        CUSTOM: "Custom",
     }
 
     @classmethod
@@ -80,12 +84,15 @@ class PlayoffType(object):
 
     @classmethod
     def get_set_match_number(cls, playoff_type, comp_level, match_number):
+        if comp_level == 'qm':
+            return 1, match_number
+
         if playoff_type == cls.AVG_SCORE_8_TEAM:
             if comp_level == 'sf':
                 return 1, match_number - 8
             elif comp_level == 'f':
                 return 1, match_number - 14
-            else:  # qm, qf
+            else:  # qf
                 return 1, match_number
         if playoff_type == cls.ROUND_ROBIN_6_TEAM:
             # Einstein 2017 for example. 15 round robin matches from sf1-1 to sf1-15, then finals
@@ -95,21 +102,15 @@ class PlayoffType(object):
             else:
                 return 1, match_number
         elif playoff_type == cls.DOUBLE_ELIM_8_TEAM:
-            if comp_level in {'ef', 'qf', 'sf', 'f'}:
-                level, set, match = cls.DOUBLE_ELIM_MAPPING.get(match_number)
-                return set, match
-            else:  # qual
-                return 1, match_number
+            level, set, match = cls.DOUBLE_ELIM_MAPPING.get(match_number)
+            return set, match
         elif playoff_type == cls.BO3_FINALS or playoff_type == cls.BO5_FINALS:
             return 1, match_number
         else:
-            if playoff_type == cls.BRACKET_4_TEAM and comp_level != 'qm' and match_number <= 12:
+            if playoff_type == cls.BRACKET_4_TEAM and match_number <= 12:
                 match_number += 12
-            if comp_level in {'ef', 'qf', 'sf', 'f'}:
-                return cls.BRACKET_OCTO_ELIM_MAPPING[match_number] if playoff_type == cls.BRACKET_16_TEAM \
-                    else cls.BRACKET_ELIM_MAPPING[match_number]
-            else:  # qm
-                return 1, match_number
+            return cls.BRACKET_OCTO_ELIM_MAPPING[match_number] if playoff_type == cls.BRACKET_16_TEAM \
+                else cls.BRACKET_ELIM_MAPPING[match_number]
 
     # Determine if a match is in the winner or loser bracket
     @classmethod

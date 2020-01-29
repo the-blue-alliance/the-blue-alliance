@@ -8,8 +8,11 @@ from consts.event_type import EventType
 from helpers.event.event_test_creator import EventTestCreator
 from models.event import Event
 
+from mocks.models.mock_event import MockEvent
+
 
 class TestEvent(unittest2.TestCase):
+
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -114,3 +117,35 @@ class TestEvent(unittest2.TestCase):
     def test_dates_ends_today(self):
         self.assertFalse(self.event_ends_today.starts_today)
         self.assertTrue(self.event_ends_today.ends_today)
+
+    def test_week_str_none(self):
+        event_week_none = MockEvent(week=None, year=2012)
+        self.assertIsNone(event_week_none.week_str)
+
+    def test_week_str_2016(self):
+        event_week_0_year_2016 = MockEvent(week=0, year=2016)
+        self.assertEqual(event_week_0_year_2016.week_str, "Week 0.5")
+        event_week_1_year_2016 = MockEvent(week=1, year=2016)
+        self.assertEqual(event_week_1_year_2016.week_str, "Week 1")
+
+    def test_week_str_not_2016(self):
+        event_week_0_year_2012 = MockEvent(week=0, year=2012)
+        self.assertEqual(event_week_0_year_2012.week_str, "Week 1")
+        event_week_1_year_2022 = MockEvent(week=1, year=2022)
+        self.assertEqual(event_week_1_year_2022.week_str, "Week 2")
+
+    def test_in_season(self):
+        for event_type in EventType.type_names.keys():
+            event = Event(event_type_enum=event_type)
+            if event_type in EventType.SEASON_EVENT_TYPES:
+                self.assertTrue(event.is_in_season)
+            else:
+                self.assertFalse(event.is_in_season)
+
+    def test_offseason(self):
+        for event_type in EventType.type_names.keys():
+            event = Event(event_type_enum=event_type)
+            if event_type in EventType.SEASON_EVENT_TYPES:
+                self.assertFalse(event.is_offseason)
+            else:
+                self.assertTrue(event.is_offseason)

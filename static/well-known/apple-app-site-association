@@ -1,0 +1,14 @@
+{
+  "activitycontinuation": {
+    "apps": ["LKZ8X6P249.com.the-blue-alliance.tba"]
+  },
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "LKZ8X6P249.com.the-blue-alliance.tba",
+        "paths": ["/event/*", "/team/*"]
+      }
+    ]
+  }
+}

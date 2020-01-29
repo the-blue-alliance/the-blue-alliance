@@ -15,7 +15,7 @@ from parsers.first_elasticsearch.first_elasticsearch_team_details_parser import 
 
 class DatafeedFIRSTElasticSearch(object):
     def __init__(self):
-        URL_BASE = 'http://es01.usfirst.org'
+        URL_BASE = 'https://es02.firstinspires.org'
         self.EVENT_LIST_URL_PATTERN = URL_BASE + '/events/_search?size=1000&source={"query":{"query_string":{"query":"(event_type:FRC)%%20AND%%20(event_season:%s)"}}}'  # (year)
         self.EVENT_DETAILS_URL_PATTERN = URL_BASE + '/events/_search?size=1&source={"query":{"query_string":{"query":"_id:%s"}}}'  # (first_eid)
         self.EVENT_TEAMS_URL_PATTERN = URL_BASE + '/teams/_search?size=1000&source={"_source":{"exclude":["awards","events"]},"query":{"query_string":{"query":"events.fk_events:%s%%20AND%%20profile_year:%s"}}}'  # (first_eid, year)

@@ -12,7 +12,7 @@ from models.team import Team
 
 
 class TeamQuery(DatabaseQuery):
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = 'team_{}'  # (team_key)
     DICT_CONVERTER = TeamConverter
 
@@ -24,7 +24,7 @@ class TeamQuery(DatabaseQuery):
 
 
 class TeamListQuery(DatabaseQuery):
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = 'team_list_{}'  # (page_num)
     PAGE_SIZE = 500
     DICT_CONVERTER = TeamConverter
@@ -39,7 +39,7 @@ class TeamListQuery(DatabaseQuery):
 
 
 class TeamListYearQuery(DatabaseQuery):
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = 'team_list_year_{}_{}'  # (year, page_num)
     DICT_CONVERTER = TeamConverter
 
@@ -61,7 +61,7 @@ class TeamListYearQuery(DatabaseQuery):
 
 
 class DistrictTeamsQuery(DatabaseQuery):
-    CACHE_VERSION = 2
+    CACHE_VERSION = 3
     CACHE_KEY_FORMAT = 'district_teams_{}'  # (district_key)
     DICT_CONVERTER = TeamConverter
 
@@ -76,7 +76,7 @@ class DistrictTeamsQuery(DatabaseQuery):
 
 
 class EventTeamsQuery(DatabaseQuery):
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = 'event_teams_{}'  # (event_key)
     DICT_CONVERTER = TeamConverter
 
@@ -90,7 +90,7 @@ class EventTeamsQuery(DatabaseQuery):
 
 
 class EventEventTeamsQuery(DatabaseQuery):
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = 'event_eventteams_{}'  # (event_key)
 
     @ndb.tasklet
@@ -101,7 +101,7 @@ class EventEventTeamsQuery(DatabaseQuery):
 
 
 class TeamParticipationQuery(DatabaseQuery):
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'team_participation_{}'  # (team_key)
 
     @ndb.tasklet
@@ -113,7 +113,7 @@ class TeamParticipationQuery(DatabaseQuery):
 
 
 class TeamDistrictsQuery(DatabaseQuery):
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = 'team_districts_{}'  # (team_key)
     DICT_CONVERTER = DistrictConverter
 

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance{% endblock %}
+{% block schema_org_markup %}{% include "index_partials/schema_org_markup.html" %}{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-5 col-lg-4">
+      {% include "index_partials/index_lhc.html" %}
+    </div>
+    <div class="col-sm-7 col-lg-8">
+      <h2>
+        <div id="countdown-finish-time">{{seasonstart_datetime_utc|isoformat}}</div>
+        <span class="countdown-number countdown-days">--</span><span class="countdown-label day-label"> Days </span>
+        Until Week 1 Starts!
+       <br>
+       <small>Official events start on {{seasonstart_datetime_utc|strftime("%B %-d%t")}}</small></h2>
+      <div class="btn-group game-manual">
+        <a class="btn btn-default" href="http://www.firstinspires.org/resource-library/frc/competition-manual-qa-system" target="_blank"><span class="glyphicon glyphicon-file"></span> {{game_name}} Game Manual and Materials</a>
+      </div>
+      {% if build_handler_show_password != 'False' %}
+      <p>Encrypted Manual Password: {{ manual_password }}</p>
+      {% endif %}
+
+      {% include "media_partials/live_special_webcast_partial.html" %}
+
+      {% if build_handler_show_ri3d != 'False' %}
+      <p>
+        <a class="btn btn-lg btn-success btn-block" href="/watch/ri3d"><span class="glyphicon glyphicon-play"></span> Watch Ri3D Live</a>
+      </p>
+      {% endif %}
+
+      {% if build_handler_show_teameventsearch == 'True' %}
+      <div>
+        <a class="btn btn-lg btn-block btn-primary" href="/advanced_team_search"><span class="glyphicon glyphicon-search"></span> Search for Previous Successful Robots</a>
+      </div>
+      <br>
+      {% endif %}
+      {% if build_handler_show_avatars == 'True' %}
+      <div>
+        <a class="btn btn-lg btn-block btn-primary" href="/avatars/{{seasonstart_datetime_utc|strftime("%Y")}}"><span class="glyphicon glyphicon-user"></span> View All {{seasonstart_datetime_utc|strftime("%Y")}} Team Avatars</a>
+      </div>
+      {% endif %}
+
+      {% if events %}
+        <h2>This Week's Events</h2>
+        {% include "event_partials/event_table.html" %}
+        <div>
+          <a class="btn btn-default" href="/webcasts"><span class="glyphicon glyphicon-info-sign"></span> Add Webcasts</a>
+          <a class="btn btn-default" href="/add-data"><span class="glyphicon glyphicon-upload"></span> Add YouTube Videos</a>
+        </div>
+      {% endif %}
+      <br>
+      <div class="fitvids">
+        <iframe width="420" height="315" src="https://www.youtube.com/embed/{{game_animation_youtube_id}}" frameborder="0" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

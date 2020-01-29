@@ -88,6 +88,7 @@
         {% if event.website %}<br><span class="glyphicon glyphicon-link"></span> <a href="{{ event.website }}" title="{{ event.name }}" target="_blank">{{ event.website }}</a>{% endif %}
         {% if event.first_eid or event.official %}{% if not event.website %}<br><span class="glyphicon glyphicon-info-sign"></span>{% else %} - {% endif %} details on <a href="{% if event.first_eid %}https://www.firstinspires.org/team-event-search/event?id={{event.first_eid}}{%elif event.official %}https://frc-events.firstinspires.org/{{event.year}}/{{event.first_api_code}}{%endif%}" target="_blank">firstinspires.org</a>{% endif %}
         {% if event.facebook_eid %}<br><span class="glyphicon glyphicon-thumbs-up"></span> <a href="{{ event.facebook_event_url }}" title="Facebook Event" target="_blank">RSVP on Facebook</a><br>{% endif %}
+        {% if event.official and event.year >= 2006 %}<br><span class="glyphicon glyphicon-info-sign"></span> Data provided by the <a href="https://frc-events.firstinspires.org/services/API" target="_blank">FIRST Events API</a>{% endif %}
       </p>
     </div>
   </div>
@@ -176,7 +177,7 @@
               {% if playoff_advancement %}
                 <h3>Playoff Advancement</h3>
                 {% include "playoff_partials/{}.html".format(playoff_template) %}
-              {% else %}
+              {% elif playoff_template != 'custom' %}
                 <h3>{% if event.year >= 2015 %}Playoff{% else %}Elimination{% endif %} Bracket</h3>
                 {% include "bracket_partials/bracket_table.html" %}
               {% endif %}

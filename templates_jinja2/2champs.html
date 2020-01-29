@@ -10,9 +10,8 @@
     <div class="col-lg-8 col-lg-offset-2">
       <h1 class="end_header">#2CHAMPS</h1>
 
-      <p>Read more about the 2017 &amp; 2018 <em>FIRST</em> Championship update <a href="http://www.firstinspires.org/2017-2018-first-championship-info" target="_blank">here</a>.</p>
       <p>This tool will let you know whether two teams will be going to the same
-      Championship event in 2017 and 2018+. This does not take into account the ability to attend
+      Championship event. This does not take into account the ability to attend
       a "non-home" Championship.</p>
 
       <div class="row">
@@ -56,56 +55,52 @@
 
       <div class="row">
         <div class="col-xs-5 text-center">
-          {% if team_a %}
-          <h3>2017: {{team_a.championship_location.2017}}</h3>
+          {% if team_a and team_b and team_a.championship_location and team_b.championship_location %}
+            {% for year in team_a.championship_location.keys()|union(team_b.championship_location.keys()) %}
+              <h3>{{year}}: {{team_a.championship_location[year] if team_a.championship_location[year] else "---"}}</h3>
+            {% endfor %}
+          {% elif team_a %}
+            {% if team_a.championship_location %}
+              {% for year, city in team_a.championship_location.items() %}
+                <h3>{{year}}: {{city}}</h3>
+              {% endfor %}
+            {% else %}
+              <h3>No home championship information</h3>
+            {% endif %}
           {% else %}
-          <p>Please pick a team.</p>
+            <p>Please pick a team.</p>
           {% endif %}
         </div>
         <div class="col-xs-2 text-center">
-          {% if team_a and team_b %}
-            <h2 style="color: red;">
-            {% if team_a.championship_location.2017 != team_b.championship_location.2017 %}
-            💔
-            {% else %}
-            ❤
-            {% endif %}
-            </h2>
+          {% if team_a and team_b and team_a.championship_location and team_b.championship_location %}
+            {% for year in team_a.championship_location.keys()|union(team_b.championship_location.keys()) %}
+              <h2 style="color: red;">
+              {% if team_a.championship_location[year] == team_b.championship_location[year] %}
+              ❤
+              {% else %}
+              💔
+              {% endif %}
+              </h2>
+            {% endfor %}
           {% else %}
             <h2>?</h2>
           {% endif %}
         </div>
         <div class="col-xs-5 text-center">
-          {% if team_b %}
-          <h3>2017: {{team_b.championship_location.2017}}</h3>
-          {% else %}
-          <p>Please pick a team.</p>
-          {% endif %}
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-xs-5 text-center">
-          {% if team_a %}
-          <h3>2018+: {{team_a.championship_location.2018}}</h3>
-          {% endif %}
-        </div>
-        <div class="col-xs-2 text-center">
-          {% if team_a and team_b %}
-            <h2 style="color: red;">
-            {% if team_a.championship_location.2018 != team_b.championship_location.2018 %}
-            💔
+          {% if team_a and team_b and team_a.championship_location and team_b.championship_location %}
+            {% for year in team_b.championship_location.keys()|union(team_a.championship_location.keys()) %}
+              <h3>{{year}}: {{team_b.championship_location[year] if team_b.championship_location[year] else "---"}}</h3>
+            {% endfor %}
+          {% elif team_b %}
+            {% if team_b.championship_location %}
+              {% for year, city in team_b.championship_location.items() %}
+                <h3>{{year}}: {{city}}</h3>
+              {% endfor %}
             {% else %}
-            ❤
+              <h3>No home championship information</h3>
             {% endif %}
-            </h2>
           {% else %}
-            <h2>?</h2>
-          {% endif %}
-        </div>
-        <div class="col-xs-5 text-center">
-          {% if team_b %}
-          <h3>2018+: {{team_b.championship_location.2018}}</h3>
+            <p>Please pick a team.</p>
           {% endif %}
         </div>
       </div>

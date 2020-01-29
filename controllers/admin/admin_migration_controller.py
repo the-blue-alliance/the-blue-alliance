@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import tba_config
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from google.appengine.ext import deferred
@@ -59,6 +60,27 @@ class AdminMigrationRankings(LoggedInHandler):
         EventDetailsManipulator.createOrUpdate(updated)
 
         self.response.out.write("DONE")
+
+
+class AdminMigrationPlayoffAdvancementAll(LoggedInHandler):
+    def get(self):
+        VALID_YEARS = tba_config.VALID_YEARS
+        for year in VALID_YEARS:
+                        taskqueue.add(url='/admin/migration/backfill_playoff_advancement/{}'.format(year),
+                                      method='GET')
+        self.response.out.write("Enqueued migrations for {} - {}".format(VALID_YEARS[0], VALID_YEARS[-1]))
+
+
+class AdminMigrationPlayoffAdvancement(LoggedInHandler):
+    def get(self, year):
+        self._require_admin()
+
+        event_keys = Event.query(Event.year==int(year)).fetch(keys_only=True)
+        for event_key in event_keys:
+            taskqueue.add(url='/tasks/math/do/playoff_advancement_update/{}'.format(event_key.id()),
+                          method='GET')
+
+        self.response.out.write("Enqueued {} migrations".format(len(event_keys)))
 
 
 class AdminMigrationAddSurrogates(LoggedInHandler):

@@ -64,6 +64,9 @@ handlers:
   static_files: static/manifest.json
   upload: static/manifest.json
   expiration: "1d"
+- url: /.well-known
+  static_dir: static/well-known
+  mime_type: application/json
 
 - url: /tasks/.* # Here to take care of requests until new dispatch.yaml kicks in
   script: cron_main.app
@@ -83,6 +86,8 @@ handlers:
 - url: /_ah/queue/deferred.*
   script: google.appengine.ext.deferred.deferred.application
   login: admin
+- url: /clientapi/.*
+  script: clientapi.clientapi_service.app
 - url: .*
   script: main.app
 
@@ -91,3 +96,4 @@ includes:
 
 env_variables:
   ENDPOINTS_SERVICE_NAME: tbatv-prod-hrd.appspot.com
+  FIREBASE_PROJECT_ID: tbatv-prod-hrd

@@ -143,6 +143,13 @@ class RankingsHelper(object):
              'precision': 2},
             {'name': 'Match Points',
              'precision': 0}],
+        2006: [
+            {'name': 'Qual Score',
+             'precision': 0},
+            {'name': 'Seeding Score',
+             'precision': 2},
+            {'name': 'Match Points',
+             'precision': 0}],
     }
 
     NO_RECORD_YEARS = {2010, 2015}

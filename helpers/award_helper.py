@@ -69,7 +69,7 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.GRACIOUS_PROFESSIONALISM, (["gracious professionalism"], [])),
     (AwardType.HIGHEST_ROOKIE_SEED, (["highest rookie seed"], [])),
     (AwardType.IMAGERY, (["imagery"], [])),
-    (AwardType.INDUSTRIAL_DEESIGN, (["industrial design"], [])),
+    (AwardType.INDUSTRIAL_DESIGN, (["industrial design"], [])),
     (AwardType.MEDIA_AND_TECHNOLOGY, (["media", "technology"], [])),
     (AwardType.MAKE_IT_LOUD, (["make", "loud"], [])),
     (AwardType.SAFETY, (["safety"], [])),
@@ -121,6 +121,7 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.MOST_IMPROVED_TEAM, (["most improved team"], [])),
     (AwardType.WILDCARD, (["wildcard"], [])),
     (AwardType.AUTONOMOUS, (["autonomous"], [])),
+    (AwardType.OTHER, (["other", "offseason award", "offseason event award"], [])),
 ]
 
 

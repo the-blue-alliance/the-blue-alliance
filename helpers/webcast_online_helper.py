@@ -54,9 +54,11 @@ class WebcastOnlineHelper(object):
             client_id = twitch_secrets.contents.get('client_id')
         if client_id:
             try:
-                url = 'https://api.twitch.tv/kraken/streams/{}?client_id={}'.format(webcast['channel'], client_id)
+                url = 'https://api.twitch.tv/helix/streams?user_login={}'.format(webcast['channel'])
                 rpc = urlfetch.create_rpc()
-                result = yield urlfetch.make_fetch_call(rpc, url)
+                result = yield urlfetch.make_fetch_call(rpc, url, headers={
+                    'Client-ID': client_id,
+                })
             except Exception, e:
                 logging.error("URLFetch failed for: {}".format(url))
                 raise ndb.Return(None)
@@ -66,7 +68,7 @@ class WebcastOnlineHelper(object):
 
         if result.status_code == 200:
             response = json.loads(result.content)
-            if response['stream']:
+            if response['data']:
                 webcast['status'] = 'online'
                 webcast['stream_title'] = response['stream']['channel']['status']
             else:

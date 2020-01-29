@@ -1,4 +1,5 @@
 import json
+import tba_config
 
 from google.appengine.ext import ndb
 
@@ -15,6 +16,34 @@ from helpers.match_helper import MatchHelper
 from helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from models.event_team import EventTeam
 from models.match import Match
+
+
+class ApiEventListAllController(ApiBaseController):
+    CACHE_VERSION = 0
+    # `all` endpoints have a longer-than-usual edge cache of one hour
+    CACHE_HEADER_LENGTH = 60 * 60
+
+    def _track_call(self, model_type=None):
+        action = 'event/list'
+        if model_type:
+            action += '/{}'.format(model_type)
+        self._track_call_defer(action, 'all')
+
+    def _render(self, model_type=None):
+        futures = []
+        for year in tba_config.VALID_YEARS:
+            futures.append(EventListQuery(year).fetch_async(dict_version=3, return_updated=True))
+
+        events = []
+        for future in futures:
+            partial_events, last_modified = future.get_result()
+            events += partial_events
+            if self._last_modified is None or last_modified > self._last_modified:
+                self._last_modified = last_modified
+
+        if model_type is not None:
+            events = filter_event_properties(events, model_type)
+        return json.dumps(events, ensure_ascii=True, indent=True, sort_keys=True)
 
 
 class ApiEventListController(ApiBaseController):
@@ -99,12 +128,20 @@ class ApiEventPlayoffAdvancementController(ApiBaseController):
         matches_future = EventMatchesQuery(event_key).fetch_async(return_updated=True)
 
         event, event_updated = event_future.get_result()
+        event.prep_details()
         matches, matches_updated = matches_future.get_result()
         self._last_modified = max(event_updated, matches_updated)
 
         cleaned_matches = MatchHelper.deleteInvalidMatches(matches, event)
         matches = MatchHelper.organizeMatches(cleaned_matches)
-        bracket_table, playoff_advancement, _, _ = PlayoffAdvancementHelper.generatePlayoffAdvancement(event, matches)
+        bracket_table = event.playoff_bracket
+        playoff_advancement = event.playoff_advancement
+
+        # Lazy handle the case when we haven't backfilled the event details
+        if not bracket_table or not playoff_advancement:
+            bracket_table2, playoff_advancement2, _, _ = PlayoffAdvancementHelper.generatePlayoffAdvancement(event, matches)
+            bracket_table = bracket_table or bracket_table2
+            playoff_advancement = playoff_advancement or playoff_advancement2
 
         output = []
         for level in Match.ELIM_LEVELS:

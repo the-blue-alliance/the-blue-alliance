@@ -29,18 +29,16 @@ class WebhookAdd(LoggedInHandler):
         if not url or not name:
             return self.redirect('/webhooks/add?error=1')
 
-        # Secret may be none - but we'll generate a secret for the user
-        secret = self.request.get('secret', None)
-        if not secret:
-            import uuid
-            secret = uuid.uuid4().hex
+        # Always generate secret server-side; previously allowed clients to set the secret
+        import uuid
+        secret = uuid.uuid4().hex
 
         current_user_account_id = self.user_bundle.account.key.id()
         query = MobileClient.query(MobileClient.messaging_id == url, ancestor=ndb.Key(Account, current_user_account_id))
         if query.count() == 0:
             # Webhook doesn't exist, add it
             from helpers.tbans_helper import TBANSHelper
-            response = TBANSHelper.verify_webhook(url, secret)
+            verification_key = TBANSHelper.verify_webhook(url, secret)
 
             client = MobileClient(
                 parent=self.user_bundle.account.key,
@@ -50,7 +48,7 @@ class WebhookAdd(LoggedInHandler):
                 secret=secret,
                 client_type=ClientType.WEBHOOK,
                 verified=False,
-                verification_code=response.verification_key)
+                verification_code=verification_key)
             client.put()
         else:
             # Webhook already exists. Update the secret
@@ -132,9 +130,9 @@ class WebhookVerificationSend(LoggedInHandler):
             return self.redirect('/')
 
         from helpers.tbans_helper import TBANSHelper
-        response = TBANSHelper.verify_webhook(webhook.messaging_id, webhook.secret)
+        verification_key = TBANSHelper.verify_webhook(webhook.messaging_id, webhook.secret)
 
-        webhook.verification_code = response.verification_key
+        webhook.verification_code = verification_key
         webhook.verified = False
         webhook.put()
 

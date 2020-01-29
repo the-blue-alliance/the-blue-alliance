@@ -1,0 +1,18 @@
+{% if any_webcast_online %}
+  <h2>Currently On Air</h2>
+{% endif %}
+{% for webcast in special_webcasts %}
+  {% if webcast.status == 'online' %}
+    <h3>
+      <a class="btn btn-md btn-success pull-right"
+         href="/gameday#layout=0&view_0={{ webcast.key_name }}-0{% if webcast.type == 'twitch' %}&chat={{ webcast.channel }}{% endif %}">
+        <span class="glyphicon glyphicon-facetime-video"></span> Watch Now
+      </a>
+      {{ webcast.name }}
+      {% if webcast.stream_title %}
+        <small>{{ webcast.stream_title }}</small>
+      {% endif %}
+    </h3>
+    <hr>
+  {% endif %}
+{% endfor %}

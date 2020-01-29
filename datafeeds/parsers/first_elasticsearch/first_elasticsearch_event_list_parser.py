@@ -49,10 +49,8 @@ class FIRSTElasticSearchEventListParser(object):
 
             # Decide what district (if any) this event is in
             if event_type in EventType.DISTRICT_EVENT_TYPES:
-                district_enum = EventHelper.getDistrictEnumFromEventName(name)
                 district_key = EventHelper.getDistrictKeyFromEventName(name, year_districts_future)
             else:
-                district_enum = DistrictType.NO_DISTRICT
                 district_key = None
 
             events.append(Event(
@@ -71,7 +69,6 @@ class FIRSTElasticSearchEventListParser(object):
                 postalcode=postalcode,
                 venue_address=venue_address,
                 year=self.season,
-                event_district_enum=district_enum,
                 district_key=district_key,
                 first_eid=first_eid,
                 website=website

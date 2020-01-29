@@ -13,6 +13,7 @@
     <th>Event Alliances</th>
     <th>Event Awards</th>
     <th>Match Video</th>
+    <th>Zebra MotionWorks</th>
   </tr>
   {% for auth in write_auths %}
   <tr>
@@ -33,6 +34,7 @@
     <td>{% if auth.can_edit_event_alliances %}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>
     <td>{% if auth.can_edit_event_awards %}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>
     <td>{% if auth.can_edit_match_video %}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>
+    <td>{% if auth.can_edit_zebra_motionworks %}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>
   </tr>
   {% endfor %}
 </table>

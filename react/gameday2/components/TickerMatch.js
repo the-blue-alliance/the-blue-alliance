@@ -53,11 +53,11 @@ const TickerMatch = (props) => {
   const match = props.match
 
   // Set backgrounds
-  if (match.w === 'red') {  // Red win
+  if (match.w === 'red') { // Red win
     matchStyle.backgroundColor = '#330000'
-  } else if (match.w === 'blue') {  // Blue win
+  } else if (match.w === 'blue') { // Blue win
     matchStyle.backgroundColor = '#000033'
-  } else if (match.r !== -1 && match.b !== -1) {  // Tie
+  } else if (match.r !== -1 && match.b !== -1) { // Tie
     matchStyle.backgroundColor = '#220022'
   } else if (props.hasFavorite) {
     matchStyle.backgroundColor = '#e6c100'

@@ -7,7 +7,7 @@ from consts.notification_type import NotificationType
 from notifications.update_subscriptions import UpdateSubscriptionsNotification
 
 
-class TestUpdateFavoritesNotification(unittest2.TestCase):
+class TestUpdateSubscriptionsNotification(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -23,7 +23,7 @@ class TestUpdateFavoritesNotification(unittest2.TestCase):
 
     def test_build(self):
         expected = {}
-        expected['notification_type'] = NotificationType.type_names[NotificationType.UPDATE_SUBSCRIPTION]
+        expected['notification_type'] = NotificationType.type_names[NotificationType.UPDATE_SUBSCRIPTIONS]
         data = self.notification._build_dict()
 
         self.assertEqual(expected, data)

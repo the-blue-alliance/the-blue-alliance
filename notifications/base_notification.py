@@ -1,16 +1,14 @@
 import logging
 import random
 import tba_config
-import uuid
 
 from google.appengine.ext import deferred
 from google.appengine.api import memcache
-from google.appengine.api import urlfetch
 
 from consts.client_type import ClientType
 from consts.notification_type import NotificationType
 from helpers.notification_sender import NotificationSender
-from models.sitevar import Sitevar
+from sitevars.notifications_enable import NotificationsEnable
 
 
 class BaseNotification(object):
@@ -18,14 +16,6 @@ class BaseNotification(object):
     # List of clients this notification type supports (these are default values)
     # Can be overridden by subclasses to only send to some types
     _supported_clients = [ClientType.OS_ANDROID, ClientType.WEBHOOK]
-
-    # If not None, the event feed to post this notification to
-    # Typically the event key
-    _event_feed = None
-
-    # If not None, the district feed to post this notificatoin to
-    # Typically, district abbreviation from consts/district_type
-    _district_feed = None
 
     # Send analytics updates for this notification?
     # Can be overridden by subclasses if not
@@ -88,8 +78,7 @@ class BaseNotification(object):
                 NotificationSender.send_webhook(notification, self.keys[ClientType.WEBHOOK])
 
     def check_enabled(self):
-        var = Sitevar.get_by_id('notifications.enable')
-        return var is None or var.values_json == "true"
+        return NotificationsEnable.notifications_enabled()
 
     """
     Subclasses should override this method and return a dict containing the payload of the notification.
@@ -137,16 +126,19 @@ class BaseNotification(object):
         For more information about GAnalytics Protocol Parameters, visit
         https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
         """
-        import urllib
-        analytics_id = Sitevar.get_by_id("google_analytics.id")
-        if analytics_id is None:
+        from sitevars.google_analytics_id import GoogleAnalyticsID
+        google_analytics_id = GoogleAnalyticsID.google_analytics_id()
+        if not google_analytics_id:
             logging.warning("Missing sitevar: google_analytics.id. Can't track API usage.")
         else:
-            GOOGLE_ANALYTICS_ID = analytics_id.contents['GOOGLE_ANALYTICS_ID']
-            params = urllib.urlencode({
+            import uuid
+            cid = uuid.uuid3(uuid.NAMESPACE_X500, str('tba-notification-tracking'))
+
+            from urllib import urlencode
+            params = urlencode({
                 'v': 1,
-                'tid': GOOGLE_ANALYTICS_ID,
-                'cid': uuid.uuid3(uuid.NAMESPACE_X500, str('tba-notification-tracking')),
+                'tid': google_analytics_id,
+                'cid': cid,
                 't': 'event',
                 'ec': 'notification',
                 'ea': NotificationType.type_names[notification_type_enum],
@@ -155,6 +147,7 @@ class BaseNotification(object):
                 'sc': 'end',  # forces tracking session to end
             })
 
+            from google.appengine.api import urlfetch
             analytics_url = 'http://www.google-analytics.com/collect?%s' % params
             urlfetch.fetch(
                 url=analytics_url,

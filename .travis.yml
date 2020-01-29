@@ -20,10 +20,10 @@ stages:
   - name: deploy
     if: (type = push) AND (branch = master)
 before_install:
-- nvm install 8.0.0
+- nvm install 8.16.0
 install:
 - travis_retry ./ops/travis/travis-install.sh $JOB
-- export PYTHONPATH=${PYTHONPATH}:${HOME}/google_appengine:${HOME}/google_appengine/lib/protorpc-1.0
+- export PYTHONPATH=${PYTHONPATH}:${HOME}/google_appengine
 - export ENDPOINTS_GAE_SDK=$(gcloud info --format="value(installation.sdk_root)")
 before_script:
 - ./ops/travis/travis-before.sh $JOB

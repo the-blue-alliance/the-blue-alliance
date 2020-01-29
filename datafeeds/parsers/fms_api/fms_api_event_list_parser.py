@@ -26,7 +26,10 @@ class FMSAPIEventListParser(object):
         'championshipsubdivision': EventType.CMP_DIVISION,
         'championship': EventType.CMP_FINALS,
         'offseason': EventType.OFFSEASON,
+        'offseasonwithazuresync': EventType.OFFSEASON,
     }
+
+    NON_OFFICIAL_EVENT_TYPES = ['offseason']
 
     EVENT_CODE_EXCEPTIONS = {
         'archimedes': ('arc', 'Archimedes'),  # (code, short_name)
@@ -53,11 +56,9 @@ class FMSAPIEventListParser(object):
     EINSTEIN_NAME_DEFAULT = 'Einstein Field'
     EINSTEIN_CODES = {'cmp', 'cmpmi', 'cmpmo', 'cmptx'}
 
-    def __init__(self, season, short=None, event_types_override=None):
+    def __init__(self, season, short=None):
         self.season = int(season)
         self.event_short = short
-        if event_types_override:
-            self.EVENT_TYPES = event_types_override
 
     def parse(self, response):
         events = []
@@ -73,10 +74,18 @@ class FMSAPIEventListParser(object):
 
         for event in response['Events']:
             code = event['code'].lower()
-            event_type = EventType.PRESEASON if code == 'week0' else self.EVENT_TYPES.get(event['type'].lower(), None)
+
+            api_event_type = event['type'].lower()
+            event_type = EventType.PRESEASON if code == 'week0' else self.EVENT_TYPES.get(api_event_type, None)
             if event_type is None and not self.event_short:
-                logging.warn("Event type '{}' not recognized!".format(event['type']))
+                logging.warn("Event type '{}' not recognized!".format(api_event_type))
                 continue
+
+            # Some event types should be marked as unofficial, so sync is disabled
+            official = True
+            if api_event_type in self.NON_OFFICIAL_EVENT_TYPES:
+                official = False
+
             name = event['name']
             short_name = EventHelper.getShortName(name, district_code=event['districtCode'])
             district_enum = EventHelper.parseDistrictName(event['districtCode'].lower()) if event['districtCode'] else DistrictType.NO_DISTRICT
@@ -131,7 +140,7 @@ class FMSAPIEventListParser(object):
                 short_name=short_name,
                 event_short=code,
                 event_type_enum=event_type,
-                official=True,
+                official=official,
                 start_date=start,
                 end_date=end,
                 venue=venue,

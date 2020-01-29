@@ -16,6 +16,10 @@ class FMSAPIEventAlliancesParser(object):
             if alliance['round3'] is not None:
                 picks.append('frc{}'.format(alliance['round3']))
 
+            # If there are no picks for a given alliance, ignore this alliance
+            if len(picks) == 0:
+                continue
+
             # If no name is specified (like in 2015), generate one
             name = alliance['name'] if alliance.get('name', None) else 'Alliance {}'.format(alliance_num)
 

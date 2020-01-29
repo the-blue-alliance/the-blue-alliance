@@ -1,3 +1,4 @@
+import copy
 import datetime
 import unittest2
 import webtest
@@ -25,6 +26,7 @@ from models.match import Match
 from models.media import Media
 from models.sitevar import Sitevar
 from models.team import Team
+from models.zebra_motionworks import ZebraMotionWorks
 
 
 class TestApiTrustedController(unittest2.TestCase):
@@ -106,6 +108,12 @@ class TestApiTrustedController(unittest2.TestCase):
                                              description='test',
                                              event_list=[ndb.Key(Event, '2014casj')],
                                              auth_types_enum=[AuthType.EVENT_INFO])
+
+        self.event_zebra_motionworks = ApiAuthAccess(id='tEsT_id_10',
+                                                     secret='321tEsTsEcReT',
+                                                     description='test',
+                                                     event_list=[ndb.Key(Event, '2014casj')],
+                                                     auth_types_enum=[AuthType.ZEBRA_MOTIONWORKS])
 
         self.event = Event(
             id='2014casj',
@@ -1096,3 +1104,112 @@ class TestApiTrustedController(unittest2.TestCase):
             self.assertTrue(str(team) in {'5'})
         for team in Award.get_by_id('2014casj_2').recipient_dict.keys():
             self.assertTrue(str(team) in {'6'})
+
+    def test_zebra_motionworks_add(self):
+        self.event_zebra_motionworks.put()
+        match1 = Match(
+            id="2014casj_qm1",
+            alliances_json="""{"blue": {"score": -1, "teams": ["frc1", "frc2", "frc3"]}, "red": {"score": -1, "teams": ["frc254", "frc971", "frc604"]}}""",
+            comp_level="qm",
+            event=ndb.Key(Event, '2014casj'),
+            year=2014,
+            set_number=1,
+            match_number=1,
+            team_key_names=[u'frc254', u'frc971', u'frc604', u'frc1', u'frc2', u'frc3'],
+            youtube_videos=["abcdef"]
+        )
+
+        data = [{
+            "key": "2014casj_qm1",
+            "times": [0.0, 0.5, 1.0, 1.5],
+            "alliances": {
+                "red": [
+                    {
+                        "team_key": "frc254",
+                        "xs": [None, 1.2, 1.3, 1.4],
+                        "ys": [None, 0.1, 0.1, 0.1],
+                    },
+                    {
+                        "team_key": "frc971",
+                        "xs": [1.1, 1.2, 1.3, 1.4],
+                        "ys": [0.1, 0.1, 0.1, 0.1],
+                    },
+                    {
+                        "team_key": "frc604",
+                        "xs": [1.1, 1.2, 1.3, 1.4],
+                        "ys": [0.1, 0.1, 0.1, 0.1],
+                    },
+                ],
+                "blue": [
+                    {
+                        "team_key": "frc1",
+                        "xs": [None, 1.2, 1.3, 1.4],
+                        "ys": [None, 0.1, 0.1, 0.1],
+                    },
+                    {
+                        "team_key": "frc2",
+                        "xs": [1.1, 1.2, 1.3, 1.4],
+                        "ys": [0.1, 0.1, 0.1, 0.1],
+                    },
+                    {
+                        "team_key": "frc3",
+                        "xs": [1.1, 1.2, None, 1.4],
+                        "ys": [0.1, 0.1, None, 0.1],
+                    },
+                ],
+            }
+        }]
+
+        # Verify failure if Match doesn't exist
+        request_body = json.dumps(data)
+        request_path = '/api/trusted/v1/event/2014casj/zebra_motionworks/add'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_10', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIsNone(ZebraMotionWorks.get_by_id('2014casj_qm1'))
+
+        # Add match
+        match1.put()
+
+        # Verify bad event_key doesn't get added
+        bad_data = copy.deepcopy(data)
+        bad_data[0]['key'] = '2019casj_qm1'
+        request_body = json.dumps(bad_data)
+        request_path = '/api/trusted/v1/event/2014casj/zebra_motionworks/add'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_10', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIsNone(ZebraMotionWorks.get_by_id('2014casj_qm1'))
+
+        # Verify malformatted data doesn't get added
+        bad_data = copy.deepcopy(data)
+        del bad_data[0]['times'][0]
+        request_body = json.dumps(bad_data)
+        request_path = '/api/trusted/v1/event/2014casj/zebra_motionworks/add'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_10', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIsNone(ZebraMotionWorks.get_by_id('2014casj_qm1'))
+
+        # Verify teams must be the same
+        bad_data = copy.deepcopy(data)
+        bad_data[0]['alliances']['red'][0]['team_key'] = 'frc9999'
+        request_body = json.dumps(bad_data)
+        request_path = '/api/trusted/v1/event/2014casj/zebra_motionworks/add'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_10', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIsNone(ZebraMotionWorks.get_by_id('2014casj_qm1'))
+
+        # Verify correctly added data
+        request_body = json.dumps(data)
+        request_path = '/api/trusted/v1/event/2014casj/zebra_motionworks/add'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_10', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(ZebraMotionWorks.get_by_id('2014casj_qm1').data, data[0])

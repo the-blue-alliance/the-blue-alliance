@@ -56,6 +56,10 @@ class ApiAuthAccess(ndb.Model):
         return AuthType.MATCH_VIDEO in self.auth_types_enum
 
     @property
+    def can_edit_zebra_motionworks(self):
+        return AuthType.ZEBRA_MOTIONWORKS in self.auth_types_enum
+
+    @property
     def is_read_key(self):
         return self.auth_types_enum == [AuthType.READ_API]
 

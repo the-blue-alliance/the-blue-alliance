@@ -1,13 +1,13 @@
 # Packages that are needed for deployment because
 # they are not included in App Engine
 iso8601==0.1.11
-google-api-python-client==1.6.2
+google-api-python-client==1.7.8
 google-cloud-bigquery==0.25.0
 beautifulsoup4
 GoogleAppEngineCloudStorageClient
 
 # TBANS
-firebase-admin==2.16.0
+firebase-admin==3.2.1 # DO NOT BUMP - 3.2.1 is the last version that supports Python 2
 
 # Cloud Endpoints Stuff
 oauth2client==3.0.0
@@ -16,4 +16,4 @@ google-endpoints
 google-endpoints-api-management
 requests-toolbelt
 # See https://github.com/urllib3/urllib3/issues/1456
-urllib3==1.23
+urllib3==1.24.2

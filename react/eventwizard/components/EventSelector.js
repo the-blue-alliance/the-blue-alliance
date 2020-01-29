@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import Select from 'react-select'
 
 class EventSelector extends Component {
-
   static loadEvents() {
     return fetch('/_/account/apiwrite_events', {
       credentials: 'same-origin',

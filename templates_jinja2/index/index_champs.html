@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance{% endblock %}
+{% block schema_org_markup %}{% include "index_partials/schema_org_markup.html" %}{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+      <h2>Welcome to The Blue Alliance's coverage of the {{year}} <i>FIRST</i> Championship!</h2>
+      <h4>More info at <a href="https://www.firstchampionship.org">firstchampionship.org</a></h4>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-12 visible-xs">
+      <a class="btn btn-block btn-success" href="/watch/champs"><span class="glyphicon glyphicon-facetime-video"></span> Watch PLAYxPLAY!</a>
+      <a class="btn btn-block btn-default" href="/watch/champs-all"><span class="glyphicon glyphicon-facetime-video"></span> Watch All Championship Streams!</a>
+      <a class="btn btn-block btn-primary" href="/mytba"><span class="glyphicon glyphicon-star"></span> Follow your Favorite teams with myTBA</a>
+    </div>
+    <div class="col-md-8 col-lg-6 col-md-offset-2 col-lg-offset-3 hidden-xs">
+      <div class="btn-group btn-group-block-2">
+        <a class="btn btn-success" href="/watch/champs"><span class="glyphicon glyphicon-facetime-video"></span> Watch PLAYxPLAY!</a>
+        <a class="btn btn-default" href="/watch/champs-all"><span class="glyphicon glyphicon-facetime-video"></span> Watch All Championship Streams!</a>
+      </div>
+      <br><br>
+      <a class="btn btn-block btn-primary" href="/mytba"><span class="glyphicon glyphicon-star"></span> Follow your Favorite teams with myTBA</a>
+    </div>
+  </div>
+
+  {#
+  <div class="row">
+    {% for event in det_events %}
+      {% if event.event_type_enum == 3 %}
+      <div class="col-xs-12 col-md-6 col-lg-4">
+        <h3>
+          <a href="/event/{{event.key.id}}">{{event.name}}</a>
+          {% if event.webcast %}
+            <div class="pull-right">
+            {% if event.now %}
+              {% if event.webcast_status == 'offline' %}
+                <a class="btn btn-default btn-small" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Offline</a>
+              {% else %}
+                {% if event.webcast_status == 'online' %}
+                  <a class="btn btn-success btn-small" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
+                {% else %}
+                  <a class="btn btn-info btn-small" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-question-sign"></span> Watch Now</a>
+                {% endif %}
+              {% endif %}
+            {% else %}
+              <a class="btn btn-default btn-small disabled">Offline</a>
+            {% endif %}
+            </div>
+          {% endif %}
+        </h3>
+        <div class="liveevent-content" data-eventkey="{{event.key.id}}" data-simple></div>
+      </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+  #}
+
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="row">
+        <div class="col-xs-12 col-md-6">
+          <h3>
+            <span class="glyphicon glyphicon-map-marker"></span> Houston
+            <!-- <a class="btn btn-default btn-sm pull-right" href="https://www.facebook.com/events/2094138704199526/"><span class="glyphicon glyphicon-calendar"></span> RSVP on Facebook</a> -->
+          </h3>
+          {% with events = hou_events %}
+            {% include "event_partials/event_table.html" %}
+          {% endwith %}
+        </div>
+        <div class="col-xs-12 col-md-6">
+          <h3>
+            <span class="glyphicon glyphicon-map-marker"></span> Detroit
+            <!-- <a class="btn btn-default btn-sm pull-right" href="https://www.facebook.com/events/343931669448597/"><span class="glyphicon glyphicon-calendar"></span> RSVP on Facebook</a> -->
+          </h3>
+          {% with events = det_events %}
+            {% include "event_partials/event_table.html" %}
+          {% endwith %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12 visible-xs">
+      {% include "index_partials/apps.html" %}
+    </div>
+    <div class="col-md-8 col-lg-6 col-md-offset-2 col-lg-offset-3 hidden-xs">
+      {% include "index_partials/apps.html" %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block inline_javascript %}
+<script type="text/javascript" src="/javascript/liveevent.min.js"></script>
+{% endblock %}

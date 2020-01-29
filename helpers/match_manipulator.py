@@ -119,6 +119,15 @@ class MatchManipulator(ManipulatorBase):
                 logging.error("Error enqueuing event_team_status for {}".format(event_key))
                 logging.error(traceback.format_exc())
 
+            # Enqueue updating playoff advancement
+            try:
+                taskqueue.add(
+                    url='/tasks/math/do/playoff_advancement_update/{}'.format(event_key),
+                    method='GET')
+            except Exception:
+                logging.error("Error enqueuing advancement update for {}".format(event_key))
+                logging.error(traceback.format_exc())
+
     @classmethod
     def updateMerge(self, new_match, old_match, auto_union=True):
         """

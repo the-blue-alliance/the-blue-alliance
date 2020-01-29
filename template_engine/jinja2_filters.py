@@ -41,6 +41,14 @@ def floatformat(num, num_decimals):
     return "%.{}f".format(num_decimals) % num
 
 
+def isoformat(datetime):
+    return datetime.isoformat()
+
+
+def union(one, two):
+    return set(one) | set(two)
+
+
 def limit_prob(prob):
     prob *= 100
     prob = min(95, max(prob, 5))
@@ -51,6 +59,22 @@ def strftime(datetime, formatstr):
     """
     Uses Python's strftime with some tweaks
     """
+
+    # https://github.com/django/django/blob/54ea290e5bbd19d87bd8dba807738eeeaf01a362/django/utils/dateformat.py#L289
+    def t(day):
+        "English ordinal suffix for the day of the month, 2 characters; i.e. 'st', 'nd', 'rd' or 'th'"
+        if day in (11, 12, 13):  # Special case
+            return 'th'
+        last = day % 10
+        if last == 1:
+            return 'st'
+        if last == 2:
+            return 'nd'
+        if last == 3:
+            return 'rd'
+        return 'th'
+
+    formatstr = formatstr.replace('%t', t(datetime.day))
     return datetime.strftime(formatstr).lstrip("0").replace(" 0", " ")
 
 

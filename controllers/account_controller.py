@@ -27,10 +27,11 @@ from models.api_auth_access import ApiAuthAccess
 from models.event import Event
 from models.favorite import Favorite
 from models.match import Match
-from models.sitevar import Sitevar
 from models.subscription import Subscription
 from models.suggestion import Suggestion
 from models.team import Team
+
+from sitevars.notifications_enable import NotificationsEnable
 
 from template_engine import jinja2_engine
 
@@ -41,8 +42,8 @@ class AccountOverview(LoggedInHandler):
     def get(self):
         self._require_registration()
 
-        push_sitevar = Sitevar.get_by_id('notifications.enable')
-        if push_sitevar is None or not push_sitevar.values_json == "true":
+        notifications_enabled = NotificationsEnable.notifications_enabled()
+        if not notifications_enabled:
             ping_enabled = "disabled"
         else:
             ping_enabled = ""
@@ -68,6 +69,7 @@ class AccountOverview(LoggedInHandler):
         # Fetch trusted API keys
         api_keys = ApiAuthAccess.query(ApiAuthAccess.owner == user).fetch()
         write_keys = filter(lambda key: key.is_write_key, api_keys)
+        write_keys.sort(key=lambda key: key.event_list[0])
         read_keys = filter(lambda key: key.is_read_key, api_keys)
 
         self.template_values['status'] = self.request.get('status')
@@ -412,7 +414,7 @@ class MyTBAEventController(LoggedInHandler):
                 year = int(event_key[:-1])
             except:
                 year = None
-            if year and year >= 1992 and year <= tba_config.MAX_YEAR:
+            if year and year in tba_config.VALID_YEARS:
                 event = Event(  # fake event for rendering
                     name="ALL {} EVENTS".format(year),
                     year=year,

@@ -2,43 +2,45 @@
   <tbody>
     <tr>
       {% if bracket_table.qf %}
-      <td class="leftAlliance {% if bracket_table.qf.1.winning_alliance == 'red' %}winnerL{% endif %}" rowspan="1">
+      <td class="leftAlliance {% if bracket_table.qf.qf1.winning_alliance == 'red' %}winnerL{% endif %}" rowspan="1">
         <div class="alliance_number">1.</div>
-        {% for team in bracket_table.qf.1.red_alliance %}
+        {% for team in bracket_table.qf.qf1.red_alliance %}
             <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
         {% endfor %}
       </td>
       {% endif %}
       {% if bracket_table.sf %}
-      <td class="leftAlliance {% if bracket_table.sf.1.winning_alliance == 'red' %}winnerL{% endif %}" rowspan="2">
-        {% for team in bracket_table.sf.1.red_alliance %}
+      <td class="leftAlliance {% if bracket_table.sf.sf1.winning_alliance == 'red' %}winnerL{% endif %}" rowspan="2">
+        {% for team in bracket_table.sf.sf1.red_alliance %}
           <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
         {% endfor %}
       </td>
       {% endif %}
-      <td class="{% if bracket_table.f.1.winning_alliance == 'red' %}winnerC{% else %}{% if bracket_table.f.1.winning_alliance == 'blue' %}secondC{% endif %}{% endif %}" rowspan="4">
+      {% if bracket_table.f %}
+      <td class="{% if bracket_table.f.f1.winning_alliance == 'red' %}winnerC{% else %}{% if bracket_table.f.f1.winning_alliance == 'blue' %}secondC{% endif %}{% endif %}" rowspan="4">
         <br>
-        {% for team in bracket_table.f.1.red_alliance %}
+        {% for team in bracket_table.f.f1.red_alliance %}
           <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
         {% endfor %}
       </td>
-      <td class="{% if bracket_table.f.1.winning_alliance == 'blue' %}winnerC{% else %}{% if bracket_table.f.1.winning_alliance == 'red' %}secondC{% endif %}{% endif %}" rowspan="4">
+      <td class="{% if bracket_table.f.f1.winning_alliance == 'blue' %}winnerC{% else %}{% if bracket_table.f.f1.winning_alliance == 'red' %}secondC{% endif %}{% endif %}" rowspan="4">
         <br>
-        {% for team in bracket_table.f.1.blue_alliance %}
+        {% for team in bracket_table.f.f1.blue_alliance %}
           <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
         {% endfor %}
       </td>
-      {% if bracket_table.sf %}
-      <td class="rightAlliance {% if bracket_table.sf.2.winning_alliance == 'blue' %}winnerR{% endif %}" rowspan="2">
-        {% for team in bracket_table.sf.2.blue_alliance %}
+      {% endif %}
+      {% if bracket_table.sf and bracket_table.sf.sf2 %}
+      <td class="rightAlliance {% if bracket_table.sf.sf2.winning_alliance == 'blue' %}winnerR{% endif %}" rowspan="2">
+        {% for team in bracket_table.sf.sf2.blue_alliance %}
           <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
         {% endfor %}
       </td>
       {% endif %}
       {% if bracket_table.qf %}
-      <td class="rightAlliance {% if bracket_table.qf.4.winning_alliance == 'red' %}winnerR{% endif %}" rowspan="1">
+      <td class="rightAlliance {% if bracket_table.qf.qf4.winning_alliance == 'red' %}winnerR{% endif %}" rowspan="1">
         <div class="alliance_number">3.</div>
-        {% for team in bracket_table.qf.4.red_alliance %}
+        {% for team in bracket_table.qf.qf4.red_alliance %}
           <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
         {% endfor %}
       </td>
@@ -46,15 +48,15 @@
     </tr>
     <tr>
       {% if bracket_table.qf %}
-      <td class="leftAlliance {% if bracket_table.qf.1.winning_alliance == 'blue' %}winnerL{% endif %}" rowspan="1">
+      <td class="leftAlliance {% if bracket_table.qf.qf1.winning_alliance == 'blue' %}winnerL{% endif %}" rowspan="1">
         <div class="alliance_number">8.</div>
-        {% for team in bracket_table.qf.1.blue_alliance %}
+        {% for team in bracket_table.qf.qf1.blue_alliance %}
           <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
         {% endfor %}
       </td>
-      <td class="rightAlliance {% if bracket_table.qf.4.winning_alliance == 'blue' %}winnerR{% endif %}" rowspan="1">
+      <td class="rightAlliance {% if bracket_table.qf.qf4.winning_alliance == 'blue' %}winnerR{% endif %}" rowspan="1">
         <div class="alliance_number">6.</div>
-        {% for team in bracket_table.qf.4.blue_alliance %}
+        {% for team in bracket_table.qf.qf4.blue_alliance %}
           <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
         {% endfor %}
       </td>
@@ -62,29 +64,31 @@
     </tr>
     <tr>
       {% if bracket_table.qf %}
-      <td class="leftAlliance {% if bracket_table.qf.2.winning_alliance == 'red' %}winnerL{% endif %}" rowspan="1">
+      <td class="leftAlliance {% if bracket_table.qf.qf2.winning_alliance == 'red' %}winnerL{% endif %}" rowspan="1">
         <div class="alliance_number">4.</div>
-        {% for team in bracket_table.qf.2.red_alliance %}
+        {% for team in bracket_table.qf.qf2.red_alliance %}
           <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
         {% endfor %}
       </td>
       {% endif %}
       {% if bracket_table.sf %}
-      <td class="leftAlliance {% if bracket_table.sf.1.winning_alliance == 'blue' %}winnerL{% endif %}" rowspan="2">
-        {% for team in bracket_table.sf.1.blue_alliance %}
+      <td class="leftAlliance {% if bracket_table.sf.sf1.winning_alliance == 'blue' %}winnerL{% endif %}" rowspan="2">
+        {% for team in bracket_table.sf.sf1.blue_alliance %}
           <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
         {% endfor %}
       </td>
-      <td class="rightAlliance {% if bracket_table.sf.2.winning_alliance == 'red' %}winnerR{% endif %}" rowspan="2">
-        {% for team in bracket_table.sf.2.red_alliance %}
+      <td class="rightAlliance {% if bracket_table.sf.sf2 and bracket_table.sf.sf2.winning_alliance == 'red' %}winnerR{% endif %}" rowspan="2">
+        {% if bracket_table.sf.sf2 %}
+        {% for team in bracket_table.sf.sf2.red_alliance %}
           <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
         {% endfor %}
+        {% endif %}
       </td>
       {% endif %}
       {% if bracket_table.qf %}
-      <td class="rightAlliance {% if bracket_table.qf.3.winning_alliance == 'red' %}winnerR{% endif %}" rowspan="1">
+      <td class="rightAlliance {% if bracket_table.qf.qf3.winning_alliance == 'red' %}winnerR{% endif %}" rowspan="1">
         <div class="alliance_number">2.</div>
-        {% for team in bracket_table.qf.3.red_alliance %}
+        {% for team in bracket_table.qf.qf3.red_alliance %}
           <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
         {% endfor %}
       </td>
@@ -92,15 +96,15 @@
     </tr>
     <tr>
       {% if bracket_table.qf %}
-      <td class="leftAlliance {% if bracket_table.qf.2.winning_alliance == 'blue' %}winnerL{% endif %}" rowspan="1">
+      <td class="leftAlliance {% if bracket_table.qf.qf2.winning_alliance == 'blue' %}winnerL{% endif %}" rowspan="1">
         <div class="alliance_number">5.</div>
-        {% for team in bracket_table.qf.2.blue_alliance %}
+        {% for team in bracket_table.qf.qf2.blue_alliance %}
           <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
         {% endfor %}
       </td>
-      <td class="rightAlliance {% if bracket_table.qf.3.winning_alliance == 'blue' %}winnerR{% endif %}" rowspan="1">
+      <td class="rightAlliance {% if bracket_table.qf.qf3.winning_alliance == 'blue' %}winnerR{% endif %}" rowspan="1">
         <div class="alliance_number">7.</div>
-        {% for team in bracket_table.qf.3.blue_alliance %}
+        {% for team in bracket_table.qf.qf3.blue_alliance %}
           <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
         {% endfor %}
       </td>

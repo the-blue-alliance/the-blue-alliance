@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
 class AddMultipleTeams extends Component {
-
   constructor(props) {
     super(props)
     this.state = {
@@ -63,7 +62,7 @@ class AddMultipleTeams extends Component {
           disabled={!this.props.selectedEvent}
         >
               Overwrite Teams
-            </button>
+        </button>
       </div>
     )
   }

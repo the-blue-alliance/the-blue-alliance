@@ -26,7 +26,7 @@ const VideoCellToolbar = (props) => {
 
   const matchTickerGroupStyle = {
     flexGrow: 1,
-    width: '0%',  // Slightly hacky. Prevents ticker from bleeding into next cell
+    width: '0%', // Slightly hacky. Prevents ticker from bleeding into next cell
     overflow: 'hidden',
     whiteSpace: 'nowrap',
   }

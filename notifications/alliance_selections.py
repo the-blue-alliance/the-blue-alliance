@@ -9,8 +9,6 @@ class AllianceSelectionNotification(BaseNotification):
 
     def __init__(self, event):
         self.event = event
-        self._event_feed = event.key_name
-        self._district_feed = event.event_district_abbrev
 
     @property
     def _type(self):

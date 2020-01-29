@@ -9,7 +9,6 @@ import AddRemoveTeamMap from './AddRemoveTeamMap'
 import ensureRequestSuccess from '../../net/EnsureRequestSuccess'
 
 class EventInfoTab extends Component {
-
   constructor(props) {
     super(props)
     this.state = {
@@ -58,19 +57,19 @@ class EventInfoTab extends Component {
     fetch(`/api/v3/event/${newEventKey}`, {
       credentials: 'same-origin',
     })
-    .then(ensureRequestSuccess)
-    .then((response) => (response.json()))
-    .then((data1) => // Merge in remap_teams
-      fetch(`/_/remap_teams/${newEventKey}`)
       .then(ensureRequestSuccess)
       .then((response) => (response.json()))
-      .then((data2) => {
-        const data = Object.assign({}, data1)
-        data.remap_teams = data2
-        return data
-      })
-    )
-    .then((data) => (this.setState({ eventInfo: data, status: '' })))
+      .then((data1) => // Merge in remap_teams
+        fetch(`/_/remap_teams/${newEventKey}`)
+          .then(ensureRequestSuccess)
+          .then((response) => (response.json()))
+          .then((data2) => {
+            const data = Object.assign({}, data1)
+            data.remap_teams = data2
+            return data
+          })
+      )
+      .then((data) => (this.setState({ eventInfo: data, status: '' })))
   }
 
   addWebcast(webcastUrl) {

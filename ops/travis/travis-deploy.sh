@@ -48,8 +48,10 @@ PATH=$PATH:$INSTALL/$NAME/bin/
 echo "Building TBA..."
 paver make
 
-echo "Deploying TBA with the following JS modules"
-npm ls || true
+if [ "$TBA_DEPLOY_VERBOSE" = "1"]; then
+  echo "Deploying TBA with the following JS modules"
+  npm ls || true
+fi
 
 echo "Configuring service account auth..."
 with_python27 "$GCLOUD -q auth activate-service-account --key-file $KEYFILE"
@@ -63,7 +65,7 @@ trap release_lock EXIT INT TERM
 
 echo "Obtained Lock. Deploying $PROJECT:$VERSION"
 # need more permissions for cron.yaml queue.yaml index.yaml, we can come back to them
-for config in app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml api.yaml clientapi.yaml tasks.yaml tbans.yaml cron.yaml dispatch.yaml; do
+for config in app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml api.yaml clientapi.yaml tasks.yaml cron.yaml dispatch.yaml; do
     with_python27 "$GCLOUD --quiet --verbosity warning --project $PROJECT app deploy $config --version $VERSION"
 done
 

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% import "match_partials/match_table_macros.html" as mtm %}
 
-{% block title %}{{match.verbose_name}} - {{event.year}} {{event.name}} - The Blue Alliance{% endblock %}
+{% block title %}{{match.verbose_name}} - {{event.name}} {{event.year}} - The Blue Alliance{% endblock %}
 
 {% block meta_description %}Match results and video for {{match.verbose_name}} at the {{event.year}} {{event.name}} FIRST Robotics Competition in {{event.location}}.{% endblock %}
 
@@ -27,7 +27,7 @@
 <div class="container">
   <div class="row">
     <div class="col-xs-12">
-      <h1>{{match.verbose_name}} <small><a href="/event/{{event.key_name}}">{{ event.year }} {{ event.name }}</a></small></h1>
+      <h1>{{match.verbose_name}} <small><a href="/event/{{event.key_name}}">{{ event.name }} {{ event.year }}</a></small></h1>
     </div>
   </div>
   <div class="row">
@@ -61,6 +61,14 @@
       </p>
     </div>
   </div>
+  {% if zebra_data %}
+  <div class="row">
+    <div class="col-xs-12">
+      <h3>Zebra MotionWorks&trade; (<a href="https://www.zebra.com/us/en/blog/posts/2020/enabling-first-robotics-students-to-explore-their-edge.html" target="_blank">?</a>)</h3>
+      <div class="zebramotionworks-content" data-zebramotionworks="{{zebra_data}}"></div>
+    </div>
+  </div>
+  {% endif %}
   <div class="row">
     <div class="col-lg-12">
       <hr>
@@ -71,6 +79,9 @@
 {% endblock %}
 
 {% block inline_javascript %}
+{% if zebra_data %}
+<script type="text/javascript" src="/javascript/zebramotionworks.min.js"></script>
+{% endif %}
 <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
 <script type="text/javascript">
   var el = document.getElementById('timeseries-chart');

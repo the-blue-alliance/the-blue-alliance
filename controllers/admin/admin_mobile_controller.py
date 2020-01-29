@@ -8,9 +8,9 @@ from google.appengine.ext.webapp import template
 
 from consts.client_type import ClientType
 from controllers.base_controller import LoggedInHandler
-from helpers.notification_helper import NotificationHelper
+from helpers.tbans_helper import TBANSHelper
 from models.mobile_client import MobileClient
-from models.sitevar import Sitevar
+from sitevars.notifications_enable import NotificationsEnable
 
 
 class AdminMobile(LoggedInHandler):
@@ -25,12 +25,7 @@ class AdminMobile(LoggedInHandler):
         ios = all_clients.filter(MobileClient.client_type == ClientType.OS_IOS).count()
         web = all_clients.filter(MobileClient.client_type == ClientType.WEB).count()
         webhook = all_clients.filter(MobileClient.client_type == ClientType.WEBHOOK).count()
-
-        var = Sitevar.get_by_id('notifications.enable')
-        if var is None or not var.values_json == "true":
-            push_enabled = False
-        else:
-            push_enabled = True
+        push_enabled = NotificationsEnable.notifications_enabled()
 
         self.template_values.update({
             'mobile_users': all_clients.count(),
@@ -50,14 +45,12 @@ class AdminMobile(LoggedInHandler):
 
         user_id = self.user_bundle.account.key.id()
         action = self.request.get('enable')
-        sitevar = Sitevar.get_or_insert('notifications.enable')
         if action == "true":
-            sitevar.values_json = "true"
+            NotificationsEnable.enable_notifications(True)
             logging.info("User {} enabled push notificatios".format(user_id))
         else:
-            sitevar.values_json = "false"
+            NotificationsEnable.enable_notifications(False)
             logging.info("User {} disabled push notification".format(user_id))
-        sitevar.put()
 
         self.redirect('/admin/mobile')
 
@@ -87,7 +80,7 @@ class AdminBroadcast(LoggedInHandler):
         self._require_admin()
 
         error = ""
-        if self.request.get('error') == "clients":
+        if self.request.get('error') == "client_types":
             error = "You must select at least one client type"
         elif self.request.get('error') == "title":
             error = "You must supply a title"
@@ -100,6 +93,7 @@ class AdminBroadcast(LoggedInHandler):
             'OS_ANDROID': ClientType.OS_ANDROID,
             'OS_IOS': ClientType.OS_IOS,
             'WEBHOOK': ClientType.WEBHOOK,
+            'WEB': ClientType.WEB,
             'error': error,
         })
 
@@ -110,15 +104,15 @@ class AdminBroadcast(LoggedInHandler):
         self._require_admin()
 
         user_id = self.user_bundle.account.key.id()
-        clients = self.request.get_all('client_types')
+        client_types = self.request.get_all('client_types')
         title = self.request.get('title')
         message = self.request.get('message')
         url = self.request.get('url')
         app_version = self.request.get('app_version')
 
         error = ""
-        if not clients:
-            error = "clients"
+        if not client_types:
+            error = "client_types"
         elif not title:
             error = "title"
         elif not message:
@@ -128,8 +122,8 @@ class AdminBroadcast(LoggedInHandler):
             return
 
         try:
-            clients = [int(c) for c in clients]
-            deferred.defer(NotificationHelper.send_broadcast, clients, title, message, url, app_version, _queue="admin")
+            client_types = [int(c) for c in client_types]
+            deferred.defer(TBANSHelper.broadcast, client_types, title, message, url, app_version, _queue="admin")
             logging.info('User {} sent broadcast'.format(user_id))
         except Exception, e:
             logging.error("Error sending broadcast: {}".format(str(e)))

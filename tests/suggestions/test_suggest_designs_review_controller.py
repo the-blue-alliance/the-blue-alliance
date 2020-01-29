@@ -29,6 +29,9 @@ class TestSuggestDesignsReviewController(unittest2.TestCase):
         self.testbed.init_urlfetch_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
+        self.testbed.init_taskqueue_stub(root_path='.')
+        self.taskqueue_stub = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
+
         app = webapp2.WSGIApplication([
             RedirectRoute(r'/suggest/cad/review', SuggestDesignsReviewController, 'review-designs', strict_slash=True),
             RedirectRoute(r'/suggest/review', SuggestReviewHomeController, 'review-home', strict_slash=True),

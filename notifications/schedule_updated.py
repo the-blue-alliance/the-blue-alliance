@@ -11,8 +11,7 @@ class ScheduleUpdatedNotification(BaseNotification):
     def __init__(self, event, next_match=None):
         from helpers.match_helper import MatchHelper  # recursive import issues
         self.event = event
-        self._event_feed = event.key_name
-        self._district_feed = event.event_district_abbrev
+
         if not next_match:
             upcoming = MatchHelper.upcomingMatches(event.matches, 1)
             self.next_match = upcoming[0] if upcoming and len(upcoming) > 0 else None

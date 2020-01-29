@@ -94,7 +94,7 @@ class LiveEventPanel extends React.PureComponent {
             currentMatch = unplayedMatchesCopy.splice(i, 1)[0]
           }
         })
-        if (!currentMatch) {  // Must have been in playedMatches, but mode is post_match
+        if (!currentMatch) { // Must have been in playedMatches, but mode is post_match
           currentMatch = unplayedMatchesCopy.splice(0, 1)[0]
           forcePreMatch = true
         }

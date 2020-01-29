@@ -6,7 +6,6 @@ import WebcastList from './WebcastList'
 import EVENT_SHAPE from '../../constants/ApiEvent'
 
 class AddRemoveWebcast extends Component {
-
   constructor(props) {
     super(props)
     this.state = {

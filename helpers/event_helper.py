@@ -172,7 +172,7 @@ class EventHelper(object):
         An event shows up in this query iff:
         a) The event is within_a_day
         OR
-        b) The event.start_date is on or within 4 days after the closest Wednesday
+        b) The event.start_date is on or within 4 days after the closest Wednesday/Monday (pre-2020/post-2020)
         """
         event_keys = memcache.get('EventHelper.getWeekEvents():event_keys')
         if event_keys is not None:
@@ -187,8 +187,13 @@ class EventHelper(object):
           Event.start_date).fetch_async(keys_only=True)
 
         events = []
-        diff_from_wed = 2 - today.weekday()  # 2 is Wednesday. diff_from_wed ranges from 3 to -3 (Monday thru Sunday)
-        closest_wednesday = today + datetime.timedelta(days=diff_from_wed)
+
+        days_diff = 0
+        # Before 2020, event weeks start on Wednesdays
+        if today.year < 2020:
+            days_diff = 2  # 2 is Wednesday. diff_from_week_start ranges from 3 to -3 (Monday thru Sunday)
+        diff_from_week_start = days_diff - today.weekday()
+        closest_wednesday = today + datetime.timedelta(days=diff_from_week_start)
 
         two_weeks_of_event_futures = ndb.get_multi_async(two_weeks_of_events_keys_future.get_result())
         for event_future in two_weeks_of_event_futures:
@@ -289,11 +294,18 @@ class EventHelper(object):
     def getDistrictKeyFromEventName(cls, event_name, year_districts_future):
         year_districts = year_districts_future.get_result()
         for district in year_districts:
-            if '{} district'.format(district.abbreviation) in event_name.lower():
+            if '{} district'.format(
+                    district.abbreviation) in event_name.lower():
+                return district.key
+            if district.display_name and '{} district'.format(
+                    district.display_name.lower()) in event_name.lower():
                 return district.key
 
-            if district.elasticsearch_name and district.elasticsearch_name in event_name:
-                return district.key
+            if district.elasticsearch_name:
+                search_names = district.elasticsearch_name.split(",")
+                for s in search_names:
+                    if s and event_name.lower().startswith(s.lower()):
+                        return district.key
 
         return None
 
@@ -418,18 +430,18 @@ class EventHelper(object):
         Mutates in place
         """
         for award in awards:
-            for old_team, new_team in remap_teams.items():
-                # Update team keys
-                for i, key in enumerate(award.team_list):
-                    if key.id() == old_team:
-                        award.dirty = True
-                        if new_team.isdigit():  # Only if non "B" teams
-                            award.team_list[i] = ndb.Key(Team, new_team)
-                        else:
-                            del award.team_list[i]
-                # Update recipient list
-                for recipient in award.recipient_list:
+            new_recipient_json_list = []
+            new_team_list = []
+            # Compute new recipient list and team list
+            for recipient in award.recipient_list:
+                for old_team, new_team in remap_teams.items():
                     if str(recipient['team_number']) == old_team[3:]:
                         award.dirty = True
                         recipient['team_number'] = new_team[3:]
-                        award.recipient_json_list = [json.dumps(r) for r in award.recipient_list]
+
+                new_recipient_json_list.append(json.dumps(recipient))
+                new_team_list.append(ndb.Key('Team', 'frc{}'.format(recipient['team_number'])))
+
+            # Update
+            award.recipient_json_list = new_recipient_json_list
+            award.team_list = new_team_list

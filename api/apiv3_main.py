@@ -10,6 +10,7 @@ from api.apiv3 import api_event_controller as aec
 from api.apiv3 import api_match_controller as amc
 from api.apiv3 import api_media_controller as amec
 from api.apiv3 import api_realtime_controller as arc
+from api.apiv3 import api_zebra_motionworks_controller as azc
 from api.apiv3 import api_team_controller as atc
 from api.apiv3 import api_suggest_controller as asgc
 
@@ -20,6 +21,10 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/v3/status',
         asc.ApiStatusController, methods=['GET', 'OPTIONS']),
     # Team List
+    webapp2.Route(r'/api/v3/teams/all',
+        atc.ApiTeamListAllController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/teams/all/<model_type:(simple|keys)>',
+        atc.ApiTeamListAllController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/teams/<page_num:([0-9]+)>',
         atc.ApiTeamListController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/teams/<page_num:([0-9]+)>/<model_type:(simple|keys)>',
@@ -83,6 +88,10 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/v3/suggest/media/team/<team_key:>/<year:([0-9]+)>',
         asgc.ApiSuggestTeamMediaController, methods=['POST', 'OPTIONS']),
     # Event List
+    webapp2.Route(r'/api/v3/events/all',
+        aec.ApiEventListAllController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/events/all/<model_type:(simple|keys)>',
+        aec.ApiEventListAllController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/events/<year:([0-9]+)>',
         aec.ApiEventListController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/events/<year:([0-9]+)>/<model_type:(simple|keys)>',
@@ -115,6 +124,8 @@ app = webapp2.WSGIApplication([
         amc.ApiMatchController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/match/<match_key:>/timeseries',
         arc.ApiRealtimeMatchController, methods=['GET', 'OPTOINS']),
+    webapp2.Route(r'/api/v3/match/<match_key:>/zebra_motionworks',
+        azc.ApiZebraMotionworksMatchController, methods=['GET', 'OPTOINS']),
     webapp2.Route(r'/api/v3/match/<match_key:>/<model_type:(simple)>',
         amc.ApiMatchController, methods=['GET', 'OPTIONS']),
     # Media

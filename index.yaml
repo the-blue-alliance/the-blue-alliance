@@ -40,6 +40,13 @@ indexes:
   properties:
   - name: event_type_enum
   - name: year
+  - name: end_date
+    direction: desc
+
+- kind: Event
+  properties:
+  - name: event_type_enum
+  - name: year
   - name: first_eid
 
 - kind: Event

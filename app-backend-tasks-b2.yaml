@@ -1,4 +1,4 @@
-module: backend-tasks-b2
+service: backend-tasks-b2
 
 runtime: python27
 api_version: 1
@@ -24,6 +24,9 @@ libraries:
   version: "latest"
 
 handlers:
+- url: /backend-tasks-b2/console/.*
+  script: google.appengine.ext.admin.application
+  login: admin
 - url: /_ah/queue/deferred.*
   script: google.appengine.ext.deferred.deferred.application
   login: admin

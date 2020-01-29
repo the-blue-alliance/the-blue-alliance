@@ -6,7 +6,6 @@ import ensureRequestSuccess from '../../net/EnsureRequestSuccess'
 import TeamList from './TeamList'
 
 class AttendingTeamList extends Component {
-
   constructor(props) {
     super(props)
     this.state = {

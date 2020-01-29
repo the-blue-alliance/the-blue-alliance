@@ -13,6 +13,7 @@ class MediaType(object):
     INSTAGRAM_IMAGE = 10
     EXTERNAL_LINK = 11
     AVATAR = 12
+    ONSHAPE = 13
 
     type_names = {
         YOUTUBE_VIDEO: 'YouTube Video',
@@ -28,6 +29,7 @@ class MediaType(object):
         INSTAGRAM_IMAGE: 'Instagram Image',
         EXTERNAL_LINK: 'External Link',
         AVATAR: 'Avatar',
+        ONSHAPE: 'Onshape',
     }
 
     image_types = [
@@ -48,6 +50,7 @@ class MediaType(object):
     # Media used to back a Robot Profile
     robot_types = [
         GRABCAD,
+        ONSHAPE,
     ]
 
     profile_urls = {  # Format with foreign_key

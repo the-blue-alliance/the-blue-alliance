@@ -1,3 +1,4 @@
+import datetime
 import os
 from consts.landing_type import LandingType
 from models.sitevar import Sitevar
@@ -44,7 +45,7 @@ CONFIG["static_resource_version"] = 8
 
 
 def _get_max_year():
-    DEFAULT_YEAR = 2019
+    DEFAULT_YEAR = datetime.datetime.now().year
     try:
         status_sitevar = Sitevar.get_by_id('apistatus')
         return status_sitevar.contents.get(
@@ -52,5 +53,6 @@ def _get_max_year():
     except Exception:
         return DEFAULT_YEAR
 
-
+MIN_YEAR = 1992
 MAX_YEAR = _get_max_year()
+VALID_YEARS = range(MIN_YEAR, MAX_YEAR + 1)

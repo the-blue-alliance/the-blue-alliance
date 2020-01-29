@@ -32,8 +32,6 @@
                 <li><a class="smooth-scroll" href="#notification_final_results">Event Final Results</a></li>
                 <li><a class="smooth-scroll" href="#notification_ping">Ping</a></li>
                 <li><a class="smooth-scroll" href="#notification_broadcast">Broadcast</a></li>
-                <li><a class="smooth-scroll" href="#notification_update_favorites">Update Favorites</a></li>
-                <li><a class="smooth-scroll" href="#notification_update_subscriptions">Update Subscriptions</a></li>
                 <li><a class="smooth-scroll" href="#notification_verification">Webhook Verification</a></li>
             </ul></li>
           </ul>
@@ -47,7 +45,7 @@
 
       <h2 id="request">Request Structure</h2>
         <p>Each request will contain a payload of JSON data containing information about the event that has been pushed to you. Details of each type of supported event is below.</p>
-        <p>Each request also contains a <code>X-TBA-Checksum</code> header that you can use to validate requests on your client. The header will contain a hash of a secret key that you set when you create the webhook concatenated with the payload string. This is caculated using SHA1(secret+payload). You can see <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/helpers/notification_sender.py#L32" target="_blank">in the code</a> where this is calculated.
+        <p>Each request also contains a <code>X-TBA-HMAC</code> header that you can use to validate requests on your client. The header will contain a hash of a secret key that is set by the server when you create the webhook concatenated with the payload string. This is caculated using <a href="https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.198-1.pdf">NIST's HMAC algorithm</a>, using SHA256. You can see <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/helpers/notification_sender.py#L32" target="_blank">in the code</a> where this is calculated.
 
       <h2 id="configuration">Configuration</h2>
         <p>Webhooks are tied to your TBA Account - you can create them from your <a href="/account">account overview</a>. You will have to enter a URL that will receive the pushed notification. You also have to enter a secret key used to secure requests - we recommend using a long randomly generated string. When you receive a webhook, TBA will send a HTTP POST request to the URL you have entered, so make sure you're listening. Not responding or returning an error code may cause your webhook to be deleted.</p>
@@ -454,26 +452,6 @@
           <h4>Example JSON</h4>
             <pre class="example-json">
             {"message_data": {"title": "Test", "desc": "Test Broadcast", "url": "http://foo.bar", "app_version": "2.0.0"}, "message_type": "broadcast"}
-            </pre>
-        <h3 id="notification_update_favorites">Update Favorites Notification</h3>
-          <p>This notification is sent out to a user's devices when favorites are updated on their account, telling that device to re-sync the list from the server.</p>
-          <h4>Structure</h4>
-            <ul>
-              <li>"message_type": "update_favorites"</li>
-            </ul>
-          <h4>Example JSON</h4>
-            <pre class="example-json">
-            {"message_type": "update_favorites"}
-            </pre>
-        <h3 id="notification_update_subscriptions">Update Subscriptions Notification</h3>
-          <p>This notification is sent out to a user's devices when their subscriptions are updated for the account, telling that device to re-sync the list from the server.</p>
-          <h4>Structure</h4>
-            <ul>
-              <li>"message_type": "update_subscriptions"</li>
-            </ul>
-          <h4>Example JSON</h4>
-            <pre class="example-json">
-            {"message_type": "update_subscriptions"}
             </pre>
         <h3 id="notification_verification">Webhook Verification Notifications</h3>
           <p>This notification is sent when a new webhook is created. It contains a verification code that needs to be entered in the <a href="/account">Account Overview</a> page for the webhook before it recieves live updates.</p>

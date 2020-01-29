@@ -14,7 +14,6 @@ import tba_config
 from consts.client_type import ClientType
 from helpers.media_helper import MediaParser
 from helpers.push_helper import PushHelper
-from helpers.notification_helper import NotificationHelper
 from helpers.mytba_helper import MyTBAHelper
 from helpers.suggestions.suggestion_creator import SuggestionCreator
 from models.account import Account
@@ -141,16 +140,12 @@ class ClientAPI(remote.Service):
             return BaseResponse(code=404, message="Invalid push token for user")
         else:
             client = clients[0]
-            response = NotificationHelper.send_ping(client)
-            # If we got a response from the send_ping method, it was sent via TBANS
-            # We'll bubble up any errors we got back
-            if response:
-                if response.code == 200:
-                    return BaseResponse(code=200, message="Ping sent")
-                else:
-                    return BaseResponse(code=response.code, message="Error pinging client - {}".format(response.message))
-            else:
+            from helpers.tbans_helper import TBANSHelper
+            success = TBANSHelper.ping(client)
+            if success:
                 return BaseResponse(code=200, message="Ping sent")
+            else:
+                return BaseResponse(code=500, message="Failed to ping client")
 
     @endpoints.method(message_types.VoidMessage, FavoriteCollection,
                       path='favorites/list', http_method='POST',
@@ -232,7 +227,7 @@ class ClientAPI(remote.Service):
                 code += 304
             else:
                 output['subscription'] = {"code":    500,
-                                          "message": "Unknown error adding favorite"}
+                                          "message": "Unknown error adding subscription"}
                 code += 500
         else:
             result = MyTBAHelper.remove_subscription(user_id, model_key, model_type, request.device_key)

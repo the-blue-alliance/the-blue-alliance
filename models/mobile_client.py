@@ -42,3 +42,34 @@ class MobileClient(ndb.Model):
     @property
     def short_id(self):
         return self.messaging_id if len(self.messaging_id)<=50 else self.messaging_id[0:50]+'...'
+
+    @staticmethod
+    def clients(users, client_types=ClientType.names.keys()):
+        """
+        Get all clients for a list of users.
+
+        Args:
+            users (list, string): A list of User ID to fetch clients for.
+            client_types (list, ClientType): The client types to filter for.
+
+        Returns:
+            list (MobileClient): List of Mobile Clients for the user.
+        """
+        if not users or not client_types:
+            return []
+        from models.account import Account
+        return MobileClient.query(
+            MobileClient.user_id.IN(users),
+            MobileClient.client_type.IN(client_types),
+            MobileClient.verified == True
+        ).fetch()
+
+    @staticmethod
+    def delete_for_messaging_id(messaging_id):
+        """
+        Delete the mobile client(s) with the associated messaging_id.
+        Args:
+            messaging_id (string): The messaging_id to filter for.
+        """
+        to_delete = MobileClient.query(MobileClient.messaging_id == messaging_id).fetch(keys_only=True)
+        ndb.delete_multi(to_delete)
