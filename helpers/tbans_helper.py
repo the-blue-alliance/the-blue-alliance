@@ -29,45 +29,16 @@ class TBANSHelper:
     Helper class for sending push notifications via the FCM HTTPv1 API and sending data payloads to webhooks
     """
 
-    """
-    Dispatch Awards notifications to users subscribed to Event or Team Award notifications.
-
-    Args:
-        event (models.event.Event): The Event to query Subscriptions for.
-        user_id (string): A user ID to only send notifications for - used ONLY for TBANS Admin testing.
-
-    Returns:
-        list (string): List of user IDs with Subscriptions to the given Event/notification type.
-    """
     @classmethod
     def awards(cls, event, user_id=None):
-        users = [user_id] if user_id else []
+        if user_id:
+            users = [user_id]
+        else:
+            users = Subscription.users_subscribed_to_event(event, NotificationType.AWARDS)
 
         from models.notifications.awards import AwardsNotification
-        # Send to Event subscribers
-        if NotificationType.AWARDS in NotificationType.enabled_event_notifications:
-            if not users:
-                users = Subscription.users_subscribed_to_event(event, NotificationType.AWARDS)
-            if users:
-                # Send to FCM/webhooks
-                cls._send(users, AwardsNotification(event))
-
-        # Send to Team subscribers
-        if NotificationType.AWARDS in NotificationType.enabled_team_notifications:
-            # Map all Teams to their Awards so we can populate our Awards notification with more specific info
-            team_awards = {}  # Key is a Team key, value is an array of Awards that team won
-            for award in event.awards:
-                for team_key in award.team_list:
-                    a = team_awards.get(team_key, [])
-                    a.append(award)
-                    team_awards[team_key] = a
-            for team_key, awards in team_awards.items():
-                team = team_key.get()
-                if not users:
-                    users = Subscription.users_subscribed_to_team(team, NotificationType.AWARDS)
-                if users:
-                    # Send to FCM/webhooks
-                    cls._send(users, AwardsNotification(event, team, awards))
+        # Send to FCM/webhooks
+        cls._send(users, AwardsNotification(event))
 
     @classmethod
     def broadcast(cls, client_types, title, message, url=None, app_version=None):
