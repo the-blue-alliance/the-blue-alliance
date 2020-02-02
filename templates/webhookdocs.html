@@ -446,12 +446,11 @@
               <li>fields in message_data object<ul>
                 <li>"title": Title of the notification to be shown</li>
                 <li>"desc": Contents of the notification</li>
-                <li>"url": URL to open when the notification is tapped</li>
-                <li>"app_version": App version number this broadcast is targeting</ul></li>
+                <li>"url": A URL with additional information - may be omitted.</li>
             </ul>
           <h4>Example JSON</h4>
             <pre class="example-json">
-            {"message_data": {"title": "Test", "desc": "Test Broadcast", "url": "http://foo.bar", "app_version": "2.0.0"}, "message_type": "broadcast"}
+            {"message_data": {"title": "Test", "desc": "Test Broadcast", "url": "http://foo.bar"}, "message_type": "broadcast"}
             </pre>
         <h3 id="notification_verification">Webhook Verification Notifications</h3>
           <p>This notification is sent when a new webhook is created. It contains a verification code that needs to be entered in the <a href="/account">Account Overview</a> page for the webhook before it recieves live updates.</p>

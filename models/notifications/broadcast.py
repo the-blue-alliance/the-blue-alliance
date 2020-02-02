@@ -22,21 +22,23 @@ class BroadcastNotification(Notification):
     @property
     def data_payload(self):
         payload = {}
+
         if self.url:
             payload['url'] = self.url
-        else:
-            payload['url'] = None
 
         if self.app_version:
             payload['app_version'] = self.app_version
-        else:
-            payload['app_version'] = None
 
         return payload
 
     @property
     def webhook_message_data(self):
-        payload = self.data_payload
-        payload['title'] = self.title
-        payload['desc'] = self.message
+        payload = {
+            'title': self.title,
+            'desc': self.message
+        }
+
+        if self.url:
+            payload['url'] = self.url
+
         return payload
