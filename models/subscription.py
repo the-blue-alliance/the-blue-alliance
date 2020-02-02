@@ -2,7 +2,6 @@ import json
 
 from google.appengine.ext import ndb
 
-from consts.model_type import ModelType
 from consts.notification_type import NotificationType
 
 
@@ -32,7 +31,7 @@ class Subscription(ndb.Model):
     def users_subscribed_to_event(cls, event, notification_type):
         """
         Get user IDs subscribed to an Event or the year an Event occurs in and a given notification type.
-        Ex: (model_key == `2020miket` or `2020*`) and (notification_type == NotificationType.UPCOMING_MATCH)
+        Ex: (model_key = `2020miket` or `2020*`) and (notification_type == NotificationType.UPCOMING_MATCH)
 
         Args:
             event (models.event.Event): The Event to query Subscription for.
@@ -44,28 +43,6 @@ class Subscription(ndb.Model):
         users = Subscription.query(
             Subscription.model_key.IN([event.key_name, "{}*".format(event.year)]),
             Subscription.notification_types == notification_type,
-            Subscription.model_type == ModelType.EVENT,
-            projection=[Subscription.user_id]
-        ).fetch()
-        return list(set([user.user_id for user in users]))
-
-    @classmethod
-    def users_subscribed_to_team(cls, team, notification_type):
-        """
-        Get user IDs subscribed to a Team and a given notification type.
-        Ex: team_key == `frc7332` and notification_type == NotificationType.UPCOMING_MATCH
-
-        Args:
-            team (models.team.Team): The Team to query Subscription for.
-            notification_type (consts.notification_type.NotificationType): A NotificationType for the Subscription.
-
-        Returns:
-            list (string): List of user IDs with Subscriptions to the given Team/notification type.
-        """
-        users = Subscription.query(
-            Subscription.model_key == team.key_name,
-            Subscription.notification_types == notification_type,
-            Subscription.model_type == ModelType.TEAM,
             projection=[Subscription.user_id]
         ).fetch()
         return list(set([user.user_id for user in users]))
