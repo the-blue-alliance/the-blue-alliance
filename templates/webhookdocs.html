@@ -11,27 +11,26 @@
       <div class="tba-sidenav-affixed">
         <div class="tba-sidebar tba-sidebar-collapsed">
           <ul class="nav tba-sidenav">
-            <li><a class="smooth-scroll" href="#overview">Overview</a></li>
-            <li><a class="smooth-scroll" href="#request">Request Structure</a><li>
-            <li><a class="smooth-scroll" href="#configuration">Configuration</a>
-              <ul class="nav hide">
-                <li><a class="smooth-scroll" href="#validation">Validation</a></li>
-                <li><a class="smooth-scroll" href="#testing">Testing</a></li>
-                <li><a class="smooth-scroll" href="#firehose">The Firehose</a></li>
-            </ul></li>
+            <li>
+              <a class="smooth-scroll" href="#overview">Overview</a>
+              <ul class="nav">
+                <li><a class="smooth-scroll" href="#request">Request Structure</a></li>
+                <li><a class="smooth-scroll" href="#configuration">Configuration</a></li>
+              </ul>
+            </li>
             <li><a class="smooth-scroll" href="#notifications">Notification Types</a>
               <ul class="nav hide">
+                <li><a class="smooth-scroll" href="#notification_awards">Awards Posted</a></li>
+                <li><a class="smooth-scroll" href="#notification_broadcast">Broadcast</a></li>
                 <li><a class="smooth-scroll" href="#notification_upcoming_match">Upcoming Match</a></li>
                 <li><a class="smooth-scroll" href="#notification_match_score">Match Score</a></li>
                 <li><a class="smooth-scroll" href="#notification_level_starting">Competition Level Starting</a></li>
                 <li><a class="smooth-scroll" href="#notification_alliance_selection">Alliance Selection</a></li>
-                <li><a class="smooth-scroll" href="#notification_awards">Awards Posted</a></li>
                 <li><a class="smooth-scroll" href="#notification_media_posted">Media Posted</a></li>
                 <li><a class="smooth-scroll" href="#notification_district_points">District Points Updated</a></li>
                 <li><a class="smooth-scroll" href="#notification_schedule_updated">Event Schedule Updated</a></li>
                 <li><a class="smooth-scroll" href="#notification_final_results">Event Final Results</a></li>
                 <li><a class="smooth-scroll" href="#notification_ping">Ping</a></li>
-                <li><a class="smooth-scroll" href="#notification_broadcast">Broadcast</a></li>
                 <li><a class="smooth-scroll" href="#notification_verification">Webhook Verification</a></li>
             </ul></li>
           </ul>
@@ -43,28 +42,108 @@
       <h2 id="overview">Overview</h2>
         <p>This documentation is for using webhooks with The Blue Alliance's dataset, which allow our server to push notifications to you, but only when the data is updated. Notifications will be sent as HTTP POST requests to a URL that your specify. This API does not replace the regular <a href="/apidocs">API</a>; it should be used to replace excessive polling or in other situations where realtime notifications are beneficial.</p>
 
-      <h2 id="request">Request Structure</h2>
-        <p>Each request will contain a payload of JSON data containing information about the event that has been pushed to you. Details of each type of supported event is below.</p>
-        <p>Each request also contains a <code>X-TBA-HMAC</code> header that you can use to validate requests on your client. The header will contain a hash of a secret key that is set by the server when you create the webhook concatenated with the payload string. This is caculated using <a href="https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.198-1.pdf">NIST's HMAC algorithm</a>, using SHA256. You can see <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/helpers/notification_sender.py#L32" target="_blank">in the code</a> where this is calculated.
+      <h3 id="request">Request Structure</h3>
+        <p>Each request will contain a payload of JSON data containing information about the event that has been pushed to you. Each payload will contain a <code>message_type</code> field with a constant relating to the notification type and a <code>message_data</code> object with additional data for the notification. Details of each type of supported event is below.</p>
+        <p>Each request also contains a <code>X-TBA-HMAC</code> header that you can use to validate requests on your client. The header will contain a hash of a secret key that is set by the server when you create the webhook concatenated with the payload string. This is caculated using <a href="https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.198-1.pdf">NIST's HMAC algorithm</a>, using SHA256. You can see <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/224e256bd10499039ffe4451e18b66a50f386b4f/helpers/notification_sender.py#L34" target="_blank">in the code</a> where this is calculated.
 
-      <h2 id="configuration">Configuration</h2>
+      <h3 id="configuration">Configuration</h3>
         <p>Webhooks are tied to your TBA Account - you can create them from your <a href="/account">account overview</a>. You will have to enter a URL that will receive the pushed notification. You also have to enter a secret key used to secure requests - we recommend using a long randomly generated string. When you receive a webhook, TBA will send a HTTP POST request to the URL you have entered, so make sure you're listening. Not responding or returning an error code may cause your webhook to be deleted.</p>
-      <h3 id="validation">Validation</h3>
+      <h4 id="validation">Validation</h4>
         <p>Once you create a webhook from the web interface, The Blue Alliance will push an initial notification to your server. The message will be of type 'verification' and look something like this:
           <code>
             {"message_type": "verification", "message_data": {"verification_key": "a93774ec6197d456f4aaadfea5fdba6697e71e6a"} }
           </code>
         Once you receive a verification message, go to your <a href="/account">account overview</a>, where you can verify the webhook you just created. If you need to, you can resend a new verification code (keep in mind that only the most recently sent code will properly verify a webhook). Until you have verified your webhook, it will not recieve any notifications from the Blue Alliance. You can still ping a webhook from the account panel without verification in order to make sure it's working properly - but no other notifications will go through. So be sure to verify your webhooks soon after making them!</p>
         <p>We will periodically prune non-responsive webhooks by checking if a webhook responds to a ping request with a 200 status code. Your webhook should handle responding to a ping to ensure it does not get pruned.</p>
-      <h3 id="testing">Testing</h3>
+      <h4 id="testing">Testing</h4>
         <p>If you want to test out recieving webhooks on your local computer, you can use a program called <a href="https://ngrok.com/download">ngrok</a> to expose a port on your device to the internet. You can check out <a href="https://developer.github.com/webhooks/configuring/">this page</a> from GitHub's documentation to see a brief overview of testing webhooks using ngrok. There is a small example script with some instructions <a href="https://github.com/phil-lopreiato/tba-webhook-test" target="_blank">here</a>.</p>
         <p>Additionally, each notification type that is enabled will have a section for "testing" where you can send a static instance of that notification type to all of your devices. This feature will use the account you currently have logged in, and send it to every device registered with that account. Every event referenced will be 2014necmp and every match will be 2014necmp_f1m1.</p>
-      <h3 id="firehose">The Firehose</h3>
+      <h4 id="firehose">The Firehose</h4>
         <p>If you want your webhook to recieve updates for <i>every</i> event in a year, you can subscribe to the TBA Notification Firehose. On the <a href="/account/mytba">myTBA Page</a> for your account, go to the Subscriptions tab. At the bottom of the page, you can subscribe to all events in this year. Choose the notification types you would like to be updated for, and submit. Keep in mind that this subscription is only good for one season - if you want to continue receiving updates next season, you will have to subscribe again. <strong>Beware:</strong> subscribing to the firsthose will also send every notification to all your connected mobile devices. We recommend you not subscribe to the Firehose using an account that is also connected to your phone, unless you want a constant stream of notifications, there as well.</p>
         <p>You can see an example App Engine site that is subscribed to the Firehose, stores all the incoming data in the ndb, and displays it <a href="https://github.com/the-blue-alliance/the-blue-alliance-notification-firehose" target="_blank">here</a>.</p>
 
+    <hr>
+
     <h2 id="notifications">Notification Types</h2>
       <p>Please keep in mind that not all notification types have been implemented or enabled yet. Watch the <code>enabled_notifications</code> enum of <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/notification_type.py#L75">this file</a> to see which types are enabled on the server.</p>
+
+      <div id="awards">
+        <h3 id="notification_awards">Awards Notification</h3>
+        <h4><code>message_type: awards_posted</code></h4>
+        <p>Event notification sent when Awards are updated for a live Event. Team notification sent for each Team that wins an Award at the Event.</p>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Key</th>
+              <th>Description</th>
+              <th>Examples</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>event_key</code></td>
+              <td>The Event key for the Event the awards were awarded at.</td>
+              <td><code>2014necmp</code></td>
+            </tr>
+            <tr>
+              <td><code>team_key</code></td>
+              <td>The Team key for a Team subscription. If the notification is not coming from a Team subscription, this field will be omitted.</td>
+              <td><code>frc7332</code></td>
+            </tr>
+            <tr>
+              <td><code>event_name</code> (DEPRECATED)</td>
+              <td>The Event name for the Event the awards were awarded at. Note: This field is deprecated and may be removed in the future.</td>
+              <td><code>New England FRC Region Championship</code></td>
+            </tr>
+            <tr>
+              <td><code>awards</code></td>
+              <td>A list of <a href="/apidocs/v3#model-Award">Award</a> objects. For an Event subscription, this will be a full list of awards at the Event. For a Team subscription, this will be only the awards the Team won.</td>
+            </tr>
+          </tbody>
+        </table>
+        <h4>Example JSON</h4>
+        <pre class="example-json">
+        {"message_data": {"event_name": "New England FRC Region Championship", "awards": [{"event_key": "2014necmp", "award_type": 0, "name": "Regional Chairman's Award", "recipient_list": [{"team_number": 2067, "awardee": null}, {"team_number": 78, "awardee": null}, {"team_number": 811, "awardee": null}, {"team_number": 2648, "awardee": null}], "year": 2014}]}, "message_type": "awards_posted"}
+        </pre>
+        {% if types.awards_posted in enabled and logged_in %}
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Test Notification</h3>
+          </div>
+          <div class="panel-body">
+            <form method="POST" action="/notifications/test/{{types.awards_posted}}" role="form webhook-test-form" onsubmit="event.preventDefault()">
+              <div class="webhook-test-form-row">
+                <label for="upcomingNotificationEvent">Event Key</label>
+                <input type="text" class="form-control" required value="2014necmp" name="event_key" id="upcomingNotificationEvent">
+              </div>
+              <button class="btn btn-info webhook-send-btn" type="submit">Send Test Awards</button>
+              <div class="webhook-test-form-response">
+                  <div class="alert webhook-alert"></div>
+              </div>
+            </form>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <div id="broadcast">
+        <h3 id="notification_broadcast">Admin Broadcast</h3>
+        <p>This notification can be sent by TBA Admins when they want to announce something important.</p>
+        <h4>Structure</h4>
+        <ul>
+          <li>"message_type: "broadcast"</li>
+          <li>fields in message_data object<ul>
+             <li>"title": Title of the notification to be shown</li>
+             <li>"desc": Contents of the notification</li>
+             <li>"url": URL to open when the notification is tapped</li>
+             <li>"app_version": App version number this broadcast is targeting</ul></li>
+         </ul>
+       <h4>Example JSON</h4>
+         <pre class="example-json">
+         {"message_data": {"title": "Test", "desc": "Test Broadcast", "url": "http://foo.bar", "app_version": "2.0.0"}, "message_type": "broadcast"}
+         </pre>
+      </div>
+
       <h3 id="notification_upcoming_match">Upcoming Match Notification</h3>
         <p>These notifications are tested for every two minutes. A notification will be sent for the next unplayed match of each currently live event.</p>
         <h4>Structure</h4>
@@ -81,7 +160,7 @@
             <pre class="example-json">
             {"message_data": {"event_name": "New England FRC Region Championship", "scheduled_time": 1397330280, "match_key": "2014necmp_f1m1", "team_keys": ["frc195", "frc558", "frc5122", "frc177", "frc230", "frc4055"], "predicted_time": 1397330280}, "message_type": "upcoming_match"}
             </pre>
-        {% if types.upcoming_match in enabled %}
+        {% if types.upcoming_match in enabled and logged_in %}
         <h4>Test Notification</h4>
             <form method="POST"
                   action="/notifications/test/{{types.upcoming_match}}"
@@ -128,7 +207,7 @@
             <pre class="example-json">
             {"message_data": {"event_name": "New England FRC Region Championship", "match": {"comp_level": "f", "match_number": 1, "videos": [], "time_string": "3:18 PM", "set_number": 1, "key": "2014necmp_f1m1", "time": 1397330280, "score_breakdown": null, "alliances": {"blue": {"score": 154, "teams": ["frc177", "frc230", "frc4055"]}, "red": {"score": 78, "teams": ["frc195", "frc558", "frc5122"]} }, "event_key": "2014necmp"} }, "message_type": "match_score"}
             </pre>
-        {% if types.match_score in enabled %}
+        {% if types.match_score in enabled and logged_in %}
         <h4>Test Notification</h4>
             <form method="POST"
                   action="/notifications/test/{{types.match_score}}"
@@ -177,7 +256,7 @@
             <pre class="example-json">
             {"message_data": {"event_name": "New England FRC Region Championship", "comp_level": "f", "event_key": "2014necmp", "scheduled_time": 1397330280}, "message_type": "starting_comp_level"}
             </pre>
-        {% if types.starting_comp_level in enabled %}
+        {% if types.starting_comp_level in enabled and logged_in %}
         <h4>Test Notification</h4>
             <form method="POST"
                   action="/notifications/test/{{types.starting_comp_level}}"
@@ -223,7 +302,7 @@
             <pre class="example-json">
             {"message_data": {"event": {"key": "2014necmp", "website": "http://www.nefirst.org/", "official": true, "end_date": "2014-04-12", "name": "New England FRC Region Championship", "short_name": "New England", "facebook_eid": null, "event_district_string": "New England", "venue_address": "Boston University\nAgganis Arena\nBoston, MA 02215\nUSA", "event_district": 3, "location": "Boston, MA, USA", "event_code": "necmp", "year": 2014, "webcast": [], "alliances": [{"declines": [], "picks": ["frc195", "frc558", "frc5122"]}, {"declines": [], "picks": ["frc1153", "frc125", "frc4048"]}, {"declines": [], "picks": ["frc230", "frc177", "frc4055"]}, {"declines": [], "picks": ["frc716", "frc78", "frc811"]}, {"declines": [], "picks": ["frc1519", "frc3467", "frc58"]}, {"declines": [], "picks": ["frc131", "frc175", "frc1073"]}, {"declines": [], "picks": ["frc228", "frc3525", "frc2168"]}, {"declines": [], "picks": ["frc172", "frc1058", "frc2067"]}], "event_type_string": "District Championship", "start_date": "2014-04-10", "event_type": 2} }, "message_type": "alliance_selection"}
             </pre>
-        {% if types.alliance_selection in enabled %}
+        {% if types.alliance_selection in enabled and logged_in %}
         <h4>Test Notification</h4>
             <form method="POST"
                   action="/notifications/test/{{types.alliance_selection}}"
@@ -251,51 +330,6 @@
 {#            <a href="/notifications/test/{{types.alliance_selection}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Alliance Selection</a>#}
         {% endif %}
 
-        <h3 id="notification_awards">Awards Posted Notification</h3>
-          <p>This notification is sent every time an award is added at a live event</p>
-          <h4>Structure</h4>
-            <ul>
-              <li>message_type: “awards_posted”
-              <li>fields in message_data object<ul>
-                <li>“event_name”</li>
-                <li>“awards”: If we want awards for a specific team (if user is subscribed to the EventTeam), then this is an array of the following objects (else, it will be null)<ul>
-                  <li>“award_name”</li>
-                  <li>“team_key”: Key of winning team</li>
-                  <li>“team_name”: Name of winning team</li></ul></li></ul></li>
-            </ul>
-          <h4>Example JSON</h4>
-            <pre class="example-json">
-            {"message_data": {"event_name": "New England FRC Region Championship", "awards": [{"event_key": "2014necmp", "award_type": 0, "name": "Regional Chairman's Award", "recipient_list": [{"team_number": 2067, "awardee": null}, {"team_number": 78, "awardee": null}, {"team_number": 811, "awardee": null}, {"team_number": 2648, "awardee": null}], "year": 2014}]}, "message_type": "awards_posted"}
-            </pre>
-        {% if types.awards_posted in enabled %}
-        <h4>Test Notification</h4>
-            <form method="POST"
-                  action="/notifications/test/{{types.awards_posted}}"
-                  class="form-horizontal"
-                  role="form"
-                  onsubmit="event.preventDefault()">
-                <div class="row">
-                    <div class="form-group">
-                        <label for="upcomingNotificationEvent" class="col-sm-2 control-label">Event Key</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" required value="2014necmp" name="event_key"
-                                   id="upcomingNotificationEvent">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-2"></div>
-                        <div class="col-sm-10">
-                            <button class="btn btn-info webhook-send-btn" type="submit">Send Test Awards</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="alert webhook-alert"></div>
-                </div>
-            </form>
-{#            <a href="/notifications/test/{{types.awards_posted}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Awards</a>#}
-        {% endif %}
-
         <h3 id="notification_media_posted">Team Media Posted Notification</h3>
           <p>This notification is sent out whenever new team media is posted (can be either photos or videos).</p>
           <h4>Structure</h4>
@@ -310,7 +344,7 @@
             <pre>
             Not yet implemented
             </pre>
-        {% if types.media_posted in enabled %}
+        {% if types.media_posted in enabled and logged_in %}
 {#        <h4>Test Notification</h4>#}
             {# LeoCodes21 - media_posted is unimplemented so there is nothing here for now. #}
 {#            <a href="/notifications/test/{{types.media_posted}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Media</a>#}
@@ -329,7 +363,7 @@
             <pre class="example-json">
             {"message_data": {"district_key": "2014ne", "district_name": "New England"}, "message_type": "district_points_updated"}
             </pre>
-        {% if types.disrict_points_updated in enabled %}
+        {% if types.disrict_points_updated in enabled and logged_in %}
         <h4>Test Notification</h4>
             <form method="POST"
                   action="/notifications/test/{{types.disrict_points_updated}}"
@@ -370,7 +404,7 @@
             <pre class="example-json">
             {"message_data": {"event_name": "New England FRC Region Championship", "first_match_time": 1397330280, "event_key": "2014necmp"}, "message_type": "schedule_updated"}
             </pre>
-        {% if types.schedule_updated in enabled %}
+        {% if types.schedule_updated in enabled and logged_in %}
         <h4>Test Notification</h4>
             <form method="POST"
                   action="/notifications/test/{{types.schedule_updated}}"
@@ -419,7 +453,7 @@
           <pre>
             <i>Not yet implemented</i>
           </pre>
-        {% if types.final_results in enabled %}
+        {% if types.final_results in enabled and logged_in %}
 {#        <h4>Test Notification</h4>#}
             {# LeoCodes21 - final_results is unimplemented so there is nothing here for now. #}
 {#            <a href="/notifications/test/{{types.final_results}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Final Results</a>#}
@@ -437,21 +471,6 @@
           <h4>Example JSON</h4>
             <pre class="example-json">
             {"message_data": {"desc": "This is a test message ensuring your device can recieve push messages from The Blue Alliance.", "title": "Test Message"}, "message_type": "ping"}
-            </pre>
-        <h3 id="notification_broadcast">Admin Broadcast</h3>
-          <p>This notification can be sent by TBA Admins when they want to announce something important.</p>
-          <h4>Structure</h4>
-            <ul>
-              <li>"message_type: "broadcast"</li>
-              <li>fields in message_data object<ul>
-                <li>"title": Title of the notification to be shown</li>
-                <li>"desc": Contents of the notification</li>
-                <li>"url": URL to open when the notification is tapped</li>
-                <li>"app_version": App version number this broadcast is targeting</ul></li>
-            </ul>
-          <h4>Example JSON</h4>
-            <pre class="example-json">
-            {"message_data": {"title": "Test", "desc": "Test Broadcast", "url": "http://foo.bar", "app_version": "2.0.0"}, "message_type": "broadcast"}
             </pre>
         <h3 id="notification_verification">Webhook Verification Notifications</h3>
           <p>This notification is sent when a new webhook is created. It contains a verification code that needs to be entered in the <a href="/account">Account Overview</a> page for the webhook before it recieves live updates.</p>

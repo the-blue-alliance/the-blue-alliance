@@ -47,6 +47,10 @@ class CacheableHandler(webapp2.RequestHandler):
                     self.response.headers['Vary'] = 'Accept-Encoding'
 
     @property
+    def logged_in(self):
+        return self._user_bundle.user is not None
+
+    @property
     def cache_key(self):
         return self._render_cache_key(self._partial_cache_key)
 

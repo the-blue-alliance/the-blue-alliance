@@ -74,6 +74,8 @@ class WebhookDocumentationHandler(CacheableHandler):
     def _render(self, *args, **kw):
         self.template_values['enabled'] = NotificationType.enabled_notifications
         self.template_values['types'] = NotificationType.types
+        if self.logged_in:
+            self.template_values['logged_in'] = True
         path = os.path.join(os.path.dirname(__file__), "../templates/webhookdocs.html")
         return template.render(path, self.template_values)
 
