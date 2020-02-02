@@ -105,7 +105,7 @@
         <pre class="example-json">
         {"message_data": {"event_name": "New England FRC Region Championship", "awards": [{"event_key": "2014necmp", "award_type": 0, "name": "Regional Chairman's Award", "recipient_list": [{"team_number": 2067, "awardee": null}, {"team_number": 78, "awardee": null}, {"team_number": 811, "awardee": null}, {"team_number": 2648, "awardee": null}], "year": 2014}]}, "message_type": "awards_posted"}
         </pre>
-        {% if types.awards_posted in enabled and logged_in %}
+        {% if types.awards_posted in enabled and user_bundle.user %}
         <div class="panel panel-default">
           <div class="panel-heading">
             <h3 class="panel-title">Test Notification</h3>
@@ -160,7 +160,7 @@
             <pre class="example-json">
             {"message_data": {"event_name": "New England FRC Region Championship", "scheduled_time": 1397330280, "match_key": "2014necmp_f1m1", "team_keys": ["frc195", "frc558", "frc5122", "frc177", "frc230", "frc4055"], "predicted_time": 1397330280}, "message_type": "upcoming_match"}
             </pre>
-        {% if types.upcoming_match in enabled and logged_in %}
+        {% if types.upcoming_match in enabled and user_bundle.user %}
         <h4>Test Notification</h4>
             <form method="POST"
                   action="/notifications/test/{{types.upcoming_match}}"
@@ -207,7 +207,7 @@
             <pre class="example-json">
             {"message_data": {"event_name": "New England FRC Region Championship", "match": {"comp_level": "f", "match_number": 1, "videos": [], "time_string": "3:18 PM", "set_number": 1, "key": "2014necmp_f1m1", "time": 1397330280, "score_breakdown": null, "alliances": {"blue": {"score": 154, "teams": ["frc177", "frc230", "frc4055"]}, "red": {"score": 78, "teams": ["frc195", "frc558", "frc5122"]} }, "event_key": "2014necmp"} }, "message_type": "match_score"}
             </pre>
-        {% if types.match_score in enabled and logged_in %}
+        {% if types.match_score in enabled and user_bundle.user %}
         <h4>Test Notification</h4>
             <form method="POST"
                   action="/notifications/test/{{types.match_score}}"
@@ -256,7 +256,7 @@
             <pre class="example-json">
             {"message_data": {"event_name": "New England FRC Region Championship", "comp_level": "f", "event_key": "2014necmp", "scheduled_time": 1397330280}, "message_type": "starting_comp_level"}
             </pre>
-        {% if types.starting_comp_level in enabled and logged_in %}
+        {% if types.starting_comp_level in enabled and user_bundle.user %}
         <h4>Test Notification</h4>
             <form method="POST"
                   action="/notifications/test/{{types.starting_comp_level}}"
@@ -302,7 +302,7 @@
             <pre class="example-json">
             {"message_data": {"event": {"key": "2014necmp", "website": "http://www.nefirst.org/", "official": true, "end_date": "2014-04-12", "name": "New England FRC Region Championship", "short_name": "New England", "facebook_eid": null, "event_district_string": "New England", "venue_address": "Boston University\nAgganis Arena\nBoston, MA 02215\nUSA", "event_district": 3, "location": "Boston, MA, USA", "event_code": "necmp", "year": 2014, "webcast": [], "alliances": [{"declines": [], "picks": ["frc195", "frc558", "frc5122"]}, {"declines": [], "picks": ["frc1153", "frc125", "frc4048"]}, {"declines": [], "picks": ["frc230", "frc177", "frc4055"]}, {"declines": [], "picks": ["frc716", "frc78", "frc811"]}, {"declines": [], "picks": ["frc1519", "frc3467", "frc58"]}, {"declines": [], "picks": ["frc131", "frc175", "frc1073"]}, {"declines": [], "picks": ["frc228", "frc3525", "frc2168"]}, {"declines": [], "picks": ["frc172", "frc1058", "frc2067"]}], "event_type_string": "District Championship", "start_date": "2014-04-10", "event_type": 2} }, "message_type": "alliance_selection"}
             </pre>
-        {% if types.alliance_selection in enabled and logged_in %}
+        {% if types.alliance_selection in enabled and user_bundle.user %}
         <h4>Test Notification</h4>
             <form method="POST"
                   action="/notifications/test/{{types.alliance_selection}}"
@@ -344,7 +344,7 @@
             <pre>
             Not yet implemented
             </pre>
-        {% if types.media_posted in enabled and logged_in %}
+        {% if types.media_posted in enabled and user_bundle.user %}
 {#        <h4>Test Notification</h4>#}
             {# LeoCodes21 - media_posted is unimplemented so there is nothing here for now. #}
 {#            <a href="/notifications/test/{{types.media_posted}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Media</a>#}
@@ -363,7 +363,7 @@
             <pre class="example-json">
             {"message_data": {"district_key": "2014ne", "district_name": "New England"}, "message_type": "district_points_updated"}
             </pre>
-        {% if types.disrict_points_updated in enabled and logged_in %}
+        {% if types.disrict_points_updated in enabled and user_bundle.user %}
         <h4>Test Notification</h4>
             <form method="POST"
                   action="/notifications/test/{{types.disrict_points_updated}}"
@@ -404,7 +404,7 @@
             <pre class="example-json">
             {"message_data": {"event_name": "New England FRC Region Championship", "first_match_time": 1397330280, "event_key": "2014necmp"}, "message_type": "schedule_updated"}
             </pre>
-        {% if types.schedule_updated in enabled and logged_in %}
+        {% if types.schedule_updated in enabled and user_bundle.user %}
         <h4>Test Notification</h4>
             <form method="POST"
                   action="/notifications/test/{{types.schedule_updated}}"
@@ -453,7 +453,7 @@
           <pre>
             <i>Not yet implemented</i>
           </pre>
-        {% if types.final_results in enabled and logged_in %}
+        {% if types.final_results in enabled and user_bundle.user %}
 {#        <h4>Test Notification</h4>#}
             {# LeoCodes21 - final_results is unimplemented so there is nothing here for now. #}
 {#            <a href="/notifications/test/{{types.final_results}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Final Results</a>#}

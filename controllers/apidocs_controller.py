@@ -3,7 +3,7 @@ import os
 from google.appengine.ext.webapp import template
 
 from consts.notification_type import NotificationType
-from controllers.base_controller import CacheableHandler
+from controllers.base_controller import CacheableHandler, LoggedInHandler
 from template_engine import jinja2_engine
 
 
@@ -63,21 +63,14 @@ class ApiTrustedDocumentationHandler(CacheableHandler):
         return template.render(path, self.template_values)
 
 
-class WebhookDocumentationHandler(CacheableHandler):
-    CACHE_VERSION = 1
-    CACHE_KEY_FORMAT = "webhook_docs"
+class WebhookDocumentationHandler(LoggedInHandler):
 
-    def __init__(self, *args, **kw):
-        super(WebhookDocumentationHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24 * 7
-
-    def _render(self, *args, **kw):
-        self.template_values['enabled'] = NotificationType.enabled_notifications
-        self.template_values['types'] = NotificationType.types
-        if self.logged_in:
-            self.template_values['logged_in'] = True
-        path = os.path.join(os.path.dirname(__file__), "../templates/webhookdocs.html")
-        return template.render(path, self.template_values)
+    def get(self):
+        self.template_values.update({
+            'enabled': NotificationType.enabled_notifications,
+            'types': NotificationType.types,
+        })
+        self.response.out.write(jinja2_engine.render('webhookdocs.html', self.template_values))
 
 
 class AddDataHandler(CacheableHandler):

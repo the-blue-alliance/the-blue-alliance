@@ -19,11 +19,11 @@ class TestBroadcastNotification(unittest2.TestCase):
         self.assertEqual(self.notification.fcm_notification.body, 'Some body message ya dig')
 
     def test_data_payload(self):
-        self.assertEqual(self.notification.data_payload, {'url': None, 'app_version': None})
+        self.assertEqual(self.notification.data_payload, {})
 
     def test_data_payload_url(self):
         notification = BroadcastNotification('T', 'B', 'https://thebluealliance.com/')
-        self.assertEqual(notification.data_payload, {'url': 'https://thebluealliance.com/', 'app_version': None})
+        self.assertEqual(notification.data_payload, {'url': 'https://thebluealliance.com/'})
 
     def test_data_payload_app_version(self):
         notification = BroadcastNotification('T', 'B', 'https://thebluealliance.com/', '1.0.0')
@@ -31,23 +31,23 @@ class TestBroadcastNotification(unittest2.TestCase):
 
     def test_data_payload_url_app_version(self):
         notification = BroadcastNotification('T', 'B', None, '1.0.0')
-        self.assertEqual(notification.data_payload, {'url': None, 'app_version': '1.0.0'})
+        self.assertEqual(notification.data_payload, {'app_version': '1.0.0'})
 
     def test_webhook_message_data(self):
-        payload = {'title': 'Title Here', 'desc': 'Some body message ya dig', 'url': None, 'app_version': None}
+        payload = {'title': 'Title Here', 'desc': 'Some body message ya dig'}
         self.assertEqual(self.notification.webhook_message_data, payload)
 
     def test_webhook_message_data_url(self):
         notification = BroadcastNotification('T', 'B', 'https://thebluealliance.com/', None)
-        payload = {'title': 'T', 'desc': 'B', 'url': 'https://thebluealliance.com/', 'app_version': None}
+        payload = {'title': 'T', 'desc': 'B', 'url': 'https://thebluealliance.com/'}
         self.assertEqual(notification.webhook_message_data, payload)
 
     def test_webhook_message_data_app_version(self):
         notification = BroadcastNotification('T', 'B', None, '1.0.0')
-        payload = {'title': 'T', 'desc': 'B', 'url': None, 'app_version': '1.0.0'}
+        payload = {'title': 'T', 'desc': 'B'}
         self.assertEqual(notification.webhook_message_data, payload)
 
     def test_webhook_message_data_url_app_version(self):
         notification = BroadcastNotification('T', 'B', 'https://thebluealliance.com/', '1.0.0')
-        payload = {'title': 'T', 'desc': 'B', 'url': 'https://thebluealliance.com/', 'app_version': '1.0.0'}
+        payload = {'title': 'T', 'desc': 'B', 'url': 'https://thebluealliance.com/'}
         self.assertEqual(notification.webhook_message_data, payload)
