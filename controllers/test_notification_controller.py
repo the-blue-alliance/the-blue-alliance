@@ -3,6 +3,7 @@ import logging
 from consts.notification_type import NotificationType
 from base_controller import LoggedInHandler
 from helpers.push_helper import PushHelper
+from helpers.tbans_helper import TBANSHelper
 from models.district import District
 from models.match import Match
 from models.event import Event
@@ -99,6 +100,7 @@ class TestNotificationController(LoggedInHandler):
         elif type == NotificationType.ALLIANCE_SELECTION:
             notification = AllianceSelectionNotification(event)
         elif type == NotificationType.AWARDS:
+            TBANSHelper.awards(event, user_id)
             notification = AwardsUpdatedNotification(event)
         elif type == NotificationType.MEDIA_POSTED:
             # Not implemented yet
