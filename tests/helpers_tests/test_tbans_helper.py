@@ -10,12 +10,19 @@ from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
+from consts.award_type import AwardType
 from consts.client_type import ClientType
+from consts.event_type import EventType
+from consts.model_type import ModelType
+from consts.notification_type import NotificationType
 import helpers.tbans_helper
 from helpers.event.event_test_creator import EventTestCreator
 from helpers.tbans_helper import TBANSHelper, _firebase_app
 from models.account import Account
+from models.award import Award
+from models.team import Team
 from models.mobile_client import MobileClient
+from models.subscription import Subscription
 from models.notifications.awards import AwardsNotification
 from models.notifications.broadcast import BroadcastNotification
 from models.notifications.requests.fcm_request import FCMRequest
@@ -44,6 +51,11 @@ class TestTBANSHelper(unittest2.TestCase):
         self.taskqueue_stub = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
         self.event = EventTestCreator.createFutureEvent()
+        self.team = Team(
+            id='frc7332',
+            team_number=7332
+        )
+        self.team.put()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -60,15 +72,96 @@ class TestTBANSHelper(unittest2.TestCase):
         # Should be the same object
         self.assertEqual(app_one, app_two)
 
+    def test_awards_no_users(self):
+        # Test send not called with no subscribed users
+        with patch.object(TBANSHelper, '_send') as mock_send:
+            TBANSHelper.awards(self.event)
+            mock_send.assert_not_called()
+
+    def test_awards_user_id(self):
+        # Test send called with user id
+        with patch.object(TBANSHelper, '_send') as mock_send:
+            TBANSHelper.awards(self.event, 'user_id')
+            mock_send.assert_called_once()
+            user_id = mock_send.call_args[0][0]
+            self.assertEqual(user_id, ['user_id'])
+
     def test_awards(self):
+        # Insert some Awards for some Teams
+        award = Award(
+            id=Award.render_key_name(self.event.key_name, AwardType.INDUSTRIAL_DESIGN),
+            name_str='Industrial Design Award sponsored by General Motors',
+            award_type_enum=AwardType.INDUSTRIAL_DESIGN,
+            event=self.event.key,
+            event_type_enum=EventType.REGIONAL,
+            team_list=[ndb.Key(Team, 'frc7332')],
+            year=2020
+        )
+        award.put()
+        winner_award = Award(
+            id=Award.render_key_name(self.event.key_name, AwardType.WINNER),
+            name_str='Regional Event Winner',
+            award_type_enum=AwardType.WINNER,
+            event=self.event.key,
+            event_type_enum=EventType.REGIONAL,
+            team_list=[ndb.Key(Team, 'frc7332'), ndb.Key(Team, 'frc1')],
+            year=2020
+        )
+        winner_award.put()
+        frc_1 = Team(
+            id='frc1',
+            team_number=1
+        )
+        frc_1.put()
+
+        # Insert a Subscription for this Event and these Teams so we call to send
+        Subscription(
+            parent=ndb.Key(Account, 'user_id_1'),
+            user_id='user_id_1',
+            model_key='frc1',
+            model_type=ModelType.TEAM,
+            notification_types=[NotificationType.AWARDS]
+        ).put()
+        Subscription(
+            parent=ndb.Key(Account, 'user_id_1'),
+            user_id='user_id_1',
+            model_key='frc7332',
+            model_type=ModelType.TEAM,
+            notification_types=[NotificationType.AWARDS]
+        ).put()
+        Subscription(
+            parent=ndb.Key(Account, 'user_id_1'),
+            user_id='user_id_1',
+            model_key=self.event.key_name,
+            model_type=ModelType.EVENT,
+            notification_types=[NotificationType.AWARDS]
+        ).put()
+
         from notifications.awards_updated import AwardsUpdatedNotification
         with patch.object(TBANSHelper, '_send') as mock_send:
             TBANSHelper.awards(self.event)
-            # Make sure we sent to FCM/webhooks
-            mock_send.assert_called_once()
-            notification = mock_send.call_args[0][1]
-            self.assertTrue(isinstance(notification, AwardsNotification))
-            self.assertEqual(notification.event, self.event)
+            # Three calls total - First to the Event, second to frc7332 (two awards), third to frc1 (one award)
+            mock_send.assert_called()
+            self.assertEqual(len(mock_send.call_args_list), 3)
+            self.assertEqual([call[0][0] for call in mock_send.call_args_list], [['user_id_1'] for call in mock_send.call_args_list])
+            notifications = [call[0][1] for call in mock_send.call_args_list]
+            for notification in notifications:
+                self.assertTrue(isinstance(notification, AwardsNotification))
+            # Check Event notification
+            event_notification = notifications[0]
+            self.assertEqual(event_notification.event, self.event)
+            self.assertIsNone(event_notification.team)
+            self.assertEqual(event_notification.team_awards, [])
+            # Check frc1 notification
+            event_notification = notifications[1]
+            self.assertEqual(event_notification.event, self.event)
+            self.assertEqual(event_notification.team, frc_1)
+            self.assertEqual(len(event_notification.team_awards), 1)
+            # Check frc7332 notification
+            event_notification = notifications[2]
+            self.assertEqual(event_notification.event, self.event)
+            self.assertEqual(event_notification.team, self.team)
+            self.assertEqual(len(event_notification.team_awards), 2)
 
     def test_broadcast_none(self):
         from notifications.base_notification import BaseNotification
