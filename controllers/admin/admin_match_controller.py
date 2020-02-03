@@ -152,6 +152,7 @@ class AdminMatchEdit(LoggedInHandler):
     def post(self, match_key):
         self._require_admin()
         alliances_json = self.request.get("alliances_json")
+        score_breakdown_json = self.request.get("score_breakdown_json")
         alliances = json.loads(alliances_json)
         tba_videos = json.loads(self.request.get("tba_videos")) if self.request.get("tba_videos") else []
         youtube_videos = json.loads(self.request.get("youtube_videos")) if self.request.get("youtube_videos") else []
@@ -168,6 +169,7 @@ class AdminMatchEdit(LoggedInHandler):
             comp_level=self.request.get("comp_level"),
             team_key_names=team_key_names,
             alliances_json=alliances_json,
+            score_breakdown_json=score_breakdown_json,
             tba_videos=tba_videos,
             youtube_videos=youtube_videos
             # no_auto_update = str(self.request.get("no_auto_update")).lower() == "true", #TODO
