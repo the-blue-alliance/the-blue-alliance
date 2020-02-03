@@ -6564,6 +6564,10 @@
           "shieldEnergizedRankingPoint": {
             "type": "boolean"
           },
+          "tba_shieldEnergizedRankingPointFromFoul": {
+            "type": "boolean",
+            "description": "Unofficial TBA-computed value that indicates whether the shieldEnergizedRankingPoint was earned normally or awarded due to a foul."
+          },
           "foulCount": {
             "type": "integer"
           },
