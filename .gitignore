@@ -85,6 +85,7 @@ ops/tbatv-prod-hrd-deploy.json
 ops/dev/conf.json
 ops/dev/*-auth.json
 test_keys.json
+service-account-key.json
 
 # Vagrant #
 ###########
