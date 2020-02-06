@@ -1,3 +1,5 @@
+import logging
+
 class Request(object):
     """ Base class used for requests to represent a notification payload.
 
