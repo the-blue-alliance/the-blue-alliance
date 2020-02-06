@@ -20,11 +20,13 @@ from helpers.event.event_test_creator import EventTestCreator
 from helpers.tbans_helper import TBANSHelper, _firebase_app
 from models.account import Account
 from models.award import Award
+from models.match import Match
 from models.team import Team
 from models.mobile_client import MobileClient
 from models.subscription import Subscription
 from models.notifications.awards import AwardsNotification
 from models.notifications.broadcast import BroadcastNotification
+from models.notifications.match_score import MatchScoreNotification
 from models.notifications.requests.fcm_request import FCMRequest
 from models.notifications.requests.webhook_request import WebhookRequest
 
@@ -56,6 +58,14 @@ class TestTBANSHelper(unittest2.TestCase):
             team_number=7332
         )
         self.team.put()
+        self.match = Match(
+            id='2020miket_qm1',
+            event=self.event.key,
+            comp_level='qm',
+            set_number=1,
+            match_number=1,
+            team_key_names=['frc7332']
+        )
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -123,27 +133,26 @@ class TestTBANSHelper(unittest2.TestCase):
             notification_types=[NotificationType.AWARDS]
         ).put()
         Subscription(
-            parent=ndb.Key(Account, 'user_id_1'),
-            user_id='user_id_1',
+            parent=ndb.Key(Account, 'user_id_2'),
+            user_id='user_id_2',
             model_key='frc7332',
             model_type=ModelType.TEAM,
             notification_types=[NotificationType.AWARDS]
         ).put()
         Subscription(
-            parent=ndb.Key(Account, 'user_id_1'),
-            user_id='user_id_1',
+            parent=ndb.Key(Account, 'user_id_3'),
+            user_id='user_id_3',
             model_key=self.event.key_name,
             model_type=ModelType.EVENT,
             notification_types=[NotificationType.AWARDS]
         ).put()
 
-        from notifications.awards_updated import AwardsUpdatedNotification
         with patch.object(TBANSHelper, '_send') as mock_send:
             TBANSHelper.awards(self.event)
             # Three calls total - First to the Event, second to frc7332 (two awards), third to frc1 (one award)
             mock_send.assert_called()
             self.assertEqual(len(mock_send.call_args_list), 3)
-            self.assertEqual([call[0][0] for call in mock_send.call_args_list], [['user_id_1'] for call in mock_send.call_args_list])
+            self.assertEqual([x[0] for x in [call[0][0] for call in mock_send.call_args_list]], ['user_id_3', 'user_id_1', 'user_id_2'])
             notifications = [call[0][1] for call in mock_send.call_args_list]
             for notification in notifications:
                 self.assertTrue(isinstance(notification, AwardsNotification))
@@ -282,6 +291,56 @@ class TestTBANSHelper(unittest2.TestCase):
         # Make sure we didn't send to FCM or webhooks
         tasks = self.taskqueue_stub.GetTasks('push-notifications')
         self.assertEqual(len(tasks), 0)
+
+    def test_match_score_no_users(self):
+        # Test send not called with no subscribed users
+        with patch.object(TBANSHelper, '_send') as mock_send:
+            TBANSHelper.match_score(self.match)
+            mock_send.assert_not_called()
+
+    def test_match_score_user_id(self):
+        # Test send called with user id
+        with patch.object(TBANSHelper, '_send') as mock_send:
+            TBANSHelper.match_score(self.match, 'user_id')
+            mock_send.assert_called()
+            self.assertEqual(len(mock_send.call_args_list), 3)
+            for call in mock_send.call_args_list:
+                self.assertEqual(call[0][0], ['user_id'])
+
+    def test_match_score(self):
+        # Insert a Subscription for this Event, Team, and Match so we call to send
+        Subscription(
+            parent=ndb.Key(Account, 'user_id_1'),
+            user_id='user_id_1',
+            model_key=self.event.key_name,
+            model_type=ModelType.EVENT,
+            notification_types=[NotificationType.MATCH_SCORE]
+        ).put()
+        Subscription(
+            parent=ndb.Key(Account, 'user_id_2'),
+            user_id='user_id_2',
+            model_key='frc7332',
+            model_type=ModelType.TEAM,
+            notification_types=[NotificationType.MATCH_SCORE]
+        ).put()
+        Subscription(
+            parent=ndb.Key(Account, 'user_id_3'),
+            user_id='user_id_3',
+            model_key=self.match.key_name,
+            model_type=ModelType.MATCH,
+            notification_types=[NotificationType.MATCH_SCORE]
+        ).put()
+
+        with patch.object(TBANSHelper, '_send') as mock_send:
+            TBANSHelper.match_score(self.match)
+            # Three calls total - First to the Event, second to Team frc7332, third to Match 2020miket_qm1
+            mock_send.assert_called()
+            self.assertEqual(len(mock_send.call_args_list), 3)
+            self.assertEqual([x[0] for x in [call[0][0] for call in mock_send.call_args_list]], ['user_id_1', 'user_id_2', 'user_id_3'])
+            notifications = [call[0][1] for call in mock_send.call_args_list]
+            for notification in notifications:
+                self.assertTrue(isinstance(notification, MatchScoreNotification))
+                self.assertEqual(notification.match, self.match)
 
     def test_ping_client(self):
         client = MobileClient(

@@ -39,14 +39,19 @@ class MatchScoreNotification(Notification):
 
     @property
     def data_payload(self):
-        from helpers.model_to_dict import ModelToDict
         return {
             'event_key': self.event.key_name,
-            'match': ModelToDict.matchConverter(self.match)
+            'match_key': self.match.key_name,
+            'team_keys': self.match.team_key_names
         }
 
     @property
     def webhook_message_data(self):
+        from helpers.model_to_dict import ModelToDict
         payload = self.data_payload
+        # Remove the FCM-only keys
+        del payload['match_key']
+        del payload['team_keys']
         payload['event_name'] = self.event.name
+        payload['match'] = ModelToDict.matchConverter(self.match)
         return payload

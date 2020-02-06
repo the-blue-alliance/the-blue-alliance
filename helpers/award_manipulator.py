@@ -36,8 +36,9 @@ class AwardManipulator(ManipulatorBase):
                     logging.error("Error sending award update for {}".format(event.id()))
                 try:
                     TBANSHelper.awards(event.get())
-                except Exception:
-                    logging.error("Error sending award update for {}".format(event.id()))
+                except Exception, exception:
+                    logging.error("Error sending {} award updates: {}".format(event.id(), exception))
+                    logging.error(traceback.format_exc())
 
         # Enqueue task to calculate district points
         for event in events:

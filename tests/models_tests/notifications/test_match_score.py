@@ -22,7 +22,7 @@ class TestMatchScoreNotification(unittest2.TestCase):
 
         self.testbed.init_taskqueue_stub(root_path=".")
 
-        for team_number in range(7):
+        for team_number in range(6):
             Team(id="frc%s" % team_number,
                  team_number=team_number).put()
 
@@ -54,16 +54,16 @@ class TestMatchScoreNotification(unittest2.TestCase):
         self.assertIsNotNone(match)
 
     def test_data_payload(self):
-        # No `event_name`
         payload = self.notification.data_payload
-        self.assertEqual(len(payload), 2)
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
-        self.assertIsNotNone(payload['match'])
+        self.assertEqual(len(payload), 3)
+        self.assertEqual(payload['event_key'], '2020testpresent')
+        self.assertEqual(payload['match_key'], '2020testpresent_qm1')
+        self.assertItemsEqual(payload['team_keys'], ['frc0', 'frc1', 'frc2', 'frc3', 'frc4', 'frc5'])
 
     def test_webhook_message_data(self):
         # Has `event_name`
         payload = self.notification.webhook_message_data
         self.assertEqual(len(payload), 3)
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
+        self.assertEqual(payload['event_key'], '2020testpresent')
         self.assertEqual(payload['event_name'], 'Present Test Event')
         self.assertIsNotNone(payload['match'])
