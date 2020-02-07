@@ -39,10 +39,10 @@ class MatchScoreNotification(Notification):
 
     @property
     def data_payload(self):
+        print(self.match.team_key_names)
         return {
             'event_key': self.event.key_name,
-            'match_key': self.match.key_name,
-            'team_keys': self.match.team_key_names
+            'match_key': self.match.key_name
         }
 
     @property
@@ -51,7 +51,6 @@ class MatchScoreNotification(Notification):
         payload = self.data_payload
         # Remove the FCM-only keys
         del payload['match_key']
-        del payload['team_keys']
         payload['event_name'] = self.event.name
         payload['match'] = ModelToDict.matchConverter(self.match)
         return payload

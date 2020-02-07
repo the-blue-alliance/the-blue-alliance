@@ -58,7 +58,6 @@ class TestMatchScoreNotification(unittest2.TestCase):
         self.assertEqual(len(payload), 3)
         self.assertEqual(payload['event_key'], '2020testpresent')
         self.assertEqual(payload['match_key'], '2020testpresent_qm1')
-        self.assertItemsEqual(payload['team_keys'], ['frc0', 'frc1', 'frc2', 'frc3', 'frc4', 'frc5'])
 
     def test_webhook_message_data(self):
         # Has `event_name`
