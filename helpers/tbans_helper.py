@@ -113,7 +113,7 @@ class TBANSHelper:
                 if not users:
                     users = Subscription.users_subscribed_to_team(team_key.get(), NotificationType.MATCH_SCORE)
                 if users:
-                    cls._send(users, MatchScoreNotification(match))
+                    cls._send(users, MatchScoreNotification(match, team_key.get()))
 
         # Send to Match subscribers
         if NotificationType.MATCH_SCORE in NotificationType.enabled_match_notifications:

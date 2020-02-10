@@ -3,9 +3,10 @@ from models.notifications.notification import Notification
 
 class MatchScoreNotification(Notification):
 
-    def __init__(self, match):
+    def __init__(self, match, team=None):
         self.match = match
         self.event = match.event.get()
+        self.team = team
 
     @classmethod
     def _type(cls):
@@ -31,26 +32,36 @@ class MatchScoreNotification(Notification):
         else:
             action = 'beat'
 
+        title = self.event.event_short.upper()
+        if self.team:
+            title = 'Team {} {}'.format(self.team.team_number, title)
+
         from firebase_admin import messaging
         return messaging.Notification(
-            title='{} {} Results'.format(self.event.event_short.upper(), self.match.short_name),
+            title='{} {} Results'.format(title, self.match.short_name),
             body='{} {} {} scoring {}-{}.'.format(alliance_one_teams, action, alliance_two_teams, alliance_one_score, alliance_two_score)
         )
 
     @property
     def data_payload(self):
-        print(self.match.team_key_names)
-        return {
+        payload = {
             'event_key': self.event.key_name,
             'match_key': self.match.key_name
         }
 
+        if self.team:
+            payload['team_key'] = self.team.key_name
+
+        return payload
+
     @property
     def webhook_message_data(self):
         from helpers.model_to_dict import ModelToDict
+
         payload = self.data_payload
         # Remove the FCM-only keys
         del payload['match_key']
+
         payload['event_name'] = self.event.name
         payload['match'] = ModelToDict.matchConverter(self.match)
         return payload

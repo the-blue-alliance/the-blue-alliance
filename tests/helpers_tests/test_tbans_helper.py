@@ -341,6 +341,9 @@ class TestTBANSHelper(unittest2.TestCase):
             for notification in notifications:
                 self.assertTrue(isinstance(notification, MatchScoreNotification))
                 self.assertEqual(notification.match, self.match)
+            # Check frc7332 notification
+            notification = notifications[1]
+            self.assertEqual(notification.team, self.team)
 
     def test_ping_client(self):
         client = MobileClient(
