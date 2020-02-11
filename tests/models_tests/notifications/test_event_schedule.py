@@ -75,6 +75,17 @@ class TestEventScheduleNotification(unittest2.TestCase):
         self.assertEqual(self.notification.fcm_notification.title, 'TESTPRESENT Schedule Updated')
         self.assertEqual(self.notification.fcm_notification.body, 'The Present Test Event match schedule has been updated. The next match starts at 13:30.')
 
+    def test_fcm_notification_time_timezone(self):
+        self._setup_notification()
+
+        self.event.timezone_id = 'America/Detroit'
+        # Set constant scheduled time for testing
+        self.notification.next_match.time = datetime(2017, 11, 28, 13, 30, 59)
+
+        self.assertIsNotNone(self.notification.fcm_notification)
+        self.assertEqual(self.notification.fcm_notification.title, 'TESTPRESENT Schedule Updated')
+        self.assertEqual(self.notification.fcm_notification.body, 'The Present Test Event match schedule has been updated. The next match starts at 13:30 EST.')
+
     def test_fcm_notification_short_name(self):
         self._setup_notification()
 
@@ -100,23 +111,9 @@ class TestEventScheduleNotification(unittest2.TestCase):
     def test_data_payload(self):
         self._setup_notification()
 
-        # Remove time for testing
-        self.notification.next_match.time = None
-
-        # No `event_name`
         payload = self.notification.data_payload
-        self.assertEqual(len(payload), 2)
+        self.assertEqual(len(payload), 1)
         self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
-        self.assertIsNone(payload['first_match_time'])
-
-    def test_data_payload_first_match_time(self):
-        self._setup_notification()
-
-        # No `event_name`
-        payload = self.notification.data_payload
-        self.assertEqual(len(payload), 2)
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
-        self.assertIsNotNone(payload['first_match_time'])
 
     def test_webhook_message_data(self):
         self._setup_notification()
@@ -126,10 +123,9 @@ class TestEventScheduleNotification(unittest2.TestCase):
 
         # Has `event_name`
         payload = self.notification.webhook_message_data
-        self.assertEqual(len(payload), 3)
+        self.assertEqual(len(payload), 2)
         self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
         self.assertEqual(payload['event_name'], 'Present Test Event')
-        self.assertIsNone(payload['first_match_time'])
 
     def test_webhook_message_data_first_match_time(self):
         self._setup_notification()

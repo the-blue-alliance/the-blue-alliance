@@ -96,6 +96,17 @@ class TBANSHelper:
             notification.send(keys)
 
     @classmethod
+    def event_schedule(cls, event, user_id=None):
+        from models.notifications.event_schedule import EventScheduleNotification
+        # Send to Event subscribers
+        if NotificationType.SCHEDULE_UPDATED in NotificationType.enabled_event_notifications:
+            users = [user_id] if user_id else []
+            if not users:
+                users = Subscription.users_subscribed_to_event(event, NotificationType.SCHEDULE_UPDATED)
+            if users:
+                cls._send(users, EventScheduleNotification(event))
+
+    @classmethod
     def match_score(cls, match, user_id=None):
         from models.notifications.match_score import MatchScoreNotification
         # Send to Event subscribers
