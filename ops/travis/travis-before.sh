@@ -8,10 +8,15 @@ fi
 
 case "$1" in
 
-    "PYUNIT" | "JSUNIT" | "PYBUILD" )
+    "JSUNIT" )
         echo "Setting up for unit tests..."
-        cp static/javascript/tba_js/tba_keys_template.js static/javascript/tba_js/tba_keys.js
-        paver make
+        npm i
+        ;;
+    "PYUNIT")
+        echo "Setting up pyunit. Nothing to do..."
+        ;;
+    "PYBUILD")
+        echo "Setting up pybuild. Nothing to do..."
         ;;
     "LINT")
         echo "Setting up to lint. Nothing to do..."
