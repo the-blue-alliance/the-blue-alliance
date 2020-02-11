@@ -42,6 +42,10 @@ case "$1" in
         echo "Running javascript tests"
         npm test
         ;;
+    "MAKE")
+        echo "Running make"
+        paver make
+        ;;
     *)
         echo "Unknown job type $JOB"
         exit -1
