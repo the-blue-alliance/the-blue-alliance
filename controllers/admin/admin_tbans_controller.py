@@ -4,6 +4,7 @@ import os
 from controllers.base_controller import LoggedInHandler
 from google.appengine.ext.webapp import template
 from models.event import Event
+from models.match import Match
 from models.mobile_client import MobileClient
 from helpers.tbans_helper import TBANSHelper
 
@@ -34,6 +35,16 @@ class AdminTBANS(LoggedInHandler):
                 return self.redirect('/admin/tbans')
 
             TBANSHelper.awards(event, user_id)
+        elif notification_type == "match_score":
+            match_key = self.request.get('match_key')
+            match = Match.get_by_id(match_key)
+            if not match:
+                self.template_values.update({
+                    'error': 'No match for key {}'.format(match_key)
+                })
+                return self.redirect('/admin/tbans')
+
+            TBANSHelper.match_score(match, user_id)
         elif notification_type == "ping":
             clients = MobileClient.clients([user_id])
             for client in clients:

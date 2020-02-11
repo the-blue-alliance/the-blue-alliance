@@ -33,7 +33,7 @@ class NotificationHelper(object):
     @classmethod
     def send_match_score_update(cls, match):
         users = PushHelper.get_users_subscribed_to_match(match, NotificationType.MATCH_SCORE)
-        keys = PushHelper.get_client_ids_for_users(users)
+        keys = PushHelper.get_client_ids_for_users(users, os_types=[ClientType.OS_ANDROID])
 
         notification = MatchScoreNotification(match)
         notification.send(keys)

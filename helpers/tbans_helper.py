@@ -46,15 +46,13 @@ class TBANSHelper:
     """
     @classmethod
     def awards(cls, event, user_id=None):
-        users = [user_id] if user_id else []
-
         from models.notifications.awards import AwardsNotification
         # Send to Event subscribers
         if NotificationType.AWARDS in NotificationType.enabled_event_notifications:
+            users = [user_id] if user_id else []
             if not users:
                 users = Subscription.users_subscribed_to_event(event, NotificationType.AWARDS)
             if users:
-                # Send to FCM/webhooks
                 cls._send(users, AwardsNotification(event))
 
         # Send to Team subscribers
@@ -63,10 +61,11 @@ class TBANSHelper:
             team_awards = event.team_awards()
             for team_key in team_awards.keys():
                 team = team_key.get()
+
+                users = [user_id] if user_id else []
                 if not users:
                     users = Subscription.users_subscribed_to_team(team, NotificationType.AWARDS)
                 if users:
-                    # Send to FCM/webhooks
                     cls._send(users, AwardsNotification(event, team))
 
     @classmethod
@@ -95,6 +94,34 @@ class TBANSHelper:
             from notifications.broadcast import BroadcastNotification
             notification = BroadcastNotification(title, message, url, app_version)
             notification.send(keys)
+
+    @classmethod
+    def match_score(cls, match, user_id=None):
+        from models.notifications.match_score import MatchScoreNotification
+        # Send to Event subscribers
+        if NotificationType.MATCH_SCORE in NotificationType.enabled_event_notifications:
+            users = [user_id] if user_id else []
+            if not users:
+                users = Subscription.users_subscribed_to_event(match.event.get(), NotificationType.MATCH_SCORE)
+            if users:
+                cls._send(users, MatchScoreNotification(match))
+
+        # Send to Team subscribers
+        if NotificationType.MATCH_SCORE in NotificationType.enabled_team_notifications:
+            for team_key in match.team_keys:
+                users = [user_id] if user_id else []
+                if not users:
+                    users = Subscription.users_subscribed_to_team(team_key.get(), NotificationType.MATCH_SCORE)
+                if users:
+                    cls._send(users, MatchScoreNotification(match, team_key.get()))
+
+        # Send to Match subscribers
+        if NotificationType.MATCH_SCORE in NotificationType.enabled_match_notifications:
+            users = [user_id] if user_id else []
+            if not users:
+                users = Subscription.users_subscribed_to_match(match, NotificationType.MATCH_SCORE)
+            if users:
+                cls._send(users, MatchScoreNotification(match))
 
     @staticmethod
     def ping(client):

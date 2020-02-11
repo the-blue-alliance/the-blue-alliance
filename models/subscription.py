@@ -69,3 +69,24 @@ class Subscription(ndb.Model):
             projection=[Subscription.user_id]
         ).fetch()
         return list(set([user.user_id for user in users]))
+
+    @classmethod
+    def users_subscribed_to_match(cls, match, notification_type):
+        """
+        Get user IDs subscribed to a Match and a given notification type.
+        Ex: team_key == `2020miket_qm1` and notification_type == NotificationType.UPCOMING_MATCH
+
+        Args:
+            match (models.match.Match): The Match to query Subscription for.
+            notification_type (consts.notification_type.NotificationType): A NotificationType for the Subscription.
+
+        Returns:
+            list (string): List of user IDs with Subscriptions to the given Team/notification type.
+        """
+        users = Subscription.query(
+            Subscription.model_key == match.key_name,
+            Subscription.notification_types == notification_type,
+            Subscription.model_type == ModelType.MATCH,
+            projection=[Subscription.user_id]
+        ).fetch()
+        return list(set([user.user_id for user in users]))
