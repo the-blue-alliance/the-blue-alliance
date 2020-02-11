@@ -15,6 +15,7 @@ env:
   - JOB=PYBUILD
   - JOB=JSUNIT
   - JOB=LINT
+  - JOB=MAKE
 stages:
   - test
   - name: deploy

@@ -21,6 +21,10 @@ case "$1" in
     "LINT")
         echo "Setting up to lint. Nothing to do..."
         ;;
+    "MAKE")
+        echo "Setting up to make."
+        cp static/javascript/tba_js/tba_keys_template.js static/javascript/tba_js/tba_keys.js
+        ;;
     "DEPLOY")
         echo "Setting up to deploy. Nothing to do..."
         ;;
