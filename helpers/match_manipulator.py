@@ -71,6 +71,11 @@ class MatchManipulator(ManipulatorBase):
                 except Exception, exception:
                     logging.error("Error sending match video updates: {}".format(exception))
                     logging.error(traceback.format_exc())
+                try:
+                    TBANSHelper.match_video(match)
+                except Exception, exception:
+                    logging.error("Error sending match video updates: {}".format(exception))
+                    logging.error(traceback.format_exc())
 
         '''
         If we have an unplayed match during an event within a day, send out a schedule update notification

@@ -55,6 +55,16 @@ class AdminTBANS(LoggedInHandler):
                 return self.redirect('/admin/tbans')
 
             TBANSHelper.match_score(match, user_id)
+        elif notification_type == "match_video":
+            match_key = self.request.get('match_key')
+            match = Match.get_by_id(match_key)
+            if not match:
+                self.template_values.update({
+                    'error': 'No match for key {}'.format(match_key)
+                })
+                return self.redirect('/admin/tbans')
+
+            TBANSHelper.match_video(match, user_id)
         elif notification_type == "ping":
             clients = MobileClient.clients([user_id])
             for client in clients:
