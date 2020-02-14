@@ -1,106 +1,103 @@
 import React from 'react'
+
 import PropTypes from 'prop-types'
+import h337 from 'heatmap.js'
 
 const WIDTH = 54
 const HEIGHT = 27
 const GRID_SCALE = 2
 
-function createColor(perc) {
-  let r = 0
-  let g = 0
-  if (perc < 50) {
-    r = 255
-    g = Math.round(5.1 * perc)
-  } else {
-    g = 255
-    r = Math.round(510 - 5.1 * perc)
-  }
-  let h = r * 0x10000
-  h += g * 0x100
-  return `#${`000000${h.toString(16)}`.slice(-6)}`
-}
-
 class HeatmapVisualizer extends React.Component {
   constructor(props) {
     super(props)
     const { data } = props
-    console.log(data)
 
-    this.state = {}
-    // Default teams as active
+    this.state = { activeCount: 0 }
+    // Default teams as inactive
     data.alliances.red.forEach((team) => {
-      this.state[team.team_key] = true
+      this.state[team.team_key] = false
     })
     data.alliances.blue.forEach((team) => {
-      this.state[team.team_key] = true
+      this.state[team.team_key] = false
+    })
+  }
+
+  componentDidMount() {
+    const cfg = {
+      container: this.ref,
+    }
+    this.heatmapInstance = h337.create(cfg)
+    this.setData()
+  }
+
+  componentDidUpdate() {
+    this.setData()
+  }
+
+  setData() {
+    const { data } = this.props
+
+    const grid = new Array(WIDTH * GRID_SCALE)
+    for (let i = 0; i < WIDTH * GRID_SCALE; i++) {
+      grid[i] = new Array(HEIGHT * GRID_SCALE).fill(0)
+    }
+
+    const dataLen = data.times.length
+
+    const alliances = ['red', 'blue']
+    alliances.forEach((color) => {
+      data.alliances[color].forEach(({ team_key: teamKey, xs, ys }) => {
+        if (this.state.activeCount === 0 || this.state[teamKey]) {
+          for (let i = 0; i < dataLen; i++) {
+            const x = xs[i]
+            const y = ys[i]
+            if (x !== null && y !== null) {
+              grid[Math.floor(x * GRID_SCALE)][Math.floor(y * GRID_SCALE)] += 1
+            }
+          }
+        }
+      })
+    })
+
+    const xScale = this.ref.offsetWidth / WIDTH
+    const yScale = this.ref.offsetHeight / HEIGHT
+    const heatmapData = []
+    let max = 0
+    for (let x = 0; x < WIDTH * GRID_SCALE; x++) {
+      for (let y = 0; y < HEIGHT * GRID_SCALE; y++) {
+        const value = grid[x][y]
+        max = Math.max(max, value)
+        if (value > 0) {
+          heatmapData.push({
+            x: (x / GRID_SCALE) * xScale,
+            y: (y / GRID_SCALE) * yScale,
+            value,
+          })
+        }
+      }
+    }
+
+    this.heatmapInstance.setData({
+      min: 0,
+      max,
+      data: heatmapData,
     })
   }
 
   render() {
     const { data } = this.props
 
-    console.time('!')
-    const grid = new Array(WIDTH * GRID_SCALE)
-    for (let i = 0; i < WIDTH * GRID_SCALE; i++) {
-      grid[i] = new Array(HEIGHT * GRID_SCALE).fill(0)
-    }
-    console.timeEnd('!')
-
-    console.time('XX')
-    const dataLength = data.times.length
-    data.alliances.red.forEach((team) => {
-      if (this.state[team.team_key]) {
-        for (let i = 0; i < dataLength; i++) {
-          const x = team.xs[i]
-          const y = team.ys[i]
-          grid[Math.floor(x * GRID_SCALE)][Math.floor(y * GRID_SCALE)] += 1
-        }
-      }
-    })
-    data.alliances.blue.forEach((team) => {
-      if (this.state[team.team_key]) {
-        for (let i = 0; i < dataLength; i++) {
-          const x = team.xs[i]
-          const y = team.ys[i]
-          grid[Math.floor(x * GRID_SCALE)][Math.floor(y * GRID_SCALE)] += 1
-        }
-      }
-    })
-    console.timeEnd('XX')
-    console.log(grid)
-
-    console.time('A')
-    const svgGrid = []
-    for (let i = 0; i < WIDTH * GRID_SCALE; i++) {
-      for (let j = 0; j < HEIGHT * GRID_SCALE; j++) {
-        const value = (100 * grid[i][j]) / 10
-        if (value !== 0) {
-          svgGrid.push(
-            <rect
-              x={i * 0.5}
-              y={j * 0.5}
-              width="0.5"
-              height="0.5"
-              fill={createColor(100 - value)}
-              fillOpacity="0.5"
-            />
-          )
-        }
-      }
-    }
-    console.timeEnd('A')
-
     return (
       <div>
-        <svg
-          viewBox="0 0 54 27"
-          style={{
-            background: 'url(/images/2019_field.png) no-repeat center center',
-            backgroundSize: 'cover',
-          }}
-        >
-          <g>{svgGrid}</g>
-        </svg>
+        <div ref={(e) => (this.ref = e)}>
+          <svg
+            viewBox="0 0 54 27"
+            style={{
+              background: 'url(/images/2019_field.png) no-repeat center center',
+              backgroundSize: 'cover',
+            }}
+          />
+        </div>
 
         <div
           style={{
@@ -124,6 +121,9 @@ class HeatmapVisualizer extends React.Component {
                 style={{ backgroundColor: '#ffdddd' }}
                 onClick={() =>
                   this.setState((state) => ({
+                    activeCount: state[team.team_key]
+                      ? state.activeCount - 1
+                      : state.activeCount + 1,
                     [team.team_key]: !state[team.team_key],
                   }))
                 }
@@ -147,6 +147,9 @@ class HeatmapVisualizer extends React.Component {
                 style={{ backgroundColor: '#ddddff' }}
                 onClick={() =>
                   this.setState((state) => ({
+                    activeCount: state[team.team_key]
+                      ? state.activeCount - 1
+                      : state.activeCount + 1,
                     [team.team_key]: !state[team.team_key],
                   }))
                 }

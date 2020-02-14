@@ -21,24 +21,36 @@ class ZebraMotionWorksVisualizer extends React.Component {
     const { mode } = this.state
     return (
       <div>
-        <div className="btn-group pull-right" role="group">
-          <button
-            type="button"
-            className={`btn btn-secondary${mode === 'traj' ? ' active' : ''}`}
-            onClick={this.handleTrajectoryClick}
-          >
-            Trajectory
-          </button>
-          <button
-            type="buttons"
-            className={`btn btn-secondary${mode === 'heat' ? ' active' : ''}`}
-            onClick={this.handleHeatmapClick}
-          >
-            Heatmap
-          </button>
+        <div className="row">
+          <div className="col-xs-12">
+            <div className="btn-group pull-right" role="group">
+              <button
+                type="button"
+                className={`btn btn-secondary${
+                  mode === 'traj' ? ' active' : ''
+                }`}
+                onClick={this.handleTrajectoryClick}
+              >
+                Trajectory
+              </button>
+              <button
+                type="buttons"
+                className={`btn btn-secondary${
+                  mode === 'heat' ? ' active' : ''
+                }`}
+                onClick={this.handleHeatmapClick}
+              >
+                Heatmap
+              </button>
+            </div>
+          </div>
         </div>
-        {mode === 'traj' && <TrajectoryVisualizer data={data} />}
-        {mode === 'heat' && <HeatmapVisualizer data={data} />}
+        <div className="row">
+          <div className="col-xs-12">
+            {mode === 'traj' && <TrajectoryVisualizer data={data} />}
+            {mode === 'heat' && <HeatmapVisualizer data={data} />}
+          </div>
+        </div>
       </div>
     )
   }
