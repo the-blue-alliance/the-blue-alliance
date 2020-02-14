@@ -2,20 +2,27 @@ import firebase_admin
 import logging
 
 from consts.client_type import ClientType
+from consts.notification_type import NotificationType
 
 from google.appengine.ext import deferred
 
 from models.mobile_client import MobileClient
+from models.subscription import Subscription
 
 
 MAXIMUM_BACKOFF = 32
 
 
 def _firebase_app():
+    from firebase_admin import credentials
+    try:
+        creds = credentials.Certificate('service-account-key.json')
+    except:
+        creds = None
     try:
         return firebase_admin.get_app('tbans')
     except ValueError:
-        return firebase_admin.initialize_app(name='tbans')
+        return firebase_admin.initialize_app(creds, name='tbans')
 
 
 firebase_app = _firebase_app()
@@ -27,6 +34,40 @@ class TBANSHelper:
     Helper class for sending push notifications via the FCM HTTPv1 API and sending data payloads to webhooks
     """
 
+    """
+    Dispatch Awards notifications to users subscribed to Event or Team Award notifications.
+
+    Args:
+        event (models.event.Event): The Event to query Subscriptions for.
+        user_id (string): A user ID to only send notifications for - used ONLY for TBANS Admin testing.
+
+    Returns:
+        list (string): List of user IDs with Subscriptions to the given Event/notification type.
+    """
+    @classmethod
+    def awards(cls, event, user_id=None):
+        from models.notifications.awards import AwardsNotification
+        # Send to Event subscribers
+        if NotificationType.AWARDS in NotificationType.enabled_event_notifications:
+            users = [user_id] if user_id else []
+            if not users:
+                users = Subscription.users_subscribed_to_event(event, NotificationType.AWARDS)
+            if users:
+                cls._send(users, AwardsNotification(event))
+
+        # Send to Team subscribers
+        if NotificationType.AWARDS in NotificationType.enabled_team_notifications:
+            # Map all Teams to their Awards so we can populate our Awards notification with more specific info
+            team_awards = event.team_awards()
+            for team_key in team_awards.keys():
+                team = team_key.get()
+
+                users = [user_id] if user_id else []
+                if not users:
+                    users = Subscription.users_subscribed_to_team(team, NotificationType.AWARDS)
+                if users:
+                    cls._send(users, AwardsNotification(event, team))
+
     @classmethod
     def broadcast(cls, client_types, title, message, url=None, app_version=None):
         from models.notifications.broadcast import BroadcastNotification
@@ -37,34 +78,50 @@ class TBANSHelper:
         if fcm_client_types:
             clients = MobileClient.query(MobileClient.client_type.IN(fcm_client_types)).fetch()
             if clients:
-                deferred.defer(
-                    cls._send_fcm,
-                    clients,
-                    notification,
-                    _queue="push-notifications",
-                    _url='/_ah/queue/deferred_notification_send'
-                )
+                cls._defer_fcm(clients, notification)
 
         # Send to webhooks
         if ClientType.WEBHOOK in client_types:
             clients = MobileClient.query(MobileClient.client_type == ClientType.WEBHOOK).fetch()
             if clients:
-                deferred.defer(
-                    cls._send_webhook,
-                    clients,
-                    notification,
-                    _queue="push-notifications",
-                    _url='/_ah/queue/deferred_notification_send'
-                )
+                cls._defer_webhook(clients, notification)
 
         if ClientType.OS_ANDROID in client_types:
+            clients = MobileClient.query(MobileClient.client_type == ClientType.OS_ANDROID).fetch()
             from helpers.push_helper import PushHelper
-            users = PushHelper.get_all_mobile_clients([ClientType.OS_ANDROID])
-            keys = PushHelper.get_client_ids_for_users(users)
+            keys = PushHelper.get_client_ids_for_clients(clients)
 
             from notifications.broadcast import BroadcastNotification
             notification = BroadcastNotification(title, message, url, app_version)
             notification.send(keys)
+
+    @classmethod
+    def match_score(cls, match, user_id=None):
+        from models.notifications.match_score import MatchScoreNotification
+        # Send to Event subscribers
+        if NotificationType.MATCH_SCORE in NotificationType.enabled_event_notifications:
+            users = [user_id] if user_id else []
+            if not users:
+                users = Subscription.users_subscribed_to_event(match.event.get(), NotificationType.MATCH_SCORE)
+            if users:
+                cls._send(users, MatchScoreNotification(match))
+
+        # Send to Team subscribers
+        if NotificationType.MATCH_SCORE in NotificationType.enabled_team_notifications:
+            for team_key in match.team_keys:
+                users = [user_id] if user_id else []
+                if not users:
+                    users = Subscription.users_subscribed_to_team(team_key.get(), NotificationType.MATCH_SCORE)
+                if users:
+                    cls._send(users, MatchScoreNotification(match, team_key.get()))
+
+        # Send to Match subscribers
+        if NotificationType.MATCH_SCORE in NotificationType.enabled_match_notifications:
+            users = [user_id] if user_id else []
+            if not users:
+                users = Subscription.users_subscribed_to_match(match, NotificationType.MATCH_SCORE)
+            if users:
+                cls._send(users, MatchScoreNotification(match))
 
     @staticmethod
     def ping(client):
@@ -130,6 +187,38 @@ class TBANSHelper:
         logging.info('Verification Key - {}'.format(notification.verification_key))
 
         return notification.verification_key
+
+    @classmethod
+    def _send(cls, users, notification):
+        # Send to FCM clients
+        fcm_clients = MobileClient.clients(users, client_types=ClientType.FCM_CLIENTS)
+        if fcm_clients:
+            cls._defer_fcm(fcm_clients, notification)
+
+        # Send to webhooks
+        webhook_clients = MobileClient.clients(users, client_types=[ClientType.WEBHOOK])
+        if webhook_clients:
+            cls._defer_webhook(webhook_clients, notification)
+
+    @classmethod
+    def _defer_fcm(cls, clients, notification):
+        deferred.defer(
+            cls._send_fcm,
+            clients,
+            notification,
+            _queue="push-notifications",
+            _url='/_ah/queue/deferred_notification_send'
+        )
+
+    @classmethod
+    def _defer_webhook(cls, clients, notification):
+        deferred.defer(
+            cls._send_webhook,
+            clients,
+            notification,
+            _queue="push-notifications",
+            _url='/_ah/queue/deferred_notification_send'
+        )
 
     @classmethod
     def _send_fcm(cls, clients, notification, backoff_iteration=0):

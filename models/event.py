@@ -558,3 +558,13 @@ class Event(ndb.Model):
             return recent_matches[0]
         else:
             return None
+
+    def team_awards(self):
+        # Returns a dictionary of awards for teams
+        team_awards = {}  # Key is a Team key, value is an array of Awards that team won
+        for award in self.awards:
+            for team_key in award.team_list:
+                a = team_awards.get(team_key, [])
+                a.append(award)
+                team_awards[team_key] = a
+        return team_awards

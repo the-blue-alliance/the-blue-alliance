@@ -113,26 +113,20 @@ class PushHelper(object):
 
     @classmethod
     def get_client_ids_for_users(cls, user_list, os_types=None):
-        output = defaultdict(list)
         if not user_list:
-            return output
+            return defaultdict(list)
 
         if os_types is None:
             os_types = ClientType.names.keys()
         clients = MobileClient.query(MobileClient.user_id.IN(user_list), MobileClient.client_type.IN(os_types), MobileClient.verified == True).fetch()
+        return cls.get_client_ids_for_clients(clients)
+
+    @classmethod
+    def get_client_ids_for_clients(cls, clients):
+        output = defaultdict(list)
         for client in clients:
             if client.client_type == ClientType.WEBHOOK:
                 output[client.client_type].append((client.messaging_id, client.secret))
             else:
                 output[client.client_type].append(client.messaging_id)
-        return output
-
-    @classmethod
-    def get_all_mobile_clients(cls, client_types=[]):
-        output = []
-        if client_types == []:
-            return output
-        clients = MobileClient.query(MobileClient.client_type.IN(client_types))
-        for user in clients:
-            output.append(user.user_id)
         return output

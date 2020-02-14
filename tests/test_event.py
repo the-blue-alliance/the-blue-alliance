@@ -4,9 +4,14 @@ import unittest2
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
+from consts.award_type import AwardType
 from consts.event_type import EventType
 from helpers.event.event_test_creator import EventTestCreator
+from models.award import Award
 from models.event import Event
+from models.team import Team
+
+from mocks.models.mock_event import MockEvent
 
 
 class TestEvent(unittest2.TestCase):
@@ -148,17 +153,46 @@ class TestEvent(unittest2.TestCase):
             else:
                 self.assertTrue(event.is_offseason)
 
+    def test_team_awards_none(self):
+        self.assertEqual(self.event_ends_today.team_awards(), {})
 
-class MockEvent(Event):
+    def test_team_awards(self):
+        # Insert some Teams
+        frc1 = Team(
+            id='frc1',
+            team_number=1
+        )
+        frc1.put()
+        frc2 = Team(
+            id='frc2',
+            team_number=2
+        )
+        frc2.put()
+        frc3 = Team(
+            id='frc3',
+            team_number=3
+        )
+        frc3.put()
+        # Insert some Awards for some Teams
+        award = Award(
+            id=Award.render_key_name(self.event_ends_today.key_name, AwardType.INDUSTRIAL_DESIGN),
+            name_str='Industrial Design Award sponsored by General Motors',
+            award_type_enum=AwardType.INDUSTRIAL_DESIGN,
+            event=self.event_ends_today.key,
+            event_type_enum=EventType.REGIONAL,
+            team_list=[ndb.Key(Team, 'frc1')],
+            year=2020
+        )
+        award.put()
+        winner_award = Award(
+            id=Award.render_key_name(self.event_ends_today.key_name, AwardType.WINNER),
+            name_str='Regional Event Winner',
+            award_type_enum=AwardType.WINNER,
+            event=self.event_ends_today.key,
+            event_type_enum=EventType.REGIONAL,
+            team_list=[ndb.Key(Team, 'frc2'), ndb.Key(Team, 'frc1')],
+            year=2020
+        )
+        winner_award.put()
 
-    def __init__(self, week, year):
-        self._week = week
-        self._year = year
-
-    @property
-    def week(self):
-        return self._week
-
-    @property
-    def year(self):
-        return self._year
+        self.assertItemsEqual(self.event_ends_today.team_awards().keys(), [frc1.key, frc2.key])

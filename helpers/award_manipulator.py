@@ -6,6 +6,7 @@ from google.appengine.api import taskqueue
 from helpers.cache_clearer import CacheClearer
 from helpers.manipulator_base import ManipulatorBase
 from helpers.notification_helper import NotificationHelper
+from helpers.tbans_helper import TBANSHelper
 
 
 class AwardManipulator(ManipulatorBase):
@@ -33,6 +34,11 @@ class AwardManipulator(ManipulatorBase):
                     NotificationHelper.send_award_update(event.get())
                 except Exception:
                     logging.error("Error sending award update for {}".format(event.id()))
+                try:
+                    TBANSHelper.awards(event.get())
+                except Exception, exception:
+                    logging.error("Error sending {} award updates: {}".format(event.id(), exception))
+                    logging.error(traceback.format_exc())
 
         # Enqueue task to calculate district points
         for event in events:

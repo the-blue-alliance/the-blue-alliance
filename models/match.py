@@ -149,8 +149,8 @@ class Match(ndb.Model):
         if self._score_breakdown is None and self.score_breakdown_json is not None:
             self._score_breakdown = json.loads(self.score_breakdown_json)
 
-            # Add in RP calculations
             if self.has_been_played:
+                # Add in RP calculations
                 if self.year in {2016, 2017}:
                     for color in ['red', 'blue']:
                         if self.comp_level == 'qm':
@@ -173,6 +173,10 @@ class Match(ndb.Model):
                             self._score_breakdown[color]['tba_rpEarned'] = rp_earned
                         else:
                             self._score_breakdown[color]['tba_rpEarned'] = None
+                # Derive if bonus RP came from fouls
+                if self.year == 2020:
+                    for color in ['red', 'blue']:
+                        self._score_breakdown[color]['tba_shieldEnergizedRankingPointFromFoul'] = self._score_breakdown[color]['shieldEnergizedRankingPoint'] and not self._score_breakdown[color]['stage3Activated']
 
         return self._score_breakdown
 

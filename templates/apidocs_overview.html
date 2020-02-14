@@ -44,7 +44,7 @@
       <p>You will also need to be familiar with <a href="https://en.wikipedia.org/wiki/Json">JSON</a>, a machine-readable format for sending and receiving data. Most of the TBA APIs use JSON-formatted data, so you should find out how to parse JSON text in the language of your choice.</p>
       <p>Once you've figured out how to make HTTPS requests, you will need to figure out how to manipulate request and response headers. These will be used to pass authentication keys to TBA and understand the cache life of returned data.</p>
 
-      <h2 id="apiv3">Read API (v3)</h2>
+      <a href="/apidocs/v3"><h2 id="apiv3">Read API (v3)</h2></a>
       <p>Most people want to pull event listings, team information, match results, or statistics from The Blue Alliance to use in their own application. The read API is the way to do this. This API exposes almost all of the data you see on TBA to your application in a machine-readable format called JSON.</p>
       <p>To get started using APIv3, you first need to generate an access token on your <a href="/account">Account Dashboard</a> in the Read API Keys section. This key needs to be passed along with each request you make in the header (or URL parameter) <code>X-TBA-Auth-Key</code>. If you are logged in to your TBA account, you can access the API without a key by simply navigating to an API URL in your web browser. All requests should be made to the base URL <code>https://www.thebluealliance.com/api/v3</code>.</p>
       <p>To see complete details of data accessible via APIv3, please see the <a href="/apidocs/v3">APIv3 full documentation</a>.</p>
@@ -64,19 +64,19 @@
       <h3>Client Libraries</h3>
       <p>The Blue Alliance automatically builds and publishes client libraries to make it easier for you to get started using APIv3. The libraries are automatically generated  by <a href="http://swagger.io/swagger-codegen/">Swagger Codegen</a> and are not provided with any guarantee of support from The Blue Alliance and are not guaranteed to be complete implementations of the API. They are merely provided as a convenience to developers looking to get started and can be found <a href="https://github.com/TBA-API">on the TBA-API GitHub</a></p>
 
-      <h2 id="apiv2">Read API (v2) - Deprecated</h2>
+      <a href="/apidocs/v2"><h2 id="apiv2">Read API (v2) - Deprecated</h2></a>
       <p>The Blue Alliance also provides continued access to our version 2 read API. The v2 API is deprecated and will be shut down on January 1, 2018.</p>
       <p>All API users are strongly encouraged to use the v3 API which provides more information than is available in our v2 API.</p>
       <p><a href="/apidocs/v2">Legacy documentation on v2</a> is still available.</p>
 
-      <h2 id="webhooks">Webhooks</h2>
+      <a href="/apidocs/webhooks"><h2 id="webhooks">Webhooks</h2></a>
       <p>The TBA API also includes support for <a href="https://en.wikipedia.org/wiki/Webhook">webhooks</a>, or HTTP callbacks. When an item of interest changes, TBA can send a HTTP request to your server, allowing your application to react instantly to the change. This can save both your client and our server time and processing power, as it can reduce the need to poll the API. See <a href="/apidocs/webhooks">this page</a> for more documentation on webhooks.
 
-      <h2 id="trusted">Write API (v1)</h2>
+      <a href="/apidocs/trusted"><h2 id="trusted">Write API (v1)</h2></a>
       <p>The Blue Alliance provides a Write API, called the Trusted API, which allows users to import data to The Blue Alliance for archival. For example, many offseason events use the Trusted API to provide real-time match results to their audience. To get started, you need to <a href="request/apiwrite/">request access tokens</a> for your desired event. These need to be used when constructing each request.</p>
       <p>To see the complete specification of the trusted API, refer to the <a href="/apidocs/trusted">full documentation</a>.</p>
 
-      <h2 id="archives">Data Archives</h2>
+      <a href="https://github.com/the-blue-alliance/the-blue-alliance-data"><h2 id="archives">Data Archives</h2></a>
       <p>If you're looking to run SQL queries over the TBA database, you can use this <a href="/bigquery">BigQuery</a> dataset. This contains a full replica of the TBA database, so the possibilities are endless!</p>
       <p>If these APIs are too complex for your application, The Blue Alliance also provides periodic data archives in comma separated value (CSV) format. The data provided here is less detailed, but is simpler to use in Excel spreadsheets, for example.</p>
       <p>You can find these data archives <a href="https://github.com/the-blue-alliance/the-blue-alliance-data">on the-blue-alliance/the-blue-alliance-data GitHub</a>.</p>

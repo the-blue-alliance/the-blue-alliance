@@ -49,6 +49,10 @@
             <td><textarea class="form-control" type="text" name="alliances_json" rows="6" cols="60">{{match.alliances_json}}</textarea></td>
         </tr>
         <tr>
+            <td>Score Breakdown JSON</td>
+            <td><textarea class="form-control" type="text" name="score_breakdown_json" rows="6" cols="60">{{match.score_breakdown_json}}</textarea></td>
+        </tr>
+        <tr>
             <td>TBA Videos</td>
             <td><textarea class="form-control" type="text" name="tba_videos" rows="6" cols="60">[{% for video in match.tba_videos %}"{{video}}"{% if not forloop.last %},{% endif %}{% endfor %}]</textarea></td>
         </tr>        <tr>
