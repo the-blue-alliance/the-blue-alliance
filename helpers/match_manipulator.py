@@ -81,6 +81,11 @@ class MatchManipulator(ManipulatorBase):
                 NotificationHelper.send_schedule_update(event)
             except Exception, exception:
                 logging.error("Eror sending schedule updates for: {}".format(event.key_name))
+            try:
+                TBANSHelper.event_schedule(event)
+            except Exception, exception:
+                logging.error("Eror sending schedule updates for: {}".format(event.key_name))
+                logging.error(traceback.format_exc())
 
         '''
         Enqueue firebase push

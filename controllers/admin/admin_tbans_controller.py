@@ -35,6 +35,16 @@ class AdminTBANS(LoggedInHandler):
                 return self.redirect('/admin/tbans')
 
             TBANSHelper.awards(event, user_id)
+        elif notification_type == "event_schedule":
+            event_key = self.request.get('event_key')
+            event = Event.get_by_id(event_key)
+            if not event:
+                self.template_values.update({
+                    'error': 'No event for key {}'.format(event_key)
+                })
+                return self.redirect('/admin/tbans')
+
+            TBANSHelper.event_schedule(event, user_id)
         elif notification_type == "match_score":
             match_key = self.request.get('match_key')
             match = Match.get_by_id(match_key)

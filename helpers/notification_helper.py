@@ -107,7 +107,7 @@ class NotificationHelper(object):
     @classmethod
     def send_schedule_update(cls, event):
         users = Subscription.users_subscribed_to_event(event, NotificationType.SCHEDULE_UPDATED)
-        keys = PushHelper.get_client_ids_for_users(users)
+        keys = PushHelper.get_client_ids_for_users(users, os_types=[ClientType.OS_ANDROID])
 
         notification = ScheduleUpdatedNotification(event)
         notification.send(keys)
