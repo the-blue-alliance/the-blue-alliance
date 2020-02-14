@@ -25,7 +25,17 @@ class AdminTBANS(LoggedInHandler):
         user_id = self.user_bundle.account.key.id()
 
         notification_type = self.request.get('type')
-        if notification_type == "awards":
+        if notification_type == "alliance_selection":
+            event_key = self.request.get('event_key')
+            event = Event.get_by_id(event_key)
+            if not event:
+                self.template_values.update({
+                    'error': 'No event for key {}'.format(event_key)
+                })
+                return self.redirect('/admin/tbans')
+
+            TBANSHelper.alliance_selection(event, user_id)
+        elif notification_type == "awards":
             event_key = self.request.get('event_key')
             event = Event.get_by_id(event_key)
             if not event:

@@ -6,6 +6,7 @@ from consts.notification_type import NotificationType
 
 from google.appengine.ext import deferred
 
+from models.team import Team
 from models.mobile_client import MobileClient
 from models.subscription import Subscription
 
@@ -33,6 +34,31 @@ class TBANSHelper:
     """
     Helper class for sending push notifications via the FCM HTTPv1 API and sending data payloads to webhooks
     """
+
+    @classmethod
+    def alliance_selection(cls, event, user_id=None):
+        from models.notifications.alliance_selection import AllianceSelectionNotification
+        # Send to Event subscribers
+        if NotificationType.ALLIANCE_SELECTION in NotificationType.enabled_event_notifications:
+            users = [user_id] if user_id else []
+            if not users:
+                users = Subscription.users_subscribed_to_event(event, NotificationType.ALLIANCE_SELECTION)
+            if users:
+                cls._send(users, AllianceSelectionNotification(event))
+
+        # Send to Team subscribers
+        if NotificationType.ALLIANCE_SELECTION in NotificationType.enabled_team_notifications:
+            for team_key in event.alliance_teams:
+                try:
+                    team = Team.get_by_id(team_key)
+                except:
+                    continue
+
+                users = [user_id] if user_id else []
+                if not users:
+                    users = Subscription.users_subscribed_to_team(team, NotificationType.ALLIANCE_SELECTION)
+                if users:
+                    cls._send(users, AllianceSelectionNotification(event, team))
 
     """
     Dispatch Awards notifications to users subscribed to Event or Team Award notifications.
