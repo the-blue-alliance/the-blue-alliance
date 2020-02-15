@@ -27,14 +27,17 @@ class EventDetailsManipulator(ManipulatorBase):
         """
         for (event_details, updated_attrs) in zip(event_details_list, updated_attr_list):
             event = Event.get_by_id(event_details.key.id())
-            try:
-                if event.within_a_day and "alliance_selections" in updated_attrs:
-                    # Send updated alliances notification
-                    logging.info("Sending alliance notifications for {}".format(event.key_name))
+            if event.within_a_day and "alliance_selections" in updated_attrs:
+                try:
                     NotificationHelper.send_alliance_update(event)
-            except Exception:
-                logging.error("Error sending alliance update notification for {}".format(event.key_name))
-                logging.error(traceback.format_exc())
+                except Exception:
+                    logging.error("Error sending alliance update notification for {}".format(event.key_name))
+                    logging.error(traceback.format_exc())
+                try:
+                    TBANSHelper.alliance_selection(event)
+                except Exception:
+                    logging.error("Error sending alliance update notification for {}".format(event.key_name))
+                    logging.error(traceback.format_exc())
 
             # Enqueue task to calculate district points
             try:

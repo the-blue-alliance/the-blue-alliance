@@ -115,7 +115,7 @@ class NotificationHelper(object):
     @classmethod
     def send_alliance_update(cls, event):
         users = PushHelper.get_users_subscribed_for_alliances(event, NotificationType.ALLIANCE_SELECTION)
-        keys = PushHelper.get_client_ids_for_users(users)
+        keys = PushHelper.get_client_ids_for_users(users, os_types=[ClientType.OS_ANDROID])
 
         notification = AllianceSelectionNotification(event)
         notification.send(keys)

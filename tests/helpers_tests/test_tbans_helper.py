@@ -20,10 +20,13 @@ from helpers.event.event_test_creator import EventTestCreator
 from helpers.tbans_helper import TBANSHelper, _firebase_app
 from models.account import Account
 from models.award import Award
+from models.event import Event
+from models.event_details import EventDetails
 from models.match import Match
 from models.team import Team
 from models.mobile_client import MobileClient
 from models.subscription import Subscription
+from models.notifications.alliance_selection import AllianceSelectionNotification
 from models.notifications.awards import AwardsNotification
 from models.notifications.broadcast import BroadcastNotification
 from models.notifications.event_schedule import EventScheduleNotification
@@ -82,6 +85,70 @@ class TestTBANSHelper(unittest2.TestCase):
         self.assertEqual(app_two.name, 'tbans')
         # Should be the same object
         self.assertEqual(app_one, app_two)
+
+    def test_alliance_selection_no_users(self):
+        # Test send not called with no subscribed users
+        with patch.object(TBANSHelper, '_send') as mock_send:
+            TBANSHelper.alliance_selection(self.event)
+            mock_send.assert_not_called()
+
+    def test_alliance_selection_user_id(self):
+        # Test send called with user id
+        with patch.object(TBANSHelper, '_send') as mock_send:
+            TBANSHelper.alliance_selection(self.event, 'user_id')
+            mock_send.assert_called_once()
+            user_id = mock_send.call_args[0][0]
+            self.assertEqual(user_id, ['user_id'])
+
+    def test_alliance_selection(self):
+        # Insert a Subscription for this Event and these Teams so we call to send
+        Subscription(
+            parent=ndb.Key(Account, 'user_id_1'),
+            user_id='user_id_1',
+            model_key='frc1',
+            model_type=ModelType.TEAM,
+            notification_types=[NotificationType.ALLIANCE_SELECTION]
+        ).put()
+        Subscription(
+            parent=ndb.Key(Account, 'user_id_2'),
+            user_id='user_id_2',
+            model_key='frc7332',
+            model_type=ModelType.TEAM,
+            notification_types=[NotificationType.ALLIANCE_SELECTION]
+        ).put()
+        Subscription(
+            parent=ndb.Key(Account, 'user_id_3'),
+            user_id='user_id_3',
+            model_key=self.event.key_name,
+            model_type=ModelType.EVENT,
+            notification_types=[NotificationType.ALLIANCE_SELECTION]
+        ).put()
+
+        # Insert EventDetails for the event with alliance selection information
+        EventDetails(
+            id=self.event.key_name,
+            alliance_selections=[
+                {"declines": [], "picks": ["frc7332"]}
+            ]
+        ).put()
+
+        with patch.object(TBANSHelper, '_send') as mock_send:
+            TBANSHelper.alliance_selection(self.event)
+            # Two calls total - First to the Event, second to frc7332, no call for frc1
+            mock_send.assert_called()
+            self.assertEqual(len(mock_send.call_args_list), 2)
+            self.assertEqual([x[0] for x in [call[0][0] for call in mock_send.call_args_list]], ['user_id_3', 'user_id_2'])
+            notifications = [call[0][1] for call in mock_send.call_args_list]
+            for notification in notifications:
+                self.assertTrue(isinstance(notification, AllianceSelectionNotification))
+            # Check Event notification
+            event_notification = notifications[0]
+            self.assertEqual(event_notification.event, self.event)
+            self.assertIsNone(event_notification.team)
+            # Check frc7332 notification
+            team_notification = notifications[1]
+            self.assertEqual(team_notification.event, self.event)
+            self.assertEqual(team_notification.team, self.team)
 
     def test_awards_no_users(self):
         # Test send not called with no subscribed users
