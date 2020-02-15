@@ -288,9 +288,9 @@
     <!-- Fouls & Adjustments -->
     {% if "foulCount" in match.score_breakdown.red %}
     <tr>
-      <td class="red" colspan="2">+{%if match.score_breakdown.red.foulCount%}{{match.score_breakdown.red.foulCount * 3}}{%else%}0{%endif%} / +{%if match.score_breakdown.red.techFoulCount%}{{match.score_breakdown.red.techFoulCount * 15}}{%else%}0{%endif%}{% if match.score_breakdown.red.tba_shieldEnergizedRankingPointFromFoul %} / +1 RP{% endif %}</td>
+      <td class="red" colspan="2">+{%if match.score_breakdown.blue.foulCount%}{{match.score_breakdown.blue.foulCount * 3}}{%else%}0{%endif%} / +{%if match.score_breakdown.blue.techFoulCount%}{{match.score_breakdown.blue.techFoulCount * 15}}{%else%}0{%endif%}{% if match.score_breakdown.red.tba_shieldEnergizedRankingPointFromFoul %} / +1 RP{% endif %}</td>
       <td>Fouls / Tech Fouls</td>
-      <td class="blue" colspan="2">+{%if match.score_breakdown.blue.foulCount%}{{match.score_breakdown.blue.foulCount * 3}}{%else%}0{%endif%} / +{%if match.score_breakdown.blue.techFoulCount%}{{match.score_breakdown.blue.techFoulCount * 15}}{%else%}0{%endif%}{% if match.score_breakdown.blue.tba_shieldEnergizedRankingPointFromFoul %} / +1 RP{% endif %}</td>
+      <td class="blue" colspan="2">+{%if match.score_breakdown.red.foulCount%}{{match.score_breakdown.red.foulCount * 3}}{%else%}0{%endif%} / +{%if match.score_breakdown.red.techFoulCount%}{{match.score_breakdown.red.techFoulCount * 15}}{%else%}0{%endif%}{% if match.score_breakdown.blue.tba_shieldEnergizedRankingPointFromFoul %} / +1 RP{% endif %}</td>
     </tr>
     {% endif %}
     {% if "adjustPoints" in match.score_breakdown.red %}
