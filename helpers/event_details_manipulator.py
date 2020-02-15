@@ -7,6 +7,7 @@ from helpers.cache_clearer import CacheClearer
 from helpers.firebase.firebase_pusher import FirebasePusher
 from helpers.manipulator_base import ManipulatorBase
 from helpers.notification_helper import NotificationHelper
+from helpers.tbans_helper import TBANSHelper
 
 from models.event import Event
 from helpers.manipulator_base import ManipulatorBase
