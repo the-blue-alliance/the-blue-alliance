@@ -139,8 +139,8 @@ class NotificationHelper(object):
         event_users = set(Subscription.users_subscribed_to_event(match.event.get(), NotificationType.MATCH_VIDEO))
         users = match_users.union(event_users)
         if match.within_seconds(60*10):
-            user_keys = PushHelper.get_client_ids_for_users(users)
+            user_keys = PushHelper.get_client_ids_for_users(users, os_types=[ClientType.OS_ANDROID])
             MatchVideoNotification(match).send(user_keys)
         else:
-            user_keys = PushHelper.get_client_ids_for_users(users)
+            user_keys = PushHelper.get_client_ids_for_users(users, os_types=[ClientType.OS_ANDROID])
             EventMatchVideoNotification(match).send(user_keys)

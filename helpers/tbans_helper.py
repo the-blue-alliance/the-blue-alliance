@@ -160,6 +160,34 @@ class TBANSHelper:
             if users:
                 cls._send(users, MatchScoreNotification(match))
 
+    @classmethod
+    def match_video(cls, match, user_id=None):
+        from models.notifications.match_video import MatchVideoNotification
+        # Send to Event subscribers
+        if NotificationType.MATCH_VIDEO in NotificationType.enabled_event_notifications:
+            users = [user_id] if user_id else []
+            if not users:
+                users = Subscription.users_subscribed_to_event(match.event.get(), NotificationType.MATCH_VIDEO)
+            if users:
+                cls._send(users, MatchVideoNotification(match))
+
+        # Send to Team subscribers
+        if NotificationType.MATCH_VIDEO in NotificationType.enabled_team_notifications:
+            for team_key in match.team_keys:
+                users = [user_id] if user_id else []
+                if not users:
+                    users = Subscription.users_subscribed_to_team(team_key.get(), NotificationType.MATCH_VIDEO)
+                if users:
+                    cls._send(users, MatchVideoNotification(match, team_key.get()))
+
+        # Send to Match subscribers
+        if NotificationType.MATCH_VIDEO in NotificationType.enabled_match_notifications:
+            users = [user_id] if user_id else []
+            if not users:
+                users = Subscription.users_subscribed_to_match(match, NotificationType.MATCH_VIDEO)
+            if users:
+                cls._send(users, MatchVideoNotification(match))
+
     @staticmethod
     def ping(client):
         """ Immediately dispatch a Ping to either FCM or a webhook """
