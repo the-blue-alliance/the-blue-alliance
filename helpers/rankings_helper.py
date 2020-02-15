@@ -6,6 +6,7 @@ from models.event_details import EventDetails
 
 class RankingsHelper(object):
     SORT_ORDERS = {
+        2020: [2, 3, 4, 5, 6],
         2019: [2, 3, 4, 5, 6],
         2018: [2, 3, 4, 5, 6],
         2017: [2, 3, 4, 5, 6, 7],
@@ -22,6 +23,15 @@ class RankingsHelper(object):
     }
 
     SORT_ORDER_INFO = {
+        2020: [
+            {'name': 'Ranking Score',
+             'precision': 2},
+            {'name': 'Auto',
+             'precision': 0},
+            {'name': 'End Game',
+             'precision': 0},
+            {'name': 'Teleop Cell + CPanel',
+             'precision': 0}],
         2019: [
             {'name': 'Ranking Score',
              'precision': 2},
