@@ -19,6 +19,14 @@ class EventLevelNotification(Notification):
     def fcm_notification(self):
         if self.match.time:
             time = self.match.time.strftime("%H:%M")
+            # Add timezone, if possible
+            if self.event.timezone_id:
+                try:
+                    import pytz
+                    timezone = pytz.timezone(self.event.timezone_id)
+                    time += timezone.localize(self.match.time).strftime(" %Z")
+                except Exception, e:
+                    logging.warning('Unable to add timezone to event level notification: {}'.format(e))
             ending = 'scheduled for {}.'.format(time)
         else:
             ending = 'starting.'
@@ -26,25 +34,20 @@ class EventLevelNotification(Notification):
         from firebase_admin import messaging
         return messaging.Notification(
             title='{} {} Matches Starting'.format(self.event.event_short.upper(), self.match.full_name),
-            body='{}: {} Matches are {}'.format(self.event.normalized_name, self.match.full_name, ending)
+            body='{} matches at the {} are {}'.format(self.match.full_name, self.event.normalized_name, ending)
         )
 
     @property
     def data_payload(self):
-        payload = {
+        return {
             'comp_level': self.match.comp_level,
             'event_key': self.event.key_name
         }
-
-        if self.match.time:
-            payload['scheduled_time'] = calendar.timegm(self.match.time.utctimetuple())
-        else:
-            payload['scheduled_time'] = None
-
-        return payload
 
     @property
     def webhook_message_data(self):
         payload = self.data_payload
         payload['event_name'] = self.event.name
+        if self.match.time:
+            payload['scheduled_time'] = calendar.timegm(self.match.time.utctimetuple())
         return payload

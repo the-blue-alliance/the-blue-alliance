@@ -55,12 +55,12 @@ class NotificationHelper(object):
     @classmethod
     def send_upcoming_match_notification(cls, match, event):
         users = PushHelper.get_users_subscribed_to_match(match, NotificationType.UPCOMING_MATCH)
-        keys = PushHelper.get_client_ids_for_users(users)
+        keys = PushHelper.get_client_ids_for_users(users, os_types=[ClientType.OS_ANDROID])
 
         if match.set_number == 1 and match.match_number == 1:
             # First match of a new type, send level starting notifications
             start_users = PushHelper.get_users_subscribed_to_match(match, NotificationType.LEVEL_STARTING)
-            start_keys = PushHelper.get_client_ids_for_users(start_users)
+            start_keys = PushHelper.get_client_ids_for_users(start_users, os_types=[ClientType.OS_ANDROID])
             level_start = CompLevelStartingNotification(match, event)
             level_start.send(start_keys)
 
