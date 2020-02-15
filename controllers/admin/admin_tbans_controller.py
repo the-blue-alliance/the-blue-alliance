@@ -46,15 +46,15 @@ class AdminTBANS(LoggedInHandler):
 
             TBANSHelper.awards(event, user_id)
         elif notification_type == "event_level":
-            event_key = self.request.get('event_key')
-            event = Event.get_by_id(event_key)
-            if not event:
+            match_key = self.request.get('match_key')
+            match = Match.get_by_id(match_key)
+            if not match:
                 self.template_values.update({
-                    'error': 'No event for key {}'.format(event_key)
+                    'error': 'No match for key {}'.format(match_key)
                 })
                 return self.redirect('/admin/tbans')
 
-            TBANSHelper.event_level(event, user_id)
+            TBANSHelper.event_level(match, user_id)
         elif notification_type == "event_schedule":
             event_key = self.request.get('event_key')
             event = Event.get_by_id(event_key)
@@ -75,6 +75,16 @@ class AdminTBANS(LoggedInHandler):
                 return self.redirect('/admin/tbans')
 
             TBANSHelper.match_score(match, user_id)
+        elif notification_type == "match_upcoming":
+            match_key = self.request.get('match_key')
+            match = Match.get_by_id(match_key)
+            if not match:
+                self.template_values.update({
+                    'error': 'No match for key {}'.format(match_key)
+                })
+                return self.redirect('/admin/tbans')
+
+            TBANSHelper.match_upcoming(match, user_id)
         elif notification_type == "match_video":
             match_key = self.request.get('match_key')
             match = Match.get_by_id(match_key)
