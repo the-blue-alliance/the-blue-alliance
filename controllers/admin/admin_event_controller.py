@@ -594,6 +594,7 @@ class AdminEventEdit(LoggedInHandler):
             short_name=self.request.get("short_name"),
             start_date=start_date,
             website=website,
+            first_eid=self.request.get("first_eid"),
             year=int(self.request.get("year")),
             official={"true": True, "false": False}.get(self.request.get("official").lower()),
             enable_predictions={"true": True, "false": False}.get(self.request.get("enable_predictions").lower()),
