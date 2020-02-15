@@ -148,6 +148,13 @@ indexes:
   - name: notification_types
   - name: model_key
 
+- kind: Subscription
+  properties:
+  - name: model_key
+  - name: model_type
+  - name: notification_types
+  - name: user_id
+
 - kind: TeamAdminAccess
   properties:
   - name: account
