@@ -5,9 +5,10 @@ from models.notifications.notification import Notification
 
 class MatchUpcomingNotification(Notification):
 
-    def __init__(self, match):
+    def __init__(self, match, team=None):
         self.match = match
         self.event = match.event.get()
+        self.team = team
 
     @classmethod
     def _type(cls):
@@ -38,24 +39,10 @@ class MatchUpcomingNotification(Notification):
         payload = {
             'event_key': self.event.key_name,
             'match_key': self.match.key_name,
-            'team_keys': self.match.team_key_names
         }
 
-        if self.match.time:
-            payload['scheduled_time'] = calendar.timegm(self.match.time.utctimetuple())
-        else:
-            payload['scheduled_time'] = None
-
-        if self.match.predicted_time:
-            payload['predicted_time'] = calendar.timegm(self.match.predicted_time.utctimetuple())
-        else:
-            payload['predicted_time'] = None
-
-        online_webcasts = self.event.online_webcasts
-        if online_webcasts:
-            payload['webcast'] = online_webcasts[0]
-        else:
-            payload['webcast'] = None
+        if self.team:
+            payload['team_key'] = self.team.key_name
 
         return payload
 
@@ -63,4 +50,16 @@ class MatchUpcomingNotification(Notification):
     def webhook_message_data(self):
         payload = self.data_payload
         payload['event_name'] = self.event.name
+        payload['team_keys'] = self.match.team_key_names
+
+        if self.match.time:
+            payload['scheduled_time'] = calendar.timegm(self.match.time.utctimetuple())
+
+        if self.match.predicted_time:
+            payload['predicted_time'] = calendar.timegm(self.match.predicted_time.utctimetuple())
+
+        online_webcasts = self.event.online_webcasts
+        if online_webcasts:
+            payload['webcast'] = online_webcasts[0]
+
         return payload

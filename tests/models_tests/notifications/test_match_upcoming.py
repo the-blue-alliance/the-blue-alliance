@@ -107,224 +107,100 @@ class TestMatchUpcomingNotification(unittest2.TestCase):
         self.notification.match.predicted_time = datetime(2017, 11, 28, 13, 30, 59)
         self.notification.match.time = datetime(2017, 11, 28, 13, 00, 59)
 
-        # No `event_name`
         payload = self.notification.data_payload
-        self.assertEqual(len(payload), 6)
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
-        self.assertEqual(payload['match_key'], '{}testpresent_qm1'.format(self.event.year))
-        self.assertIsNotNone(payload['team_keys'])
-        self.assertIsNotNone(payload['scheduled_time'])
-        self.assertIsNotNone(payload['predicted_time'])
-        self.assertIsNotNone(payload['webcast'])
+        self.assertEqual(len(payload), 2)
+        self.assertEqual(payload['event_key'], self.event.key_name)
+        self.assertEqual(payload['match_key'], self.match.key_name)
 
-    def test_data_payload_time(self):
-        # No `event_name`
-        payload = self.notification.data_payload
-        self.assertEqual(len(payload), 6)
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
-        self.assertEqual(payload['match_key'], '{}testpresent_qm1'.format(self.event.year))
-        self.assertIsNotNone(payload['team_keys'])
-        self.assertIsNone(payload['predicted_time'])
-        self.assertIsNotNone(payload['scheduled_time'])
-        self.assertIsNotNone(payload['webcast'])
-
-    def test_data_payload_predicted_time(self):
-        self.notification.match.predicted_time = datetime(2017, 11, 28, 13, 30, 59)
-        self.notification.match.time = None
-
-        # No `event_name`
-        payload = self.notification.data_payload
-        self.assertEqual(len(payload), 6)
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
-        self.assertEqual(payload['match_key'], '{}testpresent_qm1'.format(self.event.year))
-        self.assertIsNotNone(payload['team_keys'])
-        self.assertIsNone(payload['scheduled_time'])
-        self.assertIsNotNone(payload['predicted_time'])
-        self.assertIsNotNone(payload['webcast'])
-
-    def test_data_payload_no_time(self):
-        self.notification.match.time = None
-
-        # No `event_name`
-        payload = self.notification.data_payload
-        self.assertEqual(len(payload), 6)
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
-        self.assertEqual(payload['match_key'], '{}testpresent_qm1'.format(self.event.year))
-        self.assertIsNotNone(payload['team_keys'])
-        self.assertIsNone(payload['scheduled_time'])
-        self.assertIsNone(payload['predicted_time'])
-        self.assertIsNotNone(payload['webcast'])
-
-    def test_data_payload_no_webcast(self):
+    def test_data_payload_team(self):
         self.notification.match.predicted_time = datetime(2017, 11, 28, 13, 30, 59)
         self.notification.match.time = datetime(2017, 11, 28, 13, 00, 59)
-        self.notification.event._webcast = []
 
-        # No `event_name`
+        team = Team.get_by_id('frc1')
+        self.notification.team = team
+
         payload = self.notification.data_payload
-        self.assertEqual(len(payload), 6)
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
-        self.assertEqual(payload['match_key'], '{}testpresent_qm1'.format(self.event.year))
-        self.assertIsNotNone(payload['team_keys'])
-        self.assertIsNotNone(payload['scheduled_time'])
-        self.assertIsNotNone(payload['predicted_time'])
-        self.assertIsNone(payload['webcast'])
-
-    def test_data_payload_time_no_webcast(self):
-        self.notification.event._webcast = []
-
-        # No `event_name`
-        payload = self.notification.data_payload
-        self.assertEqual(len(payload), 6)
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
-        self.assertEqual(payload['match_key'], '{}testpresent_qm1'.format(self.event.year))
-        self.assertIsNotNone(payload['team_keys'])
-        self.assertIsNone(payload['predicted_time'])
-        self.assertIsNotNone(payload['scheduled_time'])
-        self.assertIsNone(payload['webcast'])
-
-    def test_data_payload_predicted_time_no_webcast(self):
-        self.notification.match.predicted_time = datetime(2017, 11, 28, 13, 30, 59)
-        self.notification.match.time = None
-        self.notification.event._webcast = []
-
-        # No `event_name`
-        payload = self.notification.data_payload
-        self.assertEqual(len(payload), 6)
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
-        self.assertEqual(payload['match_key'], '{}testpresent_qm1'.format(self.event.year))
-        self.assertIsNotNone(payload['team_keys'])
-        self.assertIsNone(payload['scheduled_time'])
-        self.assertIsNotNone(payload['predicted_time'])
-        self.assertIsNone(payload['webcast'])
-
-    def test_data_payload_no_time_no_webcast(self):
-        self.notification.match.time = None
-        self.notification.event._webcast = []
-
-        # No `event_name`
-        payload = self.notification.data_payload
-        self.assertEqual(len(payload), 6)
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
-        self.assertEqual(payload['match_key'], '{}testpresent_qm1'.format(self.event.year))
-        self.assertIsNotNone(payload['team_keys'])
-        self.assertIsNone(payload['scheduled_time'])
-        self.assertIsNone(payload['predicted_time'])
-        self.assertIsNone(payload['webcast'])
+        self.assertEqual(len(payload), 3)
+        self.assertEqual(payload['event_key'], self.event.key_name)
+        self.assertEqual(payload['match_key'], self.match.key_name)
+        self.assertEqual(payload['team_key'], team.key_name)
 
     def test_webhook_message_data(self):
         self.notification.match.predicted_time = datetime(2017, 11, 28, 13, 30, 59)
         self.notification.match.time = datetime(2017, 11, 28, 13, 00, 59)
 
-        # Has `event_name`
         payload = self.notification.webhook_message_data
         self.assertEqual(len(payload), 7)
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
+        self.assertEqual(payload['event_key'], self.event.key_name)
+        self.assertEqual(payload['match_key'], self.match.key_name)
         self.assertEqual(payload['event_name'], 'Present Test Event')
-        self.assertEqual(payload['match_key'], '{}testpresent_qm1'.format(self.event.year))
         self.assertIsNotNone(payload['team_keys'])
         self.assertIsNotNone(payload['scheduled_time'])
         self.assertIsNotNone(payload['predicted_time'])
         self.assertIsNotNone(payload['webcast'])
 
-    def test_webhook_message_data_time(self):
-        # Has `event_name`
+    def test_webhook_message_data_none(self):
+        self.notification.match.time = None
+        self.notification.match.predicted_time = None
+        self.notification.event._webcast = []
+
         payload = self.notification.webhook_message_data
-        self.assertEqual(len(payload), 7)
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
+        self.assertEqual(len(payload), 4)
+        self.assertEqual(payload['event_key'], self.event.key_name)
+        self.assertEqual(payload['match_key'], self.match.key_name)
         self.assertEqual(payload['event_name'], 'Present Test Event')
-        self.assertEqual(payload['match_key'], '{}testpresent_qm1'.format(self.event.year))
         self.assertIsNotNone(payload['team_keys'])
-        self.assertIsNone(payload['predicted_time'])
+
+    def test_webhook_message_data_team(self):
+        self.notification.match.time = None
+        self.notification.match.predicted_time = None
+        self.notification.event._webcast = []
+
+        team = Team.get_by_id('frc1')
+        self.notification.team = team
+
+        payload = self.notification.webhook_message_data
+
+        self.assertEqual(len(payload), 5)
+        self.assertEqual(payload['event_key'], self.event.key_name)
+        self.assertEqual(payload['match_key'], self.match.key_name)
+        self.assertEqual(payload['team_key'], team.key_name)
+        self.assertEqual(payload['event_name'], 'Present Test Event')
+        self.assertIsNotNone(payload['team_keys'])
+
+    def test_webhook_message_data_scheduled_time(self):
+        self.notification.match.predicted_time = None
+        self.notification.event._webcast = []
+
+        payload = self.notification.webhook_message_data
+        self.assertEqual(len(payload), 5)
+        self.assertEqual(payload['event_key'], self.event.key_name)
+        self.assertEqual(payload['match_key'], self.match.key_name)
+        self.assertEqual(payload['event_name'], 'Present Test Event')
+        self.assertIsNotNone(payload['team_keys'])
         self.assertIsNotNone(payload['scheduled_time'])
-        self.assertIsNotNone(payload['webcast'])
 
     def test_webhook_message_data_predicted_time(self):
         self.notification.match.predicted_time = datetime(2017, 11, 28, 13, 30, 59)
         self.notification.match.time = None
+        self.notification.event._webcast = []
 
-        # Has `event_name`
         payload = self.notification.webhook_message_data
-        self.assertEqual(len(payload), 7)
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
+        self.assertEqual(len(payload), 5)
+        self.assertEqual(payload['event_key'], self.event.key_name)
+        self.assertEqual(payload['match_key'], self.match.key_name)
         self.assertEqual(payload['event_name'], 'Present Test Event')
-        self.assertEqual(payload['match_key'], '{}testpresent_qm1'.format(self.event.year))
         self.assertIsNotNone(payload['team_keys'])
-        self.assertIsNone(payload['scheduled_time'])
         self.assertIsNotNone(payload['predicted_time'])
+
+    def test_webhook_message_data_webcasts(self):
+        self.notification.match.time = None
+        self.notification.match.predicted_time = None
+
+        payload = self.notification.webhook_message_data
+        self.assertEqual(len(payload), 5)
+        self.assertEqual(payload['event_key'], self.event.key_name)
+        self.assertEqual(payload['match_key'], self.match.key_name)
+        self.assertEqual(payload['event_name'], 'Present Test Event')
+        self.assertIsNotNone(payload['team_keys'])
         self.assertIsNotNone(payload['webcast'])
-
-    def test_webhook_message_data_no_time(self):
-        self.notification.match.time = None
-
-        # Has `event_name`
-        payload = self.notification.webhook_message_data
-        self.assertEqual(len(payload), 7)
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
-        self.assertEqual(payload['event_name'], 'Present Test Event')
-        self.assertEqual(payload['match_key'], '{}testpresent_qm1'.format(self.event.year))
-        self.assertIsNotNone(payload['team_keys'])
-        self.assertIsNone(payload['scheduled_time'])
-        self.assertIsNone(payload['predicted_time'])
-        self.assertIsNotNone(payload['webcast'])
-
-    def test_webhook_message_data_no_webcast(self):
-        self.notification.match.predicted_time = datetime(2017, 11, 28, 13, 30, 59)
-        self.notification.match.time = datetime(2017, 11, 28, 13, 00, 59)
-        self.notification.event._webcast = []
-
-        # Has `event_name`
-        payload = self.notification.webhook_message_data
-        self.assertEqual(len(payload), 7)
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
-        self.assertEqual(payload['event_name'], 'Present Test Event')
-        self.assertEqual(payload['match_key'], '{}testpresent_qm1'.format(self.event.year))
-        self.assertIsNotNone(payload['team_keys'])
-        self.assertIsNotNone(payload['scheduled_time'])
-        self.assertIsNotNone(payload['predicted_time'])
-        self.assertIsNone(payload['webcast'])
-
-    def test_webhook_message_data_time_no_webcast(self):
-        self.notification.event._webcast = []
-
-        # Has `event_name`
-        payload = self.notification.webhook_message_data
-        self.assertEqual(len(payload), 7)
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
-        self.assertEqual(payload['event_name'], 'Present Test Event')
-        self.assertEqual(payload['match_key'], '{}testpresent_qm1'.format(self.event.year))
-        self.assertIsNotNone(payload['team_keys'])
-        self.assertIsNone(payload['predicted_time'])
-        self.assertIsNotNone(payload['scheduled_time'])
-        self.assertIsNone(payload['webcast'])
-
-    def test_webhook_message_data_predicted_time_no_webcast(self):
-        self.notification.match.predicted_time = datetime(2017, 11, 28, 13, 30, 59)
-        self.notification.match.time = None
-        self.notification.event._webcast = []
-
-        # Has `event_name`
-        payload = self.notification.webhook_message_data
-        self.assertEqual(len(payload), 7)
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
-        self.assertEqual(payload['event_name'], 'Present Test Event')
-        self.assertEqual(payload['match_key'], '{}testpresent_qm1'.format(self.event.year))
-        self.assertIsNotNone(payload['team_keys'])
-        self.assertIsNone(payload['scheduled_time'])
-        self.assertIsNotNone(payload['predicted_time'])
-        self.assertIsNone(payload['webcast'])
-
-    def test_webhook_message_data_no_time_no_webcast(self):
-        self.notification.match.time = None
-        self.notification.event._webcast = []
-
-        # Has `event_name`
-        payload = self.notification.webhook_message_data
-        self.assertEqual(len(payload), 7)
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
-        self.assertEqual(payload['event_name'], 'Present Test Event')
-        self.assertEqual(payload['match_key'], '{}testpresent_qm1'.format(self.event.year))
-        self.assertIsNotNone(payload['team_keys'])
-        self.assertIsNone(payload['scheduled_time'])
-        self.assertIsNone(payload['predicted_time'])
-        self.assertIsNone(payload['webcast'])

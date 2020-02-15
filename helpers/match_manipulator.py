@@ -91,6 +91,12 @@ class MatchManipulator(ManipulatorBase):
             except Exception, exception:
                 logging.error("Eror sending schedule updates for: {}".format(event.key_name))
                 logging.error(traceback.format_exc())
+            try:
+                # When an event gets a new schedule, we should schedule `match_upcoming` notifications for the first matches for the event
+                TBANSHelper.schedule_upcoming_matches(event)
+            except Exception, exception:
+                logging.error("Eror scheduling match_upcoming for: {}".format(event.key_name))
+                logging.error(traceback.format_exc())
 
         '''
         Enqueue firebase push

@@ -1,3 +1,4 @@
+import datetime
 import firebase_admin
 import logging
 
@@ -12,6 +13,7 @@ from models.subscription import Subscription
 
 
 MAXIMUM_BACKOFF = 32
+MATCH_UPCOMING_MINUTES = datetime.timedelta(minutes=-7)
 
 
 def _firebase_app():
@@ -145,12 +147,14 @@ class TBANSHelper:
 
     @classmethod
     def match_score(cls, match, user_id=None):
+        event = match.event.get()
+
         from models.notifications.match_score import MatchScoreNotification
         # Send to Event subscribers
         if NotificationType.MATCH_SCORE in NotificationType.enabled_event_notifications:
             users = [user_id] if user_id else []
             if not users:
-                users = Subscription.users_subscribed_to_event(match.event.get(), NotificationType.MATCH_SCORE)
+                users = Subscription.users_subscribed_to_event(event, NotificationType.MATCH_SCORE)
             if users:
                 cls._send(users, MatchScoreNotification(match))
 
@@ -170,6 +174,54 @@ class TBANSHelper:
                 users = Subscription.users_subscribed_to_match(match, NotificationType.MATCH_SCORE)
             if users:
                 cls._send(users, MatchScoreNotification(match))
+
+        # Send UPCOMING_MATCH for the N + 2 match after this one
+        if not event.matches:
+            return
+        from helpers.match_helper import MatchHelper
+        next_matches = MatchHelper.upcomingMatches(event.matches, num=2)
+        # TODO: Think about if we need special-case handling for replayed matches
+        # (I don't think we do because if a match gets replayed at EoD, we'll cancel/reschedule
+        # for that match notification. If a match gets replayed back-to-back (which doesn't happen?)
+        # sending a second notification is probably fine.
+        # If there are not 2 scheduled matches (end of Quals, end of Quarters, etc.) don't send
+        if len(next_matches) < 2:
+            return
+
+        next_match = next_matches.pop()
+        cls.schedule_upcoming_match(next_match, user_id)
+
+    @classmethod
+    def match_upcoming(cls, match, user_id=None):
+        from models.notifications.match_upcoming import MatchUpcomingNotification
+        # Send to Event subscribers
+        if NotificationType.UPCOMING_MATCH in NotificationType.enabled_event_notifications:
+            users = [user_id] if user_id else []
+            if not users:
+                users = Subscription.users_subscribed_to_event(match.event.get(), NotificationType.UPCOMING_MATCH)
+            if users:
+                cls._send(users, MatchUpcomingNotification(match))
+
+        # Send to Team subscribers
+        if NotificationType.UPCOMING_MATCH in NotificationType.enabled_team_notifications:
+            for team_key in match.team_keys:
+                users = [user_id] if user_id else []
+                if not users:
+                    users = Subscription.users_subscribed_to_team(team_key.get(), NotificationType.UPCOMING_MATCH)
+                if users:
+                    cls._send(users, MatchUpcomingNotification(match, team_key.get()))
+
+        # Send to Match subscribers
+        if NotificationType.UPCOMING_MATCH in NotificationType.enabled_match_notifications:
+            users = [user_id] if user_id else []
+            if not users:
+                users = Subscription.users_subscribed_to_match(match, NotificationType.UPCOMING_MATCH)
+            if users:
+                cls._send(users, MatchUpcomingNotification(match))
+
+        # Send LEVEL_STARTING for the first match of a new type
+        if match.set_number == 1 and match.match_number == 1:
+            cls.event_level(match, user_id)
 
     @classmethod
     def match_video(cls, match, user_id=None):
@@ -249,6 +301,44 @@ class TBANSHelper:
 
         return success
 
+    @classmethod
+    def schedule_upcoming_match(cls, match, user_id=None):
+        from google.appengine.api import taskqueue
+        queue = taskqueue.Queue('push-notifications')
+
+        task_name = '{}_match_upcoming'.format(match.key_name)
+        # Cancel any previously-scheduled `match_upcoming` notifications for this match
+        queue.delete_tasks(taskqueue.Task(name=task_name))
+
+        now = datetime.datetime.utcnow()
+        # If we know when our match is starting, schedule to send Xmins before start of match.
+        # Otherwise, send immediately.
+        if match.time is None or match.time + MATCH_UPCOMING_MINUTES <= now:
+            cls.match_upcoming(match, user_id)
+        else:
+            deferred.defer(
+                cls.match_upcoming,
+                match,
+                user_id,
+                _name=task_name,
+                _queue='push-notifications',
+                _url='/_ah/queue/deferred_notification_send',
+                _eta=match.time + MATCH_UPCOMING_MINUTES
+            )
+
+    @classmethod
+    def schedule_upcoming_matches(cls, event, user_id=None):
+        # Schedule `match_upcoming` notifications for Match 1 and Match 2
+        # Match 3 (and onward) will be dispatched after Match 1 (or Match N - 2) has been played
+        if not event.matches:
+            logging.error('Unable to schedule `match_upcoming` notification for {} - no matches'.format(event.key_name))
+            return
+
+        from helpers.match_helper import MatchHelper
+        next_matches = MatchHelper.upcomingMatches(event.matches, num=2)
+        for match in next_matches:
+            cls.schedule_upcoming_match(match, user_id)
+
     @staticmethod
     def verify_webhook(url, secret):
         """ Immediately dispatch a Verification to a webhook """
@@ -282,7 +372,7 @@ class TBANSHelper:
             cls._send_fcm,
             clients,
             notification,
-            _queue="push-notifications",
+            _queue='push-notifications',
             _url='/_ah/queue/deferred_notification_send'
         )
 
@@ -292,7 +382,7 @@ class TBANSHelper:
             cls._send_webhook,
             clients,
             notification,
-            _queue="push-notifications",
+            _queue='push-notifications',
             _url='/_ah/queue/deferred_notification_send'
         )
 
@@ -355,7 +445,7 @@ class TBANSHelper:
                     notification,
                     backoff_iteration + 1,
                     _countdown=backoff_time,
-                    _queue="push-notifications",
+                    _queue='push-notifications',
                     _url='/_ah/queue/deferred_notification_send'
                 )
 

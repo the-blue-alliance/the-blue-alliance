@@ -1,7 +1,8 @@
+import datetime
 from firebase_admin import messaging
 from firebase_admin.exceptions import FirebaseError, InvalidArgumentError, InternalError, UnavailableError
 from firebase_admin.messaging import QuotaExceededError, SenderIdMismatchError, ThirdPartyAuthError, UnregisteredError
-
+import json
 from mock import patch, Mock, ANY
 import unittest2
 
@@ -17,6 +18,7 @@ from consts.model_type import ModelType
 from consts.notification_type import NotificationType
 import helpers.tbans_helper
 from helpers.event.event_test_creator import EventTestCreator
+from helpers.match.match_test_creator import MatchTestCreator
 from helpers.tbans_helper import TBANSHelper, _firebase_app
 from models.account import Account
 from models.award import Award
@@ -32,6 +34,7 @@ from models.notifications.broadcast import BroadcastNotification
 from models.notifications.event_level import EventLevelNotification
 from models.notifications.event_schedule import EventScheduleNotification
 from models.notifications.match_score import MatchScoreNotification
+from models.notifications.match_upcoming import MatchUpcomingNotification
 from models.notifications.match_video import MatchVideoNotification
 from models.notifications.requests.fcm_request import FCMRequest
 from models.notifications.requests.webhook_request import WebhookRequest
@@ -70,7 +73,18 @@ class TestTBANSHelper(unittest2.TestCase):
             comp_level='qm',
             set_number=1,
             match_number=1,
-            team_key_names=['frc7332']
+            team_key_names=['frc7332'],
+            alliances_json=json.dumps({
+                'red': {
+                    'teams': ['frc1', 'frc2', 'frc7332'],
+                    'score': -1,
+                },
+                'blue': {
+                    'teams': ['frc4', 'frc5', 'frc6'],
+                    'score': -1,
+                }
+            }),
+            year=2020
         )
 
     def tearDown(self):
@@ -440,13 +454,23 @@ class TestTBANSHelper(unittest2.TestCase):
             mock_send.assert_not_called()
 
     def test_match_score_user_id(self):
+        # Set some upcoming matches for the Event
+        match_creator = MatchTestCreator(self.event)
+        teams = [Team(id="frc%s" % team_number, team_number=team_number) for team_number in range(6)]
+        self.event._teams = teams
+        match_creator.createIncompleteQuals()
+
         # Test send called with user id
-        with patch.object(TBANSHelper, '_send') as mock_send:
+        with patch.object(TBANSHelper, '_send') as mock_send, patch.object(TBANSHelper, 'schedule_upcoming_match') as schedule_upcoming_match:
             TBANSHelper.match_score(self.match, 'user_id')
             mock_send.assert_called()
             self.assertEqual(len(mock_send.call_args_list), 3)
             for call in mock_send.call_args_list:
                 self.assertEqual(call[0][0], ['user_id'])
+            # Make sure we called upcoming_match with the same user_id
+            schedule_upcoming_match.assert_called()
+            self.assertEqual(len(schedule_upcoming_match.call_args_list), 1)
+            self.assertEqual(schedule_upcoming_match.call_args[0][1], 'user_id')
 
     def test_match_score(self):
         # Insert a Subscription for this Event, Team, and Match so we call to send
@@ -485,6 +509,97 @@ class TestTBANSHelper(unittest2.TestCase):
             # Check frc7332 notification
             notification = notifications[1]
             self.assertEqual(notification.team, self.team)
+
+    def test_match_score_match_upcoming(self):
+        # Set some upcoming matches for the Event
+        match_creator = MatchTestCreator(self.event)
+        teams = [Team(id="frc%s" % team_number, team_number=team_number) for team_number in range(6)]
+        self.event._teams = teams
+        match_creator.createIncompleteQuals()
+
+        from helpers.match_helper import MatchHelper
+        next_matches = MatchHelper.upcomingMatches(self.event.matches, num=2)
+
+        with patch.object(TBANSHelper, 'schedule_upcoming_match') as schedule_upcoming_match:
+            TBANSHelper.match_score(self.match)
+            schedule_upcoming_match.assert_called()
+            self.assertEqual(len(schedule_upcoming_match.call_args_list), 1)
+            self.assertEqual(len(schedule_upcoming_match.call_args), 2)
+            self.assertEqual(schedule_upcoming_match.call_args[0][0], next_matches.pop())
+            self.assertIsNone(schedule_upcoming_match.call_args[0][1])
+
+    def test_match_upcoming_no_users(self):
+        # Test send not called with no subscribed users
+        with patch.object(TBANSHelper, '_send') as mock_send:
+            TBANSHelper.match_upcoming(self.match)
+            mock_send.assert_not_called()
+
+    def test_match_upcoming_user_id(self):
+        # Set our match to be 1-1 so we can test event_level
+        self.match.set_number = 1
+        self.match.match_number = 1
+
+        # Test send called with user id
+        with patch.object(TBANSHelper, '_send') as mock_send, patch.object(TBANSHelper, 'event_level') as mock_event_level:
+            TBANSHelper.match_upcoming(self.match, 'user_id')
+            mock_send.assert_called()
+            self.assertEqual(len(mock_send.call_args_list), 3)
+            for call in mock_send.call_args_list:
+                self.assertEqual(call[0][0], ['user_id'])
+            # Make sure we called event_level with the same user_id
+            mock_event_level.assert_called()
+            self.assertEqual(len(mock_event_level.call_args_list), 1)
+            self.assertEqual(mock_event_level.call_args[0][1], 'user_id')
+
+    def test_match_upcoming(self):
+        # Insert a Subscription for this Event, Team, and Match so we call to send
+        Subscription(
+            parent=ndb.Key(Account, 'user_id_1'),
+            user_id='user_id_1',
+            model_key=self.event.key_name,
+            model_type=ModelType.EVENT,
+            notification_types=[NotificationType.UPCOMING_MATCH]
+        ).put()
+        Subscription(
+            parent=ndb.Key(Account, 'user_id_2'),
+            user_id='user_id_2',
+            model_key='frc7332',
+            model_type=ModelType.TEAM,
+            notification_types=[NotificationType.UPCOMING_MATCH]
+        ).put()
+        Subscription(
+            parent=ndb.Key(Account, 'user_id_3'),
+            user_id='user_id_3',
+            model_key=self.match.key_name,
+            model_type=ModelType.MATCH,
+            notification_types=[NotificationType.UPCOMING_MATCH]
+        ).put()
+
+        with patch.object(TBANSHelper, '_send') as mock_send:
+            TBANSHelper.match_upcoming(self.match)
+            # Three calls total - First to the Event, second to Team frc7332, third to Match 2020miket_qm1
+            mock_send.assert_called()
+            self.assertEqual(len(mock_send.call_args_list), 3)
+            self.assertEqual([x[0] for x in [call[0][0] for call in mock_send.call_args_list]], ['user_id_1', 'user_id_2', 'user_id_3'])
+            notifications = [call[0][1] for call in mock_send.call_args_list]
+            for notification in notifications:
+                self.assertTrue(isinstance(notification, MatchUpcomingNotification))
+                self.assertEqual(notification.match, self.match)
+            # Check frc7332 notification
+            notification = notifications[1]
+            self.assertEqual(notification.team, self.team)
+
+    def test_match_upcoming_event_level(self):
+        # Make sure we call event_level for a 1-1 match_upcoming
+        self.match.set_number = 1
+        self.match.match_number = 1
+
+        with patch.object(TBANSHelper, 'event_level') as mock_event_level:
+            TBANSHelper.match_upcoming(self.match)
+            mock_event_level.assert_called()
+            self.assertEqual(len(mock_event_level.call_args_list), 1)
+            self.assertEqual(mock_event_level.call_args[0][0], self.match)
+            self.assertIsNone(mock_event_level.call_args[0][1])
 
     def test_match_video_no_users(self):
         # Test send not called with no subscribed users
@@ -656,6 +771,86 @@ class TestTBANSHelper(unittest2.TestCase):
             success = TBANSHelper._ping_webhook(client)
             mock_send.assert_called_once()
             self.assertFalse(success)
+
+    def test_schedule_upcoming_matches(self):
+        # Set some upcoming matches for the Event
+        match_creator = MatchTestCreator(self.event)
+        teams = [Team(id="frc%s" % team_number, team_number=team_number) for team_number in range(6)]
+        self.event._teams = teams
+        match_creator.createIncompleteQuals()
+
+        with patch.object(TBANSHelper, 'schedule_upcoming_match') as mock_schedule_upcoming_match:
+            TBANSHelper.schedule_upcoming_matches(self.event)
+            mock_schedule_upcoming_match.assert_called()
+            self.assertEqual(len(mock_schedule_upcoming_match.call_args_list), 2)
+
+    def test_schedule_upcoming_matches_user_id(self):
+        # Set some upcoming matches for the Event
+        match_creator = MatchTestCreator(self.event)
+        teams = [Team(id="frc%s" % team_number, team_number=team_number) for team_number in range(6)]
+        self.event._teams = teams
+        match_creator.createIncompleteQuals()
+
+        with patch.object(TBANSHelper, 'schedule_upcoming_match') as mock_schedule_upcoming_match:
+            TBANSHelper.schedule_upcoming_matches(self.event, 'user_id')
+            mock_schedule_upcoming_match.assert_called()
+            self.assertEqual(['user_id', 'user_id'], [args[0][1] for args in mock_schedule_upcoming_match.call_args_list])
+
+    def test_schedule_upcoming_match_send(self):
+        with patch.object(TBANSHelper, 'match_upcoming') as mock_match_upcoming:
+            TBANSHelper.schedule_upcoming_match(self.match)
+            mock_match_upcoming.assert_called_once_with(self.match, None)
+
+    def test_schedule_upcoming_match_send_user_id(self):
+        with patch.object(TBANSHelper, 'match_upcoming') as mock_match_upcoming:
+            TBANSHelper.schedule_upcoming_match(self.match, 'user_id')
+            mock_match_upcoming.assert_called_once_with(self.match, 'user_id')
+
+    def test_schedule_upcoming_match_cancel(self):
+        # Schedule a dummy task with the same name as the task we're about to schedule
+        task_name = '{}_match_upcoming'.format(self.match.key_name)
+        taskqueue.Task(name=task_name).add('push-notifications')
+        # Sanity check - make sure we have scheduled a task
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
+        self.assertEqual(len(tasks), 1)
+        # Make sure after calling our schedule_upcoming_match we delete the previously-scheduled task
+        TBANSHelper.schedule_upcoming_match(self.match)
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
+        self.assertEqual(len(tasks), 0)
+
+    def test_schedule_upcoming_match_defer(self):
+        # Sanity check - make sure there are no existing tasks in the queue
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
+        self.assertEqual(len(tasks), 0)
+
+        self.match.time = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+        # Make sure after calling our schedule_upcoming_match we defer the task
+        TBANSHelper.schedule_upcoming_match(self.match)
+
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
+        self.assertEqual(len(tasks), 1)
+
+        # Make sure our taskqueue tasks execute what we expect
+        with patch.object(TBANSHelper, 'match_upcoming') as mockmatch_upcoming:
+            deferred.run(tasks[0].payload)
+            mockmatch_upcoming.assert_called_once_with(self.match, None)
+
+    def test_schedule_upcoming_match_defer_user_id(self):
+        # Sanity check - make sure there are no existing tasks in the queue
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
+        self.assertEqual(len(tasks), 0)
+
+        self.match.time = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+        # Make sure after calling our schedule_upcoming_match we defer the task
+        TBANSHelper.schedule_upcoming_match(self.match, 'user_id')
+
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='push-notifications')
+        self.assertEqual(len(tasks), 1)
+
+        # Make sure our taskqueue tasks execute what we expect
+        with patch.object(TBANSHelper, 'match_upcoming') as mockmatch_upcoming:
+            deferred.run(tasks[0].payload)
+            mockmatch_upcoming.assert_called_once_with(self.match, 'user_id')
 
     def test_verification(self):
         from models.notifications.requests.webhook_request import WebhookRequest
