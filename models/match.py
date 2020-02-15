@@ -177,6 +177,7 @@ class Match(ndb.Model):
                 if self.year == 2020:
                     for color in ['red', 'blue']:
                         self._score_breakdown[color]['tba_shieldEnergizedRankingPointFromFoul'] = self._score_breakdown[color]['shieldEnergizedRankingPoint'] and not self._score_breakdown[color]['stage3Activated']
+                        self._score_breakdown[color]['tba_numRobotsHanging'] = sum([1 if self._score_breakdown[color].get('endgameRobot{}'.format(i)) == 'Hang' else 0 for i in range(1, 3)])
 
         return self._score_breakdown
 

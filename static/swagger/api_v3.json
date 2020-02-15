@@ -6568,6 +6568,10 @@
             "type": "boolean",
             "description": "Unofficial TBA-computed value that indicates whether the shieldEnergizedRankingPoint was earned normally or awarded due to a foul."
           },
+          "tba_numRobotsHanging": {
+            "type": "integer",
+            "description": "Unofficial TBA-computed value that counts the number of robots who were hanging at the end of the match."
+          },
           "foulCount": {
             "type": "integer"
           },
