@@ -230,7 +230,7 @@
       <td>Shield Generator Switch Level</td>
       <td class="blue" colspan="2">
         {% if match.score_breakdown.blue.endgameRungIsLevel == 'IsLevel' %}
-          <span class="glyphicon glyphicon-ok"></span> {% if "tba_numRobotsHanging" in match.score_breakdown.red and match.score_breakdown.red.tba_numRobotsHanging > 0 %}(+15){% endif %}
+          <span class="glyphicon glyphicon-ok"></span> {% if "tba_numRobotsHanging" in match.score_breakdown.blue and match.score_breakdown.blue.tba_numRobotsHanging > 0 %}(+15){% endif %}
         {% else %}
           <span class="glyphicon glyphicon-remove"></span>
         {% endif %}
