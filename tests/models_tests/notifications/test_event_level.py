@@ -43,7 +43,7 @@ class TestEventLevelNotification(unittest2.TestCase):
 
         self.assertIsNotNone(self.notification.fcm_notification)
         self.assertEqual(self.notification.fcm_notification.title, 'TESTPRESENT Qualification Matches Starting')
-        self.assertEqual(self.notification.fcm_notification.body, 'Present Test Event: Qualification Matches are starting.')
+        self.assertEqual(self.notification.fcm_notification.body, 'Qualification matches at the Present Test Event are starting.')
 
     def test_fcm_notification_short_name(self):
         self.notification.event.short_name = 'Arizona North'
@@ -52,7 +52,7 @@ class TestEventLevelNotification(unittest2.TestCase):
 
         self.assertIsNotNone(self.notification.fcm_notification)
         self.assertEqual(self.notification.fcm_notification.title, 'TESTPRESENT Qualification Matches Starting')
-        self.assertEqual(self.notification.fcm_notification.body, 'Arizona North Regional: Qualification Matches are starting.')
+        self.assertEqual(self.notification.fcm_notification.body, 'Qualification matches at the Arizona North Regional are starting.')
 
     def test_fcm_notification_scheduled_time(self):
         # Set constant scheduled time for testing
@@ -60,7 +60,15 @@ class TestEventLevelNotification(unittest2.TestCase):
 
         self.assertIsNotNone(self.notification.fcm_notification)
         self.assertEqual(self.notification.fcm_notification.title, 'TESTPRESENT Qualification Matches Starting')
-        self.assertEqual(self.notification.fcm_notification.body, 'Present Test Event: Qualification Matches are scheduled for 13:30.')
+        self.assertEqual(self.notification.fcm_notification.body, 'Qualification matches at the Present Test Event are scheduled for 13:30.')
+
+    def test_fcm_notification_scheduled_time_timezone(self):
+        self.notification.event.timezone_id = 'America/Detroit'
+        self.notification.match.time = datetime(2017, 11, 28, 13, 30, 59)
+
+        self.assertIsNotNone(self.notification.fcm_notification)
+        self.assertEqual(self.notification.fcm_notification.title, 'TESTPRESENT Qualification Matches Starting')
+        self.assertEqual(self.notification.fcm_notification.body, 'Qualification matches at the Present Test Event are scheduled for 13:30 EST.')
 
     def test_fcm_notification_short_name_scheduled_time(self):
         self.notification.event.short_name = 'Arizona North'
@@ -69,40 +77,31 @@ class TestEventLevelNotification(unittest2.TestCase):
 
         self.assertIsNotNone(self.notification.fcm_notification)
         self.assertEqual(self.notification.fcm_notification.title, 'TESTPRESENT Qualification Matches Starting')
-        self.assertEqual(self.notification.fcm_notification.body, 'Arizona North Regional: Qualification Matches are scheduled for 13:30.')
+        self.assertEqual(self.notification.fcm_notification.body, 'Qualification matches at the Arizona North Regional are scheduled for 13:30.')
 
     def test_data_payload(self):
         # Remove time for testing
         self.notification.match.time = None
 
         payload = self.notification.data_payload
-        self.assertEqual(len(payload), 3)
+        self.assertEqual(len(payload), 2)
         self.assertEqual(payload['comp_level'], 'qm')
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
-        self.assertIsNone(payload['scheduled_time'])
-
-    def test_data_payload_scheduled_time(self):
-        payload = self.notification.data_payload
-        self.assertEqual(len(payload), 3)
-        self.assertEqual(payload['comp_level'], 'qm')
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
-        self.assertIsNotNone(payload['scheduled_time'])
+        self.assertEqual(payload['event_key'], self.event.key_name)
 
     def test_webhook_message_data(self):
         # Remove time for testing
         self.notification.match.time = None
 
         payload = self.notification.webhook_message_data
-        self.assertEqual(len(payload), 4)
+        self.assertEqual(len(payload), 3)
         self.assertEqual(payload['comp_level'], 'qm')
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
+        self.assertEqual(payload['event_key'], self.event.key_name)
         self.assertEqual(payload['event_name'], 'Present Test Event')
-        self.assertIsNone(payload['scheduled_time'])
 
     def test_webhook_message_data_scheduled_time(self):
         payload = self.notification.webhook_message_data
         self.assertEqual(len(payload), 4)
         self.assertEqual(payload['comp_level'], 'qm')
-        self.assertEqual(payload['event_key'], '{}testpresent'.format(self.event.year))
+        self.assertEqual(payload['event_key'], self.event.key_name)
         self.assertEqual(payload['event_name'], 'Present Test Event')
         self.assertIsNotNone(payload['scheduled_time'])

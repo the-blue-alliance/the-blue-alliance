@@ -122,6 +122,17 @@ class TBANSHelper:
             notification.send(keys)
 
     @classmethod
+    def event_level(cls, match, user_id=None):
+        from models.notifications.event_level import EventLevelNotification
+        # Send to Event subscribers
+        if NotificationType.LEVEL_STARTING in NotificationType.enabled_event_notifications:
+            users = [user_id] if user_id else []
+            if not users:
+                users = Subscription.users_subscribed_to_event(match.event.get(), NotificationType.LEVEL_STARTING)
+            if users:
+                cls._send(users, EventLevelNotification(match))
+
+    @classmethod
     def event_schedule(cls, event, user_id=None):
         from models.notifications.event_schedule import EventScheduleNotification
         # Send to Event subscribers

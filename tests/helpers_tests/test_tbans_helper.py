@@ -29,6 +29,7 @@ from models.subscription import Subscription
 from models.notifications.alliance_selection import AllianceSelectionNotification
 from models.notifications.awards import AwardsNotification
 from models.notifications.broadcast import BroadcastNotification
+from models.notifications.event_level import EventLevelNotification
 from models.notifications.event_schedule import EventScheduleNotification
 from models.notifications.match_score import MatchScoreNotification
 from models.notifications.match_video import MatchVideoNotification
@@ -360,6 +361,42 @@ class TestTBANSHelper(unittest2.TestCase):
         # Make sure we didn't send to FCM or webhooks
         tasks = self.taskqueue_stub.GetTasks('push-notifications')
         self.assertEqual(len(tasks), 0)
+
+    def test_event_level_no_users(self):
+        # Test send not called with no subscribed users
+        with patch.object(TBANSHelper, '_send') as mock_send:
+            TBANSHelper.event_level(self.match)
+            mock_send.assert_not_called()
+
+    def test_event_level_user_id(self):
+        # Test send called with user id
+        with patch.object(TBANSHelper, '_send') as mock_send:
+            TBANSHelper.event_level(self.match, 'user_id')
+            mock_send.assert_called()
+            self.assertEqual(len(mock_send.call_args_list), 1)
+            for call in mock_send.call_args_list:
+                self.assertEqual(call[0][0], ['user_id'])
+
+    def test_event_level(self):
+        # Insert a Subscription for this Event
+        Subscription(
+            parent=ndb.Key(Account, 'user_id_1'),
+            user_id='user_id_1',
+            model_key=self.event.key_name,
+            model_type=ModelType.EVENT,
+            notification_types=[NotificationType.LEVEL_STARTING]
+        ).put()
+
+        with patch.object(TBANSHelper, '_send') as mock_send:
+            TBANSHelper.event_level(self.match)
+            mock_send.assert_called()
+            self.assertEqual(len(mock_send.call_args_list), 1)
+            user_ids = mock_send.call_args[0][0]
+            self.assertEqual(user_ids, ['user_id_1'])
+            notification = mock_send.call_args[0][1]
+            self.assertTrue(isinstance(notification, EventLevelNotification))
+            self.assertEqual(notification.match, self.match)
+            self.assertEqual(notification.event, self.event)
 
     def test_event_schedule_no_users(self):
         # Test send not called with no subscribed users
