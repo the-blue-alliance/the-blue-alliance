@@ -66,7 +66,7 @@
         <td>{{'%0.2f' | format(event_insights.generator_energized_rp_achieved[2])}}%</td>
       </tr>
       <tr>
-          <td>"Unicorn Matches"<br/>(Win + Complete Rocket + HAB Docking)</td>
+          <td>"Unicorn Matches"<br/>(Win + Generator Operational + Generator Energized)</td>
           <td>{% if event_insights.unicorn_matches %}{{event_insights.unicorn_matches[0]}}{% else %}--{% endif %}</td>
           <td>{% if event_insights.unicorn_matches %}{{event_insights.unicorn_matches[1]}}{% else %}--{% endif %}</td>
           <td>{% if event_insights.unicorn_matches %}{{'%0.2f' | format(event_insights.unicorn_matches[2]|float)}}%{% else %}--{% endif %}</td>
