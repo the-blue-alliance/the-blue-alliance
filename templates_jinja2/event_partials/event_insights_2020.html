@@ -1,0 +1,144 @@
+<div class="row">
+  <div class="col-xs-12">
+    <h3>Bonus Objective Statistics</h3>
+    <table class="table table-condensed table-striped text-right"
+    <thead>
+        <tr>
+          <th class="text-right">Objective</th>
+          <th class="text-right">Count</th>
+          <th class="text-right"># Opportunities</th>
+          <th class="text-right">% Success</th>
+        </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Exit Init Line</td>
+        <td>{{event_insights.exit_init_line_count[0]}}</td>
+        <td>{{event_insights.exit_init_line_count[1]}}</td>
+        <td>{{'%0.2f' | format(event_insights.exit_init_line_count[2])}}%</td>
+      </tr>
+      <tr>
+        <td>Achieve Stage 1</td>
+        <td>{{event_insights.achieve_stage1_count[0]}}</td>
+        <td>{{event_insights.achieve_stage1_count[1]}}</td>
+        <td>{{'%0.2f' | format(event_insights.achieve_stage1_count[2])}}%</td>
+      </tr>
+      <tr>
+        <td>Achieve Stage 2</td>
+        <td>{{event_insights.achieve_stage2_count[0]}}</td>
+        <td>{{event_insights.achieve_stage2_count[1]}}</td>
+        <td>{{'%0.2f' | format(event_insights.achieve_stage2_count[2])}}%</td>
+      </tr>
+      <tr>
+        <td>Achieve Stage 3</td>
+        <td>{{event_insights.achieve_stage3_count[0]}}</td>
+        <td>{{event_insights.achieve_stage3_count[1]}}</td>
+        <td>{{'%0.2f' | format(event_insights.achieve_stage3_count[2])}}%</td>
+      </tr>
+      <tr>
+        <td>Endgame Parking</td>
+        <td>{{event_insights.park_count[0]}}</td>
+        <td>{{event_insights.park_count[1]}}</td>
+        <td>{{'%0.2f' | format(event_insights.park_count[2])}}%</td>
+      </tr>
+      <tr>
+        <td>Endgame Hanging</td>
+        <td>{{event_insights.hang_count[0]}}</td>
+        <td>{{event_insights.hang_count[1]}}</td>
+        <td>{{'%0.2f' | format(event_insights.hang_count[2])}}%</td>
+      </tr>
+      <tr>
+        <td>Generator Level + Hang</td>
+        <td>{{event_insights.generator_level_count[0]}}</td>
+        <td>{{event_insights.generator_level_count[1]}}</td>
+        <td>{{'%0.2f' | format(event_insights.generator_level_count[2])}}%</td>
+      </tr>
+      <tr>
+        <td><span rel="tooltip" title="Has no real meaning for Playoff matches">Shield Generator Operational RP Achieved *</span></td>
+        <td>{{event_insights.generator_operational_rp_achieved[0]}}</td>
+        <td>{{event_insights.generator_operational_rp_achieved[1]}}</td>
+        <td>{{'%0.2f' | format(event_insights.generator_operational_rp_achieved[2])}}%</td>
+      </tr>
+      <tr>
+        <td><span rel="tooltip" title="Has no real meaning for Playoff matches">Shield Generator Energzied RP Achieved *</span></td>
+        <td>{{event_insights.generator_energized_rp_achieved[0]}}</td>
+        <td>{{event_insights.generator_energized_rp_achieved[1]}}</td>
+        <td>{{'%0.2f' | format(event_insights.generator_energized_rp_achieved[2])}}%</td>
+      </tr>
+      <tr>
+          <td>"Unicorn Matches"<br/>(Win + Generator Operational + Generator Energized)</td>
+          <td>{% if event_insights.unicorn_matches %}{{event_insights.unicorn_matches[0]}}{% else %}--{% endif %}</td>
+          <td>{% if event_insights.unicorn_matches %}{{event_insights.unicorn_matches[1]}}{% else %}--{% endif %}</td>
+          <td>{% if event_insights.unicorn_matches %}{{'%0.2f' | format(event_insights.unicorn_matches[2]|float)}}%{% else %}--{% endif %}</td>
+        </tr>
+    </tbody>
+  </div>
+
+  <div class="col-xs-12">
+    <h3>Match Statistics</h3>
+    <table class="table table-condensed table-striped text-right">
+      <tbody>
+        <tr>
+          <td>High Score</td>
+          <td>{{event_insights.high_score[0]}} in <a href="/match/{{event_insights.high_score[1]}}">{{event_insights.high_score[2]}}</a></td>
+        </tr>
+        <tr>
+          <td>Average Match Score</td>
+          <td>{{'%0.2f' | format(event_insights.average_score|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average Winning Score</td>
+          <td>{{'%0.2f' | format(event_insights.average_win_score|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average Win Margin</td>
+          <td>{{'%0.2f' | format(event_insights.average_win_margin|float)}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="table table-condensed table-striped text-right">
+      <thead>
+        <tr>
+            <th></th>
+            <th class="text-right">Auto</th>
+            <th class="text-right">Teleop</th>
+            <th class="text-right">Overall</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Average Init Line Points</td>
+          <td>{{'%0.2f' | format(event_insights.average_init_line_points_auto|float)}}</td>
+          <td>--</td>
+          <td>--</td>
+        </tr>
+        <tr>
+          <td>Average Cell Points</td>
+          <td>{{'%0.2f' | format(event_insights.average_cell_points_auto|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_cell_points_teleop|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_cell_score|float)}}</td>
+        </tr>
+        <tr>
+          <td>Control Panel Points</td>
+          <td>--</td>
+          <td>{{'%0.2f' | format(event_insights.average_control_panel_points|float)}}</td>
+          <td>--</td>
+        </tr>
+        <tr>
+          <td>Average Foul Points</td>
+          <td>--</td>
+          <td>--</td>
+          <td>{{'%0.2f' | format(event_insights.average_foul_score|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average Score</td>
+          <td>{{'%0.2f' | format(event_insights.average_points_auto|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_points_teleop|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_score|float)}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+</div>
