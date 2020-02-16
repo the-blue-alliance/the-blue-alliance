@@ -68,6 +68,7 @@ class EventInsightsHelper(object):
         winning_scores = 0
         win_margins = 0
         total_scores = 0
+        total_cell = 0
         foul_scores = 0
         high_score = [0, "", ""]
 
@@ -103,7 +104,7 @@ class EventInsightsHelper(object):
                     robots_hanging += alliance_breakdown['tba_numRobotsHanging']
                     cell_points_teleop += alliance_breakdown['teleopCellPoints']
                     control_panel_points += alliance_breakdown['controlPanelPoints']
-                    points_teleop = alliance_breakdown['teleopPoints']
+                    points_teleop += alliance_breakdown['teleopPoints']
 
                     # Overall
                     for i in xrange(3):
@@ -123,6 +124,7 @@ class EventInsightsHelper(object):
                     generator_level_count += 1 if alliance_breakdown['endgameRungIsLevel'] == 'IsLevel' and alliance_breakdown['tba_numRobotsHanging'] > 0 else 0
                     generator_operational_count += 1 if alliance_breakdown['shieldOperationalRankingPoint'] else 0
                     generator_energized_count += 1 if alliance_breakdown['shieldEnergizedRankingPoint'] else 0
+                    total_cell += alliance_breakdown['autoCellPoints'] + alliance_breakdown['teleopCellPoints']
 
                     alliance_win = alliance_color == match.winning_alliance
                     unicorn_matches += (1 if alliance_win and alliance_breakdown['shieldOperationalRankingPoint'] and alliance_breakdown['shieldEnergizedRankingPoint'] else 0)
@@ -170,8 +172,9 @@ class EventInsightsHelper(object):
             'unicorn_matches': [unicorn_matches, opportunities_1x, 100.0 * float(unicorn_matches) / opportunities_1x],
             'average_win_score': float(winning_scores) / finished_matches,
             'average_win_margin': float(win_margins) / finished_matches,
-            'average_score': float(total_scores) / finished_matches,
-            'average_foul_score': float(foul_scores) / finished_matches,
+            'average_score': float(total_scores) / opportunities_1x,
+            'average_cell_score': float(total_cell) / opportunities_1x,
+            'average_foul_score': float(foul_scores) / opportunities_1x,
             'high_score': high_score,
         }
         return event_insights
