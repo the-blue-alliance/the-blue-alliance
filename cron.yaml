@@ -45,12 +45,12 @@ cron:
   timezone: America/Los_Angeles
 
 - description: Match Insights Calculation
-  url: /backend-tasks-b2/math/enqueue/insights/matches/2019
+  url: /backend-tasks-b2/math/enqueue/insights/matches/2020
   schedule: every day 01:00
   timezone: America/Los_Angeles
 
 - description: Award Insights Calculation
-  url: /backend-tasks-b2/math/enqueue/insights/awards/2019
+  url: /backend-tasks-b2/math/enqueue/insights/awards/2020
   schedule: every day 01:00
   timezone: America/Los_Angeles
 
@@ -70,7 +70,7 @@ cron:
   timezone: America/Los_Angeles
 
 - description: District Rankings Calculation
-  url: /tasks/math/enqueue/district_rankings_calc/2019
+  url: /tasks/math/enqueue/district_rankings_calc/2020
   schedule: every tuesday 1:00
   timezone: America/Los_Angeles
 
