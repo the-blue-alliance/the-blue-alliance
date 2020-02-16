@@ -120,7 +120,7 @@ class EventInsightsHelper(object):
                     achieve_stage1_count += 1 if alliance_breakdown['stage1Activated'] else 0
                     achieve_stage2_count += 1 if alliance_breakdown['stage2Activated'] else 0
                     achieve_stage3_count += 1 if alliance_breakdown['stage3Activated'] else 0
-                    generator_level_count += 1 if alliance_breakdown['endgameRungIsLevel'] == 'IsLevel' and alliance_breakdown['tba_numRobotsHanging'] > 1 else 0
+                    generator_level_count += 1 if alliance_breakdown['endgameRungIsLevel'] == 'IsLevel' and alliance_breakdown['tba_numRobotsHanging'] > 0 else 0
                     generator_operational_count += 1 if alliance_breakdown['shieldOperationalRankingPoint'] else 0
                     generator_energized_count += 1 if alliance_breakdown['shieldEnergizedRankingPoint'] else 0
 
@@ -164,11 +164,11 @@ class EventInsightsHelper(object):
             'achieve_stage3_count': [achieve_stage3_count, opportunities_1x, 100.0 * float(achieve_stage3_count) / opportunities_1x],
             'park_count': [park_count, opportunities_3x, 100.0 * float(park_count) / opportunities_3x],
             'hang_count': [hang_count, opportunities_3x, 100.0 * float(hang_count) / opportunities_3x],
-            'generator_level_count': [generator_level_count, opportunities_1x, 100.0 * float(generator_level_count)],
+            'generator_level_count': [generator_level_count, opportunities_1x, 100.0 * float(generator_level_count) / opportunities_1x],
             'generator_operational_rp_achieved': [generator_operational_count, opportunities_1x, 100.0 * float(generator_operational_count) / opportunities_1x],
             'generator_energized_rp_achieved': [generator_energized_count, opportunities_1x, 100.0 * float(generator_energized_count) / opportunities_1x],
             'unicorn_matches': [unicorn_matches, opportunities_1x, 100.0 * float(unicorn_matches) / opportunities_1x],
-            'average_win_score': float(total_scores) / finished_matches,
+            'average_win_score': float(winning_scores) / finished_matches,
             'average_win_margin': float(win_margins) / finished_matches,
             'average_score': float(total_scores) / finished_matches,
             'average_foul_score': float(foul_scores) / finished_matches,
