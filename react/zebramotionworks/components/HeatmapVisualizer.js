@@ -86,7 +86,7 @@ class HeatmapVisualizer extends React.Component {
   }
 
   render() {
-    const { data } = this.props
+    const { fieldImg, data } = this.props
 
     return (
       <div>
@@ -94,7 +94,7 @@ class HeatmapVisualizer extends React.Component {
           <svg
             viewBox="0 0 54 27"
             style={{
-              background: 'url(/images/2019_field.png) no-repeat center center',
+              background: `url(${fieldImg}) no-repeat center center`,
               backgroundSize: 'cover',
             }}
           />
@@ -166,6 +166,7 @@ class HeatmapVisualizer extends React.Component {
 }
 
 HeatmapVisualizer.propTypes = {
+  fieldImg: PropTypes.string.isRequired,
   data: PropTypes.object.isRequired,
 }
 

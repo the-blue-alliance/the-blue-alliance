@@ -17,7 +17,7 @@ class ZebraMotionWorksVisualizer extends React.Component {
   }
 
   render() {
-    const { data } = this.props
+    const { data, year } = this.props
     const { mode } = this.state
     return (
       <div>
@@ -47,8 +47,18 @@ class ZebraMotionWorksVisualizer extends React.Component {
         </div>
         <div className="row">
           <div className="col-xs-12">
-            {mode === 'traj' && <TrajectoryVisualizer data={data} />}
-            {mode === 'heat' && <HeatmapVisualizer data={data} />}
+            {mode === 'traj' && (
+              <TrajectoryVisualizer
+                fieldImg={`/images/${year}_field.png`}
+                data={data}
+              />
+            )}
+            {mode === 'heat' && (
+              <HeatmapVisualizer
+                fieldImg={`/images/${year}_field.png`}
+                data={data}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -58,6 +68,7 @@ class ZebraMotionWorksVisualizer extends React.Component {
 
 ZebraMotionWorksVisualizer.propTypes = {
   data: PropTypes.object.isRequired,
+  year: PropTypes.number.isRequired,
 }
 
 export default ZebraMotionWorksVisualizer
