@@ -64,8 +64,7 @@ echo "Installing trap handler to release deploy lock on exit..."
 trap release_lock EXIT INT TERM
 
 echo "Obtained Lock. Deploying $PROJECT:$VERSION"
-# need more permissions for cron.yaml queue.yaml index.yaml, we can come back to them
-for config in app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml api.yaml clientapi.yaml tasks.yaml cron.yaml dispatch.yaml; do
+for config in app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml api.yaml clientapi.yaml tasks.yaml cron.yaml dispatch.yaml index.yaml queue.yaml; do
     with_python27 "$GCLOUD --quiet --verbosity warning --project $PROJECT app deploy $config --version $VERSION"
 done
 
