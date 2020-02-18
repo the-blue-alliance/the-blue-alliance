@@ -5,7 +5,7 @@ import HeatmapVisualizer from './HeatmapVisualizer'
 
 class ZebraMotionWorksVisualizer extends React.Component {
   state = {
-    mode: 'heat',
+    mode: 'traj',
   }
 
   handleTrajectoryClick = () => {
