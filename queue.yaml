@@ -13,9 +13,9 @@ queue:
     task_retry_limit: 0
 
 - name: datafeed
-  rate: 5/s
+  rate: 1/s
   retry_parameters:
-    task_retry_limit: 0
+    task_age_limit: 1h
 
 - name: firebase
   rate: 50/s
