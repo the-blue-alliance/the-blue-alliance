@@ -5,9 +5,7 @@ queue:
     task_retry_limit: 0
 
 - name: cache-clearing
-  rate: 1/s
-  retry_parameters:
-    task_age_limit: 3m
+  rate: 5/s
 
 - name: api-track-call
   rate: 500/s
