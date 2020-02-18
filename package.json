@@ -11,6 +11,7 @@
     "element-resize-event": "^2.0.9",
     "firebase": "^3.6.9",
     "firedux": "^1.1.0",
+    "heatmap.js": "^2.0.5",
     "material-ui": "^0.16.5",
     "prop-types": "^15.5.10",
     "query-string": "^4.1.0",
