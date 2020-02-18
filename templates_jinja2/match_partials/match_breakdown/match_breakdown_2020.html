@@ -198,7 +198,7 @@
     <!-- Robot 3 Endgame -->
     {% if "endgameRobot3" in match.score_breakdown.red %}
     <tr>
-      <td class="red" colspan="2" rel="tooltip" title="{{match.alliances.red.teams.2}}">
+      <td class="red" colspan="2" rel="tooltip" title="{{match.alliances.red.teams.2|digits}}">
         {% if match.score_breakdown.red.endgameRobot3 == 'Hang' %}
           Hang (+25)
         {% elif match.score_breakdown.red.endgameRobot3 == 'Park' %}
@@ -207,7 +207,7 @@
           <span class="glyphicon glyphicon-remove"></span>
         {% endif %}
       <td>Robot 3 Endgame</td>
-      <td class="blue" colspan="2" rel="tooltip" title="{{match.alliances.blue.teams.2}}">
+      <td class="blue" colspan="2" rel="tooltip" title="{{match.alliances.blue.teams.2|digits}}">
         {% if match.score_breakdown.blue.endgameRobot3 == 'Hang' %}
           Hang (+25)
         {% elif match.score_breakdown.blue.endgameRobot3 == 'Park' %}
