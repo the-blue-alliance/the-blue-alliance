@@ -68,9 +68,10 @@ class HeatmapVisualizer extends React.Component {
         const value = grid[x][y]
         max = Math.max(max, value)
         if (value > 0) {
+          const scaledY = y / GRID_SCALE
           heatmapData.push({
             x: (x / GRID_SCALE) * xScale,
-            y: (y / GRID_SCALE) * yScale,
+            y: (27 - scaledY) * yScale,
             value,
           })
         }
