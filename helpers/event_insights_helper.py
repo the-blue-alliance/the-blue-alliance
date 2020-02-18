@@ -43,12 +43,18 @@ class EventInsightsHelper(object):
     def _calculate_event_insights_2020_helper(cls, matches):
         # Auto
         init_line_auto = 0
+        cell_count_bottom_auto = 0
+        cell_count_outer_auto = 0
+        cell_count_inner_auto = 0
         cell_points_auto = 0
         points_auto = 0
 
         # Teleop
         climb_park_teleop = 0
         robots_hanging = 0
+        cell_count_bottom_teleop = 0
+        cell_count_outer_teleop = 0
+        cell_count_inner_teleop = 0
         cell_points_teleop = 0
         control_panel_points = 0
         points_teleop = 0
@@ -96,12 +102,18 @@ class EventInsightsHelper(object):
 
                     # Auto
                     init_line_auto += alliance_breakdown['autoInitLinePoints']
+                    cell_count_bottom_auto += alliance_breakdown['autoCellsBottom']
+                    cell_count_outer_auto += alliance_breakdown['autoCellsOuter']
+                    cell_count_inner_auto += alliance_breakdown['autoCellsInner']
                     cell_points_auto += alliance_breakdown['autoCellPoints']
                     points_auto += alliance_breakdown['autoPoints']
 
                     # Teleop
                     climb_park_teleop += alliance_breakdown['endgamePoints']
                     robots_hanging += alliance_breakdown['tba_numRobotsHanging']
+                    cell_count_bottom_teleop += alliance_breakdown['teleopCellsBottom']
+                    cell_count_outer_teleop += alliance_breakdown['teleopCellsOuter']
+                    cell_count_inner_teleop += alliance_breakdown['teleopCellsInner']
                     cell_points_teleop += alliance_breakdown['teleopCellPoints']
                     control_panel_points += alliance_breakdown['controlPanelPoints']
                     points_teleop += alliance_breakdown['teleopPoints']
@@ -151,11 +163,19 @@ class EventInsightsHelper(object):
         event_insights = {
             # Auto
             'average_init_line_points_auto': float(init_line_auto) / opportunities_1x,
+            'average_cell_count_bottom_auto': float(cell_count_bottom_auto) / opportunities_1x,
+            'average_cell_count_outer_auto': float(cell_count_outer_auto) / opportunities_1x,
+            'average_cell_count_inner_auto': float(cell_count_inner_auto) / opportunities_1x,
+            'average_cell_count_auto': float(cell_count_bottom_auto + cell_count_outer_auto + cell_count_inner_auto) / opportunities_1x,
             'average_cell_points_auto': float(cell_points_auto) / opportunities_1x,
             'average_points_auto': float(points_auto) / opportunities_1x,
             # Teleop
             'average_endgame_points': float(climb_park_teleop) / opportunities_1x,
             'average_num_robots_hanging': float(robots_hanging) / opportunities_1x,
+            'average_cell_count_bottom_teleop': float(cell_count_bottom_teleop) / opportunities_1x,
+            'average_cell_count_outer_teleop': float(cell_count_outer_teleop) / opportunities_1x,
+            'average_cell_count_inner_teleop': float(cell_count_inner_teleop) / opportunities_1x,
+            'average_cell_count_teleop': float(cell_count_bottom_teleop + cell_count_outer_teleop + cell_count_inner_teleop) / opportunities_1x,
             'average_cell_points_teleop': float(cell_points_teleop) / opportunities_1x,
             'average_control_panel_points': float(control_panel_points) / opportunities_1x,
             'average_points_teleop': float(points_teleop) / opportunities_1x,
@@ -173,6 +193,10 @@ class EventInsightsHelper(object):
             'average_win_score': float(winning_scores) / finished_matches,
             'average_win_margin': float(win_margins) / finished_matches,
             'average_score': float(total_scores) / opportunities_1x,
+            'average_cell_count_bottom': float(cell_count_bottom_auto + cell_count_bottom_teleop) / opportunities_1x,
+            'average_cell_count_outer': float(cell_count_outer_auto + cell_count_outer_teleop) / opportunities_1x,
+            'average_cell_count_inner': float(cell_count_inner_auto + cell_count_inner_teleop) / opportunities_1x,
+            'average_cell_count': float(cell_count_bottom_auto + cell_count_outer_auto + cell_count_inner_auto + cell_count_bottom_teleop + cell_count_outer_teleop + cell_count_inner_teleop) / opportunities_1x,
             'average_cell_score': float(total_cell) / opportunities_1x,
             'average_foul_score': float(foul_scores) / opportunities_1x,
             'high_score': high_score,
