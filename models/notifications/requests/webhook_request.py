@@ -66,7 +66,7 @@ class WebhookRequest(Request):
             valid_url = False
             logging.warning('URLError: ' + str(e.reason))
         except Exception, ex:
-            logging.error("Other Exception: {}".format(str(ex)))
+            logging.error("Other Exception: ({}) {}".format(ex.__class__.__name__, str(ex)))
 
         return valid_url
 
