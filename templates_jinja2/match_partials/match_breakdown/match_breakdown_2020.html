@@ -23,38 +23,38 @@
     <tr>
       <td class="red" colspan="2">
         {% if match.score_breakdown.red.initLineRobot1 == 'Exited' %}
-        <span class="glyphicon glyphicon-ok" rel="tooltip" title="{{match.alliances.red.teams.0}}"></span>
+        <span class="glyphicon glyphicon-ok" rel="tooltip" title="{{match.alliances.red.teams.0|digits}}"></span>
         {% else %}
-        <span class="glyphicon glyphicon-remove" rel="tooltip" title="{{match.alliances.red.teams.0}}"></span>
+        <span class="glyphicon glyphicon-remove" rel="tooltip" title="{{match.alliances.red.teams.0|digits}}"></span>
         {% endif %}
         {% if match.score_breakdown.red.initLineRobot2 == 'Exited' %}
-        <span class="glyphicon glyphicon-ok" rel="tooltip" title="{{match.alliances.red.teams.1}}"></span>
+        <span class="glyphicon glyphicon-ok" rel="tooltip" title="{{match.alliances.red.teams.1|digits}}"></span>
         {% else %}
-        <span class="glyphicon glyphicon-remove" rel="tooltip" title="{{match.alliances.red.teams.1}}"></span>
+        <span class="glyphicon glyphicon-remove" rel="tooltip" title="{{match.alliances.red.teams.1|digits}}"></span>
         {% endif %}
         {% if match.score_breakdown.red.initLineRobot3 == 'Exited' %}
-        <span class="glyphicon glyphicon-ok" rel="tooltip" title="{{match.alliances.red.teams.2}}"></span>
+        <span class="glyphicon glyphicon-ok" rel="tooltip" title="{{match.alliances.red.teams.2|digits}}"></span>
         {% else %}
-        <span class="glyphicon glyphicon-remove" rel="tooltip" title="{{match.alliances.red.teams.2}}"></span>
+        <span class="glyphicon glyphicon-remove" rel="tooltip" title="{{match.alliances.red.teams.2|digits}}"></span>
         {% endif %}
         (+{{match.score_breakdown.red.autoInitLinePoints}})
       </td>
       <td>Initiation Line Exited</td>
       <td class="blue" colspan="2">
         {% if match.score_breakdown.blue.initLineRobot1 == 'Exited' %}
-        <span class="glyphicon glyphicon-ok" rel="tooltip" title="{{match.alliances.blue.teams.0}}"></span>
+        <span class="glyphicon glyphicon-ok" rel="tooltip" title="{{match.alliances.blue.teams.0|digits}}"></span>
         {% else %}
-        <span class="glyphicon glyphicon-remove" rel="tooltip" title="{{match.alliances.blue.teams.0}}"></span>
+        <span class="glyphicon glyphicon-remove" rel="tooltip" title="{{match.alliances.blue.teams.0|digits}}"></span>
         {% endif %}
         {% if match.score_breakdown.blue.initLineRobot2 == 'Exited' %}
-        <span class="glyphicon glyphicon-ok" rel="tooltip" title="{{match.alliances.blue.teams.1}}"></span>
+        <span class="glyphicon glyphicon-ok" rel="tooltip" title="{{match.alliances.blue.teams.1|digits}}"></span>
         {% else %}
-        <span class="glyphicon glyphicon-remove" rel="tooltip" title="{{match.alliances.blue.teams.1}}"></span>
+        <span class="glyphicon glyphicon-remove" rel="tooltip" title="{{match.alliances.blue.teams.1|digits}}"></span>
         {% endif %}
         {% if match.score_breakdown.blue.initLineRobot3 == 'Exited' %}
-        <span class="glyphicon glyphicon-ok" rel="tooltip" title="{{match.alliances.blue.teams.2}}"></span>
+        <span class="glyphicon glyphicon-ok" rel="tooltip" title="{{match.alliances.blue.teams.2|digits}}"></span>
         {% else %}
-        <span class="glyphicon glyphicon-remove" rel="tooltip" title="{{match.alliances.blue.teams.2}}"></span>
+        <span class="glyphicon glyphicon-remove" rel="tooltip" title="{{match.alliances.blue.teams.2|digits}}"></span>
         {% endif %}
         (+{{match.score_breakdown.blue.autoInitLinePoints}})
       </td>
@@ -152,7 +152,7 @@
     <!-- Robot 1 Endgame -->
     {% if "endgameRobot1" in match.score_breakdown.red %}
     <tr>
-      <td class="red" colspan="2" rel="tooltip" title="{{match.alliances.red.teams.0}}">
+      <td class="red" colspan="2" rel="tooltip" title="{{match.alliances.red.teams.0|digits}}">
         {% if match.score_breakdown.red.endgameRobot1 == 'Hang' %}
           Hang (+25)
         {% elif match.score_breakdown.red.endgameRobot1 == 'Park' %}
@@ -161,7 +161,7 @@
           <span class="glyphicon glyphicon-remove"></span>
         {% endif %}
       <td>Robot 1 Endgame</td>
-      <td class="blue" colspan="2" rel="tooltip" title="{{match.alliances.blue.teams.0}}">
+      <td class="blue" colspan="2" rel="tooltip" title="{{match.alliances.blue.teams.0|digits}}">
         {% if match.score_breakdown.blue.endgameRobot1 == 'Hang' %}
           Hang (+25)
         {% elif match.score_breakdown.blue.endgameRobot1 == 'Park' %}
@@ -175,7 +175,7 @@
     <!-- Robot 2 Endgame -->
     {% if "endgameRobot2" in match.score_breakdown.red %}
     <tr>
-      <td class="red" colspan="2" rel="tooltip" title="{{match.alliances.red.teams.1}}">
+      <td class="red" colspan="2" rel="tooltip" title="{{match.alliances.red.teams.1|digits}}">
         {% if match.score_breakdown.red.endgameRobot2 == 'Hang' %}
           Hang (+25)
         {% elif match.score_breakdown.red.endgameRobot2 == 'Park' %}
@@ -184,7 +184,7 @@
           <span class="glyphicon glyphicon-remove"></span>
         {% endif %}
       <td>Robot 2 Endgame</td>
-      <td class="blue" colspan="2" rel="tooltip" title="{{match.alliances.blue.teams.1}}">
+      <td class="blue" colspan="2" rel="tooltip" title="{{match.alliances.blue.teams.1|digits}}">
         {% if match.score_breakdown.blue.endgameRobot2 == 'Hang' %}
           Hang (+25)
         {% elif match.score_breakdown.blue.endgameRobot2 == 'Park' %}
@@ -198,7 +198,7 @@
     <!-- Robot 3 Endgame -->
     {% if "endgameRobot3" in match.score_breakdown.red %}
     <tr>
-      <td class="red" colspan="2" rel="tooltip" title="{{match.alliances.red.teams.2}}">
+      <td class="red" colspan="2" rel="tooltip" title="{{match.alliances.red.teams.2|digits}}">
         {% if match.score_breakdown.red.endgameRobot3 == 'Hang' %}
           Hang (+25)
         {% elif match.score_breakdown.red.endgameRobot3 == 'Park' %}
@@ -207,7 +207,7 @@
           <span class="glyphicon glyphicon-remove"></span>
         {% endif %}
       <td>Robot 3 Endgame</td>
-      <td class="blue" colspan="2" rel="tooltip" title="{{match.alliances.blue.teams.2}}">
+      <td class="blue" colspan="2" rel="tooltip" title="{{match.alliances.blue.teams.2|digits}}">
         {% if match.score_breakdown.blue.endgameRobot3 == 'Hang' %}
           Hang (+25)
         {% elif match.score_breakdown.blue.endgameRobot3 == 'Park' %}
