@@ -250,6 +250,12 @@ class ContributionCalculator(object):
                     means[color] = count
                 elif self._stat == 'hab_climb_points':
                     means[color] = match.score_breakdown[color]['habClimbPoints']
+                elif self._stat == 'power_cells_scored':
+                    count = 0
+                    for mode in ['auto', 'teleop']:
+                        for goal in ['Bottom', 'Outer', 'Inner']:
+                            count += match.score_breakdown[color]['{}Cells{}'.format(mode, goal)]
+                    means[color] = count
                 else:
                     raise Exception("Unknown stat: {}".format(self._stat))
 
@@ -436,6 +442,19 @@ class PredictionHelper(object):
                     mu = mean_vars[color][stat]['mean'] - required_points
                     prob = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
                     prediction[color]['prob_hab_docking'] = prob
+                # 2020
+                if stat == 'power_cells_scored':
+                    required_pieces = 49
+
+                    mu = mean_vars[color][stat]['mean'] - required_pieces
+                    prob = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
+                    prediction[color]['prob_shield_energized'] = prob
+                if stat == 'endgame_points':
+                    required_points = 65
+
+                    mu = mean_vars[color][stat]['mean'] - required_points
+                    prob = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
+                    prediction[color]['prob_shield_operational'] = prob
 
         # Prob win
         red_score = prediction['red']['score']
@@ -502,6 +521,12 @@ class PredictionHelper(object):
                 ('score', 10, 20**2),
                 ('rocket_pieces_scored', 1, 3**2),
                 ('hab_climb_points', 2, 3**2),
+            ]
+        elif event.year == 2020:
+            relevant_stats = [
+                ('score', 60, 20**2),
+                ('power_cells_scored', 10, 10**2),
+                ('endgame_points', 15, 10**2),
             ]
 
         contribution_calculators = [ContributionCalculator(event, matches, s, m, v) for s, m, v in relevant_stats]
@@ -652,6 +677,10 @@ class PredictionHelper(object):
                             sampled_rp1[alliance_color] = match.score_breakdown[alliance_color]['completeRocketRankingPoint']
                             sampled_rp2[alliance_color] = match.score_breakdown[alliance_color]['habDockingRankingPoint']
                             sampled_tiebreaker[alliance_color] = match.score_breakdown[alliance_color]['totalPoints']
+                        elif match.year == 2020:
+                            sampled_rp1[alliance_color] = match.score_breakdown[alliance_color]['shieldEnergizedRankingPoint']
+                            sampled_rp2[alliance_color] = match.score_breakdown[alliance_color]['shieldOperationalRankingPoint']
+                            sampled_tiebreaker[alliance_color] = match.score_breakdown[alliance_color]['totalPoints']
                 else:
                     prediction = match_predictions[match.key.id()]
                     if np.random.uniform(high=1) < prediction['prob']:
@@ -678,6 +707,10 @@ class PredictionHelper(object):
                         elif match.year == 2019:
                             sampled_rp1[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_complete_rocket']
                             sampled_rp2[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_hab_docking']
+                            sampled_tiebreaker[alliance_color] = prediction[alliance_color]['score']
+                        elif match.year == 2020:
+                            sampled_rp1[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_shield_energized']
+                            sampled_rp2[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_shield_operational']
                             sampled_tiebreaker[alliance_color] = prediction[alliance_color]['score']
 
                 # Using match results, update RP and tiebreaker

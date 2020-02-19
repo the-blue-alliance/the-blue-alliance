@@ -134,6 +134,14 @@
       {% elif match.score_breakdown.get(alliance_color).get('habDockingRankingPoint') %}H
       {% else %}--{% endif %}
     {% endif %}
+  {% elif match.year == 2020 and match.has_been_played and match.score_breakdown %}
+    {% if match.score_breakdown.get(alliance_color).get('shieldEnergizedRankingPoint') and match.score_breakdown.get(alliance_color).get('shieldOperationalRankingPoint') %}
+    E / O
+    {% else %}
+      {% if match.score_breakdown.get(alliance_color).get('shieldEnergizedRankingPoint') %}E
+      {% elif match.score_breakdown.get(alliance_color).get('shieldOperationalRankingPoint') %}O
+      {% else %}--{% endif %}
+    {% endif %}
   {% else %}
     ?
   {% endif %}
@@ -146,6 +154,8 @@
   <em>{{(predictions.get(match.key.id()).get(alliance_color).prob_auto_quest)|limit_prob}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_face_boss)|limit_prob}}%</em>
   {% elif match.year == 2019 %}
   <em>{{(predictions.get(match.key.id()).get(alliance_color).prob_complete_rocket)|limit_prob}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_hab_docking)|limit_prob}}%</em>
+  {% elif match.year == 2020 %}
+  <em>{{(predictions.get(match.key.id()).get(alliance_color).prob_shield_energized)|limit_prob}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_shield_operational)|limit_prob}}%</em>
   {% endif %}
 </td>
 {% endmacro %}
