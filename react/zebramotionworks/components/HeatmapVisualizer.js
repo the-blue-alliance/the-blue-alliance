@@ -37,9 +37,9 @@ class HeatmapVisualizer extends React.Component {
   setData() {
     const { data } = this.props
 
-    const grid = new Array(WIDTH * GRID_SCALE)
-    for (let i = 0; i < WIDTH * GRID_SCALE; i++) {
-      grid[i] = new Array(HEIGHT * GRID_SCALE).fill(0)
+    const grid = new Array(WIDTH * GRID_SCALE + 1)
+    for (let i = 0; i < WIDTH * GRID_SCALE + 1; i++) {
+      grid[i] = new Array(HEIGHT * GRID_SCALE + 1).fill(0)
     }
 
     const dataLen = data.times.length
