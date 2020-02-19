@@ -3,7 +3,6 @@ from mock import Mock, patch
 import urllib2
 
 from google.appengine.api import taskqueue
-from google.appengine.api.urlfetch_errors import DeadlineExceededError
 from google.appengine.ext import testbed
 
 from models.notifications.requests.request import Request
@@ -130,18 +129,6 @@ class TestWebhookRequest(unittest2.TestCase):
         mock_urlopen.assert_called_once()
         mock_track.assert_not_called()
         self.assertFalse(success)
-
-    def test_send_fail_deadline_error(self):
-        message = WebhookRequest(MockNotification(webhook_message_data={'data': 'value'}), 'https://www.thebluealliance.com', 'secret')
-
-        error_mock = Mock()
-        error_mock.side_effect = DeadlineExceededError('testing')
-
-        with patch.object(urllib2, 'urlopen', error_mock) as mock_urlopen, patch.object(message, 'defer_track_notification') as mock_track:
-            success = message.send()
-        mock_urlopen.assert_called_once()
-        mock_track.assert_not_called()
-        self.assertTrue(success)
 
     def test_send_error_other(self):
         message = WebhookRequest(MockNotification(webhook_message_data={'data': 'value'}), 'https://www.thebluealliance.com', 'secret')
