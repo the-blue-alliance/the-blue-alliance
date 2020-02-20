@@ -482,18 +482,6 @@ class WebcastsHandler(CacheableHandler):
         return jinja2_engine.render('webcasts.html', self.template_values)
 
 
-class RecordHandler(CacheableHandler):
-    CACHE_VERSION = 1
-    CACHE_KEY_FORMAT = "main_record"
-
-    def __init__(self, *args, **kw):
-        super(RecordHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24 * 7
-
-    def _render(self, *args, **kw):
-        return jinja2_engine.render('record.html', self.template_values)
-
-
 class ApiWriteHandler(CacheableHandler):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "api_write"

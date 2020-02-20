@@ -24,7 +24,7 @@ from controllers.insights_controller import InsightsOverview, InsightsDetail
 from controllers.main_controller import AvatarsHandler, TwoChampsHandler, ContactHandler, HashtagsHandler, FIRSTHOFHandler, \
     MainLandingHandler, OprHandler, PredictionsHandler, PrivacyHandler, SearchHandler, \
     AboutHandler, ThanksHandler, handle_404, handle_500, \
-    WebcastsHandler, RecordHandler, ApiWriteHandler
+    WebcastsHandler, ApiWriteHandler
 from controllers.match_controller import MatchDetail, MatchTimeseries
 from controllers.match_suggestion_controller import MatchSuggestionHandler
 from controllers.match_timeline_controller import MatchTimelineHandler
@@ -131,7 +131,6 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/opr', OprHandler, 'opr', strict_slash=True),
       RedirectRoute(r'/predictions', PredictionsHandler, 'predictions', strict_slash=True),
       RedirectRoute(r'/privacy', PrivacyHandler, 'privacy', strict_slash=True),
-      RedirectRoute(r'/record', RecordHandler, 'record', strict_slash=True),
       RedirectRoute(r'/request/apiwrite', SuggestApiWriteController, 'request-apiwrite', strict_slash=True),
       RedirectRoute(r'/search', SearchHandler, 'search', strict_slash=True),
       RedirectRoute(r'/suggest/apiwrite/review', SuggestApiWriteReviewController, 'request-apiwrite-review', strict_slash=True),
