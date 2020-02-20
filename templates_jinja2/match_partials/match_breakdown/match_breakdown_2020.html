@@ -264,11 +264,11 @@
     {% if "stage1Activated" in match.score_breakdown.red %}
     <tr>
       <td class="red" colspan="2">
-        {% if match.score_breakdown.red.stage3Activated %}3 (+1 RP){% elif match.score_breakdown.red.stage2Activated %}2{% elif match.score_breakdown.red.stage1Activated %}1{% else %}None{% endif %}
+        {% if match.score_breakdown.red.stage3Activated %}3 (+1 RP){% elif match.score_breakdown.red.stage2Activated %}2{% elif match.score_breakdown.red.stage1Activated %}1{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}
       </td>
       <td>Stage Activations</td>
       <td class="blue" colspan="2">
-        {% if match.score_breakdown.blue.stage3Activated %}3 (+1 RP){% elif match.score_breakdown.blue.stage2Activated %}2{% elif match.score_breakdown.blue.stage1Activated %}1{% else %}None{% endif %}
+        {% if match.score_breakdown.blue.stage3Activated %}3 (+1 RP){% elif match.score_breakdown.blue.stage2Activated %}2{% elif match.score_breakdown.blue.stage1Activated %}1{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}
 
       </td>
     </tr>
