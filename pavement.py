@@ -140,6 +140,7 @@ def make():
 @task
 def make_endpoints_config():
     sh("python lib/endpoints/endpointscfg.py get_openapi_spec mobile_main.MobileAPI --hostname tbatv-prod-hrd.appspot.com")
+    sh("python lib/endpoints/endpointscfg.py get_openapi_spec clientapi.clientapi_service.ClientAPI --hostname tbatv-prod-hrd.appspot.com")
 
 
 @task
