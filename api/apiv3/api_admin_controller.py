@@ -31,6 +31,7 @@ class ApiAdminSetBuildInfo(ApiAdminController):
         deploy_time = data.get('deploy_time', '')
         travis_job = data.get('travis_job', '')
         endpoints_sha = data.get('endpoints_sha', '')
+        tbaClient_endpoints_sha = data.get('tbaClient_endpoints_sha', '')
 
         web_info = {
             'current_commit': current_commit_sha,
@@ -38,6 +39,7 @@ class ApiAdminSetBuildInfo(ApiAdminController):
             'deploy_time': deploy_time,
             'travis_job': travis_job,
             'endpoints_sha': endpoints_sha,
+            'tbaClient_endpoints_sha': tbaClient_endpoints_sha,
         }
 
         status_sitevar = Sitevar.get_or_insert('apistatus', values_json='{}')

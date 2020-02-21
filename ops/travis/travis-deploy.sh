@@ -71,7 +71,10 @@ done
 # Check if we need to deploy our Endpoints config - cleanup afterwards so it's not in our web deploy
 paver make_endpoints_config
 if check_deploy_endpoints_config; then
-    with_python27 "$GCLOUD endpoints services deploy tbaMobilev9openapi.json"
+  with_python27 "$GCLOUD endpoints services deploy tbaMobilev9openapi.json"
+fi
+if check_deploy_tbaClient_endpoints_config; then
+  with_python27 "$GCLOUD endpoints services deploy tbaClientv9openapi.json"
 fi
 
 echo "Updating build info..."

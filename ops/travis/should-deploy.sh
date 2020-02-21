@@ -12,8 +12,9 @@ update_build_info() {
     deploy_time="$(date)"
     travis_job="$TRAVIS_BUILD_ID"
     endpoints_sha=$(sha1sum tbaMobilev9openapi.json | awk '{ echo $1 }')
+    tbaClient_endpoints_sha=$(sha1sum tbaClientv9openapi.json | awk '{ echo $1 }')
 
-    http $SET_BUILD_STATUS X-TBA-Auth-Key:$APIv3_KEY current_commit="$current_commit" commit_time="$commit_time" deploy_time="$deploy_time" travis_job="$travis_job" endpoints_sha="$endpoints_sha"
+    http $SET_BUILD_STATUS X-TBA-Auth-Key:$APIv3_KEY current_commit="$current_commit" commit_time="$commit_time" deploy_time="$deploy_time" travis_job="$travis_job" endpoints_sha="$endpoints_sha" tbaClient_endpoints_sha="$tbaClient_endpoints_sha"
 }
 
 check_killswitch() {
@@ -58,6 +59,22 @@ check_deploy_endpoints_config() {
 
     if [ "$deployed_sha" -eq "$endpoints_sha" ]; then
         echo "Deployed endpoints sha is the same as current endpoints sha. No need to deploy."
+        exit 0
+    fi
+}
+
+check_deploy_tbaClient_endpoints_config() {
+    endpoints_sha=$(sha1sum tbaClientv9openapi.json | awk '{ echo $1 }')
+
+    echo "Pulling deployed tbaClient endpoints sha..."
+    web_status=$(fetch_apiv3_status | jq '.web')
+    deployed_sha=$(echo $web_status | jq '.endpoints_sha')
+
+    echo "Previously deployed tbaClient endpoints sha is $deployed_sha"
+    echo "New tbaClient endpoints sha is $endpoints_sha"
+
+    if [ "$deployed_sha" -eq "$endpoints_sha" ]; then
+        echo "Deployed tbaClient endpoints sha is the same as current endpoints sha. No need to deploy."
         exit 0
     fi
 }
