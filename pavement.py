@@ -1,12 +1,14 @@
 # Easy paver commands for less command typing and more coding.
 # Visit http://paver.github.com/paver/ to get started. - @brandondean Sept. 30
 import subprocess
+import sys
 import json
 import time
 import optparse
 import os
 import re
 from paver.easy import *
+from openapi_spec_validator import validate_spec
 
 path = path("./")
 
@@ -85,6 +87,29 @@ def lint(options):
         args = "--commit {}".format(options.lint.commit)
 
     sh("python ops/linter.py {}".format(args))
+
+
+@task
+def validate_swagger():
+    dir = "./static/swagger"
+    for fname in os.listdir(dir):
+        print("Checking {}...".format(fname))
+        if fname.endswith(".json"):
+            with open('{}/{}'.format(dir, fname), 'rb') as file:
+                try:
+                    spec_dict = json.load(file)
+                except ValueError, e:
+                    print("Invalid JSON")
+                    print(e)
+                    sys.exit(1)
+            try:
+                validate_spec(spec_dict)
+            except Exception, e:
+                print("Invalid OpenAPI Spec")
+                print(e)
+                sys.exit(1)
+            print("{} validated!".format(fname))
+    sys.exit(0)
 
 
 @task
