@@ -5600,7 +5600,7 @@
               "example": [
                 0.0,
                 0.1,
-                0.2,
+                0.2
               ]
             }
           },
@@ -5622,7 +5622,7 @@
                 }
               }
             }
-          },
+          }
         }
       },
       "Zebra_team": {
@@ -5636,7 +5636,7 @@
           "team_key": {
             "type": "string",
             "description": "The TBA team key for the Zebra MotionWorks data.",
-            "example": "frc7332",
+            "example": "frc7332"
           },
           "xs": {
             "type": "array",
@@ -5663,7 +5663,7 @@
                 null
               ]
             }
-          },
+          }
         }
       },
       "Match_Score_Breakdown_2015": {
