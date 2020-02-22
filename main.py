@@ -98,6 +98,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/apiwrite', ApiWriteHandler, 'api-write', strict_slash=True),
       RedirectRoute(r'/avatars/<year:[0-9]+>', AvatarsHandler, 'avatars', strict_slash=True),
       RedirectRoute(r'/bigquery', redirect_to='https://console.cloud.google.com/bigquery?project=tbatv-prod-hrd&p=tbatv-prod-hrd&d=the_blue_alliance&page=dataset'),
+      RedirectRoute(r'/blog', redirect_to='https://blog.thebluealliance.com'),
       RedirectRoute(r'/contact', ContactHandler, 'contact', strict_slash=True),
       RedirectRoute(r'/event/<event_key>', EventDetail, 'event-detail', strict_slash=True),
       RedirectRoute(r'/event/<event_key>/insights', EventInsights, 'event-insights', strict_slash=True),
