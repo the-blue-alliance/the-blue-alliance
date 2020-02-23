@@ -28,7 +28,7 @@ from consts.event_type import EventType
 
 class TeamRenderer(object):
     @classmethod
-    def render_team_details(cls, handler, team, year, is_canonical):
+    def render_team_details(cls, handler, team, team_key, year, is_canonical):
         hof_award_future = award_query.TeamEventTypeAwardsQuery(team.key.id(), EventType.CMP_FINALS, AwardType.CHAIRMANS).fetch_async()
         hof_video_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_VIDEO).fetch_async()
         hof_presentation_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_PRESENTATION).fetch_async()
@@ -54,7 +54,7 @@ class TeamRenderer(object):
             },
         }
 
-        events_sorted, matches_by_event_key, awards_by_event_key, valid_years = TeamDetailsDataFetcher.fetch(team, year, return_valid_years=True)
+        events_sorted, matches_by_event_key, awards_by_event_key, valid_years = TeamDetailsDataFetcher.fetch(team, team_key, year, return_valid_years=True)
         if not events_sorted:
             return None
 
@@ -94,13 +94,13 @@ class TeamRenderer(object):
 
             if year == 2015:
                 display_wlt = None
-                match_avg = EventHelper.calculateTeamAvgScoreFromMatches(team.key_name, event_matches)
+                match_avg = EventHelper.calculateTeamAvgScoreFromMatches(team_key, event_matches)
                 year_match_avg_list.append(match_avg)
                 qual_avg, elim_avg, _, _ = match_avg
             else:
                 qual_avg = None
                 elim_avg = None
-                wlt = EventHelper.calculateTeamWLTFromMatches(team.key_name, event_matches)
+                wlt = EventHelper.calculateTeamWLTFromMatches(team_key, event_matches)
                 if event.event_type_enum in EventType.SEASON_EVENT_TYPES:
                     season_wlt_list.append(wlt)
                 else:
@@ -113,7 +113,7 @@ class TeamRenderer(object):
             team_rank = None
             if event.details and event.details.rankings2:
                 for ranking in event.details.rankings2:
-                    if ranking['team_key'] == team.key.id():
+                    if ranking['team_key'] == team_key:
                         team_rank = ranking['rank']
                         break
 
@@ -194,6 +194,7 @@ class TeamRenderer(object):
         handler.template_values.update({
             "is_canonical": is_canonical,
             "team": team,
+            "team_number": team_key.lstrip("frc"),
             "participation": participation,
             "year": year,
             "years": valid_years,
@@ -224,14 +225,14 @@ class TeamRenderer(object):
         return jinja2_engine.render("team_details.html", handler.template_values)
 
     @classmethod
-    def render_team_history(cls, handler, team, is_canonical):
+    def render_team_history(cls, handler, team, team_key, is_canonical):
         hof_award_future = award_query.TeamEventTypeAwardsQuery(team.key.id(), EventType.CMP_FINALS, AwardType.CHAIRMANS).fetch_async()
         hof_video_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_VIDEO).fetch_async()
         hof_presentation_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_PRESENTATION).fetch_async()
         hof_essay_future = media_query.TeamTagMediasQuery(team.key.id(), MediaTag.CHAIRMANS_ESSAY).fetch_async()
-        award_futures = award_query.TeamAwardsQuery(team.key.id()).fetch_async()
+        award_futures = award_query.TeamAwardsQuery(team_key).fetch_async()
         event_futures = event_query.TeamEventsQuery(team.key.id()).fetch_async()
-        participation_future = team_query.TeamParticipationQuery(team.key.id()).fetch_async()
+        participation_future = team_query.TeamParticipationQuery(team_key).fetch_async()
         social_media_future = media_query.TeamSocialMediaQuery(team.key.id()).fetch_async()
 
         hof_awards = hof_award_future.get_result()
@@ -263,13 +264,21 @@ class TeamRenderer(object):
         years = set()
         for event in event_futures.get_result():
             years.add(event.year)
+            matches = None
             if event.now:
                 current_event = event
-                matches = match_query.TeamEventMatchesQuery(team.key.id(), event.key.id()).fetch()
+                matches = match_query.TeamEventMatchesQuery(team_key, event.key.id()).fetch()
                 matches_upcoming = MatchHelper.upcomingMatches(matches)
 
             if event.within_a_day:
                 short_cache = True
+
+            if team.key.id() != team_key:
+                # verify that B teams actually attended this event
+                if matches is None:
+                    matches = match_query.TeamEventMatchesQuery(team_key, event.key.id()).fetch()
+                if not matches:
+                    continue
 
             if event.key_name in awards_by_event:
                 sorted_awards = AwardHelper.organizeAwards(awards_by_event[event.key_name])
@@ -289,6 +298,7 @@ class TeamRenderer(object):
         handler.template_values.update({
             "is_canonical": is_canonical,
             "team": team,
+            "team_number": team_key.lstrip("frc"),
             "event_awards": event_awards,
             "years": sorted(years),
             "social_medias": social_medias,

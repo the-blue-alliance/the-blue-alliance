@@ -7,14 +7,14 @@ from database import award_query, event_query, match_query, team_query
 
 class TeamDetailsDataFetcher(object):
     @classmethod
-    def fetch(self, team, year, return_valid_years=False):
+    def fetch(self, team, team_key, year, return_valid_years=False):
         """
         returns: events_sorted, matches_by_event_key, awards_by_event_key, valid_years
         of a team for a given year
         """
-        awards_future = award_query.TeamYearAwardsQuery(team.key.id(), year).fetch_async()
+        awards_future = award_query.TeamYearAwardsQuery(team_key, year).fetch_async()
         events_future = event_query.TeamYearEventsQuery(team.key.id(), year).fetch_async()
-        matches_future = match_query.TeamYearMatchesQuery(team.key.id(), year).fetch_async()
+        matches_future = match_query.TeamYearMatchesQuery(team_key, year).fetch_async()
         if return_valid_years:
             valid_years_future = team_query.TeamParticipationQuery(team.key.id()).fetch_async()
 
@@ -32,6 +32,11 @@ class TeamDetailsDataFetcher(object):
                 awards_by_event_key[award.event].append(award)
             else:
                 awards_by_event_key[award.event] = [award]
+
+        if team_key != team.key.id():
+            # for B teams, filter out events where they didn't play any matches or win any awards
+            events_sorted = [event for event in events_sorted
+                if event.key in matches_by_event_key or event.key in awards_by_event_key]
 
         if return_valid_years:
             valid_years = sorted(valid_years_future.get_result())

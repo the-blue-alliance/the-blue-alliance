@@ -62,7 +62,7 @@
   {% if fake_matches %}
   {{ team_key|strip_frc }}
   {% else %}
-  <a href="/team/{{team_key|digits}}/{{match.year}}"{% if team_key in match.alliances.get(alliance_color).surrogates and team_key in match.alliances.get(alliance_color).dqs %} class="surrogate dq" rel="tooltip" title="Surrogate | DQ"{% elif team_key in match.alliances.get(alliance_color).surrogates %} class="surrogate" rel="tooltip" title="Surrogate"{% elif team_key in match.alliances.get(alliance_color).dqs %} class="dq" rel="tooltip" title="DQ"{% endif %}>{{ team_key|strip_frc }}</a>
+  <a href="/team/{{team_key|strip_frc}}/{{match.year}}"{% if team_key in match.alliances.get(alliance_color).surrogates and team_key in match.alliances.get(alliance_color).dqs %} class="surrogate dq" rel="tooltip" title="Surrogate | DQ"{% elif team_key in match.alliances.get(alliance_color).surrogates %} class="surrogate" rel="tooltip" title="Surrogate"{% elif team_key in match.alliances.get(alliance_color).dqs %} class="dq" rel="tooltip" title="DQ"{% endif %}>{{ team_key|strip_frc }}</a>
   {% endif %}
 </td>
 {% endmacro %}
