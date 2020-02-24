@@ -1,4 +1,4 @@
-from google.appengine.api.urlfetch_errors import DeadlineExceededError
+from google.appengine.runtime import DeadlineExceededError
 
 from models.notifications.requests.request import Request
 

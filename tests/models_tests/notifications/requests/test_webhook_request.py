@@ -3,8 +3,8 @@ from mock import Mock, patch
 import urllib2
 
 from google.appengine.api import taskqueue
-from google.appengine.api.urlfetch_errors import DeadlineExceededError
 from google.appengine.ext import testbed
+from google.appengine.runtime import DeadlineExceededError
 
 from models.notifications.requests.request import Request
 from models.notifications.requests.webhook_request import WebhookRequest
