@@ -1,5 +1,3 @@
-from google.appengine.runtime import DeadlineExceededError
-
 from models.notifications.requests.request import Request
 
 
@@ -67,10 +65,11 @@ class WebhookRequest(Request):
         except urllib2.URLError, e:
             valid_url = False
             logging.warning('URLError: ' + str(e.reason))
-        except DeadlineExceededError, ex:
-            logging.warning('Deadline exceeded: {}'.format(str(ex)))
         except Exception, ex:
-            logging.error("Other Exception: {}".format(str(ex)))
+            if 'Deadline exceeded' in str(ex):
+                logging.warning('Deadline exceeded: {}'.format(str(ex)))
+            else:
+                logging.error("Other Exception ({}): {}".format(ex.__class__.__name__, str(ex)))
 
         return valid_url
 
