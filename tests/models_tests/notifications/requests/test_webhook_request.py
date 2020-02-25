@@ -4,7 +4,6 @@ import urllib2
 
 from google.appengine.api import taskqueue
 from google.appengine.ext import testbed
-from google.appengine.runtime import DeadlineExceededError
 
 from models.notifications.requests.request import Request
 from models.notifications.requests.webhook_request import WebhookRequest
@@ -135,7 +134,7 @@ class TestWebhookRequest(unittest2.TestCase):
         message = WebhookRequest(MockNotification(webhook_message_data={'data': 'value'}), 'https://www.thebluealliance.com', 'secret')
 
         error_mock = Mock()
-        error_mock.side_effect = DeadlineExceededError('testing')
+        error_mock.side_effect = Exception('Deadline exceeded while waiting for HTTP response from URL: https://thebluealliance.com')
 
         with patch.object(urllib2, 'urlopen', error_mock) as mock_urlopen, patch.object(message, 'defer_track_notification') as mock_track:
             success = message.send()
