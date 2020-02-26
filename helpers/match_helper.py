@@ -394,6 +394,34 @@ class MatchHelper(object):
                 tiebreakers.append((red_breakdown['sandStormBonusPoints'], blue_breakdown['sandStormBonusPoints']))
             else:
                 tiebreakers.append(None)
+        elif match.year == 2020 and not (match.comp_level == 'f' and match.match_number <= 3):  # Finals can't be tiebroken. Only overtime
+            # Cumulative FOUL and TECH FOUL points due to opponent rule violations
+            if 'foulPoints' in red_breakdown and 'foulPoints' in blue_breakdown:
+                tiebreakers.append((red_breakdown['foulPoints'], blue_breakdown['foulPoints']))
+            else:
+                tiebreakers.append(None)
+
+            # Cumulative AUTO points
+            if 'autoPoints' in red_breakdown and 'autoPoints' in blue_breakdown:
+                tiebreakers.append((red_breakdown['autoPoints'], blue_breakdown['autoPoints']))
+            else:
+                tiebreakers.append(None)
+
+            # Cumulative ENDGAME points
+            if 'endgamePoints' in red_breakdown and 'endgamePoints' in blue_breakdown:
+                tiebreakers.append((red_breakdown['endgamePoints'], blue_breakdown['endgamePoints']))
+            else:
+                tiebreakers.append(None)
+
+            # Cumulative TELEOP POWER CELL and CONTROL PANEL points
+            if 'teleopCellPoints' in red_breakdown and 'teleopCellPoints' in blue_breakdown and \
+                    'controlPanelPoints' in red_breakdown and 'controlPanelPoints' in blue_breakdown:
+                tiebreakers.append((
+                    red_breakdown['teleopCellPoints'] + red_breakdown['controlPanelPoints'],
+                    blue_breakdown['teleopCellPoints'] + blue_breakdown['controlPanelPoints'],
+                ))
+            else:
+                tiebreakers.append(None)
 
         for tiebreaker in tiebreakers:
             if tiebreaker is None:
