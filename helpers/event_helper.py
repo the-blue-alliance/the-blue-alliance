@@ -188,13 +188,8 @@ class EventHelper(object):
 
         events = []
 
-        days_diff = 0
-        # Before 2020, event weeks start on Wednesdays
-        if today.year < 2020:
-            days_diff = 2  # 2 is Wednesday. diff_from_week_start ranges from 3 to -3 (Monday thru Sunday)
-        diff_from_week_start = days_diff - today.weekday()
-        # Pre-2020 this is going to be a Wednesday. Post-2020 this is going to be a Monday
-        closest_start_weekday = today + datetime.timedelta(days=diff_from_week_start)
+        diff_from_week_start = 0 - today.weekday()
+        closest_start_monday = today + datetime.timedelta(days=diff_from_week_start)
 
         two_weeks_of_event_futures = ndb.get_multi_async(two_weeks_of_events_keys_future.get_result())
         for event_future in two_weeks_of_event_futures:
@@ -202,7 +197,7 @@ class EventHelper(object):
             if event.within_a_day:
                 events.append(event)
             else:
-                offset = event.start_date.date() - closest_start_weekday.date()
+                offset = event.start_date.date() - closest_start_monday.date()
                 if (offset == datetime.timedelta(0)) or (offset > datetime.timedelta(0) and offset < datetime.timedelta(weeks=1)):
                     events.append(event)
 
