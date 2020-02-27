@@ -30,10 +30,8 @@ $(document).ready(function(){
   hash && $('ul.nav a[href="' + hash + '"]').tab('show');
 
   $('.nav-tabs a, .nav-pills a').click(function (e) {
-    $(this).tab('show');
-    var scrollmem = $('body').scrollTop();
+    e.preventDefault();
     window.location.hash = this.hash;
-    $('html,body').scrollTop(scrollmem);
   });
 
 	// Fancybox
