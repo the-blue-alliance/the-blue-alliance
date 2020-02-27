@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from pytz import timezone, UTC
 import unittest2
 
@@ -118,3 +118,42 @@ class TestSeasonHelper(unittest2.TestCase):
         kickoff_2009_utc = kickoff_2009.astimezone(UTC)
         self.assertEqual(SeasonHelper.kickoff_datetime_est(year=2009), kickoff_2009)
         self.assertEqual(SeasonHelper.kickoff_datetime_utc(year=2009), kickoff_2009_utc)
+
+    def test_stop_build_date(self):
+        # 2019 - Feb 19th, 2019
+        stop_build_2019 = datetime(2019, 2, 19, 23, 59, 59, tzinfo=timezone('EST'))
+        stop_build_2019_utc = stop_build_2019.astimezone(UTC)
+        self.assertEqual(SeasonHelper.stop_build_datetime_est(year=2019), stop_build_2019)
+        self.assertEqual(SeasonHelper.stop_build_datetime_utc(year=2019), stop_build_2019_utc)
+        # 2018 - Feb 20th, 2018
+        stop_build_2018 = datetime(2018, 2, 20, 23, 59, 59, tzinfo=timezone('EST'))
+        stop_build_2018_utc = stop_build_2018.astimezone(UTC)
+        self.assertEqual(SeasonHelper.stop_build_datetime_est(year=2018), stop_build_2018)
+        self.assertEqual(SeasonHelper.stop_build_datetime_utc(year=2018), stop_build_2018_utc)
+        # 2017 - Feb 21th, 2017
+        stop_build_2017 = datetime(2017, 2, 21, 23, 59, 59, tzinfo=timezone('EST'))
+        stop_build_2017_utc = stop_build_2017.astimezone(UTC)
+        self.assertEqual(SeasonHelper.stop_build_datetime_est(year=2017), stop_build_2017)
+        self.assertEqual(SeasonHelper.stop_build_datetime_utc(year=2017), stop_build_2017_utc)
+        # 2016 - Feb 23th, 2016
+        stop_build_2016 = datetime(2016, 2, 23, 23, 59, 59, tzinfo=timezone('EST'))
+        stop_build_2016_utc = stop_build_2016.astimezone(UTC)
+        self.assertEqual(SeasonHelper.stop_build_datetime_est(year=2016), stop_build_2016)
+        self.assertEqual(SeasonHelper.stop_build_datetime_utc(year=2016), stop_build_2016_utc)
+
+    def test_competition_season_start_date(self):
+        # 2020 - Feb 24th, 2020
+        comp_season_2020 = date(2020, 2, 24)
+        self.assertEqual(SeasonHelper.competition_season_start_date(year=2020), comp_season_2020)
+        # 2019 - Feb 25th, 2019
+        comp_season_2019 = date(2019, 2, 25)
+        self.assertEqual(SeasonHelper.competition_season_start_date(year=2019), comp_season_2019)
+        # 2018 - Feb 26th, 2018
+        comp_season_2018 = date(2018, 2, 26)
+        self.assertEqual(SeasonHelper.competition_season_start_date(year=2018), comp_season_2018)
+        # 2017 - Mar 1st, 2017
+        comp_season_2017 = date(2017, 3, 1)
+        self.assertEqual(SeasonHelper.competition_season_start_date(year=2017), comp_season_2017)
+        # 2016 - Mar 2nd, 2016
+        comp_season_2016 = date(2016, 3, 2)
+        self.assertEqual(SeasonHelper.competition_season_start_date(year=2016), comp_season_2016)
