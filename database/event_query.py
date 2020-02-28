@@ -10,7 +10,7 @@ from models.team import Team
 
 
 class EventQuery(DatabaseQuery):
-    CACHE_VERSION = 2
+    CACHE_VERSION = 3
     CACHE_KEY_FORMAT = 'event_{}'  # (event_key)
     DICT_CONVERTER = EventConverter
 
@@ -22,7 +22,7 @@ class EventQuery(DatabaseQuery):
 
 
 class EventListQuery(DatabaseQuery):
-    CACHE_VERSION = 3
+    CACHE_VERSION = 4
     CACHE_KEY_FORMAT = 'event_list_{}'  # (year)
     DICT_CONVERTER = EventConverter
 
@@ -34,7 +34,7 @@ class EventListQuery(DatabaseQuery):
 
 
 class DistrictEventsQuery(DatabaseQuery):
-    CACHE_VERSION = 4
+    CACHE_VERSION = 5
     CACHE_KEY_FORMAT = 'district_events_{}'  # (district_key)
     DICT_CONVERTER = EventConverter
 
@@ -47,7 +47,7 @@ class DistrictEventsQuery(DatabaseQuery):
 
 
 class TeamEventsQuery(DatabaseQuery):
-    CACHE_VERSION = 3
+    CACHE_VERSION = 4
     CACHE_KEY_FORMAT = 'team_events_{}'  # (team_key)
     DICT_CONVERTER = EventConverter
 
@@ -61,7 +61,7 @@ class TeamEventsQuery(DatabaseQuery):
 
 
 class TeamYearEventsQuery(DatabaseQuery):
-    CACHE_VERSION = 3
+    CACHE_VERSION = 4
     CACHE_KEY_FORMAT = 'team_year_events_{}_{}'  # (team_key, year)
     DICT_CONVERTER = EventConverter
 
@@ -78,7 +78,7 @@ class TeamYearEventsQuery(DatabaseQuery):
 
 
 class TeamYearEventTeamsQuery(DatabaseQuery):
-    CACHE_VERSION = 3
+    CACHE_VERSION = 4
     CACHE_KEY_FORMAT = 'team_year_eventteams_{}_{}'  # (team_key, year)
 
     @ndb.tasklet
@@ -92,7 +92,7 @@ class TeamYearEventTeamsQuery(DatabaseQuery):
 
 
 class EventDivisionsQuery(DatabaseQuery):
-    CACHE_VERSION = 3
+    CACHE_VERSION = 4
     CACHE_KEY_FORMAT = "event_divisions_{}"  # (event_key)
     DICT_CONVERTER = EventConverter
 
