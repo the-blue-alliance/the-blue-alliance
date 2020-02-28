@@ -224,7 +224,7 @@ class Event(ndb.Model):
     @property
     def week(self):
         """
-        Returns the week of the event relative to the start of the season
+        Returns the week of the event relative to the first official season event as an integer
         Returns None if the event is not of type NON_CMP_EVENT_TYPES or is not official
         """
         if self.event_type_enum not in EventType.NON_CMP_EVENT_TYPES or not self.official:
@@ -233,16 +233,36 @@ class Event(ndb.Model):
         if self._week:
             return self._week
 
-        from helpers.season_helper import SeasonHelper
-        competition_season_start_date = SeasonHelper.competition_season_start_date(year=self.year)
-        # Find the # of weeks this event occurs after the season start
-        day_diff = self.start_date.date() - competition_season_start_date
-        if self.year == 2016:
-            # In 2016, bump all weeks forward one. `2016scmb` sets our `0` (Week 0.5), which occurs before the season officially starts
-            self._week = max((day_diff.days / 7) + 1, 0)
-        else:
-            # Round official events that start before week one (2020isde1) to Week 1
-            self._week = max(day_diff.days / 7, 0)
+        # Cache week_start for the same context
+        cache_key = '{}_season_start:{}'.format(self.year, ndb.get_context().__hash__())
+        season_start = context_cache.get(cache_key)
+        if season_start is None:
+            e = Event.query(
+                Event.year==self.year,
+                Event.event_type_enum.IN(EventType.NON_CMP_EVENT_TYPES),
+                Event.start_date!=None
+            ).order(Event.start_date).fetch(1, projection=[Event.start_date])
+            if e:
+                first_start_date = e[0].start_date
+
+                days_diff = 0
+                # Before 2018, event weeks start on Wednesdays
+                if self.year < 2018:
+                    days_diff = 2  # 2 is Wednesday
+
+                # Find the closest start weekday (Monday or Wednesday) to the first event - this is our season start
+                diff_from_week_start = (first_start_date.weekday() - days_diff) % 7
+                diff_from_week_start = min([diff_from_week_start, diff_from_week_start - 7], key=abs)
+
+                season_start = first_start_date - datetime.timedelta(days=diff_from_week_start)
+            else:
+                season_start = None
+        context_cache.set(cache_key, season_start)
+
+        if self._week is None and season_start is not None:
+            # Round events that occur just before the official start-of-season to the closest week
+            days = max((self.start_date - season_start).days, 0)
+            self._week = days / 7
 
         return self._week
 
