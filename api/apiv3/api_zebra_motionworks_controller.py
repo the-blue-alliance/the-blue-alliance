@@ -18,4 +18,5 @@ class ApiZebraMotionworksMatchController(ApiBaseController):
         if not zebra_data:
             self.abort(404)
 
+        self._last_modified = zebra_data.updated
         return json.dumps(zebra_data.data, ensure_ascii=True, indent=2, sort_keys=True)
