@@ -178,8 +178,7 @@ class CacheableHandler(webapp2.RequestHandler):
 
         if not self._is_admin:
             seconds = min(seconds, self._get_cache_expiration)  # Cache header should never be longer than memcache
-            self.response.headers['Cache-Control'] = "public, max-age=%d" % max(seconds, 61)  # needs to be at least 61 seconds to work
-            self.response.headers['Pragma'] = 'Public'
+            self.response.headers['Cache-Control'] = "public, max-age={0}, s-maxage={0}".format(max(int(seconds), 61))  # needs to be at least 61 seconds to work
 
 
 class LoggedInHandler(webapp2.RequestHandler):
