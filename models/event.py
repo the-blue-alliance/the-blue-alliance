@@ -386,6 +386,9 @@ class Event(ndb.Model):
         if self._webcast is None:
             try:
                 self._webcast = json.loads(self.webcast_json)
+
+                # Sort firstinspires channels to the front, keep the order of the rest
+                self._webcast = sorted(self._webcast, key=lambda w: (0, w) if (w['type'] == 'twitch' and w['channel'].startswith('firstinspires')) else (1, 0))
             except Exception, e:
                 self._webcast = None
         return self._webcast
