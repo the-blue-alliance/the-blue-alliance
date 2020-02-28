@@ -70,7 +70,7 @@ class WebcastOnlineHelper(object):
             response = json.loads(result.content)
             if response['data']:
                 webcast['status'] = 'online'
-                webcast['stream_title'] = response['stream']['channel']['status']
+                webcast['stream_title'] = response['data'][0]['title']
             else:
                 webcast['status'] = 'offline'
         else:
