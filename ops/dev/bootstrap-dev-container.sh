@@ -7,7 +7,7 @@ source ops/dev/vars.sh
 mkdir -p /datastore
 
 npm install uglify-js@2.7.0 -g --silent
-npm install -g gulp-cli uglify-es uglifycss less tslib request swagger-cli --silent
+npm install -g jest gulp-cli uglify-es uglifycss less tslib request swagger-cli --silent
 
 pip install --upgrade -r requirements.txt
 
