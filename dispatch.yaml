@@ -17,8 +17,8 @@ dispatch:
   service: backend-tasks-b2
 
 # Endpoints for internal client API
-# - url: "*/clientapi/*"
-#   service: clientapi
+- url: "*/clientapi/*"
+  service: clientapi
 
 # Handles latency-insensive tasks
 # - url: "*/tasks/*"
