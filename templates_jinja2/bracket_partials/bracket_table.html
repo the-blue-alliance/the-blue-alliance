@@ -1,20 +1,24 @@
+{% macro partialBracket(match, isLeftSide, isRedAlliance, allianceNumber, rowSpan) %}
+  <td class="{% if isLeftSide %}leftAlliance{% else %}rightAlliance{% endif %} {% if match.winning_alliance == ('red' if isRedAlliance else 'blue') %}{% if isLeftSide %}winnerL{% else %}winnerR{% endif %}{% endif %}" rowspan="{{rowSpan}}">
+    {% if allianceNumber %}<div class="alliance_number">{{allianceNumber}}.</div>{% endif %}
+    {% if match %}
+      {% for team in (match.red_alliance if isRedAlliance else match.blue_alliance) %}
+        <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
+      {% endfor %}
+    {% else %}
+      ?
+    {% endif %}
+  </td>
+{% endmacro %}
+
 <table class="brackettable">
   <tbody>
     <tr>
       {% if bracket_table.qf %}
-      <td class="leftAlliance {% if bracket_table.qf.qf1.winning_alliance == 'red' %}winnerL{% endif %}" rowspan="1">
-        <div class="alliance_number">1.</div>
-        {% for team in bracket_table.qf.qf1.red_alliance %}
-            <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
-        {% endfor %}
-      </td>
+        {{partialBracket(bracket_table.qf.get('qf1'), True, True, 1, 1)}}
       {% endif %}
       {% if bracket_table.sf %}
-      <td class="leftAlliance {% if bracket_table.sf.sf1.winning_alliance == 'red' %}winnerL{% endif %}" rowspan="2">
-        {% for team in bracket_table.sf.sf1.red_alliance %}
-          <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
-        {% endfor %}
-      </td>
+        {{partialBracket(bracket_table.sf.get('sf1'), True, True, None, 2)}}
       {% endif %}
       {% if bracket_table.f %}
       <td class="{% if bracket_table.f.f1.winning_alliance == 'red' %}winnerC{% else %}{% if bracket_table.f.f1.winning_alliance == 'blue' %}secondC{% endif %}{% endif %}" rowspan="4">
@@ -30,84 +34,35 @@
         {% endfor %}
       </td>
       {% endif %}
-      {% if bracket_table.sf and bracket_table.sf.sf2 %}
-      <td class="rightAlliance {% if bracket_table.sf.sf2.winning_alliance == 'blue' %}winnerR{% endif %}" rowspan="2">
-        {% for team in bracket_table.sf.sf2.blue_alliance %}
-          <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
-        {% endfor %}
-      </td>
+      {% if bracket_table.sf %}
+        {{partialBracket(bracket_table.sf.get('sf2'), False, False, None, 2)}}
       {% endif %}
       {% if bracket_table.qf %}
-      <td class="rightAlliance {% if bracket_table.qf.qf4.winning_alliance == 'red' %}winnerR{% endif %}" rowspan="1">
-        <div class="alliance_number">3.</div>
-        {% for team in bracket_table.qf.qf4.red_alliance %}
-          <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
-        {% endfor %}
-      </td>
+        {{partialBracket(bracket_table.qf.get('qf4'), False, True, 3, 1)}}
       {% endif %}
     </tr>
     <tr>
       {% if bracket_table.qf %}
-      <td class="leftAlliance {% if bracket_table.qf.qf1.winning_alliance == 'blue' %}winnerL{% endif %}" rowspan="1">
-        <div class="alliance_number">8.</div>
-        {% for team in bracket_table.qf.qf1.blue_alliance %}
-          <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
-        {% endfor %}
-      </td>
-      <td class="rightAlliance {% if bracket_table.qf.qf4.winning_alliance == 'blue' %}winnerR{% endif %}" rowspan="1">
-        <div class="alliance_number">6.</div>
-        {% for team in bracket_table.qf.qf4.blue_alliance %}
-          <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
-        {% endfor %}
-      </td>
+        {{partialBracket(bracket_table.qf.get('qf1'), True, False, 8, 1)}}
+        {{partialBracket(bracket_table.qf.get('qf4'), False, False, 6, 1)}}
       {% endif %}
     </tr>
     <tr>
       {% if bracket_table.qf %}
-      <td class="leftAlliance {% if bracket_table.qf.qf2.winning_alliance == 'red' %}winnerL{% endif %}" rowspan="1">
-        <div class="alliance_number">4.</div>
-        {% for team in bracket_table.qf.qf2.red_alliance %}
-          <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
-        {% endfor %}
-      </td>
+        {{partialBracket(bracket_table.qf.get('qf2'), True, True, 4, 1)}}
       {% endif %}
       {% if bracket_table.sf %}
-      <td class="leftAlliance {% if bracket_table.sf.sf1.winning_alliance == 'blue' %}winnerL{% endif %}" rowspan="2">
-        {% for team in bracket_table.sf.sf1.blue_alliance %}
-          <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
-        {% endfor %}
-      </td>
-      <td class="rightAlliance {% if bracket_table.sf.sf2 and bracket_table.sf.sf2.winning_alliance == 'red' %}winnerR{% endif %}" rowspan="2">
-        {% if bracket_table.sf.sf2 %}
-        {% for team in bracket_table.sf.sf2.red_alliance %}
-          <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
-        {% endfor %}
-        {% endif %}
-      </td>
+        {{partialBracket(bracket_table.sf.get('sf1'), True, False, None, 2)}}
+        {{partialBracket(bracket_table.sf.get('sf2'), False, True, None, 2)}}
       {% endif %}
       {% if bracket_table.qf %}
-      <td class="rightAlliance {% if bracket_table.qf.qf3.winning_alliance == 'red' %}winnerR{% endif %}" rowspan="1">
-        <div class="alliance_number">2.</div>
-        {% for team in bracket_table.qf.qf3.red_alliance %}
-          <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
-        {% endfor %}
-      </td>
+        {{partialBracket(bracket_table.qf.get('qf3'), False, True, 2, 1)}}
       {% endif %}
     </tr>
     <tr>
       {% if bracket_table.qf %}
-      <td class="leftAlliance {% if bracket_table.qf.qf2.winning_alliance == 'blue' %}winnerL{% endif %}" rowspan="1">
-        <div class="alliance_number">5.</div>
-        {% for team in bracket_table.qf.qf2.blue_alliance %}
-          <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
-        {% endfor %}
-      </td>
-      <td class="rightAlliance {% if bracket_table.qf.qf3.winning_alliance == 'blue' %}winnerR{% endif %}" rowspan="1">
-        <div class="alliance_number">7.</div>
-        {% for team in bracket_table.qf.qf3.blue_alliance %}
-          <a href="/team/{{team|digits}}/{{event.year}}" title="{{team}}">{{team}}</a><br>
-        {% endfor %}
-      </td>
+        {{partialBracket(bracket_table.qf.get('qf2'), True, False, 5, 1)}}
+        {{partialBracket(bracket_table.qf.get('qf3'), False, False, 7, 1)}}
       {% endif %}
     </tr>
   </tbody>
