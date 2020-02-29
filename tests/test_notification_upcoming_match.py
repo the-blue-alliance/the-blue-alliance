@@ -54,7 +54,8 @@ class TestUpcomingMatchNotification(unittest2.TestCase):
             'channel': '6540154',
             'status': 'unknown',
             'stream_title': None,
-            'type': 'ustream'
+            'type': 'ustream',
+            'viewer_count': None,
         }
 
         data = self.notification._build_dict()
