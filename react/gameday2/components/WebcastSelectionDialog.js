@@ -41,19 +41,44 @@ export default class WebcastSelectionDialog extends React.Component {
     const offlineSpecialWebcastItems = []
     const offlineWebcastItems = []
     // Don't let the user choose a webcast that is already displayed elsewhere
-    const availableWebcasts = this.props.webcasts.filter((webcastId) => this.props.displayedWebcasts.indexOf(webcastId) === -1)
+    const availableWebcasts = this.props.webcasts.filter(
+      (webcastId) => this.props.displayedWebcasts.indexOf(webcastId) === -1
+    )
     availableWebcasts.forEach((webcastId) => {
       const webcast = this.props.webcastsById[webcastId]
 
-      let rightIcon = (<ActionHelp />)
+      let rightIcon = <ActionHelp />
       let secondaryText = null
       if (webcast.status === 'online') {
-        rightIcon = (<VideoCam color={green500} />)
+        rightIcon = (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              width: 96,
+            }}
+          >
+            {webcast.viewerCount && (
+              <small
+                style={{
+                  textAlign: 'center',
+                  marginRight: 8,
+                }}
+              >
+                {webcast.viewerCount.toLocaleString()}
+                <br />
+                Viewers
+              </small>
+            )}
+            <VideoCam color={green500} />
+          </div>
+        )
         if (webcast.streamTitle) {
           secondaryText = webcast.streamTitle
         }
       } else if (webcast.status === 'offline') {
-        rightIcon = (<VideoCamOff />)
+        rightIcon = <VideoCamOff />
       }
 
       if (this.props.specialWebcastIds.has(webcast.id)) {
@@ -64,7 +89,8 @@ export default class WebcastSelectionDialog extends React.Component {
             webcastSelected={this.props.onWebcastSelected}
             secondaryText={secondaryText}
             rightIcon={rightIcon}
-          />)
+          />
+        )
         if (webcast.status === 'offline') {
           offlineSpecialWebcastItems.push(item)
         } else {
@@ -101,10 +127,7 @@ export default class WebcastSelectionDialog extends React.Component {
     let allWebcastItems = []
     if (specialWebcastItems.length !== 0 || bluezoneWebcastItems.length !== 0) {
       allWebcastItems.push(
-        <Subheader
-          key="specialWebcastsHeader"
-          style={subheaderStyle}
-        >
+        <Subheader key="specialWebcastsHeader" style={subheaderStyle}>
           Special Webcasts
         </Subheader>
       )
@@ -113,15 +136,10 @@ export default class WebcastSelectionDialog extends React.Component {
     }
     if (webcastItems.length !== 0) {
       if (specialWebcastItems.length !== 0) {
-        allWebcastItems.push(
-          <Divider key="eventWebcastsDivider" />
-        )
+        allWebcastItems.push(<Divider key="eventWebcastsDivider" />)
       }
       allWebcastItems.push(
-        <Subheader
-          key="eventWebcastsHeader"
-          style={subheaderStyle}
-        >
+        <Subheader key="eventWebcastsHeader" style={subheaderStyle}>
           Event Webcasts
         </Subheader>
       )
@@ -129,15 +147,10 @@ export default class WebcastSelectionDialog extends React.Component {
     }
     if (offlineWebcastItems.length !== 0) {
       if (webcastItems.length !== 0) {
-        allWebcastItems.push(
-          <Divider key="offlineEventWebcastsDivider" />
-        )
+        allWebcastItems.push(<Divider key="offlineEventWebcastsDivider" />)
       }
       allWebcastItems.push(
-        <Subheader
-          key="offlineWebcastsHeader"
-          style={subheaderStyle}
-        >
+        <Subheader key="offlineWebcastsHeader" style={subheaderStyle}>
           Offline Event Webcasts
         </Subheader>
       )
@@ -145,15 +158,10 @@ export default class WebcastSelectionDialog extends React.Component {
     }
     if (offlineSpecialWebcastItems.length !== 0) {
       if (offlineWebcastItems.length !== 0) {
-        allWebcastItems.push(
-          <Divider key="offlineSpecialWebcastsDivider" />
-        )
+        allWebcastItems.push(<Divider key="offlineSpecialWebcastsDivider" />)
       }
       allWebcastItems.push(
-        <Subheader
-          key="offlineSpecialWebcastsHeader"
-          style={subheaderStyle}
-        >
+        <Subheader key="offlineSpecialWebcastsHeader" style={subheaderStyle}>
           Offline Special Webcasts
         </Subheader>
       )
@@ -198,9 +206,7 @@ export default class WebcastSelectionDialog extends React.Component {
         onRequestClose={() => this.onRequestClose()}
         autoScrollBodyContent
       >
-        <List>
-          {allWebcastItems}
-        </List>
+        <List>{allWebcastItems}</List>
       </Dialog>
     )
   }

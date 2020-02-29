@@ -27,10 +27,14 @@ class WebcastOnlineHelper(object):
                 webcast['status'] = cached_webcast['status']
             if 'stream_title' in cached_webcast:
                 webcast['stream_title'] = cached_webcast['stream_title']
+            if 'viewer_count' in cached_webcast:
+                webcast['viewer_count'] = cached_webcast['viewer_count']
+
             return
 
         webcast['status'] = 'unknown'
         webcast['stream_title'] = None
+        webcast['viewer_count'] = None
         if not tba_config.CONFIG['update-webcast-online-status']:
             return
         if webcast['type'] == 'twitch':
