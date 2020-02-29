@@ -71,6 +71,7 @@ class WebcastOnlineHelper(object):
             if response['data']:
                 webcast['status'] = 'online'
                 webcast['stream_title'] = response['data'][0]['title']
+                webcast['viewer_count'] = response['data'][0]['viewer_count']
             else:
                 webcast['status'] = 'offline'
         else:
