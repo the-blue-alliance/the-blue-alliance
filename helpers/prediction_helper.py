@@ -524,9 +524,9 @@ class PredictionHelper(object):
             ]
         elif event.year == 2020:
             relevant_stats = [
-                ('score', 60, 20**2),
-                ('power_cells_scored', 10, 10**2),
-                ('endgame_points', 15, 10**2),
+                ('score', 0, 50**2),
+                ('power_cells_scored', 0, 20**2),
+                ('endgame_points', 0, 20**2),
             ]
 
         contribution_calculators = [ContributionCalculator(event, matches, s, m, v) for s, m, v in relevant_stats]
