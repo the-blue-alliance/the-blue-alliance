@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "name": "cache-worker",
+  "version": "1.0.0",
+  "description": "A Cloudflare Worker for ensuring the TBA cache is being invalidated properly",
+  "main": "index.js",
+  "scripts": {
+    "format": "prettier --write '**/*.{js,css,json,md}'"
+  },
+  "author": "The Blue Alliance",
+  "license": "MIT",
+  "devDependencies": {
+    "prettier": "^1.18.2"
+  }
+}

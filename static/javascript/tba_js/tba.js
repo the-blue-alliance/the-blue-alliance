@@ -173,3 +173,13 @@ var config = {
   messagingSenderId: firebaseMessagingSenderId,
 };
 firebase.initializeApp(config);
+
+function trackCacheHeader() {
+  const req = new XMLHttpRequest();
+  req.open('GET', document.location, false);
+  req.send(null);
+  const cacheStatus = req.getResponseHeader('X-TBA-Cache-Status');
+  if (cacheStatus) {
+    _gaq.push(['_trackEvent', 'cache_status', 'manually_invalidated']);
+  }
+}

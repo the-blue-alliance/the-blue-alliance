@@ -79,3 +79,6 @@ fi
 
 echo "Updating build info..."
 update_build_info
+
+echo "Deploying Cloudflare Worker..."
+cd cache-worker && CF_API_TOKEN=$CF_API_TOKEN wrangler publish

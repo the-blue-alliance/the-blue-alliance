@@ -21,4 +21,6 @@ unzip -q google_appengine_$GAE_VERSION.zip -d $HOME
 rm google_appengine_$GAE_VERSION.zip
 npm install
 npm install -g gulp-cli uglify-es uglifycss less request tslib
+# Install Cloudflare Worker CLI
+npm install -g @cloudflare/wrangler
 npm ls || true
