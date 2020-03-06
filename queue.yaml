@@ -13,7 +13,7 @@ queue:
     task_retry_limit: 0
 
 - name: datafeed
-  rate: 1/s
+  rate: 5/s
   retry_parameters:
     task_age_limit: 1h
 
