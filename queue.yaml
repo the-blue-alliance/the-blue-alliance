@@ -24,7 +24,7 @@ queue:
   rate: 5/s
 
 - name: push-notifications
-  rate: 2/s
+  rate: 100/s
   retry_parameters:
     task_age_limit: 3m
     min_backoff_seconds: 10
