@@ -45,7 +45,7 @@ from models.team import Team
 from sitevars.website_blacklist import WebsiteBlacklist
 
 
-class FMSAPIAwardsEnqueue(webapp.RequestHandler):
+class EventAwardsEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting awards
     """
@@ -60,7 +60,8 @@ class FMSAPIAwardsEnqueue(webapp.RequestHandler):
         for event in events:
             taskqueue.add(
                 queue_name='datafeed',
-                url='/tasks/get/fmsapi_awards/%s' % (event.key_name),
+                target='backend-tasks',
+                url='/backend-tasks/get/event_awards/%s' % (event.key_name),
                 method='GET')
         template_values = {
             'events': events,
@@ -71,7 +72,7 @@ class FMSAPIAwardsEnqueue(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
-class FMSAPIAwardsGet(webapp.RequestHandler):
+class EventAwardsGet(webapp.RequestHandler):
     """
     Handles updating awards
     """
@@ -119,7 +120,7 @@ class FMSAPIAwardsGet(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
-class FMSAPIEventAlliancesEnqueue(webapp.RequestHandler):
+class EventAlliancesEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting alliances
     """
@@ -137,7 +138,8 @@ class FMSAPIEventAlliancesEnqueue(webapp.RequestHandler):
         for event in events:
             taskqueue.add(
                 queue_name='datafeed',
-                url='/tasks/get/fmsapi_event_alliances/' + event.key_name,
+                target='backend-tasks',
+                url='/backend-tasks/get/event_event_alliances/' + event.key_name,
                 method='GET')
 
         template_values = {
@@ -149,7 +151,7 @@ class FMSAPIEventAlliancesEnqueue(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
-class FMSAPIEventAlliancesGet(webapp.RequestHandler):
+class EventAlliancesGet(webapp.RequestHandler):
     """
     Handles updating an event's alliances
     """
@@ -177,7 +179,7 @@ class FMSAPIEventAlliancesGet(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
-class FMSAPIEventRankingsEnqueue(webapp.RequestHandler):
+class EventRankingsEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting rankings
     """
@@ -192,7 +194,8 @@ class FMSAPIEventRankingsEnqueue(webapp.RequestHandler):
         for event in events:
             taskqueue.add(
                 queue_name='datafeed',
-                url='/tasks/get/fmsapi_event_rankings/' + event.key_name,
+                target='backend-tasks',
+                url='/backend-tasks/get/event_event_rankings/' + event.key_name,
                 method='GET')
 
         template_values = {
@@ -204,7 +207,7 @@ class FMSAPIEventRankingsEnqueue(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
-class FMSAPIEventRankingsGet(webapp.RequestHandler):
+class EventRankingsGet(webapp.RequestHandler):
     """
     Handles updating an event's rankings
     """
@@ -234,7 +237,7 @@ class FMSAPIEventRankingsGet(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
-class FMSAPIMatchesEnqueue(webapp.RequestHandler):
+class EventMatchesEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting match results
     """
@@ -249,7 +252,8 @@ class FMSAPIMatchesEnqueue(webapp.RequestHandler):
         for event in events:
             taskqueue.add(
                 queue_name='datafeed',
-                url='/tasks/get/fmsapi_matches/' + event.key_name,
+                target='backend-tasks',
+                url='/backend-tasks/get/event_matches/' + event.key_name,
                 method='GET')
 
         template_values = {
@@ -261,7 +265,7 @@ class FMSAPIMatchesEnqueue(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
-class FMSAPIMatchesGet(webapp.RequestHandler):
+class EventMatchesGet(webapp.RequestHandler):
     """
     Handles updating matches
     """
@@ -333,6 +337,7 @@ class FMSAPIMatchesGet(webapp.RequestHandler):
 #         for team in teams:
 #             taskqueue.add(
 #                 queue_name='datafeed',
+#                 target='backend-tasks',
 #                 url='/tasks/get/fmsapi_team_details/' + team.key_name,
 #                 method='GET')
 
