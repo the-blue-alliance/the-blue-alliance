@@ -44,14 +44,14 @@ class BaseNotification(object):
                 memcache.set(key, True, timeout)
 
         self.keys = keys  # dict like {ClientType : [ key ] } ... The list for webhooks is a tuple of (key, secret)
-        deferred.defer(self.render, self._supported_clients, _queue="push-notifications", _url='/_ah/queue/deferred_notification_send')
+        deferred.defer(self.render, self._supported_clients, _target='backend-tasks', _queue='push-notifications', _url='/_ah/queue/deferred_notification_send')
         if self._track_call and track_call:
             num_keys = 0
             for v in keys.values():
                 # Count the number of clients receiving the notification
                 num_keys += len(v)
             if random.random() < tba_config.GA_RECORD_FRACTION:
-                deferred.defer(self.track_notification, self._type, num_keys, _queue="api-track-call", _url='/_ah/queue/deferred_notification_track_send')
+                deferred.defer(self.track_notification, self._type, num_keys, _target='backend-tasks', _queue='api-track-call', _url='/_ah/queue/deferred_notification_track_send')
 
     """
     This method will create platform specific notifications and send them to the platform specified
