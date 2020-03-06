@@ -321,6 +321,7 @@ class TBANSHelper:
                 match,
                 user_id,
                 _name=task_name,
+                _target='backend-tasks',
                 _queue='push-notifications',
                 _url='/_ah/queue/deferred_notification_send',
                 _eta=match.time + MATCH_UPCOMING_MINUTES
@@ -372,6 +373,7 @@ class TBANSHelper:
             cls._send_fcm,
             clients,
             notification,
+            _target='backend-tasks',
             _queue='push-notifications',
             _url='/_ah/queue/deferred_notification_send'
         )
@@ -382,6 +384,7 @@ class TBANSHelper:
             cls._send_webhook,
             clients,
             notification,
+            _target='backend-tasks',
             _queue='push-notifications',
             _url='/_ah/queue/deferred_notification_send'
         )
@@ -445,6 +448,7 @@ class TBANSHelper:
                     notification,
                     backoff_iteration + 1,
                     _countdown=backoff_time,
+                    _target='backend-tasks',
                     _queue='push-notifications',
                     _url='/_ah/queue/deferred_notification_send'
                 )

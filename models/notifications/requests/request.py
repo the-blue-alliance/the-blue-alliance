@@ -25,7 +25,7 @@ class Request(object):
 
     def defer_track_notification(self, num_keys):
         from google.appengine.ext import deferred
-        deferred.defer(_track_notification, type(self.notification)._type(), num_keys, _queue="api-track-call", _url='/_ah/queue/deferred_notification_track_send')
+        deferred.defer(_track_notification, type(self.notification)._type(), num_keys, _target='backend-tasks', _queue='api-track-call', _url='/_ah/queue/deferred_notification_track_send')
 
 
 def _track_notification(notification_type_enum, num_keys):
