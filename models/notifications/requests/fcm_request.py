@@ -2,6 +2,10 @@ from firebase_admin import messaging
 
 from models.notifications.requests.request import Request
 
+# Fix positional argument warnings - can remove once we upgrade to firebase-admin=4.0.0
+from googleapiclient import _helpers
+_helpers.positional_parameters_enforcement = _helpers.POSITIONAL_IGNORE
+
 
 MAXIMUM_TOKENS = 500
 
