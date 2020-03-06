@@ -50,7 +50,7 @@
                 <p>* This list of teams is automatically generated based on how many people have Favorited them in myTBA.</p>
                 <table class="table table-striped table-condensed table-center team-table">
                   <thead>
-                    <tr><th>Team</th><th>Event</th></tr>
+                    <tr><th>Team</th><th>Event</th><th>Webcast</th></tr>
                   </thead>
                   <tbody>
                     {% for team, event in popular_teams_events %}
@@ -67,6 +67,27 @@
                         </div>
                       </td>
                       <td><a href="/event/{{ event.key_name }}">{{event.name}}</a></td>
+                      <td>
+                        {% if event.webcast %}
+                          {% if event.now %}
+                            {% if event.webcast_status == 'offline' %}
+                              <a class="btn btn-default btn-small" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Offline</a>
+                            {% else %}
+                              {% if event.webcast_status == 'online' %}
+                                <a class="btn btn-success btn-small" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
+                              {% else %}
+                                <a class="btn btn-info btn-small" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-question-sign"></span> Watch Now</a>
+                              {% endif %}
+                            {% endif %}
+                          {% else %}
+                            <a class="btn btn-default btn-small disabled">Offline</a>
+                          {% endif %}
+                        {% else %}
+                          {% if event.future or event.within_a_day %}
+                            <a href="/suggest/event/webcast?event_key={{event.key_name}}" target="_blank">Add webcast</a>
+                          {% endif %}
+                        {% endif %}
+                      </td>
                     </tr>
                     {% endfor %}
                   </tbody>
