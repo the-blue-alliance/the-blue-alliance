@@ -15,23 +15,23 @@ cron:
 #   timezone: America/Los_Angeles
 
 - description: FIRST match scraping for current events
-  url: /tasks/enqueue/fmsapi_matches/now
+  url: /backend-tasks/enqueue/event_matches/now
   schedule: every 1 minutes
 
 - description: FIRST event ranking scraping for current events
-  url: /tasks/enqueue/fmsapi_event_rankings/now
+  url: /backend-tasks/enqueue/event_event_rankings/now
   schedule: every 1 minutes
 
 - description: FIRST event alliance scraping for current events
-  url: /tasks/enqueue/fmsapi_event_alliances/now
+  url: /backend-tasks/enqueue/event_event_alliances/now
   schedule: every 30 minutes
 
 - description: FIRST event alliance scraping for current events on their last day
-  url: /tasks/enqueue/fmsapi_event_alliances/last_day_only
+  url: /backend-tasks/enqueue/event_event_alliances/last_day_only
   schedule: every 5 minutes
 
 - description: FIRST award scraping for current events
-  url: /tasks/enqueue/fmsapi_awards/now
+  url: /backend-tasks/enqueue/event_awards/now
   schedule: every 1 hours
 
 - description: Hall of Fame team list scraping

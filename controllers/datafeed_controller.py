@@ -45,7 +45,7 @@ from models.team import Team
 from sitevars.website_blacklist import WebsiteBlacklist
 
 
-class FMSAPIAwardsEnqueue(webapp.RequestHandler):
+class EventAwardsEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting awards
     """
@@ -60,7 +60,8 @@ class FMSAPIAwardsEnqueue(webapp.RequestHandler):
         for event in events:
             taskqueue.add(
                 queue_name='datafeed',
-                url='/tasks/get/fmsapi_awards/%s' % (event.key_name),
+                target='backend-tasks',
+                url='/backend-tasks/get/event_awards/%s' % (event.key_name),
                 method='GET')
         template_values = {
             'events': events,
@@ -71,7 +72,7 @@ class FMSAPIAwardsEnqueue(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
-class FMSAPIAwardsGet(webapp.RequestHandler):
+class EventAwardsGet(webapp.RequestHandler):
     """
     Handles updating awards
     """
@@ -119,7 +120,7 @@ class FMSAPIAwardsGet(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
-class FMSAPIEventAlliancesEnqueue(webapp.RequestHandler):
+class EventAlliancesEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting alliances
     """
@@ -137,7 +138,8 @@ class FMSAPIEventAlliancesEnqueue(webapp.RequestHandler):
         for event in events:
             taskqueue.add(
                 queue_name='datafeed',
-                url='/tasks/get/fmsapi_event_alliances/' + event.key_name,
+                target='backend-tasks',
+                url='/backend-tasks/get/event_event_alliances/' + event.key_name,
                 method='GET')
 
         template_values = {
@@ -149,7 +151,7 @@ class FMSAPIEventAlliancesEnqueue(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
-class FMSAPIEventAlliancesGet(webapp.RequestHandler):
+class EventAlliancesGet(webapp.RequestHandler):
     """
     Handles updating an event's alliances
     """
@@ -177,7 +179,7 @@ class FMSAPIEventAlliancesGet(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
-class FMSAPIEventRankingsEnqueue(webapp.RequestHandler):
+class EventRankingsEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting rankings
     """
@@ -192,7 +194,8 @@ class FMSAPIEventRankingsEnqueue(webapp.RequestHandler):
         for event in events:
             taskqueue.add(
                 queue_name='datafeed',
-                url='/tasks/get/fmsapi_event_rankings/' + event.key_name,
+                target='backend-tasks',
+                url='/backend-tasks/get/event_event_rankings/' + event.key_name,
                 method='GET')
 
         template_values = {
@@ -204,7 +207,7 @@ class FMSAPIEventRankingsEnqueue(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
-class FMSAPIEventRankingsGet(webapp.RequestHandler):
+class EventRankingsGet(webapp.RequestHandler):
     """
     Handles updating an event's rankings
     """
@@ -234,7 +237,7 @@ class FMSAPIEventRankingsGet(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
-class FMSAPIMatchesEnqueue(webapp.RequestHandler):
+class EventMatchesEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting match results
     """
@@ -249,7 +252,8 @@ class FMSAPIMatchesEnqueue(webapp.RequestHandler):
         for event in events:
             taskqueue.add(
                 queue_name='datafeed',
-                url='/tasks/get/fmsapi_matches/' + event.key_name,
+                target='backend-tasks',
+                url='/backend-tasks/get/event_matches/' + event.key_name,
                 method='GET')
 
         template_values = {
@@ -261,7 +265,7 @@ class FMSAPIMatchesEnqueue(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
-class FMSAPIMatchesGet(webapp.RequestHandler):
+class EventMatchesGet(webapp.RequestHandler):
     """
     Handles updating matches
     """
@@ -286,59 +290,6 @@ class FMSAPIMatchesGet(webapp.RequestHandler):
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
             path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_matches_get.html')
             self.response.out.write(template.render(path, template_values))
-
-# TODO: Currently unused
-
-# class TeamDetailsEnqueue(webapp.RequestHandler):
-#     """
-#     Handles enqueing updates to individual teams
-#     """
-#     def get(self):
-#         offset = int(self.request.get("offset", 0))
-
-#         team_keys = Team.query().fetch(1000, offset=int(offset), keys_only=True)
-#         teams = ndb.get_multi(team_keys)
-#         for team in teams:
-#             taskqueue.add(
-#                 queue_name='frc-api',
-#                 url='/tasks/get/fmsapi_team_details/' + team.key_name,
-#                 method='GET')
-
-#         # FIXME omg we're just writing out? -gregmarra 2012 Aug 26
-#         self.response.out.write("%s team gets have been enqueued offset from %s.<br />" % (len(teams), offset))
-#         self.response.out.write("Reload with ?offset=%s to enqueue more." % (offset + len(teams)))
-
-
-# class TeamDetailsRollingEnqueue(webapp.RequestHandler):
-#     """
-#     Handles enqueing updates to individual teams
-#     Enqueues a certain fraction of teams so that all teams will get updated
-#     every PERIOD days.
-#     """
-#     PERIOD = 14  # a particular team will be updated every PERIOD days
-
-#     def get(self):
-#         now_epoch = time.mktime(datetime.datetime.now().timetuple())
-#         bucket_num = int((now_epoch / (60 * 60 * 24)) % self.PERIOD)
-
-#         highest_team_key = Team.query().order(-Team.team_number).fetch(1, keys_only=True)[0]
-#         highest_team_num = int(highest_team_key.id()[3:])
-#         bucket_size = int(highest_team_num / (self.PERIOD)) + 1
-
-#         min_team = bucket_num * bucket_size
-#         max_team = min_team + bucket_size
-#         team_keys = Team.query(Team.team_number >= min_team, Team.team_number < max_team).fetch(1000, keys_only=True)
-
-#         teams = ndb.get_multi(team_keys)
-#         for team in teams:
-#             taskqueue.add(
-#                 queue_name='datafeed',
-#                 url='/tasks/get/fmsapi_team_details/' + team.key_name,
-#                 method='GET')
-
-#         # FIXME omg we're just writing out? -fangeugene 2013 Nov 6
-#         self.response.out.write("Bucket number {} out of {}<br>".format(bucket_num, self.PERIOD))
-#         self.response.out.write("{} team gets have been enqueued in the interval [{}, {}).".format(len(teams), min_team, max_team))
 
 
 class TeamDetailsGet(webapp.RequestHandler):
