@@ -43,7 +43,6 @@ class EventDetailsManipulator(ManipulatorBase):
             # Enqueue task to calculate district points
             try:
                 taskqueue.add(
-                    target='default',
                     url='/tasks/math/do/district_points_calc/{}'.format(event.key.id()),
                     method='GET')
             except Exception:
@@ -53,7 +52,6 @@ class EventDetailsManipulator(ManipulatorBase):
             # Enqueue task to calculate event team status
             try:
                 taskqueue.add(
-                    target='default',
                     url='/tasks/math/do/event_team_status/{}'.format(event.key.id()),
                     method='GET')
             except Exception:

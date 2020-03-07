@@ -20,7 +20,6 @@ class DistrictTeamManipulator(ManipulatorBase):
             # Enqueue task to calculate district rankings
             try:
                 taskqueue.add(
-                    target='default',
                     url='/tasks/math/do/district_rankings_calc/{}'.format(district_team.district_key.id()),
                     method='GET')
             except Exception:
