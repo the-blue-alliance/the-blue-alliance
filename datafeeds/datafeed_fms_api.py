@@ -194,7 +194,7 @@ class DatafeedFMSAPI(object):
                 'Pragma': 'no-cache',
             }
             try:
-                result = yield context.urlfetch(url, headers=headers)
+                result = yield context.urlfetch(url, headers=headers, deadline=5)
             except Exception, e:
                 logging.error("URLFetch failed for: {}".format(url))
                 logging.info(e)
