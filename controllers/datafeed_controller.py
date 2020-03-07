@@ -45,7 +45,7 @@ from models.team import Team
 from sitevars.website_blacklist import WebsiteBlacklist
 
 
-class EventAwardsEnqueue(webapp.RequestHandler):
+class FMSAPIAwardsEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting awards
     """
@@ -60,8 +60,7 @@ class EventAwardsEnqueue(webapp.RequestHandler):
         for event in events:
             taskqueue.add(
                 queue_name='datafeed',
-                target='backend-tasks',
-                url='/backend-tasks/get/event_awards/%s' % (event.key_name),
+                url='/tasks/get/fmsapi_awards/%s' % (event.key_name),
                 method='GET')
         template_values = {
             'events': events,
@@ -72,7 +71,7 @@ class EventAwardsEnqueue(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
-class EventAwardsGet(webapp.RequestHandler):
+class FMSAPIAwardsGet(webapp.RequestHandler):
     """
     Handles updating awards
     """
@@ -120,7 +119,7 @@ class EventAwardsGet(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
-class EventAlliancesEnqueue(webapp.RequestHandler):
+class FMSAPIEventAlliancesEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting alliances
     """
@@ -138,8 +137,7 @@ class EventAlliancesEnqueue(webapp.RequestHandler):
         for event in events:
             taskqueue.add(
                 queue_name='datafeed',
-                target='backend-tasks',
-                url='/backend-tasks/get/event_event_alliances/' + event.key_name,
+                url='/tasks/get/fmsapi_event_alliances/' + event.key_name,
                 method='GET')
 
         template_values = {
@@ -151,7 +149,7 @@ class EventAlliancesEnqueue(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
-class EventAlliancesGet(webapp.RequestHandler):
+class FMSAPIEventAlliancesGet(webapp.RequestHandler):
     """
     Handles updating an event's alliances
     """
@@ -179,7 +177,7 @@ class EventAlliancesGet(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
-class EventRankingsEnqueue(webapp.RequestHandler):
+class FMSAPIEventRankingsEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting rankings
     """
@@ -194,8 +192,7 @@ class EventRankingsEnqueue(webapp.RequestHandler):
         for event in events:
             taskqueue.add(
                 queue_name='datafeed',
-                target='backend-tasks',
-                url='/backend-tasks/get/event_event_rankings/' + event.key_name,
+                url='/tasks/get/fmsapi_event_rankings/' + event.key_name,
                 method='GET')
 
         template_values = {
@@ -207,7 +204,7 @@ class EventRankingsEnqueue(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
-class EventRankingsGet(webapp.RequestHandler):
+class FMSAPIEventRankingsGet(webapp.RequestHandler):
     """
     Handles updating an event's rankings
     """
@@ -237,7 +234,7 @@ class EventRankingsGet(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
-class EventMatchesEnqueue(webapp.RequestHandler):
+class FMSAPIMatchesEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting match results
     """
@@ -252,8 +249,7 @@ class EventMatchesEnqueue(webapp.RequestHandler):
         for event in events:
             taskqueue.add(
                 queue_name='datafeed',
-                target='backend-tasks',
-                url='/backend-tasks/get/event_matches/' + event.key_name,
+                url='/tasks/get/fmsapi_matches/' + event.key_name,
                 method='GET')
 
         template_values = {
@@ -265,7 +261,7 @@ class EventMatchesEnqueue(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
-class EventMatchesGet(webapp.RequestHandler):
+class FMSAPIMatchesGet(webapp.RequestHandler):
     """
     Handles updating matches
     """

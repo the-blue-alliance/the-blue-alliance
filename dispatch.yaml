@@ -20,9 +20,9 @@ dispatch:
 - url: "*/clientapi/*"
   service: clientapi
 
-# Handles latency-insensive tasks
-# - url: "*/tasks/*"
-#   service: tasks
+Handles latency-insensive tasks
+- url: "*/tasks/*"
+  service: tasks
 
 # Send everything else to default module
 - url: "*/"
