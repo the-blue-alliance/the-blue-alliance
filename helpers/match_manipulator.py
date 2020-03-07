@@ -117,6 +117,7 @@ class MatchManipulator(ManipulatorBase):
             # Enqueue task to calculate matchstats
             try:
                 taskqueue.add(
+                    target='default',
                     url='/tasks/math/do/event_matchstats/' + event_key,
                     method='GET')
             except Exception:
@@ -126,6 +127,7 @@ class MatchManipulator(ManipulatorBase):
             # Enqueue task to calculate district points
             try:
                 taskqueue.add(
+                    target='default',
                     url='/tasks/math/do/district_points_calc/{}'.format(event_key),
                     method='GET')
             except Exception:
@@ -135,6 +137,7 @@ class MatchManipulator(ManipulatorBase):
             # Enqueue task to calculate event team status
             try:
                 taskqueue.add(
+                    target='default',
                     url='/tasks/math/do/event_team_status/{}'.format(event_key),
                     method='GET')
             except Exception:
@@ -144,6 +147,7 @@ class MatchManipulator(ManipulatorBase):
             # Enqueue updating playoff advancement
             try:
                 taskqueue.add(
+                    target='default',
                     url='/tasks/math/do/playoff_advancement_update/{}'.format(event_key),
                     method='GET')
             except Exception:

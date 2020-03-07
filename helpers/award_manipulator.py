@@ -43,6 +43,7 @@ class AwardManipulator(ManipulatorBase):
         # Enqueue task to calculate district points
         for event in events:
             taskqueue.add(
+                target='default',
                 url='/tasks/math/do/district_points_calc/{}'.format(event.id()),
                 method='GET')
 
