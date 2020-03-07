@@ -20,7 +20,7 @@ dispatch:
 - url: "*/clientapi/*"
   service: clientapi
 
-Handles latency-insensive tasks
+# Handles latency-insensive tasks
 - url: "*/tasks/*"
   service: tasks
 
