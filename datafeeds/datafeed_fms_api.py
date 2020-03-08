@@ -292,22 +292,27 @@ class DatafeedFMSAPI(object):
         qual_details_future = self._parse_async(self.FMS_API_MATCH_DETAILS_QUAL_URL_PATTERN % (year, self._get_event_short(event_short, event)), detail_parser)
         playoff_details_future = self._parse_async(self.FMS_API_MATCH_DETAILS_PLAYOFF_URL_PATTERN % (year, self._get_event_short(event_short, event)), detail_parser)
 
+        # Organize matches by key
         matches_by_key = {}
         qual_matches = qual_matches_future.get_result()
         if qual_matches is not None:
             for match in qual_matches[0]:
                 matches_by_key[match.key.id()] = match
         playoff_matches = playoff_matches_future.get_result()
+        remapped_playoff_matches = {}
         if playoff_matches is not None:
             for match in playoff_matches[0]:
                 matches_by_key[match.key.id()] = match
+            remapped_playoff_matches = playoff_matches[1]
 
+        # Add details to matches based on key
         qual_details = qual_details_future.get_result()
         qual_details_items = qual_details.items() if qual_details is not None else []
         playoff_details = playoff_details_future.get_result()
         playoff_details_items = playoff_details.items() if playoff_details is not None else []
         for match_key, match_details in qual_details_items + playoff_details_items:
-            match_key = playoff_matches[1].get(match_key, match_key)
+            # Deal with remapped playoff matches, defaulting to the original match key
+            match_key = remapped_playoff_matches.get(match_key, match_key)
             if match_key in matches_by_key:
                 matches_by_key[match_key].score_breakdown_json = json.dumps(match_details)
 
