@@ -61,8 +61,7 @@ class FMSAPIHybridScheduleParser(object):
             logging.warning("Event {} has no timezone! Match times may be wrong.".format(event_key))
             event_tz = None
 
-        parsed_matches = []
-        remapped_matches = {}  # If a key changes due to a tiebreaker
+        match_identifiers = []
         for match in matches:
             if 'tournamentLevel' in match:  # 2016+
                 level = match['tournamentLevel']
@@ -70,7 +69,19 @@ class FMSAPIHybridScheduleParser(object):
                 level = match['level']
             comp_level = PlayoffType.get_comp_level(event.playoff_type, level, match['matchNumber'])
             set_number, match_number = PlayoffType.get_set_match_number(event.playoff_type, comp_level, match['matchNumber'])
+            key_name = Match.renderKeyName(
+                event_key,
+                comp_level,
+                set_number,
+                match_number)
+            match_identifiers.append((key_name, comp_level, set_number, match_number))
 
+        # Prefetch matches for tiebreaker checking
+        ndb.get_multi_async([ndb.Key(Match, key_name) for (key_name, _, _, _) in match_identifiers])
+
+        parsed_matches = []
+        remapped_matches = {}  # If a key changes due to a tiebreaker
+        for match, (key_name, comp_level, set_number, match_number) in zip(matches, match_identifiers):
             red_teams = []
             blue_teams = []
             red_surrogates = []
@@ -137,14 +148,8 @@ class FMSAPIHybridScheduleParser(object):
                 if event_tz is not None:
                     post_result_time = post_result_time - event_tz.utcoffset(post_result_time)
 
-            key_name = Match.renderKeyName(
-                event_key,
-                comp_level,
-                set_number,
-                match_number)
-
             # Check for tiebreaker matches
-            existing_match = Match.get_by_id(key_name)
+            existing_match = Match.get_by_id(key_name)  # Should be in instance cache due to prefetching above
             # Follow chain of existing matches
             while existing_match is not None and existing_match.tiebreak_match_key is not None:
                 logging.info("Following Match {} to {}".format(existing_match.key.id(), existing_match.tiebreak_match_key.id()))
