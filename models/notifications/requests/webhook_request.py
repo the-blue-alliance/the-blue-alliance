@@ -66,10 +66,7 @@ class WebhookRequest(Request):
             valid_url = False
             logging.warning('URLError: ' + str(e.reason))
         except Exception, ex:
-            if 'Deadline exceeded' in str(ex):
-                logging.warning('Deadline exceeded: {}'.format(str(ex)))
-            else:
-                logging.error("Other Exception ({}): {}".format(ex.__class__.__name__, str(ex)))
+            logging.warning("Other Exception ({}): {}".format(ex.__class__.__name__, str(ex)))
 
         return valid_url
 
