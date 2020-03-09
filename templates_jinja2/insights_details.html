@@ -59,7 +59,7 @@
   {% if match_highscore.data.overall %}
   <div class="row">
     <div class="col-xs-12">
-      <h3>Highest Scoring Match Overall{% if match_highscore.data.overall|length > 1 %}es{% endif %}</h3>
+      <h3>Highest Scoring Match{% if match_highscore.data.overall|length > 1 %}es{% endif %} Overall</h3>
       {% for match in match_highscore.data.overall %}
       <div class="row">
         <div class="col-xs-12 col-md-8 col-md-offset-2">
