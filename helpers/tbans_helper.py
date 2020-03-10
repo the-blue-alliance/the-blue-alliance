@@ -337,6 +337,15 @@ class TBANSHelper:
 
         from helpers.match_helper import MatchHelper
         next_matches = MatchHelper.upcomingMatches(event.matches, num=2)
+
+        if len(next_matches) == 0:
+            return
+
+        # Only schedule/send upcoming matches for new levels - if a schedule gets updated mid-way through the event, don't
+        # bother sending new notifications (this is to prevent a bug where we send a bunch of duplicate notifications)
+        if not (next_matches[0].set_number == 1 and next_matches[0].match_number == 1):
+            return
+
         for match in next_matches:
             cls.schedule_upcoming_match(match, user_id)
 

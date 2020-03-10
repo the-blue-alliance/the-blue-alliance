@@ -772,12 +772,28 @@ class TestTBANSHelper(unittest2.TestCase):
             mock_send.assert_called_once()
             self.assertFalse(success)
 
+    def test_schedule_upcoming_matches_not_new_schedule(self):
+        # Set some upcoming matches for the Event - not Match 1 though, so no notification gets sent
+        match_creator = MatchTestCreator(self.event)
+        teams = [Team(id="frc%s" % team_number, team_number=team_number) for team_number in range(6)]
+        self.event._teams = teams
+        match_creator.createIncompleteQuals()
+
+        with patch.object(TBANSHelper, 'schedule_upcoming_match') as mock_schedule_upcoming_match:
+            TBANSHelper.schedule_upcoming_matches(self.event)
+            mock_schedule_upcoming_match.assert_not_called()
+
     def test_schedule_upcoming_matches(self):
         # Set some upcoming matches for the Event
         match_creator = MatchTestCreator(self.event)
         teams = [Team(id="frc%s" % team_number, team_number=team_number) for team_number in range(6)]
         self.event._teams = teams
-        match_creator.createIncompleteQuals()
+        matches = match_creator.createIncompleteQuals()
+
+        # Hack our first next upcoming match to be Match 1
+        first_match = matches[0]
+        first_match.match_number = 1
+        first_match.put()
 
         with patch.object(TBANSHelper, 'schedule_upcoming_match') as mock_schedule_upcoming_match:
             TBANSHelper.schedule_upcoming_matches(self.event)
@@ -789,7 +805,12 @@ class TestTBANSHelper(unittest2.TestCase):
         match_creator = MatchTestCreator(self.event)
         teams = [Team(id="frc%s" % team_number, team_number=team_number) for team_number in range(6)]
         self.event._teams = teams
-        match_creator.createIncompleteQuals()
+        matches = match_creator.createIncompleteQuals()
+
+        # Hack our first next upcoming match to be Match 1
+        first_match = matches[0]
+        first_match.match_number = 1
+        first_match.put()
 
         with patch.object(TBANSHelper, 'schedule_upcoming_match') as mock_schedule_upcoming_match:
             TBANSHelper.schedule_upcoming_matches(self.event, 'user_id')
