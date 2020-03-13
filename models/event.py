@@ -1,16 +1,12 @@
-from google.appengine.ext import ndb
-from google.appengine.ext.ndb.tasklets import Future
-
-import datetime
-import json
-import re
+import datetime, json, re
 
 from consts.playoff_type import PlayoffType
 from consts.district_type import DistrictType
 from consts.event_type import EventType
-from context_cache import context_cache
-from helpers.location_helper import LocationHelper
-from helpers.webcast_online_helper import WebcastOnlineHelper
+
+from google.appengine.ext import ndb
+from google.appengine.ext.ndb.tasklets import Future
+
 from models.district import District
 from models.event_details import EventDetails
 from models.location import Location
@@ -234,8 +230,10 @@ class Event(ndb.Model):
             return self._week
 
         # Cache week_start for the same context
+        from context_cache import context_cache
         cache_key = '{}_season_start:{}'.format(self.year, ndb.get_context().__hash__())
         season_start = context_cache.get(cache_key)
+
         if season_start is None:
             e = Event.query(
                 Event.year==self.year,
@@ -395,7 +393,9 @@ class Event(ndb.Model):
 
     @property
     def webcast_status(self):
+        from helpers.webcast_online_helper import WebcastOnlineHelper
         WebcastOnlineHelper.add_online_status(self.current_webcasts)
+
         overall_status = 'offline'
         for webcast in self.current_webcasts:
             status = webcast.get('status')
@@ -425,7 +425,10 @@ class Event(ndb.Model):
     @property
     def online_webcasts(self):
         current_webcasts = self.current_webcasts
+
+        from helpers.webcast_online_helper import WebcastOnlineHelper
         WebcastOnlineHelper.add_online_status(current_webcasts)
+
         return filter(lambda x: x.get('status', '') != 'offline', current_webcasts if current_webcasts else [])
 
     @property
