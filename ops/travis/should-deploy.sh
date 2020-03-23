@@ -1,7 +1,7 @@
 #! /usr/bin/env sh
 
-API_STATUS=https://www.thebluealliance.com/api/v3/status
-SET_BUILD_STATUS=https://www.thebluealliance.com/api/v3/_/build
+API_STATUS=$TBA_DOMAIN/api/v3/status
+SET_BUILD_STATUS=$TBA_DOMAIN/api/v3/_/build
 fetch_apiv3_status() {
     curl -s --header "X-TBA-Auth-Key: $APIv3_KEY" $API_STATUS
 }

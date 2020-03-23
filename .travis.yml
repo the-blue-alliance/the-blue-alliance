@@ -19,7 +19,7 @@ env:
 stages:
   - test
   - name: deploy
-    if: (type = push) AND (branch = master)
+    if: (type = push) AND (branch IN (master, deploy-test))
 before_install:
 - nvm install 8.16.0
 install:
@@ -33,7 +33,7 @@ script:
 after_failure:
 - cat test_failures.temp
 before_deploy:
-- openssl aes-256-cbc -K $encrypted_7463bcfc1880_key -iv $encrypted_7463bcfc1880_iv -in ops/deploy_keys.tar.enc -out ops/deploy_keys.tar -d
+- ./ops/manage_deploy_keys.sh -d
 - ./ops/manage_deploy_keys.sh -x
 jobs:
   include:
@@ -45,5 +45,4 @@ jobs:
       provider: script
       script: ./ops/travis/travis-deploy.sh
       on:
-        repo: the-blue-alliance/the-blue-alliance
-        branch: master
+        branch: $CONTINUOUS_PUSH_BRANCH

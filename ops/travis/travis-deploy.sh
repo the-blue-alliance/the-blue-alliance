@@ -8,10 +8,10 @@ export BOTO_CONFIG=/dev/null # Hack to fix https://github.com/travis-ci/travis-c
 # Basically an implementation of:
 # https://github.com/travis-ci/dpl/blob/master/lib/dpl/provider/gae.rb
 
-KEYFILE=ops/tbatv-prod-hrd-deploy.json
-PROJECT=tbatv-prod-hrd
+KEYFILE=ops/$GAE_PROJECT_ID-deploy.json
+PROJECT=$GAE_PROJECT_ID
 VERSION=prod-2
-DEPLOY_LOCK=tbatv-prod-hrd-deploy-lock
+DEPLOY_LOCK=$PROJECT-deploy-lock
 
 BASE='https://dl.google.com/dl/cloudsdk/channels/rapid/'
 NAME='google-cloud-sdk'
@@ -48,7 +48,7 @@ PATH=$PATH:$INSTALL/$NAME/bin/
 echo "Building TBA..."
 paver make
 
-if [ "$TBA_DEPLOY_VERBOSE" = "1"]; then
+if [ "$TBA_DEPLOY_VERBOSE" = "1" ]; then
   echo "Deploying TBA with the following JS modules"
   npm ls || true
 fi
