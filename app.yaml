@@ -88,6 +88,20 @@ handlers:
   login: admin
 - url: /clientapi/.*
   script: clientapi.clientapi_service.app
+
+# These are duplicates of other modules, but are handy to run the
+# entire site on fewer GAE instances; dispatch.yaml will override this
+# if it is deployed
+- url: /backend-tasks/.*
+  script: backend_main.app
+  login: admin
+- url: /backend-tasks-b2/.*
+  script: backend_main_b2.app
+  login: admin
+- url: /tasks/.*
+  script: cron_main.app
+  login: admin
+
 - url: .*
   script: main.app
 

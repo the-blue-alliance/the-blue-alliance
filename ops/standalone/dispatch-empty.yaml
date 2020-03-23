@@ -1,0 +1,4 @@
+dispatch:
+  # Send everything to default module
+  - url: "*/"
+    service: default

@@ -13,6 +13,7 @@ else
     check_clowntown_tag
 fi
 
+bash -c "source ~/.nvm/nvm.sh; nvm install $NODE_JS_VERSION; nvm install 8.16.0"
 pip install -r travis_requirements.txt
 paver install_libs
 GAE_VERSION="1.9.66"

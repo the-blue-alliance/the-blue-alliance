@@ -1,0 +1,2 @@
+# A file with no cronjobs, for standalone mode
+cron: []
