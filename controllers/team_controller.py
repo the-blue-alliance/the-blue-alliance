@@ -11,6 +11,21 @@ from models.team import Team
 from renderers.team_renderer import TeamRenderer
 from template_engine import jinja2_engine
 
+import webapp2
+import random
+
+
+class RandomTeam(webapp2.RequestHandler):
+    """
+    Lovingly written by Caleb Denio (https://github.com/cjdenio)
+    """
+    def get(self):
+        teams = Team.query().fetch(keys_only=True)
+        randomTeam = random.choice(teams)
+        randomTeamNumber = randomTeam.get().team_number
+
+        return webapp2.redirect('/team/%s' % randomTeamNumber)
+
 
 class TeamList(CacheableHandler):
     MAX_TEAM_NUMBER_EXCLUSIVE = 9000  # Support between Team 0 and Team MAX_TEAM_NUMBER_EXCLUSIVE - 1

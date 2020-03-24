@@ -57,7 +57,7 @@ from controllers.suggestions.suggest_team_media_controller import SuggestTeamMed
 from controllers.suggestions.suggest_team_media_review_controller import SuggestTeamMediaReviewController
 from controllers.team_admin_controller import TeamAdminRedeem, TeamAdminDashboard
 from controllers.test_notification_controller import TestNotificationController
-from controllers.team_controller import TeamList, TeamCanonical, TeamDetail, TeamHistory
+from controllers.team_controller import TeamList, TeamCanonical, TeamDetail, TeamHistory, RandomTeam
 from controllers.webhook_controller import WebhookAdd, WebhookDelete, WebhookVerify, WebhookVerificationSend
 
 from google.appengine.ext.webapp import template
@@ -155,6 +155,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/team/<team_number:[0-9]+>/history', TeamHistory, 'team-history', strict_slash=True),
       RedirectRoute(r'/teams/<page:[0-9]+>', TeamList, 'team-list-year', strict_slash=True),
       RedirectRoute(r'/teams', TeamList, 'team-list', strict_slash=True),
+      RedirectRoute(r'/teams/random', RandomTeam, 'random-team', strict_slash=True),
       RedirectRoute(r'/thanks', ThanksHandler, 'thanks', strict_slash=True),
       RedirectRoute(r'/watch/<alias>', GamedayRedirectHandler, 'gameday-watch', strict_slash=True),
       RedirectRoute(r'/webcasts', WebcastsHandler, 'webcasts', strict_slash=True),
