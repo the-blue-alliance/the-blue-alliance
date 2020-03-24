@@ -12,12 +12,14 @@ from google.appengine.ext.webapp import template
 
 from consts.district_type import DistrictType
 from consts.event_type import EventType
+from consts.media_type import MediaType
 
 from controllers.api.api_status_controller import ApiStatusController
 from database.district_query import DistrictsInYearQuery
 from database.event_query import DistrictEventsQuery, EventQuery
 from database.match_query import EventMatchesQuery
 from database.team_query import DistrictTeamsQuery
+from database.media_query import TeamMediaQuery, TeamSocialMediaQuery
 from helpers.award_manipulator import AwardManipulator
 from helpers.bluezone_helper import BlueZoneHelper
 from helpers.district_helper import DistrictHelper
@@ -35,10 +37,12 @@ from helpers.insights_helper import InsightsHelper
 from helpers.match_helper import MatchHelper
 from helpers.match_time_prediction_helper import MatchTimePredictionHelper
 from helpers.matchstats_helper import MatchstatsHelper
+from helpers.media_manipulator import MediaManipulator
 from helpers.notification_helper import NotificationHelper
 from helpers.outgoing_notification_helper import OutgoingNotificationHelper
 from helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from helpers.prediction_helper import PredictionHelper
+from helpers.website_helper import WebsiteHelper
 
 from helpers.insight_manipulator import InsightManipulator
 from helpers.suggestions.suggestion_fetcher import SuggestionFetcher
@@ -53,6 +57,8 @@ from models.sitevar import Sitevar
 from models.suggestion import Suggestion
 from models.team import Team
 from models.typeahead_entry import TypeaheadEntry
+from models.media import Media
+from models.sitevar import Sitevar
 
 
 class EventShortNameCalcEnqueue(webapp.RequestHandler):
@@ -488,6 +494,24 @@ class DistrictPointsCalcEnqueue(webapp.RequestHandler):
         self.response.out.write("Enqueued for: {}".format([event_key.id() for event_key in event_keys]))
 
 
+class CheckMediaEnqueue(webapp.RequestHandler):
+    """
+    Enqueues media checking
+    """
+
+    def get(self):
+        cm_sitevar = Sitevar.get_by_id('check_media')
+        check_num = cm_sitevar.contents.get('number', 2500) if cm_sitevar else 2500  # Number of checks to run per queue
+        delay = cm_sitevar.contents.get('delay', 2) if cm_sitevar else 2  # Time (in seconds) between checks
+
+        media_keys = Media.query().order(Media.checked).fetch(check_num, keys_only=True)
+        for i, media_key in enumerate(media_keys):
+            task_delay = i * delay
+            taskqueue.add(url='/tasks/do/check_media/{}'.format(media_key.id()), method='GET', countdown=task_delay)
+
+        self.response.out.write("Enqueued for {} media".format(len(media_keys)))
+
+
 class DistrictPointsCalcDo(webapp.RequestHandler):
     """
     Calculates district points for an event
@@ -826,3 +850,34 @@ class RemapTeamsDo(webapp.RequestHandler):
         # Remap awards
         EventHelper.remapteams_awards(event.awards, event.remap_teams)
         AwardManipulator.createOrUpdate(event.awards, auto_union=False)
+
+
+class CheckMediaDo(webapp.RequestHandler):
+    """
+    Remove unavailable media
+    """
+    @ndb.transactional(xg=True)
+    def _check_media(self, media_key):
+        media = ndb.Key(Media, media_key).get()
+
+        if media.is_image:
+            url = media.view_image_url
+        elif media.is_social:
+            url = media.social_profile_url
+        elif media.media_type_enum == MediaType.YOUTUBE_VIDEO:
+            url = "https://www.youtube.com/oembed?url={}&format=json".format(media.youtube_url_link)
+        elif media.media_type_enum == MediaType.EXTERNAL_LINK:
+            url = media.external_link
+        else:
+            return
+
+        if not WebsiteHelper.exists(url):
+            MediaManipulator.delete(media)
+        else:
+            media.checked = datetime.datetime.now()
+
+            # .put() is being used instead of MediaManipulator to avoid cache busting.
+            media.put()
+
+    def get(self, media_key):
+        _check_media(media_key)

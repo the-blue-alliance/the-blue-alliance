@@ -1,3 +1,6 @@
+from google.appengine.api import urlfetch
+
+
 class WebsiteHelper(object):
     @classmethod
     def format_url(cls, website_url):
@@ -24,3 +27,15 @@ class WebsiteHelper(object):
             formatted_url = website_url
 
         return formatted_url
+
+    @classmethod
+    def exists(cls, website_url):
+        """
+        Verify that a given URL exists (returns a non-404 status code)
+        """
+        if not website_url:
+            return False
+
+        result = urlfetch.fetch(website_url)
+
+        return result.status_code != 404
