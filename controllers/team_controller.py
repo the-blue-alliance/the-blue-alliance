@@ -16,9 +16,6 @@ import random
 
 
 class RandomTeam(webapp2.RequestHandler):
-    """
-    Lovingly written by Caleb Denio (https://github.com/cjdenio)
-    """
     def get(self):
         teams = Team.query().fetch(keys_only=True)
         randomTeam = random.choice(teams)
