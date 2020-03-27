@@ -255,6 +255,17 @@ class MatchHelper(object):
             'rp', 'sandStormBonusPoints', 'techFoulCount', 'teleopPoints',
             'topLeftRocketFar', 'topLeftRocketNear', 'topRightRocketFar',
             'topRightRocketNear', 'totalPoints']),
+        2020: set([
+            'adjustPoints', 'autoCellPoints', 'autoCellsBottom', 'autoCellsInner',
+            'autoCellsOuter', 'autoInitLinePoints', 'autoPoints', 'controlPanelPoints',
+            'endgamePoints', 'endgameRobot1', 'endgameRobot2', 'endgameRobot3',
+            'endgameRungIsLevel', 'foulCount', 'foulPoints', 'initLineRobot1',
+            'initLineRobot2', 'initLineRobot3', 'rp', 'shieldEnergizedRankingPoint',
+            'shieldOperationalRankingPoint', 'stage1Activated', 'stage2Activated',
+            'stage3Activated', 'stage3TargetColor', 'techFoulCount', 'teleopCellPoints',
+            'teleopCellsBottom', 'teleopCellsInner', 'teleopCellsOuter', 'teleopPoints',
+            'totalPoints'
+        ]),
     }
 
     @classmethod
