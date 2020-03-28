@@ -121,7 +121,7 @@ class TestMediaUrlParser(unittest2.TestCase):
         details = json.loads(result['details_json'])
         self.assertEqual(details['model_name'], '2016 | 148 - Robowranglers')
         self.assertEqual(details['model_description'], 'Renegade')
-        self.assertEqual(details['model_image'], 'https://d2t1xqejof9utc.cloudfront.net/screenshots/pics/96268d5c5e6c1b7fe8892f713813bb40/card.jpg')
+        self.assertEqual(details['model_image'], 'https://d2t1xqejof9utc.cloudfront.net/screenshots/pics/bf832651cc688c27a78c224fbd07d9d7/card.jpg')
         self.assertEqual(details['model_created'], '2016-09-19T11:52:23Z')
 
     def test_instagram_image(self):
