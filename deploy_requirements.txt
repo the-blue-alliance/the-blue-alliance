@@ -19,3 +19,7 @@ requests-toolbelt
 urllib3==1.24.2
 grpcio==1.26.0 # Do not bump - App Engine will fail to deploy
 # Could move to using built in library https://cloud.google.com/appengine/docs/standard/python/tools/built-in-libraries-27
+
+# py2 --> py3 Migrations
+googleapis_common_protos
+google-cloud-ndb
