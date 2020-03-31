@@ -162,7 +162,7 @@ $(document).ready(function(){
 //     // For 2017
 //     $(".hidden-banner").removeClass('hidden');
 //   }
-// });
+});
 
 // Init Firebase
 var config = {
