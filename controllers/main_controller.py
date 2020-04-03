@@ -492,3 +492,15 @@ class ApiWriteHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         return jinja2_engine.render('apiwrite.html', self.template_values)
+
+
+class BrandHandler(CacheableHandler):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "main_brand"
+
+    def __init__(self, *args, **kw):
+        super(BrandHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+
+    def _render(self, *args, **kw):
+        return jinja2_engine.render('brand.html', self.template_values)
