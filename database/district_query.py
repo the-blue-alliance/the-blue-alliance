@@ -11,9 +11,11 @@ CODE_MAP = {
     # Old to new
     'mar': 'fma',
     'nc': 'fnc',
+    'in': 'fin',
     # New to old
     'fma': 'mar',
     'fnc': 'nc',
+    'fin': 'in',
 }
 
 
