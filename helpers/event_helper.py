@@ -232,6 +232,8 @@ class EventHelper(object):
                 codes.add('FMA')
             if 'TX' in codes:  # TX and FIT used interchangeably
                 codes.add('FIT')
+            if 'IN' in codes:  # IN and FIN used interchangeably
+                codes.add('FIN')
             district_keys = '|'.join(codes)
         memcache.set('EventHelper.getShortName():district_keys', district_keys, 60*60)
 
