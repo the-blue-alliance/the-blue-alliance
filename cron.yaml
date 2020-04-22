@@ -14,21 +14,21 @@ cron:
 #   schedule: every day 02:00
 #   timezone: America/Los_Angeles
 
-- description: FIRST match scraping for current events
-  url: /tasks/enqueue/fmsapi_matches/now
-  schedule: every 1 minutes
+#- description: FIRST match scraping for current events
+#  url: /tasks/enqueue/fmsapi_matches/now
+#  schedule: every 1 minutes
 
-- description: FIRST event ranking scraping for current events
-  url: /tasks/enqueue/fmsapi_event_rankings/now
-  schedule: every 1 minutes
+#- description: FIRST event ranking scraping for current events
+#  url: /tasks/enqueue/fmsapi_event_rankings/now
+#  schedule: every 1 minutes
 
-- description: FIRST event alliance scraping for current events
-  url: /tasks/enqueue/fmsapi_event_alliances/now
-  schedule: every 30 minutes
+#- description: FIRST event alliance scraping for current events
+#  url: /tasks/enqueue/fmsapi_event_alliances/now
+#  schedule: every 30 minutes
 
-- description: FIRST event alliance scraping for current events on their last day
-  url: /tasks/enqueue/fmsapi_event_alliances/last_day_only
-  schedule: every 5 minutes
+#- description: FIRST event alliance scraping for current events on their last day
+#  url: /tasks/enqueue/fmsapi_event_alliances/last_day_only
+#  schedule: every 5 minutes
 
 - description: FIRST award scraping for current events
   url: /tasks/enqueue/fmsapi_awards/now
@@ -74,17 +74,17 @@ cron:
   schedule: every tuesday 1:00
   timezone: America/Los_Angeles
 
-- description: Upcoming match notification sending
-  url: /tasks/notifications/upcoming_match
-  schedule: every 2 minutes
+#- description: Upcoming match notification sending
+#  url: /tasks/notifications/upcoming_match
+#  schedule: every 2 minutes
 
 - description: Update live events (and bluezone)
   url: /tasks/do/update_live_events
   schedule: every 5 minutes
 
-- description: Predict Match Times
-  url: /tasks/math/enqueue/predict_match_times
-  schedule: every 1 minutes
+#- description: Predict Match Times
+#  url: /tasks/math/enqueue/predict_match_times
+#  schedule: every 1 minutes
 
 - description: Suggestion Queue Nag
   url: /tasks/do/nag_suggestions
