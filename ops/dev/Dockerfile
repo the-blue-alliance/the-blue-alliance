@@ -1,4 +1,4 @@
-FROM ubuntu:19.04
+FROM ubuntu:latest
 MAINTAINER The Blue Alliance
 
 # Set debconf to run non-interactively
@@ -8,20 +8,25 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 RUN apt-get update && apt-get install -y \
   git \
   wget \
+  curl \
   unzip \
   sudo \
   python2.7 \
   python2.7-dev \
-  python-pip \
   build-essential \
   jq \
-  python-mysqldb \
   checkinstall \
   libssl-dev \
   tmux \
   vim \
   openssh-server \
   libmysqlclient-dev
+
+RUN ls /usr/bin/python*
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 && \
+    update-alternatives --install /usr/bin/python python /usr/bin/python3 2
+RUN echo 1 | update-alternatives --config python
+RUN curl https://bootstrap.pypa.io/get-pip.py --output get-pip.py && python get-pip.py
 
 # Configure ssh server
 RUN mkdir /var/run/sshd
