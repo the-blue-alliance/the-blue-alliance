@@ -55,6 +55,10 @@ def main(sdk_path, test_pattern):
     import dev_appserver
     dev_appserver.fix_sys_path()
 
+    import tests
+    tba_test_dir = os.path.join(os.path.dirname(__file__), 'tests')
+    tests.__path__.append(tba_test_dir)
+
     # Set up custom django template filters
     from google.appengine.ext.webapp import template
     template.register_template_library('common.my_filters')

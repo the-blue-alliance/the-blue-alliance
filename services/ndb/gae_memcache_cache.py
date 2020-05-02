@@ -31,7 +31,7 @@ class ManagedMemcacheNdbCache(GlobalCache):
         """
         cache_values = self.client.get_multi(keys, key_prefix=self.KEY_PREFIX)
         return [cache_values.get(k) for k in keys]
-        
+
     def set(self, items, expires=None):
         """Store entities in the cache.
         Arguments:

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 import webapp2
 from webapp2_extras.routes import RedirectRoute
 
@@ -59,6 +60,8 @@ from controllers.team_admin_controller import TeamAdminRedeem, TeamAdminDashboar
 from controllers.test_notification_controller import TestNotificationController
 from controllers.team_controller import TeamList, TeamCanonical, TeamDetail, TeamHistory
 from controllers.webhook_controller import WebhookAdd, WebhookDelete, WebhookVerify, WebhookVerificationSend
+
+from services.ndb import middleware as ndb_middleware
 
 from google.appengine.ext.webapp import template
 template.register_template_library('common.my_filters')
@@ -183,3 +186,5 @@ app = webapp2.WSGIApplication([
       debug=tba_config.DEBUG)
 app.error_handlers[404] = handle_404
 app.error_handlers[500] = handle_500
+
+ndb_middleware.install_middleware(app)
