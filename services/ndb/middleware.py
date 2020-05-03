@@ -10,14 +10,14 @@ ndb client context for each request
 See https://cloud.google.com/appengine/docs/standard/python3/migrating-to-cloud-ndb#using_a_runtime_context_with_wsgi_frameworks
 """
 
-client = ndb.Client()
 global_cache = ManagedMemcacheNdbCache()
 
 
 class NdbCacheRequestContext(RequestContext):
 
     def __init__(self, app, environ):
-        self.ndb_client_context = client.context(global_cache=global_cache)
+        self.ndb_client = ndb.Client()
+        self.ndb_client_context = self.ndb_client.context(global_cache=global_cache)
         super(NdbCacheRequestContext, self).__init__(app, environ)
 
     def __enter__(self):
