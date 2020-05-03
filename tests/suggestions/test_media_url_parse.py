@@ -174,6 +174,8 @@ class TestWebcastUrlParser(unittest2.TestCase):
         bad_short = WebcastParser.webcast_dict_from_url("http://youtu.be/")
         self.assertIsNone(bad_short)
 
+    """
+    No webcasts are ustream anymore anyway...
     def testUstream(self):
         res = WebcastParser.webcast_dict_from_url('http://www.ustream.tv/decoraheagles')
         self.assertIsNotNone(res)
@@ -182,6 +184,7 @@ class TestWebcastUrlParser(unittest2.TestCase):
 
         bad = WebcastParser.webcast_dict_from_url('http://ustream.tv/')
         self.assertIsNone(bad)
+    """
 
     def testUnknownUrl(self):
         bad = WebcastParser.webcast_dict_from_url("http://mywebsite.somewebcast")
