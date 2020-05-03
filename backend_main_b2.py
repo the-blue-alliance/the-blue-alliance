@@ -6,7 +6,6 @@ from controllers.admin.admin_cron_controller import AdminCreateDistrictsEnqueue,
     AdminCreateDistrictsDo
 from controllers.backup_controller import TbaCSVBackupTeamsDo
 from controllers.cron_controller import YearInsightsEnqueue, YearInsightsDo, OverallInsightsEnqueue, OverallInsightsDo, TypeaheadCalcEnqueue, TypeaheadCalcDo
-from services.ndb import middleware as ndb_middleware
 
 
 app = webapp2.WSGIApplication([('/backend-tasks-b2/math/enqueue/overallinsights/(.*)', OverallInsightsEnqueue),
@@ -20,4 +19,3 @@ app = webapp2.WSGIApplication([('/backend-tasks-b2/math/enqueue/overallinsights/
                                ('/backend-tasks-b2/do/rebuild_districts/([0-9]+)', AdminCreateDistrictsDo)
                                ],
                               debug=tba_config.DEBUG)
-ndb_middleware.install_middleware(app)

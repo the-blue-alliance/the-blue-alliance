@@ -19,8 +19,6 @@ builtins:
 libraries:
 - name: MySQLdb
   version: "latest"
-- name: grpcio
-  version: latest
 
 handlers:
 - url: /_ah/queue/deferred.*

@@ -1,8 +1,8 @@
 # Packages that are needed for deployment because
 # they are not included in App Engine
 iso8601==0.1.11
-google-api-python-client
-google-cloud-bigquery
+google-api-python-client==1.7.8
+google-cloud-bigquery==0.25.0
 beautifulsoup4
 GoogleAppEngineCloudStorageClient
 
@@ -17,7 +17,5 @@ google-endpoints-api-management
 requests-toolbelt
 # See https://github.com/urllib3/urllib3/issues/1456
 urllib3==1.24.2
-
-# py2 --> py3 Migrations
-googleapis_common_protos
-google-cloud-ndb
+grpcio==1.26.0 # Do not bump - App Engine will fail to deploy
+# Could move to using built in library https://cloud.google.com/appengine/docs/standard/python/tools/built-in-libraries-27

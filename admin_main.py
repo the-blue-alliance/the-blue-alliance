@@ -36,8 +36,6 @@ from controllers.admin.admin_team_media_mod import AdminTeamMediaModCodeList, Ad
 from controllers.admin.admin_user_controller import AdminUserDetail, AdminUserEdit, AdminUserTestSetup, AdminUserList, AdminUserPermissionsList, \
     AdminUserLookup
 from controllers.admin.admin_main_landing_controller import AdminMainLandingEdit
-from services.ndb import middleware as ndb_middleware
-
 from google.appengine.ext.webapp import template
 template.register_template_library('common.my_filters')
 
@@ -131,4 +129,3 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/mobile/webhooks', AdminMobileWebhooks),
                                ],
                               debug=tba_config.DEBUG)
-ndb_middleware.install_middleware(app)

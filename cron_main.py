@@ -28,7 +28,6 @@ from controllers.admin.admin_cron_controller import AdminMobileClearEnqueue, Adm
     AdminClearEventTeamsDo
 from controllers.admin.admin_cron_controller import AdminRunPostUpdateHooksEnqueue, AdminRunPostUpdateHooksDo, AdminRunEventPostUpdateHookDo, AdminRunTeamPostUpdateHookDo, \
     AdminUpdateAllTeamSearchIndexEnqueue, AdminUpdateAllTeamSearchIndexDo, AdminUpdateTeamSearchIndexDo
-from services.ndb import middleware as ndb_middleware
 
 
 app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackupEventsEnqueue),
@@ -89,4 +88,3 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/do/remap_teams/(.*)', RemapTeamsDo),
                                ],
                               debug=tba_config.DEBUG)
-ndb_middleware.install_middleware(app)
