@@ -16,7 +16,7 @@ class Award(ndb.Model):
     Winner or Dean's List), they show up under the repeated properties.
     """
 
-    name_str = ndb.StringProperty(required=True, indexed=False)  # award name that shows up on USFIRST Pages. May vary for the same award type.
+    name_str = ndb.TextProperty(required=True, indexed=False)  # award name that shows up on USFIRST Pages. May vary for the same award type.
     award_type_enum = ndb.IntegerProperty(required=True)
     year = ndb.IntegerProperty(required=True)  # year the award was awarded
     event = ndb.KeyProperty(kind=Event, required=True)  # event at which the award was awarded

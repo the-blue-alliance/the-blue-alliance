@@ -45,7 +45,7 @@ class Match(ndb.Model):
         'f': 5,
     }
 
-    alliances_json = ndb.StringProperty(required=True, indexed=False)  # JSON dictionary with alliances and scores.
+    alliances_json = ndb.TextProperty(required=True, indexed=False)  # JSON dictionary with alliances and scores.
 
     # {
     #   "red": {
@@ -62,7 +62,7 @@ class Match(ndb.Model):
     #   }
     # }
 
-    score_breakdown_json = ndb.StringProperty(indexed=False)  # JSON dictionary with score breakdowns. Fields are those used for seeding. Varies by year.
+    score_breakdown_json = ndb.TextProperty(indexed=False)  # JSON dictionary with score breakdowns. Fields are those used for seeding. Varies by year.
     # Example for 2014. Seeding outlined in Section 5.3.4 in the 2014 manual.
     # {"red": {
     #     "auto": 20,
@@ -85,7 +85,7 @@ class Match(ndb.Model):
     set_number = ndb.IntegerProperty(required=True, indexed=False)
     team_key_names = ndb.StringProperty(repeated=True)  # list of teams in Match, for indexing.
     time = ndb.DateTimeProperty()  # UTC time of scheduled start
-    time_string = ndb.StringProperty(indexed=False)  # the time as displayed on FIRST's site (event's local time)
+    time_string = ndb.TextProperty(indexed=False)  # the time as displayed on FIRST's site (event's local time)
     actual_time = ndb.DateTimeProperty()  # UTC time of match actual start
     predicted_time = ndb.DateTimeProperty()  # UTC time of when we predict the match will start
     post_result_time = ndb.DateTimeProperty()  # UTC time scores were shown to the audience

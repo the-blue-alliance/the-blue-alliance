@@ -19,8 +19,8 @@ class Event(ndb.Model):
     """
     name = ndb.StringProperty()
     event_type_enum = ndb.IntegerProperty(required=True)
-    short_name = ndb.StringProperty(indexed=False)  # Should not contain "Regional" or "Division", like "Hartford"
-    event_short = ndb.StringProperty(required=True, indexed=False)  # Smaller abbreviation like "CT"
+    short_name = ndb.TextProperty(indexed=False)  # Should not contain "Regional" or "Division", like "Hartford"
+    event_short = ndb.TextProperty(required=True, indexed=False)  # Smaller abbreviation like "CT"
     first_code = ndb.StringProperty()  # Event code used in FIRST's API, if different from event_short
     year = ndb.IntegerProperty(required=True)
     event_district_enum = ndb.IntegerProperty(default=DistrictType.NO_DISTRICT)  # Deprecated, use district_key instead
@@ -30,8 +30,8 @@ class Event(ndb.Model):
     playoff_type = ndb.IntegerProperty()
 
     # venue, venue_addresss, city, state_prov, country, and postalcode are from FIRST
-    venue = ndb.StringProperty(indexed=False)  # Name of the event venue
-    venue_address = ndb.StringProperty(indexed=False)  # Most detailed venue address (includes venue, street, and location separated by \n)
+    venue = ndb.TextProperty(indexed=False)  # Name of the event venue
+    venue_address = ndb.TextProperty(indexed=False)  # Most detailed venue address (includes venue, street, and location separated by \n)
     city = ndb.StringProperty()  # Equivalent to locality. From FRCAPI
     state_prov = ndb.StringProperty()  # Equivalent to region. From FRCAPI
     country = ndb.StringProperty()  # From FRCAPI
@@ -44,9 +44,9 @@ class Event(ndb.Model):
     first_eid = ndb.StringProperty()  # from USFIRST
     parent_event = ndb.KeyProperty()  # This is the division -> event champs relationship
     divisions = ndb.KeyProperty(repeated=True)  # event champs -> all divisions
-    facebook_eid = ndb.StringProperty(indexed=False)  # from Facebook
-    custom_hashtag = ndb.StringProperty(indexed=False)  # Custom HashTag
-    website = ndb.StringProperty(indexed=False)
+    facebook_eid = ndb.TextProperty(indexed=False)  # from Facebook
+    custom_hashtag = ndb.TextProperty(indexed=False)  # Custom HashTag
+    website = ndb.TextProperty(indexed=False)
     webcast_json = ndb.TextProperty(indexed=False)  # list of dicts, valid keys include 'type' and 'channel'
     enable_predictions = ndb.BooleanProperty(default=False)
     remap_teams = ndb.JsonProperty()  # Map of temporary team numbers to pre-rookie and B teams
@@ -482,7 +482,7 @@ class Event(ndb.Model):
             return "frc" + self.event_short
 
     # Depreciated, still here to keep GAE clean.
-    webcast_url = ndb.StringProperty(indexed=False)
+    webcast_url = ndb.TextProperty(indexed=False)
 
     @classmethod
     def validate_key_name(self, event_key):
