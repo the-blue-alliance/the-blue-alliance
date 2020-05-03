@@ -20,6 +20,7 @@ from controllers.api.api_trusted_controller import ApiTrustedEventAllianceSelect
                                                    ApiTrustedEventMatchesUpdate, ApiTrustedEventMatchesDelete, ApiTrustedEventMatchesDeleteAll, ApiTrustedEventRankingsUpdate, \
                                                    ApiTrustedEventTeamListUpdate, ApiTrustedAddMatchYoutubeVideo, \
                                                    ApiTrustedAddEventMedia, ApiTrustedUpdateEventInfo, ApiTrustedAddMatchZebraMotionWorks
+from services.ndb import middleware as ndb_middleware
 
 # Ensure that APIv2 routes include OPTIONS method for CORS preflight compatibility
 # https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests
@@ -138,3 +139,4 @@ app = webapp2.WSGIApplication([webapp2.Route(r'/api/v2/team/<team_key:>',
                                              ApiTrustedAddMatchZebraMotionWorks,
                                              methods=['POST', 'OPTIONS']),
                                ], debug=tba_config.DEBUG)
+ndb_middleware.install_middleware(app)

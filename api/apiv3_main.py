@@ -13,6 +13,7 @@ from api.apiv3 import api_realtime_controller as arc
 from api.apiv3 import api_zebra_motionworks_controller as azc
 from api.apiv3 import api_team_controller as atc
 from api.apiv3 import api_suggest_controller as asgc
+from services.ndb import middleware as ndb_middleware
 
 # Ensure that APIv3 routes include OPTIONS method for CORS preflight compatibility
 # https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests
@@ -149,3 +150,4 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/v3/_/build', ApiAdminSetBuildInfo, methods=['POST', 'OPTIONS'])
 ], debug=tba_config.DEBUG)
 app.error_handlers[404] = handle_404
+ndb_middleware.install_middleware(app)

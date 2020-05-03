@@ -10,6 +10,7 @@ from controllers.backup_controller import DatastoreBackupFull, BigQueryImportEnq
     BigQueryImportEntity, MainBackupsEnqueue, DatastoreBackupArchive, DatastoreBackupArchiveFile
 from controllers.datafeed_controller import EventListEnqueue, EventDetailsEnqueue
 from controllers.datafeed_controller import EventListGet, EventDetailsGet, TeamDetailsGet, TeamAvatarGet, DistrictListGet, DistrictRankingsGet, TeamBlacklistWebsiteDo, EventListCurrentEnqueue
+from services.ndb import middleware as ndb_middleware
 
 
 app = webapp2.WSGIApplication([('/backend-tasks/enqueue/event_list/([0-9]*)', EventListEnqueue),
@@ -41,3 +42,4 @@ app = webapp2.WSGIApplication([('/backend-tasks/enqueue/event_list/([0-9]*)', Ev
                                ('/backend-tasks/bigquery/import/([0-9\-]+)/([A-Za-z]+)', BigQueryImportEntity),
                                ],
                               debug=tba_config.DEBUG)
+ndb_middleware.install_middleware(app)
