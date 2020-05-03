@@ -22,6 +22,8 @@ libraries:
   version: "2016.4"
 - name: MySQLdb
   version: "latest"
+- name: grpcio
+  version: latest
 
 handlers:
 - url: /backend-tasks-b2/console/.*

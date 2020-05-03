@@ -20,7 +20,7 @@ SDK_PATH    Path to the SDK installation"""
 
 
 sys.path.insert(1, 'lib')
-MULTITHREAD = True
+MULTITHREAD = (os.environ.get('TBA_MULTITHREADED_TESTS', 'true').lower() == 'true')
 MAX_JOBS = 4
 
 
@@ -54,6 +54,10 @@ def main(sdk_path, test_pattern):
     sys.path.insert(0, sdk_path)
     import dev_appserver
     dev_appserver.fix_sys_path()
+
+    import tests
+    tba_test_dir = os.path.join(os.path.dirname(__file__), 'tests')
+    tests.__path__.append(tba_test_dir)
 
     # Set up custom django template filters
     from google.appengine.ext.webapp import template
