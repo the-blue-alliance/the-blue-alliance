@@ -20,7 +20,7 @@ SDK_PATH    Path to the SDK installation"""
 
 
 sys.path.insert(1, 'lib')
-MULTITHREAD = True
+MULTITHREAD = (os.environ.get('TBA_MULTITHREADED_TESTS', 'true').lower() == 'true')
 MAX_JOBS = 4
 
 
