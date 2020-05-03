@@ -61,7 +61,7 @@ class Insight(ndb.Model):
 
     name = ndb.StringProperty(required=True)  # general name used for sorting
     year = ndb.IntegerProperty(required=True)  # year this insight pertains to. year = 0 for overall insights
-    data_json = ndb.StringProperty(required=True, indexed=False)  # JSON dictionary of the data of the insight
+    data_json = ndb.TextProperty(required=True, indexed=False)  # JSON dictionary of the data of the insight
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)

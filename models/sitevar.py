@@ -14,8 +14,8 @@ class Sitevar(ndb.Model):
     contain a json blob that contain one or more keys with values. They are
     manually edited by site administrators in the admin console.
     """
-    description = ndb.StringProperty(indexed=False)
-    values_json = ndb.StringProperty(indexed=False, default="{}")  # a json blob
+    description = ndb.TextProperty(indexed=False)
+    values_json = ndb.TextProperty(indexed=False, default="{}")  # a json blob
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)

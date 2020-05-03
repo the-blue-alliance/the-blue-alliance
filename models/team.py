@@ -12,7 +12,7 @@ class Team(ndb.Model):
     """
     team_number = ndb.IntegerProperty(required=True)
     name = ndb.TextProperty(indexed=False)
-    nickname = ndb.StringProperty(indexed=False)
+    nickname = ndb.TextProperty(indexed=False)
     school_name = ndb.TextProperty(indexed=False)
     home_cmp = ndb.StringProperty()
 
@@ -24,11 +24,11 @@ class Team(ndb.Model):
     # Normalized address from the Google Maps API, constructed using the above
     normalized_location = ndb.StructuredProperty(Location)
 
-    website = ndb.StringProperty(indexed=False)
+    website = ndb.TextProperty(indexed=False)
     first_tpid = ndb.IntegerProperty()  # from USFIRST. FIRST team ID number. -greg 5/20/2010
     first_tpid_year = ndb.IntegerProperty()  # from USFIRST. Year tpid is applicable for. -greg 9 Jan 2011
     rookie_year = ndb.IntegerProperty()
-    motto = ndb.StringProperty(indexed=False)
+    motto = ndb.TextProperty(indexed=False)
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)

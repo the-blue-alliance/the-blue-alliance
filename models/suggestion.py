@@ -37,7 +37,7 @@ class Suggestion(ndb.Model):
     reviewed_at = ndb.DateTimeProperty()
     reviewer = ndb.KeyProperty(kind=Account)
     author = ndb.KeyProperty(kind=Account, required=True)
-    contents_json = ndb.StringProperty(indexed=False)  # a json blob
+    contents_json = ndb.TextProperty(indexed=False)  # a json blob
     target_key = ndb.StringProperty()  # "2012cmp"
     target_model = ndb.StringProperty(choices=MODELS, required=True)  # "event"
 

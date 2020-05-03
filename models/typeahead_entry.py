@@ -12,7 +12,7 @@ class TypeaheadEntry(ndb.Model):
     ALL_DISTRICTS_KEY = 'districts-all'
     YEAR_EVENTS_KEY = 'events-{}'
 
-    data_json = ndb.StringProperty(required=True, indexed=False)
+    data_json = ndb.TextProperty(required=True, indexed=False)
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)

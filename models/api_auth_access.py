@@ -14,7 +14,7 @@ class ApiAuthAccess(ndb.Model):
     - Access may be granted for more than one event.
     """
     # For both read and write:
-    description = ndb.StringProperty(indexed=False)  # human-readable description
+    description = ndb.TextProperty(indexed=False)  # human-readable description
     auth_types_enum = ndb.IntegerProperty(repeated=True)  # read and write types should never be mixed
     owner = ndb.KeyProperty(kind=Account)
     allow_admin = ndb.BooleanProperty(default=False)  # Allow access to admin APIv3
@@ -23,7 +23,7 @@ class ApiAuthAccess(ndb.Model):
     updated = ndb.DateTimeProperty(auto_now=True)
 
     # Write only:
-    secret = ndb.StringProperty(indexed=False)
+    secret = ndb.TextProperty(indexed=False)
     event_list = ndb.KeyProperty(kind=Event, repeated=True)  # events for which auth is granted
     expiration = ndb.DateTimeProperty()
 
