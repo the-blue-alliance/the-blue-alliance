@@ -237,6 +237,10 @@ class EventHelper(object):
             district_keys = '|'.join(codes)
         memcache.set('EventHelper.getShortName():district_keys', district_keys, 60*60)
 
+        # Account for 2020 suspensions
+        if name_str.startswith("***SUSPENDED***"):
+            name_str = name_str.replace("***SUSPENDED***", "")
+
         # 2015+ districts
         # Numbered events with no name
         re_string = '({}) District Event (#\d+)'.format(district_keys)
