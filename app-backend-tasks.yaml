@@ -25,6 +25,8 @@ libraries:
   version: "2016.4"
 - name: MySQLdb
   version: "latest"
+- name: grpcio
+  version: 1.0.0
 
 handlers:
 - url: /_ah/queue/deferred.*

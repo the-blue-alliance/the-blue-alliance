@@ -19,7 +19,7 @@ env:
 stages:
   - test
   - name: deploy
-    if: (type = push) AND (branch IN (master))
+    if: (type = push) AND (branch IN (master, py3))
 install:
 - travis_retry ./ops/travis/travis-install.sh $JOB
 - export PYTHONPATH=${PYTHONPATH}:${HOME}/google_appengine

@@ -15,6 +15,8 @@ libraries:
   version: 2.7.11
 - name: MySQLdb
   version: "latest"
+- name: grpcio
+  version: 1.0.0
 
 handlers:
 - url: .*
