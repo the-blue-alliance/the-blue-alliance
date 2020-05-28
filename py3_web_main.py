@@ -1,13 +1,9 @@
 from flask import Flask
+from py3_web.handlers import RootHandler
 
 
 app = Flask(__name__)
-
-
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def root(path):
-    return "Web says hello world!"
+app.add_url_rule('/', view_func=RootHandler)
 
 
 if __name__ == "__main__":

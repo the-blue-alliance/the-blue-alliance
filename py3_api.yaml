@@ -1,5 +1,6 @@
-service: py3-web
+service: py3-api
 runtime: python37
+entrypoint: gunicorn -b :$PORT py3_api_main:app
 
 instance_class: F1
 automatic_scaling:

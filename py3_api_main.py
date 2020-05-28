@@ -1,12 +1,9 @@
 from flask import Flask
+from py3_api.handlers import RootHandler
 
 
 app = Flask(__name__)
-
-
-@app.route('/api/<path:path>')
-def root(path):
-    return "API says hello world!"
+app.add_url_rule('/api/<path:path>', view_func=RootHandler)
 
 
 if __name__ == "__main__":
