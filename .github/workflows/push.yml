@@ -20,7 +20,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements_ci.txt
           pip install -r src/requirements.txt
-      - name: Run Tests
+      - name: Run Lint
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/run_lint.sh
   pyre:
@@ -37,7 +37,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements_ci.txt
           pip install -r src/requirements.txt
-      - name: Run Tests
+      - name: Run Pyre
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/run_pyre.sh
   test:

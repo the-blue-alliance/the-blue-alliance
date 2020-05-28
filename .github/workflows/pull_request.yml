@@ -20,7 +20,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements_ci.txt
           pip install -r src/requirements.txt
-      - name: Run Tests
+      - name: Run Lint
         run: ./ops/run_lint.sh
   pyre:
     name: Pyre
@@ -36,7 +36,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements_ci.txt
           pip install -r src/requirements.txt
-      - name: Run Tests
+      - name: Run Pyre
         run: ./ops/run_pyre.sh
   test:
     name: Test
