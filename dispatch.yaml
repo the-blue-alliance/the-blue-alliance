@@ -1,4 +1,11 @@
 dispatch:
+# Python 3 Migration
+- url: "py3.thebluealliance.com/api/*"
+  service: py3-api
+
+- url: "py3.thebluealliance.com/*"
+  service: py3-web
+
 # Beta PWA
 - url: "beta.thebluealliance.com/*"
   service: pwa-ssr
