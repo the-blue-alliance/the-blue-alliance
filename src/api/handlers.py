@@ -1,5 +1,5 @@
-from common import test
+from common import helpers
 
 
 def RootHandler(path):
-    return "API says: {}".format(test.hello_world())
+    return "API says: {}".format(helpers.hello_world())
