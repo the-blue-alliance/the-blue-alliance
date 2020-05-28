@@ -21,4 +21,4 @@ __pycache__/
 /setup.cfg
 
 # Tests
-*_test.py
+tests/
