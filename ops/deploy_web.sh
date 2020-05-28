@@ -1,1 +1,1 @@
-gcloud app deploy src/py3_web.yaml -v 1
+gcloud app deploy src/web.yaml -v 1
