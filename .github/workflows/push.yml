@@ -21,6 +21,7 @@ jobs:
           pip install -r requirements_ci.txt
           pip install -r src/requirements.txt
       - name: Run Tests
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: |
           ./ops/run_tests.sh
   deploy-web:
