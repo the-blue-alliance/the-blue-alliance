@@ -1,0 +1,25 @@
+name: On pull request
+
+on:
+  pull_request:
+    branches:
+      - py3
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements_ci.txt
+          pip install -r src/requirements.txt
+      - name: Run Tests
+        run: |
+          ./ops/run_tests.sh
