@@ -1,1 +1,1 @@
-black --check ./src/
+black --check --diff ./src/
