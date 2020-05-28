@@ -1,4 +1,0 @@
-RewriteEngine on
-
-RewriteCond $1 !^tbatv
-RewriteRule (.*) http://www.thebluealliance.com/$1 [R=301,L]

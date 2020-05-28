@@ -1,7 +1,0 @@
-key,event,game,comp_level,set_number,match_number,team_key_names,alliances_json,no_auto_update
-2012cmp_sf1m1,2012cmp,frc_2012_rebr,sf,1,1,"['frc2194', 'frc118', 'frc548', 'frc16', 'frc25', 'frc180']","{'blue': {'score': 71, 'teams': ['frc16', 'frc25', 'frc180']}, 'red': {'score': 34, 'teams': ['frc2194', 'frc118', 'frc548']}}",TRUE
-2012cmp_sf2m1,2012cmp,frc_2012_rebr,sf,2,1,"['frc1114', 'frc4334', 'frc2056', 'frc233', 'frc207', 'frc987']","{'blue': {'score': 83, 'teams': ['frc233', 'frc207', 'frc987']}, 'red': {'score': 54, 'teams': ['frc1114', 'frc4334', 'frc2056']}}",TRUE
-2012cmp_sf1m2,2012cmp,frc_2012_rebr,sf,1,2,"['frc548', 'frc2194', 'frc118', 'frc180', 'frc16', 'frc25']","{'blue': {'score': 104, 'teams': ['frc180', 'frc16', 'frc25']}, 'red': {'score': 56, 'teams': ['frc548', 'frc2194', 'frc118']}}",TRUE
-2012cmp_sf2m2,2012cmp,frc_2012_rebr,sf,2,2,"['frc2056', 'frc1114', 'frc4334', 'frc233', 'frc987', 'frc207']","{'blue': {'score': 83, 'teams': ['frc233', 'frc987', 'frc207']}, 'red': {'score': 61, 'teams': ['frc2056', 'frc1114', 'frc4334']}}",TRUE
-2012cmp_f1m1,2012cmp,frc_2012_rebr,f,1,1,"['frc25', 'frc180', 'frc16', 'frc207', 'frc233', 'frc987']","{'blue': {'score': 45, 'teams': ['frc207', 'frc233', 'frc987']}, 'red': {'score': 89, 'teams': ['frc25', 'frc180', 'frc16']}}",TRUE
-2012cmp_f1m2,2012cmp,frc_2012_rebr,f,1,2,"['frc180', 'frc25', 'frc16', 'frc207', 'frc233', 'frc987']","{'blue': {'score': 65, 'teams': ['frc207', 'frc233', 'frc987']}, 'red': {'score': 73, 'teams': ['frc180', 'frc25', 'frc16']}}",TRUE

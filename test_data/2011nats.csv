@@ -1,6 +1,0 @@
-key,name,short_name,event_short,year,location,website,official,week * 10 (obselete),start_date,end_date,event_type,venue,first_eid
-2011new,Newton Division,Newton,new,2011,"St. Louis, MO",http://www.usfirst.org,TRUE,90,2011-04-27T00:00:00,2011-04-30T00:00:00,Championship Division,Edward Jones Dome
-2011gal,Galileo Division,Galileo,gal,2011,"St. Louis, MO",http://www.usfirst.org,TRUE,90,2011-04-27T00:00:00,2011-04-30T00:00:00,Championship Division,Edward Jones Dome
-2011cur,Curie Division,Curie,cur,2011,"St. Louis, MO",http://www.usfirst.org,TRUE,90,2011-04-27T00:00:00,2011-04-30T00:00:00,Championship Division,Edward Jones Dome
-2011arc,Archimedes Division,Archimedes,arc,2011,"St. Louis, MO",http://www.usfirst.org,TRUE,90,2011-04-27T00:00:00,2011-04-30T00:00:00,Championship Division,Edward Jones Dome
-2011cmp,Einstein Field,Einstein,cmp,2011,"St. Louis, MO",http://www.usfirst.org,TRUE,91,2011-04-30T00:00:00,2011-04-30T00:00:00,Championship Finals,Edward Jones Dome
