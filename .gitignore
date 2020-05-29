@@ -3,3 +3,8 @@ __pycache__/
 .pyre/
 .coverage
 coverage.xml
+
+# Compiled/Intermediate Files #
+###############################
+src/web/static/css/less_css/*.css
+src/web/static/compiled/*
