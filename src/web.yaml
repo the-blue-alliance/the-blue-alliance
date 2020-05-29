@@ -7,5 +7,27 @@ automatic_scaling:
   max_idle_instances: 1
 
 handlers:
-  - url: .*
+  - url: /css
+    static_dir: web/static/compiled/css
+  - url: /favicon.ico
+    static_files: web/static/icons/favicon.ico
+    upload: web/static/icons/favicon.ico
+    expiration: "1d"
+  - url: /icons
+    static_dir: web/static/icons
+    expiration: "1d"
+  - url: /images
+    static_dir: web/static/images
+    expiration: "1h"
+  - url: /javascript
+    static_dir: web/static/compiled/javascript
+  - url: /manifest.json
+    static_files: web/static/manifest.json
+    upload: web/static/manifest.json
+    expiration: "1d"
+  - url: /robots.txt
+    static_files: web/static/robots.txt
+    upload: web/static/robots.txt
+
+  - url: /.*
     script: auto
