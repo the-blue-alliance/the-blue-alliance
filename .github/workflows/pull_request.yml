@@ -74,8 +74,8 @@ jobs:
         run: ./ops/run_tests.sh
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1.0.7
-  build:
-    name: Build
+  build-web:
+    name: Build Web
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -95,4 +95,4 @@ jobs:
           pip install -r requirements.txt
           pip install -r src/requirements.txt
       - name: Run Build
-        run: ./ops/run_build.sh
+        run: ./ops/run_buildweb.sh
