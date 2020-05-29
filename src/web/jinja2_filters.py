@@ -119,3 +119,7 @@ def match_short(match_key):
     if match_id.startswith('qm'):
         return 'Q{}'.format(match_id[2:])
     return match_id.replace('m', '-').upper()
+
+
+def register_template_filters(app):
+    pass

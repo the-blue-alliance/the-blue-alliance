@@ -1,5 +1,6 @@
+from flask import render_template
 from common import helpers
 
 
-def RootHandler() -> str:
-    return "Web says: {}".format(helpers.hello_world())
+def HomeHandler() -> str:
+    return render_template("base.html")
