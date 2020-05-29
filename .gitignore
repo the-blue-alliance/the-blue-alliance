@@ -1,8 +1,10 @@
 __pycache__/
+.mypy_cache/
 .pytest_cache/
 .pyre/
 .coverage
 coverage.xml
+**.swp
 
 # Compiled/Intermediate Files #
 ###############################

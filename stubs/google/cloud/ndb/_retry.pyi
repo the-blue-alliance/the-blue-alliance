@@ -1,0 +1,9 @@
+from google.cloud.ndb import tasklets as tasklets
+from typing import Any
+
+def wraps_safely(obj: Any, attr_names: Any = ...): ...
+def retry_async(callback: Any, retries: Any = ...): ...
+
+TRANSIENT_CODES: Any
+
+def is_transient_error(error: Any): ...

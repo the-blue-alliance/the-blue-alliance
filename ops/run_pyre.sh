@@ -1,1 +1,1 @@
-pyre --source-directory ./src check
+pyre --source-directory ./src --search-path stubs/ check
