@@ -1,6 +1,6 @@
 from flask import Flask
 from web.handlers import HomeHandler
-from web.template_filters import register_template_filters
+from web.jinja2_filters import register_template_filters
 
 
 app = Flask(__name__)
