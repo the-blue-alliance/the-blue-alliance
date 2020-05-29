@@ -64,17 +64,17 @@ def strftime(datetime, formatstr):
     def t(day):
         "English ordinal suffix for the day of the month, 2 characters; i.e. 'st', 'nd', 'rd' or 'th'"
         if day in (11, 12, 13):  # Special case
-            return 'th'
+            return "th"
         last = day % 10
         if last == 1:
-            return 'st'
+            return "st"
         if last == 2:
-            return 'nd'
+            return "nd"
         if last == 3:
-            return 'rd'
-        return 'th'
+            return "rd"
+        return "th"
 
-    formatstr = formatstr.replace('%t', t(datetime.day))
+    formatstr = formatstr.replace("%t", t(datetime.day))
     return datetime.strftime(formatstr).lstrip("0").replace(" 0", " ")
 
 
@@ -122,4 +122,4 @@ def strftime(datetime, formatstr):
 
 
 def register_template_filters(app):
-    app.jinja_env.filters['strftime'] = strftime
+    app.jinja_env.filters["strftime"] = strftime
