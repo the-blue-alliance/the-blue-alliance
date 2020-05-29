@@ -131,7 +131,7 @@
 
       {% if render_time %}
       <div>
-          <p>This page was generated on <time datetime="{{render_time|rfc2822}}+00:00" class="tba-verbose-datetime-utc">{{render_time|strftime("%b. %d, %Y at %I:%M%p")}} UTC</time></p>
+          <p>This page was generated on <time datetime="{{render_time}}" class="tba-verbose-datetime-utc">{{render_time|strftime("%b. %d, %Y at %I:%M%p")}} UTC</time></p>
       </div>
       {% endif %}
       <div>The Blue Alliance is <a href="https://github.com/the-blue-alliance/the-blue-alliance/">open source</a>. Help improve it!</div>
