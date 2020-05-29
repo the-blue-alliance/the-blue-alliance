@@ -1,7 +1,7 @@
 # The Blue Alliance
 
 [![Build Status](https://github.com/the-blue-alliance/the-blue-alliance/workflows/On%20push/badge.svg)](https://github.com/the-blue-alliance/the-blue-alliance/actions?query=workflow%3A%22On+push%22)
-[![Coverage Status](https://img.shields.io/codecov/c/github/the-blue-alliance/the-blue-alliance/py3.svg)](https://codecov.io/gh/the-blue-alliance/the-blue-alliance/branch/py3)
+[![Coverage Status](https://codecov.io/gh/the-blue-alliance/the-blue-alliance/branch/py3/graph/badge.svg)](https://codecov.io/gh/the-blue-alliance/the-blue-alliance)
 
 The Blue Alliance is a FIRST Robotics tool to help teams scout for, compete at, and relive competitions. You can see how the whole site works here, or even write code to make it better!
 
