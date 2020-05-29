@@ -86,13 +86,14 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v2
-      - name: Deploy with Google Cloud Platform
-        uses: actions-hub/gcloud@268.0.0
-        env:
-          PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
-          APPLICATION_CREDENTIALS: ${{ secrets.GCLOUD_AUTH }}
+      - name: Setup Google Cloud Platform
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
-          args: app deploy src/web.yaml --version 1 --quiet
+          version: "294.0.0"
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCLOUD_AUTH }}
+      - name: Deploy
+        run: gcloud app deploy src/web.yaml --version 1 --quiet
   deploy-api:
     name: Deploy API Service
     runs-on: ubuntu-latest
@@ -100,10 +101,11 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v2
-      - name: Deploy with Google Cloud Platform
-        uses: actions-hub/gcloud@268.0.0
-        env:
-          PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
-          APPLICATION_CREDENTIALS: ${{ secrets.GCLOUD_AUTH }}
+      - name: Setup Google Cloud Platform
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
-          args: app deploy src/api.yaml --version 1 --quiet
+          version: "294.0.0"
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCLOUD_AUTH }}
+      - name: Deploy
+        run: gcloud app deploy src/api.yaml --version 1 --quiet
