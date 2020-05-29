@@ -1,4 +1,4 @@
-from api_main import app
+from api.main import app
 
 
 def test_root() -> None:

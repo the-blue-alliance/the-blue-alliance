@@ -1,4 +1,4 @@
-from web_main import app
+from web.main import app
 
 
 def test_root() -> None:

@@ -1,0 +1,6 @@
+dispatch:
+  - url: "*/api/*"
+    service: py3-api
+
+  - url: "*/"
+    service: py3-web
