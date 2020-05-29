@@ -55,4 +55,4 @@ jobs:
       - name: Run Tests
         run: ./ops/run_tests.sh
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1.0.0
+        uses: codecov/codecov-action@v1.0.7

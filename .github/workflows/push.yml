@@ -59,7 +59,7 @@ jobs:
         run: ./ops/run_tests.sh
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v1.0.0
+        uses: codecov/codecov-action@v1.0.7
 
   deploy-web:
     name: Deploy Web Service
