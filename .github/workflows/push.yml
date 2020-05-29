@@ -103,8 +103,8 @@ jobs:
       - name: Archive production artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: web-src
-          path: src
+          name: web-static-compiled
+          path: src/web/static/compiled
 
   deploy-web:
     name: Deploy Web Service
@@ -116,8 +116,8 @@ jobs:
       - name: Download production artifacts
         uses: actions/download-artifact@v2
         with:
-          name: web-src
-          path: src
+          name: web-static-compiled
+          path: src/web/static/compiled
       - name: Setup Google Cloud Platform
         uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
