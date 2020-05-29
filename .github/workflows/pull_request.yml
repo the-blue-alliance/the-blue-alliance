@@ -54,3 +54,5 @@ jobs:
           pip install -r src/requirements.txt
       - name: Run Tests
         run: ./ops/run_tests.sh
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1.0.7
