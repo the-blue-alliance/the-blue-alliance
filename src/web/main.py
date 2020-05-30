@@ -1,6 +1,6 @@
 from flask import Flask
 from common.middleware import install_middleware
-from web.handlers import HomeHandler
+from web.handlers.home import HomeHandler
 from web.jinja2_filters import register_template_filters
 
 

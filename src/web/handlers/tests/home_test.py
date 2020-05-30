@@ -1,4 +1,3 @@
-import pytest
 from werkzeug.test import Client
 
 

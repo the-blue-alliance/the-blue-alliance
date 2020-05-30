@@ -1,5 +1,5 @@
 from flask import Flask
-from api.handlers import RootHandler
+from api.handlers.root import RootHandler
 from common.middleware import install_middleware
 
 
