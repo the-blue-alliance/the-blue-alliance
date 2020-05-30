@@ -26,9 +26,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r src/requirements.txt
-      - name: Run Pyre
+      - name: Run Type Check
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: ./ops/run_pyre.sh
+        run: ./ops/type_check.sh
   black:
     name: Format Check
     runs-on: ubuntu-latest
@@ -49,9 +49,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r src/requirements.txt
-      - name: Run Black
+      - name: Run Formatting
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: ./ops/run_black.sh
+        run: ./ops/format_check.sh
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -74,7 +74,7 @@ jobs:
           pip install -r src/requirements.txt
       - name: Run Lint
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: ./ops/run_flake.sh
+        run: ./ops/lint.sh
 
   test:
     name: Test
@@ -123,7 +123,7 @@ jobs:
           pip install -r requirements.txt
           pip install -r src/requirements.txt
       - name: Run Build
-        run: ./ops/run_buildweb.sh
+        run: ./ops/build/run_buildweb.sh
       - name: Archive production artifacts
         uses: actions/upload-artifact@v2
         with:

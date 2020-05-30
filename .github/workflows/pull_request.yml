@@ -26,8 +26,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r src/requirements.txt
-      - name: Run Pyre
-        run: ./ops/run_pyre.sh
+      - name: Run Type Check
+        run: ./ops/type_check.sh
   black:
     name: Format Check
     runs-on: ubuntu-latest
@@ -48,8 +48,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r src/requirements.txt
-      - name: Run Black
-        run: ./ops/run_black.sh
+      - name: Run Formatting
+        run: ./ops/format_check.sh
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -71,7 +71,7 @@ jobs:
           pip install -r requirements.txt
           pip install -r src/requirements.txt
       - name: Run Lint
-        run: ./ops/run_flake.sh
+        run: ./ops/lint.sh
   test:
     name: Test
     runs-on: ubuntu-latest
@@ -117,4 +117,4 @@ jobs:
           pip install -r requirements.txt
           pip install -r src/requirements.txt
       - name: Run Build
-        run: ./ops/run_buildweb.sh
+        run: ./ops/build/run_buildweb.sh
