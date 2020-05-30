@@ -1,7 +1,7 @@
-from api.main import app
+import pytest
+from werkzeug.test import Client
 
 
-def test_root() -> None:
-    client = app.test_client()
-    resp = client.get("/api/v3")
+def test_root(api_client: Client) -> None:
+    resp = api_client.get("/api/v3")
     assert resp.status_code == 200
