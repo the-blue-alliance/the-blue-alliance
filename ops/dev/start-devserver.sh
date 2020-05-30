@@ -29,3 +29,6 @@ tmux select-window -t "$session:1"
 
 tmux list-sessions
 tmux list-windows
+
+echo "To view logs, run \`./ops/dev/print-gae-logs.sh\`"
+echo "To make sure files auto-update, run \`vargrant rsync-auto\` in another shell"

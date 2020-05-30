@@ -32,9 +32,14 @@ Vagrant.configure("2") do |config|
   config.vm.hostname = "tba-py3-docker"
   config.vm.provider "docker" do |d|
     d.name = "tba-py3"
-    d.build_dir = "ops/dev"
     d.ports = ports
     d.has_ssh = true
+
+    # By deafult, run with a prebuilt container image
+    d.image = "gcr.io/tbatv-prod-hrd/tba-py3-dev:latest"
+
+    # Or built it from the local checkout
+    # d.build_dir = "ops/dev"
   end
 
   # Configure ssh into container

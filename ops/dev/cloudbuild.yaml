@@ -1,0 +1,15 @@
+# Configuration for Google Cloud Builds for the dev container
+# To build, run: ./ops/dev/build-container-images.sh
+# Local Requirements: gcloud and docker
+
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--file=Dockerfile'
+      - '--tag=gcr.io/$PROJECT_ID/tba-py3-dev'
+      - '.'
+    id: 'tba-py3-dev'
+
+images:
+- 'gcr.io/$PROJECT_ID/tba-py3-dev:latest'
