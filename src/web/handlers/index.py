@@ -1,6 +1,5 @@
 from flask import render_template
-from common import helpers
 
 
-def HomeHandler() -> str:
+def index() -> str:
     return render_template("base.html")

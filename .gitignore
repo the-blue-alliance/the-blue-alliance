@@ -5,6 +5,7 @@ __pycache__/
 .coverage
 coverage.xml
 **.swp
+venv/
 
 # Compiled/Intermediate Files #
 ###############################

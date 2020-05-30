@@ -1,5 +1,2 @@
-from common import helpers
-
-
-def RootHandler(path: str) -> str:
-    return "API says: {}".format(helpers.hello_world())
+def root(path: str) -> str:
+    return "API says: Hello World!"
