@@ -13,8 +13,7 @@ Vagrant.configure("2") do |config|
     rsync__exclude: [
       ".git/",
       "node_modules/",
-      "lib/",
-      "static/compiled/",
+      "src/web/static/compiled",
     ],
     rsync__auto: true
 
@@ -30,9 +29,9 @@ Vagrant.configure("2") do |config|
   config.vm.network "forwarded_port", guest: 8000, host: 8000
 
   # Provision with docker
-  config.vm.hostname = "tba-docker"
+  config.vm.hostname = "tba-py3-docker"
   config.vm.provider "docker" do |d|
-    d.name = "tba"
+    d.name = "tba-py3"
     d.build_dir = "ops/dev"
     d.ports = ports
     d.has_ssh = true
@@ -50,9 +49,9 @@ Vagrant.configure("2") do |config|
     privileged: false
 
   # Load in the datastore file, needs to run before devserver start
-  config.vm.provision "shell",
-    inline: "cd /tba && ./ops/dev/pull-datastore.sh push",
-    privileged: false
+  #config.vm.provision "shell",
+  #  inline: "cd /tba && ./ops/dev/pull-datastore.sh push",
+  #  privileged: false
 
   # Start the GAE devserver
   config.vm.provision "shell",
@@ -61,8 +60,8 @@ Vagrant.configure("2") do |config|
     run: "always"
 
   # When the container halts, pull the datastore files
-  config.trigger.before [:halt, :destroy] do |trigger|
-    trigger.info = "Pulling datastore from remote container"
-    trigger.run = {inline: "./ops/dev/pull-datastore.sh pull"}
-  end
+  #config.trigger.before [:halt, :destroy] do |trigger|
+  #  trigger.info = "Pulling datastore from remote container"
+  #  trigger.run = {inline: "./ops/dev/pull-datastore.sh pull"}
+  #end
 end
