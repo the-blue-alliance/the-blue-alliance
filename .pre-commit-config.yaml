@@ -14,5 +14,5 @@
       language: script
     - id: test
       name: Testing
-      entry: ./ops/run_tests.sh
+      entry: ./ops/run_tests_changed.sh
       language: script

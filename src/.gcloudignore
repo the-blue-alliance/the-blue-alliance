@@ -21,5 +21,6 @@ __pycache__/
 /setup.cfg
 
 # Tests
+.testmondata
 tests/
 conftest.py
