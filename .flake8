@@ -1,0 +1,6 @@
+[flake8]
+# Make flake play well with black
+# https://black.readthedocs.io/en/stable/the_black_code_style.html
+max-line-length = 88
+select = C,E,F,W,B,B950
+ignore = E203, E501, W503
