@@ -1,8 +1,7 @@
-import logging
 import re
 
-from google.appengine.ext import ndb
-from models.location import Location
+from google.cloud import ndb
+from backend.common.models.location import Location
 
 
 class Team(ndb.Model):
@@ -10,6 +9,7 @@ class Team(ndb.Model):
     Teams represent FIRST Robotics Competition teams.
     key_name is like 'frc177'
     """
+
     team_number = ndb.IntegerProperty(required=True)
     name = ndb.TextProperty(indexed=False)
     nickname = ndb.TextProperty(indexed=False)
@@ -20,13 +20,19 @@ class Team(ndb.Model):
     city = ndb.StringProperty()  # Equivalent to locality. From FRCAPI
     state_prov = ndb.StringProperty()  # Equivalent to region. From FRCAPI
     country = ndb.StringProperty()  # From FRCAPI
-    postalcode = ndb.StringProperty()  # From ElasticSearch only. String because it can be like "95126-1215"
+    postalcode = (
+        ndb.StringProperty()
+    )  # From ElasticSearch only. String because it can be like "95126-1215"
     # Normalized address from the Google Maps API, constructed using the above
     normalized_location = ndb.StructuredProperty(Location)
 
     website = ndb.TextProperty(indexed=False)
-    first_tpid = ndb.IntegerProperty()  # from USFIRST. FIRST team ID number. -greg 5/20/2010
-    first_tpid_year = ndb.IntegerProperty()  # from USFIRST. Year tpid is applicable for. -greg 9 Jan 2011
+    first_tpid = (
+        ndb.IntegerProperty()
+    )  # from USFIRST. FIRST team ID number. -greg 5/20/2010
+    first_tpid_year = (
+        ndb.IntegerProperty()
+    )  # from USFIRST. Year tpid is applicable for. -greg 9 Jan 2011
     rookie_year = ndb.IntegerProperty()
     motto = ndb.TextProperty(indexed=False)
 
@@ -37,12 +43,14 @@ class Team(ndb.Model):
         # store set of affected references referenced keys for cache clearing
         # keys must be model properties
         self._affected_references = {
-            'key': set(),
+            "key": set(),
         }
         self._location = None
         self._city_state_country = None
         super(Team, self).__init__(*args, **kw)
 
+    """
+    TODO: event not ported yet
     @property
     def championship_location(self):
         from models.event import Event
@@ -51,6 +59,7 @@ class Team(ndb.Model):
             if event and event.city:
                 return {self.updated.year: event.city}
         return None
+    """
 
     @property
     def location(self):
@@ -60,12 +69,12 @@ class Team(ndb.Model):
                 split_location.append(self.city)
             if self.state_prov:
                 if self.postalcode:
-                    split_location.append(self.state_prov + ' ' + self.postalcode)
+                    split_location.append(self.state_prov + " " + self.postalcode)
                 else:
                     split_location.append(self.state_prov)
             if self.country:
                 split_location.append(self.country)
-            self._location = ', '.join(split_location)
+            self._location = ", ".join(split_location)
         return self._location
 
     @property
@@ -81,10 +90,10 @@ class Team(ndb.Model):
                 location_parts.append(self.state_prov)
             if self.country:
                 country = self.country
-                if self.country == 'US':
-                    country = 'USA'
+                if self.country == "US":
+                    country = "USA"
                 location_parts.append(country)
-            self._city_state_country = ', '.join(location_parts)
+            self._city_state_country = ", ".join(location_parts)
         return self._city_state_country
 
     @property
@@ -104,6 +113,6 @@ class Team(ndb.Model):
 
     @classmethod
     def validate_key_name(self, team_key):
-        key_name_regex = re.compile(r'^frc[1-9]\d*$')
+        key_name_regex = re.compile(r"^frc[1-9]\d*$")
         match = re.match(key_name_regex, team_key)
         return True if match else False
