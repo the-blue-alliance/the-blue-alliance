@@ -19,7 +19,7 @@ fi
 
 echo "Starting devserver in new tmux session..."
 tmux new-session -d -s $session
-tmux new-window -t "$session:1" -n gae "paver devserver 2>&1 | tee /var/log/tba.log; read"
+tmux new-window -t "$session:1" -n gae "./ops/run_devserver.sh 2>&1 | tee /var/log/tba.log; read"
 tmux new-window -t "$session:2" -n gulp "gulp; read"
 if [ ! -z "$instance_name" ]; then
   echo "Starting Cloud SQL proxy to connect to $instance_name"
