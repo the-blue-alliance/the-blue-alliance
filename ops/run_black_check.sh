@@ -1,2 +1,3 @@
+#!/bin/bash
+
 black --check --diff ./src/
-flake8 ./src/
