@@ -1,0 +1,76 @@
+import doctest
+import py.path
+import pytest
+from _pytest import outcomes as outcomes
+from _pytest._code.code import (
+    ExceptionInfo as ExceptionInfo,
+    ReprFileLocation as ReprFileLocation,
+    TerminalRepr as TerminalRepr,
+)
+from _pytest._io import TerminalWriter as TerminalWriter
+from _pytest.compat import TYPE_CHECKING as TYPE_CHECKING, safe_getattr as safe_getattr
+from _pytest.fixtures import FixtureRequest as FixtureRequest
+from _pytest.outcomes import OutcomeException as OutcomeException
+from _pytest.python_api import approx as approx
+from _pytest.warning_types import PytestWarning as PytestWarning
+from typing import Any, Optional, Sequence, Tuple, Type, Union
+
+DOCTEST_REPORT_CHOICE_NONE: str
+DOCTEST_REPORT_CHOICE_CDIFF: str
+DOCTEST_REPORT_CHOICE_NDIFF: str
+DOCTEST_REPORT_CHOICE_UDIFF: str
+DOCTEST_REPORT_CHOICE_ONLY_FIRST_FAILURE: str
+DOCTEST_REPORT_CHOICES: Any
+RUNNER_CLASS: Any
+CHECKER_CLASS: Optional[Type[doctest.OutputChecker]]
+
+def pytest_addoption(parser: Any) -> None: ...
+def pytest_unconfigure() -> None: ...
+def pytest_collect_file(path: py.path.local, parent: Any) -> Any: ...
+
+class ReprFailDoctest(TerminalRepr):
+    reprlocation_lines: Any = ...
+    def __init__(
+        self, reprlocation_lines: Sequence[Tuple[ReprFileLocation, Sequence[str]]]
+    ) -> None: ...
+    def toterminal(self, tw: TerminalWriter) -> None: ...
+
+class MultipleDoctestFailures(Exception):
+    failures: Any = ...
+    def __init__(self, failures: Any) -> None: ...
+
+class DoctestItem(pytest.Item):
+    runner: Any = ...
+    dtest: Any = ...
+    obj: Any = ...
+    fixture_request: Any = ...
+    def __init__(
+        self,
+        name: Any,
+        parent: Any,
+        runner: Optional[Any] = ...,
+        dtest: Optional[Any] = ...,
+    ) -> None: ...
+    @classmethod
+    def from_parent(
+        cls: Any,
+        parent: Union[DoctestTextfile, DoctestModule],
+        name: Any,
+        runner: Any,
+        dtest: Any,
+    ) -> Any: ...
+    def setup(self) -> None: ...
+    def runtest(self) -> None: ...
+    def repr_failure(self, excinfo: Any): ...
+    def reportinfo(self) -> Tuple[py.path.local, int, str]: ...
+
+def get_optionflags(parent: Any): ...
+
+class DoctestTextfile(pytest.Module):
+    obj: Any = ...
+    def collect(self) -> None: ...
+
+class DoctestModule(pytest.Module):
+    def collect(self): ...
+
+def doctest_namespace(): ...
