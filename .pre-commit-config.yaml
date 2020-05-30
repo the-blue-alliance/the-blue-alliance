@@ -1,0 +1,18 @@
+- repo: local
+  hooks:
+    - id: pyre
+      name: Type Checking
+      entry: ./ops/run_pyre.sh
+      language: script
+    - id: black
+      name: Formatting
+      entry: ./ops/run_black_fix.sh
+      language: script
+    - id: lint
+      name: Linting
+      entry: ./ops/run_flake.sh
+      language: script
+    - id: test
+      name: Testing
+      entry: ./ops/run_tests.sh
+      language: script

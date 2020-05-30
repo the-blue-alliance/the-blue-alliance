@@ -1,4 +1,6 @@
+black
+flake8
+pre-commit
+pyre-check
 pytest
 pytest-cov
-black
-pyre-check
