@@ -6,7 +6,7 @@
       language: script
     - id: black
       name: Formatting
-      entry: ./ops/run_black.sh
+      entry: ./ops/run_black_fix.sh
       language: script
     - id: lint
       name: Linting

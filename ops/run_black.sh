@@ -1,3 +1,3 @@
 #!/bin/bash
 
-black ./src/
+black --check --diff ./src/
