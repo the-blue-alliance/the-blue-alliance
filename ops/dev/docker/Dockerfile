@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
   jq \
   tmux \
   vim \
-  openssh-server 
+  openssh-server
 
 # Setup python environmenets
 # python3 should be the default, but gcloud currently depends on python2
@@ -53,6 +53,3 @@ EXPOSE 8080-8089
 
 # Start SSH server
 CMD ["/usr/sbin/sshd", "-D"]
-
-# Add vars to SSH automatically
-RUN echo source /tba/ops/dev/vars.sh >> /root/.bashrc

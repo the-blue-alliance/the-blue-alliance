@@ -50,7 +50,7 @@ Vagrant.configure("2") do |config|
 
   # Provision dependencies
   config.vm.provision "shell",
-    inline: "cd /tba && ./ops/dev/bootstrap-dev-container.sh",
+    inline: "cd /tba && ./ops/dev/vagrant/bootstrap-dev-container.sh",
     privileged: false
 
   # Load in the datastore file, needs to run before devserver start
@@ -60,7 +60,7 @@ Vagrant.configure("2") do |config|
 
   # Start the GAE devserver
   config.vm.provision "shell",
-    inline: "cd /tba && ./ops/dev/start-devserver.sh",
+    inline: "cd /tba && ./ops/dev/vagrant/start-devserver.sh",
     privileged: false,
     run: "always"
 

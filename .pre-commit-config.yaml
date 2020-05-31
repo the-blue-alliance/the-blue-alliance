@@ -2,15 +2,15 @@
   hooks:
     - id: pyre
       name: Type Checking
-      entry: ./ops/run_pyre.sh
+      entry: ./ops/type_check.sh
       language: script
-    - id: black
+    - id: format
       name: Formatting
-      entry: ./ops/run_black_fix.sh
+      entry: ./ops/format.sh
       language: script
     - id: lint
       name: Linting
-      entry: ./ops/run_flake.sh
+      entry: ./ops/lint.sh
       language: script
     - id: test
       name: Testing
