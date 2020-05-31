@@ -121,5 +121,9 @@ def strftime(datetime, formatstr):
 #     return match_id.replace('m', '-').upper()
 
 
+_filters = {"strftime": strftime}
+
+
 def register_template_filters(app):
-    app.jinja_env.filters["strftime"] = strftime
+    for name, func in _filters.items():
+        app.jinja_env.filters[name] = func

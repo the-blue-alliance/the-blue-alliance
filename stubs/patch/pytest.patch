@@ -1,0 +1,7 @@
+diff --git a/stubs/_pytest/mark/__init__.pyi b/stubs/_pytest/mark/__init__.pyi
+index ab1d4dad..6864fad2 100644
+--- a/stubs/_pytest/mark/__init__.pyi
++++ b/stubs/_pytest/mark/__init__.pyi
+@@ -1 +1,2 @@
+ from .structures import Mark as Mark, MarkDecorator as MarkDecorator, MarkGenerator as MarkGenerator, get_empty_parameterset_mark as get_empty_parameterset_mark
++from .structures import MARK_GEN

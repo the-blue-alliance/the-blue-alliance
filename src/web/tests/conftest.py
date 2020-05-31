@@ -3,5 +3,5 @@ import pytest
 
 
 @pytest.fixture
-def app() -> Flask:
+def empty_app() -> Flask:
     return Flask(__name__)
