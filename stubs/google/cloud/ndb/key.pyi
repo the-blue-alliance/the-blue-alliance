@@ -27,72 +27,10 @@ class Key:
     def serialized(self): ...
     def urlsafe(self): ...
     def to_legacy_urlsafe(self, location_prefix: Any): ...
-    def get(
-        self,
-        read_consistency: Optional[Any] = ...,
-        read_policy: Optional[Any] = ...,
-        transaction: Optional[Any] = ...,
-        retries: Optional[Any] = ...,
-        timeout: Optional[Any] = ...,
-        deadline: Optional[Any] = ...,
-        use_cache: Optional[Any] = ...,
-        use_global_cache: Optional[Any] = ...,
-        use_datastore: Optional[Any] = ...,
-        global_cache_timeout: Optional[Any] = ...,
-        use_memcache: Optional[Any] = ...,
-        memcache_timeout: Optional[Any] = ...,
-        max_memcache_items: Optional[Any] = ...,
-        force_writes: Optional[Any] = ...,
-        _options: Optional[Any] = ...,
-    ): ...
-    def get_async(
-        self,
-        read_consistency: Optional[Any] = ...,
-        read_policy: Optional[Any] = ...,
-        transaction: Optional[Any] = ...,
-        retries: Optional[Any] = ...,
-        timeout: Optional[Any] = ...,
-        deadline: Optional[Any] = ...,
-        use_cache: Optional[Any] = ...,
-        use_global_cache: Optional[Any] = ...,
-        use_datastore: Optional[Any] = ...,
-        global_cache_timeout: Optional[Any] = ...,
-        use_memcache: Optional[Any] = ...,
-        memcache_timeout: Optional[Any] = ...,
-        max_memcache_items: Optional[Any] = ...,
-        force_writes: Optional[Any] = ...,
-        _options: Optional[Any] = ...,
-    ): ...
-    def delete(
-        self,
-        retries: Optional[Any] = ...,
-        timeout: Optional[Any] = ...,
-        deadline: Optional[Any] = ...,
-        use_cache: Optional[Any] = ...,
-        use_global_cache: Optional[Any] = ...,
-        use_datastore: Optional[Any] = ...,
-        global_cache_timeout: Optional[Any] = ...,
-        use_memcache: Optional[Any] = ...,
-        memcache_timeout: Optional[Any] = ...,
-        max_memcache_items: Optional[Any] = ...,
-        force_writes: Optional[Any] = ...,
-        _options: Optional[Any] = ...,
-    ): ...
-    def delete_async(
-        self,
-        retries: Optional[Any] = ...,
-        timeout: Optional[Any] = ...,
-        deadline: Optional[Any] = ...,
-        use_cache: Optional[Any] = ...,
-        use_global_cache: Optional[Any] = ...,
-        use_datastore: Optional[Any] = ...,
-        global_cache_timeout: Optional[Any] = ...,
-        use_memcache: Optional[Any] = ...,
-        memcache_timeout: Optional[Any] = ...,
-        max_memcache_items: Optional[Any] = ...,
-        force_writes: Optional[Any] = ...,
-        _options: Optional[Any] = ...,
-    ): ...
+    def get(self, read_consistency: Optional[Any] = ..., read_policy: Optional[Any] = ..., transaction: Optional[Any] = ..., retries: Optional[Any] = ..., timeout: Optional[Any] = ..., deadline: Optional[Any] = ..., use_cache: Optional[Any] = ..., use_global_cache: Optional[Any] = ..., use_datastore: Optional[Any] = ..., global_cache_timeout: Optional[Any] = ..., use_memcache: Optional[Any] = ..., memcache_timeout: Optional[Any] = ..., max_memcache_items: Optional[Any] = ..., force_writes: Optional[Any] = ..., _options: Optional[Any] = ...): ...
+    def get_async(self, read_consistency: Optional[Any] = ..., read_policy: Optional[Any] = ..., transaction: Optional[Any] = ..., retries: Optional[Any] = ..., timeout: Optional[Any] = ..., deadline: Optional[Any] = ..., use_cache: Optional[Any] = ..., use_global_cache: Optional[Any] = ..., use_datastore: Optional[Any] = ..., global_cache_timeout: Optional[Any] = ..., use_memcache: Optional[Any] = ..., memcache_timeout: Optional[Any] = ..., max_memcache_items: Optional[Any] = ..., force_writes: Optional[Any] = ..., _options: Optional[Any] = ...): ...
+    def delete(self, retries: Optional[Any] = ..., timeout: Optional[Any] = ..., deadline: Optional[Any] = ..., use_cache: Optional[Any] = ..., use_global_cache: Optional[Any] = ..., use_datastore: Optional[Any] = ..., global_cache_timeout: Optional[Any] = ..., use_memcache: Optional[Any] = ..., memcache_timeout: Optional[Any] = ..., max_memcache_items: Optional[Any] = ..., force_writes: Optional[Any] = ..., _options: Optional[Any] = ...): ...
+    def delete_async(self, retries: Optional[Any] = ..., timeout: Optional[Any] = ..., deadline: Optional[Any] = ..., use_cache: Optional[Any] = ..., use_global_cache: Optional[Any] = ..., use_datastore: Optional[Any] = ..., global_cache_timeout: Optional[Any] = ..., use_memcache: Optional[Any] = ..., memcache_timeout: Optional[Any] = ..., max_memcache_items: Optional[Any] = ..., force_writes: Optional[Any] = ..., _options: Optional[Any] = ...): ...
     @classmethod
     def from_old_key(cls, old_key: Any) -> None: ...
     def to_old_key(self) -> None: ...

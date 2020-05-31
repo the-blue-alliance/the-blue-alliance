@@ -6,35 +6,15 @@ from _pytest._code.code import ExceptionInfo as ExceptionInfo
 from _pytest._code.source import getfslineno as getfslineno
 from _pytest._io import TerminalWriter as TerminalWriter
 from _pytest._io.saferepr import saferepr as saferepr
-from _pytest.compat import (
-    NOTSET as NOTSET,
-    REGEX_TYPE as REGEX_TYPE,
-    STRING_TYPES as STRING_TYPES,
-    ascii_escaped as ascii_escaped,
-    get_default_arg_names as get_default_arg_names,
-    get_real_func as get_real_func,
-    getimfunc as getimfunc,
-    getlocation as getlocation,
-    is_async_function as is_async_function,
-    is_generator as is_generator,
-    safe_getattr as safe_getattr,
-    safe_isclass as safe_isclass,
-)
+from _pytest.compat import NOTSET as NOTSET, REGEX_TYPE as REGEX_TYPE, STRING_TYPES as STRING_TYPES, ascii_escaped as ascii_escaped, get_default_arg_names as get_default_arg_names, get_real_func as get_real_func, getimfunc as getimfunc, getlocation as getlocation, is_async_function as is_async_function, is_generator as is_generator, safe_getattr as safe_getattr, safe_isclass as safe_isclass
 from _pytest.config import Config as Config, hookimpl as hookimpl
 from _pytest.deprecated import FUNCARGNAMES as FUNCARGNAMES
 from _pytest.fixtures import FuncFixtureInfo as FuncFixtureInfo
 from _pytest.mark import MARK_GEN as MARK_GEN, ParameterSet as ParameterSet
-from _pytest.mark.structures import (
-    Mark as Mark,
-    get_unpacked_marks as get_unpacked_marks,
-    normalize_mark_list as normalize_mark_list,
-)
+from _pytest.mark.structures import Mark as Mark, get_unpacked_marks as get_unpacked_marks, normalize_mark_list as normalize_mark_list
 from _pytest.outcomes import fail as fail, skip as skip
 from _pytest.pathlib import parts as parts
-from _pytest.warning_types import (
-    PytestCollectionWarning as PytestCollectionWarning,
-    PytestUnhandledCoroutineWarning as PytestUnhandledCoroutineWarning,
-)
+from _pytest.warning_types import PytestCollectionWarning as PytestCollectionWarning, PytestUnhandledCoroutineWarning as PytestUnhandledCoroutineWarning
 from typing import Any, Callable, Iterable, List, Optional, Tuple, Union
 
 def pyobj_property(name: Any): ...
@@ -73,14 +53,7 @@ class Module(nodes.File, PyCollector):
 
 class Package(Module):
     name: Any = ...
-    def __init__(
-        self,
-        fspath: py.path.local,
-        parent: nodes.Collector,
-        config: Any = ...,
-        session: Any = ...,
-        nodeid: Any = ...,
-    ) -> None: ...
+    def __init__(self, fspath: py.path.local, parent: nodes.Collector, config: Any=..., session: Any=..., nodeid: Any=...) -> None: ...
     def setup(self) -> None: ...
     def gethookproxy(self, fspath: py.path.local) -> Any: ...
     def isinitpath(self, path: Any): ...
@@ -110,16 +83,7 @@ class CallSpec2:
     def getparam(self, name: Any): ...
     @property
     def id(self): ...
-    def setmulti2(
-        self,
-        valtypes: Any,
-        argnames: Any,
-        valset: Any,
-        id: Any,
-        marks: Any,
-        scopenum: Any,
-        param_index: Any,
-    ) -> None: ...
+    def setmulti2(self, valtypes: Any, argnames: Any, valset: Any, id: Any, marks: Any, scopenum: Any, param_index: Any) -> None: ...
 
 class Metafunc:
     definition: Any = ...
@@ -128,62 +92,22 @@ class Metafunc:
     function: Any = ...
     fixturenames: Any = ...
     cls: Any = ...
-    def __init__(
-        self,
-        definition: FunctionDefinition,
-        fixtureinfo: fixtures.FuncFixtureInfo,
-        config: Config,
-        cls: Any = ...,
-        module: Any = ...,
-    ) -> None: ...
+    def __init__(self, definition: FunctionDefinition, fixtureinfo: fixtures.FuncFixtureInfo, config: Config, cls: Any=..., module: Any=...) -> None: ...
     @property
     def funcargnames(self): ...
-    def parametrize(
-        self,
-        argnames: Union[str, List[str], Tuple[str, ...]],
-        argvalues: Iterable[Union[ParameterSet, typing.Sequence[object], object]],
-        indirect: Union[bool, typing.Sequence[str]] = ...,
-        ids: Optional[
-            Union[
-                Iterable[Union[None, str, float, int, bool]],
-                Callable[[object], Optional[object]],
-            ]
-        ] = ...,
-        scope: Optional[str] = ...,
-        *,
-        _param_mark: Optional[Mark] = ...
-    ) -> None: ...
+    def parametrize(self, argnames: Union[str, List[str], Tuple[str, ...]], argvalues: Iterable[Union[ParameterSet, typing.Sequence[object], object]], indirect: Union[bool, typing.Sequence[str]]=..., ids: Optional[Union[Iterable[Union[None, str, float, int, bool]], Callable[[object], Optional[object]]]]=..., scope: Optional[str]=..., *, _param_mark: Optional[Mark]=...) -> None: ...
 
-def idmaker(
-    argnames: Iterable[str],
-    parametersets: Iterable[ParameterSet],
-    idfn: Optional[Callable[[object], Optional[object]]] = ...,
-    ids: Optional[List[Union[None, str]]] = ...,
-    config: Optional[Config] = ...,
-    item: Any = ...,
-) -> List[str]: ...
+def idmaker(argnames: Iterable[str], parametersets: Iterable[ParameterSet], idfn: Optional[Callable[[object], Optional[object]]]=..., ids: Optional[List[Union[None, str]]]=..., config: Optional[Config]=..., item: Any=...) -> List[str]: ...
 def show_fixtures_per_test(config: Any): ...
 def showfixtures(config: Any): ...
-def write_docstring(tw: TerminalWriter, doc: str, indent: str = ...) -> None: ...
+def write_docstring(tw: TerminalWriter, doc: str, indent: str=...) -> None: ...
 
 class Function(PyobjMixin, nodes.Item):
     obj: Any = ...
     callspec: Any = ...
     fixturenames: Any = ...
     originalname: Any = ...
-    def __init__(
-        self,
-        name: Any,
-        parent: Any,
-        args: Any = ...,
-        config: Any = ...,
-        callspec: Optional[CallSpec2] = ...,
-        callobj: Any = ...,
-        keywords: Any = ...,
-        session: Any = ...,
-        fixtureinfo: Optional[FuncFixtureInfo] = ...,
-        originalname: Any = ...,
-    ) -> None: ...
+    def __init__(self, name: Any, parent: Any, args: Any=..., config: Any=..., callspec: Optional[CallSpec2]=..., callobj: Any=..., keywords: Any=..., session: Any=..., fixtureinfo: Optional[FuncFixtureInfo]=..., originalname: Any=...) -> None: ...
     @classmethod
     def from_parent(cls, parent: Any, **kw: Any): ...
     @property

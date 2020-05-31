@@ -24,7 +24,7 @@ class _InProcessGlobalCache(GlobalCache):
     def watch(self, keys: Any) -> None: ...
     def compare_and_swap(self, items: Any, expires: Optional[Any] = ...) -> None: ...
 
-_Pipeline = namedtuple("_Pipeline", ["pipe", "id"])
+_Pipeline = namedtuple('_Pipeline', ['pipe', 'id'])
 
 class RedisCache(GlobalCache):
     @classmethod
