@@ -8,40 +8,10 @@ class _LocalState(threading.local):
 
 def get_context(raise_context_error: bool = ...): ...
 
-_ContextTuple = namedtuple(
-    "_ContextTuple",
-    [
-        "client",
-        "namespace",
-        "eventloop",
-        "batches",
-        "commit_batches",
-        "transaction",
-        "cache",
-        "global_cache",
-        "on_commit_callbacks",
-        "legacy_data",
-    ],
-)
+_ContextTuple = namedtuple('_ContextTuple', ['client', 'namespace', 'eventloop', 'batches', 'commit_batches', 'transaction', 'cache', 'global_cache', 'on_commit_callbacks', 'legacy_data'])
 
 class _Context(_ContextTuple):
-    def __new__(
-        cls,
-        client: Any,
-        namespace: Any = ...,
-        eventloop: Optional[Any] = ...,
-        batches: Optional[Any] = ...,
-        commit_batches: Optional[Any] = ...,
-        transaction: Optional[Any] = ...,
-        cache: Optional[Any] = ...,
-        cache_policy: Optional[Any] = ...,
-        global_cache: Optional[Any] = ...,
-        global_cache_policy: Optional[Any] = ...,
-        global_cache_timeout_policy: Optional[Any] = ...,
-        datastore_policy: Optional[Any] = ...,
-        on_commit_callbacks: Optional[Any] = ...,
-        legacy_data: bool = ...,
-    ): ...
+    def __new__(cls, client: Any, namespace: Any = ..., eventloop: Optional[Any] = ..., batches: Optional[Any] = ..., commit_batches: Optional[Any] = ..., transaction: Optional[Any] = ..., cache: Optional[Any] = ..., cache_policy: Optional[Any] = ..., global_cache: Optional[Any] = ..., global_cache_policy: Optional[Any] = ..., global_cache_timeout_policy: Optional[Any] = ..., datastore_policy: Optional[Any] = ..., on_commit_callbacks: Optional[Any] = ..., legacy_data: bool = ...): ...
     def new(self, **kwargs: Any): ...
     def use(self) -> None: ...
 
@@ -77,13 +47,6 @@ class Context(_Context):
     def memcache_replace(self, *args: Any, **kwargs: Any) -> None: ...
     def memcache_set(self, *args: Any, **kwargs: Any) -> None: ...
     def urlfetch(self, *args: Any, **kwargs: Any) -> None: ...
-    def __enter__(self) -> Any: ...
-    def __exit__(
-        self,
-        exc_type: Optional[Type[BaseException]],
-        exc_value: Optional[BaseException],
-        traceback: Optional[TracebackType],
-    ) -> Optional[bool]: ...
 
 class ContextOptions:
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...

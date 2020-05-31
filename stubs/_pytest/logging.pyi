@@ -1,10 +1,7 @@
 import logging
 from _pytest import nodes as nodes
 from _pytest.compat import nullcontext as nullcontext
-from _pytest.config import (
-    Config as Config,
-    create_terminal_writer as create_terminal_writer,
-)
+from _pytest.config import Config as Config, create_terminal_writer as create_terminal_writer
 from _pytest.pathlib import Path as Path
 from typing import AbstractSet, Any, Generator, List, Mapping, Optional
 
@@ -23,9 +20,7 @@ class PercentStyleMultiline(logging.PercentStyle):
 
 def get_option_ini(config: Any, *names: Any): ...
 def pytest_addoption(parser: Any) -> None: ...
-def catching_logs(
-    handler: Any, formatter: Optional[Any] = ..., level: Optional[Any] = ...
-) -> None: ...
+def catching_logs(handler: Any, formatter: Optional[Any] = ..., level: Optional[Any] = ...) -> None: ...
 
 class LogCaptureHandler(logging.StreamHandler):
     records: Any = ...

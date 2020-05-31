@@ -12,9 +12,4 @@ def get_dirs_from_args(args: Any): ...
 
 CFG_PYTEST_SECTION: str
 
-def determine_setup(
-    inifile: Optional[str],
-    args: List[str],
-    rootdir_cmd_arg: Optional[str] = ...,
-    config: Optional[Config] = ...,
-) -> Tuple[py.path.local, Optional[str], Any]: ...
+def determine_setup(inifile: Optional[str], args: List[str], rootdir_cmd_arg: Optional[str]=..., config: Optional[Config]=...) -> Tuple[py.path.local, Optional[str], Any]: ...

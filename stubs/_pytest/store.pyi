@@ -1,7 +1,7 @@
 from typing import TypeVar, Union
 
-T = TypeVar("T")
-D = TypeVar("D")
+T = TypeVar('T')
+D = TypeVar('D')
 
 class StoreKey: ...
 

@@ -1,7 +1,4 @@
-from _pytest.warning_types import (
-    PytestDeprecationWarning as PytestDeprecationWarning,
-    UnformattedWarning as UnformattedWarning,
-)
+from _pytest.warning_types import PytestDeprecationWarning as PytestDeprecationWarning, UnformattedWarning as UnformattedWarning
 from typing import Any
 
 DEPRECATED_EXTERNAL_PLUGINS: Any

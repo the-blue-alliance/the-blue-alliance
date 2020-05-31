@@ -1,15 +1,4 @@
-from _pytest._code.code import (
-    ExceptionChainRepr as ExceptionChainRepr,
-    ExceptionInfo as ExceptionInfo,
-    ReprEntry as ReprEntry,
-    ReprEntryNative as ReprEntryNative,
-    ReprExceptionInfo as ReprExceptionInfo,
-    ReprFileLocation as ReprFileLocation,
-    ReprFuncArgs as ReprFuncArgs,
-    ReprLocals as ReprLocals,
-    ReprTraceback as ReprTraceback,
-    TerminalRepr as TerminalRepr,
-)
+from _pytest._code.code import ExceptionChainRepr as ExceptionChainRepr, ExceptionInfo as ExceptionInfo, ReprEntry as ReprEntry, ReprEntryNative as ReprEntryNative, ReprExceptionInfo as ReprExceptionInfo, ReprFileLocation as ReprFileLocation, ReprFuncArgs as ReprFuncArgs, ReprLocals as ReprLocals, ReprTraceback as ReprTraceback, TerminalRepr as TerminalRepr
 from _pytest._io import TerminalWriter as TerminalWriter
 from _pytest.compat import TYPE_CHECKING as TYPE_CHECKING
 from _pytest.nodes import Node as Node
@@ -58,19 +47,7 @@ class TestReport(BaseReport):
     user_properties: Any = ...
     sections: Any = ...
     duration: Any = ...
-    def __init__(
-        self,
-        nodeid: Any,
-        location: Tuple[str, Optional[int], str],
-        keywords: Any,
-        outcome: Any,
-        longrepr: Any,
-        when: Any,
-        sections: Any = ...,
-        duration: Any = ...,
-        user_properties: Any = ...,
-        **extra: Any
-    ) -> None: ...
+    def __init__(self, nodeid: Any, location: Tuple[str, Optional[int], str], keywords: Any, outcome: Any, longrepr: Any, when: Any, sections: Any=..., duration: Any=..., user_properties: Any=..., **extra: Any) -> None: ...
     @classmethod
     def from_item_and_call(cls: Any, item: Any, call: Any) -> TestReport: ...
 
@@ -81,15 +58,7 @@ class CollectReport(BaseReport):
     longrepr: Any = ...
     result: Any = ...
     sections: Any = ...
-    def __init__(
-        self,
-        nodeid: str,
-        outcome: Any,
-        longrepr: Any,
-        result: List[Node],
-        sections: Any = ...,
-        **extra: Any
-    ) -> None: ...
+    def __init__(self, nodeid: str, outcome: Any, longrepr: Any, result: List[Node], sections: Any=..., **extra: Any) -> None: ...
     @property
     def location(self): ...
 
