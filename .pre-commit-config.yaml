@@ -13,7 +13,7 @@
       entry: ./ops/test_py3.sh --relevant
       language: script
     - id: node-lint
-      name: "[node] Linting & Formatting"
+      name: "[node] Formatting & Linting"
       entry: ./ops/lint_node.sh --fix
       language: script
     - id: node-test
