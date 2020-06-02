@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import Flask
 import pytest
-from web.jinja2_filters import _filters, strftime, register_template_filters
+from backend.web.jinja2_filters import _filters, strftime, register_template_filters
 
 
 @pytest.mark.parametrize(

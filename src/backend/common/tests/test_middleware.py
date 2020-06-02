@@ -1,4 +1,4 @@
-from common.middleware import NdbMiddleware, install_middleware
+from backend.common.middleware import NdbMiddleware, install_middleware
 from flask import Flask
 
 

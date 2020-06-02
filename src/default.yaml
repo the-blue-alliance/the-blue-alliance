@@ -1,5 +1,5 @@
 runtime: python37
-entrypoint: gunicorn -b :$PORT default.main:app
+entrypoint: gunicorn -b :$PORT backend.default.main:app
 
 instance_class: F1
 automatic_scaling:
