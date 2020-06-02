@@ -48,7 +48,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r src/requirements.txt
-      - name: Run Lint
+      - name: Run Format & Lint
         run: ./ops/lint_py3.sh
   py3-test:
     name: "[py3] Test"
@@ -91,7 +91,7 @@ jobs:
           restore-keys: ${{ runner.os }}-node-
       - name: Install Dependencies
         run: npm install
-      - name: Run Lint
+      - name: Run Format & Lint
         run: ./ops/lint_node.sh
   node-test:
     name: "[node] Test"
