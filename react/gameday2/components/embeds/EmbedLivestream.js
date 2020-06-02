@@ -1,10 +1,10 @@
-import React from 'react'
-import { webcastPropType } from '../../utils/webcastUtils'
+import React from "react";
+import { webcastPropType } from "../../utils/webcastUtils";
 
 const EmbedLivestream = (props) => {
-  const channel = props.webcast.channel
-  const file = props.webcast.file
-  const iframeSrc = `https://new.livestream.com/accounts/${channel}/events/${file}/player?width=640&height=360&autoPlay=true&mute=false`
+  const channel = props.webcast.channel;
+  const file = props.webcast.file;
+  const iframeSrc = `https://new.livestream.com/accounts/${channel}/events/${file}/player?width=640&height=360&autoPlay=true&mute=false`;
   return (
     <iframe
       src={iframeSrc}
@@ -14,11 +14,11 @@ const EmbedLivestream = (props) => {
       width="100%"
       allowFullScreen
     />
-  )
-}
+  );
+};
 
 EmbedLivestream.propTypes = {
   webcast: webcastPropType.isRequired,
-}
+};
 
-export default EmbedLivestream
+export default EmbedLivestream;

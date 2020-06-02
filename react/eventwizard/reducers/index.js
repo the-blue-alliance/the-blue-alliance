@@ -1,8 +1,8 @@
-import { combineReducers } from 'redux'
-import auth from './auth'
+import { combineReducers } from "redux";
+import auth from "./auth";
 
 const eventwizardReducer = combineReducers({
   auth,
-})
+});
 
-export default eventwizardReducer
+export default eventwizardReducer;

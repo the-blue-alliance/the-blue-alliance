@@ -1,8 +1,7 @@
+import React from "react";
+import PropTypes from "prop-types";
 
-import React from 'react'
-import PropTypes from 'prop-types'
-
-import EVENT_SHAPE from '../../constants/ApiEvent'
+import EVENT_SHAPE from "../../constants/ApiEvent";
 
 const SyncCodeInput = (props) => (
   <div className="form-group">
@@ -21,11 +20,11 @@ const SyncCodeInput = (props) => (
       />
     </div>
   </div>
-)
+);
 
 SyncCodeInput.propTypes = {
   eventInfo: PropTypes.shape(EVENT_SHAPE),
   setSyncCode: PropTypes.func.isRequired,
-}
+};
 
-export default SyncCodeInput
+export default SyncCodeInput;

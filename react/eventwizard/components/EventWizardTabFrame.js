@@ -1,19 +1,47 @@
-import React from 'react'
-import EventInfoContainer from '../containers/EventInfoContainer'
-import TeamListContainer from '../containers/TeamListContainer'
+import React from "react";
+import EventInfoContainer from "../containers/EventInfoContainer";
+import TeamListContainer from "../containers/TeamListContainer";
 
 const EventWizardTabFrame = () => (
   <div>
     <div className="row">
       <div className="col-sm-12">
         <ul className="nav nav-tabs">
-          <li><a href="#info" data-toggle="tab">Event Info</a></li>
-          <li><a href="#teams" data-toggle="tab">Teams</a></li>
-          <li><a href="#schedule" data-toggle="tab">FMS Schedule Import</a></li>
-          <li><a href="#matches" data-toggle="tab">Match Play</a></li>
-          <li><a href="#results" data-toggle="tab">FMS Match Import</a></li>
-          <li><a href="#rankings" data-toggle="tab">FMS Rankings Import</a></li>
-          <li><a href="#alliances" data-toggle="tab">Alliance Selection</a></li>
+          <li>
+            <a href="#info" data-toggle="tab">
+              Event Info
+            </a>
+          </li>
+          <li>
+            <a href="#teams" data-toggle="tab">
+              Teams
+            </a>
+          </li>
+          <li>
+            <a href="#schedule" data-toggle="tab">
+              FMS Schedule Import
+            </a>
+          </li>
+          <li>
+            <a href="#matches" data-toggle="tab">
+              Match Play
+            </a>
+          </li>
+          <li>
+            <a href="#results" data-toggle="tab">
+              FMS Match Import
+            </a>
+          </li>
+          <li>
+            <a href="#rankings" data-toggle="tab">
+              FMS Rankings Import
+            </a>
+          </li>
+          <li>
+            <a href="#alliances" data-toggle="tab">
+              Alliance Selection
+            </a>
+          </li>
         </ul>
       </div>
     </div>
@@ -37,6 +65,6 @@ const EventWizardTabFrame = () => (
       </div>
     </div>
   </div>
-)
+);
 
-export default EventWizardTabFrame
+export default EventWizardTabFrame;

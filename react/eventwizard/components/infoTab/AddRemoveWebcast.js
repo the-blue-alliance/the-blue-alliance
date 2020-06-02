@@ -1,40 +1,40 @@
+import React, { Component } from "react";
+import PropTypes from "prop-types";
 
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-
-import WebcastList from './WebcastList'
-import EVENT_SHAPE from '../../constants/ApiEvent'
+import WebcastList from "./WebcastList";
+import EVENT_SHAPE from "../../constants/ApiEvent";
 
 class AddRemoveWebcast extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
-      nextWebcastToAdd: '',
-    }
+      nextWebcastToAdd: "",
+    };
 
-    this.onNextWebcastChange = this.onNextWebcastChange.bind(this)
-    this.onAddWebcastClick = this.onAddWebcastClick.bind(this)
+    this.onNextWebcastChange = this.onNextWebcastChange.bind(this);
+    this.onAddWebcastClick = this.onAddWebcastClick.bind(this);
   }
 
   onNextWebcastChange(event) {
-    this.setState({ nextWebcastToAdd: event.target.value })
+    this.setState({ nextWebcastToAdd: event.target.value });
   }
 
   onAddWebcastClick() {
-    this.props.addWebcast(this.state.nextWebcastToAdd)
-    this.setState({ nextWebcastToAdd: '' })
+    this.props.addWebcast(this.state.nextWebcastToAdd);
+    this.setState({ nextWebcastToAdd: "" });
   }
 
   render() {
-    let webcastList = null
+    let webcastList = null;
     if (this.props.eventInfo && this.props.eventInfo.webcasts.length > 0) {
-      webcastList =
-        (<WebcastList
+      webcastList = (
+        <WebcastList
           webcasts={this.props.eventInfo.webcasts}
           removeWebcast={this.props.removeWebcast}
-        />)
+        />
+      );
     } else {
-      webcastList = (<p>No webcasts found</p>)
+      webcastList = <p>No webcasts found</p>;
     }
 
     return (
@@ -62,7 +62,7 @@ class AddRemoveWebcast extends Component {
           </button>
         </div>
       </div>
-    )
+    );
   }
 }
 
@@ -70,6 +70,6 @@ AddRemoveWebcast.propTypes = {
   eventInfo: PropTypes.shape(EVENT_SHAPE),
   addWebcast: PropTypes.func.isRequired,
   removeWebcast: PropTypes.func.isRequired,
-}
+};
 
-export default AddRemoveWebcast
+export default AddRemoveWebcast;

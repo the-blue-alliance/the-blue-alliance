@@ -1,42 +1,44 @@
-import { UPDATE_AUTH, CLEAR_AUTH, SET_EVENT, SET_MANUAL_EVENT } from '../constants/ActionTypes'
+import {
+  UPDATE_AUTH,
+  CLEAR_AUTH,
+  SET_EVENT,
+  SET_MANUAL_EVENT,
+} from "../constants/ActionTypes";
 
 const defaultState = {
-  selectedEvent: '',
+  selectedEvent: "",
   manualEvent: false,
-}
+};
 
-const setNewAuth = (authId, authSecret, state) => (
+const setNewAuth = (authId, authSecret, state) =>
   Object.assign({}, state, {
     authId,
     authSecret,
-  })
-)
+  });
 
-const setNewEvent = (eventKey, state) => (
+const setNewEvent = (eventKey, state) =>
   Object.assign({}, state, {
     selectedEvent: eventKey,
-  })
-)
+  });
 
-const setManualEvent = (manualEvent, state) => (
+const setManualEvent = (manualEvent, state) =>
   Object.assign({}, state, {
     manualEvent,
-  })
-)
+  });
 
 const auth = (state = defaultState, action) => {
   switch (action.type) {
     case CLEAR_AUTH:
-      return setNewAuth('', '', state)
+      return setNewAuth("", "", state);
     case UPDATE_AUTH:
-      return setNewAuth(action.authId, action.authSecret, state)
+      return setNewAuth(action.authId, action.authSecret, state);
     case SET_EVENT:
-      return setNewEvent(action.eventKey, state)
+      return setNewEvent(action.eventKey, state);
     case SET_MANUAL_EVENT:
-      return setManualEvent(action.manualEvent, state)
+      return setManualEvent(action.manualEvent, state);
     default:
-      return state
+      return state;
   }
-}
+};
 
-export default auth
+export default auth;

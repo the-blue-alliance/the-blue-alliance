@@ -1,16 +1,16 @@
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import Select from 'react-select'
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import Select from "react-select";
 
-import EVENT_SHAPE from '../../constants/ApiEvent'
+import EVENT_SHAPE from "../../constants/ApiEvent";
 
 class PlayoffTypeDropdown extends Component {
   static loadPlayoffTypes() {
-    return fetch('/_/playoff_types', {
-      credentials: 'same-origin',
+    return fetch("/_/playoff_types", {
+      credentials: "same-origin",
     })
-      .then((response) => (response.json()))
-      .then((types) => ({ options: types }))
+      .then((response) => response.json())
+      .then((types) => ({ options: types }));
   }
 
   render() {
@@ -33,13 +33,13 @@ class PlayoffTypeDropdown extends Component {
           />
         </div>
       </div>
-    )
+    );
   }
 }
 
 PlayoffTypeDropdown.propTypes = {
   eventInfo: PropTypes.shape(EVENT_SHAPE),
   setType: PropTypes.func.isRequired,
-}
+};
 
-export default PlayoffTypeDropdown
+export default PlayoffTypeDropdown;

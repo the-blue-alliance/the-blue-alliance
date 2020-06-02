@@ -1,13 +1,13 @@
-import React, { PropTypes } from 'react'
+import React, { PropTypes } from "react";
 
 const TwitchChatEmbed = (props) => {
-  const id = `twich-chat-${props.channel}`
-  const src = `https://twitch.tv/embed/${props.channel}/chat`
+  const id = `twich-chat-${props.channel}`;
+  const src = `https://twitch.tv/embed/${props.channel}/chat`;
   const style = {
-    display: props.visible ? null : 'none',
-    width: '100%',
-    height: '100%',
-  }
+    display: props.visible ? null : "none",
+    width: "100%",
+    height: "100%",
+  };
 
   return (
     <div style={style}>
@@ -20,12 +20,12 @@ const TwitchChatEmbed = (props) => {
         width="100%"
       />
     </div>
-  )
-}
+  );
+};
 
 TwitchChatEmbed.propTypes = {
   channel: PropTypes.string.isRequired,
   visible: PropTypes.bool.isRequired,
-}
+};
 
-export default TwitchChatEmbed
+export default TwitchChatEmbed;

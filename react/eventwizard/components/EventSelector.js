@@ -1,49 +1,47 @@
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import Select from 'react-select'
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import Select from "react-select";
 
 class EventSelector extends Component {
   static loadEvents() {
-    return fetch('/_/account/apiwrite_events', {
-      credentials: 'same-origin',
+    return fetch("/_/account/apiwrite_events", {
+      credentials: "same-origin",
     })
-      .then((response) => (
-        response.json()
-      ))
+      .then((response) => response.json())
       .then((events) => {
-        events.push({ value: '_other', label: 'Other' })
-        return { options: events }
-      })
+        events.push({ value: "_other", label: "Other" });
+        return { options: events };
+      });
   }
 
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
-      eventSelectValue: '',
-    }
-    this.onEventSelected = this.onEventSelected.bind(this)
-    this.onManualEventChange = this.onManualEventChange.bind(this)
+      eventSelectValue: "",
+    };
+    this.onEventSelected = this.onEventSelected.bind(this);
+    this.onManualEventChange = this.onManualEventChange.bind(this);
   }
 
   onEventSelected(newEvent) {
-    this.props.clearAuth()
-    this.setState({ eventSelectValue: newEvent.value })
+    this.props.clearAuth();
+    this.setState({ eventSelectValue: newEvent.value });
 
-    if (newEvent.value === '_other') {
-      this.props.setManualEvent(true)
-      this.props.setEvent('')
+    if (newEvent.value === "_other") {
+      this.props.setManualEvent(true);
+      this.props.setEvent("");
     } else {
-      this.props.setManualEvent(false)
-      this.props.setEvent(newEvent.value)
+      this.props.setManualEvent(false);
+      this.props.setEvent(newEvent.value);
     }
   }
 
   onManualEventChange(event) {
-    this.props.setEvent(event.target.value)
+    this.props.setEvent(event.target.value);
   }
 
   render() {
-    let eventKeyBox
+    let eventKeyBox;
     if (this.props.manualEvent) {
       eventKeyBox = (
         <input
@@ -53,12 +51,14 @@ class EventSelector extends Component {
           placeholder="Event Key"
           onChange={this.onManualEventChange}
         />
-      )
+      );
     }
 
     return (
       <div className="form-group">
-        <label htmlFor="event_key_select" className="col-sm-2 control-label">Select Event</label>
+        <label htmlFor="event_key_select" className="col-sm-2 control-label">
+          Select Event
+        </label>
         <div className="col-sm-10">
           <Select.Async
             name="selectEvent"
@@ -73,7 +73,7 @@ class EventSelector extends Component {
           {eventKeyBox}
         </div>
       </div>
-    )
+    );
   }
 }
 
@@ -82,6 +82,6 @@ EventSelector.propTypes = {
   setEvent: PropTypes.func.isRequired,
   setManualEvent: PropTypes.func.isRequired,
   clearAuth: PropTypes.func.isRequired,
-}
+};
 
-export default EventSelector
+export default EventSelector;

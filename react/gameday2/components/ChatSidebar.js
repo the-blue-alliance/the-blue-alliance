@@ -1,13 +1,13 @@
-import React, { PropTypes } from 'react'
-import muiThemeable from 'material-ui/styles/muiThemeable'
-import IconButton from 'material-ui/IconButton'
-import ArrowDropUp from 'material-ui/svg-icons/navigation/arrow-drop-up'
-import { Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui/Toolbar'
-import { white } from 'material-ui/styles/colors'
-import ChatAnalyticsTracker from './ChatAnalyticsTracker'
-import TwitchChatEmbed from './TwitchChatEmbed'
-import ChatSelector from './ChatSelector'
-import { chatPropType } from '../utils/PropTypes'
+import React, { PropTypes } from "react";
+import muiThemeable from "material-ui/styles/muiThemeable";
+import IconButton from "material-ui/IconButton";
+import ArrowDropUp from "material-ui/svg-icons/navigation/arrow-drop-up";
+import { Toolbar, ToolbarGroup, ToolbarTitle } from "material-ui/Toolbar";
+import { white } from "material-ui/styles/colors";
+import ChatAnalyticsTracker from "./ChatAnalyticsTracker";
+import TwitchChatEmbed from "./TwitchChatEmbed";
+import ChatSelector from "./ChatSelector";
+import { chatPropType } from "../utils/PropTypes";
 
 class ChatSidebar extends React.Component {
   static propTypes = {
@@ -22,129 +22,126 @@ class ChatSidebar extends React.Component {
     muiTheme: PropTypes.object.isRequired,
     setChatSidebarVisibility: PropTypes.object.isRequired,
     setHashtagSidebarVisibility: PropTypes.object.isRequired,
-  }
+  };
 
   constructor(props) {
-    super(props)
+    super(props);
 
     this.state = {
       chatSelectorOpen: false,
-    }
+    };
 
-    this.onResize = this.onResize.bind(this)
+    this.onResize = this.onResize.bind(this);
   }
 
   componentDidMount() {
-    this.onResize()
-    window.addEventListener('resize', this.onResize)
+    this.onResize();
+    window.addEventListener("resize", this.onResize);
   }
 
   onResize() {
     if (window.innerWidth < 760) {
-      this.props.setChatSidebarVisibility(false)
-      this.props.setHashtagSidebarVisibility(false)
+      this.props.setChatSidebarVisibility(false);
+      this.props.setHashtagSidebarVisibility(false);
     }
   }
 
   onRequestOpenChatSelector() {
     this.setState({
       chatSelectorOpen: true,
-    })
+    });
   }
 
   onRequestCloseChatSelector() {
     this.setState({
       chatSelectorOpen: false,
-    })
+    });
   }
 
   render() {
     const metrics = {
       switcherHeight: 36,
-    }
+    };
 
     const panelContainerStyle = {
-      position: 'absolute',
+      position: "absolute",
       top: this.props.muiTheme.layout.appBarHeight,
       right: 0,
       bottom: 0,
       width: this.props.muiTheme.layout.chatPanelWidth,
-      background: '#EFEEF1',
-      display: this.props.enabled ? null : 'none',
+      background: "#EFEEF1",
+      display: this.props.enabled ? null : "none",
       zIndex: 1000,
-    }
+    };
 
     const chatEmbedContainerStyle = {
-      position: 'absolute',
+      position: "absolute",
       top: 0,
       bottom: metrics.switcherHeight,
-      width: '100%',
-    }
+      width: "100%",
+    };
 
     const switcherToolbarStyle = {
-      position: 'absolute',
+      position: "absolute",
       bottom: 0,
       height: metrics.switcherHeight,
-      width: '100%',
+      width: "100%",
       background: this.props.muiTheme.palette.primary1Color,
-      cursor: 'pointer',
-    }
+      cursor: "pointer",
+    };
 
     const toolbarTitleStyle = {
       color: white,
       fontSize: 16,
-    }
+    };
 
     const toolbarButtonStyle = {
       width: metrics.switcherHeight,
       height: metrics.switcherHeight,
       padding: 8,
-    }
+    };
 
     const toolbarButtonIconStyle = {
-      width: (metrics.switcherHeight - 16),
-      height: (metrics.switcherHeight - 16),
-    }
+      width: metrics.switcherHeight - 16,
+      height: metrics.switcherHeight - 16,
+    };
 
-    const renderedChats = []
+    const renderedChats = [];
     this.props.renderedChats.forEach((chat) => {
-      const visible = (chat === this.props.currentChat)
+      const visible = chat === this.props.currentChat;
       renderedChats.push(
-        <TwitchChatEmbed
-          channel={chat}
-          key={chat}
-          visible={visible}
-        />
-      )
-    })
+        <TwitchChatEmbed channel={chat} key={chat} visible={visible} />
+      );
+    });
 
-    const currentChat = this.props.chats[this.props.currentChat]
-    let currentChatName = 'UNKNOWN'
+    const currentChat = this.props.chats[this.props.currentChat];
+    let currentChatName = "UNKNOWN";
     if (currentChat) {
-      currentChatName = `${currentChat.name} Chat`
-      if (currentChat.channel === 'firstupdatesnow' && this.props.defaultChat === 'firstupdatesnow') {
-        currentChatName = 'TBA GameDay / FUN'
-      } else if (currentChat.channel === 'firstinspires' && this.props.defaultChat === 'firstinspires') {
-        currentChatName = 'TBA GameDay / FIRST'
+      currentChatName = `${currentChat.name} Chat`;
+      if (
+        currentChat.channel === "firstupdatesnow" &&
+        this.props.defaultChat === "firstupdatesnow"
+      ) {
+        currentChatName = "TBA GameDay / FUN";
+      } else if (
+        currentChat.channel === "firstinspires" &&
+        this.props.defaultChat === "firstinspires"
+      ) {
+        currentChatName = "TBA GameDay / FIRST";
       }
     }
 
-    let content
+    let content;
     if (this.props.hasBeenVisible) {
       content = (
         <div style={panelContainerStyle}>
-          <div style={chatEmbedContainerStyle}>
-            {renderedChats}
-          </div>
+          <div style={chatEmbedContainerStyle}>{renderedChats}</div>
           <Toolbar
             style={switcherToolbarStyle}
             onTouchTap={() => this.onRequestOpenChatSelector()}
           >
             <ToolbarGroup>
-              <ToolbarTitle
-                text={currentChatName}
-                style={toolbarTitleStyle}
-              />
+              <ToolbarTitle text={currentChatName} style={toolbarTitleStyle} />
             </ToolbarGroup>
             <ToolbarGroup lastChild>
               <IconButton
@@ -163,15 +160,17 @@ class ChatSidebar extends React.Component {
             open={this.state.chatSelectorOpen}
             onRequestClose={() => this.onRequestCloseChatSelector()}
           />
-          {this.props.enabled && <ChatAnalyticsTracker currentChat={this.props.currentChat} />}
+          {this.props.enabled && (
+            <ChatAnalyticsTracker currentChat={this.props.currentChat} />
+          )}
         </div>
-      )
+      );
     } else {
-      content = (<div />)
+      content = <div />;
     }
 
-    return content
+    return content;
   }
 }
 
-export default muiThemeable()(ChatSidebar)
+export default muiThemeable()(ChatSidebar);

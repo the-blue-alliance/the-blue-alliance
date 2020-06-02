@@ -1,8 +1,8 @@
-import React, { PropTypes } from 'react'
-import muiThemeable from 'material-ui/styles/muiThemeable'
-import VideoGridContainer from '../containers/VideoGridContainer'
-import LayoutSelectionPanel from './LayoutSelectionPanel'
-import NoWebcasts from './NoWebcasts'
+import React, { PropTypes } from "react";
+import muiThemeable from "material-ui/styles/muiThemeable";
+import VideoGridContainer from "../containers/VideoGridContainer";
+import LayoutSelectionPanel from "./LayoutSelectionPanel";
+import NoWebcasts from "./NoWebcasts";
 
 /**
  * Acts as a high-level "controller" for the main content area. This component
@@ -17,35 +17,35 @@ import NoWebcasts from './NoWebcasts'
  * If webcasts are present and a layout is set, this displays the video grid.
  */
 const MainContent = (props) => {
-  let child = null
+  let child = null;
 
   if (props.webcasts.length === 0) {
     // No webcasts. Do the thing!
-    child = (<NoWebcasts />)
+    child = <NoWebcasts />;
   } else if (!props.layoutSet) {
     // No layout set. Display the layout selector.
-    child = (<LayoutSelectionPanel setLayout={props.setLayout} />)
+    child = <LayoutSelectionPanel setLayout={props.setLayout} />;
   } else {
     // Display the video grid
-    child = (<VideoGridContainer />)
+    child = <VideoGridContainer />;
   }
 
   const contentStyles = {
-    position: 'absolute',
+    position: "absolute",
     top: props.muiTheme.layout.appBarHeight,
     left: 0,
     right: 0,
     bottom: 0,
-    marginRight: props.chatSidebarVisible ? props.muiTheme.layout.chatPanelWidth : 0,
-    marginLeft: props.hashtagSidebarVisible ? props.muiTheme.layout.socialPanelWidth : 0,
-  }
+    marginRight: props.chatSidebarVisible
+      ? props.muiTheme.layout.chatPanelWidth
+      : 0,
+    marginLeft: props.hashtagSidebarVisible
+      ? props.muiTheme.layout.socialPanelWidth
+      : 0,
+  };
 
-  return (
-    <div style={contentStyles}>
-      {child}
-    </div>
-  )
-}
+  return <div style={contentStyles}>{child}</div>;
+};
 
 MainContent.propTypes = {
   webcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -54,6 +54,6 @@ MainContent.propTypes = {
   layoutSet: PropTypes.bool.isRequired,
   setLayout: PropTypes.func.isRequired,
   muiTheme: PropTypes.object.isRequired,
-}
+};
 
-export default muiThemeable()(MainContent)
+export default muiThemeable()(MainContent);

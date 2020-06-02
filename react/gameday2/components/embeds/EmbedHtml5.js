@@ -1,19 +1,19 @@
 /* global videojs */
-import React from 'react'
-import { webcastPropType } from '../../utils/webcastUtils'
+import React from "react";
+import { webcastPropType } from "../../utils/webcastUtils";
 
 export default class EmbedHtml5 extends React.Component {
   static propTypes = {
     webcast: webcastPropType.isRequired,
-  }
+  };
 
   componentDidMount() {
     videojs(this.props.webcast.id, {
-      width: '100%',
-      height: '100%',
+      width: "100%",
+      height: "100%",
       autoplay: true,
-      crossorigin: 'anonymous',
-    })
+      crossorigin: "anonymous",
+    });
   }
 
   render() {
@@ -25,6 +25,6 @@ export default class EmbedHtml5 extends React.Component {
       >
         <source src={this.props.webcast.channel} type="application/x-mpegurl" />
       </video>
-    )
+    );
   }
 }

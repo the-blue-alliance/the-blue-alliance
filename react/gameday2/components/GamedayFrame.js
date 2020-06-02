@@ -1,8 +1,8 @@
-import React from 'react'
-import AppBarContainer from '../containers/AppBarContainer'
-import MainContentContainer from '../containers/MainContentContainer'
-import ChatSidebarContainer from '../containers/ChatSidebarContainer'
-import HashtagSidebarContainer from '../containers/HashtagSidebarContainer'
+import React from "react";
+import AppBarContainer from "../containers/AppBarContainer";
+import MainContentContainer from "../containers/MainContentContainer";
+import ChatSidebarContainer from "../containers/ChatSidebarContainer";
+import HashtagSidebarContainer from "../containers/HashtagSidebarContainer";
 
 const GamedayFrame = () => (
   <div className="gameday container-full">
@@ -11,6 +11,6 @@ const GamedayFrame = () => (
     <ChatSidebarContainer />
     <MainContentContainer />
   </div>
-)
+);
 
-export default GamedayFrame
+export default GamedayFrame;

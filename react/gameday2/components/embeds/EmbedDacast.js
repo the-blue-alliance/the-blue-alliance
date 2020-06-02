@@ -1,10 +1,10 @@
-import React from 'react'
-import { webcastPropType } from '../../utils/webcastUtils'
+import React from "react";
+import { webcastPropType } from "../../utils/webcastUtils";
 
 const EmbedDacast = (props) => {
-  const channel = props.webcast.channel
-  const file = props.webcast.file
-  const iframeSrc = `https://iframe.dacast.com/b/${channel}/c/${file}`
+  const channel = props.webcast.channel;
+  const file = props.webcast.file;
+  const iframeSrc = `https://iframe.dacast.com/b/${channel}/c/${file}`;
   return (
     <iframe
       src={iframeSrc}
@@ -20,11 +20,11 @@ const EmbedDacast = (props) => {
       oallowfullscreen
       msallowfullscreen
     />
-  )
-}
+  );
+};
 
 EmbedDacast.propTypes = {
   webcast: webcastPropType.isRequired,
-}
+};
 
-export default EmbedDacast
+export default EmbedDacast;

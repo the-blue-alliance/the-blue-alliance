@@ -1,3 +1,3 @@
 #!/bin/bash
 
-npm run fixlint
+npm run lintfix

@@ -1,5 +1,5 @@
-import React, { PropTypes } from 'react'
-import { ListItem } from 'material-ui/List'
+import React, { PropTypes } from "react";
+import { ListItem } from "material-ui/List";
 
 export default class WebcastSelectionDialogItem extends React.Component {
   static propTypes = {
@@ -7,10 +7,10 @@ export default class WebcastSelectionDialogItem extends React.Component {
     webcastSelected: PropTypes.func.isRequired,
     secondaryText: PropTypes.string,
     rightIcon: PropTypes.any,
-  }
+  };
 
   handleClick() {
-    this.props.webcastSelected(this.props.webcast.id)
+    this.props.webcastSelected(this.props.webcast.id);
   }
 
   render() {
@@ -21,6 +21,6 @@ export default class WebcastSelectionDialogItem extends React.Component {
         onTouchTap={() => this.handleClick()}
         rightIcon={this.props.rightIcon}
       />
-    )
+    );
   }
 }

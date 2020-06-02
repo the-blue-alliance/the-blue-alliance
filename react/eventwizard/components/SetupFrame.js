@@ -1,7 +1,7 @@
-import React from 'react'
-import EventSelectorContainer from '../containers/EventSelectorContainer'
-import AuthInputContainer from '../containers/AuthInputContainer'
-import AuthToolsContainer from '../containers/AuthToolsContainer'
+import React from "react";
+import EventSelectorContainer from "../containers/EventSelectorContainer";
+import AuthInputContainer from "../containers/AuthInputContainer";
+import AuthToolsContainer from "../containers/AuthToolsContainer";
 
 const SetupFrame = () => (
   <div>
@@ -12,6 +12,6 @@ const SetupFrame = () => (
       <AuthInputContainer />
     </form>
   </div>
-)
+);
 
-export default SetupFrame
+export default SetupFrame;

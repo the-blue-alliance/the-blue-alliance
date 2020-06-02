@@ -6,7 +6,7 @@ import {
   SET_HASHTAG_SIDEBAR_VISIBILITY,
   TOGGLE_LAYOUT_DRAWER_VISIBILITY,
   SET_LAYOUT_DRAWER_VISIBILITY,
-} from '../constants/ActionTypes'
+} from "../constants/ActionTypes";
 /* eslint-enable max-len */
 
 const defaultState = {
@@ -15,54 +15,59 @@ const defaultState = {
   chatSidebarHasBeenVisible: true,
   tickerSidebar: false,
   layoutDrawer: false,
-}
+};
 
 const toggleChatSidebarVisibility = (state) => {
-  const hasBeenVisible = (state.chatSidebarHasBeenVisible || !state.chatSidebar)
+  const hasBeenVisible = state.chatSidebarHasBeenVisible || !state.chatSidebar;
   return Object.assign({}, state, {
     chatSidebar: !state.chatSidebar,
     chatSidebarHasBeenVisible: hasBeenVisible,
-  })
-}
+  });
+};
 
-const setChatSidebarVisibility = (visibility, state) => (Object.assign({}, state, {
-  chatSidebar: visibility,
-  chatSidebarHasBeenVisible: (state.chatSidebarHasBeenVisible || visibility),
-}))
+const setChatSidebarVisibility = (visibility, state) =>
+  Object.assign({}, state, {
+    chatSidebar: visibility,
+    chatSidebarHasBeenVisible: state.chatSidebarHasBeenVisible || visibility,
+  });
 
-const toggleHashtagSidebarVisibility = (state) => (Object.assign({}, state, {
-  hashtagSidebar: !state.hashtagSidebar,
-}))
+const toggleHashtagSidebarVisibility = (state) =>
+  Object.assign({}, state, {
+    hashtagSidebar: !state.hashtagSidebar,
+  });
 
-const setHashtagSidebarVisibility = (visibility, state) => (Object.assign({}, state, {
-  hashtagSidebar: visibility,
-}))
+const setHashtagSidebarVisibility = (visibility, state) =>
+  Object.assign({}, state, {
+    hashtagSidebar: visibility,
+  });
 
-const toggleLayoutDrawerVisibility = (state) => (Object.assign({}, state, {
-  layoutDrawer: !state.layoutDrawer,
-}))
+const toggleLayoutDrawerVisibility = (state) =>
+  Object.assign({}, state, {
+    layoutDrawer: !state.layoutDrawer,
+  });
 
-const setLayoutDrawerVisibility = (visibility, state) => (Object.assign({}, state, {
-  layoutDrawer: !state.layoutDrawer,
-}))
+const setLayoutDrawerVisibility = (visibility, state) =>
+  Object.assign({}, state, {
+    layoutDrawer: !state.layoutDrawer,
+  });
 
 const visibility = (state = defaultState, action) => {
   switch (action.type) {
     case TOGGLE_CHAT_SIDEBAR_VISIBILITY:
-      return toggleChatSidebarVisibility(state)
+      return toggleChatSidebarVisibility(state);
     case SET_CHAT_SIDEBAR_VISIBILITY:
-      return setChatSidebarVisibility(action.visible, state)
+      return setChatSidebarVisibility(action.visible, state);
     case TOGGLE_HASHTAG_SIDEBAR_VISIBILITY:
-      return toggleHashtagSidebarVisibility(state)
+      return toggleHashtagSidebarVisibility(state);
     case SET_HASHTAG_SIDEBAR_VISIBILITY:
-      return setHashtagSidebarVisibility(action.visible, state)
+      return setHashtagSidebarVisibility(action.visible, state);
     case TOGGLE_LAYOUT_DRAWER_VISIBILITY:
-      return toggleLayoutDrawerVisibility(state)
+      return toggleLayoutDrawerVisibility(state);
     case SET_LAYOUT_DRAWER_VISIBILITY:
-      return setLayoutDrawerVisibility(action.visible, state)
+      return setLayoutDrawerVisibility(action.visible, state);
     default:
-      return state
+      return state;
   }
-}
+};
 
-export default visibility
+export default visibility;

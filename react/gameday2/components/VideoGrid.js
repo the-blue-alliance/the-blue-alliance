@@ -1,8 +1,8 @@
-import React, { PropTypes } from 'react'
-import LayoutAnalyticsTracker from './LayoutAnalyticsTracker'
-import VideoCellContainer from '../containers/VideoCellContainer'
-import { getNumViewsForLayout } from '../utils/layoutUtils'
-import { webcastPropType } from '../utils/webcastUtils'
+import React, { PropTypes } from "react";
+import LayoutAnalyticsTracker from "./LayoutAnalyticsTracker";
+import VideoCellContainer from "../containers/VideoCellContainer";
+import { getNumViewsForLayout } from "../utils/layoutUtils";
+import { webcastPropType } from "../utils/webcastUtils";
 
 export default class VideoGrid extends React.Component {
   static propTypes = {
@@ -11,55 +11,51 @@ export default class VideoGrid extends React.Component {
     domOrderLivescoreOn: PropTypes.arrayOf(PropTypes.bool).isRequired,
     webcastsById: PropTypes.objectOf(webcastPropType).isRequired,
     layoutId: PropTypes.number.isRequired,
-  }
+  };
 
   renderLayout(webcastCount) {
     const videoGridStyle = {
-      width: '100%',
-      height: '100%',
-    }
+      width: "100%",
+      height: "100%",
+    };
 
-    const {
-      domOrder,
-      positionMap,
-      domOrderLivescoreOn,
-    } = this.props
+    const { domOrder, positionMap, domOrderLivescoreOn } = this.props;
 
     // Set up reverse map between webcast ID and position
-    const idPositionMap = {}
+    const idPositionMap = {};
     for (let i = 0; i < positionMap.length; i++) {
-      const webcastId = domOrder[positionMap[i]]
+      const webcastId = domOrder[positionMap[i]];
       if (webcastId != null) {
-        idPositionMap[webcastId] = i
+        idPositionMap[webcastId] = i;
       }
     }
 
     // Compute which cells don't a webcast in them
-    const emptyCellPositions = []
+    const emptyCellPositions = [];
     for (let i = 0; i < positionMap.length; i++) {
       if (positionMap[i] === -1 && i < webcastCount) {
-        emptyCellPositions.push(i)
+        emptyCellPositions.push(i);
       }
     }
 
     // Render everything!
-    const videoCells = []
+    const videoCells = [];
     for (let i = 0; i < domOrder.length; i++) {
-      let webcast = null
-      let id = `video-${i}`
-      let position = null
-      let hasWebcast = true
-      let livescoreOn = false
+      let webcast = null;
+      let id = `video-${i}`;
+      let position = null;
+      let hasWebcast = true;
+      let livescoreOn = false;
       if (domOrder[i]) {
         // There's a webcast to display here!
-        webcast = this.props.webcastsById[domOrder[i]]
-        id = webcast.id
-        position = idPositionMap[id]
-        livescoreOn = domOrderLivescoreOn[i]
+        webcast = this.props.webcastsById[domOrder[i]];
+        id = webcast.id;
+        position = idPositionMap[id];
+        livescoreOn = domOrderLivescoreOn[i];
       } else if (emptyCellPositions.length > 0) {
-        position = emptyCellPositions.shift()
+        position = emptyCellPositions.shift();
       } else {
-        hasWebcast = false
+        hasWebcast = false;
       }
       if (hasWebcast) {
         videoCells.push(
@@ -69,11 +65,9 @@ export default class VideoGrid extends React.Component {
             webcast={webcast}
             livescoreOn={livescoreOn}
           />
-        )
+        );
       } else {
-        videoCells.push(
-          <div key={i.toString()} />
-        )
+        videoCells.push(<div key={i.toString()} />);
       }
     }
 
@@ -82,12 +76,12 @@ export default class VideoGrid extends React.Component {
         {videoCells}
         <LayoutAnalyticsTracker layoutId={this.props.layoutId} />
       </div>
-    )
+    );
   }
 
   render() {
-    const selectedLayoutId = this.props.layoutId
-    const numViews = getNumViewsForLayout(selectedLayoutId)
-    return this.renderLayout(numViews, selectedLayoutId)
+    const selectedLayoutId = this.props.layoutId;
+    const numViews = getNumViewsForLayout(selectedLayoutId);
+    return this.renderLayout(numViews, selectedLayoutId);
   }
 }

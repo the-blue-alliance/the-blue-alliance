@@ -1,9 +1,9 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
-import ApiDocsFrame from './ApiDocsFrame'
+import React from "react";
+import ReactDOM from "react-dom";
+import ApiDocsFrame from "./ApiDocsFrame";
 
-const swaggerUrl = document.getElementById('swagger_url').innerHTML
+const swaggerUrl = document.getElementById("swagger_url").innerHTML;
 ReactDOM.render(
   <ApiDocsFrame url={swaggerUrl} />,
-  document.getElementById('content')
-)
+  document.getElementById("content")
+);

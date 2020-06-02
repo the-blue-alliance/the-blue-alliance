@@ -1,8 +1,8 @@
-import React from 'react'
-import { webcastPropType } from '../../utils/webcastUtils'
+import React from "react";
+import { webcastPropType } from "../../utils/webcastUtils";
 
 const EmbedYoutube = (props) => {
-  const src = `//www.youtube.com/embed/${props.webcast.channel}?autoplay=1`
+  const src = `//www.youtube.com/embed/${props.webcast.channel}?autoplay=1`;
   return (
     <iframe
       width="100%"
@@ -11,11 +11,11 @@ const EmbedYoutube = (props) => {
       frameBorder="0"
       allowFullScreen
     />
-  )
-}
+  );
+};
 
 EmbedYoutube.propTypes = {
   webcast: webcastPropType.isRequired,
-}
+};
 
-export default EmbedYoutube
+export default EmbedYoutube;

@@ -1,7 +1,7 @@
-import { connect } from 'react-redux'
-import VideoCellToolbar from '../components/VideoCellToolbar'
-import { addWebcastAtPosition, swapWebcasts, removeWebcast } from '../actions'
-import { getTickerMatches, getWebcastIdsInDisplayOrder } from '../selectors'
+import { connect } from "react-redux";
+import VideoCellToolbar from "../components/VideoCellToolbar";
+import { addWebcastAtPosition, swapWebcasts, removeWebcast } from "../actions";
+import { getTickerMatches, getWebcastIdsInDisplayOrder } from "../selectors";
 
 const mapStateToProps = (state, props) => ({
   matches: getTickerMatches(state, props),
@@ -11,12 +11,14 @@ const mapStateToProps = (state, props) => ({
   specialWebcastIds: state.specialWebcastIds,
   displayedWebcasts: state.videoGrid.displayed,
   layoutId: state.videoGrid.layoutId,
-})
+});
 
 const mapDispatchToProps = (dispatch) => ({
   removeWebcast: (id) => dispatch(removeWebcast(id)),
-  addWebcastAtPosition: (webcastId, position) => dispatch(addWebcastAtPosition(webcastId, position)),
-  swapWebcasts: (firstPosition, secondPosition) => dispatch(swapWebcasts(firstPosition, secondPosition)),
-})
+  addWebcastAtPosition: (webcastId, position) =>
+    dispatch(addWebcastAtPosition(webcastId, position)),
+  swapWebcasts: (firstPosition, secondPosition) =>
+    dispatch(swapWebcasts(firstPosition, secondPosition)),
+});
 
-export default connect(mapStateToProps, mapDispatchToProps)(VideoCellToolbar)
+export default connect(mapStateToProps, mapDispatchToProps)(VideoCellToolbar);

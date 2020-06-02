@@ -1,7 +1,7 @@
-import { PropTypes } from 'react'
+import { PropTypes } from "react";
 
 export function getWebcastId(name, num) {
-  return `${name}-${num}`
+  return `${name}-${num}`;
 }
 
 export const webcastPropType = PropTypes.shape({
@@ -11,4 +11,4 @@ export const webcastPropType = PropTypes.shape({
   name: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
   channel: PropTypes.string.isRequired,
-})
+});

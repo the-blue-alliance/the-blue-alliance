@@ -1,103 +1,103 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import React from "react";
+import PropTypes from "prop-types";
 
-import RobotTrajectory from './RobotTrajectory'
+import RobotTrajectory from "./RobotTrajectory";
 
-const pathTimeLength = 50
+const pathTimeLength = 50;
 
 class TrajectoryVisualizer extends React.Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       showAll: true,
       autoPlay: false,
       playSpeed: 2,
       curTime: 0,
       maxTime: props.data.times.length,
-    }
+    };
   }
 
   componentDidMount() {
-    this.displayFrame()
-    this.lastFrameTime = null
+    this.displayFrame();
+    this.lastFrameTime = null;
   }
 
   componentWillUnmount() {
     if (this.raf) {
-      cancelAnimationFrame(this.raf)
+      cancelAnimationFrame(this.raf);
     }
   }
 
   getTruePlaybackSpeed = (playSpeed) => {
     switch (playSpeed) {
       case 2:
-        return 5
+        return 5;
       case 3:
-        return 10
+        return 10;
       default:
-        return 1
+        return 1;
     }
-  }
+  };
 
   displayFrame = () => {
-    const { autoPlay, playSpeed } = this.state
+    const { autoPlay, playSpeed } = this.state;
     if (autoPlay && this.lastFrameTime) {
-      const elapsedTime = Date.now() - this.lastFrameTime
-      this.lastFrameTime = Date.now()
+      const elapsedTime = Date.now() - this.lastFrameTime;
+      this.lastFrameTime = Date.now();
 
       const timeDiff =
-        (elapsedTime / 1000) * 10 * this.getTruePlaybackSpeed(playSpeed)
+        (elapsedTime / 1000) * 10 * this.getTruePlaybackSpeed(playSpeed);
       this.setState((state) => ({
         curTime: (state.curTime + timeDiff) % state.maxTime,
-      }))
+      }));
     } else {
-      this.lastFrameTime = Date.now()
+      this.lastFrameTime = Date.now();
     }
-    this.raf = requestAnimationFrame(() => this.displayFrame())
-  }
+    this.raf = requestAnimationFrame(() => this.displayFrame());
+  };
 
   handleShowEntireMatch = () => {
-    this.setState({ showAll: true, autoPlay: false, curTime: 0 })
-  }
+    this.setState({ showAll: true, autoPlay: false, curTime: 0 });
+  };
 
   handlePlayPause = () => {
     this.setState((state) => ({
       showAll: false,
       autoPlay: !state.autoPlay,
-    }))
-  }
+    }));
+  };
 
   handleSlowDown = () => {
     this.setState((state) => ({
       playSpeed: Math.max(1, state.playSpeed - 1),
-    }))
-  }
+    }));
+  };
 
   handleSpeedUp = () => {
     this.setState((state) => ({
       playSpeed: Math.min(3, state.playSpeed + 1),
-    }))
-  }
+    }));
+  };
 
   handleSliderChange = (event) => {
     this.setState({
       autoPlay: false,
       showAll: false,
       curTime: parseInt(event.target.value, 10),
-    })
-  }
+    });
+  };
 
   render() {
-    const { fieldImg, data } = this.props
-    const { showAll, autoPlay, playSpeed, curTime, maxTime } = this.state
-    const startTime = showAll ? 0 : Math.max(curTime - pathTimeLength, 0)
-    const endTime = showAll ? maxTime : curTime
+    const { fieldImg, data } = this.props;
+    const { showAll, autoPlay, playSpeed, curTime, maxTime } = this.state;
+    const startTime = showAll ? 0 : Math.max(curTime - pathTimeLength, 0);
+    const endTime = showAll ? maxTime : curTime;
     const mm = Math.floor(curTime / 10 / 60)
       .toString()
-      .padStart(2, '0')
+      .padStart(2, "0");
     const ss = Math.floor((curTime / 10) % 60)
       .toString()
-      .padStart(2, '0')
+      .padStart(2, "0");
 
     return (
       <div>
@@ -105,7 +105,7 @@ class TrajectoryVisualizer extends React.Component {
           viewBox="0 0 54 27"
           style={{
             background: `url(${fieldImg}) no-repeat center center`,
-            backgroundSize: 'cover',
+            backgroundSize: "cover",
           }}
         >
           <RobotTrajectory
@@ -151,7 +151,7 @@ class TrajectoryVisualizer extends React.Component {
             indicatorAtStart={showAll}
           />
         </svg>
-        <div style={{ width: '100%', display: 'flex', alignItems: 'center' }}>
+        <div style={{ width: "100%", display: "flex", alignItems: "center" }}>
           <button
             className="btn btn-tiny"
             style={{ marginRight: 8 }}
@@ -174,7 +174,7 @@ class TrajectoryVisualizer extends React.Component {
           <div
             className="btn-group"
             role="group"
-            style={{ display: 'flex', marginRight: 8 }}
+            style={{ display: "flex", marginRight: 8 }}
           >
             <button
               type="button"
@@ -207,7 +207,7 @@ class TrajectoryVisualizer extends React.Component {
           <div style={{ marginLeft: 8 }}>{`${mm}:${ss}`}</div>
         </div>
       </div>
-    )
+    );
   }
 }
 
@@ -215,6 +215,6 @@ TrajectoryVisualizer.propTypes = {
   fieldImg: PropTypes.string.isRequired,
 
   data: PropTypes.object.isRequired,
-}
+};
 
-export default TrajectoryVisualizer
+export default TrajectoryVisualizer;

@@ -1,30 +1,32 @@
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
+import React, { Component } from "react";
+import PropTypes from "prop-types";
 
 class AuthInput extends Component {
   constructor(props) {
-    super(props)
-    this.onAuthIdChange = this.onAuthIdChange.bind(this)
-    this.onAuthSecretChange = this.onAuthSecretChange.bind(this)
+    super(props);
+    this.onAuthIdChange = this.onAuthIdChange.bind(this);
+    this.onAuthSecretChange = this.onAuthSecretChange.bind(this);
   }
 
   onAuthIdChange(event) {
-    this.props.setAuth(event.target.value, this.props.authSecret)
+    this.props.setAuth(event.target.value, this.props.authSecret);
   }
 
   onAuthSecretChange(event) {
-    this.props.setAuth(this.props.authId, event.target.value)
+    this.props.setAuth(this.props.authId, event.target.value);
   }
 
   render() {
     if (!this.props.manualEvent) {
-      return null
+      return null;
     }
 
     return (
       <div id="auth-container">
         <div className="form-group">
-          <label htmlFor="auth_id" className="col-sm-2 control-label">Auth Id</label>
+          <label htmlFor="auth_id" className="col-sm-2 control-label">
+            Auth Id
+          </label>
           <div className="col-sm-10">
             <input
               type="password"
@@ -37,7 +39,9 @@ class AuthInput extends Component {
           </div>
         </div>
         <div className="form-group">
-          <label htmlFor="auth_secret" className="col-sm-2 control-label">Auth Secret</label>
+          <label htmlFor="auth_secret" className="col-sm-2 control-label">
+            Auth Secret
+          </label>
           <div className="col-sm-10">
             <input
               type="password"
@@ -50,7 +54,7 @@ class AuthInput extends Component {
           </div>
         </div>
       </div>
-    )
+    );
   }
 }
 
@@ -59,6 +63,6 @@ AuthInput.propTypes = {
   authSecret: PropTypes.string,
   manualEvent: PropTypes.bool,
   setAuth: PropTypes.func.isRequired,
-}
+};
 
-export default AuthInput
+export default AuthInput;

@@ -1,8 +1,8 @@
 function ensureRequestSuccess(response) {
   if (!response.ok) {
-    throw new Error(response.statusText)
+    throw new Error(response.statusText);
   }
-  return response
+  return response;
 }
 
-export default ensureRequestSuccess
+export default ensureRequestSuccess;

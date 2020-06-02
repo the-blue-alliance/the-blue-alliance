@@ -1,4 +1,4 @@
-import { PropTypes } from 'react'
+import { PropTypes } from "react";
 
 export const webcastPropType = PropTypes.shape({
   key: PropTypes.string.isRequired,
@@ -7,9 +7,9 @@ export const webcastPropType = PropTypes.shape({
   name: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
   channel: PropTypes.string.isRequired,
-})
+});
 
 export const chatPropType = PropTypes.shape({
   name: PropTypes.string.isRequired,
   channel: PropTypes.string.isRequired,
-})
+});

@@ -16,12 +16,8 @@
       name: "[py3] Testing"
       entry: ./ops/run_tests_changed.sh
       language: script
-    # - id: node-format
-    #   name: "[node] Formatting"
-    #   entry: ./ops/format_node.sh
-    #   language: script
     - id: node-lint
-      name: "[node] Linting"
+      name: "[node] Linting & Formatting"
       entry: ./ops/lintfix_node.sh
       language: script
     - id: node-test
