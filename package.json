@@ -69,7 +69,7 @@
     "yargs": "^6.5.0"
   },
   "scripts": {
-    "build": "gulp build",
+    "build": "gulp build --production",
     "test": "jest",
     "lint": "eslint --ext js react",
     "lintfix": "eslint --fix --ext js react"
