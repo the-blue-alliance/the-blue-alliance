@@ -18,12 +18,12 @@ const configs = {
   gameday: {
     js: {
       src: ['./react/gameday2/gameday2.js'],
-      outputDir: './static/compiled/javascript',
+      outputDir: './src/build/javascript',
       outputFile: 'gameday2.min.js'
     },
     less: {
       src: ['./react/gameday2/gameday2.less'],
-      outputDir: './static/compiled/css/',
+      outputDir: './src/build/css/',
       outputFile: 'gameday2.min.css',
       watch: ['./react/gameday2/**/*.less']
     }
@@ -31,12 +31,12 @@ const configs = {
   apidocs: {
     js: {
       src: ['./react/apidocs/apidocs.js'],
-      outputDir: './static/compiled/javascript',
+      outputDir: './src/build/javascript',
       outputFile: 'apidocs.min.js'
     },
     less: {
       src: ['./react/apidocs/apidocs.less'],
-      outputDir: './static/compiled/css/',
+      outputDir: './src/build/css/',
       outputFile: 'apidocs.min.css',
       watch: ['./react/apidocs/**/*.less']
     }
@@ -44,12 +44,12 @@ const configs = {
   eventwizard: {
     js: {
       src: ['./react/eventwizard/eventwizard.js'],
-      outputDir: './static/compiled/javascript',
+      outputDir: './src/build/javascript',
       outputFile: 'eventwizard.min.js'
     },
     less: {
       src: ['./react/eventwizard/eventwizard.less'],
-      outputDir: './static/compiled/css/',
+      outputDir: './src/build/css/',
       outputFile: 'eventwizard.min.css',
       watch: ['./react/eventwizard/**/*.less']
     }
@@ -57,14 +57,14 @@ const configs = {
   liveevent: {
     js: {
       src: ['./react/liveevent/liveevent.js'],
-      outputDir: './static/compiled/javascript',
+      outputDir: './src/build/javascript',
       outputFile: 'liveevent.min.js'
     }
   },
   zebramotionworks: {
     js: {
       src: ['./react/zebramotionworks/zebramotionworks.js'],
-      outputDir: './static/compiled/javascript',
+      outputDir: './src/build/javascript',
       outputFile: 'zebramotionworks.min.js'
     }
   }

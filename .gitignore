@@ -15,3 +15,6 @@ venv/
 # Compiled/Intermediate Files #
 ###############################
 src/build
+
+# Node.js
+node_modules/
