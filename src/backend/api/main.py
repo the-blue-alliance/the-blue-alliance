@@ -1,6 +1,6 @@
 from flask import Flask
-from api.handlers.root import root
-from common.middleware import install_middleware
+from backend.api.handlers.root import root
+from backend.common.middleware import install_middleware
 
 
 app = Flask(__name__)

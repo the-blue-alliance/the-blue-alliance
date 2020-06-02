@@ -71,13 +71,13 @@
   "scripts": {
     "build": "gulp build --production",
     "test": "jest",
-    "lint": "eslint --ext js react",
-    "lintfix": "eslint --fix --ext js react"
+    "lint": "eslint --ext js src/frontend",
+    "lintfix": "eslint --fix --ext js src/frontend"
   },
   "jest": {
     "automock": false,
     "roots": [
-      "<rootDir>/react"
+      "<rootDir>/src/frontend"
     ],
     "unmockedModulePathPatterns": [
       "<rootDir>/node_modules/react/",

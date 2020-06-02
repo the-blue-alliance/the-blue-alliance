@@ -27,3 +27,6 @@ conftest.py
 
 # Temp files
 build/temp/
+
+# Frontend source
+frontend/

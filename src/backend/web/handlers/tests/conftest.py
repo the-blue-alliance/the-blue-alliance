@@ -3,7 +3,7 @@ from werkzeug.test import Client
 
 
 @pytest.fixture
-def default_client() -> Client:
-    from default.main import app
+def web_client() -> Client:
+    from backend.web.main import app
 
     return app.test_client()

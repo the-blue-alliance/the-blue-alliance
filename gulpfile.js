@@ -17,53 +17,53 @@ const args = require('yargs').argv;
 const configs = {
   gameday: {
     js: {
-      src: ['./react/gameday2/gameday2.js'],
+      src: ['./src/frontend/gameday2/gameday2.js'],
       outputDir: './src/build/javascript',
       outputFile: 'gameday2.min.js'
     },
     less: {
-      src: ['./react/gameday2/gameday2.less'],
+      src: ['./src/frontend/gameday2/gameday2.less'],
       outputDir: './src/build/css/',
       outputFile: 'gameday2.min.css',
-      watch: ['./react/gameday2/**/*.less']
+      watch: ['./src/frontend/gameday2/**/*.less']
     }
   },
   apidocs: {
     js: {
-      src: ['./react/apidocs/apidocs.js'],
+      src: ['./src/frontend/apidocs/apidocs.js'],
       outputDir: './src/build/javascript',
       outputFile: 'apidocs.min.js'
     },
     less: {
-      src: ['./react/apidocs/apidocs.less'],
+      src: ['./src/frontend/apidocs/apidocs.less'],
       outputDir: './src/build/css/',
       outputFile: 'apidocs.min.css',
-      watch: ['./react/apidocs/**/*.less']
+      watch: ['./src/frontend/apidocs/**/*.less']
     }
   },
   eventwizard: {
     js: {
-      src: ['./react/eventwizard/eventwizard.js'],
+      src: ['./src/frontend/eventwizard/eventwizard.js'],
       outputDir: './src/build/javascript',
       outputFile: 'eventwizard.min.js'
     },
     less: {
-      src: ['./react/eventwizard/eventwizard.less'],
+      src: ['./src/frontend/eventwizard/eventwizard.less'],
       outputDir: './src/build/css/',
       outputFile: 'eventwizard.min.css',
-      watch: ['./react/eventwizard/**/*.less']
+      watch: ['./src/frontend/eventwizard/**/*.less']
     }
   },
   liveevent: {
     js: {
-      src: ['./react/liveevent/liveevent.js'],
+      src: ['./src/frontend/liveevent/liveevent.js'],
       outputDir: './src/build/javascript',
       outputFile: 'liveevent.min.js'
     }
   },
   zebramotionworks: {
     js: {
-      src: ['./react/zebramotionworks/zebramotionworks.js'],
+      src: ['./src/frontend/zebramotionworks/zebramotionworks.js'],
       outputDir: './src/build/javascript',
       outputFile: 'zebramotionworks.min.js'
     }
