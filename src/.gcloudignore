@@ -24,3 +24,6 @@ __pycache__/
 .testmondata
 tests/
 conftest.py
+
+# Temp files
+build/temp/

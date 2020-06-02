@@ -8,7 +8,7 @@ automatic_scaling:
 
 handlers:
   - url: /css
-    static_dir: web/static/compiled/css
+    static_dir: build/css
   - url: /favicon.ico
     static_files: web/static/icons/favicon.ico
     upload: web/static/icons/favicon.ico
@@ -20,7 +20,7 @@ handlers:
     static_dir: web/static/images
     expiration: "1h"
   - url: /javascript
-    static_dir: web/static/compiled/javascript
+    static_dir: build/javascript
   - url: /manifest.json
     static_files: web/static/manifest.json
     upload: web/static/manifest.json

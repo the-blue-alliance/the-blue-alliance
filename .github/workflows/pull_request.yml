@@ -6,8 +6,8 @@ on:
       - py3
 
 jobs:
-  pyre:
-    name: Type Check
+  py3-type:
+    name: "[py3] Type Check"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -27,9 +27,9 @@ jobs:
           pip install -r requirements.txt
           pip install -r src/requirements.txt
       - name: Run Type Check
-        run: ./ops/type_check.sh
-  black:
-    name: Format Check
+        run: ./ops/typecheck_py3.sh
+  py3-lint:
+    name: "[py3] Format & Lint"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -48,32 +48,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r src/requirements.txt
-      - name: Run Formatting
-        run: ./ops/format_check.sh
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.7
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install -r src/requirements.txt
-      - name: Run Lint
-        run: ./ops/lint.sh
-  test:
-    name: Test
+      - name: Run Format & Lint
+        run: ./ops/lint_py3.sh
+  py3-test:
+    name: "[py3] Test"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -93,9 +71,47 @@ jobs:
           pip install -r requirements.txt
           pip install -r src/requirements.txt
       - name: Run Tests
-        run: ./ops/run_tests.sh
+        run: ./ops/test_py3.sh
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1.0.7
+  node-lint:
+    name: "[node] Format & Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "10.x"
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+      - name: Install Dependencies
+        run: npm install
+      - name: Run Format & Lint
+        run: ./ops/lint_node.sh
+  node-test:
+    name: "[node] Test"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "10.x"
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+      - name: Install Dependencies
+        run: npm install
+      - name: Run Tests
+        run: ./ops/test_node.sh
   build-web:
     name: Build Web
     runs-on: ubuntu-latest
@@ -105,16 +121,28 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.7
+      - name: Set up Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "10.x"
       - name: Cache pip
         uses: actions/cache@v2
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: ${{ runner.os }}-pip-
-      - name: Install Dependencies
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+      - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r src/requirements.txt
+      - name: Install Node Dependencies
+        run: npm install
       - name: Run Build
         run: ./ops/build/run_buildweb.sh

@@ -34,7 +34,7 @@ SCRIPTS_EVENTWIZARD = ['src/web/static/javascript/tba_js/eventwizard_apiwrite.js
 STYLESHEETS_MAIN = ['src/web/static/css/precompiled_css/jquery.fancybox.css',
                     'src/web/static/css/precompiled_css/tablesorter.css',
                     'src/web/static/xcharts/xcharts.min.css',
-                    'src/web/static/css/less_css/tba_style.main.css',
+                    'src/build/temp/tba_style.main.css',
                     ]
 
 STYLESHEETS_GAMEDAY = ['src/web/static/css/precompiled_css/jquery.fancybox.css',
@@ -42,12 +42,12 @@ STYLESHEETS_GAMEDAY = ['src/web/static/css/precompiled_css/jquery.fancybox.css',
                        'src/web/static/css/less_css/tba_style.gameday.css',
                        ]
 
-SCRIPTS_MAIN_OUT = 'src/web/static/compiled/javascript/tba_combined_js.main.min.js'
-SCRIPTS_GAMEDAY_OUT = 'src/web/static/compiled/javascript/tba_combined_js.gameday.min.js'
-SCRIPTS_FIREBASE_SERVICEWORKER_OUT = 'src/web/static/compiled/javascript/firebase-messaging-sw.js'
-SCRIPTS_EVENTWIZARD_OUT = 'src/web/static/compiled/javascript/tba_combined_js.eventwizard.min.js'
-STYLESHEETS_MAIN_OUT = 'src/web/static/compiled/css/tba_combined_style.main.min.css'
-STYLESHEETS_GAMEDAY_OUT = 'src/web/static/compiled/css/tba_combined_style.gameday.min.css'
+SCRIPTS_MAIN_OUT = 'src/build/javascript/tba_combined_js.main.min.js'
+SCRIPTS_GAMEDAY_OUT = 'src/build/javascript/tba_combined_js.gameday.min.js'
+SCRIPTS_FIREBASE_SERVICEWORKER_OUT = 'src/build/javascript/firebase-messaging-sw.js'
+SCRIPTS_EVENTWIZARD_OUT = 'src/build/javascript/tba_combined_js.eventwizard.min.js'
+STYLESHEETS_MAIN_OUT = 'src/build/css/tba_combined_style.main.min.css'
+STYLESHEETS_GAMEDAY_OUT = 'src/build/css/tba_combined_style.gameday.min.css'
 
 
 def compress_css(in_files, out_file, verbose=False, temp_file='.temp'):
@@ -63,7 +63,7 @@ def compress_js(in_files, out_file):
 
 
 def main(kind=None):
-    for directory in ['src/web/static/compiled/javascript', 'src/web/static/compiled/css']:
+    for directory in ['src/build/javascript', 'src/build/css']:
         if not os.path.exists(directory):
             os.makedirs(directory)
 
