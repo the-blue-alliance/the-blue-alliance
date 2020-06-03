@@ -16,16 +16,16 @@ class ServiceImportChecker:
         Disallow cross-service imports
         backend.common is allowed
         """
-        x = re.search(r'src\/backend\/(.*)\/', self.filename)
+        x = re.search(r"src\/backend\/(.*)\/", self.filename)
         if not x:
             return True
 
-        service = x.group(1).split('/')[0]
+        service = x.group(1).split("/")[0]
 
         frm, imp, _ = i
-        if frm == ['backend']:
+        if frm == ["backend"]:
             return False
-        if frm and frm[0] == 'backend' and frm[1] not in {service, 'common'}:
+        if frm and frm[0] == "backend" and frm[1] not in {service, "common"}:
             return False
         return True
 
@@ -33,11 +33,11 @@ class ServiceImportChecker:
         if isinstance(node, ast.Import):
             module = []
         elif isinstance(node, ast.ImportFrom):
-            module = node.module.split('.')
+            module = node.module.split(".")
         else:
             return None
 
-        return [(module, n.name.split('.'), n.name) for n in node.names]
+        return [(module, n.name.split("."), n.name) for n in node.names]
 
     def run(self):
         for node in ast.walk(self.tree):
@@ -45,4 +45,9 @@ class ServiceImportChecker:
             if imports:
                 for i in imports:
                     if not self._is_allowed(i):
-                        yield (node.lineno, node.col_offset, self.ETBA0.format(i[2]), type(self))
+                        yield (
+                            node.lineno,
+                            node.col_offset,
+                            self.ETBA0.format(i[2]),
+                            type(self),
+                        )

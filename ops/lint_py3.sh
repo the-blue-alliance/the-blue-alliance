@@ -2,8 +2,8 @@
 
 if [ "$1" == "--fix" ]
 then
-  black ./src/
+  black ./ --exclude '/(old_py2|stubs|subtrees)/'
 else
-  black --check --diff ./src/
+  black ./ --check --diff --exclude '/(old_py2|stubs|subtrees)/'
 fi
-flake8 ./src/
+flake8 ./
