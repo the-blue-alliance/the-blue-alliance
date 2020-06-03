@@ -10,6 +10,5 @@ module.exports = {
   },
   rules: {
     "no-console": "warn",
-    "react/jsx-no-bind": "warn",
   },
 }
