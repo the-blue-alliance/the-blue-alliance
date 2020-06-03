@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - py3
-    paths:
-      - 'docs/**'
+    # paths:
+    #   - 'docs/**'
 
 jobs:
   update-wiki:
