@@ -1,0 +1,41 @@
+name: Update wiki
+
+on:
+  push:
+    branches:
+      - py3
+    paths:
+      - 'docs/**'
+
+jobs:
+  update-wiki:
+    runs-on: ubuntu-latest
+    env:
+      wiki-dir: docs
+      submodule-dir: ./submodules/wiki
+
+    steps:
+      - name: Checkout with submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Update wiki submodule
+        working-directory: ${{env.submodule-dir}}
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git checkout master
+          rm -rf *
+          cp -r ../../${{env.wiki-dir}} .
+          git add .
+          git commit --allow-empty -m "Update wiki from master ($GITHUB_SHA)"
+          git push "https://$GITHUB_ACTOR:${{secrets.GITHUB_TOKEN}}@github.com/$GITHUB_REPOSITORY.wiki.git"
+      - name: Update main repo
+        run: |
+          git config user.name "$(git --no-pager log --format=format:'%an' -n 1)"
+          git config user.email "$(git --no-pager log --format=format:'%ae' -n 1)"
+          git add .
+          git commit --allow-empty -m "Update wiki from master($GITHUB_SHA)"
+          git push "https://$GITHUB_ACTOR:${{secrets.GITHUB_TOKEN}}@github.com/$GITHUB_REPOSITORY.git"
