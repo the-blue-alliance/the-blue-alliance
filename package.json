@@ -71,8 +71,8 @@
   "scripts": {
     "build": "gulp build --production",
     "test": "jest",
-    "lint": "eslint --ext js src/frontend",
-    "lintfix": "eslint --fix --ext js src/frontend"
+    "lint": "eslint src/frontend/**/*.js",
+    "lintfix": "eslint --fix src/frontend/**/*.js"
   },
   "jest": {
     "automock": false,
