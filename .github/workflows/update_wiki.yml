@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       wiki-dir: docs
-      submodule-dir: ./submodules/wiki
+      submodule-dir: ./the-blue-alliance.wiki
 
     steps:
       - name: Checkout with submodules
@@ -28,7 +28,7 @@ jobs:
           git config --local user.name "GitHub Action"
           git checkout master
           rm -rf *
-          cp -r ../../${{env.wiki-dir}} .
+          cp -r ../${{env.wiki-dir}} .
           git add .
           git commit --allow-empty -m "Update wiki from master ($GITHUB_SHA)"
           git push "https://$GITHUB_ACTOR:${{secrets.GITHUB_TOKEN}}@github.com/$GITHUB_REPOSITORY.wiki.git"
