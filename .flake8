@@ -4,3 +4,7 @@
 max-line-length = 88
 select = C,E,F,W,B,B950
 ignore = E203, E501, W503
+
+[flake8:local-plugins]
+extension =
+  E = flake8_plugins.service_import_checker:ServiceImportChecker
