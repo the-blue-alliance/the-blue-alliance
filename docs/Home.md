@@ -1,7 +1,7 @@
 Welcome to The Blue Alliance Wiki! Here are some helpful pages -
 
 # Setup
-## [[Setup Guide|Setup]]
+## [[Setup Guide|Setup-Guide]]
 
 A step-by-step guide for getting The Blue Alliance up and running locally. For new contributors, this should be your first stop.
 
