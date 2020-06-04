@@ -14,6 +14,8 @@ Vagrant.configure("2") do |config|
       ".git/",
       "node_modules/",
       "src/build",
+      "src/web/static/compiled",
+      "*__pycache__*",
     ],
     rsync__auto: true
 
