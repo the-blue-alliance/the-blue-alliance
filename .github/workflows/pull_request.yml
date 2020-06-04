@@ -17,13 +17,11 @@ jobs:
           python-version: 3.7
       - name: Cache pip
         uses: actions/cache@v2
-        id: cache-pip
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: ${{ runner.os }}-pip-
       - name: Install Dependencies
-        if: steps.cache-pip.outputs.cache-hit != 'true'
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -41,13 +39,11 @@ jobs:
           python-version: 3.7
       - name: Cache pip
         uses: actions/cache@v2
-        id: cache-pip
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: ${{ runner.os }}-pip-
       - name: Install Dependencies
-        if: steps.cache-pip.outputs.cache-hit != 'true'
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -65,13 +61,11 @@ jobs:
           python-version: 3.7
       - name: Cache pip
         uses: actions/cache@v2
-        id: cache-pip
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: ${{ runner.os }}-pip-
       - name: Install Dependencies
-        if: steps.cache-pip.outputs.cache-hit != 'true'
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -91,13 +85,11 @@ jobs:
           node-version: "10.x"
       - name: Cache node modules
         uses: actions/cache@v2
-        id: cache-node
         with:
-          path: node_modules
+          path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
       - name: Install Dependencies
-        if: steps.cache-node.outputs.cache-hit != 'true'
         run: npm install
       - name: Run Format & Lint
         run: ./ops/lint_node.sh
@@ -112,13 +104,11 @@ jobs:
           node-version: "10.x"
       - name: Cache node modules
         uses: actions/cache@v2
-        id: cache-node
         with:
-          path: node_modules
+          path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
       - name: Install Dependencies
-        if: steps.cache-node.outputs.cache-hit != 'true'
         run: npm install
       - name: Run Tests
         run: ./ops/test_node.sh
@@ -137,26 +127,22 @@ jobs:
           node-version: "10.x"
       - name: Cache pip
         uses: actions/cache@v2
-        id: cache-pip
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: ${{ runner.os }}-pip-
       - name: Cache node modules
         uses: actions/cache@v2
-        id: cache-node
         with:
-          path: node_modules
+          path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
       - name: Install Python Dependencies
-        if: steps.cache-pip.outputs.cache-hit != 'true'
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r src/requirements.txt
       - name: Install Node Dependencies
-        if: steps.cache-node.outputs.cache-hit != 'true'
         run: npm install
       - name: Run Build
         run: ./ops/build/run_buildweb.sh
