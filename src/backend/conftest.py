@@ -1,5 +1,6 @@
 import pytest
 
+from google.cloud import ndb
 from _pytest.monkeypatch import MonkeyPatch
 
 
@@ -13,3 +14,10 @@ def init_ndb_env_vars(monkeypatch: MonkeyPatch) -> None:
 
     monkeypatch.setenv("DATASTORE_EMULATOR_HOST", "localhost:8432")
     monkeypatch.setenv("DATASTORE_DATASET", "tba-unit-test")
+
+
+@pytest.fixture()
+def ndb_context(init_ndb_env_vars):
+    client = ndb.Client()
+    with client.context() as context:
+        yield context
