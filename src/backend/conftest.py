@@ -1,7 +1,10 @@
 import pytest
 
 from google.cloud import ndb
+from google.cloud.datastore_v1.proto import datastore_pb2_grpc
+from google.cloud.ndb import _datastore_api
 from _pytest.monkeypatch import MonkeyPatch
+from InMemoryCloudDatastoreStub import datastore_stub
 
 
 @pytest.fixture(autouse=True)
@@ -17,7 +20,18 @@ def init_ndb_env_vars(monkeypatch: MonkeyPatch) -> None:
 
 
 @pytest.fixture()
-def ndb_context(init_ndb_env_vars):
+def ndb_stub(monkeypatch: MonkeyPatch) -> datastore_stub.LocalDatastoreStub:
+    stub = datastore_stub.LocalDatastoreStub()
+
+    def mock_stub() -> datastore_pb2_grpc.DatastoreStub:
+        return stub
+
+    monkeypatch.setattr(_datastore_api, "stub", mock_stub)
+    return stub
+
+
+@pytest.fixture()
+def ndb_context(init_ndb_env_vars, ndb_stub):
     client = ndb.Client()
     with client.context() as context:
         yield context
