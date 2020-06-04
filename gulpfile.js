@@ -125,100 +125,96 @@ function compileLess(config) {
     .pipe(gulp.dest(config.less.outputDir));
 }
 
-gulp.task("apidocs-js", (done) => {
+function apidocsJS(done) {
   compile(false, configs.apidocs);
   done();
-});
+}
 
-gulp.task("apidocs-js-watch", (done) => {
+function apidocsJSWatch(done) {
   compile(true, configs.apidocs);
   done();
-});
+}
 
-gulp.task("eventwizard-js", (done) => {
+function eventwizardJS(done) {
   compile(false, configs.eventwizard);
   done();
-});
+}
 
-gulp.task("eventwizard-js-watch", (done) => {
+function eventwizardJSWatch(done) {
   compile(true, configs.eventwizard);
   done();
-});
+}
 
-gulp.task("gameday-js", (done) => {
+function gamedayJS(done) {
   compile(false, configs.gameday);
   done();
-});
+}
 
-gulp.task("gameday-js-watch", (done) => {
+function gamedayJSWatch(done) {
   compile(true, configs.gameday);
   done();
-});
+}
 
-gulp.task("liveevent-js", (done) => {
+function liveeventJS(done) {
   compile(false, configs.liveevent);
   done();
-});
+}
 
-gulp.task("liveevent-js-watch", (done) => {
+function liveeventJSWatch(done) {
   compile(true, configs.liveevent);
   done();
-});
+}
 
-gulp.task("zebramotionworks-js", (done) => {
+function zebramotionworksJS(done) {
   compile(false, configs.zebramotionworks);
   done();
-});
+}
 
-gulp.task("zebramotionworks-js-watch", (done) => {
+function zebramotionworksJSWatch(done) {
   compile(true, configs.zebramotionworks);
   done();
-});
+}
 
-gulp.task("apidocs-less", (done) => {
+function apidocsLess(done) {
   compileLess(configs.apidocs);
   done();
-});
+}
 
-gulp.task("gameday-less", (done) => {
+function gamedayLess(done) {
   compileLess(configs.gameday);
   done();
-});
+}
 
-gulp.task("eventwizard-less", (done) => {
+function eventwizardLess(done) {
   compileLess(configs.eventwizard);
   done();
-});
+}
 
-gulp.task("gameday-less-watch", (done) => {
-  gulp.watch(configs.gameday.less.watch, gulp.series("gameday-less"));
+function gamedayLessWatch(done) {
+  gulp.watch(configs.gameday.less.watch, gamedayLess);
   done();
-});
+}
 
-gulp.task(
-  "build",
-  gulp.series(
-    "gameday-js",
-    "gameday-less",
-    "apidocs-js",
-    "apidocs-less",
-    "eventwizard-js",
-    "eventwizard-less",
-    "liveevent-js",
-    "zebramotionworks-js"
-  )
+const build = gulp.series(
+  gamedayJS,
+  gamedayLess,
+  apidocsJS,
+  apidocsLess,
+  eventwizardJS,
+  eventwizardLess,
+  liveeventJS,
+  zebramotionworksJS
 );
 
-gulp.task(
-  "watch",
-  gulp.series(
-    "gameday-js-watch",
-    "gameday-less-watch",
-    "apidocs-js-watch",
-    "eventwizard-js-watch",
-    "liveevent-js-watch",
-    "zebramotionworks-js-watch"
-  )
+const watch = gulp.series(
+  gamedayJSWatch,
+  gamedayLessWatch,
+  apidocsJSWatch,
+  eventwizardJSWatch,
+  liveeventJSWatch,
+  zebramotionworksJSWatch
 );
 
-gulp.task("default", gulp.series("build", "watch"));
+exports.build = build;
+exports.watch = watch;
+exports.default = gulp.series(build, watch);
