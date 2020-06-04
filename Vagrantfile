@@ -13,7 +13,8 @@ Vagrant.configure("2") do |config|
     rsync__exclude: [
       ".git/",
       "node_modules/",
-      "src/build",
+      "src/build/*",
+      "*__pycache__*",
     ],
     rsync__auto: true
 
@@ -39,7 +40,7 @@ Vagrant.configure("2") do |config|
     d.image = "gcr.io/tbatv-prod-hrd/tba-py3-dev:latest"
 
     # Or built it from the local checkout
-    # d.build_dir = "ops/dev"
+    # d.build_dir = "ops/dev/docker"
   end
 
   # Configure ssh into container

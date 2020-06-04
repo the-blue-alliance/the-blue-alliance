@@ -1,6 +1,6 @@
 #!/bin/bash
 
-declare -a cmds=("vagrant rsync-auto" "./ops/dev/print-gae-logs.sh")
+declare -a cmds=("vagrant rsync-auto" "./ops/dev/print-gae-logs.sh" "./ops/dev/print-gulp-logs.sh")
 for cmd in "${cmds[@]}"; do {
   echo "Running $cmd"
   $cmd & pid=$!

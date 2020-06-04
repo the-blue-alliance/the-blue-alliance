@@ -38,6 +38,9 @@ RUN apt-get update && apt-get install -y \
 # Install nodejs
 RUN apt-get install -y nodejs npm
 
+# Install pip2 for gcloud dependencies
+RUN curl https://bootstrap.pypa.io/get-pip.py | python2
+
 # Configure ssh server
 RUN mkdir /var/run/sshd
 RUN echo 'root:tba' | chpasswd

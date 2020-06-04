@@ -2,21 +2,26 @@
   hooks:
     - id: py3-type
       name: "[py3] Type Checking"
+      types: [file, python]
       entry: ./ops/typecheck_py3.sh
       language: script
     - id: py3-lint
       name: "[py3] Formatting & Linting"
+      types: [file, python]
       entry: ./ops/lint_py3.sh --fix
       language: script
     - id: py3-test
       name: "[py3] Testing"
+      types: [file, python]
       entry: ./ops/test_py3.sh --relevant
       language: script
     - id: node-lint
       name: "[node] Formatting & Linting"
+      types: [file, javascript]
       entry: ./ops/lint_node.sh --fix
       language: script
     - id: node-test
       name: "[node] Testing"
+      types: [file, javascript]
       entry: ./ops/test_node.sh
       language: script
