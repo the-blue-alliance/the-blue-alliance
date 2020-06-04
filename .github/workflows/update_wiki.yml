@@ -5,10 +5,11 @@ on:
     branches:
       - py3
     paths:
-      - 'docs/**'
+      - "docs/**"
 
 jobs:
   update-wiki:
+    name: "Update wiki"
     runs-on: ubuntu-latest
     env:
       wiki-dir: docs
