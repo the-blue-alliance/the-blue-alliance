@@ -3,6 +3,8 @@
     "src"
   ],
   "search_path": [
-    "stubs"
+    "stubs",
+    {"site-package": "InMemoryCloudDatastoreStub"},
+    {"site-package": "google/cloud/datastore_v1"}
   ]
 }
