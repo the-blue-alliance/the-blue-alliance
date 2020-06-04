@@ -1,0 +1,4 @@
+{
+    "datastore_mode": "emulator",
+    "log_level": "info"
+}

@@ -18,7 +18,7 @@ fi
 
 echo "Starting devserver in new tmux session..."
 tmux new-session -d -s $session
-tmux new-window -t "$session:1" -n gae "dev_appserver.py --admin_host=0.0.0.0 --host=0.0.0.0 --datastore_path=/datastore/tba.db src/default.yaml src/web.yaml src/api.yaml src/dispatch.yaml 2>&1 | tee /var/log/tba.log; read"
+tmux new-window -t "$session:1" -n gae "./ops/dev/vagrant/dev_appserver.sh 2>&1 | tee /var/log/tba.log; read"
 tmux new-window -t "$session:2" -n gulp "gulp 2>&1 | tee /var/log/gulp.log; read"
 if [ ! -z "$instance_name" ]; then
   echo "Starting Cloud SQL proxy to connect to $instance_name"

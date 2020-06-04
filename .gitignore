@@ -20,3 +20,6 @@ src/build
 
 # Node.js
 node_modules/
+
+ops/dev/keys/
+tba_dev_config.local.json
