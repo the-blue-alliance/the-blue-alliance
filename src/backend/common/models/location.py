@@ -34,7 +34,9 @@ class Location(ndb.Model):
 
     @property
     def country_short_if_usa(self):
-        if self.country == "United States":
+        if self.country == "US":
+            return "USA"
+        elif self.country == "United States":
             return "USA"
         else:
             return self.country

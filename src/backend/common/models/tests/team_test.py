@@ -1,10 +1,7 @@
 import pytest
 from backend.common.models.team import Team
 
-
-@pytest.fixture(autouse=True)
-def auto_add_ndb_context(ndb_context) -> None:
-    pass
+from .util import CITY_STATE_COUNTRY_PARAMETERS
 
 
 def test_valid_key_names() -> None:
@@ -44,20 +41,7 @@ def test_location(
     assert team.location == output
 
 
-@pytest.mark.parametrize(
-    "city, state, country, output",
-    [
-        (None, None, None, ""),
-        ("New York", None, None, "New York"),
-        ("New York", "NY", None, "New York, NY"),
-        ("New York", "NY", "USA", "New York, NY, USA"),
-        ("New York", "NY", "US", "New York, NY, USA"),
-        (None, "NY", None, "NY"),
-        (None, "NY", "USA", "NY, USA"),
-        (None, None, "USA", "USA"),
-        ("New York", None, "USA", "New York, USA"),
-    ],
-)
+@pytest.mark.parametrize(*CITY_STATE_COUNTRY_PARAMETERS)
 def test_city_state_country(city: str, state: str, country: str, output: str) -> None:
     team = Team(city=city, state_prov=state, country=country,)
     assert team.city_state_country == output
