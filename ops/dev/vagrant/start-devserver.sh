@@ -19,7 +19,7 @@ fi
 echo "Starting devserver in new tmux session..."
 tmux new-session -d -s $session
 tmux new-window -t "$session:1" -n gae "dev_appserver.py --admin_host=0.0.0.0 --host=0.0.0.0 --datastore_path=/datastore/tba.db src/default.yaml src/web.yaml src/api.yaml src/dispatch.yaml 2>&1 | tee /var/log/tba.log; read"
-tmux new-window -t "$session:2" -n gulp "gulp; read"
+tmux new-window -t "$session:2" -n gulp "gulp 2>&1 tee /var/log/gulp.log; read"
 if [ ! -z "$instance_name" ]; then
   echo "Starting Cloud SQL proxy to connect to $instance_name"
   tmux new-window -t "$session:3" -n sql "/cloud_sql_proxy -instances=$instance_name=tcp:3306 -credential_file=$auth_path | tee /var/log/sql.log; read"
@@ -29,5 +29,4 @@ tmux select-window -t "$session:1"
 tmux list-sessions
 tmux list-windows
 
-echo "To view logs, run \`./ops/dev/print-gae-logs.sh\`"
-echo "To make sure files auto-update, run \`vargrant rsync-auto\` in another shell"
+echo "To view logs and auto-update files, run \`./ops/dev/host.sh\`"

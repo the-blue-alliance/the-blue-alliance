@@ -13,8 +13,7 @@ Vagrant.configure("2") do |config|
     rsync__exclude: [
       ".git/",
       "node_modules/",
-      "src/build",
-      "src/web/static/compiled",
+      "src/build/*",
       "*__pycache__*",
     ],
     rsync__auto: true
