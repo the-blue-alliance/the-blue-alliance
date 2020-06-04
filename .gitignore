@@ -12,6 +12,7 @@ coverage.xml
 **.swp
 venv/
 .testmondata
+.vscode
 
 # Compiled/Intermediate Files #
 ###############################
