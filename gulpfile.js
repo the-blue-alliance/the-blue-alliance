@@ -5,6 +5,7 @@ const watchify = require("watchify");
 const log = require("fancy-log");
 const debug = require("gulp-debug");
 const less = require("gulp-less");
+const gulpMultiProcess = require("gulp-multi-process");
 const rename = require("gulp-rename");
 const sourcemaps = require("gulp-sourcemaps");
 const cleanCSS = require("gulp-clean-css");
@@ -195,16 +196,30 @@ function gamedayLessWatch(done) {
   done();
 }
 
-const build = gulp.series(
-  gamedayJS,
-  gamedayLess,
-  apidocsJS,
-  apidocsLess,
-  eventwizardJS,
-  eventwizardLess,
-  liveeventJS,
-  zebramotionworksJS
-);
+gulp.task("gamedayJS", gamedayJS);
+gulp.task("gamedayLess", gamedayLess);
+gulp.task("apidocsJS", apidocsJS);
+gulp.task("apidocsLess", apidocsLess);
+gulp.task("eventwizardJS", eventwizardJS);
+gulp.task("eventwizardLess", eventwizardLess);
+gulp.task("liveeventJS", liveeventJS);
+gulp.task("zebramotionworksJS", zebramotionworksJS);
+
+function build(done) {
+  return gulpMultiProcess(
+    [
+      "gamedayJS",
+      "gamedayLess",
+      "apidocsJS",
+      "apidocsLess",
+      "eventwizardJS",
+      "eventwizardLess",
+      "liveeventJS",
+      "zebramotionworksJS",
+    ],
+    done
+  );
+}
 
 const watch = gulp.series(
   gamedayJSWatch,
