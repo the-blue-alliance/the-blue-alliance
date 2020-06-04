@@ -21,7 +21,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git clone "https://$GITHUB_ACTOR:${{secrets.GITHUB_TOKEN}}@github.com/$GITHUB_REPOSITORY.wiki.git"
-          cd ${GITHUB_REPOSITORY}.wiki
+          cd ${GITHUB_REPOSITORY##*/}.wiki
           rm -rf *
           cp -r ../${{env.wiki-dir}} .
           git add .
