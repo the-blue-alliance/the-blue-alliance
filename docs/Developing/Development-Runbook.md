@@ -54,16 +54,21 @@ By default Vagrant will look for the pre-built Docker container upstream when pr
 ## Reprovisioning the Development Container
 If you run into issues, especially after not working with your dev instance for a while, try reprovisioning and restarting your development container.
 ```
+$ vagrant up --provision
+```
+
+The Vagrant container may be out of date as well. In this situation, destroy and recreate your local Vagrant image.
+```
 $ vagrant halt
 $ vagrant destroy
-$ vagrant up --provider=docker
+$ vagrant up
 ```
 
 If you have problems destroying your container via Vagrant, you can remove the container via Docker.
 ```
 $ docker stop tba
 $ docker rm tba
-$ vagrant up --provider=docker
+$ vagrant up
 ```
 
 ## Generating Type Checker Stubs
