@@ -48,6 +48,9 @@ $ ./ops/lint_node.sh
 $ ./ops/lint_node.sh --fix
 ```
 
+## Using the local Dockerfile
+By default Vagrant will look for the pre-built Docker container upstream when provisioning a development container. To use the local `Dockerfile`, comment out the [`d.image =`](https://github.com/the-blue-alliance/the-blue-alliance/blob/181043acc9759dd8347b89337d9f724451d8297f/Vagrantfile#L40) line and uncomment the [`d.build_dir =`](https://github.com/the-blue-alliance/the-blue-alliance/blob/181043acc9759dd8347b89337d9f724451d8297f/Vagrantfile#L43) line in the `Vagrantfile`.
+
 ## Reprovisioning the Development Container
 If you run into issues, especially after not working with your dev instance for a while, try reprovisioning and restarting your development container.
 ```
