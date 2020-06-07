@@ -1,6 +1,7 @@
 # from email import utils
 # import math
-# import re
+import re
+
 # import time
 # import urllib
 #
@@ -27,20 +28,20 @@
 #     if value in defense_render_names_2016:
 #         return defense_render_names_2016[value]
 #     return value
-#
-#
-# def digits(s):
-#     if not s:
-#         return ''
-#     if type(s) is int:
-#         return s
-#     return re.sub('[^0-9]', '', s)
-#
-#
-# def floatformat(num, num_decimals):
-#     return "%.{}f".format(num_decimals) % num
-#
-#
+
+
+def digits(s):
+    if not s:
+        return ""
+    if type(s) is int:
+        return s
+    return re.sub("[^0-9]", "", s)
+
+
+def floatformat(num, num_decimals):
+    return "%.{}f".format(num_decimals) % num
+
+
 # def isoformat(datetime):
 #     return datetime.isoformat()
 #
@@ -49,10 +50,10 @@
 #     return set(one) | set(two)
 #
 #
-# def limit_prob(prob):
-#     prob *= 100
-#     prob = min(95, max(prob, 5))
-#     return int(round(prob))
+def limit_prob(prob):
+    prob *= 100
+    prob = min(95, max(prob, 5))
+    return int(round(prob))
 
 
 def strftime(datetime, formatstr):
@@ -78,12 +79,12 @@ def strftime(datetime, formatstr):
     return datetime.strftime(formatstr).lstrip("0").replace(" 0", " ")
 
 
-# def strip_frc(s):
-#     if not s:
-#         return ''
-#     return s[3:]
-#
-#
+def strip_frc(s):
+    if not s:
+        return ""
+    return s[3:]
+
+
 # def urlencode(s):
 #     return urllib.quote(s.encode('utf8'))
 #
@@ -94,11 +95,24 @@ def strftime(datetime, formatstr):
 #     return utils.formatdate(timestamp)
 #
 #
-# def slugify(value):
-#     from django.template.defaultfilters import slugify as django_slugify
-#     return django_slugify(value)
-#
-#
+def slugify(value):
+    """
+    Based on django's slugify template
+    https://github.com/django/django/blob/a6b3938afc0204093b5356ade2be30b461a698c5/django/utils/text.py#L394
+    Convert to ASCII if 'allow_unicode' is False. Convert spaces to hyphens.
+    Remove characters that aren't alphanumerics, underscores, or hyphens.
+    Convert to lowercase. Also strip leading and trailing whitespace.
+    """
+    import unicodedata
+
+    value = str(value)
+    value = (
+        unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode("ascii")
+    )
+    value = re.sub(r"[^\w\s-]", "", value.lower()).strip()
+    return re.sub(r"[-\s]+", "-", value)
+
+
 # def yt_start(value):
 #     if '?t=' in value:  # Treat ?t= the same as #t=
 #         value = value.replace('?t=', '#t=')
@@ -121,7 +135,14 @@ def strftime(datetime, formatstr):
 #     return match_id.replace('m', '-').upper()
 
 
-_filters = {"strftime": strftime}
+_filters = {
+    "strftime": strftime,
+    "floatformat": floatformat,
+    "strip_frc": strip_frc,
+    "digits": digits,
+    "limit_prob": limit_prob,
+    "slugify": slugify,
+}
 
 
 def register_template_filters(app):

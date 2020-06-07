@@ -1,16 +1,10 @@
 import bs4
-import pytest
 import re
 from backend.common.models.team import Team
 from bs4 import BeautifulSoup
 from google.cloud import ndb
 from typing import Optional, List, NamedTuple
 from werkzeug.test import Client
-
-
-@pytest.fixture(autouse=True)
-def auto_add_ndb_stub(ndb_stub) -> None:
-    pass
 
 
 class ParsedTeam(NamedTuple):
@@ -71,6 +65,11 @@ def get_all_teams(resp_data: str) -> List[ParsedTeam]:
     return get_teams_from_table(tables[0]) + get_teams_from_table(tables[1])
 
 
+def test_bad_page(web_client: Client) -> None:
+    resp = web_client.get("/teams/9999")
+    assert resp.status_code == 404
+
+
 def test_team_list_empty_no_page(web_client: Client) -> None:
     resp = web_client.get("/teams")
     assert resp.status_code == 200
@@ -91,7 +90,9 @@ def test_team_list_empty_with_page(web_client: Client) -> None:
     assert len(get_all_teams(resp.data)) == 0
 
 
-def test_team_list_sorted_by_team_num(web_client: Client, ndb_client) -> None:
+def test_team_list_sorted_by_team_num(
+    web_client: Client, ndb_client: ndb.Client
+) -> None:
     preseed_teams(ndb_client, 1, 5)
 
     resp = web_client.get("/teams")
@@ -104,7 +105,7 @@ def test_team_list_sorted_by_team_num(web_client: Client, ndb_client) -> None:
 
 
 def test_team_list_has_expected_data_no_location(
-    web_client: Client, ndb_client
+    web_client: Client, ndb_client: ndb.Client
 ) -> None:
     preseed_teams(ndb_client, 1, 5)
 
@@ -124,7 +125,7 @@ def test_team_list_has_expected_data_no_location(
 
 
 def test_team_list_has_expected_data_with_location(
-    web_client: Client, ndb_client
+    web_client: Client, ndb_client: ndb.Client
 ) -> None:
     preseed_teams(ndb_client, 1, 5, set_city=True)
 
@@ -143,7 +144,9 @@ def test_team_list_has_expected_data_with_location(
         )
 
 
-def test_team_list_splits_teams_in_half(web_client: Client, ndb_client) -> None:
+def test_team_list_splits_teams_in_half(
+    web_client: Client, ndb_client: ndb.Client
+) -> None:
     preseed_teams(ndb_client, 1, 5)
 
     resp = web_client.get("/teams")
@@ -160,7 +163,7 @@ def test_team_list_splits_teams_in_half(web_client: Client, ndb_client) -> None:
 
 
 def test_team_list_fetches_offset_from_page_no_data(
-    web_client: Client, ndb_client
+    web_client: Client, ndb_client: ndb.Client
 ) -> None:
     preseed_teams(ndb_client, 1, 5)
 
@@ -172,7 +175,7 @@ def test_team_list_fetches_offset_from_page_no_data(
 
 
 def test_team_list_fetches_offset_from_page_with_data(
-    web_client: Client, ndb_client
+    web_client: Client, ndb_client: ndb.Client
 ) -> None:
     # We should query for the [1000, 1004] slice
     preseed_teams(ndb_client, 999, 1004)
