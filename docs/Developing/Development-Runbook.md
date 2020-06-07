@@ -78,7 +78,12 @@ $ stubgen -p google.cloud.ndb -o stubs/
 ```
 
 ### Patching Type Checker Stubs
-`stubgen` stubs our type checker but doesn’t add proper types. Manual edits to the type checking stubs can be made. Any edits should be checked in to source control as a patch file so they may be re-applied easily if dependencies are updated and stubs need to be re-generated. To create a patch file, first make changes to the stubs and then save the differences to a patch file.
+`stubgen` stubs our type checker but doesn’t add proper types. Manual edits to the type checking stubs can be made. Any edits should be checked in to source control as a patch file so they may be re-applied easily if dependencies are updated and stubs need to be re-generated. `mypy` must be installed for `stubgen`
+```
+$ pip install mypy
+```
+
+To create a patch file, first make changes to the stubs and then save the differences to a patch file.
 ```
 $ git diff > stubs/patch/{module}.patch
 ```
