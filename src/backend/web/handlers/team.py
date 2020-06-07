@@ -1,6 +1,7 @@
-from flask import render_template
+from flask import abort, render_template
 
-from backend.common.queries.team_query import TeamListQuery
+from backend.common.models.team import Team
+from backend.common.queries.team_query import TeamListQuery, TeamQuery
 
 MAX_TEAM_NUMBER_EXCLUSIVE = (
     9000  # Support between Team 0 and Team MAX_TEAM_NUMBER_EXCLUSIVE - 1
@@ -11,9 +12,30 @@ VALID_PAGES = range(
 )  # + 1 to make range inclusive
 
 
+def team_canonical(team_number: int) -> str:
+    team_key = f"frc{team_number}"
+    if not Team.validate_key_name(team_key):
+        abort(404)
+    team_future = TeamQuery(team_key=f"frc{team_number}").fetch_async()
+    team = team_future.get_result()
+    if not team:
+        abort(404)
+
+    template_values = {
+        "team": team,
+        # TODO stubbed stuff below
+        "year": 2020,
+        "hof": {},
+        "medias_by_slugname": {},
+    }
+    return render_template("team_details.html", **template_values)
+
+
 def team_list(page: int) -> str:
     page_labels = []
     cur_page_label = ""
+    if page not in VALID_PAGES:
+        abort(404)
     for curPage in VALID_PAGES:
         if curPage == 1:
             label = "1-999"

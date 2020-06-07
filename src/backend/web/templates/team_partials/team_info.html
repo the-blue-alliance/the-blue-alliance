@@ -18,18 +18,18 @@
       {% if team.city_state_country or (team.nl and team.nl.name and team.nl.city_state_country) %}
         <span class="glyphicon glyphicon-map-marker"></span> From
         {% if team.nl and team.nl.name %}
-          <a href="{{team.nl.place_details.url}}" target="_blank">{{team.nl.name}}</a> in {{team.nl.city_state_country}}
+          <a id="team-location" href="{{team.nl.place_details.url}}" target="_blank">{{team.nl.name}}</a> in {{team.nl.city_state_country}}
         {% else %}
-          <a href="{% if team.nl and team.nl.name %}{{team.nl.place_details.url}}{% else %}//maps.google.com/maps?q={{ team.city_state_country|urlencode }}{% endif %}" target="_blank">{{team.city_state_country}}</a>
+          <a id="team-location" href="{% if team.nl and team.nl.name %}{{team.nl.place_details.url}}{% else %}//maps.google.com/maps?q={{ team.city_state_country|urlencode }}{% endif %}" target="_blank">{{team.city_state_country}}</a>
         {% endif %}
         <br>
       {% endif %}
-      {% if team.name %}<span class="glyphicon glyphicon-info-sign"></span> aka <em>{{ team.name }}</em><br>{% endif %}
-      {% if team.rookie_year %}<span class="glyphicon glyphicon-calendar"></span> Rookie Year: {{ team.rookie_year }}<br>{% endif %}
-      {% if last_competed and last_competed < max_year %}<span class="glyphicon glyphicon-time"></span> Last competed in {{ last_competed }}<br>{% endif %}
-      {% if team.website %}<span class="glyphicon glyphicon-globe"></span> <a href="{{team.website}}" target="_blank">{{ team.website }}</a><br>{% endif %}
-      {% if team.championship_location and team.championship_location[year] %}<span class="glyphicon glyphicon-flag"></span> Home Championship: {{team.championship_location[year]}}<br>{% endif %}
-      {% if hof.is_hof %}<span class="hall-of-fame"><span class="glyphicon glyphicon-certificate"></span> Hall of Fame ({% for year in hof.years %}{{ year }}{{ ", " if not loop.last }}{% endfor %}){% if hof.media.video or hof.media.presentation or hof.media.essay %}:{% endif %}{% if hof.media.video %} <a href="{{hof.media.video}}">Video</a>{% endif %}{% if hof.media.presentation %}, <a href="{{hof.media.presentation}}">Presentation</a>{% endif %}{% if hof.media.essay %}, <a href="{{hof.media.essay}}">Essay</a>{% endif %}</span><br>{% endif %}
+      {% if team.name %}<span class="glyphicon glyphicon-info-sign"></span> aka <em id="team-name">{{ team.name }}</em><br>{% endif %}
+      {% if team.rookie_year %}<span class="glyphicon glyphicon-calendar"></span> <span id="team-rookie-year">Rookie Year: {{ team.rookie_year }}</span><br>{% endif %}
+      {% if last_competed and last_competed < max_year %}<span class="glyphicon glyphicon-time"></span> <span id="team-last-competed">Last competed in {{ last_competed }}</span><br>{% endif %}
+      {% if team.website %}<span class="glyphicon glyphicon-globe"></span> <a id="team-website" href="{{team.website}}" target="_blank">{{ team.website }}</a><br>{% endif %}
+      {% if team.championship_location and team.championship_location[year] %}<span class="glyphicon glyphicon-flag"></span> <span id="team-home-cmp">Home Championship: {{team.championship_location[year]}}</span><br>{% endif %}
+      {% if hof.is_hof %}<span id="team-hof" class="hall-of-fame"><span class="glyphicon glyphicon-certificate"></span> Hall of Fame ({% for year in hof.years %}{{ year }}{{ ", " if not loop.last }}{% endfor %}){% if hof.media.video or hof.media.presentation or hof.media.essay %}:{% endif %}{% if hof.media.video %} <a href="{{hof.media.video}}">Video</a>{% endif %}{% if hof.media.presentation %}, <a href="{{hof.media.presentation}}">Presentation</a>{% endif %}{% if hof.media.essay %}, <a href="{{hof.media.essay}}">Essay</a>{% endif %}</span><br>{% endif %}
       {% if year %}
         {% if year >= 2015 %}<span class="glyphicon glyphicon-info-sign"></span> Data provided by the <a href="https://frc-events.firstinspires.org/services/API" target="_blank">FIRST Events API</a><br>{% endif %}
       {% endif %}

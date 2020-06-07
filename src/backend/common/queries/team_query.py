@@ -5,6 +5,13 @@ from google.cloud import ndb
 from typing import List
 
 
+class TeamQuery(DatabaseQuery[Team]):
+    @ndb.tasklet
+    def _query_async(self, team_key: str) -> TypedFuture[Team]:
+        team = yield Team.get_by_id_async(team_key)
+        raise ndb.Return(team)
+
+
 class TeamListQuery(DatabaseQuery[List[Team]]):
 
     PAGE_SIZE: int = 500
