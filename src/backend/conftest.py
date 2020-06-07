@@ -31,7 +31,11 @@ def ndb_stub(monkeypatch: MonkeyPatch) -> datastore_stub.LocalDatastoreStub:
 
 
 @pytest.fixture()
-def ndb_context(init_ndb_env_vars, ndb_stub):
-    client = ndb.Client()
-    with client.context() as context:
+def ndb_client(init_ndb_env_vars, ndb_stub) -> ndb.Client:
+    return ndb.Client()
+
+
+@pytest.fixture()
+def ndb_context(ndb_client):
+    with ndb_client.context() as context:
         yield context

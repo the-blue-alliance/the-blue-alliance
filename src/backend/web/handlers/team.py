@@ -29,14 +29,22 @@ def team_list(page: int) -> str:
     page_1_start = QUERY_PAGE_SIZE * page_1
     page_2 = 2 * (page - 1) + 1
     page_2_start = QUERY_PAGE_SIZE * page_2
-    teams_1 = Team.query(
-        Team.team_number >= page_1_start,
-        Team.team_number < page_1_start + QUERY_PAGE_SIZE,
-    ).fetch_async()
-    teams_2 = Team.query(
-        Team.team_number >= page_2_start,
-        Team.team_number < page_2_start + QUERY_PAGE_SIZE,
-    ).fetch_async()
+    teams_1 = (
+        Team.query(
+            Team.team_number >= page_1_start,
+            Team.team_number < page_1_start + QUERY_PAGE_SIZE,
+        )
+        .order(Team.team_number)
+        .fetch_async()
+    )
+    teams_2 = (
+        Team.query(
+            Team.team_number >= page_2_start,
+            Team.team_number < page_2_start + QUERY_PAGE_SIZE,
+        )
+        .order(Team.team_number)
+        .fetch_async()
+    )
     teams = teams_1.get_result() + teams_2.get_result()
 
     num_teams = len(teams)
