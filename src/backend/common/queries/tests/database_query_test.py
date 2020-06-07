@@ -1,13 +1,7 @@
-import pytest
 from backend.common.typed_future import TypedFuture
 from backend.common.queries.database_query import DatabaseQuery
 from google.cloud import ndb
 from typing import List
-
-
-@pytest.fixture(autouse=True)
-def auto_add_ndb_context(ndb_context):
-    pass
 
 
 class DummyModel(ndb.Model):
