@@ -1,5 +1,4 @@
 from google.cloud import ndb
-import logging
 import pytest
 from unittest.mock import patch
 from urllib.parse import urlparse, parse_qsl
