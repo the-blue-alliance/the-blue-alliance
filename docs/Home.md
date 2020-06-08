@@ -13,3 +13,7 @@ A guide for configuring The Blue Alliance repo locally in order to streamline de
 ## [[Development Runbook|Development-Runbook]]
 
 Helpful commands when developing in The Blue Alliance codebase. This section includes things like how to run tests, how to seed your development environment with production data, and more!
+
+## [[Py 2 -> Py 3 Migration Notes||Py2ToPy3]]
+
+Running notes on how to migrate code from the Python 2 codebase to the new Python 3 codebase.
