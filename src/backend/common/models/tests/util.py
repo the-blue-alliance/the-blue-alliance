@@ -12,3 +12,18 @@ CITY_STATE_COUNTRY_PARAMETERS = (
         ("New York", None, "USA", "New York, USA"),
     ],
 )
+
+LOCATION_PARAMETERS = (
+    "city, state, country, postalcode, output",
+    [
+        (None, None, None, None, ""),
+        ("New York", None, None, None, "New York"),
+        ("New York", "NY", None, None, "New York, NY"),
+        ("New York", "NY", "USA", None, "New York, NY, USA"),
+        ("New York", "NY", "USA", "10023", "New York, NY 10023, USA"),
+        (None, "NY", None, None, "NY"),
+        (None, "NY", "USA", None, "NY, USA"),
+        (None, None, "USA", None, "USA"),
+        ("New York", None, "USA", None, "New York, USA"),
+    ],
+)
