@@ -1,3 +1,6 @@
+from typing import Optional
+
+
 class GoogleAnalytics:
     """
     Class that manages sending information to Google Analytics
@@ -12,7 +15,7 @@ class GoogleAnalytics:
         client_id: str,
         event_category: str,
         event_action: str,
-        event_value: int = None,
+        event_value: Optional[int] = None,
     ) -> None:
         from backend.common.sitevars.google_analytics_id import GoogleAnalyticsID
 
