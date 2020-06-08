@@ -1,6 +1,7 @@
 Welcome to The Blue Alliance Wiki! Here are some helpful pages -
 
 # Setup
+
 ## [[Setup Guide|Setup-Guide]]
 
 A step-by-step guide for getting The Blue Alliance up and running locally. For new contributors, this should be your first stop.
@@ -10,10 +11,11 @@ A step-by-step guide for getting The Blue Alliance up and running locally. For n
 A guide for configuring The Blue Alliance repo locally in order to streamline development. This step is optional as it is not required for working in The Blue Alliance repo, but it will be helpful for contributors that plan to do frequent work in the repo.
 
 # Developing
+
 ## [[Development Runbook|Development-Runbook]]
 
 Helpful commands when developing in The Blue Alliance codebase. This section includes things like how to run tests, how to seed your development environment with production data, and more!
 
-## [[Py 2 -> Py 3 Migration Notes||Py2ToPy3]]
+## [[Py 2 -> Py 3 Migration Notes|Py2ToPy3]]
 
 Running notes on how to migrate code from the Python 2 codebase to the new Python 3 codebase.
