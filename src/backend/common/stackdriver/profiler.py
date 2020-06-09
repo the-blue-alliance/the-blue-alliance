@@ -16,7 +16,7 @@ trace_context = threading.local()
 PROJECT_ID = os.environ["GOOGLE_CLOUD_PROJET"]
 
 
-# used for deferred call
+# TODO: send to task queue
 def send_trace(projectId, trace_body):
     # Authentication is provided by the 'gcloud' tool when running locally
     # and by built-in service accounts when running on GAE, GCE, or GKE.
@@ -133,13 +133,7 @@ class TraceContext(object):
             traces_body = {"projectId": PROJECT_ID, "traceId": trace_id, "spans": spans}
             body = {"traces": [traces_body]}
 
-            deferred.defer(
-                send_trace,
-                PROJECT_ID,
-                body,
-                _queue="api-track-call",
-                _url="/_ah/queue/deferred_stackdriver_send_trace",
-            )
+            send_trace(PROJECT_ID, body)  # TODO: send to task queue
         except Exception as e:
             logging.warning("TraceContext.write() failed!")
             logging.exception(e)
