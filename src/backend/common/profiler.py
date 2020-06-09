@@ -13,7 +13,7 @@ from oauth2client.client import GoogleCredentials
 # create a thread-local global context
 trace_context = threading.local()
 
-PROJECT_ID = os.environ["GOOGLE_CLOUD_PROJET"]
+PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", None)
 
 
 # TODO: send to task queue
@@ -34,7 +34,7 @@ def send_trace(projectId, trace_body):
 
 
 class Span(object):
-    def __init__(self, name, doTrace, kind="SPAN_KIND_UNSPECIFIED"):
+    def __init__(self, name: str, doTrace: bool, kind: str = "SPAN_KIND_UNSPECIFIED"):
         self.id = str(random.getrandbits(64))
         self.name = name
         self.doTrace = doTrace
@@ -109,7 +109,7 @@ class TraceContext(object):
                 self.write()
                 trace_context.spans = []
 
-    def span(self, name=""):
+    def span(self, name: str = ""):
         spn = Span(name, self._doTrace)
         if self._doTrace:
             trace_context.spans.append(spn)
