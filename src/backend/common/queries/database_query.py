@@ -1,6 +1,6 @@
 import abc
 from backend.common.typed_future import TypedFuture
-from backend.common.stackdriver.profiler import TraceContext
+from backend.common.profiler import TraceContext
 from google.cloud import ndb
 from typing import TypeVar, Generic
 
