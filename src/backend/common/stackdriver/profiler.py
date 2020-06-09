@@ -2,16 +2,18 @@
 
 from datetime import datetime
 import logging
+import os
 import random
 import threading
 
-from google.appengine.api import app_identity
 from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
 
 
 # create a thread-local global context
 trace_context = threading.local()
+
+PROJECT_ID = os.environ["GOOGLE_CLOUD_PROJET"]
 
 
 # used for deferred call
@@ -128,13 +130,12 @@ class TraceContext(object):
             for s in spans:
                 s["parentSpanId"] = root_span_id
 
-            projectId = app_identity.get_application_id()
-            traces_body = {"projectId": projectId, "traceId": trace_id, "spans": spans}
+            traces_body = {"projectId": PROJECT_ID, "traceId": trace_id, "spans": spans}
             body = {"traces": [traces_body]}
 
             deferred.defer(
                 send_trace,
-                projectId,
+                PROJECT_ID,
                 body,
                 _queue="api-track-call",
                 _url="/_ah/queue/deferred_stackdriver_send_trace",
