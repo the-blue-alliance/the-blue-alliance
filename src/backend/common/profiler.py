@@ -112,7 +112,7 @@ class TraceContext(object):
     def span(self, name: str = ""):
         spn = Span(name, self._doTrace)
         if self._doTrace:
-            trace_context.spans.append(spn)
+            trace_context.spans.append(spn)  # pyre-ignore
         return spn
 
     def write(self):
