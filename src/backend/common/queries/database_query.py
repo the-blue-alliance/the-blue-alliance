@@ -1,5 +1,6 @@
 import abc
 from backend.common.typed_future import TypedFuture
+from backend.common.stackdriver.profiler import TraceContext
 from google.cloud import ndb
 from typing import TypeVar, Generic
 
@@ -23,7 +24,9 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn]):
 
     @ndb.tasklet
     def fetch_async(self) -> TypedFuture[QueryReturn]:
-        query_result = yield self._query_async(**self._query_args)
-        # Type-hinting the tasklet decorator is hard, but it consumes
-        # the generator and returns the overall future
-        return query_result  # pyre-ignore
+        with TraceContext() as root:
+            with root.span("{}.fetch_async".format(self.__class__.__name__)):
+                query_result = yield self._query_async(**self._query_args)
+                # Type-hinting the tasklet decorator is hard, but it consumes
+                # the generator and returns the overall future
+                return query_result  # pyre-ignore
