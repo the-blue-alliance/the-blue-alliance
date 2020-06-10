@@ -29,3 +29,24 @@ def test_cached_public_timeout(app: Flask) -> None:
 
     resp = app.test_client().get("/")
     assert resp.headers.get("Cache-Control") == "public, max-age=3600, s-maxage=3600"
+
+
+def test_cached_public_etag(app: Flask) -> None:
+    @app.route("/")
+    @cached_public
+    def view():
+        return "Hello!"
+
+    resp = app.test_client().get("/")
+    etag = resp.headers.get("ETag")
+    assert etag is not None
+
+    # Check that a valid etag returns 304
+    resp2 = app.test_client().get("/", headers={"If-None-Match": etag})
+    assert resp2.status_code == 304
+    assert resp2.get_data(as_text=True) == ""
+
+    # Check that an invalid etag returns a normal response
+    resp3 = app.test_client().get("/", headers={"If-None-Match": "bad-etag"})
+    assert resp3.status_code == 200
+    assert resp3.get_data(as_text=True) == "Hello!"

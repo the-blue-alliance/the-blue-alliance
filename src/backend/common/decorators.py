@@ -1,4 +1,4 @@
-from flask import make_response
+from flask import request, make_response, Response
 from functools import partial, wraps
 
 
@@ -14,6 +14,12 @@ def cached_public(func=None, timeout: int = 61):
                 timeout, 61
             )  # needs to be at least 61 seconds to work with Google Frontend cache
         )
+        resp.add_etag()
+
+        # Check for ETag caching
+        if resp.headers.get("ETag", None) in str(request.if_none_match):
+            resp = Response(status=304)
+
         return resp
 
     return decorated_function
