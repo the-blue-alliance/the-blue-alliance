@@ -8,6 +8,7 @@ import logging
 import os
 import StringIO
 import time
+import traceback
 
 from google.appengine.api.app_identity import app_identity
 
@@ -26,8 +27,9 @@ from google.appengine.ext.webapp import template
 try:  # Tests fail on import. 2017-11-13
     from google.cloud import bigquery
     from google.cloud.bigquery.job import WriteDisposition
-except Exception:
-    logging.error("bigquery import failed")
+except Exception, e:
+    logging.error("bigquery import failed: {}".format(str(e)))
+    logging.error("Trace: {}".format(traceback.format_exc()))
 
 from helpers.award_manipulator import AwardManipulator
 from helpers.event_manipulator import EventManipulator
