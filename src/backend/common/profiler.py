@@ -26,7 +26,9 @@ def send_trace(projectId, trace_body):
     # Construct the cloudtrace service object (version v1) for interacting
     # with the API. You can browse other available API services and versions at
     # https://developers.google.com/api-client-library/python/apis/
-    service = discovery.build("cloudtrace", "v1", credentials=credentials)
+    service = discovery.build(
+        "cloudtrace", "v1", credentials=credentials, cache_discovery=False
+    )
 
     # Actually submit the patched tracing data.
     request = service.projects().patchTraces(projectId=projectId, body=trace_body)
