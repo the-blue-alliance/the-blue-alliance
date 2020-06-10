@@ -2,6 +2,6 @@ gunicorn==20.0.4
 Flask==1.1.2
 google-api-python-client==1.9.1
 google-cloud-ndb==1.2.1
-gprcio==1.29.0
+grpcio==1.29.0
 oauth2client==4.1.3
 urlfetch==1.2.1
