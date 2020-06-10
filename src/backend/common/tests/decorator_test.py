@@ -9,6 +9,18 @@ def test_no_cached_public(app: Flask) -> None:
 
     resp = app.test_client().get("/")
     assert resp.headers.get("Cache-Control") is None
+    assert resp.headers.get("ETag") is None
+
+
+def test_no_cached_public_on_error(app: Flask) -> None:
+    @app.route("/")
+    @cached_public
+    def view():
+        return "Error", 401
+
+    resp = app.test_client().get("/")
+    assert resp.headers.get("Cache-Control") is None
+    assert resp.headers.get("ETag") is None
 
 
 def test_cached_public_default(app: Flask) -> None:
