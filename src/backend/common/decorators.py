@@ -10,6 +10,8 @@ def cached_public(func=None, timeout: int = 61):
     def decorated_function(*args, **kwargs):
         resp = make_response(func(*args, **kwargs))
         if resp.status_code == 200:  # Only cache OK responses
+            # TODO: hook into Redis
+
             resp.headers["Cache-Control"] = "public, max-age={0}, s-maxage={0}".format(
                 max(
                     timeout, 61
