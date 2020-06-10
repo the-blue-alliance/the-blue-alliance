@@ -1,4 +1,4 @@
-from backend.api.flask_decorators import api_authenticated
+from backend.api.handlers.decorators import api_authenticated
 
 
 @api_authenticated
