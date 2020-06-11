@@ -1,5 +1,18 @@
 # Development Runbook
 
+## Starting the Dev Environment
+
+We recommend running a local version of The Blue Alliance inside a [docker](https://www.docker.com/) container. You can use [vagrant](https://www.vagrantup.com/) to provision the entire environment.
+
+Local Dependencies:
+ - [python3](https://wiki.python.org/moin/BeginnersGuide/Download)
+ - [docker](https://www.docker.com/)
+ - [vagrant](https://www.vagrantup.com/)
+
+You can start the container locally by running `vagrant up`. Once the setup is complete, TBA should be accessable in a web browser at `localhost:8080`.
+
+Once the container is running, you can print all the relevant logs (including the `dev_appserver` logs) on the host machine by running `./ops/dev/host.sh`.
+
 ## Bootstrapping Data
 
 (TODO: Update for Python 3)
