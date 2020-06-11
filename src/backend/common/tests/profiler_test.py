@@ -2,21 +2,12 @@ from flask import Flask
 from unittest.mock import patch
 
 from backend.common.middleware import install_middleware
-from backend.common.profiler import (
-    Span,
-    trace_context,
-    send_traces,
-)
+from backend.common.profiler import Span, trace_context
 
 
 def setup_app():
     app = Flask(__name__)
     install_middleware(app)
-
-    @app.teardown_request
-    def teardown_request(exception):
-        send_traces()
-
     return app
 
 
