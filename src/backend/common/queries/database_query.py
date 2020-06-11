@@ -42,4 +42,4 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn]):
             raise DoesNotExistException()
         # Type-hinting the tasklet decorator is hard, but it consumes
         # the generator and returns the overall future
-        return self.DICT_CONVERTER.convert(query_result, version)  # pyre-ignore
+        return self.DICT_CONVERTER(query_result).convert(version)  # pyre-ignore

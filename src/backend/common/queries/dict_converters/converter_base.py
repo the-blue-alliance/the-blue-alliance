@@ -1,31 +1,34 @@
 import abc
 from backend.common.queries.types import QueryReturn
-from typing import Callable, Generic
+from typing import Generic, List, Union
 
 
 class ConverterBase(Generic[QueryReturn]):
-    @classmethod
-    def convert(cls, thing: QueryReturn, version: int) -> dict:
-        converted_thing = cls._convert(cls._listify(thing), version)
-        if isinstance(thing, list):
-            return cls._listify(converted_thing)
-        else:
-            return cls._delistify(converted_thing)
+    _query_return: QueryReturn
 
-    @classmethod
+    def __init__(self, query_return: QueryReturn):
+        self._query_return = query_return
+
+    def convert(self, version: int) -> Union[None, dict, List[dict]]:
+        converted_query_return = self._convert_list(
+            self._listify(self._query_return), version
+        )
+        if isinstance(self._query_return, list):
+            return converted_query_return
+        else:
+            return self._delistify(converted_query_return)
+
     @abc.abstractmethod
-    def _convert(cls, thing: QueryReturn, version: int) -> Callable:
+    def _convert_list(self, model_list: list, version: int) -> List[dict]:
         ...
 
-    @classmethod
-    def _listify(cls, thing):
+    def _listify(self, thing: QueryReturn) -> list:
         if not isinstance(thing, list):
             return [thing]
         else:
             return thing
 
-    @classmethod
-    def _delistify(cls, things):
+    def _delistify(self, things: List[dict]) -> Union[None, dict, List[dict]]:
         if len(things) == 0:
             return None
         if len(things) == 1:
@@ -33,8 +36,7 @@ class ConverterBase(Generic[QueryReturn]):
         else:
             return things
 
-    @classmethod
-    def constructLocation_v3(cls, model):
+    def constructLocation_v3(self, model) -> dict:
         """
         Works for teams and events
         """

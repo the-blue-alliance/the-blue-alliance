@@ -1,3 +1,6 @@
+from typing import List
+
+from backend.common.models.team import Team
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 
 
@@ -6,19 +9,16 @@ class TeamConverter(ConverterBase):
         3: 4,
     }
 
-    @classmethod
-    def _convert(cls, teams, version):
+    def _convert_list(self, model_list: List[Team], version: int) -> List[dict]:
         CONVERTERS = {
-            3: cls.teamsConverter_v3,
+            3: self.teamsConverter_v3,
         }
-        return CONVERTERS[version](teams)
+        return CONVERTERS[version](model_list)
 
-    @classmethod
-    def teamsConverter_v3(cls, teams):
-        return list(map(cls.teamConverter_v3, teams))
+    def teamsConverter_v3(self, teams: List[Team]) -> List[dict]:
+        return list(map(self.teamConverter_v3, teams))
 
-    @classmethod
-    def teamConverter_v3(cls, team):
+    def teamConverter_v3(self, team: Team) -> dict:
         default_name = "Team {}".format(team.team_number)
         team_dict = {
             "key": team.key.id(),
@@ -31,5 +31,5 @@ class TeamConverter(ConverterBase):
             # "home_championship": team.championship_location,  # TODO: event not ported yet
             "school_name": team.school_name,
         }
-        team_dict.update(cls.constructLocation_v3(team))
+        team_dict.update(self.constructLocation_v3(team))
         return team_dict
