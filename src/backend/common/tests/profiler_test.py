@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from backend.common.middleware import install_middleware
 from backend.common.profiler import (
-    TraceContext,
+    Span,
     trace_context,
     send_traces,
 )
@@ -26,9 +26,8 @@ def test_send_trace(mock_send_traces) -> None:
 
     @app.route("/")
     def route():
-        with TraceContext() as root:
-            with root.span("test_span"):
-                assert len(root._spans) == 1
+        with Span("test_span"):
+            pass
         assert len(trace_context.request.spans) == 1
         return "Hi!"
 
@@ -46,9 +45,8 @@ def test_not_send_trace(mock_send_traces) -> None:
 
     @app.route("/")
     def route():
-        with TraceContext() as root:
-            with root.span("test_span"):
-                assert len(root._spans) == 1
+        with Span("test_span"):
+            pass
         assert len(trace_context.request.spans) == 1
         return "Hi!"
 
@@ -66,8 +64,6 @@ def test_no_spans(mock_send_traces) -> None:
 
     @app.route("/")
     def route():
-        with TraceContext() as root:
-            assert len(root._spans) == 0
         assert len(trace_context.request.spans) == 0
         return "Hi!"
 
@@ -85,15 +81,12 @@ def test_multiple_spans(mock_send_traces) -> None:
 
     @app.route("/")
     def route():
-        with TraceContext() as root1:
-            with root1.span("test_span_1"):
-                pass
-            with root1.span("test_span_2"):
-                pass
-
-        with TraceContext() as root2:
-            with root2.span("test_span_3"):
-                pass
+        with Span("test_span_1"):
+            pass
+        with Span("test_span_2"):
+            pass
+        with Span("test_span_3"):
+            pass
 
         assert len(trace_context.request.spans) == 3
         return "Hi!"

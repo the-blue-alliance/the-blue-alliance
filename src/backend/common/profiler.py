@@ -24,19 +24,17 @@ def send_traces():
         ):
             return
 
-        # Grab our spans object as a json blob
-        spans = [s.json() for s in trace_context.request.spans]
-
-        for s in spans:
-            s["parentSpanId"] = trace_context.request.root_span_id
-
-        traces_body = {
-            "projectId": PROJECT_ID,
-            "traceId": trace_context.request.trace_id,
-            "spans": spans,
-        }
-        body = {"traces": [traces_body]}
-        _make_tracing_call(body)
+        _make_tracing_call(
+            {
+                "traces": [
+                    {
+                        "projectId": PROJECT_ID,
+                        "traceId": trace_context.request.trace_id,
+                        "spans": trace_context.request.spans,
+                    }
+                ]
+            }
+        )
     except Exception as e:
         logging.warning("send_traces() failed!")
         logging.exception(e)
@@ -64,71 +62,51 @@ def _make_tracing_call(body):
 
 
 class Span(object):
-    def __init__(self, name: str, doTrace: bool, kind: str = "SPAN_KIND_UNSPECIFIED"):
-        self.id = str(random.getrandbits(64))
-        self.name = name
-        self.doTrace = doTrace
-        self.kind = kind
-
-    # Helpers for scope-specific use cases
-    def __enter__(self):
-        if self.doTrace:
-            logging.info("CREATED SPAN: {}".format(self.name))
-        self.startTime = datetime.now()
-        return self
-
-    def __exit__(self, type, value, tb):
-        self.endTime = datetime.now()
-
-    def json(self):
-        """Format as a dictionary of the correct shape for sending to the Cloud
-        Trace REST API as a JSON object"""
-        j = {
-            "kind": self.kind,
-            "name": self.name,
-            "spanId": self.id,
-            "startTime": self.startTime.isoformat() + "Z",
-            "endTime": self.endTime.isoformat() + "Z",
-        }
-        return j
-
-
-class TraceContext(object):
-    def __init__(self):
+    def __init__(self, name: str):
         """
-        Start a TraceContext
+        Start a Span
         Spans are saved in trace_context.request.spans on exit
         Spans are sent by send_traces() which is called when the request context ends
         """
-        self._spans = []
+        self._name = name
 
         if hasattr(trace_context, "request") and trace_context.request:
             tcontext = trace_context.request.headers.get(
                 "X-Cloud-Trace-Context", "NNNN/NNNN;xxxxx"
             )
             self._do_trace = ";o=1" in tcontext
+            if self._do_trace:
+                logging.info("Trace Context: {}".format(tcontext))
 
             # Breakup our given cloud tracing context so we can get the flags out of it
             trace_id, root_span_id = tcontext.split(";")[0].split("/")
             trace_context.request.trace_id = trace_id
-            trace_context.request.root_span_id = root_span_id
+            self._root_span_id = root_span_id
+
         else:
             self._do_trace = False
 
-        if self._do_trace:
-            logging.info("Trace Context: {}".format(tcontext))
-
     def __enter__(self):
+        if self._do_trace:
+            logging.info("CREATED SPAN: {}".format(self._name))
+        self._startTime = datetime.now()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        self._endTime = datetime.now()
         if self._do_trace:
             if not hasattr(trace_context.request, "spans"):
                 trace_context.request.spans = []
-            trace_context.request.spans += self._spans
+            trace_context.request.spans.append(self.dict())
 
-    def span(self, name: str = ""):
-        spn = Span(name, self._do_trace)
-        if self._do_trace:
-            self._spans.append(spn)
-        return spn
+    def dict(self):
+        """Format as a dictionary of the correct shape for sending to the Cloud
+        Trace REST API as a JSON object"""
+        return {
+            "kind": "SPAN_KIND_UNSPECIFIED",
+            "name": self._name,
+            "parentSpanId": self._root_span_id,
+            "spanId": str(random.getrandbits(64)),
+            "startTime": self._startTime.isoformat() + "Z",
+            "endTime": self._endTime.isoformat() + "Z",
+        }
