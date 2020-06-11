@@ -1,5 +1,6 @@
 from backend.common.typed_future import TypedFuture
 from backend.common.queries.database_query import DatabaseQuery
+from backend.common.queries.dict_converters.converter_base import ConverterBase
 from google.cloud import ndb
 from typing import List
 
@@ -8,7 +9,13 @@ class DummyModel(ndb.Model):
     int_prop = ndb.IntegerProperty()
 
 
+class DummyConverter(ConverterBase):
+    pass
+
+
 class DummyModelPointQuery(DatabaseQuery[DummyModel]):
+    DICT_CONVERTER = DummyConverter
+
     @ndb.tasklet
     def _query_async(self, model_key: str) -> TypedFuture[DummyModel]:
         model = yield DummyModel.get_by_id_async(model_key)
@@ -16,6 +23,8 @@ class DummyModelPointQuery(DatabaseQuery[DummyModel]):
 
 
 class DummyModelRangeQuery(DatabaseQuery[List[DummyModel]]):
+    DICT_CONVERTER = DummyConverter
+
     @ndb.tasklet
     def _query_async(self, min: int, max: int) -> TypedFuture[List[DummyModel]]:
         models = yield DummyModel.query(

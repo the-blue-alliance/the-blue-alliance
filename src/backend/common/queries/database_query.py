@@ -5,13 +5,13 @@ from backend.common.queries.dict_converters.converter_base import ConverterBase
 from backend.common.queries.exceptions import DoesNotExistException
 from backend.common.queries.types import QueryReturn
 from google.cloud import ndb
-from typing import Generic
+from typing import Generic, Type
 
 
 class DatabaseQuery(abc.ABC, Generic[QueryReturn]):
 
     _query_args: int
-    DICT_CONVERTER: ConverterBase
+    DICT_CONVERTER: Type[ConverterBase[QueryReturn]]
 
     def __init__(self, *args, **kwargs):
         self._query_args = kwargs

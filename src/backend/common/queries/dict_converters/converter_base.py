@@ -1,9 +1,9 @@
 import abc
 from backend.common.queries.types import QueryReturn
-from typing import Callable
+from typing import Callable, Generic
 
 
-class ConverterBase(object):
+class ConverterBase(Generic[QueryReturn]):
     @classmethod
     def convert(cls, thing: QueryReturn, version: int) -> dict:
         converted_thing = cls._convert(cls._listify(thing), version)
