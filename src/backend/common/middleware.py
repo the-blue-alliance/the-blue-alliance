@@ -34,7 +34,7 @@ class TraceRequestMiddleware(object):
         self.app = app
 
     def __call__(self, environ: Any, start_response: Any):
-        trace_context.request = Request(environ)
+        trace_context.request = Request(environ)  # pyre-ignore[16]
         return self.app(environ, start_response)
 
 
