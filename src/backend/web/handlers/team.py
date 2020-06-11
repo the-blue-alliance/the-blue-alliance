@@ -1,7 +1,8 @@
-from flask import abort, render_template
+from flask import abort
 
 from backend.common.models.team import Team
 from backend.common.queries.team_query import TeamListQuery, TeamQuery
+from backend.web.profiled_render import render_template
 
 MAX_TEAM_NUMBER_EXCLUSIVE = (
     9000  # Support between Team 0 and Team MAX_TEAM_NUMBER_EXCLUSIVE - 1
