@@ -2,6 +2,7 @@ import abc
 from backend.common.typed_future import TypedFuture
 from backend.common.profiler import TraceContext
 from backend.common.queries.dict_converters.converter_base import ConverterBase
+from backend.common.queries.exceptions import DoesNotExistException
 from backend.common.queries.types import QueryReturn
 from google.cloud import ndb
 from typing import Generic
@@ -37,6 +38,8 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn]):
     @ndb.tasklet
     def fetch_dict_async(self, version: int) -> TypedFuture[dict]:
         query_result = yield self.fetch_async()
+        if query_result is None:
+            raise DoesNotExistException()
         # Type-hinting the tasklet decorator is hard, but it consumes
         # the generator and returns the overall future
         return self.DICT_CONVERTER.convert(query_result, version)  # pyre-ignore

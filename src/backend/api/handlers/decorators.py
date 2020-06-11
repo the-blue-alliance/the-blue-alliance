@@ -1,6 +1,9 @@
 from flask import request
 from functools import wraps
 
+from backend.common.models.team import Team
+from backend.common.queries.exceptions import DoesNotExistException
+
 
 def api_authenticated(func):
     @wraps(func)
@@ -17,5 +20,20 @@ def api_authenticated(func):
                 401,
             )
         return func(*args, **kwargs)
+
+    return decorated_function
+
+
+def validate_team_key(func):
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        team_key = kwargs["team_key"]
+        if not Team.validate_key_name(team_key):
+            return {"Error": f"{team_key} is not a valid team key"}, 404
+
+        try:
+            return func(*args, **kwargs)
+        except DoesNotExistException:
+            return {"Error": f"team key: {team_key} does not exist"}, 404
 
     return decorated_function

@@ -12,7 +12,7 @@ class TeamQuery(DatabaseQuery[Team]):
     @ndb.tasklet
     def _query_async(self, team_key: str) -> TypedFuture[Team]:
         team = yield Team.get_by_id_async(team_key)
-        raise ndb.Return(team)
+        return team
 
 
 class TeamListQuery(DatabaseQuery[List[Team]]):
