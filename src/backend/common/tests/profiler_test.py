@@ -28,9 +28,9 @@ def test_send_trace(mock_send_traces) -> None:
     def route():
         with TraceContext() as root:
             with root.span("test_span"):
-                return "Hi!"
                 assert len(root._spans) == 1
         assert len(trace_context.request.spans) == 1
+        return "Hi!"
 
     mock_send_traces.assert_not_called()
 
@@ -48,9 +48,9 @@ def test_not_send_trace(mock_send_traces) -> None:
     def route():
         with TraceContext() as root:
             with root.span("test_span"):
-                return "Hi!"
                 assert len(root._spans) == 1
         assert len(trace_context.request.spans) == 1
+        return "Hi!"
 
     mock_send_traces.assert_not_called()
 
@@ -67,9 +67,9 @@ def test_no_spans(mock_send_traces) -> None:
     @app.route("/")
     def route():
         with TraceContext() as root:
-            return "Hi!"
             assert len(root._spans) == 0
         assert len(trace_context.request.spans) == 0
+        return "Hi!"
 
     mock_send_traces.assert_not_called()
 
@@ -95,8 +95,8 @@ def test_multiple_spans(mock_send_traces) -> None:
             with root2.span("test_span_3"):
                 pass
 
-        return "Hi!"
         assert len(trace_context.request.spans) == 3
+        return "Hi!"
 
     mock_send_traces.assert_not_called()
 
