@@ -5,6 +5,7 @@
   "search_path": [
     "stubs",
     {"site-package": "InMemoryCloudDatastoreStub"},
-    {"site-package": "google/cloud/datastore_v1"}
+    {"site-package": "google/cloud/datastore_v1"},
+    {"site-package": "freezegun"}
   ]
 }

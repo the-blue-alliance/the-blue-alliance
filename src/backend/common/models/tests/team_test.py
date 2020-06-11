@@ -1,18 +1,17 @@
 import pytest
 from backend.common.models.team import Team
 
-from .util import CITY_STATE_COUNTRY_PARAMETERS
+from .util import CITY_STATE_COUNTRY_PARAMETERS, LOCATION_PARAMETERS
 
 
-def test_valid_key_names() -> None:
-    assert Team.validate_key_name("frc177") is True
-    assert Team.validate_key_name("frc1") is True
+@pytest.mark.parametrize("key", ["frc177", "frc1"])
+def test_valid_key_names(key: str) -> None:
+    assert Team.validate_key_name(key) is True
 
 
-def test_invalida_key_names() -> None:
-    assert Team.validate_key_name("bcr077") is False
-    assert Team.validate_key_name("frc 011") is False
-    assert Team.validate_key_name("frc711\\") is False
+@pytest.mark.parametrize("key", ["bcr077", "frc 011", "frc711\\"])
+def test_invalid_key_names(key: str) -> None:
+    assert Team.validate_key_name(key) is False
 
 
 def test_key_name() -> None:
@@ -20,20 +19,7 @@ def test_key_name() -> None:
     assert team.key_name == "frc254"
 
 
-@pytest.mark.parametrize(
-    "city, state, country, postalcode, output",
-    [
-        (None, None, None, None, ""),
-        ("New York", None, None, None, "New York"),
-        ("New York", "NY", None, None, "New York, NY"),
-        ("New York", "NY", "USA", None, "New York, NY, USA"),
-        ("New York", "NY", "USA", "10023", "New York, NY 10023, USA"),
-        (None, "NY", None, None, "NY"),
-        (None, "NY", "USA", None, "NY, USA"),
-        (None, None, "USA", None, "USA"),
-        ("New York", None, "USA", None, "New York, USA"),
-    ],
-)
+@pytest.mark.parametrize(*LOCATION_PARAMETERS)
 def test_location(
     city: str, state: str, country: str, postalcode: str, output: str
 ) -> None:

@@ -5,3 +5,4 @@ google-cloud-ndb==1.2.1
 grpcio==1.29.0
 oauth2client==4.1.3
 urlfetch==1.2.1
+pyre-extensions==0.0.18
