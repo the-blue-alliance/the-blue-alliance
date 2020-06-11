@@ -1,6 +1,6 @@
 from flask import Flask
 from backend.common.middleware import install_middleware
-from backend.common.profiler import send_request_context_traces
+from backend.common.profiler import send_traces
 from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.gameday import gameday
 from backend.web.handlers.index import index
@@ -25,4 +25,4 @@ register_template_filters(app)
 
 @app.teardown_request
 def teardown_request(exception):
-    send_request_context_traces()
+    send_traces()

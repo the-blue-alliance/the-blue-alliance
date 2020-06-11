@@ -5,7 +5,7 @@ from backend.common.middleware import install_middleware
 from backend.common.profiler import (
     TraceContext,
     trace_context,
-    send_request_context_traces,
+    send_traces,
 )
 
 
@@ -15,12 +15,12 @@ def setup_app():
 
     @app.teardown_request
     def teardown_request(exception):
-        send_request_context_traces()
+        send_traces()
 
     return app
 
 
-@patch("backend.common.profiler._send_traces")
+@patch("backend.common.profiler._make_tracing_call")
 def test_send_trace(mock_send_traces) -> None:
     app = setup_app()
 
@@ -40,7 +40,7 @@ def test_send_trace(mock_send_traces) -> None:
     mock_send_traces.assert_called()
 
 
-@patch("backend.common.profiler._send_traces")
+@patch("backend.common.profiler._make_tracing_call")
 def test_not_send_trace(mock_send_traces) -> None:
     app = setup_app()
 
@@ -60,7 +60,7 @@ def test_not_send_trace(mock_send_traces) -> None:
     mock_send_traces.assert_not_called()
 
 
-@patch("backend.common.profiler._send_traces")
+@patch("backend.common.profiler._make_tracing_call")
 def test_no_spans(mock_send_traces) -> None:
     app = setup_app()
 
@@ -79,7 +79,7 @@ def test_no_spans(mock_send_traces) -> None:
     mock_send_traces.assert_not_called()
 
 
-@patch("backend.common.profiler._send_traces")
+@patch("backend.common.profiler._make_tracing_call")
 def test_multiple_spans(mock_send_traces) -> None:
     app = setup_app()
 

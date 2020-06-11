@@ -16,7 +16,7 @@ trace_context = Local()
 PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", None)
 
 
-def send_request_context_traces():
+def send_traces():
     try:
         if (
             not hasattr(trace_context.request, "spans")
@@ -36,13 +36,13 @@ def send_request_context_traces():
             "spans": spans,
         }
         body = {"traces": [traces_body]}
-        _send_traces(body)
+        _make_tracing_call(body)
     except Exception as e:
-        logging.warning("send_request_context_traces() failed!")
+        logging.warning("send_traces() failed!")
         logging.exception(e)
 
 
-def _send_traces(body):
+def _make_tracing_call(body):
     if PROJECT_ID is None:
         return
 
@@ -98,7 +98,7 @@ class TraceContext(object):
         """
         Start a TraceContext
         Spans are saved in trace_context.request.spans on exit
-        Spans are sent by send_context_traces() which is called when the request context ends
+        Spans are sent by send_traces() which is called when the request context ends
         """
         self._spans = []
 
