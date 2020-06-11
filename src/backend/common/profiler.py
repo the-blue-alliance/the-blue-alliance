@@ -4,20 +4,46 @@ from datetime import datetime
 import logging
 import os
 import random
-import threading
+from werkzeug.local import Local
 
 from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
 
 
-# create a thread-local global context
-trace_context = threading.local()
+# create a request-local global context
+trace_context = Local()
 
 PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", None)
 
 
-# TODO: send to task queue
-def send_trace(projectId, trace_body):
+def send_traces():
+    try:
+        if (
+            not hasattr(trace_context.request, "spans")
+            or len(trace_context.request.spans) == 0
+        ):
+            return
+
+        _make_tracing_call(
+            {
+                "traces": [
+                    {
+                        "projectId": PROJECT_ID,
+                        "traceId": trace_context.request.trace_id,
+                        "spans": trace_context.request.spans,
+                    }
+                ]
+            }
+        )
+    except Exception as e:
+        logging.warning("send_traces() failed!")
+        logging.exception(e)
+
+
+def _make_tracing_call(body):
+    if PROJECT_ID is None:
+        return
+
     # Authentication is provided by the 'gcloud' tool when running locally
     # and by built-in service accounts when running on GAE, GCE, or GKE.
     # See https://developers.google.com/identity/protocols/application-default-credentials for more information.
@@ -31,111 +57,56 @@ def send_trace(projectId, trace_body):
     )
 
     # Actually submit the patched tracing data.
-    request = service.projects().patchTraces(projectId=projectId, body=trace_body)
+    request = service.projects().patchTraces(projectId=PROJECT_ID, body=body)
     request.execute()
 
 
 class Span(object):
-    def __init__(self, name: str, doTrace: bool, kind: str = "SPAN_KIND_UNSPECIFIED"):
-        self.id = str(random.getrandbits(64))
-        self.name = name
-        self.doTrace = doTrace
-        self.kind = kind
-
-    def start(self):
-        if self.doTrace:
-            logging.info("CREATED SPAN: {}".format(self.name))
-        self.startTime = datetime.now()
-
-    def finish(self):
-        self.endTime = datetime.now()
-
-    # Helpers for scope-specific use cases
-    def __enter__(self):
-        self.start()
-        return self
-
-    def __exit__(self, type, value, tb):
-        self.finish()
-
-    def json(self):
-        """Format as a dictionary of the correct shape for sending to the Cloud
-        Trace REST API as a JSON object"""
-        j = {
-            "kind": self.kind,
-            "name": self.name,
-            "spanId": self.id,
-            "startTime": self.startTime.isoformat() + "Z",
-            "endTime": self.endTime.isoformat() + "Z",
-        }
-        return j
-
-
-class TraceContext(object):
-    def __init__(self, sendTrace=True):
+    def __init__(self, name: str):
         """
-        If sendTrace is False, it will rely on a later TraceContext to send trace data.
-        No data will be sent if there is no other TraceContext for this request.
+        Start a Span
+        Spans are saved in trace_context.request.spans on exit
+        Spans are sent by send_traces() which is called when the request context ends
         """
+        self._name = name
+
         if hasattr(trace_context, "request") and trace_context.request:
-            self._tcontext = trace_context.request.headers.get(
+            tcontext = trace_context.request.headers.get(
                 "X-Cloud-Trace-Context", "NNNN/NNNN;xxxxx"
             )
-            self._doTrace = ";o=1" in self._tcontext
+            self._do_trace = ";o=1" in tcontext
+            if self._do_trace:
+                logging.info("Trace Context: {}".format(tcontext))
+
+            # Breakup our given cloud tracing context so we can get the flags out of it
+            trace_id, root_span_id = tcontext.split(";")[0].split("/")
+            trace_context.request.trace_id = trace_id
+            self._root_span_id = root_span_id
+
         else:
-            self._doTrace = False
-
-        if self._doTrace:
-            logging.info("Trace Context: {}".format(self._tcontext))
-
-        self._sendTrace = sendTrace
+            self._do_trace = False
 
     def __enter__(self):
-        self.start()
+        if self._do_trace:
+            logging.info("CREATED SPAN: {}".format(self._name))
+        self._startTime = datetime.now()
         return self
 
-    def start(self):
-        if self._doTrace:
-            if not hasattr(trace_context, "_open_contexts"):
-                trace_context._open_contexts = 0
-                trace_context.spans = []
-            trace_context._open_contexts += 1
-
     def __exit__(self, exc_type, exc_value, traceback):
-        self.finish()
+        self._endTime = datetime.now()
+        if self._do_trace:
+            if not hasattr(trace_context.request, "spans"):
+                trace_context.request.spans = []
+            trace_context.request.spans.append(self.dict())
 
-    def finish(self):
-        if self._doTrace:
-            trace_context._open_contexts -= 1
-            if trace_context._open_contexts == 0 and self._sendTrace:
-                self.write()
-                trace_context.spans = []
-
-    def span(self, name: str = ""):
-        spn = Span(name, self._doTrace)
-        if self._doTrace:
-            trace_context.spans.append(spn)  # pyre-ignore[16]
-        return spn
-
-    def write(self):
-        try:
-            # Breakup our given cloud tracing context so we can get the flags out of it
-            trace_id, root_span_id = self._tcontext.split(";")[0].split("/")
-
-            # Grab our spans object as a json blob
-            spans = [s.json() for s in trace_context.spans]
-
-            # catch
-            if len(spans) == 0:
-                return
-
-            for s in spans:
-                s["parentSpanId"] = root_span_id
-
-            traces_body = {"projectId": PROJECT_ID, "traceId": trace_id, "spans": spans}
-            body = {"traces": [traces_body]}
-
-            send_trace(PROJECT_ID, body)  # TODO: send to task queue
-        except Exception as e:
-            logging.warning("TraceContext.write() failed!")
-            logging.exception(e)
+    def dict(self):
+        """Format as a dictionary of the correct shape for sending to the Cloud
+        Trace REST API as a JSON object"""
+        return {
+            "kind": "SPAN_KIND_UNSPECIFIED",
+            "name": self._name,
+            "parentSpanId": self._root_span_id,
+            "spanId": str(random.getrandbits(64)),
+            "startTime": self._startTime.isoformat() + "Z",
+            "endTime": self._endTime.isoformat() + "Z",
+        }

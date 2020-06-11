@@ -1,4 +1,4 @@
-from backend.common.profiler import trace_context
+from backend.common.profiler import trace_context, send_traces
 from flask import Flask
 from google.cloud import ndb
 from typing import Any, Callable
@@ -34,9 +34,13 @@ class TraceRequestMiddleware(object):
         self.app = app
 
     def __call__(self, environ: Any, start_response: Any):
-        trace_context.request = Request(environ)
+        trace_context.request = Request(environ)  # pyre-ignore[16]
         return self.app(environ, start_response)
 
 
 def install_middleware(app: Flask) -> None:
     app.wsgi_app = NdbMiddleware(TraceRequestMiddleware(app.wsgi_app))  # type: ignore[override]
+
+    @app.teardown_request
+    def teardown_request(exception):
+        send_traces()
