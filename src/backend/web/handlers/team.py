@@ -29,7 +29,7 @@ def team_canonical(team_number: int) -> str:
         "hof": {},
         "medias_by_slugname": {},
     }
-    return render_template("team_details.html", **template_values)
+    return render_template("team_details.html", template_values)
 
 
 def team_list(page: int) -> str:
@@ -64,4 +64,4 @@ def team_list(page: int) -> str:
         "cur_page_label": cur_page_label,
         "current_page": page,
     }
-    return render_template("team_list.html", **template_values)
+    return render_template("team_list.html", template_values)

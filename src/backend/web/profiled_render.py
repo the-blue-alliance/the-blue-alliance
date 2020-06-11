@@ -1,7 +1,7 @@
-from flask import render_template
+from flask import render_template as flask_render_template
 from backend.common.profiler import Span
 
 
-def render(template, **template_values):
+def render_template(template, template_values):
     with Span("render_template"):
-        render_template(template, template_values)
+        return flask_render_template(template, **template_values)
