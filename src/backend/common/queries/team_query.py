@@ -1,11 +1,14 @@
 from backend.common.models.team import Team
 from backend.common.typed_future import TypedFuture
 from backend.common.queries.database_query import DatabaseQuery
+from backend.common.queries.dict_converters.team_converter import TeamConverter
 from google.cloud import ndb
 from typing import List
 
 
 class TeamQuery(DatabaseQuery[Team]):
+    DICT_CONVERTER = TeamConverter
+
     @ndb.tasklet
     def _query_async(self, team_key: str) -> TypedFuture[Team]:
         team = yield Team.get_by_id_async(team_key)
@@ -13,7 +16,7 @@ class TeamQuery(DatabaseQuery[Team]):
 
 
 class TeamListQuery(DatabaseQuery[List[Team]]):
-
+    DICT_CONVERTER = TeamConverter
     PAGE_SIZE: int = 500
 
     @ndb.tasklet
