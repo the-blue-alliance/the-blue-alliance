@@ -8,3 +8,4 @@ pytest-custom_exit_code
 pytest-testmon
 InMemoryCloudDatastoreStub
 beautifulsoup4
+freezegun

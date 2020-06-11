@@ -1,5 +1,18 @@
 # Development Runbook
 
+## Starting the Dev Environment
+
+We recommend running a local version of The Blue Alliance inside a [docker](https://www.docker.com/) container. You can use [vagrant](https://www.vagrantup.com/) to provision the entire environment.
+
+Local Dependencies:
+ - [python3](https://wiki.python.org/moin/BeginnersGuide/Download)
+ - [docker](https://www.docker.com/)
+ - [vagrant](https://www.vagrantup.com/)
+
+You can start the container locally by running `vagrant up`. Once the setup is complete, TBA should be accessable in a web browser at `localhost:8080`.
+
+Once the container is running, you can print all the relevant logs (including the `dev_appserver` logs) on the host machine by running `./ops/dev/host.sh`.
+
 ## Bootstrapping Data
 
 (TODO: Update for Python 3)
@@ -57,10 +70,11 @@ If you run into issues, especially after not working with your dev instance for 
 $ vagrant up --provision
 ```
 
-The Vagrant container may be out of date as well. In this situation, destroy and recreate your local Vagrant image.
+The Vagrant container may be out of date as well. In this situation, destroy and recreate your local Vagrant image. You should also be sure you have the most up to date base container image.
 ```
 $ vagrant halt
 $ vagrant destroy
+$ docker pull gcr.io/tbatv-prod-hrd/tba-py3-dev:latest
 $ vagrant up
 ```
 
@@ -70,6 +84,15 @@ $ docker stop tba
 $ docker rm tba
 $ vagrant up
 ```
+
+## Configuring the Development Environment
+
+It is possible to change the way the local instance inside the dev container runs using a local configuration file. The defaults are checked into the repo as `tba_dev_config.json` and should be sufficient for most everyday use. However, if you want to configure overrides locally, add a json file to `tba_dev_config.local.json` (which will be ignored by `git`). Note that you need to `halt` and restart the development container for changes to take effect.
+
+Available configuration keys:
+ - `datastore_mode` can be either `local` or `remote`. By default this is set to `local` and will use the [datastore emulator](https://cloud.google.com/datastore/docs/tools/datastore-emulator) bundled with the App Engine SDK. If instead, you want to point your instance to a real datatsore instance, set this to `remote` and also set the `google_application_credentials` property
+ - `google_application_credentials` is a path (relative to the repository root) to a [service account JSON key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) used to authenticate to a production Google Cloud service. We recommend to put these in `ops/dev/keys` (which will be ignored by `git`). Example: `ops/dev/keys/tba-prod-key.json`
+ - `log_level`: This will be used to set the `--log-level` flag when invoking `dev_appserver`. See the [documentation](https://cloud.google.com/appengine/docs/standard/python3/tools/local-devserver-command) for allowed values.
 
 ## Generating Type Checker Stubs
 The `stubs/` folder contains [type hint stubs](https://www.python.org/dev/peps/pep-0484/#stub-files) for third-party dependencies that do not natively contain type hints. These type hints are necessary for [pyre](https://pyre-check.org/) (our type checker) to run successfully. In order to generate stubs for a third-party library, run [`stubgen`](https://mypy.readthedocs.io/en/stable/stubgen.html) for the third-party package. For For example, to generate stubs for the `google.cloud.ndb` library -
