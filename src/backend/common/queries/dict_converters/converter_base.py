@@ -1,6 +1,8 @@
 import abc
-from backend.common.queries.types import QueryReturn
 from typing import Generic, List, Union
+
+from backend.common.queries.types import QueryReturn
+from backend.common.profiler import TraceContext
 
 
 class ConverterBase(Generic[QueryReturn]):
@@ -10,13 +12,15 @@ class ConverterBase(Generic[QueryReturn]):
         self._query_return = query_return
 
     def convert(self, version: int) -> Union[None, dict, List[dict]]:
-        converted_query_return = self._convert_list(
-            self._listify(self._query_return), version
-        )
-        if isinstance(self._query_return, list):
-            return converted_query_return
-        else:
-            return self._delistify(converted_query_return)
+        with TraceContext() as root:
+            with root.span("{}.convert".format(self.__class__.__name__)):
+                converted_query_return = self._convert_list(
+                    self._listify(self._query_return), version
+                )
+                if isinstance(self._query_return, list):
+                    return converted_query_return
+                else:
+                    return self._delistify(converted_query_return)
 
     @abc.abstractmethod
     def _convert_list(self, model_list: list, version: int) -> List[dict]:
