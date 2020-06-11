@@ -17,18 +17,34 @@ PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", None)
 
 
 def send_request_context_traces():
-    # Grab our spans object as a json blob
-    spans = [s.json() for s in trace_context.request.spans]
+    try:
+        if (
+            not hasattr(trace_context.request, "spans")
+            or len(trace_context.request.spans) == 0
+        ):
+            return
 
-    for s in spans:
-        s["parentSpanId"] = trace_context.request.root_span_id
+        # Grab our spans object as a json blob
+        spans = [s.json() for s in trace_context.request.spans]
 
-    traces_body = {
-        "projectId": PROJECT_ID,
-        "traceId": trace_context.request.trace_id,
-        "spans": spans,
-    }
-    body = {"traces": [traces_body]}
+        for s in spans:
+            s["parentSpanId"] = trace_context.request.root_span_id
+
+        traces_body = {
+            "projectId": PROJECT_ID,
+            "traceId": trace_context.request.trace_id,
+            "spans": spans,
+        }
+        body = {"traces": [traces_body]}
+        _send_traces(body)
+    except Exception as e:
+        logging.warning("send_request_context_traces() failed!")
+        logging.exception(e)
+
+
+def _send_traces(body):
+    if PROJECT_ID is None:
+        return
 
     # Authentication is provided by the 'gcloud' tool when running locally
     # and by built-in service accounts when running on GAE, GCE, or GKE.
@@ -98,7 +114,6 @@ class TraceContext(object):
             trace_context.request.root_span_id = root_span_id
         else:
             self._do_trace = False
-        self._do_trace = True  # TODO: remove
 
         if self._do_trace:
             logging.info("Trace Context: {}".format(tcontext))
@@ -107,9 +122,10 @@ class TraceContext(object):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        if not hasattr(trace_context.request, "spans"):
-            trace_context.request.spans = []
-        trace_context.request.spans += self._spans
+        if self._do_trace:
+            if not hasattr(trace_context.request, "spans"):
+                trace_context.request.spans = []
+            trace_context.request.spans += self._spans
 
     def span(self, name: str = ""):
         spn = Span(name, self._do_trace)

@@ -1,69 +1,106 @@
+from flask import Flask
 from unittest.mock import patch
 
-from backend.common.profiler import TraceContext, trace_context
+from backend.common.middleware import install_middleware
+from backend.common.profiler import (
+    TraceContext,
+    trace_context,
+    send_request_context_traces,
+)
 
 
-class FakeRequest(object):
-    def __init__(self, headers):
-        self.headers = headers
+def setup_app():
+    app = Flask(__name__)
+    install_middleware(app)
+
+    @app.teardown_request
+    def teardown_request(exception):
+        send_request_context_traces()
+
+    return app
 
 
-@patch("backend.common.profiler.send_trace")
-def test_send_trace(mock_send_trace) -> None:
-    trace_context.request = FakeRequest(
-        {"X-Cloud-Trace-Context": "TRACE_ID/SPAN_ID;o=1"}
-    )
+@patch("backend.common.profiler._send_traces")
+def test_send_trace(mock_send_traces) -> None:
+    app = setup_app()
 
-    mock_send_trace.assert_not_called()
+    @app.route("/")
+    def route():
+        with TraceContext() as root:
+            with root.span("test_span"):
+                return "Hi!"
+                assert len(root._spans) == 1
+        assert len(trace_context.request.spans) == 1
 
-    with TraceContext() as root:
-        with root.span("test_span"):
-            assert len(trace_context.spans) == 1  # pyre-ignore[16]
+    mock_send_traces.assert_not_called()
 
-    assert len(trace_context.spans) == 0
-    mock_send_trace.assert_called()
+    with app.test_client() as client:
+        client.get("/", headers={"X-Cloud-Trace-Context": "TRACE_ID/SPAN_ID;o=1"})
 
-
-@patch("backend.common.profiler.send_trace")
-def test_not_send_trace(mock_send_trace) -> None:
-    trace_context.request = FakeRequest(
-        {"X-Cloud-Trace-Context": "TRACE_ID/SPAN_ID;o=0"}
-    )
-
-    mock_send_trace.assert_not_called()
-
-    with TraceContext() as root:
-        with root.span("test_span"):
-            assert len(trace_context.spans) == 0  # pyre-ignore[16]
-
-    assert len(trace_context.spans) == 0
-    mock_send_trace.assert_not_called()
+    mock_send_traces.assert_called()
 
 
-@patch("backend.common.profiler.send_trace")
-def test_no_spans(mock_send_trace) -> None:
-    trace_context.request = FakeRequest(
-        {"X-Cloud-Trace-Context": "TRACE_ID/SPAN_ID;o=1"}
-    )
+@patch("backend.common.profiler._send_traces")
+def test_not_send_trace(mock_send_traces) -> None:
+    app = setup_app()
 
-    mock_send_trace.assert_not_called()
+    @app.route("/")
+    def route():
+        with TraceContext() as root:
+            with root.span("test_span"):
+                return "Hi!"
+                assert len(root._spans) == 1
+        assert len(trace_context.request.spans) == 1
 
-    with TraceContext():
-        assert len(trace_context.spans) == 0  # pyre-ignore[16]
+    mock_send_traces.assert_not_called()
 
-    assert len(trace_context.spans) == 0
-    mock_send_trace.assert_not_called()
+    with app.test_client() as client:
+        client.get("/", headers={"X-Cloud-Trace-Context": "TRACE_ID/SPAN_ID;o=0"})
+
+    mock_send_traces.assert_not_called()
 
 
-@patch("backend.common.profiler.send_trace")
-def test_no_request(mock_send_trace) -> None:
-    del trace_context.request  # pyre-ignore[16]
+@patch("backend.common.profiler._send_traces")
+def test_no_spans(mock_send_traces) -> None:
+    app = setup_app()
 
-    mock_send_trace.assert_not_called()
+    @app.route("/")
+    def route():
+        with TraceContext() as root:
+            return "Hi!"
+            assert len(root._spans) == 0
+        assert len(trace_context.request.spans) == 0
 
-    with TraceContext() as root:
-        with root.span("test_span"):
-            assert len(trace_context.spans) == 0  # pyre-ignore[16]
+    mock_send_traces.assert_not_called()
 
-    assert len(trace_context.spans) == 0
-    mock_send_trace.assert_not_called()
+    with app.test_client() as client:
+        client.get("/", headers={"X-Cloud-Trace-Context": "TRACE_ID/SPAN_ID;o=1"})
+
+    mock_send_traces.assert_not_called()
+
+
+@patch("backend.common.profiler._send_traces")
+def test_multiple_spans(mock_send_traces) -> None:
+    app = setup_app()
+
+    @app.route("/")
+    def route():
+        with TraceContext() as root1:
+            with root1.span("test_span_1"):
+                pass
+            with root1.span("test_span_2"):
+                pass
+
+        with TraceContext() as root2:
+            with root2.span("test_span_3"):
+                pass
+
+        return "Hi!"
+        assert len(trace_context.request.spans) == 3
+
+    mock_send_traces.assert_not_called()
+
+    with app.test_client() as client:
+        client.get("/", headers={"X-Cloud-Trace-Context": "TRACE_ID/SPAN_ID;o=1"})
+
+    mock_send_traces.assert_called()
