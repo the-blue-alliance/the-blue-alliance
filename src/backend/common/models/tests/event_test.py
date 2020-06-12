@@ -1,5 +1,7 @@
+import json
 import pytest
 from backend.common.consts.event_type import EventType
+from backend.common.consts.webcast_type import WebcastType
 from backend.common.models.event import Event
 from datetime import datetime
 from freezegun import freeze_time
@@ -183,3 +185,36 @@ def test_location(
 def test_city_state_country(city: str, state: str, country: str, output: str) -> None:
     event = Event(city=city, state_prov=state, country=country,)
     assert event.city_state_country == output
+
+
+@freeze_time("2020-02-01")
+def test_webcasts() -> None:
+    event = Event(
+        start_date=datetime(2020, 2, 1),
+        end_date=datetime(2020, 2, 3),
+        webcast_json=json.dumps(
+            [
+                {"type": "youtube", "channel": "meow", "date": "2020-02-01"},
+                {"type": "twitch", "channel": "firstinspires"},
+            ]
+        ),
+    )
+    webcasts = event.webcast
+    assert webcasts is not None
+    assert len(webcasts) == 2
+    assert webcasts[0] == {
+        "type": WebcastType.TWITCH,
+        "channel": "firstinspires",
+    }
+    assert webcasts[1] == {
+        "type": WebcastType.YOUTUBE,
+        "channel": "meow",
+        "date": "2020-02-01",
+    }
+
+    assert len(event.current_webcasts) == 2
+    with freeze_time("2020-02-02"):
+        # go to some other time where the first webcast is not active
+        assert len(event.current_webcasts) == 1
+
+    assert event.has_first_official_webcast is True
