@@ -1,4 +1,4 @@
-from backend.common.typed_future import TypedFuture
+from backend.common.futures import TypedFuture
 from backend.common.queries.database_query import DatabaseQuery
 from google.cloud import ndb
 from typing import List

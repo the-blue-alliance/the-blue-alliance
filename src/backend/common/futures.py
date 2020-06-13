@@ -48,3 +48,15 @@ class TypedFuture(ndb.Future, Generic[T]):
 
     def cancelled(self) -> bool:
         return super().cancelled()
+
+
+class InstantFuture(TypedFuture[T], Generic[T]):
+    def __init__(self, result: T):
+        super().__init__()
+        self.set_result(result)
+
+
+class FailedFuture(TypedFuture[T], Generic[T]):
+    def __init__(self, exception: Exception):
+        super().__init__()
+        self.set_exception(exception)
