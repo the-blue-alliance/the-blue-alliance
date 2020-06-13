@@ -3,6 +3,7 @@ from backend.common.typed_future import TypedFuture
 from backend.common.profiler import Span
 from google.cloud import ndb
 from typing import TypeVar, Generic
+from pyre_extensions import safe_cast
 
 
 QueryReturn = TypeVar("QueryReturn")
@@ -26,6 +27,4 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn]):
     def fetch_async(self) -> TypedFuture[QueryReturn]:
         with Span("{}.fetch_async".format(self.__class__.__name__)):
             query_result = yield self._query_async(**self._query_args)
-            # Type-hinting the tasklet decorator is hard, but it consumes
-            # the generator and returns the overall future
-            return query_result  # pyre-ignore
+            return safe_cast(TypedFuture[QueryReturn], query_result)
