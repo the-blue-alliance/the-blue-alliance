@@ -2,7 +2,7 @@ import abc
 from backend.common.futures import TypedFuture
 from backend.common.profiler import Span
 from google.cloud import ndb
-from typing import TypeVar, Generic
+from typing import TypeVar, Generic, Union
 from pyre_extensions import safe_cast
 
 
@@ -17,7 +17,8 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn]):
         self._query_args = kwargs
 
     @abc.abstractmethod
-    def _query_async(self) -> TypedFuture[QueryReturn]:
+    def _query_async(self) -> Union[QueryReturn, TypedFuture[QueryReturn]]:
+        # The tasklet wrapper will wrap a raw value in a future if necessary
         ...
 
     def fetch(self) -> QueryReturn:

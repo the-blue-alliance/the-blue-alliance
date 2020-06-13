@@ -2,12 +2,12 @@ from backend.common.models.team import Team
 from backend.common.futures import TypedFuture
 from backend.common.queries.database_query import DatabaseQuery
 from google.cloud import ndb
-from typing import List
+from typing import List, Optional
 
 
-class TeamQuery(DatabaseQuery[Team]):
+class TeamQuery(DatabaseQuery[Optional[Team]]):
     @ndb.tasklet
-    def _query_async(self, team_key: str) -> TypedFuture[Team]:
+    def _query_async(self, team_key: str) -> TypedFuture[Optional[Team]]:
         team = yield Team.get_by_id_async(team_key)
         raise ndb.Return(team)
 
