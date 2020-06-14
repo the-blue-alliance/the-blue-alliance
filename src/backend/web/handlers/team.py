@@ -32,6 +32,14 @@ def team_canonical(team_number: int) -> str:
     return render_template("team_details.html", template_values)
 
 
+def team_detail(team_number: int, year: int) -> str:
+    pass
+
+
+def team_history(team_number: int) -> str:
+    pass
+
+
 def team_list(page: int) -> str:
     page_labels = []
     cur_page_label = ""
