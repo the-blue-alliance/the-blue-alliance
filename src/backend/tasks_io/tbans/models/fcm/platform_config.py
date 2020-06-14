@@ -1,7 +1,14 @@
-from consts.fcm.platform_priority import PlatformPriority
+from __future__ import annotations
+
+from typing import Optional
+
+from pyre_extensions import none_throws
+
+from backend.tasks_io.tbans.consts.fcm.platform_priority import PlatformPriority
+from backend.tasks_io.tbans.consts.fcm.platform_type import PlatformType
 
 
-class PlatformConfig(object):
+class PlatformConfig:
     """
     Represents platform-specific push notification configuration options.
 
@@ -9,14 +16,19 @@ class PlatformConfig(object):
 
     Args:
         collapse_key (string): Collapse key for push notification - may be None.
-        priority (int): Priority for push notification - may be None.
+        priority (PlatformPriority): Priority for push notification - may be None.
     """
+
     # TODO: Add ttl
-    def __init__(self, collapse_key=None, priority=None):
+    def __init__(
+        self,
+        collapse_key: Optional[str] = None,
+        priority: Optional[PlatformPriority] = None,
+    ) -> None:
         """
         Args:
             collapse_key (string): Collapse key for push notification - may be None.
-            priority (int): Priority for push notification - may be None.
+            priority (PlatformPriority): Priority for push notification - may be None.
         """
         self.collapse_key = collapse_key
 
@@ -25,10 +37,12 @@ class PlatformConfig(object):
             PlatformPriority.validate(priority)
         self.priority = priority
 
-    def __str__(self):
-        return 'PlatformConfig(collapse_key="{}" priority={})'.format(self.collapse_key, self.priority)
+    def __str__(self) -> str:
+        return 'PlatformConfig(collapse_key="{}" priority={})'.format(
+            self.collapse_key, self.priority
+        )
 
-    def platform_config(self, platform_type):
+    def platform_config(self, platform_type: PlatformType) -> PlatformConfig:
         """ Return a platform-specific configuration object for a platform_type, given the platform payload.
 
         Args:
@@ -37,27 +51,36 @@ class PlatformConfig(object):
         Returns:
             object: Either a AndroidConfig, ApnsConfig, or WebpushConfig depending on the platform_type.
         """
-        from consts.fcm.platform_type import PlatformType
+        from backend.tasks_io.tbans.consts.fcm.platform_type import PlatformType
+
         # Validate that platform_type is supported
         PlatformType.validate(platform_type)
 
         from firebase_admin import messaging
+
         if platform_type == PlatformType.ANDROID:
-            priority = PlatformPriority.platform_priority(platform_type, self.priority) \
-                if self.priority is not None else None
+            priority = None
+            if self.priority is not None:
+                priority = PlatformPriority.platform_priority(
+                    platform_type, none_throws(self.priority)
+                )
 
             return messaging.AndroidConfig(
-                collapse_key=self.collapse_key,
-                priority=priority
+                collapse_key=self.collapse_key, priority=priority
             )
         else:
             headers = {}
 
             if self.collapse_key:
-                headers[PlatformType.collapse_key_key(platform_type)] = self.collapse_key
+                headers[
+                    PlatformType.collapse_key_key(platform_type)
+                ] = self.collapse_key
 
+            priority = None
             if self.priority is not None:
-                priority = PlatformPriority.platform_priority(platform_type, self.priority)
+                priority = PlatformPriority.platform_priority(
+                    platform_type, none_throws(self.priority)
+                )
                 headers[PlatformType.priority_key(platform_type)] = priority
 
             # Null out headers if they're empty
@@ -71,4 +94,8 @@ class PlatformConfig(object):
             elif platform_type == PlatformType.WEBPUSH:
                 return messaging.WebpushConfig(headers=headers)
             else:
-                raise TypeError("Unsupported PlatformPayload platform_type: {}".format(platform_type))
+                raise TypeError(
+                    "Unsupported PlatformPayload platform_type: {}".format(
+                        platform_type
+                    )
+                )

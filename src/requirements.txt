@@ -1,4 +1,5 @@
 gunicorn==20.0.4
+firebase_admin==4.3.0
 Flask==1.1.2
 google-api-python-client==1.9.1
 google-cloud-ndb==1.2.1
