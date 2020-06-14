@@ -1,13 +1,17 @@
 import json
+from datetime import datetime
+from typing import Optional
+
 import pytest
+from freezegun import freeze_time
+
 from backend.common.consts.event_type import EventType
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.models.event import Event
-from datetime import datetime
-from freezegun import freeze_time
-from typing import Optional
-
-from .util import CITY_STATE_COUNTRY_PARAMETERS, LOCATION_PARAMETERS
+from backend.common.models.tests.util import (
+    CITY_STATE_COUNTRY_PARAMETERS,
+    LOCATION_PARAMETERS,
+)
 
 
 @pytest.mark.parametrize("key", ["2010ct", "2014onto2"])

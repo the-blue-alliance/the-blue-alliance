@@ -1,5 +1,6 @@
 import enum
 from typing import List, Optional
+
 from typing_extensions import TypedDict
 
 

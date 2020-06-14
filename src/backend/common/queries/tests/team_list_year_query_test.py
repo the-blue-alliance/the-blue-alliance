@@ -1,9 +1,11 @@
+from typing import List, Optional
+
 from google.cloud import ndb
+
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.team import Team
 from backend.common.queries.team_query import TeamListYearQuery
-from typing import List, Optional
 
 
 def preseed_teams(start_team: int, end_team: Optional[int] = None) -> List[ndb.Key]:

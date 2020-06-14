@@ -1,13 +1,14 @@
-from backend.common.middleware import (
-    NdbMiddleware,
-    TraceRequestMiddleware,
-    install_middleware,
-)
-from backend.common.profiler import trace_context
 import flask
 from flask import Flask
 from google.cloud.ndb import context as context_module
 from werkzeug.wrappers import Request
+
+from backend.common.middleware import (
+    install_middleware,
+    NdbMiddleware,
+    TraceRequestMiddleware,
+)
+from backend.common.profiler import trace_context
 
 
 def test_NdbMiddleware_init(app: Flask) -> None:

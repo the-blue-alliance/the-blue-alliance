@@ -1,4 +1,7 @@
+from typing import List, Optional
+
 from google.cloud import ndb
+
 from backend.common.consts.event_type import EventType
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
@@ -8,7 +11,6 @@ from backend.common.queries.event_query import (
     TeamYearEventsQuery,
     TeamYearEventTeamsQuery,
 )
-from typing import List, Optional
 
 
 def preseed_events(year: int, n: int) -> List[str]:

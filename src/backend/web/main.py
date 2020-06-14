@@ -1,4 +1,5 @@
 from flask import Flask
+
 from backend.common.middleware import install_middleware
 from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.gameday import gameday

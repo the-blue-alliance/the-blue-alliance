@@ -1,5 +1,6 @@
-from google.cloud import ndb
 import pytest
+
+from google.cloud import ndb
 
 
 @pytest.fixture(autouse=True)

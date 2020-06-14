@@ -1,7 +1,8 @@
-from google.cloud import ndb
-import pytest
 from unittest.mock import patch
-from urllib.parse import urlparse, parse_qsl
+from urllib.parse import parse_qsl, urlparse
+
+import pytest
+from google.cloud import ndb
 
 from backend.common.google_analytics import GoogleAnalytics
 

@@ -1,4 +1,5 @@
 from flask import Flask
+
 from backend.api.handlers.root import root
 from backend.common.middleware import install_middleware
 

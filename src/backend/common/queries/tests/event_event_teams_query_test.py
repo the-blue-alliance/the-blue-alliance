@@ -1,4 +1,5 @@
 from google.cloud import ndb
+
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.team import Team

@@ -1,9 +1,8 @@
 import pytest
-
+from _pytest.monkeypatch import MonkeyPatch
 from google.cloud import ndb
 from google.cloud.datastore_v1.proto import datastore_pb2_grpc
 from google.cloud.ndb import _datastore_api
-from _pytest.monkeypatch import MonkeyPatch
 from InMemoryCloudDatastoreStub import datastore_stub
 
 

@@ -1,6 +1,7 @@
 import types
-from google.cloud import ndb
 from typing import Callable, Generic, Optional, TypeVar
+
+from google.cloud import ndb
 
 
 T = TypeVar("T")

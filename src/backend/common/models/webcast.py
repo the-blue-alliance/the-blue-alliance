@@ -1,4 +1,5 @@
 from typing_extensions import TypedDict
+
 from backend.common.consts.webcast_type import WebcastType
 
 

@@ -1,9 +1,11 @@
 import abc
+from typing import Generic, TypeVar, Union
+
+from google.cloud import ndb
+from pyre_extensions import safe_cast
+
 from backend.common.futures import TypedFuture
 from backend.common.profiler import Span
-from google.cloud import ndb
-from typing import TypeVar, Generic, Union
-from pyre_extensions import safe_cast
 
 
 QueryReturn = TypeVar("QueryReturn")
