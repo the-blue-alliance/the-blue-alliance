@@ -1,6 +1,8 @@
 from google.cloud import ndb
 from backend.common.queries.database_query import DatabaseQuery
 from backend.common.models.event import Event
+from backend.common.models.event_team import EventTeam
+from backend.common.models.team import Team
 from backend.common.futures import TypedFuture
 from typing import List, Optional
 
@@ -27,44 +29,43 @@ class DistrictEventsQuery(DatabaseQuery[List[Event]]):
         events = yield Event.query(
             Event.district_key == ndb.Key(District, district_key)).fetch_async()
         return events
-
-
-class TeamEventsQuery(DatabaseQuery[List[Event]]):
-
-    @ndb.tasklet
-    def _query_async(self, team_key: str) -> TypedFuture[List[Event]]:
-        event_teams = yield EventTeam.query(EventTeam.team == ndb.Key(Team, team_key)).fetch_async()
-        event_keys = map(lambda event_team: event_team.event, event_teams)
-        events = yield ndb.get_multi_async(event_keys)
-        return events
-
-
-class TeamYearEventsQuery(DatabaseQuery[List[Event]]):
-
-    @ndb.tasklet
-    def _query_async(self, team_key: str, year: int) -> TypedFuture[List[Event]]:
-        event_teams = yield EventTeam.query(
-            EventTeam.team == ndb.Key(Team, team_key),
-            EventTeam.year == year).fetch_async()
-        event_keys = map(lambda event_team: event_team.event, event_teams)
-        events = yield ndb.get_multi_async(event_keys)
-        return events
-
-
-class TeamYearEventTeamsQuery(DatabaseQuery[List[EventTeam]]):
-
-    @ndb.tasklet
-    def _query_async(self, team_key: str, year: int) -> TypedFuture[List[EventTeam]]:
-        event_teams = yield EventTeam.query(
-            EventTeam.team == ndb.Key(Team, team_key),
-            EventTeam.year == year).fetch_async()
-        return event_teams
 """
 
 
-class EventDivisionsQuery(DatabaseQuery[List[TypedFuture[Event]]]):
+class TeamEventsQuery(DatabaseQuery[List[Event]]):
     @ndb.tasklet
-    def _query_async(self, event_key: str) -> List[TypedFuture[Event]]:
+    def _query_async(self, team_key: str) -> List[Event]:
+        event_teams = yield EventTeam.query(
+            EventTeam.team == ndb.Key(Team, team_key)
+        ).fetch_async()
+        event_keys = map(lambda event_team: event_team.event, event_teams)
+        events = yield ndb.get_multi_async(event_keys)
+        return list(events)
+
+
+class TeamYearEventsQuery(DatabaseQuery[List[Event]]):
+    @ndb.tasklet
+    def _query_async(self, team_key: str, year: int) -> List[Event]:
+        event_teams = yield EventTeam.query(
+            EventTeam.team == ndb.Key(Team, team_key), EventTeam.year == year
+        ).fetch_async()
+        event_keys = map(lambda event_team: event_team.event, event_teams)
+        events = yield ndb.get_multi_async(event_keys)
+        return list(events)
+
+
+class TeamYearEventTeamsQuery(DatabaseQuery[List[EventTeam]]):
+    @ndb.tasklet
+    def _query_async(self, team_key: str, year: int) -> TypedFuture[List[EventTeam]]:
+        event_teams = yield EventTeam.query(
+            EventTeam.team == ndb.Key(Team, team_key), EventTeam.year == year
+        ).fetch_async()
+        return event_teams
+
+
+class EventDivisionsQuery(DatabaseQuery[List[Event]]):
+    @ndb.tasklet
+    def _query_async(self, event_key: str) -> List[Event]:
         event = yield Event.get_by_id_async(event_key)
         if event is None:
             return []
