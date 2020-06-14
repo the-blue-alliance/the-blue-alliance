@@ -2,20 +2,15 @@ import datetime
 import json
 import re
 from typing import List, Optional
-from pyre_extensions import none_throws, safe_cast
-
-from backend.common.consts.playoff_type import PlayoffType
-
-# from consts.district_type import DistrictType
-from backend.common.consts import event_type
-from backend.common.consts.event_type import EventType
-from backend.common.models.webcast import Webcast
 
 from google.cloud import ndb
+from pyre_extensions import none_throws, safe_cast
 
-# from models.district import District
-# from models.event_details import EventDetails
+from backend.common.consts import event_type
+from backend.common.consts.event_type import EventType
+from backend.common.consts.playoff_type import PlayoffType
 from backend.common.models.location import Location
+from backend.common.models.webcast import Webcast
 
 
 class Event(ndb.Model):

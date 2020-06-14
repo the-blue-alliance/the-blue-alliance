@@ -1,4 +1,5 @@
 from google.cloud import ndb
+
 from backend.common.consts.event_type import EventType
 from backend.common.models.event import Event
 from backend.common.queries.event_query import EventDivisionsQuery

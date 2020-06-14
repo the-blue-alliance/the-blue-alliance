@@ -1,6 +1,7 @@
-from google.cloud import ndb
-import pytest
 from typing import Callable, List, Optional
+
+import pytest
+from google.cloud import ndb
 
 from backend.common.consts.client_type import ClientType
 from backend.common.models.account import Account

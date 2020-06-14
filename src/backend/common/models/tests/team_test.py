@@ -1,7 +1,10 @@
 import pytest
-from backend.common.models.team import Team
 
-from .util import CITY_STATE_COUNTRY_PARAMETERS, LOCATION_PARAMETERS
+from backend.common.models.team import Team
+from backend.common.models.tests.util import (
+    CITY_STATE_COUNTRY_PARAMETERS,
+    LOCATION_PARAMETERS,
+)
 
 
 @pytest.mark.parametrize("key", ["frc177", "frc1"])

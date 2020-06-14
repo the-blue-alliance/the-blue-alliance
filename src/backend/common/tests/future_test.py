@@ -1,5 +1,6 @@
 import pytest
-from backend.common.futures import TypedFuture, InstantFuture, FailedFuture
+
+from backend.common.futures import FailedFuture, InstantFuture, TypedFuture
 
 
 def test_instant_future() -> None:

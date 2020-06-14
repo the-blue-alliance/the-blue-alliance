@@ -1,13 +1,13 @@
 # From https://medium.com/google-cloud/custom-tracing-in-profiling-gae-using-the-stackdriver-api-b270288622c6
 
-from datetime import datetime
 import logging
 import os
 import random
-from werkzeug.local import Local
+from datetime import datetime
 
 from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
+from werkzeug.local import Local
 
 
 # create a request-local global context

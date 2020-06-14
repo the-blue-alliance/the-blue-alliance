@@ -1,9 +1,9 @@
 from google.cloud import ndb
+from pyre_extensions import safe_cast
 
 from backend.common.models.event import Event
 from backend.common.models.event_team_status import EventTeamStatus
 from backend.common.models.team import Team
-from pyre_extensions import safe_cast
 
 
 class EventTeam(ndb.Model):

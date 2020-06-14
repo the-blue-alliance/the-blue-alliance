@@ -1,5 +1,6 @@
-from flask import render_template
 from typing import Tuple, Union
+
+from flask import render_template
 
 
 def handle_404(_e: Union[int, Exception]) -> Tuple[str, int]:

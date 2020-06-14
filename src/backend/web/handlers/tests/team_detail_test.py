@@ -1,8 +1,10 @@
-import bs4
-from backend.common.models.team import Team
-from google.cloud import ndb
 from typing import NamedTuple, Optional
+
+import bs4
+from google.cloud import ndb
 from werkzeug.test import Client
+
+from backend.common.models.team import Team
 
 
 class TeamInfo(NamedTuple):

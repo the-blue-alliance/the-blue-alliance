@@ -1,7 +1,9 @@
+from typing import Optional
+
 from google.cloud import ndb
+
 from backend.common.models.team import Team
 from backend.common.queries.team_query import TeamListQuery
-from typing import Optional
 
 
 def preseed_teams(start_team: int, end_team: Optional[int] = None) -> None:

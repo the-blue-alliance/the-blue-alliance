@@ -1,10 +1,12 @@
+from typing import List, Optional, Set
+
+from google.cloud import ndb
+
+from backend.common.futures import TypedFuture
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.team import Team
-from backend.common.futures import TypedFuture
 from backend.common.queries.database_query import DatabaseQuery
-from google.cloud import ndb
-from typing import List, Set, Optional
 
 
 class TeamQuery(DatabaseQuery[Optional[Team]]):
