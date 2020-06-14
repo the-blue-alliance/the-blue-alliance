@@ -8,6 +8,7 @@ exclude =
   ./old_py2/
   ./stubs/
   ./subtrees/
+  ./venv/
 
 [flake8:local-plugins]
 extension =
