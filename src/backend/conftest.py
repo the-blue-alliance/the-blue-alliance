@@ -36,6 +36,6 @@ def ndb_client(init_ndb_env_vars, ndb_stub) -> ndb.Client:
 
 
 @pytest.fixture()
-def ndb_context(ndb_client):
+def ndb_context(ndb_client: ndb.Client):
     with ndb_client.context() as context:
         yield context

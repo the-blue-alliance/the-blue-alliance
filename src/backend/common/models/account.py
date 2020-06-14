@@ -1,10 +1,11 @@
-from google.appengine.ext import ndb
+from google.cloud import ndb
 
 
 class Account(ndb.Model):
     """
     Accounts represent accounts people use on TBA.
     """
+
     # Set by login/registration
     # Not editable by the user
     email = ndb.StringProperty()
