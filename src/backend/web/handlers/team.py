@@ -1,6 +1,9 @@
+import datetime
+
 from flask import abort
 
 from backend.common.models.team import Team
+from backend.common.queries.event_query import TeamYearEventsQuery
 from backend.common.queries.team_query import TeamListQuery, TeamQuery
 from backend.web.profiled_render import render_template
 
@@ -13,7 +16,7 @@ VALID_PAGES = range(
 )  # + 1 to make range inclusive
 
 
-def team_canonical(team_number: int) -> str:
+def team_detail(team_number: int, year: int) -> str:
     team_key = f"frc{team_number}"
     if not Team.validate_key_name(team_key):
         abort(404)
@@ -25,19 +28,32 @@ def team_canonical(team_number: int) -> str:
     template_values = {
         "team": team,
         # TODO stubbed stuff below
-        "year": 2020,
+        "year": year,
         "hof": {},
         "medias_by_slugname": {},
     }
     return render_template("team_details.html", template_values)
 
 
-def team_detail(team_number: int, year: int) -> str:
-    pass
-
-
 def team_history(team_number: int) -> str:
-    pass
+    abort(501)
+
+
+def team_canonical(team_number: int) -> str:
+    team_future = TeamQuery(team_key=f"frc{team_number}").fetch_async()
+    team = team_future.get_result()
+    if not team:
+        abort(404)
+
+    current_year = datetime.datetime.now().year
+    events_future = TeamYearEventsQuery(
+        team_key=team.key_name, year=current_year
+    ).fetch_async()
+    events = events_future.get_result()
+    if not events:
+        return team_history(team_number)
+
+    return team_detail(team_number, current_year)
 
 
 def team_list(page: int) -> str:
