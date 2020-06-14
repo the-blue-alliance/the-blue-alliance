@@ -3,6 +3,7 @@ from google.cloud import ndb
 from backend.common.models.event import Event
 from backend.common.models.event_team_status import EventTeamStatus
 from backend.common.models.team import Team
+from pyre_extensions import safe_cast
 
 
 class EventTeam(ndb.Model):
@@ -12,11 +13,11 @@ class EventTeam(ndb.Model):
     key_name is like 2010cmp_frc177 or 2007ct_frc195
     """
 
-    event: ndb.Key = ndb.KeyProperty(kind=Event)  # pyre-ignore[8]
-    team: ndb.Key = ndb.KeyProperty(kind=Team)  # pyre-ignore[8]
-    year: int = ndb.IntegerProperty()
+    event = ndb.KeyProperty(kind=Event)
+    team = ndb.KeyProperty(kind=Team)
+    year = ndb.IntegerProperty()
 
-    status: EventTeamStatus = ndb.JsonProperty()  # pyre-ignore[8]
+    status: EventTeamStatus = safe_cast(EventTeamStatus, ndb.JsonProperty())
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
