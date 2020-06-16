@@ -1,9 +1,10 @@
 import abc
-from typing import Generic, Type, Union
+from typing import Dict, Generic, Type, Union
 
 from google.cloud import ndb
 from pyre_extensions import safe_cast
 
+from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.futures import TypedFuture
 from backend.common.profiler import Span
 from backend.common.queries.dict_converters.converter_base import ConverterBase
@@ -33,11 +34,11 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn]):
             query_result = yield self._query_async(**self._query_args)
             return safe_cast(TypedFuture[QueryReturn], query_result)
 
-    def fetch_dict(self, version: int) -> dict:
+    def fetch_dict(self, version: ApiMajorVersion) -> Dict:
         return self.fetch_dict_async(version).get_result()
 
     @ndb.tasklet
-    def fetch_dict_async(self, version: int) -> TypedFuture[dict]:
+    def fetch_dict_async(self, version: ApiMajorVersion) -> TypedFuture[Dict]:
         query_result = yield self.fetch_async()
         if query_result is None:
             raise DoesNotExistException()

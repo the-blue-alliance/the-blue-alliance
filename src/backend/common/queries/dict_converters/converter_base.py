@@ -1,6 +1,7 @@
 import abc
 from typing import Dict, Generic, List, Union
 
+from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.profiler import Span
 from backend.common.queries.types import QueryReturn
 
@@ -11,7 +12,7 @@ class ConverterBase(Generic[QueryReturn]):
     def __init__(self, query_return: QueryReturn):
         self._query_return = query_return
 
-    def convert(self, version: int) -> Union[None, Dict, List[Dict]]:
+    def convert(self, version: ApiMajorVersion) -> Union[None, Dict, List[Dict]]:
         with Span("{}.convert".format(self.__class__.__name__)):
             converted_query_return = self._convert_list(
                 self._listify(self._query_return), version
@@ -22,7 +23,7 @@ class ConverterBase(Generic[QueryReturn]):
                 return self._delistify(converted_query_return)
 
     @abc.abstractmethod
-    def _convert_list(self, model_list: list, version: int) -> List[Dict]:
+    def _convert_list(self, model_list: list, version: ApiMajorVersion) -> List[Dict]:
         ...
 
     def _listify(self, thing: QueryReturn) -> list:

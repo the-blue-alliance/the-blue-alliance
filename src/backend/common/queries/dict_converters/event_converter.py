@@ -1,19 +1,21 @@
 from typing import List, Dict
 
-from backend.common.models.event import Event
-
 from backend.common.consts import playoff_type
+from backend.common.consts.api_version import ApiMajorVersion
+from backend.common.models.event import Event
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 
 
 class EventConverter(ConverterBase):
-    SUBVERSIONS = {  # Increment every time a change to the dict is made
-        3: 6,
-    }
+    # SUBVERSIONS = {  # Increment every time a change to the dict is made
+    #     3: 6,
+    # }  TODO: used for cache clearing
 
-    def _convert_list(self, model_list: List[Event], version: int) -> List[Dict]:
+    def _convert_list(
+        self, model_list: List[Event], version: ApiMajorVersion
+    ) -> List[Dict]:
         CONVERTERS = {
-            3: self.eventsConverter_v3,
+            ApiMajorVersion.API_V3: self.eventsConverter_v3,
         }
         return CONVERTERS[version](model_list)
 
