@@ -42,6 +42,8 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn]):
         query_result = yield self.fetch_async()
         if query_result is None:
             raise DoesNotExistException()
-        # Type-hinting the tasklet decorator is hard, but it consumes
-        # the generator and returns the overall future
-        return self.DICT_CONVERTER(query_result).convert(version)  # pyre-ignore
+        # See https://github.com/facebook/pyre-check/issues/267
+        res = self.DICT_CONVERTER(  # pyre-ignore[45]
+            safe_cast(QueryReturn, query_result)
+        ).convert(version)
+        return safe_cast(TypedFuture[Dict], res)

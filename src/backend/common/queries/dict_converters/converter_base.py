@@ -6,7 +6,7 @@ from backend.common.profiler import Span
 from backend.common.queries.types import QueryReturn
 
 
-class ConverterBase(Generic[QueryReturn]):
+class ConverterBase(abc.ABC, Generic[QueryReturn]):
     _query_return: QueryReturn
 
     def __init__(self, query_return: QueryReturn):

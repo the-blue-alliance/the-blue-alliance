@@ -33,7 +33,9 @@ class EventConverter(ConverterBase):
             "event_type_string": event.event_type_str,
             "parent_event_key": event.parent_event.id() if event.parent_event else None,
             "playoff_type": event.playoff_type,
-            "playoff_type_string": playoff_type.TYPE_NAMES.get(event.playoff_type),
+            "playoff_type_string": playoff_type.TYPE_NAMES.get(
+                playoff_type.PlayoffType(event.playoff_type)
+            ),
             # "district": DistrictConverter.convert(district_future.get_result(), 3)
             # if district_future
             # else None,
