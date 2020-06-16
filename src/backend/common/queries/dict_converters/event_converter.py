@@ -39,7 +39,9 @@ class EventConverter(ConverterBase):
             # "district": DistrictConverter.convert(district_future.get_result(), 3)
             # if district_future
             # else None,
-            "division_keys": [key.id() for key in event.divisions],
+            "division_keys": [
+                key.id() for key in event.divisions  # pyre-ignore[16]
+            ],  # Datastore stub needs to support repeated properties 2020-06-16 @fangeugene
             "first_event_id": event.first_eid,
             "first_event_code": event.first_api_code if event.official else None,
             "year": event.year,
