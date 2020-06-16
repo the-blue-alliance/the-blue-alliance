@@ -4,7 +4,7 @@ from flask import Flask
 from google.cloud import ndb
 from werkzeug.wrappers import Request
 
-from backend.common.profiler import send_traces, trace_context
+from backend.common.profiler import send_traces, Span, trace_context
 
 
 class NdbMiddleware(object):
@@ -45,4 +45,6 @@ def install_middleware(app: Flask) -> None:
 
     @app.teardown_request
     def teardown_request(exception):
+        with Span("Begin app.teardown_request"):
+            pass
         send_traces()

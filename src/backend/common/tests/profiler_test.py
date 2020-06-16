@@ -64,7 +64,7 @@ def test_no_spans(mock_send_traces) -> None:
     with app.test_client() as client:
         client.get("/", headers={"X-Cloud-Trace-Context": "TRACE_ID/SPAN_ID;o=1"})
 
-    mock_send_traces.assert_not_called()
+    mock_send_traces.assert_called()
 
 
 @patch("backend.common.profiler._make_tracing_call")
