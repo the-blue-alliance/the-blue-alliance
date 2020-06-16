@@ -13,9 +13,8 @@ from backend.common.queries.types import QueryReturn
 
 
 class DatabaseQuery(abc.ABC, Generic[QueryReturn]):
-
     _query_args: int
-    DICT_CONVERTER: Type[ConverterBase[QueryReturn]]
+    DICT_CONVERTER: Type[ConverterBase[QueryReturn]] = ConverterBase
 
     def __init__(self, *args, **kwargs):
         self._query_args = kwargs

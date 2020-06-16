@@ -23,10 +23,10 @@ class ConverterBase(abc.ABC, Generic[QueryReturn]):
                 return self._delistify(converted_query_return)
 
     @abc.abstractmethod
-    def _convert_list(self, model_list: list, version: ApiMajorVersion) -> List[Dict]:
-        ...
+    def _convert_list(self, model_list: List, version: ApiMajorVersion) -> List[Dict]:
+        return [{} for model in model_list]
 
-    def _listify(self, thing: QueryReturn) -> list:
+    def _listify(self, thing: QueryReturn) -> List:
         if not isinstance(thing, list):
             return [thing]
         else:

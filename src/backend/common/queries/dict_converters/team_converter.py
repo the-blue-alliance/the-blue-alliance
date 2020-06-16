@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import Dict, List
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.team import Team

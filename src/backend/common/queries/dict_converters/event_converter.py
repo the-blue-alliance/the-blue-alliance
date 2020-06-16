@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import Dict, List
 
 from backend.common.consts import playoff_type
 from backend.common.consts.api_version import ApiMajorVersion
