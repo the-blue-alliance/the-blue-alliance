@@ -36,6 +36,8 @@ class TeamListQuery(DatabaseQuery[List[Team]]):
 
 
 class TeamListYearQuery(DatabaseQuery[List[Team]]):
+    DICT_CONVERTER = TeamConverter
+
     @ndb.tasklet
     def _query_async(self, year: int, page: int) -> List[Team]:
         event_team_keys_future = EventTeam.query(EventTeam.year == year).fetch_async(
@@ -68,6 +70,8 @@ class DistrictTeamsQuery(DatabaseQuery[List[Team]]):
 
 
 class EventTeamsQuery(DatabaseQuery[List[Team]]):
+    DICT_CONVERTER = TeamConverter
+
     @ndb.tasklet
     def _query_async(self, event_key: str) -> List[Team]:
         event_teams = yield EventTeam.query(
@@ -79,6 +83,8 @@ class EventTeamsQuery(DatabaseQuery[List[Team]]):
 
 
 class EventEventTeamsQuery(DatabaseQuery[List[EventTeam]]):
+    DICT_CONVERTER = TeamConverter
+
     @ndb.tasklet
     def _query_async(self, event_key: str) -> List[EventTeam]:
         event_teams = yield EventTeam.query(
@@ -88,6 +94,8 @@ class EventEventTeamsQuery(DatabaseQuery[List[EventTeam]]):
 
 
 class TeamParticipationQuery(DatabaseQuery[Set[int]]):
+    DICT_CONVERTER = TeamConverter
+
     @ndb.tasklet
     def _query_async(self, team_key: str) -> Set[int]:
         event_teams = yield EventTeam.query(
