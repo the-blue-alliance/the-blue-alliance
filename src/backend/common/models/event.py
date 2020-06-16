@@ -313,7 +313,7 @@ class Event(ndb.Model):
 
         if self._week is None and season_start is not None:
             # Round events that occur just before the official start-of-season to the closest week
-            days = max((self.start_date - season_start).day, 0)
+            days = max((self.start_date - season_start).days, 0)
             self._week = days / 7
 
         return self._week

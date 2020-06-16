@@ -2,7 +2,7 @@ from typing import List
 
 from backend.common.models.event import Event
 
-from backend.common.consts.playoff_type import PlayoffType
+from backend.common.consts import playoff_type
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 
 
@@ -17,11 +17,11 @@ class EventConverter(ConverterBase):
         }
         return CONVERTERS[version](model_list)
 
-    def eventsConverter_v3(self, events):
-        events = map(self.eventConverter_v3, events)
+    def eventsConverter_v3(self, events: List[Event]) -> List[dict]:
+        events = list(map(self.eventConverter_v3, events))
         return events
 
-    def eventConverter_v3(self, event):
+    def eventConverter_v3(self, event: Event) -> dict:
         # district_future = event.district_key.get_async() if event.district_key else None
         event_dict = {
             "key": event.key.id(),
@@ -32,7 +32,7 @@ class EventConverter(ConverterBase):
             "event_type_string": event.event_type_str,
             "parent_event_key": event.parent_event.id() if event.parent_event else None,
             "playoff_type": event.playoff_type,
-            "playoff_type_string": PlayoffType.type_names.get(event.playoff_type),
+            "playoff_type_string": playoff_type.TYPE_NAMES.get(event.playoff_type),
             # "district": DistrictConverter.convert(district_future.get_result(), 3)
             # if district_future
             # else None,
