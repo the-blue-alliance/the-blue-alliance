@@ -7,17 +7,20 @@ from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.team import Team
 from backend.common.queries.database_query import DatabaseQuery
+from backend.common.queries.dict_converters.team_converter import TeamConverter
 
 
 class TeamQuery(DatabaseQuery[Optional[Team]]):
+    DICT_CONVERTER = TeamConverter
+
     @ndb.tasklet
     def _query_async(self, team_key: str) -> TypedFuture[Optional[Team]]:
         team = yield Team.get_by_id_async(team_key)
-        raise ndb.Return(team)
+        return team
 
 
 class TeamListQuery(DatabaseQuery[List[Team]]):
-
+    DICT_CONVERTER = TeamConverter
     PAGE_SIZE: int = 500
 
     @ndb.tasklet
@@ -33,6 +36,8 @@ class TeamListQuery(DatabaseQuery[List[Team]]):
 
 
 class TeamListYearQuery(DatabaseQuery[List[Team]]):
+    DICT_CONVERTER = TeamConverter
+
     @ndb.tasklet
     def _query_async(self, year: int, page: int) -> List[Team]:
         event_team_keys_future = EventTeam.query(EventTeam.year == year).fetch_async(
@@ -65,6 +70,8 @@ class DistrictTeamsQuery(DatabaseQuery[List[Team]]):
 
 
 class EventTeamsQuery(DatabaseQuery[List[Team]]):
+    DICT_CONVERTER = TeamConverter
+
     @ndb.tasklet
     def _query_async(self, event_key: str) -> List[Team]:
         event_teams = yield EventTeam.query(
@@ -76,6 +83,8 @@ class EventTeamsQuery(DatabaseQuery[List[Team]]):
 
 
 class EventEventTeamsQuery(DatabaseQuery[List[EventTeam]]):
+    DICT_CONVERTER = TeamConverter
+
     @ndb.tasklet
     def _query_async(self, event_key: str) -> List[EventTeam]:
         event_teams = yield EventTeam.query(
@@ -85,6 +94,8 @@ class EventEventTeamsQuery(DatabaseQuery[List[EventTeam]]):
 
 
 class TeamParticipationQuery(DatabaseQuery[Set[int]]):
+    DICT_CONVERTER = TeamConverter
+
     @ndb.tasklet
     def _query_async(self, team_key: str) -> Set[int]:
         event_teams = yield EventTeam.query(

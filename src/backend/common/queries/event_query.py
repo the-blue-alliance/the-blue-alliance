@@ -7,9 +7,12 @@ from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.team import Team
 from backend.common.queries.database_query import DatabaseQuery
+from backend.common.queries.dict_converters.event_converter import EventConverter
 
 
 class EventQuery(DatabaseQuery[Optional[Event]]):
+    DICT_CONVERTER = EventConverter
+
     @ndb.tasklet
     def _query_async(self, event_key: str) -> TypedFuture[Optional[Event]]:
         event = yield Event.get_by_id_async(event_key)
@@ -17,6 +20,8 @@ class EventQuery(DatabaseQuery[Optional[Event]]):
 
 
 class EventListQuery(DatabaseQuery[List[Event]]):
+    DICT_CONVERTER = EventConverter
+
     @ndb.tasklet
     def _query_async(self, year: int) -> TypedFuture[List[Event]]:
         events = yield Event.query(Event.year == year).fetch_async()
@@ -35,6 +40,8 @@ class DistrictEventsQuery(DatabaseQuery[List[Event]]):
 
 
 class TeamEventsQuery(DatabaseQuery[List[Event]]):
+    DICT_CONVERTER = EventConverter
+
     @ndb.tasklet
     def _query_async(self, team_key: str) -> List[Event]:
         event_teams = yield EventTeam.query(
@@ -46,6 +53,8 @@ class TeamEventsQuery(DatabaseQuery[List[Event]]):
 
 
 class TeamYearEventsQuery(DatabaseQuery[List[Event]]):
+    DICT_CONVERTER = EventConverter
+
     @ndb.tasklet
     def _query_async(self, team_key: str, year: int) -> List[Event]:
         event_teams = yield EventTeam.query(
@@ -57,6 +66,8 @@ class TeamYearEventsQuery(DatabaseQuery[List[Event]]):
 
 
 class TeamYearEventTeamsQuery(DatabaseQuery[List[EventTeam]]):
+    DICT_CONVERTER = EventConverter
+
     @ndb.tasklet
     def _query_async(self, team_key: str, year: int) -> TypedFuture[List[EventTeam]]:
         event_teams = yield EventTeam.query(
@@ -66,6 +77,8 @@ class TeamYearEventTeamsQuery(DatabaseQuery[List[EventTeam]]):
 
 
 class EventDivisionsQuery(DatabaseQuery[List[Event]]):
+    DICT_CONVERTER = EventConverter
+
     @ndb.tasklet
     def _query_async(self, event_key: str) -> List[Event]:
         event = yield Event.get_by_id_async(event_key)
