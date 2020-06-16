@@ -1,7 +1,7 @@
 import pytest
-from backend.common.models.location import Location
 
-from .util import CITY_STATE_COUNTRY_PARAMETERS
+from backend.common.models.location import Location
+from backend.common.models.tests.util import CITY_STATE_COUNTRY_PARAMETERS
 
 
 @pytest.mark.parametrize(

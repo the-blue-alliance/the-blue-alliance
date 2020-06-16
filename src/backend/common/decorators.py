@@ -1,5 +1,6 @@
-from flask import request, make_response, Response
 from functools import partial, wraps
+
+from flask import make_response, request, Response
 
 
 def cached_public(func=None, timeout: int = 61):

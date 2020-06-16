@@ -1,5 +1,6 @@
-from flask import Flask
 from unittest.mock import patch
+
+from flask import Flask
 
 from backend.common.middleware import install_middleware
 from backend.common.profiler import Span, trace_context

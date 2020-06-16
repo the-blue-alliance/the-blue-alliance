@@ -1,8 +1,10 @@
-from backend.common.profiler import trace_context, send_traces
+from typing import Any, Callable
+
 from flask import Flask
 from google.cloud import ndb
-from typing import Any, Callable
 from werkzeug.wrappers import Request
+
+from backend.common.profiler import send_traces, trace_context
 
 
 class NdbMiddleware(object):

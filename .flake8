@@ -2,12 +2,15 @@
 # Make flake play well with black
 # https://black.readthedocs.io/en/stable/the_black_code_style.html
 max-line-length = 88
-select = C,E,F,W,B,B950
+select = C,E,F,W,B,B950,I
 ignore = E203, E501, W503
 exclude =
   ./old_py2/
   ./stubs/
   ./subtrees/
+  ./venv/
+application_import_names = backend
+import-order-style = edited
 
 [flake8:local-plugins]
 extension =

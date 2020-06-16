@@ -1,4 +1,5 @@
 from flask import Flask
+
 from backend.api.handlers.error import handle_404
 from backend.api.handlers.team import team, team_list
 from backend.common.middleware import install_middleware

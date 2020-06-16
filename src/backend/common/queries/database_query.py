@@ -1,11 +1,14 @@
 import abc
-from backend.common.typed_future import TypedFuture
+from typing import Generic, Type, Union
+
+from google.cloud import ndb
+from pyre_extensions import safe_cast
+
+from backend.common.futures import TypedFuture
 from backend.common.profiler import Span
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 from backend.common.queries.exceptions import DoesNotExistException
 from backend.common.queries.types import QueryReturn
-from google.cloud import ndb
-from typing import Generic, Type
 
 
 class DatabaseQuery(abc.ABC, Generic[QueryReturn]):
@@ -17,7 +20,8 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn]):
         self._query_args = kwargs
 
     @abc.abstractmethod
-    def _query_async(self) -> TypedFuture[QueryReturn]:
+    def _query_async(self) -> Union[QueryReturn, TypedFuture[QueryReturn]]:
+        # The tasklet wrapper will wrap a raw value in a future if necessary
         ...
 
     def fetch(self) -> QueryReturn:
@@ -27,9 +31,7 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn]):
     def fetch_async(self) -> TypedFuture[QueryReturn]:
         with Span("{}.fetch_async".format(self.__class__.__name__)):
             query_result = yield self._query_async(**self._query_args)
-            # Type-hinting the tasklet decorator is hard, but it consumes
-            # the generator and returns the overall future
-            return query_result  # pyre-ignore
+            return safe_cast(TypedFuture[QueryReturn], query_result)
 
     def fetch_dict(self, version: int) -> dict:
         return self.fetch_dict_async(version).get_result()

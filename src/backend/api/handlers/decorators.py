@@ -1,5 +1,6 @@
-from flask import request
 from functools import wraps
+
+from flask import request
 
 from backend.common.models.team import Team
 from backend.common.queries.exceptions import DoesNotExistException

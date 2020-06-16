@@ -1,8 +1,10 @@
-from backend.common.typed_future import TypedFuture
+from typing import List
+
+from google.cloud import ndb
+
+from backend.common.futures import TypedFuture
 from backend.common.queries.database_query import DatabaseQuery
 from backend.common.queries.dict_converters.converter_base import ConverterBase
-from google.cloud import ndb
-from typing import List
 
 
 class DummyModel(ndb.Model):

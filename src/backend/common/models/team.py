@@ -1,6 +1,7 @@
 import re
 
 from google.cloud import ndb
+
 from backend.common.models.location import Location
 
 

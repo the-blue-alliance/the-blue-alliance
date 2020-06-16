@@ -1,8 +1,8 @@
 import abc
 from typing import Generic, List, Union
 
-from backend.common.queries.types import QueryReturn
 from backend.common.profiler import Span
+from backend.common.queries.types import QueryReturn
 
 
 class ConverterBase(Generic[QueryReturn]):

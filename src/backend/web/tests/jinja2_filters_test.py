@@ -1,8 +1,10 @@
-import pytest
-from backend.web import jinja2_filters as filters
 from datetime import datetime
-from flask import Flask
 from typing import Any, Optional
+
+import pytest
+from flask import Flask
+
+from backend.web import jinja2_filters as filters
 
 
 @pytest.mark.parametrize(

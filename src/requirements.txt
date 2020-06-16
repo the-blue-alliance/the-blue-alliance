@@ -1,4 +1,5 @@
 gunicorn==20.0.4
+firebase_admin==4.3.0
 Flask==1.1.2
 google-api-python-client==1.9.1
 google-cloud-ndb==1.2.1
@@ -6,3 +7,4 @@ grpcio==1.29.0
 oauth2client==4.1.3
 urlfetch==1.2.1
 pyre-extensions==0.0.18
+typing-extensions==3.7.4.2

@@ -1,6 +1,6 @@
 #!/usr/bin/python
-import os
 import optparse
+import os
 
 SCRIPTS_MAIN = [
     "src/backend/web/static/jwplayer/jwplayer.js",

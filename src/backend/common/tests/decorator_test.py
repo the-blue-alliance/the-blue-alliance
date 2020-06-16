@@ -1,5 +1,6 @@
-from backend.common.decorators import cached_public
 from flask import Flask
+
+from backend.common.decorators import cached_public
 
 
 def test_no_cached_public(app: Flask) -> None:

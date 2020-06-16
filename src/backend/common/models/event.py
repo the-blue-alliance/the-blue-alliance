@@ -1,20 +1,16 @@
 import datetime
 import json
 import re
-from typing import Any, List, Optional
-from pyre_extensions import none_throws, safe_cast
-
-from backend.common.consts.playoff_type import PlayoffType
-
-# from consts.district_type import DistrictType
-from backend.common.consts import event_type
-from backend.common.consts.event_type import EventType
+from typing import List, Optional
 
 from google.cloud import ndb
+from pyre_extensions import none_throws, safe_cast
 
-# from models.district import District
-# from models.event_details import EventDetails
+from backend.common.consts import event_type
+from backend.common.consts.event_type import EventType
+from backend.common.consts.playoff_type import PlayoffType
 from backend.common.models.location import Location
+from backend.common.models.webcast import Webcast
 
 
 class Event(ndb.Model):
@@ -440,13 +436,13 @@ class Event(ndb.Model):
         return self._venue_address_safe
 
     @property
-    def webcast(self) -> Optional[List[Any]]:  # TODO add a type spec for webcast json
+    def webcast(self) -> List[Webcast]:
         """
         Lazy load parsing webcast JSON
         """
         if self._webcast is None:
             try:
-                self._webcast = json.loads(self.webcast_json)
+                self._webcast: List[Webcast] = json.loads(self.webcast_json)
 
                 # Sort firstinspires channels to the front, keep the order of the rest
                 self._webcast = sorted(
@@ -460,7 +456,7 @@ class Event(ndb.Model):
                 )
             except Exception:
                 self._webcast = None
-        return self._webcast
+        return self._webcast or []
 
     """
     @property
@@ -480,7 +476,7 @@ class Event(ndb.Model):
     """
 
     @property
-    def current_webcasts(self) -> List[Any]:  # TODO add type spec for webcast json
+    def current_webcasts(self) -> List[Webcast]:
         if not self.webcast or not self.within_a_day:
             return []
 

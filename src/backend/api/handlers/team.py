@@ -2,7 +2,7 @@ from flask import jsonify, Response
 
 from backend.api.handlers.decorators import api_authenticated, validate_team_key
 from backend.common.decorators import cached_public
-from backend.common.queries.team_query import TeamQuery, TeamListQuery
+from backend.common.queries.team_query import TeamListQuery, TeamQuery
 
 
 @api_authenticated

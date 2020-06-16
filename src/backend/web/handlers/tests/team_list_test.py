@@ -1,10 +1,12 @@
-import bs4
 import re
-from backend.common.models.team import Team
+from typing import List, NamedTuple, Optional
+
+import bs4
 from bs4 import BeautifulSoup
 from google.cloud import ndb
-from typing import Optional, List, NamedTuple
 from werkzeug.test import Client
+
+from backend.common.models.team import Team
 
 
 class ParsedTeam(NamedTuple):
