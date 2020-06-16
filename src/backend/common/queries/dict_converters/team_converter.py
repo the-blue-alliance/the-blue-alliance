@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 from backend.common.models.team import Team
 from backend.common.queries.dict_converters.converter_base import ConverterBase
@@ -9,16 +9,16 @@ class TeamConverter(ConverterBase):
         3: 4,
     }
 
-    def _convert_list(self, model_list: List[Team], version: int) -> List[dict]:
+    def _convert_list(self, model_list: List[Team], version: int) -> List[Dict]:
         CONVERTERS = {
             3: self.teamsConverter_v3,
         }
         return CONVERTERS[version](model_list)
 
-    def teamsConverter_v3(self, teams: List[Team]) -> List[dict]:
+    def teamsConverter_v3(self, teams: List[Team]) -> List[Dict]:
         return list(map(self.teamConverter_v3, teams))
 
-    def teamConverter_v3(self, team: Team) -> dict:
+    def teamConverter_v3(self, team: Team) -> Dict:
         default_name = "Team {}".format(team.team_number)
         team_dict = {
             "key": team.key.id(),

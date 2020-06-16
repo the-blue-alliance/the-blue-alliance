@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 from backend.common.models.event import Event
 
@@ -11,17 +11,16 @@ class EventConverter(ConverterBase):
         3: 6,
     }
 
-    def _convert_list(self, model_list: List[Event], version: int) -> List[dict]:
+    def _convert_list(self, model_list: List[Event], version: int) -> List[Dict]:
         CONVERTERS = {
             3: self.eventsConverter_v3,
         }
         return CONVERTERS[version](model_list)
 
-    def eventsConverter_v3(self, events: List[Event]) -> List[dict]:
-        events = list(map(self.eventConverter_v3, events))
-        return events
+    def eventsConverter_v3(self, events: List[Event]) -> List[Dict]:
+        return list(map(self.eventConverter_v3, events))
 
-    def eventConverter_v3(self, event: Event) -> dict:
+    def eventConverter_v3(self, event: Event) -> Dict:
         # district_future = event.district_key.get_async() if event.district_key else None
         event_dict = {
             "key": event.key.id(),
