@@ -1,5 +1,5 @@
 import abc
-from typing import Generic, List, Union
+from typing import Dict, Generic, List, Union
 
 from backend.common.profiler import Span
 from backend.common.queries.types import QueryReturn
@@ -11,7 +11,7 @@ class ConverterBase(Generic[QueryReturn]):
     def __init__(self, query_return: QueryReturn):
         self._query_return = query_return
 
-    def convert(self, version: int) -> Union[None, dict, List[dict]]:
+    def convert(self, version: int) -> Union[None, Dict, List[Dict]]:
         with Span("{}.convert".format(self.__class__.__name__)):
             converted_query_return = self._convert_list(
                 self._listify(self._query_return), version
@@ -22,7 +22,7 @@ class ConverterBase(Generic[QueryReturn]):
                 return self._delistify(converted_query_return)
 
     @abc.abstractmethod
-    def _convert_list(self, model_list: list, version: int) -> List[dict]:
+    def _convert_list(self, model_list: list, version: int) -> List[Dict]:
         ...
 
     def _listify(self, thing: QueryReturn) -> list:
@@ -31,7 +31,7 @@ class ConverterBase(Generic[QueryReturn]):
         else:
             return thing
 
-    def _delistify(self, things: List[dict]) -> Union[None, dict, List[dict]]:
+    def _delistify(self, things: List[Dict]) -> Union[None, Dict, List[Dict]]:
         if len(things) == 0:
             return None
         if len(things) == 1:
@@ -39,7 +39,7 @@ class ConverterBase(Generic[QueryReturn]):
         else:
             return things
 
-    def constructLocation_v3(self, model) -> dict:
+    def constructLocation_v3(self, model) -> Dict:
         """
         Works for teams and events
         """
