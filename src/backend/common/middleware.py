@@ -3,6 +3,7 @@ from typing import Any, Callable
 from flask import Flask
 from google.cloud import ndb
 from werkzeug.wrappers import Request
+from werkzeug.wsgi import ClosingIterator
 
 from backend.common.profiler import send_traces, Span, trace_context
 
@@ -40,11 +41,24 @@ class TraceRequestMiddleware(object):
         return self.app(environ, start_response)
 
 
-def install_middleware(app: Flask) -> None:
-    app.wsgi_app = NdbMiddleware(TraceRequestMiddleware(app.wsgi_app))  # type: ignore[override]
+class AfterResponseMiddleware:
+    """
+    A middleware that handles tasks after handling the response
+    """
 
-    @app.teardown_request
-    def teardown_request(exception):
-        with Span("Begin app.teardown_request"):
+    app: Callable[[Any, Any], Any]
+
+    def __init__(self, app: Callable[[Any, Any], Any]):
+        self.app = app
+
+    def __call__(self, environ: Any, start_response: Any):
+        return ClosingIterator(self.app(environ, start_response), self._run)
+
+    def _run(self):
+        with Span("Running AfterResponseMiddleware"):
             pass
         send_traces()
+
+
+def install_middleware(app: Flask) -> None:
+    app.wsgi_app = NdbMiddleware(TraceRequestMiddleware(AfterResponseMiddleware(app.wsgi_app)))  # type: ignore[override]

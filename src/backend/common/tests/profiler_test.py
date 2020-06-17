@@ -3,7 +3,7 @@ from unittest.mock import patch
 from flask import Flask
 
 from backend.common.middleware import install_middleware
-from backend.common.profiler import Span, trace_context
+from backend.common.profiler import send_traces, Span, trace_context
 
 
 def setup_app():
@@ -27,6 +27,7 @@ def test_send_trace(mock_send_traces) -> None:
 
     with app.test_client() as client:
         client.get("/", headers={"X-Cloud-Trace-Context": "TRACE_ID/SPAN_ID;o=1"})
+        send_traces()
 
     mock_send_traces.assert_called()
 
@@ -46,6 +47,7 @@ def test_not_send_trace(mock_send_traces) -> None:
 
     with app.test_client() as client:
         client.get("/", headers={"X-Cloud-Trace-Context": "TRACE_ID/SPAN_ID;o=0"})
+        send_traces()
 
     mock_send_traces.assert_not_called()
 
@@ -63,8 +65,9 @@ def test_no_spans(mock_send_traces) -> None:
 
     with app.test_client() as client:
         client.get("/", headers={"X-Cloud-Trace-Context": "TRACE_ID/SPAN_ID;o=1"})
+        send_traces()
 
-    mock_send_traces.assert_called()
+    mock_send_traces.assert_not_called()
 
 
 @patch("backend.common.profiler._make_tracing_call")
@@ -87,5 +90,6 @@ def test_multiple_spans(mock_send_traces) -> None:
 
     with app.test_client() as client:
         client.get("/", headers={"X-Cloud-Trace-Context": "TRACE_ID/SPAN_ID;o=1"})
+        send_traces()
 
     mock_send_traces.assert_called()
