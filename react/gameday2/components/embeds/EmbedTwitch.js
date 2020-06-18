@@ -3,7 +3,7 @@ import { webcastPropType } from '../../utils/webcastUtils'
 
 const EmbedTwitch = (props) => {
   const channel = props.webcast.channel
-  const iframeSrc = `https://player.twitch.tv/?channel=${channel}&parent=thebluealliance.com`
+  const iframeSrc = `https://player.twitch.tv/?channel=${channel}&parent=thebluealliance.com&parent=www.thebluealliance.com`
   return (
     <iframe
       src={iframeSrc}
