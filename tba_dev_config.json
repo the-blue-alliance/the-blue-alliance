@@ -1,4 +1,5 @@
 {
     "datastore_mode": "local",
-    "log_level": "info"
+    "log_level": "info",
+    "apiv3_host": "https://www.thebluealliance.com"
 }

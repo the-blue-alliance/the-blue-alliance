@@ -56,14 +56,15 @@ class Event(ndb.Model):
     )  # such as 'America/Los_Angeles' or 'Asia/Jerusalem'
     official = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
     first_eid = ndb.StringProperty()  # from USFIRST
-    parent_event = (
+    parent_event: Optional[ndb.Key] = (
         ndb.KeyProperty()
     )  # This is the division -> event champs relationship
-    divisions = ndb.KeyProperty(repeated=True)  # event champs -> all divisions
+    # event champs -> all divisions
+    divisions: List[ndb.Key] = ndb.KeyProperty(repeated=True)  # pyre-ignore[8]
     facebook_eid = ndb.TextProperty(indexed=False)  # from Facebook
     custom_hashtag = ndb.TextProperty(indexed=False)  # Custom HashTag
     website = ndb.TextProperty(indexed=False)
-    webcast_json = ndb.TextProperty(
+    webcast_json: str = ndb.TextProperty(
         indexed=False
     )  # list of dicts, valid keys include 'type' and 'channel'
     enable_predictions = ndb.BooleanProperty(default=False)
@@ -514,7 +515,7 @@ class Event(ndb.Model):
 
     @property
     def division_keys_json(self) -> str:
-        keys = [key.id() for key in safe_cast(List[ndb.Key], self.divisions)]
+        keys = [key.id() for key in self.divisions]
         return json.dumps(keys)
 
     @property

@@ -1,5 +1,7 @@
 from typing import Dict, List
 
+from pyre_extensions import none_throws
+
 from backend.common.consts import playoff_type
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.event import Event
@@ -31,7 +33,9 @@ class EventConverter(ConverterBase):
             "event_code": event.event_short,
             "event_type": event.event_type_enum,
             "event_type_string": event.event_type_str,
-            "parent_event_key": event.parent_event.id() if event.parent_event else None,
+            "parent_event_key": none_throws(event.parent_event).id()
+            if event.parent_event
+            else None,
             "playoff_type": event.playoff_type,
             "playoff_type_string": playoff_type.TYPE_NAMES.get(
                 playoff_type.PlayoffType(event.playoff_type)
@@ -42,7 +46,7 @@ class EventConverter(ConverterBase):
             # if district_future
             # else None,
             "division_keys": [
-                key.id() for key in event.divisions  # pyre-ignore[16]
+                key.id() for key in event.divisions
             ],  # Datastore stub needs to support repeated properties 2020-06-16 @fangeugene
             "first_event_id": event.first_eid,
             "first_event_code": event.first_api_code if event.official else None,

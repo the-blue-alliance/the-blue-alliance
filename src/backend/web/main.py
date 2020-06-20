@@ -11,6 +11,7 @@ from backend.web.handlers.team import (
     team_list,
 )
 from backend.web.jinja2_filters import register_template_filters
+from backend.web.local.blueprint import maybe_register as maybe_install_local_routes
 
 
 app = Flask(__name__)
@@ -28,3 +29,4 @@ app.register_error_handler(404, handle_404)
 app.register_error_handler(500, handle_500)
 
 register_template_filters(app)
+maybe_install_local_routes(app)
