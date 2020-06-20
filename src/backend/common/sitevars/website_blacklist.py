@@ -1,27 +1,34 @@
-import json
+from typing import List
 
-from backend.common.models.sitevar import Sitevar
+from typing_extensions import TypedDict
+
+from backend.common.sitevars.base import SitevarBase
 
 
-class WebsiteBlacklist:
+class ContentType(TypedDict):
+    websites: List[str]
+
+
+class WebsiteBlacklist(SitevarBase[ContentType]):
     @staticmethod
-    def _default_sitevar() -> Sitevar:
-        return Sitevar.get_or_insert(
-            "website_blacklist", values_json=json.dumps({"websites": []})
+    def key() -> str:
+        return "website_blacklist"
+
+    @staticmethod
+    def default_value() -> ContentType:
+        return ContentType(websites=[],)
+
+    @classmethod
+    def is_blacklisted(cls, website: str) -> bool:
+        website_blacklist = cls.get()
+        return website in website_blacklist["websites"]
+
+    @classmethod
+    def blacklist(cls, website: str) -> None:
+        def update_data(data: ContentType):
+            data["websites"].append(website)
+            return data
+
+        cls.update(
+            should_update=lambda v: website not in v["websites"], update_f=update_data,
         )
-
-    @staticmethod
-    def is_blacklisted(website: str) -> bool:
-        website_blacklist_sitevar = WebsiteBlacklist._default_sitevar()
-        website_blacklist = website_blacklist_sitevar.contents.get("websites", [])
-        return website in website_blacklist
-
-    @staticmethod
-    def blacklist(website: str):
-        website_blacklist_sitevar = WebsiteBlacklist._default_sitevar()
-        website_blacklist = website_blacklist_sitevar.contents.get("websites", [])
-        if website in website_blacklist:
-            return
-        website_blacklist.append(website)
-        website_blacklist_sitevar.contents = {"websites": website_blacklist}
-        website_blacklist_sitevar.put()

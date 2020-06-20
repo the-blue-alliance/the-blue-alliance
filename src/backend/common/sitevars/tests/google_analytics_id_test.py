@@ -5,7 +5,7 @@ from backend.common.sitevars.google_analytics_id import GoogleAnalyticsID
 
 
 def test_default_sitevar():
-    default_sitevar = GoogleAnalyticsID._default_sitevar()
+    default_sitevar = GoogleAnalyticsID._fetch_sitevar()
     assert default_sitevar is not None
 
     default_json = {"GOOGLE_ANALYTICS_ID": ""}

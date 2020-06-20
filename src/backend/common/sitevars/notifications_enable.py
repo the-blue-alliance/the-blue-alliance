@@ -1,22 +1,21 @@
-import json
-
-from backend.common.models.sitevar import Sitevar
+from backend.common.sitevars.base import SitevarBase
 
 
-class NotificationsEnable:
+class NotificationsEnable(SitevarBase[bool]):
     @staticmethod
-    def _default_sitevar() -> Sitevar:
-        return Sitevar.get_or_insert(
-            "notifications.enable", values_json=json.dumps(True)
+    def key() -> str:
+        return "notifications.enable"
+
+    @staticmethod
+    def default_value() -> bool:
+        return True
+
+    @classmethod
+    def notifications_enabled(cls) -> bool:
+        return cls.get()
+
+    @classmethod
+    def enable_notifications(cls, enable: bool):
+        cls.update(
+            should_update=lambda v: v != enable, update_f=lambda _: enable,
         )
-
-    @staticmethod
-    def notifications_enabled() -> bool:
-        notifications = NotificationsEnable._default_sitevar()
-        return notifications.contents
-
-    @staticmethod
-    def enable_notifications(enable: bool):
-        notifications = NotificationsEnable._default_sitevar()
-        notifications.contents = enable
-        notifications.put()

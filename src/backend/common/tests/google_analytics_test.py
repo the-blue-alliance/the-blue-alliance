@@ -24,7 +24,7 @@ def test_GoogleAnalytics_track_event_missing_sitevar() -> None:
 def test_GoogleAnalytics_track_event(ev) -> None:
     from backend.common.sitevars.google_analytics_id import GoogleAnalyticsID
 
-    sitevar = GoogleAnalyticsID._default_sitevar()
+    sitevar = GoogleAnalyticsID._fetch_sitevar()
     sitevar.contents["GOOGLE_ANALYTICS_ID"] = "abc"
 
     with patch("urlfetch.fetch") as mock_fetch:
