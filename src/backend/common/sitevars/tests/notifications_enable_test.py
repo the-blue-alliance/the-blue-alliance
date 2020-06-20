@@ -5,7 +5,7 @@ from backend.common.sitevars.notifications_enable import NotificationsEnable
 
 
 def test_default_sitevar():
-    default_sitevar = NotificationsEnable._default_sitevar()
+    default_sitevar = NotificationsEnable._fetch_sitevar()
     assert default_sitevar is not None
     assert default_sitevar.contents is True
 

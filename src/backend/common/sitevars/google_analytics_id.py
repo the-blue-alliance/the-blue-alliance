@@ -1,16 +1,21 @@
-import json
+from typing_extensions import TypedDict
 
-from backend.common.models.sitevar import Sitevar
+from backend.common.sitevars.base import SitevarBase
 
 
-class GoogleAnalyticsID:
+class ContentType(TypedDict):
+    GOOGLE_ANALYTICS_ID: str
+
+
+class GoogleAnalyticsID(SitevarBase[ContentType]):
     @staticmethod
-    def _default_sitevar() -> Sitevar:
-        return Sitevar.get_or_insert(
-            "google_analytics.id", values_json=json.dumps({"GOOGLE_ANALYTICS_ID": ""})
-        )
+    def key() -> str:
+        return "google_analytics.id"
 
     @staticmethod
-    def google_analytics_id() -> str:
-        google_analytics_id = GoogleAnalyticsID._default_sitevar()
-        return google_analytics_id.contents.get("GOOGLE_ANALYTICS_ID", "")
+    def default_value() -> ContentType:
+        return ContentType(GOOGLE_ANALYTICS_ID="",)
+
+    @classmethod
+    def google_analytics_id(cls) -> str:
+        return cls.get().get("GOOGLE_ANALYTICS_ID", "")

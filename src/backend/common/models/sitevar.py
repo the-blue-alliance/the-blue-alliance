@@ -1,4 +1,5 @@
 import json
+from typing import Any
 
 from google.cloud import ndb
 
@@ -26,7 +27,7 @@ class Sitevar(ndb.Model):
         super(Sitevar, self).__init__(*args, **kw)
 
     @property
-    def contents(self):
+    def contents(self) -> Any:
         """
         Lazy load values_json
         """
