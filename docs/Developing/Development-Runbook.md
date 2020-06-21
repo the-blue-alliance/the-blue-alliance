@@ -85,6 +85,13 @@ $ docker rm tba
 $ vagrant up
 ```
 
+## Getting Data Locally
+
+There are a few ways to configure TBA to get data locally.
+ 1. Bootstrap data from prod. When using the `local` datastore mode, go to `/local/bootstrap` and choose what data to import
+ 2. Use the `remote` datastore mode and connect your locally running version to a production Google Cloud Datastore instance
+ 3. Configure the necessary API keys and use the standard datafeed tasks
+
 ## Configuring the Development Environment
 
 It is possible to change the way the local instance inside the dev container runs using a local configuration file. The defaults are checked into the repo as `tba_dev_config.json` and should be sufficient for most everyday use. However, if you want to configure overrides locally, add a json file to `tba_dev_config.local.json` (which will be ignored by `git`). Note that you need to `halt` and restart the development container for changes to take effect.
@@ -93,8 +100,6 @@ Available configuration keys:
  - `datastore_mode` can be either `local` or `remote`. By default this is set to `local` and will use the [datastore emulator](https://cloud.google.com/datastore/docs/tools/datastore-emulator) bundled with the App Engine SDK. If instead, you want to point your instance to a real datatsore instance, set this to `remote` and also set the `google_application_credentials` property
  - `google_application_credentials` is a path (relative to the repository root) to a [service account JSON key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) used to authenticate to a production Google Cloud service. We recommend to put these in `ops/dev/keys` (which will be ignored by `git`). Example: `ops/dev/keys/tba-prod-key.json`
  - `log_level`: This will be used to set the `--log-level` flag when invoking `dev_appserver`. See the [documentation](https://cloud.google.com/appengine/docs/standard/python3/tools/local-devserver-command) for allowed values.
- - `apiv3_host`: This will be used as the base URL when making apiv3 calls to bootstrap data locally. The default is prod (eg `https://www.thebluealliance.com`)
- - `apiv3_key`: This will be used when calling apiv3 to bootstrap data locally. This should be set in `tba_dev_config.local.json` so it doesn't get committed 
 
 ## Generating Type Checker Stubs
 The `stubs/` folder contains [type hint stubs](https://www.python.org/dev/peps/pep-0484/#stub-files) for third-party dependencies that do not natively contain type hints. These type hints are necessary for [pyre](https://pyre-check.org/) (our type checker) to run successfully. In order to generate stubs for a third-party library, run [`stubgen`](https://mypy.readthedocs.io/en/stable/stubgen.html) for the third-party package. For For example, to generate stubs for the `google.cloud.ndb` library -

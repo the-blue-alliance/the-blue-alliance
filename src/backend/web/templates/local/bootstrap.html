@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Bootstrap Data{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    {% if status == "success" %}
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <h4 class="alert-heading">Success!</h4>
+            {% if view_url %}
+                <p>You can view your imported data <a class="alert-link" href="{{view_url}}">here</a>.</p>
+            {% endif %}
+        </div>
+    {% elif status %}
+        <div class="alert alert-danger alert-dismissible" data-status="{{status}}">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <h4 class="alert-heading">Uh oh!</h4>
+            {% if status == "bad_key" %}
+                <p>We don't know how to import that key!</p>
+            {% elif status == "bad_apiv3" %}
+                <p>Make sure to supply a valid APIv3 key!</p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <h1>Fetch Some Data!</h1>
+    <div class="alert alert-info alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4 class="alert-heading">Getting Started</h4>
+        <p>This is a special interface available on a development version of TBA that allows you to import data from the production website.</p>
+        <hr>
+        <p>You'll need a production Read APIv3 key to import data - you can get one <a href="https://www.thebluealliance.com/account" target="_blank" class="alert-link">here</a>.</p>
+        <hr>
+        <p>
+            There are a few types of data that can be imported:
+            <ul>
+                <li>Team keys, in the format <pre>frc1234</pre></li>
+                <li>Event keys, in the format <pre>2019nyny</pre></li>
+                <li>A year (to load all events/teams from that year)</li>
+            </ul>
+        </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <h2>Input Data Key</h2>
+    <form method="post">
+        <div class="form-group">
+            <label for="apiv3_key">APIv3 Key</label>
+            <input type="text" id="apiv3_key" name="apiv3_key" class="form-control" placeholder="APIv3 Key" value="{{apiv3_key}}"/>
+            <small class="form-text text-muted">To save your API key for future use, set it in the <a href="/admin/authkeys">Admin Panel</a></small>
+        </div>
+        <div class="form-group">
+            <label for="bootstrap-key">Data Key</label>
+            <input type="text" id="bootstrap_key" name="bootstrap_key" class="form-control" placeholder="Enter key" />
+            <small class="form-text text-muted">Input a team key, event key, or year</small>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

@@ -10,3 +10,4 @@ pytest-testmon
 InMemoryCloudDatastoreStub
 beautifulsoup4
 freezegun
+requests-mock
