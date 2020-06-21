@@ -1,7 +1,6 @@
 # From https://medium.com/google-cloud/custom-tracing-in-profiling-gae-using-the-stackdriver-api-b270288622c6
 
 import logging
-import os
 import random
 from datetime import datetime
 
@@ -9,11 +8,13 @@ from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
 from werkzeug.local import Local
 
+from backend.common.environment import Environment
+
 
 # create a request-local global context
 trace_context = Local()
 
-PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", None)
+PROJECT_ID = Environment.project()
 
 
 def send_traces():
