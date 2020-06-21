@@ -45,3 +45,19 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn]):
             safe_cast(QueryReturn, query_result)
         ).convert(version)
         return safe_cast(TypedFuture[Dict], res)
+
+    @classmethod
+    def _event_affected_queries(
+        cls, event_key: str, year: int, district_key: str
+    ) -> Set[Any]:
+        return set()
+
+    @classmethod
+    def _eventteam_affected_queries(
+        cls, event_key: str, team_key: str, year: int
+    ) -> Set[Any]:
+        return set()
+
+    @classmethod
+    def _team_affected_queries(cls, team_key: str) -> Set[Any]:
+        return set()

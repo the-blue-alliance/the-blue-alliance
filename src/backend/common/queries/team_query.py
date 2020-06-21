@@ -13,6 +13,10 @@ from backend.common.queries.dict_converters.team_converter import TeamConverter
 from backend.common.tasklets import typed_tasklet
 
 
+def _get_team_page_num(team_key):
+    return int(team_key[3:]) / TeamListQuery.PAGE_SIZE
+
+
 class TeamQuery(DatabaseQuery[Optional[Team]]):
     DICT_CONVERTER = TeamConverter
 
@@ -23,6 +27,10 @@ class TeamQuery(DatabaseQuery[Optional[Team]]):
     def _query_async(self, team_key: TeamKey) -> Optional[Team]:
         team = yield Team.get_by_id_async(team_key)
         return team
+
+    @classmethod
+    def _team_affected_queries(cls, team_key: str) -> Set[DatabaseQuery]:
+        return {cls(team_key)}
 
 
 class TeamListQuery(DatabaseQuery[List[Team]]):
@@ -42,6 +50,10 @@ class TeamListQuery(DatabaseQuery[List[Team]]):
             .fetch_async()
         )
         return list(teams)
+
+    @classmethod
+    def _team_affected_queries(cls, team_key: str) -> Set[DatabaseQuery]:
+        return {cls(_get_team_page_num(team_key))}
 
 
 class TeamListYearQuery(DatabaseQuery[List[Team]]):
@@ -66,6 +78,16 @@ class TeamListYearQuery(DatabaseQuery[List[Team]]):
             lambda team: team.key.id() in year_team_keys, teams_future.get_result()
         )
         return list(teams)
+
+    @classmethod
+    def _eventteam_affected_queries(
+        cls, event_key: str, team_key: str, year: int
+    ) -> Set[DatabaseQuery]:
+        return {cls(year, _get_team_page_num(team_key))}
+
+    @classmethod
+    def _team_affected_queries(cls, team_key: str) -> Set[DatabaseQuery]:
+        return TeamListQuery._team_affected_queries(team_key)
 
 
 class DistrictTeamsQuery(DatabaseQuery[List[Team]]):
@@ -99,6 +121,21 @@ class EventTeamsQuery(DatabaseQuery[List[Team]]):
         teams = yield ndb.get_multi_async(team_keys)
         return list(teams)
 
+    @classmethod
+    def _eventteam_affected_queries(
+        cls, event_key: str, team_key: str, year: int
+    ) -> Set[DatabaseQuery]:
+        return {cls(event_key)}
+
+    @classmethod
+    def _team_affected_queries(cls, team_key: str) -> Set[DatabaseQuery]:
+        event_team_keys_future = EventTeam.query(team_key).fetch_async(keys_only=True)
+
+        return {
+            cls(event_team_key_future.get_result().id().split("_")[0])
+            for event_team_key_future in event_team_keys_future
+        }
+
 
 class EventEventTeamsQuery(DatabaseQuery[List[EventTeam]]):
     DICT_CONVERTER = TeamConverter
@@ -112,6 +149,12 @@ class EventEventTeamsQuery(DatabaseQuery[List[EventTeam]]):
             EventTeam.event == ndb.Key(Event, event_key)
         ).fetch_async()
         return event_teams
+
+    @classmethod
+    def _eventteam_affected_queries(
+        cls, event_key: str, team_key: str, year: int
+    ) -> Set[DatabaseQuery]:
+        return {cls(event_key)}
 
 
 class TeamParticipationQuery(DatabaseQuery[Set[int]]):
@@ -127,3 +170,21 @@ class TeamParticipationQuery(DatabaseQuery[Set[int]]):
         ).fetch_async(keys_only=True)
         years = map(lambda event_team: int(event_team.id()[:4]), event_teams)
         return set(years)
+
+    @classmethod
+    def _eventteam_affected_queries(
+        cls, event_key: str, team_key: str, year: int
+    ) -> Set[DatabaseQuery]:
+        return {cls(team_key)}
+
+
+"""
+class TeamDistrictsQuery(DatabaseQuery[List[District]]):
+
+    @ndb.tasklet
+    def _query_async(self, team_key: str) -> List[District]:
+        team_key = self._query_args[0]
+        district_team_keys = yield DistrictTeam.query(DistrictTeam.team == ndb.Key(Team, team_key)).fetch_async(keys_only=True)
+        districts = yield ndb.get_multi_async([ndb.Key(District, dtk.id().split('_')[0]) for dtk in district_team_keys])
+        return filter(lambda x: x is not None, districts)
+"""
