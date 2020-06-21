@@ -7,6 +7,11 @@ from InMemoryCloudDatastoreStub import datastore_stub
 
 
 @pytest.fixture(autouse=True)
+def init_test_marker_env(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("TBA_UNIT_TEST", "true")
+
+
+@pytest.fixture(autouse=True)
 def init_ndb_env_vars(monkeypatch: MonkeyPatch) -> None:
     """
     Initializing an ndb Client in a test env requires some environment variables to be set

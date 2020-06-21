@@ -1,8 +1,7 @@
-import os
-
-from flask import Blueprint, Flask, redirect, request, url_for
+from flask import abort, Blueprint, Flask, redirect, request, url_for
 from werkzeug.wrappers import Response
 
+from backend.common.environment import Environment
 from backend.common.sitevars.apiv3_key import Apiv3Key
 from backend.web.local.bootstrap import LocalDataBootstrap
 from backend.web.profiled_render import render_template
@@ -13,6 +12,13 @@ and are used as dev/unit test helpers
 """
 
 local_routes = Blueprint("local", __name__, url_prefix="/local")
+
+
+@local_routes.before_request
+def before_request() -> None:
+    # Fail if we're not running in dev mode, as a sanity check
+    if not Environment.is_dev():
+        abort(403)
 
 
 @local_routes.route("/bootstrap", methods=["GET"])
@@ -45,6 +51,5 @@ def bootstrap_post() -> Response:
 
 
 def maybe_register(app: Flask) -> None:
-    env = os.environ.get("GAE_ENV")
-    if env == "localdev":
+    if Environment.is_dev():
         app.register_blueprint(local_routes)
