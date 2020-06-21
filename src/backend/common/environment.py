@@ -15,3 +15,7 @@ class Environment(object):
     @staticmethod
     def project() -> Optional[str]:
         return os.environ.get("GOOGLE_CLOUD_PROJECT", None)
+
+    @staticmethod
+    def log_level() -> Optional[str]:
+        return os.environ.get("TBA_LOG_LEVEL")

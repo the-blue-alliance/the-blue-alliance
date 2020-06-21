@@ -17,6 +17,7 @@ function get_project_from_key {
 }
 
 log_level=$(get_config_prop log_level)
+tba_log_level=$(get_config_prop tba_log_level)
 datastore_mode=$(get_config_prop datastore_mode)
 datastore_args=""
 application=""
@@ -44,6 +45,7 @@ dev_appserver.py \
     $application \
     $datastore_args \
     $env \
+    --env_var TBA_LOG_LEVEL="$tba_log_level" \
     --datastore_path=/datastore/tba.db \
     --dev_appserver_log_level=$log_level \
     src/default.yaml src/web.yaml src/api.yaml src/dispatch.yaml

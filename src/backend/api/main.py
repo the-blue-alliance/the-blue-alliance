@@ -3,8 +3,11 @@ from flask import Flask
 from backend.api.handlers.error import handle_404
 from backend.api.handlers.event import event
 from backend.api.handlers.team import team, team_list
+from backend.common.logging import configure_logging
 from backend.common.middleware import install_middleware
 
+
+configure_logging()
 
 app = Flask(__name__)
 install_middleware(app)
