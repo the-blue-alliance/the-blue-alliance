@@ -1,5 +1,6 @@
 from flask import Flask
 
+from backend.common.logging import configure_logging
 from backend.common.middleware import install_middleware
 from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.gameday import gameday
@@ -13,6 +14,7 @@ from backend.web.handlers.team import (
 from backend.web.jinja2_filters import register_template_filters
 from backend.web.local.blueprint import maybe_register as maybe_install_local_routes
 
+configure_logging()
 
 app = Flask(__name__)
 install_middleware(app)
