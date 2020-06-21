@@ -8,3 +8,4 @@ oauth2client==4.1.3
 urlfetch==1.2.1
 pyre-extensions==0.0.18
 typing-extensions==3.7.4.2
+requests
