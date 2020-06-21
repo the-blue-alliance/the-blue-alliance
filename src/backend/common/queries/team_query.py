@@ -8,7 +8,7 @@ from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
 from backend.common.models.team import Team
-from backend.common.queries.database_query import DatabaseQuery
+from backend.common.queries.database_query import CachedDatabaseQuery
 from backend.common.queries.dict_converters.team_converter import TeamConverter
 from backend.common.tasklets import typed_tasklet
 
@@ -17,7 +17,7 @@ def _get_team_page_num(team_key: str) -> int:
     return int(int(team_key[3:]) / TeamListQuery.PAGE_SIZE)
 
 
-class TeamQuery(DatabaseQuery[Optional[Team]]):
+class TeamQuery(CachedDatabaseQuery[Optional[Team]]):
     CACHE_KEY_FORMAT = "team_{team_key}"
     CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
@@ -31,11 +31,11 @@ class TeamQuery(DatabaseQuery[Optional[Team]]):
         return team
 
     @classmethod
-    def _team_affected_queries(cls, team_key: str) -> Set[DatabaseQuery]:
+    def _team_affected_queries(cls, team_key: str) -> Set[CachedDatabaseQuery]:
         return {cls(team_key=team_key)}
 
 
-class TeamListQuery(DatabaseQuery[List[Team]]):
+class TeamListQuery(CachedDatabaseQuery[List[Team]]):
     CACHE_KEY_FORMAT = "team_list_{page}"
     CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
@@ -56,11 +56,11 @@ class TeamListQuery(DatabaseQuery[List[Team]]):
         return list(teams)
 
     @classmethod
-    def _team_affected_queries(cls, team_key: str) -> Set[DatabaseQuery]:
+    def _team_affected_queries(cls, team_key: str) -> Set[CachedDatabaseQuery]:
         return {cls(page=_get_team_page_num(team_key))}
 
 
-class TeamListYearQuery(DatabaseQuery[List[Team]]):
+class TeamListYearQuery(CachedDatabaseQuery[List[Team]]):
     CACHE_KEY_FORMAT = "team_list_year_{year}_{page}"
     CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
@@ -88,15 +88,17 @@ class TeamListYearQuery(DatabaseQuery[List[Team]]):
     @classmethod
     def _eventteam_affected_queries(
         cls, event_key: str, team_key: str, year: int
-    ) -> Set[DatabaseQuery]:
+    ) -> Set[CachedDatabaseQuery]:
         return {cls(year=year, page=_get_team_page_num(team_key))}
 
     @classmethod
-    def _team_affected_queries(cls, team_key: str) -> Set[DatabaseQuery]:
+    def _team_affected_queries(cls, team_key: str) -> Set[CachedDatabaseQuery]:
         return TeamListQuery._team_affected_queries(team_key=team_key)
 
 
 class DistrictTeamsQuery(DatabaseQuery[List[Team]]):
+    CACHE_KEY_FORMAT = "district_teams_{district_key}"
+    CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
 
     def __init__(self, district_key: DistrictKey) -> None:
@@ -112,7 +114,7 @@ class DistrictTeamsQuery(DatabaseQuery[List[Team]]):
         return list(teams)
 
 
-class EventTeamsQuery(DatabaseQuery[List[Team]]):
+class EventTeamsQuery(CachedDatabaseQuery[List[Team]]):
     CACHE_KEY_FORMAT = "event_teams_{event_key}"
     CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
@@ -135,11 +137,11 @@ class EventTeamsQuery(DatabaseQuery[List[Team]]):
     @classmethod
     def _eventteam_affected_queries(
         cls, event_key: str, team_key: str, year: int
-    ) -> Set[DatabaseQuery]:
+    ) -> Set[CachedDatabaseQuery]:
         return {cls(event_key=event_key)}
 
     @classmethod
-    def _team_affected_queries(cls, team_key: str) -> Set[DatabaseQuery]:
+    def _team_affected_queries(cls, team_key: str) -> Set[CachedDatabaseQuery]:
         event_team_keys_future = EventTeam.query(
             EventTeam.team == ndb.Key(Team, team_key)
         ).fetch_async(keys_only=True)
@@ -150,7 +152,7 @@ class EventTeamsQuery(DatabaseQuery[List[Team]]):
         }
 
 
-class EventEventTeamsQuery(DatabaseQuery[List[EventTeam]]):
+class EventEventTeamsQuery(CachedDatabaseQuery[List[EventTeam]]):
     CACHE_KEY_FORMAT = "event_event_teams_{event_key}"
     CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
@@ -168,11 +170,11 @@ class EventEventTeamsQuery(DatabaseQuery[List[EventTeam]]):
     @classmethod
     def _eventteam_affected_queries(
         cls, event_key: str, team_key: str, year: int
-    ) -> Set[DatabaseQuery]:
+    ) -> Set[CachedDatabaseQuery]:
         return {cls(event_key=event_key)}
 
 
-class TeamParticipationQuery(DatabaseQuery[Set[int]]):
+class TeamParticipationQuery(CachedDatabaseQuery[Set[int]]):
     CACHE_KEY_FORMAT = "team_participation_{team_key}"
     CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
@@ -191,12 +193,12 @@ class TeamParticipationQuery(DatabaseQuery[Set[int]]):
     @classmethod
     def _eventteam_affected_queries(
         cls, event_key: str, team_key: str, year: int
-    ) -> Set[DatabaseQuery]:
+    ) -> Set[CachedDatabaseQuery]:
         return {cls(team_key=team_key)}
 
 
 """
-class TeamDistrictsQuery(DatabaseQuery[List[District]]):
+class TeamDistrictsQuery(CachedDatabaseQuery[List[District]]):
 
     @ndb.tasklet
     def _query_async(self, team_key: str) -> List[District]:

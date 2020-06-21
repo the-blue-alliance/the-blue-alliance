@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Dict, Generic, Type
+from typing import Any, Dict, Generic, Optional, Set, Type
 
 from google.cloud import ndb
 from pyre_extensions import safe_cast
@@ -13,29 +13,11 @@ from backend.common.queries.types import QueryReturn
 
 
 class DatabaseQuery(abc.ABC, Generic[QueryReturn]):
-    _cache_key: str = ""
     _query_args: Dict[str, Any]
-    DATABASE_QUERY_VERSION = 0
-    BASE_CACHE_KEY_FORMAT: str = (
-        "{}:{}:{}"  # (partial_cache_key, cache_version, database_query_version)
-    )
-    CACHE_KEY_FORMAT: str = ""
-    CACHE_VERSION: int = 0
     DICT_CONVERTER: Type[ConverterBase[QueryReturn]] = ConverterBase
 
     def __init__(self, *args, **kwargs) -> None:
         self._query_args = kwargs
-
-    @property
-    def cache_key(self) -> str:
-        if self._cache_key == "":
-            self._cache_key = self.BASE_CACHE_KEY_FORMAT.format(
-                self.CACHE_KEY_FORMAT.format(**self._query_args),
-                self.CACHE_VERSION,
-                self.DATABASE_QUERY_VERSION,
-            )
-
-        return self._cache_key
 
     @abc.abstractmethod
     def _query_async(self) -> TypedFuture[QueryReturn]:
@@ -63,6 +45,26 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn]):
             safe_cast(QueryReturn, query_result)
         ).convert(version)
         return safe_cast(TypedFuture[Dict], res)
+
+
+class CachedDatabaseQuery(DatabaseQuery, Generic[QueryReturn]):
+    DATABASE_QUERY_VERSION = 0
+    BASE_CACHE_KEY_FORMAT: str = (
+        "{}:{}:{}"  # (partial_cache_key, cache_version, database_query_version)
+    )
+    CACHE_KEY_FORMAT: str = ""
+    CACHE_VERSION: int = 0
+    _cache_key: Optional[str] = None
+
+    @property
+    def cache_key(self) -> Optional[str]:
+        if not self._cache_key:
+            self._cache_key = self.BASE_CACHE_KEY_FORMAT.format(
+                self.CACHE_KEY_FORMAT.format(**self._query_args),
+                self.CACHE_VERSION,
+                self.DATABASE_QUERY_VERSION,
+            )
+        return self._cache_key
 
     @classmethod
     def _event_affected_queries(
