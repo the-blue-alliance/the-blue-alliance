@@ -13,11 +13,13 @@ from backend.common.queries.dict_converters.team_converter import TeamConverter
 from backend.common.tasklets import typed_tasklet
 
 
-def _get_team_page_num(team_key):
-    return int(team_key[3:]) / TeamListQuery.PAGE_SIZE
+def _get_team_page_num(team_key: str) -> int:
+    return int(int(team_key[3:]) / TeamListQuery.PAGE_SIZE)
 
 
 class TeamQuery(DatabaseQuery[Optional[Team]]):
+    CACHE_KEY_FORMAT = "team_{team_key}"
+    CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
 
     def __init__(self, team_key: TeamKey) -> None:
@@ -30,10 +32,12 @@ class TeamQuery(DatabaseQuery[Optional[Team]]):
 
     @classmethod
     def _team_affected_queries(cls, team_key: str) -> Set[DatabaseQuery]:
-        return {cls(team_key)}
+        return {cls(team_key=team_key)}
 
 
 class TeamListQuery(DatabaseQuery[List[Team]]):
+    CACHE_KEY_FORMAT = "team_list_{page}"
+    CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
     PAGE_SIZE: int = 500
 
@@ -53,10 +57,12 @@ class TeamListQuery(DatabaseQuery[List[Team]]):
 
     @classmethod
     def _team_affected_queries(cls, team_key: str) -> Set[DatabaseQuery]:
-        return {cls(_get_team_page_num(team_key))}
+        return {cls(page=_get_team_page_num(team_key))}
 
 
 class TeamListYearQuery(DatabaseQuery[List[Team]]):
+    CACHE_KEY_FORMAT = "team_list_year_{year}_{page}"
+    CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
 
     def __init__(self, year: Year, page: int) -> None:
@@ -83,11 +89,11 @@ class TeamListYearQuery(DatabaseQuery[List[Team]]):
     def _eventteam_affected_queries(
         cls, event_key: str, team_key: str, year: int
     ) -> Set[DatabaseQuery]:
-        return {cls(year, _get_team_page_num(team_key))}
+        return {cls(year=year, page=_get_team_page_num(team_key))}
 
     @classmethod
     def _team_affected_queries(cls, team_key: str) -> Set[DatabaseQuery]:
-        return TeamListQuery._team_affected_queries(team_key)
+        return TeamListQuery._team_affected_queries(team_key=team_key)
 
 
 class DistrictTeamsQuery(DatabaseQuery[List[Team]]):
@@ -107,6 +113,8 @@ class DistrictTeamsQuery(DatabaseQuery[List[Team]]):
 
 
 class EventTeamsQuery(DatabaseQuery[List[Team]]):
+    CACHE_KEY_FORMAT = "event_teams_{event_key}"
+    CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
 
     def __init__(self, event_key: EventKey) -> None:
@@ -114,10 +122,13 @@ class EventTeamsQuery(DatabaseQuery[List[Team]]):
 
     @typed_tasklet
     def _query_async(self, event_key: EventKey) -> List[Team]:
-        event_teams = yield EventTeam.query(
+        event_team_keys = yield EventTeam.query(
             EventTeam.event == ndb.Key(Event, event_key)
-        ).fetch_async()
-        team_keys = map(lambda event_team: event_team.team, event_teams)
+        ).fetch_async(keys_only=True)
+        team_keys = map(
+            lambda event_team_key: ndb.Key(Team, event_team_key.id().split("_")[1]),
+            event_team_keys,
+        )
         teams = yield ndb.get_multi_async(team_keys)
         return list(teams)
 
@@ -125,19 +136,23 @@ class EventTeamsQuery(DatabaseQuery[List[Team]]):
     def _eventteam_affected_queries(
         cls, event_key: str, team_key: str, year: int
     ) -> Set[DatabaseQuery]:
-        return {cls(event_key)}
+        return {cls(event_key=event_key)}
 
     @classmethod
     def _team_affected_queries(cls, team_key: str) -> Set[DatabaseQuery]:
-        event_team_keys_future = EventTeam.query(team_key).fetch_async(keys_only=True)
+        event_team_keys_future = EventTeam.query(
+            EventTeam.team == ndb.Key(Team, team_key)
+        ).fetch_async(keys_only=True)
 
         return {
-            cls(event_team_key_future.get_result().id().split("_")[0])
-            for event_team_key_future in event_team_keys_future
+            cls(event_key=event_team_key.id().split("_")[0])
+            for event_team_key in event_team_keys_future.get_result()
         }
 
 
 class EventEventTeamsQuery(DatabaseQuery[List[EventTeam]]):
+    CACHE_KEY_FORMAT = "event_event_teams_{event_key}"
+    CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
 
     def __init__(self, event_key: EventKey) -> None:
@@ -154,10 +169,12 @@ class EventEventTeamsQuery(DatabaseQuery[List[EventTeam]]):
     def _eventteam_affected_queries(
         cls, event_key: str, team_key: str, year: int
     ) -> Set[DatabaseQuery]:
-        return {cls(event_key)}
+        return {cls(event_key=event_key)}
 
 
 class TeamParticipationQuery(DatabaseQuery[Set[int]]):
+    CACHE_KEY_FORMAT = "team_participation_{team_key}"
+    CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
 
     def __init__(self, team_key: TeamKey) -> None:
@@ -175,7 +192,7 @@ class TeamParticipationQuery(DatabaseQuery[Set[int]]):
     def _eventteam_affected_queries(
         cls, event_key: str, team_key: str, year: int
     ) -> Set[DatabaseQuery]:
-        return {cls(team_key)}
+        return {cls(team_key=team_key)}
 
 
 """

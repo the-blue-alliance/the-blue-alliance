@@ -55,3 +55,18 @@ def test_upper_bound_exclusive() -> None:
     preseed_teams(500)
     teams = TeamListQuery(page=0).fetch()
     assert teams == []
+
+
+def test_affected_queries() -> None:
+    assert {
+        q.cache_key for q in TeamListQuery._team_affected_queries(team_key="frc254")
+    } == {TeamListQuery(page=0).cache_key}
+    assert {
+        q.cache_key for q in TeamListQuery._team_affected_queries(team_key="frc604")
+    } == {TeamListQuery(page=1).cache_key}
+    assert {
+        q.cache_key for q in TeamListQuery._team_affected_queries(team_key="frc1114")
+    } == {TeamListQuery(page=2).cache_key}
+    assert {
+        q.cache_key for q in TeamListQuery._team_affected_queries(team_key="frc9999")
+    } == {TeamListQuery(page=19).cache_key}
