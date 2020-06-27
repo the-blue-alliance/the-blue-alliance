@@ -5,6 +5,7 @@ from google.cloud import ndb
 from backend.common.futures import TypedFuture
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
+from backend.common.models.keys import EventKey, TeamKey
 from backend.common.models.team import Team
 from backend.common.queries.database_query import DatabaseQuery
 from backend.common.queries.dict_converters.team_converter import TeamConverter
@@ -14,7 +15,7 @@ class TeamQuery(DatabaseQuery[Optional[Team]]):
     DICT_CONVERTER = TeamConverter
 
     @ndb.tasklet
-    def _query_async(self, team_key: str) -> TypedFuture[Optional[Team]]:
+    def _query_async(self, team_key: TeamKey) -> TypedFuture[Optional[Team]]:
         team = yield Team.get_by_id_async(team_key)
         return team
 
@@ -73,7 +74,7 @@ class EventTeamsQuery(DatabaseQuery[List[Team]]):
     DICT_CONVERTER = TeamConverter
 
     @ndb.tasklet
-    def _query_async(self, event_key: str) -> List[Team]:
+    def _query_async(self, event_key: EventKey) -> List[Team]:
         event_teams = yield EventTeam.query(
             EventTeam.event == ndb.Key(Event, event_key)
         ).fetch_async()
@@ -86,7 +87,7 @@ class EventEventTeamsQuery(DatabaseQuery[List[EventTeam]]):
     DICT_CONVERTER = TeamConverter
 
     @ndb.tasklet
-    def _query_async(self, event_key: str) -> List[EventTeam]:
+    def _query_async(self, event_key: EventKey) -> List[EventTeam]:
         event_teams = yield EventTeam.query(
             EventTeam.event == ndb.Key(Event, event_key)
         ).fetch_async()
@@ -97,7 +98,7 @@ class TeamParticipationQuery(DatabaseQuery[Set[int]]):
     DICT_CONVERTER = TeamConverter
 
     @ndb.tasklet
-    def _query_async(self, team_key: str) -> Set[int]:
+    def _query_async(self, team_key: TeamKey) -> Set[int]:
         event_teams = yield EventTeam.query(
             EventTeam.team == ndb.Key(Team, team_key)
         ).fetch_async(keys_only=True)

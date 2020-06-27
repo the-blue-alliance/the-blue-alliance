@@ -5,6 +5,7 @@ from google.cloud import ndb
 from backend.common.futures import TypedFuture
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
+from backend.common.models.keys import EventKey, TeamKey
 from backend.common.models.team import Team
 from backend.common.queries.database_query import DatabaseQuery
 from backend.common.queries.dict_converters.event_converter import EventConverter
@@ -14,7 +15,7 @@ class EventQuery(DatabaseQuery[Optional[Event]]):
     DICT_CONVERTER = EventConverter
 
     @ndb.tasklet
-    def _query_async(self, event_key: str) -> TypedFuture[Optional[Event]]:
+    def _query_async(self, event_key: EventKey) -> TypedFuture[Optional[Event]]:
         event = yield Event.get_by_id_async(event_key)
         return event
 
@@ -43,7 +44,7 @@ class TeamEventsQuery(DatabaseQuery[List[Event]]):
     DICT_CONVERTER = EventConverter
 
     @ndb.tasklet
-    def _query_async(self, team_key: str) -> List[Event]:
+    def _query_async(self, team_key: TeamKey) -> List[Event]:
         event_teams = yield EventTeam.query(
             EventTeam.team == ndb.Key(Team, team_key)
         ).fetch_async()
@@ -56,7 +57,7 @@ class TeamYearEventsQuery(DatabaseQuery[List[Event]]):
     DICT_CONVERTER = EventConverter
 
     @ndb.tasklet
-    def _query_async(self, team_key: str, year: int) -> List[Event]:
+    def _query_async(self, team_key: TeamKey, year: int) -> List[Event]:
         event_teams = yield EventTeam.query(
             EventTeam.team == ndb.Key(Team, team_key), EventTeam.year == year
         ).fetch_async()
@@ -69,7 +70,9 @@ class TeamYearEventTeamsQuery(DatabaseQuery[List[EventTeam]]):
     DICT_CONVERTER = EventConverter
 
     @ndb.tasklet
-    def _query_async(self, team_key: str, year: int) -> TypedFuture[List[EventTeam]]:
+    def _query_async(
+        self, team_key: TeamKey, year: int
+    ) -> TypedFuture[List[EventTeam]]:
         event_teams = yield EventTeam.query(
             EventTeam.team == ndb.Key(Team, team_key), EventTeam.year == year
         ).fetch_async()
@@ -80,7 +83,7 @@ class EventDivisionsQuery(DatabaseQuery[List[Event]]):
     DICT_CONVERTER = EventConverter
 
     @ndb.tasklet
-    def _query_async(self, event_key: str) -> List[Event]:
+    def _query_async(self, event_key: EventKey) -> List[Event]:
         event = yield Event.get_by_id_async(event_key)
         if event is None:
             return []

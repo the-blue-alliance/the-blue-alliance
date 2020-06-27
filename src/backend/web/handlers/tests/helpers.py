@@ -7,6 +7,7 @@ from google.cloud import ndb
 from backend.common.consts.event_type import EventType
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
+from backend.common.models.keys import EventKey
 from backend.common.models.team import Team
 
 
@@ -41,7 +42,7 @@ def preseed_team(ndb_client: ndb.Client, team_number: int) -> None:
 
 
 def preseed_event_for_team(
-    ndb_client: ndb.Client, team_number: int, event_key: str
+    ndb_client: ndb.Client, team_number: int, event_key: EventKey
 ) -> None:
     with ndb_client.context():
         Event(
@@ -98,7 +99,7 @@ def get_years_participated_dropdown(resp_data: str) -> List[str]:
 
 
 def get_team_event_participation(
-    resp_data: str, event_key: str
+    resp_data: str, event_key: EventKey
 ) -> TeamEventParticipation:
     soup = bs4.BeautifulSoup(resp_data, "html.parser")
     event = soup.find(id=event_key)
