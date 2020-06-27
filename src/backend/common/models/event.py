@@ -1,7 +1,7 @@
 import datetime
 import json
 import re
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from google.cloud import ndb
 from pyre_extensions import none_throws, safe_cast
@@ -69,7 +69,7 @@ class Event(ndb.Model):
         indexed=False
     )  # list of dicts, valid keys include 'type' and 'channel'
     enable_predictions = ndb.BooleanProperty(default=False)
-    remap_teams = (
+    remap_teams: Dict[str, str] = (
         ndb.JsonProperty()
     )  # Map of temporary team numbers to pre-rookie and B teams
 

@@ -1,4 +1,15 @@
-from google.appengine.ext import ndb
+from typing import List
+
+from google.cloud import ndb
+from pyre_extensions import safe_cast
+
+from backend.common.models.alliance import Alliance
+from backend.common.models.event_district_points import EventDistrictPoints
+from backend.common.models.event_insights import EventInsights
+from backend.common.models.event_matchstats import EventMatchstats
+from backend.common.models.event_predictions import EventPredictions
+from backend.common.models.event_ranking import EventRanking
+from backend.common.models.keys import EventKey
 
 
 class EventDetails(ndb.Model):
@@ -7,13 +18,20 @@ class EventDetails(ndb.Model):
     update often throughout an event. This includes rankings, event stats, etc.
     key_name is the event key, like '2010ct'
     """
-    alliance_selections = ndb.JsonProperty()  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
-    district_points = ndb.JsonProperty()
-    matchstats = ndb.JsonProperty()  # for OPR, DPR, CCWM, etc.
-    insights = ndb.JsonProperty()
-    predictions = ndb.JsonProperty()
-    rankings = ndb.JsonProperty()
-    rankings2 = ndb.JsonProperty()
+
+    alliance_selections: List[
+        Alliance
+    ] = ndb.JsonProperty()  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
+    district_points: EventDistrictPoints = safe_cast(
+        EventDistrictPoints, ndb.JsonProperty()
+    )
+    matchstats: EventMatchstats = safe_cast(
+        EventMatchstats, ndb.JsonProperty()
+    )  # for OPR, DPR, CCWM, etc.
+    insights: EventInsights = safe_cast(EventInsights, ndb.JsonProperty())
+    predictions: EventPredictions = safe_cast(EventPredictions, ndb.JsonProperty())
+    rankings = ndb.JsonProperty()  # deprecated
+    rankings2: List[EventRanking] = ndb.JsonProperty()
 
     # Based on the output of PlayoffAdvancementHelper.generatePlayoffAdvancement
     # Dict with keys for: bracket, playoff_advancement
@@ -26,19 +44,20 @@ class EventDetails(ndb.Model):
         # store set of affected references referenced keys for cache clearing
         # keys must be model properties
         self._affected_references = {
-            'key': set(),
+            "key": set(),
         }
         super(EventDetails, self).__init__(*args, **kw)
 
-    def key_name(self):
+    def key_name(self) -> EventKey:
         return self.key.id()
 
     @property
-    def year(self):
+    def year(self) -> int:
         return int(self.key.id()[:4])
 
     @property
     def renderable_rankings(self):
+        """
         from helpers.rankings_helper import RankingsHelper
 
         has_extra_stats = False
@@ -75,6 +94,8 @@ class EventDetails(ndb.Model):
             'sort_order_info': sort_order_info,
             'extra_stats_info': extra_stats_info,
         }
+        """
+        return {}
 
     @property
     def rankings_table(self):
@@ -84,41 +105,51 @@ class EventDetails(ndb.Model):
         rankings = self.renderable_rankings
 
         precisions = []
-        for item in rankings['sort_order_info']:
-            precisions.append(item['precision'])
+        for item in rankings["sort_order_info"]:
+            precisions.append(item["precision"])
 
         extra_precisions = []
-        for item in rankings['extra_stats_info']:
-            extra_precisions.append(item['precision'])
+        for item in rankings["extra_stats_info"]:
+            extra_precisions.append(item["precision"])
 
         rankings_table = []
         has_record = False
         for rank in self.rankings2:
-            row = [rank['rank'], rank['team_key'][3:]]
+            row = [rank["rank"], rank["team_key"][3:]]
             # for i, item in enumerate(rank['sort_orders']):
             for i, precision in enumerate(precisions):
                 # row.append('%.*f' % (precisions[i], round(item, precisions[i])))
-                row.append('%.*f' % (precision, round(rank['sort_orders'][i], precision)))
-            if rank['record']:
-                row.append('{}-{}-{}'.format(rank['record']['wins'], rank['record']['losses'], rank['record']['ties']))
+                row.append(
+                    "%.*f" % (precision, round(rank["sort_orders"][i], precision))
+                )
+            if rank["record"]:
+                row.append(
+                    "{}-{}-{}".format(
+                        rank["record"]["wins"],
+                        rank["record"]["losses"],
+                        rank["record"]["ties"],
+                    )
+                )
                 has_record = True
-            row.append(rank['dq'])
-            row.append(rank['matches_played'])
+            row.append(rank["dq"])
+            row.append(rank["matches_played"])
 
             for i, precision in enumerate(extra_precisions):
-                row.append('%.*f' % (precision, round(rank['extra_stats'][i], precision)))
+                row.append(
+                    "%.*f" % (precision, round(rank["extra_stats"][i], precision))
+                )
 
             rankings_table.append(row)
 
-        title_row = ['Rank', 'Team']
-        for item in rankings['sort_order_info']:
-            title_row.append(item['name'])
+        title_row = ["Rank", "Team"]
+        for item in rankings["sort_order_info"]:
+            title_row.append(item["name"])
         if has_record:
-            title_row += ['Record (W-L-T)']
-        title_row += ['DQ', 'Played']
+            title_row += ["Record (W-L-T)"]
+        title_row += ["DQ", "Played"]
 
-        for item in rankings['extra_stats_info']:
-            title_row.append('{}*'.format(item['name']))
+        for item in rankings["extra_stats_info"]:
+            title_row.append("{}*".format(item["name"]))
 
         rankings_table = [title_row] + rankings_table
         return rankings_table
