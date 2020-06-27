@@ -1,8 +1,12 @@
-from typing import List
+from typing import List, Optional
 
 from google.cloud import ndb
-from pyre_extensions import safe_cast
+from pyre_extensions import none_throws, safe_cast
+from typing_extensions import TypedDict
 
+from backend.common.consts.ranking_sort_orders import (
+    SORT_ORDER_INFO as RANKING_SORT_ORDERS,
+)
 from backend.common.models.alliance import Alliance
 from backend.common.models.event_district_points import EventDistrictPoints
 from backend.common.models.event_insights import EventInsights
@@ -10,6 +14,13 @@ from backend.common.models.event_matchstats import EventMatchstats
 from backend.common.models.event_predictions import EventPredictions
 from backend.common.models.event_ranking import EventRanking
 from backend.common.models.keys import EventKey
+from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
+
+
+class RenderedRankings(TypedDict):
+    rankings: List[EventRanking]
+    sort_order_info: Optional[List[RankingSortOrderInfo]]
+    extra_stats_info: List[RankingSortOrderInfo]
 
 
 class EventDetails(ndb.Model):
@@ -56,56 +67,54 @@ class EventDetails(ndb.Model):
         return int(self.key.id()[:4])
 
     @property
-    def renderable_rankings(self):
-        """
-        from helpers.rankings_helper import RankingsHelper
-
+    def renderable_rankings(self) -> RenderedRankings:
         has_extra_stats = False
         if self.rankings2:
             for rank in self.rankings2:
-                rank['extra_stats'] = []
+                rank["extra_stats"] = []
                 if self.year in {2017, 2018, 2019, 2020}:
-                    rank['extra_stats'] = [
-                        int(round(rank['sort_orders'][0] * rank['matches_played'])),
+                    rank["extra_stats"] = [
+                        int(round(rank["sort_orders"][0] * rank["matches_played"])),
                     ]
                     has_extra_stats = True
-                elif rank['qual_average'] is None:
-                    rank['extra_stats'] = [
-                        rank['sort_orders'][0] / rank['matches_played'] if rank['matches_played'] > 0 else 0,
+                elif rank["qual_average"] is None:
+                    rank["extra_stats"] = [
+                        rank["sort_orders"][0] / rank["matches_played"]
+                        if rank["matches_played"] > 0
+                        else 0,
                     ]
                     has_extra_stats = True
 
-        sort_order_info = RankingsHelper.get_sort_order_info(self)
-        extra_stats_info = []
+        # 2015 mttd played the 2014 game
+        ranking_year = 2014 if self.key_name == "2015mttd" else self.year
+        sort_order_info = RANKING_SORT_ORDERS.get(ranking_year)
+
+        extra_stats_info: List[RankingSortOrderInfo] = []
         if has_extra_stats:
             if self.year in {2017, 2018, 2019, 2020}:
-                extra_stats_info = [{
-                    'name': 'Total Ranking Points',
-                    'precision': 0,
-                }]
-            else:
-                extra_stats_info = [{
-                    'name': '{}/Match'.format(sort_order_info[0]['name']),
-                    'precision': 2,
-                }]
+                extra_stats_info = [{"name": "Total Ranking Points", "precision": 0}]
+            elif sort_order_info is not None:
+                extra_stats_info = [
+                    {"name": f"{sort_order_info[0]['name']}/Match", "precision": 2}
+                ]
 
         return {
-            'rankings': self.rankings2,
-            'sort_order_info': sort_order_info,
-            'extra_stats_info': extra_stats_info,
+            "rankings": self.rankings2,
+            "sort_order_info": sort_order_info,
+            "extra_stats_info": extra_stats_info,
         }
-        """
-        return {}
 
     @property
-    def rankings_table(self):
+    def rankings_table(self) -> Optional[List[List[str]]]:
         if not self.rankings2:
             return None
 
         rankings = self.renderable_rankings
+        if rankings["sort_order_info"] is None:
+            return None
 
         precisions = []
-        for item in rankings["sort_order_info"]:
+        for item in none_throws(rankings["sort_order_info"]):
             precisions.append(item["precision"])
 
         extra_precisions = []
@@ -123,13 +132,8 @@ class EventDetails(ndb.Model):
                     "%.*f" % (precision, round(rank["sort_orders"][i], precision))
                 )
             if rank["record"]:
-                row.append(
-                    "{}-{}-{}".format(
-                        rank["record"]["wins"],
-                        rank["record"]["losses"],
-                        rank["record"]["ties"],
-                    )
-                )
+                record = none_throws(rank["record"])
+                row.append(f"{record['wins']}-{record['losses']}-{record['ties']}")
                 has_record = True
             row.append(rank["dq"])
             row.append(rank["matches_played"])
@@ -142,7 +146,7 @@ class EventDetails(ndb.Model):
             rankings_table.append(row)
 
         title_row = ["Rank", "Team"]
-        for item in rankings["sort_order_info"]:
+        for item in none_throws(rankings["sort_order_info"]):
             title_row.append(item["name"])
         if has_record:
             title_row += ["Record (W-L-T)"]
