@@ -6,7 +6,7 @@ from pyre_extensions import safe_cast
 
 from backend.common.models.district_advancement import DistrictAdvancement
 from backend.common.models.district_ranking import DistrictRanking
-from backend.common.models.keys import DistrictKey
+from backend.common.models.keys import DistrictAbbreviation, DistrictKey
 
 
 class District(ndb.Model):
@@ -63,6 +63,6 @@ class District(ndb.Model):
         return True if match else False
 
     @classmethod
-    def renderKeyName(cls, year: int, district_abbrev: str) -> str:
+    def renderKeyName(cls, year: int, district_abbrev: DistrictAbbreviation) -> str:
         # Like 2016ne or 2016fim
         return "{}{}".format(year, district_abbrev.lower())

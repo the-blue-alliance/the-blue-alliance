@@ -8,4 +8,5 @@ TeamKey = str
 EventKey = str
 EventTeamKey = str
 DistrictKey = str
+DistrictAbbreviation = str
 DistrictTeamKey = str

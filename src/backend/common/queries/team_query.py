@@ -3,9 +3,11 @@ from typing import List, Optional, Set
 from google.cloud import ndb
 
 from backend.common.futures import TypedFuture
+from backend.common.models.district import District
+from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
-from backend.common.models.keys import EventKey, TeamKey
+from backend.common.models.keys import DistrictKey, EventKey, TeamKey
 from backend.common.models.team import Team
 from backend.common.queries.database_query import DatabaseQuery
 from backend.common.queries.dict_converters.team_converter import TeamConverter
@@ -57,17 +59,17 @@ class TeamListYearQuery(DatabaseQuery[List[Team]]):
         return list(teams)
 
 
-"""
 class DistrictTeamsQuery(DatabaseQuery[List[Team]]):
+    DICT_CONVERTER = TeamConverter
 
     @ndb.tasklet
-    def _query_async(self, district_key: str) -> List[Team]:
+    def _query_async(self, district_key: DistrictKey) -> List[Team]:
         district_teams = yield DistrictTeam.query(
-            DistrictTeam.district_key == ndb.Key(District, district_key)).fetch_async()
+            DistrictTeam.district_key == ndb.Key(District, district_key)
+        ).fetch_async()
         team_keys = map(lambda district_team: district_team.team, district_teams)
         teams = yield ndb.get_multi_async(team_keys)
-        return teams
-"""
+        return list(teams)
 
 
 class EventTeamsQuery(DatabaseQuery[List[Team]]):
