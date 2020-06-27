@@ -9,6 +9,7 @@ from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
+from backend.common.models.keys import EventKey, TeamKey
 from backend.common.models.team import Team
 from backend.common.queries.dict_converters.event_converter import EventConverter
 from backend.common.queries.dict_converters.team_converter import TeamConverter
@@ -31,7 +32,7 @@ def make_team(team_num: int) -> Team:
     )
 
 
-def make_event(event_key: str) -> Event:
+def make_event(event_key: EventKey) -> Event:
     return Event(
         id=event_key,
         year=int(event_key[:4]),
@@ -47,7 +48,7 @@ def make_event(event_key: str) -> Event:
     )
 
 
-def make_eventteam(event_key: str, team_key: str) -> EventTeam:
+def make_eventteam(event_key: EventKey, team_key: TeamKey) -> EventTeam:
     return EventTeam(
         id=f"{event_key}_{team_key}",
         event=ndb.Key(Event, event_key),
@@ -74,7 +75,9 @@ def mock_event_detail_url(m: RequestsMocker, event: Event) -> None:
     )
 
 
-def mock_event_teams_url(m: RequestsMocker, event_key: str, teams: List[Team]) -> None:
+def mock_event_teams_url(
+    m: RequestsMocker, event_key: EventKey, teams: List[Team]
+) -> None:
     m.register_uri(
         "GET",
         f"https://www.thebluealliance.com/api/v3/event/{event_key}/teams",

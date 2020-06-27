@@ -3,13 +3,14 @@ from flask import jsonify, Response
 from backend.api.handlers.decorators import api_authenticated, validate_team_key
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.decorators import cached_public
+from backend.common.models.keys import TeamKey
 from backend.common.queries.team_query import TeamListQuery, TeamQuery
 
 
 @api_authenticated
 @cached_public
 @validate_team_key
-def team(team_key: str) -> Response:
+def team(team_key: TeamKey) -> Response:
     return jsonify(TeamQuery(team_key=team_key).fetch_dict(ApiMajorVersion.API_V3))
 
 

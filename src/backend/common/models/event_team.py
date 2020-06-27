@@ -3,6 +3,7 @@ from pyre_extensions import safe_cast
 
 from backend.common.models.event import Event
 from backend.common.models.event_team_status import EventTeamStatus
+from backend.common.models.keys import EventTeamKey
 from backend.common.models.team import Team
 
 
@@ -42,5 +43,5 @@ class EventTeam(ndb.Model):
         )
 
     @property
-    def key_name(self) -> str:
+    def key_name(self) -> EventTeamKey:
         return self.event.id() + "_" + self.team.id()

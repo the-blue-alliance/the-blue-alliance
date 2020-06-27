@@ -7,6 +7,7 @@ from google.cloud import ndb
 
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
+from backend.common.models.keys import EventKey, TeamKey
 from backend.common.models.team import Team
 
 
@@ -175,11 +176,11 @@ class LocalDataBootstrap:
         return r.json()
 
     @classmethod
-    def fetch_team(cls, team_key: str, auth_token: str) -> Dict:
+    def fetch_team(cls, team_key: TeamKey, auth_token: str) -> Dict:
         return cls.fetch_endpoint(f"team/{team_key}", auth_token)
 
     @classmethod
-    def fetch_event(cls, event_key: str, auth_token: str) -> Dict:
+    def fetch_event(cls, event_key: EventKey, auth_token: str) -> Dict:
         return cls.fetch_endpoint(f"event/{event_key}", auth_token)
 
     """
@@ -188,11 +189,13 @@ class LocalDataBootstrap:
     """
 
     @classmethod
-    def fetch_event_detail(cls, event_key: str, detail: str, auth_token: str) -> Dict:
+    def fetch_event_detail(
+        cls, event_key: EventKey, detail: str, auth_token: str
+    ) -> Dict:
         return cls.fetch_endpoint(f"event/{event_key}/{detail}", auth_token)
 
     @classmethod
-    def update_event(cls, key: str, auth_token: str) -> None:
+    def update_event(cls, key: EventKey, auth_token: str) -> None:
         event_data = cls.fetch_event(key, auth_token)
         event = cls.store_event(event_data)
 

@@ -9,6 +9,7 @@ from pyre_extensions import none_throws, safe_cast
 from backend.common.consts import event_type
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
+from backend.common.models.keys import EventKey
 from backend.common.models.location import Location
 from backend.common.models.webcast import Webcast
 
@@ -519,7 +520,7 @@ class Event(ndb.Model):
         return json.dumps(keys)
 
     @property
-    def key_name(self) -> str:
+    def key_name(self) -> EventKey:
         """
         Returns the string of the key_name of the Event object before writing it.
         """

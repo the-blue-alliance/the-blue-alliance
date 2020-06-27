@@ -2,11 +2,12 @@ from google.cloud import ndb
 
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
+from backend.common.models.keys import EventKey
 from backend.common.models.team import Team
 from backend.common.queries.team_query import EventEventTeamsQuery
 
 
-def preseed_event_teams(start_team: int, end_team: int, event_key: str) -> None:
+def preseed_event_teams(start_team: int, end_team: int, event_key: EventKey) -> None:
     event_teams = [
         EventTeam(
             id=f"{event_key}_frc{t}",

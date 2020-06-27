@@ -2,6 +2,7 @@ import re
 
 from google.cloud import ndb
 
+from backend.common.models.keys import TeamKey
 from backend.common.models.location import Location
 
 
@@ -109,7 +110,7 @@ class Team(ndb.Model):
         return "/team/%s" % self.team_number
 
     @property
-    def key_name(self):
+    def key_name(self) -> TeamKey:
         return "frc%s" % self.team_number
 
     @classmethod

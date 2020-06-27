@@ -5,6 +5,7 @@ from google.cloud import ndb
 from backend.common.consts.event_type import EventType
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
+from backend.common.models.keys import EventKey, TeamKey
 from backend.common.models.team import Team
 from backend.common.queries.event_query import (
     TeamEventsQuery,
@@ -37,7 +38,7 @@ def preseed_teams(start_team: int, end_team: Optional[int] = None) -> None:
     assert len(stored) == (end_team - start_team + 1)
 
 
-def preseed_event_team(team_key: str, event_keys: List[str]) -> None:
+def preseed_event_team(team_key: TeamKey, event_keys: List[EventKey]) -> None:
     [
         EventTeam(
             id=f"{event_key}_{team_key}",
