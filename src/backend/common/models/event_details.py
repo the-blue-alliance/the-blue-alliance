@@ -18,7 +18,7 @@ from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
 class RenderedRankings(TypedDict):
-    rankings: List[EventRanking]
+    rankings: Optional[List[EventRanking]]
     sort_order_info: Optional[List[RankingSortOrderInfo]]
     extra_stats_info: List[RankingSortOrderInfo]
 
@@ -59,6 +59,7 @@ class EventDetails(ndb.Model):
         }
         super(EventDetails, self).__init__(*args, **kw)
 
+    @property
     def key_name(self) -> EventKey:
         return self.key.id()
 

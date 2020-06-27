@@ -6,11 +6,12 @@ from backend.common.models.event_team_status import WLTRecord
 from backend.common.models.keys import TeamKey
 
 
-class _EventRankingDerived(TypedDict, total=False):
+class _EventRankingOptionalFields(TypedDict, total=False):
+    # Derived in dict converter
     extra_stats: List[float]
 
 
-class EventRanking(_EventRankingDerived, total=True):
+class EventRanking(_EventRankingOptionalFields, total=True):
     rank: int
     team_key: TeamKey
     record: Optional[WLTRecord]
