@@ -39,5 +39,14 @@ class DistrictTeam(ndb.Model):
         return self.renderKeyName(self.district_key.id(), self.team.id())
 
     @classmethod
+    def validate_key_name(cls, key: str) -> bool:
+        split = key.split("_")
+        return (
+            len(split) == 2
+            and District.validate_key_name(split[0])
+            and Team.validate_key_name(split[1])
+        )
+
+    @classmethod
     def renderKeyName(self, districtKey: DistrictKey, teamKey: TeamKey):
         return "{}_{}".format(districtKey, teamKey)

@@ -1,7 +1,7 @@
 import pytest
 from google.cloud import ndb
 
-from backend.common.models.event_team import Event
+from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.event_team import Team
 

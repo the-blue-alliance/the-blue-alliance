@@ -570,15 +570,14 @@ class Event(ndb.Model):
         match = re.match(key_name_regex, event_key)
         return True if match else False
 
-    """
     @property
-    def event_district_str(self) -> str:
-        from database.district_query import DistrictQuery
+    def event_district_str(self) -> Optional[str]:
+        from backend.common.queries.district_query import DistrictQuery
+
         if self.district_key is None:
             return None
-        district = DistrictQuery(self.district_key.id()).fetch()
+        district = DistrictQuery(district_key=self.district_key.id()).fetch()
         return district.display_name if district else None
-    """
 
     @property
     def event_district_abbrev(self) -> Optional[str]:

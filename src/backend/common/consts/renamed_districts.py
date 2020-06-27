@@ -8,11 +8,11 @@ CODE_MAP: Dict[DistrictAbbreviation, DistrictAbbreviation] = {
     "mar": "fma",
     "nc": "fnc",
     "in": "fin",
+    # New to old
+    "fma": "mar",
+    "fnc": "nc",
+    "fin": "in",
 }
-
-# Add new to old
-for old, new in CODE_MAP.items():
-    CODE_MAP[new] = old
 
 
 class RenamedDistricts(object):

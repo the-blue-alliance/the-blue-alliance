@@ -50,11 +50,7 @@ class District(ndb.Model):
 
     @property
     def render_name(self) -> str:
-        return (
-            self.display_name
-            if self.display_name
-            else "{}".format(self.abbreviation).upper()
-        )
+        return self.display_name if self.display_name else self.abbreviation.upper()
 
     @classmethod
     def validate_key_name(self, district_key: str) -> bool:
@@ -63,6 +59,8 @@ class District(ndb.Model):
         return True if match else False
 
     @classmethod
-    def renderKeyName(cls, year: int, district_abbrev: DistrictAbbreviation) -> str:
+    def renderKeyName(
+        cls, year: int, district_abbrev: DistrictAbbreviation
+    ) -> DistrictKey:
         # Like 2016ne or 2016fim
-        return "{}{}".format(year, district_abbrev.lower())
+        return f"{year}{district_abbrev.lower()}"

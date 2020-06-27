@@ -2,6 +2,7 @@ from typing import List, Optional
 
 from google.cloud import ndb
 
+from backend.common.consts.event_type import EventType
 from backend.common.futures import TypedFuture
 from backend.common.models.district import District
 from backend.common.models.event import Event
@@ -37,6 +38,18 @@ class DistrictEventsQuery(DatabaseQuery[List[Event]]):
             Event.district_key == ndb.Key(District, district_key)
         ).fetch_async()
         return events
+
+
+class DistrictChampsInYearQuery(DatabaseQuery[List[Event]]):
+    DICT_CONVERTER = EventConverter
+
+    @ndb.tasklet
+    def _query_async(self, year: int) -> List[Event]:
+        all_cmp_event_keys = yield Event.query(
+            Event.year == year, Event.event_type_enum == EventType.DISTRICT_CMP
+        ).fetch_async(keys_only=True)
+        events = yield ndb.get_multi_async(all_cmp_event_keys)
+        return list(events)
 
 
 class TeamEventsQuery(DatabaseQuery[List[Event]]):
