@@ -4,9 +4,11 @@ from typing import Optional
 
 import pytest
 from freezegun import freeze_time
+from google.cloud import ndb
 
 from backend.common.consts.event_type import EventType
 from backend.common.consts.webcast_type import WebcastType
+from backend.common.models.event import District
 from backend.common.models.event import Event
 from backend.common.models.tests.util import (
     CITY_STATE_COUNTRY_PARAMETERS,
@@ -222,3 +224,25 @@ def test_webcasts() -> None:
         assert len(event.current_webcasts) == 1
 
     assert event.has_first_official_webcast is True
+
+
+def test_linked_district() -> None:
+    District(id="2019ne", display_name="New England",).put()
+    event = Event(district_key=ndb.Key(District, "2019ne"),)
+    assert event.event_district_abbrev == "ne"
+    assert event.event_district_key == "2019ne"
+    assert event.event_district_str == "New England"
+
+
+def test_no_linked_district() -> None:
+    event = Event(district_key=None)
+    assert event.event_district_abbrev is None
+    assert event.event_district_key is None
+    assert event.event_district_str is None
+
+
+def test_nonexistent_linked_district() -> None:
+    event = Event(district_key=ndb.Key(District, "2019ne"))
+    assert event.event_district_abbrev == "ne"
+    assert event.event_district_key == "2019ne"
+    assert event.event_district_str is None
