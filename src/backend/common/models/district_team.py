@@ -1,7 +1,8 @@
-from google.appengine.ext import ndb
+from google.cloud import ndb
 
-from models.district import District
-from models.team import Team
+from backend.common.models.district import District
+from backend.common.models.keys import DistrictKey, DistrictTeamKey, TeamKey
+from backend.common.models.team import Team
 
 
 class DistrictTeam(ndb.Model):
@@ -13,7 +14,10 @@ class DistrictTeam(ndb.Model):
 
     team = ndb.KeyProperty(kind=Team)
     year = ndb.IntegerProperty()
-    district = ndb.IntegerProperty()  # One of DistrictType constants, DEPRECATED, use district_key
+    # One of DistrictType constants, DEPRECATED, use district_key
+    # district = (
+    #    ndb.IntegerProperty()
+    # )
     district_key = ndb.KeyProperty(kind=District)
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
@@ -23,17 +27,17 @@ class DistrictTeam(ndb.Model):
         # store set of affected references referenced keys for cache clearing
         # keys must be model properties
         self._affected_references = {
-            'district': set(),
-            'district_key': set(),
-            'team': set(),
-            'year': set(),
+            "district": set(),
+            "district_key": set(),
+            "team": set(),
+            "year": set(),
         }
         super(DistrictTeam, self).__init__(*args, **kw)
 
     @property
-    def key_name(self):
+    def key_name(self) -> DistrictTeamKey:
         return self.renderKeyName(self.district_key.id(), self.team.id())
 
     @classmethod
-    def renderKeyName(self, districtKey, teamKey):
+    def renderKeyName(self, districtKey: DistrictKey, teamKey: TeamKey):
         return "{}_{}".format(districtKey, teamKey)
