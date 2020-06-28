@@ -2,10 +2,11 @@ from google.cloud import ndb
 
 from backend.common.consts.event_type import EventType
 from backend.common.models.event import Event
+from backend.common.models.keys import Year
 from backend.common.queries.event_query import EventDivisionsQuery
 
 
-def preseed_event_with_divisions(year: int, n: int) -> None:
+def preseed_event_with_divisions(year: Year, n: int) -> None:
     stored = ndb.put_multi(
         [
             Event(

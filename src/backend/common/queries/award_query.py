@@ -7,7 +7,7 @@ from backend.common.consts.event_type import EventType
 from backend.common.futures import TypedFuture
 from backend.common.models.award import Award
 from backend.common.models.event import Event
-from backend.common.models.keys import EventKey, TeamKey
+from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.team import Team
 from backend.common.queries.database_query import DatabaseQuery
 from backend.common.queries.dict_converters.award_converter import AwardConverter
@@ -39,7 +39,7 @@ class TeamYearAwardsQuery(DatabaseQuery[List[Award]]):
     DICT_CONVERTER = AwardConverter
 
     @ndb.tasklet
-    def _query_async(self, team_key: TeamKey, year: int) -> TypedFuture[List[Award]]:
+    def _query_async(self, team_key: TeamKey, year: Year) -> TypedFuture[List[Award]]:
         awards = yield Award.query(
             Award.team_list == ndb.Key(Team, team_key), Award.year == year
         ).fetch_async()

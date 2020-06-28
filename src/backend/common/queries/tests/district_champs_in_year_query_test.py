@@ -1,9 +1,10 @@
 from backend.common.consts.event_type import EventType
 from backend.common.models.event import Event
+from backend.common.models.keys import Year
 from backend.common.queries.event_query import DistrictChampsInYearQuery
 
 
-def preseed_event(year: int, short: str, type: EventType) -> None:
+def preseed_event(year: Year, short: str, type: EventType) -> None:
     Event(
         id=f"{year}{short}", event_short=short, year=year, event_type_enum=type,
     ).put()

@@ -4,6 +4,7 @@ from google.cloud import ndb
 
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
+from backend.common.models.keys import Year
 from backend.common.models.team import Team
 from backend.common.queries.team_query import TeamListYearQuery
 
@@ -17,7 +18,7 @@ def preseed_teams(start_team: int, end_team: Optional[int] = None) -> List[ndb.K
     return stored
 
 
-def preseed_event_teams(team_keys: List[ndb.Key], event_year: int) -> None:
+def preseed_event_teams(team_keys: List[ndb.Key], event_year: Year) -> None:
     event_teams = [
         EventTeam(
             id=f"{event_year}ct_{t.id()}",

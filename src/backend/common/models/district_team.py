@@ -1,7 +1,7 @@
 from google.cloud import ndb
 
 from backend.common.models.district import District
-from backend.common.models.keys import DistrictKey, DistrictTeamKey, TeamKey
+from backend.common.models.keys import DistrictKey, DistrictTeamKey, TeamKey, Year
 from backend.common.models.team import Team
 
 
@@ -13,7 +13,7 @@ class DistrictTeam(ndb.Model):
     """
 
     team = ndb.KeyProperty(kind=Team)
-    year = ndb.IntegerProperty()
+    year: Year = ndb.IntegerProperty()
     # One of DistrictType constants, DEPRECATED, use district_key
     # district = (
     #    ndb.IntegerProperty()

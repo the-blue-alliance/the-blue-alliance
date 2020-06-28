@@ -5,7 +5,7 @@ from google.cloud import ndb
 from backend.common.consts.event_type import EventType
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
-from backend.common.models.keys import EventKey, TeamKey
+from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.team import Team
 from backend.common.queries.event_query import (
     TeamEventsQuery,
@@ -14,7 +14,7 @@ from backend.common.queries.event_query import (
 )
 
 
-def preseed_events(year: int, n: int) -> List[str]:
+def preseed_events(year: Year, n: int) -> List[str]:
     stored = ndb.put_multi(
         [
             Event(

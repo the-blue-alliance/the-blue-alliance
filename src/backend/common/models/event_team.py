@@ -3,7 +3,7 @@ from pyre_extensions import safe_cast
 
 from backend.common.models.event import Event
 from backend.common.models.event_team_status import EventTeamStatus
-from backend.common.models.keys import EventTeamKey
+from backend.common.models.keys import EventTeamKey, Year
 from backend.common.models.team import Team
 
 
@@ -16,7 +16,7 @@ class EventTeam(ndb.Model):
 
     event = ndb.KeyProperty(kind=Event)
     team = ndb.KeyProperty(kind=Team)
-    year = ndb.IntegerProperty()
+    year: Year = ndb.IntegerProperty()
 
     status: EventTeamStatus = safe_cast(EventTeamStatus, ndb.JsonProperty())
 

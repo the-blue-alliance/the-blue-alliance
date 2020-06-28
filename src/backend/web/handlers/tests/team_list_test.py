@@ -6,11 +6,12 @@ from bs4 import BeautifulSoup
 from google.cloud import ndb
 from werkzeug.test import Client
 
+from backend.common.models.keys import TeamNumber
 from backend.common.models.team import Team
 
 
 class ParsedTeam(NamedTuple):
-    team_number: int
+    team_number: TeamNumber
     team_number_link: Optional[str]
     team_name: str
     team_name_link: Optional[str]
@@ -18,7 +19,10 @@ class ParsedTeam(NamedTuple):
 
 
 def preseed_teams(
-    ndb_client: ndb.Client, start_team: int, end_team: int, set_city: bool = False
+    ndb_client: ndb.Client,
+    start_team: TeamNumber,
+    end_team: TeamNumber,
+    set_city: bool = False,
 ) -> None:
     with ndb_client.context():
         stored = ndb.put_multi(

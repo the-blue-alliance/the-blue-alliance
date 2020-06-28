@@ -5,6 +5,7 @@ from flask import abort
 
 from backend.common.decorators import cached_public
 from backend.common.models.event_participation import EventParticipation
+from backend.common.models.keys import TeamNumber, Year
 from backend.common.models.team import Team
 from backend.common.queries.event_query import TeamYearEventsQuery
 from backend.common.queries.team_query import (
@@ -24,7 +25,7 @@ VALID_PAGES = range(
 
 
 @cached_public
-def team_detail(team_number: int, year: int, is_canonical: bool = False) -> str:
+def team_detail(team_number: TeamNumber, year: Year, is_canonical: bool = False) -> str:
     team_key = f"frc{team_number}"
     if not Team.validate_key_name(team_key):
         abort(404)
@@ -75,12 +76,12 @@ def team_detail(team_number: int, year: int, is_canonical: bool = False) -> str:
 
 
 @cached_public
-def team_history(team_number: int) -> str:
+def team_history(team_number: TeamNumber) -> str:
     abort(501)
 
 
 @cached_public
-def team_canonical(team_number: int) -> str:
+def team_canonical(team_number: TeamNumber) -> str:
     team_future = TeamQuery(team_key=f"frc{team_number}").fetch_async()
     team = team_future.get_result()
     if not team:

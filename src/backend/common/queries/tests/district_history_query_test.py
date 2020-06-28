@@ -1,9 +1,9 @@
 from backend.common.models.district import District
-from backend.common.models.keys import DistrictAbbreviation
+from backend.common.models.keys import DistrictAbbreviation, Year
 from backend.common.queries.district_query import DistrictHistoryQuery
 
 
-def preseed_district(year: int, abbrev: DistrictAbbreviation) -> None:
+def preseed_district(year: Year, abbrev: DistrictAbbreviation) -> None:
     d = District(id=f"{year}{abbrev}", year=year, abbreviation=abbrev,)
     d.put()
 

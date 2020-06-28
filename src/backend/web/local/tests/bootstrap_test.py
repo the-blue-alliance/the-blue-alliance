@@ -9,7 +9,7 @@ from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
-from backend.common.models.keys import EventKey, TeamKey
+from backend.common.models.keys import EventKey, TeamKey, TeamNumber
 from backend.common.models.team import Team
 from backend.common.queries.dict_converters.event_converter import EventConverter
 from backend.common.queries.dict_converters.team_converter import TeamConverter
@@ -22,7 +22,7 @@ def remove_auto_add_properties(model):
     return model
 
 
-def make_team(team_num: int) -> Team:
+def make_team(team_num: TeamNumber) -> Team:
     return Team(
         id=f"frc{team_num}",
         team_number=team_num,

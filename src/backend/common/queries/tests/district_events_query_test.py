@@ -5,12 +5,12 @@ from google.cloud import ndb
 from backend.common.consts.event_type import EventType
 from backend.common.models.district import District
 from backend.common.models.event import Event
-from backend.common.models.keys import DistrictAbbreviation
+from backend.common.models.keys import DistrictAbbreviation, Year
 from backend.common.queries.event_query import DistrictEventsQuery
 
 
 def preseed_events(
-    year: int, n: int, district_abbrev: Optional[DistrictAbbreviation]
+    year: Year, n: int, district_abbrev: Optional[DistrictAbbreviation]
 ) -> None:
     event_type = EventType.DISTRICT if district_abbrev else EventType.REGIONAL
     district_key = (

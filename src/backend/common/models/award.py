@@ -9,7 +9,7 @@ from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
 from backend.common.models.award_recipient import AwardRecipient
 from backend.common.models.event import Event
-from backend.common.models.keys import AwardKey, EventKey
+from backend.common.models.keys import AwardKey, EventKey, Year
 from backend.common.models.team import Team
 
 
@@ -27,7 +27,7 @@ class Award(ndb.Model):
     award_type_enum: AwardType = safe_cast(
         AwardType, ndb.IntegerProperty(required=True, choices=award_type.AWARD_TYPES)
     )
-    year = ndb.IntegerProperty(required=True)  # year the award was awarded
+    year: Year = ndb.IntegerProperty(required=True)  # year the award was awarded
     event = ndb.KeyProperty(
         kind=Event, required=True
     )  # event at which the award was awarded

@@ -2,12 +2,12 @@ from google.cloud import ndb
 
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
-from backend.common.models.keys import DistrictKey
+from backend.common.models.keys import DistrictKey, TeamNumber
 from backend.common.models.team import Team
 from backend.common.queries.district_query import TeamDistrictsQuery
 
 
-def preseed_district_team(team_number: int, district_key: DistrictKey) -> None:
+def preseed_district_team(team_number: TeamNumber, district_key: DistrictKey) -> None:
     District(id=district_key, year=int(district_key[:4]),).put()
 
     DistrictTeam(

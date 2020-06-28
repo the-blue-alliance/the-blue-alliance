@@ -7,7 +7,7 @@ from google.cloud import ndb
 from backend.common.consts.event_type import EventType
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
-from backend.common.models.keys import EventKey
+from backend.common.models.keys import EventKey, TeamNumber
 from backend.common.models.team import Team
 
 
@@ -26,7 +26,7 @@ class TeamEventParticipation(NamedTuple):
     event_name: str
 
 
-def preseed_team(ndb_client: ndb.Client, team_number: int) -> None:
+def preseed_team(ndb_client: ndb.Client, team_number: TeamNumber) -> None:
     with ndb_client.context():
         Team(
             id=f"frc{team_number}",
@@ -42,7 +42,7 @@ def preseed_team(ndb_client: ndb.Client, team_number: int) -> None:
 
 
 def preseed_event_for_team(
-    ndb_client: ndb.Client, team_number: int, event_key: EventKey
+    ndb_client: ndb.Client, team_number: TeamNumber, event_key: EventKey
 ) -> None:
     with ndb_client.context():
         Event(

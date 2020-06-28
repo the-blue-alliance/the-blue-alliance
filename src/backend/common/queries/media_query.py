@@ -6,7 +6,7 @@ from backend.common.consts.media_tag import MediaTag
 from backend.common.futures import TypedFuture
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
-from backend.common.models.keys import EventKey, TeamKey
+from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.media import Media
 from backend.common.models.team import Team
 from backend.common.queries.database_query import DatabaseQuery
@@ -40,7 +40,7 @@ class TeamYearMediaQuery(DatabaseQuery[List[Media]]):
     DICT_CONVERTER = MediaConverter
 
     @ndb.tasklet
-    def _query_async(self, team_key: TeamKey, year: int) -> TypedFuture[List[Media]]:
+    def _query_async(self, team_key: TeamKey, year: Year) -> TypedFuture[List[Media]]:
         medias = yield Media.query(
             Media.references == ndb.Key(Team, team_key), Media.year == year
         ).fetch_async()
@@ -125,7 +125,7 @@ class TeamYearTagMediasQuery(DatabaseQuery[List[Media]]):
 
     @ndb.tasklet
     def _query_async(
-        self, team_key: TeamKey, year: int, media_tag: MediaTag
+        self, team_key: TeamKey, year: Year, media_tag: MediaTag
     ) -> TypedFuture[List[Media]]:
         team_ndb_key = ndb.Key(Team, team_key)
         medias = yield Media.query(

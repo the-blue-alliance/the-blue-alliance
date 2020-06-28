@@ -6,7 +6,7 @@ from pyre_extensions import safe_cast
 
 from backend.common.models.district_advancement import DistrictAdvancement
 from backend.common.models.district_ranking import DistrictRanking
-from backend.common.models.keys import DistrictAbbreviation, DistrictKey
+from backend.common.models.keys import DistrictAbbreviation, DistrictKey, Year
 
 
 class District(ndb.Model):
@@ -15,7 +15,7 @@ class District(ndb.Model):
     (like district rankings)
     """
 
-    year = ndb.IntegerProperty()
+    year: Year = ndb.IntegerProperty()
     abbreviation = ndb.StringProperty()
     # This is what we'll show on the TBA site
     display_name = ndb.StringProperty()
@@ -60,7 +60,7 @@ class District(ndb.Model):
 
     @classmethod
     def renderKeyName(
-        cls, year: int, district_abbrev: DistrictAbbreviation
+        cls, year: Year, district_abbrev: DistrictAbbreviation
     ) -> DistrictKey:
         # Like 2016ne or 2016fim
         return f"{year}{district_abbrev.lower()}"

@@ -10,7 +10,7 @@ from backend.common.consts import event_type
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.models.district import District
-from backend.common.models.keys import EventKey
+from backend.common.models.keys import EventKey, Year
 from backend.common.models.location import Location
 from backend.common.models.webcast import Webcast
 
@@ -32,7 +32,7 @@ class Event(ndb.Model):
     first_code = (
         ndb.StringProperty()
     )  # Event code used in FIRST's API, if different from event_short
-    year = ndb.IntegerProperty(required=True)
+    year: Year = ndb.IntegerProperty(required=True)
     # event_district_enum = ndb.IntegerProperty(default=DistrictType.NO_DISTRICT)  # Deprecated, use district_key instead
     district_key = ndb.KeyProperty(kind=District)
     start_date = ndb.DateTimeProperty()

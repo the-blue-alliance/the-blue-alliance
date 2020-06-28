@@ -5,7 +5,7 @@ from google.cloud import ndb
 from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
-from backend.common.models.keys import DistrictAbbreviation, DistrictKey, TeamKey
+from backend.common.models.keys import DistrictAbbreviation, DistrictKey, TeamKey, Year
 from backend.common.models.team import Team
 from backend.common.queries.database_query import DatabaseQuery
 from backend.common.queries.dict_converters.district_converter import DistrictConverter
@@ -30,7 +30,7 @@ class DistrictsInYearQuery(DatabaseQuery[List[District]]):
     DICT_CONVERTER = DistrictConverter
 
     @ndb.tasklet
-    def _query_async(self, year: int) -> List[District]:
+    def _query_async(self, year: Year) -> List[District]:
         district_keys = yield District.query(District.year == year).fetch_async(
             keys_only=True
         )

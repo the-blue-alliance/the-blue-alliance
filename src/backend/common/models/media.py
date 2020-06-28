@@ -8,7 +8,7 @@ from backend.common.consts import media_tag, media_type
 from backend.common.consts.media_tag import MediaTag
 from backend.common.consts.media_type import MediaType
 from backend.common.models.event import Event
-from backend.common.models.keys import MediaKey
+from backend.common.models.keys import MediaKey, Year
 from backend.common.models.team import Team
 
 
@@ -39,7 +39,7 @@ class Media(ndb.Model):
     private_details_json = (
         ndb.TextProperty()
     )  # Additional properties we don't want to expose via API
-    year = ndb.IntegerProperty()  # None if year is not relevant
+    year: Year = ndb.IntegerProperty()  # None if year is not relevant
     references = ndb.KeyProperty(
         repeated=True
     )  # Other models that are linked to this object

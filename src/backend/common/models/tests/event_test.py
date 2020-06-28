@@ -8,8 +8,9 @@ from google.cloud import ndb
 
 from backend.common.consts.event_type import EventType
 from backend.common.consts.webcast_type import WebcastType
-from backend.common.models.event import District
+from backend.common.models.district import District
 from backend.common.models.event import Event
+from backend.common.models.keys import Year
 from backend.common.models.tests.util import (
     CITY_STATE_COUNTRY_PARAMETERS,
     LOCATION_PARAMETERS,
@@ -165,7 +166,7 @@ def test_past_future_start_end_today(
     ],
 )
 def test_week(
-    year: int,
+    year: Year,
     event_type: EventType,
     official: bool,
     week: int,

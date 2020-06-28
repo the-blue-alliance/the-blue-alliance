@@ -4,7 +4,7 @@ from google.cloud import ndb
 
 from backend.common.futures import TypedFuture
 from backend.common.models.event import Event
-from backend.common.models.keys import EventKey, MatchKey, TeamKey
+from backend.common.models.keys import EventKey, MatchKey, TeamKey, Year
 from backend.common.models.match import Match
 from backend.common.queries.database_query import DatabaseQuery
 from backend.common.queries.dict_converters.match_converter import MatchConverter
@@ -47,7 +47,7 @@ class TeamYearMatchesQuery(DatabaseQuery[List[Match]]):
     DICT_CONVERTER = MatchConverter
 
     @ndb.tasklet
-    def _query_async(self, team_key: TeamKey, year: int) -> List[Match]:
+    def _query_async(self, team_key: TeamKey, year: Year) -> List[Match]:
         match_keys = yield Match.query(
             Match.team_key_names == team_key, Match.year == year
         ).fetch_async(keys_only=True)

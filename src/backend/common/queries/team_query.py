@@ -7,7 +7,7 @@ from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
-from backend.common.models.keys import DistrictKey, EventKey, TeamKey
+from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
 from backend.common.models.team import Team
 from backend.common.queries.database_query import DatabaseQuery
 from backend.common.queries.dict_converters.team_converter import TeamConverter
@@ -42,7 +42,7 @@ class TeamListYearQuery(DatabaseQuery[List[Team]]):
     DICT_CONVERTER = TeamConverter
 
     @ndb.tasklet
-    def _query_async(self, year: int, page: int) -> List[Team]:
+    def _query_async(self, year: Year, page: int) -> List[Team]:
         event_team_keys_future = EventTeam.query(EventTeam.year == year).fetch_async(
             keys_only=True
         )
