@@ -7,7 +7,7 @@ from typing_extensions import TypedDict
 from backend.common.consts.ranking_sort_orders import (
     SORT_ORDER_INFO as RANKING_SORT_ORDERS,
 )
-from backend.common.models.alliance import Alliance
+from backend.common.models.alliance import EventAlliance
 from backend.common.models.event_district_points import EventDistrictPoints
 from backend.common.models.event_insights import EventInsights
 from backend.common.models.event_matchstats import EventMatchstats
@@ -31,7 +31,7 @@ class EventDetails(ndb.Model):
     """
 
     alliance_selections: List[
-        Alliance
+        EventAlliance
     ] = ndb.JsonProperty()  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
     district_points: EventDistrictPoints = safe_cast(
         EventDistrictPoints, ndb.JsonProperty()
