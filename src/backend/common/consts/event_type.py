@@ -19,6 +19,9 @@ class EventType(enum.IntEnum):
     UNLABLED = -1
 
 
+EVENT_TYPES: Set[EventType] = {e for e in EventType}
+
+
 TYPE_NAMES: Dict[EventType, str] = {
     EventType.REGIONAL: "Regional",
     EventType.DISTRICT: "District",

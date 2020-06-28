@@ -72,4 +72,4 @@ class TeamEventTypeAwardsQuery(DatabaseQuery[List[Award]]):
             Award.event_type_enum == event_type,
             Award.award_type_enum == award_type,
         ).fetch_async()
-        raise ndb.Return(awards)
+        return awards

@@ -4,7 +4,7 @@ from typing import Dict, List, Optional
 from google.cloud import ndb
 from pyre_extensions import none_throws, safe_cast
 
-from backend.common.consts import award_type
+from backend.common.consts import award_type, event_type
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
 from backend.common.models.award_recipient import AwardRecipient
@@ -25,14 +25,14 @@ class Award(ndb.Model):
         required=True, indexed=False
     )  # award name that shows up on USFIRST Pages. May vary for the same award type.
     award_type_enum: AwardType = safe_cast(
-        AwardType, ndb.IntegerProperty(required=True)
+        AwardType, ndb.IntegerProperty(required=True, choices=award_type.AWARD_TYPES)
     )
     year = ndb.IntegerProperty(required=True)  # year the award was awarded
     event = ndb.KeyProperty(
         kind=Event, required=True
     )  # event at which the award was awarded
     event_type_enum = ndb.IntegerProperty(
-        required=True
+        required=True, choices=event_type.EVENT_TYPES,
     )  # needed to query for awards from events of a certain event type
 
     team_list = ndb.KeyProperty(
@@ -56,7 +56,7 @@ class Award(ndb.Model):
             "award_type_enum": set(),
         }
         self._recipient_list: Optional[List[AwardRecipient]] = None
-        self._recipient_dict: Optional[Dict[int, List[AwardRecipient]]] = None
+        self._recipient_dict: Optional[Dict[Optional[int], List[AwardRecipient]]] = None
         self._recipient_list_json: Optional[str] = None
         super(Award, self).__init__(*args, **kw)
 
@@ -72,6 +72,7 @@ class Award(ndb.Model):
             and self.year >= 2017
         ):
             # Only count WFA banner from the first Championship
+            # (for insights purposes)
             cmp_event_keys = (
                 Event.query(
                     Event.year == self.year,
@@ -100,7 +101,7 @@ class Award(ndb.Model):
             return self.name_str
 
     @property
-    def recipient_dict(self) -> Dict[int, List[AwardRecipient]]:
+    def recipient_dict(self) -> Dict[Optional[int], List[AwardRecipient]]:
         """
         Uses recipient_list to add a recipient_dict property,
         where the key is the team_number and the value is a list of awardees.
@@ -142,6 +143,16 @@ class Award(ndb.Model):
 
     @classmethod
     def render_key_name(
-        self, event_key_name: EventKey, award_type_enum: AwardType
+        cls, event_key_name: EventKey, award_type_enum: AwardType
     ) -> AwardKey:
         return "{}_{}".format(event_key_name, award_type_enum)
+
+    @classmethod
+    def validate_key_name(cls, key: str) -> bool:
+        split = key.split("_")
+        return (
+            len(split) == 2
+            and Event.validate_key_name(split[0])
+            and split[1].isnumeric()
+            and int(split[1]) in AwardType.__members__.values()
+        )

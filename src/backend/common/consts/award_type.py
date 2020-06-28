@@ -96,6 +96,9 @@ class AwardType(enum.IntEnum):
     AUTONOMOUS = 71
 
 
+AWARD_TYPES: Set[AwardType] = {a for a in AwardType}
+
+
 BLUE_BANNER_AWARDS: Set[AwardType] = {
     AwardType.CHAIRMANS,
     AwardType.CHAIRMANS_FINALIST,
