@@ -12,3 +12,4 @@ DistrictAbbreviation = str
 DistrictTeamKey = str
 MatchKey = str
 AwardKey = str
+MediaKey = str
