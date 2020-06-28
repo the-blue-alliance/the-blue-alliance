@@ -1,18 +1,8 @@
-import enum
 from typing import List
 
 from typing_extensions import TypedDict
 
 from backend.common.models.keys import TeamKey
-
-
-@enum.unique
-class AllianceColor(enum.Enum):
-    RED = "red"
-    BLUE = "blue"
-
-
-ALLIANCE_COLORS: List[AllianceColor] = list(AllianceColor)
 
 
 class EventAlliance(TypedDict):

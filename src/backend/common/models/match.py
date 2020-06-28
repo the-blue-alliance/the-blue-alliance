@@ -8,8 +8,9 @@ from pyre_extensions import none_throws, safe_cast
 from typing_extensions import Literal
 
 from backend.common.consts import comp_level
+from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.comp_level import CompLevel
-from backend.common.models.alliance import ALLIANCE_COLORS, AllianceColor, MatchAlliance
+from backend.common.models.alliance import MatchAlliance
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, MatchKey
 from backend.common.models.match_video import MatchVideo
