@@ -10,8 +10,11 @@ class EventAlliance(TypedDict):
     declines: List[TeamKey]
 
 
-class MatchAlliance(TypedDict):
-    teams: List[TeamKey]
-    score: int
+class _MatchAllianceOptional(TypedDict, total=False):
     surrogates: List[TeamKey]
     dqs: List[TeamKey]
+
+
+class MatchAlliance(_MatchAllianceOptional, total=True):
+    teams: List[TeamKey]
+    score: int

@@ -1,18 +1,21 @@
 import datetime
 import json
 import re
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
 from google.cloud import ndb
 from pyre_extensions import none_throws, safe_cast
-from typing_extensions import Literal
 
 from backend.common.consts import comp_level
-from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
+from backend.common.consts.alliance_color import (
+    ALLIANCE_COLORS,
+    AllianceColor,
+    TMatchWinner,
+)
 from backend.common.consts.comp_level import CompLevel
 from backend.common.models.alliance import MatchAlliance
 from backend.common.models.event import Event
-from backend.common.models.keys import EventKey, MatchKey
+from backend.common.models.keys import EventKey, MatchKey, TeamKey
 from backend.common.models.match_score_breakdown import MatchScoreBreakdown
 from backend.common.models.match_video import MatchVideo
 from backend.common.models.tba_video import TBAVideo
@@ -65,7 +68,11 @@ class Match(ndb.Model):
 
     comp_level: CompLevel = safe_cast(
         CompLevel,
-        ndb.StringProperty(required=True, choices=set(comp_level.COMP_LEVELS)),
+        ndb.StringProperty(
+            required=True,
+            choices=set(comp_level.COMP_LEVELS),
+            validator=CompLevel.ndb_validate,
+        ),
     )
     event = ndb.KeyProperty(kind=Event, required=True)
     year = ndb.IntegerProperty(required=True)
@@ -74,9 +81,8 @@ class Match(ndb.Model):
         default=False, indexed=False
     )  # Set to True after manual update
     set_number = ndb.IntegerProperty(required=True, indexed=False)
-    team_key_names = ndb.StringProperty(
-        repeated=True
-    )  # list of teams in Match, for indexing.
+    # list of teams in Match, for indexing.
+    team_key_names: List[TeamKey] = ndb.StringProperty(repeated=True)  # pyre-ignore[8]
     time = ndb.DateTimeProperty()  # UTC time of scheduled start
     time_string = ndb.TextProperty(
         indexed=False
@@ -113,7 +119,7 @@ class Match(ndb.Model):
         self._alliances: Optional[Dict[AllianceColor, MatchAlliance]] = None
         self._score_breakdown: Optional[MatchScoreBreakdown] = None
         self._tba_video: Optional[TBAVideo] = None
-        self._winning_alliance: Optional[Union[AllianceColor, Literal[""]]] = None
+        self._winning_alliance: Optional[TMatchWinner] = None
         self._youtube_videos: Optional[List[str]] = None
         self._updated_attrs = []  # Used in MatchManipulator to track what changed
         super(Match, self).__init__(*args, **kw)
@@ -137,9 +143,13 @@ class Match(ndb.Model):
                 # add surrogates if not present
                 if "surrogates" not in alliances[color]:
                     alliances[color]["surrogates"] = []
+
                 # add dqs if not present
                 if "dqs" not in alliances[color]:
                     alliances[color]["dqs"] = []
+
+                # In elims, FIRST only reports the captain receiving a DQ
+                # but we want to show it affecting the entire alliance
                 if (
                     len(alliances[color]["dqs"]) != 0
                     and self.comp_level in comp_level.ELIM_LEVELS
@@ -214,7 +224,7 @@ class Match(ndb.Model):
         return self._score_breakdown
 
     @property
-    def winning_alliance(self) -> Union[AllianceColor, Literal[""]]:
+    def winning_alliance(self) -> TMatchWinner:
         """
         from helpers.event_helper import EventHelper
         from helpers.match_helper import MatchHelper
@@ -246,7 +256,7 @@ class Match(ndb.Model):
         return self._winning_alliance or ""
 
     @property
-    def losing_alliance(self) -> Union[AllianceColor, Literal[""]]:
+    def losing_alliance(self) -> TMatchWinner:
         winning_alliance = self.winning_alliance
         # No winning alliance means no losing alliance - either a tie, or 2015
         if winning_alliance == "":
@@ -275,10 +285,8 @@ class Match(ndb.Model):
     @property
     def has_been_played(self) -> bool:
         """If there are scores, it's been played"""
-        for alliance in self.alliances.keys():
-            if (self.alliances[alliance]["score"] is None) or (
-                self.alliances[alliance]["score"] == -1
-            ):
+        for color in ALLIANCE_COLORS:
+            if self.alliances[color]["score"] == -1:
                 return False
         return True
 
@@ -313,7 +321,7 @@ class Match(ndb.Model):
             return "F%s" % self.match_number
         else:
             return "%s%s-%s" % (
-                str(self.comp_level).upper(),
+                self.comp_level.upper(),
                 self.set_number,
                 self.match_number,
             )
