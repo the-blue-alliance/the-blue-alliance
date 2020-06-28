@@ -13,6 +13,7 @@ from backend.common.consts.comp_level import CompLevel
 from backend.common.models.alliance import MatchAlliance
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, MatchKey
+from backend.common.models.match_score_breakdown import MatchScoreBreakdown
 from backend.common.models.match_video import MatchVideo
 from backend.common.models.tba_video import TBAVideo
 from backend.common.models.team import Team
@@ -110,7 +111,7 @@ class Match(ndb.Model):
             "year": set(),
         }
         self._alliances: Optional[Dict[AllianceColor, MatchAlliance]] = None
-        self._score_breakdown = None
+        self._score_breakdown: Optional[MatchScoreBreakdown] = None
         self._tba_video: Optional[TBAVideo] = None
         self._winning_alliance: Optional[Union[AllianceColor, Literal[""]]] = None
         self._youtube_videos: Optional[List[str]] = None
@@ -149,17 +150,17 @@ class Match(ndb.Model):
         return none_throws(self._alliances)
 
     @property
-    def score_breakdown(self):
+    def score_breakdown(self) -> Optional[MatchScoreBreakdown]:
         """
         Lazy load score_breakdown_json
         """
         if self._score_breakdown is None and self.score_breakdown_json is not None:
-            self._score_breakdown = json.loads(self.score_breakdown_json)
+            score_breakdown = json.loads(self.score_breakdown_json)
 
             if self.has_been_played:
                 # Add in RP calculations
                 if self.year in {2016, 2017}:
-                    for color in ["red", "blue"]:
+                    for color in ALLIANCE_COLORS:
                         if self.comp_level == "qm":
                             rp_earned = 0
                             if self.winning_alliance == color:
@@ -168,39 +169,39 @@ class Match(ndb.Model):
                                 rp_earned += 1
 
                             if self.year == 2016:
-                                if self._score_breakdown.get(color, {}).get(
+                                if score_breakdown.get(color, {}).get(
                                     "teleopDefensesBreached"
                                 ):
                                     rp_earned += 1
-                                if self._score_breakdown.get(color, {}).get(
+                                if score_breakdown.get(color, {}).get(
                                     "teleopTowerCaptured"
                                 ):
                                     rp_earned += 1
                             elif self.year == 2017:
-                                if self._score_breakdown.get(color, {}).get(
+                                if score_breakdown.get(color, {}).get(
                                     "kPaRankingPointAchieved"
                                 ):
                                     rp_earned += 1
-                                if self._score_breakdown.get(color, {}).get(
+                                if score_breakdown.get(color, {}).get(
                                     "rotorRankingPointAchieved"
                                 ):
                                     rp_earned += 1
-                            self._score_breakdown[color]["tba_rpEarned"] = rp_earned
+                            score_breakdown[color]["tba_rpEarned"] = rp_earned
                         else:
-                            self._score_breakdown[color]["tba_rpEarned"] = None
+                            score_breakdown[color]["tba_rpEarned"] = None
                 # Derive if bonus RP came from fouls
                 if self.year == 2020:
-                    for color in ["red", "blue"]:
-                        self._score_breakdown[color][
+                    for color in ALLIANCE_COLORS:
+                        score_breakdown[color][
                             "tba_shieldEnergizedRankingPointFromFoul"
                         ] = (
-                            self._score_breakdown[color]["shieldEnergizedRankingPoint"]
-                            and not self._score_breakdown[color]["stage3Activated"]
+                            score_breakdown[color]["shieldEnergizedRankingPoint"]
+                            and not score_breakdown[color]["stage3Activated"]
                         )
-                        self._score_breakdown[color]["tba_numRobotsHanging"] = sum(
+                        score_breakdown[color]["tba_numRobotsHanging"] = sum(
                             [
                                 1
-                                if self._score_breakdown[color].get(
+                                if score_breakdown[color].get(
                                     "endgameRobot{}".format(i)
                                 )
                                 == "Hang"
@@ -208,6 +209,7 @@ class Match(ndb.Model):
                                 for i in range(1, 4)
                             ]
                         )
+                self._score_breakdown = score_breakdown
 
         return self._score_breakdown
 
