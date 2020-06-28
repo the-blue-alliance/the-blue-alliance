@@ -3,6 +3,8 @@ from typing import List, Optional
 
 from typing_extensions import TypedDict
 
+from backend.common.consts.comp_level import CompLevel
+
 
 @enum.unique
 class EventTeamLevelStatus(str, enum.Enum):
@@ -16,14 +18,6 @@ class EventTeamPlayoffStatus(str, enum.Enum):
     WON = "won"
     ELIMINATED = "eliminated"
     PLAYING = "playing"
-
-
-@enum.unique
-class ElimCompLevel(str, enum.Enum):
-    EF = "ef"
-    QF = "qf"
-    SF = "sf"
-    F = "f"
 
 
 class WLTRecord(TypedDict):
@@ -55,7 +49,7 @@ class EventTeamStatusQual(TypedDict):
 
 
 class EventTeamStatusPlayoff(TypedDict):
-    level: ElimCompLevel
+    level: CompLevel
     current_level_record: Optional[WLTRecord]
     record: Optional[WLTRecord]
     status: EventTeamPlayoffStatus
