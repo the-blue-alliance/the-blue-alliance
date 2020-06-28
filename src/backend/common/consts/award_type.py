@@ -1,7 +1,11 @@
-from consts.event_type import EventType
+import enum
+from typing import Dict, Set
+
+from backend.common.consts.event_type import EventType
 
 
-class AwardType(object):
+@enum.unique
+class AwardType(enum.IntEnum):
     """
     An award type defines a logical type of award that an award falls into.
     These types are the same across both years and competitions within a year.
@@ -15,6 +19,7 @@ class AwardType(object):
     District Championship, Championship Division, Championship Finals, etc.)
     the award is from. In other words, RCA and CCA are of the same award type.
     """
+
     CHAIRMANS = 0
     WINNER = 1
     FINALIST = 2
@@ -90,56 +95,73 @@ class AwardType(object):
     OTHER = 70
     AUTONOMOUS = 71
 
-    BLUE_BANNER_AWARDS = {CHAIRMANS, CHAIRMANS_FINALIST, WINNER, WOODIE_FLOWERS}
-    INDIVIDUAL_AWARDS = {WOODIE_FLOWERS, DEANS_LIST, VOLUNTEER, FOUNDERS,
-                         BART_KAMEN_MEMORIAL, MAKE_IT_LOUD}
-    NON_JUDGED_NON_TEAM_AWARDS = {  # awards not used in the district point model
-        HIGHEST_ROOKIE_SEED,
-        WOODIE_FLOWERS,
-        DEANS_LIST,
-        VOLUNTEER,
-        WINNER,
-        FINALIST,
-        WILDCARD,
-    }
 
-    normalized_name = {
-        CHAIRMANS: {
-            None: "Chairman's Award",
-        },
-        CHAIRMANS_FINALIST: {
-            None: "Chairman's Award Finalist",
-        },
-        WINNER: {
-            None: "Winner",
-        },
-        WOODIE_FLOWERS: {
-            None: "Woodie Flowers Finalist Award",
-            EventType.CMP_FINALS: "Woodie Flowers Award",
-        },
-    }
+AWARD_TYPES: Set[AwardType] = {a for a in AwardType}
 
-    SEARCHABLE = {  # Only searchable awards. Obscure & old awards not listed
-        CHAIRMANS: 'Chairman\'s',
-        CHAIRMANS_FINALIST: 'Chairman\'s Finalist',
-        ENGINEERING_INSPIRATION: 'Engineering Inspiration',
-        COOPERTITION: 'Coopertition',
-        CREATIVITY: 'Creativity',
-        ENGINEERING_EXCELLENCE: 'Engineering Excellence',
-        ENTREPRENEURSHIP: 'Entrepreneurship',
-        DEANS_LIST: 'Dean\'s List',
-        BART_KAMEN_MEMORIAL: 'Bart Kamen Memorial',
-        GRACIOUS_PROFESSIONALISM: 'Gracious Professionalism',
-        HIGHEST_ROOKIE_SEED: 'Highest Rookie Seed',
-        IMAGERY: 'Imagery',
-        INDUSTRIAL_DESIGN: 'Industrial Design',
-        SAFETY: 'Safety',
-        INNOVATION_IN_CONTROL: 'Innovation in Control',
-        QUALITY: 'Quality',
-        ROOKIE_ALL_STAR: 'Rookie All Star',
-        ROOKIE_INSPIRATION: 'Rookie Inspiration',
-        SPIRIT: 'Spirit',
-        VOLUNTEER: 'Volunteer',
-        WOODIE_FLOWERS: 'Woodie Flowers',
-        JUDGES: 'Judges\'',
-    }
+
+BLUE_BANNER_AWARDS: Set[AwardType] = {
+    AwardType.CHAIRMANS,
+    AwardType.CHAIRMANS_FINALIST,
+    AwardType.WINNER,
+    AwardType.WOODIE_FLOWERS,
+}
+
+
+INDIVIDUAL_AWARDS: Set[AwardType] = {
+    AwardType.WOODIE_FLOWERS,
+    AwardType.DEANS_LIST,
+    AwardType.VOLUNTEER,
+    AwardType.FOUNDERS,
+    AwardType.BART_KAMEN_MEMORIAL,
+    AwardType.MAKE_IT_LOUD,
+}
+
+
+# awards not used in the district point model
+NON_JUDGED_NON_TEAM_AWARDS: Set[AwardType] = {
+    AwardType.HIGHEST_ROOKIE_SEED,
+    AwardType.WOODIE_FLOWERS,
+    AwardType.DEANS_LIST,
+    AwardType.VOLUNTEER,
+    AwardType.WINNER,
+    AwardType.FINALIST,
+    AwardType.WILDCARD,
+}
+
+
+NORMALIZED_NAMES = {
+    AwardType.CHAIRMANS: {None: "Chairman's Award"},
+    AwardType.CHAIRMANS_FINALIST: {None: "Chairman's Award Finalist"},
+    AwardType.WINNER: {None: "Winner"},
+    AwardType.WOODIE_FLOWERS: {
+        None: "Woodie Flowers Finalist Award",
+        EventType.CMP_FINALS: "Woodie Flowers Award",
+    },
+}
+
+
+# Only searchable awards. Obscure & old awards not listed
+SEARCHABLE: Dict[AwardType, str] = {
+    AwardType.CHAIRMANS: "Chairman's",
+    AwardType.CHAIRMANS_FINALIST: "Chairman's Finalist",
+    AwardType.ENGINEERING_INSPIRATION: "Engineering Inspiration",
+    AwardType.COOPERTITION: "Coopertition",
+    AwardType.CREATIVITY: "Creativity",
+    AwardType.ENGINEERING_EXCELLENCE: "Engineering Excellence",
+    AwardType.ENTREPRENEURSHIP: "Entrepreneurship",
+    AwardType.DEANS_LIST: "Dean's List",
+    AwardType.BART_KAMEN_MEMORIAL: "Bart Kamen Memorial",
+    AwardType.GRACIOUS_PROFESSIONALISM: "Gracious Professionalism",
+    AwardType.HIGHEST_ROOKIE_SEED: "Highest Rookie Seed",
+    AwardType.IMAGERY: "Imagery",
+    AwardType.INDUSTRIAL_DESIGN: "Industrial Design",
+    AwardType.SAFETY: "Safety",
+    AwardType.INNOVATION_IN_CONTROL: "Innovation in Control",
+    AwardType.QUALITY: "Quality",
+    AwardType.ROOKIE_ALL_STAR: "Rookie All Star",
+    AwardType.ROOKIE_INSPIRATION: "Rookie Inspiration",
+    AwardType.SPIRIT: "Spirit",
+    AwardType.VOLUNTEER: "Volunteer",
+    AwardType.WOODIE_FLOWERS: "Woodie Flowers",
+    AwardType.JUDGES: "Judges'",
+}
