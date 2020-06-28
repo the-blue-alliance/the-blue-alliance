@@ -66,12 +66,14 @@ class Media(ndb.Model):
 
     @property
     def details(self) -> Dict:
+        # TODO add better typing
         if self._details is None and self.details_json is not None:
             self._details = json.loads(self.details_json)
         return none_throws(self._details)
 
     @property
     def private_details(self) -> Optional[Dict]:
+        # TODO add better typing
         if self._private_details is None and self.private_details_json is not None:
             self._private_details = json.loads(self.private_details_json)
         return self._private_details
@@ -89,8 +91,17 @@ class Media(ndb.Model):
         return media_type.SLUG_NAMES[self.media_type_enum]
 
     @classmethod
-    def render_key_name(self, media_type_enum: MediaType, foreign_key: str) -> MediaKey:
+    def render_key_name(cls, media_type_enum: MediaType, foreign_key: str) -> MediaKey:
         return "{}_{}".format(media_type.SLUG_NAMES[media_type_enum], foreign_key)
+
+    @classmethod
+    def validate_key_name(cls, key: str) -> bool:
+        split = key.split("_")
+        return (
+            len(split) == 2
+            and split[0] in media_type.SLUG_NAMES.values()
+            and len(split[1]) > 0
+        )
 
     # URL renderers
     @property

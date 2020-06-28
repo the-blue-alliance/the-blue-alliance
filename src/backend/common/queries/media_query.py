@@ -60,9 +60,11 @@ class EventTeamsMediasQuery(DatabaseQuery[List[Media]]):
         ).fetch_async(keys_only=True)
         if not event_team_keys:
             return []
-        team_keys = map(
-            lambda event_team_key: ndb.Key(Team, event_team_key.id().split("_")[1]),
-            event_team_keys,
+        team_keys = list(
+            map(
+                lambda event_team_key: ndb.Key(Team, event_team_key.id().split("_")[1]),
+                event_team_keys,
+            )
         )
         medias = yield Media.query(
             Media.references.IN(team_keys), Media.year == year
@@ -83,9 +85,11 @@ class EventTeamsPreferredMediasQuery(DatabaseQuery[List[Media]]):
         ).fetch_async(keys_only=True)
         if not event_team_keys:
             return []
-        team_keys = map(
-            lambda event_team_key: ndb.Key(Team, event_team_key.id().split("_")[1]),
-            event_team_keys,
+        team_keys = list(
+            map(
+                lambda event_team_key: ndb.Key(Team, event_team_key.id().split("_")[1]),
+                event_team_keys,
+            )
         )
         medias = yield Media.query(
             Media.preferred_references.IN(team_keys), Media.year == year
@@ -98,7 +102,9 @@ class EventMediasQuery(DatabaseQuery[List[Media]]):
 
     @ndb.tasklet
     def _query_async(self, event_key: EventKey) -> TypedFuture[List[Media]]:
-        medias = yield Media.query(Media.references == event_key).fetch_async()
+        medias = yield Media.query(
+            Media.references == ndb.Key(Event, event_key)
+        ).fetch_async()
         return medias
 
 
@@ -108,7 +114,8 @@ class TeamTagMediasQuery(DatabaseQuery[List[Media]]):
     @ndb.tasklet
     def _query_async(self, team_key: TeamKey, media_tag: MediaTag):
         medias = yield Media.query(
-            Media.references == team_key, Media.media_tag_enum == media_tag
+            Media.references == ndb.Key(Team, team_key),
+            Media.media_tag_enum == media_tag,
         ).fetch_async()
         return medias
 
