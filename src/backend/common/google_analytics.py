@@ -36,7 +36,7 @@ class GoogleAnalytics:
         params = {
             "v": 1,
             "tid": google_analytics_id,
-            "cid": cid,
+            "cid": str(cid),
             "t": "event",
             "ec": event_category,
             "ea": event_action,
@@ -46,13 +46,5 @@ class GoogleAnalytics:
         if event_value:
             params["ev"] = event_value
 
-        from urllib.parse import urlencode
-
-        params = urlencode(params)
-
-        import urlfetch
-
-        analytics_url = "https://www.google-analytics.com/collect?%s" % params
-        urlfetch.fetch(
-            url=analytics_url, method=urlfetch.GET, deadline=10,
-        )
+        import requests
+        requests.get("https://www.google-analytics.com/collect", params=params, timeout=10)

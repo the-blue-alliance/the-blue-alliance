@@ -11,7 +11,7 @@ google.appengine.api.app_identity => (TODO: Move)
 google.appengine.api.memcache => (TODO: Move)
 google.appengine.api.search => (TODO: Move)
 google.appengine.api.taskqueue => (TODO: Move)
-google.appengine.api.urlfetch => urlfetch
+google.appengine.api.urlfetch => requests
 google.appengine.api.users => (TODO: Move)
 
 google.appengine.ext.ndb => google.cloud.ndb

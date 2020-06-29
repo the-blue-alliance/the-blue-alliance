@@ -1,5 +1,5 @@
 from unittest.mock import patch
-from urllib.parse import parse_qsl, urlparse
+from uuid import UUID
 
 import pytest
 from google.cloud import ndb
@@ -27,38 +27,28 @@ def test_GoogleAnalytics_track_event(ev) -> None:
     sitevar = GoogleAnalyticsID._fetch_sitevar()
     sitevar.contents["GOOGLE_ANALYTICS_ID"] = "abc"
 
-    with patch("urlfetch.fetch") as mock_fetch:
+    with patch("requests.get") as mock_get:
         GoogleAnalytics.track_event("testbed", "test", "test", ev)
 
-    mock_fetch.assert_called()
-    _, kwargs = mock_fetch.call_args
+    mock_get.assert_called()
+    args, kwargs = mock_get.call_args
 
-    assert len(kwargs) == 3
-    assert kwargs["deadline"] == 10
-    assert kwargs["method"] == "GET"
-
-    url = kwargs["url"]
-    assert url
-
-    url_components = urlparse(url)
-    assert url_components.scheme == "https"
-    assert url_components.netloc == "www.google-analytics.com"
-    assert url_components.path == "/collect"
-
-    query_components = parse_qsl(url_components.query)
-    assert len(query_components) == 8 + (1 if ev else 0)
+    assert len(args) == 1
+    assert len(kwargs) == 2
+    assert args[0] == "https://www.google-analytics.com/collect"
+    assert kwargs["timeout"] == 10
 
     query_components_expected = {
-        ("v", "1"),
-        ("tid", "abc"),
-        ("cid", "6dcf939a-da96-33c4-acd1-51208db9ceaa"),
-        ("t", "event"),
-        ("ec", "test"),
-        ("ea", "test"),
-        ("ni", "1"),
-        ("sc", "end"),
+        "v": 1,
+        "tid": "abc",
+        "cid": "6dcf939a-da96-33c4-acd1-51208db9ceaa",
+        "t": "event",
+        "ec": "test",
+        "ea": "test",
+        "ni": 1,
+        "sc": "end",
     }
     if ev:
-        query_components_expected.add(("ev", str(ev)))
+        query_components_expected["ev"] = ev
 
-    assert set(query_components) == query_components_expected
+    assert kwargs["params"] == query_components_expected
