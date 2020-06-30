@@ -1,5 +1,4 @@
 from unittest.mock import patch
-from uuid import UUID
 
 import pytest
 from google.cloud import ndb
