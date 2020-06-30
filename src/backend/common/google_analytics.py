@@ -47,6 +47,7 @@ class GoogleAnalytics:
             params["ev"] = event_value
 
         import requests
+
         requests.get(
             "https://www.google-analytics.com/collect", params=params, timeout=10
         )
