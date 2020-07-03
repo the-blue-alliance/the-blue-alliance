@@ -1,28 +1,13 @@
-import logging
+from typing import List, Tuple
 
-from consts.award_type import AwardType
-
-
-# Prioritized sort order for certain awards
-sort_order = {
-    AwardType.CHAIRMANS: 0,
-    AwardType.FOUNDERS: 1,
-    AwardType.ENGINEERING_INSPIRATION: 2,
-    AwardType.ROOKIE_ALL_STAR: 3,
-    AwardType.WOODIE_FLOWERS: 4,
-    AwardType.VOLUNTEER: 5,
-    AwardType.DEANS_LIST: 6,
-    AwardType.WINNER: 7,
-    AwardType.FINALIST: 8,
-}
-
+from backend.common.consts.award_type import AwardType
 
 """
 An award matches an AwardType if the award's name_str contains every string in
 the the first list of the tuple and does NOT contain any string in the second
 list of the tuple.
 """
-AWARD_MATCHING_STRINGS = [
+AWARD_MATCHING_STRINGS: List[Tuple[AwardType, Tuple[List[str], List[str]]]] = [
     (AwardType.CHAIRMANS, (["chairman"], ["hon", "finalist"])),
     (AwardType.CHAIRMANS_HONORABLE_MENTION, (["chairman", "hon", "mention"], [])),
     (AwardType.CHAIRMANS_FINALIST, (["chairman", "finalist"], ["hon", "mention"])),
@@ -61,10 +46,16 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.ENTREPRENEURSHIP, (["kleiner", "perkins", "caufield", "byers"], [])),
     (AwardType.EXCELLENCE_IN_DESIGN, (["excellence in design"], ["cad", "animation"])),
     (AwardType.EXCELLENCE_IN_DESIGN_CAD, (["excellence in design", "cad"], [])),
-    (AwardType.EXCELLENCE_IN_DESIGN_ANIMATION, (["excellence in design", "animation"], [])),
+    (
+        AwardType.EXCELLENCE_IN_DESIGN_ANIMATION,
+        (["excellence in design", "animation"], []),
+    ),
     (AwardType.DEANS_LIST, (["dean", "list"], [])),
     (AwardType.BART_KAMEN_MEMORIAL, (["bart", "kamen", "memorial"], [])),
-    (AwardType.DRIVING_TOMORROWS_TECHNOLOGY, (["driving", "tomorrow", "technology"], [])),
+    (
+        AwardType.DRIVING_TOMORROWS_TECHNOLOGY,
+        (["driving", "tomorrow", "technology"], []),
+    ),
     (AwardType.DRIVING_TOMORROWS_TECHNOLOGY, (["delphi", "driv", "tech"], [])),
     (AwardType.GRACIOUS_PROFESSIONALISM, (["gracious professionalism"], [])),
     (AwardType.HIGHEST_ROOKIE_SEED, (["highest rookie seed"], [])),
@@ -87,7 +78,10 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.FOUNDERS, (["founder"], [])),
     (AwardType.AUTODESK_INVENTOR, (["autodesk inventor"], [])),
     (AwardType.FUTURE_INNOVATOR, (["future innovator"], [])),
-    (AwardType.RECOGNITION_OF_EXTRAORDINARY_SERVICE, (["recognition", "extraordinary", "service"], [])),
+    (
+        AwardType.RECOGNITION_OF_EXTRAORDINARY_SERVICE,
+        (["recognition", "extraordinary", "service"], []),
+    ),
     (AwardType.OUTSTANDING_CART, (["outstanding", "cart"], [])),
     (AwardType.WSU_AIM_HIGHER, (["wayne", "state", "university", "aim", "higher"], [])),
     (AwardType.LEADERSHIP_IN_CONTROL, (["leadership", "control"], [])),
@@ -103,13 +97,34 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.POWER_TO_SIMPLIFY, (["power to simplify"], [])),
     (AwardType.AGAINST_ALL_ODDS, (["against all odds"], [])),
     (AwardType.RISING_STAR, (["autodesk", "rising star"], ["hon", "mention"])),
-    (AwardType.CONTENT_COMMUNICATION_HONORABLE_MENTION, (["content communication", "hon", "mention"], [])),
-    (AwardType.TECHNICAL_EXECUTION_HONORABLE_MENTION, (["technical execution", "hon", "mention"], [])),
+    (
+        AwardType.CONTENT_COMMUNICATION_HONORABLE_MENTION,
+        (["content communication", "hon", "mention"], []),
+    ),
+    (
+        AwardType.TECHNICAL_EXECUTION_HONORABLE_MENTION,
+        (["technical execution", "hon", "mention"], []),
+    ),
     (AwardType.REALIZATION, (["autodesk", "realization"], ["hon", "mention"])),
-    (AwardType.REALIZATION_HONORABLE_MENTION, (["autodesk", "realization", "hon", "mention"], [])),
-    (AwardType.DESIGN_YOUR_FUTURE, (["autodesk", "design your future"], ["hon", "mention"])),
-    (AwardType.DESIGN_YOUR_FUTURE_HONORABLE_MENTION, (["autodesk", "design your future", "hon", "mention"], [])),
-    (AwardType.SPECIAL_RECOGNITION_CHARACTER_ANIMATION, (["autodesk", "special recognition", "character animation"], ["hon", "mention"])),
+    (
+        AwardType.REALIZATION_HONORABLE_MENTION,
+        (["autodesk", "realization", "hon", "mention"], []),
+    ),
+    (
+        AwardType.DESIGN_YOUR_FUTURE,
+        (["autodesk", "design your future"], ["hon", "mention"]),
+    ),
+    (
+        AwardType.DESIGN_YOUR_FUTURE_HONORABLE_MENTION,
+        (["autodesk", "design your future", "hon", "mention"], []),
+    ),
+    (
+        AwardType.SPECIAL_RECOGNITION_CHARACTER_ANIMATION,
+        (
+            ["autodesk", "special recognition", "character animation"],
+            ["hon", "mention"],
+        ),
+    ),
     (AwardType.HIGH_SCORE, (["high score"], [])),
     (AwardType.TEACHER_PIONEER, (["teacher pioneer"], [])),
     (AwardType.BEST_CRAFTSMANSHIP, (["best craftsmanship"], [])),
@@ -123,41 +138,3 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.AUTONOMOUS, (["autonomous"], [])),
     (AwardType.OTHER, (["other", "offseason award", "offseason event award"], [])),
 ]
-
-
-class AwardHelper(object):
-    @classmethod
-    def organizeAwards(self, award_list):
-        """
-        Sorts awards first by sort_order and then alphabetically by name_str
-        """
-        sorted_awards = sorted(award_list, key=lambda award: sort_order.get(award.award_type_enum, award.name_str))
-        return sorted_awards
-
-    @classmethod
-    def parse_award_type(self, name_str):
-        """
-        Returns the AwardType given a name_str, or None if there are no matches.
-        """
-        name_str_lower = name_str.lower()
-
-        # to match awards without the "#1", "#2", etc suffix
-        if name_str_lower == 'winner':
-            return AwardType.WINNER
-        elif name_str_lower == 'finalist':
-            return AwardType.FINALIST
-
-        for type_enum, (yes_strings, no_strings) in AWARD_MATCHING_STRINGS:
-            for string in yes_strings:
-                if string not in name_str_lower:
-                    break
-            else:
-                for string in no_strings:
-                    if string in name_str_lower:
-                        break
-                else:
-                    # found a match
-                    return type_enum
-        # no matches
-        logging.warning("Found an award without an associated type: " + name_str)
-        return None
