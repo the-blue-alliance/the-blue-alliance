@@ -15,3 +15,4 @@ DistrictTeamKey = str
 MatchKey = str
 AwardKey = str
 MediaKey = str
+RobotKey = str
