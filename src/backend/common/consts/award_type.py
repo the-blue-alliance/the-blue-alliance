@@ -165,3 +165,16 @@ SEARCHABLE: Dict[AwardType, str] = {
     AwardType.WOODIE_FLOWERS: "Woodie Flowers",
     AwardType.JUDGES: "Judges'",
 }
+
+# Prioritized sort order for certain awards
+SORT_ORDER: Dict[AwardType, int] = {
+    AwardType.CHAIRMANS: 0,
+    AwardType.FOUNDERS: 1,
+    AwardType.ENGINEERING_INSPIRATION: 2,
+    AwardType.ROOKIE_ALL_STAR: 3,
+    AwardType.WOODIE_FLOWERS: 4,
+    AwardType.VOLUNTEER: 5,
+    AwardType.DEANS_LIST: 6,
+    AwardType.WINNER: 7,
+    AwardType.FINALIST: 8,
+}
