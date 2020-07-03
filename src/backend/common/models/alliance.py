@@ -5,9 +5,12 @@ from typing_extensions import TypedDict
 from backend.common.models.keys import TeamKey
 
 
-class EventAlliance(TypedDict):
-    picks: List[TeamKey]
+class _EventAllianceOptional(TypedDict, total=False):
     declines: List[TeamKey]
+
+
+class EventAlliance(_EventAllianceOptional, total=True):
+    picks: List[TeamKey]
 
 
 class _MatchAllianceOptional(TypedDict, total=False):

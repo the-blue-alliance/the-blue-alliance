@@ -94,12 +94,12 @@ class Event(ndb.Model):
         # store set of affected references referenced keys for cache clearing
         # keys must be model properties
         self._affected_references = {"key": set(), "year": set(), "district_key": set()}
-        self._awards: Optional[TypedFuture[List["Award"]]] = None
-        self._details: Optional[TypedFuture[EventDetails]] = None
+        self._awards = None
+        self._details = None
         self._location = None
         self._city_state_country = None
-        self._matches: Optional[TypedFuture[List["Match"]]] = None
-        self._teams: Optional[TypedFuture[List["Team"]]] = None
+        self._matches = None
+        self._teams = None
         self._venue_address_safe = None
         self._webcast = None
         self._updated_attrs = []  # Used in EventManipulator to track what changed
@@ -111,7 +111,7 @@ class Event(ndb.Model):
         if self._awards is None:
             from backend.common.queries import award_query
 
-            self._awards = yield award_query.EventAwardsQuery(  # pyre-ignore[8]
+            self._awards = yield award_query.EventAwardsQuery(
                 event_key=self.key_name
             ).fetch_async()
         return none_throws(self._awards)
@@ -138,8 +138,8 @@ class Event(ndb.Model):
     @property
     def awards(self) -> List["Award"]:
         if self._awards is None:
-            self.get_awards_async().wait()
-        return none_throws(self._awards).result()
+            return self.get_awards_async().get_result()
+        return none_throws(self._awards)
 
     @property
     def details(self) -> EventDetails:
@@ -187,24 +187,20 @@ class Event(ndb.Model):
         if self._matches is None:
             from backend.common.queries import match_query
 
-            self._matches = yield match_query.EventMatchesQuery(  # pyre-ignore[8]
+            self._matches = yield match_query.EventMatchesQuery(
                 event_key=self.key_name
             ).fetch_async()
         return none_throws(self._matches)
 
     def prep_matches(self) -> None:
         if self._matches is None:
-            from backend.common.queries import match_query
-
-            self._matches = match_query.EventMatchesQuery(
-                event_key=self.key_name
-            ).fetch_async()
+            self.get_matches_async()
 
     @property
     def matches(self) -> List["Match"]:
         if self._matches is None:
             self.get_matches_async().wait()
-        return none_throws(self._matches).result()
+        return none_throws(self._matches)
 
     def time_as_utc(self, time: datetime.datetime) -> datetime.datetime:
         import pytz
@@ -356,7 +352,7 @@ class Event(ndb.Model):
     def get_teams_async(self) -> TypedFuture[List["Team"]]:
         from backend.common.queries import team_query
 
-        self._teams = yield team_query.EventTeamsQuery(  # pyre-ignore[8]
+        self._teams = yield team_query.EventTeamsQuery(
             event_key=self.key_name
         ).fetch_async()
         return none_throws(self._teams)
@@ -365,7 +361,7 @@ class Event(ndb.Model):
     def teams(self) -> List["Team"]:
         if self._teams is None:
             self.get_teams_async().wait()
-        return none_throws(self._teams).result()
+        return none_throws(self._teams)
 
     @ndb.toplevel
     def prepAwardsMatchesTeams(
