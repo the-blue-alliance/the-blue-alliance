@@ -251,3 +251,62 @@ def test_within_seconds(
     with freeze_time(current_time):
         match = get_base_qual_match(actual_time=match_time)
         assert match.within_seconds(nsec) == within
+
+
+@pytest.mark.parametrize(
+    "red_score, blue_score, winner",
+    [(10, 0, AllianceColor.RED), (0, 10, AllianceColor.BLUE), (10, 10, "")],
+)
+def test_winning_alliance_not_2015(
+    red_score: int, blue_score: int, winner: AllianceColor,
+) -> None:
+    alliances = {
+        AllianceColor.RED: MatchAlliance(
+            teams=["frc1", "frc2", "frc3"], score=red_score,
+        ),
+        AllianceColor.BLUE: MatchAlliance(
+            teams=["frc4", "frc5", "frc6"], score=blue_score,
+        ),
+    }
+    match = Match(
+        id=Match.renderKeyName("2010ct", CompLevel.QM, 1, 1),
+        event=ndb.Key(Event, "2010ct"),
+        year=2010,
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=1,
+        alliances_json=json.dumps(alliances),
+    )
+    assert match.winning_alliance == winner
+
+
+@pytest.mark.parametrize(
+    "comp_level, red_score, blue_score, winner",
+    [
+        (CompLevel.QM, 10, 0, ""),
+        (CompLevel.QF, 0, 10, ""),
+        (CompLevel.SF, 10, 10, "",),
+        (CompLevel.F, 15, 10, AllianceColor.RED,),
+    ],
+)
+def test_winning_alliance_2015(
+    comp_level: CompLevel, red_score: int, blue_score: int, winner: AllianceColor,
+) -> None:
+    alliances = {
+        AllianceColor.RED: MatchAlliance(
+            teams=["frc1", "frc2", "frc3"], score=red_score,
+        ),
+        AllianceColor.BLUE: MatchAlliance(
+            teams=["frc4", "frc5", "frc6"], score=blue_score,
+        ),
+    }
+    match = Match(
+        id=Match.renderKeyName("2015ct", comp_level, 1, 1),
+        event=ndb.Key(Event, "2015ct"),
+        year=2015,
+        comp_level=comp_level,
+        set_number=1,
+        match_number=1,
+        alliances_json=json.dumps(alliances),
+    )
+    assert match.winning_alliance == winner

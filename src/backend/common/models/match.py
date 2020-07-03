@@ -13,6 +13,8 @@ from backend.common.consts.alliance_color import (
     TMatchWinner,
 )
 from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.event_type import EventType
+from backend.common.consts.playoff_type import PlayoffType
 from backend.common.models.alliance import MatchAlliance
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, MatchKey, TeamKey, Year
@@ -226,23 +228,22 @@ class Match(ndb.Model):
 
     @property
     def winning_alliance(self) -> TMatchWinner:
-        """
-        from helpers.event_helper import EventHelper
-        from helpers.match_helper import MatchHelper
+        from backend.common.helpers.event_helper import EventHelper
+        from backend.common.helpers.match_tiebreakers import MatchTiebreakers
 
         if self._winning_alliance is None:
             if (
                 EventHelper.is_2015_playoff(self.event_key_name)
-                and self.comp_level != "f"
+                and self.comp_level != CompLevel.F
             ):
                 return ""  # report all 2015 non finals matches as ties
 
-            red_score = int(self.alliances["red"]["score"])
-            blue_score = int(self.alliances["blue"]["score"])
+            red_score = int(self.alliances[AllianceColor.RED]["score"])
+            blue_score = int(self.alliances[AllianceColor.BLUE]["score"])
             if red_score > blue_score:
-                self._winning_alliance = "red"
+                self._winning_alliance = AllianceColor.RED
             elif blue_score > red_score:
-                self._winning_alliance = "blue"
+                self._winning_alliance = AllianceColor.BLUE
             else:  # tie
                 event = self.event.get()
                 if (
@@ -252,9 +253,8 @@ class Match(ndb.Model):
                 ):
                     self._winning_alliance = ""
                 else:
-                    self._winning_alliance = MatchHelper.tiebreak_winner(self)
-        """
-        return self._winning_alliance or ""
+                    self._winning_alliance = MatchTiebreakers.tiebreak_winner(self)
+        return none_throws(self._winning_alliance)
 
     @property
     def losing_alliance(self) -> TMatchWinner:
@@ -434,7 +434,7 @@ class Match(ndb.Model):
 
     @classmethod
     def renderKeyName(
-        self,
+        cls,
         event_key_name: EventKey,
         comp_level: CompLevel,
         set_number: int,
