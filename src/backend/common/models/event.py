@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import datetime
 import json
 import re
-from typing import Dict, List, Optional
+import typing
+from typing import Dict, Generator, List, Optional, Tuple
 
 from google.cloud import ndb
 from pyre_extensions import none_throws, safe_cast
@@ -9,10 +12,20 @@ from pyre_extensions import none_throws, safe_cast
 from backend.common.consts import event_type
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
+from backend.common.futures import TypedFuture
+from backend.common.models.alliance import EventAlliance
 from backend.common.models.district import District
-from backend.common.models.keys import EventKey, Year
+from backend.common.models.event_details import EventDetails
+from backend.common.models.event_district_points import EventDistrictPoints
+from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.location import Location
 from backend.common.models.webcast import Webcast
+
+# To avoid circular dependencies from type hints
+if typing.TYPE_CHECKING:
+    from backend.common.models.award import Award
+    from backend.common.models.team import Team
+    from backend.common.models.match import Match
 
 
 class Event(ndb.Model):
@@ -93,21 +106,25 @@ class Event(ndb.Model):
         self._week = None
         super(Event, self).__init__(*args, **kw)
 
-    """
     @ndb.tasklet
-    def get_awards_async(self):
-        from database import award_query
-        self._awards = yield award_query.EventAwardsQuery(self.key_name).fetch_async()
+    def get_awards_async(self) -> TypedFuture[List["Award"]]:
+        if self._awards is None:
+            from backend.common.queries import award_query
+
+            self._awards = yield award_query.EventAwardsQuery(
+                event_key=self.key_name
+            ).fetch_async()
+        return none_throws(self._awards)
 
     @property
-    def alliance_selections(self):
+    def alliance_selections(self) -> Optional[List[EventAlliance]]:
         if self.details is None:
             return None
         else:
             return self.details.alliance_selections
 
     @property
-    def alliance_teams(self):
+    def alliance_teams(self) -> List[TeamKey]:
         # Load a list of team keys playing in elims
         alliances = self.alliance_selections
         if alliances is None:
@@ -119,32 +136,32 @@ class Event(ndb.Model):
         return teams
 
     @property
-    def awards(self):
+    def awards(self) -> List["Award"]:
         if self._awards is None:
-            self.get_awards_async().wait()
-        return self._awards
+            return self.get_awards_async().get_result()
+        return none_throws(self._awards)
 
     @property
-    def details(self):
+    def details(self) -> EventDetails:
         if self._details is None:
-            self._details = EventDetails.get_by_id(self.key.id())
-        elif type(self._details) == Future:
-            self._details = self._details.get_result()
-        return self._details
+            self.prep_details()
+        if not none_throws(self._details).done():
+            none_throws(self._details).wait()
+        return none_throws(self._details).result()
 
-    def prep_details(self):
+    def prep_details(self) -> None:
         if self._details is None:
             self._details = ndb.Key(EventDetails, self.key.id()).get_async()
 
     @property
-    def district_points(self):
+    def district_points(self) -> Optional[EventDistrictPoints]:
         if self.details is None:
             return None
         else:
             return self.details.district_points
 
     @property
-    def playoff_advancement(self):
+    def playoff_advancement(self) -> Optional[Dict]:  # TODO type this
         if self.details is None:
             return None
         else:
@@ -155,7 +172,7 @@ class Event(ndb.Model):
             )
 
     @property
-    def playoff_bracket(self):
+    def playoff_bracket(self) -> Optional[Dict]:  # TODO type this
         if self.details is None:
             return None
         else:
@@ -166,26 +183,24 @@ class Event(ndb.Model):
             )
 
     @ndb.tasklet
-    def get_matches_async(self):
+    def get_matches_async(self) -> TypedFuture[List["Match"]]:
         if self._matches is None:
-            from database import match_query
-            self._matches = yield match_query.EventMatchesQuery(self.key_name).fetch_async()
-    """
+            from backend.common.queries import match_query
 
-    """
-    def prep_matches(self):
+            self._matches = yield match_query.EventMatchesQuery(
+                event_key=self.key_name
+            ).fetch_async()
+        return none_throws(self._matches)
+
+    def prep_matches(self) -> None:
         if self._matches is None:
-            from database import match_query
-            self._matches = match_query.EventMatchesQuery(self.key_name).fetch_async()
+            self.get_matches_async()
 
     @property
-    def matches(self):
+    def matches(self) -> List["Match"]:
         if self._matches is None:
             self.get_matches_async().wait()
-        elif type(self._matches) == Future:
-            self._matches = self._matches.get_result()
-        return self._matches
-    """
+        return none_throws(self._matches)
 
     def time_as_utc(self, time: datetime.datetime) -> datetime.datetime:
         import pytz
@@ -333,28 +348,45 @@ class Event(ndb.Model):
     def is_season_event(self) -> bool:
         return self.event_type_enum in event_type.SEASON_EVENT_TYPES
 
-    """
     @ndb.tasklet
-    def get_teams_async(self):
-        from database import team_query
-        self._teams = yield team_query.EventTeamsQuery(self.key_name).fetch_async()
+    def get_teams_async(self) -> TypedFuture[List["Team"]]:
+        from backend.common.queries import team_query
+
+        self._teams = yield team_query.EventTeamsQuery(
+            event_key=self.key_name
+        ).fetch_async()
+        return none_throws(self._teams)
 
     @property
-    def teams(self):
+    def teams(self) -> List["Team"]:
         if self._teams is None:
             self.get_teams_async().wait()
-        return self._teams
+        return none_throws(self._teams)
 
     @ndb.toplevel
-    def prepAwardsMatchesTeams(self):
+    def prepAwardsMatchesTeams(
+        self,
+    ) -> Generator[
+        Tuple[
+            TypedFuture[List["Award"]],
+            TypedFuture[List["Match"]],
+            TypedFuture[List["Team"]],
+        ],
+        None,
+        None,
+    ]:
         yield self.get_awards_async(), self.get_matches_async(), self.get_teams_async()
 
     @ndb.toplevel
-    def prepTeams(self):
+    def prepTeams(self) -> Generator[TypedFuture[List["Team"]], None, None]:
         yield self.get_teams_async()
 
     @ndb.toplevel
-    def prepTeamsMatches(self):
+    def prepTeamsMatches(
+        self,
+    ) -> Generator[
+        Tuple[TypedFuture[List["Match"]], TypedFuture[List["Team"]]], None, None,
+    ]:
         yield self.get_matches_async(), self.get_teams_async()
 
     @property
@@ -370,7 +402,6 @@ class Event(ndb.Model):
             return None
         else:
             return self.details.rankings
-    """
 
     @property
     def location(self) -> Optional[str]:

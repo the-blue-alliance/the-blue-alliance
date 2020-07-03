@@ -6,11 +6,20 @@ import pytest
 from freezegun import freeze_time
 from google.cloud import ndb
 
+from backend.common.consts.award_type import AwardType
+from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.consts.webcast_type import WebcastType
+from backend.common.models.alliance import EventAlliance
+from backend.common.models.award import Award
 from backend.common.models.district import District
 from backend.common.models.event import Event
+from backend.common.models.event_details import EventDetails
+from backend.common.models.event_district_points import EventDistrictPoints
+from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import Year
+from backend.common.models.match import Match
+from backend.common.models.team import Team
 from backend.common.models.tests.util import (
     CITY_STATE_COUNTRY_PARAMETERS,
     LOCATION_PARAMETERS,
@@ -247,3 +256,115 @@ def test_nonexistent_linked_district() -> None:
     assert event.event_district_abbrev == "ne"
     assert event.event_district_key == "2019ne"
     assert event.event_district_str is None
+
+
+def test_get_awards() -> None:
+    event = Event(id="2019ct", year=2019, event_short="ct")
+    future = event.get_awards_async()
+    assert future.get_result() == []
+    assert event.awards == []
+
+    a = Award(
+        id="2019ct_1",
+        year=2019,
+        award_type_enum=AwardType.WINNER,
+        event_type_enum=EventType.REGIONAL,
+        event=ndb.Key(Event, "2019ct"),
+        name_str="Winner",
+    )
+    a.put()
+
+    event._awards = None
+    future = event.get_awards_async()
+    assert future.get_result() == [a]
+    assert event.awards == [a]
+
+    event._awards = None
+    assert event.awards == [a]
+
+
+def test_details() -> None:
+    event = Event(id="2019ct", year=2019, event_short="ct")
+    d = EventDetails(id="2019ct",)
+    d.put()
+
+    event.prep_details()
+    assert event.details == d
+
+    event._details = None
+    assert event.details == d
+
+
+def test_get_alliances() -> None:
+    event = Event(id="2019ct", year=2019, event_short="ct")
+    assert event.alliance_selections is None
+
+    teams = ["frc1", "frc2", "frc3"]
+    alliances = [
+        EventAlliance(picks=teams),
+    ]
+    EventDetails(id="2019ct", alliance_selections=alliances,).put()
+
+    event._details = None
+    assert event.alliance_selections == alliances
+    assert event.alliance_teams == teams
+
+
+def test_district_points() -> None:
+    event = Event(id="2019ct", year=2019, event_short="ct")
+    assert event.district_points is None
+
+    points = EventDistrictPoints(points={}, tiebreakers={})
+    EventDetails(id="2019ct", district_points=points,).put()
+
+    event._details = None
+    assert event.district_points == points
+
+
+def test_matches() -> None:
+    event = Event(id="2019ct", year=2019, event_short="ct")
+    future = event.get_matches_async()
+    assert future.get_result() == []
+    assert event.matches == []
+
+    event._matches = None
+    event.prep_matches()
+    assert event.matches == []
+
+    m = Match(
+        id="2019ct_qm1",
+        event=ndb.Key(Event, "2019ct"),
+        year=2019,
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=1,
+        alliances_json="",
+    )
+    m.put()
+
+    event._matches = None
+    assert event.matches == [m]
+    assert event.get_matches_async().get_result() == [m]
+
+    event._matches = None
+    event.prep_matches()
+    assert event.get_matches_async().get_result() == [m]
+    assert event.matches == [m]
+
+
+def test_teams() -> None:
+    event = Event(id="2019ct", year=2019, event_short="ct")
+    assert event.teams == []
+
+    EventTeam(
+        id="2019ct_frc1",
+        event=ndb.Key(Event, "2019ct"),
+        team=ndb.Key(Team, "frc1"),
+        year=2019,
+    ).put()
+    t = Team(id="frc1", team_number=1,)
+    t.put()
+
+    event._teams = None
+    assert event.teams == [t]
+    assert event.get_teams_async().get_result() == [t]
