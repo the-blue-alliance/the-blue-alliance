@@ -1,6 +1,7 @@
-from google.appengine.ext import ndb
+from google.cloud import ndb
 
-from models.team import Team
+from backend.common.models.keys import RobotKey, TeamKey, Year
+from backend.common.models.team import Team
 
 
 class Robot(ndb.Model):
@@ -20,15 +21,24 @@ class Robot(ndb.Model):
         # store set of affected references referenced keys for cache clearing
         # keys must be model properties
         self._affected_references = {
-            'team': set(),
-            'year': set(),
+            "team": set(),
+            "year": set(),
         }
         super(Robot, self).__init__(*args, **kw)
 
     @property
-    def key_name(self):
+    def key_name(self) -> RobotKey:
         return self.renderKeyName(self.team.id(), self.year)
 
     @classmethod
-    def renderKeyName(self, teamKey, year):
+    def renderKeyName(cls, teamKey: TeamKey, year: Year) -> RobotKey:
         return "{}_{}".format(teamKey, year)
+
+    @classmethod
+    def validate_key_name(cls, key: str) -> bool:
+        split = key.split("_")
+        return (
+            len(split) == 2
+            and Team.validate_key_name(split[0])
+            and split[1].isnumeric()
+        )
