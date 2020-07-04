@@ -88,36 +88,6 @@ class MatchHelper(object):
 
         MatchManipulator.createOrUpdate(qual_matches)
 
-    """
-    Helper to put matches into sub-dictionaries for the way we render match tables
-    """
-    # Allows us to sort matches by key name.
-    # Note: Matches within a comp_level (qual, qf, sf, f, etc.) will be in order,
-    # but the comp levels themselves may not be in order. Doesn't matter because
-    # XXX_match_table.html checks for comp_level when rendering the page
-    @classmethod
-    def natural_sort_matches(self, matches):
-        import re
-        convert = lambda text: int(text) if text.isdigit() else text.lower()
-        alphanum_key = lambda match: [convert(c) for c in re.split('([0-9]+)', str(match.key_name))]
-        return sorted(matches, key=alphanum_key)
-
-    @classmethod
-    def play_order_sort_matches(self, matches, reverse=False):
-        sort_key = lambda match: match.play_order
-        return sorted(matches, key=sort_key, reverse=reverse)
-
-    @classmethod
-    def organizeMatches(self, match_list):
-        match_list = MatchHelper.natural_sort_matches(match_list)
-        matches = dict([(comp_level, list()) for comp_level in Match.COMP_LEVELS])
-        matches["num"] = len(match_list)
-        while len(match_list) > 0:
-            match = match_list.pop(0)
-            matches[match.comp_level].append(match)
-
-        return matches
-
     # Assumed that organizeMatches is called first
     @classmethod
     def organizeDoubleElimMatches(cls, organized_matches):
@@ -144,30 +114,6 @@ class MatchHelper(object):
                     matches[comp_level].append(match_key)
 
         return matches
-
-    @classmethod
-    def recentMatches(self, matches, num=3):
-        matches = filter(lambda x: x.has_been_played, matches)
-        matches = self.play_order_sort_matches(matches)
-        return matches[-num:]
-
-    @classmethod
-    def upcomingMatches(self, matches, num=3):
-        matches = self.play_order_sort_matches(matches)
-
-        last_played_match_index = None
-        for i, match in enumerate(reversed(matches)):
-            if match.has_been_played:
-                last_played_match_index = len(matches) - i
-                break
-
-        upcoming_matches = []
-        for i, match in enumerate(matches[last_played_match_index:]):
-            if i == num:
-                break
-            if not match.has_been_played:
-                upcoming_matches.append(match)
-        return upcoming_matches
 
     @classmethod
     def deleteInvalidMatches(self, match_list, event):
