@@ -19,7 +19,11 @@ def test_team_found_no_events(web_client: Client, ndb_client: ndb.Client) -> Non
     helpers.preseed_team(ndb_client, 254)
     resp = web_client.get("/team/254")
     # This should render team history, but it's not implemented yet
-    assert resp.status_code == 501
+    assert resp.status_code == 200
+    assert (
+        helpers.get_page_title(resp.data)
+        == "The 254 Team - Team 254 (History) - The Blue Alliance"
+    )
 
 
 @freeze_time("2020-02-01")

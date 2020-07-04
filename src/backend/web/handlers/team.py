@@ -1,19 +1,17 @@
 import datetime
-from typing import List
 
 from flask import abort
 
 from backend.common.decorators import cached_public
-from backend.common.models.event_participation import EventParticipation
 from backend.common.models.keys import TeamNumber, Year
 from backend.common.models.team import Team
 from backend.common.queries.event_query import TeamYearEventsQuery
 from backend.common.queries.team_query import (
     TeamListQuery,
-    TeamParticipationQuery,
     TeamQuery,
 )
 from backend.web.profiled_render import render_template
+from backend.web.renderers.team_renderer import TeamRenderer
 
 MAX_TEAM_NUMBER_EXCLUSIVE = (
     9000  # Support between Team 0 and Team MAX_TEAM_NUMBER_EXCLUSIVE - 1
@@ -34,50 +32,24 @@ def team_detail(team_number: TeamNumber, year: Year, is_canonical: bool = False)
     if not team:
         abort(404)
 
-    events_future = TeamYearEventsQuery(team_key=team.key_name, year=year).fetch_async()
-    valid_years_future = TeamParticipationQuery(team_key=team.key_name).fetch_async()
-
-    events_sorted = sorted(
-        events_future.get_result(),
-        key=lambda e: e.start_date if e.start_date else datetime.datetime(year, 12, 31),
-    )  # unknown goes last
-    valid_years = sorted(valid_years_future.get_result())
-
-    if not events_sorted:
+    template_values = TeamRenderer.render_team_details(team, year, is_canonical)
+    if template_values is None:
         abort(404)
-
-    event_participation: List[EventParticipation] = []
-    for event in events_sorted:
-        event_participation.append(
-            EventParticipation(
-                event=event,
-                matches={},
-                wlt=None,
-                qual_avg=None,
-                elim_avg=None,
-                rank=None,
-                awards=[],
-                playlist="",
-                district_points=None,
-            )
-        )
-
-    template_values = {
-        "team": team,
-        "year": year,
-        "is_canonical": is_canonical,
-        "years": valid_years,
-        "participation": event_participation,
-        # TODO stubbed stuff below
-        "hof": {},
-        "medias_by_slugname": {},
-    }
     return render_template("team_details.html", template_values)
 
 
 @cached_public
-def team_history(team_number: TeamNumber) -> str:
-    abort(501)
+def team_history(team_number: TeamNumber, is_canonical: bool = False) -> str:
+    team_key = f"frc{team_number}"
+    if not Team.validate_key_name(team_key):
+        abort(404)
+    team_future = TeamQuery(team_key=f"frc{team_number}").fetch_async()
+    team = team_future.get_result()
+    if not team:
+        abort(404)
+
+    template_values = TeamRenderer.render_team_history(team, is_canonical)
+    return render_template("team_history.html", template_values)
 
 
 @cached_public
@@ -93,7 +65,7 @@ def team_canonical(team_number: TeamNumber) -> str:
     ).fetch_async()
     events = events_future.get_result()
     if not events:
-        return team_history(team_number)
+        return team_history(team_number, is_canonical=True)
 
     return team_detail(team_number, current_year, is_canonical=True)
 

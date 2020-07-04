@@ -19,3 +19,7 @@ class Environment(object):
     @staticmethod
     def log_level() -> Optional[str]:
         return os.environ.get("TBA_LOG_LEVEL")
+
+    @staticmethod
+    def ndb_log_level() -> Optional[str]:
+        return os.environ.get("NDB_LOG_LEVEL")
