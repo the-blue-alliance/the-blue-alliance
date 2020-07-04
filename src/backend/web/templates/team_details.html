@@ -112,7 +112,7 @@
                   {% if comp.rank %}was <strong>Rank {{ comp.rank }}</strong>{% endif %}
                   {% if comp.wlt %}
                     {% if comp.rank %}with a record of{% else %}had a record of{% endif %}
-                    <strong>{{comp.wlt.win}}-{{comp.wlt.loss}}-{{comp.wlt.tie}}</strong>
+                    <strong>{{comp.wlt.wins}}-{{comp.wlt.losses}}-{{comp.wlt.ties}}</strong>
                   {% else %}
                     {% if comp.qual_avg or comp.elim_avg %}
                       {% if comp.rank %}with{% else %}had{% endif %}
