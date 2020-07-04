@@ -5,8 +5,14 @@ from backend.common.consts import comp_level, event_type
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
 from backend.common.consts.media_tag import MediaTag
+from backend.common.helpers.award_helper import AwardHelper
+from backend.common.helpers.event_helper import EventHelper
+from backend.common.helpers.match_helper import MatchHelper
+from backend.common.helpers.media_helper import MediaHelper
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.award import Award
 from backend.common.models.event import Event
+from backend.common.models.event_team_status import WLTRecord
 from backend.common.models.keys import EventKey, Year
 from backend.common.models.match import Match
 from backend.common.models.robot import Robot
@@ -27,27 +33,31 @@ class TeamRenderer(object):
         cls, team: Team, year: Year, is_canonical: bool
     ) -> Optional[Dict]:
         hof_award_future = award_query.TeamEventTypeAwardsQuery(
-            team.key.id(), EventType.CMP_FINALS, AwardType.CHAIRMANS
+            team_key=team.key.id(),
+            event_type=EventType.CMP_FINALS,
+            award_type=AwardType.CHAIRMANS,
         ).fetch_async()
         hof_video_future = media_query.TeamTagMediasQuery(
-            team.key.id(), MediaTag.CHAIRMANS_VIDEO
+            team_key=team.key.id(), media_tag=MediaTag.CHAIRMANS_VIDEO
         ).fetch_async()
         hof_presentation_future = media_query.TeamTagMediasQuery(
-            team.key.id(), MediaTag.CHAIRMANS_PRESENTATION
+            team_key=team.key.id(), media_tag=MediaTag.CHAIRMANS_PRESENTATION
         ).fetch_async()
         hof_essay_future = media_query.TeamTagMediasQuery(
-            team.key.id(), MediaTag.CHAIRMANS_ESSAY
+            team_key=team.key.id(), media_tag=MediaTag.CHAIRMANS_ESSAY
         ).fetch_async()
-        media_future = media_query.TeamYearMediaQuery(team.key.id(), year).fetch_async()
+        media_future = media_query.TeamYearMediaQuery(
+            team_key=team.key.id(), year=year
+        ).fetch_async()
         social_media_future = media_query.TeamSocialMediaQuery(
-            team.key.id()
+            team_key=team.key.id()
         ).fetch_async()
         robot_future = Robot.get_by_id_async("{}_{}".format(team.key.id(), year))
         team_districts_future = district_query.TeamDistrictsQuery(
-            team.key.id()
+            team_key=team.key.id()
         ).fetch_async()
         participation_future = team_query.TeamParticipationQuery(
-            team.key.id()
+            team_key=team.key.id()
         ).fetch_async()
 
         hof_awards = hof_award_future.get_result()
@@ -108,7 +118,7 @@ class TeamRenderer(object):
             event_awards = AwardHelper.organizeAwards(
                 awards_by_event_key.get(event.key, [])
             )
-            matches_organized = MatchHelper.organizeMatches(event_matches)
+            match_count, matches_organized = MatchHelper.organizeMatches(event_matches)
 
             if event.now:
                 current_event = event
@@ -136,7 +146,7 @@ class TeamRenderer(object):
                     season_wlt_list.append(wlt)
                 else:
                     offseason_wlt_list.append(wlt)
-                if wlt["win"] + wlt["loss"] + wlt["tie"] == 0:
+                if wlt["wins"] + wlt["losses"] + wlt["ties"] == 0:
                     display_wlt = None
                 else:
                     display_wlt = wlt
@@ -155,9 +165,9 @@ class TeamRenderer(object):
                 for match in matches:
                     video_ids += [video.split("?")[0] for video in match.youtube_videos]
             if video_ids:
-                playlist_title = u"{} (Team {})".format(event.name, team.team_number)
-                playlist = u"https://www.youtube.com/watch_videos?video_ids={}&title={}"
-                playlist = playlist.format(u",".join(video_ids), playlist_title)
+                playlist_title = "{} (Team {})".format(event.name, team.team_number)
+                playlist = "https://www.youtube.com/watch_videos?video_ids={}&title={}"
+                playlist = playlist.format(",".join(video_ids), playlist_title)
 
             district_points = None
             if team_district_points:
@@ -175,6 +185,7 @@ class TeamRenderer(object):
                 {
                     "event": event,
                     "matches": matches_organized,
+                    "match_count": match_count,
                     "wlt": display_wlt,
                     "qual_avg": qual_avg,
                     "elim_avg": elim_avg,
@@ -207,21 +218,24 @@ class TeamRenderer(object):
         else:
             year_qual_avg = None
             year_elim_avg = None
-            season_wlt = {"win": 0, "loss": 0, "tie": 0}
-            offseason_wlt = {"win": 0, "loss": 0, "tie": 0}
+            season_wlt: Optional[WLTRecord] = {"wins": 0, "losses": 0, "ties": 0}
+            offseason_wlt: Optional[WLTRecord] = {"wins": 0, "losses": 0, "ties": 0}
 
             for wlt in season_wlt_list:
-                season_wlt["win"] += wlt["win"]
-                season_wlt["loss"] += wlt["loss"]
-                season_wlt["tie"] += wlt["tie"]
-            if season_wlt["win"] + season_wlt["loss"] + season_wlt["tie"] == 0:
+                season_wlt["wins"] += wlt["wins"]
+                season_wlt["losses"] += wlt["losses"]
+                season_wlt["ties"] += wlt["ties"]
+            if season_wlt["wins"] + season_wlt["losses"] + season_wlt["ties"] == 0:
                 season_wlt = None
 
             for wlt in offseason_wlt_list:
-                offseason_wlt["win"] += wlt["win"]
-                offseason_wlt["loss"] += wlt["loss"]
-                offseason_wlt["tie"] += wlt["tie"]
-            if offseason_wlt["win"] + offseason_wlt["loss"] + offseason_wlt["tie"] == 0:
+                offseason_wlt["wins"] += wlt["wins"]
+                offseason_wlt["losses"] += wlt["losses"]
+                offseason_wlt["ties"] += wlt["ties"]
+            if (
+                offseason_wlt["wins"] + offseason_wlt["losses"] + offseason_wlt["ties"]
+                == 0
+            ):
                 offseason_wlt = None
 
         medias_by_slugname = MediaHelper.group_by_slugname(
@@ -232,8 +246,8 @@ class TeamRenderer(object):
         social_medias = sorted(
             social_media_future.get_result(), key=MediaHelper.social_media_sorter
         )
-        preferred_image_medias = filter(
-            lambda x: team.key in x.preferred_references, image_medias
+        preferred_image_medias = list(
+            filter(lambda x: team.key in x.preferred_references, image_medias)
         )
 
         last_competed = None
@@ -264,7 +278,7 @@ class TeamRenderer(object):
             "district_abbrev": district_abbrev,
             "last_competed": last_competed,
             "current_year": current_year,
-            "max_year": tba_config.MAX_YEAR,
+            "max_year": SeasonHelper.get_max_year(),
             "hof": hall_of_fame,
             "team_district_points": team_district_points,
         }
@@ -278,24 +292,30 @@ class TeamRenderer(object):
     @classmethod
     def render_team_history(cls, team: Team, is_canonical: bool) -> Dict:
         hof_award_future = award_query.TeamEventTypeAwardsQuery(
-            team.key.id(), EventType.CMP_FINALS, AwardType.CHAIRMANS
+            team_key=team.key.id(),
+            event_type=EventType.CMP_FINALS,
+            award_type=AwardType.CHAIRMANS,
         ).fetch_async()
         hof_video_future = media_query.TeamTagMediasQuery(
-            team.key.id(), MediaTag.CHAIRMANS_VIDEO
+            team_key=team.key.id(), media_tag=MediaTag.CHAIRMANS_VIDEO
         ).fetch_async()
         hof_presentation_future = media_query.TeamTagMediasQuery(
-            team.key.id(), MediaTag.CHAIRMANS_PRESENTATION
+            team_key=team.key.id(), media_tag=MediaTag.CHAIRMANS_PRESENTATION
         ).fetch_async()
         hof_essay_future = media_query.TeamTagMediasQuery(
-            team.key.id(), MediaTag.CHAIRMANS_ESSAY
+            team_key=team.key.id(), media_tag=MediaTag.CHAIRMANS_ESSAY
         ).fetch_async()
-        award_futures = award_query.TeamAwardsQuery(team.key.id()).fetch_async()
-        event_futures = event_query.TeamEventsQuery(team.key.id()).fetch_async()
+        award_futures = award_query.TeamAwardsQuery(
+            team_key=team.key.id()
+        ).fetch_async()
+        event_futures = event_query.TeamEventsQuery(
+            team_key=team.key.id()
+        ).fetch_async()
         participation_future = team_query.TeamParticipationQuery(
-            team.key.id()
+            team_key=team.key.id()
         ).fetch_async()
         social_media_future = media_query.TeamSocialMediaQuery(
-            team.key.id()
+            team_key=team.key.id()
         ).fetch_async()
 
         hof_awards = hof_award_future.get_result()
@@ -325,7 +345,7 @@ class TeamRenderer(object):
         event_awards = []
         current_event = None
         matches_upcoming = None
-        short_cache = False
+        # short_cache = False
         years = set()
         for event in event_futures.get_result():
             years.add(event.year)
@@ -375,7 +395,7 @@ class TeamRenderer(object):
             "matches_upcoming": matches_upcoming,
             "last_competed": last_competed,
             "current_year": current_year,
-            "max_year": tba_config.MAX_YEAR,
+            "max_year": SeasonHelper.get_max_year(),
             "hof": hall_of_fame,
         }
 
@@ -399,17 +419,17 @@ class TeamRenderer(object):
         of a team for a given year
         """
         awards_future = award_query.TeamYearAwardsQuery(
-            team.key.id(), year
+            team_key=team.key.id(), year=year
         ).fetch_async()
         events_future = event_query.TeamYearEventsQuery(
-            team.key.id(), year
+            team_key=team.key.id(), year=year
         ).fetch_async()
         matches_future = match_query.TeamYearMatchesQuery(
-            team.key.id(), year
+            team_key=team.key.id(), year=year
         ).fetch_async()
         if return_valid_years:
             valid_years_future = team_query.TeamParticipationQuery(
-                team.key.id()
+                team_key=team.key.id()
             ).fetch_async()
         else:
             valid_years_future = None
