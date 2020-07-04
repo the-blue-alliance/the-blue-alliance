@@ -15,7 +15,7 @@ from backend.common.consts.alliance_color import (
 from backend.common.consts.comp_level import CompLevel
 from backend.common.models.alliance import MatchAlliance
 from backend.common.models.event import Event
-from backend.common.models.keys import EventKey, MatchKey, TeamKey
+from backend.common.models.keys import EventKey, MatchKey, TeamKey, Year
 from backend.common.models.match_score_breakdown import MatchScoreBreakdown
 from backend.common.models.match_video import MatchVideo
 from backend.common.models.tba_video import TBAVideo
@@ -30,7 +30,7 @@ class Match(ndb.Model):
     key_name is like 2010ct_qm10 or 2010ct_sf1m2
     """
 
-    alliances_json = ndb.TextProperty(
+    alliances_json: str = ndb.TextProperty(
         required=True, indexed=False
     )  # JSON dictionary with alliances and scores.
 
@@ -49,7 +49,7 @@ class Match(ndb.Model):
     #   }
     # }
 
-    score_breakdown_json = ndb.TextProperty(
+    score_breakdown_json: Optional[str] = ndb.TextProperty(
         indexed=False
     )  # JSON dictionary with score breakdowns. Fields are those used for seeding. Varies by year.
     # Example for 2014. Seeding outlined in Section 5.3.4 in the 2014 manual.
@@ -74,8 +74,8 @@ class Match(ndb.Model):
             validator=CompLevel.ndb_validate,
         ),
     )
-    event = ndb.KeyProperty(kind=Event, required=True)
-    year = ndb.IntegerProperty(required=True)
+    event: ndb.Key = ndb.KeyProperty(kind=Event, required=True)
+    year: Year = ndb.IntegerProperty(required=True)
     match_number = ndb.IntegerProperty(required=True, indexed=False)
     no_auto_update = ndb.BooleanProperty(
         default=False, indexed=False
@@ -94,7 +94,8 @@ class Match(ndb.Model):
     post_result_time = (
         ndb.DateTimeProperty()
     )  # UTC time scores were shown to the audience
-    youtube_videos = ndb.StringProperty(repeated=True)  # list of Youtube IDs
+    # list of Youtube IDs
+    youtube_videos: List[str] = ndb.StringProperty(repeated=True)  # pyre-ignore[8]
     # list of filetypes a TBA video exists for
     tba_videos: List[str] = ndb.StringProperty(repeated=True)  # pyre-ignore[8]
     push_sent = (
@@ -165,7 +166,7 @@ class Match(ndb.Model):
         Lazy load score_breakdown_json
         """
         if self._score_breakdown is None and self.score_breakdown_json is not None:
-            score_breakdown = json.loads(self.score_breakdown_json)
+            score_breakdown = json.loads(none_throws(self.score_breakdown_json))
 
             if self.has_been_played:
                 # Add in RP calculations

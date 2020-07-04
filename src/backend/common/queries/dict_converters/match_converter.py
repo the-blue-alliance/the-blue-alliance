@@ -32,6 +32,7 @@ class MatchConverter(ConverterBase):
         for alliance in ALLIANCE_COLORS:
             alliances[alliance] = {
                 "team_keys": match.alliances[alliance]["teams"],
+                "score": match.alliances[alliance]["score"],
                 "surrogate_team_keys": match.alliances[alliance]["surrogates"],
                 "dq_team_keys": match.alliances[alliance]["dqs"]
                 if "dqs" in match.alliances[alliance]
@@ -44,7 +45,7 @@ class MatchConverter(ConverterBase):
             "comp_level": match.comp_level,
             "set_number": match.set_number,
             "match_number": match.match_number,
-            "alliances": match.alliances,
+            "alliances": alliances,
             "winning_alliance": match.winning_alliance,
             "score_breakdown": match.score_breakdown,
             "videos": match.videos,

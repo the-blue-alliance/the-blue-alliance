@@ -11,21 +11,18 @@ class DistrictConverter(ConverterBase):
     # }
     # TODO use for cache clearing
 
-    @classmethod
-    def _convert(
-        cls, districts: List[District], version: ApiMajorVersion
+    def _convert_list(
+        self, model_list: List[District], version: ApiMajorVersion
     ) -> List[Dict]:
         CONVERTERS = {
-            3: cls.districtsConverter_v3,
+            3: self.districtsConverter_v3,
         }
-        return CONVERTERS[version](districts)
+        return CONVERTERS[version](model_list)
 
-    @classmethod
-    def districtsConverter_v3(cls, districts: List[District]) -> List[Dict]:
-        return list(map(cls.districtConverter_v3, districts))
+    def districtsConverter_v3(self, districts: List[District]) -> List[Dict]:
+        return list(map(self.districtConverter_v3, districts))
 
-    @classmethod
-    def districtConverter_v3(cls, district: District) -> Dict:
+    def districtConverter_v3(self, district: District) -> Dict:
         return {
             "key": district.key.id(),
             "year": district.year,

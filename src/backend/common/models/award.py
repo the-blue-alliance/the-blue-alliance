@@ -28,7 +28,7 @@ class Award(ndb.Model):
         AwardType, ndb.IntegerProperty(required=True, choices=award_type.AWARD_TYPES)
     )
     year: Year = ndb.IntegerProperty(required=True)  # year the award was awarded
-    event = ndb.KeyProperty(
+    event: ndb.Key = ndb.KeyProperty(
         kind=Event, required=True
     )  # event at which the award was awarded
     event_type_enum = ndb.IntegerProperty(
@@ -38,7 +38,7 @@ class Award(ndb.Model):
     team_list = ndb.KeyProperty(
         kind=Team, repeated=True
     )  # key of team(s) that won the award (if applicable)
-    recipient_json_list = ndb.StringProperty(
+    recipient_json_list: List[str] = ndb.StringProperty(  # pyre-ignore[8]
         repeated=True
     )  # JSON dict(s) with team_number and/or awardee
 

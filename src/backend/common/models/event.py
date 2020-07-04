@@ -47,7 +47,7 @@ class Event(ndb.Model):
     )  # Event code used in FIRST's API, if different from event_short
     year: Year = ndb.IntegerProperty(required=True)
     # event_district_enum = ndb.IntegerProperty(default=DistrictType.NO_DISTRICT)  # Deprecated, use district_key instead
-    district_key = ndb.KeyProperty(kind=District)
+    district_key: ndb.Key = ndb.KeyProperty(kind=District)
     start_date = ndb.DateTimeProperty()
     end_date = ndb.DateTimeProperty()
     playoff_type = ndb.IntegerProperty(choices=list(PlayoffType))
