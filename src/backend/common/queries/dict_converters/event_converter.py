@@ -6,6 +6,7 @@ from backend.common.consts import playoff_type
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.event import Event
 from backend.common.queries.dict_converters.converter_base import ConverterBase
+from backend.common.queries.dict_converters.district_converter import DistrictConverter
 
 
 class EventConverter(ConverterBase):
@@ -25,7 +26,7 @@ class EventConverter(ConverterBase):
         return list(map(self.eventConverter_v3, events))
 
     def eventConverter_v3(self, event: Event) -> Dict:
-        # district_future = event.district_key.get_async() if event.district_key else None
+        district_future = event.district_key.get_async() if event.district_key else None
         event_dict = {
             "key": event.key.id(),
             "name": event.name,
@@ -42,9 +43,11 @@ class EventConverter(ConverterBase):
             )
             if event.playoff_type
             else None,
-            # "district": DistrictConverter.convert(district_future.get_result(), 3)
-            # if district_future
-            # else None,
+            "district": DistrictConverter(district_future.get_result()).convert(
+                ApiMajorVersion.API_V3
+            )
+            if district_future
+            else None,
             "division_keys": [
                 key.id() for key in event.divisions
             ],  # Datastore stub needs to support repeated properties 2020-06-16 @fangeugene

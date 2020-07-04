@@ -1,13 +1,18 @@
 import datetime
 import json
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 import requests
 from google.cloud import ndb
 
+from backend.common.consts.alliance_color import ALLIANCE_COLORS
+from backend.common.models.award import Award
+from backend.common.models.district import District
 from backend.common.models.event import Event
+from backend.common.models.event_details import EventDetails
 from backend.common.models.event_team import EventTeam
-from backend.common.models.keys import EventKey, TeamKey
+from backend.common.models.keys import EventKey, MatchKey, TeamKey
+from backend.common.models.match import Match
 from backend.common.models.team import Team
 
 
@@ -15,15 +20,15 @@ class LocalDataBootstrap:
     EVENT_DATE_FORMAT_STR = "%Y-%m-%d"
     AUTH_HEADER = "X-TBA-Auth-Key"
 
-    """
-    def store_district(data):
-        district = District(id=data['key'])
-        district.year = data['year']
-        district.abbreviation = data['abbreviation']
-        district.display_name = data['display_name']
+    @classmethod
+    def store_district(cls, data: Dict) -> District:
+        district = District(id=data["key"])
+        district.year = data["year"]
+        district.abbreviation = data["abbreviation"]
+        district.display_name = data["display_name"]
 
-        return DistrictManipulator.createOrUpdate(district)
-    """
+        # return DistrictManipulator.createOrUpdate(district)
+        return district
 
     @classmethod
     def store_event(cls, data: Dict) -> Event:
@@ -62,8 +67,8 @@ class LocalDataBootstrap:
             else []
         )
 
-        # district = store_district(data['district']) if data['district'] else None
-        # event.district_key = district.key if district else None
+        district = cls.store_district(data["district"]) if data["district"] else None
+        event.district_key = district.key if district else None
 
         # return EventManipulator.createOrUpdate(event)
         event.put()
@@ -87,44 +92,62 @@ class LocalDataBootstrap:
         team.put()
         return team
 
-    """
-    def store_match(data):
-        match = Match(id=data['key'])
-        match.event = ndb.Key(Event, data['event_key'])
-        match.year = int(data['key'][:4])
-        match.comp_level = data['comp_level']
-        match.set_number = data['set_number']
-        match.match_number = data['match_number']
-        if data.get('time'):
-            match.time = datetime.datetime.fromtimestamp(int(data['time']))
+    @classmethod
+    def store_match(cls, data: Dict) -> Match:
+        match = Match(id=data["key"])
+        match.event = ndb.Key(Event, data["event_key"])
+        match.year = int(data["key"][:4])
+        match.comp_level = data["comp_level"]
+        match.set_number = data["set_number"]
+        match.match_number = data["match_number"]
+        if data.get("time"):
+            match.time = datetime.datetime.fromtimestamp(int(data["time"]))
 
-        if data.get('actual_time'):
-            match.actual_time = datetime.datetime.fromtimestamp(int(data['actual_time']))
+        if data.get("actual_time"):
+            match.actual_time = datetime.datetime.fromtimestamp(
+                int(data["actual_time"])
+            )
 
-        if data.get('predicted_time'):
-            match.predicted_time = datetime.datetime.fromtimestamp(int(data['predicted_time']))
+        if data.get("predicted_time"):
+            match.predicted_time = datetime.datetime.fromtimestamp(
+                int(data["predicted_time"])
+            )
 
-        if data.get('post_result_time'):
-            match.post_result_time = datetime.datetime.fromtimestamp(int(data['post_result_time']))
-        match.score_breakdown_json = json.dumps(data['score_breakdown'])
+        if data.get("post_result_time"):
+            match.post_result_time = datetime.datetime.fromtimestamp(
+                int(data["post_result_time"])
+            )
+        match.score_breakdown_json = (
+            json.dumps(data["score_breakdown"]) if data["score_breakdown"] else None
+        )
 
         team_key_names = []
-        for alliance in ['red', 'blue']:
-            team_key_names += data['alliances'][alliance]['team_keys']
-            data['alliances'][alliance]['teams'] = data['alliances'][alliance].pop('team_keys')
-            data['alliances'][alliance]['surrogates'] = data['alliances'][alliance].pop('surrogate_team_keys')
-            data['alliances'][alliance]['dqs'] = data['alliances'][alliance].pop('dq_team_keys')
-        match.alliances_json = json.dumps(data['alliances'])
+        for alliance in ALLIANCE_COLORS:
+            team_key_names += data["alliances"][alliance]["team_keys"]
+            data["alliances"][alliance]["teams"] = data["alliances"][alliance].pop(
+                "team_keys"
+            )
+            data["alliances"][alliance]["score"] = data["alliances"][alliance].pop(
+                "score"
+            )
+            data["alliances"][alliance]["surrogates"] = data["alliances"][alliance].pop(
+                "surrogate_team_keys"
+            )
+            data["alliances"][alliance]["dqs"] = data["alliances"][alliance].pop(
+                "dq_team_keys"
+            )
+        match.alliances_json = json.dumps(data["alliances"])
         match.team_key_names = team_key_names
 
         youtube_videos = []
-        for video in data['videos']:
-            if video['type'] == 'youtube':
-                youtube_videos.append(video['key'])
+        for video in data["videos"]:
+            if video["type"] == "youtube":
+                youtube_videos.append(video["key"])
         match.youtube_videos = youtube_videos
 
-        return MatchManipulator.createOrUpdate(match)
-    """
+        # return MatchManipulator.createOrUpdate(match)
+        match.put()
+        return match
 
     @staticmethod
     def store_eventteam(team: Team, event: Event) -> EventTeam:
@@ -137,35 +160,46 @@ class LocalDataBootstrap:
         eventteam.put()
         return eventteam
 
-    """
-    def store_eventdetail(event, type, data):
-        detail = EventDetails(id=event.key_name)
-        setattr(detail, type, data)
+    @classmethod
+    def store_eventdetail(
+        cls, event: Event, detail_type: str, data: Any
+    ) -> EventDetails:
+        detail = EventDetails.get_or_insert(event.key_name)
+        setattr(detail, detail_type, data)
 
-        return EventDetailsManipulator.createOrUpdate(detail)
-    """
+        # return EventDetailsManipulator.createOrUpdate(detail)
+        detail.put()
+        return detail
 
-    """"
-    def store_award(data, event):
-        award = Award(id=Award.render_key_name(data['event_key'], data['award_type']))
-        award.event = ndb.Key(Event, data['event_key'])
-        award.award_type_enum = data['award_type']
-        award.year = data['year']
-        award.name_str = data['name']
+    @classmethod
+    def store_award(cls, data: Dict, event: Event) -> Award:
+        award = Award(id=Award.render_key_name(data["event_key"], data["award_type"]))
+        award.event = ndb.Key(Event, data["event_key"])
+        award.award_type_enum = data["award_type"]
+        award.year = data["year"]
+        award.name_str = data["name"]
         award.event_type_enum = event.event_type_enum
 
         recipient_list_fixed = []
         team_keys = []
-        for recipient in data['recipient_list']:
-            if recipient['team_key']:
-                team_keys.append(ndb.Key(Team, recipient['team_key']))
-            recipient_list_fixed.append(json.dumps({
-                'awardee': recipient['awardee'],
-                'team_number': recipient['team_key'][3:] if recipient['team_key'] else None,
-            }))
+        for recipient in data["recipient_list"]:
+            if recipient["team_key"]:
+                team_keys.append(ndb.Key(Team, recipient["team_key"]))
+            recipient_list_fixed.append(
+                json.dumps(
+                    {
+                        "awardee": recipient["awardee"],
+                        "team_number": recipient["team_key"][3:]
+                        if recipient["team_key"]
+                        else None,
+                    }
+                )
+            )
         award.recipient_json_list = recipient_list_fixed
-        return AwardManipulator.createOrUpdate(award)
-    """
+
+        # return AwardManipulator.createOrUpdate(award)
+        award.put()
+        return award
 
     @classmethod
     def fetch_endpoint(cls, endpoint: str, auth_token: str) -> Dict:
@@ -183,10 +217,9 @@ class LocalDataBootstrap:
     def fetch_event(cls, event_key: EventKey, auth_token: str) -> Dict:
         return cls.fetch_endpoint(f"event/{event_key}", auth_token)
 
-    """
-    def fetch_match(match_key):
-        return fetch_endpoint("match/{}".format(match_key))
-    """
+    @classmethod
+    def fetch_match(cls, match_key: MatchKey, auth_token: str) -> Dict:
+        return cls.fetch_endpoint(f"match/{match_key}", auth_token)
 
     @classmethod
     def fetch_event_detail(
@@ -203,29 +236,27 @@ class LocalDataBootstrap:
         teams = list(map(cls.store_team, event_teams))
         list(map(lambda t: cls.store_eventteam(t, event), teams))
 
-        """
-        event_matches = fetch_event_detail(key, 'matches')
-        map(store_match, event_matches)
+        event_matches = cls.fetch_event_detail(key, "matches", auth_token)
+        list(map(cls.store_match, event_matches))
 
-        event_rankings = fetch_event_detail(key, 'rankings')
-        store_eventdetail(event, 'rankings2', event_rankings['rankings'] if event_rankings else [])
+        event_rankings = cls.fetch_event_detail(key, "rankings", auth_token)
+        cls.store_eventdetail(
+            event, "rankings2", event_rankings["rankings"] if event_rankings else []
+        )
 
-        event_alliances = fetch_event_detail(key, 'alliances')
-        store_eventdetail(event, 'alliance_selections', event_alliances)
+        event_alliances = cls.fetch_event_detail(key, "alliances", auth_token)
+        cls.store_eventdetail(event, "alliance_selections", event_alliances)
 
-        event_awards = fetch_event_detail(key, 'awards')
-        map(lambda t: store_award(t, event), event_awards)
-        """
+        event_awards = cls.fetch_event_detail(key, "awards", auth_token)
+        list(map(lambda t: cls.store_award(t, event), event_awards))
 
     @classmethod
     def bootstrap_key(cls, key: str, apiv3_key: str) -> Optional[str]:
-        """
         if Match.validate_key_name(key):
-            match_data = fetch_match(key)
-            store_match(match_data)
-        """
-
-        if Event.validate_key_name(key):
+            match_data = cls.fetch_match(key, apiv3_key)
+            cls.store_match(match_data)
+            return f"/match/{key}"
+        elif Event.validate_key_name(key):
             cls.update_event(key, apiv3_key)
             return f"/event/{key}"
         elif Team.validate_key_name(key):
