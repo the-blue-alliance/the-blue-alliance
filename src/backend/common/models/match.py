@@ -12,7 +12,7 @@ from backend.common.consts.alliance_color import (
     AllianceColor,
     TMatchWinner,
 )
-from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.comp_level import COMP_LEVELS_VERBOSE, CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.models.alliance import MatchAlliance
@@ -293,26 +293,20 @@ class Match(ndb.Model):
 
     @property
     def verbose_name(self) -> str:
-        """
-        from helpers.event_helper import EventHelper
+        from backend.common.helpers.event_helper import EventHelper
 
         if (
             self.comp_level == "qm"
             or self.comp_level == "f"
             or EventHelper.is_2015_playoff(self.event_key_name)
         ):
-            return "%s %s" % (
-                self.COMP_LEVELS_VERBOSE[self.comp_level],
-                self.match_number,
-            )
+            return "%s %s" % (COMP_LEVELS_VERBOSE[self.comp_level], self.match_number,)
         else:
             return "%s %s Match %s" % (
-                self.COMP_LEVELS_VERBOSE[self.comp_level],
+                COMP_LEVELS_VERBOSE[self.comp_level],
                 self.set_number,
                 self.match_number,
             )
-        """
-        return ""
 
     @property
     def short_name(self) -> str:
