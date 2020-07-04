@@ -29,3 +29,11 @@ class DistrictConverter(ConverterBase):
             "abbreviation": district.abbreviation,
             "display_name": district.display_name,
         }
+
+    @staticmethod
+    def dictToModel_v3(data: Dict) -> District:
+        district = District(id=data["key"])
+        district.year = data["year"]
+        district.abbreviation = data["abbreviation"]
+        district.display_name = data["display_name"]
+        return district

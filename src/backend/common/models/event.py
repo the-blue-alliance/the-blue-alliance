@@ -47,7 +47,7 @@ class Event(ndb.Model):
     )  # Event code used in FIRST's API, if different from event_short
     year: Year = ndb.IntegerProperty(required=True)
     # event_district_enum = ndb.IntegerProperty(default=DistrictType.NO_DISTRICT)  # Deprecated, use district_key instead
-    district_key: ndb.Key = ndb.KeyProperty(kind=District)
+    district_key: Optional[ndb.Key] = ndb.KeyProperty(kind=District)
     start_date = ndb.DateTimeProperty()
     end_date = ndb.DateTimeProperty()
     playoff_type = ndb.IntegerProperty(choices=list(PlayoffType))
@@ -607,7 +607,9 @@ class Event(ndb.Model):
 
         if self.district_key is None:
             return None
-        district = DistrictQuery(district_key=self.district_key.id()).fetch()
+        district = DistrictQuery(
+            district_key=none_throws(self.district_key).id()
+        ).fetch()
         return district.display_name if district else None
 
     @property
@@ -615,14 +617,14 @@ class Event(ndb.Model):
         if self.district_key is None:
             return None
         else:
-            return self.district_key.id()[4:]
+            return none_throws(self.district_key).id()[4:]
 
     @property
     def event_district_key(self) -> Optional[str]:
         if self.district_key is None:
             return None
         else:
-            return self.district_key.id()
+            return none_throws(self.district_key).id()
 
     @property
     def event_type_str(self) -> str:

@@ -36,3 +36,18 @@ class TeamConverter(ConverterBase):
         }
         team_dict.update(self.constructLocation_v3(team))
         return team_dict
+
+    @staticmethod
+    def dictToModel_v3(data: Dict) -> Team:
+        team = Team(id=data["key"])
+        team.team_number = data["team_number"]
+        team.nickname = data["nickname"]
+        team.name = data["name"]
+        team.website = data["website"]
+        team.rookie_year = data["rookie_year"]
+        team.motto = data["motto"]
+        team.city = data["city"]
+        team.state_prov = data["state_prov"]
+        team.country = data["country"]
+        team.school_name = data["school_name"]
+        return team

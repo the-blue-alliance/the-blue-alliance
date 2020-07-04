@@ -1,7 +1,12 @@
+import json
 from typing import Dict, List
+
+from google.cloud import ndb
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.award import Award
+from backend.common.models.event import Event
+from backend.common.models.team import Team
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 
 
@@ -41,3 +46,30 @@ class AwardConverter(ConverterBase):
             "event_key": award.event.id(),
             "recipient_list": recipient_list_fixed,
         }
+
+    @staticmethod
+    def dictToModel_v3(data: Dict, event: Event) -> Award:
+        award = Award(id=Award.render_key_name(data["event_key"], data["award_type"]))
+        award.event = ndb.Key(Event, data["event_key"])
+        award.award_type_enum = data["award_type"]
+        award.year = data["year"]
+        award.name_str = data["name"]
+        award.event_type_enum = event.event_type_enum
+
+        recipient_list_fixed = []
+        team_keys = []
+        for recipient in data["recipient_list"]:
+            if recipient["team_key"]:
+                team_keys.append(ndb.Key(Team, recipient["team_key"]))
+            recipient_list_fixed.append(
+                json.dumps(
+                    {
+                        "awardee": recipient["awardee"],
+                        "team_number": recipient["team_key"][3:]
+                        if recipient["team_key"]
+                        else None,
+                    }
+                )
+            )
+        award.recipient_json_list = recipient_list_fixed
+        return award

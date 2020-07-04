@@ -1,6 +1,7 @@
 from typing import Optional
 
 from google.cloud import ndb
+from pyre_extensions import none_throws
 
 from backend.common.consts.event_type import EventType
 from backend.common.models.district import District
@@ -51,5 +52,6 @@ def test_with_districts() -> None:
     events = DistrictEventsQuery(district_key="2019ne").fetch()
     assert len(events) == 3
     assert all(
-        e.district_key is not None and e.district_key.id() == "2019ne" for e in events
+        e.district_key is not None and none_throws(e.district_key).id() == "2019ne"
+        for e in events
     )
