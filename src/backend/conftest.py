@@ -5,6 +5,8 @@ from google.cloud.datastore_v1.proto import datastore_pb2_grpc
 from google.cloud.ndb import _datastore_api
 from InMemoryCloudDatastoreStub import datastore_stub
 
+from backend.tests.test_data_importer import TestDataImporter
+
 
 @pytest.fixture(autouse=True)
 def init_test_marker_env(monkeypatch: MonkeyPatch) -> None:
@@ -43,3 +45,8 @@ def ndb_client(init_ndb_env_vars, ndb_stub) -> ndb.Client:
 def ndb_context(ndb_client: ndb.Client):
     with ndb_client.context() as context:
         yield context
+
+
+@pytest.fixture()
+def test_data_importer(ndb_context) -> TestDataImporter:
+    return TestDataImporter()

@@ -1,0 +1,132 @@
+{
+  "actual_time": 1462058284, 
+  "alliances": {
+    "blue": {
+      "dq_team_keys": [], 
+      "score": 225, 
+      "surrogate_team_keys": [], 
+      "team_keys": [
+        "frc1690", 
+        "frc2056", 
+        "frc1405"
+      ]
+    }, 
+    "red": {
+      "dq_team_keys": [], 
+      "score": 225, 
+      "surrogate_team_keys": [], 
+      "team_keys": [
+        "frc120", 
+        "frc2481", 
+        "frc330"
+      ]
+    }
+  }, 
+  "comp_level": "f", 
+  "event_key": "2016cmp", 
+  "key": "2016cmp_f1m3", 
+  "match_number": 3, 
+  "post_result_time": null, 
+  "predicted_time": null, 
+  "score_breakdown": {
+    "blue": {
+      "adjustPoints": 0, 
+      "autoBoulderPoints": 20, 
+      "autoBouldersHigh": 2, 
+      "autoBouldersLow": 0, 
+      "autoCrossingPoints": 30, 
+      "autoPoints": 50, 
+      "autoReachPoints": 0, 
+      "breachPoints": 20, 
+      "capturePoints": 25, 
+      "foulCount": 1, 
+      "foulPoints": 0, 
+      "position1crossings": 2, 
+      "position2": "B_Ramparts", 
+      "position2crossings": 2, 
+      "position3": "D_RockWall", 
+      "position3crossings": 2, 
+      "position4": "C_SallyPort", 
+      "position4crossings": 0, 
+      "position5": "A_ChevalDeFrise", 
+      "position5crossings": 2, 
+      "robot1Auto": "Crossed", 
+      "robot2Auto": "Crossed", 
+      "robot3Auto": "Crossed", 
+      "tba_rpEarned": null, 
+      "techFoulCount": 0, 
+      "teleopBoulderPoints": 80, 
+      "teleopBouldersHigh": 16, 
+      "teleopBouldersLow": 0, 
+      "teleopChallengePoints": 10, 
+      "teleopCrossingPoints": 25, 
+      "teleopDefensesBreached": true, 
+      "teleopPoints": 175, 
+      "teleopScalePoints": 15, 
+      "teleopTowerCaptured": true, 
+      "totalPoints": 225, 
+      "towerEndStrength": -8, 
+      "towerFaceA": "Scaled", 
+      "towerFaceB": "Challenged", 
+      "towerFaceC": "Challenged"
+    }, 
+    "red": {
+      "adjustPoints": 0, 
+      "autoBoulderPoints": 10, 
+      "autoBouldersHigh": 1, 
+      "autoBouldersLow": 0, 
+      "autoCrossingPoints": 30, 
+      "autoPoints": 40, 
+      "autoReachPoints": 0, 
+      "breachPoints": 20, 
+      "capturePoints": 25, 
+      "foulCount": 0, 
+      "foulPoints": 5, 
+      "position1crossings": 2, 
+      "position2": "A_ChevalDeFrise", 
+      "position2crossings": 2, 
+      "position3": "D_RockWall", 
+      "position3crossings": 2, 
+      "position4": "B_Moat", 
+      "position4crossings": 2, 
+      "position5": "C_SallyPort", 
+      "position5crossings": 0, 
+      "robot1Auto": "Crossed", 
+      "robot2Auto": "Crossed", 
+      "robot3Auto": "Crossed", 
+      "tba_rpEarned": null, 
+      "techFoulCount": 0, 
+      "teleopBoulderPoints": 85, 
+      "teleopBouldersHigh": 17, 
+      "teleopBouldersLow": 0, 
+      "teleopChallengePoints": 10, 
+      "teleopCrossingPoints": 25, 
+      "teleopDefensesBreached": true, 
+      "teleopPoints": 180, 
+      "teleopScalePoints": 15, 
+      "teleopTowerCaptured": true, 
+      "totalPoints": 225, 
+      "towerEndStrength": -8, 
+      "towerFaceA": "Scaled", 
+      "towerFaceB": "Challenged", 
+      "towerFaceC": "Challenged"
+    }
+  }, 
+  "set_number": 1, 
+  "time": 1462055700, 
+  "videos": [
+    {
+      "key": "i1repWTe0j0", 
+      "type": "youtube"
+    }, 
+    {
+      "key": "Zmm0hygll5o", 
+      "type": "youtube"
+    }, 
+    {
+      "key": "CteNiGKy0Lo", 
+      "type": "youtube"
+    }
+  ], 
+  "winning_alliance": "red"
+}
