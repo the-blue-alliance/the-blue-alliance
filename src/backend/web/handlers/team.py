@@ -1,16 +1,13 @@
 import datetime
-from typing import List
 
 from flask import abort
 
 from backend.common.decorators import cached_public
-from backend.common.models.event_participation import EventParticipation
 from backend.common.models.keys import TeamNumber, Year
 from backend.common.models.team import Team
 from backend.common.queries.event_query import TeamYearEventsQuery
 from backend.common.queries.team_query import (
     TeamListQuery,
-    TeamParticipationQuery,
     TeamQuery,
 )
 from backend.web.profiled_render import render_template
