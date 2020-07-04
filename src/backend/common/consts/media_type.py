@@ -47,6 +47,10 @@ SLUG_NAMES: Dict[MediaType, str] = {
     MediaType.AVATAR: "avatar",
 }
 
+SLUG_NAME_TO_TYPE: Dict[str, MediaType] = {
+    slug: media_type for media_type, slug in SLUG_NAMES.items()
+}
+
 TYPE_NAMES: Dict[MediaType, str] = {
     MediaType.YOUTUBE_VIDEO: "YouTube Video",
     MediaType.CD_PHOTO_THREAD: "Chief Delphi Photo Thread",
@@ -86,11 +90,20 @@ ROBOT_TYPES: Set[MediaType] = {
 }
 
 # Format with foreign_key
-PROFILE_URLS = {
+PROFILE_URLS: Dict[MediaType, str] = {
     MediaType.FACEBOOK_PROFILE: "https://www.facebook.com/{}",
     MediaType.TWITTER_PROFILE: "https://twitter.com/{}",
     MediaType.YOUTUBE_CHANNEL: "https://www.youtube.com/{}",
     MediaType.GITHUB_PROFILE: "https://github.com/{}",
     MediaType.INSTAGRAM_PROFILE: "https://www.instagram.com/{}",
     MediaType.PERISCOPE_PROFILE: "https://www.periscope.tv/{}",
+}
+
+SOCIAL_SORT_ORDER: Dict[MediaType, int] = {
+    MediaType.FACEBOOK_PROFILE: 0,
+    MediaType.YOUTUBE_CHANNEL: 1,
+    MediaType.TWITTER_PROFILE: 2,
+    MediaType.INSTAGRAM_PROFILE: 3,
+    MediaType.PERISCOPE_PROFILE: 4,
+    MediaType.GITHUB_PROFILE: 5,
 }

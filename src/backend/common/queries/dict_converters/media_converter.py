@@ -1,6 +1,8 @@
-from typing import Dict, List
+import json
+from typing import Dict, List, Optional
 
 from backend.common.consts.api_version import ApiMajorVersion
+from backend.common.consts.media_type import SLUG_NAME_TO_TYPE
 from backend.common.models.media import Media
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 
@@ -41,3 +43,16 @@ class MediaConverter(ConverterBase):
             dict["direct_url"] = media.image_direct_url
             dict["view_url"] = media.view_image_url
         return dict
+
+    @staticmethod
+    def dictToModel_v3(data: Dict, year: Optional[int]) -> Media:
+        media_type = SLUG_NAME_TO_TYPE[data["type"]]
+        foreign_key = data["foreign_key"]
+        media = Media(
+            id=Media.render_key_name(media_type, foreign_key),
+            media_type_enum=media_type,
+            foreign_key=foreign_key,
+            details_json=json.dumps(data["details"]),
+            year=year,
+        )
+        return media
