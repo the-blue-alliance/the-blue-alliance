@@ -5,7 +5,7 @@ from google.cloud.datastore_v1.proto import datastore_pb2_grpc
 from google.cloud.ndb import _datastore_api
 from InMemoryCloudDatastoreStub import datastore_stub
 
-from backend.tests.test_data_importer import TestDataImporter
+from backend.tests.json_data_importer import JsonDataImporter
 
 
 @pytest.fixture(autouse=True)
@@ -48,5 +48,5 @@ def ndb_context(ndb_client: ndb.Client):
 
 
 @pytest.fixture()
-def test_data_importer(ndb_context) -> TestDataImporter:
-    return TestDataImporter()
+def test_data_importer(ndb_client) -> JsonDataImporter:
+    return JsonDataImporter(ndb_client)

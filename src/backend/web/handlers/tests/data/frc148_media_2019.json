@@ -1,0 +1,36 @@
+[
+  {
+    "details": {
+      "base64Image": "iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAIAAAADnC86AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAALEQAACxEBf2RfkQAAABl0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC4xMzQDW3oAAAAcSURBVFhH7cEBDQAAAMKg909tDjcgAAAAALhXAxLoAAGcRf2wAAAAAElFTkSuQmCC"
+    }, 
+    "direct_url": "", 
+    "foreign_key": "avatar_2019_frc148", 
+    "preferred": false, 
+    "type": "avatar", 
+    "view_url": ""
+  }, 
+  {
+    "details": {}, 
+    "direct_url": "https://i.imgur.com/1FqA6wah.jpg", 
+    "foreign_key": "1FqA6wa", 
+    "preferred": true, 
+    "type": "imgur", 
+    "view_url": "https://imgur.com/1FqA6wa"
+  }, 
+  {
+    "details": {}, 
+    "direct_url": "https://img.youtube.com/vi/Xsur2oiqmjk/hqdefault.jpg", 
+    "foreign_key": "Xsur2oiqmjk", 
+    "preferred": false, 
+    "type": "youtube", 
+    "view_url": "https://youtu.be/Xsur2oiqmjk"
+  }, 
+  {
+    "details": {}, 
+    "direct_url": "https://img.youtube.com/vi/oLPJaNfnPO4/hqdefault.jpg", 
+    "foreign_key": "oLPJaNfnPO4", 
+    "preferred": false, 
+    "type": "youtube", 
+    "view_url": "https://youtu.be/oLPJaNfnPO4"
+  }
+]

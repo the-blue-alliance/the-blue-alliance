@@ -1,0 +1,34 @@
+[
+  {
+    "details": {}, 
+    "direct_url": "", 
+    "foreign_key": "robotics-team-148-robowranglers-144761815581405", 
+    "preferred": false, 
+    "type": "facebook-profile", 
+    "view_url": ""
+  }, 
+  {
+    "details": {}, 
+    "direct_url": "", 
+    "foreign_key": "team148", 
+    "preferred": false, 
+    "type": "github-profile", 
+    "view_url": ""
+  }, 
+  {
+    "details": {}, 
+    "direct_url": "", 
+    "foreign_key": "robowranglers", 
+    "preferred": false, 
+    "type": "twitter-profile", 
+    "view_url": ""
+  }, 
+  {
+    "details": {}, 
+    "direct_url": "", 
+    "foreign_key": "robowranglers", 
+    "preferred": false, 
+    "type": "youtube-channel", 
+    "view_url": ""
+  }
+]

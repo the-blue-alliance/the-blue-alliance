@@ -1,9 +1,13 @@
 import json
 from typing import Dict, List, Optional
 
+from google.cloud import ndb
+
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.consts.media_type import SLUG_NAME_TO_TYPE
+from backend.common.models.keys import TeamKey
 from backend.common.models.media import Media
+from backend.common.models.team import Team
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 
 
@@ -45,7 +49,9 @@ class MediaConverter(ConverterBase):
         return dict
 
     @staticmethod
-    def dictToModel_v3(data: Dict, year: Optional[int]) -> Media:
+    def dictToModel_v3(
+        data: Dict, year: Optional[int], team_key: Optional[TeamKey]
+    ) -> Media:
         media_type = SLUG_NAME_TO_TYPE[data["type"]]
         foreign_key = data["foreign_key"]
         media = Media(
@@ -53,6 +59,10 @@ class MediaConverter(ConverterBase):
             media_type_enum=media_type,
             foreign_key=foreign_key,
             details_json=json.dumps(data["details"]),
+            references=[ndb.Key(Team, team_key)] if team_key else [],
+            preferred_references=[ndb.Key(Team, team_key)]
+            if team_key and data["preferred"]
+            else [],
             year=year,
         )
         return media
