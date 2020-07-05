@@ -13,6 +13,9 @@ from backend.common.tasklets import typed_tasklet
 class MatchQuery(DatabaseQuery[Optional[Match]]):
     DICT_CONVERTER = MatchConverter
 
+    def __init__(self, match_key: MatchKey) -> None:
+        super().__init__(match_key=match_key)
+
     @typed_tasklet
     def _query_async(self, match_key: MatchKey) -> Optional[Match]:
         match = yield Match.get_by_id_async(match_key)
@@ -21,6 +24,9 @@ class MatchQuery(DatabaseQuery[Optional[Match]]):
 
 class EventMatchesQuery(DatabaseQuery[List[Match]]):
     DICT_CONVERTER = MatchConverter
+
+    def __init__(self, event_key: EventKey) -> None:
+        super().__init__(event_key=event_key)
 
     @typed_tasklet
     def _query_async(self, event_key: EventKey) -> List[Match]:
@@ -34,6 +40,9 @@ class EventMatchesQuery(DatabaseQuery[List[Match]]):
 class TeamEventMatchesQuery(DatabaseQuery[List[Match]]):
     DICT_CONVERTER = MatchConverter
 
+    def __init__(self, team_key: TeamKey, event_key: EventKey) -> None:
+        super().__init__(team_key=team_key, event_key=event_key)
+
     @typed_tasklet
     def _query_async(self, team_key: TeamKey, event_key: EventKey) -> List[Match]:
         match_keys = yield Match.query(
@@ -45,6 +54,9 @@ class TeamEventMatchesQuery(DatabaseQuery[List[Match]]):
 
 class TeamYearMatchesQuery(DatabaseQuery[List[Match]]):
     DICT_CONVERTER = MatchConverter
+
+    def __init__(self, team_key: TeamKey, year: Year) -> None:
+        super().__init__(team_key=team_key, year=year)
 
     @typed_tasklet
     def _query_async(self, team_key: TeamKey, year: Year) -> List[Match]:

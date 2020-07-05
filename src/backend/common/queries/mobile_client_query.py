@@ -7,9 +7,14 @@ from backend.common.tasklets import typed_tasklet
 
 
 class MobileClientListQuery(DatabaseQuery[List[MobileClient]]):
+    def __init__(
+        self, users: List[str], client_types: List[ClientType] = list(ClientType)
+    ) -> None:
+        super().__init__(users=users, client_types=client_types)
+
     @typed_tasklet
     def _query_async(
-        self, users: List[str], client_types: List[ClientType] = list(ClientType)
+        self, users: List[str], client_types: List[ClientType]
     ) -> List[MobileClient]:
         if not users or not client_types:
             return []

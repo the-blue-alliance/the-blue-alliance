@@ -15,6 +15,9 @@ from backend.common.tasklets import typed_tasklet
 class DistrictQuery(DatabaseQuery[Optional[District]]):
     DICT_CONVERTER = DistrictConverter
 
+    def __init__(self, district_key: DistrictKey) -> None:
+        super().__init__(district_key=district_key)
+
     @typed_tasklet
     def _query_async(self, district_key: DistrictKey) -> Optional[District]:
         # Fetch all equivalent keys
@@ -30,6 +33,9 @@ class DistrictQuery(DatabaseQuery[Optional[District]]):
 class DistrictsInYearQuery(DatabaseQuery[List[District]]):
     DICT_CONVERTER = DistrictConverter
 
+    def __init__(self, year: Year) -> None:
+        super().__init__(year=year)
+
     @typed_tasklet
     def _query_async(self, year: Year) -> List[District]:
         district_keys = yield District.query(District.year == year).fetch_async(
@@ -41,6 +47,9 @@ class DistrictsInYearQuery(DatabaseQuery[List[District]]):
 
 class DistrictHistoryQuery(DatabaseQuery[List[District]]):
     DICT_CONVERTER = DistrictConverter
+
+    def __init__(self, abbreviation: DistrictAbbreviation) -> None:
+        super().__init__(abbreviation=abbreviation)
 
     @typed_tasklet
     def _query_async(self, abbreviation: DistrictAbbreviation) -> List[District]:
@@ -55,6 +64,9 @@ class DistrictHistoryQuery(DatabaseQuery[List[District]]):
 
 class TeamDistrictsQuery(DatabaseQuery[List[District]]):
     DICT_CONVERTER = DistrictConverter
+
+    def __init__(self, team_key: TeamKey) -> None:
+        super().__init__(team_key=team_key)
 
     @typed_tasklet
     def _query_async(self, team_key: TeamKey) -> List[District]:

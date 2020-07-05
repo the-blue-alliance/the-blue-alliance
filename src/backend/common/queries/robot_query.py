@@ -13,6 +13,9 @@ from backend.common.tasklets import typed_tasklet
 class TeamRobotsQuery(DatabaseQuery[List[Robot]]):
     DICT_CONVERTER = RobotConverter
 
+    def __init__(self, team_key: TeamKey) -> None:
+        super().__init__(team_key=team_key)
+
     @typed_tasklet
     def _query_async(self, team_key: TeamKey) -> List[Robot]:
         robots = yield Robot.query(Robot.team == ndb.Key(Team, team_key)).fetch_async()

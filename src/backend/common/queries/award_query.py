@@ -16,6 +16,9 @@ from backend.common.tasklets import typed_tasklet
 class EventAwardsQuery(DatabaseQuery[List[Award]]):
     DICT_CONVERTER = AwardConverter
 
+    def __init__(self, event_key: EventKey) -> None:
+        super().__init__(event_key=event_key)
+
     @typed_tasklet
     def _query_async(self, event_key: EventKey) -> List[Award]:
         awards = yield Award.query(
@@ -26,6 +29,9 @@ class EventAwardsQuery(DatabaseQuery[List[Award]]):
 
 class TeamAwardsQuery(DatabaseQuery[List[Award]]):
     DICT_CONVERTER = AwardConverter
+
+    def __init__(self, team_key: TeamKey) -> None:
+        super().__init__(team_key=team_key)
 
     @typed_tasklet
     def _query_async(self, team_key: TeamKey) -> List[Award]:
@@ -38,6 +44,9 @@ class TeamAwardsQuery(DatabaseQuery[List[Award]]):
 class TeamYearAwardsQuery(DatabaseQuery[List[Award]]):
     DICT_CONVERTER = AwardConverter
 
+    def __init__(self, team_key: TeamKey, year: Year) -> None:
+        super().__init__(team_key=team_key, year=year)
+
     @typed_tasklet
     def _query_async(self, team_key: TeamKey, year: Year) -> List[Award]:
         awards = yield Award.query(
@@ -48,6 +57,9 @@ class TeamYearAwardsQuery(DatabaseQuery[List[Award]]):
 
 class TeamEventAwardsQuery(DatabaseQuery[List[Award]]):
     DICT_CONVERTER = AwardConverter
+
+    def __init__(self, team_key: TeamKey, event_key: EventKey) -> None:
+        super().__init__(team_key=team_key, event_key=event_key)
 
     @typed_tasklet
     def _query_async(self, team_key: TeamKey, event_key: EventKey) -> List[Award]:
@@ -60,6 +72,13 @@ class TeamEventAwardsQuery(DatabaseQuery[List[Award]]):
 
 class TeamEventTypeAwardsQuery(DatabaseQuery[List[Award]]):
     DICT_CONVERTER = AwardConverter
+
+    def __init__(
+        self, team_key: TeamKey, event_type: EventType, award_type: AwardType
+    ) -> None:
+        super().__init__(
+            team_key=team_key, event_type=event_type, award_type=award_type
+        )
 
     @typed_tasklet
     def _query_async(

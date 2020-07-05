@@ -16,6 +16,9 @@ from backend.common.tasklets import typed_tasklet
 class TeamSocialMediaQuery(DatabaseQuery[List[Media]]):
     DICT_CONVERTER = MediaConverter
 
+    def __init__(self, team_key: TeamKey) -> None:
+        super().__init__(team_key=team_key)
+
     @typed_tasklet
     def _query_async(self, team_key: TeamKey) -> List[Media]:
         medias = yield Media.query(
@@ -28,6 +31,9 @@ class TeamSocialMediaQuery(DatabaseQuery[List[Media]]):
 class TeamMediaQuery(DatabaseQuery[List[Media]]):
     DICT_CONVERTER = MediaConverter
 
+    def __init__(self, team_key: TeamKey) -> None:
+        super().__init__(team_key=team_key)
+
     @typed_tasklet
     def _query_async(self, team_key: TeamKey) -> List[Media]:
         medias = yield Media.query(
@@ -39,6 +45,9 @@ class TeamMediaQuery(DatabaseQuery[List[Media]]):
 class TeamYearMediaQuery(DatabaseQuery[List[Media]]):
     DICT_CONVERTER = MediaConverter
 
+    def __init(self, team_key: TeamKey, year: Year) -> None:
+        super().__init__(team_key=team_key, year=year)
+
     @typed_tasklet
     def _query_async(self, team_key: TeamKey, year: Year) -> List[Media]:
         medias = yield Media.query(
@@ -49,6 +58,9 @@ class TeamYearMediaQuery(DatabaseQuery[List[Media]]):
 
 class EventTeamsMediasQuery(DatabaseQuery[List[Media]]):
     DICT_CONVERTER = MediaConverter
+
+    def __init__(self, event_key: EventKey) -> None:
+        super().__init__(event_key=event_key)
 
     @typed_tasklet
     def _query_async(self, event_key: EventKey) -> List[Media]:
@@ -73,6 +85,9 @@ class EventTeamsMediasQuery(DatabaseQuery[List[Media]]):
 class EventTeamsPreferredMediasQuery(DatabaseQuery[List[Media]]):
     DICT_CONVERTER = MediaConverter
 
+    def __init__(self, event_key: EventKey) -> None:
+        super().__init__(event_key=event_key)
+
     @typed_tasklet
     def _query_async(self, event_key: EventKey) -> List[Media]:
         year = int(event_key[:4])
@@ -96,6 +111,9 @@ class EventTeamsPreferredMediasQuery(DatabaseQuery[List[Media]]):
 class EventMediasQuery(DatabaseQuery[List[Media]]):
     DICT_CONVERTER = MediaConverter
 
+    def __init__(self, event_key: EventKey) -> None:
+        super().__init__(event_key=event_key)
+
     @typed_tasklet
     def _query_async(self, event_key: EventKey) -> List[Media]:
         medias = yield Media.query(
@@ -106,6 +124,9 @@ class EventMediasQuery(DatabaseQuery[List[Media]]):
 
 class TeamTagMediasQuery(DatabaseQuery[List[Media]]):
     DICT_CONVERTER = MediaConverter
+
+    def __init__(self, team_key: TeamKey, media_tag: MediaTag) -> None:
+        super().__init__(team_key=team_key, media_tag=media_tag)
 
     @typed_tasklet
     def _query_async(self, team_key: TeamKey, media_tag: MediaTag) -> List[Media]:
@@ -118,6 +139,9 @@ class TeamTagMediasQuery(DatabaseQuery[List[Media]]):
 
 class TeamYearTagMediasQuery(DatabaseQuery[List[Media]]):
     DICT_CONVERTER = MediaConverter
+
+    def __init__(self, team_key: TeamKey, year: Year, media_tag: MediaTag) -> None:
+        super().__init__(team_key=team_key, year=year, media_tag=media_tag)
 
     @typed_tasklet
     def _query_async(
