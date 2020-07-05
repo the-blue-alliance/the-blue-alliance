@@ -1,18 +1,16 @@
 from typing import List
 
-from google.cloud import ndb
-
 from backend.common.consts.client_type import ClientType
-from backend.common.futures import TypedFuture
 from backend.common.models.mobile_client import MobileClient
 from backend.common.queries.database_query import DatabaseQuery
+from backend.common.tasklets import typed_tasklet
 
 
-class MobileClientListQuery(DatabaseQuery[List[TypedFuture[MobileClient]]]):
-    @ndb.tasklet
+class MobileClientListQuery(DatabaseQuery[List[MobileClient]]):
+    @typed_tasklet
     def _query_async(
         self, users: List[str], client_types: List[ClientType] = list(ClientType)
-    ) -> List[TypedFuture[MobileClient]]:
+    ) -> List[MobileClient]:
         if not users or not client_types:
             return []
 

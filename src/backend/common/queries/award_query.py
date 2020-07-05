@@ -4,20 +4,20 @@ from google.cloud import ndb
 
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
-from backend.common.futures import TypedFuture
 from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.team import Team
 from backend.common.queries.database_query import DatabaseQuery
 from backend.common.queries.dict_converters.award_converter import AwardConverter
+from backend.common.tasklets import typed_tasklet
 
 
 class EventAwardsQuery(DatabaseQuery[List[Award]]):
     DICT_CONVERTER = AwardConverter
 
-    @ndb.tasklet
-    def _query_async(self, event_key: EventKey) -> TypedFuture[List[Award]]:
+    @typed_tasklet
+    def _query_async(self, event_key: EventKey) -> List[Award]:
         awards = yield Award.query(
             Award.event == ndb.Key(Event, event_key)
         ).fetch_async()
@@ -27,8 +27,8 @@ class EventAwardsQuery(DatabaseQuery[List[Award]]):
 class TeamAwardsQuery(DatabaseQuery[List[Award]]):
     DICT_CONVERTER = AwardConverter
 
-    @ndb.tasklet
-    def _query_async(self, team_key: TeamKey) -> TypedFuture[List[Award]]:
+    @typed_tasklet
+    def _query_async(self, team_key: TeamKey) -> List[Award]:
         awards = yield Award.query(
             Award.team_list == ndb.Key(Team, team_key)
         ).fetch_async()
@@ -38,8 +38,8 @@ class TeamAwardsQuery(DatabaseQuery[List[Award]]):
 class TeamYearAwardsQuery(DatabaseQuery[List[Award]]):
     DICT_CONVERTER = AwardConverter
 
-    @ndb.tasklet
-    def _query_async(self, team_key: TeamKey, year: Year) -> TypedFuture[List[Award]]:
+    @typed_tasklet
+    def _query_async(self, team_key: TeamKey, year: Year) -> List[Award]:
         awards = yield Award.query(
             Award.team_list == ndb.Key(Team, team_key), Award.year == year
         ).fetch_async()
@@ -49,10 +49,8 @@ class TeamYearAwardsQuery(DatabaseQuery[List[Award]]):
 class TeamEventAwardsQuery(DatabaseQuery[List[Award]]):
     DICT_CONVERTER = AwardConverter
 
-    @ndb.tasklet
-    def _query_async(
-        self, team_key: TeamKey, event_key: EventKey
-    ) -> TypedFuture[List[Award]]:
+    @typed_tasklet
+    def _query_async(self, team_key: TeamKey, event_key: EventKey) -> List[Award]:
         awards = yield Award.query(
             Award.team_list == ndb.Key(Team, team_key),
             Award.event == ndb.Key(Event, event_key),
@@ -63,10 +61,10 @@ class TeamEventAwardsQuery(DatabaseQuery[List[Award]]):
 class TeamEventTypeAwardsQuery(DatabaseQuery[List[Award]]):
     DICT_CONVERTER = AwardConverter
 
-    @ndb.tasklet
+    @typed_tasklet
     def _query_async(
         self, team_key: TeamKey, event_type: EventType, award_type: AwardType
-    ) -> TypedFuture[List[Award]]:
+    ) -> List[Award]:
         awards = yield Award.query(
             Award.team_list == ndb.Key(Team, team_key),
             Award.event_type_enum == event_type,

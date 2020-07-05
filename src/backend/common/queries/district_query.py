@@ -9,12 +9,13 @@ from backend.common.models.keys import DistrictAbbreviation, DistrictKey, TeamKe
 from backend.common.models.team import Team
 from backend.common.queries.database_query import DatabaseQuery
 from backend.common.queries.dict_converters.district_converter import DistrictConverter
+from backend.common.tasklets import typed_tasklet
 
 
 class DistrictQuery(DatabaseQuery[Optional[District]]):
     DICT_CONVERTER = DistrictConverter
 
-    @ndb.tasklet
+    @typed_tasklet
     def _query_async(self, district_key: DistrictKey) -> Optional[District]:
         # Fetch all equivalent keys
         keys = RenamedDistricts.get_equivalent_keys(district_key)
@@ -29,7 +30,7 @@ class DistrictQuery(DatabaseQuery[Optional[District]]):
 class DistrictsInYearQuery(DatabaseQuery[List[District]]):
     DICT_CONVERTER = DistrictConverter
 
-    @ndb.tasklet
+    @typed_tasklet
     def _query_async(self, year: Year) -> List[District]:
         district_keys = yield District.query(District.year == year).fetch_async(
             keys_only=True
@@ -41,7 +42,7 @@ class DistrictsInYearQuery(DatabaseQuery[List[District]]):
 class DistrictHistoryQuery(DatabaseQuery[List[District]]):
     DICT_CONVERTER = DistrictConverter
 
-    @ndb.tasklet
+    @typed_tasklet
     def _query_async(self, abbreviation: DistrictAbbreviation) -> List[District]:
         district_keys = yield District.query(
             District.abbreviation.IN(
@@ -55,7 +56,7 @@ class DistrictHistoryQuery(DatabaseQuery[List[District]]):
 class TeamDistrictsQuery(DatabaseQuery[List[District]]):
     DICT_CONVERTER = DistrictConverter
 
-    @ndb.tasklet
+    @typed_tasklet
     def _query_async(self, team_key: TeamKey) -> List[District]:
         district_team_keys = yield DistrictTeam.query(
             DistrictTeam.team == ndb.Key(Team, team_key)
