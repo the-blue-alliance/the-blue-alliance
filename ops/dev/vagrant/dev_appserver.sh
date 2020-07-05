@@ -30,6 +30,7 @@ if [ "$datastore_mode" == "local" ]; then
     datastore_path="/datastore/tba.db"
     datastore_args="--support_datastore_emulator=true --datastore_emulator_port=$emulator_port --datastore_path=$datastore_path"
     env="--env_var DATASTORE_EMULATOR_HOST=localhost:$emulator_port --env_var DATASTORE_DATASET=test"
+    application="--application test"
 elif [ "$datastore_mode" == "remote" ]; then
     cred_file=$(get_config_prop google_application_credentials | xargs realpath)
     project=$(get_project_from_key "$cred_file")
