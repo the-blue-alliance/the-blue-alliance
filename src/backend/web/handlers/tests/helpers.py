@@ -1,5 +1,6 @@
+import re
 from datetime import datetime
-from typing import List, NamedTuple, Optional
+from typing import List, NamedTuple, Optional, Tuple
 
 import bs4
 from google.cloud import ndb
@@ -11,6 +12,13 @@ from backend.common.models.keys import EventKey, TeamNumber
 from backend.common.models.team import Team
 
 
+class TeamCurrentEvent(NamedTuple):
+    event_key: Optional[str]
+    webcast: Optional[Tuple[str, str]]  # (link, text)
+    currently_competing: Optional[str]
+    upcoming_matches: Optional[bool]
+
+
 class TeamInfo(NamedTuple):
     header: str
     location: Optional[str]
@@ -20,10 +28,23 @@ class TeamInfo(NamedTuple):
     website: Optional[str]
     home_cmp: Optional[str]
     hof: Optional[str]
+    district: Optional[str]
+    district_link: Optional[str]
+    social_media: Optional[List[Tuple[str, str]]]  # tuple of (slug_name, foreign_key)
+    preferred_medias: Optional[
+        List[Tuple[str, str]]
+    ]  # tuple of (slug_name, foreign_key)
+    current_event: Optional[TeamCurrentEvent]
 
 
 class TeamEventParticipation(NamedTuple):
     event_name: str
+
+
+class TeamEventHistory(NamedTuple):
+    year: int
+    event: str
+    awards: List[str]
 
 
 def preseed_team(ndb_client: ndb.Client, team_number: TeamNumber) -> None:
@@ -64,7 +85,7 @@ def preseed_event_for_team(
 
 def get_team_info(resp_data: str) -> TeamInfo:
     soup = bs4.BeautifulSoup(resp_data, "html.parser")
-    header = soup.find("h2")
+    header = soup.find(id="team-title")
     location = soup.find(id="team-location")
     full_name = soup.find(id="team-name")
     rookie_year = soup.find(id="team-rookie-year")
@@ -72,9 +93,51 @@ def get_team_info(resp_data: str) -> TeamInfo:
     website = soup.find(id="team-website")
     home_cmp = soup.find(id="team-home-cmp")
     hof = soup.find(id="team-hof")
+    district = soup.find(id="team-district")
+    district = district.find("a") if district else None
+    social_media = soup.find(id="team-social-media")
+    social_media = (
+        [
+            (m["data-media-type"], "".join(m.stripped_strings))
+            for m in social_media.find_all(attrs={"data-media-type": True})
+        ]
+        if social_media
+        else None
+    )
+    preferred_carousel = soup.find(id=re.compile(r"team-carousel-frc\d+"))
+    preferred_medias = (
+        [
+            (m["data-media-type"], m["data-foreign-key"])
+            for m in preferred_carousel.find_all(attrs={"data-media-type": True})
+        ]
+        if preferred_carousel
+        else None
+    )
+
+    current_event = None
+    current_soup = soup.find(id="current-event")
+    if current_soup:
+        current_webcast = current_soup.find(id="current-event-webcast")
+        currently_competing = current_soup.find(attrs={"class": "panel-title"})
+        upcoming_matches = current_soup.find(attrs={"class": "panel-body"})
+        upcoming_match_table = (
+            upcoming_matches.find(attrs={"class": "match-table"})
+            if upcoming_matches
+            else None
+        )
+        current_event = TeamCurrentEvent(
+            event_key=current_soup["data-event-key"],
+            webcast=(current_webcast["href"], "".join(current_webcast.stripped_strings))
+            if current_webcast
+            else None,
+            currently_competing="".join(currently_competing.stripped_strings)
+            if currently_competing
+            else None,
+            upcoming_matches=upcoming_match_table is not None,
+        )
 
     return TeamInfo(
-        header=header.string.strip(),
+        header="".join(header.stripped_strings),
         location=location.string.strip() if location else None,
         full_name=full_name.string.strip() if full_name else None,
         rookie_year=rookie_year.string.strip() if rookie_year else None,
@@ -82,7 +145,29 @@ def get_team_info(resp_data: str) -> TeamInfo:
         website=website.string.strip() if website else None,
         home_cmp=home_cmp.string.strip() if home_cmp else None,
         hof=hof.string.strip() if hof else None,
+        district=district.string.strip() if district else None,
+        district_link=district["href"] if district else None,
+        social_media=social_media or None,
+        preferred_medias=preferred_medias or None,
+        current_event=current_event,
     )
+
+
+def get_team_history(resp_data: str) -> Optional[List[TeamEventHistory]]:
+    soup = bs4.BeautifulSoup(resp_data, "html.parser")
+    history_table = soup.find(id="competition-list-table")
+    if not history_table:
+        return None
+
+    events = history_table.find("tbody").find_all("tr")
+    return [
+        TeamEventHistory(
+            year=int(e.find_all("td")[0].string),
+            event="".join(e.find_all("td")[1].stripped_strings),
+            awards=list(e.find_all("td")[2].stripped_strings),
+        )
+        for e in events
+    ]
 
 
 def get_page_title(resp_data: str) -> str:

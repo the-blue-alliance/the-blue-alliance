@@ -1,0 +1,23 @@
+{
+  "address": null, 
+  "city": "Greenville", 
+  "country": "USA", 
+  "gmaps_place_id": null, 
+  "gmaps_url": null, 
+  "home_championship": {
+    "2020": "Houston"
+  }, 
+  "key": "frc148", 
+  "lat": null, 
+  "lng": null, 
+  "location_name": null, 
+  "motto": null, 
+  "name": "Innovation First International/L3 Harris&Greenville High School", 
+  "nickname": "Robowranglers", 
+  "postal_code": "75402", 
+  "rookie_year": 1992, 
+  "school_name": "Greenville High School", 
+  "state_prov": "Texas", 
+  "team_number": 148, 
+  "website": "http://www.robowranglers148.com/"
+}

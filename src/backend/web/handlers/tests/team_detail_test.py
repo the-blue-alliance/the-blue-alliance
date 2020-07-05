@@ -1,3 +1,4 @@
+from freezegun import freeze_time
 from google.cloud import ndb
 from werkzeug.test import Client
 
@@ -31,17 +32,65 @@ def test_page_title(web_client: Client, ndb_client: ndb.Client) -> None:
     )
 
 
-def test_team_info(web_client: Client, ndb_client: ndb.Client) -> None:
-    helpers.preseed_team(ndb_client, 254)
-    helpers.preseed_event_for_team(ndb_client, 254, "2020test")
-    resp = web_client.get("/team/254/2020")
+def test_team_info(web_client: Client, setup_full_team) -> None:
+    resp = web_client.get("/team/148/2019")
     assert resp.status_code == 200
 
     team_info = helpers.get_team_info(resp.data)
-    assert team_info.header == "Team 254 - The 254 Team"
-    assert team_info.location == "New York, NY, USA"
-    assert team_info.full_name == "The Blue Alliance / Some High School"
-    assert team_info.rookie_year == "Rookie Year: 2008"
+    assert team_info.header == "Team 148 - Robowranglers"
+    assert team_info.location == "Greenville, Texas, USA"
+    assert (
+        team_info.full_name
+        == "Innovation First International/L3 Harris&Greenville High School"
+    )
+    assert team_info.rookie_year == "Rookie Year: 1992"
+    assert team_info.website == "http://www.robowranglers148.com/"
+    assert team_info.district == "FIRST In Texas District"
+    assert team_info.district_link == "/events/tx/2019"
+    assert team_info.social_media == [
+        ("facebook-profile", "robotics-team-148-robowranglers-144761815581405"),
+        ("youtube-channel", "robowranglers"),
+        ("twitter-profile", "robowranglers"),
+        ("github-profile", "team148"),
+    ]
+    assert team_info.preferred_medias == [
+        ("imgur", "1FqA6wa"),
+    ]
+    assert team_info.current_event is None
+
+
+@freeze_time("2019-03-30")  # This makes 2019txdls active
+def test_team_info_live_event_no_upcoming_matches(
+    web_client: Client, setup_full_team
+) -> None:
+    resp = web_client.get("/team/148/2019")
+    assert resp.status_code == 200
+
+    team_info = helpers.get_team_info(resp.data)
+    assert team_info.header == "Team 148 - Robowranglers"
+    assert team_info.location == "Greenville, Texas, USA"
+    assert (
+        team_info.full_name
+        == "Innovation First International/L3 Harris&Greenville High School"
+    )
+    assert team_info.rookie_year == "Rookie Year: 1992"
+    assert team_info.website == "http://www.robowranglers148.com/"
+    assert team_info.district == "FIRST In Texas District"
+    assert team_info.district_link == "/events/tx/2019"
+    assert team_info.social_media == [
+        ("facebook-profile", "robotics-team-148-robowranglers-144761815581405"),
+        ("youtube-channel", "robowranglers"),
+        ("twitter-profile", "robowranglers"),
+        ("github-profile", "team148"),
+    ]
+    # If there's a live event, don't show the preferred media
+    assert team_info.preferred_medias is None
+    assert team_info.current_event == helpers.TeamCurrentEvent(
+        event_key="2019txdls",
+        webcast=("/gameday/2019txdls", "Watch Now"),
+        currently_competing="Currently competing at:FIT District Dallas Event",
+        upcoming_matches=False,
+    )
 
 
 def test_team_year_dropdown(web_client: Client, ndb_client: ndb.Client) -> None:

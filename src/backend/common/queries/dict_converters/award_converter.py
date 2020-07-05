@@ -72,4 +72,5 @@ class AwardConverter(ConverterBase):
                 )
             )
         award.recipient_json_list = recipient_list_fixed
+        award.team_list = team_keys
         return award

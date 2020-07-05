@@ -3,12 +3,12 @@
 
 <div id="team-info" class="row hidden-xs">
   <div class="col-xs-12">
-    <h2>
+    <h2 id="team-title">
     {% if avatar %}
       <img class="team-avatar single blue" src='{{avatar.avatar_image_source}}'/>
     {% endif %}
     Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h2>
-    {% if district_name %}<blockquote><em>Part of the <a href="/events/{{district_abbrev}}/{{year}}">{{district_name}} District</a></em></blockquote>{% endif %}
+    {% if district_name %}<blockquote id="team-district"><em>Part of the <a href="/events/{{district_abbrev}}/{{year}}">{{district_name}} District</a></em></blockquote>{% endif %}
   </div>
 </div>
 
@@ -35,22 +35,24 @@
       {% endif %}
 
       <hr>
-      <a class="btn btn-xs btn-default{% if social_medias %} pull-right{% endif %}" href="/suggest/team/social_media?team_key={{team.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add Social Media!</a>
-      {% for media in social_medias %}
-        {{smm.social_media_icon_link(media)}}{% if not loop.last %}&middot;{% endif %}
-      {% endfor %}
+      <span id="team-social-media">
+        <a class="btn btn-xs btn-default{% if social_medias %} pull-right{% endif %}" href="/suggest/team/social_media?team_key={{team.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add Social Media!</a>
+        {% for media in social_medias %}
+          {{smm.social_media_icon_link(media)}}{% if not loop.last %}&middot;{% endif %}
+        {% endfor %}
+      </span>
     </p>
   </div>
   <div class="col-sm-6">
   {% if current_event %}
-    <div class="panel panel-default">
+    <div class="panel panel-default" id="current-event" data-event-key="{{current_event.key_name}}">
       <div class="panel-heading">
         {% if current_event.webcast%}
           <div class="hidden-xs pull-right">
             {% if current_event.webcast_status == 'offline' %}
-              <a class="btn btn-default" href="{{current_event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Offline</a>
+              <a class="btn btn-default" id="current-event-webcast" href="{{current_event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Offline</a>
             {% else %}
-              <a class="btn btn-success" href="{{current_event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
+              <a class="btn btn-success" id="current-event-webcast" href="{{current_event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
             {% endif %}
           </div>
         {% endif %}

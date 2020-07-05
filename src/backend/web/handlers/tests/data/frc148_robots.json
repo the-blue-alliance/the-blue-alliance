@@ -1,0 +1,20 @@
+[
+  {
+    "key": "frc148_2016", 
+    "robot_name": "Renegade", 
+    "team_key": "frc148", 
+    "year": 2016
+  }, 
+  {
+    "key": "frc148_2017", 
+    "robot_name": "Rogue", 
+    "team_key": "frc148", 
+    "year": 2017
+  }, 
+  {
+    "key": "frc148_2018", 
+    "robot_name": "Uppercut", 
+    "team_key": "frc148", 
+    "year": 2018
+  }
+]

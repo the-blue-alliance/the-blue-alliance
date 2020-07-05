@@ -1,7 +1,10 @@
 from typing import Dict, List
 
+from google.cloud import ndb
+
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.robot import Robot
+from backend.common.models.team import Team
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 
 
@@ -29,3 +32,12 @@ class RobotConverter(ConverterBase):
             "year": robot.year,
             "robot_name": robot.robot_name,
         }
+
+    @staticmethod
+    def dictToModel_v3(data: Dict) -> Robot:
+        return Robot(
+            id=data["key"],
+            team=ndb.Key(Team, data["team_key"]),
+            year=data["year"],
+            robot_name=data["robot_name"],
+        )

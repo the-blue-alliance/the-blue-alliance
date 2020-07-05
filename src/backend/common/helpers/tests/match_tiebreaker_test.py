@@ -1,10 +1,17 @@
 import json
 
+import pytest
+
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.helpers.match_tiebreakers import MatchTiebreakers
 from backend.common.models.alliance import MatchAlliance
 from backend.common.models.match import Match
+
+
+@pytest.fixture(autouse=True)
+def auto_add_ndb_context(ndb_context) -> None:
+    pass
 
 
 def test_not_elim_match() -> None:

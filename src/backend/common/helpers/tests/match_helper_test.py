@@ -1,8 +1,15 @@
 import json
 
+import pytest
+
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.helpers.match_helper import MatchHelper
+
+
+@pytest.fixture(autouse=True)
+def auto_add_ndb_context(ndb_context) -> None:
+    pass
 
 
 def test_organize_matches_counts(test_data_importer) -> None:

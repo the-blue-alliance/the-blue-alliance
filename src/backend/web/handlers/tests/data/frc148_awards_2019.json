@@ -1,0 +1,122 @@
+[
+  {
+    "award_type": 1, 
+    "event_key": "2019ftcmp", 
+    "name": "District Championship Winner", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc148"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc3310"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc3035"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 1, 
+    "event_key": "2019roe", 
+    "name": "Championship Subdivision Winner", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc148"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc3847"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc6829"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc2907"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 17, 
+    "event_key": "2019roe", 
+    "name": "Quality Award sponsored by Motorola Solutions Foundation", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc148"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 1, 
+    "event_key": "2019txama", 
+    "name": "District Event Winner", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc148"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc3310"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc2657"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 17, 
+    "event_key": "2019txama", 
+    "name": "Quality Award sponsored by Motorola Solutions Foundation", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc148"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 1, 
+    "event_key": "2019txdls", 
+    "name": "District Event Winner", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc148"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc6672"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc3282"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 16, 
+    "event_key": "2019txdls", 
+    "name": "Industrial Design Award sponsored by General Motors", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc148"
+      }
+    ], 
+    "year": 2019
+  }
+]
