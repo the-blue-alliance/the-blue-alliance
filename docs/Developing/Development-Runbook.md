@@ -15,7 +15,15 @@ Once the container is running, you can print all the relevant logs (including th
 
 ## Bootstrapping Data
 
-(TODO: Update for Python 3)
+There are two ways to import data into a local copy of TBA. You can either bootstrap the local db from the production site, or run the datafeeds locally to fetch data directly from FIRST.
+
+### Bootstrapping from Prod TBA
+
+When running locally, TBA will export a bootstrap interface at [http://localhost:8080/local/bootstrap](http://localhost:8080/local/bootstrap). You need to have an API key for the Read APIv3 on prod, which you can obtain on [your account page](https://www.thebluealliance.com/account). Then, you can choose which data you want to import by inputting its data key.
+
+### Bootstrapping from FIRST
+
+(TODO not implemented yet)
 
 ## Rebuilding Web Resources (JavaScript, CSS, etc.)
 If you make changes to JavaScript or CSS files for the `web` service, you will have to recompile the files in order for the changes to show up in your browser. After syncing changes from your local environment to the development container, run the `ops/build/run_buildweb.sh.sh` script from inside the development container.
