@@ -12,6 +12,9 @@ from backend.common.tasklets import typed_tasklet
 class EventDetailsQuery(DatabaseQuery[Optional[EventDetails]]):
     DICT_CONVERTER = EventDetailsConverter
 
+    def __init__(self, event_key: EventKey) -> None:
+        super().__init__(event_key=event_key)
+
     @typed_tasklet
     def _query_async(self, event_key: EventKey) -> Optional[EventDetails]:
         event_details = yield EventDetails.get_by_id_async(event_key)

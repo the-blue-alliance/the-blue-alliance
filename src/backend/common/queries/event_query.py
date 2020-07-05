@@ -16,6 +16,9 @@ from backend.common.tasklets import typed_tasklet
 class EventQuery(DatabaseQuery[Optional[Event]]):
     DICT_CONVERTER = EventConverter
 
+    def __init__(self, event_key: EventKey) -> None:
+        super().__init__(event_key=event_key)
+
     @typed_tasklet
     def _query_async(self, event_key: EventKey) -> Optional[Event]:
         event = yield Event.get_by_id_async(event_key)
@@ -25,6 +28,9 @@ class EventQuery(DatabaseQuery[Optional[Event]]):
 class EventListQuery(DatabaseQuery[List[Event]]):
     DICT_CONVERTER = EventConverter
 
+    def __init__(self, year: Year) -> None:
+        super().__init__(year=year)
+
     @typed_tasklet
     def _query_async(self, year: Year) -> List[Event]:
         events = yield Event.query(Event.year == year).fetch_async()
@@ -32,6 +38,9 @@ class EventListQuery(DatabaseQuery[List[Event]]):
 
 
 class DistrictEventsQuery(DatabaseQuery[List[Event]]):
+    def __init__(self, district_key: DistrictKey) -> None:
+        super().__init__(district_key=district_key)
+
     @typed_tasklet
     def _query_async(self, district_key: DistrictKey) -> List[Event]:
         events = yield Event.query(
@@ -42,6 +51,9 @@ class DistrictEventsQuery(DatabaseQuery[List[Event]]):
 
 class DistrictChampsInYearQuery(DatabaseQuery[List[Event]]):
     DICT_CONVERTER = EventConverter
+
+    def __init__(self, year: Year) -> None:
+        super().__init__(year=year)
 
     @typed_tasklet
     def _query_async(self, year: Year) -> List[Event]:
@@ -54,6 +66,9 @@ class DistrictChampsInYearQuery(DatabaseQuery[List[Event]]):
 
 class TeamEventsQuery(DatabaseQuery[List[Event]]):
     DICT_CONVERTER = EventConverter
+
+    def __init__(self, team_key: TeamKey) -> None:
+        super().__init__(team_key=team_key)
 
     @typed_tasklet
     def _query_async(self, team_key: TeamKey) -> List[Event]:
@@ -68,6 +83,9 @@ class TeamEventsQuery(DatabaseQuery[List[Event]]):
 class TeamYearEventsQuery(DatabaseQuery[List[Event]]):
     DICT_CONVERTER = EventConverter
 
+    def __init__(self, team_key: TeamKey, year: Year) -> None:
+        super().__init__(team_key=team_key, year=year)
+
     @typed_tasklet
     def _query_async(self, team_key: TeamKey, year: Year) -> List[Event]:
         event_teams = yield EventTeam.query(
@@ -81,6 +99,9 @@ class TeamYearEventsQuery(DatabaseQuery[List[Event]]):
 class TeamYearEventTeamsQuery(DatabaseQuery[List[EventTeam]]):
     DICT_CONVERTER = EventConverter
 
+    def __init__(self, team_key: TeamKey, year: Year) -> None:
+        super().__init__(team_key=team_key, year=year)
+
     @typed_tasklet
     def _query_async(self, team_key: TeamKey, year: Year) -> List[EventTeam]:
         event_teams = yield EventTeam.query(
@@ -91,6 +112,9 @@ class TeamYearEventTeamsQuery(DatabaseQuery[List[EventTeam]]):
 
 class EventDivisionsQuery(DatabaseQuery[List[Event]]):
     DICT_CONVERTER = EventConverter
+
+    def __init__(self, event_key: EventKey) -> None:
+        super().__init__(event_key=event_key)
 
     @typed_tasklet
     def _query_async(self, event_key: EventKey) -> List[Event]:
