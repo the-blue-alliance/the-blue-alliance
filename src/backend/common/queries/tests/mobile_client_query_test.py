@@ -6,7 +6,7 @@ from google.cloud import ndb
 from backend.common.consts.client_type import ClientType
 from backend.common.models.account import Account
 from backend.common.models.mobile_client import MobileClient
-from backend.common.queries.mobile_client_query import MobileClientListQuery
+from backend.common.queries.mobile_client_query import MobileClientQuery
 
 
 def _client(
@@ -29,7 +29,7 @@ def _client(
 
 
 @pytest.mark.parametrize(
-    "clients, users, client_types, expected_users",
+    "clients, user_ids, client_types, expected_users",
     [
         ([_client("abc"), _client("efg", verified=False)], [], None, []),
         ([_client("abc"), _client("efg", verified=False)], ["abc"], [], []),
@@ -54,16 +54,16 @@ def _client(
 )
 def test_mobile_client_list(
     clients,
-    users: List[str],
+    user_ids: List[str],
     client_types: Optional[List[ClientType]],
     expected_users: List[str],
 ) -> None:
     clients = [client() for client in clients]
     expected = [client for client in clients if client.user_id in expected_users]
     if client_types is not None:
-        mobile_clients = MobileClientListQuery(users=users, client_types=client_types)
+        mobile_clients = MobileClientQuery(user_ids=user_ids, client_types=client_types)
     else:
-        mobile_clients = MobileClientListQuery(users=users)
+        mobile_clients = MobileClientQuery(user_ids=user_ids)
     assert mobile_clients.fetch() == expected
 
 
