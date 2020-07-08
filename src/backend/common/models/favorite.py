@@ -1,4 +1,6 @@
-from google.appengine.ext import ndb
+from google.cloud import ndb
+
+from backend.common.consts.model_type import ModelType
 
 
 class Favorite(ndb.Model):
@@ -9,11 +11,10 @@ class Favorite(ndb.Model):
 
     user_id = ndb.StringProperty(required=True)
     model_key = ndb.StringProperty(required=True)
-    model_type = ndb.IntegerProperty(required=True)
+    model_type = ndb.IntegerProperty(required=True, choices=list(ModelType))
 
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
 
     def __init__(self, *args, **kw):
         super(Favorite, self).__init__(*args, **kw)
-
