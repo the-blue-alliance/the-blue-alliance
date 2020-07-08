@@ -19,3 +19,13 @@ Helpful commands when developing in The Blue Alliance codebase. This section inc
 ## [[Py 2 -> Py 3 Migration Notes|Py2ToPy3]]
 
 Running notes on how to migrate code from the Python 2 codebase to the new Python 3 codebase.
+
+# Deployment
+
+## Manual Deployment
+
+TODO
+
+## [[CI/CD Setup|CI-CD-Setup]]
+
+Steps for setting up automatic deployment via Github Actions.
