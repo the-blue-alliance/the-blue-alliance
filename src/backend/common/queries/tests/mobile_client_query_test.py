@@ -67,6 +67,28 @@ def test_mobile_client_list(
     assert mobile_clients.fetch() == expected
 
 
+def test_mobile_client_list_only_verified() -> None:
+    user_id = "user-id"
+    verified = MobileClient(
+        id="verified",
+        user_id=user_id,
+        messaging_id="token",
+        client_type=ClientType.OS_IOS,
+        verified=True
+    )
+    verified.put()
+    unverified = MobileClient(
+        id="unverified",
+        user_id=user_id,
+        messaging_id="token",
+        client_type=ClientType.OS_IOS,
+        verified=False
+    )
+    unverified.put()
+    assert [verified] == MobileClientQuery(user_ids=[user_id]).fetch()
+    assert [verified] == MobileClientQuery(user_ids=[user_id], only_verified=True).fetch()
+    assert [verified, unverified] == MobileClientQuery(user_ids=[user_id], only_verified=False).fetch()
+
 # def test_delete_for_messaging_id(self):
 #     user_id_one = 'user_id_one'
 #     messaging_id_one = 'messaging_id1'
