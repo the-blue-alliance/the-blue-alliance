@@ -21,7 +21,7 @@ class MobileClientQuery(DatabaseQuery[List[MobileClient]]):
     def _query_async(
         self,
         user_ids: List[str],
-        client_types: List[ClientType],
+        client_types: List[ClientType] = list(ClientType),
         only_verified: bool = True,
     ) -> List[MobileClient]:
         if not user_ids or not client_types:
@@ -35,11 +35,7 @@ class MobileClientQuery(DatabaseQuery[List[MobileClient]]):
                 MobileClient.verified == True  # noqa: E712
             )
         return (
-            yield MobileClient.query(
-                MobileClient.user_id.IN(user_ids),
-                MobileClient.client_type.IN(client_types),
-                MobileClient.verified == True,  # noqa: E712
-            ).fetch_async()
+            yield mobile_clients_query.fetch_async()
         )
 
     # @staticmethod
