@@ -34,9 +34,7 @@ class MobileClientQuery(DatabaseQuery[List[MobileClient]]):
             mobile_clients_query = mobile_clients_query.filter(
                 MobileClient.verified == True  # noqa: E712
             )
-        return (
-            yield mobile_clients_query.fetch_async()
-        )
+        return (yield mobile_clients_query.fetch_async())
 
     # @staticmethod
     # def delete_for_messaging_id(messaging_id):
