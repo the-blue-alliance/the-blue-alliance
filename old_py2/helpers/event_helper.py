@@ -14,13 +14,6 @@ from models.district import District
 from models.event import Event
 from models.match import Match
 
-CHAMPIONSHIP_EVENTS_LABEL = 'FIRST Championship'
-TWO_CHAMPS_LABEL = 'FIRST Championship - {}'
-FOC_LABEL = 'FIRST Festival of Champions'
-WEEKLESS_EVENTS_LABEL = 'Other Official Events'
-OFFSEASON_EVENTS_LABEL = 'Offseason'
-PRESEASON_EVENTS_LABEL = 'Preseason'
-
 
 class EventHelper(object):
     """
@@ -53,71 +46,6 @@ class EventHelper(object):
                 logging.exception(e)
 
         return team_points
-
-    @classmethod
-    def groupByWeek(self, events):
-        """
-        Events should already be ordered by start_date
-        """
-        to_return = collections.OrderedDict()  # key: week_label, value: list of events
-
-        weekless_events = []
-        offseason_events = []
-        preseason_events = []
-        for event in events:
-            if event.official and event.event_type_enum in {EventType.CMP_DIVISION, EventType.CMP_FINALS}:
-                if event.year >= 2017:
-                    champs_label = TWO_CHAMPS_LABEL.format(event.city)
-                else:
-                    champs_label = CHAMPIONSHIP_EVENTS_LABEL
-                if champs_label in to_return:
-                    to_return[champs_label].append(event)
-                else:
-                    to_return[champs_label] = [event]
-            elif event.official and event.event_type_enum in {EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP_DIVISION, EventType.DISTRICT_CMP}:
-                if (event.start_date is None or
-                   (event.start_date.month == 12 and event.start_date.day == 31)):
-                    weekless_events.append(event)
-                else:
-                    label = event.week_str
-                    if label in to_return:
-                        to_return[label].append(event)
-                    else:
-                        to_return[label] = [event]
-            elif event.event_type_enum == EventType.FOC:
-                if FOC_LABEL in to_return:
-                    to_return[FOC_LABEL].append(event)
-                else:
-                    to_return[FOC_LABEL] = [event]
-            elif event.event_type_enum == EventType.PRESEASON:
-                preseason_events.append(event)
-            else:
-                # everything else is an offseason event
-                offseason_events.append(event)
-
-        # Add weekless + other events last
-        if weekless_events:
-            to_return[WEEKLESS_EVENTS_LABEL] = weekless_events
-        if preseason_events:
-            to_return[PRESEASON_EVENTS_LABEL] = preseason_events
-        if offseason_events:
-            to_return[OFFSEASON_EVENTS_LABEL] = offseason_events
-
-        return to_return
-
-    @classmethod
-    def distantFutureIfNoStartDate(self, event):
-        if not event.start_date:
-            return datetime.datetime(2177, 1, 1, 1, 1, 1)
-        else:
-            return event.time_as_utc(event.start_date)
-
-    @classmethod
-    def distantFutureIfNoEndDate(self, event):
-        if not event.end_date:
-            return datetime.datetime(2177, 1, 1, 1, 1, 1)
-        else:
-            return event.end_date
 
     @classmethod
     def getTeamWLT(self, team_key, event):
@@ -316,15 +244,6 @@ class EventHelper(object):
         # An event slipped through!
         logging.warn("Event type '{}' not recognized!".format(event_type_str))
         return EventType.UNLABLED
-
-    @classmethod
-    def sort_events(cls, events):
-        """
-        Sorts by start date then end date
-        Sort is stable
-        """
-        events.sort(key=EventHelper.distantFutureIfNoStartDate)
-        events.sort(key=EventHelper.distantFutureIfNoEndDate)
 
     @classmethod
     def is_2015_playoff(Cls, event_key):
