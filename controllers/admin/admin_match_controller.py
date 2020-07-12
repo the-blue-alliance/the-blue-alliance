@@ -153,6 +153,11 @@ class AdminMatchEdit(LoggedInHandler):
         self._require_admin()
         alliances_json = self.request.get("alliances_json")
         score_breakdown_json = self.request.get("score_breakdown_json")
+        # Ignore u'None' from form POST
+        score_breakdown_json = score_breakdown_json if score_breakdown_json != "None" else None
+        # Fake JSON load of the score breakdown to ensure the JSON is proper before attempting to save to the DB
+        if score_breakdown_json:
+            json.loads(score_breakdown_json)
         alliances = json.loads(alliances_json)
         tba_videos = json.loads(self.request.get("tba_videos")) if self.request.get("tba_videos") else []
         youtube_videos = json.loads(self.request.get("youtube_videos")) if self.request.get("youtube_videos") else []
