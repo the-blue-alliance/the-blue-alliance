@@ -1,4 +1,3 @@
-import logging
 from typing import Optional
 
 from flask import abort, redirect, request
@@ -15,14 +14,13 @@ from backend.web.profiled_render import render_template
 
 @cached_public
 def event_list(year: Optional[Year] = None) -> Response:
-    logging.info(f"REQ YEAR {year}")
     explicit_year = year is not None
     if year is None:
         year = SeasonHelper.get_current_season()
 
     valid_years = SeasonHelper.get_valid_years()
     if year not in valid_years:
-        abort(400)
+        abort(404)
 
     state_prov = request.args.get("state_prov", None)
     districts_future = district_query.DistrictsInYearQuery(year).fetch_async()

@@ -189,6 +189,24 @@ def test_week(
     assert e.week_str == week_str
 
 
+def test_week_stored_in_context_cache() -> None:
+    e = Event(
+        id="2019test",
+        year=2019,
+        event_type_enum=EventType.REGIONAL,
+        official=True,
+        start_date=datetime(2019, 3, 1),
+        event_short="test",
+    )
+    e.put()
+
+    assert e.week == 0
+
+    context_cache = ndb.get_context().cache
+    assert "2019_season_start" in context_cache
+    assert context_cache["2019_season_start"] == datetime(2019, 3, 4, 0, 0)
+
+
 @pytest.mark.parametrize(*LOCATION_PARAMETERS)
 def test_location(
     city: str, state: str, country: str, postalcode: str, output: str

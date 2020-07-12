@@ -7,6 +7,7 @@ from pyre_extensions import none_throws
 
 from backend.common.consts import playoff_type
 from backend.common.consts.api_version import ApiMajorVersion
+from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.queries.dict_converters.converter_base import ConverterBase
@@ -91,6 +92,7 @@ class EventConverter(ConverterBase):
         event.short_name = data["short_name"]
         event.event_short = data["event_code"]
         event.event_type_enum = data["event_type"]
+        event.official = event.event_type_enum in SEASON_EVENT_TYPES
         event.year = data["year"]
         event.timezone_id = data["timezone"]
         event.website = data["website"]

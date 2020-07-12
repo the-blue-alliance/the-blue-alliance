@@ -51,21 +51,24 @@ class JsonDataImporter(object):
             team = TeamConverter.dictToModel_v3(data)
             team.put()
 
-    def import_event_list(self, base_path: str, path: str, team_key: TeamKey) -> None:
+    def import_event_list(
+        self, base_path: str, path: str, team_key: Optional[TeamKey] = None
+    ) -> None:
         with open(self._get_path(base_path, path), "r") as f:
             data = json.load(f)
 
         with self._maybe_with_context():
             [EventConverter.dictToModel_v3(e).put() for e in data]
-            [
-                EventTeam(
-                    id=f"{e['key']}_{team_key}",
-                    event=ndb.Key(Event, e["key"]),
-                    team=ndb.Key(Team, team_key),
-                    year=e["year"],
-                ).put()
-                for e in data
-            ]
+            if team_key:
+                [
+                    EventTeam(
+                        id=f"{e['key']}_{team_key}",
+                        event=ndb.Key(Event, e["key"]),
+                        team=ndb.Key(Team, team_key),
+                        year=e["year"],
+                    ).put()
+                    for e in data
+                ]
 
     def import_match(self, base_path: str, path: str) -> None:
         with open(self._get_path(base_path, path), "r") as f:

@@ -24,7 +24,7 @@
             {{selected_year}}
             <span class="caret"></span>
           </a>
-          <ul class="dropdown-menu tba-dropdown-menu-limited">
+          <ul class="dropdown-menu tba-dropdown-menu-limited" id="valid-years">
             {% for year in valid_years %}
               <li><a href="/events/{{year}}{% if state_prov %}?state_prov={{state_prov}}{% endif %}">{{year}}</a></li>
             {% endfor %}
@@ -74,8 +74,10 @@
       <a class="btn btn-default pull-right" href="/nearby?search_type=events"><span class="glyphicon glyphicon-search"></span> Search Nearby</a>
 
       {% for label, events in week_events.items() %}
-        <h2 id="{{label|slugify}}">{{ label }} <small>{{events|length}} Events</small></h2>
-        {% include "event_partials/event_table.html" %}
+        <div id="event_label_container_{{label|slugify}}">
+          <h2 id="{{label|slugify}}">{{ label }} <small>{{events|length}} Events</small></h2>
+          {% include "event_partials/event_table.html" %}
+        </div>
       {% endfor %}
     </div>
   </div>

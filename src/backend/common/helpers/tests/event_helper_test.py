@@ -1,9 +1,11 @@
+import datetime
 import json
 
 from google.cloud import ndb
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.event_type import EventType
 from backend.common.helpers.event_helper import EventHelper, TeamAvgScore
 from backend.common.models.alliance import MatchAlliance
 from backend.common.models.event import Event
@@ -196,3 +198,81 @@ def test_calculate_wlt(ndb_context) -> None:
 
     wlt = EventHelper.calculateTeamWLTFromMatches("frc1", [m1, m2, m3])
     assert wlt == WLTRecord(wins=1, losses=1, ties=1)
+
+
+def test_sort_events(ndb_context) -> None:
+    e1 = Event()
+    e2 = Event(
+        start_date=datetime.datetime(2010, 3, 1),
+        end_date=datetime.datetime(2010, 3, 2),
+    )
+
+    events = [e1, e2]
+    EventHelper.sort_events(events)
+    assert events == [e2, e1]
+
+
+def test_group_by_week_old_champs(ndb_context) -> None:
+    e = Event(event_type_enum=EventType.CMP_DIVISION, year=2010, official=True)
+    events = EventHelper.groupByWeek([e])
+    assert events == {
+        "FIRST Championship": [e],
+    }
+
+
+def test_group_by_week_two_champs(ndb_context) -> None:
+    e1 = Event(
+        event_type_enum=EventType.CMP_DIVISION, year=2018, official=True, city="Detriot"
+    )
+    e2 = Event(
+        event_type_enum=EventType.CMP_DIVISION, year=2018, official=True, city="Detriot"
+    )
+    events = EventHelper.groupByWeek([e1, e2])
+    assert events == {
+        "FIRST Championship - Detriot": [e1, e2],
+    }
+
+
+def test_group_by_week_in_season(ndb_context) -> None:
+    e1 = Event(
+        event_type_enum=EventType.DISTRICT,
+        year=2018,
+        start_date=datetime.datetime(2018, 3, 1),
+        official=True,
+    )
+    e2 = Event(
+        event_type_enum=EventType.DISTRICT,
+        year=2018,
+        start_date=datetime.datetime(2018, 3, 1),
+        official=True,
+    )
+    e1._week = 1  # Remmeber, these are 0-indexed
+    e2._week = 1
+    events = EventHelper.groupByWeek([e1, e2])
+    assert events == {
+        "Week 2": [e1, e2],
+    }
+
+
+def test_group_by_week_in_season_weekless(ndb_context) -> None:
+    e = Event(event_type_enum=EventType.DISTRICT, year=2018, official=True,)
+    events = EventHelper.groupByWeek([e])
+    assert events == {
+        "Other Official Events": [e],
+    }
+
+
+def test_group_by_week_offseason(ndb_context) -> None:
+    e = Event(event_type_enum=EventType.OFFSEASON, year=2018, official=True,)
+    events = EventHelper.groupByWeek([e])
+    assert events == {
+        "Offseason": [e],
+    }
+
+
+def test_group_by_week_preseason(ndb_context) -> None:
+    e = Event(event_type_enum=EventType.PRESEASON, year=2018, official=True,)
+    events = EventHelper.groupByWeek([e])
+    assert events == {
+        "Preseason": [e],
+    }
