@@ -147,7 +147,10 @@ class Match(ndb.Model):
         Lazy load score_breakdown_json
         """
         if self._score_breakdown is None and self.score_breakdown_json is not None:
-            self._score_breakdown = json.loads(self.score_breakdown_json)
+            try:
+                self._score_breakdown = json.loads(self.score_breakdown_json)
+            except:
+                return None
 
             if self.has_been_played:
                 # Add in RP calculations
