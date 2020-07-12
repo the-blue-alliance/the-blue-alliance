@@ -42,10 +42,10 @@ def floatformat(num, num_decimals):
     return "%.{}f".format(num_decimals) % num
 
 
-# def isoformat(datetime):
-#     return datetime.isoformat()
-#
-#
+def isoformat(datetime):
+    return datetime.isoformat()
+
+
 # def union(one, two):
 #     return set(one) | set(two)
 #
@@ -142,6 +142,7 @@ _filters = {
     "digits": digits,
     "limit_prob": limit_prob,
     "slugify": slugify,
+    "isoformat": isoformat,
 }
 
 

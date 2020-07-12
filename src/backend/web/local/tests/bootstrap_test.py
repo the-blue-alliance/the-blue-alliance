@@ -60,6 +60,7 @@ def make_event(event_key: EventKey) -> Event:
         short_name="New York City",
         event_short=event_key[4:],
         event_type_enum=EventType.REGIONAL,
+        official=True,
         playoff_type=PlayoffType.BRACKET_8_TEAM,
         start_date=datetime(2020, 3, 1),
         end_date=datetime(2020, 3, 5),

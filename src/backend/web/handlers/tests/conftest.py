@@ -32,3 +32,8 @@ def setup_full_team(test_data_importer) -> None:
         __file__, "data/frc148_districts.json", "frc148"
     )
     test_data_importer.import_robot_list(__file__, "data/frc148_robots.json")
+
+
+@pytest.fixture()
+def setup_full_year_events(test_data_importer) -> None:
+    test_data_importer.import_event_list(__file__, "data/all_events_2019.json")

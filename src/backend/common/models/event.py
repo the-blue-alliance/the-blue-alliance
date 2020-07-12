@@ -69,7 +69,7 @@ class Event(ndb.Model):
     timezone_id = (
         ndb.StringProperty()
     )  # such as 'America/Los_Angeles' or 'Asia/Jerusalem'
-    official = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
+    official: bool = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
     first_eid = ndb.StringProperty()  # from USFIRST
     parent_event: Optional[ndb.Key] = (
         ndb.KeyProperty()
@@ -292,13 +292,11 @@ class Event(ndb.Model):
             return self._week
 
         # Cache week_start for the same context
-        """
-        TODO cache this
-        from context_cache import context_cache
-        cache_key = '{}_season_start:{}'.format(self.year, ndb.get_context().__hash__())
+        ndb_context = ndb.get_context()
+        context_cache = ndb_context.cache
+        cache_key = "{}_season_start".format(self.year)
         season_start = context_cache.get(cache_key)
-        """
-        if True:
+        if season_start is None:
             e = (
                 Event.query(
                     Event.year == self.year,
@@ -327,7 +325,7 @@ class Event(ndb.Model):
                 )
             else:
                 season_start = None
-        # context_cache.set(cache_key, season_start)
+            context_cache[cache_key] = season_start
 
         if self._week is None and season_start is not None:
             # Round events that occur just before the official start-of-season to the closest week

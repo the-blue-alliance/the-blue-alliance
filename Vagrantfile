@@ -15,6 +15,7 @@ Vagrant.configure("2") do |config|
       "node_modules/",
       "src/build/*",
       "*__pycache__*",
+      "venv/*",
     ],
     rsync__auto: true
 

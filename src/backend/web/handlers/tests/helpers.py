@@ -62,6 +62,19 @@ def preseed_team(ndb_client: ndb.Client, team_number: TeamNumber) -> None:
         ).put()
 
 
+def preseed_event(ndb_client: ndb.Client, event_key: EventKey) -> None:
+    with ndb_client.context():
+        Event(
+            id=event_key,
+            event_short=event_key[4:],
+            year=int(event_key[:4]),
+            name="Test Event",
+            event_type_enum=EventType.OFFSEASON,
+            start_date=datetime(2020, 3, 1),
+            end_date=datetime(2020, 3, 5),
+        ).put()
+
+
 def preseed_event_for_team(
     ndb_client: ndb.Client, team_number: TeamNumber, event_key: EventKey
 ) -> None:
