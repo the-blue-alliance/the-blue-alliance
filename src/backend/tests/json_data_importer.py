@@ -8,8 +8,9 @@ from google.cloud import ndb
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
+from backend.common.models.event_details import EventDetails
 from backend.common.models.event_team import EventTeam
-from backend.common.models.keys import TeamKey
+from backend.common.models.keys import EventKey, TeamKey
 from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.team import Team
@@ -69,6 +70,25 @@ class JsonDataImporter(object):
                     ).put()
                     for e in data
                 ]
+
+    def import_event(self, base_path: str, path: str) -> None:
+        with open(self._get_path(base_path, path), "r") as f:
+            data = json.load(f)
+
+        with self._maybe_with_context():
+            event = EventConverter.dictToModel_v3(data)
+            event.put()
+
+    def import_event_alliances(
+        self, base_path: str, path: str, event_key: EventKey
+    ) -> None:
+        with open(self._get_path(base_path, path), "r") as f:
+            data = json.load(f)
+
+        with self._maybe_with_context():
+            detail = EventDetails.get_or_insert(event_key)
+            detail.alliance_selections = data
+            detail.put()
 
     def import_match(self, base_path: str, path: str) -> None:
         with open(self._get_path(base_path, path), "r") as f:

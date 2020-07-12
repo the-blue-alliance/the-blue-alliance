@@ -50,7 +50,9 @@ class Event(ndb.Model):
     district_key: Optional[ndb.Key] = ndb.KeyProperty(kind=District)
     start_date = ndb.DateTimeProperty()
     end_date = ndb.DateTimeProperty()
-    playoff_type = ndb.IntegerProperty(choices=list(PlayoffType))
+    playoff_type: PlayoffType = safe_cast(
+        PlayoffType, ndb.IntegerProperty(choices=list(PlayoffType))
+    )
 
     # venue, venue_addresss, city, state_prov, country, and postalcode are from FIRST
     venue = ndb.TextProperty(indexed=False)  # Name of the event venue

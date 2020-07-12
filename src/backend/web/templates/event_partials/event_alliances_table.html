@@ -1,6 +1,6 @@
 {% if event.alliance_selections %}
   <h3>Alliances</h3>
-  <table class="table table-condensed table-striped table-center">
+  <table class="table table-condensed table-striped table-center" id="event-alliances">
   {% for alliance in event.alliance_selections %}
     {% if loop.first %}
     <tr>

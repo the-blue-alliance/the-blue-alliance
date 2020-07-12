@@ -1,4 +1,4 @@
-from typing import List
+from typing import cast, List
 
 from google.cloud import ndb
 
@@ -77,7 +77,7 @@ class EventTeamsMediasQuery(DatabaseQuery[List[Media]]):
             )
         )
         medias = yield Media.query(
-            Media.references.IN(team_keys), Media.year == year
+            cast(ndb.KeyProperty, Media.references).IN(team_keys), Media.year == year
         ).fetch_async()
         return medias
 
@@ -103,7 +103,8 @@ class EventTeamsPreferredMediasQuery(DatabaseQuery[List[Media]]):
             )
         )
         medias = yield Media.query(
-            Media.preferred_references.IN(team_keys), Media.year == year
+            cast(ndb.KeyProperty, Media.preferred_references).IN(team_keys),
+            Media.year == year,
         ).fetch_async()
         return medias
 

@@ -7,6 +7,7 @@ from backend.common.models.keys import TeamKey
 
 class _EventAllianceOptional(TypedDict, total=False):
     declines: List[TeamKey]
+    name: str
 
 
 class EventAlliance(_EventAllianceOptional, total=True):

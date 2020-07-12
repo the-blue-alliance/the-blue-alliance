@@ -40,10 +40,10 @@ class Media(ndb.Model):
         ndb.TextProperty()
     )  # Additional properties we don't want to expose via API
     year: Year = ndb.IntegerProperty()  # None if year is not relevant
-    references = ndb.KeyProperty(
+    references: List[ndb.Key] = ndb.KeyProperty(  # pyre-ignore[8]
         repeated=True
     )  # Other models that are linked to this object
-    preferred_references = ndb.KeyProperty(
+    preferred_references: List[ndb.Key] = ndb.KeyProperty(  # pyre-ignore[8]
         repeated=True
     )  # Other models for which this media is "Preferred". All preferred_references MUST also be in references
 

@@ -15,7 +15,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for alliance, _, champ_points, _, tiebreaker1, _, tiebreaker2, alliance_name, record in playoff_advancement.sf %}
+      {% for alliance, _, champ_points, _, tiebreaker1, _, tiebreaker2, alliance_name, record, is_complete in playoff_advancement.sf %}
         <tr>
           <td>{{loop.index}}</td>
           <td>{{ alliance_name }}</td>
@@ -26,10 +26,10 @@
           {% if playoff_advancement_tiebreakers|length == 2 %}
             <td>{{ tiebreaker2 }}</td>
           {% endif %}
-          <td>{% if playoff_advancement.sf_complete and loop.index0 < 2 %}<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>{% endif %}</td>
+          <td>{% if is_complete and loop.index0 < 2 %}<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>{% endif %}</td>
         </tr>
       {% endfor %}
-    </tbody>
+    </tbody>,
   </table>
 {% endif %}
 

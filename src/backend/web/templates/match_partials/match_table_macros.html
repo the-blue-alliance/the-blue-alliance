@@ -2,16 +2,16 @@
 {% import "match_partials/match_table_cell_macros.html" as mtcm %}
 
 {% macro qual_match_table(matches, cur_team_key=None) %}
-<table class="match-table">
+<table class="match-table" id="qual-match-table">
   <thead>
     {% include "match_partials/match_table_header.html" %}
+    <tr class="key">
+        <th colspan="16">Qualifications</th>
+    </tr>
   </thead>
 
   <tbody>
     {% if matches.qm %}
-      <tr class="key">
-        <th colspan="16">Qualifications</th>
-      </tr>
       {% for match in matches.qm %}
         {{mtrm.match_row_tr(match, cur_team_key)}}
       {% endfor %}
@@ -102,7 +102,7 @@
 {% endmacro %}
 
 {% macro elim_match_table(matches, cur_team_key=None) %}
-<table class="match-table">
+<table class="match-table" id="elim-match-table">
   <thead>
     {% include "match_partials/match_table_header.html" %}
   </thead>

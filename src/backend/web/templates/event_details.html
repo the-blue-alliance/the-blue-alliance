@@ -37,7 +37,7 @@
       {% if event.year == 2016 and event.event_type_enum == 3 %}
       <p class="pull-right"><a class="btn btn-primary" href="/event/{{event.key_name}}/insights"><span class="glyphicon glyphicon-align-left"></span> Advanced Insights</a></p>
       {% endif %}
-      <h1 itemprop="summary">{{event.name}} {{event.year}}</h1>
+      <h1 itemprop="summary" id="event-name">{{event.name}} {{event.year}}</h1>
       {% if event_divisions %}
       <div class="btn-group division-button">
         <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
@@ -96,7 +96,7 @@
   <div class="row">
     <div class="col-sm-12">
       <ul class="nav nav-tabs nav-justified">
-        {% if matches.num > 0 %}<li class="active"><a href="#results" data-toggle="tab">Results</a></li>{% endif %}
+        {% if match_count > 0 %}<li class="active"><a href="#results" data-toggle="tab">Results</a></li>{% endif %}
         {% if event.details and event.details.rankings_table %}<li><a href="#rankings" data-toggle="tab">Rankings</a></li>{% endif %}
         {% if awards %}<li><a href="#awards" data-toggle="tab">Awards</a></li>{% endif %}
         {% if district_points_sorted %}<li><a href="#district-points" data-toggle="tab">District Points</a></li>{% endif %}
@@ -108,7 +108,7 @@
   </div>
 
   <div class="tab-content">
-    {% if matches.num > 0 %}
+    {% if match_count > 0 %}
     <div class="tab-pane active" id="results">
       {% if event.now %}
       <br />

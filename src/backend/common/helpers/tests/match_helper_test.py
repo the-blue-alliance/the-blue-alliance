@@ -4,6 +4,7 @@ import pytest
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.playoff_type import DoubleElimBracket
 from backend.common.helpers.match_helper import MatchHelper
 
 
@@ -41,6 +42,27 @@ def test_organize_matches_sorted(test_data_importer) -> None:
     assert all(
         quarters[i].set_number <= quarters[i + 1].set_number
         for i in range(len(quarters) - 1)
+    )
+
+
+def test_organize_double_elim_matches(test_data_importer) -> None:
+    matches = test_data_importer.parse_match_list(
+        __file__, "data/2017wiwi_matches.json"
+    )
+
+    _, organized_matches = MatchHelper.organizeMatches(matches)
+    double_elim_matches = MatchHelper.organizeDoubleElimMatches(organized_matches)
+
+    assert DoubleElimBracket.WINNER in double_elim_matches
+    assert DoubleElimBracket.LOSER in double_elim_matches
+
+    assert all(
+        level in double_elim_matches[DoubleElimBracket.WINNER]
+        for level in [CompLevel.EF, CompLevel.QF, CompLevel.SF, CompLevel.F]
+    )
+    assert all(
+        level in double_elim_matches[DoubleElimBracket.LOSER]
+        for level in [CompLevel.EF, CompLevel.QF, CompLevel.SF, CompLevel.F]
     )
 
 
