@@ -16,6 +16,7 @@ Vagrant.configure("2") do |config|
       "src/build/*",
       "*__pycache__*",
       "venv/*",
+      ".pyre/*",
     ],
     rsync__auto: true
 
