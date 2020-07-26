@@ -15,6 +15,7 @@ from backend.common.consts.alliance_color import (
 from backend.common.consts.comp_level import COMP_LEVELS_VERBOSE, CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
+from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.models.alliance import MatchAlliance
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, MatchKey, TeamKey, Year
@@ -110,7 +111,7 @@ class Match(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True)
 
-    def __init__(self, *args, **kw):
+    def __init__(self, *args, **kw) -> None:
         # store set of affected references referenced keys for cache clearing
         # keys must be model properties
         self._affected_references = {
@@ -359,9 +360,8 @@ class Match(ndb.Model):
         """
         Get youtube video ids formatted for embedding
         """
-        """
         if self._youtube_videos is None:
-            self._youtube_videos = []
+            videos = []
             for video in self.youtube_videos:
                 if "?t=" in video:  # Treat ?t= the same as #t=
                     video = video.replace("?t=", "#t=")
@@ -371,8 +371,8 @@ class Match(ndb.Model):
                     old_ts = sp[1]
                     total_seconds = YouTubeVideoHelper.time_to_seconds(old_ts)
                     video = "%s?start=%i" % (video_id, total_seconds)
-                self._youtube_videos.append(video)
-        """
+                videos.append(video)
+            self._youtube_videos = videos
         return self._youtube_videos or []
 
     @property
@@ -440,7 +440,7 @@ class Match(ndb.Model):
             return "%s_%s%sm%s" % (event_key_name, comp_level, set_number, match_number)
 
     @classmethod
-    def validate_key_name(self, match_key: str) -> bool:
+    def validate_key_name(cls, match_key: str) -> bool:
         key_name_regex = re.compile(
             r"^[1-9]\d{3}[a-z]+[0-9]?\_(?:qm|ef\dm|qf\dm|sf\dm|f\dm)\d+$"
         )

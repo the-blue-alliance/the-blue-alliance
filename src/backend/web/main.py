@@ -6,6 +6,7 @@ from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.event import event_detail, event_list
 from backend.web.handlers.gameday import gameday
 from backend.web.handlers.index import index
+from backend.web.handlers.match import match_detail
 from backend.web.handlers.team import (
     team_canonical,
     team_detail,
@@ -26,6 +27,8 @@ app.add_url_rule("/gameday", view_func=gameday)
 app.add_url_rule("/event/<event_key>", view_func=event_detail)
 app.add_url_rule("/events/<int:year>", view_func=event_list)
 app.add_url_rule("/events", view_func=event_list, defaults={"year": None})
+
+app.add_url_rule("/match/<match_key>", view_func=match_detail)
 
 app.add_url_rule("/team/<int:team_number>", view_func=team_canonical)
 app.add_url_rule("/team/<int:team_number>/<int:year>", view_func=team_detail)

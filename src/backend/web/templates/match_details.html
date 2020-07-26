@@ -27,7 +27,7 @@
 <div class="container">
   <div class="row">
     <div class="col-xs-12">
-      <h1>{{match.verbose_name}} <small><a href="/event/{{event.key_name}}">{{ event.name }} {{ event.year }}</a></small></h1>
+      <h1 id="match-title">{{match.verbose_name}} <small><a href="/event/{{event.key_name}}">{{ event.name }} {{ event.year }}</a></small></h1>
     </div>
   </div>
   <div class="row">
@@ -39,9 +39,11 @@
       {% endif %}
 
       {% if match_breakdown_template %}
-      <h3>Detailed Results</h3>
-        {% include match_breakdown_template %}
-      {% endif %}
+      <div id="match-breakdown">
+        <h3>Detailed Results</h3>
+          {% include match_breakdown_template %}
+        {% endif %}
+      </div>
     </div>
     <div class="col-xs-12 col-md-6">
       <h3>Video</h3>

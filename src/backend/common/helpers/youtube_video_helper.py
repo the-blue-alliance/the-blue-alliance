@@ -1,10 +1,13 @@
 import re
-import urlparse
+from typing import Optional
+from urllib import parse as urlparse
+
+from pyre_extensions import none_throws
 
 
 class YouTubeVideoHelper(object):
     @classmethod
-    def parse_id_from_url(cls, youtube_url):
+    def parse_id_from_url(cls, youtube_url: str) -> Optional[str]:
         """
         Attempts to parse a URL for the video ID and timestamp (if present)
         Returns None if parsing fails
@@ -29,23 +32,25 @@ class YouTubeVideoHelper(object):
         if youtube_id is not None:
             parsed = urlparse.urlparse(youtube_url)
             queries = urlparse.parse_qs(parsed.query)
-            if 't' in queries:
-                total_seconds = cls.time_to_seconds(queries['t'][0])
-                youtube_id = '{}?t={}'.format(youtube_id, total_seconds)
-            elif parsed.fragment and 't=' in parsed.fragment:
-                total_seconds = cls.time_to_seconds(parsed.fragment.split('t=')[1])
-                youtube_id = '{}?t={}'.format(youtube_id, total_seconds)
+            if "t" in queries:
+                total_seconds = cls.time_to_seconds(queries["t"][0])
+                youtube_id = "{}?t={}".format(youtube_id, total_seconds)
+            elif parsed.fragment and "t=" in parsed.fragment:
+                total_seconds = cls.time_to_seconds(parsed.fragment.split("t=")[1])
+                youtube_id = "{}?t={}".format(youtube_id, total_seconds)
 
         return youtube_id
 
     @classmethod
-    def time_to_seconds(cls, time_str):
+    def time_to_seconds(cls, time_str: str) -> int:
         """
         Format time in seconds. Turns things like "3h17m30s" to "11850"
         """
-        match = re.match('((?P<hour>\d*?)h)?((?P<min>\d*?)m)?((?P<sec>\d*)s?)?', time_str).groupdict()
-        hours = match['hour'] or 0
-        minutes = match['min'] or 0
-        seconds = match['sec'] or 0
+        match = none_throws(
+            re.match(r"((?P<hour>\d*?)h)?((?P<min>\d*?)m)?((?P<sec>\d*)s?)?", time_str)
+        ).groupdict()
+        hours = match["hour"] or 0
+        minutes = match["min"] or 0
+        seconds = match["sec"] or 0
         total_seconds = (int(hours) * 3600) + (int(minutes) * 60) + int(seconds)
         return total_seconds

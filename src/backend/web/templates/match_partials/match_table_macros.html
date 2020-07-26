@@ -225,7 +225,7 @@
 {% endmacro %}
 
 {% macro single_match_table(match, force_played=False) %}
-<table class="match-table">
+<table class="match-table" id="match-table-{{match.key_name}}">
   <thead>
     <tr class="key">
       <th colspan="12">Teams</th>
