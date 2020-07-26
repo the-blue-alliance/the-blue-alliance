@@ -310,3 +310,32 @@ def test_winning_alliance_2015(
         alliances_json=json.dumps(alliances),
     )
     assert match.winning_alliance == winner
+
+
+@pytest.mark.parametrize(
+    "old_ts, seconds",
+    [
+        ("5m6s", "306"),
+        ("1m02s", "62"),
+        ("10s", "10"),
+        ("2m", "120"),
+        ("12345", "12345"),
+        ("5h", "18000"),
+        ("1h2m3s", "3723"),
+    ],
+)
+def test_youtube_videos_formatted_timestamp_conversion(
+    old_ts: str, seconds: str
+) -> None:
+    # Test timestamp conversion with both #t= and ?t=
+    match = Match(youtube_videos=["TqY324xLU4s#t=" + old_ts])
+    assert match.youtube_videos_formatted == ["TqY324xLU4s?start=" + seconds]
+
+    match = Match(youtube_videos=["TqY324xLU4s?t=" + old_ts])
+    assert match.youtube_videos_formatted == ["TqY324xLU4s?start=" + seconds]
+
+
+def test_youtube_videos_formatted_no_timestamp() -> None:
+    # Test that nothing is changed if there is no timestamp
+    match = Match(youtube_videos=["TqY324xLU4s"])
+    assert match.youtube_videos_formatted == ["TqY324xLU4s"]

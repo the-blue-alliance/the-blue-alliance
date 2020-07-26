@@ -38,7 +38,7 @@ def setup_full_team(test_data_importer) -> None:
 def setup_full_event(test_data_importer):
     # So we can import different event keys, return a function
 
-    def import_event(event_key):
+    def import_event(event_key) -> None:
         test_data_importer.import_event(__file__, f"data/{event_key}.json")
         test_data_importer.import_match_list(__file__, f"data/{event_key}_matches.json")
         test_data_importer.import_event_alliances(
@@ -46,6 +46,16 @@ def setup_full_event(test_data_importer):
         )
 
     return import_event
+
+
+@pytest.fixture
+def setup_full_match(test_data_importer):
+    def import_match(match_key) -> None:
+        event_key = match_key.split("_")[0]
+        test_data_importer.import_event(__file__, f"data/{event_key}.json")
+        test_data_importer.import_match(__file__, f"data/{match_key}.json")
+
+    return import_match
 
 
 @pytest.fixture
