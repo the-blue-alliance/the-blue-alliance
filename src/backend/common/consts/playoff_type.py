@@ -1,5 +1,15 @@
+from __future__ import annotations
+
 import enum
 from typing import Dict, Set, Tuple
+
+from backend.common.consts.comp_level import CompLevel
+
+
+@enum.unique
+class DoubleElimBracket(str, enum.Enum):
+    WINNER = "winner"
+    LOSER = "loser"
 
 
 @enum.unique
@@ -24,96 +34,6 @@ class PlayoffType(enum.IntEnum):
 
     # Custom
     CUSTOM = 8
-
-    @classmethod
-    def get_comp_level(cls, playoff_type, match_level, match_number):
-        if match_level == "Qualification":
-            return "qm"
-        else:
-            if playoff_type == cls.AVG_SCORE_8_TEAM:
-                if match_number <= 8:
-                    return "qf"
-                elif match_number <= 14:
-                    return "sf"
-                else:
-                    return "f"
-            elif playoff_type == cls.ROUND_ROBIN_6_TEAM:
-                # Einstein 2017 for example. 15 round robin matches, then finals
-                return "sf" if match_number <= 15 else "f"
-            elif playoff_type == cls.DOUBLE_ELIM_8_TEAM:
-                level, _, _ = cls.DOUBLE_ELIM_MAPPING.get(match_number)
-                return level
-            elif playoff_type == cls.BO3_FINALS or playoff_type == cls.BO5_FINALS:
-                return "f"
-            else:
-                if playoff_type == cls.BRACKET_16_TEAM:
-                    return cls.get_comp_level_octo(match_number)
-                elif playoff_type == cls.BRACKET_4_TEAM and match_number <= 12:
-                    # Account for a 4 team bracket where numbering starts at 1
-                    match_number += 12
-                if match_number <= 12:
-                    return "qf"
-                elif match_number <= 18:
-                    return "sf"
-                else:
-                    return "f"
-
-    @classmethod
-    def get_comp_level_octo(cls, match_number):
-        """ No 2015 support """
-        if match_number <= 24:
-            return "ef"
-        elif match_number <= 36:
-            return "qf"
-        elif match_number <= 42:
-            return "sf"
-        else:
-            return "f"
-
-    @classmethod
-    def get_set_match_number(cls, playoff_type, comp_level, match_number):
-        if comp_level == "qm":
-            return 1, match_number
-
-        if playoff_type == cls.AVG_SCORE_8_TEAM:
-            if comp_level == "sf":
-                return 1, match_number - 8
-            elif comp_level == "f":
-                return 1, match_number - 14
-            else:  # qf
-                return 1, match_number
-        if playoff_type == cls.ROUND_ROBIN_6_TEAM:
-            # Einstein 2017 for example. 15 round robin matches from sf1-1 to sf1-15, then finals
-            match_number = match_number if match_number <= 15 else match_number - 15
-            if comp_level == "f":
-                return 1, match_number
-            else:
-                return 1, match_number
-        elif playoff_type == cls.DOUBLE_ELIM_8_TEAM:
-            level, set, match = cls.DOUBLE_ELIM_MAPPING.get(match_number)
-            return set, match
-        elif playoff_type == cls.BO3_FINALS or playoff_type == cls.BO5_FINALS:
-            return 1, match_number
-        else:
-            if playoff_type == cls.BRACKET_4_TEAM and match_number <= 12:
-                match_number += 12
-            return (
-                cls.BRACKET_OCTO_ELIM_MAPPING[match_number]
-                if playoff_type == cls.BRACKET_16_TEAM
-                else cls.BRACKET_ELIM_MAPPING[match_number]
-            )
-
-    # Determine if a match is in the winner or loser bracket
-    @classmethod
-    def get_double_elim_bracket(cls, level, set):
-        if level == "ef":
-            return "winner" if set <= 4 else "loser"
-        elif level == "qf":
-            return "winner" if set <= 2 else "loser"
-        elif level == "sf":
-            return "winner" if set == 1 else "loser"
-        elif level == "f":
-            return "loser" if set == 1 else "winner"
 
 
 BRACKET_TYPES: Set[PlayoffType] = {
@@ -228,28 +148,28 @@ BRACKET_OCTO_ELIM_MAPPING: Dict[int, Tuple[int, int]] = {
 # Map match number -> set/match for a 8 alliance double elim bracket
 # Based off: https://www.printyourbrackets.com/fillable-brackets/8-seeded-double-fillable.pdf
 # Matches 1-6 are ef, 7-10 are qf, 11/12 are sf, 13 is f1, and 14/15 are f2
-DOUBLE_ELIM_MAPPING: Dict[int, Tuple[str, int, int]] = {
+DOUBLE_ELIM_MAPPING: Dict[int, Tuple[CompLevel, int, int]] = {
     # octofinals (winners bracket)
-    1: ("ef", 1, 1),
-    2: ("ef", 2, 1),
-    3: ("ef", 3, 1),
-    4: ("ef", 4, 1),
+    1: (CompLevel.EF, 1, 1),
+    2: (CompLevel.EF, 2, 1),
+    3: (CompLevel.EF, 3, 1),
+    4: (CompLevel.EF, 4, 1),
     # octofinals (losers bracket)
-    5: ("ef", 5, 1),
-    6: ("ef", 6, 1),
+    5: (CompLevel.EF, 5, 1),
+    6: (CompLevel.EF, 6, 1),
     # quarterfinals (winners bracket)
-    7: ("qf", 1, 1),
-    8: ("qf", 2, 1),
+    7: (CompLevel.QF, 1, 1),
+    8: (CompLevel.QF, 2, 1),
     # quarterfinals (losers bracket)
-    9: ("qf", 3, 1),
-    10: ("qf", 4, 1),
+    9: (CompLevel.QF, 3, 1),
+    10: (CompLevel.QF, 4, 1),
     # semifinals (winners bracket)
-    11: ("sf", 1, 1),
+    11: (CompLevel.SF, 1, 1),
     # semifinals (losers bracket)
-    12: ("sf", 2, 1),
+    12: (CompLevel.SF, 2, 1),
     # finals (losers bracket)
-    13: ("f", 1, 1),
+    13: (CompLevel.F, 1, 1),
     # overall finals (winners bracket)
-    14: ("f", 2, 1),
-    15: ("f", 2, 2),
+    14: (CompLevel.F, 2, 1),
+    15: (CompLevel.F, 2, 2),
 }

@@ -14,7 +14,7 @@ def web_client() -> Client:
     return app.test_client()
 
 
-@pytest.fixture()
+@pytest.fixture
 def setup_full_team(test_data_importer) -> None:
     test_data_importer.import_team(__file__, "data/frc148.json")
     test_data_importer.import_event_list(
@@ -34,6 +34,20 @@ def setup_full_team(test_data_importer) -> None:
     test_data_importer.import_robot_list(__file__, "data/frc148_robots.json")
 
 
-@pytest.fixture()
+@pytest.fixture
+def setup_full_event(test_data_importer):
+    # So we can import different event keys, return a function
+
+    def import_event(event_key):
+        test_data_importer.import_event(__file__, f"data/{event_key}.json")
+        test_data_importer.import_match_list(__file__, f"data/{event_key}_matches.json")
+        test_data_importer.import_event_alliances(
+            __file__, f"data/{event_key}_alliances.json", event_key
+        )
+
+    return import_event
+
+
+@pytest.fixture
 def setup_full_year_events(test_data_importer) -> None:
     test_data_importer.import_event_list(__file__, "data/all_events_2019.json")
