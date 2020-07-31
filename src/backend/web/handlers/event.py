@@ -83,6 +83,7 @@ def event_detail(event_key: EventKey) -> Response:
     if not event:
         abort(404)
 
+    event = none_throws(event)  # for pyre
     event.prepAwardsMatchesTeams()
     event.prep_details()
     medias_future = media_query.EventTeamsPreferredMediasQuery(event_key).fetch_async()
