@@ -1,4 +1,7 @@
-CITY_STATE_COUNTRY_PARAMETERS = (
+from typing import Iterable, Sequence, Tuple
+
+
+CITY_STATE_COUNTRY_PARAMETERS: Tuple[str, Iterable[Sequence[object]]] = (
     "city, state, country, output",
     [
         (None, None, None, ""),
@@ -13,7 +16,7 @@ CITY_STATE_COUNTRY_PARAMETERS = (
     ],
 )
 
-LOCATION_PARAMETERS = (
+LOCATION_PARAMETERS: Tuple[str, Iterable[Sequence[object]]] = (
     "city, state, country, postalcode, output",
     [
         (None, None, None, None, ""),

@@ -207,7 +207,7 @@ def test_week_stored_in_context_cache() -> None:
     assert context_cache["2019_season_start"] == datetime(2019, 3, 4, 0, 0)
 
 
-@pytest.mark.parametrize(*LOCATION_PARAMETERS)
+@pytest.mark.parametrize(LOCATION_PARAMETERS[0], LOCATION_PARAMETERS[1])
 def test_location(
     city: str, state: str, country: str, postalcode: str, output: str
 ) -> None:
@@ -215,7 +215,9 @@ def test_location(
     assert event.location == output
 
 
-@pytest.mark.parametrize(*CITY_STATE_COUNTRY_PARAMETERS)
+@pytest.mark.parametrize(
+    CITY_STATE_COUNTRY_PARAMETERS[0], CITY_STATE_COUNTRY_PARAMETERS[1]
+)
 def test_city_state_country(city: str, state: str, country: str, output: str) -> None:
     event = Event(city=city, state_prov=state, country=country,)
     assert event.city_state_country == output
