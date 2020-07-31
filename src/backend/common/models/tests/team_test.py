@@ -22,7 +22,7 @@ def test_key_name() -> None:
     assert team.key_name == "frc254"
 
 
-@pytest.mark.parametrize(*LOCATION_PARAMETERS)
+@pytest.mark.parametrize(LOCATION_PARAMETERS[0], LOCATION_PARAMETERS[1])
 def test_location(
     city: str, state: str, country: str, postalcode: str, output: str
 ) -> None:
@@ -30,7 +30,9 @@ def test_location(
     assert team.location == output
 
 
-@pytest.mark.parametrize(*CITY_STATE_COUNTRY_PARAMETERS)
+@pytest.mark.parametrize(
+    CITY_STATE_COUNTRY_PARAMETERS[0], CITY_STATE_COUNTRY_PARAMETERS[1]
+)
 def test_city_state_country(city: str, state: str, country: str, output: str) -> None:
     team = Team(city=city, state_prov=state, country=country,)
     assert team.city_state_country == output
