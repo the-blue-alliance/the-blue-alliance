@@ -218,25 +218,25 @@ class TeamRenderer(object):
         else:
             year_qual_avg = None
             year_elim_avg = None
-            season_wlt: Optional[WLTRecord] = {"wins": 0, "losses": 0, "ties": 0}
-            offseason_wlt: Optional[WLTRecord] = {"wins": 0, "losses": 0, "ties": 0}
+            season_wlt: WLTRecord = {"wins": 0, "losses": 0, "ties": 0}
+            offseason_wlt: WLTRecord = {"wins": 0, "losses": 0, "ties": 0}
 
             for wlt in season_wlt_list:
                 season_wlt["wins"] += wlt["wins"]
                 season_wlt["losses"] += wlt["losses"]
                 season_wlt["ties"] += wlt["ties"]
-            if season_wlt["wins"] + season_wlt["losses"] + season_wlt["ties"] == 0:
-                season_wlt = None
 
             for wlt in offseason_wlt_list:
                 offseason_wlt["wins"] += wlt["wins"]
                 offseason_wlt["losses"] += wlt["losses"]
                 offseason_wlt["ties"] += wlt["ties"]
-            if (
+
+            total_season_matches = (
+                season_wlt["wins"] + season_wlt["losses"] + season_wlt["ties"]
+            )
+            total_offseason_matches = (
                 offseason_wlt["wins"] + offseason_wlt["losses"] + offseason_wlt["ties"]
-                == 0
-            ):
-                offseason_wlt = None
+            )
 
         medias_by_slugname = MediaHelper.group_by_slugname(
             [media for media in media_future.get_result()]
@@ -262,8 +262,8 @@ class TeamRenderer(object):
             "participation": participation,
             "year": year,
             "years": valid_years,
-            "season_wlt": season_wlt,
-            "offseason_wlt": offseason_wlt,
+            "season_wlt": season_wlt if total_season_matches > 0 else None,
+            "offseason_wlt": offseason_wlt if total_offseason_matches > 0 else None,
             "year_qual_avg": year_qual_avg,
             "year_elim_avg": year_elim_avg,
             "current_event": current_event,
