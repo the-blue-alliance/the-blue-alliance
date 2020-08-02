@@ -66,7 +66,9 @@ class Event(ndb.Model):
         ndb.StringProperty()
     )  # From ElasticSearch only. String because it can be like "95126-1215"
     # Normalized address from the Google Maps API, constructed using the above
-    normalized_location = ndb.StructuredProperty(Location)
+    normalized_location: Location = safe_cast(
+        Location, ndb.StructuredProperty(Location)
+    )
 
     timezone_id = (
         ndb.StringProperty()
@@ -319,7 +321,8 @@ class Event(ndb.Model):
                 # Find the closest start weekday (Monday or Wednesday) to the first event - this is our season start
                 diff_from_week_start = (first_start_date.weekday() - days_diff) % 7
                 diff_from_week_start = min(
-                    [diff_from_week_start, diff_from_week_start - 7], key=abs
+                    [diff_from_week_start, diff_from_week_start - 7],
+                    key=lambda x: abs(x),
                 )
 
                 season_start = first_start_date - datetime.timedelta(
@@ -440,7 +443,7 @@ class Event(ndb.Model):
 
     @property
     def nl(self) -> Location:
-        return safe_cast(Location, self.normalized_location)
+        return self.normalized_location
 
     @property
     def venue_or_venue_from_address(self) -> Optional[str]:
@@ -596,7 +599,7 @@ class Event(ndb.Model):
     webcast_url = ndb.TextProperty(indexed=False)
 
     @classmethod
-    def validate_key_name(self, event_key: str) -> bool:
+    def validate_key_name(cls, event_key: str) -> bool:
         key_name_regex = re.compile(r"^[1-9]\d{3}[a-z]+[0-9]{0,2}$")
         match = re.match(key_name_regex, event_key)
         return True if match else False

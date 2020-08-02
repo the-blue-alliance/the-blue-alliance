@@ -2,6 +2,7 @@ import copy
 from collections import defaultdict
 from typing import Any, cast, DefaultDict, Dict, List, Mapping, NamedTuple, Optional
 
+from pyre_extensions import none_throws
 from typing_extensions import TypedDict
 
 from backend.common.consts.alliance_color import AllianceColor, OPPONENT, TMatchWinner
@@ -318,10 +319,10 @@ class PlayoffAdvancementHelper(object):
                             ):  # if >= 2 teams are the same, then the alliance is the same
                                 complete_alliance = complete_alliances[alliance_index]
                                 scores.append(match.alliances[color]["score"])
-                                advancement[comp_level][j].average_score = float(
-                                    sum(scores)
-                                ) / len(scores)
-                                advancement[comp_level][j].num_played = len(scores)
+                                advancement[comp_level][j]._replace(
+                                    average_score=float(sum(scores)) / len(scores),
+                                    num_played=len(scores),
+                                )
                                 break
                         else:
                             is_new = True
@@ -367,9 +368,10 @@ class PlayoffAdvancementHelper(object):
                     alliance = cls.getOrderedAlliance(
                         match.alliances[color]["teams"], alliance_selections
                     )
-                    alliance_name = cls.getAllianceName(
+                    alliance_name: str = cls.getAllianceName(
                         match.alliances[color]["teams"], alliance_selections
-                    )
+                    ) or ""
+                    breakdown = none_throws(match.score_breakdown)
                     for i, complete_alliance in enumerate(
                         complete_alliances
                     ):  # search for alliance. could be more efficient
@@ -403,6 +405,7 @@ class PlayoffAdvancementHelper(object):
                                 _,
                                 _,
                                 record,
+                                _,
                             ),
                         ) in enumerate(
                             advancement[comp_level]
@@ -430,53 +433,51 @@ class PlayoffAdvancementHelper(object):
                                     champ_points.append(cp)
                                     if year == 2018:
                                         tiebreaker1.append(
-                                            match.score_breakdown[color][
-                                                "endgamePoints"
-                                            ]
+                                            breakdown[color]["endgamePoints"]
                                         )
                                         tiebreaker2.append(
-                                            match.score_breakdown[color]["autoPoints"]
+                                            breakdown[color]["autoPoints"]
                                         )
                                     elif year == 2019:
                                         tiebreaker1.append(
-                                            match.score_breakdown[color]["cargoPoints"]
+                                            breakdown[color]["cargoPoints"]
                                         )
                                         tiebreaker2.append(
-                                            match.score_breakdown[color][
-                                                "hatchPanelPoints"
-                                            ]
+                                            breakdown[color]["hatchPanelPoints"]
                                         )
                                     else:
                                         tiebreaker1.append(
                                             match.alliances[color]["score"]
                                         )
                                         tiebreaker2.append(0)
-                                    advancement[comp_level][j][2] = sum(champ_points)
-                                    advancement[comp_level][j][4] = sum(tiebreaker1)
-                                    advancement[comp_level][j][6] = sum(tiebreaker2)
+                                    advancement[comp_level][j]._replace(
+                                        champ_points=sum(champ_points),
+                                        tiebreaker1=sum(tiebreaker1),
+                                        tiebreaker2=sum(tiebreaker2),
+                                    )
                                 break
                         else:
                             is_new = True
 
                     if year == 2018:
                         tiebreaker1 = (
-                            match.score_breakdown[color]["endgamePoints"]
+                            breakdown[color]["endgamePoints"]
                             if match.has_been_played
                             else 0
                         )
                         tiebreaker2 = (
-                            match.score_breakdown[color]["autoPoints"]
+                            breakdown[color]["autoPoints"]
                             if match.has_been_played
                             else 0
                         )
                     elif year == 2019:
                         tiebreaker1 = (
-                            match.score_breakdown[color]["cargoPoints"]
+                            breakdown[color]["cargoPoints"]
                             if match.has_been_played
                             else 0
                         )
                         tiebreaker2 = (
-                            match.score_breakdown[color]["hatchPanelPoints"]
+                            breakdown[color]["hatchPanelPoints"]
                             if match.has_been_played
                             else 0
                         )
@@ -488,7 +489,7 @@ class PlayoffAdvancementHelper(object):
                         )
                         tiebreaker2 = 0
 
-                    record = {"wins": 0, "losses": 0, "ties": 0}
+                    record: WLTRecord = {"wins": 0, "losses": 0, "ties": 0}
                     if not match.has_been_played:
                         cp = 0
                     elif match.winning_alliance == color:
@@ -541,7 +542,8 @@ class PlayoffAdvancementHelper(object):
                 advancement[comp_level], key=lambda x: -x.sum_champ_points
             )  # sort by championship points
 
-            advancement[comp_level].complete = not any_unplayed
+            for i in range(len(advancement[comp_level])):
+                advancement[comp_level][i]._replace(complete=not any_unplayed)
 
         return advancement
 

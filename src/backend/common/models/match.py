@@ -1,7 +1,7 @@
 import datetime
 import json
 import re
-from typing import Dict, List, Optional
+from typing import cast, Dict, List, Optional
 
 from google.cloud import ndb
 from pyre_extensions import none_throws, safe_cast
@@ -10,6 +10,7 @@ from backend.common.consts import comp_level
 from backend.common.consts.alliance_color import (
     ALLIANCE_COLORS,
     AllianceColor,
+    OPPONENT,
     TMatchWinner,
 )
 from backend.common.consts.comp_level import COMP_LEVELS_VERBOSE, CompLevel
@@ -255,7 +256,7 @@ class Match(ndb.Model):
                     self._winning_alliance = ""
                 else:
                     self._winning_alliance = MatchTiebreakers.tiebreak_winner(self)
-        return none_throws(self._winning_alliance)
+        return cast(TMatchWinner, none_throws(self._winning_alliance))
 
     @property
     def losing_alliance(self) -> TMatchWinner:
@@ -264,7 +265,7 @@ class Match(ndb.Model):
         if winning_alliance == "":
             return ""
 
-        return next(iter([a for a in ALLIANCE_COLORS if a != winning_alliance]), "")
+        return OPPONENT[cast(AllianceColor, winning_alliance)]
 
     @property
     def event_key_name(self) -> EventKey:
