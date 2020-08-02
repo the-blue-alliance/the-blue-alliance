@@ -5,4 +5,4 @@ numpy==1.6.1
 Paver==1.2.4
 pep8==1.7.0
 pyyaml
-grpcio==1.0.0
+grpcio==1.30.0
