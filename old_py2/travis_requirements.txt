@@ -1,5 +1,5 @@
 # Packages that are needed for testing on Travis
-Paver==1.1.1
+Paver==1.3.4
 WebTest==2.0.28
 unittest2==0.5.1
 webapp2==2.5.2
