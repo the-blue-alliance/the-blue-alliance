@@ -4,7 +4,7 @@ from backend.common.futures import FailedFuture, InstantFuture, TypedFuture
 
 
 def test_instant_future() -> None:
-    f: TypedFuture[int] = InstantFuture(42)
+    f = InstantFuture(42)
     assert f.running() is False
     assert f.done() is True
     assert f.result() == 42
