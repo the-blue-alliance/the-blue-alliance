@@ -1,6 +1,7 @@
 import json
 
 import pytest
+from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
@@ -43,23 +44,23 @@ def test_match_not_played() -> None:
 
 def test_2016_tiebreakers(test_data_importer) -> None:
     test_data_importer.import_match(__file__, "data/2016cmp_f1m3.json")
-    match = Match.get_by_id("2016cmp_f1m3")
+    match: Match = none_throws(Match.get_by_id("2016cmp_f1m3"))
     assert match.winning_alliance == AllianceColor.RED
 
 
 def test_2017_tiebreakers(test_data_importer) -> None:
     test_data_importer.import_match(__file__, "data/2017dal_qf3m2.json")
-    match = Match.get_by_id("2017dal_qf3m2")
+    match: Match = none_throws(Match.get_by_id("2017dal_qf3m2"))
     assert match.winning_alliance == AllianceColor.RED
 
 
 def test_2019_tiebreakers(test_data_importer) -> None:
     test_data_importer.import_match(__file__, "data/2019hiho_qf4m1.json")
-    match = Match.get_by_id("2019hiho_qf4m1")
+    match: Match = none_throws(Match.get_by_id("2019hiho_qf4m1"))
     assert match.winning_alliance == AllianceColor.RED
 
 
 def test_2020_tiebreakers(test_data_importer) -> None:
     test_data_importer.import_match(__file__, "data/2020mndu2_sf2m2.json")
-    match = Match.get_by_id("2020mndu2_sf2m2")
+    match: Match = none_throws(Match.get_by_id("2020mndu2_sf2m2"))
     assert match.winning_alliance == AllianceColor.BLUE

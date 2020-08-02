@@ -1,6 +1,8 @@
 import datetime
 from typing import Dict, List, Optional, Tuple
 
+from google.cloud import ndb
+
 from backend.common.consts import comp_level, event_type
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
@@ -13,7 +15,7 @@ from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.event_team_status import WLTRecord
-from backend.common.models.keys import EventKey, Year
+from backend.common.models.keys import Year
 from backend.common.models.match import Match
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
@@ -409,10 +411,7 @@ class TeamRenderer(object):
     def _fetch_data(
         cls, team: Team, year: Year, return_valid_years: bool = False
     ) -> Tuple[
-        List[Event],
-        Dict[EventKey, List[Match]],
-        Dict[EventKey, List[Award]],
-        List[Year],
+        List[Event], Dict[ndb.Key, List[Match]], Dict[ndb.Key, List[Award]], List[Year],
     ]:
         """
         returns: events_sorted, matches_by_event_key, awards_by_event_key, valid_years
@@ -441,13 +440,14 @@ class TeamRenderer(object):
             else datetime.datetime(year, 12, 31),
         )  # unknown goes last
 
-        matches_by_event_key = {}
+        matches_by_event_key: Dict[ndb.Key, List[Match]] = {}
         for match in matches_future.get_result():
             if match.event in matches_by_event_key:
                 matches_by_event_key[match.event].append(match)
             else:
                 matches_by_event_key[match.event] = [match]
-        awards_by_event_key = {}
+
+        awards_by_event_key: Dict[ndb.Key, List[Award]] = {}
         for award in awards_future.get_result():
             if award.event in awards_by_event_key:
                 awards_by_event_key[award.event].append(award)

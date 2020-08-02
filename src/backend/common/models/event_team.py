@@ -14,8 +14,8 @@ class EventTeam(ndb.Model):
     key_name is like 2010cmp_frc177 or 2007ct_frc195
     """
 
-    event = ndb.KeyProperty(kind=Event)
-    team = ndb.KeyProperty(kind=Team)
+    event: ndb.Key = ndb.KeyProperty(kind=Event)
+    team: ndb.Key = ndb.KeyProperty(kind=Team)
     year: Year = ndb.IntegerProperty()
 
     status: EventTeamStatus = safe_cast(EventTeamStatus, ndb.JsonProperty())

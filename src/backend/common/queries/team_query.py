@@ -41,7 +41,7 @@ class TeamListQuery(DatabaseQuery[List[Team]]):
             .order(Team.team_number)
             .fetch_async()
         )
-        return teams
+        return list(teams)
 
 
 class TeamListYearQuery(DatabaseQuery[List[Team]]):
