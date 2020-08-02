@@ -4,10 +4,6 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-  - package-ecosystem: "pip"
-    directory: "/src"
-    schedule:
-      interval: "daily"
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
