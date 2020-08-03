@@ -20,3 +20,10 @@ class CachedModel(ndb.Model):
 
     # This stores a mapping of an model property name --> affected keys for cache clearing
     _affected_references: TAffectedReferences = {}
+
+    # Which references get overwritten
+    _mutable_references: Set[str] = set()
+
+    def __init__(self, *args, **kwargs):
+        super(CachedModel, self).__init__(*args, **kwargs)
+        self._fix_up_properties()
