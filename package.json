@@ -8,7 +8,7 @@
     "@babel/preset-react": "^7.10.4",
     "babel-polyfill": "^6.8.0",
     "classnames": "^2.2.3",
-    "element-resize-event": "^2.0.9",
+    "element-resize-event": "^3.0.3",
     "firebase": "^7.17.1",
     "firedux": "^1.1.0",
     "heatmap.js": "^2.0.5",
