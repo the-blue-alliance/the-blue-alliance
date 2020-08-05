@@ -2,7 +2,7 @@ black
 flake8
 flake8-import-order
 pre-commit
-pyre-check==0.0.51
+pyre-check==0.0.52
 pytest
 pytest-cov
 pytest-custom_exit_code
