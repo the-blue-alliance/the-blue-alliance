@@ -16,10 +16,13 @@ from parsers.first_elasticsearch.first_elasticsearch_team_details_parser import 
 class DatafeedFIRSTElasticSearch(object):
     def __init__(self):
         URL_BASE = 'https://es02.firstinspires.org'
+
+        TEAM_QUERY = {"sort":[{"profile_year":{"order":"desc","ignore_unmapped":True}}],"query":{"bool":{"must":[{"match":{"team_number_yearly":"%s"}},{"bool":{"should":[[{"match":{"team_type":"FRC"}}]]}}]}}}
+
         self.EVENT_LIST_URL_PATTERN = URL_BASE + '/events/_search?size=1000&source={"query":{"query_string":{"query":"(event_type:FRC)%%20AND%%20(event_season:%s)"}}}'  # (year)
         self.EVENT_DETAILS_URL_PATTERN = URL_BASE + '/events/_search?size=1&source={"query":{"query_string":{"query":"_id:%s"}}}'  # (first_eid)
         self.EVENT_TEAMS_URL_PATTERN = URL_BASE + '/teams/_search?size=1000&source={"_source":{"exclude":["awards","events"]},"query":{"query_string":{"query":"events.fk_events:%s%%20AND%%20profile_year:%s"}}}'  # (first_eid, year)
-        self.TEAM_DETAILS_URL_PATTERN = URL_BASE + '/teams/_search?size=1&source={"query":{"query_string":{"query":"_id:%s"}}}'  # (first_tpid)
+        self.TEAM_DETAILS_URL_PATTERN = URL_BASE + '/teams/_search?size=1&source=' + json.dumps(TEAM_QUERY, separators=(',', ':'), indent=None)  # (team_number)
 
     def _get_event_short(self, event_short):
         return self.EVENT_SHORT_EXCEPTIONS.get(event_short, event_short)
@@ -65,4 +68,4 @@ class DatafeedFIRSTElasticSearch(object):
             logging.info("Cannot get team details for {}! No first_tpid or first_tpid_year.".format(team.key.id()))
             return None
 
-        return self._parse(self.TEAM_DETAILS_URL_PATTERN % (team.first_tpid), FIRSTElasticSearchTeamDetailsParser(team.first_tpid_year))[0]
+        return self._parse(self.TEAM_DETAILS_URL_PATTERN % (team.team_number), FIRSTElasticSearchTeamDetailsParser(team.first_tpid_year))[0]

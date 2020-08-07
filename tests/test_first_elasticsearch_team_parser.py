@@ -35,7 +35,7 @@ class TestFIRSTElasticSearchTeamParser(unittest2.TestCase):
                     self.assertEqual(team.postalcode, "95126-1215")
                     self.assertEqual(team.website, "http://www.team254.com")
                     self.assertEqual(team.first_tpid, 357159)
-                    self.assertEqual(team.first_tpid_year, 2015)
+                    self.assertEqual(team.first_tpid_year, 2016)
 
                 if team.key.id() == 'frc604':
                     self.assertEqual(team.key_name, "frc604")
@@ -45,7 +45,7 @@ class TestFIRSTElasticSearchTeamParser(unittest2.TestCase):
                     self.assertEqual(team.postalcode, "95120")
                     self.assertEqual(team.website, "http://604robotics.com")
                     self.assertEqual(team.first_tpid, 357405)
-                    self.assertEqual(team.first_tpid_year, 2015)
+                    self.assertEqual(team.first_tpid_year, 2016)
                     self.assertEqual(team.motto, "It will work - because it has to.")
 
                 # A team who doesn't have 'http' starting their website
@@ -57,7 +57,7 @@ class TestFIRSTElasticSearchTeamParser(unittest2.TestCase):
                     self.assertEqual(team.postalcode, "94010")
                     self.assertEqual(team.website, "http:///gryphonrobotics.org")
                     self.assertEqual(team.first_tpid, 361441)
-                    self.assertEqual(team.first_tpid_year, 2015)
+                    self.assertEqual(team.first_tpid_year, 2016)
                     self.assertEqual(team.motto, None)
 
                 # A team with a blacklisted website
