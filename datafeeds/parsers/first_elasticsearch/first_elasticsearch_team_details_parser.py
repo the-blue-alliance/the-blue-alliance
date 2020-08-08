@@ -34,7 +34,7 @@ class FIRSTElasticSearchTeamDetailsParser(object):
                 website=website,
                 rookie_year=team.get('team_rookieyear', None),
                 first_tpid=first_tpid,
-                first_tpid_year=self.year,
+                first_tpid_year=team.get('profile_year', self.year),
                 motto=team.get('team_motto', None),
             ))
 
