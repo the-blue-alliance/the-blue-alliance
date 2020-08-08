@@ -1,13 +1,16 @@
+from typing import Set
+
 from google.cloud import ndb
 from pyre_extensions import safe_cast
 
+from backend.common.models.cached_model import CachedModel
 from backend.common.models.event import Event
 from backend.common.models.event_team_status import EventTeamStatus
 from backend.common.models.keys import EventTeamKey, Year
 from backend.common.models.team import Team
 
 
-class EventTeam(ndb.Model):
+class EventTeam(CachedModel):
     """
     EventTeam serves as a join model between Events and Teams, indicating that
     a team will or has competed in an Event.
@@ -23,6 +26,11 @@ class EventTeam(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
+    _mutable_attrs: Set[str] = {
+        "status",
+        "year",  # technically immutable, but corruptable and needs repair. See github issue #409
+    }
+
     def __init__(self, *args, **kw):
         # store set of affected references referenced keys for cache clearing
         # keys must be model properties
@@ -34,7 +42,7 @@ class EventTeam(ndb.Model):
         super(EventTeam, self).__init__(*args, **kw)
 
     @classmethod
-    def validate_key_name(self, key: str) -> bool:
+    def validate_key_name(cls, key: str) -> bool:
         split = key.split("_")
         return (
             len(split) == 2
