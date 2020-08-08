@@ -1,24 +1,20 @@
 import json
-import logging
-import traceback
 
-from google.appengine.ext import ndb
-
-from helpers.cache_clearer import CacheClearer
-from helpers.location_helper import LocationHelper
-from helpers.manipulator_base import ManipulatorBase
-from helpers.notification_helper import NotificationHelper
-from helpers.search_helper import SearchHelper
+from backend.common.manipulators.manipulator_base import ManipulatorBase
+from backend.common.models.event import Event
 
 
-class EventManipulator(ManipulatorBase):
+class EventManipulator(ManipulatorBase[Event]):
     """
     Handle Event database writes.
+    """
     """
     @classmethod
     def getCacheKeysAndControllers(cls, affected_refs):
         return CacheClearer.get_event_cache_keys_and_controllers(affected_refs)
+    """
 
+    """
     @classmethod
     def postDeleteHook(cls, events):
         '''
@@ -26,12 +22,12 @@ class EventManipulator(ManipulatorBase):
         '''
         for event in events:
             SearchHelper.remove_event_location_index(event)
+    """
 
+    """
     @classmethod
     def postUpdateHook(cls, events, updated_attr_list, is_new_list):
-        """
-        To run after models have been updated
-        """
+        # To run after models have been updated
         for (event, updated_attrs) in zip(events, updated_attr_list):
             try:
                 LocationHelper.update_event_location(event)
@@ -59,14 +55,10 @@ class EventManipulator(ManipulatorBase):
                 logging.error("update_event_location_index for {} errored!".format(event.key.id()))
                 logging.exception(e)
         cls.createOrUpdate(events, run_post_update_hook=False)
+    """
 
     @classmethod
-    def updateMerge(self, new_event, old_event, auto_union=True):
-        """
-        Given an "old" and a "new" Event object, replace the fields in the
-        "old" event that are present in the "new" event, but keep fields from
-        the "old" event that are null in the "new" event.
-        """
+    def updateMerge(cls, new_event: Event, old_event: Event, auto_union: bool = True) -> Event:
         attrs = [
             "end_date",
             "event_short",
