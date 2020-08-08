@@ -2,6 +2,7 @@ import abc
 from typing import Dict, Generic, List, Union
 
 from backend.common.consts.api_version import ApiMajorVersion
+from backend.common.helpers.listify import delistify, listify
 from backend.common.profiler import Span
 from backend.common.queries.types import QueryReturn
 
@@ -15,30 +16,16 @@ class ConverterBase(abc.ABC, Generic[QueryReturn]):
     def convert(self, version: ApiMajorVersion) -> Union[None, Dict, List[Dict]]:
         with Span("{}.convert".format(self.__class__.__name__)):
             converted_query_return = self._convert_list(
-                self._listify(self._query_return), version
+                listify(self._query_return), version
             )
             if isinstance(self._query_return, list):
                 return converted_query_return
             else:
-                return self._delistify(converted_query_return)
+                return delistify(converted_query_return)
 
     @abc.abstractmethod
     def _convert_list(self, model_list: List, version: ApiMajorVersion) -> List[Dict]:
         return [{} for model in model_list]
-
-    def _listify(self, thing: QueryReturn) -> List:
-        if not isinstance(thing, list):
-            return [thing]
-        else:
-            return thing
-
-    def _delistify(self, things: List[Dict]) -> Union[None, Dict, List[Dict]]:
-        if len(things) == 0:
-            return None
-        if len(things) == 1:
-            return things.pop()
-        else:
-            return things
 
     def constructLocation_v3(self, model) -> Dict:
         """
