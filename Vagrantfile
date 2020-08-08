@@ -72,4 +72,7 @@ Vagrant.configure("2") do |config|
   #  trigger.info = "Pulling datastore from remote container"
   #  trigger.run = {inline: "./ops/dev/pull-datastore.sh pull"}
   #end
+
+
+  config.vm.synced_folder '.', '/vagrant', disabled: true
 end
