@@ -22,8 +22,11 @@ class CachedModel(ndb.Model):
     _affected_references: TAffectedReferences = {}
 
     # Which references get overwritten
-    _mutable_references: Set[str] = set()
+    _mutable_attrs: Set[str] = set()
 
     def __init__(self, *args, **kwargs):
         super(CachedModel, self).__init__(*args, **kwargs)
+
+        # The initialization path is different for models vs those created via
+        # constructors, so make sure we have a common set of properties defined
         self._fix_up_properties()

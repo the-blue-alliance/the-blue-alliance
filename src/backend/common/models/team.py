@@ -1,12 +1,14 @@
 import re
+from typing import Set
 
 from google.cloud import ndb
 
+from backend.common.models.cached_model import CachedModel
 from backend.common.models.keys import TeamKey
 from backend.common.models.location import Location
 
 
-class Team(ndb.Model):
+class Team(CachedModel):
     """
     Teams represent FIRST Robotics Competition teams.
     key_name is like 'frc177'
@@ -40,6 +42,21 @@ class Team(ndb.Model):
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+
+    _mutable_attrs: Set[str] = {
+        "city",
+        "state_prov",
+        "country",
+        "postalcode",
+        "normalized_location",  # Overwrite whole thing as one
+        "name",
+        "nickname",
+        "school_name",
+        "home_cmp",
+        "website",
+        "rookie_year",
+        "motto",
+    }
 
     def __init__(self, *args, **kw):
         # store set of affected references referenced keys for cache clearing
