@@ -1,22 +1,14 @@
-import unittest2
+import unittest
 
-from google.appengine.ext import ndb
-from google.appengine.ext import testbed
+import pytest
 
-from helpers.team_manipulator import TeamManipulator
-from models.team import Team
+from backend.common.manipulators.team_manipulator import TeamManipulator
+from backend.common.models.team import Team
 
 
-class TestTeamManipulator(unittest2.TestCase):
+@pytest.mark.usefixtures("ndb_context")
+class TestTeamManipulator(unittest.TestCase):
     def setUp(self):
-        self.testbed = testbed.Testbed()
-        self.testbed.activate()
-        self.testbed.init_datastore_v3_stub()
-        self.testbed.init_memcache_stub()
-        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
-
-        self.testbed.init_taskqueue_stub(root_path=".")
-
         self.old_team = Team(
             id="frc177",
             team_number=177,
@@ -31,9 +23,6 @@ class TestTeamManipulator(unittest2.TestCase):
             rookie_year=1995,
             website="http://www.bobcatrobotics.org",
         )
-
-    def tearDown(self):
-        self.testbed.deactivate()
 
     def assertMergedTeam(self, team):
         self.assertOldTeam(team)
@@ -59,12 +48,34 @@ class TestTeamManipulator(unittest2.TestCase):
     def test_updateMerge(self):
         self.assertMergedTeam(TeamManipulator.updateMerge(self.new_team, self.old_team))
 
+    def test_update_tpid(self):
+        self.old_team.first_tpid_year = 2016
+        self.old_team.first_tpid = 1000
+
+        self.new_team.first_tpid_year = 2017
+        self.new_team.first_tpid = 1337
+
+        merged_team = TeamManipulator.updateMerge(self.new_team, self.old_team)
+        assert merged_team.first_tpid_year == 2017
+        assert merged_team.first_tpid == 1337
+
+    def test_update_tpid_doest_move_backwards(self):
+        self.old_team.first_tpid_year = 2016
+        self.old_team.first_tpid = 1000
+
+        self.new_team.first_tpid_year = 2015
+        self.new_team.first_tpid = 1337
+
+        merged_team = TeamManipulator.updateMerge(self.new_team, self.old_team)
+        assert merged_team.first_tpid_year == 2016
+        assert merged_team.first_tpid == 1000
+
     def test_create_lots_of_teams(self):
         number = 500
-        teams = [Team(
-            id="frc%s" % team_number,
-            team_number=team_number)
-            for team_number in range(number)]
+        teams = [
+            Team(id="frc%s" % team_number, team_number=team_number)
+            for team_number in range(number)
+        ]
         TeamManipulator.createOrUpdate(teams)
 
         team = Team.get_by_id("frc177")

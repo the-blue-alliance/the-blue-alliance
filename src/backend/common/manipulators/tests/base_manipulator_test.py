@@ -10,7 +10,7 @@ class DummyModel(CachedModel):
     int_prop: int = ndb.IntegerProperty()
     str_prop: str = ndb.StringProperty()
 
-    mutable_attrs: Set[str] = {
+    _mutable_attrs: Set[str] = {
         "int_prop",
     }
 
@@ -20,7 +20,7 @@ class DummyManipulator(ManipulatorBase[DummyModel]):
     def updateMerge(
         cls, new_model: DummyModel, old_model: DummyModel, auto_union: bool
     ) -> DummyModel:
-        cls._update_attrs(new_model, old_model, DummyModel.mutable_attrs)
+        cls._update_attrs(new_model, old_model, DummyModel._mutable_attrs)
         return old_model
 
 
@@ -67,7 +67,7 @@ def test_update_model_leaves_unknown_attrs(ndb_context) -> None:
     assert model == expected
 
     model.str_prop = "asdf"
-    assert "str_prop" not in DummyModel.mutable_attrs
+    assert "str_prop" not in DummyModel._mutable_attrs
 
     DummyManipulator.createOrUpdate(model)
     check = DummyModel.get_by_id("test")

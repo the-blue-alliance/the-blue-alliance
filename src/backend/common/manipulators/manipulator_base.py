@@ -122,6 +122,11 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
 
     @staticmethod
     def _update_attrs(new_model: TModel, old_model: TModel, attrs: Set[str]) -> None:
+        """
+        Given an "old" and a "new" model, replace the fields in the
+        "old" that are present in the "new", but keep fields from
+        the "old" that are null in the "new".
+        """
         for attr in attrs:
             if getattr(new_model, attr) is not None:
                 if getattr(new_model, attr) != getattr(old_model, attr):
