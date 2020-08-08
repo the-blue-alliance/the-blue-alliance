@@ -30,7 +30,7 @@
     "react-redux": "^5.1.2",
     "react-select": "^1.0.0-rc.5",
     "react-tap-event-plugin": "^2.0.1",
-    "redux": "^3.5.2",
+    "redux": "^4.0.5",
     "redux-thunk": "^2.0.1",
     "reselect": "^2.5.1",
     "swagger-client": "3.9.2",
