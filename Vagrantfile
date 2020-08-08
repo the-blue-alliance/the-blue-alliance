@@ -72,4 +72,8 @@ Vagrant.configure("2") do |config|
   #  trigger.info = "Pulling datastore from remote container"
   #  trigger.run = {inline: "./ops/dev/pull-datastore.sh pull"}
   #end
+
+  # Fix for WSL
+  # Source: https://github.com/hashicorp/vagrant/issues/10576
+  config.vm.synced_folder '.', '/vagrant', disabled: true
 end
