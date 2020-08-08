@@ -26,15 +26,6 @@ You probably need to install Virtualbox too, as it says in the article.
 
 https://linuxize.com/post/how-to-install-vagrant-on-ubuntu-20-04/
 
-<!-- 
-### Edit `Vagrantfile`
-
-Add the following line towards the end of `Vagrantfile`:
-
-```
-  config.vm.synced_folder '.', '/vagrant', disabled: true
-end
-``` -->
 
 ### Edit `/etc/wsl.conf`
 
@@ -48,6 +39,8 @@ mountFsTab = false
 ```
 
 Restart WSL after this. You may be able to get away with just restarting your shells, but it didn't work for me until I restarted Windows entirely.
+
+Source: https://github.com/microsoft/WSL/issues/81#issuecomment-400597679
 
 ### Maybe `chmod` the ssh key
 
