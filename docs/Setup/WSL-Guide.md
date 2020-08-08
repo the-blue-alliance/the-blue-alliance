@@ -26,6 +26,7 @@ You probably need to install Virtualbox too, as it says in the article.
 
 https://linuxize.com/post/how-to-install-vagrant-on-ubuntu-20-04/
 
+<!-- 
 ### Edit `Vagrantfile`
 
 Add the following line towards the end of `Vagrantfile`:
@@ -33,7 +34,7 @@ Add the following line towards the end of `Vagrantfile`:
 ```
   config.vm.synced_folder '.', '/vagrant', disabled: true
 end
-```
+``` -->
 
 ### Edit `/etc/wsl.conf`
 
