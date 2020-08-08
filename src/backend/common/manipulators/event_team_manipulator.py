@@ -1,34 +1,27 @@
-from helpers.cache_clearer import CacheClearer
-from helpers.manipulator_base import ManipulatorBase
+from backend.common.manipulators.manipulator_base import ManipulatorBase
+from backend.common.models.event_team import EventTeam
 
 
-class EventTeamManipulator(ManipulatorBase):
+class EventTeamManipulator(ManipulatorBase[EventTeam]):
     """
     Handle EventTeam database writes.
+    """
+
     """
     @classmethod
     def getCacheKeysAndControllers(cls, affected_refs):
         return CacheClearer.get_eventteam_cache_keys_and_controllers(affected_refs)
+    """
 
     @classmethod
-    def updateMerge(self, new_event_team, old_event_team, auto_union=True):
+    def updateMerge(
+        cls,
+        new_event_team: EventTeam,
+        old_event_team: EventTeam,
+        auto_union: bool = True,
+    ) -> EventTeam:
         """
         Update and return EventTeams.
         """
-        immutable_attrs = [
-            "event",
-            "team",
-        ]  # These build key_name, and cannot be changed without deleting the model.
-
-        attrs = [
-            "year",  # technically immutable, but corruptable and needs repair. See github issue #409
-            "status",
-        ]
-
-        for attr in attrs:
-            if getattr(new_event_team, attr) is not None:
-                if getattr(new_event_team, attr) != getattr(old_event_team, attr):
-                    setattr(old_event_team, attr, getattr(new_event_team, attr))
-                    old_event_team.dirty = True
-
+        cls._update_attrs(new_event_team, old_event_team, EventTeam._mutable_attrs)
         return old_event_team

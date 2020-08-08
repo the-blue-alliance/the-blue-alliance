@@ -72,9 +72,6 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
     def findOrSpawn(cls, new_models, auto_union=True) -> Any:
         new_models = listify(new_models)
         old_models = ndb.get_multi([model.key for model in new_models], use_cache=False)
-        if old_models:
-            print([m.__class__ for m in old_models])
-            print([dir(m) for m in old_models])
 
         updated_models = [
             cls.updateMergeBase(new_model, old_model, auto_union)
