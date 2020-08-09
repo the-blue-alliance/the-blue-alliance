@@ -1,5 +1,5 @@
 import json
-from typing import cast, Dict, List, Optional
+from typing import cast, Dict, List, Optional, Set
 
 from google.cloud import ndb
 from pyre_extensions import none_throws, safe_cast
@@ -7,12 +7,13 @@ from pyre_extensions import none_throws, safe_cast
 from backend.common.consts import media_tag, media_type
 from backend.common.consts.media_tag import MediaTag
 from backend.common.consts.media_type import MediaType
+from backend.common.models.cached_model import CachedModel
 from backend.common.models.event import Event
 from backend.common.models.keys import MediaKey, Year
 from backend.common.models.team import Team
 
 
-class Media(ndb.Model):
+class Media(CachedModel):
     """
     The Media model represents different forms of media, such as YouTube Videos
     or ChiefDelphi photos, that are associated with other models, such as Teams.
@@ -49,6 +50,19 @@ class Media(ndb.Model):
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+
+    _mutable_attrs: Set[str] = {
+        "media_type_enum",
+        "foreign_key",
+        "details_json",
+        "year",
+    }
+
+    _auto_union_attrs: Set[str] = {
+        "references",
+        "preferred_references",
+        "media_tag_enum",
+    }
 
     def __init__(self, *args, **kw):
         # store set of affected references referenced keys for cache clearing
