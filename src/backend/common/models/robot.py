@@ -1,10 +1,13 @@
+from typing import Set
+
 from google.cloud import ndb
 
+from backend.common.models.cached_model import CachedModel
 from backend.common.models.keys import RobotKey, TeamKey, Year
 from backend.common.models.team import Team
 
 
-class Robot(ndb.Model):
+class Robot(CachedModel):
     """
     Represent a team's robot in a given year
     key_name is like <team_key>_<year> (e.g. frc1124_2015)
@@ -16,6 +19,10 @@ class Robot(ndb.Model):
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+
+    _mutable_attrs: Set[str] = {
+        "robot_name",
+    }
 
     def __init__(self, *args, **kw):
         # store set of affected references referenced keys for cache clearing
