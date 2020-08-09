@@ -8,12 +8,13 @@ from backend.common.consts import award_type, event_type
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
 from backend.common.models.award_recipient import AwardRecipient
+from backend.common.models.cached_model import CachedModel
 from backend.common.models.event import Event
 from backend.common.models.keys import AwardKey, EventKey, Year
 from backend.common.models.team import Team
 
 
-class Award(ndb.Model):
+class Award(CachedModel):
     """
     Awards represent FIRST Robotics Competition awards given out at an event.
     key_name is formatted as: <event_key_name>_<award_type_enum>
@@ -44,6 +45,10 @@ class Award(ndb.Model):
 
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
+
+    _mutable_attrs = {
+        "name_str",
+    }
 
     def __init__(self, *args, **kw):
         # store set of affected references referenced keys for cache clearing
