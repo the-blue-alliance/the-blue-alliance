@@ -158,6 +158,6 @@ class MatchManipulator(ManipulatorBase[Match]):
         cls._update_attrs(new_match, old_match, auto_union)
 
         if added_video:
-            old_match._updated_attrs.append("_video_added")
+            old_match._updated_attrs.add("_video_added")
 
         return old_match

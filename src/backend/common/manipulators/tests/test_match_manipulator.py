@@ -137,6 +137,11 @@ class TestMatchManipulator(unittest.TestCase):
             MatchManipulator.updateMerge(self.new_match, self.old_match), True
         )
 
+    def test_updateMerge_addVideo(self) -> None:
+        self.old_match.youtube_videos = []
+        result = MatchManipulator.updateMerge(self.new_match, self.old_match)
+        self.assertTrue("_video_added" in result._updated_attrs)
+
     def test_createOrUpdate_no_auto_union(self) -> None:
         MatchManipulator.createOrUpdate(self.old_match)
 
