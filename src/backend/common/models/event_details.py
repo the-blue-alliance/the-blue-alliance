@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Set
 
 from google.cloud import ndb
 from pyre_extensions import none_throws, safe_cast
@@ -8,6 +8,7 @@ from backend.common.consts.ranking_sort_orders import (
     SORT_ORDER_INFO as RANKING_SORT_ORDERS,
 )
 from backend.common.models.alliance import EventAlliance
+from backend.common.models.cached_model import CachedModel
 from backend.common.models.event_district_points import EventDistrictPoints
 from backend.common.models.event_insights import EventInsights
 from backend.common.models.event_matchstats import EventMatchstats
@@ -23,7 +24,7 @@ class RenderedRankings(TypedDict):
     extra_stats_info: List[RankingSortOrderInfo]
 
 
-class EventDetails(ndb.Model):
+class EventDetails(CachedModel):
     """
     EventsDetails contains aggregate details about an event that tends to
     update often throughout an event. This includes rankings, event stats, etc.
@@ -51,6 +52,17 @@ class EventDetails(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
 
+    _mutable_attrs: Set[str] = {
+        "alliance_selections",
+        "district_points",
+        "matchstats",
+        "insights",
+        "predictions",
+        "rankings",
+        "rankings2",
+        "playoff_advancement",
+    }
+
     def __init__(self, *args, **kw):
         # store set of affected references referenced keys for cache clearing
         # keys must be model properties
@@ -61,11 +73,11 @@ class EventDetails(ndb.Model):
 
     @property
     def key_name(self) -> EventKey:
-        return self.key.id()
+        return str(self.key.id())
 
     @property
     def year(self) -> int:
-        return int(self.key.id()[:4])
+        return int(self.key_name[:4])
 
     @property
     def renderable_rankings(self) -> RenderedRankings:

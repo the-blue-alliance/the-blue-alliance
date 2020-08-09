@@ -47,7 +47,9 @@ class AwardManipulator(ManipulatorBase[Award]):
     """
 
     @classmethod
-    def updateMerge(cls, new_award: Award, old_award: Award, auto_union: bool = True):
+    def updateMerge(
+        cls, new_award: Award, old_award: Award, auto_union: bool = True
+    ) -> Award:
         auto_union_list_attrs = {
             "team_list",
             "recipient_json_list",
