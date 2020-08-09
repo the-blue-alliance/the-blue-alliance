@@ -125,6 +125,14 @@ class Event(CachedModel):
         "remap_teams",
     }
 
+    _allow_none_attrs: Set[str] = {
+        "district_key",
+    }
+
+    _list_attrs: Set[str] = {
+        "divisions",
+    }
+
     def __init__(self, *args, **kw):
         # store set of affected references referenced keys for cache clearing
         # keys must be model properties

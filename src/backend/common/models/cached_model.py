@@ -1,4 +1,4 @@
-from typing import Dict, Set
+from typing import Dict, Optional, Set
 
 from google.cloud import ndb
 
@@ -23,6 +23,15 @@ class CachedModel(ndb.Model):
 
     # Which references get overwritten
     _mutable_attrs: Set[str] = set()
+
+    # Attributes where overwriting None is allowed
+    _allow_none_attrs: Set[str] = set()
+
+    # We will merge the lists of these attrs
+    _list_attrs: Set[str] = set()
+
+    # This will get updated with the attrs that actually change
+    _updated_attrs: Optional[Set[str]] = None
 
     def __init__(self, *args, **kwargs):
         super(CachedModel, self).__init__(*args, **kwargs)

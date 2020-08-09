@@ -8,6 +8,7 @@ class EventManipulator(ManipulatorBase[Event]):
     """
     Handle Event database writes.
     """
+
     """
     @classmethod
     def getCacheKeysAndControllers(cls, affected_refs):
@@ -58,70 +59,16 @@ class EventManipulator(ManipulatorBase[Event]):
     """
 
     @classmethod
-    def updateMerge(cls, new_event: Event, old_event: Event, auto_union: bool = True) -> Event:
-        attrs = [
-            "end_date",
-            "event_short",
-            "event_type_enum",
-            "event_district_enum",
-            "district_key",
-            "custom_hashtag",
-            "enable_predictions",
-            "facebook_eid",
-            "first_code",
-            "first_eid",
-            "city",
-            "state_prov",
-            "country",
-            "postalcode",
-            "parent_event",
-            "playoff_type",
-            "normalized_location",  # Overwrite whole thing as one
-            "timezone_id",
-            "name",
-            "official",
-            "short_name",
-            "start_date",
-            "venue",
-            "venue_address",
-            "website",
-            "year",
-            "remap_teams",
-        ]
-
-        allow_none_attrs = {
-            'district_key'
-        }
-
-        list_attrs = [
-            "divisions",
-        ]
-
-        old_event._updated_attrs = []
-
-        for attr in attrs:
-            if getattr(new_event, attr) is not None or attr in allow_none_attrs:
-                if getattr(new_event, attr) != getattr(old_event, attr):
-                    setattr(old_event, attr, getattr(new_event, attr))
-                    old_event._updated_attrs.append(attr)
-                    old_event.dirty = True
-            if getattr(new_event, attr) == "None":
-                if getattr(old_event, attr, None) is not None:
-                    setattr(old_event, attr, None)
-                    old_event._updated_attrs.append(attr)
-                    old_event.dirty = True
-
-        for attr in list_attrs:
-            if len(getattr(new_event, attr)) > 0:
-                if getattr(new_event, attr) != getattr(old_event, attr):
-                    setattr(old_event, attr, getattr(new_event, attr))
-                    old_event._updated_attrs.append(attr)
-                    old_event.dirty = True
+    def updateMerge(
+        cls, new_event: Event, old_event: Event, auto_union: bool = True
+    ) -> Event:
+        cls._update_attrs(new_event, old_event)
 
         # Special case to handle webcast_json
         if not auto_union and new_event.webcast != old_event.webcast:
             old_event.webcast_json = new_event.webcast_json
-            old_event.dirty = True
+            old_event._webcast = None
+            old_event._dirty = True
         else:
             if new_event.webcast:
                 old_webcasts = old_event.webcast
@@ -134,6 +81,6 @@ class EventManipulator(ManipulatorBase[Event]):
                             old_event.webcast_json = json.dumps(old_webcasts)
                 else:
                     old_event.webcast_json = new_event.webcast_json
-                old_event.dirty = True
+                old_event._dirty = True
 
         return old_event

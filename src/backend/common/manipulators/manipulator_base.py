@@ -14,7 +14,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
     @classmethod
     @abc.abstractmethod
     def updateMerge(
-        cls, new_model: TModel, old_model: TModel, auto_union: bool = True
+        cls, new_model: TModel, old_model: TModel, auto_union: bool
     ) -> TModel:
         """
         Child classes should implement this method with specific merging logic
@@ -81,7 +81,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
 
     @classmethod
     def updateMergeBase(
-        cls, new_model: TModel, old_model: Optional[TModel], auto_union=True
+        cls, new_model: TModel, old_model: Optional[TModel], auto_union
     ) -> TModel:
         """
         Given an "old" and a "new" model object, replace the fields in the
@@ -118,17 +118,37 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
     """
 
     @staticmethod
-    def _update_attrs(new_model: TModel, old_model: TModel, attrs: Set[str]) -> None:
+    def _update_attrs(new_model: TModel, old_model: TModel) -> None:
         """
         Given an "old" and a "new" model, replace the fields in the
         "old" that are present in the "new", but keep fields from
         the "old" that are null in the "new".
         """
-        for attr in attrs:
-            if getattr(new_model, attr) is not None:
+        updated_attrs: Set[str] = set()
+
+        for attr in old_model._mutable_attrs:
+            if (
+                getattr(new_model, attr, None) is not None
+                or attr in old_model._allow_none_attrs
+            ):
                 if getattr(new_model, attr) != getattr(old_model, attr):
                     setattr(old_model, attr, getattr(new_model, attr))
+                    updated_attrs.add(attr)
                     old_model._dirty = True
+            if getattr(new_model, attr, None) == "None":
+                if getattr(old_model, attr, None) is not None:
+                    setattr(old_model, attr, None)
+                    updated_attrs.add(attr)
+                    old_model._dirty = True
+
+        for attr in old_model._list_attrs:
+            if len(getattr(new_model, attr)) > 0:
+                if getattr(new_model, attr) != getattr(old_model, attr):
+                    setattr(old_model, attr, getattr(new_model, attr))
+                    updated_attrs.add(attr)
+                    old_model._dirty = True
+
+        old_model._updated_attrs = updated_attrs
 
     """
     cache clearing hook
