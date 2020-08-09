@@ -1,15 +1,16 @@
 import re
-from typing import List
+from typing import List, Set
 
 from google.cloud import ndb
 from pyre_extensions import safe_cast
 
+from backend.common.models.cached_model import CachedModel
 from backend.common.models.district_advancement import DistrictAdvancement
 from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.keys import DistrictAbbreviation, DistrictKey, Year
 
 
-class District(ndb.Model):
+class District(CachedModel):
     """
     One instance of a district in a year. Here, we store info about a district and in-season data
     (like district rankings)
@@ -33,6 +34,13 @@ class District(ndb.Model):
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+
+    _mutable_attrs: Set[str] = {
+        "display_name",
+        "elasticsearch_name",
+        "rankings",
+        "advancement",
+    }
 
     def __init__(self, *args, **kw):
         # store set of affected references referenced keys for cache clearing
