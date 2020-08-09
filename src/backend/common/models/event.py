@@ -4,7 +4,7 @@ import datetime
 import json
 import re
 import typing
-from typing import Dict, Generator, List, Optional, Tuple
+from typing import Dict, Generator, List, Optional, Set, Tuple
 
 from google.cloud import ndb
 from pyre_extensions import none_throws, safe_cast
@@ -14,6 +14,7 @@ from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.futures import TypedFuture
 from backend.common.models.alliance import EventAlliance
+from backend.common.models.cached_model import CachedModel
 from backend.common.models.district import District
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_district_points import EventDistrictPoints
@@ -28,7 +29,7 @@ if typing.TYPE_CHECKING:
     from backend.common.models.match import Match
 
 
-class Event(ndb.Model):
+class Event(CachedModel):
     """
     Events represent FIRST Robotics Competition events, both official and unofficial.
     key_name is like '2010ct'
@@ -93,6 +94,44 @@ class Event(ndb.Model):
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+
+    _mutable_attrs: Set[str] = {
+        "end_date",
+        "event_short",
+        "event_type_enum",
+        "event_district_enum",
+        "district_key",
+        "custom_hashtag",
+        "enable_predictions",
+        "facebook_eid",
+        "first_code",
+        "first_eid",
+        "city",
+        "state_prov",
+        "country",
+        "postalcode",
+        "parent_event",
+        "playoff_type",
+        "normalized_location",  # Overwrite whole thing as one
+        "timezone_id",
+        "name",
+        "official",
+        "short_name",
+        "start_date",
+        "venue",
+        "venue_address",
+        "website",
+        "year",
+        "remap_teams",
+    }
+
+    _allow_none_attrs: Set[str] = {
+        "district_key",
+    }
+
+    _list_attrs: Set[str] = {
+        "divisions",
+    }
 
     def __init__(self, *args, **kw):
         # store set of affected references referenced keys for cache clearing
