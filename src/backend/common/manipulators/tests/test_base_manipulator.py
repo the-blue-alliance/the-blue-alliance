@@ -33,7 +33,7 @@ class DummyManipulator(ManipulatorBase[DummyModel]):
     def updateMerge(
         cls, new_model: DummyModel, old_model: DummyModel, auto_union: bool
     ) -> DummyModel:
-        cls._update_attrs(new_model, old_model)
+        cls._update_attrs(new_model, old_model, auto_union)
         return old_model
 
 

@@ -1,7 +1,7 @@
 import datetime
 import json
 import re
-from typing import cast, Dict, List, Optional
+from typing import cast, Dict, List, Optional, Set
 
 from google.cloud import ndb
 from pyre_extensions import none_throws, safe_cast
@@ -18,6 +18,7 @@ from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.models.alliance import MatchAlliance
+from backend.common.models.cached_model import CachedModel
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, MatchKey, TeamKey, Year
 from backend.common.models.match_score_breakdown import MatchScoreBreakdown
@@ -26,7 +27,7 @@ from backend.common.models.tba_video import TBAVideo
 from backend.common.models.team import Team
 
 
-class Match(ndb.Model):
+class Match(CachedModel):
     """
     Matches represent individual matches at Events.
     Matches have many Videos.
@@ -111,6 +112,32 @@ class Match(ndb.Model):
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True)
+
+    _mutable_attrs: Set[str] = {
+        "year",
+        "no_auto_update",
+        "time",
+        "time_string",
+        "actual_time",
+        "predicted_time",
+        "post_result_time",
+        "push_sent",
+        "tiebreak_match_key",
+    }
+
+    _list_attrs: Set[str] = {
+        "team_key_names",
+    }
+
+    _json_attrs: Set[str] = {
+        "alliances_json",
+        "score_breakdown_json",
+    }
+
+    _auto_union_attrs: Set[str] = {
+        "tba_videos",
+        "youtube_videos",
+    }
 
     def __init__(self, *args, **kw) -> None:
         # store set of affected references referenced keys for cache clearing
@@ -224,7 +251,7 @@ class Match(ndb.Model):
                                 for i in range(1, 4)
                             ]
                         )
-                self._score_breakdown = score_breakdown
+            self._score_breakdown = score_breakdown
 
         return self._score_breakdown
 
