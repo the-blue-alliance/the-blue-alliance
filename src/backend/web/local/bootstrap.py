@@ -132,6 +132,9 @@ class LocalDataBootstrap:
         event_awards = cls.fetch_event_detail(key, "awards", auth_token)
         list(map(lambda t: cls.store_award(t, event), event_awards))
 
+        event_oprs = cls.fetch_event_detail(key, "oprs", auth_token)
+        cls.store_eventdetail(event, "matchstats", event_oprs)
+
     @classmethod
     def bootstrap_key(cls, key: str, apiv3_key: str) -> Optional[str]:
         if Match.validate_key_name(key):
