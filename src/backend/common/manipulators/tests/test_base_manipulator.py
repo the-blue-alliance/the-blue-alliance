@@ -1,4 +1,5 @@
-from typing import List, Optional, Set
+import json
+from typing import Dict, List, Optional, Set
 
 from google.cloud import ndb
 
@@ -12,6 +13,9 @@ class DummyModel(CachedModel):
     mutable_str_prop: str = ndb.StringProperty()
     can_be_none: Optional[int] = ndb.IntegerProperty()
     repeated_prop: List[int] = ndb.IntegerProperty(repeated=True)  # pyre-ignore[8]
+    union_prop: List[int] = ndb.IntegerProperty(repeated=True)  # pyre-ignore[8]
+
+    prop_json: str = ndb.StringProperty()
 
     _mutable_attrs: Set[str] = {
         "int_prop",
@@ -27,13 +31,32 @@ class DummyModel(CachedModel):
         "repeated_prop",
     }
 
+    _json_attrs: Set[str] = {
+        "prop_json",
+    }
+
+    _auto_union_attrs: Set[str] = {
+        "union_prop",
+    }
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+        self._prop = None
+
+    @property
+    def prop(self) -> Dict:
+        if self._prop is None and self.prop_json is not None:
+            self._prop = json.loads(self.prop_json)
+        return self._prop
+
 
 class DummyManipulator(ManipulatorBase[DummyModel]):
     @classmethod
     def updateMerge(
         cls, new_model: DummyModel, old_model: DummyModel, auto_union: bool
     ) -> DummyModel:
-        cls._update_attrs(new_model, old_model)
+        cls._update_attrs(new_model, old_model, auto_union)
         return old_model
 
 
@@ -140,3 +163,37 @@ def test_update_lists_empty_keeps_old(ndb_context) -> None:
 
     check = DummyModel.get_by_id("test")
     assert check.repeated_prop == [1, 2, 3]
+
+
+def test_update_json_attrs(ndb_context) -> None:
+    model = DummyModel(id="test", prop_json=json.dumps({"foo": "bar"}))
+    model.put()
+
+    update = DummyModel(id="test", prop_json=json.dumps({"foo": "baz"}))
+    DummyManipulator.createOrUpdate(update)
+
+    check = DummyModel.get_by_id("test")
+    assert check.prop_json == json.dumps({"foo": "baz"})
+    assert check.prop == {"foo": "baz"}
+
+
+def test_update_auto_union(ndb_context) -> None:
+    model = DummyModel(id="test", union_prop=[1, 2, 3])
+    model.put()
+
+    update = DummyModel(id="test", union_prop=[4, 5, 6])
+    DummyManipulator.createOrUpdate(update, auto_union=True)
+
+    check = DummyModel.get_by_id("test")
+    assert check.union_prop == [1, 2, 3, 4, 5, 6]
+
+
+def test_update_auto_union_false(ndb_context) -> None:
+    model = DummyModel(id="test", union_prop=[1, 2, 3])
+    model.put()
+
+    update = DummyModel(id="test", union_prop=[4, 5, 6])
+    DummyManipulator.createOrUpdate(update, auto_union=False)
+
+    check = DummyModel.get_by_id("test")
+    assert check.union_prop == [4, 5, 6]

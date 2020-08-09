@@ -23,5 +23,5 @@ class EventTeamManipulator(ManipulatorBase[EventTeam]):
         """
         Update and return EventTeams.
         """
-        cls._update_attrs(new_event_team, old_event_team)
+        cls._update_attrs(new_event_team, old_event_team, auto_union)
         return old_event_team

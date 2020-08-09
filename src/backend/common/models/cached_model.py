@@ -30,6 +30,10 @@ class CachedModel(ndb.Model):
     # We will merge the lists of these attrs
     _list_attrs: Set[str] = set()
 
+    _json_attrs: Set[str] = set()
+
+    _auto_union_attrs: Set[str] = set()
+
     # This will get updated with the attrs that actually change
     _updated_attrs: Optional[Set[str]] = None
 

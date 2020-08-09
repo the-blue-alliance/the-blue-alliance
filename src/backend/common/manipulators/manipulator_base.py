@@ -1,4 +1,5 @@
 import abc
+import json
 from typing import Any, Generic, List, Optional, overload, Set, TypeVar
 
 from google.cloud import ndb
@@ -118,7 +119,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
     """
 
     @staticmethod
-    def _update_attrs(new_model: TModel, old_model: TModel) -> None:
+    def _update_attrs(new_model: TModel, old_model: TModel, auto_union: bool) -> None:
         """
         Given an "old" and a "new" model, replace the fields in the
         "old" that are present in the "new", but keep fields from
@@ -141,12 +142,36 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
                     updated_attrs.add(attr)
                     old_model._dirty = True
 
-        for attr in old_model._list_attrs:
+        for attr in old_model._json_attrs:
+            if getattr(new_model, attr) is not None:
+                if (getattr(old_model, attr) is None) or (
+                    json.loads(getattr(new_model, attr))
+                    != json.loads(getattr(old_model, attr))
+                ):
+                    setattr(old_model, attr, getattr(new_model, attr))
+                    # changinging 'attr_json' doesn't clear lazy-loaded '_attr'
+                    setattr(old_model, "_{}".format(attr.replace("_json", "")), None)
+                    updated_attrs.add(attr)
+                    old_model._dirty = True
+
+        list_attrs = old_model._list_attrs
+        if not auto_union:
+            list_attrs = list_attrs.union(old_model._auto_union_attrs)
+        for attr in list_attrs:
             if len(getattr(new_model, attr)) > 0:
                 if getattr(new_model, attr) != getattr(old_model, attr):
                     setattr(old_model, attr, getattr(new_model, attr))
                     updated_attrs.add(attr)
                     old_model._dirty = True
+
+        for attr in old_model._auto_union_attrs if auto_union else {}:
+            old_set = set(getattr(old_model, attr))
+            new_set = set(getattr(new_model, attr))
+            unioned = old_set.union(new_set)
+            if unioned != old_set:
+                setattr(old_model, attr, list(unioned))
+                updated_attrs.add(attr)
+                old_model._dirty = True
 
         old_model._updated_attrs = updated_attrs
 
