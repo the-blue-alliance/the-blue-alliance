@@ -23,6 +23,10 @@ class MatchstatsHelper:
         2020: {
             "Foul Points": lambda match, color: match.score_breakdown[color].get(
                 "foulPoints", 0
+            ),
+            "Auton div Total": lambda match, color: (
+                match.score_breakdown[color].get("autoPoints", 0)
+                / max(match.score_breakdown[color].get("totalPoints", 0), 1)
             )
         }
     }
@@ -37,11 +41,26 @@ class MatchstatsHelper:
 
         # Base components
         coprs = {}
-        for component, value in matches[0].score_breakdown[AllianceColor.RED].items():
-            if isinstance(value, int) or isinstance(value, float):
-                coprs[component] = OPRHelper.calculate_opr(
-                    matches, cls.component_default(component)
+        # Force generators to be lists via len? Not sure if necessary
+        # Ran into some errors on 2006cur without it
+        if matches is not None and len(list(matches)) > 0 and matches[0].score_breakdown is not None:
+            for component, value in matches[0].score_breakdown[AllianceColor.RED].items():
+                if isinstance(value, int) or isinstance(value, float):
+                    coprs[component] = OPRHelper.calculate_opr(
+                        matches, cls.component_default(component)
+                    )
+
+            return_val['coprs'] = coprs
+
+        # Specific components
+        coprs = {}
+        year = matches[0].year
+        if year in cls.COMPONENTS:
+            for title, fn in cls.COMPONENTS[year].items():
+                coprs[title] = OPRHelper.calculate_opr(
+                    matches, fn
                 )
 
-        return_val['coprs'] = coprs
+            return_val['coprs'].update(coprs)
+
         return return_val

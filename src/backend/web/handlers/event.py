@@ -131,18 +131,14 @@ def event_detail(event_key: EventKey) -> Response:
         middle_value += 1
     teams_a, teams_b = team_and_medias[:middle_value], team_and_medias[middle_value:]
 
-    oprs = (
-        [i for i in event.matchstats["oprs"].items()]
-        if (event.matchstats is not None and "oprs" in event.matchstats)
-        else []
-    )
-    oprs = sorted(oprs, key=lambda t: t[1], reverse=True)  # sort by OPR
-    oprs = oprs[:15]  # get the top 15 OPRs
-
-    coprs = {}
+    num_oprs = 15
+    coprs = collections.OrderedDict()
+    coprs["OPRs"] = sorted(event.matchstats["oprs"].items(), key=lambda t: -t[1])[:num_oprs]
+    coprs["DPRs"] = sorted(event.matchstats["dprs"].items(), key=lambda t: -t[1])[:num_oprs]
+    coprs["CCWMs"] = sorted(event.matchstats["ccwms"].items(), key=lambda t: -t[1])[:num_oprs]
     if event.matchstats is not None and "coprs" in event.matchstats:
         for component, copr_dict in event.matchstats["coprs"].items():
-            coprs[component] = sorted(copr_dict.items(), key=lambda t: -t[1])[:15]
+            coprs[component] = sorted(copr_dict.items(), key=lambda t: -t[1])[:num_oprs]
 
     if event.now:
         matches_recent = MatchHelper.recentMatches(cleaned_matches)
@@ -212,8 +208,7 @@ def event_detail(event_key: EventKey) -> Response:
         "teams_a": teams_a,
         "teams_b": teams_b,
         "num_teams": num_teams,
-        "oprs": oprs,
-        "copr_choices": sorted([c for c in coprs.keys()]),
+        "copr_choices": list(coprs.keys()),
         "copr_json": json.dumps(coprs),
         "bracket_table": bracket_table,
         "playoff_advancement": playoff_advancement,

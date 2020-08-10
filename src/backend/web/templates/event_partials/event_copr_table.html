@@ -1,5 +1,5 @@
 {% if copr_choices|length > 0 %}
-<h3>Component OPRs - Top 15</h3>
+<h3><abbr title="Component Offensive Power Ratings">COPRs</abbr> - Top 15 (<a href="/opr">?</a>)</h3>
 <div class="btn-group">
   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
           aria-expanded="false">
@@ -7,7 +7,7 @@
   </button>
   <ul class="dropdown-menu">
     {% for component in copr_choices %}
-        <li><a href="#" id="dropdown_{{ component }}">{{ component }}</a></li>
+        <li><a href="#" id='dropdown_{{ component|replace(" ", "_") }}'>{{ component }}</a></li>
     {% endfor %}
   </ul>
 </div>
@@ -15,9 +15,9 @@
 <table class="table table-condensed table-striped table-center">
     <thead>
         <tr>
-        <th>Team</th>
-        <th id="componentColHeader">COPR</th>
-    </tr>
+            <th>Team</th>
+            <th id="componentColHeader"><abbr title="Component Offensive Power Rating">COPR</abbr></th>
+        </tr>
     </thead>
     <tbody id="coprTableBody">
     </tbody>
@@ -49,11 +49,13 @@
 
     document.addEventListener("DOMContentLoaded", function() {
         {% for component in copr_choices %}
-            $("#dropdown_{{ component }}").click(function(e) {
+            $('#dropdown_{{ component|replace(" ", "_") }}').click(function(e) {
                e.preventDefault();
                buildCoprTable("{{ component }}");
             });
         {% endfor %}
+
+        buildCoprTable("OPRs");
     });
 </script>
 
