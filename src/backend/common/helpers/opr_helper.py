@@ -123,47 +123,4 @@ class OPRHelper:
             return {}
 
         m_inv = cls.build_m_inv_matrix(matches, team_id_map, played_only=True)
-        d = cls.calc_stat(matches, team_list, team_id_map, m_inv, point_accessor)
-        return d
-
-    @classmethod
-    def calculate_matchstats(
-        cls, matches: List[Match], year: int
-    ) -> Dict[str, Union[Dict[TeamKey, float], Dict[str, Dict[TeamKey, float]]]]:
-        """
-        return type:
-        Dict[
-            str,  # any of "oprs", "dprs", "ccwms", "coprs"
-            Union[  # either
-                Dict[str, float],  # simple team:float OPR dict
-                Dict[str, Dict[str, float]]  # cOPR dict for component:Dict[team:float]
-            ]
-        ]
-        """
-        if not matches:
-            return {}
-
-        team_list, team_id_map = cls.build_team_mapping(matches)
-        if not team_list:
-            return {}
-
-        m_inv = cls.build_m_inv_matrix(matches, team_id_map, played_only=True)
-
-        oprs_dict = cls.calc_stat(matches, team_list, team_id_map, m_inv, "oprs")
-        dprs_dict = cls.calc_stat(matches, team_list, team_id_map, m_inv, "dprs")
-        ccwms_dict = cls.calc_stat(matches, team_list, team_id_map, m_inv, "ccwms")
-
-        coprs_dict = {}
-        for component in matches[0].score_breakdown[AllianceColor.RED].keys():
-            coprs_dict[component] = cls.calc_stat(
-                matches, team_list, team_id_map, m_inv, component
-            )
-
-        stats = {
-            "oprs": oprs_dict,
-            "dprs": dprs_dict,
-            "ccwms": ccwms_dict,
-            "coprs": coprs_dict,
-        }
-
-        return stats
+        return cls.calc_stat(matches, team_list, team_id_map, m_inv, point_accessor)
