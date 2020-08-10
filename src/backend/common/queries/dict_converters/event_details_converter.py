@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import cast, Dict, List
+from typing import cast, Dict, List, Union
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.event_details import EventDetails
@@ -18,6 +18,15 @@ class EventDetailsConverter(ConverterBase):
         }
         return CONVERTERS[version](model_list)
 
+    @staticmethod
+    def _add_frc_str_to_keys(d: Dict[Union[str, int], float]) -> Dict[str, float]:
+        normalized = {}
+        for team, value in d.items():
+            if "frc" not in str(team):
+                normalized[f"frc{team}"] = value
+
+        return normalized
+
     def eventsDetailsConverter_v3(self, event_details: List[EventDetails]):
         return list(map(self.eventDetailsConverter_v3, event_details))
 
@@ -25,11 +34,17 @@ class EventDetailsConverter(ConverterBase):
         normalized_oprs = defaultdict(dict)
         if event_details and event_details.matchstats:
             for stat_type, stats in event_details.matchstats.items():
+                stats = cast(Dict[TeamKey, float], stats)
                 if stat_type in {"oprs", "dprs", "ccwms"}:
-                    for team, value in cast(Dict[TeamKey, float], stats).items():
-                        if "frc" not in team:  # Normalize output
-                            team = "frc{}".format(team)
-                        normalized_oprs[stat_type][team] = value
+                    normalized_oprs[
+                        stat_type
+                    ] = EventDetailsConverter._add_frc_str_to_keys(stats)
+
+                if stat_type == "coprs":
+                    for component, component_oprs in stats.items():
+                        normalized_oprs[stat_type][
+                            component
+                        ] = EventDetailsConverter._add_frc_str_to_keys(stats)
 
         rankings = {}
         if event_details:

@@ -12,6 +12,10 @@
 
 import numpy as np
 
+from typing import List, Dict, Union
+from backend.common.models.match import Match
+from backend.common.consts.alliance_color import AllianceColor
+
 
 class MatchstatsHelper:
     @classmethod
@@ -63,6 +67,7 @@ class MatchstatsHelper:
         init_stats=None,
         init_stats_default=0,
         limit_matches=None,
+        is_component=False,
     ):
 
         n = len(team_id_map.keys())
@@ -87,9 +92,12 @@ class MatchstatsHelper:
                     init_stats,
                     init_stats_default,
                     treat_as_unplayed,
+                    is_component=is_component,
                 )
-                for team in alliance_teams:
-                    s[team_id_map[team]] += stat
+                if isinstance(stat, int) or isinstance(stat, float):
+                    for team in alliance_teams:
+                        s[team_id_map[team]] += float(stat)
+
         return s
 
     @classmethod
@@ -103,6 +111,7 @@ class MatchstatsHelper:
         init_stats=None,
         init_stats_default=0,
         limit_matches=None,
+        is_component=False,
     ):
         s = cls.build_s_matrix(
             matches,
@@ -111,6 +120,7 @@ class MatchstatsHelper:
             init_stats=init_stats,
             init_stats_default=init_stats_default,
             limit_matches=limit_matches,
+            is_component=is_component,
         )
         x = np.dot(m_inv, s)
 
@@ -129,65 +139,82 @@ class MatchstatsHelper:
         init_stats,
         init_stats_default,
         treat_as_unplayed,
+        is_component,
     ):
         match_played = match.has_been_played and not treat_as_unplayed
 
         if match_played:
-            if stat_type == "oprs":
-                return match.alliances[alliance_color]["score"]
-            elif stat_type == "dprs":
-                if alliance_color == "red":
-                    other_alliance_color = "blue"
-                else:
-                    other_alliance_color = "red"
-                return match.alliances[other_alliance_color]["score"]
-            elif stat_type == "ccwms":
-                if alliance_color == "red":
-                    other_alliance_color = "blue"
-                else:
-                    other_alliance_color = "red"
-                return (
-                    match.alliances[alliance_color]["score"]
-                    - match.alliances[other_alliance_color]["score"]
-                )
+            if is_component:
+                return match.score_breakdown[alliance_color].get(stat_type, 0)
+            else:
+                if stat_type == "oprs":
+                    return match.alliances[alliance_color]["score"]
+                elif stat_type == "dprs":
+                    if alliance_color == "red":
+                        other_alliance_color = "blue"
+                    else:
+                        other_alliance_color = "red"
+                    return match.alliances[other_alliance_color]["score"]
+                elif stat_type == "ccwms":
+                    if alliance_color == "red":
+                        other_alliance_color = "blue"
+                    else:
+                        other_alliance_color = "red"
+                    return (
+                        match.alliances[alliance_color]["score"]
+                        - match.alliances[other_alliance_color]["score"]
+                    )
 
-            # 2016 specific
-            if stat_type == "2016autoPointsOPR":
-                if match.score_breakdown and alliance_color in match.score_breakdown:
-                    return match.score_breakdown[alliance_color].get("autoPoints", 0)
-            elif stat_type == "2016bouldersOPR":
-                if match.score_breakdown and alliance_color in match.score_breakdown:
-                    return (
-                        match.score_breakdown[alliance_color].get("autoBouldersLow", 0)
-                        + match.score_breakdown[alliance_color].get(
-                            "autoBouldersHigh", 0
+                # 2016 specific
+                if stat_type == "2016autoPointsOPR":
+                    if (
+                        match.score_breakdown
+                        and alliance_color in match.score_breakdown
+                    ):
+                        return match.score_breakdown[alliance_color].get(
+                            "autoPoints", 0
                         )
-                        + match.score_breakdown[alliance_color].get(
-                            "teleopBouldersLow", 0
+                elif stat_type == "2016bouldersOPR":
+                    if (
+                        match.score_breakdown
+                        and alliance_color in match.score_breakdown
+                    ):
+                        return (
+                            match.score_breakdown[alliance_color].get(
+                                "autoBouldersLow", 0
+                            )
+                            + match.score_breakdown[alliance_color].get(
+                                "autoBouldersHigh", 0
+                            )
+                            + match.score_breakdown[alliance_color].get(
+                                "teleopBouldersLow", 0
+                            )
+                            + match.score_breakdown[alliance_color].get(
+                                "teleopBouldersHigh", 0
+                            )
                         )
-                        + match.score_breakdown[alliance_color].get(
-                            "teleopBouldersHigh", 0
+                elif stat_type == "2016crossingsOPR":
+                    if (
+                        match.score_breakdown
+                        and alliance_color in match.score_breakdown
+                    ):
+                        return (
+                            match.score_breakdown[alliance_color].get(
+                                "position1crossings", 0
+                            )
+                            + match.score_breakdown[alliance_color].get(
+                                "position2crossings", 0
+                            )
+                            + match.score_breakdown[alliance_color].get(
+                                "position3crossings", 0
+                            )
+                            + match.score_breakdown[alliance_color].get(
+                                "position4crossings", 0
+                            )
+                            + match.score_breakdown[alliance_color].get(
+                                "position5crossings", 0
+                            )
                         )
-                    )
-            elif stat_type == "2016crossingsOPR":
-                if match.score_breakdown and alliance_color in match.score_breakdown:
-                    return (
-                        match.score_breakdown[alliance_color].get(
-                            "position1crossings", 0
-                        )
-                        + match.score_breakdown[alliance_color].get(
-                            "position2crossings", 0
-                        )
-                        + match.score_breakdown[alliance_color].get(
-                            "position3crossings", 0
-                        )
-                        + match.score_breakdown[alliance_color].get(
-                            "position4crossings", 0
-                        )
-                        + match.score_breakdown[alliance_color].get(
-                            "position5crossings", 0
-                        )
-                    )
 
         # None of the above cases were met. Return default.
         if init_stats and stat_type in init_stats:
@@ -202,7 +229,19 @@ class MatchstatsHelper:
             return total
 
     @classmethod
-    def calculate_matchstats(cls, matches, year):
+    def calculate_matchstats(
+        cls, matches: List[Match], year: int
+    ) -> Dict[str, Union[Dict[str, float], Dict[str, Dict[str, float]]]]:
+        """
+        return type:
+        Dict[
+            str,  # any of "oprs", "dprs", "ccwms", "coprs"
+            Union[  # either
+                Dict[str, float],  # simple team:float OPR dict
+                Dict[str, Dict[str, float]]  # cOPR dict for component:Dict[team:float]
+            ]
+        ]
+        """
         if not matches:
             return {}
 
@@ -216,6 +255,17 @@ class MatchstatsHelper:
         dprs_dict = cls.calc_stat(matches, team_list, team_id_map, m_inv, "dprs")
         ccwms_dict = cls.calc_stat(matches, team_list, team_id_map, m_inv, "ccwms")
 
-        stats = {"oprs": oprs_dict, "dprs": dprs_dict, "ccwms": ccwms_dict}
+        coprs_dict = {}
+        for component in matches[0].score_breakdown[AllianceColor.RED].keys():
+            coprs_dict[component] = cls.calc_stat(
+                matches, team_list, team_id_map, m_inv, component, is_component=True
+            )
+
+        stats = {
+            "oprs": oprs_dict,
+            "dprs": dprs_dict,
+            "ccwms": ccwms_dict,
+            "coprs": coprs_dict,
+        }
 
         return stats

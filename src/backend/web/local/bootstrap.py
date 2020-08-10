@@ -148,7 +148,6 @@ class LocalDataBootstrap:
             print("Convert the following to a warning!")
             print(f"Matchstat calculation for {event.key} failed!")
 
-        print(f"{matchstats_dict}", flush=True)
         cls.store_eventdetail(event, "matchstats", matchstats_dict)
 
     @classmethod
