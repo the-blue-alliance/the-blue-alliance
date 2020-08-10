@@ -403,6 +403,15 @@
       </div>
       {% endif %}
 
+      {% if copr_choices|length > 0 %}
+      <div class="row">
+        <div class="col-sm-12">
+        {% include "event_partials/event_copr_table.html" %}
+        </div>
+      </div>
+      {% endif %}
+
+
       <div class="row">
         {% if event_insights_qual %}
         <div class="col-sm-6">

@@ -1,5 +1,6 @@
 import collections
 from typing import List, Optional
+import json
 
 from flask import abort, redirect, request
 from google.cloud import ndb
@@ -138,6 +139,11 @@ def event_detail(event_key: EventKey) -> Response:
     oprs = sorted(oprs, key=lambda t: t[1], reverse=True)  # sort by OPR
     oprs = oprs[:15]  # get the top 15 OPRs
 
+    coprs = {}
+    if event.matchstats is not None and "coprs" in event.matchstats:
+        for component, copr_dict in event.matchstats["coprs"].items():
+            coprs[component] = sorted(copr_dict.items(), key=lambda t: -t[1])[:15]
+
     if event.now:
         matches_recent = MatchHelper.recentMatches(cleaned_matches)
         matches_upcoming = MatchHelper.upcomingMatches(cleaned_matches)
@@ -207,6 +213,8 @@ def event_detail(event_key: EventKey) -> Response:
         "teams_b": teams_b,
         "num_teams": num_teams,
         "oprs": oprs,
+        "copr_choices": sorted([c for c in coprs.keys()]),
+        "copr_json": json.dumps(coprs),
         "bracket_table": bracket_table,
         "playoff_advancement": playoff_advancement,
         "playoff_template": playoff_template,
