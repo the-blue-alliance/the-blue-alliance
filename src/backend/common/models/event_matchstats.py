@@ -9,3 +9,4 @@ class EventMatchstats(TypedDict):
     oprs: Dict[TeamKey, float]
     dprs: Dict[TeamKey, float]
     ccwms: Dict[TeamKey, float]
+    coprs: Dict[str, Dict[TeamKey, float]]
