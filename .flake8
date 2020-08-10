@@ -9,6 +9,7 @@ exclude =
   ./stubs/
   ./subtrees/
   ./venv/
+  ./node_modules/
 application_import_names = backend
 import-order-style = edited
 

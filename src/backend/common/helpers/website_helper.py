@@ -1,6 +1,9 @@
-class WebsiteHelper(object):
-    @classmethod
-    def format_url(cls, website_url):
+from typing import Optional
+
+
+class WebsiteHelper:
+    @staticmethod
+    def format_url(website_url: str) -> Optional[str]:
         """
         Updates a URL to have the correct format. For example, it will change
         "website.com" to "http://website.com", while keeping
@@ -17,10 +20,10 @@ class WebsiteHelper(object):
         if not all(ord(c) < 128 for c in website_url):
             return None
 
-        url_parts = website_url.split('://')
+        url_parts = website_url.split("://")
         if len(url_parts) == 1:
-            formatted_url = 'http://{}'.format(website_url)
-        elif url_parts[0] in {'http', 'https'}:
+            formatted_url = "http://{}".format(website_url)
+        elif url_parts[0] in {"http", "https"}:
             formatted_url = website_url
 
         return formatted_url
