@@ -24,22 +24,23 @@
 </table>
 
 <script>
-    var coprs = JSON.parse('{{ copr_json|safe }}');
+    const coprs = JSON.parse('{{ copr_json|safe }}');
 
     function buildCoprTable(component) {
         document.getElementById('componentColHeader').innerHTML = `COPR`;
         document.getElementById('coprSelector').innerText = component;
         document.getElementById('coprTableBody').innerHTML = '';
         coprs[component].forEach((e) => {
-            var teamLink = document.createElement('a', {href: `/team/${e[0]}/{{ event.year }}`});
+            const teamLink = document.createElement('a');
+            teamLink.href = `/team/${e[0]}/{{ event.year }}`;
             teamLink.innerText = e[0];
-            var teamTd = document.createElement('td');
+            const teamTd = document.createElement('td');
             teamTd.appendChild(teamLink);
 
-            var coprTd = document.createElement('td');
+            const coprTd = document.createElement('td');
             coprTd.innerText = e[1].toFixed(2); // round to 2 decimal places
 
-            var tr = document.createElement('tr');
+            const tr = document.createElement('tr');
             tr.appendChild(teamTd);
             tr.appendChild(coprTd);
             document.getElementById('coprTableBody').appendChild(tr);
