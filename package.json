@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "dependencies": {
     "@babel/core": "^7.11.1",
-    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
     "@babel/preset-env": "^7.5.5",
     "@babel/preset-react": "^7.10.4",
     "babel-polyfill": "^6.8.0",
