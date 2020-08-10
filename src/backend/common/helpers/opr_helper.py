@@ -110,7 +110,11 @@ class OPRHelper:
         return stat_dict
 
     @classmethod
-    def calculate_opr(cls, matches: List[Match], point_accessor: Callable[[Match, AllianceColor], float]):
+    def calculate_opr(
+        cls,
+        matches: List[Match],
+        point_accessor: Callable[[Match, AllianceColor], float],
+    ):
         if not matches:
             return {}
 

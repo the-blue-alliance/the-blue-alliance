@@ -133,9 +133,15 @@ def event_detail(event_key: EventKey) -> Response:
 
     num_oprs = 15
     coprs = collections.OrderedDict()
-    coprs["OPRs"] = sorted(event.matchstats["oprs"].items(), key=lambda t: -t[1])[:num_oprs]
-    coprs["DPRs"] = sorted(event.matchstats["dprs"].items(), key=lambda t: -t[1])[:num_oprs]
-    coprs["CCWMs"] = sorted(event.matchstats["ccwms"].items(), key=lambda t: -t[1])[:num_oprs]
+    coprs["OPRs"] = sorted(event.matchstats["oprs"].items(), key=lambda t: -t[1])[
+        :num_oprs
+    ]
+    coprs["DPRs"] = sorted(event.matchstats["dprs"].items(), key=lambda t: -t[1])[
+        :num_oprs
+    ]
+    coprs["CCWMs"] = sorted(event.matchstats["ccwms"].items(), key=lambda t: -t[1])[
+        :num_oprs
+    ]
     if event.matchstats is not None and "coprs" in event.matchstats:
         for component, copr_dict in event.matchstats["coprs"].items():
             coprs[component] = sorted(copr_dict.items(), key=lambda t: -t[1])[:num_oprs]
