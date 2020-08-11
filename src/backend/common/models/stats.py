@@ -13,10 +13,5 @@ class StatType(str, enum.Enum):
     DPR = "dprs"
     CCWM = "ccwms"
 
-    # 2016 specific stats
-    STRONGHOLD_AUTO_OPR = "2016autoPointsOPR"
-    STRONGHOLD_BOULDER_OPR = "2016bouldersOPR"
-    STRONGHOLD_CROSS_OPR = "2016crossingsOPR"
-
 
 EventMatchStats = Dict[StatType, TStatMap]

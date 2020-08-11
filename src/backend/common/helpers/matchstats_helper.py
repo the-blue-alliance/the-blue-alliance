@@ -168,29 +168,6 @@ class MatchstatsHelper(object):
                     - match.alliances[other_alliance_color]["score"]
                 )
 
-            # 2016 specific
-            breakdown = match.score_breakdown
-            if stat_type == StatType.STRONGHOLD_AUTO_OPR:
-                if breakdown is not None and alliance_color in breakdown:
-                    return breakdown[alliance_color].get("autoPoints", 0)
-            elif stat_type == StatType.STRONGHOLD_BOULDER_OPR:
-                if breakdown is not None and alliance_color in breakdown:
-                    return (
-                        breakdown[alliance_color].get("autoBouldersLow", 0)
-                        + breakdown[alliance_color].get("autoBouldersHigh", 0)
-                        + breakdown[alliance_color].get("teleopBouldersLow", 0)
-                        + breakdown[alliance_color].get("teleopBouldersHigh", 0)
-                    )
-            elif stat_type == StatType.STRONGHOLD_CROSS_OPR:
-                if breakdown is not None and alliance_color in breakdown:
-                    return (
-                        breakdown[alliance_color].get("position1crossings", 0)
-                        + breakdown[alliance_color].get("position2crossings", 0)
-                        + breakdown[alliance_color].get("position3crossings", 0)
-                        + breakdown[alliance_color].get("position4crossings", 0)
-                        + breakdown[alliance_color].get("position5crossings", 0)
-                    )
-
         # None of the above cases were met. Return default.
         if init_stats and stat_type in init_stats:
             total = 0
@@ -222,14 +199,6 @@ class MatchstatsHelper(object):
             StatType.DPR: dprs_dict,
             StatType.CCWM: ccwms_dict,
         }
-
-        # if year == 2016:
-        #     # First ranking tiebreaker
-        #     stats['2016autoPointsOPR'] = cls.calc_stat(matches, team_list, team_id_map, Minv, '2016autoPointsOPR')
-
-        #     # For RP calculation
-        #     stats['2016crossingsOPR'] = cls.calc_stat(matches, team_list, team_id_map, Minv, '2016crossingsOPR')
-        #     stats['2016bouldersOPR'] = cls.calc_stat(matches, team_list, team_id_map, Minv, '2016bouldersOPR')
 
         return stats
 
