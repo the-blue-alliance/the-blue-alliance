@@ -14,7 +14,7 @@ PS C:\Users\justin> wsl --list --verbose
 
 We highly recommend cloning your TBA fork onto the WSL filesystem. Upon an initial WSL setup, doing `cd ~` in your WSL shell will bring you to the FS in your terminal. To see the files in Windows Explorer, you can navigate to `\\wsl$` and then open your corresponding OS installation.
 
-If you do not clone to the WSL FS, you will experience slower file read/write times and *hot reloading will not work* (such as `vagrant rsync-auto`). There may be an option to swap these hote reloading tools to poll the FS, but these will be much slower, especially in a large project like TBA. (Source: https://github.com/microsoft/WSL/issues/4417)
+If you do not clone to the WSL FS, you will experience slower file read/write times and *hot reloading will not work* (such as `vagrant rsync-auto`). There may be an option to swap these hot reloading tools to poll the FS, but these will be much slower, especially in a large project like TBA. (Source: https://github.com/microsoft/WSL/issues/4417)
 
 ### Install Docker on windows
 
