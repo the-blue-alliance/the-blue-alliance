@@ -80,6 +80,14 @@ You may have to chmod 600 to the private key, but proobably not:
 $ chmod 600 -f .vagrant/machines/default/docker/private_key
 ```
 
+### Note which branch you are on
+
+Note that currently, TBA is porting a significant portion of code from Python 2 to Python 3. As a result, most work is going into the `py3` branch, while prod is running `master`. There is a small change to `Vagrantfile` present in `py3` but has not yet made it into `master` (or other branches). If you run into problems running those branches, check to see if the following line is present in `Vagrantfile`:
+
+```
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+```
+
 ### Run `vagrant up`
 
 Try running `vagrant up`. If you see an error regarding unable to find the directory `/tba`, try running `vagrant destroy && vagrant up`.
