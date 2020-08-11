@@ -74,7 +74,7 @@ Source: https://github.com/microsoft/WSL/issues/81#issuecomment-400597679
 
 ### Maybe `chmod` the ssh key
 
-You may have to chmod 600 to the private key, but proobably not:
+You may have to chmod 600 to the private key, but probably not:
 
 ```
 $ chmod 600 -f .vagrant/machines/default/docker/private_key
