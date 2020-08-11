@@ -1,6 +1,6 @@
 ### Initial setup
 
-This doc was written on `Windows 10 Version 2004 (OS Build 19041.388)` using WSL 2 running Ubuntu 20.04. This was not testing on WSL1 and we highly recommend using WSL2.
+This doc was written on `Windows 10 Version 2004 (OS Build 19041.388)` using WSL 2 running Ubuntu 20.04. This was not tested on WSL1 and we highly recommend using WSL2.
 
 Powershell:
 
