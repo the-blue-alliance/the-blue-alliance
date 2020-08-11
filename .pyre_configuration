@@ -6,6 +6,7 @@
     "stubs",
     {"site-package": "InMemoryCloudDatastoreStub"},
     {"site-package": "google/cloud/datastore_v1"},
+    {"site-package": "numpy"},
     {"site-package": "freezegun"},
     {"site-package": "requests_mock"},
     {"site-package": "pytest"},
