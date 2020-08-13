@@ -14,15 +14,17 @@ import numpy as np
 
 from typing import List, Dict, Union, Tuple, Callable
 from backend.common.models.match import Match
-from backend.common.consts.alliance_color import AllianceColor
-from backend.common.models.keys import TeamKey
+from backend.common.consts.alliance_color import AllianceColor, ALLIANCE_COLORS
+from backend.common.models.keys import TeamId, Year
+
+TTeamIdMap = Dict[TeamId, int]
 
 
 class OPRHelper:
     @classmethod
     def build_team_mapping(
         cls, matches: List[Match]
-    ) -> Tuple[List[TeamKey], Dict[TeamKey, int]]:
+    ) -> Tuple[List[TeamId], TTeamIdMap]:
         """
         Returns (team_list, team_id_map)
         team_list: A list of team_str such as '254' or '254B'
@@ -33,7 +35,7 @@ class OPRHelper:
         for match in matches:
             if match.comp_level != "qm":  # only consider quals matches
                 continue
-            for alliance_color in [AllianceColor.RED, AllianceColor.BLUE]:
+            for alliance_color in ALLIANCE_COLORS:
                 for team in match.alliances[alliance_color]["teams"]:
                     team_list.add(team[3:])  # turns "frc254B" into "254B"
 
@@ -46,10 +48,7 @@ class OPRHelper:
 
     @classmethod
     def build_m_inv_matrix(
-        cls,
-        matches: List[Match],
-        team_id_map: Dict[TeamKey, int],
-        played_only: bool = False,
+        cls, matches: List[Match], team_id_map: TTeamIdMap, played_only: bool = False,
     ) -> np.ndarray:
         n = len(team_id_map.keys())
         m = np.zeros([n, n])
@@ -71,10 +70,9 @@ class OPRHelper:
     def build_s_matrix(
         cls,
         matches: List[Match],
-        team_id_map: Dict[TeamKey, int],
+        team_id_map: TTeamIdMap,
         point_accessor: Callable[[Match, AllianceColor], float],
-    ):
-
+    ) -> np.ndarray:
         n = len(team_id_map.keys())
         s = np.zeros([n, 1])
         for match in matches:
@@ -96,8 +94,8 @@ class OPRHelper:
     def calc_stat(
         cls,
         matches: List[Match],
-        team_list: List[TeamKey],
-        team_id_map: Dict[TeamKey, int],
+        team_list: List[TeamId],
+        team_id_map: TTeamIdMap,
         m_inv: np.ndarray,
         point_accessor: Callable[[Match, AllianceColor], float],
     ):

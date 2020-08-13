@@ -26,6 +26,30 @@ You probably need to install Virtualbox too, as it says in the article.
 
 https://linuxize.com/post/how-to-install-vagrant-on-ubuntu-20-04/
 
+### Edit `~/.bashrc`
+
+(Or the equivalent for whatever shell you are using)
+
+Please follow the Vagrant setup for WSL here: https://www.vagrantup.com/docs/other/wsl
+
+##### Additionally...
+
+WSL may not be able to find your powershell executable (for some reason); you'll need to add the following:
+
+```
+alias powershell="/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
+```
+
+For whatever reason, the usual way of exporting the powershell executable onto the `PATH` variable doesn't work here.
+
+At the end, your `~/.bashrc` should contain the following:
+
+```
+export VAGRANT_WSL_ENABLE_WINDOWS_ACCESS="1"
+export VAGRANT_WSL_WINDOWS_ACCESS_USER_HOME_PATH="/mnt/c/Code"
+alias powershell="/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
+```
+
 
 ### Edit `/etc/wsl.conf`
 

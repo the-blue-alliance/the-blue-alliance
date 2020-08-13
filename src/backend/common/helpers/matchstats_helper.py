@@ -1,21 +1,18 @@
 from typing import Dict, Callable, List
 
-from backend.common.consts.alliance_color import AllianceColor
+from backend.common.consts.alliance_color import AllianceColor, OPPONENT
 from backend.common.models.match import Match
 from backend.common.helpers.opr_helper import OPRHelper
-
-
-def get_opp_color(color: AllianceColor) -> AllianceColor:
-    return [AllianceColor.RED, AllianceColor.BLUE][color == AllianceColor.RED]
+from backend.common.models.stats import StatType, EventMatchStats
+from backend.common.models.keys import TeamId
 
 
 class MatchstatsHelper:
-    EVERGREEN: Dict[str, Callable[[Match, AllianceColor], float]] = {
+    EVERGREEN: Dict[StatType, Callable[[Match, AllianceColor], float]] = {
         "oprs": lambda match, color: match.alliances[color]["score"],
-        "dprs": lambda match, color: match.alliances[get_opp_color(color)]["score"],
+        "dprs": lambda match, color: match.alliances[OPPONENT[color]]["score"],
         "ccwms": lambda match, color: (
-            match.alliances[color]["score"]
-            - match.alliances[get_opp_color(color)]["score"]
+            match.alliances[color]["score"] - match.alliances[OPPONENT[color]]["score"]
         ),
     }
 
@@ -36,7 +33,7 @@ class MatchstatsHelper:
     )
 
     @classmethod
-    def calculate_matchstats(cls, matches: List[Match]):
+    def calculate_matchstats(cls, matches: List[Match]) -> EventMatchStats:
         return_val = {
             k: OPRHelper.calculate_opr(matches, v) for k, v in cls.EVERGREEN.items()
         }
