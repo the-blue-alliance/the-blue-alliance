@@ -8,14 +8,14 @@
 
 # x is OPR and should be n x 1
 
-from typing import Dict, Callable, List
+from typing import Callable, Dict, List
 from typing import Tuple
 
 import numpy as np
 
 from backend.common.consts.alliance_color import ALLIANCE_COLORS
 from backend.common.consts.alliance_color import AllianceColor, OPPONENT
-from backend.common.models.event_matchstats import StatType, EventMatchStats, Component
+from backend.common.models.event_matchstats import Component, EventMatchStats, StatType
 from backend.common.models.keys import TeamId
 from backend.common.models.match import Match
 
@@ -59,14 +59,12 @@ class MatchstatsHelper:
     def calculate_matchstats(
         cls, matches: List[Match], skip_coprs: bool = False, keyed: bool = True
     ) -> EventMatchStats:
-        return {
-            StatType.OPR: cls.calculate_oprs(matches, keyed=keyed),
-            StatType.DPR: cls.calculate_dprs(matches, keyed=keyed),
-            StatType.CCWM: cls.calculate_ccwms(matches, keyed=keyed),
-            StatType.COPR: {}
-            if skip_coprs
-            else cls.calculate_coprs(matches, keyed=keyed),
-        }
+        return EventMatchStats(
+            oprs=cls.calculate_oprs(matches, keyed=keyed),
+            dprs=cls.calculate_dprs(matches, keyed=keyed),
+            ccwms=cls.calculate_ccwms(matches, keyed=keyed),
+            coprs={} if skip_coprs else cls.calculate_coprs(matches, keyed=keyed),
+        )
 
     @classmethod
     def calculate_oprs(cls, matches: List[Match], keyed: bool = True):
@@ -161,7 +159,7 @@ class MatchstatsHelper:
     @classmethod
     def __build_m_inv_matrix(
         cls, matches: List[Match], team_id_map: TTeamIdMap, played_only: bool = False,
-    ) -> np.ndarray:
+    ):  # TODO: add np.ndarray typing
         n = len(team_id_map.keys())
         m = np.zeros([n, n])
         for match in matches:
@@ -184,7 +182,7 @@ class MatchstatsHelper:
         matches: List[Match],
         team_id_map: TTeamIdMap,
         point_accessor: Callable[[Match, AllianceColor], float],
-    ) -> np.ndarray:
+    ):  # TODO: add np.ndarray typing
         n = len(team_id_map.keys())
         s = np.zeros([n, 1])
         for match in matches:

@@ -1,6 +1,6 @@
 import collections
-from typing import List, Optional
 import json
+from typing import List, Optional
 
 from flask import abort, redirect, request
 from google.cloud import ndb

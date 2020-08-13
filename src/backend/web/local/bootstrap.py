@@ -2,6 +2,7 @@ from typing import Any, Dict, Optional
 
 import requests
 
+from backend.common.helpers.matchstats_helper import MatchstatsHelper
 from backend.common.models.award import Award
 from backend.common.models.district import District
 from backend.common.models.event import Event
@@ -15,7 +16,6 @@ from backend.common.queries.dict_converters.district_converter import DistrictCo
 from backend.common.queries.dict_converters.event_converter import EventConverter
 from backend.common.queries.dict_converters.match_converter import MatchConverter
 from backend.common.queries.dict_converters.team_converter import TeamConverter
-from backend.common.helpers.matchstats_helper import MatchstatsHelper
 
 
 class LocalDataBootstrap:
