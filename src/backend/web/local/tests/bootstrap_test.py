@@ -16,7 +16,7 @@ from backend.common.models.award import Award
 from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
-from backend.common.models.event_matchstats import EventMatchStats, TeamStatMap
+from backend.common.models.event_matchstats import EventMatchstats, TeamStatMap
 from backend.common.models.event_ranking import EventRanking
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey, MatchKey, TeamKey, TeamNumber
@@ -203,7 +203,7 @@ def mock_event_awards_url(
 
 
 def mock_event_matchstats_url(
-    m: RequestsMocker, event_key: EventKey, matchstats: EventMatchStats
+    m: RequestsMocker, event_key: EventKey, matchstats: EventMatchstats
 ) -> None:
     details = EventDetailsConverter(
         EventDetails(id=event_key, matchstats=matchstats)
@@ -269,7 +269,7 @@ def test_bootstrap_event(ndb_context, requests_mock: RequestsMocker) -> None:
         year=2020,
         team_list=[],
     )
-    matchstats = EventMatchStats(
+    matchstats = EventMatchstats(
         oprs=make_team_stat_map(),
         dprs=make_team_stat_map(),
         ccwms=make_team_stat_map(),

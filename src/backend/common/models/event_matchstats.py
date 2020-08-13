@@ -9,7 +9,7 @@ Component = str
 TeamStatMap = Dict[Union[TeamKey, TeamId], float]
 
 
-class EventMatchStats(TypedDict):
+class EventMatchstats(TypedDict):
     oprs: TeamStatMap
     dprs: TeamStatMap
     ccwms: TeamStatMap

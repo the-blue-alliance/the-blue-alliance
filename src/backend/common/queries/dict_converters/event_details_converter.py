@@ -16,15 +16,6 @@ class EventDetailsConverter(ConverterBase):
         }
         return CONVERTERS[version](model_list)
 
-    @staticmethod
-    def _add_frc_str_to_keys(d: Dict[Union[str, int], float]) -> Dict[str, float]:
-        normalized = {}
-        for team, value in d.items():
-            if "frc" not in str(team):
-                normalized[f"frc{team}"] = value
-
-        return normalized
-
     def eventsDetailsConverter_v3(self, event_details: List[EventDetails]):
         return list(map(self.eventDetailsConverter_v3, event_details))
 

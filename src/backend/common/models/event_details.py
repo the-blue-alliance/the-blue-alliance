@@ -11,7 +11,7 @@ from backend.common.models.alliance import EventAlliance
 from backend.common.models.cached_model import CachedModel
 from backend.common.models.event_district_points import EventDistrictPoints
 from backend.common.models.event_insights import EventInsights
-from backend.common.models.event_matchstats import EventMatchStats
+from backend.common.models.event_matchstats import EventMatchstats
 from backend.common.models.event_predictions import EventPredictions
 from backend.common.models.event_ranking import EventRanking
 from backend.common.models.keys import EventKey
@@ -37,8 +37,8 @@ class EventDetails(CachedModel):
     district_points: EventDistrictPoints = safe_cast(
         EventDistrictPoints, ndb.JsonProperty()
     )
-    matchstats: EventMatchStats = safe_cast(
-        EventMatchStats, ndb.JsonProperty()
+    matchstats: EventMatchstats = safe_cast(
+        EventMatchstats, ndb.JsonProperty()
     )  # for OPR, DPR, CCWM, etc.
     insights: EventInsights = safe_cast(EventInsights, ndb.JsonProperty())
     predictions: EventPredictions = safe_cast(EventPredictions, ndb.JsonProperty())

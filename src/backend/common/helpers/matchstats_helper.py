@@ -19,7 +19,7 @@ from backend.common.consts.alliance_color import AllianceColor, OPPONENT
 from backend.common.consts.comp_level import CompLevel
 from backend.common.models.event_matchstats import (
     Component,
-    EventMatchStats,
+    EventMatchstats,
     StatType,
     TeamStatMap,
 )
@@ -66,8 +66,8 @@ class MatchstatsHelper:
     @classmethod
     def calculate_matchstats(
         cls, matches: List[Match], skip_coprs: bool = False, keyed: bool = True
-    ) -> EventMatchStats:
-        return EventMatchStats(
+    ) -> EventMatchstats:
+        return EventMatchstats(
             oprs=cls.calculate_oprs(matches, keyed=keyed),
             dprs=cls.calculate_dprs(matches, keyed=keyed),
             ccwms=cls.calculate_ccwms(matches, keyed=keyed),
