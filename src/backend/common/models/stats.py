@@ -4,6 +4,7 @@ from typing import Dict
 from backend.common.models.keys import TeamId
 
 
+Component = str
 TStatMap = Dict[TeamId, float]
 
 

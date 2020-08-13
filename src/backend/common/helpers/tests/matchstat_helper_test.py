@@ -4,9 +4,9 @@ from typing import Dict
 
 import pytest
 
-from backend.common.helpers.opr_helper import OPRHelper
 from backend.common.models.keys import TeamKey
 from backend.common.models.stats import EventMatchStats, StatType
+from backend.common.helpers.matchstats_helper import MatchstatsHelper
 
 
 @pytest.fixture(autouse=True)
@@ -22,6 +22,11 @@ def api_data_to_opr(api_data: EventMatchStats) -> EventMatchStats:
         }
 
     return data
+
+
+def test_compute_matchstats_no_matches():
+    stats = MatchstatsHelper.calculate_matchstats([])
+    assert stats == {}
 
 
 # def api_data_to_matchstats(
