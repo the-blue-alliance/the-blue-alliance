@@ -15,9 +15,9 @@ import numpy as np
 
 from backend.common.consts.alliance_color import ALLIANCE_COLORS
 from backend.common.consts.alliance_color import AllianceColor, OPPONENT
+from backend.common.models.event_matchstats import StatType, EventMatchStats, Component
 from backend.common.models.keys import TeamId
 from backend.common.models.match import Match
-from backend.common.models.stats import StatType, EventMatchStats, Component
 
 StatAccessor = Callable[[Match, AllianceColor], float]
 TTeamIdMap = Dict[TeamId, int]
@@ -36,16 +36,18 @@ class MatchstatsHelper:
     )
 
     EVERGREEN: Dict[StatType, StatAccessor] = {
-        "oprs": OPR_ACCESSOR,
-        "dprs": DPR_ACCESSOR,
-        "ccwms": CCWM_ACCESSOR,
+        StatType.OPR: OPR_ACCESSOR,
+        StatType.DPR: DPR_ACCESSOR,
+        StatType.CCWM: CCWM_ACCESSOR,
     }
 
     COMPONENTS = {
         2020: {
+            # Temporary example metric
             "Foul Points": lambda match, color: match.score_breakdown[color].get(
                 "foulPoints", 0
             ),
+            # Temporary example metric
             "Auton div Total": lambda match, color: (
                 match.score_breakdown[color].get("autoPoints", 0)
                 / max(match.score_breakdown[color].get("totalPoints", 0), 1)
@@ -54,42 +56,82 @@ class MatchstatsHelper:
     }
 
     @classmethod
-    def calculate_matchstats(cls, matches: List[Match]) -> EventMatchStats:
-        return_val: EventMatchStats = {}
-        for stat_type, accessor in cls.EVERGREEN.items():
-            stat_dict = cls.calculate_opr(matches, accessor)
-            if stat_dict != {}:
-                return_val[stat_type] = stat_dict
+    def calculate_matchstats(
+        cls, matches: List[Match], skip_coprs: bool = False, keyed: bool = True
+    ) -> EventMatchStats:
+        return {
+            StatType.OPR: cls.calculate_oprs(matches, keyed=keyed),
+            StatType.DPR: cls.calculate_dprs(matches, keyed=keyed),
+            StatType.CCWM: cls.calculate_ccwms(matches, keyed=keyed),
+            StatType.COPR: {}
+            if skip_coprs
+            else cls.calculate_coprs(matches, keyed=keyed),
+        }
 
-        # Base components
+    @classmethod
+    def calculate_oprs(cls, matches: List[Match], keyed: bool = True):
+        return cls.calculate_stat(matches, cls.OPR_ACCESSOR, keyed=keyed)
+
+    @classmethod
+    def calculate_dprs(cls, matches: List[Match], keyed: bool = True):
+        return cls.calculate_stat(matches, cls.DPR_ACCESSOR, keyed=keyed)
+
+    @classmethod
+    def calculate_ccwms(cls, matches: List[Match], keyed: bool = True):
+        return cls.calculate_stat(matches, cls.CCWM_ACCESSOR, keyed=keyed)
+
+    @classmethod
+    def calculate_coprs(cls, matches: List[Match], keyed: bool = True):
         coprs = {}
-        # Force generators to be lists via len? Not sure if necessary
-        # Ran into some errors on 2006cur without it
-        if (
+
+        # If there is not valid data for COPRs, skip
+        if not (
             matches is not None
-            and len(list(matches)) > 0
+            and len(matches) > 0
             and matches[0].score_breakdown is not None
         ):
-            for component, value in (
-                matches[0].score_breakdown[AllianceColor.RED].items()
-            ):
-                if isinstance(value, int) or isinstance(value, float):
-                    coprs[component] = cls.calculate_opr(
-                        matches, cls.DEFAULT_COMPONENT_ACCESSOR(component)
-                    )
+            return coprs
 
-            return_val["coprs"] = coprs
+        # for each string-like key in the score_breakdown object
+        # (just take the red score_breakdown from match 0, it's an arbitrary selection)
+        for component, value in matches[0].score_breakdown[AllianceColor.RED].items():
+            # if the component is an int or a float, we can compute it easily
+            # (as opposed to, say, a string)
+            if isinstance(value, int) or isinstance(value, float):
+                coprs[component] = cls.calculate_stat(
+                    matches, cls.DEFAULT_COMPONENT_ACCESSOR(component), keyed=keyed
+                )
 
-            # Specific components
-            coprs = {}
-            year = matches[0].year
-            if year in cls.COMPONENTS:
-                for title, fn in cls.COMPONENTS[year].items():
-                    coprs[title] = cls.calculate_opr(matches, fn)
+        # Specific components specified in cls
+        year = matches[0].year
+        if year in cls.COMPONENTS.keys():
+            for title, accessor in cls.COMPONENTS[year].items():
+                coprs[title] = cls.calculate_stat(matches, accessor, keyed=keyed)
 
-                return_val["coprs"].update(coprs)
+        return coprs
 
-        return return_val
+    @classmethod
+    def calculate_stat(
+        cls,
+        matches: List[Match],
+        point_accessor: Callable[[Match, AllianceColor], float],
+        keyed: bool,
+    ):
+        if not matches:
+            return {}
+
+        team_list, team_id_map = cls.__build_team_mapping(matches)
+        if not team_list:
+            return {}
+
+        m_inv = cls.__build_m_inv_matrix(matches, team_id_map, played_only=True)
+
+        return {
+            f"frc{k}" if keyed else k: v
+            for k, v in cls.__calc_stat(
+                matches, team_list, team_id_map, m_inv, point_accessor
+            ).items()
+        }
 
     @classmethod
     def __build_team_mapping(
@@ -175,20 +217,5 @@ class MatchstatsHelper:
         stat_dict = {}
         for team, stat in zip(team_list, x):
             stat_dict[team] = stat[0]
+
         return stat_dict
-
-    @classmethod
-    def calculate_opr(
-        cls,
-        matches: List[Match],
-        point_accessor: Callable[[Match, AllianceColor], float],
-    ):
-        if not matches:
-            return {}
-
-        team_list, team_id_map = cls.__build_team_mapping(matches)
-        if not team_list:
-            return {}
-
-        m_inv = cls.__build_m_inv_matrix(matches, team_id_map, played_only=True)
-        return cls.__calc_stat(matches, team_list, team_id_map, m_inv, point_accessor)

@@ -5,7 +5,7 @@ from typing import Dict
 import pytest
 
 from backend.common.models.keys import TeamKey
-from backend.common.models.stats import EventMatchStats, StatType
+from backend.common.models.event_matchstats import EventMatchStats
 from backend.common.helpers.matchstats_helper import MatchstatsHelper
 
 
@@ -14,31 +14,25 @@ def auto_add_ndb_context(ndb_context) -> None:
     pass
 
 
-def api_data_to_opr(api_data: EventMatchStats) -> EventMatchStats:
-    data: EventMatchStats = {}
-    for stat_type in StatType:
-        data[stat_type] = {
-            team_key[3:]: stat for team_key, stat in api_data[stat_type].items()
-        }
-
-    return data
-
-
 def test_compute_matchstats_no_matches():
     stats = MatchstatsHelper.calculate_matchstats([])
-    assert stats == {}
+    assert stats == {"oprs": {}, "dprs": {}, "ccwms": {}, "coprs": {}}
 
 
-# def api_data_to_matchstats(
-#     api_data: Dict[StatType, Dict[TeamKey, float]]
-# ) -> EventMatchStats:
-#     data: EventMatchStats = {}
-#     for stat_type in StatType:
-#         data[stat_type] = {
-#             team_key[3:]: stat for team_key, stat in api_data[stat_type].items()
-#         }
-#
-#     return data
+def test_compute_matchstats_skip_coprs(test_data_importer):
+    matches = test_data_importer.parse_match_list(
+        __file__, "data/2019nyny_matches.json"
+    )
+    with open(
+        os.path.join(os.path.dirname(__file__), "data/2019nyny_stats.json"), "r"
+    ) as f:
+        expected_stats = json.load(f)
+
+    stats = MatchstatsHelper.calculate_matchstats(matches, skip_coprs=True)
+    for stat in expected_stats.keys():
+        assert expected_stats[stat] == pytest.approx(stats[stat])
+
+
 #
 #
 # def assert_stats_equal(stats: EventMatchStats, expected_stats: EventMatchStats) -> None:
@@ -46,10 +40,6 @@ def test_compute_matchstats_no_matches():
 #     for stat, team_stats in stats.items():
 #         assert team_stats.keys() == expected_stats[stat].keys()
 #
-#
-# def test_compute_matchstats_no_matches() -> None:
-#     stats = MatchstatsHelper.calculate_matchstats([], 2019)
-#     assert stats == {}
 #
 #
 # def test_compute_matchstats(test_data_importer) -> None:
