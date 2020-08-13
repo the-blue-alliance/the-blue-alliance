@@ -149,11 +149,12 @@ def event_detail(event_key: EventKey) -> Response:
             matchstats[component] = sorted(copr_dict.items(), key=lambda t: -t[1])[
                 :num_matchstats
             ]
-    matchstat_dropdown_id_map = {
-        k: re.sub('[^0-9a-zA-Z]+', '_', k)
-        for k in matchstats.keys()
-    }
 
+    # Replace non-alphanumeric characters with underscores
+    # in order to make sure that the html div IDs are valid
+    matchstat_dropdown_id_map = {
+        k: re.sub("[^0-9a-zA-Z]+", "_", k) for k in matchstats.keys()
+    }
 
     if event.now:
         matches_recent = MatchHelper.recentMatches(cleaned_matches)
@@ -207,7 +208,6 @@ def event_detail(event_key: EventKey) -> Response:
     )
 
     # status_sitevar = status_sitevar_future.get_result()
-    # print(f"{event.details}")
 
     template_values = {
         "event": event,

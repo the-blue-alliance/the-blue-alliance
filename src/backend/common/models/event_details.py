@@ -123,7 +123,6 @@ class EventDetails(CachedModel):
             return None
 
         rankings = self.renderable_rankings
-        # print(f"RANKINGS {rankings}")
         if rankings["sort_order_info"] is None:
             return None
 

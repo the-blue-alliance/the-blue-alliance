@@ -12,9 +12,11 @@ from typing import Callable, Dict, List
 from typing import Tuple
 
 import numpy as np
+from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import ALLIANCE_COLORS
 from backend.common.consts.alliance_color import AllianceColor, OPPONENT
+from backend.common.consts.comp_level import CompLevel
 from backend.common.models.event_matchstats import (
     Component,
     EventMatchStats,
@@ -58,7 +60,7 @@ class MatchstatsHelper:
                 match.score_breakdown[color].get("cargoPoints")
                 + match.score_breakdown[color].get("hatchPanelPoints")
             )
-        }
+        },
     }
 
     @classmethod
@@ -100,7 +102,9 @@ class MatchstatsHelper:
 
         # for each string-like key in the score_breakdown object
         # (just take the red score_breakdown from match 0, it's an arbitrary selection)
-        for component, value in matches[0].score_breakdown[AllianceColor.RED].items():
+        for component, value in none_throws(matches[0].score_breakdown)[
+            AllianceColor.RED
+        ].items():
             # if the component is an int or a float, we can compute it easily
             # (as opposed to, say, a string)
             if isinstance(value, int) or isinstance(value, float):
@@ -151,7 +155,7 @@ class MatchstatsHelper:
         # Build team list
         team_list = set()
         for match in matches:
-            if match.comp_level != "qm":  # only consider quals matches
+            if match.comp_level != CompLevel.QM:  # only consider quals matches
                 continue
             for alliance_color in ALLIANCE_COLORS:
                 for team in match.alliances[alliance_color]["teams"]:
@@ -169,13 +173,13 @@ class MatchstatsHelper:
         cls, matches: List[Match], team_id_map: TTeamIdMap, played_only: bool = False,
     ) -> "np.ndarray[float]":
         n = len(team_id_map.keys())
-        m = np.zeros([n, n])
+        m = np.zeros((n, n))
         for match in matches:
-            if match.comp_level != "qm":  # only consider quals matches
+            if match.comp_level != CompLevel.QM:  # only consider quals matches
                 continue
             if played_only and not match.has_been_played:
                 continue
-            for alliance_color in [AllianceColor.RED, AllianceColor.BLUE]:
+            for alliance_color in ALLIANCE_COLORS:
                 alliance_teams = match.alliances[alliance_color]["teams"]
                 for team1 in alliance_teams:
                     team1_id = team_id_map[team1[3:]]
@@ -194,10 +198,10 @@ class MatchstatsHelper:
         n = len(team_id_map.keys())
         s = np.zeros((n, 1))
         for match in matches:
-            if match.comp_level != "qm":  # only consider quals matches
+            if match.comp_level != CompLevel.QM:  # only consider quals matches
                 continue
 
-            for alliance_color in [AllianceColor.RED, AllianceColor.BLUE]:
+            for alliance_color in ALLIANCE_COLORS:
                 alliance_teams = [
                     team[3:] for team in match.alliances[alliance_color]["teams"]
                 ]
