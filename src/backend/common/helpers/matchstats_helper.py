@@ -179,7 +179,7 @@ class MatchstatsHelper:
         point_accessor: Callable[[Match, AllianceColor], float],
     ):  # TODO: add np.ndarray typing
         n = len(team_id_map.keys())
-        s = np.zeros([n, 1])
+        s = np.zeros((n, 1))
         for match in matches:
             if match.comp_level != "qm":  # only consider quals matches
                 continue
