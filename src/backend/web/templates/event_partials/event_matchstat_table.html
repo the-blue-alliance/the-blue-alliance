@@ -1,4 +1,4 @@
-{% if copr_choices|length > 0 %}
+{% if matchstat_choices|length > 0 %}
 <h3><abbr title="Component Offensive Power Ratings">COPRs</abbr> - Top 15 (<a href="/opr">?</a>)</h3>
 <div class="btn-group">
   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
@@ -6,7 +6,7 @@
     <span id="coprSelector">Choose component</span> <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
-    {% for component in copr_choices %}
+    {% for component in matchstat_choices %}
         <li><a href="#" id='dropdown_{{ component|replace(" ", "_") }}'>{{ component }}</a></li>
     {% endfor %}
   </ul>
@@ -24,7 +24,7 @@
 </table>
 
 <script>
-    const coprs = JSON.parse('{{ copr_json|safe }}');
+    const coprs = JSON.parse('{{ matchstat_json|safe }}');
 
     function buildCoprTable(component) {
         document.getElementById('componentColHeader').innerHTML = `COPR`;
@@ -48,7 +48,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        {% for component in copr_choices %}
+        {% for component in matchstat_choices %}
             $('#dropdown_{{ component|replace(" ", "_") }}').click(function(e) {
                e.preventDefault();
                buildCoprTable("{{ component }}");

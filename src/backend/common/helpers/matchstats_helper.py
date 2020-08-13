@@ -43,14 +43,9 @@ class MatchstatsHelper:
 
     COMPONENTS = {
         2020: {
-            # Temporary example metric
-            "Foul Points": lambda match, color: match.score_breakdown[color].get(
-                "foulPoints", 0
-            ),
-            # Temporary example metric
-            "Auton div Total": lambda match, color: (
-                match.score_breakdown[color].get("autoPoints", 0)
-                / max(match.score_breakdown[color].get("totalPoints", 0), 1)
+            "Total Power Cell Points": lambda match, color: (
+                match.score_breakdown[color].get("autoCellPoints")
+                + match.score_breakdown[color].get("teleopCellPoints")
             ),
         }
     }

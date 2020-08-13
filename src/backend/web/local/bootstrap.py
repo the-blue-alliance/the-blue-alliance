@@ -138,7 +138,7 @@ class LocalDataBootstrap:
         # cls.store_eventdetail(event, "matchstats", event_oprs)
 
         # Calculate insights locally
-        matchstats_dict = MatchstatsHelper.calculate_matchstats(event.matches)
+        matchstats_dict = MatchstatsHelper.calculate_matchstats(event.matches, keyed=False)
 
         # if any([v != {} for v in matchstats_dict.values()]):
         #     pass
