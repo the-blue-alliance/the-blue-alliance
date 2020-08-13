@@ -13,6 +13,19 @@ You can start the container locally by running `vagrant up`. Once the setup is c
 
 Once the container is running, you can print all the relevant logs (including the `dev_appserver` logs) on the host machine by running `./ops/dev/host.sh`.
 
+In order to run the typechecker, tests, lints, etc locally, you'll need to set up a [venv](https://docs.python.org/3/tutorial/venv.html). You can do so with the following commands:
+
+```
+# Create a venv
+$ python3 -m venv ./venv
+
+# Activate it
+$ source ./venv/bin/activate
+
+# Install dependencies
+$ pip install -r requirements.txt; pip install -r src/requirements.txt
+```
+
 ## Bootstrapping Data
 
 There are two ways to import data into a local copy of TBA. You can either bootstrap the local db from the production site, or run the datafeeds locally to fetch data directly from FIRST.
@@ -28,7 +41,7 @@ When running locally, TBA will export a bootstrap interface at [http://localhost
 ## Rebuilding Web Resources (JavaScript, CSS, etc.)
 If you make changes to JavaScript or CSS files for the `web` service, you will have to recompile the files in order for the changes to show up in your browser. After syncing changes from your local environment to the development container, run the `ops/build/run_buildweb.sh.sh` script from inside the development container.
 
-## Running Tests/Lint/etc.
+## Running Tests/Typecheck/Lint/etc.
 
 ### Running Tests (Python)
 Python tests are run using [pytest](https://docs.pytest.org/en/latest/). You can specify a single file to test, or a directory to run all downstream tests (`test_*.py` files) for. The `--relevant` flag can be used to only test modified codepaths.
