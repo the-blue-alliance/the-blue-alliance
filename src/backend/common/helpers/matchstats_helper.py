@@ -55,10 +55,10 @@ class MatchstatsHelper(object):
     @classmethod
     def build_Minv_matrix(
         cls, matches: List[Match], team_id_map: TTeamIdMap, played_only: bool = False
-    ):
+    ) -> "np.ndarray[int]":
 
         n = len(team_id_map.keys())
-        M = np.zeros([n, n])
+        M = np.zeros((n, n))
         for match in matches:
             if match.comp_level != CompLevel.QM:  # only consider quals matches
                 continue
@@ -81,9 +81,9 @@ class MatchstatsHelper(object):
         init_stats: Optional[Dict[StatType, Dict[TeamId, int]]] = None,
         init_stats_default: int = 0,
         limit_matches: Optional[int] = None,
-    ):
+    ) -> "np.ndarray[int]":
         n = len(team_id_map.keys())
-        s = np.zeros([n, 1])
+        s = np.zeros((n, 1))
         for match in matches:
             if match.comp_level != CompLevel.QM:  # only consider quals matches
                 continue
