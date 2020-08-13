@@ -134,21 +134,22 @@ def event_detail(event_key: EventKey) -> Response:
 
     num_matchstats = 15
     matchstats = collections.OrderedDict()
-    matchstats["OPRs"] = sorted(event.matchstats["oprs"].items(), key=lambda t: -t[1])[
-        :num_matchstats
-    ]
-    matchstats["DPRs"] = sorted(event.matchstats["dprs"].items(), key=lambda t: -t[1])[
-        :num_matchstats
-    ]
-    matchstats["CCWMs"] = sorted(
-        event.matchstats["ccwms"].items(), key=lambda t: -t[1]
-    )[:num_matchstats]
+    if event.matchstats is not None:
+        matchstats["OPRs"] = sorted(
+            event.matchstats["oprs"].items(), key=lambda t: -t[1]
+        )[:num_matchstats]
+        matchstats["DPRs"] = sorted(
+            event.matchstats["dprs"].items(), key=lambda t: -t[1]
+        )[:num_matchstats]
+        matchstats["CCWMs"] = sorted(
+            event.matchstats["ccwms"].items(), key=lambda t: -t[1]
+        )[:num_matchstats]
 
-    if event.matchstats is not None and "coprs" in event.matchstats:
-        for component, copr_dict in event.matchstats["coprs"].items():
-            matchstats[component] = sorted(copr_dict.items(), key=lambda t: -t[1])[
-                :num_matchstats
-            ]
+        if "coprs" in event.matchstats:
+            for component, copr_dict in event.matchstats["coprs"].items():
+                matchstats[component] = sorted(copr_dict.items(), key=lambda t: -t[1])[
+                    :num_matchstats
+                ]
 
     # Replace non-alphanumeric characters with underscores
     # in order to make sure that the html div IDs are valid

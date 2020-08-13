@@ -16,6 +16,7 @@ from backend.common.models.award import Award
 from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
+from backend.common.models.event_matchstats import EventMatchStats, TeamStatMap
 from backend.common.models.event_ranking import EventRanking
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey, MatchKey, TeamKey, TeamNumber
@@ -100,6 +101,17 @@ def make_match(match_key: MatchKey) -> Match:
         team_key_names=["frc1", "frc2", "frc3", "frc4", "frc5", "frc6"],
         youtube_videos=[],
     )
+
+
+def make_team_stat_map() -> TeamStatMap:
+    return {
+        "frc1": 0.0,
+        "frc2": 0.0,
+        "frc3": 0.0,
+        "frc4": 0.0,
+        "frc5": 0.0,
+        "frc6": 0.0,
+    }
 
 
 def mock_team_detail_url(m: RequestsMocker, team: Team) -> None:
@@ -190,6 +202,20 @@ def mock_event_awards_url(
     )
 
 
+def mock_event_matchstats_url(
+    m: RequestsMocker, event_key: EventKey, matchstats: EventMatchStats
+) -> None:
+    details = EventDetailsConverter(
+        EventDetails(id=event_key, matchstats=matchstats)
+    ).convert(ApiMajorVersion.API_V3)
+    m.register_uri(
+        "GET",
+        f"https://www.thebluealliance.com/api/v3/event/{event_key}/oprs",
+        headers={"X-TBA-Auth-Key": "test_apiv3"},
+        json=cast(Dict, details)["oprs"],
+    )
+
+
 def test_bootstrap_unknown_key() -> None:
     resp = LocalDataBootstrap.bootstrap_key("asdf", "asdf")
     assert resp is None
@@ -243,12 +269,19 @@ def test_bootstrap_event(ndb_context, requests_mock: RequestsMocker) -> None:
         year=2020,
         team_list=[],
     )
+    matchstats = EventMatchStats(
+        oprs=make_team_stat_map(),
+        dprs=make_team_stat_map(),
+        ccwms=make_team_stat_map(),
+        coprs={},
+    )
     mock_event_detail_url(requests_mock, event)
     mock_event_teams_url(requests_mock, event.key_name, [team1, team2])
     mock_event_matches_url(requests_mock, event.key_name, [match])
     mock_event_rankings_url(requests_mock, event.key_name, rankings)
     mock_event_alliances_url(requests_mock, event.key_name, alliances)
     mock_event_awards_url(requests_mock, event.key_name, [award])
+    mock_event_matchstats_url(requests_mock, event.key_name, matchstats)
 
     resp = LocalDataBootstrap.bootstrap_key("2020nyny", "test_apiv3")
     assert resp == "/event/2020nyny"
@@ -276,7 +309,10 @@ def test_bootstrap_event(ndb_context, requests_mock: RequestsMocker) -> None:
 
     stored_details = EventDetails.get_by_id("2020nyny")
     expected_details = EventDetails(
-        id="2020nyny", rankings2=rankings, alliance_selections=alliances,
+        id="2020nyny",
+        rankings2=rankings,
+        alliance_selections=alliances,
+        matchstats=matchstats,
     )
     assert expected_details == remove_auto_add_properties(stored_details)
 

@@ -33,9 +33,10 @@
         document.getElementById('coprSelector').innerText = component;
         document.getElementById('coprTableBody').innerHTML = '';
         coprs[component].forEach((e) => {
+            const teamId = e[0].slice(3);
             const teamLink = document.createElement('a');
-            teamLink.href = `/team/${e[0]}/{{ event.year }}`;
-            teamLink.innerText = e[0];
+            teamLink.href = `/team/${teamId}/{{ event.year }}`;
+            teamLink.innerText = teamId;
             const teamTd = document.createElement('td');
             teamTd.appendChild(teamLink);
 
