@@ -15,7 +15,12 @@ import numpy as np
 
 from backend.common.consts.alliance_color import ALLIANCE_COLORS
 from backend.common.consts.alliance_color import AllianceColor, OPPONENT
-from backend.common.models.event_matchstats import Component, EventMatchStats, StatType
+from backend.common.models.event_matchstats import (
+    Component,
+    EventMatchStats,
+    StatType,
+    TeamStatMap,
+)
 from backend.common.models.keys import TeamId
 from backend.common.models.match import Match
 
@@ -62,19 +67,21 @@ class MatchstatsHelper:
         )
 
     @classmethod
-    def calculate_oprs(cls, matches: List[Match], keyed: bool = True):
+    def calculate_oprs(cls, matches: List[Match], keyed: bool = True) -> TeamStatMap:
         return cls.calculate_stat(matches, cls.OPR_ACCESSOR, keyed=keyed)
 
     @classmethod
-    def calculate_dprs(cls, matches: List[Match], keyed: bool = True):
+    def calculate_dprs(cls, matches: List[Match], keyed: bool = True) -> TeamStatMap:
         return cls.calculate_stat(matches, cls.DPR_ACCESSOR, keyed=keyed)
 
     @classmethod
-    def calculate_ccwms(cls, matches: List[Match], keyed: bool = True):
+    def calculate_ccwms(cls, matches: List[Match], keyed: bool = True) -> TeamStatMap:
         return cls.calculate_stat(matches, cls.CCWM_ACCESSOR, keyed=keyed)
 
     @classmethod
-    def calculate_coprs(cls, matches: List[Match], keyed: bool = True):
+    def calculate_coprs(
+        cls, matches: List[Match], keyed: bool = True
+    ) -> Dict[Component, TeamStatMap]:
         coprs = {}
 
         # If there is not valid data for COPRs, skip
@@ -109,7 +116,7 @@ class MatchstatsHelper:
         matches: List[Match],
         point_accessor: Callable[[Match, AllianceColor], float],
         keyed: bool,
-    ):
+    ) -> TeamStatMap:
         if not matches:
             return {}
 
@@ -154,7 +161,7 @@ class MatchstatsHelper:
     @classmethod
     def __build_m_inv_matrix(
         cls, matches: List[Match], team_id_map: TTeamIdMap, played_only: bool = False,
-    ):  # TODO: add np.ndarray typing
+    ) -> "np.ndarray[float]":
         n = len(team_id_map.keys())
         m = np.zeros([n, n])
         for match in matches:
@@ -177,7 +184,7 @@ class MatchstatsHelper:
         matches: List[Match],
         team_id_map: TTeamIdMap,
         point_accessor: Callable[[Match, AllianceColor], float],
-    ):  # TODO: add np.ndarray typing
+    ) -> "np.ndarray[float]":
         n = len(team_id_map.keys())
         s = np.zeros((n, 1))
         for match in matches:

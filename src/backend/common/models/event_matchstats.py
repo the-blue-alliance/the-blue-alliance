@@ -1,12 +1,12 @@
 import enum
-from typing import Dict
+from typing import Dict, Union
 
 from typing_extensions import TypedDict
 
-from backend.common.models.keys import TeamKey
+from backend.common.models.keys import TeamId, TeamKey
 
 Component = str
-TeamStatMap = Dict[TeamKey, float]
+TeamStatMap = Dict[Union[TeamKey, TeamId], float]
 
 
 class EventMatchStats(TypedDict):
