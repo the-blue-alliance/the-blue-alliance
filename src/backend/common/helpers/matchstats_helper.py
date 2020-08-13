@@ -52,6 +52,12 @@ class MatchstatsHelper:
                 match.score_breakdown[color].get("autoCellPoints")
                 + match.score_breakdown[color].get("teleopCellPoints")
             ),
+        },
+        2019: {
+            "Cargo + Panel Points": lambda match, color: (
+                match.score_breakdown[color].get("cargoPoints")
+                + match.score_breakdown[color].get("hatchPanelPoints")
+            )
         }
     }
 

@@ -1,5 +1,6 @@
 import collections
 import json
+import re
 from typing import List, Optional
 
 from flask import abort, redirect, request
@@ -148,6 +149,11 @@ def event_detail(event_key: EventKey) -> Response:
             matchstats[component] = sorted(copr_dict.items(), key=lambda t: -t[1])[
                 :num_matchstats
             ]
+    matchstat_dropdown_id_map = {
+        k: re.sub('[^0-9a-zA-Z]+', '_', k)
+        for k in matchstats.keys()
+    }
+
 
     if event.now:
         matches_recent = MatchHelper.recentMatches(cleaned_matches)
@@ -219,6 +225,7 @@ def event_detail(event_key: EventKey) -> Response:
         "num_teams": num_teams,
         "matchstat_choices": list(matchstats.keys()),
         "matchstat_json": json.dumps(matchstats),
+        "matchstat_dropdown_id_map": matchstat_dropdown_id_map,
         "bracket_table": bracket_table,
         "playoff_advancement": playoff_advancement,
         "playoff_template": playoff_template,
