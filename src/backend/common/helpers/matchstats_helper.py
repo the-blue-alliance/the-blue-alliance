@@ -8,6 +8,7 @@
 
 # x is OPR and should be n x 1
 
+from collections import OrderedDict
 from typing import Callable, Dict, List
 from typing import Tuple
 
@@ -90,7 +91,7 @@ class MatchstatsHelper:
     def calculate_coprs(
         cls, matches: List[Match], keyed: bool = True
     ) -> Dict[Component, TeamStatMap]:
-        coprs = {}
+        coprs = OrderedDict()
 
         # If there is not valid data for COPRs, skip
         if not (
@@ -99,6 +100,12 @@ class MatchstatsHelper:
             and matches[0].score_breakdown is not None
         ):
             return coprs
+
+        # Specific components specified in cls
+        year = matches[0].year
+        if year in cls.COMPONENTS.keys():
+            for title, accessor in cls.COMPONENTS[year].items():
+                coprs[title] = cls.calculate_stat(matches, accessor, keyed=keyed)
 
         # for each string-like key in the score_breakdown object
         # (just take the red score_breakdown from match 0, it's an arbitrary selection)
@@ -111,12 +118,6 @@ class MatchstatsHelper:
                 coprs[component] = cls.calculate_stat(
                     matches, cls.DEFAULT_COMPONENT_ACCESSOR(component), keyed=keyed
                 )
-
-        # Specific components specified in cls
-        year = matches[0].year
-        if year in cls.COMPONENTS.keys():
-            for title, accessor in cls.COMPONENTS[year].items():
-                coprs[title] = cls.calculate_stat(matches, accessor, keyed=keyed)
 
         return coprs
 
