@@ -96,7 +96,7 @@ class TeamListYearQuery(CachedDatabaseQuery[List[Team]]):
         return TeamListQuery._team_affected_queries(team_key=team_key)
 
 
-class DistrictTeamsQuery(DatabaseQuery[List[Team]]):
+class DistrictTeamsQuery(CachedDatabaseQuery[List[Team]]):
     CACHE_KEY_FORMAT = "district_teams_{district_key}"
     CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
