@@ -37,3 +37,12 @@ def test_get_data() -> None:
 
     years = TeamParticipationQuery(team_key="frc254").fetch()
     assert years == {2020, 2019, 2018}
+
+
+def test_affected_queries() -> None:
+    assert {
+        q.cache_key
+        for q in TeamParticipationQuery._eventteam_affected_queries(
+            team_key="frc254", event_key="test", year=2020
+        )
+    } == {TeamParticipationQuery(team_key="frc254").cache_key}

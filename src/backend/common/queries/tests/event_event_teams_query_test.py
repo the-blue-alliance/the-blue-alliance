@@ -30,3 +30,12 @@ def test_get_data() -> None:
 
     event_teams = EventEventTeamsQuery(event_key="2020ct").fetch()
     assert len(event_teams) == 10
+
+
+def test_affected_queries() -> None:
+    assert {
+        q.cache_key
+        for q in EventEventTeamsQuery._eventteam_affected_queries(
+            event_key="2020casj", team_key="frc254", year=2020
+        )
+    } == {EventEventTeamsQuery(event_key="2020casj").cache_key}

@@ -42,3 +42,43 @@ def test_get_data() -> None:
 
     teams = EventTeamsQuery(event_key="2020ct").fetch()
     assert len(teams) == len(stored_teams)
+
+
+def test_affected_queries() -> None:
+    stored_teams1 = preseed_teams(1, 10)
+    stored_teams2 = preseed_teams(100, 110)
+    preseed_event_teams(stored_teams1, "2020aaa")
+    preseed_event_teams(stored_teams2, "2020bbb")
+    preseed_event_teams(stored_teams1 + stored_teams2, "2020ccc")
+
+    for team_key in stored_teams1:
+        assert {
+            q.cache_key
+            for q in EventTeamsQuery._eventteam_affected_queries(
+                event_key="2020aaa", team_key=team_key.id(), year=2020
+            )
+        } == {EventTeamsQuery(event_key="2020aaa").cache_key}
+
+        assert {
+            q.cache_key
+            for q in EventTeamsQuery._team_affected_queries(team_key=team_key.id())
+        } == {
+            EventTeamsQuery(event_key="2020aaa").cache_key,
+            EventTeamsQuery(event_key="2020ccc").cache_key,
+        }
+
+    for team_key in stored_teams2:
+        assert {
+            q.cache_key
+            for q in EventTeamsQuery._eventteam_affected_queries(
+                event_key="2020bbb", team_key=team_key.id(), year=2020
+            )
+        } == {EventTeamsQuery(event_key="2020bbb").cache_key}
+
+        assert {
+            q.cache_key
+            for q in EventTeamsQuery._team_affected_queries(team_key=team_key.id())
+        } == {
+            EventTeamsQuery(event_key="2020bbb").cache_key,
+            EventTeamsQuery(event_key="2020ccc").cache_key,
+        }

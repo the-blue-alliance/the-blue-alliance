@@ -8,12 +8,18 @@ from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
 from backend.common.models.team import Team
-from backend.common.queries.database_query import DatabaseQuery
+from backend.common.queries.database_query import CachedDatabaseQuery
 from backend.common.queries.dict_converters.team_converter import TeamConverter
 from backend.common.tasklets import typed_tasklet
 
 
-class TeamQuery(DatabaseQuery[Optional[Team]]):
+def _get_team_page_num(team_key: str) -> int:
+    return int(int(team_key[3:]) / TeamListQuery.PAGE_SIZE)
+
+
+class TeamQuery(CachedDatabaseQuery[Optional[Team]]):
+    CACHE_KEY_FORMAT = "team_{team_key}"
+    CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
 
     def __init__(self, team_key: TeamKey) -> None:
@@ -24,8 +30,14 @@ class TeamQuery(DatabaseQuery[Optional[Team]]):
         team = yield Team.get_by_id_async(team_key)
         return team
 
+    @classmethod
+    def _team_affected_queries(cls, team_key: TeamKey) -> Set[CachedDatabaseQuery]:
+        return {cls(team_key=team_key)}
 
-class TeamListQuery(DatabaseQuery[List[Team]]):
+
+class TeamListQuery(CachedDatabaseQuery[List[Team]]):
+    CACHE_KEY_FORMAT = "team_list_{page}"
+    CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
     PAGE_SIZE: int = 500
 
@@ -43,8 +55,14 @@ class TeamListQuery(DatabaseQuery[List[Team]]):
         )
         return list(teams)
 
+    @classmethod
+    def _team_affected_queries(cls, team_key: TeamKey) -> Set[CachedDatabaseQuery]:
+        return {cls(page=_get_team_page_num(team_key))}
 
-class TeamListYearQuery(DatabaseQuery[List[Team]]):
+
+class TeamListYearQuery(CachedDatabaseQuery[List[Team]]):
+    CACHE_KEY_FORMAT = "team_list_year_{year}_{page}"
+    CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
 
     def __init__(self, year: Year, page: int) -> None:
@@ -67,8 +85,20 @@ class TeamListYearQuery(DatabaseQuery[List[Team]]):
         )
         return list(teams)
 
+    @classmethod
+    def _eventteam_affected_queries(
+        cls, event_key: EventKey, team_key: TeamKey, year: Year
+    ) -> Set[CachedDatabaseQuery]:
+        return {cls(year=year, page=_get_team_page_num(team_key))}
 
-class DistrictTeamsQuery(DatabaseQuery[List[Team]]):
+    @classmethod
+    def _team_affected_queries(cls, team_key: str) -> Set[CachedDatabaseQuery]:
+        return TeamListQuery._team_affected_queries(team_key=team_key)
+
+
+class DistrictTeamsQuery(CachedDatabaseQuery[List[Team]]):
+    CACHE_KEY_FORMAT = "district_teams_{district_key}"
+    CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
 
     def __init__(self, district_key: DistrictKey) -> None:
@@ -84,7 +114,9 @@ class DistrictTeamsQuery(DatabaseQuery[List[Team]]):
         return list(teams)
 
 
-class EventTeamsQuery(DatabaseQuery[List[Team]]):
+class EventTeamsQuery(CachedDatabaseQuery[List[Team]]):
+    CACHE_KEY_FORMAT = "event_teams_{event_key}"
+    CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
 
     def __init__(self, event_key: EventKey) -> None:
@@ -92,15 +124,37 @@ class EventTeamsQuery(DatabaseQuery[List[Team]]):
 
     @typed_tasklet
     def _query_async(self, event_key: EventKey) -> List[Team]:
-        event_teams = yield EventTeam.query(
+        event_team_keys = yield EventTeam.query(
             EventTeam.event == ndb.Key(Event, event_key)
-        ).fetch_async()
-        team_keys = map(lambda event_team: event_team.team, event_teams)
+        ).fetch_async(keys_only=True)
+        team_keys = map(
+            lambda event_team_key: ndb.Key(Team, event_team_key.id().split("_")[1]),
+            event_team_keys,
+        )
         teams = yield ndb.get_multi_async(team_keys)
         return list(teams)
 
+    @classmethod
+    def _eventteam_affected_queries(
+        cls, event_key: str, team_key: str, year: int
+    ) -> Set[CachedDatabaseQuery]:
+        return {cls(event_key=event_key)}
 
-class EventEventTeamsQuery(DatabaseQuery[List[EventTeam]]):
+    @classmethod
+    def _team_affected_queries(cls, team_key: TeamKey) -> Set[CachedDatabaseQuery]:
+        event_team_keys_future = EventTeam.query(
+            EventTeam.team == ndb.Key(Team, team_key)
+        ).fetch_async(keys_only=True)
+
+        return {
+            cls(event_key=event_team_key.id().split("_")[0])
+            for event_team_key in event_team_keys_future.get_result()
+        }
+
+
+class EventEventTeamsQuery(CachedDatabaseQuery[List[EventTeam]]):
+    CACHE_KEY_FORMAT = "event_event_teams_{event_key}"
+    CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
 
     def __init__(self, event_key: EventKey) -> None:
@@ -113,8 +167,16 @@ class EventEventTeamsQuery(DatabaseQuery[List[EventTeam]]):
         ).fetch_async()
         return event_teams
 
+    @classmethod
+    def _eventteam_affected_queries(
+        cls, event_key: EventKey, team_key: TeamKey, year: Year
+    ) -> Set[CachedDatabaseQuery]:
+        return {cls(event_key=event_key)}
 
-class TeamParticipationQuery(DatabaseQuery[Set[int]]):
+
+class TeamParticipationQuery(CachedDatabaseQuery[Set[int]]):
+    CACHE_KEY_FORMAT = "team_participation_{team_key}"
+    CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
 
     def __init__(self, team_key: TeamKey) -> None:
@@ -127,3 +189,21 @@ class TeamParticipationQuery(DatabaseQuery[Set[int]]):
         ).fetch_async(keys_only=True)
         years = map(lambda event_team: int(event_team.id()[:4]), event_teams)
         return set(years)
+
+    @classmethod
+    def _eventteam_affected_queries(
+        cls, event_key: EventKey, team_key: TeamKey, year: Year
+    ) -> Set[CachedDatabaseQuery]:
+        return {cls(team_key=team_key)}
+
+
+"""
+class TeamDistrictsQuery(CachedDatabaseQuery[List[District]]):
+
+    @ndb.tasklet
+    def _query_async(self, team_key: str) -> List[District]:
+        team_key = self._query_args[0]
+        district_team_keys = yield DistrictTeam.query(DistrictTeam.team == ndb.Key(Team, team_key)).fetch_async(keys_only=True)
+        districts = yield ndb.get_multi_async([ndb.Key(District, dtk.id().split('_')[0]) for dtk in district_team_keys])
+        return filter(lambda x: x is not None, districts)
+"""
