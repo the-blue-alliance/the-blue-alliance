@@ -31,7 +31,7 @@ class TeamQuery(CachedDatabaseQuery[Optional[Team]]):
         return team
 
     @classmethod
-    def _team_affected_queries(cls, team_key: str) -> Set[CachedDatabaseQuery]:
+    def _team_affected_queries(cls, team_key: TeamKey) -> Set[CachedDatabaseQuery]:
         return {cls(team_key=team_key)}
 
 
@@ -56,7 +56,7 @@ class TeamListQuery(CachedDatabaseQuery[List[Team]]):
         return list(teams)
 
     @classmethod
-    def _team_affected_queries(cls, team_key: str) -> Set[CachedDatabaseQuery]:
+    def _team_affected_queries(cls, team_key: TeamKey) -> Set[CachedDatabaseQuery]:
         return {cls(page=_get_team_page_num(team_key))}
 
 
@@ -87,7 +87,7 @@ class TeamListYearQuery(CachedDatabaseQuery[List[Team]]):
 
     @classmethod
     def _eventteam_affected_queries(
-        cls, event_key: str, team_key: str, year: int
+        cls, event_key: EventKey, team_key: TeamKey, year: Year
     ) -> Set[CachedDatabaseQuery]:
         return {cls(year=year, page=_get_team_page_num(team_key))}
 
@@ -141,7 +141,7 @@ class EventTeamsQuery(CachedDatabaseQuery[List[Team]]):
         return {cls(event_key=event_key)}
 
     @classmethod
-    def _team_affected_queries(cls, team_key: str) -> Set[CachedDatabaseQuery]:
+    def _team_affected_queries(cls, team_key: TeamKey) -> Set[CachedDatabaseQuery]:
         event_team_keys_future = EventTeam.query(
             EventTeam.team == ndb.Key(Team, team_key)
         ).fetch_async(keys_only=True)
@@ -169,7 +169,7 @@ class EventEventTeamsQuery(CachedDatabaseQuery[List[EventTeam]]):
 
     @classmethod
     def _eventteam_affected_queries(
-        cls, event_key: str, team_key: str, year: int
+        cls, event_key: EventKey, team_key: TeamKey, year: Year
     ) -> Set[CachedDatabaseQuery]:
         return {cls(event_key=event_key)}
 
@@ -192,7 +192,7 @@ class TeamParticipationQuery(CachedDatabaseQuery[Set[int]]):
 
     @classmethod
     def _eventteam_affected_queries(
-        cls, event_key: str, team_key: str, year: int
+        cls, event_key: EventKey, team_key: TeamKey, year: Year
     ) -> Set[CachedDatabaseQuery]:
         return {cls(team_key=team_key)}
 
