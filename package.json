@@ -38,7 +38,7 @@
     "underscore": "^1.10.2"
   },
   "devDependencies": {
-    "babel-eslint": "^7.1.1",
+    "babel-eslint": "^10.1.0",
     "babel-jest": "^26.3.0",
     "babelify": "^10.0.0",
     "browserify": "^16.5.2",
