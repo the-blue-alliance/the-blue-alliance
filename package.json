@@ -25,7 +25,7 @@
     "react-dom": "^15.0.1",
     "react-event-listener": "^0.6.6",
     "react-file-input": "^0.2.5",
-    "react-ga": "^2.5.7",
+    "react-ga": "^3.1.2",
     "react-native-listener": "^1.0.1",
     "react-redux": "^5.1.2",
     "react-select": "^1.0.0-rc.5",
