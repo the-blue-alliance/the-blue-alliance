@@ -19,7 +19,7 @@
     "react": "^15.4.1",
     "react-addons-transition-group": "^15.4.1",
     "react-bootstrap": "^0.32.4",
-    "react-bootstrap-dialog": "^0.9.1",
+    "react-bootstrap-dialog": "^0.13.0",
     "react-bootstrap-typeahead": "^3.4.7",
     "react-countup": "^4.3.3",
     "react-dom": "^15.0.1",
