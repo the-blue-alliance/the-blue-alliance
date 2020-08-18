@@ -7,7 +7,7 @@ function get_config_prop {
     if [ -f "tba_dev_config.local.json" ]; then
         local dev_config_file="tba_dev_config.local.json"
     fi
-    
+
     jq -r -s ".[0] * (.[1] // {}) | .$prop_name" tba_dev_config.json $dev_config_file
 }
 
