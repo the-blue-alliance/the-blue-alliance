@@ -28,6 +28,9 @@ handlers:
   - url: /robots.txt
     static_files: backend/web/static/robots.txt
     upload: backend/web/static/robots.txt
+  - url: /.well-known
+    static_dir: backend/web/static/well-known
+    mime_type: application/json
 
   - url: /.*
     script: auto
