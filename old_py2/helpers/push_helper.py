@@ -40,6 +40,7 @@ class PushHelper(object):
 
     @classmethod
     def user_email_to_id(cls, user_email):
+        # TODO: Note to Zach - fix this for the new Firebase Auth - we should be able to get a User from an email easy
         """
         Returns the user id for a given email address (or None if invalid)
         workaround for this bug: https://code.google.com/p/googleappengine/issues/detail?id=8848
