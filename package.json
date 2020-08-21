@@ -34,7 +34,7 @@
     "redux-thunk": "^2.0.1",
     "reselect": "^4.0.0",
     "swagger-client": "3.10.12",
-    "swagger-ui": "^3.32.3",
+    "swagger-ui": "^3.32.4",
     "underscore": "^1.10.2"
   },
   "devDependencies": {
