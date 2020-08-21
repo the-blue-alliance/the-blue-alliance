@@ -9,7 +9,7 @@
     "babel-polyfill": "^6.8.0",
     "classnames": "^2.2.3",
     "element-resize-event": "^3.0.3",
-    "firebase": "^7.18.0",
+    "firebase": "^7.19.0",
     "firedux": "^1.1.0",
     "heatmap.js": "^2.0.5",
     "material-ui": "^0.20.2",
