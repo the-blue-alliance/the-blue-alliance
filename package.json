@@ -54,7 +54,7 @@
     "gulp-less": "^4.0.1",
     "gulp-rename": "^1.2.2",
     "gulp-sourcemaps": "^1.6.0",
-    "gulp-uglify": "^2.0.0",
+    "gulp-uglify-es": "^2.0.0",
     "jest-cli": "^24.8.0",
     "less": "3.10.3",
     "md5": "^2.2.1",
