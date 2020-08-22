@@ -2,7 +2,7 @@ import datetime
 from unittest.mock import ANY, Mock, patch
 
 from firebase_admin import auth
-from flask import session
+from flask import Flask, session
 
 import backend.web.auth as backend_auth
 from backend.web.auth import (
@@ -15,15 +15,11 @@ from backend.web.auth import (
 from backend.web.models.user import User
 
 
-def test_create_session_cookie() -> None:
+def test_create_session_cookie(secret_app: Flask) -> None:
     id_token = "abc"
     expires_in = datetime.timedelta(seconds=1)
 
-    from backend.web.main import app
-
-    app.secret_key = "test_secret_key"
-
-    with app.test_request_context("/"):
+    with secret_app.test_request_context("/"):
         assert session.get("session") is None
 
         with patch.object(auth, "create_session_cookie") as mock_create_session_cookie:
@@ -35,12 +31,8 @@ def test_create_session_cookie() -> None:
         assert session["session"] is not None
 
 
-def test_revoke_session_cookie_no_claims() -> None:
-    from backend.web.main import app
-
-    app.secret_key = "test_secret_key"
-
-    with app.test_request_context("/"):
+def test_revoke_session_cookie_no_claims(secret_app: Flask) -> None:
+    with secret_app.test_request_context("/"):
         session["session"] = "abc"
 
         with patch.object(
@@ -52,14 +44,10 @@ def test_revoke_session_cookie_no_claims() -> None:
         assert session.get("session") is None
 
 
-def test_revoke_session_cookie() -> None:
+def test_revoke_session_cookie(secret_app: Flask) -> None:
     sub = "sub"
 
-    from backend.web.main import app
-
-    app.secret_key = "test_secret_key"
-
-    with app.test_request_context("/"):
+    with secret_app.test_request_context("/"):
         session["session"] = "abc"
 
         with patch.object(
@@ -71,22 +59,14 @@ def test_revoke_session_cookie() -> None:
         assert session.get("session") is None
 
 
-def test_decoded_claims_no_session() -> None:
-    from backend.web.main import app
-
-    app.secret_key = "test_secret_key"
-
-    with app.test_request_context("/"):
+def test_decoded_claims_no_session(secret_app: Flask) -> None:
+    with secret_app.test_request_context("/"):
         assert session.get("session") is None
         assert _decoded_claims() is None
 
 
-def test_decoded_claims_throw_error() -> None:
-    from backend.web.main import app
-
-    app.secret_key = "test_secret_key"
-
-    with app.test_request_context("/"):
+def test_decoded_claims_throw_error(secret_app: Flask) -> None:
+    with secret_app.test_request_context("/"):
         session["session"] = "abc"
 
         error_mock = Mock()
@@ -101,12 +81,8 @@ def test_decoded_claims_throw_error() -> None:
         mock_verify_session_cookie.assert_called_once()
 
 
-def test_decoded_claims() -> None:
-    from backend.web.main import app
-
-    app.secret_key = "test_secret_key"
-
-    with app.test_request_context("/"):
+def test_decoded_claims(secret_app: Flask) -> None:
+    with secret_app.test_request_context("/"):
         session["session"] = "abc"
 
         mock_decoded_claims = {"email": "zach@thebluealliance.com"}

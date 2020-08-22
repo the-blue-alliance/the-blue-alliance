@@ -4,11 +4,13 @@ from flask import Flask
 
 from backend.common.middleware import install_middleware
 from backend.common.profiler import send_traces, Span, trace_context
+from backend.common.sitevars.secrets import Secrets
 
 
 def setup_app():
     app = Flask(__name__)
-    install_middleware(app)
+    with patch.object(Secrets, "secret_key", return_value="thebluealliance"):
+        install_middleware(app)
     return app
 
 
