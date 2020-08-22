@@ -12,6 +12,8 @@
   <h1>{{ suggestions_and_references|length }} Pending CAD Suggestions</h1>
 
   <form action="/suggest/cad/review" method="post" id='review_designs'>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
       <div class="col-xs-12">
 
           <div class="row">

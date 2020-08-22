@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_wtf.csrf import CSRFProtect
 
 from backend.common.logging import configure_logging
 from backend.common.middleware import install_middleware
@@ -20,6 +21,9 @@ configure_logging()
 
 app = Flask(__name__)
 install_middleware(app)
+
+csrf = CSRFProtect()
+csrf.init_app(app)
 
 app.add_url_rule("/", view_func=index)
 app.add_url_rule("/gameday", view_func=gameday)

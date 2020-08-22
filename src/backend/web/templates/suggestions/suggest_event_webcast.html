@@ -75,6 +75,7 @@
           {% endif %}
           <p>Find a webcast for {{event.name}} and paste it below so we can add it to the site :)</p>
           <form action="/suggest/event/webcast" method="post" id="suggest_webcast">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <input name="event_key" type="hidden" value="{{event.key.id()}}" />
             <div class="form-group">
               <label>Webcast Link</label>

@@ -13,6 +13,7 @@
   <h1>{{ suggestions_and_references|length }} Pending Team Social Media Suggestions</h1>
 
   <form action="/suggest/team/social/review" method="post" id="review_social">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
       <div class="col-xs-12">
 
           <div class="row">

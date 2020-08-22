@@ -84,6 +84,7 @@
             <h4>Message for the User</h4>
             <p><textarea name="user_message" form="apiwrite_review_{{ suggestion_id }}">Thanks for helping make TBA better!</textarea></p>
 
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <input type="hidden" name="suggestion_id" value="{{ suggestion_id }}" />
             <button type="submit" class="btn btn-primary" name="verdict" value="accept"><span class="glyphicon glyphicon-thumbs-up"></span> Add Auth</button>
             <button type="submit" class="btn btn-danger" name="verdict" value="reject"><span class="glyphicon glyphicon-thumbs-down"></span> Reject</button>

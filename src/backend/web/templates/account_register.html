@@ -20,6 +20,7 @@
           </tbody>
         </table>
         <input name="account_id" type="hidden" value="{{user_bundle.account.key.id()}}" />
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Create Account</button>
         <a class="btn btn-warning" href="{{logout_url}}"><span class="glyphicon glyphicon-remove"></span> Cancel and Logout</a>
       </form>

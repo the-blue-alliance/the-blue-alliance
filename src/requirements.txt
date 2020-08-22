@@ -9,3 +9,4 @@ pyre-extensions==0.0.18
 typing-extensions==3.7.4.2
 requests==2.24.0
 numpy==1.19.1
+Flask-WTF==0.14.3

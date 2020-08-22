@@ -40,6 +40,7 @@
   {% for team_link in existing_access %}
   <h2>Team {{team_link.team_number}}</h2>
   <form action="/mod" method="post" id="team-info-frc{{team_link.team_number}}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <input type="hidden" name="team_number" value="{{team_link.team_number}}" />
     <input name="action" type="hidden" value="set_team_info" />
     <table class="table table-striped table-hover">

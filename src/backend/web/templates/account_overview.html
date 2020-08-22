@@ -164,6 +164,7 @@
           <label for="form-description">Description</label>
           <input type="text" class="form-control" id="form-description" name="description" placeholder="My Scouting App v1">
         </div>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> Add New Key</button>
       </form>
 
@@ -192,6 +193,7 @@
               <td>
                 <form class="form-inline" action="/account/api/read_key_delete" method="post">
                   <input type="hidden" name="key_id" value="{{key.key.id()}}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                   <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Delete</button>
                 </form>
               </td>
@@ -316,6 +318,7 @@
               <td><form action="/notifications/broadcast" method="post">
                 <input name="account_id" type="hidden" value="{{user_bundle.account.key.id()}}" />
                 <input name="client_id" type="hidden" value="{{client.key.id()}}" />
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <button type="submit" class="btn btn-default" {{ping_enabled}}><span class="glyphicon glyphicon-cloud"></span> Ping</button>
               </form></td>
               <td>
@@ -323,6 +326,7 @@
                 <form action="/webhooks/delete" method="post">
                   <input name="account_id" type="hidden" value="{{user_bundle.account.key.id()}}" />
                   <input name="client_id" type="hidden" value="{{client.key.id()}}" />
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                   <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Delete</button>
                 </form>
                 {% endif %}
@@ -336,6 +340,7 @@
                     <form action="/webhooks/send_verification" method="post">
                     <input name="account_id" type="hidden" value="{{user_bundle.account.key.id()}}" />
                     <input name="client_id" type="hidden" value="{{client.key.id()}}" />
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-send"></span> Resend Code</button>
                     </form>
                   {% endif %}

@@ -62,6 +62,7 @@
           <h4>Add another video</h4>
           {% endif %}
           <form action="/suggest/match/video" method="post" id="suggest_match_video">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <input name="match_key" type="hidden" value="{{match.key.id()}}" />
             <div class="input-group">
               <input class="form-control" type="text" name="youtube_url" placeholder="https://www.youtube.com/watch?v=MQ0VNzIvHx0" value="" />

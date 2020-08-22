@@ -12,6 +12,7 @@
     <h1>{{ suggestions_and_events|length }} Pending Match Video Suggestions</h1>
 
     <form action="/suggest/match/video/review" method="post" id="review_videos">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div class="col-xs-12">
 
             <div class="row">
