@@ -8,7 +8,7 @@ const less = require('gulp-less');
 const rename = require('gulp-rename');
 const sourcemaps = require('gulp-sourcemaps');
 const cleanCSS = require('gulp-clean-css');
-const uglify = require('gulp-uglify');
+const uglify = require('gulp-uglify-es').default;
 const buffer = require('vinyl-buffer');
 const gulpif = require('gulp-if');
 
