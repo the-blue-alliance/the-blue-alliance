@@ -202,3 +202,19 @@ def get_team_event_participation(
     soup = bs4.BeautifulSoup(resp_data, "html.parser")
     event = soup.find(id=event_key)
     return TeamEventParticipation(event_name=event.find("h3").string.strip(),)
+
+
+def assert_alert(div: bs4.element.Tag, title: str, message: str, success: bool) -> None:
+    # Ensure our status alert contains 1) a close button, 2) a h4, 3) a status message
+    close_button = div.find(
+        "button", attrs={"type": "button", "class": "close", "data-dismiss": "alert"}
+    )
+    assert close_button
+    assert close_button.text.encode("utf-8") == b"\xc3\x97"
+    assert ("alert-success" if success else "alert-danger") in div.attrs["class"]
+    alert_title = div.find("h4")
+    assert alert_title
+    assert alert_title.text == title
+    alert_message = div.find("p")
+    assert alert_message
+    assert alert_message.text == message

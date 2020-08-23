@@ -1,6 +1,6 @@
 <nav class="navbar navbar-inverse navbar-fixed-bottom" id="admin-bar">
   <div class="container">
-    <p class="navbar-text">Admin logged in as {{ user_bundle.account.display_name }}</p>
+    <p class="navbar-text">Admin logged in as {{ user.display_name }}</p>
     <form class="navbar-form navbar-left" action="/admin/memcache" method="post">
       <input name="memcache_key" value="{{cache_key}}" type="hidden" />
       <input name="return_url" value="{{return_url}}" type="hidden" />

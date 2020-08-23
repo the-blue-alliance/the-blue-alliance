@@ -7,7 +7,7 @@
 {% block content %}
 <div class="container">
   {% if status %}
-  <div class="row">
+  <div id="status-row" class="row">
     <div class="col-md-10 col-md-offset-1">
       {% if status == 'account_edit_success' %}
         <div class="alert alert-success">
@@ -15,17 +15,11 @@
           <h4>Success!</h4>
           <p>Your profile has been updated.</p>
         </div>
-      {% elif status == 'account_edit_failure' %}
-      <div class="alert alert-danger">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        <h4>Oops!</h4>
-        <p>Something went wrong with editing your profile. Please contact support if the problem persists.</p>
-      </div>
       {% elif status == 'read_key_add_success' %}
         <div class="alert alert-success">
           <button type="button" class="close" data-dismiss="alert">&times;</button>
           <h4>Success!</h4>
-          <p>A new read API key has been successfully added!</p>
+          <p>A new read API key has been successfully added.</p>
         </div>
       {% elif status == 'read_key_add_no_description' %}
       <div class="alert alert-danger">
@@ -51,7 +45,7 @@
   {% endif %}
 
   {% if webhook_verification_success %}
-  <div class="row">
+  <div id="webhook-row" class="row">
     <div class="col-md-10 col-md-offset-1">
       <div class="alert alert-success">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -62,19 +56,19 @@
   </div>
   {% endif %}
   {% if ping_sent %}
-  <div class="row">
+  <div id="ping-row" class="row">
     <div class="col-md-10 col-md-offset-1">
       {% if ping_sent == '1' %}
       <div class="alert alert-success">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <h4>Success!</h4>
-        <p>Ping was sent</p>
+        <p>Ping was sent.</p>
       </div>
       {% elif ping_sent == '0' %}
       <div class="alert alert-danger">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <h4>Failure</h4>
-        <p>Failed to send ping</p>
+        <p>Failed to send ping.</p>
       </div>
       {% endif %}
     </div>
@@ -83,9 +77,9 @@
   <div class="row">
     <div class="col-md-10 col-md-offset-1">
       <p class="pull-right">
-        <a class="btn btn-warning" href="/logout"><span class="glyphicon glyphicon-remove"></span> Logout</a>
+        <a class="btn btn-warning" href="{{ url_for('account.logout') }}"><span class="glyphicon glyphicon-remove"></span> Logout</a>
       </p>
-      <h1>Welcome Back, {{user_bundle.account.display_name}}!</h1>
+      <h1>Welcome Back, {{ user.display_name }}!</h1>
     </div>
   </div>
 
@@ -98,15 +92,15 @@
         <tbody>
           <tr>
             <td>Name (Public): </td>
-            <td>{{user_bundle.account.display_name}}</td>
+            <td>{{ user.display_name }}</td>
           </tr>
           <tr>
             <td>Email: </td>
-            <td>{{user_bundle.account.email}}</td>
+            <td>{{ user.email }}</td>
           </tr>
         </tbody>
       </table>
-      <p><a class="btn btn-primary" href="/account/edit"><span class="glyphicon glyphicon-pencil"></span> Edit Profile</a></p>
+      <p><a class="btn btn-primary" href="{{ url_for('account.edit') }}"><span class="glyphicon glyphicon-pencil"></span> Edit Profile</a></p>
     </div>
   </div>
   <hr>
@@ -179,7 +173,7 @@
           <th></th>
         </tr>
         <tbody>
-          {% for key in read_keys %}
+          {% for key in api_read_keys %}
             <tr>
               <td>
                 {{ key.key.id() }}
@@ -220,7 +214,7 @@
           <th>Auth Secret</th>
         </tr>
         <tbody>
-          {% for key in write_keys %}
+          {% for key in api_write_keys %}
             <tr>
               <td><ul>
               {% for event in key.event_list %}
@@ -260,7 +254,7 @@
   <hr>
 
   {% if review_permissions %}
-  <div class="row">
+  <div id="review-permissions-row" class="row">
     <div class="col-md-10 col-md-offset-1">
       <h2>Suggestion Reviews</h2>
       <p>Your account has permission to help review Suggestion submissions!</p>
@@ -269,12 +263,8 @@
       <table class="table table-striped">
         <tbody>
           <tr>
-            <td>Pending: </td>
-            <td>{{total_pending}}</td>
-          </tr>
-          <tr>
             <td>Reviewed: </td>
-            <td>{{num_reviewed}}</td>
+            <td>{{submissions_reviewed}}</td>
           </tr>
         </tbody>
       </table>
@@ -291,8 +281,8 @@
     <div class="col-md-10 col-md-offset-1">
       <p class="notifications-disabled-visible">Push notifications (beta) for this device are <strong>disabled</strong>! <a class="btn btn-success" role="button" onclick="setupMessaging(true)">Enable</a></p>
       <p class="notifications-enabled-visible">Push notifications (beta) for this device are <strong>enabled</strong>! <a class="btn btn-danger" role="button" onclick="disableMessaging()">Disable</a></p>
-      {% if user_bundle.mobile_clients %}
-      <p>All devices will appear below, whether or not push notifications are enabled or disabled for a specific device.</p>
+      {% if user.mobile_clients %}
+      < p>All devices will appear below, whether or not push notifications are enabled or disabled for a specific device.</p>
       <table class="table table-striped">
         <tr>
           <th>Type</th>
@@ -302,8 +292,8 @@
           <th></th>
           <th></th>
         </tr>
-          {% for client in user_bundle.mobile_clients %}
-            <tr>
+          {% for client in user.mobile_clients %}
+            < tr>
               <td>{{ client.type_string }}</td>
               <td> {{ client.display_name }} </td>
               <td>
@@ -316,15 +306,15 @@
                 {% endif %}
               </td>
               <td><form action="/notifications/broadcast" method="post">
-                <input name="account_id" type="hidden" value="{{user_bundle.account.key.id()}}" />
+                <input name="account_id" type="hidden" value="{{ user.uid }}" />
                 <input name="client_id" type="hidden" value="{{client.key.id()}}" />
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" class="btn btn-default" {{ping_enabled}}><span class="glyphicon glyphicon-cloud"></span> Ping</button>
+                <button type="submit" class="ping btn btn-default" {{ping_enabled}}><span class="glyphicon glyphicon-cloud"></span> Ping</button>
               </form></td>
               <td>
                 {% if client.is_webhook %}
                 <form action="/webhooks/delete" method="post">
-                  <input name="account_id" type="hidden" value="{{user_bundle.account.key.id()}}" />
+                  <input name="account_id" type="hidden" value="{{ user.uid }}" />
                   <input name="client_id" type="hidden" value="{{client.key.id()}}" />
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                   <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Delete</button>
@@ -338,7 +328,7 @@
                   {% else %}
                     <a href="/webhooks/verify/{{client.key.id()}}"><button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span> Verify</button></a>
                     <form action="/webhooks/send_verification" method="post">
-                    <input name="account_id" type="hidden" value="{{user_bundle.account.key.id()}}" />
+                    <input name="account_id" type="hidden" value="{{ user.uid }}" />
                     <input name="client_id" type="hidden" value="{{client.key.id()}}" />
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-send"></span> Resend Code</button>

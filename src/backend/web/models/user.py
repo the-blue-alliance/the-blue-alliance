@@ -2,6 +2,7 @@ from typing import Any, Dict, List, Optional
 
 from pyre_extensions import none_throws
 
+from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.models.account import Account
 from backend.common.models.api_auth_access import ApiAuthAccess
@@ -70,6 +71,12 @@ class User:
         if self._account is None:
             return False
         return none_throws(self._account).registered
+
+    @property
+    def permissions(self) -> Optional[List[AccountPermission]]:
+        if self._account is None:
+            return None
+        return none_throws(self._account).permissions
 
     @property
     def mobile_clients(self) -> List[MobileClient]:

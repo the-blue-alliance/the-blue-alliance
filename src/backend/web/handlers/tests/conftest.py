@@ -1,5 +1,9 @@
+from typing import Any, Dict, Generator, List, Tuple
+
 import pytest
-from werkzeug.test import Client
+from flask import template_rendered
+from flask.testing import FlaskClient
+from jinja2 import Template
 
 
 @pytest.fixture(autouse=True)
@@ -8,10 +12,32 @@ def auto_add_ndb_stub(ndb_stub) -> None:
 
 
 @pytest.fixture
-def web_client() -> Client:
+def web_client() -> FlaskClient:
     from backend.web.main import app
 
+    # Disable CSRF protection for unit testing
+    app.config["WTF_CSRF_CHECK_DEFAULT"] = False
+
     return app.test_client()
+
+
+CapturedTemplate = Tuple[Template, Dict[str, Any]]  # (template, context)
+
+
+@pytest.fixture
+def captured_templates() -> Generator[List[CapturedTemplate], None, None]:
+    from backend.web.main import app
+
+    recorded = []
+
+    def record(sender, template, context, **extra):
+        recorded.append((template, context))
+
+    template_rendered.connect(record, app)
+    try:
+        yield recorded
+    finally:
+        template_rendered.disconnect(record, app)
 
 
 @pytest.fixture

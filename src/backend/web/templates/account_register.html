@@ -8,9 +8,9 @@
 <div class="container">
   <div class="row">
     <div class="col-md-8 col-md-offset-2">
-      <h1>Greetings, {{user_bundle.user.nickname()}}!</h1>
+      <h1>Greetings, {{ user.nickname }}!</h1>
       <p>Fill out this short form to finish signing up for a TBA account.</p>
-      <form class="account_signup_form" action="/account/register{% if redirect %}?redirect={{redirect}}{% endif %}" method="post">
+      <form class="account_signup_form" action="{{ url_for('account.register', next=next) }}" method="post">
         <table class="table table-striped">
           <tbody>
             <tr>
@@ -19,10 +19,10 @@
             </tr>
           </tbody>
         </table>
-        <input name="account_id" type="hidden" value="{{user_bundle.account.key.id()}}" />
+        <input name="account_id" type="hidden" value="{{ user.uid }}" />
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Create Account</button>
-        <a class="btn btn-warning" href="{{logout_url}}"><span class="glyphicon glyphicon-remove"></span> Cancel and Logout</a>
+        <a class="btn btn-warning" href="{{ url_for('account.logout') }}"><span class="glyphicon glyphicon-remove"></span> Cancel and Logout</a>
       </form>
     </div>
   </div>

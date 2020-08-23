@@ -4,6 +4,11 @@
 
 {% block meta_description %}Login Required{% endblock %}
 
+{% block inline_javascript %}
+<script src="/javascript/tba_combined_js.firebase.min.js"></script>
+<script src="//gstatic.com/firebasejs/7.15.5/firebase-auth.js"></script>
+{% endblock %}
+
 {% block content %}
 <div class="container">
   <div class="row">
@@ -16,7 +21,14 @@
           {% include "mytba_partials/mytba_settings.html" %}
         </div>
         <div class="col-md-6">
-          <a href="/login{% if redirect %}?redirect={{redirect|urlencode}}{% endif %}" class="btn btn-success btn-block" role="button">Take me to the login page!</a>
+          <a class="btn btn-block tba-auth-button tba-auth-button-google" role="button" href="javascript:signInWithGoogle('{{ csrf_token() }}')">
+            <span class="pull-left"><img class="tba-auth-button-img" src="{{ url_for('static', filename='images/sign-in/google_sign_in_logo.svg') }}"></span>
+            <span class="tba-auth-text tba-auth-text-google">Sign in with Google</span>
+          </a>
+          <a class="btn btn-block tba-auth-button tba-auth-button-apple" role="button" href="javascript:signInWithApple('{{ csrf_token() }}')">
+            <span class="pull-left"><img class="tba-auth-button-img" src="{{ url_for('static', filename='images/sign-in/apple_sign_in_logo.svg') }}"></span>
+            <span class="tba-auth-text tba-auth-text-apple">Sign in with Apple</span>
+          </a>
           <a href="javascript:history.back()" class="btn btn-default btn-block" role="button">No thanks, take me back.</a>
         </div>
       </div>
@@ -37,8 +49,9 @@
       <hr>
 
       <h3>About Google Accounts</h3>
-      <p>The Blue Alliance uses <a href="https://myaccount.google.com" target="_blank">Google Accounts</a> to handle our login.
-      Only your email address is shared with us and it will always be kept private.</p>
+      <p>The Blue Alliance uses <a href="https://myaccount.google.com" target="_blank">Google Accounts</a> and
+        <a href="https://appleid.apple.com" target="_blank">Apple IDs</a> to handle our login. Only your email address
+        is shared with us and it will always be kept private.</p>
     </div>
   </div>
 </div>

@@ -8,7 +8,7 @@
 {% block content %}
 <div class="container">
 <h1>Team Admin Dashboard</h1>
-<h3>Hi, {{user_bundle.account.display_name}}, you have administrative access for {{teams|length}} team{% if teams|length > 1%}s{%endif%}</h3>
+<h3>Hi, {{ user.display_name }}, you have administrative access for {{teams|length}} team{% if teams|length > 1%}s{%endif%}</h3>
 <ul>
   {% for team_link in existing_access %}
     <li><a href="/team/{{team_link.team_number}}/{{team_link.year}}">Team {{team_link.team_number}} - {{teams[team_link.team_number].nickname}} ({{team_link.year}})</a></li>

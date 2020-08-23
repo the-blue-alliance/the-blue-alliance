@@ -85,7 +85,7 @@
             <li>Please do not submit match videos from an Official <i>FIRST</i> webcast.</li>
             <li>You may submit videos at are offered on and linked to an Official <i>FIRST</i> channel.</li>
             <li>Please help our moderators by including either the match preview, or score result audience display in your video, if possible.</li>
-            <li>Your account info (like {{user_bundle.user.email()}} and {{user_bundle.user.nickname()}}) will also be submitted. <a href="{{user_bundle.logout_url}}">log in as a different user</a></li>
+            <li>Your account info (like {{ user.email }} and {{ user.nickname }}) will also be submitted. <a href="{{ url_for('account.logout') }}">log in as a different user</a></li>
           </ul>
           <div class="alert alert-success">
             <strong>Match ID Examples</strong>

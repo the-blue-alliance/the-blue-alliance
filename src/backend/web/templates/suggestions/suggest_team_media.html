@@ -49,7 +49,7 @@
           <ul>
             <li>Your suggestion will be reviewed by a moderator.</li>
             <li>Please help our moderators by including information in the media that clearly identifies the team. (For example, bumpers, banners, logos, etc.)</li>
-            <li>Your account info (like {{user_bundle.user.email()}} and {{user_bundle.user.nickname()}}) will also be submitted. <a href="{{user_bundle.logout_url}}">log in as a different user</a></li>
+            <li>Your account info (like {{ user.email }} and {{ user.nickname }}) will also be submitted. <a href="{{ url_for('account.logout') }}">log in as a different user</a></li>
           </ul>
 
           <hr>
