@@ -5,6 +5,7 @@ from google.cloud import ndb
 from werkzeug.wrappers import Request
 from werkzeug.wsgi import ClosingIterator
 
+from backend.common.environment import Environment
 from backend.common.profiler import send_traces, Span, trace_context
 
 
@@ -17,9 +18,9 @@ class NdbMiddleware(object):
     app: Callable[[Any, Any], Any]
     ndb_client: ndb.Client
 
-    def __init__(self, app: Callable[[Any, Any], Any]):
+    def __init__(self, app: Callable[[Any, Any], Any], ndb_client: ndb.Client):
         self.app = app
-        self.ndb_client = ndb.Client()
+        self.ndb_client = ndb_client
 
     def __call__(self, environ: Any, start_response: Any):
         with self.ndb_client.context():
@@ -61,4 +62,21 @@ class AfterResponseMiddleware:
 
 
 def install_middleware(app: Flask) -> None:
-    app.wsgi_app = NdbMiddleware(TraceRequestMiddleware(AfterResponseMiddleware(app.wsgi_app)))  # type: ignore[override]
+    ndb_client = ndb.Client()
+
+    _set_secret_key(app, ndb_client)
+
+    app.wsgi_app = NdbMiddleware(TraceRequestMiddleware(AfterResponseMiddleware(app.wsgi_app)), ndb_client)  # type: ignore[override]
+
+
+def _set_secret_key(app: Flask, ndb_client: ndb.Client) -> None:
+    from backend.common.sitevars.secrets import Secrets
+
+    with ndb_client.context():
+        secret_key = Secrets.secret_key()
+        if Environment.is_prod():
+            if not secret_key:
+                raise Exception("Secret key not set in production!")
+            if secret_key == Secrets.DEFAULT_SECRET_KEY:
+                raise Exception("Secret key may not be default in production!")
+        app.secret_key = Secrets.secret_key()
