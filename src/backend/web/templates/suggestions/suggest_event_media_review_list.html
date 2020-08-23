@@ -34,6 +34,8 @@
   </div>
 
   <form action="/suggest/event/media/review" method="post" id="review_media">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
       <div class="col-xs-12">
 
           <div class="row">

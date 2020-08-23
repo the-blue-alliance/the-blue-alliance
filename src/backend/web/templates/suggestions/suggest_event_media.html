@@ -101,6 +101,7 @@
             <div class="col-xs-12">
               <h4>Add more media</h4>
               <form action="/suggest/event/media" method="post" id="suggest_media">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <input name="event_key" type="hidden" value="{% if event %}{{event.key.id()}}{% endif %}" />
                 <div class="input-group">
                   <span class="input-group-addon">{{year}}</span>

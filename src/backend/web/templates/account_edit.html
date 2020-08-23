@@ -31,10 +31,11 @@
           </div>
         </div>
         <input name="account_id" type="hidden" value="{{user_bundle.account.key.id()}}" />
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Save profile</button>
         <a href="/account" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-down"></span> Cancel</a>
       </form>
     </div>
-  </d<iv>
+  </div>
 </div>
 {% endblock %}

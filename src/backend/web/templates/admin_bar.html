@@ -4,6 +4,7 @@
     <form class="navbar-form navbar-left" action="/admin/memcache" method="post">
       <input name="memcache_key" value="{{cache_key}}" type="hidden" />
       <input name="return_url" value="{{return_url}}" type="hidden" />
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
       <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-trash"></span> Clear Page Cache</button>
     </form>
     {% if flushed %}<p class="navbar-text">Cleared cache keys: {{ flushed }}</p>{% endif %}

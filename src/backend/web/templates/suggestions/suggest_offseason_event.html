@@ -53,6 +53,7 @@
                         <p>All fields below are required, please do the best you can to fill them accurately </p>
 
                         <form action="/suggest/offseason" method="post" id="suggest_offseason">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             <table class="table table-striped table-hover table-condensed">
                                 <tr>
                                     <td>Event Name</td>
