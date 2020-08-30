@@ -194,6 +194,9 @@ class MediaParser:
     def _partial_media_dict_from_cd_photo_thread(
         cls, url: str
     ) -> Optional[SuggestionDict]:
+        # This is broken with new CD, cd-media is no more
+        return None
+        """
         foreign_key = cls._parse_cdphotothread_foreign_key(url)
         if foreign_key is None:
             logging.warning("Failed to determine foreign_key from url: {}".format(url))
@@ -217,6 +220,7 @@ class MediaParser:
             "details_json": json.dumps({"image_partial": image_partial}),
         }
         return media_dict
+        """
 
     @classmethod
     def _partial_media_dict_from_onshape(cls, url: str) -> Optional[SuggestionDict]:
@@ -312,6 +316,11 @@ class MediaParser:
         returns the url of the image in the thread
         ex: https://www.chiefdelphi.com/media/img/3f5/3f5db241521ae5f2636ff8460f277997_l.jpg
         """
+
+        # cd-media is dead
+        return None
+
+        """
         from bs4 import BeautifulSoup
 
         html = html_bytes.decode("utf-8", "replace")
@@ -332,8 +341,9 @@ class MediaParser:
 
         # partial_url looks something like: "/media/img/774/774d98c80dcf656f2431b2e9186f161a_l.jpg"
         # we want "774/774d98c80dcf656f2431b2e9186f161a_l.jpg"
-        image_partial = re.match(r"\/media\/img\/(.*)", partial_url)
+        image_partial = re.match(r"/media/img/(.*)", partial_url)
         if image_partial is not None:
             return image_partial.group(1)
         else:
             return None
+        """
