@@ -12,7 +12,7 @@ from backend.common.consts.media_type import (
     SOCIAL_TYPES,
     TYPE_NAMES,
 )
-from backend.common.models.media_dict import MediaDict
+from backend.common.models.suggestion_dict import SuggestionDict
 
 
 class MediaParser:
@@ -90,7 +90,7 @@ class MediaParser:
     }
 
     @classmethod
-    def partial_media_dict_from_url(cls, url: str) -> Optional[MediaDict]:
+    def partial_media_dict_from_url(cls, url: str) -> Optional[SuggestionDict]:
         """
         Takes a url, and turns it into a partial Media object dict
         """
@@ -118,7 +118,9 @@ class MediaParser:
         return None
 
     @classmethod
-    def _create_media_dict(cls, media_type: MediaType, url: str) -> Optional[MediaDict]:
+    def _create_media_dict(
+        cls, media_type: MediaType, url: str
+    ) -> Optional[SuggestionDict]:
         """
         Build a media dict from the given url and media type
         This will parse the foreign key from the url and add other data about the media type
@@ -136,9 +138,8 @@ class MediaParser:
             if media_type in cls.CASE_SENSITIVE_FOREIGN_KEYS
             else foreign_key.lower()
         )
-        media_dict: MediaDict = {
+        media_dict: SuggestionDict = {
             "media_type_enum": media_type,
-            "media_type": media_type,
             "is_social": media_type in SOCIAL_TYPES,
             "foreign_key": foreign_key,
             "site_name": type_name,
@@ -190,7 +191,9 @@ class MediaParser:
         return clean_url
 
     @classmethod
-    def _partial_media_dict_from_cd_photo_thread(cls, url: str) -> Optional[MediaDict]:
+    def _partial_media_dict_from_cd_photo_thread(
+        cls, url: str
+    ) -> Optional[SuggestionDict]:
         foreign_key = cls._parse_cdphotothread_foreign_key(url)
         if foreign_key is None:
             logging.warning("Failed to determine foreign_key from url: {}".format(url))
@@ -208,7 +211,7 @@ class MediaParser:
             )
             return None
 
-        media_dict: MediaDict = {
+        media_dict: SuggestionDict = {
             "media_type_enum": MediaType.CD_PHOTO_THREAD,
             "foreign_key": foreign_key,
             "details_json": json.dumps({"image_partial": image_partial}),
@@ -216,7 +219,7 @@ class MediaParser:
         return media_dict
 
     @classmethod
-    def _partial_media_dict_from_onshape(cls, url: str) -> Optional[MediaDict]:
+    def _partial_media_dict_from_onshape(cls, url: str) -> Optional[SuggestionDict]:
         media_dict = cls._create_media_dict(MediaType.ONSHAPE, url)
         if not media_dict:
             return None
@@ -248,7 +251,7 @@ class MediaParser:
         return media_dict
 
     @classmethod
-    def _partial_media_dict_from_grabcad(cls, url: str) -> Optional[MediaDict]:
+    def _partial_media_dict_from_grabcad(cls, url: str) -> Optional[SuggestionDict]:
         media_dict = cls._create_media_dict(MediaType.GRABCAD, url)
         if not media_dict:
             return None
@@ -275,7 +278,7 @@ class MediaParser:
     @classmethod
     def _partial_media_dict_from_oembed(
         cls, media_type: MediaType, url: str
-    ) -> Optional[MediaDict]:
+    ) -> Optional[SuggestionDict]:
         media_dict = cls._create_media_dict(media_type, url)
         if not media_dict:
             return None
