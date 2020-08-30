@@ -57,7 +57,7 @@
     "gulp-rename": "^2.0.0",
     "gulp-sourcemaps": "^2.6.5",
     "gulp-uglify-es": "^2.0.0",
-    "jest-cli": "^26.4.1",
+    "jest-cli": "^26.4.2",
     "less": "3.12.2",
     "md5": "^2.3.0",
     "react-addons-test-utils": "^15.3.0",
