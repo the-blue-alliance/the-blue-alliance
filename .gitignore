@@ -17,6 +17,7 @@ venv/
 # Compiled/Intermediate Files #
 ###############################
 src/build
+src/backend/web/static/javascript/tba_js/tba_keys.js
 
 # Node.js
 node_modules/
