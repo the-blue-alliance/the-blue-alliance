@@ -8,7 +8,7 @@ SCRIPTS_MAIN = [
     "src/backend/web/static/xcharts/xcharts.min.js",
     "src/backend/web/static/javascript/utils/client_detection.js",
     "src/backend/web/static/javascript/tba_js/tablesorter.js",
-    # 'src/backend/web/static/javascript/tba_js/tba_keys.js',
+    "src/backend/web/static/javascript/tba_js/tba_keys.js",
     "src/backend/web/static/javascript/tba_js/tba.js",
     "src/backend/web/static/javascript/tba_js/tba_charts.js",
     "src/backend/web/static/javascript/tba_js/tba_countdown.js",
