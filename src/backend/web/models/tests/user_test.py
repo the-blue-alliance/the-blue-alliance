@@ -132,6 +132,21 @@ def test_uid() -> None:
     assert user.uid == account.key.id()
 
 
+def test_account_key_none() -> None:
+    user = User(session_claims={})
+    assert user._account is None
+    assert user.account_key is None
+
+
+def test_account_key() -> None:
+    email = "zach@thebluealliance.com"
+    account = Account(email=email)
+    account.put()
+
+    user = User(session_claims={"email": email})
+    assert user.account_key == account.key
+
+
 def test_is_registered_none() -> None:
     user = User(session_claims={})
     assert user._account is None
