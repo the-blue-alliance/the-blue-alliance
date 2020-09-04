@@ -16,7 +16,9 @@ def auto_add_ndb_context(ndb_context) -> None:
 
 
 def test_not_elim_match() -> None:
-    m = Match(comp_level=CompLevel.QM,)
+    m = Match(
+        comp_level=CompLevel.QM,
+    )
     assert MatchTiebreakers.tiebreak_winner(m) == ""
 
 
@@ -31,10 +33,12 @@ def test_match_not_played() -> None:
         alliances_json=json.dumps(
             {
                 AllianceColor.RED: MatchAlliance(
-                    teams=["frc1", "frc2", "frc3"], score=-1,
+                    teams=["frc1", "frc2", "frc3"],
+                    score=-1,
                 ),
                 AllianceColor.BLUE: MatchAlliance(
-                    teams=["frc4", "frc5", "frc6"], score=-1,
+                    teams=["frc4", "frc5", "frc6"],
+                    score=-1,
                 ),
             }
         ),

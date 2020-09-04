@@ -36,12 +36,15 @@ class TestMediaUrlParser(unittest.TestCase):
     @pytest.mark.skip(reason="CD media is dead")
     def test_cdphotothread_parsetest_cdphotothread_parse(self):
         cd = MediaParser.partial_media_dict_from_url(
-            "https://www.chiefdelphi.com/media/photos/41999")
-        self.assertEqual(cd['media_type_enum'], MediaType.CD_PHOTO_THREAD)
-        self.assertEqual(cd['foreign_key'], "41999")
-        self.assertTrue(cd['details_json'])
-        details = json.loads(cd['details_json'])
-        self.assertEqual(details['image_partial'], "a88/a880fa0d65c6b49ddb93323bc7d2e901_l.jpg")
+            "https://www.chiefdelphi.com/media/photos/41999"
+        )
+        self.assertEqual(cd["media_type_enum"], MediaType.CD_PHOTO_THREAD)
+        self.assertEqual(cd["foreign_key"], "41999")
+        self.assertTrue(cd["details_json"])
+        details = json.loads(cd["details_json"])
+        self.assertEqual(
+            details["image_partial"], "a88/a880fa0d65c6b49ddb93323bc7d2e901_l.jpg"
+        )
 
     def test_imgur_parse(self) -> None:
         imgur_img = MediaParser.partial_media_dict_from_url("http://imgur.com/zYqWbBh")
@@ -223,12 +226,12 @@ class TestWebcastUrlParser(unittest.TestCase):
 
     @pytest.mark.skip(reason="we don't have ustream suggestions anymore")
     def testUstream(self):
-        res = WebcastParser.webcast_dict_from_url('http://www.ustream.tv/decoraheagles')
+        res = WebcastParser.webcast_dict_from_url("http://www.ustream.tv/decoraheagles")
         self.assertIsNotNone(res)
-        self.assertEqual(res['type'], 'ustream')
-        self.assertEqual(res['channel'], '3064708')
+        self.assertEqual(res["type"], "ustream")
+        self.assertEqual(res["channel"], "3064708")
 
-        bad = WebcastParser.webcast_dict_from_url('http://ustream.tv/')
+        bad = WebcastParser.webcast_dict_from_url("http://ustream.tv/")
         self.assertIsNone(bad)
 
     def testUnknownUrl(self) -> None:

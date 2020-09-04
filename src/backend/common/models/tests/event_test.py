@@ -50,7 +50,9 @@ def test_invalid_key_names(key: str) -> None:
     ],
 )
 def test_time_as_utc(starttime: datetime, timezone_id: str, output: datetime) -> None:
-    e = Event(timezone_id=timezone_id,)
+    e = Event(
+        timezone_id=timezone_id,
+    )
 
     assert e.time_as_utc(starttime) == output
 
@@ -67,7 +69,9 @@ def test_time_as_utc(starttime: datetime, timezone_id: str, output: datetime) ->
 def test_local_time(
     mock_time: str, timezone_id: Optional[str], output: datetime
 ) -> None:
-    e = Event(timezone_id=timezone_id,)
+    e = Event(
+        timezone_id=timezone_id,
+    )
 
     with freeze_time(mock_time):
         assert e.local_time() == output
@@ -93,7 +97,10 @@ def test_within_days(
     days_after: int,
     is_within: bool,
 ) -> None:
-    e = Event(start_date=event_start, end_date=event_end,)
+    e = Event(
+        start_date=event_start,
+        end_date=event_end,
+    )
 
     with freeze_time(mock_time):
         assert e.withinDays(days_before, days_after) == is_within
@@ -109,8 +116,14 @@ def test_within_days(
         ("2020-03-02", False),
     ],
 )
-def test_within_a_day(mock_time: str, is_within: bool,) -> None:
-    e = Event(start_date=datetime(2020, 2, 1), end_date=datetime(2020, 2, 5),)
+def test_within_a_day(
+    mock_time: str,
+    is_within: bool,
+) -> None:
+    e = Event(
+        start_date=datetime(2020, 2, 1),
+        end_date=datetime(2020, 2, 5),
+    )
 
     with freeze_time(mock_time):
         assert e.within_a_day == is_within
@@ -130,7 +143,11 @@ def test_within_a_day(mock_time: str, is_within: bool,) -> None:
         ("2020-03-02", "UTC", False),
     ],
 )
-def test_now(mock_time: str, timezone: Optional[str], is_now: bool,) -> None:
+def test_now(
+    mock_time: str,
+    timezone: Optional[str],
+    is_now: bool,
+) -> None:
     e = Event(
         timezone_id=timezone,
         start_date=datetime(2020, 2, 1),
@@ -154,7 +171,10 @@ def test_now(mock_time: str, timezone: Optional[str], is_now: bool,) -> None:
 def test_past_future_start_end_today(
     mock_time: str, is_past: bool, is_future: bool, start_today: bool, end_today: bool
 ) -> None:
-    e = Event(start_date=datetime(2020, 2, 1), end_date=datetime(2020, 2, 5),)
+    e = Event(
+        start_date=datetime(2020, 2, 1),
+        end_date=datetime(2020, 2, 5),
+    )
 
     with freeze_time(mock_time):
         assert e.past == is_past
@@ -182,7 +202,11 @@ def test_week(
     week_output: int,
     week_str: str,
 ) -> None:
-    e = Event(year=year, event_type_enum=event_type, official=official,)
+    e = Event(
+        year=year,
+        event_type_enum=event_type,
+        official=official,
+    )
     e._week = week
 
     assert e.week == week_output
@@ -211,7 +235,12 @@ def test_week_stored_in_context_cache() -> None:
 def test_location(
     city: str, state: str, country: str, postalcode: str, output: str
 ) -> None:
-    event = Event(city=city, state_prov=state, country=country, postalcode=postalcode,)
+    event = Event(
+        city=city,
+        state_prov=state,
+        country=country,
+        postalcode=postalcode,
+    )
     assert event.location == output
 
 
@@ -219,7 +248,11 @@ def test_location(
     CITY_STATE_COUNTRY_PARAMETERS[0], CITY_STATE_COUNTRY_PARAMETERS[1]
 )
 def test_city_state_country(city: str, state: str, country: str, output: str) -> None:
-    event = Event(city=city, state_prov=state, country=country,)
+    event = Event(
+        city=city,
+        state_prov=state,
+        country=country,
+    )
     assert event.city_state_country == output
 
 
@@ -257,8 +290,13 @@ def test_webcasts() -> None:
 
 
 def test_linked_district() -> None:
-    District(id="2019ne", display_name="New England",).put()
-    event = Event(district_key=ndb.Key(District, "2019ne"),)
+    District(
+        id="2019ne",
+        display_name="New England",
+    ).put()
+    event = Event(
+        district_key=ndb.Key(District, "2019ne"),
+    )
     assert event.event_district_abbrev == "ne"
     assert event.event_district_key == "2019ne"
     assert event.event_district_str == "New England"
@@ -305,7 +343,9 @@ def test_get_awards() -> None:
 
 def test_details() -> None:
     event = Event(id="2019ct", year=2019, event_short="ct")
-    d = EventDetails(id="2019ct",)
+    d = EventDetails(
+        id="2019ct",
+    )
     d.put()
 
     event.prep_details()
@@ -323,7 +363,10 @@ def test_get_alliances() -> None:
     alliances = [
         EventAlliance(picks=teams),
     ]
-    EventDetails(id="2019ct", alliance_selections=alliances,).put()
+    EventDetails(
+        id="2019ct",
+        alliance_selections=alliances,
+    ).put()
 
     event._details = None
     assert event.alliance_selections == alliances
@@ -335,7 +378,10 @@ def test_district_points() -> None:
     assert event.district_points is None
 
     points = EventDistrictPoints(points={}, tiebreakers={})
-    EventDetails(id="2019ct", district_points=points,).put()
+    EventDetails(
+        id="2019ct",
+        district_points=points,
+    ).put()
 
     event._details = None
     assert event.district_points == points
@@ -382,7 +428,10 @@ def test_teams() -> None:
         team=ndb.Key(Team, "frc1"),
         year=2019,
     ).put()
-    t = Team(id="frc1", team_number=1,)
+    t = Team(
+        id="frc1",
+        team_number=1,
+    )
     t.put()
 
     event._teams = None

@@ -28,8 +28,8 @@ def match_detail(match_key: MatchKey) -> Response:
 
     match_breakdown_template = None
     if match.score_breakdown is not None and match.year >= 2015:
-        match_breakdown_template = "match_partials/match_breakdown/match_breakdown_{}.html".format(
-            match.year
+        match_breakdown_template = (
+            "match_partials/match_breakdown/match_breakdown_{}.html".format(match.year)
         )
 
     template_values = {

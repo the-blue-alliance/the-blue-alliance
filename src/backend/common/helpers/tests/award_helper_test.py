@@ -8,9 +8,18 @@ from backend.common.models.award import Award
 
 
 def test_organize_awards() -> None:
-    a1 = Award(award_type_enum=AwardType.SAFETY, name_str="Safety",)
-    a2 = Award(award_type_enum=AwardType.CHAIRMANS, name_str="Chairmans",)
-    a3 = Award(award_type_enum=AwardType.WINNER, name_str="Winner",)
+    a1 = Award(
+        award_type_enum=AwardType.SAFETY,
+        name_str="Safety",
+    )
+    a2 = Award(
+        award_type_enum=AwardType.CHAIRMANS,
+        name_str="Chairmans",
+    )
+    a3 = Award(
+        award_type_enum=AwardType.WINNER,
+        name_str="Winner",
+    )
     assert AwardHelper.organizeAwards([a1, a2, a3]) == [a2, a3, a1]
 
 

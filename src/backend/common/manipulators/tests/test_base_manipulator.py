@@ -87,7 +87,10 @@ def test_update_model(ndb_context) -> None:
     model.put()
 
     model.int_prop = 1337
-    expected = DummyModel(id="test", int_prop=1337,)
+    expected = DummyModel(
+        id="test",
+        int_prop=1337,
+    )
     put = DummyManipulator.createOrUpdate(model)
     assert put == expected
 
@@ -96,7 +99,10 @@ def test_update_model(ndb_context) -> None:
 
 
 def test_update_model_leaves_unknown_attrs(ndb_context) -> None:
-    expected = DummyModel(id="test", int_prop=42,)
+    expected = DummyModel(
+        id="test",
+        int_prop=42,
+    )
     expected.put()
 
     model = DummyModel.get_by_id("test")

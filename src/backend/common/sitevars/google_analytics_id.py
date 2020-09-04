@@ -14,7 +14,9 @@ class GoogleAnalyticsID(SitevarBase[ContentType]):
 
     @staticmethod
     def default_value() -> ContentType:
-        return ContentType(GOOGLE_ANALYTICS_ID="",)
+        return ContentType(
+            GOOGLE_ANALYTICS_ID="",
+        )
 
     @classmethod
     def google_analytics_id(cls) -> str:

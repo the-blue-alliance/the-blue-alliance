@@ -127,7 +127,10 @@ class PlayoffAdvancementHelper(object):
                     del bracket_table[comp_level]
 
         return PlayoffAdvancement(
-            bracket_table, playoff_advancement, double_elim_matches, playoff_template,
+            bracket_table,
+            playoff_advancement,
+            double_elim_matches,
+            playoff_template,
         )
 
     """
@@ -368,9 +371,12 @@ class PlayoffAdvancementHelper(object):
                     alliance = cls.getOrderedAlliance(
                         match.alliances[color]["teams"], alliance_selections
                     )
-                    alliance_name: str = cls.getAllianceName(
-                        match.alliances[color]["teams"], alliance_selections
-                    ) or ""
+                    alliance_name: str = (
+                        cls.getAllianceName(
+                            match.alliances[color]["teams"], alliance_selections
+                        )
+                        or ""
+                    )
                     breakdown = none_throws(match.score_breakdown)
                     for i, complete_alliance in enumerate(
                         complete_alliances

@@ -32,7 +32,10 @@ class TestTeamManipulator(unittest.TestCase):
                 qual=None,
                 playoff=None,
                 alliance=EventTeamStatusAlliance(
-                    name=None, number=1, pick=1, backup=None,
+                    name=None,
+                    number=1,
+                    pick=1,
+                    backup=None,
                 ),
             ),
         )

@@ -17,7 +17,7 @@ class PlatformPriority(enum.IntEnum):
 
     @staticmethod
     def validate(platform_priority: PlatformPriority) -> None:
-        """ Validate that the platform_priority is supported.
+        """Validate that the platform_priority is supported.
 
         Raises:
             ValueError: If platform_priority is an unsupported platform priority.

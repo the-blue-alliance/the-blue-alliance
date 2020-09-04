@@ -329,7 +329,10 @@ class Match(CachedModel):
             or self.comp_level == "f"
             or EventHelper.is_2015_playoff(self.event_key_name)
         ):
-            return "%s %s" % (COMP_LEVELS_VERBOSE[self.comp_level], self.match_number,)
+            return "%s %s" % (
+                COMP_LEVELS_VERBOSE[self.comp_level],
+                self.match_number,
+            )
         else:
             return "%s %s Match %s" % (
                 COMP_LEVELS_VERBOSE[self.comp_level],

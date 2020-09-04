@@ -242,7 +242,9 @@ class SuggestionCreator:
                     return SuggestionCreationStatus.SUGGESTION_EXISTS
 
             suggestion = Suggestion(
-                author=author_account_key, target_model="event", target_key=event_key,
+                author=author_account_key,
+                target_model="event",
+                target_key=event_key,
             )
             suggestion.contents = contents
             suggestion.put()

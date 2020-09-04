@@ -28,7 +28,10 @@ class SuggestionCreatorTest(unittest.TestCase):
         self.account.put()
 
         self.account_banned = Account.get_or_insert(
-            "456", email="user@example.com", registered=True, shadow_banned=True,
+            "456",
+            email="user@example.com",
+            registered=True,
+            shadow_banned=True,
         )
         self.account_banned.put()
 
