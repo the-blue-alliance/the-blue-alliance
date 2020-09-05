@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Optional
 
+from google.cloud import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.account_permission import AccountPermission
@@ -59,6 +60,12 @@ class User:
         if self._account is None:
             return None
         return none_throws(self._account).nickname
+
+    @property
+    def account_key(self) -> Optional[ndb.Key]:
+        if self._account is None:
+            return None
+        return none_throws(self._account).key
 
     @property
     def uid(self) -> Optional[str]:

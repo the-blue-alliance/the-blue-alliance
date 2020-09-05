@@ -10,37 +10,37 @@
   <div class="row">
     <div class="col-xs-12 col-lg-6 col-lg-offset-3">
       {% if status == 'success' %}
-      <div class="alert alert-success">
+      <div class="alert alert-success" id="success-alert">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <h4>Thanks!</h4>
         <p>We'll review your suggestion and get it added to the site soon!</p>
       </div>
       {% elif status == 'blank_webcast' %}
-      <div class="alert alert-warning">
+      <div class="alert alert-warning" id="blank_webcast-alert">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <h4>Oops!</h4>
         <p>You have to let us know where there is a webcast online for this event. You submitted a blank field. Please find a webcast online and paste it's address below. Thanks!</p>
       </div>
       {% elif status == 'invalid_url' %}
-      <div class="alert alert-warning">
+      <div class="alert alert-warning" id="invalid_url-alert">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <h4>Oops!</h4>
         <p>You have submitted an invalid webcast url. Please submit a valid (with no spaces), non Blue Alliance web address. Thanks!</p>
       </div>
       {% elif status == 'invalid_date' %}
-      <div class="alert alert-warning">
+      <div class="alert alert-warning" id="invalid_date-alert">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <h4>Oops!</h4>
         <p>You have submitted an invalid webcast date. Please submit a valid date in the format YYYY-MM-DD or leave the field blank. Thanks!</p>
       </div>
       {% elif status == 'webcast_exists' %}
-      <div class="alert alert-info">
+      <div class="alert alert-info" id="webcast_exists-alert">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <h4>Thanks!</h4>
         <p>The webcast you submitted has already been approved!</p>
       </div>
       {% elif status == 'suggestion_exists' %}
-      <div class="alert alert-warning">
+      <div class="alert alert-warning" id="suggestion_exists-alert">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <h4>Thanks!</h4>
         <p>The webcast you submitted is already pending review!</p>
