@@ -79,4 +79,4 @@ def _set_secret_key(app: Flask) -> None:
             raise Exception("Secret key not set in production!")
         if secret_key == Secrets.DEFAULT_SECRET_KEY:
             raise Exception("Secret key may not be default in production!")
-    app.secret_key = Secrets.secret_key()
+    app.secret_key = secret_key

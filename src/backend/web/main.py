@@ -52,4 +52,4 @@ app.register_error_handler(500, handle_500)
 app.context_processor(_user_context_processor)
 
 register_template_filters(app)
-maybe_install_local_routes(app)
+maybe_install_local_routes(app, csrf)
