@@ -82,7 +82,9 @@ def test_suggestion_reviewer_keys_only() -> None:
     suggestion.put()
 
     suggestions = SuggestionQuery(
-        review_state=SuggestionState.REVIEW_PENDING, reviewer=reviewer, keys_only=True,
+        review_state=SuggestionState.REVIEW_PENDING,
+        reviewer=reviewer,
+        keys_only=True,
     ).fetch()
     assert suggestions == [suggestion.key]
 

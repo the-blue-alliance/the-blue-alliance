@@ -16,7 +16,10 @@ from backend.common.models.match import Match
 def test_calculate_avg_score_no_matches() -> None:
     avg_score = EventHelper.calculateTeamAvgScoreFromMatches("frc254", [])
     assert avg_score == TeamAvgScore(
-        qual_avg=None, elim_avg=None, all_qual_scores=[], all_elim_scores=[],
+        qual_avg=None,
+        elim_avg=None,
+        all_qual_scores=[],
+        all_elim_scores=[],
     )
 
 
@@ -29,7 +32,10 @@ def test_calculate_avg_score_no_team_matches() -> None:
 
     avg_score = EventHelper.calculateTeamAvgScoreFromMatches("frc254", [m])
     assert avg_score == TeamAvgScore(
-        qual_avg=None, elim_avg=None, all_qual_scores=[], all_elim_scores=[],
+        qual_avg=None,
+        elim_avg=None,
+        all_qual_scores=[],
+        all_elim_scores=[],
     )
 
 
@@ -42,7 +48,10 @@ def test_calculate_avg_score_all_unplayed() -> None:
 
     avg_score = EventHelper.calculateTeamAvgScoreFromMatches("frc1", [m])
     assert avg_score == TeamAvgScore(
-        qual_avg=None, elim_avg=None, all_qual_scores=[], all_elim_scores=[],
+        qual_avg=None,
+        elim_avg=None,
+        all_qual_scores=[],
+        all_elim_scores=[],
     )
 
 
@@ -76,7 +85,10 @@ def test_calculate_avg_score_qual_only() -> None:
 
     avg_score = EventHelper.calculateTeamAvgScoreFromMatches("frc1", [m1, m2])
     assert avg_score == TeamAvgScore(
-        qual_avg=4.0, elim_avg=None, all_qual_scores=[5, 3], all_elim_scores=[],
+        qual_avg=4.0,
+        elim_avg=None,
+        all_qual_scores=[5, 3],
+        all_elim_scores=[],
     )
 
 
@@ -110,13 +122,20 @@ def test_calculate_avg_score_elim_only() -> None:
 
     avg_score = EventHelper.calculateTeamAvgScoreFromMatches("frc1", [m1, m2])
     assert avg_score == TeamAvgScore(
-        qual_avg=None, elim_avg=4.0, all_qual_scores=[], all_elim_scores=[5, 3],
+        qual_avg=None,
+        elim_avg=4.0,
+        all_qual_scores=[],
+        all_elim_scores=[5, 3],
     )
 
 
 def test_calculate_wlt_no_matches() -> None:
     wlt = EventHelper.calculateTeamWLTFromMatches("frc254", [])
-    assert wlt == WLTRecord(wins=0, losses=0, ties=0,)
+    assert wlt == WLTRecord(
+        wins=0,
+        losses=0,
+        ties=0,
+    )
 
 
 def test_calculate_wlt_no_team_matches(ndb_context) -> None:
@@ -131,7 +150,11 @@ def test_calculate_wlt_no_team_matches(ndb_context) -> None:
     )
 
     wlt = EventHelper.calculateTeamWLTFromMatches("frc254", [m])
-    assert wlt == WLTRecord(wins=0, losses=0, ties=0,)
+    assert wlt == WLTRecord(
+        wins=0,
+        losses=0,
+        ties=0,
+    )
 
 
 def test_calculate_wlt_all_unplayed(ndb_context) -> None:
@@ -146,7 +169,11 @@ def test_calculate_wlt_all_unplayed(ndb_context) -> None:
     )
 
     wlt = EventHelper.calculateTeamWLTFromMatches("frc254", [m])
-    assert wlt == WLTRecord(wins=0, losses=0, ties=0,)
+    assert wlt == WLTRecord(
+        wins=0,
+        losses=0,
+        ties=0,
+    )
 
 
 def test_calculate_wlt(ndb_context) -> None:
@@ -255,7 +282,11 @@ def test_group_by_week_in_season(ndb_context) -> None:
 
 
 def test_group_by_week_in_season_weekless(ndb_context) -> None:
-    e = Event(event_type_enum=EventType.DISTRICT, year=2018, official=True,)
+    e = Event(
+        event_type_enum=EventType.DISTRICT,
+        year=2018,
+        official=True,
+    )
     events = EventHelper.groupByWeek([e])
     assert events == {
         "Other Official Events": [e],
@@ -263,7 +294,11 @@ def test_group_by_week_in_season_weekless(ndb_context) -> None:
 
 
 def test_group_by_week_offseason(ndb_context) -> None:
-    e = Event(event_type_enum=EventType.OFFSEASON, year=2018, official=True,)
+    e = Event(
+        event_type_enum=EventType.OFFSEASON,
+        year=2018,
+        official=True,
+    )
     events = EventHelper.groupByWeek([e])
     assert events == {
         "Offseason": [e],
@@ -271,7 +306,11 @@ def test_group_by_week_offseason(ndb_context) -> None:
 
 
 def test_group_by_week_preseason(ndb_context) -> None:
-    e = Event(event_type_enum=EventType.PRESEASON, year=2018, official=True,)
+    e = Event(
+        event_type_enum=EventType.PRESEASON,
+        year=2018,
+        official=True,
+    )
     events = EventHelper.groupByWeek([e])
     assert events == {
         "Preseason": [e],

@@ -8,7 +8,11 @@ def test_district_doesnt_exist() -> None:
 
 
 def test_district_found() -> None:
-    d = District(id="2019ne", year=2019, abbreviation="ne",)
+    d = District(
+        id="2019ne",
+        year=2019,
+        abbreviation="ne",
+    )
     d.put()
 
     district = DistrictQuery(district_key="2019ne").fetch()
@@ -16,7 +20,11 @@ def test_district_found() -> None:
 
 
 def test_found_with_renamed_district() -> None:
-    d = District(id="2019fma", year=2019, abbreviation="fma",)
+    d = District(
+        id="2019fma",
+        year=2019,
+        abbreviation="fma",
+    )
     d.put()
 
     district = DistrictQuery(district_key="2019mar").fetch()

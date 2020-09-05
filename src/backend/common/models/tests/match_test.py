@@ -74,7 +74,10 @@ def test_basic_fields() -> None:
 def test_lazy_load_alliances() -> None:
     alliance_dict = {
         AllianceColor.RED: MatchAlliance(
-            teams=["frc1", "frc2", "frc3"], score=-1, dqs=["frc1"], surrogates=[],
+            teams=["frc1", "frc2", "frc3"],
+            score=-1,
+            dqs=["frc1"],
+            surrogates=[],
         ),
         AllianceColor.BLUE: MatchAlliance(
             teams=["frc4", "frc5", "frc6"], score=-1, dqs=[], surrogates=["frc5"]
@@ -108,7 +111,9 @@ def test_correct_bad_alliance_scores() -> None:
         AllianceColor.RED: {"teams": ["frc1", "frc2", "frc3"], "score": None},
         AllianceColor.BLUE: {"teams": ["frc4", "frc5", "frc6"], "score": -1},
     }
-    match = get_base_qual_match(alliances_json=json.dumps(alliance_dict),)
+    match = get_base_qual_match(
+        alliances_json=json.dumps(alliance_dict),
+    )
     assert match._alliances is None
 
     alliances = match.alliances
@@ -125,7 +130,9 @@ def test_all_teams_dqd_in_elims() -> None:
         },
         AllianceColor.BLUE: {"teams": ["frc4", "frc5", "frc6"], "score": 11},
     }
-    match = get_base_elim_match(alliances_json=json.dumps(alliance_dict),)
+    match = get_base_elim_match(
+        alliances_json=json.dumps(alliance_dict),
+    )
     assert match._alliances is None
 
     alliances = match.alliances
@@ -258,14 +265,18 @@ def test_within_seconds(
     [(10, 0, AllianceColor.RED), (0, 10, AllianceColor.BLUE), (10, 10, "")],
 )
 def test_winning_alliance_not_2015(
-    red_score: int, blue_score: int, winner: AllianceColor,
+    red_score: int,
+    blue_score: int,
+    winner: AllianceColor,
 ) -> None:
     alliances = {
         AllianceColor.RED: MatchAlliance(
-            teams=["frc1", "frc2", "frc3"], score=red_score,
+            teams=["frc1", "frc2", "frc3"],
+            score=red_score,
         ),
         AllianceColor.BLUE: MatchAlliance(
-            teams=["frc4", "frc5", "frc6"], score=blue_score,
+            teams=["frc4", "frc5", "frc6"],
+            score=blue_score,
         ),
     }
     match = Match(
@@ -285,19 +296,34 @@ def test_winning_alliance_not_2015(
     [
         (CompLevel.QM, 10, 0, ""),
         (CompLevel.QF, 0, 10, ""),
-        (CompLevel.SF, 10, 10, "",),
-        (CompLevel.F, 15, 10, AllianceColor.RED,),
+        (
+            CompLevel.SF,
+            10,
+            10,
+            "",
+        ),
+        (
+            CompLevel.F,
+            15,
+            10,
+            AllianceColor.RED,
+        ),
     ],
 )
 def test_winning_alliance_2015(
-    comp_level: CompLevel, red_score: int, blue_score: int, winner: AllianceColor,
+    comp_level: CompLevel,
+    red_score: int,
+    blue_score: int,
+    winner: AllianceColor,
 ) -> None:
     alliances = {
         AllianceColor.RED: MatchAlliance(
-            teams=["frc1", "frc2", "frc3"], score=red_score,
+            teams=["frc1", "frc2", "frc3"],
+            score=red_score,
         ),
         AllianceColor.BLUE: MatchAlliance(
-            teams=["frc4", "frc5", "frc6"], score=blue_score,
+            teams=["frc4", "frc5", "frc6"],
+            score=blue_score,
         ),
     }
     match = Match(

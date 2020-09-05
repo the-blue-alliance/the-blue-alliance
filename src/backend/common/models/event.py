@@ -76,9 +76,9 @@ class Event(CachedModel):
     )  # such as 'America/Los_Angeles' or 'Asia/Jerusalem'
     official: bool = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
     first_eid = ndb.StringProperty()  # from USFIRST
-    parent_event: Optional[ndb.Key] = (
-        ndb.KeyProperty()
-    )  # This is the division -> event champs relationship
+    parent_event: Optional[
+        ndb.Key
+    ] = ndb.KeyProperty()  # This is the division -> event champs relationship
     # event champs -> all divisions
     divisions: List[ndb.Key] = ndb.KeyProperty(repeated=True)  # pyre-ignore[8]
     facebook_eid = ndb.TextProperty(indexed=False)  # from Facebook
@@ -88,9 +88,9 @@ class Event(CachedModel):
         indexed=False
     )  # list of dicts, valid keys include 'type' and 'channel'
     enable_predictions = ndb.BooleanProperty(default=False)
-    remap_teams: Dict[str, str] = (
-        ndb.JsonProperty()
-    )  # Map of temporary team numbers to pre-rookie and B teams
+    remap_teams: Dict[
+        str, str
+    ] = ndb.JsonProperty()  # Map of temporary team numbers to pre-rookie and B teams
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
@@ -427,7 +427,9 @@ class Event(CachedModel):
     def prepTeamsMatches(
         self,
     ) -> Generator[
-        Tuple[TypedFuture[List["Match"]], TypedFuture[List["Team"]]], None, None,
+        Tuple[TypedFuture[List["Match"]], TypedFuture[List["Team"]]],
+        None,
+        None,
     ]:
         yield self.get_matches_async(), self.get_teams_async()
 

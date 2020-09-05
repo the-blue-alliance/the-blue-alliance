@@ -12,7 +12,9 @@ class TestDistrictManipulator(unittest.TestCase):
         self.old_district = District(id="2014ne", year=2014, display_name="")
 
         self.new_district = District(
-            id="2014ne", year=2014, display_name="New England",
+            id="2014ne",
+            year=2014,
+            display_name="New England",
         )
 
     def assertMergedDistrict(self, district: District) -> None:

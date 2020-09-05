@@ -43,7 +43,7 @@ class PlatformConfig:
         )
 
     def platform_config(self, platform_type: PlatformType) -> PlatformConfig:
-        """ Return a platform-specific configuration object for a platform_type, given the platform payload.
+        """Return a platform-specific configuration object for a platform_type, given the platform payload.
 
         Args:
             platform_type (PlatformType): Type for the platform config.

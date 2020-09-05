@@ -153,6 +153,10 @@ jobs:
         run: npm install
       - name: Run Build
         run: ./ops/build/run_buildweb.sh
+        env:
+          GCLOUD_PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
+          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
       - name: Archive production artifacts
         uses: actions/upload-artifact@v2
         with:

@@ -201,7 +201,9 @@ def get_team_event_participation(
 ) -> TeamEventParticipation:
     soup = bs4.BeautifulSoup(resp_data, "html.parser")
     event = soup.find(id=event_key)
-    return TeamEventParticipation(event_name=event.find("h3").string.strip(),)
+    return TeamEventParticipation(
+        event_name=event.find("h3").string.strip(),
+    )
 
 
 def assert_alert(div: bs4.element.Tag, title: str, message: str, success: bool) -> None:

@@ -1,10 +1,15 @@
 import json
+from typing import Optional
 
 from google.cloud import ndb
+from pyre_extensions import none_throws
 
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.consts.suggestion_type import SUGGESTION_TYPES
 from backend.common.models.account import Account
+from backend.common.models.keys import EventKey, Year
+from backend.common.models.suggestion_dict import SuggestionDict
+from backend.common.models.webcast import Webcast
 
 
 class Suggestion(ndb.Model):
@@ -31,7 +36,7 @@ class Suggestion(ndb.Model):
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
     def __init__(self, *args, **kw):
-        self._contents = None
+        self._contents: Optional[SuggestionDict] = None
         super(Suggestion, self).__init__(*args, **kw)
 
     def put(self, *args, **kwargs):
@@ -42,16 +47,16 @@ class Suggestion(ndb.Model):
         return super(Suggestion, self).put(*args, **kwargs)
 
     @property
-    def contents(self):
+    def contents(self) -> SuggestionDict:
         """
         Lazy load contents_json
         """
         if self._contents is None:
             self._contents = json.loads(self.contents_json)
-        return self._contents
+        return none_throws(self._contents)
 
     @contents.setter
-    def contents(self, contents):
+    def contents(self, contents: SuggestionDict) -> None:
         self._contents = contents
         self.contents_json = json.dumps(self._contents)
 
@@ -66,23 +71,31 @@ class Suggestion(ndb.Model):
     # def youtube_video(self):
     #     if "youtube_videos" in self.contents:
     #         return self.contents["youtube_videos"][0]
-    #
-    # @classmethod
-    # def render_media_key_name(cls, year, target_model, target_key, foreign_type, foreign_key):
-    #     """
-    #     Keys aren't required for this model. This is only necessary if checking
-    #     for duplicate suggestions is desired.
-    #     """
-    #     return 'media_{}_{}_{}_{}_{}'.format(year, target_model, target_key, foreign_type, foreign_key)
-    #
-    # @classmethod
-    # def render_webcast_key_name(cls, event_key, webcast_dict):
-    #     """
-    #     Keys aren't required for this model. This is only necessary if checking
-    #     for duplicate suggestions is desired.
-    #     """
-    #     return 'webcast_{}_{}_{}_{}'.format(
-    #         event_key,
-    #         webcast_dict.get('type', None),
-    #         webcast_dict.get('channel', None),
-    #         webcast_dict.get('file', None))
+
+    @classmethod
+    def render_media_key_name(
+        cls,
+        year: Year,
+        target_model: str,
+        target_key: str,
+        foreign_type: str,
+        foreign_key: str,
+    ) -> str:
+        """
+        Keys aren't required for this model. This is only necessary if checking
+        for duplicate suggestions is desired.
+        """
+        return f"media_{year}_{target_model}_{target_key}_{foreign_type}_{foreign_key}"
+
+    @classmethod
+    def render_webcast_key_name(cls, event_key: EventKey, webcast_dict: Webcast) -> str:
+        """
+        Keys aren't required for this model. This is only necessary if checking
+        for duplicate suggestions is desired.
+        """
+        return "webcast_{}_{}_{}_{}".format(
+            event_key,
+            webcast_dict.get("type", None),
+            webcast_dict.get("channel", None),
+            webcast_dict.get("file", None),
+        )

@@ -11,7 +11,11 @@ def test_no_data() -> None:
 
 
 def test_fetch_robots() -> None:
-    r = Robot(id="frc254_2019", team=ndb.Key(Team, "frc254"), year=2019,)
+    r = Robot(
+        id="frc254_2019",
+        team=ndb.Key(Team, "frc254"),
+        year=2019,
+    )
     r.put()
 
     robots = TeamRobotsQuery(team_key="frc254").fetch()

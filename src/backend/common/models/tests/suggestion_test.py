@@ -1,9 +1,11 @@
 import json
 
+from backend.common.consts.media_type import MediaType
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.consts.suggestion_type import SuggestionType
 from backend.common.models.account import Account
 from backend.common.models.suggestion import Suggestion
+from backend.common.models.suggestion_dict import SuggestionDict
 
 
 def test_lazy_load_json() -> None:
@@ -14,7 +16,7 @@ def test_lazy_load_json() -> None:
 
 def test_lazy_sets_json() -> None:
     suggestion = Suggestion()
-    j = {"abc": "def"}
+    j: SuggestionDict = {"media_type_enum": MediaType.YOUTUBE_VIDEO}
     suggestion.contents = j
     assert suggestion.contents_json == json.dumps(j)
 

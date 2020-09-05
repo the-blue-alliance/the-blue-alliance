@@ -33,7 +33,9 @@ class EventDetails(CachedModel):
 
     alliance_selections: List[
         EventAlliance
-    ] = ndb.JsonProperty()  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
+    ] = (
+        ndb.JsonProperty()
+    )  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
     district_points: EventDistrictPoints = safe_cast(
         EventDistrictPoints, ndb.JsonProperty()
     )

@@ -34,7 +34,8 @@ class TestEventDetailsManipulator(unittest.TestCase):
         }
 
         self.old_event_details = EventDetails(
-            id="2011ct", alliance_selections=self.old_alliance_selections,
+            id="2011ct",
+            alliance_selections=self.old_alliance_selections,
         )
 
         self.new_event_details = EventDetails(

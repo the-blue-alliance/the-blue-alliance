@@ -411,7 +411,10 @@ class TeamRenderer(object):
     def _fetch_data(
         cls, team: Team, year: Year, return_valid_years: bool = False
     ) -> Tuple[
-        List[Event], Dict[ndb.Key, List[Match]], Dict[ndb.Key, List[Award]], List[Year],
+        List[Event],
+        Dict[ndb.Key, List[Match]],
+        Dict[ndb.Key, List[Award]],
+        List[Year],
     ]:
         """
         returns: events_sorted, matches_by_event_key, awards_by_event_key, valid_years

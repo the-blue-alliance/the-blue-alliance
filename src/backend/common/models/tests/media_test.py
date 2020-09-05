@@ -27,7 +27,9 @@ def test_key_name() -> None:
 def test_media_type_validation() -> None:
     with pytest.raises(ndb.exceptions.BadValueError):
         Media(
-            id="youtube_abc", media_type_enum=1337, foreign_key="abc",
+            id="youtube_abc",
+            media_type_enum=1337,
+            foreign_key="abc",
         )
 
 
