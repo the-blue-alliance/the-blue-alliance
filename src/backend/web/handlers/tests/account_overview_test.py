@@ -75,7 +75,8 @@ def test_overview_unregistered(web_client: Client) -> None:
 
 
 def test_overview(
-    captured_templates: List[CapturedTemplate], web_client: Client,
+    captured_templates: List[CapturedTemplate],
+    web_client: Client,
 ) -> None:
     mock = user_mock()
     with patch.object(
@@ -164,7 +165,8 @@ def test_overview_status(
 
 
 def test_overview_no_status(
-    captured_templates: List[CapturedTemplate], web_client: Client,
+    captured_templates: List[CapturedTemplate],
+    web_client: Client,
 ) -> None:
     mock = user_mock()
     with patch.object(
@@ -186,7 +188,8 @@ def test_overview_no_status(
 
 
 def test_overview_webhook_verification_success(
-    captured_templates: List[CapturedTemplate], web_client: Client,
+    captured_templates: List[CapturedTemplate],
+    web_client: Client,
 ) -> None:
     webhook_verification_success = "1"
 
@@ -217,7 +220,8 @@ def test_overview_webhook_verification_success(
 
 
 def test_overview_no_webhook_verification_success(
-    captured_templates: List[CapturedTemplate], web_client: Client,
+    captured_templates: List[CapturedTemplate],
+    web_client: Client,
 ) -> None:
     mock = user_mock()
     with patch.object(
@@ -271,7 +275,8 @@ def test_overview_ping_sent(
 
 
 def test_overview_no_ping_sent(
-    captured_templates: List[CapturedTemplate], web_client: Client,
+    captured_templates: List[CapturedTemplate],
+    web_client: Client,
 ) -> None:
     mock = user_mock()
     with patch.object(
@@ -293,7 +298,8 @@ def test_overview_no_ping_sent(
 
 
 def test_ping_enabled(
-    captured_templates: List[CapturedTemplate], web_client: Client,
+    captured_templates: List[CapturedTemplate],
+    web_client: Client,
 ) -> None:
     mock = user_mock()
     # Add a dummy client so we have something to ping, to check that the ping rows are disabled
@@ -324,7 +330,8 @@ def test_ping_enabled(
 
 
 def test_ping_disabled(
-    captured_templates: List[CapturedTemplate], web_client: Client,
+    captured_templates: List[CapturedTemplate],
+    web_client: Client,
 ) -> None:
     mock = user_mock()
     # Add a dummy client so we have something to ping, to check that the ping rows are disabled
@@ -355,7 +362,8 @@ def test_ping_disabled(
 
 
 def test_num_favorites(
-    captured_templates: List[CapturedTemplate], web_client: Client,
+    captured_templates: List[CapturedTemplate],
+    web_client: Client,
 ) -> None:
     favorites_count = randint(1, 100)
 
@@ -381,7 +389,8 @@ def test_num_favorites(
 
 
 def test_num_subscriptions(
-    captured_templates: List[CapturedTemplate], web_client: Client,
+    captured_templates: List[CapturedTemplate],
+    web_client: Client,
 ) -> None:
     subscriptions_count = randint(1, 100)
 
@@ -403,7 +412,8 @@ def test_num_subscriptions(
 
 
 def test_submissions_pending(
-    captured_templates: List[CapturedTemplate], web_client: Client,
+    captured_templates: List[CapturedTemplate],
+    web_client: Client,
 ) -> None:
     submissions_pending_count = randint(1, 100)
 
@@ -425,7 +435,8 @@ def test_submissions_pending(
 
 
 def test_submissions_accepted(
-    captured_templates: List[CapturedTemplate], web_client: Client,
+    captured_templates: List[CapturedTemplate],
+    web_client: Client,
 ) -> None:
     submissions_accepted_count = randint(1, 100)
 
@@ -447,7 +458,8 @@ def test_submissions_accepted(
 
 
 def test_submissions_reviewed(
-    captured_templates: List[CapturedTemplate], web_client: Client,
+    captured_templates: List[CapturedTemplate],
+    web_client: Client,
 ) -> None:
     submissions_reviewed_count = randint(1, 100)
 
@@ -500,7 +512,8 @@ def test_has_review_permissions(
 
 
 def test_api_read_keys(
-    captured_templates: List[CapturedTemplate], web_client: Client,
+    captured_templates: List[CapturedTemplate],
+    web_client: Client,
 ) -> None:
     api_read_keys = [Mock()]
 
@@ -522,7 +535,8 @@ def test_api_read_keys(
 
 
 def test_api_write_keys(
-    captured_templates: List[CapturedTemplate], web_client: Client,
+    captured_templates: List[CapturedTemplate],
+    web_client: Client,
 ) -> None:
     api_write_keys = [Mock(event_list=[], auth_types_enum=[])]
 
@@ -544,7 +558,8 @@ def test_api_write_keys(
 
 
 def test_auth_write_type_names(
-    captured_templates: List[CapturedTemplate], web_client: Client,
+    captured_templates: List[CapturedTemplate],
+    web_client: Client,
 ) -> None:
     mock = user_mock()
     with patch.object(

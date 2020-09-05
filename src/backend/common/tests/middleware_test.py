@@ -72,9 +72,7 @@ def test_set_secret_key_default(ndb_context, app: Flask) -> None:
 
 def test_set_secret_key_not_default(ndb_context, app: Flask) -> None:
     secret_key = "some_new_secret_key"
-    Sitevar.get_or_insert(
-        "secrets", values_json=json.dumps({"secret_key": secret_key})
-    )
+    Sitevar.get_or_insert("secrets", values_json=json.dumps({"secret_key": secret_key}))
 
     assert app.secret_key is None
     _set_secret_key(app)
@@ -101,9 +99,7 @@ def test_set_secret_key_default_prod(ndb_context, app: Flask) -> None:
 
 def test_set_secret_key_prod(ndb_context, app: Flask) -> None:
     secret_key = "some_new_secret_key"
-    Sitevar.get_or_insert(
-        "secrets", values_json=json.dumps({"secret_key": secret_key})
-    )
+    Sitevar.get_or_insert("secrets", values_json=json.dumps({"secret_key": secret_key}))
 
     assert app.secret_key is None
     with patch.object(Environment, "is_prod", return_value=True):

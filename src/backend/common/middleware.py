@@ -62,7 +62,6 @@ class AfterResponseMiddleware:
 
 
 def install_middleware(app: Flask, configure_secret_key: bool = True) -> None:
-
     @app.before_first_request
     def _app_before():
         if configure_secret_key:
