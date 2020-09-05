@@ -1,4 +1,3 @@
-import os
 from unittest.mock import Mock, patch
 from urllib.parse import parse_qsl, urlparse
 
@@ -16,10 +15,6 @@ from backend.web.handlers.decorators import (
     require_login_only,
     require_permission,
 )
-
-os.environ[
-    "GOOGLE_APPLICATION_CREDENTIALS"
-] = "src/backend/web/handlers/tests/test-credentials.json"
 
 
 def test_require_login_only_no_user() -> None:
