@@ -47,7 +47,7 @@
           <p>Thanks for helping make The Blue Alliance better! Let us know about media so we can add them to the site!</p>
           <ul>
             <li>Your suggestion will be reviewed by a moderator.</li>
-            <li>Your account info (like {{user_bundle.user.email()}} and {{user_bundle.user.nickname()}}) will also be submitted. <a href="{{user_bundle.logout_url}}">log in as a different user</a></li>
+            <li>Your account info (like {{ user.email }} and {{ user.nickname }}) will also be submitted. <a href="{{ url_for('account.logout') }}">log in as a different user</a></li>
           </ul>
 
           <hr>

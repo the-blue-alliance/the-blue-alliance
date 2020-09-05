@@ -1,11 +1,19 @@
 import importlib
 import os
-from unittest.mock import patch
 
+import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from flask import Flask
 
 from backend.common.sitevars.secrets import Secrets
+
+
+@pytest.fixture(autouse=True)
+def setup_secret_key(monkeypatch: MonkeyPatch) -> None:
+    def mock_get_secret():
+        return "thebluealliance-test"
+
+    monkeypatch.setattr(Secrets, "secret_key", mock_get_secret)
 
 
 def test_blueprint_not_installed_by_default() -> None:
@@ -26,8 +34,7 @@ def test_blueprint_not_installed_on_prod(monkeypatch: MonkeyPatch) -> None:
 
     from backend.web import main
 
-    with patch.object(Secrets, "secret_key", return_value="secret_key"):
-        importlib.reload(main)
+    importlib.reload(main)
 
     client = main.app.test_client()
     resp = client.get("/local/bootstrap")

@@ -54,10 +54,10 @@
                         <ul>
                             <li>Your request will be reviewed by a moderator</li>
                             <li>After review, we will send you an email at the address associated
-                                with your TBA account, <strong>{{ user_bundle.user.email() }}</strong>.
+                                with your TBA account, <strong>{{  user.email  }}</strong>.
                                 You can also find auth tokens associated with your account on your
-                                <a href="/account">account overview</a>. You can also
-                                <a href="{{ user_bundle.logout_url }}">log in as a different
+                                <a href="{{ url_for('account.overview') }}"">account overview</a>. You can also
+                                <a href="{{ url_for('account.logout') }}">log in as a different
                                     user</a> if this is not correct.</li>
                             <li>You can only request tokens for offseason events, please
                                 <a href="/contact">contact us</a> you find errors with official

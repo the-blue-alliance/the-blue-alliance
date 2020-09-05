@@ -18,9 +18,9 @@ class NdbMiddleware(object):
     app: Callable[[Any, Any], Any]
     ndb_client: ndb.Client
 
-    def __init__(self, app: Callable[[Any, Any], Any], ndb_client: ndb.Client):
+    def __init__(self, app: Callable[[Any, Any], Any]):
         self.app = app
-        self.ndb_client = ndb_client
+        self.ndb_client = ndb.Client()
 
     def __call__(self, environ: Any, start_response: Any):
         with self.ndb_client.context():
@@ -61,22 +61,22 @@ class AfterResponseMiddleware:
         send_traces()
 
 
-def install_middleware(app: Flask) -> None:
-    ndb_client = ndb.Client()
+def install_middleware(app: Flask, configure_secret_key: bool = True) -> None:
+    @app.before_first_request
+    def _app_before():
+        if configure_secret_key:
+            _set_secret_key(app)
 
-    _set_secret_key(app, ndb_client)
-
-    app.wsgi_app = NdbMiddleware(TraceRequestMiddleware(AfterResponseMiddleware(app.wsgi_app)), ndb_client)  # type: ignore[override]
+    app.wsgi_app = NdbMiddleware(TraceRequestMiddleware(AfterResponseMiddleware(app.wsgi_app)))  # type: ignore[override]
 
 
-def _set_secret_key(app: Flask, ndb_client: ndb.Client) -> None:
+def _set_secret_key(app: Flask) -> None:
     from backend.common.sitevars.secrets import Secrets
 
-    with ndb_client.context():
-        secret_key = Secrets.secret_key()
-        if Environment.is_prod():
-            if not secret_key:
-                raise Exception("Secret key not set in production!")
-            if secret_key == Secrets.DEFAULT_SECRET_KEY:
-                raise Exception("Secret key may not be default in production!")
-        app.secret_key = Secrets.secret_key()
+    secret_key = Secrets.secret_key()
+    if Environment.is_prod():
+        if not secret_key:
+            raise Exception("Secret key not set in production!")
+        if secret_key == Secrets.DEFAULT_SECRET_KEY:
+            raise Exception("Secret key may not be default in production!")
+    app.secret_key = secret_key

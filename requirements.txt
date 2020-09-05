@@ -11,3 +11,4 @@ InMemoryCloudDatastoreStub
 beautifulsoup4
 freezegun
 requests-mock
+blinker==1.4

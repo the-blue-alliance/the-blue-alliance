@@ -1,5 +1,5 @@
 <ul class="nav nav-pills nav-stacked">
-    {% if media_permission in user_bundle.account.permissions %}
+    {% if media_permission in user.permissions %}
     <li{% if suggestions.match %} class="active"{% endif %}>
         <a href="/suggest/match/video/review">
             <span class="badge pull-right">{{suggestions.match}}</span>
@@ -27,7 +27,7 @@
     </li>
     {% endif %}
 
-    {% if event_media_permission in user_bundle.account.permissions %}
+    {% if event_media_permission in user.permissions %}
     <li{% if suggestions.event_media %} class="active"{% endif %}>
         <a href="/suggest/event/media/review">
             <span class="badge pull-right">{{suggestions.event_media}}</span>
@@ -36,7 +36,7 @@
     </li>
     {% endif %}
 
-    {% if cad_permission in user_bundle.account.permissions %}
+    {% if cad_permission in user.permissions %}
     <li{% if suggestions.cad %} class="active"{% endif %}>
         <a href="/suggest/cad/review">
             <span class="badge pull-right">{{suggestions.cad}}</span>
@@ -45,7 +45,7 @@
     </li>
     {% endif %}
 
-    {% if offseason_permission in user_bundle.account.permissions %}
+    {% if offseason_permission in user.permissions %}
     <li{% if suggestions.offseason %} class="active"{% endif %}>
         <a href="/suggest/offseason/review">
             <span class="badge pull-right">{{suggestions.offseason}}</span>
@@ -54,7 +54,7 @@
     </li>
     {% endif %}
 
-    {% if apiwrite_permission in user_bundle.account.permissions %}
+    {% if apiwrite_permission in user.permissions %}
     <li{% if suggestions.apiwrite %} class="active"{% endif %}>
         <a href="/suggest/apiwrite/review">
             <span class="badge pull-right">{{suggestions.apiwrite}}</span>

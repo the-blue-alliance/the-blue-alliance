@@ -9,7 +9,7 @@
   <div class="row">
     <div class="col-md-8 col-md-offset-2">
       <ol class="breadcrumb">
-        <li><a href="/account">Account Overview</a></li>
+        <li><a href="{{ url_for('account.overview') }}">Account Overview</a></li>
         <li><a href="/account/mytba#my-teams">Manage myTBA</a></li>
         <li class="active">Team {{team.team_number}}</li>
       </ol>
@@ -23,7 +23,7 @@
 
       <form method="post">
         <input name="action" type="hidden" value="subscription_year_add" />
-        <input name="account_id" type="hidden" value="{{user_bundle.account.key.id()}}" />
+        <input name="account_id" type="hidden" value="{{ user.uid }}" />
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
         <table class="table">

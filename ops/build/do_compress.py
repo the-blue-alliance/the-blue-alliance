@@ -15,8 +15,14 @@ SCRIPTS_MAIN = [
     "src/backend/web/static/javascript/tba_js/tba_sidebar.js",
     "src/backend/web/static/javascript/tba_js/tba_typeahead.js",
     "src/backend/web/static/javascript/tba_js/tba_favorites.js",
-    # 'src/backend/web/static/javascript/tba_js/tba_fcm.js',
     "src/backend/web/static/javascript/tba_js/ReView0.65b.js",
+]
+
+SCRIPTS_FIREBASE = [
+    "src/backend/web/static/javascript/tba_js/tba_keys.js",
+    "src/backend/web/static/javascript/tba_js/tba_firebase.js",
+    "src/backend/web/static/javascript/tba_js/tba_auth.js",
+    # 'src/backend/web/static/javascript/tba_js/tba_fcm.js',
 ]
 
 SCRIPTS_FIREBASE_SERVICEWORKER = [
@@ -51,6 +57,7 @@ STYLESHEETS_GAMEDAY = [
 ]
 
 SCRIPTS_MAIN_OUT = "src/build/javascript/tba_combined_js.main.min.js"
+SCRIPTS_FIREBASE_OUT = "src/build/javascript/tba_combined_js.firebase.min.js"
 SCRIPTS_GAMEDAY_OUT = "src/build/javascript/tba_combined_js.gameday.min.js"
 SCRIPTS_FIREBASE_SERVICEWORKER_OUT = "src/build/javascript/firebase-messaging-sw.js"
 SCRIPTS_EVENTWIZARD_OUT = "src/build/javascript/tba_combined_js.eventwizard.min.js"
@@ -78,6 +85,9 @@ def main(kind=None):
     if kind == "js" or kind is None:
         print("Compressing Main JavaScript...")
         compress_js(SCRIPTS_MAIN, SCRIPTS_MAIN_OUT)
+
+        print("Compressing Firebase JavaScript...")
+        compress_js(SCRIPTS_FIREBASE, SCRIPTS_FIREBASE_OUT)
 
         # print('Compressing Firebase Messaging Serviceworker JavaScript...')
         # compress_js(SCRIPTS_FIREBASE_SERVICEWORKER, SCRIPTS_FIREBASE_SERVICEWORKER_OUT)

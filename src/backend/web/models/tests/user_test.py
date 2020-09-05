@@ -4,6 +4,7 @@ import pytest
 from google.cloud import ndb
 from pyre_extensions import none_throws
 
+from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.client_type import ClientType
 from backend.common.consts.model_type import ModelType
@@ -25,7 +26,7 @@ def test_init_no_email() -> None:
 
 
 def test_init_account() -> None:
-    email = "zach@zach.com"
+    email = "zach@thebluealliance.com"
     account = Account(email=email)
     account.put()
 
@@ -34,7 +35,7 @@ def test_init_account() -> None:
 
 
 def test_init_account_uid_required() -> None:
-    email = "zach@zachorr.com"
+    email = "zach@thebluealliance.com"
     with pytest.raises(KeyError, match="uid"):
         User(session_claims={"email": email})
 
@@ -42,7 +43,7 @@ def test_init_account_uid_required() -> None:
 def test_init_new_account() -> None:
     id = "abc"
     nickname = "zach"
-    email = "{}@zachorr.com".format(nickname)
+    email = "{}@thebluealliance.com".format(nickname)
 
     user = User(session_claims={"uid": id, "email": email})
 
@@ -62,7 +63,7 @@ def test_init_new_account() -> None:
 
 def test_init_new_account_name() -> None:
     id = "abc"
-    email = "zach@zachorr.com"
+    email = "zach@thebluealliance.com"
     name = "Zach"
 
     user = User(session_claims={"uid": id, "email": email, "name": name})
@@ -76,7 +77,7 @@ def test_email_none() -> None:
 
 
 def test_email() -> None:
-    email = "zach@zach.com"
+    email = "zach@thebluealliance.com"
     account = Account(email=email)
     account.put()
 
@@ -91,7 +92,7 @@ def test_display_name_none() -> None:
 
 
 def test_display_name() -> None:
-    email = "zach@zach.com"
+    email = "zach@thebluealliance.com"
     name = "Zach"
     account = Account(email=email, display_name=name)
     account.put()
@@ -107,7 +108,7 @@ def test_nickname_none() -> None:
 
 
 def test_nickname() -> None:
-    email = "zach@zach.com"
+    email = "zach@thebluealliance.com"
     nickname = "zach"
     account = Account(email=email, nickname=nickname)
     account.put()
@@ -123,7 +124,7 @@ def test_uid_none() -> None:
 
 
 def test_uid() -> None:
-    email = "zach@zach.com"
+    email = "zach@thebluealliance.com"
     account = Account(email=email)
     account.put()
 
@@ -138,7 +139,7 @@ def test_is_registered_none() -> None:
 
 
 def test_is_registered_false() -> None:
-    email = "zach@zach.com"
+    email = "zach@thebluealliance.com"
     account = Account(email=email)
     account.put()
 
@@ -148,12 +149,28 @@ def test_is_registered_false() -> None:
 
 
 def test_is_registered() -> None:
-    email = "zach@zach.com"
+    email = "zach@thebluealliance.com"
     account = Account(email=email, registered=True)
     account.put()
 
     user = User(session_claims={"email": email})
     assert user.is_registered
+
+
+def test_permissions_none() -> None:
+    user = User(session_claims={})
+    assert user._account is None
+    assert user.permissions is None
+
+
+def test_permissions() -> None:
+    email = "zach@thebluealliance.com"
+    permissions = [AccountPermission.REVIEW_MEDIA]
+    account = Account(email=email, permissions=permissions)
+    account.put()
+
+    user = User(session_claims={"email": email})
+    assert user.permissions == permissions
 
 
 def test_mobile_clients_none() -> None:
@@ -163,7 +180,7 @@ def test_mobile_clients_none() -> None:
 
 
 def test_mobile_clients() -> None:
-    email = "zach@zach.com"
+    email = "zach@thebluealliance.com"
     account = Account(id="account", email=email, registered=True)
     account.put()
 
@@ -196,7 +213,7 @@ def test_favorites_none() -> None:
 
 
 def test_favorites() -> None:
-    email = "zach@zach.com"
+    email = "zach@thebluealliance.com"
     account = Account(id="account", email=email, registered=True)
     account.put()
 
@@ -219,7 +236,7 @@ def test_favorites_count_none() -> None:
 
 
 def test_favorites_count() -> None:
-    email = "zach@zach.com"
+    email = "zach@thebluealliance.com"
     account = Account(id="account", email=email, registered=True)
     account.put()
 
@@ -242,7 +259,7 @@ def test_subscriptions_none() -> None:
 
 
 def test_subscriptions() -> None:
-    email = "zach@zach.com"
+    email = "zach@thebluealliance.com"
     account = Account(id="account", email=email, registered=True)
     account.put()
 
@@ -265,7 +282,7 @@ def test_subscriptions_count_none() -> None:
 
 
 def test_subscriptions_count() -> None:
-    email = "zach@zach.com"
+    email = "zach@thebluealliance.com"
     account = Account(id="account", email=email, registered=True)
     account.put()
 
@@ -304,7 +321,7 @@ def test_register_none() -> None:
 
 
 def test_register() -> None:
-    email = "zach@zach.com"
+    email = "zach@thebluealliance.com"
     account = Account(id="account", email=email, registered=False)
     account.put()
 
@@ -330,7 +347,7 @@ def test_update_display_name_none() -> None:
 
 
 def test_update_display_name() -> None:
-    email = "zach@zach.com"
+    email = "zach@thebluealliance.com"
     account = Account(id="account", email=email, registered=False)
     account.put()
 
@@ -359,7 +376,7 @@ def test_submissions_method_count_none(method) -> None:
 
 @pytest.mark.parametrize("method, count", zip(submission_methods, [1, 1]))
 def test_submissions_method_count(method, count) -> None:
-    email = "zach@zach.com"
+    email = "zach@thebluealliance.com"
     account = Account(id="account", email=email)
     account.put()
 
@@ -382,7 +399,7 @@ def test_submissions_reviewed_count_none() -> None:
 
 
 def test_submissions_reviewed_count() -> None:
-    email = "zach@zach.com"
+    email = "zach@thebluealliance.com"
     account = Account(id="account", email=email)
     account.put()
 
@@ -407,7 +424,7 @@ def test_has_review_permissions_none() -> None:
 
 
 def test_has_review_permissions_empty() -> None:
-    email = "zach@zach.com"
+    email = "zach@thebluealliance.com"
     account = Account(id="account", email=email, permissions=[])
     account.put()
 
@@ -417,7 +434,7 @@ def test_has_review_permissions_empty() -> None:
 
 
 def test_has_review_permissions() -> None:
-    email = "zach@zach.com"
+    email = "zach@thebluealliance.com"
     account = Account(id="account", email=email, permissions=[1])
     account.put()
 
@@ -458,7 +475,7 @@ def _api_key(auth_type: AuthType) -> Callable[[], ApiAuthAccess]:
     ),
 )
 def test_api_keys_method(method, keys) -> None:
-    email = "zach@zach.com"
+    email = "zach@thebluealliance.com"
     account = Account(id="account", email=email)
     account.put()
 
