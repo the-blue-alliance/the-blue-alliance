@@ -42,11 +42,15 @@ def _decoded_claims() -> Optional[Dict[str, Any]]:
         return None
 
 
-def current_user() -> Optional[User]:
+def _current_user() -> Optional[User]:
     session_claims = _decoded_claims()
     if not session_claims:
         return None
     return User(session_claims)
+
+
+def current_user() -> Optional[User]:
+    return _current_user()
 
 
 def _user_context_processor() -> Dict[str, Optional[User]]:

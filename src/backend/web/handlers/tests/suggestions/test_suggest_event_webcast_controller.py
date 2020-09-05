@@ -1,6 +1,5 @@
 from datetime import datetime
 from typing import cast, List
-from unittest.mock import Mock, patch
 from urllib.parse import urlparse
 
 import pytest
@@ -8,11 +7,9 @@ from bs4 import BeautifulSoup
 from google.cloud import ndb
 from werkzeug.test import Client
 
-import backend
 from backend.common.consts.event_type import EventType
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.consts.webcast_type import WebcastType
-from backend.common.models.account import Account
 from backend.common.models.event import Event
 from backend.common.models.suggestion import Suggestion
 from backend.common.models.webcast import Webcast
@@ -42,30 +39,6 @@ def createEvent(ndb_client) -> None:
             website="http://www.firstsv.org",
         )
         event.put()
-
-
-@pytest.fixture
-def login_user(ndb_client):
-    with ndb_client.context():
-        account = Account(
-            email="test@tba.com",
-            registered=True,
-        )
-        account_key = account.put()
-
-    mock_user = Mock()
-    mock_user.is_registered = True
-    mock_user.api_read_keys = []
-    mock_user.api_write_keys = []
-    mock_user.mobile_clients = []
-    mock_user.account_key = account_key
-
-    with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock_user
-    ), patch.object(
-        backend.web.handlers.suggestions, "current_user", return_value=mock_user
-    ):
-        yield mock_user
 
 
 def assert_template_status(
