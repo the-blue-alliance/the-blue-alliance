@@ -10,6 +10,7 @@ var firebaseAuthDomain = "${GCLOUD_PROJECT_ID}.firebaseapp.com";
 var firebaseDatabaseURL = "https://${GCLOUD_PROJECT_ID}.firebaseio.com";
 var firebaseStorageBucket = "${GCLOUD_PROJECT_ID}.appspot.com";
 var firebaseMessagingSenderId = "${FIREBASE_MESSAGING_SENDER_ID}";
+var firebaseProjectId = "${GCLOUD_PROJECT_ID}";
 EOF
 
 python ./ops/build/do_compress.py
