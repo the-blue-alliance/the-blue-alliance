@@ -6,6 +6,7 @@ npx -p less@3.11.3 lessc src/backend/web/static/css/less_css/tba_style.main.less
 touch ./src/backend/web/static/javascript/tba_js/tba_keys.js
 cat > ./src/backend/web/static/javascript/tba_js/tba_keys.js <<EOF
 var firebaseApiKey = "${FIREBASE_API_KEY}";
+var firebaseAppId = "${FIREBASE_APP_ID}";
 var firebaseAuthDomain = "${GCLOUD_PROJECT_ID}.firebaseapp.com";
 var firebaseDatabaseURL = "https://${GCLOUD_PROJECT_ID}.firebaseio.com";
 var firebaseStorageBucket = "${GCLOUD_PROJECT_ID}.appspot.com";
