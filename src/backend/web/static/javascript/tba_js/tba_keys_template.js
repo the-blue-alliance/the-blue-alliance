@@ -6,4 +6,3 @@ var firebaseProjectId = "";
 var firebaseStorageBucket = "";
 var firebaseMessagingSenderId = "";
 var firebaseAppId = "";
-var firebaseMeasurementId = "";

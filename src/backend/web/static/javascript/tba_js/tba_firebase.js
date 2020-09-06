@@ -6,7 +6,6 @@ var config = {
   projectId: firebaseProjectId,
   storageBucket: firebaseStorageBucket,
   messagingSenderId: firebaseMessagingSenderId,
-  appId: firebaseAppId,
-  measurementId: firebaseMeasurementId,
+  appId: firebaseAppId
 };
 firebase.initializeApp(config);
