@@ -87,34 +87,39 @@ def createMatchAndEvent(ndb_client: ndb.Client):
         match.put()
 
 
-def assert_template_status(
-    captured_templates: List[CapturedTemplate], status: str
+def assert_num_added(
+    captured_templates: List[CapturedTemplate], num_added: int
 ) -> None:
     template = captured_templates[0][0]
     context = captured_templates[0][1]
-    assert template.name == "suggestions/suggest_match_video.html"
-    assert context["status"] == status
+    assert template.name == "suggestions/suggest_match_video_playlist.html"
+    assert context["num_added"] == str(num_added)
 
 
 def test_login_redirect(web_client: Client) -> None:
-    response = web_client.get("/suggest/match/video?match_key=2016necmp_f1m1")
+    response = web_client.get("/suggest/event/video?event_key=2016necmp")
     assert response.status_code == 302
     assert urlparse(response.headers["Location"]).path == "/account/login"
 
 
-def test_bad_match(login_user, web_client: Client) -> None:
-    response = web_client.get("/suggest/match/video?match_key=2016necmp_f1m2")
+def test_garbage_event(login_user, web_client: Client) -> None:
+    response = web_client.get("/suggest/event/video?event_key=asdf")
+    assert response.status_code == 404
+
+
+def test_bad_event(login_user, web_client: Client) -> None:
+    response = web_client.get("/suggest/event/video?event_key=2016foo")
     assert response.status_code == 404
 
 
 def test_get_form(login_user, web_client: Client) -> None:
-    response = web_client.get("/suggest/match/video?match_key=2016necmp_f1m1")
+    response = web_client.get("/suggest/event/video?event_key=2016necmp")
     assert response.status_code == 200
 
     soup = BeautifulSoup(response.data, "html.parser")
-    form = soup.find("form", id="suggest_match_video")
+    form = soup.find("form", id="event_videos")
     assert form is not None
-    assert form["action"] == "/suggest/match/video"
+    assert form["action"] == "/suggest/event/video"
     assert form["method"] == "post"
 
     csrf = form.find(attrs={"name": "csrf_token"})
@@ -122,20 +127,35 @@ def test_get_form(login_user, web_client: Client) -> None:
     assert csrf["type"] == "hidden"
     assert csrf["value"] is not None
 
-    match_key = form.find(attrs={"name": "match_key"})
-    assert match_key is not None
-    assert match_key["type"] == "hidden"
-    assert match_key["value"] == "2016necmp_f1m1"
-
-    assert form.find(attrs={"name": "youtube_url"}) is not None
+    event_key = form.find(attrs={"name": "event_key"})
+    assert event_key is not None
+    assert event_key["type"] == "hidden"
+    assert event_key["value"] == "2016necmp"
 
 
-def test_submit_no_match(
-    login_user,
-    ndb_client: ndb.Client,
-    web_client: Client,
+def test_submit_no_event(
+    login_user, ndb_client: ndb.Client, web_client: Client
 ) -> None:
-    resp = web_client.post("/suggest/match/video", data={}, follow_redirects=True)
+    resp = web_client.post(
+        "/suggest/event/video",
+        data={},
+        follow_redirects=True,
+    )
+    assert resp.status_code == 404
+
+    # Assert no suggestions were written
+    with ndb_client.context():
+        assert Suggestion.query().fetch() == []
+
+
+def test_submit_bad_event(
+    login_user, ndb_client: ndb.Client, web_client: Client
+) -> None:
+    resp = web_client.post(
+        "/suggest/event/video",
+        data={"event_key": "2016foo"},
+        follow_redirects=True,
+    )
     assert resp.status_code == 404
 
     # Assert no suggestions were written
@@ -150,70 +170,89 @@ def test_submit_empty_form(
     captured_templates: List[CapturedTemplate],
 ) -> None:
     resp = web_client.post(
-        "/suggest/match/video",
-        data={"match_key": "2016necmp_f1m1"},
+        "/suggest/event/video",
+        data={"event_key": "2016necmp"},
         follow_redirects=True,
     )
     assert resp.status_code == 200
-    assert_template_status(captured_templates, "invalid_url")
-
-    # Assert the correct dialog shows
-    soup = BeautifulSoup(resp.data, "html.parser")
-    assert soup.find(id="invalid_url-alert") is not None
+    assert_num_added(captured_templates, 0)
 
     # Assert no suggestions were written
     with ndb_client.context():
         assert Suggestion.query().fetch() == []
 
 
-def test_submit_bad_url(
+def test_submit_partial_mismatch(
     login_user,
     ndb_client: ndb.Client,
     web_client: Client,
     captured_templates: List[CapturedTemplate],
 ) -> None:
-    resp = web_client.post(
-        "/suggest/match/video",
-        data={"match_key": "2016necmp_f1m1", "youtube_url": "asdf"},
-        follow_redirects=True,
-    )
-    assert resp.status_code == 200
-    assert_template_status(captured_templates, "invalid_url")
-
-    # Assert the correct dialog shows
-    soup = BeautifulSoup(resp.data, "html.parser")
-    assert soup.find(id="invalid_url-alert") is not None
-
-    # Assert no suggestions were written
-    with ndb_client.context():
-        assert Suggestion.query().fetch() == []
-
-
-def test_submit_match_video(
-    login_user,
-    ndb_client: ndb.Client,
-    web_client: Client,
-    captured_templates: List[CapturedTemplate],
-) -> None:
-    resp = web_client.post(
-        "/suggest/match/video",
+    response = web_client.post(
+        "/suggest/event/video?event_key=2016necmp",
         data={
-            "match_key": "2016necmp_f1m1",
-            "youtube_url": "http://youtu.be/bHGyTjxbLz8",
+            "event_key": "2016necmp",
+            "num_videos": 1,
+            "video_id_0": "37F5tbrFqJQ",
         },
         follow_redirects=True,
     )
-    assert resp.status_code == 200
-    assert_template_status(captured_templates, "success")
+    assert response.status_code == 200
+    assert_num_added(captured_templates, 0)
 
-    # Assert the correct dialog shows
-    soup = BeautifulSoup(resp.data, "html.parser")
-    assert soup.find(id="success-alert") is not None
-
-    # Make sure the Suggestion gets created
+    # Assert no suggestions were written
     with ndb_client.context():
-        suggestion = cast(Suggestion, Suggestion.query().fetch()[0])
+        assert Suggestion.query().fetch() == []
+
+
+def test_submit_bad_match(
+    login_user,
+    ndb_client: ndb.Client,
+    web_client: Client,
+    captured_templates: List[CapturedTemplate],
+) -> None:
+    response = web_client.post(
+        "/suggest/event/video?event_key=2016necmp",
+        data={
+            "event_key": "2016necmp",
+            "num_videos": 1,
+            "video_id_0": "37F5tbrFqJQ",
+            "match_partial_0": "qm1",
+        },
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert_num_added(captured_templates, 0)
+
+    # Assert no suggestions were written
+    with ndb_client.context():
+        assert Suggestion.query().fetch() == []
+
+
+def test_submit_one_video(
+    login_user,
+    ndb_client: ndb.Client,
+    web_client: Client,
+    captured_templates: List[CapturedTemplate],
+) -> None:
+    response = web_client.post(
+        "/suggest/event/video?event_key=2016necmp",
+        data={
+            "event_key": "2016necmp",
+            "num_videos": 1,
+            "video_id_0": "37F5tbrFqJQ",
+            "match_partial_0": "f1m1",
+        },
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert_num_added(captured_templates, 1)
+
+    with ndb_client.context():
+        suggestions = Suggestion.query().fetch()
+        assert len(suggestions) == 1
+        suggestion = cast(Suggestion, suggestions[0])
         assert suggestion is not None
         assert suggestion.review_state == SuggestionState.REVIEW_PENDING
         assert suggestion.target_key == "2016necmp_f1m1"
-        assert suggestion.contents == SuggestionDict(youtube_videos=["bHGyTjxbLz8"])
+        assert suggestion.contents == SuggestionDict(youtube_videos=["37F5tbrFqJQ"])
