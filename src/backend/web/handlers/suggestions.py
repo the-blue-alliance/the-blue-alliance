@@ -5,7 +5,10 @@ from werkzeug.wrappers import Response
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.models.event import Event
 from backend.common.models.match import Match
-from backend.common.suggestions.suggestion_creator import SuggestionCreator
+from backend.common.suggestions.suggestion_creator import (
+    SuggestionCreationStatus,
+    SuggestionCreator,
+)
 from backend.web.auth import current_user
 from backend.web.handlers.decorators import require_login
 from backend.web.profiled_render import render_template
@@ -117,4 +120,67 @@ def submit_match_video() -> Response:
 
     return redirect(
         url_for(".suggest_match_video", match_key=match_key, status=status.value)
+    )
+
+
+@blueprint.route("/event/video")
+@require_login
+def suggest_match_video_playlist() -> Response:
+    event_key = request.args.get("event_key") or ""
+
+    if not Event.validate_key_name(event_key):
+        abort(404)
+
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    template_values = {"event": event, "num_added": request.args.get("num_added")}
+    return render_template(
+        "suggestions/suggest_match_video_playlist.html", template_values
+    )
+
+
+@blueprint.route("/event/video", methods=["POST"])
+@require_login
+def submit_match_video_playlist() -> Response:
+    event_key = request.form.get("event_key") or ""
+
+    if not Event.validate_key_name(event_key):
+        abort(404)
+
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    match_futures = Match.query(Match.event == event.key).fetch_async(keys_only=True)
+    valid_match_keys = [match.id() for match in match_futures.get_result()]
+
+    num_videos = int(request.form.get("num_videos", 0))
+    suggestions_added = 0
+    for i in range(0, num_videos):
+        yt_id = request.form.get(f"video_id_{i}")
+        match_partial = request.form.get(f"match_partial_{i}")
+        if not yt_id or not match_partial:
+            continue
+
+        match_key = f"{event_key}_{match_partial}"
+        if match_key not in valid_match_keys:
+            continue
+
+        user = current_user()
+        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(
+            author_account_key=none_throws(none_throws(user).account_key),
+            youtube_id=yt_id,
+            match_key=match_key,
+        )
+        if status == SuggestionCreationStatus.SUCCESS:
+            suggestions_added += 1
+
+    return redirect(
+        url_for(
+            ".suggest_match_video_playlist",
+            event_key=event_key,
+            num_added=suggestions_added,
+        )
     )
