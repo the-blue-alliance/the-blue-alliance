@@ -2,11 +2,17 @@ from flask import abort, Blueprint, jsonify, redirect, request, url_for
 from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
 
+from backend.common.consts.media_type import MediaType
 from backend.common.helpers.media_helper import MediaHelper
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.models.event import Event
 from backend.common.models.match import Match
-from backend.common.queries.media_query import EventMediasQuery
+from backend.common.models.team import Team
+from backend.common.queries.media_query import (
+    EventMediasQuery,
+    TeamSocialMediaQuery,
+    TeamYearMediaQuery,
+)
 from backend.common.suggestions.suggestion_creator import (
     SuggestionCreationStatus,
     SuggestionCreator,
@@ -246,4 +252,117 @@ def submit_event_media() -> Response:
 
     return redirect(
         url_for(".suggest_event_media", event_key=event_key, status=status.value)
+    )
+
+
+@blueprint.route("/team/media")
+@require_login
+def suggest_team_media() -> Response:
+    team_key = request.args.get("team_key", "")
+    year_str = request.args.get("year", "")
+
+    if not Team.validate_key_name(team_key) or not year_str.isdigit():
+        abort(404)
+
+    year = int(year_str)
+    team = Team.get_by_id(team_key)
+    if not team:
+        abort(404)
+
+    media_future = TeamYearMediaQuery(team_key=team.key_name, year=year).fetch_async()
+    social_media_future = TeamSocialMediaQuery(team_key=team.key_name).fetch_async()
+
+    medias = media_future.get_result()
+    medias_by_slugname = MediaHelper.group_by_slugname(medias)
+
+    social_medias = sorted(
+        social_media_future.get_result(), key=MediaHelper.social_media_sorter
+    )
+    social_medias = filter(
+        lambda m: m.media_type_enum == MediaType.INSTAGRAM_PROFILE, social_medias
+    )  # we only allow IG media, so only show IG profile
+
+    template_values = {
+        "medias_by_slugname": medias_by_slugname,
+        "social_medias": list(social_medias),
+        "status": request.args.get("status"),
+        "team": team,
+        "year": year,
+    }
+    return render_template("suggestions/suggest_team_media.html", template_values)
+
+
+@blueprint.route("/team/media", methods=["POST"])
+@enforce_login
+def submit_team_media() -> Response:
+    team_key = request.form.get("team_key", "")
+    year_str = request.form.get("year", "")
+    if not Team.validate_key_name(team_key) or not year_str.isdigit():
+        abort(404)
+
+    team = Team.get_by_id(team_key)
+    if not team:
+        abort(404)
+
+    user = current_user()
+    status, suggestion = SuggestionCreator.createTeamMediaSuggestion(
+        author_account_key=none_throws(none_throws(user).account_key),
+        media_url=request.form.get("media_url", ""),
+        team_key=team_key,
+        year_str=year_str,
+    )
+    return redirect(
+        url_for(
+            ".suggest_team_media", team_key=team_key, year=year_str, status=status.value
+        )
+    )
+
+
+@blueprint.route("/team/social_media")
+@require_login
+def suggest_team_social_media() -> Response:
+    team_key = request.args.get("team_key", "")
+
+    if not Team.validate_key_name(team_key):
+        abort(404)
+
+    team = Team.get_by_id(team_key)
+    if not team:
+        abort(404)
+
+    medias_future = TeamSocialMediaQuery(team_key=team_key).fetch_async()
+    social_medias = medias_future.get_result()
+
+    template_values = {
+        "team": team,
+        "status": request.args.get("status"),
+        "social_medias": social_medias,
+    }
+    return render_template(
+        "suggestions/suggest_team_social_media.html", template_values
+    )
+
+
+@blueprint.route("/team/social_media", methods=["POST"])
+@enforce_login
+def submit_team_social_media() -> Response:
+    team_key = request.form.get("team_key", "")
+
+    if not Team.validate_key_name(team_key):
+        abort(404)
+
+    team = Team.get_by_id(team_key)
+    if not team:
+        abort(404)
+
+    user = current_user()
+    status, suggestion = SuggestionCreator.createTeamMediaSuggestion(
+        author_account_key=none_throws(none_throws(user).account_key),
+        media_url=request.form.get("media_url", ""),
+        team_key=team_key,
+        year_str=None,
+        is_social=True,
+    )
+    return redirect(
+        url_for(".suggest_team_social_media", team_key=team_key, status=status.value)
     )

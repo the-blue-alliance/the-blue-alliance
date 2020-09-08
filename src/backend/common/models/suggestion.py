@@ -75,7 +75,7 @@ class Suggestion(ndb.Model):
     @classmethod
     def render_media_key_name(
         cls,
-        year: Year,
+        year: Optional[Year],
         target_model: str,
         target_key: str,
         foreign_type: str,
