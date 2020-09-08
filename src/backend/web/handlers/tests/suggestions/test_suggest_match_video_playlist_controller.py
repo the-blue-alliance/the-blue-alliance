@@ -1,5 +1,7 @@
+import json
 from datetime import datetime
 from typing import cast, List
+from unittest.mock import patch
 from urllib.parse import urlparse
 
 import pytest
@@ -9,6 +11,7 @@ from werkzeug.test import Client
 
 from backend.common.consts.event_type import EventType
 from backend.common.consts.suggestion_state import SuggestionState
+from backend.common.helpers.youtube_video_helper import YouTubePlaylistItem
 from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.common.models.suggestion import Suggestion
@@ -256,3 +259,33 @@ def test_submit_one_video(
         assert suggestion.review_state == SuggestionState.REVIEW_PENDING
         assert suggestion.target_key == "2016necmp_f1m1"
         assert suggestion.contents == SuggestionDict(youtube_videos=["37F5tbrFqJQ"])
+
+
+def test_ajax_no_login(web_client: Client) -> None:
+    response = web_client.get("/suggest/_/yt/playlist/videos")
+    assert response.status_code == 401
+
+
+def test_ajax_no_playlist(login_user, web_client: Client) -> None:
+    response = web_client.get("/suggest/_/yt/playlist/videos")
+    assert response.status_code == 400
+
+
+def test_ajax_resolve_playlist(login_user, web_client: Client) -> None:
+    expected = [
+        YouTubePlaylistItem(
+            video_title="Video Title",
+            video_id="abc123",
+            guessed_match_partial="qm1",
+        ),
+    ]
+
+    with patch(
+        "backend.common.helpers.youtube_video_helper.YouTubeVideoHelper.videos_in_playlist"
+    ) as playlist_mock:
+        playlist_mock.return_value = expected
+
+        resp = web_client.get("/suggest/_/yt/playlist/videos?playlist_id=plist1234")
+        assert resp.status_code == 200
+        assert json.loads(resp.data) == expected
+        playlist_mock.assert_called_with("plist1234")

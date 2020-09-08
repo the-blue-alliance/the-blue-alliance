@@ -31,6 +31,17 @@ def require_login(f: Callable):
     return decorated_function
 
 
+def enforce_login(f: Callable):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        user = current_user()
+        if not user:
+            abort(401)
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
 def require_admin(f: Callable) -> Response:
     @wraps(f)
     def decorated_function(*args, **kwargs):
