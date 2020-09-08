@@ -2,9 +2,11 @@ from flask import abort, Blueprint, jsonify, redirect, request, url_for
 from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
 
+from backend.common.helpers.media_helper import MediaHelper
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.models.event import Event
 from backend.common.models.match import Match
+from backend.common.queries.media_query import EventMediasQuery
 from backend.common.suggestions.suggestion_creator import (
     SuggestionCreationStatus,
     SuggestionCreator,
@@ -194,4 +196,54 @@ def submit_match_video_playlist() -> Response:
             event_key=event_key,
             num_added=suggestions_added,
         )
+    )
+
+
+@blueprint.route("/event/media")
+@require_login
+def suggest_event_media() -> Response:
+    event_key = request.args.get("event_key", "")
+
+    if not Event.validate_key_name(event_key):
+        abort(404)
+
+    event_future = Event.get_by_id_async(event_key)
+    medias_future = EventMediasQuery(event_key).fetch_async()
+
+    event = event_future.get_result()
+    medias = medias_future.get_result()
+    medias_by_slugname = MediaHelper.group_by_slugname(medias)
+
+    if not event:
+        abort(404)
+
+    template_values = {
+        "event": event,
+        "status": request.args.get("status"),
+        "medias_by_slugname": medias_by_slugname,
+    }
+    return render_template("suggestions/suggest_event_media.html", template_values)
+
+
+@blueprint.route("/event/media", methods=["POST"])
+@enforce_login
+def submit_event_media() -> Response:
+    event_key = request.form.get("event_key", "")
+
+    if not Event.validate_key_name(event_key):
+        abort(404)
+
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    user = current_user()
+    status, suggestion = SuggestionCreator.createEventMediaSuggestion(
+        author_account_key=none_throws(none_throws(user).account_key),
+        media_url=request.form.get("media_url", ""),
+        event_key=event_key,
+    )
+
+    return redirect(
+        url_for(".suggest_event_media", event_key=event_key, status=status.value)
     )
