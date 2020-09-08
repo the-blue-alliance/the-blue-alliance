@@ -286,55 +286,6 @@ class WebcastHandler(CacheableHandler):
         return keys
 
 
-class YouTubePlaylistHandler(LoggedInHandler):
-    """
-    For Hitting the YouTube API to get a list of video keys associated with a playlist
-    """
-    def get(self):
-        if not self.user_bundle.user:
-            self.response.set_status(401)
-            return
-
-        playlist_id = self.request.get("playlist_id")
-        if not playlist_id:
-            self.response.set_status(400)
-            return
-
-        video_ids = []
-        headers = {}
-        yt_key = Sitevar.get_by_id("google.secrets")
-        if not yt_key:
-            self.response.set_status(500)
-            return
-
-        next_page_token = ""
-
-        # format with playlist id, page token, api key
-        url = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId={}&&pageToken={}&fields=items%2Fsnippet%2FresourceId%2Citems%2Fsnippet%2Ftitle%2CnextPageToken&key={}"
-
-        while True:
-            try:
-                result = urlfetch.fetch(url.format(playlist_id, next_page_token, yt_key.contents["api_key"]),
-                                        headers=headers,
-                                        deadline=5)
-            except Exception, e:
-                self.response.set_status(500)
-                return []
-
-            if result.status_code != 200:
-                self.response.set_status(result.status_code)
-                return []
-
-            video_result = json.loads(result.content)
-            video_ids += [video for video in video_result["items"] if video["snippet"]["resourceId"]["kind"] == "youtube#video"]
-
-            if "nextPageToken" not in video_result:
-                break
-            next_page_token = video_result["nextPageToken"]
-
-        self.response.out.write(json.dumps(video_ids))
-
-
 class AllowedApiWriteEventsHandler(LoggedInHandler):
     """
     Get the events the current user is allowed to edit via the trusted API

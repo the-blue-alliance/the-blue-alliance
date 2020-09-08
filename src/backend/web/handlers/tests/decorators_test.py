@@ -10,6 +10,7 @@ import backend.web.auth as backend_auth
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.models.account import Account
 from backend.web.handlers.decorators import (
+    enforce_login,
     require_admin,
     require_login,
     require_login_only,
@@ -84,6 +85,34 @@ def test_require_login(ndb_client: ndb.Client) -> None:
             return_value={"email": "zach@thebluealliance.com"},
         ), app.test_request_context("/"):
             decorated_func = require_login(func)
+            decorated_func(request)
+        func.assert_called_with(request)
+
+
+def test_enforce_login_no_user() -> None:
+    from backend.web.main import app
+
+    func = Mock()
+    decorated_func = enforce_login(func)
+    with app.test_request_context("/"):
+        with pytest.raises(werkzeug.exceptions.Unauthorized):
+            decorated_func(None, request)
+
+
+def test_enforce_login(ndb_client: ndb.Client) -> None:
+    from backend.web.main import app
+
+    with ndb_client.context():
+        a = Account(email="zach@thebluealliance.com", registered=True)
+        a.put()
+
+        func = Mock()
+        with patch.object(
+            backend_auth,
+            "_decoded_claims",
+            return_value={"email": "zach@thebluealliance.com"},
+        ), app.test_request_context("/"):
+            decorated_func = enforce_login(func)
             decorated_func(request)
         func.assert_called_with(request)
 

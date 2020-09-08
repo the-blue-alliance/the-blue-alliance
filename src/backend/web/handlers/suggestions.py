@@ -1,4 +1,4 @@
-from flask import abort, Blueprint, redirect, request, url_for
+from flask import abort, Blueprint, jsonify, redirect, request, url_for
 from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
 
@@ -10,7 +10,7 @@ from backend.common.suggestions.suggestion_creator import (
     SuggestionCreator,
 )
 from backend.web.auth import current_user
-from backend.web.handlers.decorators import require_login
+from backend.web.handlers.decorators import enforce_login, require_login
 from backend.web.profiled_render import render_template
 
 
@@ -141,8 +141,19 @@ def suggest_match_video_playlist() -> Response:
     )
 
 
+@blueprint.route("/_/yt/playlist/videos")
+@enforce_login
+def resolve_youtube_playlist() -> Response:
+    playlist_id = request.args.get("playlist_id")
+    if not playlist_id:
+        abort(400)
+
+    playlist_videos = YouTubeVideoHelper.videos_in_playlist(playlist_id)
+    return jsonify(playlist_videos)
+
+
 @blueprint.route("/event/video", methods=["POST"])
-@require_login
+@enforce_login
 def submit_match_video_playlist() -> Response:
     event_key = request.form.get("event_key") or ""
 
