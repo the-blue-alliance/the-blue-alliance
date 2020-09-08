@@ -43,14 +43,14 @@ class SuggestionCreator:
         author_account_key: ndb.Key,
         media_url: str,
         team_key: TeamKey,
-        year_str: str,
+        year_str: Optional[str],
         private_details_json: Optional[str] = None,
         is_social: bool = False,
         default_preferred: bool = False,
     ) -> Tuple[SuggestionCreationStatus, Optional[Suggestion]]:
         """Create a Team Media Suggestion. Returns status (success, suggestion_exists, media_exists, bad_url)"""
 
-        year = int(year_str)
+        year = int(year_str) if year_str else None
         media_dict = MediaParser.partial_media_dict_from_url(media_url)
         if media_dict is not None:
             if media_dict.get("is_social", False) != is_social:

@@ -125,6 +125,26 @@ class TestTeamMediaSuggestionCreator(SuggestionCreatorTest):
         self.assertEqual(suggestion.author, self.account.key)
         self.assertEqual(suggestion.target_model, "media")
 
+    def test_create_social_media_suggestion(self) -> None:
+        status, _ = SuggestionCreator.createTeamMediaSuggestion(
+            self.account.key,
+            "https://github.com/frc1124",
+            "frc1124",
+            None,
+            is_social=True
+        )
+        self.assertEqual(status, "success")
+
+        # Ensure the Suggestion gets created
+        suggestion_id = Suggestion.render_media_key_name(
+            None, "team", "frc1124", "github-profile", "frc1124"
+        )
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.review_state, SuggestionState.REVIEW_PENDING)
+        self.assertEqual(suggestion.author, self.account.key)
+        self.assertEqual(suggestion.target_model, "social-media")
+
     def test_duplicate_suggestion(self) -> None:
         suggestion_id = Suggestion.render_media_key_name(
             2016, "team", "frc1124", "imgur", "ruRAxDm"
