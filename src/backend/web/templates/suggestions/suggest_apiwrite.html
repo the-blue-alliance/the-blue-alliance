@@ -10,7 +10,7 @@
             <div class="row">
                 <div class="col-xs-12 col-lg-8 col-lg-offset-2">
                     {% if status == 'success' %}
-                        <div class="alert alert-success">
+                        <div class="alert alert-success" id="success-alert">
                             <button type="button" class="close"
                                     data-dismiss="alert">&times;</button>
                             <h4>Thanks!</h4>
@@ -18,7 +18,7 @@
                             <p>We'll review your request and let you know soon!</p>
                         </div>
                     {% elif status == 'bad_event' %}
-                        <div class="alert alert-danger">
+                        <div class="alert alert-danger" id="bad_event-alert">
                             <button type="button" class="close"
                                     data-dismiss="alert">&times;</button>
                             <h4>Uh Oh!</h4>
@@ -28,7 +28,7 @@
                             to <a href="/suggest/offseason">suggest it</a>.</p>
                         </div>
                     {% elif status == 'no_affiliation' %}
-                        <div class="alert alert-danger">
+                        <div class="alert alert-danger" id="no_affiliation-alert">
                             <button type="button" class="close"
                                     data-dismiss="alert">&times;</button>
                             <h4>Uh Oh!</h4>
@@ -88,7 +88,7 @@
                                 <tr>
                                     <td>Auth Types Requested</td>
                                     <td>
-                                        {% for type,name in auth_types.iteritems() %}
+                                        {% for type,name in auth_types.items() %}
                                             <input type="checkbox" name="auth_types" value="{{ type }}"/> {{ name }} <br/>
                                         {% endfor %}
                                     </td>

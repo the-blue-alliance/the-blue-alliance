@@ -131,7 +131,7 @@ class TestTeamMediaSuggestionCreator(SuggestionCreatorTest):
             "https://github.com/frc1124",
             "frc1124",
             None,
-            is_social=True
+            is_social=True,
         )
         self.assertEqual(status, "success")
 

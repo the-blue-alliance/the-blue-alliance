@@ -2,6 +2,7 @@ from flask import abort, Blueprint, jsonify, redirect, request, url_for
 from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
 
+from backend.common.consts.auth_type import WRITE_TYPE_NAMES
 from backend.common.consts.media_type import MediaType
 from backend.common.helpers.media_helper import MediaHelper
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
@@ -22,10 +23,10 @@ from backend.web.handlers.decorators import enforce_login, require_login
 from backend.web.profiled_render import render_template
 
 
-blueprint = Blueprint("suggestions", __name__, url_prefix="/suggest")
+blueprint = Blueprint("suggestions", __name__)
 
 
-@blueprint.route("/event/webcast")
+@blueprint.route("/suggest/event/webcast")
 @require_login
 def suggest_webcast() -> str:
     event_key = request.args.get("event_key")
@@ -43,7 +44,7 @@ def suggest_webcast() -> str:
     return render_template("suggestions/suggest_event_webcast.html", template_values)
 
 
-@blueprint.route("/event/webcast", methods=["POST"])
+@blueprint.route("/suggest/event/webcast", methods=["POST"])
 @require_login
 def submit_webcast() -> Response:
     event_key = request.form.get("event_key")
@@ -80,7 +81,7 @@ def submit_webcast() -> Response:
     )
 
 
-@blueprint.route("/match/video")
+@blueprint.route("/suggest/match/video")
 @require_login
 def suggest_match_video() -> str:
     match_key = request.args.get("match_key")
@@ -104,7 +105,7 @@ def suggest_match_video() -> str:
     return render_template("suggestions/suggest_match_video.html", template_values)
 
 
-@blueprint.route("/match/video", methods=["POST"])
+@blueprint.route("/suggest/match/video", methods=["POST"])
 @require_login
 def submit_match_video() -> Response:
     match_key = request.form.get("match_key") or ""
@@ -131,7 +132,7 @@ def submit_match_video() -> Response:
     )
 
 
-@blueprint.route("/event/video")
+@blueprint.route("/suggest/event/video")
 @require_login
 def suggest_match_video_playlist() -> Response:
     event_key = request.args.get("event_key") or ""
@@ -149,7 +150,7 @@ def suggest_match_video_playlist() -> Response:
     )
 
 
-@blueprint.route("/_/yt/playlist/videos")
+@blueprint.route("/suggest/_/yt/playlist/videos")
 @enforce_login
 def resolve_youtube_playlist() -> Response:
     playlist_id = request.args.get("playlist_id")
@@ -160,7 +161,7 @@ def resolve_youtube_playlist() -> Response:
     return jsonify(playlist_videos)
 
 
-@blueprint.route("/event/video", methods=["POST"])
+@blueprint.route("/suggest/event/video", methods=["POST"])
 @enforce_login
 def submit_match_video_playlist() -> Response:
     event_key = request.form.get("event_key") or ""
@@ -205,7 +206,7 @@ def submit_match_video_playlist() -> Response:
     )
 
 
-@blueprint.route("/event/media")
+@blueprint.route("/suggest/event/media")
 @require_login
 def suggest_event_media() -> Response:
     event_key = request.args.get("event_key", "")
@@ -231,7 +232,7 @@ def suggest_event_media() -> Response:
     return render_template("suggestions/suggest_event_media.html", template_values)
 
 
-@blueprint.route("/event/media", methods=["POST"])
+@blueprint.route("/suggest/event/media", methods=["POST"])
 @enforce_login
 def submit_event_media() -> Response:
     event_key = request.form.get("event_key", "")
@@ -255,7 +256,7 @@ def submit_event_media() -> Response:
     )
 
 
-@blueprint.route("/team/media")
+@blueprint.route("/suggest/team/media")
 @require_login
 def suggest_team_media() -> Response:
     team_key = request.args.get("team_key", "")
@@ -292,7 +293,7 @@ def suggest_team_media() -> Response:
     return render_template("suggestions/suggest_team_media.html", template_values)
 
 
-@blueprint.route("/team/media", methods=["POST"])
+@blueprint.route("/suggest/team/media", methods=["POST"])
 @enforce_login
 def submit_team_media() -> Response:
     team_key = request.form.get("team_key", "")
@@ -318,7 +319,7 @@ def submit_team_media() -> Response:
     )
 
 
-@blueprint.route("/team/social_media")
+@blueprint.route("/suggest/team/social_media")
 @require_login
 def suggest_team_social_media() -> Response:
     team_key = request.args.get("team_key", "")
@@ -343,7 +344,7 @@ def suggest_team_social_media() -> Response:
     )
 
 
-@blueprint.route("/team/social_media", methods=["POST"])
+@blueprint.route("/suggest/team/social_media", methods=["POST"])
 @enforce_login
 def submit_team_social_media() -> Response:
     team_key = request.form.get("team_key", "")
@@ -366,3 +367,41 @@ def submit_team_social_media() -> Response:
     return redirect(
         url_for(".suggest_team_social_media", team_key=team_key, status=status.value)
     )
+
+
+@blueprint.route("/request/apiwrite")
+@require_login
+def request_apiwrite() -> Response:
+    template_values = {
+        "auth_types": WRITE_TYPE_NAMES,
+        "status": request.args.get("status"),
+    }
+    return render_template("suggestions/suggest_apiwrite.html", template_values)
+
+
+@blueprint.route("/request/apiwrite", methods=["POST"])
+@enforce_login
+def submit_apiwrite() -> Response:
+    auth_types = request.form.getlist("auth_types", type=int)
+    event_key = request.form.get("event_key", "")
+    role = request.form.get("role", "")
+
+    if not Event.validate_key_name(event_key):
+        abort(404)
+
+    user = current_user()
+    status = SuggestionCreator.createApiWriteSuggestion(
+        author_account_key=none_throws(none_throws(user).account_key),
+        event_key=event_key,
+        affiliation=role,
+        auth_types=auth_types,
+    )
+
+    """
+    # TODO support outgoing emails
+    if status == SuggestionCreationStatus.SUCCESS:
+            subject, body = self._gen_notification_email(event_key, self.user_bundle)
+            OutgoingNotificationHelper.send_admin_alert_email(subject, body)
+    """
+
+    return redirect(url_for(".request_apiwrite", status=status.value))
