@@ -34,9 +34,7 @@ def assert_template_status(
 
 
 def test_login_redirect(web_client: Client) -> None:
-    response = web_client.get(
-        "/suggest/team/social_media?team_key=frc1124"
-    )
+    response = web_client.get("/suggest/team/social_media?team_key=frc1124")
     assert response.status_code == 302
     assert urlparse(response.headers["Location"]).path == "/account/login"
 
