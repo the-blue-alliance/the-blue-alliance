@@ -343,7 +343,7 @@ class SuggestionCreator:
         name: str,
         start_date: str,
         end_date: str,
-        website: str,
+        website: Optional[str],
         venue_name: str,
         address: str,
         city: str,

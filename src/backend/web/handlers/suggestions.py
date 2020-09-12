@@ -5,6 +5,7 @@ from werkzeug.wrappers import Response
 from backend.common.consts.auth_type import WRITE_TYPE_NAMES
 from backend.common.consts.media_type import MediaType
 from backend.common.helpers.media_helper import MediaHelper
+from backend.common.helpers.website_helper import WebsiteHelper
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.models.event import Event
 from backend.common.models.match import Match
@@ -405,3 +406,53 @@ def submit_apiwrite() -> Response:
     """
 
     return redirect(url_for(".request_apiwrite", status=status.value))
+
+
+@blueprint.route("/suggest/offseason")
+@require_login
+def suggest_offseason() -> Response:
+    template_values = {
+        "status": request.args.get("status"),
+    }
+    return render_template("suggestions/suggest_offseason_event.html", template_values)
+
+
+@blueprint.route("/suggest/offseason", methods=["POST"])
+@enforce_login
+def submit_offseason() -> Response:
+    user = current_user()
+    event_name = request.form.get("name", None)
+    website = WebsiteHelper.format_url(request.form.get("website", None))
+    status, failures = SuggestionCreator.createOffseasonEventSuggestion(
+        author_account_key=none_throws(none_throws(user).account_key),
+        name=event_name,
+        start_date=request.form.get("start_date", None),
+        end_date=request.form.get("end_date", None),
+        website=website,
+        venue_name=request.form.get("venue_name", None),
+        address=request.form.get("venue_address", None),
+        city=request.form.get("venue_city", None),
+        state=request.form.get("venue_state", None),
+        country=request.form.get("venue_country", None),
+        first_code=request.form.get("first_code", None),
+    )
+    if status != "success":
+        # Don't completely wipe form data if validation fails
+        template_values = {
+            "status": status,
+            "failures": failures,
+            "name": request.form.get("name", None),
+            "start_date": request.form.get("start_date", None),
+            "end_date": request.form.get("end_date", None),
+            "website": request.form.get("website", None),
+            "venue_address": request.form.get("venue_address", None),
+            "first_code": request.form.get("first_code", None),
+        }
+        return render_template(
+            "suggestions/suggest_offseason_event.html", template_values
+        )
+    else:
+        # TODO support outgoing emails
+        # subject, body = self._gen_notification_email(event_name)
+        # OutgoingNotificationHelper.send_admin_alert_email(subject, body)
+        return redirect(url_for(".suggest_offseason", status=status.value))
