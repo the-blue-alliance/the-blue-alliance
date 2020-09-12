@@ -26,7 +26,7 @@ class SuggestionDict(TypedDict, total=False):
     name: str
     start_date: str
     end_date: str
-    website: str
+    website: Optional[str]
     address: str
     city: str
     state: str

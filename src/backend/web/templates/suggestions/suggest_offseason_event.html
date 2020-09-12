@@ -10,7 +10,7 @@
             <div class="row">
                 <div class="col-xs-12 col-lg-8 col-lg-offset-2">
                     {% if status == 'success' %}
-                        <div class="alert alert-success">
+                        <div class="alert alert-success" id="success-alert">
                             <button type="button" class="close"
                                     data-dismiss="alert">&times;</button>
                             <h4>Thanks!</h4>
@@ -18,7 +18,7 @@
                             <p>We'll review your suggestion and get it added to the site soon!</p>
                         </div>
                     {% elif status == 'validation_failure' %}
-                        <div class="alert alert-danger">
+                        <div class="alert alert-danger" id="validation_failure-alert">
                             <button type="button" class="close"
                                     data-dismiss="alert">&times;</button>
                             <h4>Uh Oh!</h4>
