@@ -9,6 +9,7 @@ from jinja2 import Template
 
 from backend.common.models.account import Account
 from backend.web import auth
+from backend.web.models.user import User
 
 
 @pytest.fixture(autouse=True)
@@ -35,11 +36,12 @@ def login_user(ndb_client, monkeypatch: MonkeyPatch):
         )
         account_key = account.put()
 
-    mock_user = Mock()
+    mock_user = Mock(spec=User)
     mock_user.is_registered = True
     mock_user.api_read_keys = []
     mock_user.api_write_keys = []
     mock_user.mobile_clients = []
+    mock_user.permissions = []
     mock_user.account_key = account_key
 
     def mock_current_user():

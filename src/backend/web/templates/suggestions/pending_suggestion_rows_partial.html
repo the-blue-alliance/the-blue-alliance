@@ -1,25 +1,25 @@
-<ul class="nav nav-pills nav-stacked">
+<ul class="nav nav-pills nav-stacked" id="suggestion-review-list">
     {% if media_permission in user.permissions %}
-    <li{% if suggestions.match %} class="active"{% endif %}>
+    <li{% if suggestions.match %} class="active"{% endif %} id="match-video-suggestions">
         <a href="/suggest/match/video/review">
             <span class="badge pull-right">{{suggestions.match}}</span>
             Match Video Suggestions
         </a>
     </li>
-    <li{% if suggestions.event %} class="active"{% endif %}>
+    <li{% if suggestions.event %} class="active"{% endif %} id="event-webcast-suggestions">
         <a href="/suggest/event/webcast/review">
             <span class="badge pull-right">{{suggestions.event}}</span>
             Event Webcast Suggestions
         </a>
     </li>
 
-    <li{% if suggestions.media %} class="active"{% endif %}>
+    <li{% if suggestions.media %} class="active"{% endif %} id="team-media-suggestions">
         <a href="/suggest/team/media/review">
             <span class="badge pull-right">{{suggestions.media}}</span>
             Team Media Suggestions
         </a>
     </li>
-    <li{% if suggestions.social %} class="active"{% endif %}>
+    <li{% if suggestions.social %} class="active"{% endif %} id="team-social-media-suggestions">
         <a href="/suggest/team/social/review">
             <span class="badge pull-right">{{suggestions.social}}</span>
             Team Social Media Suggestions
@@ -28,7 +28,7 @@
     {% endif %}
 
     {% if event_media_permission in user.permissions %}
-    <li{% if suggestions.event_media %} class="active"{% endif %}>
+    <li{% if suggestions.event_media %} class="active"{% endif %} id="event-media-suggestions">
         <a href="/suggest/event/media/review">
             <span class="badge pull-right">{{suggestions.event_media}}</span>
             Event Media Suggestions
@@ -37,7 +37,7 @@
     {% endif %}
 
     {% if cad_permission in user.permissions %}
-    <li{% if suggestions.cad %} class="active"{% endif %}>
+    <li{% if suggestions.cad %} class="active"{% endif %} id="team-cad-suggestions">
         <a href="/suggest/cad/review">
             <span class="badge pull-right">{{suggestions.cad}}</span>
             Team CAD Suggestions
@@ -46,7 +46,7 @@
     {% endif %}
 
     {% if offseason_permission in user.permissions %}
-    <li{% if suggestions.offseason %} class="active"{% endif %}>
+    <li{% if suggestions.offseason %} class="active"{% endif %} id="offseason-event-suggestions">
         <a href="/suggest/offseason/review">
             <span class="badge pull-right">{{suggestions.offseason}}</span>
             Offseason Event Suggestions
@@ -55,7 +55,7 @@
     {% endif %}
 
     {% if apiwrite_permission in user.permissions %}
-    <li{% if suggestions.apiwrite %} class="active"{% endif %}>
+    <li{% if suggestions.apiwrite %} class="active"{% endif %} id="apiwrite-suggestions">
         <a href="/suggest/apiwrite/review">
             <span class="badge pull-right">{{suggestions.apiwrite}}</span>
             Trusted API Requests

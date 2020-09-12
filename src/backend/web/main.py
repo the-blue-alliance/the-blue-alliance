@@ -10,6 +10,9 @@ from backend.web.handlers.event import event_detail, event_list
 from backend.web.handlers.gameday import gameday
 from backend.web.handlers.index import index
 from backend.web.handlers.match import match_detail
+from backend.web.handlers.suggestion_review import (
+    blueprint as suggestion_review_blueprint,
+)
 from backend.web.handlers.suggestions import blueprint as suggestion_blueprint
 from backend.web.handlers.team import (
     team_canonical,
@@ -47,6 +50,7 @@ app.add_url_rule("/teams", view_func=team_list, defaults={"page": 1})
 
 app.register_blueprint(account_blueprint, url_prefix="/account")
 app.register_blueprint(suggestion_blueprint)
+app.register_blueprint(suggestion_review_blueprint)
 
 app.register_error_handler(404, handle_404)
 app.register_error_handler(500, handle_500)

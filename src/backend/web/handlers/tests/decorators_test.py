@@ -12,6 +12,7 @@ from backend.common.models.account import Account
 from backend.web.handlers.decorators import (
     enforce_login,
     require_admin,
+    require_any_permission,
     require_login,
     require_login_only,
     require_permission,
@@ -216,5 +217,75 @@ def test_require_permission(ndb_client: ndb.Client) -> None:
             return_value={"email": "zach@thebluealliance.com"},
         ), app.test_request_context("/"):
             decorated_func = require_permission(AccountPermission.REVIEW_MEDIA)(func)
+            decorated_func(None, request)
+        func.assert_called_with(None, request)
+
+
+def test_require_any_permission_false(ndb_client: ndb.Client) -> None:
+    from backend.web.main import app
+
+    with ndb_client.context():
+        a = Account(
+            email="zach@thebluealliance.com",
+        )
+        a.put()
+
+        func = Mock()
+        with patch.object(
+            backend_auth,
+            "_decoded_claims",
+            return_value={"email": "zach@thebluealliance.com"},
+        ), app.test_request_context("/"):
+            with pytest.raises(werkzeug.exceptions.Unauthorized):
+                decorated_func = require_permission(AccountPermission.REVIEW_MEDIA)(
+                    func
+                )
+                decorated_func(None, request)
+        assert not func.called
+
+
+def test_require_any_permission_wrong(ndb_client: ndb.Client) -> None:
+    from backend.web.main import app
+
+    with ndb_client.context():
+        a = Account(
+            email="zach@thebluealliance.com",
+            permissions=[AccountPermission.REVIEW_MEDIA],
+        )
+        a.put()
+
+        func = Mock()
+        with patch.object(
+            backend_auth,
+            "_decoded_claims",
+            return_value={"email": "zach@thebluealliance.com"},
+        ), app.test_request_context("/"):
+            with pytest.raises(werkzeug.exceptions.Unauthorized):
+                decorated_func = require_permission(
+                    AccountPermission.REVIEW_EVENT_MEDIA
+                )(func)
+                decorated_func(None, request)
+        assert not func.called
+
+
+def test_require_any_permission(ndb_client: ndb.Client) -> None:
+    from backend.web.main import app
+
+    with ndb_client.context():
+        a = Account(
+            email="zach@thebluealliance.com",
+            permissions=[AccountPermission.REVIEW_MEDIA],
+        )
+        a.put()
+
+        func = Mock()
+        with patch.object(
+            backend_auth,
+            "_decoded_claims",
+            return_value={"email": "zach@thebluealliance.com"},
+        ), app.test_request_context("/"):
+            decorated_func = require_any_permission(
+                {AccountPermission.REVIEW_MEDIA, AccountPermission.REVIEW_EVENT_MEDIA}
+            )(func)
             decorated_func(None, request)
         func.assert_called_with(None, request)
