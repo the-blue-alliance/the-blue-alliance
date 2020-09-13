@@ -1,7 +1,6 @@
 import enum
-
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Set
 
 
 @enum.unique
@@ -45,4 +44,12 @@ PERMISSIONS: Dict[AccountPermission, PermissionDescription] = {
     AccountPermission.OFFSEASON_EVENTWIZARD: PermissionDescription(
         "OFFSEASON_EVENTWIZARD", "Can use the eventwizard for any offseason event"
     ),
+}
+
+SUGGESTION_PERMISSIONS: Set[AccountPermission] = {
+    AccountPermission.REVIEW_MEDIA,
+    AccountPermission.REVIEW_OFFSEASON_EVENTS,
+    AccountPermission.REVIEW_APIWRITE,
+    AccountPermission.REVIEW_DESIGNS,
+    AccountPermission.REVIEW_EVENT_MEDIA,
 }

@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import Callable
+from typing import Callable, Set
 
 from flask import abort, redirect, request, Response, url_for
 
@@ -63,6 +63,22 @@ def require_permission(permission: AccountPermission):
             if not user:
                 return redirect(url_for("account.login", next=request.url))
             if permission not in user.permissions:
+                return abort(401)
+            return f(*args, **kwargs)
+
+        return decorated_function
+
+    return decorator
+
+
+def require_any_permission(permissions: Set[AccountPermission]):
+    def decorator(f: Callable):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            user = current_user()
+            if not user:
+                return redirect(url_for("account.login", next=request.url))
+            if not permissions.intersection(user.permissions or {}):
                 return abort(401)
             return f(*args, **kwargs)
 
