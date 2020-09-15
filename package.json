@@ -33,7 +33,7 @@
     "redux": "^4.0.5",
     "redux-thunk": "^2.0.1",
     "reselect": "^4.0.0",
-    "swagger-client": "3.10.12",
+    "swagger-client": "3.10.13",
     "swagger-ui": "^3.33.0",
     "underscore": "^1.11.0"
   },
