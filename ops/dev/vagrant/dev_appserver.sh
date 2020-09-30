@@ -51,4 +51,4 @@ dev_appserver.py \
     --env_var TBA_LOG_LEVEL="$tba_log_level" \
     --env_var NDB_LOG_LEVEL="$ndb_log_level" \
     --dev_appserver_log_level=$log_level \
-    src/default.yaml src/web.yaml src/api.yaml src/dispatch.yaml
+    src/default.yaml src/web.yaml src/api.yaml src/tasks_io.yaml src/dispatch.yaml
