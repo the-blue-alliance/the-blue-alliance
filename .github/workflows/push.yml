@@ -152,7 +152,7 @@ jobs:
       - name: Install Node Dependencies
         run: npm install
       - name: Run Build
-        run: ./ops/build/run_buildweb.sh
+        run: ./ops/build/run_buildweb.sh --env
         env:
           GCLOUD_PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
           FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}

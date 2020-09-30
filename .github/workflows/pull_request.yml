@@ -145,4 +145,4 @@ jobs:
       - name: Install Node Dependencies
         run: npm install
       - name: Run Build
-        run: ./ops/build/run_buildweb.sh
+        run: ./ops/build/run_buildweb.sh --env
