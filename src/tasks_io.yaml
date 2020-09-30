@@ -1,0 +1,11 @@
+service: py3-tasks-io
+runtime: python37
+entrypoint: gunicorn -b :$PORT backend.tasks_io.main:app
+
+instance_class: F1
+automatic_scaling:
+  max_idle_instances: 1
+
+handlers:
+  - url: .*
+    script: auto
