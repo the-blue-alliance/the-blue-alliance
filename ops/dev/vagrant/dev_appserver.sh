@@ -8,7 +8,7 @@ function get_config_prop {
         local dev_config_file="tba_dev_config.local.json"
     fi
 
-    jq -r -s ".[0] * (.[1] // {}) | .$prop_name" tba_dev_config.json $dev_config_file
+    jq -r -s ".[0] * (.[1] // {}) | .$prop_name | select (.!=null)" tba_dev_config.json $dev_config_file
 }
 
 function get_project_from_key {
@@ -24,18 +24,34 @@ datastore_args=""
 application=""
 env=""
 
+# Setup Google Application Credentials, if available
+google_application_credentials=$(get_config_prop google_application_credentials)
+if [ $google_application_credentials ]; then
+    cred_file=$(realpath $google_application_credentials)
+    project=$(get_project_from_key "$cred_file")
+    application="--application $project"
+    env="$env --env_var GOOGLE_APPLICATION_CREDENTIALS=$cred_file"
+else
+    application="--application test"
+fi
+
+function assert_google_application_credentials {
+    if [ -z $google_application_credentials ]; then
+        echo "google_application_credentials required to be set in tba_dev_config"
+        exit -1
+    fi
+}
+
+# Setup Cloud Datastore emulator/remote
 if [ "$datastore_mode" == "local" ]; then
     echo "Starting with datastore emulator"
     emulator_port=8089
     datastore_path="/datastore/tba.db"
     datastore_args="--support_datastore_emulator=true --datastore_emulator_port=$emulator_port --datastore_path=$datastore_path"
-    env="--env_var DATASTORE_EMULATOR_HOST=localhost:$emulator_port --env_var DATASTORE_DATASET=test"
-    application="--application test"
+    env="$env --env_var DATASTORE_EMULATOR_HOST=localhost:$emulator_port --env_var DATASTORE_DATASET=test"
 elif [ "$datastore_mode" == "remote" ]; then
-    cred_file=$(get_config_prop google_application_credentials | xargs realpath)
-    project=$(get_project_from_key "$cred_file")
-    application="--application $project"
-    env="--env_var GOOGLE_APPLICATION_CREDENTIALS=$cred_file"
+    echo "Starting with remote datastore"
+    assert_google_application_credentials
 else
     echo "Unknown datastore mode $datastore_mode! Must be one of [local, remote]"
     exit -1
