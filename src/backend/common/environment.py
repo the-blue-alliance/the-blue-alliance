@@ -1,5 +1,12 @@
+import enum
 import os
 from typing import Optional
+
+
+@enum.unique
+class EnvironmentMode(enum.Enum):
+    LOCAL = "local"
+    REMOTE = "remote"
 
 
 class Environment(object):
@@ -19,6 +26,12 @@ class Environment(object):
     @staticmethod
     def log_level() -> Optional[str]:
         return os.environ.get("TBA_LOG_LEVEL")
+
+    @staticmethod
+    def tasks_mode() -> EnvironmentMode:
+        if Environment.is_prod():
+            return EnvironmentMode.REMOTE
+        return EnvironmentMode(os.environ.get("TASKS_MODE", "local"))
 
     @staticmethod
     def ndb_log_level() -> Optional[str]:
