@@ -1,6 +1,6 @@
 # The Blue Alliance
 
-[![Build Status](https://travis-ci.org/the-blue-alliance/the-blue-alliance.svg?branch=master)](https://travis-ci.org/the-blue-alliance/the-blue-alliance)
+[![Build Status](https://travis-ci.com/the-blue-alliance/the-blue-alliance.svg?branch=master)](https://travis-ci.com/the-blue-alliance/the-blue-alliance)
 
 The Blue Alliance is a FIRST Robotics tool to help teams scout for, compete at, and relive competitions. You can see how the whole site works here, or even write code to make it better!
 
