@@ -5,6 +5,10 @@ dispatch:
 
 - url: "py3.thebluealliance.com/*"
   service: py3-web
+  
+# Start serving certain pages from py3
+- url: "/"  # Just the homepage
+  service: py3-web
 
 # Beta PWA
 - url: "beta.thebluealliance.com/*"
