@@ -7,7 +7,7 @@ dispatch:
   service: py3-web
   
 # Start serving certain pages from py3
-- url: "thebluealliance.com/"  # Just the homepage
+- url: "www.thebluealliance.com/"  # Just the homepage
   service: py3-web
 
 # Beta PWA
