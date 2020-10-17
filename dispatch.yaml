@@ -1,13 +1,13 @@
 dispatch:
+# Start serving certain pages from py3
+- url: "www.thebluealliance.com/"  # Just the homepage
+  service: py3-web
+
 # Python 3 Migration
 - url: "py3.thebluealliance.com/api/*"
   service: py3-api
 
 - url: "py3.thebluealliance.com/*"
-  service: py3-web
-  
-# Start serving certain pages from py3
-- url: "www.thebluealliance.com/"  # Just the homepage
   service: py3-web
 
 # Beta PWA
