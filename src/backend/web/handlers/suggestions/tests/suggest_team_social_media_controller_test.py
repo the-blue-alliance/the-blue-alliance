@@ -11,11 +11,11 @@ from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.models.suggestion import Suggestion
 from backend.common.models.suggestion_dict import SuggestionDict
 from backend.common.models.team import Team
-from backend.web.handlers.tests.conftest import CapturedTemplate
+from backend.web.handlers.conftest import CapturedTemplate
 
 
 @pytest.fixture(autouse=True)
-def storeTeam(ndb_client: ndb.Client):
+def storeTeam(ndb_client: ndb.Client) -> None:
     with ndb_client.context():
         team = Team(
             id="frc1124",
@@ -29,39 +29,34 @@ def assert_template_status(
 ) -> None:
     template = captured_templates[0][0]
     context = captured_templates[0][1]
-    assert template.name == "suggestions/suggest_team_media.html"
+    assert template.name == "suggestions/suggest_team_social_media.html"
     assert context["status"] == status
 
 
 def test_login_redirect(web_client: Client) -> None:
-    response = web_client.get("/suggest/team/media?team_key=frc1124&year=2016")
+    response = web_client.get("/suggest/team/social_media?team_key=frc1124")
     assert response.status_code == 302
     assert urlparse(response.headers["Location"]).path == "/account/login"
 
 
 def test_get_no_team(login_user, web_client: Client) -> None:
-    response = web_client.get("/suggest/team/media")
+    response = web_client.get("/suggest/team/social_media")
     assert response.status_code == 404
 
 
 def test_get_bad_team(login_user, web_client: Client) -> None:
-    response = web_client.get("/suggest/team/media?team_key=frc254&year=2016")
-    assert response.status_code == 404
-
-
-def test_get_bad_year(login_user, web_client: Client) -> None:
-    response = web_client.get("/suggest/team/media?team_key=frc1124&year=asdf")
+    response = web_client.get("/suggest/team/social_media?team_key=frc254")
     assert response.status_code == 404
 
 
 def test_get_form(login_user, web_client: Client) -> None:
-    response = web_client.get("/suggest/team/media?team_key=frc1124&year=2016")
+    response = web_client.get("/suggest/team/social_media?team_key=frc1124&year=2016")
     assert response.status_code == 200
 
     soup = BeautifulSoup(response.data, "html.parser")
-    form = soup.find("form", id="suggest_media")
+    form = soup.find("form", id="suggest_social_media")
     assert form is not None
-    assert form["action"] == "/suggest/team/media"
+    assert form["action"] == "/suggest/team/social_media"
     assert form["method"] == "post"
 
     csrf = form.find(attrs={"name": "csrf_token"})
@@ -74,16 +69,11 @@ def test_get_form(login_user, web_client: Client) -> None:
     assert team_key["type"] == "hidden"
     assert team_key["value"] == "frc1124"
 
-    year = form.find(attrs={"name": "year"})
-    assert year is not None
-    assert year["type"] == "hidden"
-    assert year["value"] == "2016"
-
     assert form.find(attrs={"name": "media_url"}) is not None
 
 
 def test_submit_no_team(login_user, ndb_client: ndb.Client, web_client: Client) -> None:
-    resp = web_client.post("/suggest/team/media", data={})
+    resp = web_client.post("/suggest/team/social_media", data={})
     assert resp.status_code == 404
 
     # Assert no suggestions were written
@@ -95,8 +85,8 @@ def test_submit_bad_team(
     login_user, ndb_client: ndb.Client, web_client: Client
 ) -> None:
     response = web_client.post(
-        "/suggest/team/media",
-        data={"team_key": "frc254", "year": "2016"},
+        "/suggest/team/social_media",
+        data={"team_key": "frc254"},
         follow_redirects=True,
     )
     assert response.status_code == 404
@@ -113,8 +103,8 @@ def test_submit_empty_form(
     captured_templates: List[CapturedTemplate],
 ) -> None:
     resp = web_client.post(
-        "/suggest/team/media",
-        data={"team_key": "frc1124", "year": "2016", "media_url": ""},
+        "/suggest/team/social_media",
+        data={"team_key": "frc1124", "media_url": ""},
         follow_redirects=True,
     )
     assert resp.status_code == 200
@@ -136,11 +126,10 @@ def test_suggest_media(
     captured_templates: List[CapturedTemplate],
 ) -> None:
     resp = web_client.post(
-        "/suggest/team/media",
+        "/suggest/team/social_media",
         data={
             "team_key": "frc1124",
-            "year": "2016",
-            "media_url": "http://imgur.com/aF8T5ZE",
+            "media_url": "https://github.com/frc1124",
         },
         follow_redirects=True,
     )
@@ -158,12 +147,13 @@ def test_suggest_media(
         assert suggestion.review_state == SuggestionState.REVIEW_PENDING
         assert suggestion.target_key == "frc1124"
         assert suggestion.contents == SuggestionDict(
-            year=2016,
+            year=None,
             reference_type="team",
             reference_key="frc1124",
-            foreign_key="aF8T5ZE",
-            is_social=False,
-            media_type_enum=MediaType.IMGUR,
+            foreign_key="frc1124",
+            profile_url="https://github.com/frc1124",
+            is_social=True,
+            media_type_enum=MediaType.GITHUB_PROFILE,
             default_preferred=False,
-            site_name="Imgur Image",
+            site_name="GitHub Profile",
         )

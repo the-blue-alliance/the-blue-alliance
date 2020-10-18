@@ -10,10 +10,12 @@ from backend.web.handlers.event import event_detail, event_list
 from backend.web.handlers.gameday import gameday
 from backend.web.handlers.index import index
 from backend.web.handlers.match import match_detail
-from backend.web.handlers.suggestion_review import (
+from backend.web.handlers.suggestions.suggestion_review import (
     blueprint as suggestion_review_blueprint,
 )
-from backend.web.handlers.suggestions import blueprint as suggestion_blueprint
+from backend.web.handlers.suggestions.suggestion_submission import (
+    blueprint as suggestion_blueprint,
+)
 from backend.web.handlers.team import (
     team_canonical,
     team_detail,

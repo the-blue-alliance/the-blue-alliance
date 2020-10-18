@@ -7,7 +7,7 @@ from flask import session
 from flask.testing import FlaskClient
 
 import backend
-from backend.web.handlers.tests.conftest import CapturedTemplate
+from backend.web.handlers.conftest import CapturedTemplate
 from backend.web.handlers.tests.helpers import get_page_title
 
 
