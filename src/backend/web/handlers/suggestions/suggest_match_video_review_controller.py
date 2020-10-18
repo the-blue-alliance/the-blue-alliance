@@ -1,6 +1,7 @@
 from typing import Optional
 
 from flask import redirect, request
+from werkzeug.wrappers import Response
 
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.suggestion_state import SuggestionState
@@ -34,7 +35,9 @@ class SuggestMatchVideoReviewController(SuggestionsReviewBase[Match]):
     View the list of suggestions.
     """
 
-    def get(self):
+    def get(self) -> Response:
+        super().get()
+
         suggestions = (
             Suggestion.query()
             .filter(Suggestion.review_state == SuggestionState.REVIEW_PENDING)
@@ -59,7 +62,9 @@ class SuggestMatchVideoReviewController(SuggestionsReviewBase[Match]):
             "suggestions/suggest_match_video_review_list.html", template_values
         )
 
-    def post(self):
+    def post(self) -> Response:
+        super().post()
+
         accept_keys = []
         reject_keys = []
         for value in request.form.values():

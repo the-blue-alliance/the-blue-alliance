@@ -5,6 +5,8 @@ from flask import abort, redirect, request, url_for
 from flask.views import MethodView
 from google.cloud import ndb
 from pyre_extensions import none_throws
+from werkzeug.exceptions import HTTPException
+from werkzeug.wrappers import Response
 
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.models.suggestion import Suggestion
@@ -34,11 +36,16 @@ class SuggestionsReviewBase(Generic[TTargetModel], MethodView):
             # (verify_permissions only checks the account-level permission)
             self.verify_permissions()
 
-    def verify_write_permissions(self, suggestion):
+    def verify_write_permissions(self, suggestion: Suggestion) -> None:
         # Allow users who have the global permissions
+        user = current_user()
+        if not user:
+            raise HTTPException(
+                response=redirect(url_for("account.login", next=request.url))
+            )
         if all(
             [
-                p in self.user_bundle.account.permissions
+                p in (none_throws(user).permissions or [])
                 for p in self.REQUIRED_PERMISSIONS
             ]
         ):
@@ -54,21 +61,22 @@ class SuggestionsReviewBase(Generic[TTargetModel], MethodView):
             ):
                 return
 
-        return self.redirect("/", abort=True)
+        raise HTTPException(response=abort(401))
 
-    def verify_permissions(self):
+    def verify_permissions(self) -> None:
         user = current_user()
         if not user:
-            return redirect(url_for("account.login", next=request.url))
+            raise HTTPException(
+                response=redirect(url_for("account.login", next=request.url))
+            )
         for permission in self.REQUIRED_PERMISSIONS:
-            if permission not in user.permissions:
-                return abort(401)
+            if permission not in (none_throws(user).permissions or []):
+                raise HTTPException(response=abort(401))
 
-    def get(self):
-        pass
+    def get(self) -> Optional[Response]:
+        return self.verify_permissions()
 
-    def post(self):
-        self._require_login()
+    def post(self) -> Optional[Response]:
         """
         now = datetime.datetime.now()
         self.existing_access = TeamAdminAccess.query(

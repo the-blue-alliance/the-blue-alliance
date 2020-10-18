@@ -203,3 +203,14 @@ def test_update_auto_union_false(ndb_context) -> None:
 
     check = DummyModel.get_by_id("test")
     assert check.union_prop == [4, 5, 6]
+
+
+def test_update_auto_union_false_can_set_empty(ndb_context) -> None:
+    model = DummyModel(id="test", union_prop=[1, 2, 3])
+    model.put()
+
+    update = DummyModel(id="test", union_prop=[])
+    DummyManipulator.createOrUpdate(update, auto_union=False)
+
+    check = DummyModel.get_by_id("test")
+    assert check.union_prop == []

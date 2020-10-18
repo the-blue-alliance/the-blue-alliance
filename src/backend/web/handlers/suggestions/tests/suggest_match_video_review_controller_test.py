@@ -174,7 +174,7 @@ def get_suggestion_queue(web_client: Client) -> List[str]:
     return queue
 
 
-def createSuggestion(logged_in_user, ndb_client):
+def createSuggestion(logged_in_user, ndb_client: ndb.Client) -> str:
     with ndb_client.context():
         status = SuggestionCreator.createMatchVideoYouTubeSuggestion(
             logged_in_user.account_key, "H-54KMwMKY0", "2016necmp_f1m1"

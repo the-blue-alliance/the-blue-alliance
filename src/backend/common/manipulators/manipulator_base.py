@@ -158,7 +158,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
         if not auto_union:
             list_attrs = list_attrs.union(old_model._auto_union_attrs)
         for attr in list_attrs:
-            if len(getattr(new_model, attr)) > 0:
+            if len(getattr(new_model, attr)) > 0 or not auto_union:
                 if getattr(new_model, attr) != getattr(old_model, attr):
                     setattr(old_model, attr, getattr(new_model, attr))
                     updated_attrs.add(attr)

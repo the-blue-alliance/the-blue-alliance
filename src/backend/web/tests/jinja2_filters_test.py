@@ -66,11 +66,12 @@ def test_slugify(input: str, output: str) -> None:
 
 
 @pytest.mark.parametrize(
-    "input, output", [
+    "input, output",
+    [
         ("blah", "blah"),
         ("blah?t=30s", "blah?start=30"),
         ("blah#t=30s", "blah?start=30"),
-    ]
+    ],
 )
 def test_yt_start(input: str, output: str) -> None:
     assert filters.yt_start(input) == output
