@@ -65,6 +65,17 @@ def test_slugify(input: str, output: str) -> None:
     assert filters.slugify(input) == output
 
 
+@pytest.mark.parametrize(
+    "input, output", [
+        ("blah", "blah"),
+        ("blah?t=30s", "blah?start=30"),
+        ("blah#t=30s", "blah?start=30"),
+    ]
+)
+def test_yt_start(input: str, output: str) -> None:
+    assert filters.yt_start(input) == output
+
+
 def test_register_template_filters(empty_app: Flask) -> None:
     for filter in filters._filters:
         assert filter not in empty_app.jinja_env.filters

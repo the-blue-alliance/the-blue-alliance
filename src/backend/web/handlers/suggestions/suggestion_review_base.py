@@ -1,12 +1,22 @@
 import datetime
-from google.appengine.ext import ndb
+from typing import Generic, Iterable, Optional, TypeVar
 
-from controllers.base_controller import LoggedInHandler
-from models.suggestion import Suggestion
-from models.team_admin_access import TeamAdminAccess
+from flask import abort, redirect, request, url_for
+from flask.views import MethodView
+from google.cloud import ndb
+from pyre_extensions import none_throws
+
+from backend.common.consts.suggestion_state import SuggestionState
+from backend.common.models.suggestion import Suggestion
+from backend.web.auth import current_user
+
+# from backend.common.models.team_admin_access import TeamAdminAccess
 
 
-class SuggestionsReviewBaseController(LoggedInHandler):
+TTargetModel = TypeVar("TTargetModel")
+
+
+class SuggestionsReviewBase(Generic[TTargetModel], MethodView):
     """
     Base controller for reviewing suggestions.
     """
@@ -14,8 +24,9 @@ class SuggestionsReviewBaseController(LoggedInHandler):
     REQUIRED_PERMISSIONS = []
     ALLOW_TEAM_ADMIN_ACCESS = False
 
-    def __init__(self, *args, **kw):
-        super(SuggestionsReviewBaseController, self).__init__(*args, **kw)
+    def __init__(self, *args, **kw) -> None:
+        super(SuggestionsReviewBase, self).__init__(*args, **kw)
+        # TODO port over TeamAdminAccess
         self.existing_access = []
         if not self.ALLOW_TEAM_ADMIN_ACCESS:
             # For suggestion types that are enabled for delegated mod tools
@@ -25,48 +36,57 @@ class SuggestionsReviewBaseController(LoggedInHandler):
 
     def verify_write_permissions(self, suggestion):
         # Allow users who have the global permissions
-        if all([
+        if all(
+            [
                 p in self.user_bundle.account.permissions
                 for p in self.REQUIRED_PERMISSIONS
-        ]):
+            ]
+        ):
             return
 
         # For other team suggestions, make sure the user has a valid access
         if self.ALLOW_TEAM_ADMIN_ACCESS:
-            if any([
+            if any(
+                [
                     "frc{}".format(a.team_number) == suggestion.target_key
                     for a in self.existing_access
-            ]):
+                ]
+            ):
                 return
 
         return self.redirect("/", abort=True)
 
     def verify_permissions(self):
+        user = current_user()
+        if not user:
+            return redirect(url_for("account.login", next=request.url))
         for permission in self.REQUIRED_PERMISSIONS:
-            self._require_permission(permission)
+            if permission not in user.permissions:
+                return abort(401)
 
     def get(self):
-        self.verify_permissions()
+        pass
 
     def post(self):
         self._require_login()
+        """
         now = datetime.datetime.now()
         self.existing_access = TeamAdminAccess.query(
             TeamAdminAccess.account == self.user_bundle.account.key,
             TeamAdminAccess.expiration > now).fetch()
+        """
 
-    def create_target_model(self, suggestion):
+    def create_target_model(self, suggestion: Suggestion) -> Optional[TTargetModel]:
         """
         This function creates the model from the accepted suggestion and writes it to the ndb
         """
-        raise NotImplementedError(
-            "Subclasses should implement create_target_model")
+        raise NotImplementedError
 
-    def was_create_success(self, ret):
-        return ret
+    def was_create_success(self, ret: Optional[TTargetModel]) -> bool:
+        return ret is not None
 
     @ndb.transactional(xg=True)
-    def _process_accepted(self, accept_key):
+    def _process_accepted(self, accept_key: str) -> Optional[TTargetModel]:
         """
         Performs all actions for an accepted Suggestion in a Transaction.
         Suggestions are processed one at a time (instead of in batch) in a
@@ -80,41 +100,41 @@ class SuggestionsReviewBaseController(LoggedInHandler):
         self.verify_write_permissions(suggestion)
 
         # Make sure Suggestion hasn't been processed (by another thread)
-        if suggestion.review_state != Suggestion.REVIEW_PENDING:
-            return
+        if suggestion.review_state != SuggestionState.REVIEW_PENDING:
+            return None
 
         # Do all DB writes
+        user = none_throws(current_user())
         ret = self.create_target_model(suggestion)
         if self.was_create_success(ret):
             # Mark Suggestion as accepted
-            suggestion.review_state = Suggestion.REVIEW_ACCEPTED
-            suggestion.reviewer = self.user_bundle.account.key
+            suggestion.review_state = SuggestionState.REVIEW_ACCEPTED
+            suggestion.reviewer = user.account_key
             suggestion.reviewed_at = datetime.datetime.now()
             suggestion.put()
         return ret
 
-    def _process_rejected(self, reject_keys):
+    def _process_rejected(self, reject_keys: Iterable[str]) -> None:
         """
         Do everything we need to reject a batch of suggestions
         We can batch these, because we're just rejecting everything
         """
-        if not isinstance(reject_keys, list):
-            reject_keys = [reject_keys]
-
         rejected_suggestion_futures = [
             Suggestion.get_by_id_async(key) for key in reject_keys
         ]
-        rejected_suggestions = map(lambda a: a.get_result(),
-                                   rejected_suggestion_futures)
+        rejected_suggestions = map(
+            lambda a: a.get_result(), rejected_suggestion_futures
+        )
 
         for suggestion in rejected_suggestions:
             self.verify_write_permissions(suggestion)
             self._reject_suggestion(suggestion)
 
     @ndb.transactional(xg=True)
-    def _reject_suggestion(self, suggestion):
-        if suggestion.review_state == Suggestion.REVIEW_PENDING:
-            suggestion.review_state = Suggestion.REVIEW_REJECTED
-            suggestion.reviewer = self.user_bundle.account.key
+    def _reject_suggestion(self, suggestion: Suggestion) -> None:
+        user = none_throws(current_user())
+        if suggestion.review_state == SuggestionState.REVIEW_PENDING:
+            suggestion.review_state = SuggestionState.REVIEW_REJECTED
+            suggestion.reviewer = user.account_key
             suggestion.reviewed_at = datetime.datetime.now()
             suggestion.put()
