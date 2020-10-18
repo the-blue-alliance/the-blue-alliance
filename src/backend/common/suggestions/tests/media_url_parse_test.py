@@ -134,6 +134,9 @@ class TestMediaUrlParser(unittest.TestCase):
         self.assertEqual(result["site_name"], TYPE_NAMES[MediaType.GITHUB_PROFILE])
         self.assertEqual(result["profile_url"], "https://github.com/frc1124")
 
+    @pytest.mark.skip(
+        reason="TODO: need to migrate off legacy IG oembed https://developers.facebook.com/docs/instagram/oembed"
+    )
     def test_instagram_profile_parse(self) -> None:
         result = MediaParser.partial_media_dict_from_url(
             "https://www.instagram.com/4hteamneutrino"
