@@ -8,6 +8,7 @@ from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.consts.suggestion_type import SUGGESTION_TYPES
 from backend.common.models.account import Account
 from backend.common.models.keys import EventKey, Year
+from backend.common.models.media import Media
 from backend.common.models.suggestion_dict import SuggestionDict
 from backend.common.models.webcast import Webcast
 
@@ -60,13 +61,15 @@ class Suggestion(ndb.Model):
         self._contents = contents
         self.contents_json = json.dumps(self._contents)
 
-    # @property
-    # def candidate_media(self):
-    #     team_reference = Media.create_reference(
-    #         self.contents['reference_type'],
-    #         self.contents['reference_key'])
-    #     return MediaCreator.create_media_model(self, team_reference)
-    #
+    @property
+    def candidate_media(self) -> Media:
+        from backend.common.suggestions.media_creator import MediaCreator
+
+        team_reference = Media.create_reference(
+            self.contents["reference_type"], self.contents["reference_key"]
+        )
+        return MediaCreator.create_media_model(self, team_reference)
+
     # @property
     # def youtube_video(self):
     #     if "youtube_videos" in self.contents:

@@ -169,6 +169,9 @@ class Model(_NotEqualMixin, metaclass=MetaModel):
     def put_async(self, **kwargs) -> "TypedFuture[Key]":
         ...
 
+    def id(self) -> int:
+        ...
+
     @staticmethod
     def query(*args, **kwargs) -> Query: ...
 
