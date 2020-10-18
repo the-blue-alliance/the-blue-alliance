@@ -190,6 +190,21 @@ def test_guess_match_partial_from_title(title: str, expected_partial: str) -> No
     assert partial == expected_partial
 
 
+@pytest.mark.parametrize(
+    "time,expected_seconds",
+    [
+        ("3h17m30s", 11850),
+        ("3h", 10800),
+        ("10m", 600),
+        ("30s", 30),
+        ("asdf", 0),
+    ],
+)
+def test_time_to_seconds(time: str, expected_seconds: int) -> None:
+    seconds = YouTubeVideoHelper.time_to_seconds(time)
+    assert seconds == expected_seconds
+
+
 @pytest.fixture
 def mock_google_api_secret(monkeypatch: MonkeyPatch) -> None:
     def mock_secret():

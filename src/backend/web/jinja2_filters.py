@@ -2,10 +2,11 @@
 # import math
 import re
 
+from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
+
 # import time
 # import urllib
 #
-# from helpers.youtube_video_helper import YouTubeVideoHelper
 # from models.match import Match
 #
 # defense_render_names_2016 = {
@@ -113,17 +114,19 @@ def slugify(value):
     return re.sub(r"[-\s]+", "-", value)
 
 
-# def yt_start(value):
-#     if '?t=' in value:  # Treat ?t= the same as #t=
-#         value = value.replace('?t=', '#t=')
-#     if '#t=' in value:
-#         sp = value.split('#t=')
-#         video_id = sp[0]
-#         old_ts = sp[1]
-#         total_seconds = YouTubeVideoHelper.time_to_seconds(old_ts)
-#         value = '%s?start=%i' % (video_id, total_seconds)
-#
-#     return value
+def yt_start(value):
+    if "?t=" in value:  # Treat ?t= the same as #t=
+        value = value.replace("?t=", "#t=")
+    if "#t=" in value:
+        sp = value.split("#t=")
+        video_id = sp[0]
+        old_ts = sp[1]
+        total_seconds = YouTubeVideoHelper.time_to_seconds(old_ts)
+        value = "%s?start=%i" % (video_id, total_seconds)
+
+    return value
+
+
 #
 #
 # def match_short(match_key):
@@ -143,6 +146,7 @@ _filters = {
     "limit_prob": limit_prob,
     "slugify": slugify,
     "isoformat": isoformat,
+    "yt_start": yt_start,
 }
 
 
