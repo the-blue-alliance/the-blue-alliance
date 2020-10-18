@@ -7,22 +7,22 @@ from bs4 import BeautifulSoup
 from google.cloud import ndb
 from werkzeug.test import Client
 
-from backend.common.consts.auth_type import AuthType, WRITE_TYPE_NAMES
 from backend.common.consts.event_type import EventType
 from backend.common.consts.suggestion_state import SuggestionState
+from backend.common.consts.webcast_type import WebcastType
 from backend.common.models.event import Event
 from backend.common.models.suggestion import Suggestion
-from backend.common.models.suggestion_dict import SuggestionDict
-from backend.web.handlers.tests.conftest import CapturedTemplate
+from backend.common.models.webcast import Webcast
+from backend.web.handlers.conftest import CapturedTemplate
 
 
 @pytest.fixture(autouse=True)
-def createEvent(ndb_client: ndb.Client) -> None:
+def createEvent(ndb_client) -> None:
     with ndb_client.context():
         event = Event(
             id="2016necmp",
             name="New England District Championship",
-            event_type_enum=EventType.OFFSEASON,
+            event_type_enum=EventType.DISTRICT_CMP,
             short_name="New England",
             event_short="necmp",
             year=2016,
@@ -35,7 +35,7 @@ def createEvent(ndb_client: ndb.Client) -> None:
             venue_address="Some Venue, Hartford, CT, USA",
             timezone_id="America/New_York",
             start_date=datetime(2016, 3, 24),
-            webcast_json='[{"type": "twitch", "channel": "frcgamesense"}]',
+            webcast_json="",
             website="http://www.firstsv.org",
         )
         event.put()
@@ -46,24 +46,29 @@ def assert_template_status(
 ) -> None:
     template = captured_templates[0][0]
     context = captured_templates[0][1]
-    assert template.name == "suggestions/suggest_apiwrite.html"
+    assert template.name == "suggestions/suggest_event_webcast.html"
     assert context["status"] == status
 
 
 def test_login_redirect(web_client: Client) -> None:
-    response = web_client.get("/request/apiwrite")
+    response = web_client.get("/suggest/event/webcast?event_key=2016necmp")
     assert response.status_code == 302
     assert urlparse(response.headers["Location"]).path == "/account/login"
 
 
+def test_get_form_bad_event(login_user, web_client: Client) -> None:
+    response = web_client.get("/suggest/event/webcast?event_key=2016asdf")
+    assert response.status_code == 404
+
+
 def test_get_form(login_user, web_client: Client) -> None:
-    response = web_client.get("/request/apiwrite")
+    response = web_client.get("/suggest/event/webcast?event_key=2016necmp")
     assert response.status_code == 200
 
     soup = BeautifulSoup(response.data, "html.parser")
-    form = soup.find("form", id="suggest_apiwrite")
+    form = soup.find("form", id="suggest_webcast")
     assert form is not None
-    assert form["action"] == "/request/apiwrite"
+    assert form["action"] == "/suggest/event/webcast"
     assert form["method"] == "post"
 
     csrf = form.find(attrs={"name": "csrf_token"})
@@ -71,14 +76,25 @@ def test_get_form(login_user, web_client: Client) -> None:
     assert csrf["type"] == "hidden"
     assert csrf["value"] is not None
 
-    assert form.find(attrs={"name": "event_key"}) is not None
-    assert form.find(attrs={"name": "role"}) is not None
-    assert len(form.find_all(attrs={"name": "auth_types"})) == len(WRITE_TYPE_NAMES)
+    event_key = form.find(attrs={"name": "event_key"})
+    assert event_key is not None
+    assert event_key["type"] == "hidden"
+    assert event_key["value"] == "2016necmp"
+
+    assert form.find(attrs={"name": "webcast_url"}) is not None
+    assert form.find(attrs={"name": "webcast_date"}) is not None
+    assert form.find("button", type="submit") is not None
 
 
-def test_submit_no_data(login_user, ndb_client: ndb.Client, web_client: Client) -> None:
-    resp = web_client.post("/request/apiwrite", data={}, follow_redirects=True)
+def test_submit_no_event(
+    login_user, ndb_client: ndb.Client, web_client: Client
+) -> None:
+    resp = web_client.post("/suggest/event/webcast", data={}, follow_redirects=True)
     assert resp.status_code == 404
+
+    # Assert no suggestions were written
+    with ndb_client.context():
+        assert Suggestion.query().fetch() == []
 
 
 def test_submit_empty_form(
@@ -88,55 +104,78 @@ def test_submit_empty_form(
     captured_templates: List[CapturedTemplate],
 ) -> None:
     resp = web_client.post(
-        "/request/apiwrite", data={"event_key": "2016necmp"}, follow_redirects=True
+        "/suggest/event/webcast", data={"event_key": "2016necmp"}, follow_redirects=True
     )
     assert resp.status_code == 200
-    assert_template_status(captured_templates, "no_affiliation")
+    assert_template_status(captured_templates, "blank_webcast")
 
     # Assert the correct dialog shows
     soup = BeautifulSoup(resp.data, "html.parser")
-    assert soup.find(id="no_affiliation-alert") is not None
+    assert soup.find(id="blank_webcast-alert") is not None
 
     # Assert no suggestions were written
     with ndb_client.context():
         assert Suggestion.query().fetch() == []
 
 
-def test_submit_bad_event(
+def test_submit_bad_url(
     login_user,
     ndb_client: ndb.Client,
     web_client: Client,
     captured_templates: List[CapturedTemplate],
 ) -> None:
     resp = web_client.post(
-        "/request/apiwrite",
-        data={"event_key": "2016foo", "role": "Test Code"},
+        "/suggest/event/webcast",
+        data={"event_key": "2016necmp", "webcast_url": "The Blue Alliance"},
         follow_redirects=True,
     )
     assert resp.status_code == 200
-    assert_template_status(captured_templates, "bad_event")
+    assert_template_status(captured_templates, "invalid_url")
 
     # Assert the correct dialog shows
     soup = BeautifulSoup(resp.data, "html.parser")
-    assert soup.find(id="bad_event-alert") is not None
+    assert soup.find(id="invalid_url-alert") is not None
 
     # Assert no suggestions were written
     with ndb_client.context():
         assert Suggestion.query().fetch() == []
 
 
-def test_suggest_api_write(
+def test_submit_tba_url(
     login_user,
     ndb_client: ndb.Client,
     web_client: Client,
     captured_templates: List[CapturedTemplate],
-):
+) -> None:
     resp = web_client.post(
-        "/request/apiwrite",
+        "/suggest/event/webcast",
+        data={"event_key": "2016necmp", "webcast_url": "http://thebluealliance.com"},
+        follow_redirects=True,
+    )
+    assert resp.status_code == 200
+    assert_template_status(captured_templates, "invalid_url")
+
+    # Assert the correct dialog shows
+    soup = BeautifulSoup(resp.data, "html.parser")
+    assert soup.find(id="invalid_url-alert") is not None
+
+    # Assert no suggestions were written
+    with ndb_client.context():
+        assert Suggestion.query().fetch() == []
+
+
+def test_submit_webcast(
+    login_user,
+    ndb_client: ndb.Client,
+    web_client: Client,
+    captured_templates: List[CapturedTemplate],
+) -> None:
+    resp = web_client.post(
+        "/suggest/event/webcast",
         data={
             "event_key": "2016necmp",
-            "role": "Test Code",
-            "auth_types": [int(AuthType.MATCH_VIDEO), int(AuthType.EVENT_TEAMS)],
+            "webcast_url": "https://twitch.tv/frcgamesense",
+            "webcast_date": "",
         },
         follow_redirects=True,
     )
@@ -153,9 +192,7 @@ def test_suggest_api_write(
         assert suggestion is not None
         assert suggestion.review_state == SuggestionState.REVIEW_PENDING
         assert suggestion.target_key == "2016necmp"
-        assert suggestion.target_model == "api_auth_access"
-        assert suggestion.contents == SuggestionDict(
-            event_key="2016necmp",
-            affiliation="Test Code",
-            auth_types=[AuthType.MATCH_VIDEO, AuthType.EVENT_TEAMS],
+        assert suggestion.contents["webcast_url"] == "https://twitch.tv/frcgamesense"
+        assert suggestion.contents.get("webcast_dict") == Webcast(
+            type=WebcastType.TWITCH, channel="frcgamesense"
         )

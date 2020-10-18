@@ -8,7 +8,7 @@ from werkzeug.test import Client
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.models.suggestion import Suggestion
 from backend.common.models.suggestion_dict import SuggestionDict
-from backend.web.handlers.tests.conftest import CapturedTemplate
+from backend.web.handlers.conftest import CapturedTemplate
 
 
 def assert_template_status(

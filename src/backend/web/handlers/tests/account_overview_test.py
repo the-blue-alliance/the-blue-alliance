@@ -15,7 +15,7 @@ from backend.common.consts.auth_type import (
 )
 from backend.common.sitevars.notifications_enable import NotificationsEnable
 from backend.web.handlers.account import blueprint
-from backend.web.handlers.tests.conftest import CapturedTemplate
+from backend.web.handlers.conftest import CapturedTemplate
 from backend.web.handlers.tests.helpers import assert_alert, get_page_title
 
 
