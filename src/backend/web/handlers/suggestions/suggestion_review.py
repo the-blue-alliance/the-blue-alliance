@@ -8,6 +8,9 @@ from backend.common.consts.account_permission import (
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.helpers.suggestion_fetcher import SuggestionFetcher
 from backend.web.handlers.decorators import require_any_permission
+from backend.web.handlers.suggestions.suggest_event_webcast_review_controller import (
+    SuggestEventWebcastReviewController,
+)
 from backend.web.handlers.suggestions.suggest_match_video_review_controller import (
     SuggestMatchVideoReviewController,
 )
@@ -18,6 +21,12 @@ from backend.web.profiled_render import render_template
 
 blueprint = Blueprint("suggestion_review", __name__)
 
+blueprint.add_url_rule(
+    "/suggest/event/webcast/review",
+    view_func=SuggestEventWebcastReviewController.as_view(
+        "suggest_event_webcast_review"
+    ),
+)
 blueprint.add_url_rule(
     "/suggest/match/video/review",
     view_func=SuggestMatchVideoReviewController.as_view("suggest_match_video_review"),
