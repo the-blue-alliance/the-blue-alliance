@@ -1,5 +1,5 @@
 import datetime
-from typing import Generic, Iterable, Optional, TypeVar
+from typing import Generic, List, Optional, TypeVar, Union
 
 from flask import abort, redirect, request, url_for
 from flask.views import MethodView
@@ -122,7 +122,7 @@ class SuggestionsReviewBase(Generic[TTargetModel], MethodView):
             suggestion.put()
         return ret
 
-    def _process_rejected(self, reject_keys: Iterable[str]) -> None:
+    def _process_rejected(self, reject_keys: List[Union[int, str]]) -> None:
         """
         Do everything we need to reject a batch of suggestions
         We can batch these, because we're just rejecting everything
