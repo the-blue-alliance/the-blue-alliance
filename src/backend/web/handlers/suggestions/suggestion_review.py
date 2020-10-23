@@ -14,6 +14,9 @@ from backend.web.handlers.suggestions.suggest_event_webcast_review_controller im
 from backend.web.handlers.suggestions.suggest_match_video_review_controller import (
     SuggestMatchVideoReviewController,
 )
+from backend.web.handlers.suggestions.suggest_social_media_review_controller import (
+    SuggestSocialMediaReviewController,
+)
 from backend.web.handlers.suggestions.suggest_team_media_review_controller import (
     SuggestTeamMediaReviewController,
 )
@@ -34,6 +37,10 @@ blueprint.add_url_rule(
 blueprint.add_url_rule(
     "/suggest/team/media/review",
     view_func=SuggestTeamMediaReviewController.as_view("suggest_team_media_review"),
+)
+blueprint.add_url_rule(
+    "/suggest/team/social/review",
+    view_func=SuggestSocialMediaReviewController.as_view("suggest_social_media_review"),
 )
 
 

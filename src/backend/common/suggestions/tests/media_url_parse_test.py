@@ -180,6 +180,7 @@ class TestMediaUrlParser(unittest.TestCase):
         )
         self.assertEqual(details["model_created"], "2016-09-19T11:52:23Z")
 
+    @pytest.mark.skip
     def test_instagram_image(self) -> None:
         result = MediaParser.partial_media_dict_from_url(
             "https://www.instagram.com/p/BUnZiriBYre/"
