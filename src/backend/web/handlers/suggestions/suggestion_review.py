@@ -8,6 +8,9 @@ from backend.common.consts.account_permission import (
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.helpers.suggestion_fetcher import SuggestionFetcher
 from backend.web.handlers.decorators import require_any_permission
+from backend.web.handlers.suggestions.suggest_apiwrite_review_controller import (
+    SuggestApiWriteReviewController,
+)
 from backend.web.handlers.suggestions.suggest_designs_review_controller import (
     SuggestDesignsReviewController,
 )
@@ -30,6 +33,10 @@ from backend.web.profiled_render import render_template
 
 blueprint = Blueprint("suggestion_review", __name__)
 
+blueprint.add_url_rule(
+    "/suggest/apiwrite/review",
+    view_func=SuggestApiWriteReviewController.as_view("suggest_apiwrite_review"),
+)
 blueprint.add_url_rule(
     "/suggest/cad/review",
     view_func=SuggestDesignsReviewController.as_view("suggest_designs_review"),
