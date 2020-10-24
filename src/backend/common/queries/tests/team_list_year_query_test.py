@@ -1,6 +1,7 @@
 from typing import List, Optional
 
 from google.cloud import ndb
+from pyre_extensions import none_throws
 
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
@@ -80,10 +81,14 @@ def test_affected_queries() -> None:
         assert {
             q.cache_key
             for q in TeamListYearQuery._eventteam_affected_queries(
-                event_key="2020test", team_key=team_key.id(), year=2020
+                event_key="2020test",
+                team_key=none_throws(team_key.string_id()),
+                year=2020,
             )
         } == {TeamListYearQuery(year=2020, page=0).cache_key}
         assert {
             q.cache_key
-            for q in TeamListYearQuery._team_affected_queries(team_key=team_key.id())
+            for q in TeamListYearQuery._team_affected_queries(
+                team_key=none_throws(team_key.string_id())
+            )
         } == {TeamListQuery(page=0).cache_key}

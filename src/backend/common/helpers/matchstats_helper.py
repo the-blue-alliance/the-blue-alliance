@@ -13,6 +13,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 from google.cloud import ndb
+from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.comp_level import CompLevel
@@ -206,7 +207,7 @@ class MatchstatsHelper(object):
     def get_last_event_stats(
         cls, team_list: List[TeamId], event_key: ndb.Key
     ) -> EventMatchStats:
-        year = int(event_key.id()[:4])
+        year = int(none_throws(event_key.string_id())[:4])
         cur_event = event_key.get()
 
         # Check cache for stored OPRs

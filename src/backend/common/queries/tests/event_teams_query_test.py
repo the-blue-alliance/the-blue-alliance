@@ -1,6 +1,7 @@
 from typing import List, Optional
 
 from google.cloud import ndb
+from pyre_extensions import none_throws
 
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
@@ -61,13 +62,17 @@ def test_affected_queries() -> None:
         assert {
             q.cache_key
             for q in EventTeamsQuery._eventteam_affected_queries(
-                event_key="2020aaa", team_key=team_key.id(), year=2020
+                event_key="2020aaa",
+                team_key=none_throws(team_key.string_id()),
+                year=2020,
             )
         } == {EventTeamsQuery(event_key="2020aaa").cache_key}
 
         assert {
             q.cache_key
-            for q in EventTeamsQuery._team_affected_queries(team_key=team_key.id())
+            for q in EventTeamsQuery._team_affected_queries(
+                team_key=none_throws(team_key.string_id())
+            )
         } == {
             EventTeamsQuery(event_key="2020aaa").cache_key,
             EventTeamsQuery(event_key="2020ccc").cache_key,
@@ -77,13 +82,17 @@ def test_affected_queries() -> None:
         assert {
             q.cache_key
             for q in EventTeamsQuery._eventteam_affected_queries(
-                event_key="2020bbb", team_key=team_key.id(), year=2020
+                event_key="2020bbb",
+                team_key=none_throws(team_key.string_id()),
+                year=2020,
             )
         } == {EventTeamsQuery(event_key="2020bbb").cache_key}
 
         assert {
             q.cache_key
-            for q in EventTeamsQuery._team_affected_queries(team_key=team_key.id())
+            for q in EventTeamsQuery._team_affected_queries(
+                team_key=none_throws(team_key.string_id())
+            )
         } == {
             EventTeamsQuery(event_key="2020bbb").cache_key,
             EventTeamsQuery(event_key="2020ccc").cache_key,

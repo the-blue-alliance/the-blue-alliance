@@ -296,7 +296,7 @@ class Match(CachedModel):
 
     @property
     def event_key_name(self) -> EventKey:
-        return self.event.id()
+        return none_throws(self.event.string_id())
 
     @property
     def team_keys(self) -> List[ndb.Key]:
@@ -310,7 +310,7 @@ class Match(CachedModel):
 
     @property
     def short_key(self) -> str:
-        return self.key.id().split("_")[1]
+        return none_throws(self.key.string_id()).split("_")[1]
 
     @property
     def has_been_played(self) -> bool:
