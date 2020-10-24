@@ -38,11 +38,15 @@ Vagrant.configure("2") do |config|
     d.ports = ports
     d.has_ssh = true
 
-    # By deafult, run with a prebuilt container image
-    d.image = "gcr.io/tbatv-prod-hrd/tba-py3-dev:latest"
+    if ENV['TBA_LOCAL_DOCKERFILE'] != nil
+      # We can build the docker container from the local Dockerfile
+      d.build_dir = "ops/dev/docker"
+    else
+      # But by deafult, run with a prebuilt container image because it's faster
+      d.image = "gcr.io/tbatv-prod-hrd/tba-py3-dev:latest"
+    end
 
-    # Or built it from the local checkout
-    # d.build_dir = "ops/dev/docker"
+
   end
 
   # Configure ssh into container

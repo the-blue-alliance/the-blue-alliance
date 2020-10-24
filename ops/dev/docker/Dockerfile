@@ -13,7 +13,8 @@ RUN apt-get update && apt-get install -y \
   jq \
   tmux \
   vim \
-  openssh-server
+  openssh-server \
+  redis-server
 
 # Setup python environmenets
 # python3 should be the default, but gcloud currently depends on python2

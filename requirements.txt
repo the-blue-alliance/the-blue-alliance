@@ -12,3 +12,4 @@ beautifulsoup4
 freezegun
 requests-mock
 blinker==1.4
+redis==3.5.3
