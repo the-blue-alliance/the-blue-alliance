@@ -23,6 +23,9 @@ from backend.web.handlers.suggestions.suggest_event_webcast_review_controller im
 from backend.web.handlers.suggestions.suggest_match_video_review_controller import (
     SuggestMatchVideoReviewController,
 )
+from backend.web.handlers.suggestions.suggest_offseason_event_review_controller import (
+    SuggestOffseasonEventReviewController,
+)
 from backend.web.handlers.suggestions.suggest_social_media_review_controller import (
     SuggestSocialMediaReviewController,
 )
@@ -50,6 +53,10 @@ blueprint.add_url_rule(
     view_func=SuggestEventWebcastReviewController.as_view(
         "suggest_event_webcast_review"
     ),
+)
+blueprint.add_url_rule(
+    "/suggest/offseason/review",
+    view_func=SuggestOffseasonEventReviewController.as_view("suggest_offseason_review"),
 )
 blueprint.add_url_rule(
     "/suggest/match/video/review",
