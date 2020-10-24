@@ -35,31 +35,31 @@ class TeamRenderer(object):
         cls, team: Team, year: Year, is_canonical: bool
     ) -> Optional[Dict]:
         hof_award_future = award_query.TeamEventTypeAwardsQuery(
-            team_key=team.key.id(),
+            team_key=team.key_name,
             event_type=EventType.CMP_FINALS,
             award_type=AwardType.CHAIRMANS,
         ).fetch_async()
         hof_video_future = media_query.TeamTagMediasQuery(
-            team_key=team.key.id(), media_tag=MediaTag.CHAIRMANS_VIDEO
+            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_VIDEO
         ).fetch_async()
         hof_presentation_future = media_query.TeamTagMediasQuery(
-            team_key=team.key.id(), media_tag=MediaTag.CHAIRMANS_PRESENTATION
+            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_PRESENTATION
         ).fetch_async()
         hof_essay_future = media_query.TeamTagMediasQuery(
-            team_key=team.key.id(), media_tag=MediaTag.CHAIRMANS_ESSAY
+            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_ESSAY
         ).fetch_async()
         media_future = media_query.TeamYearMediaQuery(
-            team_key=team.key.id(), year=year
+            team_key=team.key_name, year=year
         ).fetch_async()
         social_media_future = media_query.TeamSocialMediaQuery(
-            team_key=team.key.id()
+            team_key=team.key_name
         ).fetch_async()
         robot_future = Robot.get_by_id_async("{}_{}".format(team.key.id(), year))
         team_districts_future = district_query.TeamDistrictsQuery(
-            team_key=team.key.id()
+            team_key=team.key_name
         ).fetch_async()
         participation_future = team_query.TeamParticipationQuery(
-            team_key=team.key.id()
+            team_key=team.key_name
         ).fetch_async()
 
         hof_awards = hof_award_future.get_result()
@@ -294,30 +294,30 @@ class TeamRenderer(object):
     @classmethod
     def render_team_history(cls, team: Team, is_canonical: bool) -> Dict:
         hof_award_future = award_query.TeamEventTypeAwardsQuery(
-            team_key=team.key.id(),
+            team_key=team.key_name,
             event_type=EventType.CMP_FINALS,
             award_type=AwardType.CHAIRMANS,
         ).fetch_async()
         hof_video_future = media_query.TeamTagMediasQuery(
-            team_key=team.key.id(), media_tag=MediaTag.CHAIRMANS_VIDEO
+            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_VIDEO
         ).fetch_async()
         hof_presentation_future = media_query.TeamTagMediasQuery(
-            team_key=team.key.id(), media_tag=MediaTag.CHAIRMANS_PRESENTATION
+            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_PRESENTATION
         ).fetch_async()
         hof_essay_future = media_query.TeamTagMediasQuery(
-            team_key=team.key.id(), media_tag=MediaTag.CHAIRMANS_ESSAY
+            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_ESSAY
         ).fetch_async()
         award_futures = award_query.TeamAwardsQuery(
-            team_key=team.key.id()
+            team_key=team.key_name
         ).fetch_async()
         event_futures = event_query.TeamEventsQuery(
-            team_key=team.key.id()
+            team_key=team.key_name
         ).fetch_async()
         participation_future = team_query.TeamParticipationQuery(
-            team_key=team.key.id()
+            team_key=team.key_name
         ).fetch_async()
         social_media_future = media_query.TeamSocialMediaQuery(
-            team_key=team.key.id()
+            team_key=team.key_name
         ).fetch_async()
 
         hof_awards = hof_award_future.get_result()
@@ -354,7 +354,7 @@ class TeamRenderer(object):
             if event.now:
                 current_event = event
                 matches = match_query.TeamEventMatchesQuery(
-                    team.key.id(), event.key.id()
+                    team.key_name, event.key_name
                 ).fetch()
                 matches_upcoming = MatchHelper.upcomingMatches(matches)
 
@@ -421,17 +421,17 @@ class TeamRenderer(object):
         of a team for a given year
         """
         awards_future = award_query.TeamYearAwardsQuery(
-            team_key=team.key.id(), year=year
+            team_key=team.key_name, year=year
         ).fetch_async()
         events_future = event_query.TeamYearEventsQuery(
-            team_key=team.key.id(), year=year
+            team_key=team.key_name, year=year
         ).fetch_async()
         matches_future = match_query.TeamYearMatchesQuery(
-            team_key=team.key.id(), year=year
+            team_key=team.key_name, year=year
         ).fetch_async()
         if return_valid_years:
             valid_years_future = team_query.TeamParticipationQuery(
-                team_key=team.key.id()
+                team_key=team.key_name
             ).fetch_async()
         else:
             valid_years_future = None

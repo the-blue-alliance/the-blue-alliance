@@ -652,7 +652,7 @@ class Event(CachedModel):
         if self.district_key is None:
             return None
         district = DistrictQuery(
-            district_key=none_throws(self.district_key).id()
+            district_key=none_throws(none_throws(self.district_key).string_id())
         ).fetch()
         return district.display_name if district else None
 
@@ -661,14 +661,14 @@ class Event(CachedModel):
         if self.district_key is None:
             return None
         else:
-            return none_throws(self.district_key).id()[4:]
+            return none_throws(none_throws(self.district_key).string_id())[4:]
 
     @property
     def event_district_key(self) -> Optional[str]:
         if self.district_key is None:
             return None
         else:
-            return none_throws(self.district_key).id()
+            return none_throws(none_throws(self.district_key).string_id())
 
     @property
     def event_type_str(self) -> str:

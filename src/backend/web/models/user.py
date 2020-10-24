@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from google.cloud import ndb
 from pyre_extensions import none_throws
@@ -68,10 +68,10 @@ class User:
         return none_throws(self._account).key
 
     @property
-    def uid(self) -> Optional[str]:
+    def uid(self) -> Optional[Union[int, str]]:
         if self._account is None:
             return None
-        return none_throws(self._account).key.id()
+        return none_throws(none_throws(self._account).key.id())
 
     @property
     def is_registered(self) -> bool:
@@ -90,7 +90,8 @@ class User:
         if self._account is None:
             return []
         return MobileClientQuery(
-            user_ids=[none_throws(self._account).key.id()], only_verified=False
+            user_ids=[none_throws(none_throws(self._account).key.string_id())],
+            only_verified=False,
         ).fetch()
 
     @property

@@ -145,7 +145,9 @@ class Award(CachedModel):
 
     @property
     def key_name(self) -> AwardKey:
-        return self.render_key_name(self.event.id(), self.award_type_enum)
+        return self.render_key_name(
+            none_throws(self.event.string_id()), self.award_type_enum
+        )
 
     @classmethod
     def render_key_name(

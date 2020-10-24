@@ -88,7 +88,9 @@ def event_detail(event_key: EventKey) -> Response:
     event.prep_details()
     medias_future = media_query.EventTeamsPreferredMediasQuery(event_key).fetch_async()
     district_future = (
-        district_query.DistrictQuery(none_throws(event.district_key).id()).fetch_async()
+        district_query.DistrictQuery(
+            none_throws(none_throws(event.district_key).string_id())
+        ).fetch_async()
         if event.district_key
         else None
     )
@@ -103,7 +105,7 @@ def event_detail(event_key: EventKey) -> Response:
     elif event.parent_event:
         parent_event_future = none_throws(event.parent_event).get_async()
         event_codivisions_future = event_query.EventDivisionsQuery(
-            none_throws(event.parent_event).id()
+            none_throws(none_throws(event.parent_event).string_id())
         ).fetch_async()
 
     awards = AwardHelper.organizeAwards(event.awards)

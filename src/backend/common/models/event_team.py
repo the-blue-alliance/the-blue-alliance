@@ -1,7 +1,7 @@
 from typing import Set
 
 from google.cloud import ndb
-from pyre_extensions import safe_cast
+from pyre_extensions import none_throws, safe_cast
 
 from backend.common.models.cached_model import CachedModel
 from backend.common.models.event import Event
@@ -52,4 +52,8 @@ class EventTeam(CachedModel):
 
     @property
     def key_name(self) -> EventTeamKey:
-        return self.event.id() + "_" + self.team.id()
+        return (
+            none_throws(self.event.string_id())
+            + "_"
+            + none_throws(self.team.string_id())
+        )
