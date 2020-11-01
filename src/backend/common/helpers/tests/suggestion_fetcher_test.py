@@ -1,4 +1,3 @@
-import pytest
 from google.cloud import ndb
 
 from backend.common.consts.suggestion_state import SuggestionState
@@ -7,7 +6,6 @@ from backend.common.models.account import Account
 from backend.common.models.suggestion import Suggestion
 
 
-@pytest.mark.skip
 def test_count(ndb_context):
     Suggestion(
         author=ndb.Key(Account, "foo@bar.com"),
