@@ -1,5 +1,5 @@
 import datetime
-from typing import Dict, List, Optional, Tuple
+from typing import cast, Dict, List, Optional, Tuple
 
 from google.cloud import ndb
 
@@ -198,8 +198,8 @@ class TeamRenderer(object):
                 }
             )
 
-        season_wlt = None
-        offseason_wlt = None
+        season_wlt: Optional[WLTRecord] = None
+        offseason_wlt: Optional[WLTRecord] = None
         if year == 2015:
             year_qual_scores = []
             year_elim_scores = []
@@ -220,8 +220,12 @@ class TeamRenderer(object):
         else:
             year_qual_avg = None
             year_elim_avg = None
-            season_wlt: WLTRecord = {"wins": 0, "losses": 0, "ties": 0}
-            offseason_wlt: WLTRecord = {"wins": 0, "losses": 0, "ties": 0}
+
+            season_wlt = {"wins": 0, "losses": 0, "ties": 0}
+            season_wlt = cast(WLTRecord, season_wlt)
+
+            offseason_wlt = {"wins": 0, "losses": 0, "ties": 0}
+            offseason_wlt = cast(WLTRecord, offseason_wlt)
 
             for wlt in season_wlt_list:
                 season_wlt["wins"] += wlt["wins"]
