@@ -20,6 +20,10 @@ If you are planning on developing using WSL, there are a few extra steps you'll 
 
 Helpful commands when developing in The Blue Alliance codebase. This section includes things like how to run tests, how to seed your development environment with production data, and more!
 
+## [[Queues + defer|Queues-defer]]
+
+Details on using the `defer` method to enqueue tasks to be executed asynchronously, along with notes on task queues in The Blue Alliance codebase.
+
 ## [[Py 2 -> Py 3 Migration Notes|Py2ToPy3]]
 
 Running notes on how to migrate code from the Python 2 codebase to the new Python 3 codebase.
