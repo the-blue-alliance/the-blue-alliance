@@ -9,6 +9,8 @@ class EnvironmentMode(enum.Enum):
     REMOTE = "remote"
 
 
+# Mostly GAE env variables
+# See https://cloud.google.com/appengine/docs/standard/python3/runtime#environment_variables
 class Environment(object):
     @staticmethod
     def is_dev() -> bool:
@@ -18,6 +20,10 @@ class Environment(object):
     def is_prod() -> bool:
         env = os.environ.get("GAE_ENV")
         return env is not None and env.startswith("standard")
+
+    @staticmethod
+    def service() -> Optional[str]:
+        return os.environ.get("GAE_SERVICE", None)
 
     @staticmethod
     def project() -> Optional[str]:
