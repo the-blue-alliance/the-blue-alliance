@@ -1,5 +1,6 @@
 {
     "datastore_mode": "local",
+    "tasks_mode": "local",
     "log_level": "info",
     "tba_log_level": "debug",
     "ndb_log_level": "warning"

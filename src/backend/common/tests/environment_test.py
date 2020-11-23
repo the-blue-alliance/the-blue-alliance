@@ -1,7 +1,7 @@
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
 
-from backend.common.environment import Environment
+from backend.common.environment import Environment, EnvironmentMode
 
 
 @pytest.fixture
@@ -12,6 +12,16 @@ def set_dev(monkeypatch: MonkeyPatch) -> None:
 @pytest.fixture
 def set_prod(monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setenv("GAE_ENV", "standard")
+
+
+@pytest.fixture
+def set_tasks_local(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("TASKS_MODE", "local")
+
+
+@pytest.fixture
+def set_tasks_remote(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("TASKS_MODE", "remote")
 
 
 @pytest.fixture
@@ -48,6 +58,26 @@ def test_service_none() -> None:
 
 def test_service(set_service) -> None:
     assert Environment.service() == "default"
+
+
+def test_tasks_mode_prod(set_prod) -> None:
+    assert Environment.tasks_mode() is EnvironmentMode.LOCAL
+
+
+def test_tasks_mode_prod_remote(set_prod, set_tasks_remote) -> None:
+    assert Environment.tasks_mode() is EnvironmentMode.REMOTE
+
+
+def test_tasks_mode_local_empty() -> None:
+    assert Environment.tasks_mode() is EnvironmentMode.LOCAL
+
+
+def test_tasks_mode_local(set_tasks_local) -> None:
+    assert Environment.tasks_mode() is EnvironmentMode.LOCAL
+
+
+def test_tasks_mode_remote(set_tasks_remote) -> None:
+    assert Environment.tasks_mode() is EnvironmentMode.REMOTE
 
 
 def test_other_env(monkeypatch: MonkeyPatch) -> None:

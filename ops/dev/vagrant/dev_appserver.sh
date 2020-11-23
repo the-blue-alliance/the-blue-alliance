@@ -20,6 +20,7 @@ log_level=$(get_config_prop log_level)
 tba_log_level=$(get_config_prop tba_log_level)
 ndb_log_level=$(get_config_prop ndb_log_level)
 datastore_mode=$(get_config_prop datastore_mode)
+tasks_mode=$(get_config_prop tasks_mode)
 datastore_args=""
 application=""
 env=""
@@ -57,6 +58,17 @@ else
     exit -1
 fi
 
+# Setup Google Cloud Tasks local/remote
+if [ "$tasks_mode" == "local" ]; then
+    echo "Using local tasks (rq + Redis)"
+elif [ "$tasks_mode" == "remote" ]; then
+    echo "Using remote tasks (Cloud Tasks + ngrok)"
+    assert_google_application_credentials
+else
+    echo "Unknown tasks mode $tasks_mode! Must be one of [local, remote]"
+    exit -1
+fi
+
 set -x
 dev_appserver.py \
     --admin_host=0.0.0.0 \
@@ -66,5 +78,6 @@ dev_appserver.py \
     $env \
     --env_var TBA_LOG_LEVEL="$tba_log_level" \
     --env_var NDB_LOG_LEVEL="$ndb_log_level" \
+    --env_var TASKS_MODE="$tasks_mode" \
     --dev_appserver_log_level=$log_level \
     src/default.yaml src/web.yaml src/api.yaml src/tasks_io.yaml src/dispatch.yaml
