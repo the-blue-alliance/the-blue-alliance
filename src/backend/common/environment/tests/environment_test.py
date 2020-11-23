@@ -1,7 +1,10 @@
+from typing import cast
+
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
 
 from backend.common.environment import Environment, EnvironmentMode
+from backend.common.environment.tasks.tasks_remote_config import TasksRemoteConfig
 
 
 @pytest.fixture
@@ -22,6 +25,11 @@ def set_tasks_local(monkeypatch: MonkeyPatch) -> None:
 @pytest.fixture
 def set_tasks_remote(monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setenv("TASKS_MODE", "remote")
+
+
+@pytest.fixture
+def set_tasks_remote_config(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("TASKS_REMOTE_CONFIG_NGROK_URL", "http://1d03c3c73356.ngrok.io")
 
 
 @pytest.fixture
@@ -78,6 +86,16 @@ def test_tasks_mode_local(set_tasks_local) -> None:
 
 def test_tasks_mode_remote(set_tasks_remote) -> None:
     assert Environment.tasks_mode() is EnvironmentMode.REMOTE
+
+
+def test_tasks_remote_config_none() -> None:
+    assert Environment.tasks_remote_config() is None
+
+
+def test_tasks_remote_config(set_tasks_remote_config) -> None:
+    remote_config = Environment.tasks_remote_config()
+    remote_config = cast(TasksRemoteConfig, remote_config)
+    assert remote_config.ngrok_url == "http://1d03c3c73356.ngrok.io"
 
 
 def test_other_env(monkeypatch: MonkeyPatch) -> None:

@@ -8,7 +8,7 @@ function get_config_prop {
         local dev_config_file="tba_dev_config.local.json"
     fi
 
-    jq -r -s ".[0] * (.[1] // {}) | .$prop_name | select (.!=null)" tba_dev_config.json $dev_config_file
+    jq -c -r -s ".[0] * (.[1] // {}) | .$prop_name | select (.!=null)" tba_dev_config.json $dev_config_file
 }
 
 function get_project_from_key {
@@ -21,6 +21,7 @@ tba_log_level=$(get_config_prop tba_log_level)
 ndb_log_level=$(get_config_prop ndb_log_level)
 datastore_mode=$(get_config_prop datastore_mode)
 tasks_mode=$(get_config_prop tasks_mode)
+tasks_remote_config_ngrok_url=$(get_config_prop tasks_remote_config.ngrok_url)
 datastore_args=""
 application=""
 env=""
@@ -39,6 +40,13 @@ fi
 function assert_google_application_credentials {
     if [ -z $google_application_credentials ]; then
         echo "google_application_credentials required to be set in tba_dev_config"
+        exit -1
+    fi
+}
+
+function assert_tasks_remote_config_ngrok_url {
+    if [ -z $tasks_remote_config_ngrok_url ]; then
+        echo "tasks_remote_config.ngrok_url required to be set in tba_dev_config"
         exit -1
     fi
 }
@@ -64,6 +72,8 @@ if [ "$tasks_mode" == "local" ]; then
 elif [ "$tasks_mode" == "remote" ]; then
     echo "Using remote tasks (Cloud Tasks + ngrok)"
     assert_google_application_credentials
+    assert_tasks_remote_config_ngrok_url
+    env="$env --env_var TASKS_REMOTE_CONFIG_NGROK_URL=$tasks_remote_config_ngrok_url"
 else
     echo "Unknown tasks mode $tasks_mode! Must be one of [local, remote]"
     exit -1
