@@ -5,11 +5,13 @@ import flask
 import pytest
 from flask import Flask
 from google.cloud.ndb import context as context_module
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from werkzeug.wrappers import Request
 
 import backend
 from backend.common.environment import Environment
 from backend.common.middleware import (
+    _install_prefix_middleware,
     _set_secret_key,
     install_middleware,
     NdbMiddleware,
@@ -62,6 +64,30 @@ def test_install_middleware(app: Flask) -> None:
         app.try_trigger_before_first_request_functions()
     mock_set_secret_key.assert_called_with(app)
     assert type(app.wsgi_app) is NdbMiddleware
+
+
+def test_install_middleware_prefix(app: Flask) -> None:
+    assert not type(app.wsgi_app) is DispatcherMiddleware
+    with patch.object(
+        backend.common.middleware, "_set_secret_key"
+    ) as mock_set_secret_key:
+        install_middleware(app, prefix="test")
+        assert len(app.before_first_request_funcs) > 0
+        app.try_trigger_before_first_request_functions()
+    mock_set_secret_key.assert_called_with(app)
+    assert type(app.wsgi_app) is DispatcherMiddleware
+
+
+@pytest.mark.parametrize("prefix", ["test", "/test"])
+def test_install_prefix_middleware(app: Flask, prefix: str) -> None:
+    assert not type(app.wsgi_app) is DispatcherMiddleware
+    original_wsgi = app.wsgi_app
+    _install_prefix_middleware(app, prefix=prefix)
+    assert type(app.wsgi_app) is DispatcherMiddleware
+    assert app.wsgi_app.app == app
+    prefix_without_slash = prefix.lstrip("/")
+    assert f"/{prefix_without_slash}" in app.wsgi_app.mounts
+    assert app.wsgi_app.mounts[f"/{prefix_without_slash}"] == original_wsgi
 
 
 def test_set_secret_key_default(ndb_context, app: Flask) -> None:

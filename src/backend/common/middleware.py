@@ -1,7 +1,8 @@
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 from flask import Flask
 from google.cloud import ndb
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from werkzeug.wrappers import Request
 from werkzeug.wsgi import ClosingIterator
 
@@ -61,13 +62,20 @@ class AfterResponseMiddleware:
         send_traces()
 
 
-def install_middleware(app: Flask, configure_secret_key: bool = True) -> None:
+def install_middleware(app: Flask, prefix: Optional[str] = None, configure_secret_key: bool = True) -> None:
     @app.before_first_request
     def _app_before():
         if configure_secret_key:
             _set_secret_key(app)
 
+    if prefix:
+        _install_prefix_middleware(app, prefix)
     app.wsgi_app = NdbMiddleware(TraceRequestMiddleware(AfterResponseMiddleware(app.wsgi_app)))  # type: ignore[override]
+
+
+def _install_prefix_middleware(app: Flask, prefix: str):
+    prefix = prefix.lstrip("/")  # Remove leading slash from prefix - easier than doing a conditional append
+    app.wsgi_app = DispatcherMiddleware(app, {f"/{prefix}": app.wsgi_app})
 
 
 def _set_secret_key(app: Flask) -> None:

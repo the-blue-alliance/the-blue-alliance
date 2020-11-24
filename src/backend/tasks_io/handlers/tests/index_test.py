@@ -1,12 +1,6 @@
 from flask.testing import FlaskClient
 
 
-def test_app() -> None:
-    from backend.tasks_io.main import app
-
-    assert app is not None
-
-
 def test_app_prefix(tasks_io_client: FlaskClient) -> None:
     response = tasks_io_client.get("/tasks-io")
     assert response.status_code == 404
