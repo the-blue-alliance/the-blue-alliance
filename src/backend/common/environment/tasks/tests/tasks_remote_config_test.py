@@ -1,4 +1,4 @@
-from backend.common.environment.tasks.tasks_remote_config import TasksRemoteConfig
+from backend.common.environment.tasks import TasksRemoteConfig
 
 
 def test_ngrok_url() -> None:
