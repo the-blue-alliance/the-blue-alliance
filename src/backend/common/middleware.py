@@ -1,4 +1,4 @@
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 from flask import Flask
 from google.cloud import ndb
@@ -7,6 +7,7 @@ from werkzeug.wsgi import ClosingIterator
 
 from backend.common.environment import Environment
 from backend.common.profiler import send_traces, Span, trace_context
+from backend.common.redis import RedisClient
 
 
 class NdbMiddleware(object):
@@ -17,12 +18,13 @@ class NdbMiddleware(object):
 
     app: Callable[[Any, Any], Any]
     ndb_client: ndb.Client
-    global_cache: ndb.GlobalCache
+    global_cache: Optional[ndb.GlobalCache]
 
     def __init__(self, app: Callable[[Any, Any], Any]):
         self.app = app
         self.ndb_client = ndb.Client()
-        self.global_cache = ndb.RedisCache.from_environment()
+        redis_client = RedisClient.get()
+        self.global_cache = ndb.RedisCache(redis_client) if redis_client else None
 
     def __call__(self, environ: Any, start_response: Any):
         with self.ndb_client.context(

@@ -7,7 +7,9 @@
     {"site-package": "InMemoryCloudDatastoreStub"},
     {"site-package": "google/cloud/datastore_v1"},
     {"site-package": "numpy"},
+    {"site-package": "fakeredis"},
     {"site-package": "freezegun"},
+    {"site-package": "redis"},
     {"site-package": "requests_mock"},
     {"site-package": "pytest"},
     {"site-package": "_pytest"}
