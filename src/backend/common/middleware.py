@@ -17,13 +17,17 @@ class NdbMiddleware(object):
 
     app: Callable[[Any, Any], Any]
     ndb_client: ndb.Client
+    global_cache: ndb.GlobalCache
 
     def __init__(self, app: Callable[[Any, Any], Any]):
         self.app = app
         self.ndb_client = ndb.Client()
+        self.global_cache = ndb.RedisCache.from_environment()
 
     def __call__(self, environ: Any, start_response: Any):
-        with self.ndb_client.context():
+        with self.ndb_client.context(
+            global_cache=self.global_cache,
+        ):
             return self.app(environ, start_response)
 
 
