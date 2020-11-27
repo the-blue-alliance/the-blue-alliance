@@ -3,7 +3,10 @@ import pickle
 from typing import Any, Dict, List, Optional
 
 import redis
+from pyre_extensions import none_throws
 from typing_extensions import TypedDict
+
+from backend.common.redis import RedisClient
 
 
 """
@@ -174,17 +177,17 @@ class RedisCache(CacheIf):
     of checking the value's type)
     """
 
-    redis: redis.Redis
+    redis_client: redis.Redis
 
-    def __init__(self, redis_url: str) -> None:
-        self.redis = redis.Redis.from_url(redis_url)
+    def __init__(self, redis_client: redis.Redis) -> None:
+        self.redis_client = redis_client
 
     def set(self, key: bytes, value: Any, time: Optional[int] = None) -> bool:
         if time is not None and time < 0:
             raise ValueError("Expiration must not be negative")
 
         pickled_value = pickle.dumps(value)
-        ret = self.redis.set(key, pickled_value, ex=time)
+        ret = self.redis_client.set(key, pickled_value, ex=time)
         if ret is None:
             return False
         return ret
@@ -198,7 +201,7 @@ class RedisCache(CacheIf):
             raise ValueError("Expiration must not be negative")
 
         mapping_to_set = {k: pickle.dumps(v) for k, v in mapping.items()}
-        pipeline = self.redis.pipeline()
+        pipeline = self.redis_client.pipeline()
         pipeline.mset(mapping_to_set)
         if time is not None:
             # Redis doesn't support mset + TTL, so we do it
@@ -208,7 +211,7 @@ class RedisCache(CacheIf):
         pipeline.execute()
 
     def get(self, key: bytes) -> Optional[Any]:
-        value = self.redis.get(key)
+        value = self.redis_client.get(key)
         if value is None:
             return None
 
@@ -218,14 +221,30 @@ class RedisCache(CacheIf):
         self,
         keys: List[bytes],
     ) -> Dict[bytes, Optional[Any]]:
-        values = self.redis.mget(keys)
+        values = self.redis_client.mget(keys)
         return {
             k: pickle.loads(v) if v is not None else None for k, v in zip(keys, values)
         }
 
     def get_stats(self) -> Optional[CacheStats]:
-        info = self.redis.info(section="stats")
+        info = self.redis_client.info(section="stats")
         return CacheStats(
             hits=info["keyspace_hits"],
             misses=info["keyspace_misses"],
         )
+
+
+class MemcacheClient:
+
+    cache: Optional[CacheIf] = None
+
+    @classmethod
+    def get(cls) -> CacheIf:
+        if cls.cache is None:
+            redis_client = RedisClient.get()
+            if redis_client is not None:
+                cls.cache = RedisCache(redis_client)
+            else:
+                cls.cache = NoopCache()
+
+        return none_throws(cls.cache)
