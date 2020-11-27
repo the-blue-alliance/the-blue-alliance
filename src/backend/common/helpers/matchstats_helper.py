@@ -18,6 +18,7 @@ from pyre_extensions import none_throws
 from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
+from backend.common.memcache import MemcacheClient
 from backend.common.models.keys import TeamId, Year
 from backend.common.models.match import Match
 from backend.common.models.stats import EventMatchStats, StatType
@@ -212,12 +213,12 @@ class MatchstatsHelper(object):
 
         # Check cache for stored OPRs
         last_event_stats: EventMatchStats = defaultdict(dict)
-        """
-        cache_key = '{}:last_event_stats'.format(event_key.id())
+
+        memcache = MemcacheClient.get()
+        cache_key = f"{event_key.id()}:last_event_stats".encode()
         last_event_stats = memcache.get(cache_key)
         if last_event_stats is None:
             last_event_stats = defaultdict(dict)
-        """
 
         # Make necessary queries for missing stats
         futures = []
@@ -250,5 +251,5 @@ class MatchstatsHelper(object):
                     if values and team in values:
                         last_event_stats[stat][team] = values[team]
 
-        # memcache.set(cache_key, last_event_stats, 60*60*24)
+        memcache.set(cache_key, last_event_stats, 60 * 60 * 24)
         return last_event_stats
