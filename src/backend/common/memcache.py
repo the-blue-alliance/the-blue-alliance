@@ -186,7 +186,7 @@ class RedisCache(CacheIf):
         if time is not None and time < 0:
             raise ValueError("Expiration must not be negative")
 
-        pickled_value = pickle.dumps(value)
+        pickled_value = pickle.dumps(value, protocol=pickle.HIGHEST_PROTOCOL)
         ret = self.redis_client.set(key, pickled_value, ex=time)
         if ret is None:
             return False
@@ -200,7 +200,10 @@ class RedisCache(CacheIf):
         if time is not None and time < 0:
             raise ValueError("Expiration must not be negative")
 
-        mapping_to_set = {k: pickle.dumps(v) for k, v in mapping.items()}
+        mapping_to_set = {
+            k: pickle.dumps(v, protocol=pickle.HIGHEST_PROTOCOL)
+            for k, v in mapping.items()
+        }
         pipeline = self.redis_client.pipeline()
         pipeline.mset(mapping_to_set)
         if time is not None:
@@ -236,15 +239,19 @@ class RedisCache(CacheIf):
 
 class MemcacheClient:
 
-    cache: Optional[CacheIf] = None
+    _cache: Optional[CacheIf] = None
 
     @classmethod
     def get(cls) -> CacheIf:
-        if cls.cache is None:
+        if cls._cache is None:
             redis_client = RedisClient.get()
             if redis_client is not None:
-                cls.cache = RedisCache(redis_client)
+                cls._cache = RedisCache(redis_client)
             else:
-                cls.cache = NoopCache()
+                cls._cache = NoopCache()
 
-        return none_throws(cls.cache)
+        return none_throws(cls._cache)
+
+    @classmethod
+    def reset(cls) -> None:
+        cls._cache = None

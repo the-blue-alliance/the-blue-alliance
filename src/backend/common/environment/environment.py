@@ -55,3 +55,7 @@ class Environment(object):
     @staticmethod
     def ndb_log_level() -> Optional[str]:
         return os.environ.get("NDB_LOG_LEVEL")
+
+    @staticmethod
+    def redis_url() -> Optional[str]:
+        return os.environ.get("REDIS_CACHE_URL")
