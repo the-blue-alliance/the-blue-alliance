@@ -47,6 +47,25 @@ def test_noop_cache() -> None:
     assert stats["misses"] == 4
 
 
+def test_single_key_get_get_delete(redis_cache: CacheIf) -> None:
+    assert redis_cache.get(b"key") is None
+    assert redis_cache.set(b"key", "value") is True
+    assert redis_cache.get(b"key") == "value"
+    redis_cache.delete(b"key")
+    assert redis_cache.get(b"key") is None
+
+
+def test_multi_key_get_get_delete(redis_cache: CacheIf) -> None:
+    assert redis_cache.get_multi([b"key1", b"key2"]) == {b"key1": None, b"key2": None}
+    redis_cache.set_multi({b"key1": "value1", b"key2": "value2"})
+    assert redis_cache.get_multi([b"key1", b"key2"]) == {
+        b"key1": "value1",
+        b"key2": "value2",
+    }
+    redis_cache.delete_multi([b"key1", b"key2"])
+    assert redis_cache.get_multi([b"key1", b"key2"]) == {b"key1": None, b"key2": None}
+
+
 def test_redis_ttl(redis_cache: CacheIf) -> None:
     start_time = datetime.datetime.now()
     with freeze_time(start_time) as frozen_time:
@@ -85,6 +104,7 @@ def test_memcache_client_empty_env(monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setenv("REDIS_CACHE_URL", "")
     client = MemcacheClient.get()
     assert isinstance(client, NoopCache)
+
 
 def test_memcache_client_with_env(monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setenv("REDIS_CACHE_URL", "redis://localhost:1234")

@@ -104,6 +104,22 @@ class CacheIf(abc.ABC):
         """
 
     @abc.abstractmethod
+    def delete(self, key: bytes) -> None:
+        """Deletes a key from memcache.
+
+        Args:
+        key: Key to delete.  See docs on Client for detils.
+        """
+
+    @abc.abstractmethod
+    def delete_multi(self, keys: List[bytes]) -> None:
+        """Delete multiple keys at once.
+
+        Args:
+        keys: List of keys to delete.
+        """
+
+    @abc.abstractmethod
     def get_stats(self) -> Optional[CacheStats]:
         """Gets memcache statistics for this application.
 
@@ -160,6 +176,12 @@ class NoopCache(CacheIf):
     ) -> Dict[bytes, Optional[Any]]:
         self.miss_count += len(keys)
         return {k: None for k in keys}
+
+    def delete(self, key: bytes) -> None:
+        return None
+
+    def delete_multi(self, keys: List[bytes]) -> None:
+        return None
 
     def get_stats(self) -> Optional[CacheStats]:
         return CacheStats(
@@ -228,6 +250,12 @@ class RedisCache(CacheIf):
         return {
             k: pickle.loads(v) if v is not None else None for k, v in zip(keys, values)
         }
+
+    def delete(self, key: bytes) -> None:
+        self.redis_client.delete(key)
+
+    def delete_multi(self, keys: List[bytes]) -> None:
+        self.redis_client.delete(*keys)
 
     def get_stats(self) -> Optional[CacheStats]:
         info = self.redis_client.info(section="stats")
