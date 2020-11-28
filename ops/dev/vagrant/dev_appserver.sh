@@ -72,7 +72,7 @@ if [ -z "$redis_cache_url" ]; then
     echo "Running without redis cache"
 else
     echo "Starting with redis cache at $redis_cache_url"
-    env="$env --env_var REDIS_CACHE_URL $redis_cache_url"
+    env="$env --env_var REDIS_CACHE_URL=$redis_cache_url"
 fi
 
 # Setup Google Cloud Tasks local/remote
