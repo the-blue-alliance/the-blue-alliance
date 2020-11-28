@@ -125,6 +125,38 @@ class CacheIf(abc.ABC):
         """
 
     @abc.abstractmethod
+    def incr(self, key: bytes) -> Optional[int]:
+        """Atomically increments a key's value.
+
+        Internally, the value is a unsigned 64-bit integer.  Memcache
+        doesn't check 64-bit overflows.  The value, if too large, will
+        wrap around.
+
+
+        Args:
+        key: Key to increment.
+
+        Returns:
+        The new integer value of the key
+        """
+
+    @abc.abstractmethod
+    def decr(self, key: bytes) -> Optional[int]:
+        """Atomically decrements a key's value.
+
+        Internally, the value is a unsigned 64-bit integer.  Memcache
+        doesn't check 64-bit overflows.  The value, if too large, will
+        wrap around.
+
+
+        Args:
+        key: Key to decrement.
+
+        Returns:
+        The new integer value of the key
+        """
+
+    @abc.abstractmethod
     def get_stats(self) -> Optional[CacheStats]:
         """Gets memcache statistics for this application.
 
@@ -186,6 +218,12 @@ class NoopCache(CacheIf):
         return None
 
     def delete_multi(self, keys: List[bytes]) -> None:
+        return None
+
+    def incr(self, key: bytes) -> Optional[int]:
+        return None
+
+    def decr(self, key: bytes) -> Optional[int]:
         return None
 
     def get_stats(self) -> Optional[CacheStats]:
@@ -372,6 +410,12 @@ class RedisCache(CacheIf):
 
     def delete_multi(self, keys: List[bytes]) -> None:
         self.redis_client.delete(*keys)
+
+    def incr(self, key: bytes) -> Optional[int]:
+        return self.redis_client.incr(key)
+
+    def decr(self, key: bytes) -> Optional[int]:
+        return self.redis_client.decr(key)
 
     def get_stats(self) -> Optional[CacheStats]:
         info = self.redis_client.info(section="stats")
