@@ -1,6 +1,6 @@
 {
     "datastore_mode": "local",
-    "redis_cache_url": "redis://localhost:6739",
+    "redis_cache_url": "redis://localhost:6379",
     "tasks_mode": "local",
     "log_level": "info",
     "tba_log_level": "debug",
