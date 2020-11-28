@@ -73,7 +73,16 @@ def install_middleware(app: Flask, configure_secret_key: bool = True) -> None:
         if configure_secret_key:
             _set_secret_key(app)
 
-    app.wsgi_app = NdbMiddleware(TraceRequestMiddleware(AfterResponseMiddleware(app.wsgi_app)))  # type: ignore[override]
+    # The middlewares get added in order of this last, and each wraps the previous
+    # This means, the last one in this list is the "outermost" middleware that runs
+    # _first_ for a given request, for the cases when order matters
+    middlewares = [
+        AfterResponseMiddleware,
+        TraceRequestMiddleware,
+        NdbMiddleware,
+    ]
+    for middleware in middlewares:
+        app.wsgi_app = middleware(app.wsgi_app)  # type: ignore[override]
 
 
 def _set_secret_key(app: Flask) -> None:
