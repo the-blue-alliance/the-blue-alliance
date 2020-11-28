@@ -192,7 +192,6 @@ def event_detail(event_key: EventKey) -> Response:
     )
 
     # status_sitevar = status_sitevar_future.get_result()
-    print(f"{event.details}")
 
     template_values = {
         "event": event,
