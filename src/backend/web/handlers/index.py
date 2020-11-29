@@ -10,3 +10,8 @@ def index() -> str:
         "kickoff_datetime_utc": SeasonHelper.kickoff_datetime_utc(2021),
     }
     return render_template("index/index_kickoff.html", template_values)
+
+
+@cached_public
+def about() -> str:
+    return render_template("about.html")
