@@ -8,6 +8,7 @@ from pyre_extensions import safe_cast
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.futures import TypedFuture
+from backend.common.models.cached_query_result import CachedQueryResult
 from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
 from backend.common.profiler import Span
 from backend.common.queries.dict_converters.converter_base import ConverterBase
@@ -26,13 +27,17 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn]):
     def _query_async(self) -> TypedFuture[QueryReturn]:
         ...
 
+    def _do_query(self, *args, **kwargs) -> TypedFuture[QueryReturn]:
+        # This gives CachedDatabaseQuery a place to hook into
+        return self._query_async(*args, **kwargs)
+
     def fetch(self) -> QueryReturn:
         return self.fetch_async().get_result()
 
     @ndb.tasklet
     def fetch_async(self) -> TypedFuture[QueryReturn]:
         with Span("{}.fetch_async".format(self.__class__.__name__)):
-            query_result = yield self._query_async(**self._query_args)
+            query_result = yield self._do_query(**self._query_args)
             return safe_cast(TypedFuture[QueryReturn], query_result)
 
     def fetch_dict(self, version: ApiMajorVersion) -> Dict:
@@ -57,6 +62,7 @@ class CachedDatabaseQuery(DatabaseQuery, Generic[QueryReturn]):
     )
     CACHE_KEY_FORMAT: str = ""
     CACHE_VERSION: int = 0
+    CACHING_ENABLED: bool = False
     _cache_key: Optional[str] = None
 
     def __init__(self, *args, **kwargs) -> None:
@@ -71,6 +77,20 @@ class CachedDatabaseQuery(DatabaseQuery, Generic[QueryReturn]):
                 self.DATABASE_QUERY_VERSION,
             )
         return self._cache_key
+
+    @ndb.tasklet
+    def _do_query(self, *args, **kwargs) -> TypedFuture[QueryReturn]:
+        if not self.CACHING_ENABLED:
+            result = yield self._query_async(*args, **kwargs)
+            return result  # pyre-ignore[7]
+
+        cache_key = self.cache_key
+        cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
+        if cached_query_result is None:
+            query_result = yield self._query_async(*args, **kwargs)
+            yield CachedQueryResult(id=cache_key, result=query_result).put_async()
+            return query_result  # pyre-ignore[7]
+        return cached_query_result.query_result
 
     @classmethod
     def _event_affected_queries(
