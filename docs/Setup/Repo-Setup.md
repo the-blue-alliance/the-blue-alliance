@@ -4,14 +4,14 @@ A small amount of repo configuration can be done in order to streamline developm
 ## Install Dependencies
 This optional tooling requires [Python 3](https://www.python.org/downloads/) and [`pip`](https://pip.pypa.io/en/stable/installing/) to install.
 
-1. Install [Python 3](https://www.python.org/downloads/)
+1. Install [Python 3](https://www.python.org/downloads/) (3.8+)
 2. Install [`pip`](https://pip.pypa.io/en/stable/installing/)
 
 If you have both a Python 2 and Python 3 interpreter on your machine, run the `pip3` command instead of `pip`. To confirm, run -
 ```
 $ ls -l `which pip`
 ```
-If the path is a `2.7(.X)` path, run `pip3` instead of `pip`. If the path is a `3.7(.X)` path, run `pip`.
+If the path is a `2.7(.X)` path, run `pip3` instead of `pip`. If the path is a `3.8(.X)` path, run `pip`.
 
 ### Globally Install
 ```
