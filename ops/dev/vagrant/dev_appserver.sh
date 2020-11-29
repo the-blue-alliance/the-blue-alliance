@@ -92,6 +92,7 @@ set -x
 dev_appserver.py \
     --admin_host=0.0.0.0 \
     --host=0.0.0.0 \
+    --runtime="python37" \
     $application \
     $datastore_args \
     $env \
