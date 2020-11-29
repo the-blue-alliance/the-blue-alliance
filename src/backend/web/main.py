@@ -8,7 +8,7 @@ from backend.web.handlers.account import blueprint as account_blueprint
 from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.event import event_detail, event_list
 from backend.web.handlers.gameday import gameday
-from backend.web.handlers.index import index, about
+from backend.web.handlers.index import about, index
 from backend.web.handlers.match import match_detail
 from backend.web.handlers.suggestions.suggestion_review import (
     blueprint as suggestion_review_blueprint,
