@@ -200,7 +200,7 @@ function gamedayLessWatch(done) {
   done();
 }
 
-const build = gulp.series(
+const build = gulp.parallel(
   gamedayJS,
   gamedayLess,
   apidocsJS,
@@ -211,7 +211,7 @@ const build = gulp.series(
   zebramotionworksJS
 );
 
-const watch = gulp.series(
+const watch = gulp.parallel(
   gamedayJSWatch,
   gamedayLessWatch,
   apidocsJSWatch,
@@ -222,4 +222,4 @@ const watch = gulp.series(
 
 exports.build = build;
 exports.watch = watch;
-exports.default = gulp.series(build, watch);
+exports.default = gulp.parallel(build, watch);
