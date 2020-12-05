@@ -7,7 +7,7 @@ automatic_scaling:
   max_idle_instances: 1
 
 handlers:
-  - url: /css
+  - url: /py3_css
     static_dir: build/css
   - url: /favicon.ico
     static_files: backend/web/static/icons/favicon.ico
@@ -19,7 +19,7 @@ handlers:
   - url: /images
     static_dir: backend/web/static/images
     expiration: "1h"
-  - url: /javascript
+  - url: /py3_javascript
     static_dir: build/javascript
   - url: /manifest.json
     static_files: backend/web/static/manifest.json
