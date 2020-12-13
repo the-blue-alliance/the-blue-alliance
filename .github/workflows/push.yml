@@ -170,6 +170,20 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
       - name: Download production artifacts
         uses: actions/download-artifact@v2
         with:
@@ -181,8 +195,14 @@ jobs:
           version: "294.0.0"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
           service_account_key: ${{ secrets.GCLOUD_AUTH }}
+      - name: Install gcloud beta
+        # gcloud beta is needed to use the VPC connector needed for redis
+        run: gcloud components install beta
       - name: Deploy
-        run: gcloud components install beta && gcloud beta app deploy src/web.yaml --version 1 --quiet
+        env:
+          REDIS_CACHE_URL: ${{ secrets.REDIS_CACHE_URL }}
+          VPC_CONNECTOR_NAME: ${{ secrets.VPC_CONNECTOR_NAME }}
+        run: ./ops/deploy/deploy_module.sh src/web.yaml
   deploy-api:
     name: Deploy API Service
     runs-on: ubuntu-latest
@@ -190,11 +210,31 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
       - name: Setup Google Cloud Platform
         uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
           version: "294.0.0"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
           service_account_key: ${{ secrets.GCLOUD_AUTH }}
+      - name: Install gcloud beta
+        # gcloud beta is needed to use the VPC connector needed for redis
+        run: gcloud components install beta
       - name: Deploy
-        run: gcloud components install beta && gcloud beta app deploy src/api.yaml --version 1 --quiet
+        env:
+          REDIS_CACHE_URL: ${{ secrets.REDIS_CACHE_URL }}
+          VPC_CONNECTOR_NAME: ${{ secrets.VPC_CONNECTOR_NAME }}
+        run: ./ops/deploy/deploy_module.sh src/api.yaml
