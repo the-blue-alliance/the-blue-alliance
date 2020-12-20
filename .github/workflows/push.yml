@@ -182,7 +182,7 @@ jobs:
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
           service_account_key: ${{ secrets.GCLOUD_AUTH }}
       - name: Deploy
-        run: gcloud beta app deploy src/web.yaml --version 1 --quiet
+        run: gcloud components install beta && gcloud beta app deploy src/web.yaml --version 1 --quiet
   deploy-api:
     name: Deploy API Service
     runs-on: ubuntu-latest
@@ -197,4 +197,4 @@ jobs:
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
           service_account_key: ${{ secrets.GCLOUD_AUTH }}
       - name: Deploy
-        run: gcloud beta app deploy src/api.yaml --version 1 --quiet
+        run: gcloud components install beta && gcloud beta app deploy src/api.yaml --version 1 --quiet
