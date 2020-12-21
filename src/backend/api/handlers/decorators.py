@@ -1,7 +1,9 @@
+import logging
 from functools import wraps
 
 from flask import request
 
+from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 from backend.common.models.team import Team
 from backend.common.queries.exceptions import DoesNotExistException
@@ -10,7 +12,6 @@ from backend.common.queries.exceptions import DoesNotExistException
 def api_authenticated(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        # TODO: Validate with database
         auth_key = request.headers.get(
             "X-TBA-Auth-Key", request.args.get("X-TBA-Auth-Key")
         )
@@ -18,6 +19,18 @@ def api_authenticated(func):
             return (
                 {
                     "Error": "X-TBA-Auth-Key is a required header or URL param. Please get an access key at http://www.thebluealliance.com/account.",
+                },
+                401,
+            )
+        auth = ApiAuthAccess.get_by_id(auth_key)
+        if auth and auth.is_read_key:
+            logging.info(
+                f"Auth owner: {auth.owner.id() if auth.owner else None}, X-TBA-Auth-Key: {auth_key}"
+            )
+        else:
+            return (
+                {
+                    "Error": "X-TBA-Auth-Key is invalid. Please get an access key at http://www.thebluealliance.com/account."
                 },
                 401,
             )

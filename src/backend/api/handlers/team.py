@@ -7,9 +7,9 @@ from backend.common.models.keys import TeamKey
 from backend.common.queries.team_query import TeamListQuery, TeamQuery
 
 
+@validate_team_key
 @api_authenticated
 @cached_public
-@validate_team_key
 def team(team_key: TeamKey) -> Response:
     return jsonify(TeamQuery(team_key=team_key).fetch_dict(ApiMajorVersion.API_V3))
 
