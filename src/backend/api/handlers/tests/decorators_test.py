@@ -17,6 +17,21 @@ def test_not_authenticated(ndb_client: ndb.Client, api_client: Client) -> None:
         Team(id="frc254", team_number=254).put()
     resp = api_client.get("/api/v3/team/frc254")
     assert resp.status_code == 401
+    assert "required" in resp.json["Error"]
+
+
+def test_bad_auth(ndb_client: ndb.Client, api_client: Client) -> None:
+    with ndb_client.context():
+        ApiAuthAccess(
+            id="test_auth_key",
+            auth_types_enum=[AuthType.READ_API],
+        ).put()
+        Team(id="frc254", team_number=254).put()
+    resp = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "bad_auth_key"}
+    )
+    assert resp.status_code == 401
+    assert "invalid" in resp.json["Error"]
 
 
 def test_authenticated_header(ndb_client: ndb.Client, api_client: Client) -> None:
