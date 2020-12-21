@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Callable, Optional
 
 from flask import Flask
@@ -8,6 +9,7 @@ from werkzeug.wsgi import ClosingIterator
 from backend.common.environment import Environment
 from backend.common.profiler import send_traces, Span, trace_context
 from backend.common.redis import RedisClient
+from backend.common.run_after_response import execute_callbacks
 
 
 class NdbMiddleware(object):
@@ -65,6 +67,7 @@ class AfterResponseMiddleware:
         with Span("Running AfterResponseMiddleware"):
             pass
         send_traces()
+        execute_callbacks()
 
 
 def install_middleware(app: Flask, configure_secret_key: bool = True) -> None:
