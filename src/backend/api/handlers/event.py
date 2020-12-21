@@ -7,8 +7,8 @@ from backend.common.models.keys import EventKey
 from backend.common.queries.event_query import EventQuery
 
 
+@validate_event_key
 @api_authenticated
 @cached_public
-@validate_event_key
 def event(event_key: EventKey) -> Response:
     return jsonify(EventQuery(event_key=event_key).fetch_dict(ApiMajorVersion.API_V3))
