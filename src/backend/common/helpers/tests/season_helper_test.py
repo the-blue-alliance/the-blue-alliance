@@ -1,7 +1,9 @@
 from datetime import datetime
-from backend.common.helpers.season_helper import SeasonHelper
 
 from pytz import timezone, UTC
+
+from backend.common.helpers.season_helper import SeasonHelper
+
 
 EST = timezone("EST")
 
