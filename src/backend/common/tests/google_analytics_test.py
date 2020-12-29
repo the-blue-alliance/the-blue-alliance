@@ -1,3 +1,4 @@
+import itertools
 from unittest.mock import patch
 
 import pytest
@@ -19,15 +20,17 @@ def test_GoogleAnalytics_track_event_missing_sitevar() -> None:
         )
 
 
-@pytest.mark.parametrize("ev", [(None), (123)])
-def test_GoogleAnalytics_track_event(ev) -> None:
+@pytest.mark.parametrize("el,ev", itertools.product([None, "test"], [None, 123]))
+def test_GoogleAnalytics_track_event(el, ev) -> None:
     from backend.common.sitevars.google_analytics_id import GoogleAnalyticsID
 
     sitevar = GoogleAnalyticsID._fetch_sitevar()
     sitevar.contents["GOOGLE_ANALYTICS_ID"] = "abc"
 
     with patch("requests.get") as mock_get:
-        GoogleAnalytics.track_event("testbed", "test", "test", ev)
+        GoogleAnalytics.track_event(
+            "testbed", "test", "test", event_label=el, event_value=ev
+        )
 
     mock_get.assert_called()
     args, kwargs = mock_get.call_args
@@ -44,9 +47,12 @@ def test_GoogleAnalytics_track_event(ev) -> None:
         "t": "event",
         "ec": "test",
         "ea": "test",
+        "cd1": "testbed",
         "ni": 1,
         "sc": "end",
     }
+    if el:
+        query_components_expected["el"] = el
     if ev:
         query_components_expected["ev"] = ev
 
