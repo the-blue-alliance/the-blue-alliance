@@ -9,7 +9,7 @@ from backend.common.redis import RedisClient
 def configure_flask_cache(app: Flask) -> None:
     redis_client = RedisClient.get()
     if not redis_client:
-        logging.warn(
+        logging.warning(
             f"Unable to get redis client, not setting up flask cache for {app.import_name}"
         )
         config = {
