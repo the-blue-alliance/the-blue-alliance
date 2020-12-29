@@ -31,6 +31,10 @@ Vagrant.configure("2") do |config|
   ports.push("8000:8000")
   config.vm.network "forwarded_port", guest: 8000, host: 8000
 
+  # Forward RQ Dashboard
+  ports.push("9181:9181")
+  config.vm.network "forwarded_port", guest: 9181, host: 9181
+
   # Provision with docker
   config.vm.hostname = "tba-py3-docker"
   config.vm.provider "docker" do |d|

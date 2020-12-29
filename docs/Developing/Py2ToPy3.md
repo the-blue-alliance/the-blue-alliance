@@ -7,15 +7,15 @@ Migrated files should be **moved** from the `old_py2/` folder to the new destina
 Any `google.appengine` namespaced imports should be replaced with their new Google Cloud libraries.
 
 ```
-google.appengine.api.app_identity => (TODO: Move)
+google.appengine.api.app_identity => backend.common.environment(ish)
 google.appengine.api.memcache => (TODO: Move)
 google.appengine.api.search => (TODO: Move)
-google.appengine.api.taskqueue => (TODO: Move)
+google.appengine.api.taskqueue => google.cloud.tasks_v2
 google.appengine.api.urlfetch => requests
-google.appengine.api.users => (TODO: Move)
+google.appengine.api.users => backend.web.auth
 
 google.appengine.ext.ndb => google.cloud.ndb
-google.appengine.ext.deferred => (TODO: Move)
+google.appengine.ext.deferred => backend.common.deferred
 google.appengine.ext.testbed => (Removed)
 ```
 
