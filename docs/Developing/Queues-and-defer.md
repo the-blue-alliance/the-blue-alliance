@@ -31,10 +31,25 @@ defer(do_expensive_work, "a", b="c")
 The `defer` method can also take several arguments to better control how deferred tasks should execute.
 
 `_client` - A `backend.common.deferred.clients.task_client` instance that manages creating a queue. If this is not specified, `defer` will create a client based on the current environment.
+
 `_target` - The service which the executed task should be run on. If this is not specified, `defer` will attempt to run the task on the service that enqueued the task.
+
 `_url` - The URL that the task should hit. This expects a partial URL (path + query). If this is not specified, tasks will use the `/_ah/queue/deferred` URL.
+
 `_headers` - Any headers that should be passed along to the executing request handler. Currently these headers are unused.
+
 `_queue` - The queue which the task should be enqueued in. If this is not specified, tasks will be enqueued in the `default` queue.
+
+---
+
+An in-depth example making use of these parameters might be a task that needs to be deferred to execute on a vanity URL for logging + metrics and on a different service than the service that is enqueueing the task to be executed on a specific queue.
+
+```python
+def do_something():
+    ...
+
+defer(do_something, _target="tasks-io", _url="/_ah/queue/deferred_do_something", _queue="do-something-queue")
+```
 
 ## Creating Queues
 
