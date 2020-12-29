@@ -19,5 +19,5 @@ def team(team_key: TeamKey) -> Response:
 @api_authenticated
 @cached_public
 def team_list(page_num: int) -> Response:
-    track_call_after_response("team/list", page_num)
+    track_call_after_response("team/list", str(page_num))
     return jsonify(TeamListQuery(page=page_num).fetch_dict(ApiMajorVersion.API_V3))
