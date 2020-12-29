@@ -1,5 +1,6 @@
 {
   "source_directories": [
+    "ops",
     "src"
   ],
   "search_path": [
