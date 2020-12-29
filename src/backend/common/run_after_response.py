@@ -5,7 +5,7 @@ from werkzeug.local import Local
 
 
 local = Local()
-local.callbacks = []
+local.callbacks = []  # pyre-ignore[16]
 
 
 def run_after_response(callback: Callable[[], None]) -> None:
