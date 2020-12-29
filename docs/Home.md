@@ -24,6 +24,10 @@ Helpful commands when developing in The Blue Alliance codebase. This section inc
 
 Details on using the `defer` method to enqueue tasks to be executed asynchronously, along with notes on task queues in The Blue Alliance codebase.
 
+## [[Redis|Redis]]
+
+Details on how to cache data using `redis`.
+
 ## [[Py 2 -> Py 3 Migration Notes|Py2ToPy3]]
 
 Running notes on how to migrate code from the Python 2 codebase to the new Python 3 codebase.
@@ -33,6 +37,10 @@ Running notes on how to migrate code from the Python 2 codebase to the new Pytho
 ## Manual Deployment
 
 TODO
+
+## [[Prod Setup|Prod-Setup]]
+
+A list of Google Cloud resources that need to be configured outside of App Engine.
 
 ## [[CI/CD Setup|CI-CD-Setup]]
 
