@@ -190,9 +190,9 @@ jobs:
           name: web-build
           path: src/build
       - name: Setup Google Cloud Platform
-        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        uses: google-github-actions/setup-gcloud@master
         with:
-          version: "294.0.0"
+          version: "321.0.0"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
           service_account_key: ${{ secrets.GCLOUD_AUTH }}
       - name: Install gcloud beta
@@ -225,9 +225,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Setup Google Cloud Platform
-        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        uses: google-github-actions/setup-gcloud@master
         with:
-          version: "294.0.0"
+          version: "321.0.0"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
           service_account_key: ${{ secrets.GCLOUD_AUTH }}
       - name: Install gcloud beta
