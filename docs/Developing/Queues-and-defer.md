@@ -6,7 +6,7 @@ The Blue Alliances leverages [Google Cloud Task](https://cloud.google.com/tasks/
 
 Tasks executed with `defer` are just HTTP requests that are serialized + executed at a later time. By default, these tasks will use a use a `/_ah/queue/deferred.*` route when executing. A catch-all route for requests matching this regex can be installed for Flask apps by using the `install_defer_routes` method.
 
-```
+```python
 from flask import Flask
 
 from backend.common.deferred.handlers import install_defer_routes
@@ -19,7 +19,7 @@ install_defer_routes(app)
 
 Deferred tasks tend to be expensive tasks that can happen asynchronously in order to expedite serving a response for a request.
 
-```
+```python
 from from backend.common.deferred import defer
 
 def do_expensive_work(a, *, b):
@@ -42,7 +42,7 @@ Queues must be created in Google App Engine [using the gcloud command](https://c
 
 Currently there is no automated tooling for creating/updating queues in production. The list below describes how to get setup the current production queues.
 
-```
+```shell
 $ gcloud tasks queues create admin --max-dispatches-per-second 5 --max-attempts -1
 $ gcloud tasks queues create api-track-call --max-dispatches-per-second 500 --max-attempts 1
 $ gcloud tasks queues create backups --max-dispatches-per-second 0.1 --max-concurrent-dispatches 1 --max-attempts -1
@@ -75,7 +75,7 @@ You'll need an upstream Google App Engine instance, along with the queues create
 
 Download [ngrok](https://ngrok.com/) and run `ngrok` with the `http` command + the port you want to forward traffic to. The port is the port associated with your service in the development container. Ex: At the time of writing, the `py3-tasks-io` service is the 4th service started, so it maps to `8084` (or `http://localhost:8084`).
 
-```
+```shell
 $ ./ngrok http 8084
 ...
 Forwarding  http://a0e8a1c75a5e.ngrok.io -> http://localhost:8084
@@ -83,7 +83,7 @@ Forwarding  http://a0e8a1c75a5e.ngrok.io -> http://localhost:8084
 
 Change the `tasks_mode` property in `tba_dev_config.json`/`tba_dev_config.local.json` to be `remote`, and add a `tasks_remote_config` dictionary with a `ngrok_url` key/value. The value should be the URL for your ngrok URL. Additionally, set the `google_application_credentials` field (details can be found in the [[development runbook|Development-Runbook]]).
 
-```
+```json
 {
     ...
     "google_application_credentials": "ops/dev/keys/my-key.json",
