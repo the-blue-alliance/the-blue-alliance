@@ -5,8 +5,8 @@ import flask
 import pytest
 from flask import Flask
 from google.cloud.ndb import context as context_module
-from werkzeug.wrappers import Request
 from werkzeug.test import create_environ, run_wsgi_app
+from werkzeug.wrappers import Request
 
 import backend
 from backend.common.environment import Environment
@@ -61,13 +61,13 @@ def test_AfterResponseMiddleware_init(app: Flask) -> None:
 
 
 def test_AfterResponseMiddleware_callable(app: Flask) -> None:
-    app = AfterResponseMiddleware(app)
+    middleware = AfterResponseMiddleware(app)
 
     callback = Mock()
     run_after_response(callback)
 
     callback.assert_not_called()
-    run_wsgi_app(app, create_environ(), buffered=True)
+    run_wsgi_app(middleware, create_environ(), buffered=True)
     callback.assert_called_once()
 
 
