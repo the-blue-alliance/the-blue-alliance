@@ -20,7 +20,7 @@ If you are planning on developing using WSL, there are a few extra steps you'll 
 
 Helpful commands when developing in The Blue Alliance codebase. This section includes things like how to run tests, how to seed your development environment with production data, and more!
 
-## [[Queues + defer|Queues-defer]]
+## [[Queues and defer|Queues-and-defer]]
 
 Details on using the `defer` method to enqueue tasks to be executed asynchronously, along with notes on task queues in The Blue Alliance codebase.
 

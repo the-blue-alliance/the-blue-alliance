@@ -1,5 +1,3 @@
-## Queues + defer
-
 The Blue Alliances leverages [Google Cloud Task](https://cloud.google.com/tasks/docs/dual-overview) for deferred work. Examples of this work include tracking API request calls, dispatching push notifications, any post-request tasks, etc. Locally, Google Cloud Tasks can be used by round-tripping requests upstream back to a local development container via ngrok, or more commonly swapped out for Redis/RQ.
 
 `defer` is a drop-in replacement for [google.appengine.ext.deferred.deferred.defer](https://cloud.google.com/appengine/docs/standard/python/refdocs/google.appengine.ext.deferred.deferred). `defer` enqueues a method to be run later while automatically managing dispatching to the proper client based on the environment, getting a queue for a specified queue name, etc. Using `defer` is recommended unless you need some more fine-tuned control over tasks/queues. `defer` manages executing a task with the proper parameters both in development and in production. If an option is not supported in `defer` that is supported in the Google Cloud Task API protos, it is recommend to build this functionality in to `defer` and then leverage `defer`.
