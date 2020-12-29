@@ -20,7 +20,7 @@ def run_after_response(callback: Callable[[], None]) -> None:
 
     3) As a decorator
     @run_after_response
-    function_to_run():
+    def function_to_run():
         ...
     """
     local.callbacks.append(callback)
@@ -28,5 +28,7 @@ def run_after_response(callback: Callable[[], None]) -> None:
 
 def execute_callbacks() -> None:
     for callback in local.callbacks:
-        logging.info(f"Running callack after response: {callback.__name__}")
+        logging.info(
+            f"Running callack after response: {callback.__name__ if hasattr(callback, '__name__') else None}"
+        )
         callback()
