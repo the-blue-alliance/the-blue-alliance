@@ -12,11 +12,12 @@ from backend.common.queries.team_query import TeamListQuery, TeamQuery
 @api_authenticated
 @cached_public
 def team(team_key: TeamKey) -> Response:
-    track_call_after_response("/team", team_key)
+    track_call_after_response("team", team_key)
     return jsonify(TeamQuery(team_key=team_key).fetch_dict(ApiMajorVersion.API_V3))
 
 
 @api_authenticated
 @cached_public
 def team_list(page_num: int) -> Response:
+    track_call_after_response("team/list", page_num)
     return jsonify(TeamListQuery(page=page_num).fetch_dict(ApiMajorVersion.API_V3))
