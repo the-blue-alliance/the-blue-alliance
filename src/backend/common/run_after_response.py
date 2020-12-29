@@ -10,7 +10,7 @@ local.callbacks = []  # pyre-ignore[16]
 
 def run_after_response(callback: Callable[[], None]) -> None:
     """
-    Enqueues a callback to be run after the request repsonse.
+    Enqueues a callback to be run after the request response.
     Usage examples:
     1) As a lambda (Note that this will not log the function name because it is a lambda)
     run_after_response(lambda: ...)
