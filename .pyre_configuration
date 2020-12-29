@@ -6,6 +6,7 @@
   "search_path": [
     "stubs",
     {"site-package": "fakeredis"},
+    {"site-package": "flask_caching"},
     {"site-package": "freezegun"},
     {"site-package": "google/cloud/datastore_v1"},
     {"site-package": "google/cloud/tasks_v2/"},

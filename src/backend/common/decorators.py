@@ -1,6 +1,6 @@
 from functools import partial, wraps
 
-from flask import make_response, request, Response
+from flask import current_app, make_response, request, Response
 
 
 def cached_public(func=None, timeout: int = 61):
@@ -9,10 +9,9 @@ def cached_public(func=None, timeout: int = 61):
 
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        resp = make_response(func(*args, **kwargs))
+        cached = current_app.cache.cached(timeout=timeout)
+        resp = make_response(cached(func)(*args, **kwargs))
         if resp.status_code == 200:  # Only cache OK responses
-            # TODO: hook into Redis
-
             resp.headers["Cache-Control"] = "public, max-age={0}, s-maxage={0}".format(
                 max(
                     timeout, 61

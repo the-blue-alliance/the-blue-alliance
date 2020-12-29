@@ -45,9 +45,9 @@ def test_handle_defer_task_name_header():
     data = task.serialize()
 
     app = Flask(__name__)
-    with app.test_request_context(headers={"X-AppEngine-TaskName": 123}, data=data), patch(
-        "backend.common.deferred.handlers.defer_handler.run"
-    ) as mock_run:
+    with app.test_request_context(
+        headers={"X-AppEngine-TaskName": 123}, data=data
+    ), patch("backend.common.deferred.handlers.defer_handler.run") as mock_run:
         response = handle_defer("/some/path")
 
     assert type(response) is Response

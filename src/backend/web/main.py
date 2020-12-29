@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_wtf.csrf import CSRFProtect
 
+from backend.common.flask_cache import configure_flask_cache
 from backend.common.logging import configure_logging
 from backend.common.middleware import install_middleware
 from backend.web.auth import _user_context_processor
@@ -29,6 +30,7 @@ configure_logging()
 
 app = Flask(__name__)
 install_middleware(app)
+configure_flask_cache(app)
 
 csrf = CSRFProtect()
 csrf.init_app(app)
