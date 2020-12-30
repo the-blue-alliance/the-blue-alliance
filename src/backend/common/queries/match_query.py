@@ -5,12 +5,14 @@ from google.cloud import ndb
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, MatchKey, TeamKey, Year
 from backend.common.models.match import Match
-from backend.common.queries.database_query import DatabaseQuery
+from backend.common.queries.database_query import CachedDatabaseQuery
 from backend.common.queries.dict_converters.match_converter import MatchConverter
 from backend.common.tasklets import typed_tasklet
 
 
-class MatchQuery(DatabaseQuery[Optional[Match]]):
+class MatchQuery(CachedDatabaseQuery[Optional[Match]]):
+    CACHE_VERSION = 2
+    CACHE_KEY_FORMAT = "match_{match_key}"
     DICT_CONVERTER = MatchConverter
 
     def __init__(self, match_key: MatchKey) -> None:
@@ -22,7 +24,9 @@ class MatchQuery(DatabaseQuery[Optional[Match]]):
         return match
 
 
-class EventMatchesQuery(DatabaseQuery[List[Match]]):
+class EventMatchesQuery(CachedDatabaseQuery[List[Match]]):
+    CACHE_VERSION = 2
+    CACHE_KEY_FORMAT = "event_matches_{event_key}"
     DICT_CONVERTER = MatchConverter
 
     def __init__(self, event_key: EventKey) -> None:
@@ -37,7 +41,9 @@ class EventMatchesQuery(DatabaseQuery[List[Match]]):
         return list(filter(None, matches))
 
 
-class TeamEventMatchesQuery(DatabaseQuery[List[Match]]):
+class TeamEventMatchesQuery(CachedDatabaseQuery[List[Match]]):
+    CACHE_VERSION = 2
+    CACHE_KEY_FORMAT = "team_event_matches_{team_key}_{event_key}"
     DICT_CONVERTER = MatchConverter
 
     def __init__(self, team_key: TeamKey, event_key: EventKey) -> None:
@@ -52,7 +58,9 @@ class TeamEventMatchesQuery(DatabaseQuery[List[Match]]):
         return list(filter(None, matches))
 
 
-class TeamYearMatchesQuery(DatabaseQuery[List[Match]]):
+class TeamYearMatchesQuery(CachedDatabaseQuery[List[Match]]):
+    CACHE_VERSION = 2
+    CACHE_KEY_FORMAT = "team_year_matches_{team_key}_{year}"
     DICT_CONVERTER = MatchConverter
 
     def __init__(self, team_key: TeamKey, year: Year) -> None:

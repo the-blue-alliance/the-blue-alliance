@@ -112,7 +112,7 @@ def event_detail(event_key: EventKey) -> Response:
     cleaned_matches = event.matches
     # MatchHelper.deleteInvalidMatches(event.matches, event)
     match_count, matches = MatchHelper.organizeMatches(cleaned_matches)
-    teams = TeamHelper.sortTeams(safe_cast(List[Optional[Team]], event.teams))
+    teams = TeamHelper.sortTeams(event.teams)
 
     # Organize medias by team
     image_medias = MediaHelper.get_images(
