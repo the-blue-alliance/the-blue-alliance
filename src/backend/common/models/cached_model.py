@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Set
+from typing import Any, Dict, Optional, Set
 
 from google.cloud import ndb
 
@@ -43,3 +43,22 @@ class CachedModel(ndb.Model):
         # The initialization path is different for models vs those created via
         # constructors, so make sure we have a common set of properties defined
         self._fix_up_properties()
+
+    def __setstate__(self, state: Any) -> None:
+        """
+        TODO this will receive a serialized legacy protobuf,
+        we need to implement something similar
+
+        From the legacy NDB model implementation:
+        ```
+        def __getstate__(self):
+            return self._to_pb().Encode()
+
+        def __setstate__(self, serialized_pb):
+            pb = entity_pb.EntityProto(serialized_pb)
+            self.__init__()
+            self.__class__._from_pb(pb, set_key=False, ent=self)
+        ```
+
+        See https://github.com/googleapis/python-ndb/issues/587 about fixing upstream
+        """
