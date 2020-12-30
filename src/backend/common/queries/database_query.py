@@ -62,7 +62,7 @@ class CachedDatabaseQuery(DatabaseQuery, Generic[QueryReturn]):
     )
     CACHE_KEY_FORMAT: str = ""
     CACHE_VERSION: int = 0
-    CACHING_ENABLED: bool = True
+    CACHING_ENABLED: bool = False
     _cache_key: Optional[str] = None
 
     def __init__(self, *args, **kwargs) -> None:
