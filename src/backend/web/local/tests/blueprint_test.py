@@ -5,7 +5,7 @@ import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from flask import Flask
 
-from backend.common.sitevars.secrets import Secrets
+from backend.common.sitevars.flask_secrets import FlaskSecrets
 
 
 @pytest.fixture(autouse=True)
@@ -13,7 +13,7 @@ def setup_secret_key(monkeypatch: MonkeyPatch) -> None:
     def mock_get_secret():
         return "thebluealliance-test"
 
-    monkeypatch.setattr(Secrets, "secret_key", mock_get_secret)
+    monkeypatch.setattr(FlaskSecrets, "secret_key", mock_get_secret)
 
 
 def test_blueprint_not_installed_by_default() -> None:
