@@ -9,7 +9,10 @@ from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
 from backend.common.models.team import Team
 from backend.common.queries.database_query import CachedDatabaseQuery
-from backend.common.queries.dict_converters.team_converter import TeamConverter
+from backend.common.queries.dict_converters.team_converter import (
+    TeamConverter,
+    TeamDict,
+)
 from backend.common.tasklets import typed_tasklet
 
 
@@ -17,7 +20,7 @@ def _get_team_page_num(team_key: str) -> int:
     return int(int(team_key[3:]) / TeamListQuery.PAGE_SIZE)
 
 
-class TeamQuery(CachedDatabaseQuery[Optional[Team]]):
+class TeamQuery(CachedDatabaseQuery[Optional[Team], Optional[TeamDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "team_{team_key}"
     DICT_CONVERTER = TeamConverter
@@ -35,7 +38,7 @@ class TeamQuery(CachedDatabaseQuery[Optional[Team]]):
         return {cls(team_key=team_key)}
 
 
-class TeamListQuery(CachedDatabaseQuery[List[Team]]):
+class TeamListQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "team_list_{page}"
     DICT_CONVERTER = TeamConverter
@@ -60,7 +63,7 @@ class TeamListQuery(CachedDatabaseQuery[List[Team]]):
         return {cls(page=_get_team_page_num(team_key))}
 
 
-class TeamListYearQuery(CachedDatabaseQuery[List[Team]]):
+class TeamListYearQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "team_list_year_{year}_{page}"
     DICT_CONVERTER = TeamConverter
@@ -96,7 +99,7 @@ class TeamListYearQuery(CachedDatabaseQuery[List[Team]]):
         return TeamListQuery._team_affected_queries(team_key=team_key)
 
 
-class DistrictTeamsQuery(CachedDatabaseQuery[List[Team]]):
+class DistrictTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
     CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "district_teams_{district_key}"
     DICT_CONVERTER = TeamConverter
@@ -114,7 +117,7 @@ class DistrictTeamsQuery(CachedDatabaseQuery[List[Team]]):
         return list(teams)
 
 
-class EventTeamsQuery(CachedDatabaseQuery[List[Team]]):
+class EventTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "event_teams_{event_key}"
     DICT_CONVERTER = TeamConverter
@@ -152,7 +155,7 @@ class EventTeamsQuery(CachedDatabaseQuery[List[Team]]):
         }
 
 
-class EventEventTeamsQuery(CachedDatabaseQuery[List[EventTeam]]):
+class EventEventTeamsQuery(CachedDatabaseQuery[List[EventTeam], List[TeamDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "event_event_teams_{event_key}"
     DICT_CONVERTER = TeamConverter
@@ -174,10 +177,9 @@ class EventEventTeamsQuery(CachedDatabaseQuery[List[EventTeam]]):
         return {cls(event_key=event_key)}
 
 
-class TeamParticipationQuery(CachedDatabaseQuery[Set[int]]):
+class TeamParticipationQuery(CachedDatabaseQuery[Set[int], None]):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "team_participation_{team_key}"
-    DICT_CONVERTER = TeamConverter
 
     def __init__(self, team_key: TeamKey) -> None:
         super().__init__(team_key=team_key)
@@ -198,7 +200,7 @@ class TeamParticipationQuery(CachedDatabaseQuery[Set[int]]):
 
 
 """
-class TeamDistrictsQuery(CachedDatabaseQuery[List[District]]):
+class TeamDistrictsQuery(CachedDatabaseQuery[List[District], List[TeamDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = 'team_districts_{}'  # (team_key)
     DICT_CONVERTER = DistrictConverter

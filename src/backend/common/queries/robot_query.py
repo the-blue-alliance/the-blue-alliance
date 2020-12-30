@@ -6,11 +6,14 @@ from backend.common.models.keys import TeamKey
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 from backend.common.queries.database_query import CachedDatabaseQuery
-from backend.common.queries.dict_converters.robot_converter import RobotConverter
+from backend.common.queries.dict_converters.robot_converter import (
+    RobotConverter,
+    RobotDict,
+)
 from backend.common.tasklets import typed_tasklet
 
 
-class TeamRobotsQuery(CachedDatabaseQuery[List[Robot]]):
+class TeamRobotsQuery(CachedDatabaseQuery[List[Robot], List[RobotDict]]):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "team_robots_{team_key}"
     DICT_CONVERTER = RobotConverter

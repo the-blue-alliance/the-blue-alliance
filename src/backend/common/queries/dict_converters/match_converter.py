@@ -1,7 +1,7 @@
 import datetime
 import json
 import time
-from typing import Dict, List
+from typing import Dict, List, NewType
 
 from google.cloud import ndb
 
@@ -10,6 +10,8 @@ from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.common.queries.dict_converters.converter_base import ConverterBase
+
+MatchDict = NewType("MatchDict", Dict)
 
 
 class MatchConverter(ConverterBase):
@@ -21,18 +23,18 @@ class MatchConverter(ConverterBase):
     @classmethod
     def _convert_list(
         cls, matches: List[Match], version: ApiMajorVersion
-    ) -> List[Dict]:
+    ) -> List[MatchDict]:
         CONVERTERS = {
             ApiMajorVersion.API_V3: cls.matchesConverter_v3,
         }
         return CONVERTERS[version](matches)
 
     @classmethod
-    def matchesConverter_v3(cls, matches: List[Match]) -> List[Dict]:
+    def matchesConverter_v3(cls, matches: List[Match]) -> List[MatchDict]:
         return list(map(cls.matchConverter_v3, matches))
 
     @classmethod
-    def matchConverter_v3(cls, match: Match) -> Dict:
+    def matchConverter_v3(cls, match: Match) -> MatchDict:
         alliances = {}
         for alliance in ALLIANCE_COLORS:
             alliances[alliance] = {
@@ -76,7 +78,7 @@ class MatchConverter(ConverterBase):
         else:
             match_dict["post_result_time"] = None
 
-        return match_dict
+        return MatchDict(match_dict)
 
     @staticmethod
     def dictToModel_v3(data: Dict) -> Match:

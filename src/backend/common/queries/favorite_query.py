@@ -6,7 +6,7 @@ from backend.common.queries.database_query import DatabaseQuery
 from backend.common.tasklets import typed_tasklet
 
 
-class FavoriteQuery(DatabaseQuery[List[Favorite]]):
+class FavoriteQuery(DatabaseQuery[List[Favorite], None]):
     def __init__(self, account: Account, keys_only: bool = False) -> None:
         super().__init__(account=account, keys_only=keys_only)
 

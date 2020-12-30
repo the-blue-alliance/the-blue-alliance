@@ -9,11 +9,14 @@ from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.media import Media
 from backend.common.models.team import Team
 from backend.common.queries.database_query import CachedDatabaseQuery
-from backend.common.queries.dict_converters.media_converter import MediaConverter
+from backend.common.queries.dict_converters.media_converter import (
+    MediaConverter,
+    MediaDict,
+)
 from backend.common.tasklets import typed_tasklet
 
 
-class TeamSocialMediaQuery(CachedDatabaseQuery[List[Media]]):
+class TeamSocialMediaQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "team_social_media_{team_key}"
     DICT_CONVERTER = MediaConverter
@@ -30,7 +33,7 @@ class TeamSocialMediaQuery(CachedDatabaseQuery[List[Media]]):
         return medias
 
 
-class TeamMediaQuery(CachedDatabaseQuery[List[Media]]):
+class TeamMediaQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "team_media_{team_key}"
     DICT_CONVERTER = MediaConverter
@@ -46,7 +49,7 @@ class TeamMediaQuery(CachedDatabaseQuery[List[Media]]):
         return medias
 
 
-class TeamYearMediaQuery(CachedDatabaseQuery[List[Media]]):
+class TeamYearMediaQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "team_year_media_{team_key}_{year}"
     DICT_CONVERTER = MediaConverter
@@ -62,7 +65,7 @@ class TeamYearMediaQuery(CachedDatabaseQuery[List[Media]]):
         return medias
 
 
-class EventTeamsMediasQuery(CachedDatabaseQuery[List[Media]]):
+class EventTeamsMediasQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "event_teams_medias_{event_key}"
     DICT_CONVERTER = MediaConverter
@@ -90,7 +93,7 @@ class EventTeamsMediasQuery(CachedDatabaseQuery[List[Media]]):
         return medias
 
 
-class EventTeamsPreferredMediasQuery(CachedDatabaseQuery[List[Media]]):
+class EventTeamsPreferredMediasQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "event_teams_medias_preferred_{event_key}"
     DICT_CONVERTER = MediaConverter
@@ -119,7 +122,7 @@ class EventTeamsPreferredMediasQuery(CachedDatabaseQuery[List[Media]]):
         return medias
 
 
-class EventMediasQuery(CachedDatabaseQuery[List[Media]]):
+class EventMediasQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "event_medias_{event_key}"
     DICT_CONVERTER = MediaConverter
@@ -135,7 +138,7 @@ class EventMediasQuery(CachedDatabaseQuery[List[Media]]):
         return medias
 
 
-class TeamTagMediasQuery(CachedDatabaseQuery[List[Media]]):
+class TeamTagMediasQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "team_tag_medias_{team_key}_{media_tag}"
     DICT_CONVERTER = MediaConverter
@@ -152,7 +155,7 @@ class TeamTagMediasQuery(CachedDatabaseQuery[List[Media]]):
         return medias
 
 
-class TeamYearTagMediasQuery(CachedDatabaseQuery[List[Media]]):
+class TeamYearTagMediasQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "team_year_tag_medias_{team_key}_{year}_{media_tag}"
     DICT_CONVERTER = MediaConverter

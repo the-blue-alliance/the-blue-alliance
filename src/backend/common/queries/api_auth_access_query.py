@@ -6,7 +6,7 @@ from backend.common.queries.database_query import DatabaseQuery
 from backend.common.tasklets import typed_tasklet
 
 
-class ApiAuthAccessQuery(DatabaseQuery[List[ApiAuthAccess]]):
+class ApiAuthAccessQuery(DatabaseQuery[List[ApiAuthAccess], None]):
     def __init__(self, owner: Account) -> None:
         super().__init__(owner=owner)
 

@@ -8,11 +8,14 @@ from backend.common.models.district_team import DistrictTeam
 from backend.common.models.keys import DistrictAbbreviation, DistrictKey, TeamKey, Year
 from backend.common.models.team import Team
 from backend.common.queries.database_query import CachedDatabaseQuery
-from backend.common.queries.dict_converters.district_converter import DistrictConverter
+from backend.common.queries.dict_converters.district_converter import (
+    DistrictConverter,
+    DistrictDict,
+)
 from backend.common.tasklets import typed_tasklet
 
 
-class DistrictQuery(CachedDatabaseQuery[Optional[District]]):
+class DistrictQuery(CachedDatabaseQuery[Optional[District], Optional[DistrictDict]]):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "district_{district_key}"
     DICT_CONVERTER = DistrictConverter
@@ -32,7 +35,7 @@ class DistrictQuery(CachedDatabaseQuery[Optional[District]]):
         return None
 
 
-class DistrictsInYearQuery(CachedDatabaseQuery[List[District]]):
+class DistrictsInYearQuery(CachedDatabaseQuery[List[District], List[DistrictDict]]):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "districts_in_year_{year}"
     DICT_CONVERTER = DistrictConverter
@@ -49,7 +52,7 @@ class DistrictsInYearQuery(CachedDatabaseQuery[List[District]]):
         return list(districts)
 
 
-class DistrictHistoryQuery(CachedDatabaseQuery[List[District]]):
+class DistrictHistoryQuery(CachedDatabaseQuery[List[District], List[DistrictDict]]):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "district_history_{abbreviation}"
     DICT_CONVERTER = DistrictConverter
@@ -68,7 +71,7 @@ class DistrictHistoryQuery(CachedDatabaseQuery[List[District]]):
         return list(districts)
 
 
-class TeamDistrictsQuery(CachedDatabaseQuery[List[District]]):
+class TeamDistrictsQuery(CachedDatabaseQuery[List[District], List[DistrictDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "team_districts_{team_key}"
     DICT_CONVERTER = DistrictConverter

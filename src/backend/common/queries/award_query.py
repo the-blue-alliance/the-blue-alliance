@@ -9,11 +9,14 @@ from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.team import Team
 from backend.common.queries.database_query import CachedDatabaseQuery
-from backend.common.queries.dict_converters.award_converter import AwardConverter
+from backend.common.queries.dict_converters.award_converter import (
+    AwardConverter,
+    AwardDict,
+)
 from backend.common.tasklets import typed_tasklet
 
 
-class EventAwardsQuery(CachedDatabaseQuery[List[Award]]):
+class EventAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "event_awards_{event_key}"
     DICT_CONVERTER = AwardConverter
@@ -29,7 +32,7 @@ class EventAwardsQuery(CachedDatabaseQuery[List[Award]]):
         return awards
 
 
-class TeamAwardsQuery(CachedDatabaseQuery[List[Award]]):
+class TeamAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "team_awards_{team_key}"
     DICT_CONVERTER = AwardConverter
@@ -45,7 +48,7 @@ class TeamAwardsQuery(CachedDatabaseQuery[List[Award]]):
         return awards
 
 
-class TeamYearAwardsQuery(CachedDatabaseQuery[List[Award]]):
+class TeamYearAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "team_year_awards_{team_key}_{year}"
     DICT_CONVERTER = AwardConverter
@@ -61,7 +64,7 @@ class TeamYearAwardsQuery(CachedDatabaseQuery[List[Award]]):
         return awards
 
 
-class TeamEventAwardsQuery(CachedDatabaseQuery[List[Award]]):
+class TeamEventAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "team_event_awards_{team_key}_{event_key}"
     DICT_CONVERTER = AwardConverter
@@ -78,7 +81,7 @@ class TeamEventAwardsQuery(CachedDatabaseQuery[List[Award]]):
         return awards
 
 
-class TeamEventTypeAwardsQuery(CachedDatabaseQuery[List[Award]]):
+class TeamEventTypeAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = (
         "team_events_type_tag_awards_{team_key}_{event_type}_{award_type}"

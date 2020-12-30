@@ -1,8 +1,10 @@
-from typing import Dict, List
+from typing import Dict, List, NewType
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.team import Team
 from backend.common.queries.dict_converters.converter_base import ConverterBase
+
+TeamDict = NewType("TeamDict", Dict)
 
 
 class TeamConverter(ConverterBase):
@@ -12,16 +14,16 @@ class TeamConverter(ConverterBase):
 
     def _convert_list(
         self, model_list: List[Team], version: ApiMajorVersion
-    ) -> List[Dict]:
+    ) -> List[TeamDict]:
         CONVERTERS = {
             ApiMajorVersion.API_V3: self.teamsConverter_v3,
         }
         return CONVERTERS[version](model_list)
 
-    def teamsConverter_v3(self, teams: List[Team]) -> List[Dict]:
+    def teamsConverter_v3(self, teams: List[Team]) -> List[TeamDict]:
         return list(map(self.teamConverter_v3, teams))
 
-    def teamConverter_v3(self, team: Team) -> Dict:
+    def teamConverter_v3(self, team: Team) -> TeamDict:
         default_name = "Team {}".format(team.team_number)
         team_dict = {
             "key": team.key.id(),
@@ -35,7 +37,7 @@ class TeamConverter(ConverterBase):
             "school_name": team.school_name,
         }
         team_dict.update(self.constructLocation_v3(team))
-        return team_dict
+        return TeamDict(team_dict)
 
     @staticmethod
     def dictToModel_v3(data: Dict) -> Team:

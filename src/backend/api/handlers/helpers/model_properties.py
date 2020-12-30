@@ -1,7 +1,11 @@
-from typing import Dict, List
+from typing import List, NewType
+
+from backend.common.queries.dict_converters.event_converter import EventDict
+from backend.common.queries.dict_converters.match_converter import MatchDict
+from backend.common.queries.dict_converters.team_converter import TeamDict
 
 # Type aliases
-ModelType = str
+ModelType = NewType("ModelType", str)
 
 simple_event_properties = [
     "key",
@@ -41,7 +45,7 @@ simple_match_properties = [
 ]
 
 
-def filter_event_properties(events: List[Dict], model_type: ModelType) -> List[Dict]:
+def filter_event_properties(events: List[EventDict], model_type: ModelType) -> List:
     if not events:
         return []
     if model_type == "simple":
@@ -54,7 +58,7 @@ def filter_event_properties(events: List[Dict], model_type: ModelType) -> List[D
         raise Exception("Unknown model_type: {}".format(model_type))
 
 
-def filter_team_properties(teams: List[Dict], model_type: ModelType) -> List[Dict]:
+def filter_team_properties(teams: List[TeamDict], model_type: ModelType) -> List:
     if not teams:
         return []
     if model_type == "simple":
@@ -65,7 +69,7 @@ def filter_team_properties(teams: List[Dict], model_type: ModelType) -> List[Dic
         raise Exception("Unknown model_type: {}".format(model_type))
 
 
-def filter_match_properties(matches: List[Dict], model_type: ModelType) -> List[Dict]:
+def filter_match_properties(matches: List[MatchDict], model_type: ModelType) -> List:
     if not matches:
         return []
     if model_type == "simple":
