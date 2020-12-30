@@ -1,22 +1,22 @@
 import json
 
 from backend.common.models.sitevar import Sitevar
-from backend.common.sitevars.secrets import Secrets
+from backend.common.sitevars.flask_secrets import FlaskSecrets
 
 
 def test_default_sitevar():
-    default_sitevar = Secrets._fetch_sitevar()
+    default_sitevar = FlaskSecrets._fetch_sitevar()
     assert default_sitevar is not None
 
-    default_json = {"secret_key": Secrets.DEFAULT_SECRET_KEY}
+    default_json = {"secret_key": FlaskSecrets.DEFAULT_SECRET_KEY}
     assert default_sitevar.contents == default_json
 
 
 def test_secret_key():
-    assert Secrets.secret_key() == Secrets.DEFAULT_SECRET_KEY
+    assert FlaskSecrets.secret_key() == FlaskSecrets.DEFAULT_SECRET_KEY
 
 
 def test_secrets_set():
     secret_key = "abc"
-    Sitevar.get_or_insert("secrets", values_json=json.dumps({"secret_key": secret_key}))
-    assert Secrets.secret_key() == secret_key
+    Sitevar.get_or_insert("flask.secrets", values_json=json.dumps({"secret_key": secret_key}))
+    assert FlaskSecrets.secret_key() == secret_key
