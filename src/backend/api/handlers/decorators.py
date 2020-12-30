@@ -1,7 +1,7 @@
 import logging
 from functools import wraps
 
-from flask import request
+from flask import g, request
 
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
@@ -23,6 +23,7 @@ def api_authenticated(func):
                 401,
             )
         auth = ApiAuthAccess.get_by_id(auth_key)
+        g.api_auth_access = auth
         if auth and auth.is_read_key:
             logging.info(
                 f"Auth owner: {auth.owner.id() if auth.owner else None}, X-TBA-Auth-Key: {auth_key}"

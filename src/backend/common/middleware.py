@@ -8,6 +8,7 @@ from werkzeug.wsgi import ClosingIterator
 from backend.common.environment import Environment
 from backend.common.profiler import send_traces, Span, trace_context
 from backend.common.redis import RedisClient
+from backend.common.run_after_response import execute_callbacks
 
 
 class NdbMiddleware(object):
@@ -48,23 +49,21 @@ class TraceRequestMiddleware(object):
         return self.app(environ, start_response)
 
 
-class AfterResponseMiddleware:
+class AfterResponseMiddleware(NdbMiddleware):
     """
-    A middleware that handles tasks after handling the response
+    A middleware that handles tasks after handling the response.
+    Inherits from NdbMiddleware to access the ndb context.
     """
-
-    app: Callable[[Any, Any], Any]
-
-    def __init__(self, app: Callable[[Any, Any], Any]):
-        self.app = app
 
     def __call__(self, environ: Any, start_response: Any):
-        return ClosingIterator(self.app(environ, start_response), self._run)
+        return ClosingIterator(self.app(environ, start_response), self._run_after)
 
-    def _run(self):
+    def _run_after(self):
         with Span("Running AfterResponseMiddleware"):
             pass
         send_traces()
+        with self.ndb_client.context(global_cache=self.global_cache):
+            execute_callbacks()
 
 
 def install_middleware(app: Flask, configure_secret_key: bool = True) -> None:
