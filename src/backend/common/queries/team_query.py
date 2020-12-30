@@ -18,8 +18,8 @@ def _get_team_page_num(team_key: str) -> int:
 
 
 class TeamQuery(CachedDatabaseQuery[Optional[Team]]):
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "team_{team_key}"
-    CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
 
     def __init__(self, team_key: TeamKey) -> None:
@@ -36,8 +36,8 @@ class TeamQuery(CachedDatabaseQuery[Optional[Team]]):
 
 
 class TeamListQuery(CachedDatabaseQuery[List[Team]]):
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "team_list_{page}"
-    CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
     PAGE_SIZE: int = 500
 
@@ -61,8 +61,8 @@ class TeamListQuery(CachedDatabaseQuery[List[Team]]):
 
 
 class TeamListYearQuery(CachedDatabaseQuery[List[Team]]):
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "team_list_year_{year}_{page}"
-    CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
 
     def __init__(self, year: Year, page: int) -> None:
@@ -97,8 +97,8 @@ class TeamListYearQuery(CachedDatabaseQuery[List[Team]]):
 
 
 class DistrictTeamsQuery(CachedDatabaseQuery[List[Team]]):
+    CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "district_teams_{district_key}"
-    CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
 
     def __init__(self, district_key: DistrictKey) -> None:
@@ -115,8 +115,8 @@ class DistrictTeamsQuery(CachedDatabaseQuery[List[Team]]):
 
 
 class EventTeamsQuery(CachedDatabaseQuery[List[Team]]):
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "event_teams_{event_key}"
-    CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
 
     def __init__(self, event_key: EventKey) -> None:
@@ -153,8 +153,8 @@ class EventTeamsQuery(CachedDatabaseQuery[List[Team]]):
 
 
 class EventEventTeamsQuery(CachedDatabaseQuery[List[EventTeam]]):
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "event_event_teams_{event_key}"
-    CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
 
     def __init__(self, event_key: EventKey) -> None:
@@ -175,8 +175,8 @@ class EventEventTeamsQuery(CachedDatabaseQuery[List[EventTeam]]):
 
 
 class TeamParticipationQuery(CachedDatabaseQuery[Set[int]]):
+    CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "team_participation_{team_key}"
-    CACHE_VERSION = 0
     DICT_CONVERTER = TeamConverter
 
     def __init__(self, team_key: TeamKey) -> None:
@@ -199,6 +199,9 @@ class TeamParticipationQuery(CachedDatabaseQuery[Set[int]]):
 
 """
 class TeamDistrictsQuery(CachedDatabaseQuery[List[District]]):
+    CACHE_VERSION = 2
+    CACHE_KEY_FORMAT = 'team_districts_{}'  # (team_key)
+    DICT_CONVERTER = DistrictConverter
 
     @ndb.tasklet
     def _query_async(self, team_key: str) -> List[District]:

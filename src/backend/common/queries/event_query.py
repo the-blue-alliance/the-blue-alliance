@@ -8,12 +8,14 @@ from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
 from backend.common.models.team import Team
-from backend.common.queries.database_query import DatabaseQuery
+from backend.common.queries.database_query import CachedDatabaseQuery
 from backend.common.queries.dict_converters.event_converter import EventConverter
 from backend.common.tasklets import typed_tasklet
 
 
-class EventQuery(DatabaseQuery[Optional[Event]]):
+class EventQuery(CachedDatabaseQuery[Optional[Event]]):
+    CACHE_VERSION = 3
+    CACHE_KEY_FORMAT = "event_{event_key}"
     DICT_CONVERTER = EventConverter
 
     def __init__(self, event_key: EventKey) -> None:
@@ -25,7 +27,9 @@ class EventQuery(DatabaseQuery[Optional[Event]]):
         return event
 
 
-class EventListQuery(DatabaseQuery[List[Event]]):
+class EventListQuery(CachedDatabaseQuery[List[Event]]):
+    CACHE_VERSION = 4
+    CACHE_KEY_FORMAT = "event_list_{year}"
     DICT_CONVERTER = EventConverter
 
     def __init__(self, year: Year) -> None:
@@ -37,7 +41,10 @@ class EventListQuery(DatabaseQuery[List[Event]]):
         return events
 
 
-class DistrictEventsQuery(DatabaseQuery[List[Event]]):
+class DistrictEventsQuery(CachedDatabaseQuery[List[Event]]):
+    CACHE_VERSION = 5
+    CACHE_KEY_FORMAT = "district_events_{district_key}"
+
     def __init__(self, district_key: DistrictKey) -> None:
         super().__init__(district_key=district_key)
 
@@ -49,7 +56,9 @@ class DistrictEventsQuery(DatabaseQuery[List[Event]]):
         return events
 
 
-class DistrictChampsInYearQuery(DatabaseQuery[List[Event]]):
+class DistrictChampsInYearQuery(CachedDatabaseQuery[List[Event]]):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "district_list_{year}"
     DICT_CONVERTER = EventConverter
 
     def __init__(self, year: Year) -> None:
@@ -64,7 +73,9 @@ class DistrictChampsInYearQuery(DatabaseQuery[List[Event]]):
         return list(events)
 
 
-class TeamEventsQuery(DatabaseQuery[List[Event]]):
+class TeamEventsQuery(CachedDatabaseQuery[List[Event]]):
+    CACHE_VERSION = 4
+    CACHE_KEY_FORMAT = "team_events_{team_key}"
     DICT_CONVERTER = EventConverter
 
     def __init__(self, team_key: TeamKey) -> None:
@@ -80,7 +91,9 @@ class TeamEventsQuery(DatabaseQuery[List[Event]]):
         return list(events)
 
 
-class TeamYearEventsQuery(DatabaseQuery[List[Event]]):
+class TeamYearEventsQuery(CachedDatabaseQuery[List[Event]]):
+    CACHE_VERSION = 4
+    CACHE_KEY_FORMAT = "team_year_events_{team_key}_{year}"
     DICT_CONVERTER = EventConverter
 
     def __init__(self, team_key: TeamKey, year: Year) -> None:
@@ -96,7 +109,9 @@ class TeamYearEventsQuery(DatabaseQuery[List[Event]]):
         return list(events)
 
 
-class TeamYearEventTeamsQuery(DatabaseQuery[List[EventTeam]]):
+class TeamYearEventTeamsQuery(CachedDatabaseQuery[List[EventTeam]]):
+    CACHE_VERSION = 4
+    CACHE_KEY_FORMAT = "team_year_eventteams_{team_key}_{year}"
     DICT_CONVERTER = EventConverter
 
     def __init__(self, team_key: TeamKey, year: Year) -> None:
@@ -110,7 +125,9 @@ class TeamYearEventTeamsQuery(DatabaseQuery[List[EventTeam]]):
         return event_teams
 
 
-class EventDivisionsQuery(DatabaseQuery[List[Event]]):
+class EventDivisionsQuery(CachedDatabaseQuery[List[Event]]):
+    CACHE_VERSION = 4
+    CACHE_KEY_FORMAT = "event_divisions_{event_key}"
     DICT_CONVERTER = EventConverter
 
     def __init__(self, event_key: EventKey) -> None:

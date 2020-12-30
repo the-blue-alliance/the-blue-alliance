@@ -8,12 +8,14 @@ from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.team import Team
-from backend.common.queries.database_query import DatabaseQuery
+from backend.common.queries.database_query import CachedDatabaseQuery
 from backend.common.queries.dict_converters.award_converter import AwardConverter
 from backend.common.tasklets import typed_tasklet
 
 
-class EventAwardsQuery(DatabaseQuery[List[Award]]):
+class EventAwardsQuery(CachedDatabaseQuery[List[Award]]):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "event_awards_{event_key}"
     DICT_CONVERTER = AwardConverter
 
     def __init__(self, event_key: EventKey) -> None:
@@ -27,7 +29,9 @@ class EventAwardsQuery(DatabaseQuery[List[Award]]):
         return awards
 
 
-class TeamAwardsQuery(DatabaseQuery[List[Award]]):
+class TeamAwardsQuery(CachedDatabaseQuery[List[Award]]):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "team_awards_{team_key}"
     DICT_CONVERTER = AwardConverter
 
     def __init__(self, team_key: TeamKey) -> None:
@@ -41,7 +45,9 @@ class TeamAwardsQuery(DatabaseQuery[List[Award]]):
         return awards
 
 
-class TeamYearAwardsQuery(DatabaseQuery[List[Award]]):
+class TeamYearAwardsQuery(CachedDatabaseQuery[List[Award]]):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "team_year_awards_{team_key}_{year}"
     DICT_CONVERTER = AwardConverter
 
     def __init__(self, team_key: TeamKey, year: Year) -> None:
@@ -55,7 +61,9 @@ class TeamYearAwardsQuery(DatabaseQuery[List[Award]]):
         return awards
 
 
-class TeamEventAwardsQuery(DatabaseQuery[List[Award]]):
+class TeamEventAwardsQuery(CachedDatabaseQuery[List[Award]]):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "team_event_awards_{team_key}_{event_key}"
     DICT_CONVERTER = AwardConverter
 
     def __init__(self, team_key: TeamKey, event_key: EventKey) -> None:
@@ -70,7 +78,11 @@ class TeamEventAwardsQuery(DatabaseQuery[List[Award]]):
         return awards
 
 
-class TeamEventTypeAwardsQuery(DatabaseQuery[List[Award]]):
+class TeamEventTypeAwardsQuery(CachedDatabaseQuery[List[Award]]):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = (
+        "team_events_type_tag_awards_{team_key}_{event_type}_{award_type}"
+    )
     DICT_CONVERTER = AwardConverter
 
     def __init__(

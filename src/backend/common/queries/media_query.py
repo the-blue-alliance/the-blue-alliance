@@ -8,12 +8,14 @@ from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.media import Media
 from backend.common.models.team import Team
-from backend.common.queries.database_query import DatabaseQuery
+from backend.common.queries.database_query import CachedDatabaseQuery
 from backend.common.queries.dict_converters.media_converter import MediaConverter
 from backend.common.tasklets import typed_tasklet
 
 
-class TeamSocialMediaQuery(DatabaseQuery[List[Media]]):
+class TeamSocialMediaQuery(CachedDatabaseQuery[List[Media]]):
+    CACHE_VERSION = 2
+    CACHE_KEY_FORMAT = "team_social_media_{team_key}"
     DICT_CONVERTER = MediaConverter
 
     def __init__(self, team_key: TeamKey) -> None:
@@ -28,7 +30,9 @@ class TeamSocialMediaQuery(DatabaseQuery[List[Media]]):
         return medias
 
 
-class TeamMediaQuery(DatabaseQuery[List[Media]]):
+class TeamMediaQuery(CachedDatabaseQuery[List[Media]]):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "team_media_{team_key}"
     DICT_CONVERTER = MediaConverter
 
     def __init__(self, team_key: TeamKey) -> None:
@@ -42,7 +46,9 @@ class TeamMediaQuery(DatabaseQuery[List[Media]]):
         return medias
 
 
-class TeamYearMediaQuery(DatabaseQuery[List[Media]]):
+class TeamYearMediaQuery(CachedDatabaseQuery[List[Media]]):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "team_year_media_{team_key}_{year}"
     DICT_CONVERTER = MediaConverter
 
     def __init(self, team_key: TeamKey, year: Year) -> None:
@@ -56,7 +62,9 @@ class TeamYearMediaQuery(DatabaseQuery[List[Media]]):
         return medias
 
 
-class EventTeamsMediasQuery(DatabaseQuery[List[Media]]):
+class EventTeamsMediasQuery(CachedDatabaseQuery[List[Media]]):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "event_teams_medias_{event_key}"
     DICT_CONVERTER = MediaConverter
 
     def __init__(self, event_key: EventKey) -> None:
@@ -82,7 +90,9 @@ class EventTeamsMediasQuery(DatabaseQuery[List[Media]]):
         return medias
 
 
-class EventTeamsPreferredMediasQuery(DatabaseQuery[List[Media]]):
+class EventTeamsPreferredMediasQuery(CachedDatabaseQuery[List[Media]]):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "event_teams_medias_preferred_{event_key}"
     DICT_CONVERTER = MediaConverter
 
     def __init__(self, event_key: EventKey) -> None:
@@ -109,7 +119,9 @@ class EventTeamsPreferredMediasQuery(DatabaseQuery[List[Media]]):
         return medias
 
 
-class EventMediasQuery(DatabaseQuery[List[Media]]):
+class EventMediasQuery(CachedDatabaseQuery[List[Media]]):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "event_medias_{event_key}"
     DICT_CONVERTER = MediaConverter
 
     def __init__(self, event_key: EventKey) -> None:
@@ -123,7 +135,9 @@ class EventMediasQuery(DatabaseQuery[List[Media]]):
         return medias
 
 
-class TeamTagMediasQuery(DatabaseQuery[List[Media]]):
+class TeamTagMediasQuery(CachedDatabaseQuery[List[Media]]):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "team_tag_medias_{team_key}_{media_tag}"
     DICT_CONVERTER = MediaConverter
 
     def __init__(self, team_key: TeamKey, media_tag: MediaTag) -> None:
@@ -138,7 +152,9 @@ class TeamTagMediasQuery(DatabaseQuery[List[Media]]):
         return medias
 
 
-class TeamYearTagMediasQuery(DatabaseQuery[List[Media]]):
+class TeamYearTagMediasQuery(CachedDatabaseQuery[List[Media]]):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "team_year_tag_medias_{team_key}_{year}_{media_tag}"
     DICT_CONVERTER = MediaConverter
 
     def __init__(self, team_key: TeamKey, year: Year, media_tag: MediaTag) -> None:
