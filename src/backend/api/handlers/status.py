@@ -1,6 +1,7 @@
 from flask import jsonify, Response
 
 from backend.api.handlers.decorators import api_authenticated
+from backend.api.handlers.helpers.make_error_response import make_error_response
 from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.decorators import cached_public
 from backend.common.models.sitevar import Sitevar
@@ -15,10 +16,10 @@ def status() -> Response:
     fmsapi_sitevar_future = Sitevar.get_by_id_async("apistatus.fmsapi_down")
     down_events_sitevar_future = Sitevar.get_by_id_async("apistatus.down_events")
 
-    # Error out of no sitevar found
+    # Error out if no sitevar found
     status_sitevar = status_sitevar_future.get_result()
     if not status_sitevar:
-        return {"404": "API Status Not Found"}, 404
+        return make_error_response(404, {"404": "API Status Not Found"})
 
     status_dict = status_sitevar.contents
     down_events_sitevar = down_events_sitevar_future.get_result()
