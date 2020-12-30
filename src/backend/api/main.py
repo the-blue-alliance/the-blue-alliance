@@ -2,6 +2,7 @@ from flask import Flask
 
 from backend.api.handlers.error import handle_404
 from backend.api.handlers.event import event
+from backend.api.handlers.status import status
 from backend.api.handlers.team import team, team_list
 from backend.common.flask_cache import configure_flask_cache
 from backend.common.logging import configure_logging
@@ -16,6 +17,7 @@ configure_flask_cache(app)
 
 app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
 
+app.add_url_rule("/api/v3/status", view_func=status)
 app.add_url_rule("/api/v3/event/<string:event_key>", view_func=event)
 app.add_url_rule("/api/v3/team/<string:team_key>", view_func=team)
 app.add_url_rule("/api/v3/teams/<int:page_num>", view_func=team_list)
