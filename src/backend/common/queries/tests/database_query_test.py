@@ -132,5 +132,8 @@ def test_cached_query() -> None:
     # still read a stale value
     [k.delete() for k in keys]
     assert ndb.get_multi(keys) == [None] * 5
-
     assert CachedQueryResult.get_by_id(query.cache_key) is not None
+
+    query = CachedDummyModelRangeQuery(min=0, max=2)
+    result = query.fetch()
+    assert len(result) == 3
