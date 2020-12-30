@@ -90,7 +90,7 @@ class CachedDatabaseQuery(DatabaseQuery, Generic[QueryReturn]):
             query_result = yield self._query_async(*args, **kwargs)
             yield CachedQueryResult(id=cache_key, result=query_result).put_async()
             return query_result  # pyre-ignore[7]
-        return cached_query_result.query_result
+        return cached_query_result.result
 
     @classmethod
     def _event_affected_queries(

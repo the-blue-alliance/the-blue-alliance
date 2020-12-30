@@ -6,6 +6,7 @@ import pytest
 from freezegun import freeze_time
 from google.cloud import ndb
 
+from backend.conftest import clear_cached_queries
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
@@ -333,11 +334,13 @@ def test_get_awards() -> None:
     a.put()
 
     event._awards = None
+    clear_cached_queries()
     future = event.get_awards_async()
     assert future.get_result() == [a]
     assert event.awards == [a]
 
     event._awards = None
+    clear_cached_queries()
     assert event.awards == [a]
 
 
@@ -409,10 +412,12 @@ def test_matches() -> None:
     m.put()
 
     event._matches = None
+    clear_cached_queries()
     assert event.matches == [m]
     assert event.get_matches_async().get_result() == [m]
 
     event._matches = None
+    clear_cached_queries()
     event.prep_matches()
     assert event.get_matches_async().get_result() == [m]
     assert event.matches == [m]
@@ -435,5 +440,6 @@ def test_teams() -> None:
     t.put()
 
     event._teams = None
+    clear_cached_queries()
     assert event.teams == [t]
     assert event.get_teams_async().get_result() == [t]
