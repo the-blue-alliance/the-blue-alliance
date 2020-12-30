@@ -55,4 +55,3 @@ def test_data_importer(ndb_client) -> JsonDataImporter:
 
 def clear_cached_queries() -> None:
     ndb.delete_multi(CachedQueryResult.query().fetch(keys_only=True))
-

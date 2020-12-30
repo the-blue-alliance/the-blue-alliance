@@ -1,9 +1,9 @@
 import collections
-from typing import List, Optional
+from typing import Optional
 
 from flask import abort, redirect, request
 from google.cloud import ndb
-from pyre_extensions import none_throws, safe_cast
+from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
 
 from backend.common.consts import playoff_type
@@ -17,7 +17,6 @@ from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.team_helper import TeamHelper
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, Year
-from backend.common.models.team import Team
 from backend.common.queries import district_query, event_query, media_query
 from backend.web.profiled_render import render_template
 

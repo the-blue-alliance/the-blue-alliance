@@ -6,7 +6,6 @@ import pytest
 from freezegun import freeze_time
 from google.cloud import ndb
 
-from backend.conftest import clear_cached_queries
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
@@ -25,6 +24,7 @@ from backend.common.models.tests.util import (
     CITY_STATE_COUNTRY_PARAMETERS,
     LOCATION_PARAMETERS,
 )
+from backend.conftest import clear_cached_queries  # noqa: ETBA0
 
 
 @pytest.mark.parametrize("key", ["2010ct", "2014onto2"])
