@@ -24,6 +24,7 @@ redis_cache_url=$(get_config_prop redis_cache_url)
 tasks_mode=$(get_config_prop tasks_mode)
 tasks_remote_config_ngrok_url=$(get_config_prop tasks_remote_config.ngrok_url)
 datastore_args=""
+tasks_args=""
 application=""
 env=""
 
@@ -82,6 +83,8 @@ elif [ "$tasks_mode" == "remote" ]; then
     echo "Using remote tasks (Cloud Tasks + ngrok)"
     assert_google_application_credentials
     assert_tasks_remote_config_ngrok_url
+    # Need to disable host checking to allow for round-trip requests coming from ngrok
+    tasks_args="--enable_host_checking=false"
     env="$env --env_var TASKS_REMOTE_CONFIG_NGROK_URL=$tasks_remote_config_ngrok_url"
 else
     echo "Unknown tasks mode $tasks_mode! Must be one of [local, remote]"
@@ -95,6 +98,7 @@ dev_appserver.py \
     --runtime="python37" \
     $application \
     $datastore_args \
+    $tasks_args \
     $env \
     --env_var TBA_LOG_LEVEL="$tba_log_level" \
     --env_var NDB_LOG_LEVEL="$ndb_log_level" \

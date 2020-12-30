@@ -28,12 +28,6 @@ class Environment(object):
         return os.environ.get("GAE_SERVICE", None)
 
     @staticmethod
-    def service_for_current_service() -> str:
-        # Get current service - otherwise, fallback on default service
-        service = Environment.service()
-        return service if service else "default"
-
-    @staticmethod
     def project() -> Optional[str]:
         return os.environ.get("GOOGLE_CLOUD_PROJECT", None)
 

@@ -54,6 +54,7 @@ EXPOSE 22
 # Expose ports for TBA
 EXPOSE 8000
 EXPOSE 8080-8089
+EXPOSE 9181
 
 # Start SSH server
 CMD ["/usr/sbin/sshd", "-D"]

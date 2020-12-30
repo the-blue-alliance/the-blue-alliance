@@ -42,11 +42,6 @@ def set_service(monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setenv("GAE_SERVICE", "default")
 
 
-@pytest.fixture
-def set_service_test(monkeypatch: MonkeyPatch) -> None:
-    monkeypatch.setenv("GAE_SERVICE", "test")
-
-
 def test_dev_env(set_dev) -> None:
     assert Environment.is_dev() is True
     assert Environment.is_prod() is False
@@ -71,18 +66,6 @@ def test_service_none() -> None:
 
 def test_service(set_service) -> None:
     assert Environment.service() == "default"
-
-
-def test_service_for_current_service_none() -> None:
-    assert Environment.service_for_current_service() == "default"
-
-
-def test_service_for_current_service_default(set_service) -> None:
-    assert Environment.service_for_current_service() == "default"
-
-
-def test_service_for_current_service(set_service_test) -> None:
-    assert Environment.service_for_current_service() == "test"
 
 
 def test_tasks_mode_prod(set_prod) -> None:

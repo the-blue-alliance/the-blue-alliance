@@ -7,12 +7,14 @@ from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.keys import DistrictAbbreviation, DistrictKey, TeamKey, Year
 from backend.common.models.team import Team
-from backend.common.queries.database_query import DatabaseQuery
+from backend.common.queries.database_query import CachedDatabaseQuery
 from backend.common.queries.dict_converters.district_converter import DistrictConverter
 from backend.common.tasklets import typed_tasklet
 
 
-class DistrictQuery(DatabaseQuery[Optional[District]]):
+class DistrictQuery(CachedDatabaseQuery[Optional[District]]):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "district_{district_key}"
     DICT_CONVERTER = DistrictConverter
 
     def __init__(self, district_key: DistrictKey) -> None:
@@ -30,7 +32,9 @@ class DistrictQuery(DatabaseQuery[Optional[District]]):
         return None
 
 
-class DistrictsInYearQuery(DatabaseQuery[List[District]]):
+class DistrictsInYearQuery(CachedDatabaseQuery[List[District]]):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "districts_in_year_{year}"
     DICT_CONVERTER = DistrictConverter
 
     def __init__(self, year: Year) -> None:
@@ -45,7 +49,9 @@ class DistrictsInYearQuery(DatabaseQuery[List[District]]):
         return list(districts)
 
 
-class DistrictHistoryQuery(DatabaseQuery[List[District]]):
+class DistrictHistoryQuery(CachedDatabaseQuery[List[District]]):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "district_history_{abbreviation}"
     DICT_CONVERTER = DistrictConverter
 
     def __init__(self, abbreviation: DistrictAbbreviation) -> None:
@@ -62,7 +68,9 @@ class DistrictHistoryQuery(DatabaseQuery[List[District]]):
         return list(districts)
 
 
-class TeamDistrictsQuery(DatabaseQuery[List[District]]):
+class TeamDistrictsQuery(CachedDatabaseQuery[List[District]]):
+    CACHE_VERSION = 2
+    CACHE_KEY_FORMAT = "team_districts_{team_key}"
     DICT_CONVERTER = DistrictConverter
 
     def __init__(self, team_key: TeamKey) -> None:
