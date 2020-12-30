@@ -1,4 +1,26 @@
-The Blue Alliances leverages [Google Cloud Task](https://cloud.google.com/tasks/docs/dual-overview) for deferred work. Examples of this work include tracking API request calls, dispatching push notifications, any post-request tasks, etc. Locally, Google Cloud Tasks can be used by round-tripping requests upstream back to a local development container via ngrok, or more commonly swapped out for Redis/RQ.
+## Before using a deferred task, consider `run_after_response`
+
+Deferred tasks are used to handle expensive tasks asynchronously in order to not block the serving of a response for a request. Before using a deferred task, consider the importance of retrying the task if an error should occur. If it's okay for the task to fail silently without retries (e.g. tracking an API request call), `backend.common.run_after_response` is a lighter-weight solution that is more appropriate.
+
+Usage examples:
+
+```
+run_after_response(lambda: ...)
+```
+
+```
+run_after_response(function_to_run)
+```
+
+```
+@run_after_response
+def function_to_run():
+    ...
+```
+
+## Deferred Tasks
+
+The Blue Alliances leverages [Google Cloud Task](https://cloud.google.com/tasks/docs/dual-overview) for deferred work. Examples of this work include any post-request tasks that need retrying should an error occur, such as dispatching push notifications. Locally, Google Cloud Tasks can be used by round-tripping requests upstream back to a local development container via ngrok, or more commonly swapped out for Redis/RQ.
 
 `defer` is a drop-in replacement for [google.appengine.ext.deferred.deferred.defer](https://cloud.google.com/appengine/docs/standard/python/refdocs/google.appengine.ext.deferred.deferred). `defer` enqueues a method to be run later while automatically managing dispatching to the proper client based on the environment, getting a queue for a specified queue name, etc. Using `defer` is recommended unless you need some more fine-tuned control over tasks/queues. `defer` manages executing a task with the proper parameters both in development and in production. If an option is not supported in `defer` that is supported in the Google Cloud Task API protos, it is recommend to build this functionality in to `defer` and then leverage `defer`.
 
@@ -80,7 +102,6 @@ As a note - the production legacy queues have a `--max-concurrent-dispatches` va
 ### Redis + RQ
 
 In development, `defer` use Redis + RQ as opposed to Google Cloud Tasks to execute deferred tasks. A Redis server, RQ worker, and dashboard are spun up when the development container is booted and can be seen when attaching to the container's tmux session. The RQ Dashboard can be found at [0.0.0.0:9181](http://0.0.0.0:9181/) be used to monitor failed tasks. Tasks that execute successfully will not show up in the RQ Dashboard, but they can be seen as successfully executed in the `rq-worker` tmux tab.
-
 
 ### Google Cloud Tasks + ngrok
 
