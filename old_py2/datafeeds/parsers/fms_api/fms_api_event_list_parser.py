@@ -27,6 +27,7 @@ class FMSAPIEventListParser(object):
         'championship': EventType.CMP_FINALS,
         'offseason': EventType.OFFSEASON,
         'offseasonwithazuresync': EventType.OFFSEASON,
+        'remote': EventType.REMOTE,
     }
 
     NON_OFFICIAL_EVENT_TYPES = ['offseason']
