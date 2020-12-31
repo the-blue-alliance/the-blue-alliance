@@ -57,9 +57,6 @@ class CachedModel(ndb.Model):
 
     def __setstate__(self, state: Any) -> None:
         """
-        TODO this will receive a serialized legacy protobuf,
-        we need to implement something similar
-
         From the legacy NDB model implementation:
         ```
         def __getstate__(self):
