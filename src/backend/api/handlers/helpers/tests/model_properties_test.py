@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 from google.cloud import ndb
 
 from backend.api.handlers.helpers.model_properties import (
@@ -40,6 +42,10 @@ def test_filter_event_properties(ndb_client: ndb.Client) -> None:
     key = filter_event_properties([event], ModelType("keys"))[0]
     assert key == "2020casj"
 
+    assert filter_event_properties([], ModelType("bad_type")) == []
+    with pytest.raises(Exception):
+        filter_event_properties([event], ModelType("bad_type"))
+
 
 def test_filter_match_properties(ndb_client: ndb.Client) -> None:
     with ndb_client.context():
@@ -68,6 +74,10 @@ def test_filter_match_properties(ndb_client: ndb.Client) -> None:
     key = filter_match_properties([match], ModelType("keys"))[0]
     assert key == "2020casj_qm1"
 
+    assert filter_match_properties([], ModelType("bad_type")) == []
+    with pytest.raises(Exception):
+        filter_match_properties([match], ModelType("bad_type"))
+
 
 def test_filter_team_properties(ndb_client: ndb.Client) -> None:
     with ndb_client.context():
@@ -80,3 +90,7 @@ def test_filter_team_properties(ndb_client: ndb.Client) -> None:
 
     key = filter_team_properties([team], ModelType("keys"))[0]
     assert key == "frc604"
+
+    assert filter_team_properties([], ModelType("bad_type")) == []
+    with pytest.raises(Exception):
+        filter_team_properties([team], ModelType("bad_type"))
