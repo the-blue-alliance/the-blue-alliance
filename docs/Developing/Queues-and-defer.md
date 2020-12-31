@@ -50,6 +50,8 @@ def do_expensive_work(a, *, b):
 defer(do_expensive_work, "a", b="c")
 ```
 
+---
+
 The `defer` method can also take several arguments to better control how deferred tasks should execute.
 
 `_client` - A `backend.common.deferred.clients.task_client` instance that manages creating a queue. If this is not specified, `defer` will create a client based on the current environment.
@@ -77,25 +79,7 @@ defer(do_something, _target="tasks-io", _url="/_ah/queue/deferred_do_something",
 
 Queues must be created in Google App Engine [using the gcloud command](https://cloud.google.com/tasks/docs/creating-queues). The linked document should be the source of truth for creating queues.
 
-Currently there is no automated tooling for creating/updating queues in production. The list below describes how to get setup the current production queues.
-
-```shell
-$ gcloud tasks queues create admin --max-dispatches-per-second 5 --max-attempts -1
-$ gcloud tasks queues create api-track-call --max-dispatches-per-second 500 --max-attempts 1
-$ gcloud tasks queues create backups --max-dispatches-per-second 0.1 --max-concurrent-dispatches 1 --max-attempts -1
-$ gcloud tasks queues create cache-clearing --max-dispatches-per-second 5 --max-attempts -1
-$ gcloud tasks queues create datafeed --max-dispatches-per-second 5 --max-attempts -1 --max-retry-duration 3600s
-$ gcloud tasks queues create default --max-dispatches-per-second 10 --max-attempts 1
-$ gcloud tasks queues create firebase --max-dispatches-per-second 50 --max-attempts -1
-$ gcloud tasks queues create post-update-hooks --max-dispatches-per-second 5 --max-attempts -1
-$ gcloud tasks queues create push-notifications --max-dispatches-per-second 100 --max-attempts -1 --max-retry-duration 180s --min-backoff=10s --max-backoff=30s
-$ gcloud tasks queues create run-in-order --max-dispatches-per-second 5 --max-concurrent-dispatches 1 --max-attempts -1
-$ gcloud tasks queues create search-index-update --max-dispatches-per-second 10 --max-attempts -1
-```
-
-Queues can be updated using the `gcloud tasks queues update {queue_name}` command. See `gcloud tasks queues update --help` for all available options. Alternatively, these properties can be updated in the Google Cloud Tasks interface.
-
-As a note - the production legacy queues have a `--max-concurrent-dispatches` value of `0`, where newly created queues must have a non-zero value for this field. The default value is `1000`, and the maximum value is `5000`. The commands above leave the the `max-concurrent-dispatches` value to the default. However, this might be too low for some use cases, and can be increased as necessary.
+For details on setting up queues to match a production instance, see the [Task Queues section of the Google App Engine + Firebase setup page](https://github.com/the-blue-alliance/the-blue-alliance/wiki/GAE-Firebase-Setup#task-queues).
 
 ## Local Development
 
@@ -107,7 +91,7 @@ In development, `defer` use Redis + RQ as opposed to Google Cloud Tasks to execu
 
 Sometimes, Google Cloud Tasks semantics are necessary when testing a feature. It is possible to enqueue a task from a local development instance to an upstream project's Google Cloud Tasks queue to be executed in the local development instance. This process leverages [ngrok](https://ngrok.com/) to expose a public URL that routes back to the host machine.
 
-You'll need an upstream Google App Engine instance, along with the queues created upstream. The former is out of scope for this document, and the latter is documented above.
+You'll need an upstream Google App Engine instance, along with the queues created upstream. Refer to the [[Google App Engine + Firebase Setup|GAE-Firebase-Setup]] for details.
 
 Download [ngrok](https://ngrok.com/) and run `ngrok` with the `http` command + the port you want to forward traffic to. The port is the port associated with your service in the development container. Ex: At the time of writing, the `py3-tasks-io` service is the 4th service started, so it maps to `8084` (or `http://localhost:8084`).
 
