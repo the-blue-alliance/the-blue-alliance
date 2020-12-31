@@ -1,0 +1,81 @@
+import json
+
+from google.cloud import ndb
+
+from backend.api.handlers.helpers.model_properties import (
+    filter_event_properties,
+    filter_match_properties,
+    filter_team_properties,
+    simple_event_properties,
+    simple_match_properties,
+    simple_team_properties,
+)
+from backend.common.consts.api_version import ApiMajorVersion
+from backend.common.consts.event_type import EventType
+from backend.common.models.event import Event
+from backend.common.models.match import Match
+from backend.common.models.team import Team
+from backend.common.queries.dict_converters.event_converter import EventConverter
+from backend.common.queries.dict_converters.match_converter import MatchConverter
+from backend.common.queries.dict_converters.team_converter import TeamConverter
+
+
+def test_filter_event_properties(ndb_client: ndb.Client) -> None:
+    with ndb_client.context():
+        event = EventConverter(
+            Event(
+                id="2020casj",
+                event_type_enum=EventType.REGIONAL,
+                event_short="casj",
+                year=2020,
+            )
+        ).convert(ApiMajorVersion.API_V3)
+
+    assert set(event.keys()).difference(set(simple_event_properties)) != set()
+
+    simple = filter_event_properties([event], "simple")[0]
+    assert set(simple.keys()).difference(set(simple_event_properties)) == set()
+
+    key = filter_event_properties([event], "keys")[0]
+    assert key == "2020casj"
+
+
+def test_filter_match_properties(ndb_client: ndb.Client) -> None:
+    with ndb_client.context():
+        match = MatchConverter(
+            Match(
+                id="2020casj_qm1",
+                year=2020,
+                event=ndb.Key("Event", "2020casj"),
+                comp_level="qm",
+                match_number=1,
+                set_number=1,
+                alliances_json=json.dumps(
+                    {
+                        "red": {"score": 0, "teams": []},
+                        "blue": {"score": 0, "teams": []},
+                    }
+                ),
+            )
+        ).convert(ApiMajorVersion.API_V3)
+
+    assert set(match.keys()).difference(set(simple_match_properties)) != set()
+
+    simple = filter_match_properties([match], "simple")[0]
+    assert set(simple.keys()).difference(set(simple_match_properties)) == set()
+
+    key = filter_match_properties([match], "keys")[0]
+    assert key == "2020casj_qm1"
+
+
+def test_filter_team_properties(ndb_client: ndb.Client) -> None:
+    with ndb_client.context():
+        team = TeamConverter(Team(id="frc604")).convert(ApiMajorVersion.API_V3)
+
+    assert set(team.keys()).difference(set(simple_team_properties)) != set()
+
+    simple = filter_team_properties([team], "simple")[0]
+    assert set(simple.keys()).difference(set(simple_team_properties)) == set()
+
+    key = filter_team_properties([team], "keys")[0]
+    assert key == "frc604"
