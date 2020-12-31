@@ -641,7 +641,7 @@ class Event(CachedModel):
 
     @classmethod
     def validate_key_name(cls, event_key: str) -> bool:
-        key_name_regex = re.compile(r"^[1-9]\d{3}[a-z]+[0-9]{0,2}$")
+        key_name_regex = re.compile(r"^[1-9]\d{3}(\d{2})?[a-z]+[0-9]{0,2}$")
         match = re.match(key_name_regex, event_key)
         return True if match else False
 
