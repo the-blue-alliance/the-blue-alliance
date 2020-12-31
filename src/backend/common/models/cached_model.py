@@ -2,6 +2,7 @@ import datetime
 from typing import Any, Dict, Optional, Set
 
 from google.cloud import ndb
+from google.cloud.datastore.helpers import GeoPoint
 from google.cloud.ndb._datastore_types import BlobKey
 from google.cloud.ndb._legacy_entity_pb import (
     EntityProto,
@@ -78,11 +79,43 @@ class CachedModel(ndb.Model):
 
     def _set_state_from_pb(self, pb: EntityProto) -> None:
         deserialized_props = {}
+        if len(pb.key().path().element_list()):
+            key_ref = pb.key()
+            app = key_ref.app().decode()
+            namespace = key_ref.name_space()
+            pairs = [
+                (elem.type().decode(), elem.id() or elem.name().decode())
+                for elem in key_ref.path().element_list()
+            ]
+            deserialized_props["key"] = ndb.Key(
+                pairs=pairs, app=app, namespace=namespace
+            )
+
         for pb_prop in pb.property_list():
+            prop_name = pb_prop.name().decode()
+
+            # There are some fields we did not port to py3, skip them
+            # StructuredProperty uses "." in field names, so skip those
+            if not hasattr(self, prop_name) and "." not in prop_name:
+                continue
+
             prop_value = self._get_prop_value(pb_prop.value(), pb_prop)
+            if not hasattr(self, prop_name) and "." in prop_name:
+                supername, subname = prop_name.split(".", 1)
+                structprop = getattr(self.__class__, supername, None)
+                prop_type = structprop._model_class
+                if getattr(self, supername) is None:
+                    self._set_attributes({supername: prop_type()})
+                getattr(self, supername)._set_attributes({subname: prop_value})
+
+                if pb_prop.multiple():
+                    raise Exception("TODO multiple structured property")
+
+                continue
+
             if pb_prop.multiple() and not isinstance(prop_value, list):
                 prop_value = [prop_value]
-            deserialized_props[pb_prop.name().decode()] = prop_value
+            deserialized_props[prop_name] = prop_value
         self._set_attributes(deserialized_props)
 
     @staticmethod
@@ -128,7 +161,8 @@ class CachedModel(ndb.Model):
             ]
             return ndb.Key(pairs=pairs, app=app, namespace=namespace)
         elif v.has_pointvalue():
-            raise Exception("missing datastore_types.GeoPt")
+            pv = v.pointvalue()
+            return GeoPoint(pv.x(), pv.y())
         else:
             # A missing value implies null.
             return None
