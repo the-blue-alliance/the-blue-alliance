@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List, Optional
+from typing import Dict, List, NewType, Optional
 
 from google.cloud import ndb
 
@@ -10,6 +10,8 @@ from backend.common.models.media import Media
 from backend.common.models.team import Team
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 
+MediaDict = NewType("MediaDict", Dict)
+
 
 class MediaConverter(ConverterBase):
     # SUBVERSIONS = {  # Increment every time a change to the dict is made
@@ -18,18 +20,18 @@ class MediaConverter(ConverterBase):
     # TODO use for cache clearing
 
     @classmethod
-    def _convert(cls, medias: List[Media], version: ApiMajorVersion) -> List[Dict]:
+    def _convert(cls, medias: List[Media], version: ApiMajorVersion) -> List[MediaDict]:
         MEDIA_CONVERTERS = {
             ApiMajorVersion.API_V3: cls.mediasConverter_v3,
         }
         return MEDIA_CONVERTERS[version](medias)
 
     @classmethod
-    def mediasConverter_v3(cls, medias: List[Media]) -> List[Dict]:
+    def mediasConverter_v3(cls, medias: List[Media]) -> List[MediaDict]:
         return list(map(cls.mediaConverter_v3, medias))
 
     @classmethod
-    def mediaConverter_v3(cls, media: Media) -> Dict:
+    def mediaConverter_v3(cls, media: Media) -> MediaDict:
         dict = {
             "type": media.slug_name,
             "foreign_key": media.foreign_key,
@@ -46,7 +48,7 @@ class MediaConverter(ConverterBase):
         else:
             dict["direct_url"] = media.image_direct_url
             dict["view_url"] = media.view_image_url
-        return dict
+        return MediaDict(dict)
 
     @staticmethod
     def dictToModel_v3(

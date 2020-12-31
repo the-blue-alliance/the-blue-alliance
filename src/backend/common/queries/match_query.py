@@ -6,11 +6,14 @@ from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, MatchKey, TeamKey, Year
 from backend.common.models.match import Match
 from backend.common.queries.database_query import CachedDatabaseQuery
-from backend.common.queries.dict_converters.match_converter import MatchConverter
+from backend.common.queries.dict_converters.match_converter import (
+    MatchConverter,
+    MatchDict,
+)
 from backend.common.tasklets import typed_tasklet
 
 
-class MatchQuery(CachedDatabaseQuery[Optional[Match]]):
+class MatchQuery(CachedDatabaseQuery[Optional[Match], Optional[MatchDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "match_{match_key}"
     DICT_CONVERTER = MatchConverter
@@ -24,7 +27,7 @@ class MatchQuery(CachedDatabaseQuery[Optional[Match]]):
         return match
 
 
-class EventMatchesQuery(CachedDatabaseQuery[List[Match]]):
+class EventMatchesQuery(CachedDatabaseQuery[List[Match], List[MatchDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "event_matches_{event_key}"
     DICT_CONVERTER = MatchConverter
@@ -41,7 +44,7 @@ class EventMatchesQuery(CachedDatabaseQuery[List[Match]]):
         return list(filter(None, matches))
 
 
-class TeamEventMatchesQuery(CachedDatabaseQuery[List[Match]]):
+class TeamEventMatchesQuery(CachedDatabaseQuery[List[Match], List[MatchDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "team_event_matches_{team_key}_{event_key}"
     DICT_CONVERTER = MatchConverter
@@ -58,7 +61,7 @@ class TeamEventMatchesQuery(CachedDatabaseQuery[List[Match]]):
         return list(filter(None, matches))
 
 
-class TeamYearMatchesQuery(CachedDatabaseQuery[List[Match]]):
+class TeamYearMatchesQuery(CachedDatabaseQuery[List[Match], List[MatchDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "team_year_matches_{team_key}_{year}"
     DICT_CONVERTER = MatchConverter

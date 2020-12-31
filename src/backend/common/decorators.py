@@ -17,7 +17,7 @@ def cached_public(func=None, timeout: int = 61):
             resp = make_response(cached(func)(*args, **kwargs))
         else:
             resp = make_response(func(*args, **kwargs))
-        if resp.status_code == 200:  # Only cache OK responses
+        if resp.status_code == 200:  # Only set cache headers for OK responses
             resp.headers["Cache-Control"] = "public, max-age={0}, s-maxage={0}".format(
                 max(
                     timeout, 61
@@ -25,9 +25,9 @@ def cached_public(func=None, timeout: int = 61):
             )
             resp.add_etag()
 
-            # Check for ETag caching
+            # Return 304 Not Modified if ETag matches
             if resp.headers.get("ETag", None) in str(request.if_none_match):
-                resp = Response(status=304)
+                return Response(status=304)
 
         return resp
 

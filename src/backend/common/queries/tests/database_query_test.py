@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 
 from google.cloud import ndb
 
@@ -12,11 +12,14 @@ class DummyModel(ndb.Model):
     int_prop = ndb.IntegerProperty()
 
 
+DummyDict = Dict
+
+
 class DummyConverter(ConverterBase):
     pass
 
 
-class DummyModelPointQuery(DatabaseQuery[DummyModel]):
+class DummyModelPointQuery(DatabaseQuery[DummyModel, DummyDict]):
     DICT_CONVERTER = DummyConverter
 
     @ndb.tasklet
@@ -25,7 +28,7 @@ class DummyModelPointQuery(DatabaseQuery[DummyModel]):
         return model
 
 
-class DummyModelRangeQuery(DatabaseQuery[List[DummyModel]]):
+class DummyModelRangeQuery(DatabaseQuery[List[DummyModel], List[DummyDict]]):
     DICT_CONVERTER = DummyConverter
 
     @ndb.tasklet
@@ -36,7 +39,9 @@ class DummyModelRangeQuery(DatabaseQuery[List[DummyModel]]):
         return models
 
 
-class CachedDummyModelRangeQuery(CachedDatabaseQuery[List[DummyModel]]):
+class CachedDummyModelRangeQuery(
+    CachedDatabaseQuery[List[DummyModel], List[DummyDict]]
+):
     CACKE_KEY_FORMAT = "test_query_{min}_{max}"
     DICT_CONVERTER = DummyConverter
     CACHING_ENABLED = True

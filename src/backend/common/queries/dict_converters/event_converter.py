@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Dict, List
+from typing import Dict, List, NewType
 
 from google.cloud import ndb
 from pyre_extensions import none_throws
@@ -13,6 +13,8 @@ from backend.common.models.event import Event
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 from backend.common.queries.dict_converters.district_converter import DistrictConverter
 
+EventDict = NewType("EventDict", Dict)
+
 
 class EventConverter(ConverterBase):
     EVENT_DATE_FORMAT_STR = "%Y-%m-%d"
@@ -23,16 +25,16 @@ class EventConverter(ConverterBase):
 
     def _convert_list(
         self, model_list: List[Event], version: ApiMajorVersion
-    ) -> List[Dict]:
+    ) -> List[EventDict]:
         CONVERTERS = {
             ApiMajorVersion.API_V3: self.eventsConverter_v3,
         }
         return CONVERTERS[version](model_list)
 
-    def eventsConverter_v3(self, events: List[Event]) -> List[Dict]:
+    def eventsConverter_v3(self, events: List[Event]) -> List[EventDict]:
         return list(map(self.eventConverter_v3, events))
 
-    def eventConverter_v3(self, event: Event) -> Dict:
+    def eventConverter_v3(self, event: Event) -> EventDict:
         district_future = (
             none_throws(event.district_key).get_async() if event.district_key else None
         )
@@ -83,7 +85,7 @@ class EventConverter(ConverterBase):
         else:
             event_dict["webcasts"] = []
 
-        return event_dict
+        return EventDict(event_dict)
 
     @classmethod
     def dictToModel_v3(cls, data: Dict) -> Event:

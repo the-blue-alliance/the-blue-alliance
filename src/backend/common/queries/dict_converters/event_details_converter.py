@@ -1,10 +1,12 @@
 from collections import defaultdict
-from typing import cast, Dict, List
+from typing import cast, Dict, List, NewType
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.event_details import EventDetails
 from backend.common.models.keys import TeamKey
 from backend.common.queries.dict_converters.converter_base import ConverterBase
+
+EventDetailsDict = NewType("EventDetailsDict", Dict)
 
 
 class EventDetailsConverter(ConverterBase):
@@ -21,7 +23,7 @@ class EventDetailsConverter(ConverterBase):
     def eventsDetailsConverter_v3(self, event_details: List[EventDetails]):
         return list(map(self.eventDetailsConverter_v3, event_details))
 
-    def eventDetailsConverter_v3(self, event_details: EventDetails) -> Dict:
+    def eventDetailsConverter_v3(self, event_details: EventDetails) -> EventDetailsDict:
         normalized_oprs = defaultdict(dict)
         if event_details and event_details.matchstats:
             for stat_type, stats in event_details.matchstats.items():
@@ -52,4 +54,4 @@ class EventDetailsConverter(ConverterBase):
             "rankings": rankings,
         }
 
-        return event_details_dict
+        return EventDetailsDict(event_details_dict)

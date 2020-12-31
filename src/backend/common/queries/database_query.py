@@ -13,12 +13,12 @@ from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
 from backend.common.profiler import Span
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 from backend.common.queries.exceptions import DoesNotExistException
-from backend.common.queries.types import QueryReturn
+from backend.common.queries.types import DictQueryReturn, QueryReturn
 
 
-class DatabaseQuery(abc.ABC, Generic[QueryReturn]):
+class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
     _query_args: Dict[str, Any]
-    DICT_CONVERTER: Type[ConverterBase[QueryReturn]] = ConverterBase
+    DICT_CONVERTER: Type[ConverterBase[QueryReturn, DictQueryReturn]] = ConverterBase
 
     def __init__(self, *args, **kwargs) -> None:
         self._query_args = kwargs
@@ -40,11 +40,13 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn]):
             query_result = yield self._do_query(**self._query_args)
             return safe_cast(TypedFuture[QueryReturn], query_result)
 
-    def fetch_dict(self, version: ApiMajorVersion) -> Dict:
+    def fetch_dict(self, version: ApiMajorVersion) -> DictQueryReturn:
         return self.fetch_dict_async(version).get_result()
 
     @ndb.tasklet
-    def fetch_dict_async(self, version: ApiMajorVersion) -> TypedFuture[Dict]:
+    def fetch_dict_async(
+        self, version: ApiMajorVersion
+    ) -> TypedFuture[DictQueryReturn]:
         query_result = yield self.fetch_async()
         if query_result is None:
             raise DoesNotExistException()
@@ -52,10 +54,10 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn]):
         res = self.DICT_CONVERTER(  # pyre-ignore[45]
             safe_cast(QueryReturn, query_result)
         ).convert(version)
-        return safe_cast(TypedFuture[Dict], res)
+        return safe_cast(TypedFuture[DictQueryReturn], res)
 
 
-class CachedDatabaseQuery(DatabaseQuery, Generic[QueryReturn]):
+class CachedDatabaseQuery(DatabaseQuery, Generic[QueryReturn, DictQueryReturn]):
     DATABASE_QUERY_VERSION = 0
     BASE_CACHE_KEY_FORMAT: str = (
         "{}:{}:{}"  # (partial_cache_key, cache_version, database_query_version)
