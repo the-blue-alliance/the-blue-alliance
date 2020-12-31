@@ -6,6 +6,7 @@ class EventType(object):
     CMP_FINALS = 4
     DISTRICT_CMP_DIVISION = 5
     FOC = 6
+    REMOTE = 7
 
     OFFSEASON = 99
     PRESEASON = 100
@@ -21,6 +22,7 @@ class EventType(object):
         FOC: 'Festival of Champions',
         OFFSEASON: 'Offseason',
         PRESEASON: 'Preseason',
+        REMOTE: 'Remote',
         UNLABLED: '--',
     }
 
@@ -34,6 +36,7 @@ class EventType(object):
         FOC: 'FoC',
         OFFSEASON: 'Offseason',
         PRESEASON: 'Preseason',
+        REMOTE: 'Remote',
         UNLABLED: '--',
     }
 
@@ -48,6 +51,7 @@ class EventType(object):
         DISTRICT,
         DISTRICT_CMP_DIVISION,
         DISTRICT_CMP,
+        REMOTE,
     }
 
     CMP_EVENT_TYPES = {
@@ -63,4 +67,5 @@ class EventType(object):
         CMP_DIVISION,
         CMP_FINALS,
         FOC,
+        REMOTE,
     }
