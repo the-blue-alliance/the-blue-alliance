@@ -4,8 +4,8 @@ from werkzeug.test import Client
 from backend.api.handlers.helpers.model_properties import simple_team_properties
 from backend.common.consts.auth_type import AuthType
 from backend.common.models.api_auth_access import ApiAuthAccess
-from backend.common.models.team import Team
 from backend.common.models.event_team import EventTeam
+from backend.common.models.team import Team
 
 
 def validate_nominal_keys(team):
