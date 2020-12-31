@@ -18,5 +18,7 @@ def test_secret_key():
 
 def test_secrets_set():
     secret_key = "abc"
-    Sitevar.get_or_insert("flask.secrets", values_json=json.dumps({"secret_key": secret_key}))
+    Sitevar.get_or_insert(
+        "flask.secrets", values_json=json.dumps({"secret_key": secret_key})
+    )
     assert FlaskSecrets.secret_key() == secret_key

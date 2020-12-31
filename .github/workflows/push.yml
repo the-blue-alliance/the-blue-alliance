@@ -163,10 +163,39 @@ jobs:
           name: web-build
           path: src/build
 
+  deploy-queues:
+    name: Deploy Queues
+    runs-on: ubuntu-latest
+    needs: [py3-type, py3-lint, py3-test]
+    if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Setup Google Cloud Platform
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          version: "321.0.0"
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCLOUD_AUTH }}
+      - name: Deploy
+        run: python3 ops/deploy/deploy_queues.py src/queue.yaml
   deploy-web:
     name: Deploy Web Service
     runs-on: ubuntu-latest
-    needs: [py3-type, py3-lint, py3-test, node-lint, node-test, build-web]
+    needs: [py3-type, py3-lint, py3-test, node-lint, node-test, build-web, deploy-queues]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v2
@@ -206,7 +235,7 @@ jobs:
   deploy-api:
     name: Deploy API Service
     runs-on: ubuntu-latest
-    needs: [py3-type, py3-lint, py3-test]
+    needs: [py3-type, py3-lint, py3-test, deploy-queues]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v2
