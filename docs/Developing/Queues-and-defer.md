@@ -77,9 +77,23 @@ defer(do_something, _target="tasks-io", _url="/_ah/queue/deferred_do_something",
 
 ## Creating Queues
 
-Queues must be created in Google App Engine [using the gcloud command](https://cloud.google.com/tasks/docs/creating-queues). The linked document should be the source of truth for creating queues.
+Queues and queue configurations are managed via the `queue.yaml` file. Queues and their configurations will be created/updated during deploys. Queues removed from this file will not be deleted. Queues must be deleted manually from the web interface.
 
 For details on setting up queues to match a production instance, see the [Task Queues section of the Google App Engine + Firebase setup page](https://github.com/the-blue-alliance/the-blue-alliance/wiki/GAE-Firebase-Setup#task-queues).
+
+### `queue.yaml` syntax
+
+| Key | Type | Default | Description |
+| --- | --- | --- | --- |
+| `max_dispatches_per_second` | float | | The maximum rate at which tasks are dispatched from this queue. |
+| `max_concurrent_dispatches` | int | 0 | The maximum number of concurrent tasks that Cloud Tasks allows to be dispatched for this queue. After this threshold has been reached, Cloud Tasks stops dispatching tasks until the number of outstanding requests decreases. |
+| `max_attempts` | int | -1 | The maximum number of attempts per task in the queue. Set to `0` for no re-attempts. Set to `-1` for unlimited attempts. |
+| `max_retry_duration_seconds` | int | | The time limit in seconds for retrying a failed task, measured from when the task was first run. Once the `--max-retry-duration` time has passed and the task has been attempted `--max-attempts` times, no further attempts will be made and the task will be deleted. |
+| `min_backoff_seconds` | int | | The minimum amount of time in seconds to wait before retrying a task after it fails. |
+| `max_backoff_seconds` | int | | The maximum amount of time in seconds to wait before retrying a task after it fails. |
+| `max_doublings` | int | | The time between retries will double maxDoublings times. A tasks retry interval starts at minBackoff, then doubles maxDoublings times, then increases linearly, and finally retries retries at intervals of maxBackoff up to maxAttempts times. |
+
+See the [gcloud tasks queues create](https://cloud.google.com/sdk/gcloud/reference/tasks/queues/create) or [gcloud tasks queues update](https://cloud.google.com/sdk/gcloud/reference/tasks/queues/update) command documentation for details.
 
 ## Local Development
 
