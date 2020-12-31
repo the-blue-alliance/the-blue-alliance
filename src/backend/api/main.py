@@ -17,7 +17,8 @@ configure_flask_cache(app)
 
 app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
 
-MODEL_TYPE = "<any('simple','keys'):model_type>"
+SIMPLE_MODEL_TYPE = "<any('simple'):model_type>"
+ANY_MODEL_TYPE = "<any('simple','keys'):model_type>"
 
 # Overall Status
 app.add_url_rule("/api/v3/status", view_func=status)
@@ -25,15 +26,16 @@ app.add_url_rule("/api/v3/status", view_func=status)
 app.add_url_rule("/api/v3/event/<string:event_key>", view_func=event)
 # Team
 app.add_url_rule("/api/v3/team/<string:team_key>", view_func=team)
-app.add_url_rule(f"/api/v3/team/<string:team_key>/{MODEL_TYPE}", view_func=team)
+app.add_url_rule(f"/api/v3/team/<string:team_key>/{SIMPLE_MODEL_TYPE}", view_func=team)
 # Team List
 app.add_url_rule("/api/v3/teams/all", view_func=team_list_all)
-app.add_url_rule(f"/api/v3/teams/all/{MODEL_TYPE}", view_func=team_list_all)
+app.add_url_rule(f"/api/v3/teams/all/{ANY_MODEL_TYPE}", view_func=team_list_all)
 app.add_url_rule("/api/v3/teams/<int:page_num>", view_func=team_list)
-app.add_url_rule(f"/api/v3/teams/<int:page_num>/{MODEL_TYPE}", view_func=team_list)
+app.add_url_rule(f"/api/v3/teams/<int:page_num>/{ANY_MODEL_TYPE}", view_func=team_list)
 app.add_url_rule("/api/v3/teams/<int:year>/<int:page_num>", view_func=team_list_year)
 app.add_url_rule(
-    f"/api/v3/teams/<int:year>/<int:page_num>/{MODEL_TYPE}", view_func=team_list_year
+    f"/api/v3/teams/<int:year>/<int:page_num>/{ANY_MODEL_TYPE}",
+    view_func=team_list_year,
 )
 
 app.register_error_handler(404, handle_404)
