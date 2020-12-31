@@ -6,6 +6,7 @@ from backend.api.handlers.helpers.model_properties import (
     filter_event_properties,
     filter_match_properties,
     filter_team_properties,
+    ModelType,
     simple_event_properties,
     simple_match_properties,
     simple_team_properties,
@@ -33,10 +34,10 @@ def test_filter_event_properties(ndb_client: ndb.Client) -> None:
 
     assert set(event.keys()).difference(set(simple_event_properties)) != set()
 
-    simple = filter_event_properties([event], "simple")[0]
+    simple = filter_event_properties([event], ModelType("simple"))[0]
     assert set(simple.keys()).difference(set(simple_event_properties)) == set()
 
-    key = filter_event_properties([event], "keys")[0]
+    key = filter_event_properties([event], ModelType("keys"))[0]
     assert key == "2020casj"
 
 
@@ -61,10 +62,10 @@ def test_filter_match_properties(ndb_client: ndb.Client) -> None:
 
     assert set(match.keys()).difference(set(simple_match_properties)) != set()
 
-    simple = filter_match_properties([match], "simple")[0]
+    simple = filter_match_properties([match], ModelType("simple"))[0]
     assert set(simple.keys()).difference(set(simple_match_properties)) == set()
 
-    key = filter_match_properties([match], "keys")[0]
+    key = filter_match_properties([match], ModelType("keys"))[0]
     assert key == "2020casj_qm1"
 
 
@@ -74,8 +75,8 @@ def test_filter_team_properties(ndb_client: ndb.Client) -> None:
 
     assert set(team.keys()).difference(set(simple_team_properties)) != set()
 
-    simple = filter_team_properties([team], "simple")[0]
+    simple = filter_team_properties([team], ModelType("simple"))[0]
     assert set(simple.keys()).difference(set(simple_team_properties)) == set()
 
-    key = filter_team_properties([team], "keys")[0]
+    key = filter_team_properties([team], ModelType("keys"))[0]
     assert key == "frc604"
