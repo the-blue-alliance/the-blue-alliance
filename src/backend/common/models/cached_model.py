@@ -58,6 +58,7 @@ class CachedModel(ndb.Model):
 
     """
     From the legacy NDB model implementation:
+
     ```
     def __getstate__(self):
         return self._to_pb().Encode()
