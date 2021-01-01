@@ -15,7 +15,6 @@ from consts.media_type import MediaType
 from consts.media_tag import MediaTag
 
 from datafeeds.datafeed_fms_api import DatafeedFMSAPI
-from datafeeds.datafeed_first_elasticsearch import DatafeedFIRSTElasticSearch
 from datafeeds.datafeed_tba import DatafeedTba
 from datafeeds.datafeed_resource_library import DatafeedResourceLibrary
 from helpers.district_manipulator import DistrictManipulator
@@ -323,13 +322,11 @@ class FMSAPITeamDetailsRollingEnqueue(webapp.RequestHandler):
 class TeamDetailsGet(webapp.RequestHandler):
     """
     Fetches team details
-    FMSAPI should be trusted over FIRSTElasticSearch
     """
     def get(self, key_name):
         existing_team = Team.get_by_id(key_name)
 
         fms_df = DatafeedFMSAPI('v2.0')
-        df2 = DatafeedFIRSTElasticSearch()
         year = datetime.date.today().year
         fms_details = fms_df.getTeamDetails(year, key_name)
 
@@ -339,11 +336,6 @@ class TeamDetailsGet(webapp.RequestHandler):
             team = None
             district_team = None
             robot = None
-
-        if team:
-            team = TeamManipulator.mergeModels(team, df2.getTeamDetails(existing_team))
-        else:
-            team = df2.getTeamDetails(existing_team)
 
         if team:
             team = TeamManipulator.createOrUpdate(team)
@@ -381,7 +373,6 @@ class TeamDetailsGet(webapp.RequestHandler):
 class TeamAvatarGet(webapp.RequestHandler):
     """
     Fetches team avatar
-    Doesn't currently use FIRSTElasticSearch
     """
 
     def get(self, key_name):
@@ -456,15 +447,9 @@ class EventListGet(webapp.RequestHandler):
     Fetch all events for a given year via the FRC Events API.
     """
     def get(self, year):
-        df_config = Sitevar.get_or_insert('event_list_datafeed_config')
         df = DatafeedFMSAPI('v2.0')
-        df2 = DatafeedFIRSTElasticSearch()
 
         fmsapi_events, event_list_districts = df.getEventList(year)
-        if df_config.contents.get('enable_es') == True:
-            elasticsearch_events = df2.getEventList(year)
-        else:
-            elasticsearch_events = []
 
         # All regular-season events can be inserted without any work involved.
         # We need to de-duplicate offseason events from the FRC Events API with a different code than the TBA event code
@@ -484,11 +469,7 @@ class EventListGet(webapp.RequestHandler):
         # For all new offseason events we can't automatically match, create suggestions
         SuggestionCreator.createDummyOffseasonSuggestions(new_offseason_events)
 
-        merged_events = EventManipulator.mergeModels(
-            list(events_to_put),
-            elasticsearch_events) if elasticsearch_events else list(
-                events_to_put)
-        events = EventManipulator.createOrUpdate(merged_events) or []
+        events = EventManipulator.createOrUpdate(events_to_put) or []
 
         fmsapi_districts = df.getDistrictList(year)
         merged_districts = DistrictManipulator.mergeModels(fmsapi_districts, event_list_districts)
@@ -557,22 +538,15 @@ class EventDetailsEnqueue(webapp.RequestHandler):
 class EventDetailsGet(webapp.RequestHandler):
     """
     Fetch event details, event teams, and team details
-    FMSAPI should be trusted over FIRSTElasticSearch
     """
     def get(self, event_key):
         df = DatafeedFMSAPI('v2.0')
-        df2 = DatafeedFIRSTElasticSearch()
 
         event = Event.get_by_id(event_key)
 
         # Update event
         fmsapi_events, fmsapi_districts = df.getEventDetails(event_key)
-        elasticsearch_events = df2.getEventDetails(event)
-        updated_event = EventManipulator.mergeModels(
-            fmsapi_events,
-            elasticsearch_events)
-        if updated_event:
-            event = EventManipulator.createOrUpdate(updated_event)
+        event = EventManipulator.createOrUpdate(fmsapi_events)
         DistrictManipulator.createOrUpdate(fmsapi_districts)
 
         models = df.getEventTeams(event_key)
@@ -587,9 +561,6 @@ class EventDetailsGet(webapp.RequestHandler):
                 district_teams.append(group[1])
             if isinstance(group[2], Robot):
                 robots.append(group[2])
-
-        # Merge teams
-        teams = TeamManipulator.mergeModels(teams, df2.getEventTeams(event))
 
         # Write new models
         if teams and event.year == tba_config.MAX_YEAR:  # Only update from latest year

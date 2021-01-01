@@ -11,7 +11,6 @@ class District(ndb.Model):
     year = ndb.IntegerProperty()
     abbreviation = ndb.StringProperty()
     display_name = ndb.StringProperty()  # This is what we'll show on the TBA site
-    elasticsearch_name = ndb.StringProperty()  # These names are in the event's name as returned by FRC Elasticsearch
 
     rankings = ndb.JsonProperty()  # District rankings as calculated by TBA
     advancement = ndb.JsonProperty()  # Dict of team key -> advancement data

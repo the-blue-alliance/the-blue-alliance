@@ -58,8 +58,7 @@ class AdminDistrictEdit(LoggedInHandler):
             id=District.renderKeyName(self.request.get("year"), self.request.get("abbreviation")),
             year=int(self.request.get("year")),
             abbreviation=self.request.get("abbreviation"),
-            display_name=self.request.get("display_name"),
-            elasticsearch_name=self.request.get("elasticsearch_name"),
+            display_name=self.request.get("display_name")
         )
         DistrictManipulator.createOrUpdate(district)
 
