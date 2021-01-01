@@ -324,8 +324,7 @@ class AdminCreateDistrictsDo(LoggedInHandler):
                 id=district_key,
                 year=year,
                 abbreviation=district_abbrev,
-                display_name=DistrictType.type_names[dcmp.event_district_enum],
-                elasticsearch_name=next((k for k, v in DistrictType.elasticsearch_names.iteritems() if v == dcmp.event_district_enum), None)
+                display_name=DistrictType.type_names[dcmp.event_district_enum]
             )
             districts_to_write.append(district)
 

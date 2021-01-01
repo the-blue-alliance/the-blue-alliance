@@ -60,22 +60,6 @@ class DistrictType(object):
         'Israel': ISRAEL,
     }
 
-    # Names used by FIRST ElasticSearch
-    elasticsearch_names = {
-        'Michigan': MICHIGAN,
-        'Mid-Atlantic': MID_ATLANTIC,
-        'New England': NEW_ENGLAND,
-        'NE FIRST': NEW_ENGLAND,
-        'Pacific Northwest': PACIFIC_NORTHWEST,
-        'Indiana': INDIANA,
-        'Chesapeake': CHESAPEAKE,
-        'NC FIRST': NORTH_CAROLINA,
-        'FIRST North Carolina': NORTH_CAROLINA,  # 2017 uses a different name
-        'Peachtree': GEORGIA,
-        'FIRST Ontario': ONTARIO,
-        'FIRST Israel': ISRAEL,
-    }
-
     # make sure abbreviations stay all lower case
     abbrevs = {
         'fim': MICHIGAN,
