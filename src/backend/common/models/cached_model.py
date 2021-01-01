@@ -56,21 +56,22 @@ class CachedModel(ndb.Model):
         # constructors, so make sure we have a common set of properties defined
         self._fix_up_properties()
 
+    """
+    From the legacy NDB model implementation:
+    ```
+    def __getstate__(self):
+        return self._to_pb().Encode()
+
+    def __setstate__(self, serialized_pb):
+        pb = entity_pb.EntityProto(serialized_pb)
+        self.__init__()
+        self.__class__._from_pb(pb, set_key=False, ent=self)
+    ```
+
+    See https://github.com/googleapis/python-ndb/issues/587 about fixing upstream
+    """
+
     def __setstate__(self, state: Any) -> None:
-        """
-        From the legacy NDB model implementation:
-        ```
-        def __getstate__(self):
-            return self._to_pb().Encode()
-
-        def __setstate__(self, serialized_pb):
-            pb = entity_pb.EntityProto(serialized_pb)
-            self.__init__()
-            self.__class__._from_pb(pb, set_key=False, ent=self)
-        ```
-
-        See https://github.com/googleapis/python-ndb/issues/587 about fixing upstream
-        """
         pb = EntityProto()
         pb.MergePartialFromString(state)
 

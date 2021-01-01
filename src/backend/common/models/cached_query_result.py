@@ -1,7 +1,12 @@
 import io
 import pickle
+from typing import Any
 
 from google.cloud import ndb
+
+
+class ImportFixingPickler(pickle.Pickler):
+    pass
 
 
 class ImportFixingUnpickler(pickle.Unpickler):
@@ -14,16 +19,19 @@ class ImportFixingUnpickler(pickle.Unpickler):
 
 
 class ImportFixingPickleProperty(ndb.BlobProperty):
-    def _to_base_type(self, value):
+    def _to_base_type(self, value: Any) -> bytes:
         """Convert a value to the "base" value type for this property.
         Args:
             value (Any): The value to be converted.
         Returns:
             bytes: The pickled ``value``.
         """
-        return pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
 
-    def _from_base_type(self, value):
+        file_obj = io.BytesIO()
+        ImportFixingPickler(file_obj, protocol=2, fix_imports=True).dump(value)
+        return file_obj.getvalue()
+
+    def _from_base_type(self, value: bytes) -> Any:
         """Convert a value from the "base" value type for this property.
         Args:
             value (bytes): The value to be converted.
