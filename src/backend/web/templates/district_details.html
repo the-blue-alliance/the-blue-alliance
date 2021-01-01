@@ -57,7 +57,7 @@
       <ul class="nav nav-tabs nav-justified" role="tablist">
         <li class="active"><a href="#events" role="tab" data-toggle="tab">Events</a></li>
         {% if teams_a or teams_b %}
-        <li><a href="#teams" role="tab" data-toggle="tab">Teams</a></li>
+        <li><a href="#teams" role="tab" data-toggle="tab">Teams <span class="badge">{{num_teams}}</span></a></li>
         {% endif %}
         {% if rankings %}
         <li><a href="#rankings" role="tab" data-toggle="tab">Rankings</a></li>
