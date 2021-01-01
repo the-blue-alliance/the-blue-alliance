@@ -55,6 +55,18 @@ deploy_single() {
   deploy_module dispatch.yaml
 }
 
+deploy_skeleton() {
+  deploy_module app.yaml
+  deploy_module index.yaml
+  deploy_module queue.yaml
+
+  # Overwrite files with magic names
+  mv -f ops/standalone/cron-skeleton.yaml ./cron.yaml
+  mv -f ops/standalone/dispatch-empty.yaml ./dispatch.yaml
+  deploy_module cron.yaml
+  deploy_module dispatch.yaml
+}
+
 # Install the lock release function as a trap so it always runs
 # http://tldp.org/LDP/Bash-Beginners-Guide/html/sect_12_02.html
 release_lock() {
@@ -98,6 +110,9 @@ echo "Obtained Lock. Deploying $PROJECT:$VERSION in mode $TBA_DEPLOY_TYPE"
 case "$TBA_DEPLOY_TYPE" in
   "prod")
     deploy_full
+    ;;
+  "skeleton")
+    deploy_skeleton
     ;;
   "single-instance")
     deploy_single
