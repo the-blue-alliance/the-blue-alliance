@@ -50,23 +50,23 @@ class TestMatchVideoNotification(unittest2.TestCase):
     def test_data_payload(self):
         payload = self.notification.data_payload
         self.assertEqual(len(payload), 2)
-        self.assertEqual(payload['event_key'], '2020testpresent')
-        self.assertEqual(payload['match_key'], '2020testpresent_qm1')
+        self.assertEqual(payload['event_key'], self.event.key_name)
+        self.assertEqual(payload['match_key'], '{}_qm1'.format(self.event.key_name))
 
     def test_data_payload_team(self):
         team = Team.get_by_id('frc1')
         notification = MatchVideoNotification(self.match, team)
         payload = notification.data_payload
         self.assertEqual(len(payload), 3)
-        self.assertEqual(payload['event_key'], '2020testpresent')
-        self.assertEqual(payload['match_key'], '2020testpresent_qm1')
+        self.assertEqual(payload['event_key'], self.event.key_name)
+        self.assertEqual(payload['match_key'], '{}_qm1'.format(self.event.key_name))
         self.assertEqual(payload['team_key'], 'frc1')
 
     def test_webhook_message_data(self):
         # Has `event_name`
         payload = self.notification.webhook_message_data
         self.assertEqual(len(payload), 3)
-        self.assertEqual(payload['event_key'], '2020testpresent')
+        self.assertEqual(payload['event_key'], self.event.key_name)
         self.assertEqual(payload['event_name'], 'Present Test Event')
         self.assertIsNotNone(payload['match'])
 
@@ -75,7 +75,7 @@ class TestMatchVideoNotification(unittest2.TestCase):
         notification = MatchVideoNotification(self.match, team)
         payload = notification.webhook_message_data
         self.assertEqual(len(payload), 4)
-        self.assertEqual(payload['event_key'], '2020testpresent')
+        self.assertEqual(payload['event_key'], self.event.key_name)
         self.assertEqual(payload['event_name'], 'Present Test Event')
         self.assertEqual(payload['team_key'], 'frc1')
         self.assertIsNotNone(payload['match'])
