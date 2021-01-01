@@ -1,5 +1,14 @@
 Welcome to The Blue Alliance Wiki! Here are some helpful pages -
 
+# Site Architecture & Design Docs
+
+A guide to understanding how TBA works internally.
+
+ - [[Architecture Overview|Architecture-Overview]]; to learn how the basics work
+ - [[The Data Model|Architecture-Data-Model]]; for how the data is laid out in the DB
+ - [[Caching Architecture|Architecture-Caching]]; for all the ways data is cached
+ - [[Closet Skeletons|Closet-Skeletons]]; for some of the bonkers things we do deep down
+
 # Setup
 
 ## [[Setup Guide|Setup-Guide]]
