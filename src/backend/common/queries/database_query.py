@@ -64,7 +64,8 @@ class CachedDatabaseQuery(DatabaseQuery, Generic[QueryReturn, DictQueryReturn]):
     )
     CACHE_KEY_FORMAT: str = ""
     CACHE_VERSION: int = 0
-    CACHING_ENABLED: bool = False
+    CACHING_ENABLED: bool = True
+    CACHE_WRITES_ENABLED: bool = False
     _cache_key: Optional[str] = None
 
     def __init__(self, *args, **kwargs) -> None:
@@ -90,7 +91,8 @@ class CachedDatabaseQuery(DatabaseQuery, Generic[QueryReturn, DictQueryReturn]):
         cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
         if cached_query_result is None:
             query_result = yield self._query_async(*args, **kwargs)
-            yield CachedQueryResult(id=cache_key, result=query_result).put_async()
+            if self.CACHE_WRITES_ENABLED:
+                yield CachedQueryResult(id=cache_key, result=query_result).put_async()
             return query_result  # pyre-ignore[7]
         return cached_query_result.result
 

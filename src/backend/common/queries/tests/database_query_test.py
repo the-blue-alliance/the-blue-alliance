@@ -45,6 +45,7 @@ class CachedDummyModelRangeQuery(
     CACKE_KEY_FORMAT = "test_query_{min}_{max}"
     DICT_CONVERTER = DummyConverter
     CACHING_ENABLED = True
+    CACHE_WRITES_ENABLED = True
 
     @ndb.tasklet
     def _query_async(self, min: int, max: int) -> TypedFuture[List[DummyModel]]:
