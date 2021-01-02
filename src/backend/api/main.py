@@ -2,7 +2,7 @@ from flask import Flask
 from werkzeug.routing import BaseConverter
 
 from backend.api.handlers.error import handle_404
-from backend.api.handlers.event import event
+from backend.api.handlers.event import event, event_list_all, event_list_year
 from backend.api.handlers.status import status
 from backend.api.handlers.team import team, team_list, team_list_all, team_list_year
 from backend.common.flask_cache import configure_flask_cache
@@ -36,6 +36,13 @@ app.add_url_rule("/api/v3/status", view_func=status)
 app.add_url_rule("/api/v3/event/<string:event_key>", view_func=event)
 app.add_url_rule(
     "/api/v3/event/<string:event_key>/<simple_model_type:model_type>", view_func=event
+)
+# Event List
+app.add_url_rule("/api/v3/events/all", view_func=event_list_all)
+app.add_url_rule("/api/v3/events/all/<model_type:model_type>", view_func=event_list_all)
+app.add_url_rule("/api/v3/events/<int:year>", view_func=event_list_year)
+app.add_url_rule(
+    "/api/v3/events/<int:year>/<model_type:model_type>", view_func=event_list_year
 )
 # Team
 app.add_url_rule("/api/v3/team/<string:team_key>", view_func=team)
