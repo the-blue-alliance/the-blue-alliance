@@ -8,11 +8,11 @@ from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 
 
-def validate_nominal_keys(team):
+def validate_nominal_event_keys(team):
     assert set(team.keys()).difference(set(simple_event_properties)) != set()
 
 
-def validate_simple_keys(team):
+def validate_simple_event_keys(team):
     assert set(team.keys()).difference(set(simple_event_properties)) == set()
 
 
@@ -35,7 +35,7 @@ def test_event(ndb_client: ndb.Client, api_client: Client) -> None:
     )
     assert resp.status_code == 200
     assert resp.json["key"] == "2019casj"
-    validate_nominal_keys(resp.json)
+    validate_nominal_event_keys(resp.json)
 
     # Simple response
     resp = api_client.get(
@@ -43,7 +43,7 @@ def test_event(ndb_client: ndb.Client, api_client: Client) -> None:
     )
     assert resp.status_code == 200
     assert resp.json["key"] == "2019casj"
-    validate_simple_keys(resp.json)
+    validate_simple_event_keys(resp.json)
 
     # Keys response
     resp = api_client.get(
@@ -78,7 +78,7 @@ def test_event_list_all(ndb_client: ndb.Client, api_client: Client) -> None:
     assert resp.status_code == 200
     assert len(resp.json) == 2
     for event in resp.json:
-        validate_nominal_keys(event)
+        validate_nominal_event_keys(event)
     keys = set([event["key"] for event in resp.json])
     assert "2019casj" in keys
     assert "2020casj" in keys
@@ -90,7 +90,7 @@ def test_event_list_all(ndb_client: ndb.Client, api_client: Client) -> None:
     assert resp.status_code == 200
     assert len(resp.json) == 2
     for event in resp.json:
-        validate_simple_keys(event)
+        validate_simple_event_keys(event)
     keys = set([event["key"] for event in resp.json])
     assert "2019casj" in keys
     assert "2020casj" in keys
@@ -136,7 +136,7 @@ def test_event_list_year(ndb_client: ndb.Client, api_client: Client) -> None:
     assert resp.status_code == 200
     assert len(resp.json) == 1
     for event in resp.json:
-        validate_nominal_keys(event)
+        validate_nominal_event_keys(event)
     assert resp.json[0]["key"] == "2019casj"
 
     resp = api_client.get(
@@ -145,7 +145,7 @@ def test_event_list_year(ndb_client: ndb.Client, api_client: Client) -> None:
     assert resp.status_code == 200
     assert len(resp.json) == 2
     for event in resp.json:
-        validate_nominal_keys(event)
+        validate_nominal_event_keys(event)
     keys = set([event["key"] for event in resp.json])
     assert "2020casf" in keys
     assert "2020casj" in keys
@@ -157,7 +157,7 @@ def test_event_list_year(ndb_client: ndb.Client, api_client: Client) -> None:
     assert resp.status_code == 200
     assert len(resp.json) == 1
     for event in resp.json:
-        validate_simple_keys(event)
+        validate_simple_event_keys(event)
     assert resp.json[0]["key"] == "2019casj"
 
     resp = api_client.get(
@@ -166,7 +166,7 @@ def test_event_list_year(ndb_client: ndb.Client, api_client: Client) -> None:
     assert resp.status_code == 200
     assert len(resp.json) == 2
     for event in resp.json:
-        validate_simple_keys(event)
+        validate_simple_event_keys(event)
     keys = set([event["key"] for event in resp.json])
     assert "2020casf" in keys
     assert "2020casj" in keys
