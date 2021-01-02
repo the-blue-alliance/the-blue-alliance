@@ -33,7 +33,7 @@ TYPE_NAMES: Dict[EventType, str] = {
     EventType.FOC: "Festival of Champions",
     EventType.OFFSEASON: "Offseason",
     EventType.PRESEASON: "Preseason",
-    EventType.REMOTE: 'Remote',
+    EventType.REMOTE: "Remote",
     EventType.UNLABLED: "--",
 }
 
@@ -48,7 +48,7 @@ SHORT_TYPE_NAMES: Dict[EventType, str] = {
     EventType.FOC: "FoC",
     EventType.OFFSEASON: "Offseason",
     EventType.PRESEASON: "Preseason",
-    EventType.REMOTE: 'Remote',
+    EventType.REMOTE: "Remote",
     EventType.UNLABLED: "--",
 }
 
@@ -65,7 +65,7 @@ NON_CMP_EVENT_TYPES: Set[EventType] = {
     EventType.DISTRICT,
     EventType.DISTRICT_CMP_DIVISION,
     EventType.DISTRICT_CMP,
-    EventType.REMOTE
+    EventType.REMOTE,
 }
 
 CMP_EVENT_TYPES: Set[EventType] = {
@@ -82,5 +82,5 @@ SEASON_EVENT_TYPES: Set[EventType] = {
     EventType.CMP_DIVISION,
     EventType.CMP_FINALS,
     EventType.FOC,
-    EventType.REMOTE
+    EventType.REMOTE,
 }
