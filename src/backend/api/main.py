@@ -26,6 +26,9 @@ ANY_MODEL_TYPE = "<any('simple','keys'):model_type>"
 app.add_url_rule("/api/v3/status", view_func=status)
 # Event
 app.add_url_rule("/api/v3/event/<string:event_key>", view_func=event)
+app.add_url_rule(
+    f"/api/v3/event/<string:event_key>/{SIMPLE_MODEL_TYPE}", view_func=event
+)
 # Team
 app.add_url_rule("/api/v3/team/<string:team_key>", view_func=team)
 app.add_url_rule(f"/api/v3/team/<string:team_key>/{SIMPLE_MODEL_TYPE}", view_func=team)
