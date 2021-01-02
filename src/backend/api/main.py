@@ -1,4 +1,5 @@
 from flask import Flask
+from werkzeug.routing import BaseConverter
 
 from backend.api.handlers.error import handle_404
 from backend.api.handlers.event import event
@@ -10,6 +11,14 @@ from backend.common.middleware import install_middleware
 from backend.common.url_converters import install_url_converters
 
 
+class SimpleModelTypeConverter(BaseConverter):
+    regex = r"simple"
+
+
+class ModelTypeConverter(BaseConverter):
+    regex = r"simple|keys"
+
+
 configure_logging()
 
 app = Flask(__name__)
@@ -18,28 +27,31 @@ install_url_converters(app)
 configure_flask_cache(app)
 
 app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
-
-SIMPLE_MODEL_TYPE = "<any('simple'):model_type>"
-ANY_MODEL_TYPE = "<any('simple','keys'):model_type>"
+app.url_map.converters["simple_model_type"] = SimpleModelTypeConverter
+app.url_map.converters["model_type"] = ModelTypeConverter
 
 # Overall Status
 app.add_url_rule("/api/v3/status", view_func=status)
 # Event
 app.add_url_rule("/api/v3/event/<string:event_key>", view_func=event)
 app.add_url_rule(
-    f"/api/v3/event/<string:event_key>/{SIMPLE_MODEL_TYPE}", view_func=event
+    "/api/v3/event/<string:event_key>/<simple_model_type:model_type>", view_func=event
 )
 # Team
 app.add_url_rule("/api/v3/team/<string:team_key>", view_func=team)
-app.add_url_rule(f"/api/v3/team/<string:team_key>/{SIMPLE_MODEL_TYPE}", view_func=team)
+app.add_url_rule(
+    "/api/v3/team/<string:team_key>/<simple_model_type:model_type>", view_func=team
+)
 # Team List
 app.add_url_rule("/api/v3/teams/all", view_func=team_list_all)
-app.add_url_rule(f"/api/v3/teams/all/{ANY_MODEL_TYPE}", view_func=team_list_all)
+app.add_url_rule("/api/v3/teams/all/<model_type:model_type>", view_func=team_list_all)
 app.add_url_rule("/api/v3/teams/<int:page_num>", view_func=team_list)
-app.add_url_rule(f"/api/v3/teams/<int:page_num>/{ANY_MODEL_TYPE}", view_func=team_list)
+app.add_url_rule(
+    "/api/v3/teams/<int:page_num>/<model_type:model_type>", view_func=team_list
+)
 app.add_url_rule("/api/v3/teams/<int:year>/<int:page_num>", view_func=team_list_year)
 app.add_url_rule(
-    f"/api/v3/teams/<int:year>/<int:page_num>/{ANY_MODEL_TYPE}",
+    "/api/v3/teams/<int:year>/<int:page_num>/<model_type:model_type>",
     view_func=team_list_year,
 )
 
