@@ -15,8 +15,8 @@ from backend.common.models.keys import EventKey
 from backend.common.queries.event_query import EventListQuery, EventQuery
 
 
-@validate_event_key
 @api_authenticated
+@validate_event_key
 @cached_public
 def event(event_key: EventKey, model_type: Optional[ModelType] = None) -> Response:
     """

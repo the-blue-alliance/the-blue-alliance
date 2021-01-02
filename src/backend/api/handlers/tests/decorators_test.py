@@ -1,8 +1,10 @@
+import json
 import logging
 from unittest.mock import patch
 
 import pytest
 from flask import g
+
 from google.cloud import ndb
 from werkzeug.test import Client
 
@@ -12,6 +14,7 @@ from backend.common.consts.event_type import EventType
 from backend.common.models.account import Account
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
+from backend.common.models.match import Match
 from backend.common.models.team import Team
 
 
@@ -151,8 +154,25 @@ def test_authenticated_user(ndb_client: ndb.Client, api_client: Client, caplog) 
     assert resp.status_code == 200
 
 
+def test_team_key_valid(ndb_client: ndb.Client, api_client: Client) -> None:
+    with ndb_client.context():
+        ApiAuthAccess(
+            id="test_auth_key",
+            auth_types_enum=[AuthType.READ_API],
+        ).put()
+        Team(id="frc254", team_number=254).put()
+    resp = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+
+
 def test_team_key_invalid(ndb_client: ndb.Client, api_client: Client) -> None:
     with ndb_client.context():
+        ApiAuthAccess(
+            id="test_auth_key",
+            auth_types_enum=[AuthType.READ_API],
+        ).put()
         Team(id="frc254", team_number=254).put()
     resp = api_client.get(
         "/api/v3/team/254", headers={"X-TBA-Auth-Key": "test_auth_key"}
@@ -175,8 +195,30 @@ def test_team_key_does_not_exist(ndb_client: ndb.Client, api_client: Client) -> 
     assert resp.json["Error"] == "team key: frc604 does not exist"
 
 
+def test_event_key_valid(ndb_client: ndb.Client, api_client: Client) -> None:
+    with ndb_client.context():
+        ApiAuthAccess(
+            id="test_auth_key",
+            auth_types_enum=[AuthType.READ_API],
+        ).put()
+        Event(
+            id="2019casj",
+            year=2019,
+            event_short="casj",
+            event_type_enum=EventType.REGIONAL,
+        ).put()
+    resp = api_client.get(
+        "/api/v3/event/2019casj", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+
+
 def test_event_key_invalid(ndb_client: ndb.Client, api_client: Client) -> None:
     with ndb_client.context():
+        ApiAuthAccess(
+            id="test_auth_key",
+            auth_types_enum=[AuthType.READ_API],
+        ).put()
         Event(
             id="2019casj",
             year=2019,
@@ -207,3 +249,83 @@ def test_event_key_does_not_exist(ndb_client: ndb.Client, api_client: Client) ->
     )
     assert resp.status_code == 404
     assert resp.json["Error"] == "event key: 2019casf does not exist"
+
+
+def test_match_key_valid(ndb_client: ndb.Client, api_client: Client) -> None:
+    with ndb_client.context():
+        ApiAuthAccess(
+            id="test_auth_key",
+            auth_types_enum=[AuthType.READ_API],
+        ).put()
+        Match(
+            id="2020casj_qm1",
+            year=2020,
+            event=ndb.Key("Event", "2020casj"),
+            comp_level="qm",
+            match_number=1,
+            set_number=1,
+            alliances_json=json.dumps(
+                {
+                    "red": {"score": 0, "teams": []},
+                    "blue": {"score": 0, "teams": []},
+                }
+            ),
+        ).put()
+    resp = api_client.get(
+        "/api/v3/match/2020casj_qm1", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+
+
+def test_match_key_invalid(ndb_client: ndb.Client, api_client: Client) -> None:
+    with ndb_client.context():
+        ApiAuthAccess(
+            id="test_auth_key",
+            auth_types_enum=[AuthType.READ_API],
+        ).put()
+        Match(
+            id="2020casj_qm1",
+            year=2020,
+            event=ndb.Key("Event", "2020casj"),
+            comp_level="qm",
+            match_number=1,
+            set_number=1,
+            alliances_json=json.dumps(
+                {
+                    "red": {"score": 0, "teams": []},
+                    "blue": {"score": 0, "teams": []},
+                }
+            ),
+        ).put()
+    resp = api_client.get(
+        "/api/v3/match/2020casj_qm", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 404
+    assert resp.json["Error"] == "2020casj_qm is not a valid match key"
+
+
+def test_match_key_does_not_exist(ndb_client: ndb.Client, api_client: Client) -> None:
+    with ndb_client.context():
+        ApiAuthAccess(
+            id="test_auth_key",
+            auth_types_enum=[AuthType.READ_API],
+        ).put()
+        Match(
+            id="2020casj_qm1",
+            year=2020,
+            event=ndb.Key("Event", "2020casj"),
+            comp_level="qm",
+            match_number=1,
+            set_number=1,
+            alliances_json=json.dumps(
+                {
+                    "red": {"score": 0, "teams": []},
+                    "blue": {"score": 0, "teams": []},
+                }
+            ),
+        ).put()
+    resp = api_client.get(
+        "/api/v3/match/2020casj_qm2", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 404
+    assert resp.json["Error"] == "match key: 2020casj_qm2 does not exist"

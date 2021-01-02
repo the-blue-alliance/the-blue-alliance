@@ -6,6 +6,7 @@ from flask import g, request
 from backend.common.auth import current_user
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
+from backend.common.models.match import Match
 from backend.common.models.team import Team
 from backend.common.queries.exceptions import DoesNotExistException
 
@@ -80,5 +81,20 @@ def validate_event_key(func):
             return func(*args, **kwargs)
         except DoesNotExistException:
             return {"Error": f"event key: {event_key} does not exist"}, 404
+
+    return decorated_function
+
+
+def validate_match_key(func):
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        match_key = kwargs["match_key"]
+        if not Match.validate_key_name(match_key):
+            return {"Error": f"{match_key} is not a valid match key"}, 404
+
+        try:
+            return func(*args, **kwargs)
+        except DoesNotExistException:
+            return {"Error": f"match key: {match_key} does not exist"}, 404
 
     return decorated_function

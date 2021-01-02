@@ -19,8 +19,8 @@ from backend.common.queries.team_query import (
 )
 
 
-@validate_team_key
 @api_authenticated
+@validate_team_key
 @cached_public
 def team(team_key: TeamKey, model_type: Optional[ModelType] = None) -> Response:
     """

@@ -3,6 +3,7 @@ from werkzeug.routing import BaseConverter
 
 from backend.api.handlers.error import handle_404
 from backend.api.handlers.event import event, event_list_all, event_list_year
+from backend.api.handlers.match import match
 from backend.api.handlers.status import status
 from backend.api.handlers.team import team, team_list, team_list_all, team_list_year
 from backend.common.flask_cache import configure_flask_cache
@@ -43,6 +44,11 @@ app.add_url_rule("/api/v3/events/all/<model_type:model_type>", view_func=event_l
 app.add_url_rule("/api/v3/events/<int:year>", view_func=event_list_year)
 app.add_url_rule(
     "/api/v3/events/<int:year>/<model_type:model_type>", view_func=event_list_year
+)
+# Match
+app.add_url_rule("/api/v3/match/<string:match_key>", view_func=match)
+app.add_url_rule(
+    "/api/v3/match/<string:match_key>/<simple_model_type:model_type>", view_func=match
 )
 # Team
 app.add_url_rule("/api/v3/team/<string:team_key>", view_func=team)
