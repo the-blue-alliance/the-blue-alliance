@@ -14,14 +14,14 @@ class InlineRQTaskQueue(RQTaskQueue):
         self._queue.enqueue(task.obj, *task.args, **task.kwargs)
 
 
-class FakeRQTaskClient(RQTaskClient):
+class InlineRQTaskClient(RQTaskClient):
     def queue(self, name) -> InlineRQTaskQueue:
         return InlineRQTaskQueue(
             name, default_service=self.default_service, redis_client=self._client
         )
 
 
-class FakeTaskClient(FakeRQTaskClient):
+class InlineTaskClient(InlineRQTaskClient):
     """
     Similar interface to an in-memory RQTaskClient, except:
      - with a stubbed out Redis client
@@ -41,3 +41,11 @@ class FakeTaskClient(FakeRQTaskClient):
     def drain_pending_jobs(self, queue_name: str) -> None:
         jobs = self.queue(queue_name).jobs()
         [j.perform() for j in jobs]
+
+
+# Similar interface to an in-memory RQTaskClient, except with a stubbed out Redis client
+class FakeTaskClient(RQTaskClient):
+    def __init__(self) -> None:
+        from fakeredis import FakeRedis
+
+        super().__init__(default_service="test", redis_client=FakeRedis())
