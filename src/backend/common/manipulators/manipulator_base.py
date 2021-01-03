@@ -1,11 +1,26 @@
 import abc
 import json
-from typing import Any, Generic, List, Optional, overload, Set, TypeVar
+from collections import defaultdict
+from typing import (
+    Any,
+    DefaultDict,
+    Generic,
+    List,
+    Optional,
+    overload,
+    Set,
+    Tuple,
+    Type,
+    TypeVar,
+)
 
 from google.cloud import ndb
 
+from backend.common.cache_clearing.get_affected_queries import TCacheKeyAndQuery
+from backend.common.deferred import defer
 from backend.common.helpers.listify import delistify, listify
-from backend.common.models.cached_model import CachedModel
+from backend.common.models.cached_model import CachedModel, TAffectedReferences
+from backend.common.queries.database_query import DatabaseQuery
 
 
 TModel = TypeVar("TModel", bound=CachedModel)
@@ -187,3 +202,39 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
         Needs to save _affected_references and the dirty flag
         TODO implement this
         """
+        all_affected_references: List[TAffectedReferences] = []
+        for model in models:
+            if model._dirty and model._affected_references:
+                all_affected_references.append(model._affected_references)
+
+        if all_affected_references:
+            defer(
+                cls._clearCacheDeferred,
+                all_affected_references,
+                _queue="cache-clearing",
+                # this does not exist in Cloud Tasks
+                # _transactional=ndb.in_transaction(),
+                _target="default",
+                _url="/_ah/queue/deferred_manipulator_clearCache",
+            )
+
+    @classmethod
+    def _clearCacheDeferred(
+        cls, all_affected_references: List[TAffectedReferences]
+    ) -> None:
+        to_clear: DefaultDict[Type[DatabaseQuery], Set[str]] = defaultdict(set)
+        for affected_references in all_affected_references:
+            for cache_key, query in cls.getCacheKeysAndQueries(affected_references):
+                to_clear[query].add(cache_key)
+
+        for query, cache_keys in to_clear.items():
+            query.delete_cache_multi(cache_keys)
+
+    @classmethod
+    def getCacheKeysAndQueries(
+        cls, affected_refs: TAffectedReferences
+    ) -> List[TCacheKeyAndQuery]:
+        """
+        Child classes should replace method with appropriate call to CacheClearer.
+        """
+        return []

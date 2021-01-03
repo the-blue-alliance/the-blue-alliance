@@ -1,4 +1,8 @@
+from typing import List
+
+from backend.common.cache_clearing import get_affected_queries
 from backend.common.manipulators.manipulator_base import ManipulatorBase
+from backend.common.models.cached_model import TAffectedReferences
 from backend.common.models.team import Team
 
 
@@ -7,11 +11,13 @@ class TeamManipulator(ManipulatorBase[Team]):
     Handle Team database writes.
     """
 
-    """
     @classmethod
-    def getCacheKeysAndControllers(cls, affected_refs):
-        return CacheClearer.get_team_cache_keys_and_controllers(affected_refs)
+    def getCacheKeysAndControllers(
+        cls, affected_refs: TAffectedReferences
+    ) -> List[get_affected_queries.TCacheKeyAndQuery]:
+        return get_affected_queries.team_updated(affected_refs)
 
+    """
     @classmethod
     def postDeleteHook(cls, teams):
         # To run after the team has been deleted.

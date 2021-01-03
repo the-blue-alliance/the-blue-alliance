@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import abc
+import logging
 from typing import Any, Dict, Generic, Optional, Set, Type
 
 from google.cloud import ndb
@@ -22,6 +23,27 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
 
     def __init__(self, *args, **kwargs) -> None:
         self._query_args = kwargs
+
+    @classmethod
+    def delete_cache_multi(cls, cache_keys: Set[str]) -> None:
+        all_cache_keys = []
+        for cache_key in cache_keys:
+            all_cache_keys.append(cache_key)
+            if cls.DICT_CONVERTER is not None and False:
+                # TODO haven't supported caching API dicts yet
+                all_cache_keys += [
+                    cls._dict_cache_key(cache_key, valid_dict_version)
+                    for valid_dict_version in set(ApiMajorVersion)
+                ]
+        logging.info("Deleting db query cache keys: {}".format(all_cache_keys))
+        ndb.delete_multi(
+            [ndb.Key(CachedQueryResult, cache_key) for cache_key in all_cache_keys]
+        )
+
+    @classmethod
+    def _dict_cache_key(cls, cache_key: str, dict_version: int) -> str:
+        # return f'{cache_key}~dictv{dict_version}.{cls.DICT_CONVERTER.SUBVERSIONS[dict_version]}'
+        raise NotImplementedError
 
     @abc.abstractmethod
     def _query_async(self) -> TypedFuture[QueryReturn]:
