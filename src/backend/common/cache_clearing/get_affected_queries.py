@@ -154,7 +154,7 @@ def media_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]
     years = _filter(affected_refs["year"])
     media_tags = _filter(affected_refs["media_tag_enum"])
 
-    team_keys = filter(lambda x: x.kind() == "Team", reference_keys)
+    team_keys = list(filter(lambda x: x.kind() == "Team", reference_keys))
     event_team_keys_future = (
         EventTeam.query(EventTeam.team.IN(team_keys)).fetch_async(  # pyre-ignore[16]
             None, keys_only=True
@@ -171,7 +171,7 @@ def media_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]
                 for media_tag in media_tags:
                     queries.append(
                         media_query.TeamYearTagMediasQuery(
-                            reference_key.id(), media_tag, year
+                            reference_key.id(), year, media_tag
                         )
                     )
             for media_tag in media_tags:

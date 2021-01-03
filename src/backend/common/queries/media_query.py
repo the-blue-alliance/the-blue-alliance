@@ -54,7 +54,7 @@ class TeamYearMediaQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
     CACHE_KEY_FORMAT = "team_year_media_{team_key}_{year}"
     DICT_CONVERTER = MediaConverter
 
-    def __init(self, team_key: TeamKey, year: Year) -> None:
+    def __init__(self, team_key: TeamKey, year: Year) -> None:
         super().__init__(team_key=team_key, year=year)
 
     @typed_tasklet
