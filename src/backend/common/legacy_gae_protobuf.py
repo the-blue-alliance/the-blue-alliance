@@ -148,13 +148,13 @@ class Encoder:
 
     def putFloat(self, v):
         a = array.array("B")
-        a.fromstring(struct.pack("<f", v))
+        a.frombytes(struct.pack("<f", v))
         self.buf.extend(a)
         return
 
     def putDouble(self, v):
         a = array.array("B")
-        a.fromstring(struct.pack("<d", v))
+        a.frombytes(struct.pack("<d", v))
         self.buf.extend(a)
         return
 
@@ -167,13 +167,13 @@ class Encoder:
 
     def putPrefixedString(self, v):
 
-        v = str(v)
+        v = str(v).encode()
         self.putVarInt32(len(v))
-        self.buf.fromstring(v)
+        self.buf.frombytes(v)
         return
 
     def putRawString(self, v):
-        self.buf.fromstring(v)
+        self.buf.frombytes(v)
 
     _TYPE_TO_METHOD = {
         TYPE_DOUBLE: putDouble,

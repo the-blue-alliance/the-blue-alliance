@@ -11,11 +11,11 @@ from google.cloud.ndb._legacy_entity_pb import (
 )
 from google.cloud.ndb.model import _CompressedValue
 
+from backend.common.legacy_gae_entity_model_encoder import EPOCH, MEANING_URI_COMPRESSED, NdbModelEncoder
+from backend.common.legacy_gae_entity_pb_encoder import EntityProtoEncoder
+from backend.common.legacy_gae_protobuf import Encoder as ProtoEncoder
 
 TAffectedReferences = Dict[str, Set[Any]]
-
-_EPOCH = datetime.datetime.utcfromtimestamp(0)
-_MEANING_URI_COMPRESSED = "ZLIB"
 
 
 class CachedModel(ndb.Model):
@@ -58,6 +58,7 @@ class CachedModel(ndb.Model):
 
     """
     From the legacy NDB model implementation:
+    https://github.com/GoogleCloudPlatform/datastore-ndb-python/blob/cf4cab3f1f69cd04e1a9229871be466b53729f3f/ndb/model.py#L2964-L2970
 
     ```
     def __getstate__(self):
@@ -72,6 +73,14 @@ class CachedModel(ndb.Model):
     See https://github.com/googleapis/python-ndb/issues/587 about fixing upstream
     """
 
+    def __getstate__(self) -> bytes:
+        pb = NdbModelEncoder.model_to_proto(self)
+        encoder = ProtoEncoder()
+        EntityProtoEncoder.OutputUnchecked(pb, encoder)
+        b = encoder.buffer().tobytes()
+        print(f"ENCODED PROTO: {b}")
+        return b
+
     def __setstate__(self, state: Any) -> None:
         pb = EntityProto()
         pb.MergePartialFromString(state)
@@ -81,10 +90,10 @@ class CachedModel(ndb.Model):
 
     def _set_state_from_pb(self, pb: EntityProto) -> None:
         deserialized_props = {}
-        if len(pb.key().path().element_list()):
+        if pb.key().path().element_list():
             key_ref = pb.key()
             app = key_ref.app().decode()
-            namespace = key_ref.name_space()
+            namespace = key_ref.name_space() if key_ref.has_name_space() else None
             pairs = [
                 (elem.type().decode(), elem.id() or elem.name().decode())
                 for elem in key_ref.path().element_list()
@@ -130,7 +139,7 @@ class CachedModel(ndb.Model):
             if meaning == ProtoProperty.BLOBKEY:
                 sval = BlobKey(sval)
             elif meaning == ProtoProperty.BLOB:
-                if p.meaning_uri() == _MEANING_URI_COMPRESSED:
+                if p.meaning_uri() == MEANING_URI_COMPRESSED:
                     sval = _CompressedValue(sval)
             elif meaning == ProtoProperty.ENTITY_PROTO:
                 raise Exception("ENTITY_PROTO meaning implementation")
@@ -147,7 +156,7 @@ class CachedModel(ndb.Model):
         elif v.has_int64value():
             ival = v.int64value()
             if p.meaning() == ProtoProperty.GD_WHEN:
-                return _EPOCH + datetime.timedelta(microseconds=ival)
+                return EPOCH + datetime.timedelta(microseconds=ival)
             return ival
         elif v.has_booleanvalue():
             return bool(v.booleanvalue())

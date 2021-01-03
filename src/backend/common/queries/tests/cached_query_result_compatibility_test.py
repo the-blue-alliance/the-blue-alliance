@@ -1,5 +1,8 @@
 import base64
 import datetime
+import pickle
+import pickletools
+import zlib
 
 from google.cloud import ndb
 from google.cloud.datastore.helpers import GeoPoint
@@ -54,7 +57,6 @@ def _run_test(py2_b64_data, expected_result) -> None:
 
     # Check that py3 would write an equivalent object
     # TODO do this  too
-    """
     check_query_result = CachedQueryResult(
         id="py3_data",
         result=expected_result
@@ -62,10 +64,99 @@ def _run_test(py2_b64_data, expected_result) -> None:
     check_entity = ndb.model._entity_to_ds_entity(check_query_result)
     check_raw_model = ndb.model._entity_from_ds_entity(check_entity, model_class=RawCachedQueryResult)
 
-    pickletools.dis(zlib.decompress(base64.b64decode(py2_b64_data)))
-    pickletools.dis(zlib.decompress(check_raw_model.result))
-    assert base64.b64encode(check_raw_model.result) == py2_b64_data
-    """
+    # pickletools.dis(zlib.decompress(base64.b64decode(py2_b64_data)))
+    # pickletools.dis(zlib.decompress(check_raw_model.result))
+
+    # raise Exception(f"result: {base64.b64encode(zlib.decompress(check_raw_model.result))}")
+    # assert base64.b64encode(check_raw_model.result) == py2_b64_data
+
+
+class ModelWithInt(ndb.Model):
+    int_prop = ndb.IntegerProperty()
+
+
+def test_round_trip_model_pickle_integer() -> None:
+    ModelWithInt(
+        id="test_model",
+        int_prop=2018,
+    ).put()
+    model = ModelWithInt.get_by_id("test_model")
+
+    pickled = pickle.dumps(model, protocol=2, fix_imports=True)
+    check = pickle.loads(pickled, fix_imports=True, encoding="bytes")
+
+    assert check == model
+
+
+class ModelWithIntRepeated(ndb.Model):
+    int_prop = ndb.IntegerProperty(repeated=True)
+
+
+def test_round_trip_model_pickle_integer_repeated() -> None:
+    ModelWithIntRepeated(
+        id="test_model",
+        int_prop=[2018, 2019, 2020],
+    ).put()
+    model = ModelWithIntRepeated.get_by_id("test_model")
+
+    pickled = pickle.dumps(model, protocol=2, fix_imports=True)
+    check = pickle.loads(pickled, fix_imports=True, encoding="bytes")
+
+    assert check == model
+
+
+class ModelWithString(ndb.Model):
+    str_prop = ndb.StringProperty()
+
+
+def test_round_trip_model_pickle_string() -> None:
+    ModelWithString(
+        id="test_model",
+        str_prop="abc123",
+    ).put()
+    model = ModelWithString.get_by_id("test_model")
+
+    pickled = pickle.dumps(model, protocol=2, fix_imports=True)
+    check = pickle.loads(pickled, fix_imports=True, encoding="bytes")
+
+    assert check == model
+
+
+class ModelWithKey(ndb.Model):
+    key_prop = ndb.KeyProperty()
+
+
+def test_round_trip_model_pickle_key() -> None:
+    ModelWithKey(
+        id="test_model",
+        key_prop=ndb.Key(Media, "test_media"),
+    ).put()
+    model = ModelWithKey.get_by_id("test_model")
+
+    pickled = pickle.dumps(model, protocol=2, fix_imports=True)
+    check = pickle.loads(pickled, fix_imports=True, encoding="bytes")
+
+    assert check == model
+
+
+def test_round_trip_model_pickle_media() -> None:
+    Media(
+        id="test_media",
+        #details_json='{"base64Image": "iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOvwAADr8BOAVTJAAAABl0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC4yMfEgaZUAAAJESURBVFhHzZTBcepAEEQdhYvibCgC8ZHECIQgODoPTiQiq7f0VK3WGCP7sr/qeWZ7e3oH/P9/G4aha0qxJ0qxJ0qxJ0qxJ0qxJ0qxJ0oRxj/6Mbb1/X95Jb8Wp8Hr9dp4JWgL5F0ul1/zl4cYFOoFd8JnwO9f8fgbvMPdYmZupiEqAalxFj/N3m631b3IZTjnO6rzrIekMfsqUGihys99zqVXevaLBT3Eh8X5fG6Ve0c6fp9Jzc+uk+0ez14tyKBgWJWeEHx5RnvF67lUsVowRQYzgD4f5O9b6uqrX71qle2a7zOyDMUkjsfj3HsAfuELkkH1BdE8R+QbqloO//wrzhAfdHiUxYTP0nMW9/u9nVXRHL2VH159280XVBXVgtUHoXcqHY0PRRb4goKZ5tMPBjzQl3SP4FtU//X+OTw+PhazqtJ0x5k74XnPvr3mcXP+Y1F1Mz5B2OPxaGdfhl53/qiosnjL3589NO0wmQjMb1HV4XH8Vc/ZISu/vVyu+RaHyagqNOxLUiGX8Nm8A88in7tfF2zCKCkUs4dQ3ZdL0OcdM55Fnz5ncWjCNKAFWVJ4ID7h4dTUBTOeI3iHt+RzFodZHGWFM0SoL+i+XCx192fWs+XESmjiKPMAj0D6hHudZzNCHi2H132wEsCD8s7RfS7k5/Q7+J/5SnELPKCFDodDw5dN/1ZKcSssczqdFv8Vpe8vlOJf2O12bTmx3+9HqfZtpRR7ohR7ohR7ohR7ohR7ohR7ohR7ohR7ohR7ohT7YXj7BpL35FWepDMDAAAAAElFTkSuQmCC"}',
+        foreign_key="avatar_2018_frc999",
+        media_type_enum=12,
+        #private_details_json=None,
+        references=[
+            ndb.Key("Team", "frc999", project="tbatv-prod-hrd", namespace="")
+        ],
+        #year=2018
+    ).put()
+    model = Media.get_by_id("test_media")
+
+    pickled = pickle.dumps(model, protocol=2, fix_imports=True)
+    check = pickle.loads(pickled, fix_imports=True, encoding="bytes")
+
+    assert check == model
 
 
 def test_cached_result_team_year_media() -> None:
