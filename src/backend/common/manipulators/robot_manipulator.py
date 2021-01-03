@@ -1,4 +1,8 @@
+from typing import List
+
+from backend.common.cache_clearing import get_affected_queries
 from backend.common.manipulators.manipulator_base import ManipulatorBase
+from backend.common.models.cached_model import TAffectedReferences
 from backend.common.models.robot import Robot
 
 
@@ -7,11 +11,11 @@ class RobotManipulator(ManipulatorBase[Robot]):
     Handle Robot database writes.
     """
 
-    """
     @classmethod
-    def getCacheKeysAndControllers(cls, affected_refs):
-        return CacheClearer.get_robot_cache_keys_and_controllers(affected_refs)
-    """
+    def getCacheKeysAndQueries(
+        cls, affected_refs: TAffectedReferences
+    ) -> List[get_affected_queries.TCacheKeyAndQuery]:
+        return get_affected_queries.robot_updated(affected_refs)
 
     @classmethod
     def updateMerge(

@@ -12,7 +12,7 @@ class TeamManipulator(ManipulatorBase[Team]):
     """
 
     @classmethod
-    def getCacheKeysAndControllers(
+    def getCacheKeysAndQueries(
         cls, affected_refs: TAffectedReferences
     ) -> List[get_affected_queries.TCacheKeyAndQuery]:
         return get_affected_queries.team_updated(affected_refs)

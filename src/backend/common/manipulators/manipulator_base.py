@@ -9,7 +9,6 @@ from typing import (
     Optional,
     overload,
     Set,
-    Tuple,
     Type,
     TypeVar,
 )
@@ -192,7 +191,6 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
 
     """
     cache clearing hook
-    TODO
     """
 
     @classmethod
@@ -231,10 +229,11 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
             query.delete_cache_multi(cache_keys)
 
     @classmethod
+    @abc.abstractmethod
     def getCacheKeysAndQueries(
         cls, affected_refs: TAffectedReferences
     ) -> List[TCacheKeyAndQuery]:
         """
         Child classes should replace method with appropriate call to CacheClearer.
         """
-        return []
+        ...
