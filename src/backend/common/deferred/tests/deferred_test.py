@@ -6,6 +6,7 @@ import pytest
 from _pytest.monkeypatch import MonkeyPatch
 
 from backend.common.deferred import _client_for_env, defer
+from backend.common.deferred.clients.fake_client import FakeTaskClient
 from backend.common.deferred.clients.gcloud_client import GCloudTaskClient
 from backend.common.deferred.clients.rq_client import RQTaskClient
 from backend.common.deferred.queues.task_queue import TaskQueue
@@ -13,6 +14,11 @@ from backend.common.deferred.requests.gcloud_http_request import (
     GCloudHttpTaskRequestConfiguration,
 )
 from backend.common.deferred.tasks.task import Task
+
+
+@pytest.fixture
+def set_override_tba_test(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("TBA_UNIT_TEST", "false")
 
 
 @pytest.fixture
@@ -50,7 +56,12 @@ def set_tasks_remote_config(monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setenv("TASKS_REMOTE_CONFIG_NGROK_URL", "http://1d03c3c73356.ngrok.io")
 
 
-def test_client_for_env_no_project():
+def test_client_for_env_test():
+    client = _client_for_env()
+    assert type(client) is FakeTaskClient
+
+
+def test_client_for_env_no_project(set_override_tba_test):
     with pytest.raises(
         Exception,
         match=re.escape(
@@ -60,7 +71,7 @@ def test_client_for_env_no_project():
         _client_for_env()
 
 
-def test_client_for_env_production(set_project):
+def test_client_for_env_production(set_override_tba_test, set_project):
     with patch.object(
         GCloudTaskClient, "__init__", return_value=None
     ) as gcloud_client_init:
@@ -70,12 +81,12 @@ def test_client_for_env_production(set_project):
     assert type(client) is GCloudTaskClient
 
 
-def test_client_for_env_dev_local_no_redis(set_project, set_dev, set_tasks_local):
+def test_client_for_env_dev_local_no_redis(set_override_tba_test, set_project, set_dev, set_tasks_local):
     with pytest.raises(Exception, match="Redis is not setup for the environment."):
         _client_for_env()
 
 
-def test_client_for_env_dev_local(set_project, set_dev, set_tasks_local, set_redis):
+def test_client_for_env_dev_local(set_override_tba_test, set_project, set_dev, set_tasks_local, set_redis):
     with patch.object(RQTaskClient, "__init__", return_value=None) as rq_client_init:
         client = _client_for_env()
 
@@ -84,7 +95,7 @@ def test_client_for_env_dev_local(set_project, set_dev, set_tasks_local, set_red
 
 
 def test_client_for_env_dev_local_service(
-    set_project, set_dev, set_service, set_tasks_local, set_redis
+    set_override_tba_test, set_project, set_dev, set_service, set_tasks_local, set_redis
 ):
     with patch.object(RQTaskClient, "__init__", return_value=None) as rq_client_init:
         client = _client_for_env()
@@ -94,7 +105,7 @@ def test_client_for_env_dev_local_service(
 
 
 def test_client_for_env_dev_remote_fallback_no_redis(
-    caplog, set_project, set_dev, set_tasks_remote
+    set_override_tba_test, caplog, set_project, set_dev, set_tasks_remote
 ):
     with caplog.at_level(logging.WARNING), pytest.raises(
         Exception, match="Redis is not setup for the environment."
@@ -110,7 +121,7 @@ def test_client_for_env_dev_remote_fallback_no_redis(
 
 
 def test_client_for_env_dev_remote_fallback(
-    caplog, set_project, set_dev, set_tasks_remote, set_redis
+    set_override_tba_test, caplog, set_project, set_dev, set_tasks_remote, set_redis
 ):
     with patch.object(RQTaskClient, "__init__", return_value=None) as rq_client_init:
         client = _client_for_env()
@@ -127,7 +138,7 @@ def test_client_for_env_dev_remote_fallback(
 
 
 def test_client_for_env_dev_remote_fallback_service(
-    caplog, set_project, set_dev, set_tasks_remote, set_redis, set_service
+    set_override_tba_test, caplog, set_project, set_dev, set_tasks_remote, set_redis, set_service
 ):
     with patch.object(RQTaskClient, "__init__", return_value=None) as rq_client_init:
         client = _client_for_env()
@@ -143,7 +154,7 @@ def test_client_for_env_dev_remote_fallback_service(
     assert type(client) is RQTaskClient
 
 
-def test_client_for_env_dev_remote(set_dev, set_tasks_remote, set_tasks_remote_config):
+def test_client_for_env_dev_remote(set_override_tba_test, set_dev, set_tasks_remote, set_tasks_remote_config):
     with patch.object(
         GCloudTaskClient, "__init__", return_value=None
     ) as gcloud_client_init:
@@ -159,7 +170,7 @@ def test_client_for_env_dev_remote(set_dev, set_tasks_remote, set_tasks_remote_c
 
 
 def test_client_for_env_dev_remote_project(
-    set_project, set_dev, set_tasks_remote, set_tasks_remote_config
+    set_override_tba_test, set_project, set_dev, set_tasks_remote, set_tasks_remote_config
 ):
     with patch.object(
         GCloudTaskClient, "__init__", return_value=None
@@ -273,11 +284,3 @@ def test_defer_enqueue_task_simple():
         defer(print, _client=FakeTaskClient())
     task = mock_enqueue.call_args[0][0]
     assert type(task) is Task
-
-
-# Similar interface to an in-memory RQTaskClient, except with a stubbed out Redis client
-class FakeTaskClient(RQTaskClient):
-    def __init__(self) -> None:
-        from fakeredis import FakeRedis
-
-        super().__init__(default_service="test", redis_client=FakeRedis())
