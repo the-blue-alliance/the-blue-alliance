@@ -32,3 +32,6 @@ class RQTaskQueue(TaskQueue[RQTaskRequest]):
         self._queue.enqueue(
             requests.post, url=request.url, data=request.body, headers=request.headers
         )
+
+    def jobs(self):
+        return self._queue.jobs

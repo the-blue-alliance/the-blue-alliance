@@ -1,10 +1,20 @@
 import json
 from typing import Dict, List, Optional, Set
+from unittest.mock import MagicMock
 
+from _pytest.monkeypatch import MonkeyPatch
+from fakeredis import FakeRedis
 from google.cloud import ndb
+from pyre_extensions import none_throws
 
+from backend.common.cache_clearing.get_affected_queries import TCacheKeyAndQuery
+from backend.common.deferred.clients.fake_client import FakeTaskClient
+from backend.common.futures import TypedFuture
 from backend.common.manipulators.manipulator_base import ManipulatorBase
-from backend.common.models.cached_model import CachedModel
+from backend.common.models.cached_model import CachedModel, TAffectedReferences
+from backend.common.models.cached_query_result import CachedQueryResult
+from backend.common.queries.database_query import CachedDatabaseQuery
+from backend.common.redis import RedisClient
 
 
 class DummyModel(CachedModel):
@@ -44,6 +54,10 @@ class DummyModel(CachedModel):
 
         self._prop = None
 
+        self._affected_references = {
+            "key": set(),
+        }
+
     @property
     def prop(self) -> Dict:
         if self._prop is None and self.prop_json is not None:
@@ -51,7 +65,34 @@ class DummyModel(CachedModel):
         return self._prop
 
 
+class DummyCachedQuery(CachedDatabaseQuery[DummyModel, None]):
+
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "dummy_query_{model_key}"
+    CACHE_WRITES_ENABLED = True
+
+    @ndb.tasklet
+    def _query_async(self, model_key: str) -> TypedFuture[DummyModel]:
+        model = yield DummyModel.get_by_id_async(model_key)
+        return model
+
+
 class DummyManipulator(ManipulatorBase[DummyModel]):
+    @classmethod
+    def getCacheKeysAndQueries(
+        cls, affected_refs: TAffectedReferences
+    ) -> List[TCacheKeyAndQuery]:
+        ref_keys: Set[ndb.Key] = affected_refs["key"]
+        return [
+            (
+                none_throws(
+                    DummyCachedQuery(model_key=none_throws(k.string_id())).cache_key
+                ),
+                DummyCachedQuery,
+            )
+            for k in ref_keys
+        ]
+
     @classmethod
     def updateMerge(
         cls, new_model: DummyModel, old_model: DummyModel, auto_union: bool
@@ -214,3 +255,33 @@ def test_update_auto_union_false_can_set_empty(ndb_context) -> None:
 
     check = DummyModel.get_by_id("test")
     assert check.union_prop == []
+
+
+def test_cache_clearing(ndb_context, monkeypatch: MonkeyPatch) -> None:
+    # We want to be able to pull cache clearing tasks off
+    # the queue, which means we'll need to be able to share
+    # a redis instance
+    shared_redis = FakeRedis()
+    monkeypatch.setattr(RedisClient, "get", MagicMock(return_value=shared_redis))
+
+    model = DummyModel(id="test", int_prop=1337)
+    model.put()
+
+    # Do a query to populate CachedQueryResult
+    query = DummyCachedQuery(model_key="test")
+    query.fetch()
+
+    assert CachedQueryResult.get_by_id(query.cache_key) is not None
+
+    update = DummyModel(id="test", int_prop=42)
+    DummyManipulator.createOrUpdate(update)
+
+    # Ensure we've enqueued the cache clearing task to be run
+    fake_queue = FakeTaskClient()
+    assert fake_queue.pending_job_count("cache-clearing") == 1
+
+    # Run cache clearing manually
+    fake_queue.drain_pending_jobs("cache-clearing")
+
+    # We should have cleared the cached result
+    assert CachedQueryResult.get_by_id(query.cache_key) is None
