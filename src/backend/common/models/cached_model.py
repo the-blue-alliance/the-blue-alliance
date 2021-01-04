@@ -12,7 +12,7 @@ from google.cloud.ndb._legacy_entity_pb import (
 from google.cloud.ndb.model import _CompressedValue
 
 
-TAffectedReferences = Dict[str, Set[ndb.Key]]
+TAffectedReferences = Dict[str, Set[Any]]
 
 _EPOCH = datetime.datetime.utcfromtimestamp(0)
 _MEANING_URI_COMPRESSED = "ZLIB"

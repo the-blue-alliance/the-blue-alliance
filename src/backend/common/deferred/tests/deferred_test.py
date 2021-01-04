@@ -81,12 +81,16 @@ def test_client_for_env_production(set_override_tba_test, set_project):
     assert type(client) is GCloudTaskClient
 
 
-def test_client_for_env_dev_local_no_redis(set_override_tba_test, set_project, set_dev, set_tasks_local):
+def test_client_for_env_dev_local_no_redis(
+    set_override_tba_test, set_project, set_dev, set_tasks_local
+):
     with pytest.raises(Exception, match="Redis is not setup for the environment."):
         _client_for_env()
 
 
-def test_client_for_env_dev_local(set_override_tba_test, set_project, set_dev, set_tasks_local, set_redis):
+def test_client_for_env_dev_local(
+    set_override_tba_test, set_project, set_dev, set_tasks_local, set_redis
+):
     with patch.object(RQTaskClient, "__init__", return_value=None) as rq_client_init:
         client = _client_for_env()
 
@@ -138,7 +142,13 @@ def test_client_for_env_dev_remote_fallback(
 
 
 def test_client_for_env_dev_remote_fallback_service(
-    set_override_tba_test, caplog, set_project, set_dev, set_tasks_remote, set_redis, set_service
+    set_override_tba_test,
+    caplog,
+    set_project,
+    set_dev,
+    set_tasks_remote,
+    set_redis,
+    set_service,
 ):
     with patch.object(RQTaskClient, "__init__", return_value=None) as rq_client_init:
         client = _client_for_env()
@@ -154,7 +164,9 @@ def test_client_for_env_dev_remote_fallback_service(
     assert type(client) is RQTaskClient
 
 
-def test_client_for_env_dev_remote(set_override_tba_test, set_dev, set_tasks_remote, set_tasks_remote_config):
+def test_client_for_env_dev_remote(
+    set_override_tba_test, set_dev, set_tasks_remote, set_tasks_remote_config
+):
     with patch.object(
         GCloudTaskClient, "__init__", return_value=None
     ) as gcloud_client_init:
@@ -170,7 +182,11 @@ def test_client_for_env_dev_remote(set_override_tba_test, set_dev, set_tasks_rem
 
 
 def test_client_for_env_dev_remote_project(
-    set_override_tba_test, set_project, set_dev, set_tasks_remote, set_tasks_remote_config
+    set_override_tba_test,
+    set_project,
+    set_dev,
+    set_tasks_remote,
+    set_tasks_remote_config,
 ):
     with patch.object(
         GCloudTaskClient, "__init__", return_value=None

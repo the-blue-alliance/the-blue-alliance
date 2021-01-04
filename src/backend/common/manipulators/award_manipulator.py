@@ -1,7 +1,10 @@
 import json
+from typing import List
 
+from backend.common.cache_clearing import get_affected_queries
 from backend.common.manipulators.manipulator_base import ManipulatorBase
 from backend.common.models.award import Award
+from backend.common.models.cached_model import TAffectedReferences
 
 
 class AwardManipulator(ManipulatorBase[Award]):
@@ -9,11 +12,11 @@ class AwardManipulator(ManipulatorBase[Award]):
     Handle Award database writes.
     """
 
-    """
     @classmethod
-    def getCacheKeysAndControllers(cls, affected_refs):
-        return CacheClearer.get_award_cache_keys_and_controllers(affected_refs)
-    """
+    def getCacheKeysAndQueries(
+        cls, affected_refs: TAffectedReferences
+    ) -> List[get_affected_queries.TCacheKeyAndQuery]:
+        return get_affected_queries.award_updated(affected_refs)
 
     """
     @classmethod

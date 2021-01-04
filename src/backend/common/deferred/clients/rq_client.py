@@ -1,7 +1,7 @@
 from redis import Redis
 
 from backend.common.deferred.clients.task_client import TaskClient
-from backend.common.deferred.queues.rq_queue import RQTaskQueue
+from backend.common.deferred.queues.rq_queue import InlineRQTaskQueue, RQTaskQueue
 
 
 class RQTaskClient(TaskClient[RQTaskQueue]):
@@ -15,5 +15,12 @@ class RQTaskClient(TaskClient[RQTaskQueue]):
 
     def queue(self, name) -> RQTaskQueue:
         return RQTaskQueue(
+            name, default_service=self.default_service, redis_client=self._client
+        )
+
+
+class InlineRQTaskClient(RQTaskClient):
+    def queue(self, name) -> InlineRQTaskQueue:
+        return InlineRQTaskQueue(
             name, default_service=self.default_service, redis_client=self._client
         )

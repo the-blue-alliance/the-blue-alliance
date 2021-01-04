@@ -42,7 +42,6 @@ def defer(
 def _client_for_env() -> TaskClient:
     # If we're running in tests, always return a FakeTestClient
     if os.environ.get("TBA_UNIT_TEST", None) == "true":
-        print("Returning here")
         from backend.common.deferred.clients.fake_client import FakeTaskClient
 
         return FakeTaskClient()
