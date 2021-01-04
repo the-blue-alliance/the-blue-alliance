@@ -294,6 +294,9 @@ jobs:
           version: "321.0.0"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
           service_account_key: ${{ secrets.GCLOUD_AUTH }}
+      - name: Install gcloud beta
+        # gcloud beta is needed to use the VPC connector needed for redis
+        run: gcloud components install beta
       - name: Deploy
         env:
           REDIS_CACHE_URL: ${{ secrets.REDIS_CACHE_URL }}
