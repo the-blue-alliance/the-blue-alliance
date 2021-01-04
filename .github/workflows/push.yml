@@ -203,16 +203,6 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
       - name: Download production artifacts
         uses: actions/download-artifact@v2
         with:
@@ -224,9 +214,6 @@ jobs:
           version: "321.0.0"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
           service_account_key: ${{ secrets.GCLOUD_AUTH }}
-      - name: Install gcloud beta
-        # gcloud beta is needed to use the VPC connector needed for redis
-        run: gcloud components install beta
       - name: Deploy
         env:
           REDIS_CACHE_URL: ${{ secrets.REDIS_CACHE_URL }}
@@ -243,25 +230,12 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
       - name: Setup Google Cloud Platform
         uses: google-github-actions/setup-gcloud@master
         with:
           version: "321.0.0"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
           service_account_key: ${{ secrets.GCLOUD_AUTH }}
-      - name: Install gcloud beta
-        # gcloud beta is needed to use the VPC connector needed for redis
-        run: gcloud components install beta
       - name: Deploy
         env:
           REDIS_CACHE_URL: ${{ secrets.REDIS_CACHE_URL }}
@@ -278,25 +252,12 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
       - name: Setup Google Cloud Platform
         uses: google-github-actions/setup-gcloud@master
         with:
           version: "321.0.0"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
           service_account_key: ${{ secrets.GCLOUD_AUTH }}
-      - name: Install gcloud beta
-        # gcloud beta is needed to use the VPC connector needed for redis
-        run: gcloud components install beta
       - name: Deploy
         env:
           REDIS_CACHE_URL: ${{ secrets.REDIS_CACHE_URL }}
