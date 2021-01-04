@@ -198,7 +198,6 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
         """
         Make deferred calls to clear caches
         Needs to save _affected_references and the dirty flag
-        TODO implement this
         """
         all_affected_references: List[TAffectedReferences] = []
         for model in models:
@@ -212,7 +211,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
                 _queue="cache-clearing",
                 # this does not exist in Cloud Tasks
                 # _transactional=ndb.in_transaction(),
-                _target="default",
+                _target="tasks-io",
                 _url="/_ah/queue/deferred_manipulator_clearCache",
             )
 

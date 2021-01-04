@@ -6,7 +6,6 @@ from backend.common.models.cached_model import TAffectedReferences
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
-from backend.common.models.keys import TeamKey
 from backend.common.queries import (
     award_query,
     district_query,
@@ -29,10 +28,6 @@ def _queries_to_cache_keys_and_queries(
     for query in queries:
         out.append((query.cache_key, type(query)))
     return out
-
-
-def _get_team_page_num(team_key: TeamKey) -> int:
-    return int(team_key[3:]) // team_query.TeamListQuery.PAGE_SIZE
 
 
 def _filter(refs: Set[Any]) -> Set[Any]:
@@ -216,13 +211,13 @@ def team_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
     queries: List[CachedDatabaseQuery] = []
     for team_key in team_keys:
         queries.append(team_query.TeamQuery(team_key.id()))
-        page_num = _get_team_page_num(team_key.id())
+        page_num = team_query.get_team_page_num(team_key.id())
         queries.append(team_query.TeamListQuery(page_num))
 
     for et_key in event_team_keys_future.get_result():
         year = int(et_key.id()[:4])
         event_key = et_key.id().split("_")[0]
-        page_num = _get_team_page_num(et_key.id().split("_")[1])
+        page_num = team_query.get_team_page_num(et_key.id().split("_")[1])
         queries.append(team_query.TeamListYearQuery(year, page_num))
         queries.append(team_query.EventTeamsQuery(event_key))
         queries.append(team_query.EventEventTeamsQuery(event_key))
@@ -243,7 +238,7 @@ def eventteam_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQu
     for team_key in team_keys:
         queries.append(event_query.TeamEventsQuery(team_key.id()))
         queries.append(team_query.TeamParticipationQuery(team_key.id()))
-        page_num = _get_team_page_num(team_key.id())
+        page_num = team_query.get_team_page_num(team_key.id())
         for year in years:
             queries.append(event_query.TeamYearEventsQuery(team_key.id(), year))
             queries.append(event_query.TeamYearEventTeamsQuery(team_key.id(), year))

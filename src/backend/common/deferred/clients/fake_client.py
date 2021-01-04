@@ -1,24 +1,5 @@
-from backend.common.deferred.clients.rq_client import RQTaskClient
-from backend.common.deferred.queues.rq_queue import RQTaskQueue
-from backend.common.deferred.tasks.task import Task
+from backend.common.deferred.clients.rq_client import InlineRQTaskClient, RQTaskClient
 from backend.common.redis import RedisClient
-
-
-class InlineRQTaskQueue(RQTaskQueue):
-    """
-    A RQ-backed queue, but will run jobs inline
-    instead of making a HTTP request callback
-    """
-
-    def enqueue(self, task: Task, *args, **kwargs) -> None:
-        self._queue.enqueue(task.obj, *task.args, **task.kwargs)
-
-
-class InlineRQTaskClient(RQTaskClient):
-    def queue(self, name) -> InlineRQTaskQueue:
-        return InlineRQTaskQueue(
-            name, default_service=self.default_service, redis_client=self._client
-        )
 
 
 class InlineTaskClient(InlineRQTaskClient):

@@ -16,7 +16,7 @@ from backend.common.queries.dict_converters.team_converter import (
 from backend.common.tasklets import typed_tasklet
 
 
-def _get_team_page_num(team_key: str) -> int:
+def get_team_page_num(team_key: str) -> int:
     return int(int(team_key[3:]) / TeamListQuery.PAGE_SIZE)
 
 
