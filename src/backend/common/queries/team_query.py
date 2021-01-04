@@ -33,10 +33,6 @@ class TeamQuery(CachedDatabaseQuery[Optional[Team], Optional[TeamDict]]):
         team = yield Team.get_by_id_async(team_key)
         return team
 
-    @classmethod
-    def _team_affected_queries(cls, team_key: TeamKey) -> Set[CachedDatabaseQuery]:
-        return {cls(team_key=team_key)}
-
 
 class TeamListQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
     CACHE_VERSION = 2
@@ -57,10 +53,6 @@ class TeamListQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
             .fetch_async()
         )
         return list(teams)
-
-    @classmethod
-    def _team_affected_queries(cls, team_key: TeamKey) -> Set[CachedDatabaseQuery]:
-        return {cls(page=_get_team_page_num(team_key))}
 
 
 class TeamListYearQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
@@ -87,16 +79,6 @@ class TeamListYearQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
             lambda team: team.key.id() in year_team_keys, teams_future.get_result()
         )
         return list(teams)
-
-    @classmethod
-    def _eventteam_affected_queries(
-        cls, event_key: EventKey, team_key: TeamKey, year: Year
-    ) -> Set[CachedDatabaseQuery]:
-        return {cls(year=year, page=_get_team_page_num(team_key))}
-
-    @classmethod
-    def _team_affected_queries(cls, team_key: str) -> Set[CachedDatabaseQuery]:
-        return TeamListQuery._team_affected_queries(team_key=team_key)
 
 
 class DistrictTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
@@ -137,23 +119,6 @@ class EventTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
         teams = yield ndb.get_multi_async(team_keys)
         return list(teams)
 
-    @classmethod
-    def _eventteam_affected_queries(
-        cls, event_key: str, team_key: str, year: int
-    ) -> Set[CachedDatabaseQuery]:
-        return {cls(event_key=event_key)}
-
-    @classmethod
-    def _team_affected_queries(cls, team_key: TeamKey) -> Set[CachedDatabaseQuery]:
-        event_team_keys_future = EventTeam.query(
-            EventTeam.team == ndb.Key(Team, team_key)
-        ).fetch_async(keys_only=True)
-
-        return {
-            cls(event_key=event_team_key.id().split("_")[0])
-            for event_team_key in event_team_keys_future.get_result()
-        }
-
 
 class EventEventTeamsQuery(CachedDatabaseQuery[List[EventTeam], List[TeamDict]]):
     CACHE_VERSION = 2
@@ -170,12 +135,6 @@ class EventEventTeamsQuery(CachedDatabaseQuery[List[EventTeam], List[TeamDict]])
         ).fetch_async()
         return event_teams
 
-    @classmethod
-    def _eventteam_affected_queries(
-        cls, event_key: EventKey, team_key: TeamKey, year: Year
-    ) -> Set[CachedDatabaseQuery]:
-        return {cls(event_key=event_key)}
-
 
 class TeamParticipationQuery(CachedDatabaseQuery[Set[int], None]):
     CACHE_VERSION = 1
@@ -191,12 +150,6 @@ class TeamParticipationQuery(CachedDatabaseQuery[Set[int], None]):
         ).fetch_async(keys_only=True)
         years = map(lambda event_team: int(event_team.id()[:4]), event_teams)
         return set(years)
-
-    @classmethod
-    def _eventteam_affected_queries(
-        cls, event_key: EventKey, team_key: TeamKey, year: Year
-    ) -> Set[CachedDatabaseQuery]:
-        return {cls(team_key=team_key)}
 
 
 """

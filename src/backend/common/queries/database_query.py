@@ -10,7 +10,6 @@ from pyre_extensions import safe_cast
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.futures import TypedFuture
 from backend.common.models.cached_query_result import CachedQueryResult
-from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
 from backend.common.profiler import Span
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 from backend.common.queries.exceptions import DoesNotExistException
@@ -117,19 +116,3 @@ class CachedDatabaseQuery(DatabaseQuery, Generic[QueryReturn, DictQueryReturn]):
                 yield CachedQueryResult(id=cache_key, result=query_result).put_async()
             return query_result  # pyre-ignore[7]
         return cached_query_result.result
-
-    @classmethod
-    def _event_affected_queries(
-        cls, event_key: EventKey, year: Year, district_key: Optional[DistrictKey]
-    ) -> Set[CachedDatabaseQuery]:
-        return set()
-
-    @classmethod
-    def _eventteam_affected_queries(
-        cls, event_key: EventKey, team_key: TeamKey, year: Year
-    ) -> Set[CachedDatabaseQuery]:
-        return set()
-
-    @classmethod
-    def _team_affected_queries(cls, team_key: TeamKey) -> Set[CachedDatabaseQuery]:
-        return set()
