@@ -13,10 +13,9 @@ AwardDict = NewType("AwardDict", Dict)
 
 
 class AwardConverter(ConverterBase):
-    # SUBVERSIONS = {  # Increment every time a change to the dict is made
-    #     3: 3,
-    # }
-    # TODO use for cache clearing
+    SUBVERSIONS = {  # Increment every time a change to the dict is made
+        ApiMajorVersion.API_V3: 3,
+    }
 
     @classmethod
     def _convert_list(

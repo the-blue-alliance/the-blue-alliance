@@ -5,12 +5,14 @@ from google.cloud import ndb
 from pyre_extensions import none_throws
 
 from backend.common.cache_clearing.get_affected_queries import TCacheKeyAndQuery
+from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.deferred.clients.fake_client import InlineTaskClient
 from backend.common.futures import TypedFuture
 from backend.common.manipulators.manipulator_base import ManipulatorBase
 from backend.common.models.cached_model import CachedModel, TAffectedReferences
 from backend.common.models.cached_query_result import CachedQueryResult
 from backend.common.queries.database_query import CachedDatabaseQuery
+from backend.common.queries.dict_converters.converter_base import ConverterBase
 
 
 class DummyModel(CachedModel):
@@ -61,11 +63,18 @@ class DummyModel(CachedModel):
         return self._prop
 
 
+class DummyConverter(ConverterBase):
+    SUBVERSIONS = {
+        ApiMajorVersion.API_V3: 0,
+    }
+
+
 class DummyCachedQuery(CachedDatabaseQuery[DummyModel, None]):
 
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "dummy_query_{model_key}"
     CACHE_WRITES_ENABLED = True
+    DICT_CONVERTER = DummyConverter
 
     @ndb.tasklet
     def _query_async(self, model_key: str) -> TypedFuture[DummyModel]:

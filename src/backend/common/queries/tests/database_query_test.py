@@ -1,7 +1,9 @@
-from typing import Dict, List
+from typing import List
 
 from google.cloud import ndb
+from typing_extensions import TypedDict
 
+from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.futures import TypedFuture
 from backend.common.models.cached_query_result import CachedQueryResult
 from backend.common.queries.database_query import CachedDatabaseQuery, DatabaseQuery
@@ -12,11 +14,24 @@ class DummyModel(ndb.Model):
     int_prop = ndb.IntegerProperty()
 
 
-DummyDict = Dict
+class DummyDict(TypedDict):
+    int_val: int
 
 
 class DummyConverter(ConverterBase):
-    pass
+    SUBVERSIONS = {
+        ApiMajorVersion.API_V3: 0,
+    }
+
+    def _convert_list(
+        self, model_list: List[DummyModel], version: ApiMajorVersion
+    ) -> List[DummyDict]:
+        return list(map(self.converter_v3, model_list))
+
+    def converter_v3(self, model: DummyModel) -> DummyDict:
+        return {
+            "int_val": model.int_prop,
+        }
 
 
 class DummyModelPointQuery(DatabaseQuery[DummyModel, DummyDict]):
@@ -143,3 +158,47 @@ def test_cached_query() -> None:
     query = CachedDummyModelRangeQuery(min=0, max=2)
     result = query.fetch()
     assert len(result) == 3
+
+
+def test_cached_dict_query() -> None:
+    keys = ndb.put_multi([DummyModel(id=f"{i}", int_prop=i) for i in range(0, 5)])
+    assert len(keys) == 5
+
+    query = CachedDummyModelRangeQuery(min=0, max=2)
+    result = query.fetch_dict(ApiMajorVersion.API_V3)
+    assert len(result) == 3
+
+    # Now, verify the cached response exists
+    cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+    assert CachedQueryResult.get_by_id(cache_key) is not None
+
+    # And if we delete the underlying data out without clearing the cache, we should
+    # still read a stale value
+    [k.delete() for k in keys]
+    assert ndb.get_multi(keys) == [None] * 5
+    assert CachedQueryResult.get_by_id(cache_key) is not None
+
+    query = CachedDummyModelRangeQuery(min=0, max=2)
+    result = query.fetch_dict(ApiMajorVersion.API_V3)
+    assert len(result) == 3
+
+
+def test_clear_cache() -> None:
+    keys = ndb.put_multi([DummyModel(id=f"{i}", int_prop=i) for i in range(0, 5)])
+    assert len(keys) == 5
+
+    query = CachedDummyModelRangeQuery(min=0, max=2)
+    result = query.fetch()
+    dict_result = query.fetch_dict(ApiMajorVersion.API_V3)
+    assert len(result) == 3
+    assert len(dict_result) == 3
+
+    # Now, verify the cached response exists
+    cache_key = query.cache_key
+    dict_cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+    assert CachedQueryResult.get_by_id(cache_key) is not None
+    assert CachedQueryResult.get_by_id(dict_cache_key) is not None
+
+    # Deleting cache for these queries should leave no CachedQueryResults remaining
+    CachedDummyModelRangeQuery.delete_cache_multi({cache_key})
+    assert len(CachedQueryResult.query().fetch()) == 0

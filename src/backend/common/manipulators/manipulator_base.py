@@ -19,7 +19,7 @@ from backend.common.cache_clearing.get_affected_queries import TCacheKeyAndQuery
 from backend.common.deferred import defer
 from backend.common.helpers.listify import delistify, listify
 from backend.common.models.cached_model import CachedModel, TAffectedReferences
-from backend.common.queries.database_query import DatabaseQuery
+from backend.common.queries.database_query import CachedDatabaseQuery
 
 
 TModel = TypeVar("TModel", bound=CachedModel)
@@ -219,7 +219,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
     def _clearCacheDeferred(
         cls, all_affected_references: List[TAffectedReferences]
     ) -> None:
-        to_clear: DefaultDict[Type[DatabaseQuery], Set[str]] = defaultdict(set)
+        to_clear: DefaultDict[Type[CachedDatabaseQuery], Set[str]] = defaultdict(set)
         for affected_references in all_affected_references:
             for cache_key, query in cls.getCacheKeysAndQueries(affected_references):
                 to_clear[query].add(cache_key)

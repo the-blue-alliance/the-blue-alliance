@@ -10,9 +10,9 @@ EventDetailsDict = NewType("EventDetailsDict", Dict)
 
 
 class EventDetailsConverter(ConverterBase):
-    # SUBVERSIONS = {  # Increment every time a change to the dict is made
-    #     3: 3,
-    # }
+    SUBVERSIONS = {  # Increment every time a change to the dict is made
+        ApiMajorVersion.API_V3: 3,
+    }
 
     def _convert_list(self, model_list: List[EventDetails], version: ApiMajorVersion):
         CONVERTERS = {

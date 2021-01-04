@@ -14,10 +14,9 @@ MediaDict = NewType("MediaDict", Dict)
 
 
 class MediaConverter(ConverterBase):
-    # SUBVERSIONS = {  # Increment every time a change to the dict is made
-    #     3: 4,
-    # }
-    # TODO use for cache clearing
+    SUBVERSIONS = {  # Increment every time a change to the dict is made
+        ApiMajorVersion.API_V3: 4,
+    }
 
     @classmethod
     def _convert(cls, medias: List[Media], version: ApiMajorVersion) -> List[MediaDict]:

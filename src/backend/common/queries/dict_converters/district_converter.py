@@ -8,10 +8,9 @@ DistrictDict = NewType("DistrictDict", Dict)
 
 
 class DistrictConverter(ConverterBase):
-    # SUBVERSIONS = {  # Increment every time a change to the dict is made
-    #     3: 2,
-    # }
-    # TODO use for cache clearing
+    SUBVERSIONS = {  # Increment every time a change to the dict is made
+        ApiMajorVersion.API_V3: 2,
+    }
 
     def _convert_list(
         self, model_list: List[District], version: ApiMajorVersion
