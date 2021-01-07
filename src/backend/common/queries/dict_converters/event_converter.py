@@ -19,9 +19,9 @@ EventDict = NewType("EventDict", Dict)
 class EventConverter(ConverterBase):
     EVENT_DATE_FORMAT_STR = "%Y-%m-%d"
 
-    # SUBVERSIONS = {  # Increment every time a change to the dict is made
-    #     3: 6,
-    # }  TODO: used for cache clearing
+    SUBVERSIONS = {  # Increment every time a change to the dict is made
+        ApiMajorVersion.API_V3: 6,
+    }
 
     def _convert_list(
         self, model_list: List[Event], version: ApiMajorVersion

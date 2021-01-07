@@ -15,10 +15,9 @@ MatchDict = NewType("MatchDict", Dict)
 
 
 class MatchConverter(ConverterBase):
-    # SUBVERSIONS = {  # Increment every time a change to the dict is made
-    #     3: 6,
-    # }
-    # TODO: use for cache clearing
+    SUBVERSIONS = {  # Increment every time a change to the dict is made
+        ApiMajorVersion.API_V3: 6,
+    }
 
     @classmethod
     def _convert_list(
