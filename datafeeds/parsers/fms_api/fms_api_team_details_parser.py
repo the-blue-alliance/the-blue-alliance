@@ -3,7 +3,10 @@ import urlparse
 
 from google.appengine.ext import ndb
 
+from consts.district_type import DistrictType
 from helpers.website_helper import WebsiteHelper
+from models.district import District
+from models.district_team import DistrictTeam
 from models.robot import Robot
 from models.team import Team
 from sitevars.website_blacklist import WebsiteBlacklist
@@ -16,7 +19,7 @@ class FMSAPITeamDetailsParser(object):
     def parse(self, response):
         """
         Parse team info from FMSAPI
-        Returns a tuple of: list of models (Team, Robot),
+        Returns a tuple of: list of models (Team, DistrictTeam, Robot),
         and a Boolean indicating if there are more pages to be fetched
         """
 
@@ -51,6 +54,16 @@ class FMSAPITeamDetailsParser(object):
                 rookie_year=teamData['rookieYear']
             )
 
+            districtTeam = None
+            if teamData['districtCode']:
+                districtKey = District.renderKeyName(self.year, teamData['districtCode'].lower())
+                districtTeam = DistrictTeam(
+                    id=DistrictTeam.renderKeyName(districtKey, team.key_name),
+                    team=ndb.Key(Team, team.key_name),
+                    year=self.year,
+                    district_key=ndb.Key(District, districtKey),
+                )
+
             robot = None
             if teamData['robotName'] and self.year not in [2019]:
                 # FIRST did not support entering robot names  in 2019, so the
@@ -63,6 +76,6 @@ class FMSAPITeamDetailsParser(object):
                     robot_name=teamData['robotName'].strip()
                 )
 
-            ret_models.append((team, robot))
+            ret_models.append((team, districtTeam, robot))
 
         return (ret_models, (current_page < total_pages))
