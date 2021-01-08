@@ -351,9 +351,6 @@ class TeamDetailsGet(webapp.RequestHandler):
                 keys_to_delete.add(dt_key)
         DistrictTeamManipulator.delete_keys(keys_to_delete)
 
-        if district_team:
-            district_team = DistrictTeamManipulator.createOrUpdate(district_team)
-
         if robot:
             robot = RobotManipulator.createOrUpdate(robot)
 
@@ -361,7 +358,6 @@ class TeamDetailsGet(webapp.RequestHandler):
             'key_name': key_name,
             'team': team,
             'success': team is not None,
-            'district': district_team,
             'robot': robot,
         }
 
