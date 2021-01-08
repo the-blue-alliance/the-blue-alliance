@@ -331,13 +331,25 @@ class TeamDetailsGet(webapp.RequestHandler):
         fms_details = fms_df.getTeamDetails(year, key_name)
 
         if fms_details:
-            team, robot = fms_details[0]
+            team, district_team, robot = fms_details[0]
         else:
             team = None
+            district_team = None
             robot = None
 
         if team:
             team = TeamManipulator.createOrUpdate(team)
+
+        # Clean up junk district teams
+        # https://www.facebook.com/groups/moardata/permalink/1310068625680096/
+        dt_keys = DistrictTeam.query(
+            DistrictTeam.team == existing_team.key,
+            DistrictTeam.year == year).fetch(keys_only=True)
+        keys_to_delete = set()
+        for dt_key in dt_keys:
+            if not district_team or dt_key.id() != district_team.key.id():
+                keys_to_delete.add(dt_key)
+        DistrictTeamManipulator.delete_keys(keys_to_delete)
 
         if robot:
             robot = RobotManipulator.createOrUpdate(robot)
