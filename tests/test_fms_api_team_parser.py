@@ -6,7 +6,6 @@ from datafeeds.parsers.fms_api.fms_api_team_details_parser import FMSAPITeamDeta
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from models.district import District
 from models.sitevar import Sitevar
 
 
@@ -29,7 +28,7 @@ class TestFMSAPITeamParser(unittest2.TestCase):
             self.assertFalse(more_pages)
             self.assertEqual(len(models), 1)
 
-            team, districtTeam, robot = models[0]
+            team, robot = models[0]
 
             # Ensure we get the proper Team model back
             self.assertEqual(team.key_name, "frc1124")
@@ -41,12 +40,6 @@ class TestFMSAPITeamParser(unittest2.TestCase):
             self.assertEqual(team.country, "USA")
             self.assertEqual(team.rookie_year, 2003)
             self.assertEqual(team.website, "http://uberbots.org")
-
-            # Test the DistrictTeam model we get back
-            self.assertNotEqual(districtTeam, None)
-            self.assertEqual(districtTeam.key_name, "2015ne_frc1124")
-            self.assertEqual(districtTeam.team.id(), "frc1124")
-            self.assertEqual(districtTeam.district_key, ndb.Key(District, '2015ne'))
 
             # Test the Robot model we get back
             self.assertNotEqual(robot, None)
@@ -61,7 +54,7 @@ class TestFMSAPITeamParser(unittest2.TestCase):
             self.assertFalse(more_pages)
             self.assertEqual(len(models), 1)
 
-            team, districtTeam, robot = models[0]
+            team, robot = models[0]
 
             # Ensure we get the proper Team model back
             self.assertEqual(team.key_name, "frc254")
@@ -73,9 +66,6 @@ class TestFMSAPITeamParser(unittest2.TestCase):
             self.assertEqual(team.country, "USA")
             self.assertEqual(team.rookie_year, 1999)
             self.assertEqual(team.website, "http://team254.com/")
-
-            # Test the DistrictTeam model we get back
-            self.assertEqual(districtTeam, None)
 
             # Test the Robot model we get back
             self.assertNotEqual(robot, None)
@@ -98,7 +88,7 @@ class TestFMSAPITeamParser(unittest2.TestCase):
                 self.assertFalse(more_pages)
                 self.assertEqual(len(models), 1)
 
-                team, districtTeam, robot = models[0]
+                team, robot = models[0]
 
                 # Ensure we get the proper Team model back
                 self.assertEqual(team.key_name, "frc1124")
@@ -118,7 +108,7 @@ class TestFMSAPITeamParser(unittest2.TestCase):
             self.assertFalse(more_pages)
             self.assertEqual(len(models), 1)
 
-            team, districtTeam, robot = models[0]
+            team, robot = models[0]
 
             # Ensure we get the proper Team model back
             self.assertEqual(team.key_name, "frc604")
@@ -130,9 +120,6 @@ class TestFMSAPITeamParser(unittest2.TestCase):
             self.assertEqual(team.country, "USA")
             self.assertEqual(team.rookie_year, 2001)
             self.assertEqual(team.website, "http://604Robotics.com")
-
-            # Test the DistrictTeam model we get back
-            self.assertEqual(districtTeam, None)
 
             # Test the Robot model we get back
             self.assertNotEqual(robot, None)
