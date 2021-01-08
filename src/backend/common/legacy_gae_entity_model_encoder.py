@@ -181,16 +181,16 @@ class NdbModelEncoder:
             raise TypeError('KeyProperty %s can only be set to Key values; '
                             'received %r' % (self._name, value))
         rv = v.mutable_referencevalue()    # A Reference
-        rv.set_app(value.project.encode())
+        rv.set_app(value.project)
         if value.namespace:
-            rv.set_name_space(value.namespace.encode())
+            rv.set_name_space(value.namespace)
         for elem in datastore.key._to_legacy_path(value._path).element:  # pyre-ignore
             e = rv.add_pathelement()
-            e.set_type(elem.type.encode())
-            if elem.id is not None:
+            e.set_type(elem.type)
+            if elem.HasField("id"):
                 e.set_id(elem.id)
-            elif elem.name is not None:
-                e.set_name(elem.name.encode())
+            elif elem.HasField("name"):
+                e.set_name(elem.name)
 
     @staticmethod
     def _copy_blob_key_property_to_proto(self: ndb.BlobKeyProperty, v: PropertyValue, p: Property, value: Any) -> None:

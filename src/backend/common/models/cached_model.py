@@ -78,7 +78,6 @@ class CachedModel(ndb.Model):
         encoder = ProtoEncoder()
         EntityProtoEncoder.OutputUnchecked(pb, encoder)
         b = encoder.buffer().tobytes()
-        print(f"ENCODED PROTO: {b}")
         return b
 
     def __setstate__(self, state: Any) -> None:
@@ -165,7 +164,7 @@ class CachedModel(ndb.Model):
         elif v.has_referencevalue():
             rv = v.referencevalue()
             app = rv.app().decode()
-            namespace = rv.name_space()
+            namespace = rv.name_space() if rv.has_name_space() else None
             pairs = [
                 (elem.type().decode(), elem.id() or elem.name().decode())
                 for elem in rv.pathelement_list()

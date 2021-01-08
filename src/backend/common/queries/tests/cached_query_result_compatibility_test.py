@@ -11,8 +11,10 @@ from backend.common.models.award import Award
 from backend.common.models.cached_query_result import CachedQueryResult
 from backend.common.models.district import District
 from backend.common.models.event import Event
+from backend.common.models.event_team import EventTeam
 from backend.common.models.location import Location
 from backend.common.models.media import Media
+from backend.common.models.team import Team
 
 """
 The purpose of these tests is to make sure that py3 can deserialize cached query results
@@ -142,16 +144,30 @@ def test_round_trip_model_pickle_key() -> None:
 def test_round_trip_model_pickle_media() -> None:
     Media(
         id="test_media",
-        #details_json='{"base64Image": "iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOvwAADr8BOAVTJAAAABl0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC4yMfEgaZUAAAJESURBVFhHzZTBcepAEEQdhYvibCgC8ZHECIQgODoPTiQiq7f0VK3WGCP7sr/qeWZ7e3oH/P9/G4aha0qxJ0qxJ0qxJ0qxJ0qxJ0qxJ0oRxj/6Mbb1/X95Jb8Wp8Hr9dp4JWgL5F0ul1/zl4cYFOoFd8JnwO9f8fgbvMPdYmZupiEqAalxFj/N3m631b3IZTjnO6rzrIekMfsqUGihys99zqVXevaLBT3Eh8X5fG6Ve0c6fp9Jzc+uk+0ez14tyKBgWJWeEHx5RnvF67lUsVowRQYzgD4f5O9b6uqrX71qle2a7zOyDMUkjsfj3HsAfuELkkH1BdE8R+QbqloO//wrzhAfdHiUxYTP0nMW9/u9nVXRHL2VH159280XVBXVgtUHoXcqHY0PRRb4goKZ5tMPBjzQl3SP4FtU//X+OTw+PhazqtJ0x5k74XnPvr3mcXP+Y1F1Mz5B2OPxaGdfhl53/qiosnjL3589NO0wmQjMb1HV4XH8Vc/ZISu/vVyu+RaHyagqNOxLUiGX8Nm8A88in7tfF2zCKCkUs4dQ3ZdL0OcdM55Fnz5ncWjCNKAFWVJ4ID7h4dTUBTOeI3iHt+RzFodZHGWFM0SoL+i+XCx192fWs+XESmjiKPMAj0D6hHudZzNCHi2H132wEsCD8s7RfS7k5/Q7+J/5SnELPKCFDodDw5dN/1ZKcSssczqdFv8Vpe8vlOJf2O12bTmx3+9HqfZtpRR7ohR7ohR7ohR7ohR7ohR7ohR7ohR7ohR7ohT7YXj7BpL35FWepDMDAAAAAElFTkSuQmCC"}',
+        details_json='{"base64Image": "iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOvwAADr8BOAVTJAAAABl0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC4yMfEgaZUAAAJESURBVFhHzZTBcepAEEQdhYvibCgC8ZHECIQgODoPTiQiq7f0VK3WGCP7sr/qeWZ7e3oH/P9/G4aha0qxJ0qxJ0qxJ0qxJ0qxJ0qxJ0oRxj/6Mbb1/X95Jb8Wp8Hr9dp4JWgL5F0ul1/zl4cYFOoFd8JnwO9f8fgbvMPdYmZupiEqAalxFj/N3m631b3IZTjnO6rzrIekMfsqUGihys99zqVXevaLBT3Eh8X5fG6Ve0c6fp9Jzc+uk+0ez14tyKBgWJWeEHx5RnvF67lUsVowRQYzgD4f5O9b6uqrX71qle2a7zOyDMUkjsfj3HsAfuELkkH1BdE8R+QbqloO//wrzhAfdHiUxYTP0nMW9/u9nVXRHL2VH159280XVBXVgtUHoXcqHY0PRRb4goKZ5tMPBjzQl3SP4FtU//X+OTw+PhazqtJ0x5k74XnPvr3mcXP+Y1F1Mz5B2OPxaGdfhl53/qiosnjL3589NO0wmQjMb1HV4XH8Vc/ZISu/vVyu+RaHyagqNOxLUiGX8Nm8A88in7tfF2zCKCkUs4dQ3ZdL0OcdM55Fnz5ncWjCNKAFWVJ4ID7h4dTUBTOeI3iHt+RzFodZHGWFM0SoL+i+XCx192fWs+XESmjiKPMAj0D6hHudZzNCHi2H132wEsCD8s7RfS7k5/Q7+J/5SnELPKCFDodDw5dN/1ZKcSssczqdFv8Vpe8vlOJf2O12bTmx3+9HqfZtpRR7ohR7ohR7ohR7ohR7ohR7ohR7ohR7ohR7ohT7YXj7BpL35FWepDMDAAAAAElFTkSuQmCC"}',
         foreign_key="avatar_2018_frc999",
         media_type_enum=12,
-        #private_details_json=None,
+        private_details_json=None,
         references=[
-            ndb.Key("Team", "frc999", project="tbatv-prod-hrd", namespace="")
+            ndb.Key("Team", "frc999", project="tbatv-prod-hrd"),
         ],
-        #year=2018
+        year=2018
     ).put()
     model = Media.get_by_id("test_media")
+
+    pickled = pickle.dumps(model, protocol=2, fix_imports=True)
+    check = pickle.loads(pickled, fix_imports=True, encoding="bytes")
+
+    assert check == model
+
+
+def test_round_trip_model_pickle_event_team() -> None:
+    k = EventTeam(
+        id="2020test_frc254",
+        team=ndb.Key(Team, "frc254"),
+        event=ndb.Key(Event, "2020test"),
+    ).put()
+    model = k.get()
 
     pickled = pickle.dumps(model, protocol=2, fix_imports=True)
     check = pickle.loads(pickled, fix_imports=True, encoding="bytes")
@@ -169,7 +185,6 @@ eJy1VcuP5EYd3pmdMJNk0aIoKKQlJGtEpCW9M3612/aKi9ttt/vpfrjdDwWNyna57W6/Xe6HIxBEnBBH
                 "Media",
                 "avatar_avatar_2018_frc999",
                 project="tbatv-prod-hrd",
-                namespace="",
             ),
             created=datetime.datetime(2018, 2, 20, 10, 0, 48, 320900),
             details_json='{"base64Image": "iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOvwAADr8BOAVTJAAAABl0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC4yMfEgaZUAAAJESURBVFhHzZTBcepAEEQdhYvibCgC8ZHECIQgODoPTiQiq7f0VK3WGCP7sr/qeWZ7e3oH/P9/G4aha0qxJ0qxJ0qxJ0qxJ0qxJ0qxJ0oRxj/6Mbb1/X95Jb8Wp8Hr9dp4JWgL5F0ul1/zl4cYFOoFd8JnwO9f8fgbvMPdYmZupiEqAalxFj/N3m631b3IZTjnO6rzrIekMfsqUGihys99zqVXevaLBT3Eh8X5fG6Ve0c6fp9Jzc+uk+0ez14tyKBgWJWeEHx5RnvF67lUsVowRQYzgD4f5O9b6uqrX71qle2a7zOyDMUkjsfj3HsAfuELkkH1BdE8R+QbqloO//wrzhAfdHiUxYTP0nMW9/u9nVXRHL2VH159280XVBXVgtUHoXcqHY0PRRb4goKZ5tMPBjzQl3SP4FtU//X+OTw+PhazqtJ0x5k74XnPvr3mcXP+Y1F1Mz5B2OPxaGdfhl53/qiosnjL3589NO0wmQjMb1HV4XH8Vc/ZISu/vVyu+RaHyagqNOxLUiGX8Nm8A88in7tfF2zCKCkUs4dQ3ZdL0OcdM55Fnz5ncWjCNKAFWVJ4ID7h4dTUBTOeI3iHt+RzFodZHGWFM0SoL+i+XCx192fWs+XESmjiKPMAj0D6hHudZzNCHi2H132wEsCD8s7RfS7k5/Q7+J/5SnELPKCFDodDw5dN/1ZKcSssczqdFv8Vpe8vlOJf2O12bTmx3+9HqfZtpRR7ohR7ohR7ohR7ohR7ohR7ohR7ohR7ohR7ohT7YXj7BpL35FWepDMDAAAAAElFTkSuQmCC"}',
@@ -177,7 +192,7 @@ eJy1VcuP5EYd3pmdMJNk0aIoKKQlJGtEpCW9M3612/aKi9ttt/vpfrjdDwWNyna57W6/Xe6HIxBEnBBH
             media_type_enum=12,
             private_details_json=None,
             references=[
-                ndb.Key("Team", "frc999", project="tbatv-prod-hrd", namespace="")
+                ndb.Key("Team", "frc999", project="tbatv-prod-hrd"),
             ],
             updated=datetime.datetime(2018, 2, 20, 10, 0, 48, 320930),
             year=2018,
@@ -187,7 +202,6 @@ eJy1VcuP5EYd3pmdMJNk0aIoKKQlJGtEpCW9M3612/aKi9ttt/vpfrjdDwWNyna57W6/Xe6HIxBEnBBH
                 "Media",
                 "grabcad_switchback-team-999-1",
                 project="tbatv-prod-hrd",
-                namespace="",
             ),
             created=datetime.datetime(2020, 12, 30, 21, 58, 14, 901316),
             details_json='{"model_description": "Team 999 2018 robot called Switchback. The robot won the Industrial Design Award sponsored by General Motors at NE District Hartford Event. Also, the Team achieved to be Alliance 6 captain at the  Hartford Event.\\n\\nThe robot competed at NE District Waterbury Event, NE District Hartford Event, New England District Championship, CT FIRST State Robotics Championship, and BattleCry 19.", "model_image": "https://d2t1xqejof9utc.cloudfront.net/screenshots/pics/3579941eec849570fca523a00bf7d38b/card.jpg", "model_created": "2020-12-29T21:57:14Z", "model_name": "Switchback Team 999"}',
@@ -195,7 +209,7 @@ eJy1VcuP5EYd3pmdMJNk0aIoKKQlJGtEpCW9M3612/aKi9ttt/vpfrjdDwWNyna57W6/Xe6HIxBEnBBH
             media_type_enum=9,
             private_details_json=None,
             references=[
-                ndb.Key("Team", "frc999", project="tbatv-prod-hrd", namespace="")
+                ndb.Key("Team", "frc999", project="tbatv-prod-hrd"),
             ],
             updated=datetime.datetime(2020, 12, 30, 21, 58, 14, 901329),
             year=2018,
@@ -214,7 +228,6 @@ eJyVkLFKxEAURZO4kphdUMKCMtUiKriwK4iI1tZ228owm3mJEzOT5M1kISlE7fQL/AELCz/JT7C1NjuI
                 "Media",
                 "instagram-profile_titaniumtigers4829",
                 project="tbatv-prod-hrd",
-                namespace="",
             ),
             created=datetime.datetime(2020, 12, 20, 20, 3, 17, 962520),
             details_json=None,
@@ -222,7 +235,7 @@ eJyVkLFKxEAURZO4kphdUMKCMtUiKriwK4iI1tZ228owm3mJEzOT5M1kISlE7fQL/AELCz/JT7C1NjuI
             media_type_enum=7,
             private_details_json=None,
             references=[
-                ndb.Key("Team", "frc4829", project="tbatv-prod-hrd", namespace="")
+                ndb.Key("Team", "frc4829", project="tbatv-prod-hrd")
             ],
             updated=datetime.datetime(2020, 12, 20, 20, 3, 17, 962533),
             year=None,
@@ -237,7 +250,7 @@ eJzVfEmMJFmaVnV19VR2VvdUd1fRM+3d02MdMF1TVeGRti/Zy4zv+777VMlky7PFzdzM3BZ3N28VapAQ
     """
     expected_result = [
         Event(
-            key=ndb.Key("Event", "2020arli", project="tbatv-prod-hrd", namespace=""),
+            key=ndb.Key("Event", "2020arli", project="tbatv-prod-hrd"),
             city="Little Rock",
             country="USA",
             created=datetime.datetime(2019, 9, 4, 22, 59, 12, 341024),
@@ -284,7 +297,7 @@ eJzVfEmMJFmaVnV19VR2VvdUd1fRM+3d02MdMF1TVeGRti/Zy4zv+777VMlky7PFzdzM3BZ3N28VapAQ
             year=2020,
         ),
         Event(
-            key=ndb.Key("Event", "2020lake", project="tbatv-prod-hrd", namespace=""),
+            key=ndb.Key("Event", "2020lake", project="tbatv-prod-hrd"),
             city="Kenner",
             country="USA",
             created=datetime.datetime(2019, 9, 4, 22, 59, 12, 343527),
@@ -339,13 +352,13 @@ def test_cached_result_district() -> None:
 eJzNmk1vG0UYx5NQEUMDRBWqKp/CnqByq52XfcuZIPVaekOVtba3dFt7naw3qZIoCLjzGfoZkCrBgQu3fgC+AFLFBXFFHNmZEHu0z2bn73WIevPL+Bn/5nmZ/8w+324MJ9NRMp7dH6WzIk+HxfufX7w4WP/su4ONR+u9tbVnnz7bnn1TDOLi6N5+Ph3de5qP8o9v3upcDHbe5S5302wrv93digeDPDlK4yKdZjtrd290N9Isv9vdKqfYH8fH/SyeJOXnd7q3v3jw8MtHOw+yURpn8c7D6WBapMNZ/kn3VjKOZ+p1EufDpxe/eK+7+d/Y/IPujePyu/LDdzpvPjp5vd35sHszHh3F2TCZJFlRfvFqu/vj9qnzJB96MpTO7qkzGk72nd0n8XiW9JzF67OeGsSEZx8TyMA6KPAju6XSEGBJetAgO1zImG+3xKLQOkgCKyAjDszmM7slX3rMOsiTLrcPcpkL/CdgwUMu7NPJS0KgyA/nI0L7HxIssK9k6NvdJmRoJxORsM/GPM8e3r4EQinkkX02l9ujW8oQyDgPiBIRAeFdDrJ7jkfAbKEPLGXA7SlQLrd9Oi6QQuEKu6HQt68SC7h9lZgv7RFX1lMkLF37MvHItYecYEAMlDuBMZ3K6rp6aveb69rzhHlAonAGTMdchpSKyB4nggHVS/pA8Wah/S9xFgG7Dg+AlPO8xrU8O7nT2exuDvMkLpKR0hydX//+84eXP7/ZOHm9V4qMTh5nz9Ps61n53U973Vd7X506+9M0K/rFtIjHzm4gek6RxJP+8+TY2b3Iu56THJWypK+Hzpzd8lfxeJwquTL/jPk9J34R56P5J175s3E6mb8Xbs+5EGp9k8CY+3ye88nPRdlgPC3nPziMx3NDnJ897jkKpZy2fDGdPk+T/mCaHZZfume9KhOrMunsviYohkK5Cyhuh/IJlNZbEJRXhXIrUNwC5fkoFFtAiSqUR6C8kHhKFcZ2UFVPWaFCEIqFCyhp95QkUFr0QlDS5ilmgZJoTrFoAeXZPSU94imlddpBVT1lhfJQKH8B5QOeIsVPS2oIyuYoW50QaPQFC6QA8BMpE0pvQ0Ri5dhDS5+ZUKHdTcKvMunN83qgBFr6mFhARW2gtEiDoNwqFKtSXRmUkVBqEisVySgtYRAqvuomJeDSZ2xSDNATghMoJboRqJVLn5p76fBjgJ6gUPq6CIo/UvyqVFcGZYYf0RM1UKT66csdBCoiOSWWhEKrn7HxMkBO8IgwqbsYhIkUv2WjT829fEoROYFA6TsYKPqsheLKoIytlwFyosZT15VROJNZJoiegBylbnhaZdT/xuQZTICe4EGVSR/rEaZwVaYAZZIGEyAnKJO+REeYiJoIl2NiKJNR+DjREqyGiUgkfQuPMAWr1ghYyhp+4kRLUH2uwKuFzwNl38qFzwWhDHnOASlBmfS9bKvYWzKfGIpklAhOhERN7DESe/rhRjt5vqSfGKrODXXEASXByBle34u28tOySPAJ3nQUICQok75/v5bYg5nMmz5ARzByiFLPnhAkcnu5rJvQI5ShjDigIhg9QUWgNFo58uCzhnHJzAEVUcOknlq+vUyAiqBM6sHgW4skgBsJRjcn9UScMC2Mkl28ZnugSl89GruOhUJFsSG2BLCHkzKqWz4aVgm53afyLfKabJI9DLGpHpQ32ETutslxQHVfXIczJehMQ2QKYAMhIa9bihoWCSjhxKbqQGowCVTQmr/Z7EugghGbuk3ocpsSKCHEpmwil8CNIrGoe1kabAIZTB2kWl8abAL3aZRc9a402ARUaA27rMm2hU1ABVKbqlelwWabJNJdKw022ySR7k1psNkmi3SXSoPNNlmkW1Eut+m1yaKg5ti7sNgmi3TrSYPNNlmkO1UabLbJIt3Y0mCzVRapPpgGm22ySHXENJhsk0S6N6bBZk0SPT5vcjncH82bXH757feXf/zz18b367VtvYP7/wLcN7ZC
     """
     expected_result = District(
-        key=ndb.Key("District", "2020in", project="tbatv-prod-hrd", namespace=""),
+        key=ndb.Key("District", "2020in", project="tbatv-prod-hrd"),
         abbreviation="in",
-        advancement=b'{"frc5484":{"dcmp":false,"cmp":false},"frc135":{"dcmp":false,"cmp":false},"frc1747":{"dcmp":false,"cmp":false},"frc7695":{"dcmp":false,"cmp":false},"frc7477":{"dcmp":false,"cmp":false},"frc7457":{"dcmp":false,"cmp":false},"frc7454":{"dcmp":false,"cmp":false},"frc8116":{"dcmp":false,"cmp":false},"frc7198":{"dcmp":false,"cmp":false},"frc447":{"dcmp":false,"cmp":false},"frc4926":{"dcmp":false,"cmp":false},"frc7617":{"dcmp":false,"cmp":false},"frc6451":{"dcmp":false,"cmp":false},"frc5402":{"dcmp":false,"cmp":false},"frc5010":{"dcmp":false,"cmp":false},"frc7657":{"dcmp":false,"cmp":false},"frc8232":{"dcmp":false,"cmp":false},"frc45":{"dcmp":false,"cmp":true},"frc4580":{"dcmp":false,"cmp":false},"frc3176":{"dcmp":false,"cmp":false},"frc868":{"dcmp":false,"cmp":false},"frc3487":{"dcmp":false,"cmp":false},"frc3936":{"dcmp":false,"cmp":false},"frc1555":{"dcmp":false,"cmp":false},"frc6498":{"dcmp":false,"cmp":false},"frc829":{"dcmp":false,"cmp":false},"frc1024":{"dcmp":false,"cmp":false},"frc4485":{"dcmp":false,"cmp":false},"frc7502":{"dcmp":false,"cmp":false},"frc3947":{"dcmp":false,"cmp":false},"frc3940":{"dcmp":false,"cmp":false},"frc292":{"dcmp":false,"cmp":false},"frc3865":{"dcmp":false,"cmp":false},"frc6721":{"dcmp":false,"cmp":false},"frc4982":{"dcmp":false,"cmp":false},"frc234":{"dcmp":false,"cmp":false},"frc8103":{"dcmp":false,"cmp":false},"frc2867":{"dcmp":false,"cmp":false},"frc1720":{"dcmp":false,"cmp":false},"frc1646":{"dcmp":false,"cmp":false},"frc6956":{"dcmp":false,"cmp":false},"frc1501":{"dcmp":false,"cmp":false},"frc2909":{"dcmp":false,"cmp":false},"frc3147":{"dcmp":false,"cmp":false},"frc1741":{"dcmp":true,"cmp":false},"frc71":{"dcmp":false,"cmp":false},"frc4008":{"dcmp":false,"cmp":false},"frc1529":{"dcmp":false,"cmp":false},"frc2171":{"dcmp":false,"cmp":false},"frc1018":{"dcmp":false,"cmp":false},"frc3494":{"dcmp":false,"cmp":false},"frc3180":{"dcmp":false,"cmp":false},"frc461":{"dcmp":false,"cmp":false},"frc5188":{"dcmp":false,"cmp":false},"frc2197":{"dcmp":false,"cmp":false},"frc4272":{"dcmp":false,"cmp":false},"frc3559":{"dcmp":false,"cmp":false}}',
+        advancement='{"frc5484":{"dcmp":false,"cmp":false},"frc135":{"dcmp":false,"cmp":false},"frc1747":{"dcmp":false,"cmp":false},"frc7695":{"dcmp":false,"cmp":false},"frc7477":{"dcmp":false,"cmp":false},"frc7457":{"dcmp":false,"cmp":false},"frc7454":{"dcmp":false,"cmp":false},"frc8116":{"dcmp":false,"cmp":false},"frc7198":{"dcmp":false,"cmp":false},"frc447":{"dcmp":false,"cmp":false},"frc4926":{"dcmp":false,"cmp":false},"frc7617":{"dcmp":false,"cmp":false},"frc6451":{"dcmp":false,"cmp":false},"frc5402":{"dcmp":false,"cmp":false},"frc5010":{"dcmp":false,"cmp":false},"frc7657":{"dcmp":false,"cmp":false},"frc8232":{"dcmp":false,"cmp":false},"frc45":{"dcmp":false,"cmp":true},"frc4580":{"dcmp":false,"cmp":false},"frc3176":{"dcmp":false,"cmp":false},"frc868":{"dcmp":false,"cmp":false},"frc3487":{"dcmp":false,"cmp":false},"frc3936":{"dcmp":false,"cmp":false},"frc1555":{"dcmp":false,"cmp":false},"frc6498":{"dcmp":false,"cmp":false},"frc829":{"dcmp":false,"cmp":false},"frc1024":{"dcmp":false,"cmp":false},"frc4485":{"dcmp":false,"cmp":false},"frc7502":{"dcmp":false,"cmp":false},"frc3947":{"dcmp":false,"cmp":false},"frc3940":{"dcmp":false,"cmp":false},"frc292":{"dcmp":false,"cmp":false},"frc3865":{"dcmp":false,"cmp":false},"frc6721":{"dcmp":false,"cmp":false},"frc4982":{"dcmp":false,"cmp":false},"frc234":{"dcmp":false,"cmp":false},"frc8103":{"dcmp":false,"cmp":false},"frc2867":{"dcmp":false,"cmp":false},"frc1720":{"dcmp":false,"cmp":false},"frc1646":{"dcmp":false,"cmp":false},"frc6956":{"dcmp":false,"cmp":false},"frc1501":{"dcmp":false,"cmp":false},"frc2909":{"dcmp":false,"cmp":false},"frc3147":{"dcmp":false,"cmp":false},"frc1741":{"dcmp":true,"cmp":false},"frc71":{"dcmp":false,"cmp":false},"frc4008":{"dcmp":false,"cmp":false},"frc1529":{"dcmp":false,"cmp":false},"frc2171":{"dcmp":false,"cmp":false},"frc1018":{"dcmp":false,"cmp":false},"frc3494":{"dcmp":false,"cmp":false},"frc3180":{"dcmp":false,"cmp":false},"frc461":{"dcmp":false,"cmp":false},"frc5188":{"dcmp":false,"cmp":false},"frc2197":{"dcmp":false,"cmp":false},"frc4272":{"dcmp":false,"cmp":false},"frc3559":{"dcmp":false,"cmp":false}}',
         created=datetime.datetime(2019, 9, 4, 22, 44, 13, 832001),
         display_name="FIRST Indiana Robotics",
         elasticsearch_name="Indiana",
-        rankings=b'[{"point_total":73,"team_key":"frc234","event_points":[{"alliance_points":16,"award_points":5,"elim_points":30,"district_cmp":false,"total":73,"event_key":"2020inblo","qual_points":22}],"rank":1,"rookie_bonus":0},{"point_total":71,"team_key":"frc1720","event_points":[{"alliance_points":16,"award_points":5,"elim_points":30,"district_cmp":false,"total":71,"event_key":"2020inblo","qual_points":20}],"rank":2,"rookie_bonus":0},{"point_total":61,"team_key":"frc7457","event_points":[{"alliance_points":15,"award_points":0,"elim_points":20,"district_cmp":false,"total":56,"event_key":"2020inblo","qual_points":21}],"rank":3,"rookie_bonus":5},{"point_total":58,"team_key":"frc1501","event_points":[{"alliance_points":15,"award_points":5,"elim_points":20,"district_cmp":false,"total":58,"event_key":"2020inblo","qual_points":18}],"rank":4,"rookie_bonus":0},{"point_total":48,"team_key":"frc7454","event_points":[{"alliance_points":14,"award_points":0,"elim_points":10,"district_cmp":false,"total":43,"event_key":"2020inblo","qual_points":19}],"rank":5,"rookie_bonus":5},{"point_total":45,"team_key":"frc1024","event_points":[{"alliance_points":14,"award_points":5,"elim_points":10,"district_cmp":false,"total":45,"event_key":"2020inblo","qual_points":16}],"rank":6,"rookie_bonus":0},{"point_total":43,"team_key":"frc7657","event_points":[{"alliance_points":1,"award_points":0,"elim_points":30,"district_cmp":false,"total":38,"event_key":"2020inblo","qual_points":7}],"rank":7,"rookie_bonus":5},{"point_total":41,"team_key":"frc868","event_points":[{"alliance_points":13,"award_points":0,"elim_points":10,"district_cmp":false,"total":41,"event_key":"2020inblo","qual_points":18}],"rank":8,"rookie_bonus":0},{"point_total":36,"team_key":"frc4272","event_points":[{"alliance_points":13,"award_points":0,"elim_points":10,"district_cmp":false,"total":36,"event_key":"2020inblo","qual_points":13}],"rank":9,"rookie_bonus":0},{"point_total":36,"team_key":"frc1741","event_points":[{"alliance_points":10,"award_points":10,"elim_points":0,"district_cmp":false,"total":36,"event_key":"2020inblo","qual_points":16}],"rank":10,"rookie_bonus":0},{"point_total":33,"team_key":"frc3559","event_points":[{"alliance_points":2,"award_points":0,"elim_points":20,"district_cmp":false,"total":33,"event_key":"2020inblo","qual_points":11}],"rank":11,"rookie_bonus":0},{"point_total":32,"team_key":"frc3147","event_points":[{"alliance_points":4,"award_points":5,"elim_points":10,"district_cmp":false,"total":32,"event_key":"2020inblo","qual_points":13}],"rank":12,"rookie_bonus":0},{"point_total":32,"team_key":"frc1747","event_points":[{"alliance_points":11,"award_points":5,"elim_points":0,"district_cmp":false,"total":32,"event_key":"2020inblo","qual_points":16}],"rank":13,"rookie_bonus":0},{"point_total":31,"team_key":"frc4926","event_points":[{"alliance_points":9,"award_points":13,"elim_points":0,"district_cmp":false,"total":31,"event_key":"2020inblo","qual_points":9}],"rank":14,"rookie_bonus":0},{"point_total":29,"team_key":"frc4580","event_points":[{"alliance_points":3,"award_points":5,"elim_points":10,"district_cmp":false,"total":29,"event_key":"2020inblo","qual_points":11}],"rank":15,"rookie_bonus":0},{"point_total":29,"team_key":"frc6498","event_points":[{"alliance_points":12,"award_points":0,"elim_points":0,"district_cmp":false,"total":29,"event_key":"2020inblo","qual_points":17}],"rank":16,"rookie_bonus":0},{"point_total":29,"team_key":"frc447","event_points":[{"alliance_points":11,"award_points":5,"elim_points":0,"district_cmp":false,"total":29,"event_key":"2020inblo","qual_points":13}],"rank":17,"rookie_bonus":0},{"point_total":29,"team_key":"frc6721","event_points":[{"alliance_points":9,"award_points":5,"elim_points":0,"district_cmp":false,"total":29,"event_key":"2020inblo","qual_points":15}],"rank":18,"rookie_bonus":0},{"point_total":27,"team_key":"frc5188","event_points":[{"alliance_points":8,"award_points":5,"elim_points":0,"district_cmp":false,"total":27,"event_key":"2020inblo","qual_points":14}],"rank":19,"rookie_bonus":0},{"point_total":27,"team_key":"frc8116","event_points":[{"alliance_points":0,"award_points":8,"elim_points":0,"district_cmp":false,"total":17,"event_key":"2020inblo","qual_points":9}],"rank":20,"rookie_bonus":10},{"point_total":26,"team_key":"frc7617","event_points":[{"alliance_points":7,"award_points":0,"elim_points":0,"district_cmp":false,"total":21,"event_key":"2020inblo","qual_points":14}],"rank":21,"rookie_bonus":5},{"point_total":20,"team_key":"frc6451","event_points":[{"alliance_points":12,"award_points":0,"elim_points":0,"district_cmp":false,"total":20,"event_key":"2020inblo","qual_points":8}],"rank":22,"rookie_bonus":0},{"point_total":20,"team_key":"frc8103","event_points":[{"alliance_points":0,"award_points":5,"elim_points":0,"district_cmp":false,"total":10,"event_key":"2020inblo","qual_points":5}],"rank":23,"rookie_bonus":10},{"point_total":16,"team_key":"frc3176","event_points":[{"alliance_points":10,"award_points":0,"elim_points":0,"district_cmp":false,"total":16,"event_key":"2020inblo","qual_points":6}],"rank":24,"rookie_bonus":0},{"point_total":15,"team_key":"frc3180","event_points":[{"alliance_points":0,"award_points":0,"elim_points":0,"district_cmp":false,"total":15,"event_key":"2020inblo","qual_points":15}],"rank":25,"rookie_bonus":0},{"point_total":15,"team_key":"frc6956","event_points":[{"alliance_points":0,"award_points":5,"elim_points":0,"district_cmp":false,"total":15,"event_key":"2020inblo","qual_points":10}],"rank":26,"rookie_bonus":0},{"point_total":13,"team_key":"frc829","event_points":[{"alliance_points":6,"award_points":0,"elim_points":0,"district_cmp":false,"total":13,"event_key":"2020inblo","qual_points":7}],"rank":27,"rookie_bonus":0},{"point_total":12,"team_key":"frc3947","event_points":[{"alliance_points":0,"award_points":0,"elim_points":0,"district_cmp":false,"total":12,"event_key":"2020inblo","qual_points":12}],"rank":28,"rookie_bonus":0},{"point_total":12,"team_key":"frc3487","event_points":[{"alliance_points":0,"award_points":0,"elim_points":0,"district_cmp":false,"total":12,"event_key":"2020inblo","qual_points":12}],"rank":29,"rookie_bonus":0},{"point_total":12,"team_key":"frc292","event_points":[{"alliance_points":0,"award_points":0,"elim_points":0,"district_cmp":false,"total":12,"event_key":"2020inblo","qual_points":12}],"rank":30,"rookie_bonus":0},{"point_total":10,"team_key":"frc8232","event_points":[],"rank":31,"rookie_bonus":10},{"point_total":9,"team_key":"frc4008","event_points":[{"alliance_points":0,"award_points":0,"elim_points":0,"district_cmp":false,"total":9,"event_key":"2020inblo","qual_points":9}],"rank":32,"rookie_bonus":0},{"point_total":5,"team_key":"frc7477","event_points":[],"rank":33,"rookie_bonus":5},{"point_total":5,"team_key":"frc7695","event_points":[],"rank":34,"rookie_bonus":5},{"point_total":5,"team_key":"frc7502","event_points":[],"rank":35,"rookie_bonus":5},{"point_total":4,"team_key":"frc5010","event_points":[{"alliance_points":0,"award_points":0,"elim_points":0,"district_cmp":false,"total":4,"event_key":"2020inblo","qual_points":4}],"rank":36,"rookie_bonus":0},{"point_total":0,"team_key":"frc5484","event_points":[],"rank":37,"rookie_bonus":0},{"point_total":0,"team_key":"frc135","event_points":[],"rank":38,"rookie_bonus":0},{"point_total":0,"team_key":"frc5402","event_points":[],"rank":39,"rookie_bonus":0},{"point_total":0,"team_key":"frc7198","event_points":[],"rank":40,"rookie_bonus":0},{"point_total":0,"team_key":"frc45","event_points":[],"rank":41,"rookie_bonus":0},{"point_total":0,"team_key":"frc3936","event_points":[],"rank":42,"rookie_bonus":0},{"point_total":0,"team_key":"frc1555","event_points":[],"rank":43,"rookie_bonus":0},{"point_total":0,"team_key":"frc4485","event_points":[],"rank":44,"rookie_bonus":0},{"point_total":0,"team_key":"frc3940","event_points":[],"rank":45,"rookie_bonus":0},{"point_total":0,"team_key":"frc3865","event_points":[],"rank":46,"rookie_bonus":0},{"point_total":0,"team_key":"frc4982","event_points":[],"rank":47,"rookie_bonus":0},{"point_total":0,"team_key":"frc2867","event_points":[],"rank":48,"rookie_bonus":0},{"point_total":0,"team_key":"frc1646","event_points":[],"rank":49,"rookie_bonus":0},{"point_total":0,"team_key":"frc2909","event_points":[],"rank":50,"rookie_bonus":0},{"point_total":0,"team_key":"frc71","event_points":[],"rank":51,"rookie_bonus":0},{"point_total":0,"team_key":"frc1529","event_points":[],"rank":52,"rookie_bonus":0},{"point_total":0,"team_key":"frc2171","event_points":[],"rank":53,"rookie_bonus":0},{"point_total":0,"team_key":"frc1018","event_points":[],"rank":54,"rookie_bonus":0},{"point_total":0,"team_key":"frc3494","event_points":[],"rank":55,"rookie_bonus":0},{"point_total":0,"team_key":"frc461","event_points":[],"rank":56,"rookie_bonus":0},{"point_total":0,"team_key":"frc2197","event_points":[],"rank":57,"rookie_bonus":0}]',
+        rankings='[{"point_total":73,"team_key":"frc234","event_points":[{"alliance_points":16,"award_points":5,"elim_points":30,"district_cmp":false,"total":73,"event_key":"2020inblo","qual_points":22}],"rank":1,"rookie_bonus":0},{"point_total":71,"team_key":"frc1720","event_points":[{"alliance_points":16,"award_points":5,"elim_points":30,"district_cmp":false,"total":71,"event_key":"2020inblo","qual_points":20}],"rank":2,"rookie_bonus":0},{"point_total":61,"team_key":"frc7457","event_points":[{"alliance_points":15,"award_points":0,"elim_points":20,"district_cmp":false,"total":56,"event_key":"2020inblo","qual_points":21}],"rank":3,"rookie_bonus":5},{"point_total":58,"team_key":"frc1501","event_points":[{"alliance_points":15,"award_points":5,"elim_points":20,"district_cmp":false,"total":58,"event_key":"2020inblo","qual_points":18}],"rank":4,"rookie_bonus":0},{"point_total":48,"team_key":"frc7454","event_points":[{"alliance_points":14,"award_points":0,"elim_points":10,"district_cmp":false,"total":43,"event_key":"2020inblo","qual_points":19}],"rank":5,"rookie_bonus":5},{"point_total":45,"team_key":"frc1024","event_points":[{"alliance_points":14,"award_points":5,"elim_points":10,"district_cmp":false,"total":45,"event_key":"2020inblo","qual_points":16}],"rank":6,"rookie_bonus":0},{"point_total":43,"team_key":"frc7657","event_points":[{"alliance_points":1,"award_points":0,"elim_points":30,"district_cmp":false,"total":38,"event_key":"2020inblo","qual_points":7}],"rank":7,"rookie_bonus":5},{"point_total":41,"team_key":"frc868","event_points":[{"alliance_points":13,"award_points":0,"elim_points":10,"district_cmp":false,"total":41,"event_key":"2020inblo","qual_points":18}],"rank":8,"rookie_bonus":0},{"point_total":36,"team_key":"frc4272","event_points":[{"alliance_points":13,"award_points":0,"elim_points":10,"district_cmp":false,"total":36,"event_key":"2020inblo","qual_points":13}],"rank":9,"rookie_bonus":0},{"point_total":36,"team_key":"frc1741","event_points":[{"alliance_points":10,"award_points":10,"elim_points":0,"district_cmp":false,"total":36,"event_key":"2020inblo","qual_points":16}],"rank":10,"rookie_bonus":0},{"point_total":33,"team_key":"frc3559","event_points":[{"alliance_points":2,"award_points":0,"elim_points":20,"district_cmp":false,"total":33,"event_key":"2020inblo","qual_points":11}],"rank":11,"rookie_bonus":0},{"point_total":32,"team_key":"frc3147","event_points":[{"alliance_points":4,"award_points":5,"elim_points":10,"district_cmp":false,"total":32,"event_key":"2020inblo","qual_points":13}],"rank":12,"rookie_bonus":0},{"point_total":32,"team_key":"frc1747","event_points":[{"alliance_points":11,"award_points":5,"elim_points":0,"district_cmp":false,"total":32,"event_key":"2020inblo","qual_points":16}],"rank":13,"rookie_bonus":0},{"point_total":31,"team_key":"frc4926","event_points":[{"alliance_points":9,"award_points":13,"elim_points":0,"district_cmp":false,"total":31,"event_key":"2020inblo","qual_points":9}],"rank":14,"rookie_bonus":0},{"point_total":29,"team_key":"frc4580","event_points":[{"alliance_points":3,"award_points":5,"elim_points":10,"district_cmp":false,"total":29,"event_key":"2020inblo","qual_points":11}],"rank":15,"rookie_bonus":0},{"point_total":29,"team_key":"frc6498","event_points":[{"alliance_points":12,"award_points":0,"elim_points":0,"district_cmp":false,"total":29,"event_key":"2020inblo","qual_points":17}],"rank":16,"rookie_bonus":0},{"point_total":29,"team_key":"frc447","event_points":[{"alliance_points":11,"award_points":5,"elim_points":0,"district_cmp":false,"total":29,"event_key":"2020inblo","qual_points":13}],"rank":17,"rookie_bonus":0},{"point_total":29,"team_key":"frc6721","event_points":[{"alliance_points":9,"award_points":5,"elim_points":0,"district_cmp":false,"total":29,"event_key":"2020inblo","qual_points":15}],"rank":18,"rookie_bonus":0},{"point_total":27,"team_key":"frc5188","event_points":[{"alliance_points":8,"award_points":5,"elim_points":0,"district_cmp":false,"total":27,"event_key":"2020inblo","qual_points":14}],"rank":19,"rookie_bonus":0},{"point_total":27,"team_key":"frc8116","event_points":[{"alliance_points":0,"award_points":8,"elim_points":0,"district_cmp":false,"total":17,"event_key":"2020inblo","qual_points":9}],"rank":20,"rookie_bonus":10},{"point_total":26,"team_key":"frc7617","event_points":[{"alliance_points":7,"award_points":0,"elim_points":0,"district_cmp":false,"total":21,"event_key":"2020inblo","qual_points":14}],"rank":21,"rookie_bonus":5},{"point_total":20,"team_key":"frc6451","event_points":[{"alliance_points":12,"award_points":0,"elim_points":0,"district_cmp":false,"total":20,"event_key":"2020inblo","qual_points":8}],"rank":22,"rookie_bonus":0},{"point_total":20,"team_key":"frc8103","event_points":[{"alliance_points":0,"award_points":5,"elim_points":0,"district_cmp":false,"total":10,"event_key":"2020inblo","qual_points":5}],"rank":23,"rookie_bonus":10},{"point_total":16,"team_key":"frc3176","event_points":[{"alliance_points":10,"award_points":0,"elim_points":0,"district_cmp":false,"total":16,"event_key":"2020inblo","qual_points":6}],"rank":24,"rookie_bonus":0},{"point_total":15,"team_key":"frc3180","event_points":[{"alliance_points":0,"award_points":0,"elim_points":0,"district_cmp":false,"total":15,"event_key":"2020inblo","qual_points":15}],"rank":25,"rookie_bonus":0},{"point_total":15,"team_key":"frc6956","event_points":[{"alliance_points":0,"award_points":5,"elim_points":0,"district_cmp":false,"total":15,"event_key":"2020inblo","qual_points":10}],"rank":26,"rookie_bonus":0},{"point_total":13,"team_key":"frc829","event_points":[{"alliance_points":6,"award_points":0,"elim_points":0,"district_cmp":false,"total":13,"event_key":"2020inblo","qual_points":7}],"rank":27,"rookie_bonus":0},{"point_total":12,"team_key":"frc3947","event_points":[{"alliance_points":0,"award_points":0,"elim_points":0,"district_cmp":false,"total":12,"event_key":"2020inblo","qual_points":12}],"rank":28,"rookie_bonus":0},{"point_total":12,"team_key":"frc3487","event_points":[{"alliance_points":0,"award_points":0,"elim_points":0,"district_cmp":false,"total":12,"event_key":"2020inblo","qual_points":12}],"rank":29,"rookie_bonus":0},{"point_total":12,"team_key":"frc292","event_points":[{"alliance_points":0,"award_points":0,"elim_points":0,"district_cmp":false,"total":12,"event_key":"2020inblo","qual_points":12}],"rank":30,"rookie_bonus":0},{"point_total":10,"team_key":"frc8232","event_points":[],"rank":31,"rookie_bonus":10},{"point_total":9,"team_key":"frc4008","event_points":[{"alliance_points":0,"award_points":0,"elim_points":0,"district_cmp":false,"total":9,"event_key":"2020inblo","qual_points":9}],"rank":32,"rookie_bonus":0},{"point_total":5,"team_key":"frc7477","event_points":[],"rank":33,"rookie_bonus":5},{"point_total":5,"team_key":"frc7695","event_points":[],"rank":34,"rookie_bonus":5},{"point_total":5,"team_key":"frc7502","event_points":[],"rank":35,"rookie_bonus":5},{"point_total":4,"team_key":"frc5010","event_points":[{"alliance_points":0,"award_points":0,"elim_points":0,"district_cmp":false,"total":4,"event_key":"2020inblo","qual_points":4}],"rank":36,"rookie_bonus":0},{"point_total":0,"team_key":"frc5484","event_points":[],"rank":37,"rookie_bonus":0},{"point_total":0,"team_key":"frc135","event_points":[],"rank":38,"rookie_bonus":0},{"point_total":0,"team_key":"frc5402","event_points":[],"rank":39,"rookie_bonus":0},{"point_total":0,"team_key":"frc7198","event_points":[],"rank":40,"rookie_bonus":0},{"point_total":0,"team_key":"frc45","event_points":[],"rank":41,"rookie_bonus":0},{"point_total":0,"team_key":"frc3936","event_points":[],"rank":42,"rookie_bonus":0},{"point_total":0,"team_key":"frc1555","event_points":[],"rank":43,"rookie_bonus":0},{"point_total":0,"team_key":"frc4485","event_points":[],"rank":44,"rookie_bonus":0},{"point_total":0,"team_key":"frc3940","event_points":[],"rank":45,"rookie_bonus":0},{"point_total":0,"team_key":"frc3865","event_points":[],"rank":46,"rookie_bonus":0},{"point_total":0,"team_key":"frc4982","event_points":[],"rank":47,"rookie_bonus":0},{"point_total":0,"team_key":"frc2867","event_points":[],"rank":48,"rookie_bonus":0},{"point_total":0,"team_key":"frc1646","event_points":[],"rank":49,"rookie_bonus":0},{"point_total":0,"team_key":"frc2909","event_points":[],"rank":50,"rookie_bonus":0},{"point_total":0,"team_key":"frc71","event_points":[],"rank":51,"rookie_bonus":0},{"point_total":0,"team_key":"frc1529","event_points":[],"rank":52,"rookie_bonus":0},{"point_total":0,"team_key":"frc2171","event_points":[],"rank":53,"rookie_bonus":0},{"point_total":0,"team_key":"frc1018","event_points":[],"rank":54,"rookie_bonus":0},{"point_total":0,"team_key":"frc3494","event_points":[],"rank":55,"rookie_bonus":0},{"point_total":0,"team_key":"frc461","event_points":[],"rank":56,"rookie_bonus":0},{"point_total":0,"team_key":"frc2197","event_points":[],"rank":57,"rookie_bonus":0}]',
         updated=datetime.datetime(2020, 12, 31, 17, 59, 52, 185404),
         year=2020,
     )
@@ -358,57 +371,57 @@ eJzNlL1v00AYxmM3H06hChAk0AlVJlXbtKKRnZgWMREB/QNar8hy7INc6o/kfAlKEAg6lgFG+C8YmBgQ
     """
     expected_result = [
         Award(
-            key=ndb.Key("Award", "2003mi_10", project="tbatv-prod-hrd", namespace=""),
+            key=ndb.Key("Award", "2003mi_10", project="tbatv-prod-hrd"),
             award_type_enum=10,
             created=datetime.datetime(2013, 11, 23, 21, 17, 57, 121480),
-            event=ndb.Key("Event", "2003mi", project="tbatv-prod-hrd", namespace=""),
+            event=ndb.Key("Event", "2003mi", project="tbatv-prod-hrd"),
             event_type_enum=0,
             name_str="Rookie All Star Award Friday",
             recipient_json_list=['{"awardee": null, "team_number": 1000}'],
             team_list=[
-                ndb.Key("Team", "frc1000", project="tbatv-prod-hrd", namespace="")
+                ndb.Key("Team", "frc1000", project="tbatv-prod-hrd")
             ],
             updated=datetime.datetime(2013, 11, 23, 21, 17, 57, 121460),
             year=2003,
         ),
         Award(
-            key=ndb.Key("Award", "2004dt_2", project="tbatv-prod-hrd", namespace=""),
+            key=ndb.Key("Award", "2004dt_2", project="tbatv-prod-hrd"),
             award_type_enum=2,
             created=datetime.datetime(2013, 11, 23, 21, 17, 20, 943970),
-            event=ndb.Key("Event", "2004dt", project="tbatv-prod-hrd", namespace=""),
+            event=ndb.Key("Event", "2004dt", project="tbatv-prod-hrd"),
             event_type_enum=0,
             name_str="Regional Finalist",
             recipient_json_list=['{"awardee": null, "team_number": 1447}'],
             team_list=[
-                ndb.Key("Team", "frc1447", project="tbatv-prod-hrd", namespace="")
+                ndb.Key("Team", "frc1447", project="tbatv-prod-hrd")
             ],
             updated=datetime.datetime(2013, 11, 23, 21, 17, 20, 943960),
             year=2004,
         ),
         Award(
-            key=ndb.Key("Award", "2004dt_30", project="tbatv-prod-hrd", namespace=""),
+            key=ndb.Key("Award", "2004dt_30", project="tbatv-prod-hrd"),
             award_type_enum=30,
             created=datetime.datetime(2013, 11, 23, 21, 17, 20, 947390),
-            event=ndb.Key("Event", "2004dt", project="tbatv-prod-hrd", namespace=""),
+            event=ndb.Key("Event", "2004dt", project="tbatv-prod-hrd"),
             event_type_enum=0,
             name_str="DaimlerChrysler Team Spirit Award",
             recipient_json_list=['{"awardee": null, "team_number": 1000}'],
             team_list=[
-                ndb.Key("Team", "frc1000", project="tbatv-prod-hrd", namespace="")
+                ndb.Key("Team", "frc1000", project="tbatv-prod-hrd")
             ],
             updated=datetime.datetime(2013, 11, 23, 21, 17, 20, 947380),
             year=2004,
         ),
         Award(
-            key=ndb.Key("Award", "2007il_2", project="tbatv-prod-hrd", namespace=""),
+            key=ndb.Key("Award", "2007il_2", project="tbatv-prod-hrd"),
             award_type_enum=2,
             created=datetime.datetime(2013, 11, 23, 21, 14, 55, 727100),
-            event=ndb.Key("Event", "2007il", project="tbatv-prod-hrd", namespace=""),
+            event=ndb.Key("Event", "2007il", project="tbatv-prod-hrd"),
             event_type_enum=0,
             name_str="Regional Finalist",
             recipient_json_list=['{"awardee": null, "team_number": 447}'],
             team_list=[
-                ndb.Key("Team", "frc447", project="tbatv-prod-hrd", namespace="")
+                ndb.Key("Team", "frc447", project="tbatv-prod-hrd"),
             ],
             updated=datetime.datetime(2013, 11, 23, 21, 14, 55, 727100),
             year=2007,
