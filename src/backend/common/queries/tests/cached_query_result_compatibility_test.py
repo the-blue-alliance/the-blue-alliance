@@ -64,11 +64,6 @@ def _run_test(py2_b64_data, expected_result) -> None:
         check_entity, model_class=CachedQueryResult
     )
 
-    # pickletools.dis(zlib.decompress(base64.b64decode(py2_b64_data)))
-    # pickletools.dis(zlib.decompress(check_raw_model.result))
-
-    # raise Exception(f"result: {base64.b64encode(zlib.decompress(check_raw_model.result))}")
-    # assert base64.b64encode(check_raw_model.result) == py2_b64_data
     assert check_model.result == expected_result
 
 

@@ -5,10 +5,6 @@ from typing import Any
 from google.cloud import ndb
 
 
-class ImportFixingPickler(pickle.Pickler):
-    pass
-
-
 class ImportFixingUnpickler(pickle.Unpickler):
     def find_class(self, module, name):
         renamed_module = module
@@ -28,7 +24,7 @@ class ImportFixingPickleProperty(ndb.BlobProperty):
         """
 
         file_obj = io.BytesIO()
-        ImportFixingPickler(file_obj, protocol=2, fix_imports=True).dump(value)
+        pickle.Pickler(file_obj, protocol=2, fix_imports=True).dump(value)
         return file_obj.getvalue()
 
     def _from_base_type(self, value: bytes) -> Any:
