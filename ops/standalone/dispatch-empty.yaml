@@ -5,6 +5,21 @@ dispatch:
 
   - url: "www.thebluealliance.com/about"
     service: py3-web
+
+  - url: "www.thebluealliance.com/events"
+    service: py3-web
+
+  - url: "www.thebluealliance.com/event/*"
+    service: py3-web
+
+  - url: "www.thebluealliance.com/teams"
+    service: py3-web
+
+  - url: "www.thebluealliance.com/team/*"
+    service: py3-web
+
+  - url: "www.thebluealliance.com/match/*"
+    service: py3-web
     
   - url: "www.thebluealliance.com/py3_css/*"
     service: py3-web
@@ -22,6 +37,9 @@ dispatch:
   # Beta PWA
   - url: "beta.thebluealliance.com/*"
     service: pwa-ssr
+
+  - url: "py2.thebluealliance.com/*"
+    service: default
 
   # Send everything to default module
   - url: "*/"
