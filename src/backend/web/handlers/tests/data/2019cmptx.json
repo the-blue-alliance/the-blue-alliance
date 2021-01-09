@@ -1,0 +1,48 @@
+{
+  "address": "1001 Avenida De Las Americas, Houston, TX 77010, USA", 
+  "city": "Houston", 
+  "country": "USA", 
+  "district": null, 
+  "division_keys": [
+    "2019carv", 
+    "2019gal", 
+    "2019hop", 
+    "2019new", 
+    "2019roe", 
+    "2019tur"
+  ], 
+  "end_date": "2019-04-20", 
+  "event_code": "cmptx", 
+  "event_type": 4, 
+  "event_type_string": "Championship Finals", 
+  "first_event_code": "CMPTX", 
+  "first_event_id": null, 
+  "gmaps_place_id": "ChIJux2LIyW_QIYR2T4aJ0P5MBw", 
+  "gmaps_url": "https://maps.google.com/?cid=2031397498758250201", 
+  "key": "2019cmptx", 
+  "lat": 29.7521422, 
+  "lng": -95.3578364, 
+  "location_name": "George R. Brown Convention Center", 
+  "name": "Einstein Field (Houston)", 
+  "parent_event_key": null, 
+  "playoff_type": 4, 
+  "playoff_type_string": "Round Robin (6 Alliances)", 
+  "postal_code": "77010", 
+  "short_name": "Einstein (Houston)", 
+  "start_date": "2019-04-20", 
+  "state_prov": "TX", 
+  "timezone": "America/Chicago", 
+  "webcasts": [
+    {
+      "channel": "firstinspires", 
+      "type": "twitch"
+    }, 
+    {
+      "channel": "firstinspires1", 
+      "type": "twitch"
+    }
+  ], 
+  "website": "https://www.firstchampionship.org/", 
+  "week": null, 
+  "year": 2019
+}

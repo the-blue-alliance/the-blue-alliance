@@ -9,9 +9,15 @@ def index() -> str:
     # special_webcasts = FirebasePusher.get_special_webcasts()
     effective_season_year = SeasonHelper.effective_season_year()
     template_values = {
-        "is_kickoff": SeasonHelper.is_kickoff_at_least_one_day_away(year=effective_season_year),
-        "kickoff_datetime_est": SeasonHelper.kickoff_datetime_est(effective_season_year),
-        "kickoff_datetime_utc": SeasonHelper.kickoff_datetime_utc(effective_season_year),
+        "is_kickoff": SeasonHelper.is_kickoff_at_least_one_day_away(
+            year=effective_season_year
+        ),
+        "kickoff_datetime_est": SeasonHelper.kickoff_datetime_est(
+            effective_season_year
+        ),
+        "kickoff_datetime_utc": SeasonHelper.kickoff_datetime_utc(
+            effective_season_year
+        ),
     }
     return render_template("index/index_kickoff.html", template_values)
 
