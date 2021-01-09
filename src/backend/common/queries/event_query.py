@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from google.cloud import ndb
 
-from backend.common.consts.event_type import EventType
+from backend.common.consts.event_type import EventType, SEASON_EVENT_TYPES
 from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
@@ -147,3 +147,26 @@ class EventDivisionsQuery(CachedDatabaseQuery[List[Event], List[EventDict]]):
             return []
         divisions = yield ndb.get_multi_async(event.divisions)
         return list(divisions)
+
+
+class LastSeasonEventQuery(CachedDatabaseQuery[Optional[Event], Optional[EventDict]]):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "last_season_event_list_{year}"
+    DICT_CONVERTER = EventConverter
+
+    def __init__(self, year: Year) -> None:
+        super().__init__(year=year)
+
+    @typed_tasklet
+    def _query_async(self, year: Year) -> Optional[Event]:
+        events = (
+            yield Event.query(
+                Event.year == year, Event.event_type_enum.IN(SEASON_EVENT_TYPES)
+            )
+            .order(-Event.end_date)
+            .fetch_async(1)
+        )
+        events = list(events)
+        if not events:
+            return None
+        return events[0]
