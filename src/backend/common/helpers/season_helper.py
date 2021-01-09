@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Iterable
+from typing import Sequence
 
 from pytz import timezone, UTC
 
@@ -24,7 +24,7 @@ class SeasonHelper(object):
         return status_sv["current_season"]
 
     @classmethod
-    def get_valid_years(cls) -> Iterable[Year]:
+    def get_valid_years(cls) -> Sequence[Year]:
         max_year = cls.get_max_year()
         return range(cls.MIN_YEAR, max_year + 1)
 

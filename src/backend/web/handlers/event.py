@@ -27,7 +27,7 @@ def event_list(year: Optional[Year] = None) -> Response:
     if year is None:
         year = SeasonHelper.get_current_season()
 
-    valid_years = SeasonHelper.get_valid_years()
+    valid_years = list(reversed(SeasonHelper.get_valid_years()))
     if year not in valid_years:
         abort(404)
 
