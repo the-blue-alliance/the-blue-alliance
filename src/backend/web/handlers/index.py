@@ -14,7 +14,7 @@ def index() -> str:
         # "special_webcasts": special_webcasts,
         "manual_password": "!+Gam3^time#2021",  # TODO: Pull from Sitevar
         "game_name": "INFINITE RECHARGE at Home",
-        "game_animation_youtube_id": "gmiYWTmFRVE",
+        "game_animation_youtube_id": "I77Dz9pfds4",
     }
     return render_template("index/index_buildseason.html", template_values)
 
