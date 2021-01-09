@@ -28,7 +28,7 @@ from google.cloud.ndb._legacy_entity_pb import (
     Reference,
 )
 
-from backend.common.legacy_gae_protobuf import Encoder
+from backend.common.legacy_protobuf.legacy_gae_protobuf import Encoder
 
 
 class EntityProtoEncoder:
