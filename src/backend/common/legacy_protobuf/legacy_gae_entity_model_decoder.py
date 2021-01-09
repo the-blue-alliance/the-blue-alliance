@@ -63,12 +63,13 @@ class EntityProtoDecoder:
                 return value
             return None if value is None else _BaseValue(value)
 
+        model_properties = model._properties.keys()  # pyre-ignore
         for pb_prop in pb.property_list():
             prop_name = pb_prop.name().decode()
 
             # There are some fields we did not port to py3, skip them
             # StructuredProperty uses "." in field names, so skip those
-            if not hasattr(model, prop_name) and "." not in prop_name:
+            if prop_name not in model_properties and "." not in prop_name:
                 continue
 
             prop_value = cls._get_prop_value(pb_prop.value(), pb_prop)
