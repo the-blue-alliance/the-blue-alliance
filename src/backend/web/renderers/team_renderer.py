@@ -200,6 +200,8 @@ class TeamRenderer(object):
 
         season_wlt: Optional[WLTRecord] = None
         offseason_wlt: Optional[WLTRecord] = None
+        total_season_matches = 0
+        total_offseason_matches = 0
         if year == 2015:
             year_qual_scores = []
             year_elim_scores = []
