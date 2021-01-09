@@ -8,27 +8,27 @@ from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 # import urllib
 #
 # from models.match import Match
-#
-# defense_render_names_2016 = {
-#     'A_ChevalDeFrise': 'Cheval De Frise',
-#     'A_Portcullis': 'Portcullis',
-#     'B_Ramparts': 'Ramparts',
-#     'B_Moat': 'Moat',
-#     'C_SallyPort': 'Sally Port',
-#     'C_Drawbridge': 'Drawbridge',
-#     'D_RoughTerrain': 'Rough Terrain',
-#     'D_RockWall': 'Rock Wall'
-# }
-#
-#
+
+defense_render_names_2016 = {
+    'A_ChevalDeFrise': 'Cheval De Frise',
+    'A_Portcullis': 'Portcullis',
+    'B_Ramparts': 'Ramparts',
+    'B_Moat': 'Moat',
+    'C_SallyPort': 'Sally Port',
+    'C_Drawbridge': 'Drawbridge',
+    'D_RoughTerrain': 'Rough Terrain',
+    'D_RockWall': 'Rock Wall'
+}
+
+
 # def ceil(value):
 #     return int(math.ceil(value))
-#
-#
-# def defense_name(value):
-#     if value in defense_render_names_2016:
-#         return defense_render_names_2016[value]
-#     return value
+
+
+def defense_name(value):
+    if value in defense_render_names_2016:
+        return defense_render_names_2016[value]
+    return value
 
 
 def digits(s):
@@ -147,6 +147,7 @@ _filters = {
     "slugify": slugify,
     "isoformat": isoformat,
     "yt_start": yt_start,
+    "defense_name": defense_name,
 }
 
 
