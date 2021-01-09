@@ -22,8 +22,8 @@ from controllers.event_wizard_controller import EventWizardHandler, ReactEventWi
 from controllers.gameday_controller import Gameday2Controller, GamedayHandler, GamedayRedirectHandler
 from controllers.insights_controller import InsightsOverview, InsightsDetail
 from controllers.main_controller import AvatarsHandler, TwoChampsHandler, ContactHandler, HashtagsHandler, FIRSTHOFHandler, \
-    MainLandingHandler, OprHandler, PredictionsHandler, PrivacyHandler, SearchHandler, \
-    AboutHandler, ThanksHandler, handle_404, handle_500, \
+    OprHandler, PredictionsHandler, PrivacyHandler, SearchHandler, \
+    ThanksHandler, handle_404, handle_500, \
     WebcastsHandler, ApiWriteHandler, BrandHandler
 from controllers.match_controller import MatchDetail, MatchTimeseries
 from controllers.match_suggestion_controller import MatchSuggestionHandler
@@ -72,9 +72,7 @@ class Webapp2HandlerAdapter(webapp2.BaseHandlerAdapter):
         return handler.get()
 
 app = webapp2.WSGIApplication([
-      RedirectRoute(r'/', MainLandingHandler, 'landing', strict_slash=True),
       RedirectRoute(r'/2champs', TwoChampsHandler, '2champs', strict_slash=True),
-      RedirectRoute(r'/about', AboutHandler, 'about', strict_slash=True),
       RedirectRoute(r'/account', AccountOverview, 'account-overview', strict_slash=True),
       RedirectRoute(r'/account/api/read_key_add', AccountAPIReadKeyAdd, 'account-api-read-key-add', strict_slash=True),
       RedirectRoute(r'/account/api/read_key_delete', AccountAPIReadKeyDelete, 'account-api-read-key-delete', strict_slash=True),
