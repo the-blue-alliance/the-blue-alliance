@@ -8,7 +8,9 @@ from backend.web import jinja2_filters as filters
 from backend.web.jinja2_filters import defense_render_names_2016
 
 
-@pytest.mark.parametrize("key, name", [(k, v) for k, v in defense_render_names_2016.items()])
+@pytest.mark.parametrize(
+    "key, name", [(k, v) for k, v in defense_render_names_2016.items()]
+)
 def test_defense_name(key: str, name: str) -> None:
     assert filters.defense_name(key) == name
 

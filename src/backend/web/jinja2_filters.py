@@ -10,14 +10,14 @@ from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 # from models.match import Match
 
 defense_render_names_2016 = {
-    'A_ChevalDeFrise': 'Cheval De Frise',
-    'A_Portcullis': 'Portcullis',
-    'B_Ramparts': 'Ramparts',
-    'B_Moat': 'Moat',
-    'C_SallyPort': 'Sally Port',
-    'C_Drawbridge': 'Drawbridge',
-    'D_RoughTerrain': 'Rough Terrain',
-    'D_RockWall': 'Rock Wall'
+    "A_ChevalDeFrise": "Cheval De Frise",
+    "A_Portcullis": "Portcullis",
+    "B_Ramparts": "Ramparts",
+    "B_Moat": "Moat",
+    "C_SallyPort": "Sally Port",
+    "C_Drawbridge": "Drawbridge",
+    "D_RoughTerrain": "Rough Terrain",
+    "D_RockWall": "Rock Wall",
 }
 
 

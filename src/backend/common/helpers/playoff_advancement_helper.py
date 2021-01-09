@@ -113,7 +113,7 @@ class PlayoffAdvancementHelper(object):
             playoff_advancement = cls.generatePlayoffAdvancementRoundRobin(
                 matches, event.year, event.alliance_selections
             )
-            comp_levels = bracket_table.keys()
+            comp_levels = list(bracket_table.keys())
             for comp_level in comp_levels:
                 if comp_level != CompLevel.F:
                     del bracket_table[comp_level]
@@ -121,7 +121,7 @@ class PlayoffAdvancementHelper(object):
             event.playoff_type == PlayoffType.BO3_FINALS
             or event.playoff_type == PlayoffType.BO5_FINALS
         ):
-            comp_levels = bracket_table.keys()
+            comp_levels = list(bracket_table.keys())
             for comp_level in comp_levels:
                 if comp_level != CompLevel.F:
                     del bracket_table[comp_level]
