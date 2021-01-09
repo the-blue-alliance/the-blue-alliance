@@ -166,8 +166,10 @@ class Encoder:
         return
 
     def putPrefixedString(self, v):
+        assert isinstance(v, (str, bytes))
+        if isinstance(v, str):
+            v = v.encode()
 
-        v = str(v).encode()
         self.putVarInt32(len(v))
         self.buf.frombytes(v)
         return

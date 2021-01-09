@@ -2,8 +2,6 @@ import base64
 import datetime
 import json
 import pickle
-import pickletools
-import zlib
 
 from google.cloud import ndb
 from google.cloud.datastore.helpers import GeoPoint
@@ -58,12 +56,12 @@ def _run_test(py2_b64_data, expected_result) -> None:
     )
     assert query_result.result == expected_result
 
-    # Check that py3 would write an equivalent object
-    # TODO do this  too
+    # Check that py3 would write an equivalent object and that the round trip
+    # returns the same data as the original
     check_query_result = CachedQueryResult(id="py3_data", result=expected_result)
     check_entity = ndb.model._entity_to_ds_entity(check_query_result)
-    check_raw_model = ndb.model._entity_from_ds_entity(
-        check_entity, model_class=RawCachedQueryResult
+    check_model = ndb.model._entity_from_ds_entity(
+        check_entity, model_class=CachedQueryResult
     )
 
     # pickletools.dis(zlib.decompress(base64.b64decode(py2_b64_data)))
@@ -71,6 +69,7 @@ def _run_test(py2_b64_data, expected_result) -> None:
 
     # raise Exception(f"result: {base64.b64encode(zlib.decompress(check_raw_model.result))}")
     # assert base64.b64encode(check_raw_model.result) == py2_b64_data
+    assert check_model.result == expected_result
 
 
 class ModelWithInt(ndb.Model):

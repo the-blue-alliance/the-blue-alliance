@@ -52,7 +52,11 @@ class NdbModelEncoder:
 
     @classmethod
     def copy_property_to_proto(
-        cls, pb: EntityProto, prop: Any, val: Optional[Any], prop_prefix: str = "",
+        cls,
+        pb: EntityProto,
+        prop: Any,
+        val: Optional[Any],
+        prop_prefix: str = "",
     ) -> None:
         if isinstance(prop, ndb.StructuredProperty):
             cls._copy_structured_property_to_proto(prop, pb, val, prop_prefix)
@@ -86,8 +90,6 @@ class NdbModelEncoder:
             cls._copy_date_time_property_to_proto(prop, v, p, val)
         elif isinstance(prop, ndb.GenericProperty):
             cls._copy_generic_property_to_proto(prop, v, p, val)
-        elif isinstance(prop, ndb.StructuredProperty):
-            cls._copy_structured_property_to_proto(prop, v, p, val)
         else:
             raise NotImplementedError(f"{prop}")
 
@@ -350,7 +352,9 @@ class NdbModelEncoder:
         if value is not None:
             # TODO: Avoid re-sorting for repeated values.
             for name, prop in sorted(value.items()):
-                cls.copy_property_to_proto(pb, getattr(value_type, name), prop, self._name + ".")
+                cls.copy_property_to_proto(
+                    pb, getattr(value_type, name), prop, self._name + "."
+                )
         else:
             # Serialize a single None
             p = pb.add_property()
