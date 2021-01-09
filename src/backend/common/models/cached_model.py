@@ -9,9 +9,13 @@ from google.cloud.ndb._legacy_entity_pb import (
     Property as ProtoProperty,
     PropertyValue as ProtoPropertyValue,
 )
-from google.cloud.ndb.model import _CompressedValue
+from google.cloud.ndb.model import _BaseValue, _CompressedValue
 
-from backend.common.legacy_gae_entity_model_encoder import EPOCH, MEANING_URI_COMPRESSED, NdbModelEncoder
+from backend.common.legacy_gae_entity_model_encoder import (
+    EPOCH,
+    MEANING_URI_COMPRESSED,
+    NdbModelEncoder,
+)
 from backend.common.legacy_gae_entity_pb_encoder import EntityProtoEncoder
 from backend.common.legacy_gae_protobuf import Encoder as ProtoEncoder
 
@@ -101,6 +105,11 @@ class CachedModel(ndb.Model):
                 pairs=pairs, app=app, namespace=namespace
             )
 
+        def maybe_base_value_or_none(value):
+            if isinstance(value, ndb.Key):
+                return value
+            return None if value is None else _BaseValue(value)
+
         for pb_prop in pb.property_list():
             prop_name = pb_prop.name().decode()
 
@@ -116,7 +125,9 @@ class CachedModel(ndb.Model):
                 prop_type = structprop._model_class
                 if getattr(self, supername) is None:
                     self._set_attributes({supername: prop_type()})
-                getattr(self, supername)._set_attributes({subname: prop_value})
+                getattr(self, supername)._set_attributes(
+                    {subname: maybe_base_value_or_none(prop_value)}
+                )
 
                 if pb_prop.multiple():
                     raise Exception("TODO multiple structured property")
@@ -124,8 +135,12 @@ class CachedModel(ndb.Model):
                 continue
 
             if pb_prop.multiple() and not isinstance(prop_value, list):
-                prop_value = [prop_value]
+                prop_value = [maybe_base_value_or_none(prop_value)]
+            else:
+                prop_value = maybe_base_value_or_none(prop_value)
+
             deserialized_props[prop_name] = prop_value
+
         self._set_attributes(deserialized_props)
 
     @staticmethod

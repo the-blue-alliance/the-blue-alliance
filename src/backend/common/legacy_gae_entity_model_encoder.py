@@ -14,7 +14,7 @@
 # limitations under the License.
 
 import datetime
-from typing import Any
+from typing import Any, Optional
 
 from google.cloud import datastore
 from google.cloud import ndb
@@ -47,16 +47,25 @@ class NdbModelEncoder:
         for name, prop in model._properties.items():  # pyre-ignore[16]
             values = prop._get_base_value_unwrapped_as_list(model)
             for val in values:
-                p = pb.add_property()
-                p.set_name(prop._name)
-                p.set_multiple(prop._repeated)
-                v = p.mutable_value()
-                if val is not None:
-                    NdbModelEncoder.copy_property_to_proto(v, p, prop, val)
+                NdbModelEncoder.copy_property_to_proto(pb, prop, val)
         return pb
 
     @classmethod
-    def copy_property_to_proto(cls, v: PropertyValue, p: Property, prop: Any, val: Any) -> None:
+    def copy_property_to_proto(
+        cls, pb: EntityProto, prop: Any, val: Optional[Any], prop_prefix: str = "",
+    ) -> None:
+        if isinstance(prop, ndb.StructuredProperty):
+            cls._copy_structured_property_to_proto(prop, pb, val, prop_prefix)
+            return
+
+        p = pb.add_property()
+        p.set_name(prop_prefix + prop._name)  # pyre-ignore[6]
+        p.set_multiple(prop._repeated)
+        v = p.mutable_value()
+
+        if val is None:
+            return
+
         if isinstance(prop, ndb.BooleanProperty):
             cls._copy_boolean_property_to_proto(prop, v, p, val)
         elif isinstance(prop, ndb.IntegerProperty):
@@ -77,8 +86,10 @@ class NdbModelEncoder:
             cls._copy_date_time_property_to_proto(prop, v, p, val)
         elif isinstance(prop, ndb.GenericProperty):
             cls._copy_generic_property_to_proto(prop, v, p, val)
+        elif isinstance(prop, ndb.StructuredProperty):
+            cls._copy_structured_property_to_proto(prop, v, p, val)
         else:
-            raise NotImplementedError
+            raise NotImplementedError(f"{prop}")
 
     @staticmethod
     def _add_key_to_entityproto(model: ndb.Model, pb: EntityProto) -> None:
@@ -101,33 +112,48 @@ class NdbModelEncoder:
             pb_key.set_database_id(ref.database_id)
 
     @staticmethod
-    def _copy_boolean_property_to_proto(self: ndb.BooleanProperty, v: PropertyValue, _p: Property, value: Any) -> None:
+    def _copy_boolean_property_to_proto(
+        self: ndb.BooleanProperty, v: PropertyValue, _p: Property, value: Any
+    ) -> None:
         # From BooleanProperty._db_set_value
         # https://github.com/GoogleCloudPlatform/datastore-ndb-python/blob/master/ndb/model.py#L1599
         if not isinstance(value, bool):
-            raise TypeError('BooleanProperty %s can only be set to bool values; received %r' % (self._name, value))
+            raise TypeError(
+                "BooleanProperty %s can only be set to bool values; received %r"
+                % (self._name, value)
+            )
         v.set_booleanvalue(value)
 
     @staticmethod
-    def _copy_integer_property_to_proto(self: ndb.IntegerProperty, v: PropertyValue, _p: Property, value: Any) -> None:
+    def _copy_integer_property_to_proto(
+        self: ndb.IntegerProperty, v: PropertyValue, _p: Property, value: Any
+    ) -> None:
         # From IntegerProperty._db_set_value
         # https://github.com/GoogleCloudPlatform/datastore-ndb-python/blob/master/ndb/model.py#L1622
         if not isinstance(value, (bool, int)):
-            raise TypeError('IntegerProperty %s can only be set to integer values; '
-                            'received %r' % (self._name, value))
+            raise TypeError(
+                "IntegerProperty %s can only be set to integer values; "
+                "received %r" % (self._name, value)
+            )
         v.set_int64value(value)
 
     @staticmethod
-    def _copy_float_property_to_proto(self: ndb.FloatProperty, v: PropertyValue, _p: Property, value: Any) -> None:
+    def _copy_float_property_to_proto(
+        self: ndb.FloatProperty, v: PropertyValue, _p: Property, value: Any
+    ) -> None:
         # From FloatProperty._db_set_value
         # https://github.com/GoogleCloudPlatform/datastore-ndb-python/blob/master/ndb/model.py#L1646
         if not isinstance(value, (bool, int, float)):
-            raise TypeError('FloatProperty %s can only be set to integer or float '
-                            'values; received %r' % (self._name, value))
+            raise TypeError(
+                "FloatProperty %s can only be set to integer or float "
+                "values; received %r" % (self._name, value)
+            )
         v.set_doublevalue(float(value))
 
     @staticmethod
-    def _copy_blob_property_to_proto(self: ndb.BlobProperty, v: PropertyValue, p: Property, value: Any) -> None:
+    def _copy_blob_property_to_proto(
+        self: ndb.BlobProperty, v: PropertyValue, p: Property, value: Any
+    ) -> None:
         # From BlobProperty._db_set_value
         # https://github.com/GoogleCloudPlatform/datastore-ndb-python/blob/master/ndb/model.py#L1735
         if isinstance(value, ndb.model._CompressedValue):
@@ -145,7 +171,9 @@ class NdbModelEncoder:
         v.set_stringvalue(value)
 
     @staticmethod
-    def _copy_text_property_to_proto(self: ndb.TextProperty, v: PropertyValue, p: Property, value: Any) -> None:
+    def _copy_text_property_to_proto(
+        self: ndb.TextProperty, v: PropertyValue, p: Property, value: Any
+    ) -> None:
         # TextProperty does not inherit from BlobProperty in cloud-ndb, so copy the implementation here
         # From BlobProperty._db_set_value
         # https://github.com/GoogleCloudPlatform/datastore-ndb-python/blob/master/ndb/model.py#L1735
@@ -162,25 +190,33 @@ class NdbModelEncoder:
         v.set_stringvalue(value)
 
     @staticmethod
-    def _copy_geo_pt_property_to_proto(self: ndb.GeoPtProperty, v: PropertyValue, p: Property, value: Any) -> None:
+    def _copy_geo_pt_property_to_proto(
+        self: ndb.GeoPtProperty, v: PropertyValue, p: Property, value: Any
+    ) -> None:
         # From GeoPtProperty._db_set_value
         # https://github.com/GoogleCloudPlatform/datastore-ndb-python/blob/master/ndb/model.py#L1822
         if not isinstance(value, GeoPoint):
-            raise TypeError('GeoPtProperty %s can only be set to GeoPt values; '
-                            'received %r' % (self._name, value))
+            raise TypeError(
+                "GeoPtProperty %s can only be set to GeoPt values; "
+                "received %r" % (self._name, value)
+            )
         p.set_meaning(Property.GEORSS_POINT)
         pv = v.mutable_pointvalue()
         pv.set_x(value.latitude)
         pv.set_y(value.longitude)
 
     @staticmethod
-    def _copy_key_property_to_proto(self: ndb.KeyProperty, v: PropertyValue, p: Property, value: Any) -> None:
+    def _copy_key_property_to_proto(
+        self: ndb.KeyProperty, v: PropertyValue, p: Property, value: Any
+    ) -> None:
         # From KeyProperty._db_set_value
         # https://github.com/GoogleCloudPlatform/datastore-ndb-python/blob/master/ndb/model.py#L2023
         if not isinstance(value, datastore.Key):
-            raise TypeError('KeyProperty %s can only be set to Key values; '
-                            'received %r' % (self._name, value))
-        rv = v.mutable_referencevalue()    # A Reference
+            raise TypeError(
+                "KeyProperty %s can only be set to Key values; "
+                "received %r" % (self._name, value)
+            )
+        rv = v.mutable_referencevalue()  # A Reference
         rv.set_app(value.project)
         if value.namespace:
             rv.set_name_space(value.namespace)
@@ -193,33 +229,45 @@ class NdbModelEncoder:
                 e.set_name(elem.name)
 
     @staticmethod
-    def _copy_blob_key_property_to_proto(self: ndb.BlobKeyProperty, v: PropertyValue, p: Property, value: Any) -> None:
+    def _copy_blob_key_property_to_proto(
+        self: ndb.BlobKeyProperty, v: PropertyValue, p: Property, value: Any
+    ) -> None:
         # From BlobKeyProperty._db_set_value
         # https://github.com/GoogleCloudPlatform/datastore-ndb-python/blob/master/ndb/model.py#L2059
         if not isinstance(value, BlobKey):
-            raise TypeError('BlobKeyProperty %s can only be set to BlobKey values; '
-                            'received %r' % (self._name, value))
+            raise TypeError(
+                "BlobKeyProperty %s can only be set to BlobKey values; "
+                "received %r" % (self._name, value)
+            )
         p.set_meaning(Property.BLOBKEY)
         v.set_stringvalue(str(value).encode())
 
     @staticmethod
-    def _copy_date_time_property_to_proto(self: ndb.DateTimeProperty, v: PropertyValue, p: Property, value: Any) -> None:
+    def _copy_date_time_property_to_proto(
+        self: ndb.DateTimeProperty, v: PropertyValue, p: Property, value: Any
+    ) -> None:
         # From DateTimeProperty._db_set_value
         # https://github.com/GoogleCloudPlatform/datastore-ndb-python/blob/master/ndb/model.py#L2122
         if not isinstance(value, datetime.datetime):
-            raise TypeError('DatetimeProperty %s can only be set to datetime values; '
-                            'received %r' % (self._name, value))
+            raise TypeError(
+                "DatetimeProperty %s can only be set to datetime values; "
+                "received %r" % (self._name, value)
+            )
         if value.tzinfo is not None:
-            raise NotImplementedError('DatetimeProperty %s can only support UTC. '
-                                      'Please derive a new Property to support '
-                                      'alternative timezones.' % self._name)
+            raise NotImplementedError(
+                "DatetimeProperty %s can only support UTC. "
+                "Please derive a new Property to support "
+                "alternative timezones." % self._name
+            )
         dt = value - EPOCH
         ival = dt.microseconds + 1000000 * (dt.seconds + 24 * 3600 * dt.days)
         v.set_int64value(ival)
         p.set_meaning(Property.GD_WHEN)
 
     @staticmethod
-    def _copy_generic_property_to_proto(self: ndb.GenericProperty, v: PropertyValue, p: Property, value: Any) -> None:
+    def _copy_generic_property_to_proto(
+        self: ndb.GenericProperty, v: PropertyValue, p: Property, value: Any
+    ) -> None:
         # From GenericProperty._db_set_value
         # https://github.com/GoogleCloudPlatform/datastore-ndb-python/blob/master/ndb/model.py#L2706
         # TODO: use a dict mapping types to functions
@@ -228,22 +276,24 @@ class NdbModelEncoder:
             # TODO: Set meaning to BLOB or BYTESTRING if it's not UTF-8?
             # (Or TEXT if unindexed.)
         elif isinstance(value, str):
-            v.set_stringvalue(value.encode('utf8'))
+            v.set_stringvalue(value.encode("utf8"))
             if not self._indexed:
                 p.set_meaning(Property.TEXT)
-        elif isinstance(value, bool):    # Must test before int!
+        elif isinstance(value, bool):  # Must test before int!
             v.set_booleanvalue(value)
         elif isinstance(value, int):
             if not (-MAX_INT <= value < MAX_INT):
-                raise TypeError('Property %s can only accept 64-bit integers; '
-                                'received %s' % (self._name, value))
+                raise TypeError(
+                    "Property %s can only accept 64-bit integers; "
+                    "received %s" % (self._name, value)
+                )
             v.set_int64value(value)
         elif isinstance(value, float):
             v.set_doublevalue(value)
         elif isinstance(value, ndb.Key):
             # See datastore_types.PackKey
             ref = value.reference()
-            rv = v.mutable_referencevalue()    # A Reference
+            rv = v.mutable_referencevalue()  # A Reference
             rv.set_app(ref.app())
             if ref.has_name_space():
                 rv.set_name_space(ref.name_space())
@@ -256,9 +306,11 @@ class NdbModelEncoder:
                     e.set_name(elem.name)
         elif isinstance(value, datetime.datetime):
             if value.tzinfo is not None:
-                raise NotImplementedError('Property %s can only support the UTC. '
-                                          'Please derive a new Property to support '
-                                          'alternative timezones.' % self._name)
+                raise NotImplementedError(
+                    "Property %s can only support the UTC. "
+                    "Please derive a new Property to support "
+                    "alternative timezones." % self._name
+                )
             dt = value - EPOCH
             ival = dt.microseconds + 1000000 * (dt.seconds + 24 * 3600 * dt.days)
             v.set_int64value(ival)
@@ -286,5 +338,22 @@ class NdbModelEncoder:
             p.set_meaning_uri(MEANING_URI_COMPRESSED.encode())
             p.set_meaning(Property.BLOB)
         else:
-            raise NotImplementedError('Property %s does not support %s types.' %
-                                      (self._name, type(value)))
+            raise NotImplementedError(
+                "Property %s does not support %s types." % (self._name, type(value))
+            )
+
+    @classmethod
+    def _copy_structured_property_to_proto(
+        cls, self: ndb.StructuredProperty, pb: EntityProto, value: Any, prop_prefix: str
+    ) -> None:
+        value_type = self._model_class
+        if value is not None:
+            # TODO: Avoid re-sorting for repeated values.
+            for name, prop in sorted(value.items()):
+                cls.copy_property_to_proto(pb, getattr(value_type, name), prop, self._name + ".")
+        else:
+            # Serialize a single None
+            p = pb.add_property()
+            p.set_name(prop_prefix + self._name)  # pyre-ignore[6]
+            p.set_multiple(self._repeated)
+            p.mutable_value()
