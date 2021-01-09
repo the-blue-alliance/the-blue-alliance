@@ -23,6 +23,7 @@ datastore_mode=$(get_config_prop datastore_mode)
 redis_cache_url=$(get_config_prop redis_cache_url)
 tasks_mode=$(get_config_prop tasks_mode)
 tasks_remote_config_ngrok_url=$(get_config_prop tasks_remote_config.ngrok_url)
+flask_response_cache_enabled=$(get_config_prop flask_response_cache_enabled)
 datastore_args=""
 tasks_args=""
 application=""
@@ -103,5 +104,6 @@ dev_appserver.py \
     --env_var TBA_LOG_LEVEL="$tba_log_level" \
     --env_var NDB_LOG_LEVEL="$ndb_log_level" \
     --env_var TASKS_MODE="$tasks_mode" \
+    --env_var FLASK_RESPONE_CACHE_ENABLED="$flask_response_cache_enabled" \
     --dev_appserver_log_level=$log_level \
     src/default.yaml src/web.yaml src/api.yaml src/tasks_io.yaml src/dispatch.yaml

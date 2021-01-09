@@ -2,6 +2,8 @@ from functools import partial, wraps
 
 from flask import current_app, make_response, request, Response
 
+from backend.common.environment import Environment
+
 
 def cached_public(func=None, timeout: int = 61):
     if func is None:  # Handle no-argument decorator
@@ -9,7 +11,7 @@ def cached_public(func=None, timeout: int = 61):
 
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        if hasattr(current_app, "cache"):
+        if hasattr(current_app, "cache") and Environment.flask_response_cache_enabled():
             cached = current_app.cache.cached(
                 timeout=timeout,
                 response_filter=lambda resp: make_response(resp).status_code == 200,
