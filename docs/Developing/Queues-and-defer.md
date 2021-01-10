@@ -4,15 +4,15 @@ Deferred tasks are used to handle expensive tasks asynchronously in order to not
 
 Usage examples:
 
-```
+```python
 run_after_response(lambda: ...)
 ```
 
-```
+```python
 run_after_response(function_to_run)
 ```
 
-```
+```python
 @run_after_response
 def function_to_run():
     ...
