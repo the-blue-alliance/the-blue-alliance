@@ -6,7 +6,7 @@ from pyre_extensions import none_throws
 
 from backend.common.cache_clearing.get_affected_queries import TCacheKeyAndQuery
 from backend.common.consts.api_version import ApiMajorVersion
-from backend.common.deferred.clients.fake_client import InlineTaskClient
+from backend.common.deferred.clients.fake_client import FakeTaskClient
 from backend.common.futures import TypedFuture
 from backend.common.manipulators.manipulator_base import ManipulatorBase
 from backend.common.models.cached_model import CachedModel, TAffectedReferences
@@ -262,7 +262,7 @@ def test_update_auto_union_false_can_set_empty(ndb_context) -> None:
     assert check.union_prop == []
 
 
-def test_cache_clearing(ndb_context, run_tasks_inline: InlineTaskClient) -> None:
+def test_cache_clearing(ndb_context, task_client: FakeTaskClient) -> None:
     model = DummyModel(id="test", int_prop=1337)
     model.put()
 
@@ -276,10 +276,10 @@ def test_cache_clearing(ndb_context, run_tasks_inline: InlineTaskClient) -> None
     DummyManipulator.createOrUpdate(update)
 
     # Ensure we've enqueued the cache clearing task to be run
-    assert run_tasks_inline.pending_job_count("cache-clearing") == 1
+    assert task_client.pending_job_count("cache-clearing") == 1
 
     # Run cache clearing manually
-    run_tasks_inline.drain_pending_jobs("cache-clearing")
+    task_client.drain_pending_jobs("cache-clearing")
 
     # We should have cleared the cached result
     assert CachedQueryResult.get_by_id(query.cache_key) is None

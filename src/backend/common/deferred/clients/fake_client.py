@@ -1,32 +1,33 @@
-from backend.common.deferred.clients.rq_client import InlineRQTaskClient, RQTaskClient
-from backend.common.redis import RedisClient
+from backend.common.deferred.clients.rq_client import RQTaskClient
+from backend.common.deferred.queues.fake_queue import FakeTaskQueue
 
 
-class InlineTaskClient(InlineRQTaskClient):
-    """
-    Similar interface to an in-memory RQTaskClient, except:
-     - with a stubbed out Redis client
-     - and will execute functions inline so we can manually run them
-    """
+# Similar interface to an in-memory RQTaskClient, except with a stubbed out Redis client
+class FakeTaskClient(RQTaskClient):
+
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(FakeTaskClient, cls).__new__(cls)
+
+        return cls._instance
 
     def __init__(self) -> None:
         from fakeredis import FakeRedis
 
-        super().__init__(
-            default_service="test", redis_client=RedisClient.get() or FakeRedis()
-        )
+        super().__init__(default_service="test", redis_client=FakeRedis())
 
     def pending_job_count(self, queue_name: str) -> int:
         return len(self.queue(queue_name).jobs())
 
     def drain_pending_jobs(self, queue_name: str) -> None:
+        from backend.common.deferred.handlers.defer_handler import run
+
         jobs = self.queue(queue_name).jobs()
-        [j.perform() for j in jobs]
+        [run(j.kwargs["data"]) for j in jobs]
 
-
-# Similar interface to an in-memory RQTaskClient, except with a stubbed out Redis client
-class FakeTaskClient(RQTaskClient):
-    def __init__(self) -> None:
-        from fakeredis import FakeRedis
-
-        super().__init__(default_service="test", redis_client=FakeRedis())
+    def queue(self, name) -> FakeTaskQueue:
+        return FakeTaskQueue(
+            name, default_service=self.default_service, redis_client=self._client
+        )

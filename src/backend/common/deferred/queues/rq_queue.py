@@ -4,7 +4,6 @@ from redis import Redis
 
 from backend.common.deferred.queues.task_queue import TaskQueue
 from backend.common.deferred.requests.rq_request import RQTaskRequest
-from backend.common.deferred.tasks.task import Task
 
 
 class RQTaskQueue(TaskQueue[RQTaskRequest]):
@@ -33,16 +32,3 @@ class RQTaskQueue(TaskQueue[RQTaskRequest]):
         self._queue.enqueue(
             requests.post, url=request.url, data=request.body, headers=request.headers
         )
-
-    def jobs(self):
-        return self._queue.jobs
-
-
-class InlineRQTaskQueue(RQTaskQueue):
-    """
-    A RQ-backed queue, but will run jobs inline
-    instead of making a HTTP request callback
-    """
-
-    def enqueue(self, task: Task, *args, **kwargs) -> None:
-        self._queue.enqueue(task.obj, *task.args, **task.kwargs)

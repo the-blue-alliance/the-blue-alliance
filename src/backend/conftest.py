@@ -1,5 +1,3 @@
-from unittest.mock import MagicMock
-
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from google.cloud import ndb
@@ -7,7 +5,7 @@ from google.cloud.datastore_v1.proto import datastore_pb2_grpc
 from google.cloud.ndb import _datastore_api
 from InMemoryCloudDatastoreStub import datastore_stub
 
-from backend.common.deferred.clients import fake_client
+from backend.common.deferred.clients.fake_client import FakeTaskClient
 from backend.common.models.cached_query_result import CachedQueryResult
 from backend.tests.json_data_importer import JsonDataImporter
 
@@ -41,6 +39,11 @@ def ndb_stub(monkeypatch: MonkeyPatch) -> datastore_stub.LocalDatastoreStub:
 
 
 @pytest.fixture()
+def task_client() -> FakeTaskClient:
+    return FakeTaskClient()
+
+
+@pytest.fixture()
 def ndb_client(init_ndb_env_vars, ndb_stub) -> ndb.Client:
     return ndb.Client()
 
@@ -54,21 +57,6 @@ def ndb_context(ndb_client: ndb.Client):
 @pytest.fixture()
 def test_data_importer(ndb_client) -> JsonDataImporter:
     return JsonDataImporter(ndb_client)
-
-
-@pytest.fixture()
-def run_tasks_inline(monkeypatch: MonkeyPatch) -> fake_client.InlineTaskClient:
-    from fakeredis import FakeRedis
-    from backend.common.redis import RedisClient
-
-    # We want to be able to pull cache clearing tasks off
-    # the queue, which means we'll need to be able to share
-    # a redis instance, so stub out the tasks to run inline
-    shared_redis = FakeRedis()
-    monkeypatch.setattr(RedisClient, "get", MagicMock(return_value=shared_redis))
-    monkeypatch.setattr(fake_client, "FakeTaskClient", fake_client.InlineTaskClient)
-
-    return fake_client.InlineTaskClient()
 
 
 def clear_cached_queries() -> None:

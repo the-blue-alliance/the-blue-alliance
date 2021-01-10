@@ -54,15 +54,13 @@ defer(do_expensive_work, "a", b="c")
 
 The `defer` method can also take several arguments to better control how deferred tasks should execute.
 
-`_client` - A `backend.common.deferred.clients.task_client` instance that manages creating a queue. If this is not specified, `defer` will create a client based on the current environment.
-
-`_target` - The service which the executed task should be run on. If this is not specified, `defer` will attempt to run the task on the service that enqueued the task.
-
-`_url` - The URL that the task should hit. This expects a partial URL (path + query). If this is not specified, tasks will use the `/_ah/queue/deferred` URL.
-
-`_headers` - Any headers that should be passed along to the executing request handler. Currently these headers are unused.
-
-`_queue` - The queue which the task should be enqueued in. If this is not specified, tasks will be enqueued in the `default` queue.
+| Parameter | Description |
+| --- | --- |
+| `_client` | A `backend.common.deferred.clients.task_client` instance that manages creating a queue. If this is not specified, `defer` will create a client based on the current environment. |
+| `_target` | The service which the executed task should be run on. If this is not specified, `defer` will attempt to run the task on the service that enqueued the task. |
+| `_url` | The URL that the task should hit. This expects a partial URL (path + query). If this is not specified, tasks will use the `/_ah/queue/deferred` URL. |
+| `_headers` | Any headers that should be passed along to the executing request handler. Currently these headers are unused. |
+| `_queue` | The queue which the task should be enqueued in. If this is not specified, tasks will be enqueued in the `default` queue. |
 
 ---
 
@@ -132,3 +130,24 @@ Change the `tasks_mode` property in `tba_dev_config.json`/`tba_dev_config.local.
 After syncing over your modified config file, make sure to either restart your dev container or restart the `dev_appserver.sh` script in the tmux session in order to get the local project to respect the modified config file.
 
 Finally, execute the code that defers a task locally. Success/failure of tasks along with logs should be available in the [Google Cloud Tasks Dashboard](https://console.cloud.google.com/cloudtasks). If your task is not being enqueued upstream or the task is failing to execute properly downstream, check for logs in the `gae` tmux tab. If you suspect your task is failing to route properly to your local development contianer, check ngrok for any errors.
+
+
+## Testing Queues + defer
+
+A `FakeTaskClient`, which uses an in-memory Redis stub, can be used during test to mock queues. `FakeTaskClient` is a singleton and calling the initializer will give you the singleton instance. By default, using `defer` will use the `FakeTaskClient` during tests. The `FakeTaskClient` instance is available via a pytest fixture as well for convenience.
+
+`FakeTaskClient` exposes two methods - `pending_job_count` and `drain_pending_jobs`. `pending_job_count` can be used to test that jobs have been enqueued for a given queue, and `drain_pending_jobs` can be used to run all jobs on a given queue. `drain_pending_jobs` does *not* require that a webapp is running to process requests - it will run enqueued functions without going through the usual HTTP routing used for Google Cloud Tasks/RQ tasks.
+
+```python
+def test_enqueue(task_client: FakeTaskClient) -> None:
+    def do_something() -> None:
+        pass
+
+    assert task_client.pending_job_count("testing") == 0
+
+    defer(do_something, _queue="testing")
+
+    assert task_client.pending_job_count("testing") == 1
+
+    task_client.drain_pending_jobs("testing")
+```
