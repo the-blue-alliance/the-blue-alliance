@@ -88,8 +88,15 @@ class EntityProtoDecoder:
 
                 continue
 
-            if pb_prop.multiple() and not isinstance(prop_value, list):
-                prop_value = [maybe_base_value_or_none(prop_value)]
+            if pb_prop.multiple():
+                # For repeated properties, we want to normalize everything to a list
+                # and then make sure we append values onto the data we already have
+                if isinstance(prop_value, list):
+                    listfied_val = prop_value
+                else:
+                    listfied_val = [maybe_base_value_or_none(prop_value)]
+
+                prop_value = deserialized_props.get(prop_name, []) + listfied_val
             else:
                 prop_value = maybe_base_value_or_none(prop_value)
 
