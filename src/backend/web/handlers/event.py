@@ -107,10 +107,7 @@ def event_detail(event_key: EventKey) -> Response:
             none_throws(none_throws(event.parent_event).string_id())
         ).fetch_async()
 
-    print("Awards before: {}".format(event.awards))
     awards = AwardHelper.organizeAwards(event.awards)
-    print("Awards after: {}".format(awards))
-
     cleaned_matches = event.matches
     # MatchHelper.deleteInvalidMatches(event.matches, event)
     match_count, matches = MatchHelper.organizeMatches(cleaned_matches)
