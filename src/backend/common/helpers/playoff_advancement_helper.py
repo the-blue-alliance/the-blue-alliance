@@ -475,7 +475,8 @@ class PlayoffAdvancementHelper(object):
                         else:
                             is_new = True
 
-                    if year == 2018:
+                    if year == 2018 and match.score_breakdown is not None:
+                        breakdown = none_throws(match.score_breakdown)
                         tiebreaker1 = (
                             breakdown[color]["endgamePoints"]
                             if match.has_been_played
@@ -486,7 +487,8 @@ class PlayoffAdvancementHelper(object):
                             if match.has_been_played
                             else 0
                         )
-                    elif year == 2019:
+                    elif year == 2019 and match.score_breakdown is not None:
+                        breakdown = none_throws(match.score_breakdown)
                         tiebreaker1 = (
                             breakdown[color]["cargoPoints"]
                             if match.has_been_played
