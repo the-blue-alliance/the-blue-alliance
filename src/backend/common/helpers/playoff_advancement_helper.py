@@ -381,7 +381,6 @@ class PlayoffAdvancementHelper(object):
                         )
                         or ""
                     )
-                    breakdown = none_throws(match.score_breakdown)
                     for i, complete_alliance in enumerate(
                         complete_alliances
                     ):  # search for alliance. could be more efficient
@@ -440,14 +439,22 @@ class PlayoffAdvancementHelper(object):
                                     record["losses"] += 1
                                 if match.has_been_played:
                                     champ_points.append(cp)
-                                    if year == 2018:
+                                    if (
+                                        year == 2018
+                                        and match.score_breakdown is not None
+                                    ):
+                                        breakdown = none_throws(match.score_breakdown)
                                         tiebreaker1.append(
                                             breakdown[color]["endgamePoints"]
                                         )
                                         tiebreaker2.append(
                                             breakdown[color]["autoPoints"]
                                         )
-                                    elif year == 2019:
+                                    elif (
+                                        year == 2019
+                                        and match.score_breakdown is not None
+                                    ):
+                                        breakdown = none_throws(match.score_breakdown)
                                         tiebreaker1.append(
                                             breakdown[color]["cargoPoints"]
                                         )
