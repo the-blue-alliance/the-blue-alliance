@@ -33,6 +33,17 @@ from backend.common.legacy_protobuf.legacy_gae_entity_model_encoder import (
 )
 
 
+class _OverflowDateTime(int):
+    """
+    Container for GD_WHEN values that don't fit into a datetime.datetime.
+    This class only exists to safely round-trip GD_WHEN values that are too large
+    to fit in a datetime.datetime instance e.g. that were created by Java
+    applications. It should not be created directly.
+
+    See https://github.com/GoogleCloudPlatform/python-compat-runtime/blob/743ade7e1350c790c4aaa48dd2c0893d06d80cee/appengine-compat/exported_appengine_sdk/google/appengine/api/datastore_types.py#L787-L794
+    """
+
+
 class EntityProtoDecoder:
     """
     This is a class that takes fields defined on an EntityProto and sets them on an ndb Model
@@ -105,6 +116,17 @@ class EntityProtoDecoder:
         model._set_attributes(deserialized_props)
 
     @staticmethod
+    def _get_safe_int64_value(v: ProtoPropertyValue) -> int:
+        """
+        This exists to work around https://github.com/googleapis/python-ndb/issues/590
+        TODO: remove if/when that issue is resolved
+        """
+        result = v.int64value()
+        if result >= (1 << 63):
+            result -= 1 << 64
+        return result
+
+    @staticmethod
     def _get_prop_value(v: ProtoPropertyValue, p: ProtoProperty) -> Any:
         # rougly based on https://github.com/GoogleCloudPlatform/datastore-ndb-python/blob/cf4cab3f1f69cd04e1a9229871be466b53729f3f/ndb/model.py#L2647
         if v.has_stringvalue():
@@ -129,9 +151,12 @@ class EntityProtoDecoder:
                         pass
             return sval
         elif v.has_int64value():
-            ival = v.int64value()
+            ival = EntityProtoDecoder._get_safe_int64_value(v)
             if p.meaning() == ProtoProperty.GD_WHEN:
-                return EPOCH + datetime.timedelta(microseconds=ival)
+                try:
+                    return EPOCH + datetime.timedelta(microseconds=ival)
+                except OverflowError:
+                    return _OverflowDateTime(ival)
             return ival
         elif v.has_booleanvalue():
             return bool(v.booleanvalue())

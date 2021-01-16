@@ -12,6 +12,7 @@ from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.location import Location
+from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.team import Team
 
@@ -441,4 +442,32 @@ eJzNlL1v00AYxmM3H06hChAk0AlVJlXbtKKRnZgWMREB/QNar8hy7INc6o/kfAlKEAg6lgFG+C8YmBgQ
             year=2007,
         ),
     ]
+    _run_test(py2_b64, expected_result)
+
+
+def test_cached_result_event_weird_timestamp() -> None:
+    py2_b64 = b"""
+eJyVVMtu2zAQvOsrDB2aImgCUrb86L3H9tAe64DgS7EcSWRJKnUcpN/eXZGy4yQI4oNEkTszXO0OKaWxD8zp2wxe0nQ+uF4G4zJLss+yNUo3/rrlQW6y78Pb0kwyJvq6CXXHWGbEVsuQ2SL7Eew0+2ln2a+L7eV2vaPE/wuCh/sr64y62jjlYHG+3hEBYwFjOUjmuFIQMu82rKIthalEJHxQjjEuQ88bFupWT2BOLvGFiOmA6KRpLWv0vW4O4Wni0sqNMiUAuhARn+Sb+fk94r4hbr1bDnx45jG3MKaPapRY4wOUzPdNeCOzWdpUW6dVLYNWr0GkGkDB9n7D/CG3UUKOEkHzlt3pB9bxVnsEUQQtU3xeOTmlq3Mp5bw4l0IXc6SodykhRRdIKM5mlOf/CZ1OkZKWaBFqLZzmd2ywLZJPC7uIfLJIGrOTzogYXZL1roJHQe5Sr3cCRgXjcgXrkF1VYSpp3xO5RW8Vh4YnxRDDKwgJ4CkadSUYScOowakEOuHGZB40d89tjGSFh6YCc6oyeXJ5sA/UiDdNzTupPdt6041koSMWMQL/ij7moul1/nXymKs/HsbfN18mue+dM7eQ8XFFGoewgsAEGzBE8uizHNaifdIXuCK/eYJvcPrHtcvFS200yyhZHvaB5oL60/6tQkvo8utCl+8Vev/sbMroj65vhT6WvEi70P3xtBPdGcb7YFjs7XMwJTjZJ/PhMxv+kQ0eVOZvd9KVCC3ixeV1eHf7ww2IDmVwNdfd7VEIzFikFn/sUr3IbJmJ6/9Gkf/Z
+    """
+    expected_result = Match(
+        key=ndb.Key("Match", "2006nh_f1m1", project="tbatv-prod-hrd"),
+        actual_time=None,
+        alliances_json='{"blue": {"dqs": [], "surrogates": [], "score": 20, "teams": ["frc319", "frc562", "frc176"]}, "red": {"dqs": [], "surrogates": [], "score": 57, "teams": ["frc1276", "frc1519", "frc133"]}}',
+        comp_level="f",
+        created=datetime.datetime(2019, 8, 1, 1, 47, 53, 22997),
+        event=ndb.Key("Event", "2006nh", project="tbatv-prod-hrd"),
+        match_number=1,
+        no_auto_update=False,
+        post_result_time=None,
+        predicted_time=None,
+        push_sent=None,
+        score_breakdown_json=None,
+        set_number=1,
+        team_key_names=["frc319", "frc562", "frc176", "frc1276", "frc1519", "frc133"],
+        tiebreak_match_key=None,
+        time=datetime.datetime(1900, 1, 1, 4, 56),
+        time_string=None,
+        updated=datetime.datetime(2019, 8, 1, 1, 47, 53, 23002),
+        year=2006,
+    )
     _run_test(py2_b64, expected_result)
