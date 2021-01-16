@@ -43,7 +43,11 @@ class PlayoffAdvancementRoundRobin(NamedTuple):
     sum_tiebreaker2: int
     alliance_name: str
     record: WLTRecord
-    complete: bool
+
+
+class PlayoffAdvancementRoundRobinLevels(TypedDict):
+    sf: List[PlayoffAdvancementRoundRobin]
+    sf_complete: bool
 
 
 class BracketItem(TypedDict):
@@ -354,7 +358,7 @@ class PlayoffAdvancementHelper(object):
         matches: TOrganizedMatches,
         year: Year,
         alliance_selections: Optional[List[EventAlliance]] = None,
-    ) -> Mapping[CompLevel, List[PlayoffAdvancementRoundRobin]]:
+    ) -> PlayoffAdvancementRoundRobinLevels:
         complete_alliances: List[List[TeamNumber]] = []
         alliance_names: List[str] = []
         advancement: DefaultDict[
@@ -411,7 +415,6 @@ class PlayoffAdvancementHelper(object):
                                 _,
                                 _,
                                 record,
-                                _,
                             ),
                         ) in enumerate(
                             advancement[comp_level]
@@ -519,7 +522,6 @@ class PlayoffAdvancementHelper(object):
                                 tiebreaker2,
                                 alliance_name,
                                 record,
-                                any_unplayed,
                             )
                         )
                     elif is_new:
@@ -534,7 +536,6 @@ class PlayoffAdvancementHelper(object):
                                 tiebreaker2,
                                 alliance_names[i],
                                 record,
-                                any_unplayed,
                             )
                         )
 
@@ -548,10 +549,11 @@ class PlayoffAdvancementHelper(object):
                 advancement[comp_level], key=lambda x: -x.sum_champ_points
             )  # sort by championship points
 
-            for i in range(len(advancement[comp_level])):
-                advancement[comp_level][i]._replace(complete=not any_unplayed)
+            advancement[
+                "{}_complete".format(comp_level)  # pyre-ignore
+            ] = not any_unplayed
 
-        return advancement
+        return cast(PlayoffAdvancementRoundRobinLevels, advancement)
 
     @classmethod
     def getOrderedAlliance(
