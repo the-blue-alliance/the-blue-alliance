@@ -10,6 +10,12 @@ def test_get_bad_team_num(web_client: Client) -> None:
     assert resp.status_code == 404
 
 
+def test_get_bad_year(web_client: Client, ndb_client: ndb.Client) -> None:
+    helpers.preseed_team(ndb_client, 254)
+    resp = web_client.get("/team/254/1337")
+    assert resp.status_code == 404
+
+
 def test_team_not_found(web_client: Client) -> None:
     resp = web_client.get("/team/254/2020")
     assert resp.status_code == 404
