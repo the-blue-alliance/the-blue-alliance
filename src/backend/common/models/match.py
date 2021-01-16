@@ -197,7 +197,10 @@ class Match(CachedModel):
         Lazy load score_breakdown_json
         """
         if self._score_breakdown is None and self.score_breakdown_json is not None:
-            score_breakdown = json.loads(none_throws(self.score_breakdown_json))
+            try:
+                score_breakdown = json.loads(none_throws(self.score_breakdown_json))
+            except json.decoder.JSONDecodeError:
+                return None
 
             if self.has_been_played:
                 # Add in RP calculations
