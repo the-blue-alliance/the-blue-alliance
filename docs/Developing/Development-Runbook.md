@@ -145,7 +145,7 @@ $ vagrant up
 
 ## Configuring the Development Environment
 
-It is possible to change the way the local instance inside the dev container runs using a local configuration file. See the [[`tba_dev_config.json`|tba-dev-config]] documentation for more details.
+It is possible to change the way the local instance inside the dev container runs using a local configuration file. See the [[`tba_dev_config.json`|tba_dev_config]] documentation for more details.
 
 ## Generating Type Checker Stubs
 The `stubs/` folder contains [type hint stubs](https://www.python.org/dev/peps/pep-0484/#stub-files) for third-party dependencies that do not natively contain type hints. These type hints are necessary for [pyre](https://pyre-check.org/) (our type checker) to run successfully.

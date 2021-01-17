@@ -113,7 +113,7 @@ $ ./ngrok http 8084
 Forwarding  http://a0e8a1c75a5e.ngrok.io -> http://localhost:8084
 ```
 
-Change the `tasks_mode` property in [[`tba_dev_config.json`/`tba_dev_config.local.json`|tba-dev-config]] to be `remote`, and add a `tasks_remote_config` dictionary with a `ngrok_url` key/value. The value should be the URL for your ngrok URL. Additionally, set the `google_application_credentials` field (details can be found in the [[development runbook|Development-Runbook]]).
+Change the `tasks_mode` property in [[`tba_dev_config.json`/`tba_dev_config.local.json`|tba_dev_config]] to be `remote`, and add a `tasks_remote_config` dictionary with a `ngrok_url` key/value. The value should be the URL for your ngrok URL. Additionally, set the `google_application_credentials` field (details can be found in the [[development runbook|Development-Runbook]]).
 
 ```json
 {
