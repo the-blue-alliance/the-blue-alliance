@@ -67,6 +67,6 @@ Documentation primarily for maintainers.
 
 Runbook for maintainer tasks. A catch-all of administration information.
 
-### [[Preparing for a New Season||New-Season]]
+### [[Preparing for a New Season|New-Season]]
 
 The years start coming and they don't stop coming. Here is a collection of notes for preparing/supporting a new season.
