@@ -34,3 +34,18 @@ def cached_public(func=None, timeout: int = 61):
         return resp
 
     return decorated_function
+
+
+def memoize(func=None, timeout: int = 61):
+    if func is None:  # Handle no-argument decorator
+        return partial(memoize, timeout=timeout)
+
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        if hasattr(current_app, "cache"):
+            cached = current_app.cache.memoize(timeout=timeout)
+            return cached(func)(*args, **kwargs)
+        else:
+            return func(*args, **kwargs)
+
+    return decorated_function
