@@ -10,7 +10,8 @@ exclude =
   ./subtrees/
   ./venv/
   ./node_modules/
-  ./pyre
+  ./.pyre
+
 application_import_names = backend
 import-order-style = edited
 
