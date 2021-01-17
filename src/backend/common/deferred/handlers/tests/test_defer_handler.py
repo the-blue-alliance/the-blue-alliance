@@ -12,6 +12,7 @@ from backend.common.deferred.handlers.defer_handler import (
     run,
 )
 from backend.common.deferred.tasks.task import Task
+from backend.common.url_converters import install_url_converters
 
 
 def test_install_defer_routes():
@@ -19,6 +20,7 @@ def test_install_defer_routes():
     app = Flask(__name__)
     rules = [r for r in app.url_map.iter_rules() if str(r) == route]
     assert len(rules) == 0
+    install_url_converters(app)
     install_defer_routes(app)
     rules = [r for r in app.url_map.iter_rules() if str(r) == route]
     assert len(rules) == 1

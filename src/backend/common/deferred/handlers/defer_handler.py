@@ -3,13 +3,6 @@ import pickle
 from typing import Any
 
 from flask import abort, Flask, request, Response
-from werkzeug.routing import BaseConverter
-
-
-class RegexConverter(BaseConverter):
-    def __init__(self, url_map, *items) -> None:
-        super(RegexConverter, self).__init__(url_map)
-        self.regex = items[0]
 
 
 class PermanentTaskFailure(Exception):
@@ -44,7 +37,6 @@ def handle_defer(path: str) -> Response:
 
 
 def install_defer_routes(app: Flask) -> None:
-    app.url_map.converters["regex"] = RegexConverter
     app.add_url_rule(
         '/_ah/queue/<regex("deferred.*"):path>',
         view_func=handle_defer,
