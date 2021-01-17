@@ -29,10 +29,17 @@ $ pip install -r requirements.txt
 
 ## Pre-Commit Hook
 Install the pre-commit hook to automatically run a series of checks before committing your code upstream. This will ensure that basic issues (linting, type checking, etc.) are fixed locally happen before committing your code upstream.
-```
+
+```bash
+# To install hooks to run before commits (to run tests, etc)
 $ pre-commit install
+
+# To install hooks to run after checking out a commit, do set up repo state
+$ pre-commit install --hook-type post-checkout
 ```
+
 In the case that you want to bypass the pre-commit hook when committing code, you can commit using the `—no-verify` flag
-```
+
+```bash
 $ git commit -m "Bypasing pre-commit hook" --no-verify
 ```
