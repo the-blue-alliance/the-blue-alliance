@@ -25,7 +25,7 @@ If you are planning on developing using WSL, there are a few extra steps you'll 
 
 ## Developing
 
-### [[`tba_dev_config`|tba_dev_config]]
+### [[`tba_dev_config`|tba-dev-config]]
 
 Documentation on configuration option for a local development container using the `tba_dev_config.json` file.
 

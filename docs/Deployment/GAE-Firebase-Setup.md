@@ -90,7 +90,7 @@ Edit the fields specified in the file and save. If you're using the development 
 
 Download a [Firebase service account key](https://firebase.google.com/docs/admin/setup#initialize-sdk) for your project from the Firebase console via Settings -> Service accounts. Move the downloaded key to the `ops/dev/keys/` folder.
 
-Set the [`google_application_credentials` of the `tba_config.json`/`tba_config.local.json`](https://github.com/the-blue-alliance/the-blue-alliance/wiki/Development-Runbook#configuring-the-development-environment-understanding-tba_dev_configjson) to the path of your downloaded key.
+Set the [[`google_application_credentials` of the `tba_config.json`/`tba_config.local.json`|tba-dev-config]] to the path of your downloaded key.
 
 ```json
 {
