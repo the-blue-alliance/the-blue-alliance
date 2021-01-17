@@ -61,8 +61,6 @@ TODO
 
 ## Maintainers
 
-Documentation primarily for maintainers.
-
 ### [[Maintainers Runbook|Maintainer-Runbook]]
 
 Runbook for maintainer tasks. A catch-all of administration information.
