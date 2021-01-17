@@ -6,6 +6,7 @@ Local Dependencies:
  - [python3](https://wiki.python.org/moin/BeginnersGuide/Download)
  - [docker](https://www.docker.com/)
  - [vagrant](https://www.vagrantup.com/)
+ - *(optionally)* [watchman](https://facebook.github.io/watchman/)
 
 You can start the container locally by running `vagrant up`. Once the setup is complete, TBA should be accessable in a web browser at `localhost:8080`.
 
@@ -53,50 +54,11 @@ $ ./ops/build/run_buildweb.sh
 
 ## Running Tests/Typecheck/Lint/etc.
 
-### Running Tests (Python)
-Python tests are run using [pytest](https://docs.pytest.org/en/latest/). You can specify a single file to test, or a directory to run all downstream tests (`test_*.py` files) for. The `--relevant` flag can be used to only test modified codepaths.
-```
-# Run all tests in src/ folder
-$ pytest src/
-# Run only tests for downstream code changes in the src/ folder
-$ pytest src/ --relevant
-```
-
-### Running Lint (Python)
-Python linting is a two-step process - running [`black`](https://black.readthedocs.io/en/stable/) and [`flake8`](https://flake8.pycqa.org/en/latest/). Run them together with the `lint_py3.sh` script. Using the `--fix` flag will automatically reformat code that doesn't meet the style guide requirements.
-```
-# Check for linter errors
-$ ./ops/lint_py3.sh
-# Fixing linter errors automatically
-$ ./ops/lint_py3.sh --fix
-```
-
-### Running Type Checker (Python)
-The Blue Alliance's Python codebases enforces the use of [type hints](https://www.python.org/dev/peps/pep-0484/) using [pyre](https://pyre-check.org/).
-```
-$ ./ops/typecheck_py3.sh
-```
-
-### Running Tests (Node)
-Node tests are run using [Jest](https://jestjs.io/).
-```
-$ ./ops/test_node.sh
-```
-
-### Running Lint (Node)
-Node linting runs using [ESLint](https://eslint.org/). Run using the `ops/lint_node.sh` script. Using the `--fix` flag will automatically reformat code that doesn't meet the style guide requirements.
-```
-# Check for linter errors
-$ ./ops/lint_node.sh
-# Fixing linter errors automatically
-$ ./ops/lint_node.sh --fix
-```
-
-### Running Typechecker/Lint/Tests Locally (outside of container)
+### Set up local venv
 
 In order to run the typechecker, tests, and lints outside of the dev container, you'll need to set up a [venv](https://docs.python.org/3/tutorial/venv.html). You can do so with the following commands:
 
-```
+```bash
 # Create a venv
 $ python3 -m venv ./venv
 
@@ -107,7 +69,66 @@ $ source ./venv/bin/activate
 $ pip install -r requirements.txt; pip install -r src/requirements.txt
 ```
 
-The commands to run the typechecker, tests, and lints will be the same commands listed above.
+In large projects, running the typechecker can be slow, as there is a lot of code to parse. `pyre` can be sped up if [`watchman`](https://facebook.github.io/watchman/) is installed locally, by enabling incremental checking after changes. Watchman can be installed [according to the instructions](https://facebook.github.io/watchman/docs/install.html), or via your operating system's package manager or from source:
+
+```bash
+# On MacOS via homebrew
+$ brew install watchman
+
+# On Ubuntu (https://packages.ubuntu.com/search?keywords=watchman)
+$ sudo apt-get install watchman
+
+# On Fedora (https://koji.fedoraproject.org/koji/packageinfo?packageID=32733)
+$ sudo dnf install watchman
+```
+
+The commands to run the typechecker, tests, and lints are listed below
+
+### Running Tests (Python)
+Python tests are run using [pytest](https://docs.pytest.org/en/latest/). You can specify a single file to test, or a directory to run all downstream tests (`test_*.py` files) for. The `--relevant` flag can be used to only test modified codepaths.
+
+```bash
+# Run all tests in src/ folder
+$ pytest src/
+
+# Run only tests for downstream code changes in the src/ folder
+$ pytest src/ --relevant
+```
+
+### Running Lint (Python)
+Python linting is a two-step process - running [`black`](https://black.readthedocs.io/en/stable/) and [`flake8`](https://flake8.pycqa.org/en/latest/). Run them together with the `lint_py3.sh` script. Using the `--fix` flag will automatically reformat code that doesn't meet the style guide requirements.
+
+```bash
+# Check for linter errors
+$ ./ops/lint_py3.sh
+
+# Fixing linter errors automatically
+$ ./ops/lint_py3.sh --fix
+```
+
+### Running Type Checker (Python)
+The Blue Alliance's Python codebases enforces the use of [type hints](https://www.python.org/dev/peps/pep-0484/) using [pyre](https://pyre-check.org/).
+
+```bash
+$ ./ops/typecheck_py3.sh
+```
+
+### Running Tests (Node)
+Node tests are run using [Jest](https://jestjs.io/).
+
+```bash
+$ ./ops/test_node.sh
+```
+
+### Running Lint (Node)
+Node linting runs using [ESLint](https://eslint.org/). Run using the `ops/lint_node.sh` script. Using the `--fix` flag will automatically reformat code that doesn't meet the style guide requirements.
+
+```bash
+# Check for linter errors
+$ ./ops/lint_node.sh
+# Fixing linter errors automatically
+$ ./ops/lint_node.sh --fix
+```
 
 ## Using the local Dockerfile
 By default Vagrant will look for the pre-built Docker container upstream when provisioning a development container. To use the local `Dockerfile`, set `TBA_LOCAL_DOCKERFILE` to be `true` and start the container normally.
