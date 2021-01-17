@@ -7,12 +7,14 @@ from backend.api.handlers.team import team, team_list, team_list_all, team_list_
 from backend.common.flask_cache import configure_flask_cache
 from backend.common.logging import configure_logging
 from backend.common.middleware import install_middleware
+from backend.common.url_converters import install_url_converters
 
 
 configure_logging()
 
 app = Flask(__name__)
 install_middleware(app)
+install_url_converters(app)
 configure_flask_cache(app)
 
 app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
