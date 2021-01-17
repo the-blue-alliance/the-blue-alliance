@@ -166,6 +166,22 @@ def test_memoize_outside_of_request(app: Flask) -> None:
 
     an_expensive_function.counter = 0
 
+    resp1 = an_expensive_function()
+    assert resp1 == 1
+
+    # By deafult, we shouldn't have memoized anything (because redis isn't configured)
+    resp2 = an_expensive_function()
+    assert resp2 == 2
+
+
+def test_memoize_without_setup(app: Flask) -> None:
+    @memoize
+    def an_expensive_function():
+        an_expensive_function.counter += 1
+        return an_expensive_function.counter
+
+    an_expensive_function.counter = 0
+
     @app.route("/")
     def view():
         return str(an_expensive_function())

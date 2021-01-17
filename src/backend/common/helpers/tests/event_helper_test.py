@@ -1,6 +1,8 @@
 import datetime
 import json
 
+import pytest
+from freezegun import freeze_time
 from google.cloud import ndb
 
 from backend.common.consts.alliance_color import AllianceColor
@@ -315,3 +317,31 @@ def test_group_by_week_preseason(ndb_context) -> None:
     assert events == {
         "Preseason": [e],
     }
+
+
+@pytest.mark.parametrize(
+    "current_date,expected_event_keys",
+    [
+        (datetime.datetime(2019, 3, 1), [f"event_{i}" for i in range(1, 4)]),
+        (datetime.datetime(2019, 3, 4), [f"event_{i}" for i in range(3, 11)]),
+        (datetime.datetime(2019, 3, 6), [f"event_{i}" for i in range(4, 11)]),
+    ],
+)
+def test_get_week_events(ndb_context, current_date, expected_event_keys) -> None:
+    # Seed a month of events
+    [
+        Event(
+            id=f"2019event_{day}",
+            event_short=f"event_{day}",
+            year=2019,
+            event_type_enum=EventType.OFFSEASON,
+            start_date=datetime.datetime(2019, 3, day),
+            end_date=datetime.datetime(2019, 3, day),
+        ).put()
+        for day in range(1, 30)
+    ]
+
+    with freeze_time(current_date):
+        events = EventHelper.getWeekEvents()
+        event_keys = [e.event_short for e in events]
+        assert event_keys == expected_event_keys
