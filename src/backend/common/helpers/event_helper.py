@@ -1,10 +1,13 @@
 from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import cast, Dict, List, NamedTuple, Optional
+
+from google.cloud import ndb
 
 from backend.common.consts import comp_level
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.event_type import EventType
+from backend.common.decorators import memoize
 from backend.common.models.event import Event
 from backend.common.models.event_team_status import WLTRecord
 from backend.common.models.keys import EventKey, TeamKey
@@ -174,3 +177,47 @@ class EventHelper(object):
                 else:
                     wlt["losses"] += 1
         return wlt
+
+    @classmethod
+    @memoize(timeout=3600)  # 1 hour
+    def getWeekEvents(cls) -> List[Event]:
+        """
+        Get events this week
+        In general, if an event is currently going on, it shows up in this query
+        An event shows up in this query iff:
+        a) The event is within_a_day
+        OR
+        b) The event.start_date is on or within 4 days after the closest Wednesday/Monday (pre-2020/post-2020)
+        """
+        today = datetime.today()
+
+        # Make sure all events to be returned are within range
+        two_weeks_of_events_keys_future = (
+            Event.query()
+            .filter(Event.start_date >= (today - timedelta(weeks=1)))
+            .filter(Event.start_date <= (today + timedelta(weeks=1)))
+            .order(Event.start_date)
+            .fetch_async(keys_only=True)
+        )
+
+        events = []
+
+        diff_from_week_start = 0 - today.weekday()
+        closest_start_monday = today + timedelta(days=diff_from_week_start)
+
+        two_weeks_of_event_futures = ndb.get_multi_async(
+            two_weeks_of_events_keys_future.get_result()
+        )
+        for event_future in two_weeks_of_event_futures:
+            event = event_future.get_result()
+            if event.within_a_day:
+                events.append(event)
+            else:
+                offset = event.start_date.date() - closest_start_monday.date()
+                if (offset == timedelta(0)) or (
+                    offset > timedelta(0) and offset < timedelta(weeks=1)
+                ):
+                    events.append(event)
+
+        cls.sort_events(events)
+        return events

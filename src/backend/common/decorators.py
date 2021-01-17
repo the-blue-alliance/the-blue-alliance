@@ -1,6 +1,6 @@
 from functools import partial, wraps
 
-from flask import current_app, make_response, request, Response
+from flask import current_app, has_request_context, make_response, request, Response
 
 from backend.common.environment import Environment
 
@@ -42,7 +42,7 @@ def memoize(func=None, timeout: int = 61):
 
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        if hasattr(current_app, "cache"):
+        if has_request_context() and hasattr(current_app, "cache"):
             cached = current_app.cache.memoize(timeout=timeout)
             return cached(func)(*args, **kwargs)
         else:
