@@ -14,16 +14,19 @@ class EventDetailsConverter(ConverterBase):
         ApiMajorVersion.API_V3: 3,
     }
 
-    def _convert_list(self, model_list: List[EventDetails], version: ApiMajorVersion):
+    @classmethod
+    def _convert_list(cls, model_list: List[EventDetails], version: ApiMajorVersion):
         CONVERTERS = {
-            3: self.eventsDetailsConverter_v3,
+            3: cls.eventsDetailsConverter_v3,
         }
         return CONVERTERS[version](model_list)
 
-    def eventsDetailsConverter_v3(self, event_details: List[EventDetails]):
-        return list(map(self.eventDetailsConverter_v3, event_details))
+    @classmethod
+    def eventsDetailsConverter_v3(cls, event_details: List[EventDetails]):
+        return list(map(cls.eventDetailsConverter_v3, event_details))
 
-    def eventDetailsConverter_v3(self, event_details: EventDetails) -> EventDetailsDict:
+    @classmethod
+    def eventDetailsConverter_v3(cls, event_details: EventDetails) -> EventDetailsDict:
         normalized_oprs = defaultdict(dict)
         if event_details and event_details.matchstats:
             for stat_type, stats in event_details.matchstats.items():

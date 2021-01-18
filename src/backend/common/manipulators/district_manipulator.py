@@ -49,7 +49,7 @@ class DistrictManipulator(ManipulatorBase):
 
     @classmethod
     def updateMerge(
-        cls, new_modle: District, old_model: District, auto_union: bool = True
+        cls, new_model: District, old_model: District, auto_union: bool = True
     ) -> District:
-        cls._update_attrs(new_modle, old_model, auto_union)
+        cls._update_attrs(new_model, old_model, auto_union)
         return old_model

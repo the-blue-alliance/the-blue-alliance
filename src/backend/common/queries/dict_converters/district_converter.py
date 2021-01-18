@@ -12,18 +12,21 @@ class DistrictConverter(ConverterBase):
         ApiMajorVersion.API_V3: 2,
     }
 
+    @classmethod
     def _convert_list(
-        self, model_list: List[District], version: ApiMajorVersion
+        cls, model_list: List[District], version: ApiMajorVersion
     ) -> List[DistrictDict]:
         CONVERTERS = {
-            3: self.districtsConverter_v3,
+            3: cls.districtsConverter_v3,
         }
         return CONVERTERS[version](model_list)
 
-    def districtsConverter_v3(self, districts: List[District]) -> List[DistrictDict]:
-        return list(map(self.districtConverter_v3, districts))
+    @classmethod
+    def districtsConverter_v3(cls, districts: List[District]) -> List[DistrictDict]:
+        return list(map(cls.districtConverter_v3, districts))
 
-    def districtConverter_v3(self, district: District) -> DistrictDict:
+    @classmethod
+    def districtConverter_v3(cls, district: District) -> DistrictDict:
         return DistrictDict(
             {
                 "key": district.key.id(),

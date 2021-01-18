@@ -29,13 +29,15 @@ class ConverterBase(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
             else:
                 return delistify(converted_query_return)
 
+    @classmethod
     @abc.abstractmethod
     def _convert_list(
-        self, model_list: List, version: ApiMajorVersion
+        cls, model_list: List, version: ApiMajorVersion
     ) -> List[DictQueryReturn]:
         return [{} for model in model_list]
 
-    def constructLocation_v3(self, model) -> Dict:
+    @classmethod
+    def constructLocation_v3(cls, model) -> Dict:
         """
         Works for teams and events
         """

@@ -23,12 +23,14 @@ class DummyConverter(ConverterBase):
         ApiMajorVersion.API_V3: 0,
     }
 
+    @classmethod
     def _convert_list(
-        self, model_list: List[DummyModel], version: ApiMajorVersion
+        cls, model_list: List[DummyModel], version: ApiMajorVersion
     ) -> List[DummyDict]:
-        return list(map(self.converter_v3, model_list))
+        return list(map(cls.converter_v3, model_list))
 
-    def converter_v3(self, model: DummyModel) -> DummyDict:
+    @classmethod
+    def converter_v3(cls, model: DummyModel) -> DummyDict:
         return {
             "int_val": model.int_prop,
         }
