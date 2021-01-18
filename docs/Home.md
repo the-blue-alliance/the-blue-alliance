@@ -41,6 +41,10 @@ Details on how to cache data using `redis`.
 
 Helpful commands when developing in The Blue Alliance codebase. This section includes things like how to run tests, how to seed your development environment with production data, and more!
 
+### [[Web Dev Runbook|Web-Dev-Runbook]]
+
+Notes for working effectively and safely in the `web` service.
+
 ### [[Py 2 -> Py 3 Migration Notes|Py2ToPy3]]
 
 Running notes on how to migrate code from the Python 2 codebase to the new Python 3 codebase.
