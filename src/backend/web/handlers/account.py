@@ -29,24 +29,13 @@ blueprint = Blueprint("account", __name__, url_prefix="/account")
 @blueprint.route("")
 @require_login
 def overview() -> str:
-    user = none_throws(current_user())
     template_values = {
         "status": session.pop("account_status", None),
         "webhook_verification_success": request.args.get(
             "webhook_verification_success"
         ),
         "ping_sent": request.args.get("ping_sent"),
-        "ping_enabled": "disabled"
-        if not NotificationsEnable.notifications_enabled()
-        else "",
-        "num_favorites": user.favorites_count,
-        "num_subscriptions": user.subscriptions_count,
-        "submissions_pending": user.submissions_pending_count,
-        "submissions_accepted": user.submissions_accepted_count,
-        "submissions_reviewed": user.submissions_reviewed_count,
-        "review_permissions": user.has_review_permissions,
-        "api_read_keys": user.api_read_keys,
-        "api_write_keys": user.api_write_keys,
+        "ping_enabled": NotificationsEnable.notifications_enabled(),
         "auth_write_type_names": AUTH_TYPE_WRITE_TYPE_NAMES,
     }
     return render_template("account_overview.html", **template_values)
@@ -66,14 +55,11 @@ def register() -> Response:
         error_response = redirect("/")
 
         account_id = request.form.get("account_id")
-        if not account_id:
+        if not account_id or not account_id == user.uid:
             return error_response
 
         display_name = request.form.get("display_name")
         if not display_name:
-            return error_response
-
-        if not account_id == user.uid:
             return error_response
 
         user.register(display_name)

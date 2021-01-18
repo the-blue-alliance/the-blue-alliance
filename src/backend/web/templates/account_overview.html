@@ -118,13 +118,13 @@
     <div class="col-md-6 col-md-offset-3">
       <table class="table table-striped">
         <tbody>
-          <tr>
-            <td>Favorites: </td>
-            <td>{{num_favorites}}</td>
+          <tr id="mytba-favorites-count-row">
+            <td>Favorites:</td>
+            <td>{{ user.favorites_count }}</td>
           </tr>
-          <tr>
-            <td>Subscriptions: </td>
-            <td>{{num_subscriptions}}</td>
+          <tr id="mytba-subscriptions-count-row">
+            <td>Subscriptions:</td>
+            <td>{{ user.subscriptions_count }}</td>
           </tr>
         </tbody>
       </table>
@@ -141,13 +141,13 @@
     <div class="col-md-6 col-md-offset-3">
       <table class="table table-striped">
         <tbody>
-          <tr>
-            <td>Pending: </td>
-            <td>{{submissions_pending}}</td>
+          <tr id="submissions-pending-count-row">
+            <td>Pending:</td>
+            <td>{{ user.submissions_pending_count }}</td>
           </tr>
-          <tr>
-            <td>Accepted: </td>
-            <td>{{submissions_accepted}}</td>
+          <tr id="submissions-accepted-count-row">
+            <td>Accepted:</td>
+            <td>{{ user.submissions_accepted_count }}</td>
           </tr>
         </tbody>
       </table>
@@ -171,7 +171,7 @@
       <p>These keys allow you to access TBA's read APIv3.</p>
     </div>
     <div class="col-md-10 col-md-offset-1">
-      <table class="table table-striped">
+      <table id="api-read-keys" class="table table-striped">
         <tr>
           <th>X-TBA-Auth-Key</th>
           <th>Created</th>
@@ -179,8 +179,8 @@
           <th></th>
         </tr>
         <tbody>
-          {% for key in api_read_keys %}
-            <tr>
+          {% for key in user.api_read_keys %}
+            <tr class="api-read-key">
               <td>
                 {{ key.key.id() }}
               </td>
@@ -191,7 +191,7 @@
                 {{ key.description }}
               </td>
               <td>
-                <form class="form-inline" action="{{ url_for('account.read_key_delete') }}" method="post">
+                <form class="form-inline" action="{{ url_for('account.read_key_delete') }}" method="POST">
                   <input type="hidden" name="key_id" value="{{ key.key.id() }}">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                   <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Delete</button>
@@ -211,7 +211,7 @@
       <p>These keys grant volunteers planning events and working at the scoring table the ability to import offseason event data to TBA. <a href="request/apiwrite" class="btn btn-success pull-right"><span class="glyphicon glyphicon-plus-sign"></span> Request Tokens</a></p>
     </div>
     <div class="col-md-10 col-md-offset-1">
-      <table class="table table-striped">
+      <table id="api-write-keys" class="table table-striped">
         <tr>
           <th>Event</th>
           <th>Permissions</th>
@@ -220,21 +220,18 @@
           <th>Auth Secret</th>
         </tr>
         <tbody>
-          {% for key in api_write_keys %}
-            <tr>
-              <td><ul>
+          {% for key in user.api_write_keys %}
+            <tr class="api-write-key">
+              <td>
               {% for event in key.event_list %}
-                <li>
-                  <a href="/event/{{ event.id() }}">{{ event.id() }}</a>
-                  <a href="/eventwizard?event={{ event.id() }}" class="btn btn-default">EventWizard</a>
-                </li>
-                <hr/>
+                <a href="/event/{{ event.id() }}">{{ event.id() }}</a>
+                <a href="/eventwizard?event={{ event.id() }}" class="btn btn-default">EventWizard</a>
               {% endfor %}
-              </ul></td>
+              </td>
               <td>
                 <ul>
                 {% for auth_type in key.auth_types_enum %}
-                  <li>{{auth_write_type_names[auth_type]}}</li>
+                  <li>{{ auth_write_type_names[auth_type] }}</li>
                 {% endfor %}
                 </ul>
               </td>
@@ -259,7 +256,7 @@
   </div>
   <hr>
 
-  {% if review_permissions %}
+  {% if user.has_review_permissions %}
   <div id="review-permissions-row" class="row">
     <div class="col-md-10 col-md-offset-1">
       <h2>Suggestion Reviews</h2>
@@ -268,9 +265,9 @@
     <div class="col-md-6 col-md-offset-3">
       <table class="table table-striped">
         <tbody>
-          <tr>
-            <td>Reviewed: </td>
-            <td>{{submissions_reviewed}}</td>
+          <tr id="submissions-reviewed-count-row">
+            <td>Reviewed:</td>
+            <td>{{ user.submissions_reviewed_count }}</td>
           </tr>
         </tbody>
       </table>
@@ -301,7 +298,7 @@
           {% for client in user.mobile_clients %}
             < tr>
               <td>{{ client.type_string }}</td>
-              <td> {{ client.display_name }} </td>
+              <td>{{ client.display_name }}</td>
               <td>
                 {% if client.is_webhook %}
                   URL: {{ client.messaging_id }}
@@ -312,15 +309,13 @@
                 {% endif %}
               </td>
               <td><form action="/notifications/broadcast" method="post">
-                <input name="account_id" type="hidden" value="{{ user.uid }}" />
-                <input name="client_id" type="hidden" value="{{client.key.id()}}" />
+                <input name="client_id" type="hidden" value="{{ client.key.id() }}" />
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" class="ping btn btn-default" {{ping_enabled}}><span class="glyphicon glyphicon-cloud"></span> Ping</button>
+                <button type="submit" class="ping btn btn-default" {{ '' if ping_enabled else 'disabled' }}><span class="glyphicon glyphicon-cloud"></span> Ping</button>
               </form></td>
               <td>
                 {% if client.is_webhook %}
                 <form action="/webhooks/delete" method="post">
-                  <input name="account_id" type="hidden" value="{{ user.uid }}" />
                   <input name="client_id" type="hidden" value="{{client.key.id()}}" />
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                   <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Delete</button>
@@ -334,8 +329,7 @@
                   {% else %}
                     <a href="/webhooks/verify/{{client.key.id()}}"><button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span> Verify</button></a>
                     <form action="/webhooks/send_verification" method="post">
-                    <input name="account_id" type="hidden" value="{{ user.uid }}" />
-                    <input name="client_id" type="hidden" value="{{client.key.id()}}" />
+                    <input name="client_id" type="hidden" value="{{ client.key.id() }}" />
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-send"></span> Resend Code</button>
                     </form>
