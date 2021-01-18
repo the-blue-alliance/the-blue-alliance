@@ -19,10 +19,10 @@ class RobotManipulator(ManipulatorBase[Robot]):
 
     @classmethod
     def updateMerge(
-        cls, new_robot: Robot, old_robot: Robot, auto_union: bool = True
+        cls, new_model: Robot, old_model: Robot, auto_union: bool = True
     ) -> Robot:
         """
         Update and return Robots
         """
-        cls._update_attrs(new_robot, old_robot, auto_union)
-        return old_robot
+        cls._update_attrs(new_model, old_model, auto_union)
+        return old_model

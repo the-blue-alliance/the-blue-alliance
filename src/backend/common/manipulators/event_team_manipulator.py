@@ -20,12 +20,12 @@ class EventTeamManipulator(ManipulatorBase[EventTeam]):
     @classmethod
     def updateMerge(
         cls,
-        new_event_team: EventTeam,
-        old_event_team: EventTeam,
+        new_model: EventTeam,
+        old_model: EventTeam,
         auto_union: bool = True,
     ) -> EventTeam:
         """
         Update and return EventTeams.
         """
-        cls._update_attrs(new_event_team, old_event_team, auto_union)
-        return old_event_team
+        cls._update_attrs(new_model, old_model, auto_union)
+        return old_model

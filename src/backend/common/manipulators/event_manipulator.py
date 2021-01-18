@@ -63,27 +63,27 @@ class EventManipulator(ManipulatorBase[Event]):
 
     @classmethod
     def updateMerge(
-        cls, new_event: Event, old_event: Event, auto_union: bool = True
+        cls, new_model: Event, old_model: Event, auto_union: bool = True
     ) -> Event:
-        cls._update_attrs(new_event, old_event, auto_union)
+        cls._update_attrs(new_model, old_model, auto_union)
 
         # Special case to handle webcast_json
-        if not auto_union and new_event.webcast != old_event.webcast:
-            old_event.webcast_json = new_event.webcast_json
-            old_event._webcast = None
-            old_event._dirty = True
+        if not auto_union and new_model.webcast != old_model.webcast:
+            old_model.webcast_json = new_model.webcast_json
+            old_model._webcast = None
+            old_model._dirty = True
         else:
-            if new_event.webcast:
-                old_webcasts = old_event.webcast
+            if new_model.webcast:
+                old_webcasts = old_model.webcast
                 if old_webcasts:
-                    for webcast in new_event.webcast:
+                    for webcast in new_model.webcast:
                         if webcast in old_webcasts:
                             continue
                         else:
                             old_webcasts.append(webcast)
-                            old_event.webcast_json = json.dumps(old_webcasts)
+                            old_model.webcast_json = json.dumps(old_webcasts)
                 else:
-                    old_event.webcast_json = new_event.webcast_json
-                old_event._dirty = True
+                    old_model.webcast_json = new_model.webcast_json
+                old_model._dirty = True
 
-        return old_event
+        return old_model
