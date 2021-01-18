@@ -7,6 +7,7 @@ from backend.common.middleware import install_middleware
 from backend.common.url_converters import install_url_converters
 from backend.web.auth import _user_context_processor
 from backend.web.handlers.account import blueprint as account_blueprint
+from backend.web.handlers.district import district_detail
 from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.event import event_detail, event_list
 from backend.web.handlers.gameday import gameday
@@ -45,6 +46,14 @@ app.add_url_rule("/gameday", view_func=gameday)
 
 app.add_url_rule("/event/<event_key>", view_func=event_detail)
 app.add_url_rule("/events/<int:year>", view_func=event_list)
+app.add_url_rule(
+    '/events/<regex("[a-z]+"):district_abbrev>',
+    view_func=district_detail,
+    defaults={"year": None},
+)
+app.add_url_rule(
+    '/events/<regex("[a-z]+"):district_abbrev>/<int:year>', view_func=district_detail
+)
 app.add_url_rule("/events", view_func=event_list, defaults={"year": None})
 
 app.add_url_rule("/match/<match_key>", view_func=match_detail)

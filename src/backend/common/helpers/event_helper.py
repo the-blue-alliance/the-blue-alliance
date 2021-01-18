@@ -36,18 +36,18 @@ class EventHelper(object):
         Sorts by start date then end date
         Sort is stable
         """
-        events.sort(key=cls._distantFutureIfNoStartDate)
-        events.sort(key=cls._distantFutureIfNoEndDate)
+        events.sort(key=cls.distantFutureIfNoStartDate)
+        events.sort(key=cls.distantFutureIfNoEndDate)
 
     @classmethod
-    def _distantFutureIfNoStartDate(cls, event) -> datetime:
+    def distantFutureIfNoStartDate(cls, event: Event) -> datetime:
         if not event.start_date:
             return datetime(2177, 1, 1, 1, 1, 1)
         else:
             return event.time_as_utc(event.start_date)
 
     @classmethod
-    def _distantFutureIfNoEndDate(cls, event) -> datetime:
+    def distantFutureIfNoEndDate(cls, event: Event) -> datetime:
         if not event.end_date:
             return datetime(2177, 1, 1, 1, 1, 1)
         else:
