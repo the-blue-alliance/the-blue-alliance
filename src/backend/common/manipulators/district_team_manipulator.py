@@ -37,12 +37,12 @@ class DistrictTeamManipulator(ManipulatorBase[DistrictTeam]):
     @classmethod
     def updateMerge(
         cls,
-        new_district_team: DistrictTeam,
-        old_district_team: DistrictTeam,
+        new_model: DistrictTeam,
+        old_model: DistrictTeam,
         auto_union: bool = True,
     ) -> DistrictTeam:
         """
         Update and return DistrictTeams
         """
-        cls._update_attrs(new_district_team, old_district_team, auto_union)
-        return old_district_team
+        cls._update_attrs(new_model, old_model, auto_union)
+        return old_model

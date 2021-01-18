@@ -64,9 +64,9 @@ class EventDetailsManipulator(ManipulatorBase[EventDetails]):
     @classmethod
     def updateMerge(
         cls,
-        new_event_details: EventDetails,
-        old_event_details: EventDetails,
+        new_model: EventDetails,
+        old_model: EventDetails,
         auto_union: bool = True,
     ) -> EventDetails:
-        cls._update_attrs(new_event_details, old_event_details, auto_union)
-        return old_event_details
+        cls._update_attrs(new_model, old_model, auto_union)
+        return old_model

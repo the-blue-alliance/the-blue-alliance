@@ -46,17 +46,17 @@ class TeamManipulator(ManipulatorBase[Team]):
 
     @classmethod
     def updateMerge(
-        cls, new_team: Team, old_team: Team, auto_union: bool = True
+        cls, new_model: Team, old_model: Team, auto_union: bool = True
     ) -> Team:
-        cls._update_attrs(new_team, old_team, auto_union)
+        cls._update_attrs(new_model, old_model, auto_union)
 
         # Take the new tpid and tpid_year iff the year is newer than or equal to the old one
         if (
-            new_team.first_tpid_year is not None
-            and new_team.first_tpid_year >= old_team.first_tpid_year
+            new_model.first_tpid_year is not None
+            and new_model.first_tpid_year >= old_model.first_tpid_year
         ):
-            old_team.first_tpid_year = new_team.first_tpid_year
-            old_team.first_tpid = new_team.first_tpid
-            old_team._dirty = True
+            old_model.first_tpid_year = new_model.first_tpid_year
+            old_model.first_tpid = new_model.first_tpid
+            old_model._dirty = True
 
-        return old_team
+        return old_model

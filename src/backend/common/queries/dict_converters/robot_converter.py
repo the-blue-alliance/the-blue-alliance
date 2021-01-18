@@ -15,18 +15,21 @@ class RobotConverter(ConverterBase):
         ApiMajorVersion.API_V3: 3,
     }
 
+    @classmethod
     def _convert_list(
-        self, model_list: List[Robot], version: ApiMajorVersion
+        cls, model_list: List[Robot], version: ApiMajorVersion
     ) -> List[RobotDict]:
         ROBOT_CONVERTERS = {
-            ApiMajorVersion.API_V3: self.robotsConverter_v3,
+            ApiMajorVersion.API_V3: cls.robotsConverter_v3,
         }
         return ROBOT_CONVERTERS[version](model_list)
 
-    def robotsConverter_v3(self, robots: List[Robot]) -> List[RobotDict]:
-        return list(map(self.robotConverter_v3, robots))
+    @classmethod
+    def robotsConverter_v3(cls, robots: List[Robot]) -> List[RobotDict]:
+        return list(map(cls.robotConverter_v3, robots))
 
-    def robotConverter_v3(self, robot: Robot) -> RobotDict:
+    @classmethod
+    def robotConverter_v3(cls, robot: Robot) -> RobotDict:
         return RobotDict(
             {
                 "key": robot.key_name,

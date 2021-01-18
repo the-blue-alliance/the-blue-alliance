@@ -23,18 +23,21 @@ class EventConverter(ConverterBase):
         ApiMajorVersion.API_V3: 6,
     }
 
+    @classmethod
     def _convert_list(
-        self, model_list: List[Event], version: ApiMajorVersion
+        cls, model_list: List[Event], version: ApiMajorVersion
     ) -> List[EventDict]:
         CONVERTERS = {
-            ApiMajorVersion.API_V3: self.eventsConverter_v3,
+            ApiMajorVersion.API_V3: cls.eventsConverter_v3,
         }
         return CONVERTERS[version](model_list)
 
-    def eventsConverter_v3(self, events: List[Event]) -> List[EventDict]:
-        return list(map(self.eventConverter_v3, events))
+    @classmethod
+    def eventsConverter_v3(cls, events: List[Event]) -> List[EventDict]:
+        return list(map(cls.eventConverter_v3, events))
 
-    def eventConverter_v3(self, event: Event) -> EventDict:
+    @classmethod
+    def eventConverter_v3(cls, event: Event) -> EventDict:
         district_future = (
             none_throws(event.district_key).get_async() if event.district_key else None
         )
@@ -69,7 +72,7 @@ class EventConverter(ConverterBase):
             "week": event.week,
             "website": event.website,
         }
-        event_dict.update(self.constructLocation_v3(event))
+        event_dict.update(cls.constructLocation_v3(event))
 
         if event.start_date:
             event_dict["start_date"] = event.start_date.date().isoformat()
