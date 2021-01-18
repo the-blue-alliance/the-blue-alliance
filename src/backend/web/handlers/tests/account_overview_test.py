@@ -758,3 +758,24 @@ def test_overview_api_read_add_form(
         "button", attrs={"class": "btn btn-success", "type": "submit"}
     )
     assert api_read_key_form_button.text == " Add New Key"
+
+
+def test_overview_api_write_add_button(
+    captured_templates: List[CapturedTemplate], web_client: FlaskClient
+) -> None:
+    mock = user_mock()
+    with patch.object(
+        backend.web.decorators, "current_user", return_value=mock
+    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
+        response = web_client.get("/account")
+
+    assert response.status_code == 200
+    assert len(captured_templates) == 1
+
+    template = captured_templates[0][0]
+    assert template.name == "account_overview.html"
+
+    soup = bs4.BeautifulSoup(response.data, "html.parser")
+    api_write_key_row = soup.find("div", attrs={"class": "row"}, id="api-write-keys-row")
+    api_write_key_row_button = api_write_key_row.find("a", attrs={"href": "request/apiwrite", "class": "btn btn-success pull-right"})
+    assert api_write_key_row_button.text == " Request Tokens"
