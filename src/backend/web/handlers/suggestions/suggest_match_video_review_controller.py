@@ -9,7 +9,7 @@ from backend.common.helpers.match_suggestion_accepter import MatchSuggestionAcce
 from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.common.models.suggestion import Suggestion
-from backend.web.handlers.decorators import require_permission
+from backend.web.decorators import require_permission
 from backend.web.handlers.suggestions.suggestion_review_base import (
     SuggestionsReviewBase,
 )

@@ -9,7 +9,7 @@ from google.cloud import ndb
 import backend.web.auth as backend_auth
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.models.account import Account
-from backend.web.handlers.decorators import (
+from backend.web.decorators import (
     enforce_login,
     require_admin,
     require_any_permission,

@@ -252,7 +252,6 @@ def get_page_title(resp_data: str) -> str:
 def get_years_participated_dropdown(resp_data: str) -> List[str]:
     soup = bs4.BeautifulSoup(resp_data, "html.parser")
     dropdown = soup.find("ul", id="team-year-dropdown")
-    print(f"{dropdown.contents}")
     return [li.string.strip() for li in dropdown.contents if li.name == "li"]
 
 

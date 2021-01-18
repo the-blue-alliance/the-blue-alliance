@@ -20,7 +20,7 @@ from backend.common.suggestions.suggestion_creator import (
     SuggestionCreator,
 )
 from backend.web.auth import current_user
-from backend.web.handlers.decorators import enforce_login, require_login
+from backend.web.decorators import enforce_login, require_login
 from backend.web.profiled_render import render_template
 
 
