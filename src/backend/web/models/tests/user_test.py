@@ -502,3 +502,129 @@ def test_api_keys_method(method, keys) -> None:
     user = User(session_claims={"email": email})
     assert user._account is not None
     assert method.__get__(user) == expected_keys
+
+
+def test_api_read_key_no_key() -> None:
+    user = User(session_claims={"uid": "123", "email": "zach@thebluealliance.com"})
+    assert user.api_read_key("abcd") is None
+
+
+def test_api_read_key_wrong_owner() -> None:
+    api_key_id = "abcd"
+
+    first_user = User(
+        session_claims={"uid": "123", "email": "not-zach@thebluealliance.com"}
+    )
+
+    api_key = ApiAuthAccess(
+        id=api_key_id,
+        owner=first_user.account_key,
+        auth_types_enum=[AuthType.READ_API],
+        description="Test",
+    )
+    api_key.put()
+
+    second_user = User(
+        session_claims={"uid": "456", "email": "zach@thebluealliance.com"}
+    )
+
+    assert second_user.api_read_key(api_key_id) is None
+    assert first_user.api_read_key(api_key_id) == api_key
+
+
+def test_api_read_key_wrong_permission() -> None:
+    api_key_id = "abcd"
+
+    user = User(session_claims={"uid": "123", "email": "zach@thebluealliance.com"})
+    api_key = ApiAuthAccess(
+        id=api_key_id,
+        owner=user.account_key,
+        auth_types_enum=[AuthType.ZEBRA_MOTIONWORKS],
+        description="Test",
+    )
+    api_key.put()
+
+    assert user.api_read_key(api_key_id) is None
+
+
+def test_api_read_key_wrong_key() -> None:
+    api_key_id = "abcd"
+
+    user = User(session_claims={"uid": "123", "email": "zach@thebluealliance.com"})
+    api_key = ApiAuthAccess(
+        id=api_key_id,
+        owner=user.account_key,
+        auth_types_enum=[AuthType.READ_API],
+        description="Test",
+    )
+    api_key.put()
+
+    assert user.api_read_key("wrong") is None
+    assert user.api_read_key(api_key_id) == api_key
+
+
+def test_api_read_key() -> None:
+    api_key_id = "abcd"
+
+    user = User(session_claims={"uid": "123", "email": "zach@thebluealliance.com"})
+    api_key = ApiAuthAccess(
+        id=api_key_id,
+        owner=user.account_key,
+        auth_types_enum=[AuthType.READ_API],
+        description="Test",
+    )
+    api_key.put()
+
+    assert user.api_read_key(api_key_id) == api_key
+
+
+def test_add_api_read_key() -> None:
+    description = "Testing"
+
+    user = User(session_claims={"uid": "123", "email": "zach@thebluealliance.com"})
+    assert len(user.api_read_keys) == 0
+
+    api_key = user.add_api_read_key(description)
+    assert len(user.api_read_keys) == 1
+    assert api_key is not None
+
+    assert len(str(api_key.key.id())) == 64
+    assert api_key.owner == user.account_key
+    assert api_key.is_read_key
+    assert api_key.description == description
+
+
+def test_delete_api_key_wrong_user() -> None:
+    first_user = User(
+        session_claims={"uid": "123", "email": "not-zach@thebluealliance.com"}
+    )
+
+    api_key = ApiAuthAccess(
+        id="abcd",
+        owner=first_user.account_key,
+        auth_types_enum=[AuthType.READ_API],
+        description="Test",
+    )
+    api_key.put()
+
+    second_user = User(
+        session_claims={"uid": "456", "email": "zach@thebluealliance.com"}
+    )
+    with pytest.raises(AssertionError):
+        second_user.delete_api_key(api_key)
+
+
+def test_delete_api_key() -> None:
+    user = User(session_claims={"uid": "123", "email": "not-zach@thebluealliance.com"})
+
+    api_key = ApiAuthAccess(
+        id="abcd",
+        owner=user.account_key,
+        auth_types_enum=[AuthType.READ_API],
+        description="Test",
+    )
+    api_key.put()
+
+    assert len(user.api_read_keys) == 1
+    user.delete_api_key(api_key)
+    assert len(user.api_read_keys) == 0

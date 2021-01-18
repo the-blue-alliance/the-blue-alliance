@@ -1,9 +1,12 @@
+import random
+import string
 from typing import Any, Dict, List, Optional, Union
 
 from google.cloud import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.account_permission import AccountPermission
+from backend.common.consts.auth_type import AuthType
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.models.account import Account
 from backend.common.models.api_auth_access import ApiAuthAccess
@@ -125,17 +128,17 @@ class User:
         )
 
     @property
-    def is_admin(self):
+    def is_admin(self) -> bool:
         return self._session_claims.get("admin", False)
 
-    def register(self, display_name: str):
+    def register(self, display_name: str) -> None:
         if self._account is None:
             return
         none_throws(self._account).display_name = display_name
         none_throws(self._account).registered = True
         none_throws(self._account).put()
 
-    def update_display_name(self, display_name: str):
+    def update_display_name(self, display_name: str) -> None:
         if self._account is None:
             return
         none_throws(self._account).display_name = display_name
@@ -202,6 +205,35 @@ class User:
     def api_read_keys(self) -> List[ApiAuthAccess]:
         return list(filter(lambda key: key.is_read_key, self.api_keys))
 
+    def api_read_key(self, key_id: str) -> Optional[ApiAuthAccess]:
+        return next(
+            (
+                api_read_key
+                for api_read_key in self.api_read_keys
+                if api_read_key.key.id() == key_id
+            ),
+            None,
+        )
+
     @property
     def api_write_keys(self) -> List[ApiAuthAccess]:
         return list(filter(lambda key: key.is_write_key, self.api_keys))
+
+    def add_api_read_key(self, description: str) -> ApiAuthAccess:
+        api_key = ApiAuthAccess(
+            id="".join(
+                random.choice(
+                    string.ascii_lowercase + string.ascii_uppercase + string.digits
+                )
+                for _ in range(64)
+            ),
+            owner=none_throws(self.account_key),
+            auth_types_enum=[AuthType.READ_API],
+            description=description,
+        )
+        api_key.put()
+        return api_key
+
+    def delete_api_key(self, api_key: ApiAuthAccess) -> None:
+        assert api_key.owner == none_throws(self.account_key)
+        api_key.key.delete()

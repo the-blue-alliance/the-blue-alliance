@@ -19,7 +19,7 @@ from backend.common.consts.auth_type import (
 )
 from backend.common.sitevars.notifications_enable import NotificationsEnable
 from backend.web.auth import create_session_cookie, current_user, revoke_session_cookie
-from backend.web.decorators import require_login, require_login_only
+from backend.web.decorators import enforce_login, require_login, require_login_only
 from backend.web.redirect import is_safe_url, safe_next_redirect
 
 
@@ -31,7 +31,7 @@ blueprint = Blueprint("account", __name__, url_prefix="/account")
 def overview() -> str:
     user = none_throws(current_user())
     template_values = {
-        "status": request.args.get("status"),
+        "status": session.pop("account_status", None),
         "webhook_verification_success": request.args.get(
             "webhook_verification_success"
         ),
@@ -104,7 +104,9 @@ def edit() -> Response:
 
         user.update_display_name(display_name)
 
+        _set_account_status("account_edit_success")
         return redirect(url_for("account.overview"))
+
     return make_response(
         render_template(
             "account_edit.html", status=session.pop("account_edit_status", None)
@@ -137,37 +139,56 @@ def logout() -> Response:
     return safe_next_redirect("/")
 
 
-# class AccountAPIReadKeyAdd(LoggedInHandler):
-#     def post(self):
-#         self._require_registration()
-#
-#         description = self.request.get('description')
-#         if description:
-#             ApiAuthAccess(
-#                 id=''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _ in range(64)),
-#                 owner=self.user_bundle.account.key,
-#                 auth_types_enum=[AuthType.READ_API],
-#                 description=description,
-#             ).put()
-#             self.redirect('/account?status=read_key_add_success')
-#         else:
-#             self.redirect('/account?status=read_key_add_no_description')
-#
-#
-# class AccountAPIReadKeyDelete(LoggedInHandler):
-#     def post(self):
-#         self._require_registration()
-#
-#         key_id = self.request.get('key_id')
-#         auth = ApiAuthAccess.get_by_id(key_id)
-#
-#         if auth and auth.owner == self.user_bundle.account.key:
-#             auth.key.delete()
-#             self.redirect('/account?status=read_key_delete_success')
-#         else:
-#             self.redirect('/account?status=read_key_delete_failure')
-#
-#
+@blueprint.route("/api/read_key_add", methods=["POST"])
+@enforce_login
+def read_key_add() -> Response:
+    response = redirect(url_for("account.overview"))
+
+    description = request.form.get("description")
+    if not description:
+        _set_account_status("read_key_add_no_description")
+        return response
+
+    user = none_throws(current_user())
+    try:
+        user.add_api_read_key(description)
+    except Exception:
+        _set_account_status("read_key_add_failure")
+        return response
+
+    _set_account_status("read_key_add_success")
+    return response
+
+
+@blueprint.route("/api/read_key_delete", methods=["POST"])
+@enforce_login
+def read_key_delete() -> Response:
+    response = redirect(url_for("account.overview"))
+
+    def _set_read_key_failure():
+        _set_account_status("read_key_delete_failure")
+
+    key_id = request.form.get("key_id")
+    if not key_id:
+        _set_read_key_failure()
+        return response
+
+    user = none_throws(current_user())
+    api_key = user.api_read_key(key_id)
+    if not api_key:
+        _set_read_key_failure()
+        return response
+
+    user.delete_api_key(api_key)
+
+    _set_account_status("read_key_delete_success")
+    return response
+
+
+def _set_account_status(status: str) -> None:
+    session["account_status"] = status
+
+
 # class MyTBAController(LoggedInHandler):
 #     def get(self):
 #         self._require_registration()
