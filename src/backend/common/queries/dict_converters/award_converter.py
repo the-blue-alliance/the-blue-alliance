@@ -19,12 +19,12 @@ class AwardConverter(ConverterBase):
 
     @classmethod
     def _convert_list(
-        cls, awards: List[Award], version: ApiMajorVersion
+        cls, model_list: List[Award], version: ApiMajorVersion
     ) -> List[AwardDict]:
         AWARD_CONVERTERS = {
             ApiMajorVersion.API_V3: cls.awardsConverter_v3,
         }
-        return AWARD_CONVERTERS[version](awards)
+        return AWARD_CONVERTERS[version](model_list)
 
     @classmethod
     def awardsConverter_v3(cls, awards: List[Award]) -> List[AwardDict]:

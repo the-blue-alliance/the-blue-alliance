@@ -21,12 +21,12 @@ class MatchConverter(ConverterBase):
 
     @classmethod
     def _convert_list(
-        cls, matches: List[Match], version: ApiMajorVersion
+        cls, model_list: List[Match], version: ApiMajorVersion
     ) -> List[MatchDict]:
         CONVERTERS = {
             ApiMajorVersion.API_V3: cls.matchesConverter_v3,
         }
-        return CONVERTERS[version](matches)
+        return CONVERTERS[version](model_list)
 
     @classmethod
     def matchesConverter_v3(cls, matches: List[Match]) -> List[MatchDict]:
