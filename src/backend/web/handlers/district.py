@@ -1,29 +1,18 @@
-<<<<<<< HEAD
-=======
 import datetime
 import logging
->>>>>>> 2e949f3b (simple district detail)
 from operator import itemgetter
 from typing import List, Optional, Tuple
 
 from flask import abort
-<<<<<<< HEAD
-=======
 from google.cloud import ndb
->>>>>>> 2e949f3b (simple district detail)
 from werkzeug.wrappers import Response
 
 from backend.common.decorators import cached_public
 from backend.common.helpers.event_helper import EventHelper
-<<<<<<< HEAD
-from backend.common.helpers.season_helper import SeasonHelper
-from backend.common.helpers.team_helper import TeamHelper
-=======
 from backend.common.helpers.event_team_status_helper import EventTeamStatusHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.team_helper import TeamHelper
 from backend.common.models.event_team import EventTeam
->>>>>>> 2e949f3b (simple district detail)
 from backend.common.models.keys import DistrictAbbreviation, Year
 from backend.common.queries.district_query import (
     DistrictHistoryQuery,
@@ -31,11 +20,7 @@ from backend.common.queries.district_query import (
     DistrictsInYearQuery,
 )
 from backend.common.queries.event_query import DistrictEventsQuery
-<<<<<<< HEAD
-from backend.common.queries.team_query import DistrictTeamsQuery
-=======
 from backend.common.queries.team_query import DistrictTeamsQuery, EventTeamsQuery
->>>>>>> 2e949f3b (simple district detail)
 from backend.web.profiled_render import render_template
 
 
@@ -67,11 +52,6 @@ def district_detail(
     districts_in_year_future = DistrictsInYearQuery(district.year).fetch_async()
 
     # needed for active team statuses
-<<<<<<< HEAD
-    """
-    TODO port this
-=======
->>>>>>> 2e949f3b (simple district detail)
     live_events = []
     live_eventteams_futures = []
 
@@ -79,10 +59,6 @@ def district_detail(
         live_events = EventHelper.week_events()
     for event in live_events:
         live_eventteams_futures.append(EventTeamsQuery(event.key_name).fetch_async())
-<<<<<<< HEAD
-    """
-=======
->>>>>>> 2e949f3b (simple district detail)
 
     events = events_future.get_result()
     EventHelper.sort_events(events)
@@ -98,10 +74,7 @@ def district_detail(
     valid_districts = sorted(valid_districts, key=itemgetter(0))
 
     teams = TeamHelper.sortTeams(district_teams_future.get_result())
-<<<<<<< HEAD
-=======
     team_keys = set([t.key.id() for t in teams])
->>>>>>> 2e949f3b (simple district detail)
 
     num_teams = len(teams)
     middle_value = num_teams // 2
@@ -110,14 +83,6 @@ def district_detail(
     teams_a, teams_b = teams[:middle_value], teams[middle_value:]
 
     # Currently Competing Team Status
-<<<<<<< HEAD
-    live_events_with_teams = []
-    """
-    TODO port live eventteam status
-
-    team_keys = set([t.key.id() for t in teams])
-=======
->>>>>>> 2e949f3b (simple district detail)
     event_team_keys = []
     for event, teams_future in zip(live_events, live_eventteams_futures):
         for team in teams_future.get_result():
@@ -127,11 +92,8 @@ def district_detail(
                 )  # Should be in context cache
 
     ndb.get_multi(event_team_keys)  # Warms context cache
-<<<<<<< HEAD
 
-=======
     live_events_with_teams = []
->>>>>>> 2e949f3b (simple district detail)
     for event, teams_future in zip(live_events, live_eventteams_futures):
         teams_and_statuses = []
         has_teams = False
@@ -158,11 +120,7 @@ def district_detail(
         if has_teams:
             teams_and_statuses.sort(key=lambda x: x[0].team_number)
             live_events_with_teams.append((event, teams_and_statuses))
-<<<<<<< HEAD
-    """
 
-=======
->>>>>>> 2e949f3b (simple district detail)
     live_events_with_teams.sort(key=lambda x: x[0].name)
     live_events_with_teams.sort(
         key=lambda x: EventHelper.start_date_or_distant_future(x[0])

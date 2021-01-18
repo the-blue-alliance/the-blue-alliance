@@ -2,6 +2,7 @@ import unittest
 
 import pytest
 from google.cloud import ndb
+from pyre_extensions import none_throws
 
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
 from backend.common.models.event import Event
@@ -48,7 +49,8 @@ class TestTeamManipulator(unittest.TestCase):
     def assertMergedEventTeam(self, event_team: EventTeam) -> None:
         self.assertOldEventTeam(event_team)
         assert event_team.status is not None
-        assert event_team.status["alliance"]["number"] == 1
+        assert event_team.status["alliance"] is not None
+        assert none_throws(event_team.status["alliance"])["number"] == 1
 
     def test_createOrUpdate(self):
         EventTeamManipulator.createOrUpdate(self.old_team)

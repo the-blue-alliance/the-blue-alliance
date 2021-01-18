@@ -3,6 +3,7 @@
 import re
 
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
+from backend.common.models.match import Match
 
 # import time
 # import urllib
@@ -127,15 +128,13 @@ def yt_start(value):
     return value
 
 
-#
-#
-# def match_short(match_key):
-#     if not Match.validate_key_name(match_key):
-#         return ''
-#     match_id = match_key.split('_')[1]
-#     if match_id.startswith('qm'):
-#         return 'Q{}'.format(match_id[2:])
-#     return match_id.replace('m', '-').upper()
+def match_short(match_key):
+    if not Match.validate_key_name(match_key):
+        return ""
+    match_id = match_key.split("_")[1]
+    if match_id.startswith("qm"):
+        return "Q{}".format(match_id[2:])
+    return match_id.replace("m", "-").upper()
 
 
 _filters = {
@@ -148,6 +147,7 @@ _filters = {
     "isoformat": isoformat,
     "yt_start": yt_start,
     "defense_name": defense_name,
+    "match_short": match_short,
 }
 
 

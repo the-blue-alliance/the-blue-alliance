@@ -6,6 +6,11 @@ from backend.common.models.event_team_status import WLTRecord
 from backend.common.models.keys import TeamKey
 
 
+class RankingSortInfo(TypedDict):
+    name: str
+    precision: int
+
+
 class _EventRankingOptionalFields(TypedDict, total=False):
     # Derived in dict converter
     extra_stats: List[float]
