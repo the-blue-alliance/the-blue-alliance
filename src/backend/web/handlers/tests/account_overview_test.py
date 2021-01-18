@@ -1,12 +1,12 @@
 from random import randint
 from typing import List
-from unittest.mock import Mock, patch
+from unittest.mock import ANY, Mock, patch
 from urllib.parse import parse_qsl, urlparse
 
 import bs4
 import pytest
 from flask import Flask
-from werkzeug.test import Client
+from flask.testing import FlaskClient
 
 import backend
 import backend.web.auth as backend_auth
@@ -41,6 +41,8 @@ def test_blueprint() -> None:
 
     rules_map = {str(rule): rule.endpoint for rule in rules}
     assert rules_map == {
+        "/account/api/read_key_add": "account.read_key_add",
+        "/account/api/read_key_delete": "account.read_key_delete",
         "/account/register": "account.register",
         "/account/logout": "account.logout",
         "/account/login": "account.login",
@@ -49,7 +51,7 @@ def test_blueprint() -> None:
     }
 
 
-def test_overview_logged_out(web_client: Client) -> None:
+def test_overview_logged_out(web_client: FlaskClient) -> None:
     response = web_client.get("/account")
     assert response.status_code == 302
     parsed_response = urlparse(response.headers["Location"])
@@ -59,7 +61,7 @@ def test_overview_logged_out(web_client: Client) -> None:
     }
 
 
-def test_overview_unregistered(web_client: Client) -> None:
+def test_overview_unregistered(web_client: FlaskClient) -> None:
     mock = user_mock(registered=False)
     with patch.object(
         backend.web.decorators, "current_user", return_value=mock
@@ -76,7 +78,7 @@ def test_overview_unregistered(web_client: Client) -> None:
 
 def test_overview(
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     mock = user_mock()
     with patch.object(
@@ -126,6 +128,11 @@ def test_overview(
             False,
         ),
         (
+            "read_key_add_failure",
+            "Unable to add a read API key. If this problem persists, please contact us.",
+            False,
+        ),
+        (
             "read_key_delete_success",
             "The selected read API key has been deleted.",
             True,
@@ -142,13 +149,15 @@ def test_overview_status(
     message: str,
     success: bool,
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     mock = user_mock()
     with patch.object(
         backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get("/account?status={}".format(status))
+    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock), web_client:
+        with web_client.session_transaction() as session:  # pyre-ignore[16]
+            session["account_status"] = status
+        response = web_client.get("/account")
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
@@ -166,7 +175,7 @@ def test_overview_status(
 
 def test_overview_no_status(
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     mock = user_mock()
     with patch.object(
@@ -189,7 +198,7 @@ def test_overview_no_status(
 
 def test_overview_webhook_verification_success(
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     webhook_verification_success = "1"
 
@@ -221,7 +230,7 @@ def test_overview_webhook_verification_success(
 
 def test_overview_no_webhook_verification_success(
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     mock = user_mock()
     with patch.object(
@@ -247,7 +256,7 @@ def test_overview_ping_sent(
     ping_sent: str,
     success: bool,
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     mock = user_mock()
     with patch.object(
@@ -276,7 +285,7 @@ def test_overview_ping_sent(
 
 def test_overview_no_ping_sent(
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     mock = user_mock()
     with patch.object(
@@ -299,7 +308,7 @@ def test_overview_no_ping_sent(
 
 def test_ping_enabled(
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     mock = user_mock()
     # Add a dummy client so we have something to ping, to check that the ping rows are disabled
@@ -331,7 +340,7 @@ def test_ping_enabled(
 
 def test_ping_disabled(
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     mock = user_mock()
     # Add a dummy client so we have something to ping, to check that the ping rows are disabled
@@ -363,7 +372,7 @@ def test_ping_disabled(
 
 def test_num_favorites(
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     favorites_count = randint(1, 100)
 
@@ -390,7 +399,7 @@ def test_num_favorites(
 
 def test_num_subscriptions(
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     subscriptions_count = randint(1, 100)
 
@@ -413,7 +422,7 @@ def test_num_subscriptions(
 
 def test_submissions_pending(
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     submissions_pending_count = randint(1, 100)
 
@@ -436,7 +445,7 @@ def test_submissions_pending(
 
 def test_submissions_accepted(
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     submissions_accepted_count = randint(1, 100)
 
@@ -459,7 +468,7 @@ def test_submissions_accepted(
 
 def test_submissions_reviewed(
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     submissions_reviewed_count = randint(1, 100)
 
@@ -484,7 +493,7 @@ def test_submissions_reviewed(
 def test_has_review_permissions(
     has_review_permissions: bool,
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     mock = user_mock()
     mock.has_review_permissions = has_review_permissions
@@ -513,7 +522,7 @@ def test_has_review_permissions(
 
 def test_api_read_keys(
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     api_read_keys = [Mock()]
 
@@ -536,7 +545,7 @@ def test_api_read_keys(
 
 def test_api_write_keys(
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     api_write_keys = [Mock(event_list=[], auth_types_enum=[])]
 
@@ -559,7 +568,7 @@ def test_api_write_keys(
 
 def test_auth_write_type_names(
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     mock = user_mock()
     with patch.object(
@@ -574,3 +583,29 @@ def test_auth_write_type_names(
     context = captured_templates[0][1]
     assert template.name == "account_overview.html"
     assert context["auth_write_type_names"] == AUTH_TYPE_WRITE_TYPE_NAMES
+
+
+def test_overview_api_read_add_form(captured_templates: List[CapturedTemplate], web_client: FlaskClient) -> None:
+    mock = user_mock()
+    with patch.object(
+        backend.web.decorators, "current_user", return_value=mock
+    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
+        response = web_client.get("/account")
+
+    assert response.status_code == 200
+    assert len(captured_templates) == 1
+
+    template = captured_templates[0][0]
+    assert template.name == "account_overview.html"
+
+    soup = bs4.BeautifulSoup(response.data, "html.parser")
+    api_read_key_form = soup.find("form", id="api-read-key-add")
+    assert api_read_key_form is not None
+    assert api_read_key_form.get("action") == "/account/api/read_key_add"
+    assert api_read_key_form.get("method") == "POST"
+
+    api_read_key_form_inputs = api_read_key_form.find_all("input")
+    assert [(input.get("name"), input.get("value"), input.get("type")) for input in api_read_key_form_inputs] == [("description", None, "text"), ("csrf_token", ANY, "hidden")]
+
+    api_read_key_form_button = api_read_key_form.find("button", attrs={"class": "btn btn-success", "type": "submit"})
+    assert api_read_key_form_button.text == " Add New Key"

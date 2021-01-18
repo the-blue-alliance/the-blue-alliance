@@ -358,6 +358,7 @@ def test_edit_success(web_client: FlaskClient) -> None:
             "/account/edit", data={"account_id": "abc", "display_name": "Zach"}
         )
         assert session.get("account_edit_status") is None
+        assert session.get("account_status") == "account_edit_success"
 
     mock_update_display_name.assert_called_with("Zach")
 
@@ -474,3 +475,124 @@ def test_login_success(web_client: FlaskClient) -> None:
 
     assert response.status_code == 200
     assert response.get_json() == {"status": "success"}
+
+
+def test_read_key_add_no_description(web_client: FlaskClient) -> None:
+    mock = user_mock()
+    with patch.object(
+        backend.web.decorators, "current_user", return_value=mock
+    ), patch.object(
+        backend.web.handlers.account, "current_user", return_value=mock
+    ), patch.object(
+        mock, "add_api_read_key"
+    ) as mock_add_api_read_key, web_client:
+        response = web_client.post("/account/api/read_key_add")
+        assert session.get("account_status") == "read_key_add_no_description"
+
+    mock_add_api_read_key.assert_not_called()
+    assert response.status_code == 302
+    parsed_response = urlparse(response.headers["Location"])
+    assert parsed_response.path == "/account"
+
+
+def test_read_key_add_no_api_key(web_client: FlaskClient) -> None:
+    mock = user_mock()
+    with patch.object(
+        backend.web.decorators, "current_user", return_value=mock
+    ), patch.object(
+        backend.web.handlers.account, "current_user", return_value=mock
+    ), patch.object(
+        mock, "add_api_read_key", side_effect=Exception()
+    ) as mock_add_api_read_key, web_client:
+        response = web_client.post(
+            "/account/api/read_key_add", data={"description": "Testing"}
+        )
+        assert session.get("account_status") == "read_key_add_failure"
+
+    mock_add_api_read_key.assert_called_with("Testing")
+    assert response.status_code == 302
+    parsed_response = urlparse(response.headers["Location"])
+    assert parsed_response.path == "/account"
+
+
+def test_read_key_add(web_client: FlaskClient) -> None:
+    mock = user_mock()
+    with patch.object(
+        backend.web.decorators, "current_user", return_value=mock
+    ), patch.object(
+        backend.web.handlers.account, "current_user", return_value=mock
+    ), patch.object(
+        mock, "add_api_read_key"
+    ) as mock_add_api_read_key, web_client:
+        response = web_client.post(
+            "/account/api/read_key_add", data={"description": "Testing"}
+        )
+        assert session.get("account_status") == "read_key_add_success"
+
+    mock_add_api_read_key.assert_called_with("Testing")
+    assert response.status_code == 302
+    parsed_response = urlparse(response.headers["Location"])
+    assert parsed_response.path == "/account"
+
+
+def test_read_key_delete_no_key_id(web_client: FlaskClient) -> None:
+    mock = user_mock()
+    with patch.object(
+        backend.web.decorators, "current_user", return_value=mock
+    ), patch.object(
+        backend.web.handlers.account, "current_user", return_value=mock
+    ), patch.object(
+        mock, "delete_api_key"
+    ) as mock_delete_api_key, web_client:
+        response = web_client.post("/account/api/read_key_delete")
+        assert session.get("account_status") == "read_key_delete_failure"
+
+    mock_delete_api_key.assert_not_called()
+    assert response.status_code == 302
+    parsed_response = urlparse(response.headers["Location"])
+    assert parsed_response.path == "/account"
+
+
+def test_read_key_delete_no_api_key(web_client: FlaskClient) -> None:
+    mock = user_mock()
+    with patch.object(
+        backend.web.decorators, "current_user", return_value=mock
+    ), patch.object(
+        backend.web.handlers.account, "current_user", return_value=mock
+    ), patch.object(
+        mock, "delete_api_key"
+    ) as mock_delete_api_key, patch.object(
+        mock, "api_read_key", return_value=None
+    ), web_client:
+        response = web_client.post(
+            "/account/api/read_key_delete", data={"key_id": "abcd"}
+        )
+        assert session.get("account_status") == "read_key_delete_failure"
+
+    mock_delete_api_key.assert_not_called()
+    assert response.status_code == 302
+    parsed_response = urlparse(response.headers["Location"])
+    assert parsed_response.path == "/account"
+
+
+def test_read_key_delete(web_client: FlaskClient) -> None:
+    mock = user_mock()
+    mock_api_key = Mock()
+    with patch.object(
+        backend.web.decorators, "current_user", return_value=mock
+    ), patch.object(
+        backend.web.handlers.account, "current_user", return_value=mock
+    ), patch.object(
+        mock, "delete_api_key"
+    ) as mock_delete_api_key, patch.object(
+        mock, "api_read_key", return_value=mock_api_key
+    ), web_client:
+        response = web_client.post(
+            "/account/api/read_key_delete", data={"key_id": "abcd"}
+        )
+        assert session.get("account_status") == "read_key_delete_success"
+
+    mock_delete_api_key.assert_called_with(mock_api_key)
+    assert response.status_code == 302
+    parsed_response = urlparse(response.headers["Location"])
+    assert parsed_response.path == "/account"

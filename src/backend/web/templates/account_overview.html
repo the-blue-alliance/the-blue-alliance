@@ -21,6 +21,12 @@
           <h4>Success!</h4>
           <p>A new read API key has been successfully added.</p>
         </div>
+      {% elif status == 'read_key_add_failure' %}
+        <div class="alert alert-danger">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <h4>Oops!</h4>
+          <p>Unable to add a read API key. If this problem persists, please contact us.</p>
+        </div>
       {% elif status == 'read_key_add_no_description' %}
       <div class="alert alert-danger">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -153,7 +159,7 @@
     <div class="col-md-10 col-md-offset-1">
       <h2>Read API Keys</h2>
 
-      <form class="form-inline pull-right" action="/account/api/read_key_add" method="post">
+      <form id="api-read-key-add" class="form-inline pull-right" action="{{ url_for('account.read_key_add') }}" method="POST">
         <div class="form-group">
           <label for="form-description">Description</label>
           <input type="text" class="form-control" id="form-description" name="description" placeholder="My Scouting App v1">
@@ -185,8 +191,8 @@
                 {{ key.description }}
               </td>
               <td>
-                <form class="form-inline" action="/account/api/read_key_delete" method="post">
-                  <input type="hidden" name="key_id" value="{{key.key.id()}}">
+                <form class="form-inline" action="{{ url_for('account.read_key_delete') }}" method="post">
+                  <input type="hidden" name="key_id" value="{{ key.key.id() }}">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                   <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Delete</button>
                 </form>
