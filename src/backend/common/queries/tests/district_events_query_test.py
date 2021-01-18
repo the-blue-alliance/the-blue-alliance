@@ -40,7 +40,6 @@ def test_no_events() -> None:
 def test_no_events_with_districts() -> None:
     preseed_events(2019, 3, district_abbrev=None)
     events = DistrictEventsQuery(district_key="2019ne").fetch()
-    print(f"{events}")
     assert events == []
 
 

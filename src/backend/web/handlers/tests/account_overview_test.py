@@ -62,7 +62,7 @@ def test_overview_logged_out(web_client: Client) -> None:
 def test_overview_unregistered(web_client: Client) -> None:
     mock = user_mock(registered=False)
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.get("/account")
 
@@ -80,7 +80,7 @@ def test_overview(
 ) -> None:
     mock = user_mock()
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.get("/account")
 
@@ -146,7 +146,7 @@ def test_overview_status(
 ) -> None:
     mock = user_mock()
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.get("/account?status={}".format(status))
 
@@ -170,7 +170,7 @@ def test_overview_no_status(
 ) -> None:
     mock = user_mock()
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.get("/account")
 
@@ -195,7 +195,7 @@ def test_overview_webhook_verification_success(
 
     mock = user_mock()
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.get(
             "/account?webhook_verification_success={}".format(
@@ -225,7 +225,7 @@ def test_overview_no_webhook_verification_success(
 ) -> None:
     mock = user_mock()
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.get("/account")
 
@@ -251,7 +251,7 @@ def test_overview_ping_sent(
 ) -> None:
     mock = user_mock()
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.get("/account?ping_sent={}".format(ping_sent))
 
@@ -280,7 +280,7 @@ def test_overview_no_ping_sent(
 ) -> None:
     mock = user_mock()
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.get("/account")
 
@@ -306,7 +306,7 @@ def test_ping_enabled(
     mock.mobile_clients = [Mock()]
 
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(
         backend.web.handlers.account, "current_user", return_value=mock
     ), patch.object(
@@ -338,7 +338,7 @@ def test_ping_disabled(
     mock.mobile_clients = [Mock()]
 
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(
         backend.web.handlers.account, "current_user", return_value=mock
     ), patch.object(
@@ -371,7 +371,7 @@ def test_num_favorites(
     mock.favorites_count = favorites_count
 
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(
         backend.web.handlers.account, "current_user", return_value=mock
     ), patch.object(
@@ -398,7 +398,7 @@ def test_num_subscriptions(
     mock.subscriptions_count = subscriptions_count
 
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.get("/account")
 
@@ -421,7 +421,7 @@ def test_submissions_pending(
     mock.submissions_pending_count = submissions_pending_count
 
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.get("/account")
 
@@ -444,7 +444,7 @@ def test_submissions_accepted(
     mock.submissions_accepted_count = submissions_accepted_count
 
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.get("/account")
 
@@ -467,7 +467,7 @@ def test_submissions_reviewed(
     mock.submissions_reviewed_count = submissions_reviewed_count
 
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.get("/account")
 
@@ -490,7 +490,7 @@ def test_has_review_permissions(
     mock.has_review_permissions = has_review_permissions
 
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.get("/account")
 
@@ -521,7 +521,7 @@ def test_api_read_keys(
     mock.api_read_keys = api_read_keys
 
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.get("/account")
 
@@ -544,7 +544,7 @@ def test_api_write_keys(
     mock.api_write_keys = api_write_keys
 
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.get("/account")
 
@@ -563,7 +563,7 @@ def test_auth_write_type_names(
 ) -> None:
     mock = user_mock()
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.get("/account")
 

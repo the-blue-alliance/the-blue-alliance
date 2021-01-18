@@ -32,7 +32,7 @@ def test_register_unregistered(
 ) -> None:
     mock = user_mock(registered=False)
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.get("/account/register")
 
@@ -62,7 +62,7 @@ def test_register_unregistered_next(
 ) -> None:
     mock = user_mock(registered=False)
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.get("/account/register?next={}".format(quote(next_url)))
 
@@ -91,7 +91,7 @@ def test_register_register(
 ) -> None:
     mock = user_mock()
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.get("/account/register?next={}".format(quote(next_url)))
 
@@ -105,7 +105,7 @@ def test_register_register_no_account_id(web_client: FlaskClient) -> None:
     mock.uid = "abc"
 
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.post("/account/register", data={"display_name": "Zach"})
 
@@ -119,7 +119,7 @@ def test_register_register_no_display_name(web_client: FlaskClient) -> None:
     mock.uid = "abc"
 
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.post("/account/register", data={"account_id": "abc"})
 
@@ -133,7 +133,7 @@ def test_register_register_account_id_mismatch(web_client: FlaskClient) -> None:
     mock.uid = "abc"
 
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.post(
             "/account/register", data={"account_id": "efg", "display_name": "Zach"}
@@ -161,7 +161,7 @@ def test_register_register_account(
     mock.uid = "abc"
 
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(
         backend.web.handlers.account, "current_user", return_value=mock
     ), patch.object(
@@ -192,7 +192,7 @@ def test_edit_logged_out(web_client: FlaskClient) -> None:
 def test_edit_unregistered(web_client: FlaskClient) -> None:
     mock = user_mock(registered=False)
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.get("/account/edit")
 
@@ -209,7 +209,7 @@ def test_edit(
 ) -> None:
     mock = user_mock()
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.get("/account/edit")
 
@@ -223,12 +223,10 @@ def test_edit(
     assert context["status"] is None
 
 
-def test_edit_no_account_id(
-    captured_templates: List[CapturedTemplate], web_client: FlaskClient
-) -> None:
+def test_edit_no_account_id(web_client: FlaskClient) -> None:
     mock = user_mock()
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(
         backend.web.handlers.account, "current_user", return_value=mock
     ), web_client:
@@ -245,7 +243,7 @@ def test_edit_no_account_id_follow_redirect(
 ) -> None:
     mock = user_mock()
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(
         backend.web.handlers.account, "current_user", return_value=mock
     ), web_client:
@@ -261,14 +259,12 @@ def test_edit_no_account_id_follow_redirect(
     assert context["status"] == "account_edit_failure"
 
 
-def test_edit_mismatch_account_id(
-    captured_templates: List[CapturedTemplate], web_client: FlaskClient
-) -> None:
+def test_edit_mismatch_account_id(web_client: FlaskClient) -> None:
     mock = user_mock()
     mock.uid = "abc"
 
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(
         backend.web.handlers.account, "current_user", return_value=mock
     ), web_client:
@@ -287,7 +283,7 @@ def test_edit_mismatch_account_id_follow_redirect(
     mock.uid = "abc"
 
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(
         backend.web.handlers.account, "current_user", return_value=mock
     ), web_client:
@@ -305,14 +301,12 @@ def test_edit_mismatch_account_id_follow_redirect(
     assert context["status"] == "account_edit_failure"
 
 
-def test_edit_no_display_name(
-    captured_templates: List[CapturedTemplate], web_client: FlaskClient
-) -> None:
+def test_edit_no_display_name(web_client: FlaskClient) -> None:
     mock = user_mock()
     mock.uid = "abc"
 
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(
         backend.web.handlers.account, "current_user", return_value=mock
     ), web_client:
@@ -331,7 +325,7 @@ def test_edit_no_display_name_follow_redirect(
     mock.uid = "abc"
 
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(
         backend.web.handlers.account, "current_user", return_value=mock
     ), web_client:
@@ -349,14 +343,12 @@ def test_edit_no_display_name_follow_redirect(
     assert context["status"] == "account_edit_failure_name"
 
 
-def test_edit_success(
-    captured_templates: List[CapturedTemplate], web_client: FlaskClient
-) -> None:
+def test_edit_success(web_client: FlaskClient) -> None:
     mock = user_mock()
     mock.uid = "abc"
 
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(
         backend.web.handlers.account, "current_user", return_value=mock
     ), web_client, patch.object(
@@ -399,7 +391,7 @@ def test_logout_unregistered(
 ) -> None:
     mock = user_mock(registered=False)
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(
         backend.web.handlers.account, "current_user", return_value=mock
     ), patch.object(
@@ -427,7 +419,7 @@ def test_logout_unregistered(
 def test_logout(next_url: str, expected: str, web_client: FlaskClient) -> None:
     mock = user_mock()
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(
         backend.web.handlers.account, "current_user", return_value=mock
     ), patch.object(
@@ -445,7 +437,7 @@ def test_logout(next_url: str, expected: str, web_client: FlaskClient) -> None:
 def test_login_logged_in(web_client: FlaskClient) -> None:
     mock = user_mock()
     with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
+        backend.web.decorators, "current_user", return_value=mock
     ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
         response = web_client.get("/account/login")
 

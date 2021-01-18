@@ -7,7 +7,7 @@ from backend.common.consts.account_permission import (
 )
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.helpers.suggestion_fetcher import SuggestionFetcher
-from backend.web.handlers.decorators import require_any_permission
+from backend.web.decorators import require_any_permission
 from backend.web.handlers.suggestions.suggest_apiwrite_review_controller import (
     SuggestApiWriteReviewController,
 )
