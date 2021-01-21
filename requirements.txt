@@ -4,7 +4,7 @@ flake8==3.8.4
 flake8-import-order
 blinker==1.4
 fakeredis
-freezegun==1.0.0
+freezegun==1.1.0
 InMemoryCloudDatastoreStub
 pre-commit
 pyre-check==0.0.59
