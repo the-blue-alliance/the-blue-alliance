@@ -369,18 +369,23 @@ class DatafeedFMSAPI(object):
         district = District.get_by_id(district_key)
         if not district:
             return None
+
         year = int(district_key[:4])
         district_short = district_key[4:]
         advancement = {}
-        for page in range(1, 15):  # Ensure this won't loop forever
+
+        more_pages = True
+        page = 1
+
+        while more_pages:
             url = self.FMS_API_DISTRICT_RANKINGS_PATTERN % (year, district_short.upper(), page)
             result = self._parse(url, FMSAPIDistrictRankingsParser(advancement))
             if not result:
                 break
+
             advancement, more_pages = result
 
-            if not more_pages:
-                break
+            page = page + 1
 
         district.advancement = advancement
         return [district]
@@ -408,17 +413,21 @@ class DatafeedFMSAPI(object):
         api_event_short = self._get_event_short(event_short, event)
         avatars = []
         keys_to_delete = set()
-        for page in range(1, 9):  # Ensure this won't loop forever. 8 pages should be more than enough
+
+        more_pages = True
+        page = 1
+
+        while more_pages:
             url = self.FMS_API_EVENT_AVATAR_URL_PATTERN % (year, api_event_short, page)
             result = self._parse(url, parser)
             if result is None:
                 break
+
             partial_avatars, partial_keys_to_delete, more_pages = result
             avatars.extend(partial_avatars)
             keys_to_delete = keys_to_delete.union(partial_keys_to_delete)
 
-            if not more_pages:
-                break
+            page = page + 1
 
         return avatars, keys_to_delete
 
@@ -430,15 +439,19 @@ class DatafeedFMSAPI(object):
         event = Event.get_by_id(event_key)
         parser = FMSAPITeamDetailsParser(year)
         models = []  # will be list of tuples (team, districtteam, robot) model
-        for page in range(1, 9):  # Ensure this won't loop forever. 8 pages should be more than enough
+
+        more_pages = True
+        page = 1
+
+        while more_pages:
             url = self.FMS_API_EVENTTEAM_LIST_URL_PATTERN % (year, self._get_event_short(event_code, event), page)
             result = self._parse(url, parser)
             if result is None:
                 break
+
             partial_models, more_pages = result
             models.extend(partial_models)
 
-            if not more_pages:
-                break
+            page = page + 1
 
         return models
