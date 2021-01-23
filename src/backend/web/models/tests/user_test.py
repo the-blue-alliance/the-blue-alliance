@@ -628,3 +628,30 @@ def test_delete_api_key() -> None:
     assert len(user.api_read_keys) == 1
     user.delete_api_key(api_key)
     assert len(user.api_read_keys) == 0
+
+
+def test_mytba() -> None:
+    email = "zach@thebluealliance.com"
+
+    account = Account(id="account", email=email)
+    account.put()
+
+    f = Favorite(
+        parent=account.key,
+        user_id=account.key.id(),
+        model_key="frc7332",
+        model_type=ModelType.TEAM,
+    )
+    f.put()
+    s = Subscription(
+        parent=account.key,
+        user_id=account.key.id(),
+        model_key="frc7332",
+        model_type=ModelType.TEAM,
+    )
+    s.put()
+
+    user = User(session_claims={"email": email})
+    mytba = user.myTBA
+    assert mytba is not None
+    assert mytba.models == [f, s]
