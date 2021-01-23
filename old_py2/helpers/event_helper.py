@@ -53,10 +53,10 @@ class EventHelper(object):
         Given a team_key, and an event, find the team's Win Loss Tie.
         """
         match_keys = Match.query(Match.event == event.key, Match.team_key_names == team_key).fetch(500, keys_only=True)
-        return self.calculateTeamWLTFromMatches(team_key, ndb.get_multi(match_keys))
+        return self.calculate_wlt(team_key, ndb.get_multi(match_keys))
 
     @classmethod
-    def getWeekEvents(self):
+    def week_events(self):
         """
         Get events this week
         In general, if an event is currently going on, it shows up in this query
@@ -65,7 +65,7 @@ class EventHelper(object):
         OR
         b) The event.start_date is on or within 4 days after the closest Wednesday/Monday (pre-2020/post-2020)
         """
-        event_keys = memcache.get('EventHelper.getWeekEvents():event_keys')
+        event_keys = memcache.get('EventHelper.week_events():event_keys')
         if event_keys is not None:
             return ndb.get_multi(event_keys)
 
@@ -93,7 +93,7 @@ class EventHelper(object):
                     events.append(event)
 
         EventHelper.sort_events(events)
-        memcache.set('EventHelper.getWeekEvents():event_keys', [e.key for e in events], 60*60)
+        memcache.set('EventHelper.week_events():event_keys', [e.key for e in events], 60*60)
         return events
 
     @classmethod
@@ -102,7 +102,7 @@ class EventHelper(object):
         if event_keys is not None:
             return ndb.get_multi(event_keys)
 
-        events = filter(lambda e: e.within_a_day, self.getWeekEvents())
+        events = filter(lambda e: e.within_a_day, self.week_events())
         memcache.set('EventHelper.getEventsWithinADay():event_keys', [e.key for e in events], 60*60)
         return events
 

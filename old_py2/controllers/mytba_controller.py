@@ -92,8 +92,8 @@ class MyTBALiveController(LoggedInHandler):
             teams_and_statuses.sort(key=lambda x: x[0].team_number)
             past_events_with_teams.append((event, teams_and_statuses))
         past_events_with_teams.sort(key=lambda x: x[0].name)
-        past_events_with_teams.sort(key=lambda x: EventHelper.distantFutureIfNoStartDate(x[0]))
-        past_events_with_teams.sort(key=lambda x: EventHelper.distantFutureIfNoEndDate(x[0]))
+        past_events_with_teams.sort(key=lambda x: EventHelper.start_date_or_distant_future(x[0]))
+        past_events_with_teams.sort(key=lambda x: EventHelper.end_date_or_distant_future(x[0]))
 
         live_events_with_teams = []
         for event, teams in live_events_by_event.itervalues():
@@ -112,16 +112,16 @@ class MyTBALiveController(LoggedInHandler):
             teams_and_statuses.sort(key=lambda x: x[0].team_number)
             live_events_with_teams.append((event, teams_and_statuses))
         live_events_with_teams.sort(key=lambda x: x[0].name)
-        live_events_with_teams.sort(key=lambda x: EventHelper.distantFutureIfNoStartDate(x[0]))
-        live_events_with_teams.sort(key=lambda x: EventHelper.distantFutureIfNoEndDate(x[0]))
+        live_events_with_teams.sort(key=lambda x: EventHelper.start_date_or_distant_future(x[0]))
+        live_events_with_teams.sort(key=lambda x: EventHelper.end_date_or_distant_future(x[0]))
 
         future_events_with_teams = []
         for event, teams in future_events_by_event.itervalues():
             teams.sort(key=lambda t: t.team_number)
             future_events_with_teams.append((event, teams))
         future_events_with_teams.sort(key=lambda x: x[0].name)
-        future_events_with_teams.sort(key=lambda x: EventHelper.distantFutureIfNoStartDate(x[0]))
-        future_events_with_teams.sort(key=lambda x: EventHelper.distantFutureIfNoEndDate(x[0]))
+        future_events_with_teams.sort(key=lambda x: EventHelper.start_date_or_distant_future(x[0]))
+        future_events_with_teams.sort(key=lambda x: EventHelper.end_date_or_distant_future(x[0]))
 
         self.template_values.update({
             'year': year,

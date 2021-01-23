@@ -16,7 +16,7 @@ from backend.common.models.match import Match
 
 
 def test_calculate_avg_score_no_matches() -> None:
-    avg_score = EventHelper.calculateTeamAvgScoreFromMatches("frc254", [])
+    avg_score = EventHelper.calculate_team_avg_score("frc254", [])
     assert avg_score == TeamAvgScore(
         qual_avg=None,
         elim_avg=None,
@@ -32,7 +32,7 @@ def test_calculate_avg_score_no_team_matches() -> None:
     }
     m = Match(comp_level=CompLevel.QM, alliances_json=json.dumps(alliance_dict))
 
-    avg_score = EventHelper.calculateTeamAvgScoreFromMatches("frc254", [m])
+    avg_score = EventHelper.calculate_team_avg_score("frc254", [m])
     assert avg_score == TeamAvgScore(
         qual_avg=None,
         elim_avg=None,
@@ -48,7 +48,7 @@ def test_calculate_avg_score_all_unplayed() -> None:
     }
     m = Match(comp_level=CompLevel.QM, alliances_json=json.dumps(alliance_dict))
 
-    avg_score = EventHelper.calculateTeamAvgScoreFromMatches("frc1", [m])
+    avg_score = EventHelper.calculate_team_avg_score("frc1", [m])
     assert avg_score == TeamAvgScore(
         qual_avg=None,
         elim_avg=None,
@@ -85,7 +85,7 @@ def test_calculate_avg_score_qual_only() -> None:
         ),
     )
 
-    avg_score = EventHelper.calculateTeamAvgScoreFromMatches("frc1", [m1, m2])
+    avg_score = EventHelper.calculate_team_avg_score("frc1", [m1, m2])
     assert avg_score == TeamAvgScore(
         qual_avg=4.0,
         elim_avg=None,
@@ -122,7 +122,7 @@ def test_calculate_avg_score_elim_only() -> None:
         ),
     )
 
-    avg_score = EventHelper.calculateTeamAvgScoreFromMatches("frc1", [m1, m2])
+    avg_score = EventHelper.calculate_team_avg_score("frc1", [m1, m2])
     assert avg_score == TeamAvgScore(
         qual_avg=None,
         elim_avg=4.0,
@@ -132,7 +132,7 @@ def test_calculate_avg_score_elim_only() -> None:
 
 
 def test_calculate_wlt_no_matches() -> None:
-    wlt = EventHelper.calculateTeamWLTFromMatches("frc254", [])
+    wlt = EventHelper.calculate_wlt("frc254", [])
     assert wlt == WLTRecord(
         wins=0,
         losses=0,
@@ -151,7 +151,7 @@ def test_calculate_wlt_no_team_matches(ndb_context) -> None:
         alliances_json=json.dumps(alliance_dict),
     )
 
-    wlt = EventHelper.calculateTeamWLTFromMatches("frc254", [m])
+    wlt = EventHelper.calculate_wlt("frc254", [m])
     assert wlt == WLTRecord(
         wins=0,
         losses=0,
@@ -170,7 +170,7 @@ def test_calculate_wlt_all_unplayed(ndb_context) -> None:
         alliances_json=json.dumps(alliance_dict),
     )
 
-    wlt = EventHelper.calculateTeamWLTFromMatches("frc254", [m])
+    wlt = EventHelper.calculate_wlt("frc254", [m])
     assert wlt == WLTRecord(
         wins=0,
         losses=0,
@@ -225,11 +225,49 @@ def test_calculate_wlt(ndb_context) -> None:
         ),
     )
 
-    wlt = EventHelper.calculateTeamWLTFromMatches("frc1", [m1, m2, m3])
+    wlt = EventHelper.calculate_wlt("frc1", [m1, m2, m3])
     assert wlt == WLTRecord(wins=1, losses=1, ties=1)
 
 
-def test_sort_events(ndb_context) -> None:
+def test_sort_events_start_date(ndb_context) -> None:
+    e1 = Event(
+        start_date=datetime.datetime(2010, 2, 21),
+        end_date=datetime.datetime(2010, 3, 2),
+    )
+    e2 = Event(
+        start_date=datetime.datetime(2010, 3, 1),
+        end_date=datetime.datetime(2010, 3, 2),
+    )
+
+    events = [e2, e1]
+    EventHelper.sort_events(events)
+    assert events == [e1, e2]
+
+    events = [e1, e2]
+    EventHelper.sort_events(events)
+    assert events == [e1, e2]
+
+
+def test_sort_events_end_date(ndb_context) -> None:
+    e1 = Event(
+        start_date=datetime.datetime(2010, 3, 1),
+        end_date=datetime.datetime(2010, 3, 2),
+    )
+    e2 = Event(
+        start_date=datetime.datetime(2010, 3, 1),
+        end_date=datetime.datetime(2010, 3, 3),
+    )
+
+    events = [e1, e2]
+    EventHelper.sort_events(events)
+    assert events == [e1, e2]
+
+    events = [e2, e1]
+    EventHelper.sort_events(events)
+    assert events == [e1, e2]
+
+
+def test_sort_events_distant_future_event(ndb_context) -> None:
     e1 = Event()
     e2 = Event(
         start_date=datetime.datetime(2010, 3, 1),
@@ -240,10 +278,14 @@ def test_sort_events(ndb_context) -> None:
     EventHelper.sort_events(events)
     assert events == [e2, e1]
 
+    events = [e2, e1]
+    EventHelper.sort_events(events)
+    assert events == [e2, e1]
+
 
 def test_group_by_week_old_champs(ndb_context) -> None:
     e = Event(event_type_enum=EventType.CMP_DIVISION, year=2010, official=True)
-    events = EventHelper.groupByWeek([e])
+    events = EventHelper.group_by_week([e])
     assert events == {
         "FIRST Championship": [e],
     }
@@ -256,7 +298,7 @@ def test_group_by_week_two_champs(ndb_context) -> None:
     e2 = Event(
         event_type_enum=EventType.CMP_DIVISION, year=2018, official=True, city="Detriot"
     )
-    events = EventHelper.groupByWeek([e1, e2])
+    events = EventHelper.group_by_week([e1, e2])
     assert events == {
         "FIRST Championship - Detriot": [e1, e2],
     }
@@ -277,7 +319,7 @@ def test_group_by_week_in_season(ndb_context) -> None:
     )
     e1._week = 1  # Remmeber, these are 0-indexed
     e2._week = 1
-    events = EventHelper.groupByWeek([e1, e2])
+    events = EventHelper.group_by_week([e1, e2])
     assert events == {
         "Week 2": [e1, e2],
     }
@@ -289,7 +331,7 @@ def test_group_by_week_in_season_weekless(ndb_context) -> None:
         year=2018,
         official=True,
     )
-    events = EventHelper.groupByWeek([e])
+    events = EventHelper.group_by_week([e])
     assert events == {
         "Other Official Events": [e],
     }
@@ -301,7 +343,7 @@ def test_group_by_week_offseason(ndb_context) -> None:
         year=2018,
         official=True,
     )
-    events = EventHelper.groupByWeek([e])
+    events = EventHelper.group_by_week([e])
     assert events == {
         "Offseason": [e],
     }
@@ -313,7 +355,7 @@ def test_group_by_week_preseason(ndb_context) -> None:
         year=2018,
         official=True,
     )
-    events = EventHelper.groupByWeek([e])
+    events = EventHelper.group_by_week([e])
     assert events == {
         "Preseason": [e],
     }
@@ -342,6 +384,34 @@ def test_get_week_events(ndb_context, current_date, expected_event_keys) -> None
     ]
 
     with freeze_time(current_date):
-        events = EventHelper.getWeekEvents()
+        events = EventHelper.week_events()
         event_keys = [e.event_short for e in events]
         assert event_keys == expected_event_keys
+
+
+@pytest.mark.parametrize(
+    "start_date, expected_date",
+    [
+        (None, datetime.datetime(2177, 1, 1, 1, 1, 1)),
+        (datetime.datetime(2019, 3, 4), datetime.datetime(2019, 3, 4)),
+    ],
+)
+def test_start_date_or_distant_future(
+    start_date: datetime.datetime, expected_date: datetime.datetime
+) -> None:
+    e = Event(start_date=start_date)
+    assert EventHelper.start_date_or_distant_future(e) == expected_date
+
+
+@pytest.mark.parametrize(
+    "end_date, expected_date",
+    [
+        (None, datetime.datetime(2177, 1, 1, 1, 1, 1)),
+        (datetime.datetime(2019, 3, 4), datetime.datetime(2019, 3, 4)),
+    ],
+)
+def test_end_date_or_distant_future(
+    end_date: datetime.datetime, expected_date: datetime.datetime
+) -> None:
+    e = Event(end_date=end_date)
+    assert EventHelper.end_date_or_distant_future(e) == expected_date

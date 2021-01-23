@@ -776,6 +776,10 @@ def test_overview_api_write_add_button(
     assert template.name == "account_overview.html"
 
     soup = bs4.BeautifulSoup(response.data, "html.parser")
-    api_write_key_row = soup.find("div", attrs={"class": "row"}, id="api-write-keys-row")
-    api_write_key_row_button = api_write_key_row.find("a", attrs={"href": "request/apiwrite", "class": "btn btn-success pull-right"})
+    api_write_key_row = soup.find(
+        "div", attrs={"class": "row"}, id="api-write-keys-row"
+    )
+    api_write_key_row_button = api_write_key_row.find(
+        "a", attrs={"href": "request/apiwrite", "class": "btn btn-success pull-right"}
+    )
     assert api_write_key_row_button.text == " Request Tokens"
