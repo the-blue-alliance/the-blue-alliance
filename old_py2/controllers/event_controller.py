@@ -82,7 +82,7 @@ class EventList(CacheableHandler):
 
         EventHelper.sort_events(events)
 
-        week_events = EventHelper.groupByWeek(events)
+        week_events = EventHelper.group_by_week(events)
 
         districts = []  # a tuple of (district abbrev, district name)
         for district in districts_future.get_result():

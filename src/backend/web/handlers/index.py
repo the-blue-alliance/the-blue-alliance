@@ -39,7 +39,7 @@ def index_kickoff(template_values: Dict[str, Any]) -> str:
             ),
         }
     )
-    # "events": EventHelper.getWeekEvents(),
+    # "events": EventHelper.week_events(),
     # "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
     # "special_webcasts": special_webcasts
     return render_template("index/index_kickoff.html", template_values)
@@ -56,14 +56,14 @@ def index_buildseason(template_values: Dict[str, Any]) -> str:
             ),
         }
     )
-    # "events": EventHelper.getWeekEvents(),
+    # "events": EventHelper.week_events(),
     # "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
     # "special_webcasts": special_webcasts,
     return render_template("index/index_buildseason.html", template_values)
 
 
 def index_competitionseason(template_values: Dict[str, Any]) -> str:
-    # week_events = EventHelper.getWeekEvents()
+    # week_events = EventHelper.week_events()
     # popular_teams_events = TeamHelper.getPopularTeamsEvents(week_events)
     #
     # # Only show special webcasts that aren't also hosting an event
@@ -119,7 +119,7 @@ def index_offseason(template_values: Dict[str, Any]) -> str:
     # effective_season_year = SeasonHelper.effective_season_year()
     #
     # template_values.update({
-    #     "events": EventHelper.getWeekEvents(),
+    #     "events": EventHelper.week_events(),
     #     "kickoff_datetime_utc": SeasonHelper.kickoff_datetime_utc(effective_season_year),
     #     "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
     #     "special_webcasts": special_webcasts,
@@ -128,7 +128,7 @@ def index_offseason(template_values: Dict[str, Any]) -> str:
 
 
 def index_insights(template_values: Dict[str, Any]) -> str:
-    # week_events = EventHelper.getWeekEvents()
+    # week_events = EventHelper.week_events()
     # year = datetime.datetime.now().year
     # special_webcasts = FirebasePusher.get_special_webcasts()
     # template_values.update({

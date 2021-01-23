@@ -36,25 +36,25 @@ class EventHelper(object):
         Sorts by start date then end date
         Sort is stable
         """
-        events.sort(key=cls.distantFutureIfNoStartDate)
-        events.sort(key=cls.distantFutureIfNoEndDate)
+        events.sort(key=cls.start_date_or_distant_future)
+        events.sort(key=cls.end_date_or_distant_future)
 
     @classmethod
-    def distantFutureIfNoStartDate(cls, event: Event) -> datetime:
+    def start_date_or_distant_future(cls, event: Event) -> datetime:
         if not event.start_date:
             return datetime(2177, 1, 1, 1, 1, 1)
         else:
             return event.time_as_utc(event.start_date)
 
     @classmethod
-    def distantFutureIfNoEndDate(cls, event: Event) -> datetime:
+    def end_date_or_distant_future(cls, event: Event) -> datetime:
         if not event.end_date:
             return datetime(2177, 1, 1, 1, 1, 1)
         else:
             return event.end_date
 
     @classmethod
-    def groupByWeek(cls, events: List[Event]) -> Dict[str, List[Event]]:
+    def group_by_week(cls, events: List[Event]) -> Dict[str, List[Event]]:
         """
         Events should already be ordered by start_date
         """
@@ -120,7 +120,7 @@ class EventHelper(object):
         return year == "2015" and event_short not in {"cc", "cacc", "mttd"}
 
     @staticmethod
-    def calculateTeamAvgScoreFromMatches(
+    def calculate_team_avg_score(
         team_key: TeamKey, matches: List[Match]
     ) -> TeamAvgScore:
         """
@@ -155,9 +155,7 @@ class EventHelper(object):
         )
 
     @staticmethod
-    def calculateTeamWLTFromMatches(
-        team_key: TeamKey, matches: List[Match]
-    ) -> WLTRecord:
+    def calculate_wlt(team_key: TeamKey, matches: List[Match]) -> WLTRecord:
         """
         Given a team_key and some matches, find the Win Loss Tie.
         """
@@ -180,7 +178,7 @@ class EventHelper(object):
 
     @classmethod
     @memoize(timeout=3600)  # 1 hour
-    def getWeekEvents(cls) -> List[Event]:
+    def week_events(cls) -> List[Event]:
         """
         Get events this week
         In general, if an event is currently going on, it shows up in this query

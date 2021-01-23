@@ -261,8 +261,8 @@ def _set_account_status(status: str) -> None:
 #             subs = match_subs.get(match.key.id(), None)
 #             match_fav_subs_by_event[event_key][1].append((match, fav, subs))
 #
-#         event_match_fav_subs = sorted(match_fav_subs_by_event.values(), key=lambda x: EventHelper.distantFutureIfNoStartDate(x[0]))
-#         event_match_fav_subs = sorted(event_match_fav_subs, key=lambda x: EventHelper.distantFutureIfNoEndDate(x[0]))
+#         event_match_fav_subs = sorted(match_fav_subs_by_event.values(), key=lambda x: EventHelper.start_date_or_distant_future(x[0]))
+#         event_match_fav_subs = sorted(event_match_fav_subs, key=lambda x: EventHelper.end_date_or_distant_future(x[0]))
 #
 #         self.template_values['team_fav_subs'] = team_fav_subs
 #         self.template_values['event_fav_subs'] = event_fav_subs

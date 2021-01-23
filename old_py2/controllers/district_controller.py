@@ -65,7 +65,7 @@ class DistrictDetail(CacheableHandler):
         # needed for active team statuses
         live_events = []
         if year == datetime.datetime.now().year:  # Only show active teams for current year
-            live_events = EventHelper.getWeekEvents()
+            live_events = EventHelper.week_events()
         live_eventteams_futures = []
         for event in live_events:
             live_eventteams_futures.append(EventTeamsQuery(event.key_name).fetch_async())
@@ -75,7 +75,7 @@ class DistrictDetail(CacheableHandler):
         events_by_key = {}
         for event in events:
             events_by_key[event.key.id()] = event
-        week_events = EventHelper.groupByWeek(events)
+        week_events = EventHelper.group_by_week(events)
 
         valid_districts = set()
         districts_in_year = districts_in_year_future.get_result()
@@ -124,8 +124,8 @@ class DistrictDetail(CacheableHandler):
                 teams_and_statuses.sort(key=lambda x: x[0].team_number)
                 live_events_with_teams.append((event, teams_and_statuses))
         live_events_with_teams.sort(key=lambda x: x[0].name)
-        live_events_with_teams.sort(key=lambda x: EventHelper.distantFutureIfNoStartDate(x[0]))
-        live_events_with_teams.sort(key=lambda x: EventHelper.distantFutureIfNoEndDate(x[0]))
+        live_events_with_teams.sort(key=lambda x: EventHelper.start_date_or_distant_future(x[0]))
+        live_events_with_teams.sort(key=lambda x: EventHelper.end_date_or_distant_future(x[0]))
 
         # Get valid years
         district_history = history_future.get_result()

@@ -53,7 +53,7 @@ def district_detail(
     live_eventteams_futures = []
 
     if year == datetime.datetime.now().year:  # Only show active teams for current year
-        live_events = EventHelper.getWeekEvents()
+        live_events = EventHelper.week_events()
     for event in live_events:
         live_eventteams_futures.append(EventTeamsQuery(event.key_name).fetch_async())
     """
@@ -63,7 +63,7 @@ def district_detail(
     events_by_key = {}
     for event in events:
         events_by_key[event.key.id()] = event
-    week_events = EventHelper.groupByWeek(events)
+    week_events = EventHelper.group_by_week(events)
 
     valid_districts: List[Tuple[str, DistrictAbbreviation]] = []
     districts_in_year = districts_in_year_future.get_result()
@@ -125,10 +125,10 @@ def district_detail(
 
     live_events_with_teams.sort(key=lambda x: x[0].name)
     live_events_with_teams.sort(
-        key=lambda x: EventHelper.distantFutureIfNoStartDate(x[0])
+        key=lambda x: EventHelper.start_date_or_distant_future(x[0])
     )
     live_events_with_teams.sort(
-        key=lambda x: EventHelper.distantFutureIfNoEndDate(x[0])
+        key=lambda x: EventHelper.end_date_or_distant_future(x[0])
     )
 
     # Get valid years

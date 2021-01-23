@@ -133,7 +133,7 @@ class TeamRenderer(object):
 
             if year == 2015:
                 display_wlt = None
-                match_avg = EventHelper.calculateTeamAvgScoreFromMatches(
+                match_avg = EventHelper.calculate_team_avg_score(
                     team.key_name, event_matches
                 )
                 year_match_avg_list.append(match_avg)
@@ -141,9 +141,7 @@ class TeamRenderer(object):
             else:
                 qual_avg = None
                 elim_avg = None
-                wlt = EventHelper.calculateTeamWLTFromMatches(
-                    team.key_name, event_matches
-                )
+                wlt = EventHelper.calculate_wlt(team.key_name, event_matches)
                 if event.event_type_enum in event_type.SEASON_EVENT_TYPES:
                     season_wlt_list.append(wlt)
                 else:
