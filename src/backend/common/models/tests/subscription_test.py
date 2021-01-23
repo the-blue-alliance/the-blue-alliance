@@ -9,7 +9,7 @@ def test_notification_names():
             NotificationType.MATCH_SCORE,
         ]
     )
-    assert subscription.notification_names == ["upcoming_match", "match_score"]
+    assert subscription.notification_names == ["Upcoming Match", "Match Score"]
 
 
 # def test_users_subscribed_to_event_year(self):
