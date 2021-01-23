@@ -5,7 +5,7 @@ from pyre_extensions import safe_cast
 
 from backend.common.consts.notification_type import NotificationType
 from backend.common.consts.notification_type import (
-    TYPE_NAMES as NOTIFICATION_TYPE_NAMES,
+    RENDER_NAMES as NOTIFICATION_RENDER_NAMES,
 )
 from backend.common.models.mytba import MyTBAModel
 
@@ -27,7 +27,7 @@ class Subscription(MyTBAModel):
     @property
     def notification_names(self) -> List[str]:
         return [
-            NOTIFICATION_TYPE_NAMES[NotificationType(index)]
+            NOTIFICATION_RENDER_NAMES[NotificationType(index)]
             for index in self.notification_types
         ]
 
