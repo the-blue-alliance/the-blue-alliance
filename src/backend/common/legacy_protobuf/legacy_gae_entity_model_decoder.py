@@ -116,17 +116,6 @@ class EntityProtoDecoder:
         model._set_attributes(deserialized_props)
 
     @staticmethod
-    def _get_safe_int64_value(v: ProtoPropertyValue) -> int:
-        """
-        This exists to work around https://github.com/googleapis/python-ndb/issues/590
-        TODO: remove if/when that issue is resolved
-        """
-        result = v.int64value()
-        if result >= (1 << 63):
-            result -= 1 << 64
-        return result
-
-    @staticmethod
     def _get_prop_value(v: ProtoPropertyValue, p: ProtoProperty) -> Any:
         # rougly based on https://github.com/GoogleCloudPlatform/datastore-ndb-python/blob/cf4cab3f1f69cd04e1a9229871be466b53729f3f/ndb/model.py#L2647
         if v.has_stringvalue():
@@ -151,7 +140,7 @@ class EntityProtoDecoder:
                         pass
             return sval
         elif v.has_int64value():
-            ival = EntityProtoDecoder._get_safe_int64_value(v)
+            ival = v.int64value()
             if p.meaning() == ProtoProperty.GD_WHEN:
                 try:
                     return EPOCH + datetime.timedelta(microseconds=ival)
