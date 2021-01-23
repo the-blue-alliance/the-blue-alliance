@@ -1,10 +1,14 @@
 import re
 
 from bs4 import BeautifulSoup
+from freezegun import freeze_time
 from google.cloud import ndb
 from werkzeug.test import Client
 
 
+from backend.common.models.district import District
+from backend.common.models.district_team import DistrictTeam
+from backend.common.models.event import Event
 from backend.web.handlers.tests import helpers
 
 
@@ -136,3 +140,40 @@ def test_district_details_render_events(
         "Week 3 1 Events",
         "Week 4 1 Events",
     ]
+
+
+@freeze_time("2019-03-09")
+def test_district_details_render_active_teams(
+    web_client: Client, ndb_client: ndb.Client, setup_full_event
+) -> None:
+    helpers.preseed_district(ndb_client, "2019ne")
+    setup_full_event("2019ctwat")
+
+    # Make sure we have DistrictTeam links for all the teams
+    with ndb_client.context():
+        event = Event.get_by_id("2019ctwat")
+        district_teams = [
+            DistrictTeam(
+                id=f"2019ne_{team.key_name}",
+                year=2019,
+                district_key=ndb.Key(District, "2019ne"),
+                team=team.key,
+            )
+            for team in event.teams
+        ]
+        ndb.put_multi(district_teams)
+
+    resp = web_client.get("/events/ne/2019")
+    assert resp.status_code == 200
+
+    soup = BeautifulSoup(resp.data, "html.parser")
+    active_teams = soup.find(id="active-teams")
+    assert active_teams is not None
+
+    live_teams_table = active_teams.find(id="live-teams")
+    assert live_teams_table is not None
+
+    live_teams = live_teams_table.find_all(
+        "tr", id=re.compile(r"live-team-2019ctwat-frc\d{3}")
+    )
+    assert len(live_teams) == 41

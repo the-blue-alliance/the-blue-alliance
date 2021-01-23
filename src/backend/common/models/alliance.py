@@ -5,9 +5,13 @@ from typing_extensions import TypedDict
 from backend.common.models.keys import TeamKey
 
 
+EventAllianceBackup = TypedDict("EventAllianceBackup", {"in": str, "out": str})
+
+
 class _EventAllianceOptional(TypedDict, total=False):
     declines: List[TeamKey]
     name: str
+    backup: EventAllianceBackup
 
 
 class EventAlliance(_EventAllianceOptional, total=True):

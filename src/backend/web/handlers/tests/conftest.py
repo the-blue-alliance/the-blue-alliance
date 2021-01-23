@@ -31,6 +31,9 @@ def setup_full_event(test_data_importer):
         test_data_importer.import_event_alliances(
             __file__, f"data/{event_key}_alliances.json", event_key
         )
+        test_data_importer.import_event_teams(
+            __file__, f"data/{event_key}_teams.json", event_key
+        )
 
     return import_event
 

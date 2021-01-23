@@ -90,6 +90,18 @@ def test_yt_start(input: str, output: str) -> None:
     assert filters.yt_start(input) == output
 
 
+@pytest.mark.parametrize(
+    "input, output",
+    [
+        ("blah", ""),
+        ("2019nyny_qm12", "Q12"),
+        ("2019nyny_sf1m2", "SF1-2"),
+    ],
+)
+def test_match_short(input: str, output: str) -> None:
+    assert filters.match_short(input) == output
+
+
 def test_register_template_filters(empty_app: Flask) -> None:
     for filter in filters._filters:
         assert filter not in empty_app.jinja_env.filters

@@ -4,6 +4,8 @@ from typing import List, Optional
 from typing_extensions import TypedDict
 
 from backend.common.consts.comp_level import CompLevel
+from backend.common.models.alliance import EventAllianceBackup
+from backend.common.models.keys import TeamKey
 
 
 @enum.unique
@@ -37,15 +39,15 @@ class EventTeamRanking(TypedDict):
     dq: Optional[int]
     record: Optional[WLTRecord]
     qual_average: Optional[float]
-    num_teams: int
     sort_orders: Optional[List[float]]
+    team_key: TeamKey
 
 
 class EventTeamStatusQual(TypedDict):
     status: EventTeamLevelStatus
     num_teams: int
     ranking: EventTeamRanking
-    sort_order_info: List[RankingSortOrderInfo]
+    sort_order_info: Optional[List[RankingSortOrderInfo]]
 
 
 class EventTeamStatusPlayoff(TypedDict):
@@ -56,21 +58,16 @@ class EventTeamStatusPlayoff(TypedDict):
     playoff_average: Optional[float]
 
 
-EventTeamStatusAllianceBackup = TypedDict(
-    "EventTeamStatusAllianceBackup", {"in": str, "out": str}
-)
-
-
 class EventTeamStatusAlliance(TypedDict):
     name: Optional[str]
     number: int
     pick: int
-    backup: Optional[EventTeamStatusAllianceBackup]
+    backup: Optional[EventAllianceBackup]
 
 
 class EventTeamStatus(TypedDict):
     qual: Optional[EventTeamStatusQual]
     playoff: Optional[EventTeamStatusPlayoff]
-    alliance: EventTeamStatusAlliance
+    alliance: Optional[EventTeamStatusAlliance]
     last_match_key: Optional[str]
     next_match_key: Optional[str]
