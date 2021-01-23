@@ -42,3 +42,15 @@ Disconnect from the Redis instance and the VM. Afterwards, make sure to roll-bac
 
 1) Stop the `redis-telnet-vm` VM
 2) Disable the `tba-memorystore-allow-ssh` firewall rule
+
+
+## Building a New Development Container Version
+
+We host built container images with [Google Cloud Build](https://cloud.google.com/cloud-build). The build config and `Dockerfile` are [in the repo](https://github.com/the-blue-alliance/the-blue-alliance/tree/py3/ops/dev/docker). After the `Dockerfile` is updated, we'll need to rebuild + push the image:
+
+```bash
+# Locally, you need gcloud and docker installed
+$ ./ops/dev/docker/build-container-images.sh
+```
+
+Images are published to `gcr.io/tbatv-prod-hrd/tba-py3-dev` and can be managed from the [cloud console](https://console.cloud.google.com/gcr).
