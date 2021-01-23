@@ -3,7 +3,7 @@ import string
 from typing import Any, Dict, List, Optional, Union
 
 from google.cloud import ndb
-from pyre_extensions import none_throws
+from pyre_extensions import none_throws, safe_cast
 
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.auth_type import AuthType
@@ -12,6 +12,7 @@ from backend.common.models.account import Account
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.favorite import Favorite
 from backend.common.models.mobile_client import MobileClient
+from backend.common.models.mytba import MyTBAModel
 from backend.common.models.subscription import Subscription
 from backend.common.queries.account_query import AccountQuery
 from backend.common.queries.api_auth_access_query import ApiAuthAccessQuery
@@ -19,6 +20,7 @@ from backend.common.queries.favorite_query import FavoriteQuery
 from backend.common.queries.mobile_client_query import MobileClientQuery
 from backend.common.queries.subscription_query import SubscriptionQuery
 from backend.common.queries.suggestion_query import SuggestionQuery
+from backend.web.models.mytba import MyTBA
 
 
 class User:
@@ -96,6 +98,13 @@ class User:
             user_ids=[none_throws(none_throws(self._account).key.string_id())],
             only_verified=False,
         ).fetch()
+
+    @property
+    def myTBA(self) -> MyTBA:
+        models = safe_cast(List[MyTBAModel], self.favorites) + safe_cast(
+            List[MyTBAModel], self.subscriptions
+        )
+        return MyTBA(models)
 
     @property
     def favorites(self) -> List[Favorite]:
