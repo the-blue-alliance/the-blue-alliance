@@ -6,8 +6,6 @@ from typing import Dict, List, Optional, Set, Type
 from google.cloud import ndb
 
 from backend.common.consts.model_type import ModelType
-from backend.common.helpers.event_helper import EventHelper
-from backend.common.helpers.match_helper import MatchHelper
 from backend.common.models.event import Event
 from backend.common.models.favorite import Favorite
 from backend.common.models.match import Match
@@ -40,6 +38,7 @@ class MyTBA:
         futures = ndb.get_multi_async(event_keys)
         events = [f.get_result() for f in futures]
 
+        # Add dummy Event models for wildcard events - for render purposes
         for model in wildcard_event_models:
             event_year = int(model.model_key[:-1])
             events.append(
@@ -53,7 +52,7 @@ class MyTBA:
                 )
             )
 
-        return EventHelper.sorted_events(events)
+        return events
 
     @property
     def team_models(self) -> List[MyTBAModel]:
@@ -63,9 +62,7 @@ class MyTBA:
     def teams(self) -> List[Team]:
         team_keys = {ndb.Key(Team, model.model_key) for model in self.team_models}
         futures = ndb.get_multi_async(team_keys)
-        return sorted(
-            [f.get_result() for f in futures], key=lambda team: team.team_number
-        )
+        return [f.get_result() for f in futures]
 
     @property
     def match_models(self) -> List[MyTBAModel]:
@@ -75,9 +72,7 @@ class MyTBA:
     def matches(self) -> List[Match]:
         match_keys = {ndb.Key(Match, model.model_key) for model in self.match_models}
         futures = ndb.get_multi_async(match_keys)
-        matches = [f.get_result() for f in futures]
-        MatchHelper.natural_sort_matches(matches)
-        return matches
+        return [f.get_result() for f in futures]
 
     @property
     def event_matches(self) -> Dict[ndb.Key, List[Match]]:
