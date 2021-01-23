@@ -351,9 +351,6 @@ class TeamDetailsGet(webapp.RequestHandler):
                 keys_to_delete.add(dt_key)
         DistrictTeamManipulator.delete_keys(keys_to_delete)
 
-        if district_team:
-            district_team = DistrictTeamManipulator.createOrUpdate(district_team)
-
         if robot:
             robot = RobotManipulator.createOrUpdate(robot)
 
@@ -361,7 +358,6 @@ class TeamDetailsGet(webapp.RequestHandler):
             'key_name': key_name,
             'team': team,
             'success': team is not None,
-            'district': district_team,
             'robot': robot,
         }
 
@@ -588,12 +584,22 @@ class EventDetailsGet(webapp.RequestHandler):
 
         # Delete eventteams of teams that are no longer registered
         if event_teams and not skip_eventteams:
-            existing_event_team_keys = set(EventTeam.query(EventTeam.event == event.key).fetch(1000, keys_only=True))
-            event_team_keys = set([et.key for et in event_teams])
-            et_keys_to_delete = existing_event_team_keys.difference(event_team_keys)
+            existing_event_teams = EventTeam.query(EventTeam.event == event.key).fetch()
+
+            # Don't delete EventTeam models for teams who won Awards at the Event, but who did not attend the Event
+            award_teams = set()
+            for award in event.awards:
+                for team in award.team_list:
+                    award_teams.add(team.id())
+            award_event_teams = {et.key for et in existing_event_teams if et.team.id() in award_teams}
+
+            event_team_keys = {et.key for et in event_teams}
+            existing_event_team_keys = {et.key for et in existing_event_teams}
+
+            et_keys_to_delete = existing_event_team_keys.difference(event_team_keys.union(award_event_teams))
             EventTeamManipulator.delete_keys(et_keys_to_delete)
 
-            event_teams = EventTeamManipulator.createOrUpdate(event_teams)
+        event_teams = EventTeamManipulator.createOrUpdate(event_teams)
         if type(event_teams) is not list:
             event_teams = [event_teams]
 
