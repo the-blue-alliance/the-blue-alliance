@@ -7,7 +7,6 @@ from google.cloud import ndb
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.consts.model_type import ModelType
-from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.models.event import Event
 from backend.common.models.favorite import Favorite
@@ -83,9 +82,7 @@ def test_events() -> None:
     models = _create_one_of_each_mytba_model()
     mytba = MyTBA(models)
 
-    with patch.object(EventHelper, "sort_events") as mock_sort_events:
-        events = mytba.events
-    mock_sort_events.assert_called_with(ANY)
+    events = mytba.events
 
     assert len(events) == 2
     assert all([type(event) is Event for event in events])
@@ -96,10 +93,7 @@ def test_events_wildcard() -> None:
     wildcard = Subscription(model_key="2019*", model_type=ModelType.EVENT)
     mytba = MyTBA([wildcard])
 
-    with patch.object(EventHelper, "sort_events") as mock_sort_events:
-        events = mytba.events
-    mock_sort_events.assert_called_with(ANY)
-
+    events = mytba.events
     assert len(events) == 1
 
     wildcard_event = events.pop()

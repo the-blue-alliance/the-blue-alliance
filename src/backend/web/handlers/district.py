@@ -60,8 +60,7 @@ def district_detail(
     for event in live_events:
         live_eventteams_futures.append(EventTeamsQuery(event.key_name).fetch_async())
 
-    events = events_future.get_result()
-    EventHelper.sort_events(events)
+    events = EventHelper.sorted_events(events_future.get_result())
     events_by_key = {}
     for event in events:
         events_by_key[event.key.id()] = event
