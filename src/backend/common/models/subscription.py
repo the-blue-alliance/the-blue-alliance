@@ -1,38 +1,28 @@
-from datetime import datetime
 from typing import List
 
 from google.cloud import ndb
 from pyre_extensions import safe_cast
 
-from backend.common.consts.model_type import ModelType
 from backend.common.consts.notification_type import NotificationType
 from backend.common.consts.notification_type import (
     TYPE_NAMES as NOTIFICATION_TYPE_NAMES,
 )
+from backend.common.models.mytba import MyTBAModel
 
 
-class Subscription(ndb.Model):
+class Subscription(MyTBAModel):
     """
     In order to make strongly consistent DB requests, instances of this class
     should be created with a parent that is the associated Account key.
     """
 
-    user_id: str = ndb.StringProperty(required=True)
-    model_key: str = ndb.StringProperty(required=True)
-    model_type: ModelType = safe_cast(
-        ModelType, ndb.IntegerProperty(required=True, choices=list(ModelType))
-    )
     notification_types: List[NotificationType] = safe_cast(
         List[NotificationType],
         ndb.IntegerProperty(choices=list(NotificationType), repeated=True),
     )
 
-    created: datetime = ndb.DateTimeProperty(auto_now_add=True)
-    updated: datetime = ndb.DateTimeProperty(auto_now=True)
-
-    def __init__(self, *args, **kw) -> None:
-        self._settings = None
-        super(Subscription, self).__init__(*args, **kw)
+    def __init__(self, *args, **kwargs) -> None:
+        super(Subscription, self).__init__(*args, **kwargs)
 
     @property
     def notification_names(self) -> List[str]:
