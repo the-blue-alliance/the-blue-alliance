@@ -268,7 +268,7 @@ class FMSAPIMatchesGet(webapp.RequestHandler):
         df = DatafeedFMSAPI('v2.0', save_response=True)
         event = Event.get_by_id(event_key)
 
-        matches = MatchHelper.deleteInvalidMatches(
+        matches = MatchHelper.delete_invalid_matches(
             df.getMatches(event_key),
             Event.get_by_id(event_key)
         )

@@ -127,8 +127,8 @@ class EventSimulator:
             event.details.alliance_selections
         )
         self._alliance_selections_without_backup[1]["backup"] = None
-        self._played_matches = MatchHelper.organizeMatches(event.matches)[1]
-        self._all_matches = MatchHelper.organizeMatches(
+        self._played_matches = MatchHelper.organized_matches(event.matches)[1]
+        self._all_matches = MatchHelper.organized_matches(
             event.matches + unplayed_matches
         )[1]
 
@@ -239,7 +239,7 @@ class EventSimulator:
                 MatchManipulator.createOrUpdate(match)
             self._step += 1
         elif self._step == 4:  # After each QF match
-            new_match = MatchHelper.play_order_sort_matches(
+            new_match = MatchHelper.play_order_sorted_matches(
                 self._played_matches[CompLevel.QF]
             )[self._substep]
             MatchManipulator.createOrUpdate(new_match)
@@ -310,7 +310,7 @@ class EventSimulator:
                     MatchManipulator.createOrUpdate(match)
                 self._step += 1
         elif self._step == 6:  # After each SF match
-            new_match = MatchHelper.play_order_sort_matches(
+            new_match = MatchHelper.play_order_sorted_matches(
                 self._played_matches[CompLevel.SF]
             )[self._substep]
             MatchManipulator.createOrUpdate(new_match)
@@ -384,9 +384,9 @@ class EventSimulator:
                 self._step += 1
         elif self._step == 8:  # After each F match
             MatchManipulator.createOrUpdate(
-                MatchHelper.play_order_sort_matches(self._played_matches[CompLevel.F])[
-                    self._substep
-                ]
+                MatchHelper.play_order_sorted_matches(
+                    self._played_matches[CompLevel.F]
+                )[self._substep]
             )
             if self._substep < len(self._played_matches[CompLevel.F]) - 1:
                 self._substep += 1
@@ -397,6 +397,6 @@ class EventSimulator:
         ndb.get_context().clear_cache()
         # Re fetch event matches
         # event = Event.get_by_id("2016nytr")
-        # MatchHelper.deleteInvalidMatches(event.matches, event)
+        # MatchHelper.delete_invalid_matches(event.matches, event)
         # ndb.get_context().clear_cache()
         self._update_rankings()

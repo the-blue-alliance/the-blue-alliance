@@ -111,8 +111,8 @@ class EventSimulator(object):
         self._event_details = event.details
         self._alliance_selections_without_backup = copy.deepcopy(event.details.alliance_selections)
         self._alliance_selections_without_backup[1]['backup'] = None
-        self._played_matches = MatchHelper.organizeMatches(event.matches)
-        self._all_matches = MatchHelper.organizeMatches(event.matches + unplayed_matches)
+        self._played_matches = MatchHelper.organized_matches(event.matches)
+        self._all_matches = MatchHelper.organized_matches(event.matches + unplayed_matches)
 
         # Delete data
         event.details.key.delete()
@@ -212,7 +212,7 @@ class EventSimulator(object):
                 MatchManipulator.createOrUpdate(match)
             self._step += 1
         elif self._step == 4:  # After each QF match
-            new_match = MatchHelper.play_order_sort_matches(self._played_matches['qf'])[self._substep]
+            new_match = MatchHelper.play_order_sorted_matches(self._played_matches['qf'])[self._substep]
             MatchManipulator.createOrUpdate(new_match)
 
             if not self._batch_advance:
@@ -267,7 +267,7 @@ class EventSimulator(object):
                     MatchManipulator.createOrUpdate(match)
                 self._step += 1
         elif self._step == 6:  # After each SF match
-            new_match = MatchHelper.play_order_sort_matches(self._played_matches['sf'])[self._substep]
+            new_match = MatchHelper.play_order_sorted_matches(self._played_matches['sf'])[self._substep]
             MatchManipulator.createOrUpdate(new_match)
 
             if not self._batch_advance:
@@ -323,7 +323,7 @@ class EventSimulator(object):
                 self._step += 1
         elif self._step == 8:  # After each F match
             MatchManipulator.createOrUpdate(
-                MatchHelper.play_order_sort_matches(
+                MatchHelper.play_order_sorted_matches(
                     self._played_matches['f'])[self._substep])
             if self._substep < len(self._played_matches['f']) - 1:
                 self._substep += 1
@@ -334,6 +334,6 @@ class EventSimulator(object):
         ndb.get_context().clear_cache()
         # Re fetch event matches
         event = Event.get_by_id('2016nytr')
-        MatchHelper.deleteInvalidMatches(event.matches, event)
+        MatchHelper.delete_invalid_matches(event.matches, event)
         ndb.get_context().clear_cache()
         self._update_rankings()

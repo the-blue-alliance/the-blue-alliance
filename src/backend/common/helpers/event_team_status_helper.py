@@ -305,15 +305,15 @@ class EventTeamStatusHelper:
         Generate a dict containing team@event status information
         :param team_key: Key name of the team to focus on
         :param event: Event object
-        :param matches: Organized matches (via MatchHelper.organizeMatches) from the event, optional
+        :param matches: Organized matches (via MatchHelper.organized_matches) from the event, optional
         """
         event_details = event.details
         if not match_list:
             match_list = event.matches
         team_matches = [m for m in match_list if team_key in m.team_key_names]
-        next_match = MatchHelper.upcomingMatches(team_matches, num=1)
-        last_match = MatchHelper.recentMatches(team_matches, num=1)
-        matches = MatchHelper.organizeMatches(match_list)[1]
+        next_match = MatchHelper.upcoming_matches(team_matches, num=1)
+        last_match = MatchHelper.recent_matches(team_matches, num=1)
+        matches = MatchHelper.organized_matches(match_list)[1]
         status = EventTeamStatus(
             qual=cls._build_qual_info(team_key, event_details, matches, event.year),
             alliance=cls._build_alliance_info(team_key, event_details, matches),

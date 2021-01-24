@@ -193,7 +193,7 @@ def mytba() -> str:
         [event_key.get() for event_key in mytba_event_matches.keys()]
     )
     event_matches = [
-        (event, MatchHelper.natural_sort_matches(mytba_event_matches[event.key]))
+        (event, MatchHelper.natural_sorted_matches(mytba_event_matches[event.key]))
         for event in mytba_event_matches_events
     ]
 

@@ -65,7 +65,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEqual(len(matches), 88)
 
             # Assert we get enough of each match type
-            clean_matches = MatchHelper.organizeMatches(matches)
+            clean_matches = MatchHelper.organized_matches(matches)
             self.assertEqual(len(clean_matches["qm"]), 88)
 
         # Changed format in 2018
@@ -76,7 +76,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEqual(len(matches), 88)
 
             # Assert we get enough of each match type
-            clean_matches = MatchHelper.organizeMatches(matches)
+            clean_matches = MatchHelper.organized_matches(matches)
             self.assertEqual(len(clean_matches["qm"]), 88)
 
     def test_parse_playoff(self):
@@ -100,7 +100,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEqual(len(matches), 15)
 
             # Assert we get enough of each match type
-            clean_matches = MatchHelper.organizeMatches(matches)
+            clean_matches = MatchHelper.organized_matches(matches)
             self.assertEqual(len(clean_matches["ef"]), 0)
             self.assertEqual(len(clean_matches["qf"]), 9)
             self.assertEqual(len(clean_matches["sf"]), 4)
@@ -130,7 +130,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEquals(len(matches), 36)
 
             # Assert we get enough of each match type
-            clean_matches = MatchHelper.organizeMatches(matches)
+            clean_matches = MatchHelper.organized_matches(matches)
             self.assertEqual(len(clean_matches["ef"]), 20)
             self.assertEqual(len(clean_matches["qf"]), 10)
             self.assertEqual(len(clean_matches["sf"]), 4)
@@ -158,7 +158,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEqual(len(matches), 17)
 
             # Assert we get enough of each match type
-            clean_matches = MatchHelper.organizeMatches(matches)
+            clean_matches = MatchHelper.organized_matches(matches)
             self.assertEqual(len(clean_matches["ef"]), 0)
             self.assertEqual(len(clean_matches["qf"]), 8)
             self.assertEqual(len(clean_matches["sf"]), 6)
@@ -189,7 +189,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEquals(len(matches), 6)
 
             # Assert we get enough of each match type
-            clean_matches = MatchHelper.organizeMatches(matches)
+            clean_matches = MatchHelper.organized_matches(matches)
             self.assertEqual(len(clean_matches["ef"]), 0)
             self.assertEqual(len(clean_matches["qf"]), 0)
             self.assertEqual(len(clean_matches["sf"]), 4)
@@ -219,7 +219,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEquals(len(matches), 18)
 
             # Assert we get enough of each match type
-            clean_matches = MatchHelper.organizeMatches(matches)
+            clean_matches = MatchHelper.organized_matches(matches)
             self.assertEqual(len(clean_matches["ef"]), 0)
             self.assertEqual(len(clean_matches["qf"]), 0)
             self.assertEqual(len(clean_matches["sf"]), 15)
@@ -250,7 +250,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEquals(len(matches), 5)
 
             # Assert we get enough of each match type
-            clean_matches = MatchHelper.organizeMatches(matches)
+            clean_matches = MatchHelper.organized_matches(matches)
             self.assertEqual(len(clean_matches["ef"]), 0)
             self.assertEqual(len(clean_matches["qf"]), 0)
             self.assertEqual(len(clean_matches["sf"]), 0)

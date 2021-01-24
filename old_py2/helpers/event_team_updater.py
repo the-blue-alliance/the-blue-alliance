@@ -95,7 +95,7 @@ class EventTeamUpdater(object):
         """
         First alliance to win two finals matches is the winner
         """
-        matches_by_type = MatchHelper.organizeMatches(matches)
+        matches_by_type = MatchHelper.organized_matches(matches)
         if 'f' not in matches_by_type or not matches_by_type['f']:
             return set()
         finals_matches = matches_by_type['f']

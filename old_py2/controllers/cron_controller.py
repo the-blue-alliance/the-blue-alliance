@@ -176,7 +176,7 @@ class EventMatchstatsDo(webapp.RequestHandler):
 
         predictions_dict = None
         if event.year in {2016, 2017, 2018, 2019, 2020} and event.event_type_enum in EventType.SEASON_EVENT_TYPES or event.enable_predictions:
-            sorted_matches = MatchHelper.play_order_sort_matches(event.matches)
+            sorted_matches = MatchHelper.play_order_sorted_matches(event.matches)
             match_predictions, match_prediction_stats, stat_mean_vars = PredictionHelper.get_match_predictions(sorted_matches)
             ranking_predictions, ranking_prediction_stats = PredictionHelper.get_ranking_predictions(sorted_matches, match_predictions)
 
@@ -673,7 +673,7 @@ class MatchTimePredictionsDo(webapp.RequestHandler):
             return
 
         timezone = pytz.timezone(event.timezone_id)
-        played_matches = MatchHelper.recentMatches(matches, num=0)
+        played_matches = MatchHelper.recent_matches(matches, num=0)
         unplayed_matches = MatchHelper.upcomingMatches(matches, num=len(matches))
         MatchTimePredictionHelper.predict_future_matches(event_key, played_matches, unplayed_matches, timezone, event.within_a_day)
 
@@ -736,8 +736,8 @@ class RebuildPlayoffAdvancementDo(webapp.RequestHandler):
         event, _ = event_future.get_result()
         matches, _ = matches_future.get_result()
 
-        cleaned_matches = MatchHelper.deleteInvalidMatches(matches, event)
-        matches = MatchHelper.organizeMatches(cleaned_matches)
+        cleaned_matches = MatchHelper.delete_invalid_matches(matches, event)
+        matches = MatchHelper.organized_matches(cleaned_matches)
         bracket_table, playoff_advancement, _, _ = PlayoffAdvancementHelper.generatePlayoffAdvancement(event, matches)
 
         event_details = EventDetails(
