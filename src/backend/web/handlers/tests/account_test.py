@@ -605,6 +605,7 @@ def test_mytba(
     mock_mytba = Mock()
 
     mock_event = Mock()
+    mock_event_sorted = Mock()
     mock_events = [mock_event]
     mock_mytba.events = mock_events
 
@@ -613,9 +614,10 @@ def test_mytba(
 
     mock_event_key = Mock()
     mock_event_key.configure_mock(**{"get.return_value": mock_event})
-    mock_event.key = mock_event_key
+    mock_event_sorted.key = mock_event_key
 
     mock_match = Mock()
+    mock_match_sorted = Mock()
     mock_matches = [mock_match]
     mock_event_matches = {mock_event_key: mock_matches}
     mock_mytba.event_matches = mock_event_matches
@@ -659,11 +661,11 @@ def test_mytba(
     ), patch.object(
         backend.common.helpers.event_helper.EventHelper,
         "sorted_events",
-        return_value=mock_events,
+        return_value=[mock_event_sorted],
     ) as mock_sorted_events, patch.object(
         backend.common.helpers.match_helper.MatchHelper,
         "natural_sort_matches",
-        return_value=mock_matches,
+        return_value=[mock_match_sorted],
     ) as mock_natural_sort_matches, patch.object(
         backend.common.helpers.season_helper.SeasonHelper,
         "effective_season_year",
@@ -683,12 +685,12 @@ def test_mytba(
     mock_effective_season_year.assert_called()
 
     assert context["event_fav_sub"] == [
-        (mock_event, mock_event_favorite, mock_event_subscription)
+        (mock_event_sorted, mock_event_favorite, mock_event_subscription)
     ]
     assert context["team_fav_sub"] == [
         (mock_team, mock_team_favorite, mock_team_subscription)
     ]
     assert context["event_match_fav_sub"] == [
-        (mock_event, [(mock_match, mock_match_favorite, mock_match_subscription)])
+        (mock_event_sorted, [(mock_match_sorted, mock_match_favorite, mock_match_subscription)])
     ]
     assert context["year"] == mock_year
