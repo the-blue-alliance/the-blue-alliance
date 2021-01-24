@@ -189,16 +189,13 @@ def mytba() -> str:
     mytba_teams = sorted(mytba.teams, key=lambda team: team.team_number)
 
     mytba_event_matches = mytba.event_matches
-    mytba_event_matches_events = [
-        event_key.get() for event_key in mytba_event_matches.keys()
+    mytba_event_matches_events = EventHelper.sorted_events(
+        [event_key.get() for event_key in mytba_event_matches.keys()]
+    )
+    event_matches = [
+        (event, MatchHelper.natural_sort_matches(mytba_event_matches[event.key]))
+        for event in mytba_event_matches_events
     ]
-    mytba_event_matches_events = EventHelper.sorted_events(mytba_event_matches_events)
-
-    event_matches = []
-    for event in mytba_event_matches_events:
-        matches = mytba_event_matches[event.key]
-        MatchHelper.natural_sort_matches(matches)
-        event_matches.append((event, matches))
 
     template_values = {
         "event_fav_sub": [
