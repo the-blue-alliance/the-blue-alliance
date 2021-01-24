@@ -43,11 +43,9 @@ def event_list(year: Optional[Year] = None) -> Response:
     else:
         events_future = all_events_future
 
-    events = events_future.get_result()
+    events = EventHelper.sorted_events(events_future.get_result())
     if state_prov == "" or (state_prov and not events):
         return redirect(request.path)
-
-    EventHelper.sort_events(events)
 
     week_events = EventHelper.group_by_week(events)
 

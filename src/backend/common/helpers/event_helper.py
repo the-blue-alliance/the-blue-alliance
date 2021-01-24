@@ -31,13 +31,24 @@ class TeamAvgScore(NamedTuple):
 
 class EventHelper(object):
     @classmethod
-    def sort_events(cls, events: List[Event]) -> None:
+    def sorted_events(cls, events: List[Event]) -> List[Event]:
         """
-        Sorts by start date then end date
-        Sort is stable
+        Sort events first by end date (ascending), and break ties by start date (ascending)
+        Ex:
+            e1 = Event(start_date=(2010, 3, 1), end_date=(2010, 3, 3))
+            e2 = Event(start_date=(2010, 3, 2), end_date=(2010, 3, 4))
+            e3 = Event(start_date=(2010, 3, 1), end_date=(2010, 3, 4))
+
+            EventHelper.sorted_events([e1, e2, e3])
+            > [e1, e3, e2]
         """
-        events.sort(key=cls.start_date_or_distant_future)
-        events.sort(key=cls.end_date_or_distant_future)
+        return sorted(
+            events,
+            key=lambda x: (
+                cls.end_date_or_distant_future(x),
+                cls.start_date_or_distant_future(x),
+            ),
+        )
 
     @classmethod
     def start_date_or_distant_future(cls, event: Event) -> datetime:
@@ -217,5 +228,4 @@ class EventHelper(object):
                 ):
                     events.append(event)
 
-        cls.sort_events(events)
-        return events
+        return cls.sorted_events(events)

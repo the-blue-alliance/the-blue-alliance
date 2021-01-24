@@ -229,7 +229,7 @@ def test_calculate_wlt(ndb_context) -> None:
     assert wlt == WLTRecord(wins=1, losses=1, ties=1)
 
 
-def test_sort_events_start_date(ndb_context) -> None:
+def test_sorted_events_start_date(ndb_context) -> None:
     e1 = Event(
         start_date=datetime.datetime(2010, 2, 21),
         end_date=datetime.datetime(2010, 3, 2),
@@ -239,16 +239,11 @@ def test_sort_events_start_date(ndb_context) -> None:
         end_date=datetime.datetime(2010, 3, 2),
     )
 
-    events = [e2, e1]
-    EventHelper.sort_events(events)
-    assert events == [e1, e2]
-
-    events = [e1, e2]
-    EventHelper.sort_events(events)
+    events = EventHelper.sorted_events([e2, e1])
     assert events == [e1, e2]
 
 
-def test_sort_events_end_date(ndb_context) -> None:
+def test_sorted_events_end_date(ndb_context) -> None:
     e1 = Event(
         start_date=datetime.datetime(2010, 3, 1),
         end_date=datetime.datetime(2010, 3, 2),
@@ -258,28 +253,48 @@ def test_sort_events_end_date(ndb_context) -> None:
         end_date=datetime.datetime(2010, 3, 3),
     )
 
-    events = [e1, e2]
-    EventHelper.sort_events(events)
-    assert events == [e1, e2]
-
-    events = [e2, e1]
-    EventHelper.sort_events(events)
+    events = EventHelper.sorted_events([e2, e1])
     assert events == [e1, e2]
 
 
-def test_sort_events_distant_future_event(ndb_context) -> None:
+def test_sorted_events_start_date_end_date(ndb_context) -> None:
+    e1 = Event(
+        start_date=datetime.datetime(2010, 3, 1),
+        end_date=datetime.datetime(2010, 3, 3),
+    )
+    e2 = Event(
+        start_date=datetime.datetime(2010, 3, 2),
+        end_date=datetime.datetime(2010, 3, 4),
+    )
+    e3 = Event(
+        start_date=datetime.datetime(2010, 3, 1),
+        end_date=datetime.datetime(2010, 3, 4),
+    )
+    e4 = Event(
+        start_date=datetime.datetime(2002, 3, 1),
+        end_date=datetime.datetime(2002, 3, 2),
+    )
+
+    expected_order = [e4, e1, e3, e2]
+
+    events = [e1, e2, e3, e4]
+    # Ensure compatability with the previous sorting
+    events.sort(key=EventHelper.start_date_or_distant_future)
+    events.sort(key=EventHelper.end_date_or_distant_future)
+    assert events == expected_order
+
+    events = EventHelper.sorted_events([e1, e2, e3, e4])
+    assert events == expected_order
+
+
+def test_sorted_events_distant_future_event(ndb_context) -> None:
     e1 = Event()
     e2 = Event(
         start_date=datetime.datetime(2010, 3, 1),
         end_date=datetime.datetime(2010, 3, 2),
     )
 
-    events = [e1, e2]
-    EventHelper.sort_events(events)
-    assert events == [e2, e1]
-
-    events = [e2, e1]
-    EventHelper.sort_events(events)
+    events = EventHelper.sorted_events([e1, e2])
     assert events == [e2, e1]
 
 

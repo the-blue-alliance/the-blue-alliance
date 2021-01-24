@@ -53,9 +53,7 @@ class MyTBA:
                 )
             )
 
-        EventHelper.sort_events(events)
-
-        return events
+        return EventHelper.sorted_events(events)
 
     @property
     def team_models(self) -> List[MyTBAModel]:
