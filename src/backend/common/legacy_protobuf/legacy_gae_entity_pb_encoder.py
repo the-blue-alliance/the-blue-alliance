@@ -84,8 +84,16 @@ class EntityProtoEncoder:
             out.putVarInt32(114)
             out.putVarInt32(EntityProtoByteSize.ByteSize(self.property_[i]))
             EntityProtoEncoder.OutputUnchecked(self.property_[i], out)
-        # Skip encoding raw_property and entity_group
-        # They're not present in cloud-ndb's implementation
+        # Skip encoding raw_property
+        # It's not present in cloud-ndb's implementation
+
+        # encode a dummy entity_group - it's not present in cloud ndb
+        # but is requird by legacy NDB
+        entity_group = Path()
+        out.putVarInt32(130)
+        out.putVarInt32(EntityProtoByteSize.ByteSize(entity_group))
+        EntityProtoEncoder.OutputUnchecked(entity_group, out)
+
         if self.has_owner_:
             out.putVarInt32(138)
             out.putVarInt32(self.owner_.ByteSize())
