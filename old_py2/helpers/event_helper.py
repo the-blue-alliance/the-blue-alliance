@@ -1,6 +1,5 @@
 import json
 import logging
-import collections
 import datetime
 import re
 
@@ -213,12 +212,6 @@ class EventHelper(object):
         # An event slipped through!
         logging.warn("Event type '{}' not recognized!".format(event_type_str))
         return EventType.UNLABLED
-
-    @classmethod
-    def is_2015_playoff(Cls, event_key):
-        year = event_key[:4]
-        event_short = event_key[4:]
-        return year == '2015' and event_short not in {'cc', 'cacc', 'mttd'}
 
     @classmethod
     def remapteams_matches(cls, matches, remap_teams):
