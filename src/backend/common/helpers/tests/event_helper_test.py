@@ -1,5 +1,6 @@
 import datetime
 import json
+from random import shuffle
 
 import pytest
 from freezegun import freeze_time
@@ -239,7 +240,10 @@ def test_sorted_events_start_date(ndb_context) -> None:
         end_date=datetime.datetime(2010, 3, 2),
     )
 
-    events = EventHelper.sorted_events([e2, e1])
+    events = [e1, e2]
+    shuffle(events)
+
+    events = EventHelper.sorted_events(events)
     assert events == [e1, e2]
 
 
@@ -253,7 +257,10 @@ def test_sorted_events_end_date(ndb_context) -> None:
         end_date=datetime.datetime(2010, 3, 3),
     )
 
-    events = EventHelper.sorted_events([e2, e1])
+    events = [e1, e2]
+    shuffle(events)
+
+    events = EventHelper.sorted_events(events)
     assert events == [e1, e2]
 
 
@@ -278,12 +285,16 @@ def test_sorted_events_start_date_end_date(ndb_context) -> None:
     expected_order = [e4, e1, e3, e2]
 
     events = [e1, e2, e3, e4]
+    shuffle(events)
+
     # Ensure compatability with the previous sorting
     events.sort(key=EventHelper.start_date_or_distant_future)
     events.sort(key=EventHelper.end_date_or_distant_future)
     assert events == expected_order
 
-    events = EventHelper.sorted_events([e1, e2, e3, e4])
+    shuffle(events)
+
+    events = EventHelper.sorted_events(events)
     assert events == expected_order
 
 
@@ -294,7 +305,10 @@ def test_sorted_events_distant_future_event(ndb_context) -> None:
         end_date=datetime.datetime(2010, 3, 2),
     )
 
-    events = EventHelper.sorted_events([e1, e2])
+    events = [e1, e2]
+    shuffle(events)
+
+    events = EventHelper.sorted_events(events)
     assert events == [e2, e1]
 
 
