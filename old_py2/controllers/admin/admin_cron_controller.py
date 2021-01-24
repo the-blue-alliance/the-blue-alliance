@@ -376,7 +376,7 @@ class AdminPostEventTasksDo(LoggedInHandler):
         awards = []
         event = event_future.get_result()
         if event.event_type_enum in {EventType.OFFSEASON, EventType.FOC}:
-            matches = MatchHelper.organizeMatches(matches_future.get_result())
+            matches = MatchHelper.organized_matches(matches_future.get_result())
             bracket = PlayoffAdvancementHelper.generateBracket(matches, event, event.alliance_selections)
             if 'f' in bracket:
                 winning_alliance = '{}_alliance'.format(bracket['f']['f1']['winning_alliance'])

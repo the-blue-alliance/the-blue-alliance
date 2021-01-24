@@ -107,8 +107,8 @@ def event_detail(event_key: EventKey) -> Response:
 
     awards = AwardHelper.organizeAwards(event.awards)
     cleaned_matches = event.matches
-    # MatchHelper.deleteInvalidMatches(event.matches, event)
-    match_count, matches = MatchHelper.organizeMatches(cleaned_matches)
+    # MatchHelper.delete_invalid_matches(event.matches, event)
+    match_count, matches = MatchHelper.organized_matches(cleaned_matches)
     teams = TeamHelper.sortTeams(event.teams)
 
     # Organize medias by team
@@ -138,8 +138,8 @@ def event_detail(event_key: EventKey) -> Response:
     oprs = oprs[:15]  # get the top 15 OPRs
 
     if event.now:
-        matches_recent = MatchHelper.recentMatches(cleaned_matches)
-        matches_upcoming = MatchHelper.upcomingMatches(cleaned_matches)
+        matches_recent = MatchHelper.recent_matches(cleaned_matches)
+        matches_upcoming = MatchHelper.upcoming_matches(cleaned_matches)
     else:
         matches_recent = None
         matches_upcoming = None

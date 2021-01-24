@@ -162,8 +162,8 @@ class EventDetail(CacheableHandler):
             event_codivisions_future = EventDivisionsQuery(event.parent_event.id()).fetch_async()
 
         awards = AwardHelper.organizeAwards(event.awards)
-        cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches, event)
-        matches = MatchHelper.organizeMatches(cleaned_matches)
+        cleaned_matches = MatchHelper.delete_invalid_matches(event.matches, event)
+        matches = MatchHelper.organized_matches(cleaned_matches)
         teams = TeamHelper.sortTeams(event.teams)
 
         # Organize medias by team
@@ -187,7 +187,7 @@ class EventDetail(CacheableHandler):
         oprs = oprs[:15]  # get the top 15 OPRs
 
         if event.now:
-            matches_recent = MatchHelper.recentMatches(cleaned_matches)
+            matches_recent = MatchHelper.recent_matches(cleaned_matches)
             matches_upcoming = MatchHelper.upcomingMatches(cleaned_matches)
         else:
             matches_recent = None
@@ -292,8 +292,8 @@ class EventInsights(CacheableHandler):
         ranking_predictions = event.details.predictions.get('ranking_predictions', None)
         ranking_prediction_stats = event.details.predictions.get('ranking_prediction_stats', None)
 
-        cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches, event)
-        matches = MatchHelper.organizeMatches(cleaned_matches)
+        cleaned_matches = MatchHelper.delete_invalid_matches(event.matches, event)
+        matches = MatchHelper.organized_matches(cleaned_matches)
 
         # If no matches but there are match predictions, create fake matches
         # For cases where FIRST doesn't allow posting of match schedule
@@ -388,7 +388,7 @@ class EventRss(CacheableHandler):
         if not event:
             self.abort(404)
 
-        matches = MatchHelper.organizeMatches(event.matches)
+        matches = MatchHelper.organized_matches(event.matches)
 
         self.template_values.update({
             "event": event,

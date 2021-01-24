@@ -27,7 +27,7 @@ class MatchHelper(object):
             logging.warning('Cannot compute match time for event with no timezone_id: {}'.format(event.key_name))
             return
 
-        matches_reversed = cls.play_order_sort_matches(matches, reverse=True)
+        matches_reversed = cls.play_order_sorted_matches(matches, reverse=True)
         tz = pytz.timezone(event.timezone_id)
 
         last_match_time = None
@@ -59,7 +59,7 @@ class MatchHelper(object):
         if event.year < 2008 or event.event_type_enum not in EventType.SEASON_EVENT_TYPES:
             return
 
-        qual_matches = cls.organizeMatches(event.matches)['qm']
+        qual_matches = cls.organized_matches(event.matches)['qm']
         if not qual_matches:
             return
 
@@ -102,7 +102,7 @@ class MatchHelper(object):
         return matches
 
     @classmethod
-    def deleteInvalidMatches(self, match_list, event):
+    def delete_invalid_matches(self, match_list, event):
         """
         A match is invalid iff it is an elim match that has not been played
         and the same alliance already won in 2 match numbers in the same set.
@@ -210,4 +210,3 @@ class MatchHelper(object):
             return True
         else:
             return valid_breakdowns
-    

@@ -132,8 +132,8 @@ class ApiEventPlayoffAdvancementController(ApiBaseController):
         matches, matches_updated = matches_future.get_result()
         self._last_modified = max(event_updated, matches_updated)
 
-        cleaned_matches = MatchHelper.deleteInvalidMatches(matches, event)
-        matches = MatchHelper.organizeMatches(cleaned_matches)
+        cleaned_matches = MatchHelper.delete_invalid_matches(matches, event)
+        matches = MatchHelper.organized_matches(cleaned_matches)
         bracket_table = event.playoff_bracket
         playoff_advancement = event.playoff_advancement
 

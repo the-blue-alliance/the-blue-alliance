@@ -13,12 +13,12 @@ def auto_add_ndb_context(ndb_context) -> None:
     pass
 
 
-def test_organize_matches_counts(test_data_importer) -> None:
+def test_organized_matches_counts(test_data_importer) -> None:
     matches = test_data_importer.parse_match_list(
         __file__, "data/2019nyny_matches.json"
     )
 
-    count, organized_matches = MatchHelper.organizeMatches(matches)
+    count, organized_matches = MatchHelper.organized_matches(matches)
     assert count == 94
     assert len(organized_matches[CompLevel.QM]) == 77
     assert len(organized_matches[CompLevel.QF]) == 11
@@ -27,12 +27,12 @@ def test_organize_matches_counts(test_data_importer) -> None:
     assert len(organized_matches[CompLevel.F]) == 2
 
 
-def test_organize_matches_sorted(test_data_importer) -> None:
+def test_organized_matches_sorted(test_data_importer) -> None:
     matches = test_data_importer.parse_match_list(
         __file__, "data/2019nyny_matches.json"
     )
 
-    _, organized_matches = MatchHelper.organizeMatches(matches)
+    _, organized_matches = MatchHelper.organized_matches(matches)
     quals = organized_matches[CompLevel.QM]
     quarters = organized_matches[CompLevel.QF]
     assert all(
@@ -45,13 +45,13 @@ def test_organize_matches_sorted(test_data_importer) -> None:
     )
 
 
-def test_organize_double_elim_matches(test_data_importer) -> None:
+def test_organized_double_elim_matches(test_data_importer) -> None:
     matches = test_data_importer.parse_match_list(
         __file__, "data/2017wiwi_matches.json"
     )
 
-    _, organized_matches = MatchHelper.organizeMatches(matches)
-    double_elim_matches = MatchHelper.organizeDoubleElimMatches(organized_matches)
+    _, organized_matches = MatchHelper.organized_matches(matches)
+    double_elim_matches = MatchHelper.organized_double_elim_matches(organized_matches)
 
     assert DoubleElimBracket.WINNER in double_elim_matches
     assert DoubleElimBracket.LOSER in double_elim_matches
@@ -70,7 +70,7 @@ def test_play_order_sort(test_data_importer) -> None:
     matches = test_data_importer.parse_match_list(
         __file__, "data/2019nyny_matches.json"
     )
-    sorted_matches = MatchHelper.play_order_sort_matches(matches)
+    sorted_matches = MatchHelper.play_order_sorted_matches(matches)
     assert len(sorted_matches) == 94
     assert all(
         sorted_matches[i].play_order <= sorted_matches[i + 1].play_order
@@ -90,7 +90,7 @@ def test_recent_matches(test_data_importer) -> None:
             m.alliances_json = json.dumps(m.alliances)
             m._alliances = None
 
-    recent_matches = MatchHelper.recentMatches(quals, num=3)
+    recent_matches = MatchHelper.recent_matches(quals, num=3)
     assert [m.key_name for m in recent_matches] == [
         "2019nyny_qm68",
         "2019nyny_qm69",
@@ -109,7 +109,7 @@ def test_recent_matches_none_played(test_data_importer) -> None:
         m.alliances_json = json.dumps(m.alliances)
         m._alliances = None
 
-    recent_matches = MatchHelper.recentMatches(quals, num=3)
+    recent_matches = MatchHelper.recent_matches(quals, num=3)
     assert recent_matches == []
 
 
@@ -125,7 +125,7 @@ def test_upcoming_matches(test_data_importer) -> None:
             m.alliances_json = json.dumps(m.alliances)
             m._alliances = None
 
-    upcoming_matches = MatchHelper.upcomingMatches(quals, num=3)
+    upcoming_matches = MatchHelper.upcoming_matches(quals, num=3)
     assert [m.key_name for m in upcoming_matches] == [
         "2019nyny_qm71",
         "2019nyny_qm72",
@@ -139,5 +139,5 @@ def test_upcoming_matches_all_played(test_data_importer) -> None:
     )
     quals = [m for m in matches if m.comp_level == CompLevel.QM]
 
-    upcoming_matches = MatchHelper.upcomingMatches(quals, num=3)
+    upcoming_matches = MatchHelper.upcoming_matches(quals, num=3)
     assert upcoming_matches == []

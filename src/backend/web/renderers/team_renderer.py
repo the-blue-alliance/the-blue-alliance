@@ -120,11 +120,13 @@ class TeamRenderer(object):
             event_awards = AwardHelper.organizeAwards(
                 awards_by_event_key.get(event.key, [])
             )
-            match_count, matches_organized = MatchHelper.organizeMatches(event_matches)
+            match_count, matches_organized = MatchHelper.organized_matches(
+                event_matches
+            )
 
             if event.now:
                 current_event = event
-                matches_upcoming = MatchHelper.upcomingMatches(event_matches)
+                matches_upcoming = MatchHelper.upcoming_matches(event_matches)
 
             """
             if event.within_a_day:
@@ -360,7 +362,7 @@ class TeamRenderer(object):
                 matches = match_query.TeamEventMatchesQuery(
                     team.key_name, event.key_name
                 ).fetch()
-                matches_upcoming = MatchHelper.upcomingMatches(matches)
+                matches_upcoming = MatchHelper.upcoming_matches(matches)
 
             """
             if event.within_a_day:

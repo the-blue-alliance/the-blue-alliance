@@ -92,7 +92,7 @@ class PlayoffAdvancementHelper(object):
     ) -> Optional[TOrganizedDoubleElimMatches]:
         double_elim_matches = None
         if event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
-            double_elim_matches = MatchHelper.organizeDoubleElimMatches(matches)
+            double_elim_matches = MatchHelper.organized_double_elim_matches(matches)
         return double_elim_matches
 
     @classmethod

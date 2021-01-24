@@ -30,7 +30,7 @@ def test_standard_bracket(test_data_importer) -> None:
     matches = test_data_importer.parse_match_list(
         __file__, "data/2019nyny_matches.json"
     )
-    organized_matches = MatchHelper.organizeMatches(matches)[1]
+    organized_matches = MatchHelper.organized_matches(matches)[1]
 
     advancement = PlayoffAdvancementHelper.generatePlayoffAdvancement(
         event, organized_matches
@@ -46,7 +46,7 @@ def test_2015_event(test_data_importer) -> None:
     matches = test_data_importer.parse_match_list(
         __file__, "data/2015nyny_matches.json"
     )
-    organized_matches = MatchHelper.organizeMatches(matches)[1]
+    organized_matches = MatchHelper.organized_matches(matches)[1]
 
     advancement = PlayoffAdvancementHelper.generatePlayoffAdvancement(
         event, organized_matches
@@ -62,7 +62,7 @@ def test_round_robin(test_data_importer) -> None:
     matches = test_data_importer.parse_match_list(
         __file__, "data/2019cmptx_matches.json"
     )
-    organized_matches = MatchHelper.organizeMatches(matches)[1]
+    organized_matches = MatchHelper.organized_matches(matches)[1]
 
     advancement = PlayoffAdvancementHelper.generatePlayoffAdvancement(
         event, organized_matches
@@ -78,7 +78,7 @@ def test_best_of_3_finals(test_data_importer) -> None:
     matches = test_data_importer.parse_match_list(
         __file__, "data/2019nyny_matches.json"
     )
-    organized_matches = MatchHelper.organizeMatches(matches)[1]
+    organized_matches = MatchHelper.organized_matches(matches)[1]
 
     advancement = PlayoffAdvancementHelper.generatePlayoffAdvancement(
         event, organized_matches
@@ -94,7 +94,7 @@ def test_best_of_5_finals(test_data_importer) -> None:
     matches = test_data_importer.parse_match_list(
         __file__, "data/2019nyny_matches.json"
     )
-    organized_matches = MatchHelper.organizeMatches(matches)[1]
+    organized_matches = MatchHelper.organized_matches(matches)[1]
 
     advancement = PlayoffAdvancementHelper.generatePlayoffAdvancement(
         event, organized_matches

@@ -720,7 +720,7 @@ class Event(CachedModel):
     @property
     def next_match(self):
         from helpers.match_helper import MatchHelper
-        upcoming_matches = MatchHelper.upcomingMatches(self.matches, 1)
+        upcoming_matches = MatchHelper.upcoming_matches(self.matches, 1)
         if upcoming_matches:
             return upcoming_matches[0]
         else:
@@ -729,7 +729,7 @@ class Event(CachedModel):
     @property
     def previous_match(self):
         from helpers.match_helper import MatchHelper
-        recent_matches = MatchHelper.recentMatches(self.matches, 1)[0]
+        recent_matches = MatchHelper.recent_matches(self.matches, 1)[0]
         if recent_matches:
             return recent_matches[0]
         else:

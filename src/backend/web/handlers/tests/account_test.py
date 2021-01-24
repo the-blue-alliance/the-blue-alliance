@@ -664,9 +664,9 @@ def test_mytba(
         return_value=[mock_event_sorted],
     ) as mock_sorted_events, patch.object(
         backend.common.helpers.match_helper.MatchHelper,
-        "natural_sort_matches",
+        "natural_sorted_matches",
         return_value=[mock_match_sorted],
-    ) as mock_natural_sort_matches, patch.object(
+    ) as mock_natural_sorted_matches, patch.object(
         backend.common.helpers.season_helper.SeasonHelper,
         "effective_season_year",
         return_value=mock_year,
@@ -681,7 +681,7 @@ def test_mytba(
     assert template.name == "mytba.html"
 
     mock_sorted_events.assert_called_with(mock_events)
-    mock_natural_sort_matches.assert_called_with(mock_matches)
+    mock_natural_sorted_matches.assert_called_with(mock_matches)
     mock_effective_season_year.assert_called()
 
     assert context["event_fav_sub"] == [
@@ -691,6 +691,9 @@ def test_mytba(
         (mock_team, mock_team_favorite, mock_team_subscription)
     ]
     assert context["event_match_fav_sub"] == [
-        (mock_event_sorted, [(mock_match_sorted, mock_match_favorite, mock_match_subscription)])
+        (
+            mock_event_sorted,
+            [(mock_match_sorted, mock_match_favorite, mock_match_subscription)],
+        )
     ]
     assert context["year"] == mock_year

@@ -57,7 +57,7 @@ class MatchSuggestionHandler(LoggedInHandler):
         for event in current_events:
             if not event.details:
                 continue
-            finished_matches += MatchHelper.recentMatches(event.matches, num=1)
+            finished_matches += MatchHelper.recent_matches(event.matches, num=1)
             for i, match in enumerate(MatchHelper.upcomingMatches(event.matches, num=3)):
                 if not match.time:
                     continue

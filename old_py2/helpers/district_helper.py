@@ -300,7 +300,7 @@ class DistrictHelper(object):
         else:
             logging.info("Event {} has no rankings for qual_points calculations!".format(event.key.id()))
 
-        matches = MatchHelper.organizeMatches(matches)
+        matches = MatchHelper.organized_matches(matches)
 
         # qual match calculations. only used for tiebreaking
         for match in matches['qm']:

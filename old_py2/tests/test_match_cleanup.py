@@ -47,7 +47,7 @@ class TestMatchCleanup(unittest2.TestCase):
 
     def test_cleanup(self):
         matches = self.setupMatches('test_data/cleanup_matches.csv')
-        cleaned_matches = MatchHelper.deleteInvalidMatches(matches, self.event)
+        cleaned_matches = MatchHelper.delete_invalid_matches(matches, self.event)
         indices = {9, 12, 26}
         correct_matches = []
         for i, match in enumerate(matches):
