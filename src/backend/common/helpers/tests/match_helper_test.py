@@ -1,4 +1,5 @@
 import json
+import random
 
 import pytest
 
@@ -11,6 +12,31 @@ from backend.common.helpers.match_helper import MatchHelper
 @pytest.fixture(autouse=True)
 def auto_add_ndb_context(ndb_context) -> None:
     pass
+
+
+def test_natural_sorted_matches(test_data_importer) -> None:
+    matches = test_data_importer.parse_match_list(
+        __file__, "data/2019nyny_matches.json"
+    )
+
+    random.shuffle(matches)
+    matches = MatchHelper.natural_sorted_matches(matches)
+    # Spot check - f, qf, qm, sf. Matches in comp level should be in order
+    spot_check_indexes = [0, 1, 2, 3, 4, 13, 14, 90, 91, 92]
+    spot_check_match_keys = [matches[i].key_name for i in spot_check_indexes]
+    expected_match_keys = [
+        "2019nyny_f1m1",
+        "2019nyny_f1m2",
+        "2019nyny_qf1m1",
+        "2019nyny_qf1m2",
+        "2019nyny_qf2m1",
+        "2019nyny_qm1",
+        "2019nyny_qm2",
+        "2019nyny_sf1m1",
+        "2019nyny_sf1m2",
+        "2019nyny_sf2m1",
+    ]
+    assert spot_check_match_keys == expected_match_keys
 
 
 def test_organized_matches_counts(test_data_importer) -> None:

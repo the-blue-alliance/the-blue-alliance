@@ -18,7 +18,7 @@ class MatchHelper(object):
 
     """
     Helper to put matches into sub-dictionaries for the way we render match tables
-    Allows us to sort m atches by key name.
+    Allows us to sort matches by key name.
     Note: Matches within a comp_level (qual, qf, sf, f, etc.) will be in order,
     but the comp levels themselves may not be in order. Doesn't matter because
     XXX_match_table.html checks for comp_level when rendering the page
