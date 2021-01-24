@@ -49,6 +49,7 @@ def test_blueprint() -> None:
         "/account/logout": "account.logout",
         "/account/login": "account.login",
         "/account/edit": "account.edit",
+        "/account/mytba": "account.mytba",
         "/account": "account.overview",
     }
 

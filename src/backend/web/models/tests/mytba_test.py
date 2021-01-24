@@ -1,13 +1,11 @@
 from datetime import datetime
 from typing import List
-from unittest.mock import ANY, patch
 
 from google.cloud import ndb
 
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.consts.model_type import ModelType
-from backend.common.helpers.match_helper import MatchHelper
 from backend.common.models.event import Event
 from backend.common.models.favorite import Favorite
 from backend.common.models.match import Match
@@ -136,10 +134,7 @@ def test_match_models() -> None:
 def test_matches() -> None:
     models = _create_one_of_each_mytba_model()
     mytba = MyTBA(models)
-
-    with patch.object(MatchHelper, "natural_sort_matches") as mock_natural_sort_matches:
-        matches = mytba.matches
-    mock_natural_sort_matches.assert_called_with(ANY)
+    matches = mytba.matches
 
     assert len(matches) == 2
     assert all([type(match) is Match for match in matches])

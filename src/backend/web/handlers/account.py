@@ -17,6 +17,10 @@ from werkzeug.wrappers import Response
 from backend.common.consts.auth_type import (
     WRITE_TYPE_NAMES as AUTH_TYPE_WRITE_TYPE_NAMES,
 )
+from backend.common.consts.model_type import ModelType
+from backend.common.helpers.event_helper import EventHelper
+from backend.common.helpers.match_helper import MatchHelper
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.sitevars.notifications_enable import NotificationsEnable
 from backend.web.auth import create_session_cookie, current_user, revoke_session_cookie
 from backend.web.decorators import enforce_login, require_login, require_login_only
@@ -175,111 +179,75 @@ def _set_account_status(status: str) -> None:
     session["account_status"] = status
 
 
-# class MyTBAController(LoggedInHandler):
-#     def get(self):
-#         self._require_registration()
-#
-#         user = self.user_bundle.account.key
-#         favorites = Favorite.query(ancestor=user).fetch()
-#         subscriptions = Subscription.query(ancestor=user).fetch()
-#
-#         team_keys = set()
-#         team_fav = {}
-#         team_subs = {}
-#         event_keys = set()
-#         event_fav = {}
-#         event_subs = {}
-#         events = []
-#         match_keys = set()
-#         match_event_keys = set()
-#         match_fav = {}
-#         match_subs = {}
-#         for item in favorites + subscriptions:
-#             if item.model_type == ModelType.TEAM:
-#                 team_keys.add(ndb.Key(Team, item.model_key))
-#                 if type(item) == Favorite:
-#                     team_fav[item.model_key] = item
-#                 elif type(item) == Subscription:
-#                     team_subs[item.model_key] = item
-#             elif item.model_type == ModelType.MATCH:
-#                 match_keys.add(ndb.Key(Match, item.model_key))
-#                 match_event_keys.add(ndb.Key(Event, item.model_key.split('_')[0]))
-#                 if type(item) == Favorite:
-#                     match_fav[item.model_key] = item
-#                 elif type(item) == Subscription:
-#                     match_subs[item.model_key] = item
-#             elif item.model_type == ModelType.EVENT:
-#                 if item.model_key.endswith('*'):  # All year events wildcard
-#                     event_year = int(item.model_key[:-1])
-#                     events.append(Event(  # add fake event for rendering
-#                         id=item.model_key,
-#                         short_name='ALL EVENTS',
-#                         event_short=item.model_key,
-#                         year=event_year,
-#                         start_date=datetime.datetime(event_year, 1, 1),
-#                         end_date=datetime.datetime(event_year, 1, 1)
-#                     ))
-#                 else:
-#                     event_keys.add(ndb.Key(Event, item.model_key))
-#                 if type(item) == Favorite:
-#                     event_fav[item.model_key] = item
-#                 elif type(item) == Subscription:
-#                     event_subs[item.model_key] = item
-#
-#         team_futures = ndb.get_multi_async(team_keys)
-#         event_futures = ndb.get_multi_async(event_keys)
-#         match_futures = ndb.get_multi_async(match_keys)
-#         match_event_futures = ndb.get_multi_async(match_event_keys)
-#
-#         teams = sorted([team_future.get_result() for team_future in team_futures], key=lambda x: x.team_number)
-#         team_fav_subs = []
-#         for team in teams:
-#             fav = team_fav.get(team.key.id(), None)
-#             subs = team_subs.get(team.key.id(), None)
-#             team_fav_subs.append((team, fav, subs))
-#
-#         events += [event_future.get_result() for event_future in event_futures]
-#         EventHelper.sort_events(events)
-#
-#         event_fav_subs = []
-#         for event in events:
-#             fav = event_fav.get(event.key.id(), None)
-#             subs = event_subs.get(event.key.id(), None)
-#             event_fav_subs.append((event, fav, subs))
-#
-#         matches = [match_future.get_result() for match_future in match_futures]
-#         match_events = [match_event_future.get_result() for match_event_future in match_event_futures]
-#         MatchHelper.natural_sort_matches(matches)
-#
-#         match_fav_subs_by_event = {}
-#         for event in match_events:
-#             match_fav_subs_by_event[event.key.id()] = (event, [])
-#
-#         for match in matches:
-#             event_key = match.key.id().split('_')[0]
-#             fav = match_fav.get(match.key.id(), None)
-#             subs = match_subs.get(match.key.id(), None)
-#             match_fav_subs_by_event[event_key][1].append((match, fav, subs))
-#
-#         event_match_fav_subs = sorted(match_fav_subs_by_event.values(), key=lambda x: EventHelper.start_date_or_distant_future(x[0]))
-#         event_match_fav_subs = sorted(event_match_fav_subs, key=lambda x: EventHelper.end_date_or_distant_future(x[0]))
-#
-#         self.template_values['team_fav_subs'] = team_fav_subs
-#         self.template_values['event_fav_subs'] = event_fav_subs
-#         self.template_values['event_match_fav_subs'] = event_match_fav_subs
-#         self.template_values['status'] = self.request.get('status')
-#         self.template_values['year'] = datetime.datetime.now().year
-#
-#         self.response.out.write(jinja2_engine.render('mytba.html', self.template_values))
-#
-#
+@blueprint.route("/mytba")
+@require_login
+def mytba() -> str:
+    user = none_throws(current_user())
+    mytba = user.myTBA
+
+    mytba_events = EventHelper.sorted_events(mytba.events)
+    mytba_teams = sorted(mytba.teams, key=lambda team: team.team_number)
+
+    mytba_event_matches = mytba.event_matches
+    mytba_event_matches_events = [
+        event_key.get() for event_key in mytba_event_matches.keys()
+    ]
+    mytba_event_matches_events = EventHelper.sorted_events(mytba_event_matches_events)
+
+    event_matches = []
+    for event in mytba_event_matches_events:
+        matches = mytba_event_matches[event.key]
+        MatchHelper.natural_sort_matches(matches)
+        event_matches.append((event, matches))
+
+    template_values = {
+        "event_fav_sub": [
+            (
+                event,
+                mytba.favorite(ModelType.EVENT, none_throws(event.key.string_id())),
+                mytba.subscription(ModelType.EVENT, none_throws(event.key.string_id())),
+            )
+            for event in mytba_events
+        ],
+        "team_fav_sub": [
+            (
+                team,
+                mytba.favorite(ModelType.TEAM, none_throws(team.key.string_id())),
+                mytba.subscription(ModelType.TEAM, none_throws(team.key.string_id())),
+            )
+            for team in mytba_teams
+        ],
+        "event_match_fav_sub": [
+            (
+                event,
+                [
+                    (
+                        match,
+                        mytba.favorite(
+                            ModelType.MATCH, none_throws(match.key.string_id())
+                        ),
+                        mytba.subscription(
+                            ModelType.MATCH, none_throws(match.key.string_id())
+                        ),
+                    )
+                    for match in matches
+                ],
+            )
+            for (event, matches) in event_matches
+        ],
+        # "status": request.get('status'),
+        "year": SeasonHelper.effective_season_year(),
+    }
+    return render_template("mytba.html", **template_values)
+
+
 # class myTBAAddHotMatchesController(LoggedInHandler):
 #     def get(self, event_key=None):
 #         self._require_registration()
 #
 #         if event_key is None:
 #             events = EventHelper.getEventsWithinADay()
-#             EventHelper.sort_events(events)
+#             EventHelper.sorted_events(events)
 #             self.template_values['events'] = events
 #             self.response.out.write(jinja2_engine.render('mytba_add_hot_matches_base.html', self.template_values))
 #             return

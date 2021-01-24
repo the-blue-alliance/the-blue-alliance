@@ -7,6 +7,7 @@ from flask import session
 from flask.testing import FlaskClient
 
 import backend
+from backend.common.consts.model_type import ModelType
 from backend.web.handlers.conftest import CapturedTemplate
 from backend.web.handlers.tests.helpers import get_page_title
 
@@ -596,3 +597,98 @@ def test_read_key_delete(web_client: FlaskClient) -> None:
     assert response.status_code == 302
     parsed_response = urlparse(response.headers["Location"])
     assert parsed_response.path == "/account"
+
+
+def test_mytba(
+    captured_templates: List[CapturedTemplate], web_client: FlaskClient
+) -> None:
+    mock_mytba = Mock()
+
+    mock_event = Mock()
+    mock_events = [mock_event]
+    mock_mytba.events = mock_events
+
+    mock_team = Mock()
+    mock_mytba.teams = [mock_team]
+
+    mock_event_key = Mock()
+    mock_event_key.configure_mock(**{"get.return_value": mock_event})
+    mock_event.key = mock_event_key
+
+    mock_match = Mock()
+    mock_matches = [mock_match]
+    mock_event_matches = {mock_event_key: mock_matches}
+    mock_mytba.event_matches = mock_event_matches
+
+    mock = user_mock()
+    mock.myTBA = mock_mytba
+
+    mock_event_favorite = Mock()
+    mock_event_subscription = Mock()
+    mock_event_subscription.notification_names = []
+    mock_team_favorite = Mock()
+    mock_team_subscription = Mock()
+    mock_team_subscription.notification_names = []
+    mock_match_favorite = Mock()
+    mock_match_subscription = Mock()
+    mock_match_subscription.notification_names = []
+
+    def mock_favorite(model_type, key):
+        if model_type == ModelType.EVENT:
+            return mock_event_favorite
+        elif model_type == ModelType.TEAM:
+            return mock_team_favorite
+        return mock_match_favorite
+
+    def mock_subscription(model_type, key):
+        if model_type == ModelType.EVENT:
+            return mock_event_subscription
+        elif model_type == ModelType.TEAM:
+            return mock_team_subscription
+        return mock_match_subscription
+
+    mock_mytba.favorite.side_effect = mock_favorite
+    mock_mytba.subscription.side_effect = mock_subscription
+
+    mock_year = 2012
+
+    with patch.object(
+        backend.web.decorators, "current_user", return_value=mock
+    ), patch.object(
+        backend.web.handlers.account, "current_user", return_value=mock
+    ), patch.object(
+        backend.common.helpers.event_helper.EventHelper,
+        "sorted_events",
+        return_value=mock_events,
+    ) as mock_sorted_events, patch.object(
+        backend.common.helpers.match_helper.MatchHelper,
+        "natural_sort_matches",
+        return_value=mock_matches,
+    ) as mock_natural_sort_matches, patch.object(
+        backend.common.helpers.season_helper.SeasonHelper,
+        "effective_season_year",
+        return_value=mock_year,
+    ) as mock_effective_season_year:
+        response = web_client.get("/account/mytba")
+
+    assert response.status_code == 200
+    assert len(captured_templates) == 1
+
+    template = captured_templates[0][0]
+    context = captured_templates[0][1]
+    assert template.name == "mytba.html"
+
+    mock_sorted_events.assert_called_with(mock_events)
+    mock_natural_sort_matches.assert_called_with(mock_matches)
+    mock_effective_season_year.assert_called()
+
+    assert context["event_fav_sub"] == [
+        (mock_event, mock_event_favorite, mock_event_subscription)
+    ]
+    assert context["team_fav_sub"] == [
+        (mock_team, mock_team_favorite, mock_team_subscription)
+    ]
+    assert context["event_match_fav_sub"] == [
+        (mock_event, [(mock_match, mock_match_favorite, mock_match_subscription)])
+    ]
+    assert context["year"] == mock_year
