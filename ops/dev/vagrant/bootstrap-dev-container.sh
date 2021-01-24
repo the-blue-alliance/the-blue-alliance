@@ -8,6 +8,7 @@ mkdir -p /datastore
 pip2 install grpcio
 python -m pip install --upgrade pip
 pip install -r requirements.txt
+pip install -r src/requirements.txt
 
 # nodejs dependencies
 npm install uglify-js --silent
