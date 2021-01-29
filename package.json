@@ -65,7 +65,7 @@
     "uglifycss": "0.0.29",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^2.0.0",
-    "watchify": "^3.7.0",
+    "watchify": "^4.0.0",
     "yargs": "^16.2.0"
   },
   "scripts": {
