@@ -7,6 +7,7 @@ from pyre_extensions import none_throws, safe_cast
 
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.auth_type import AuthType
+from backend.common.consts.model_type import ModelType
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.helpers.mytba import MyTBA
 from backend.common.models.account import Account
@@ -121,6 +122,27 @@ class User:
         return len(
             FavoriteQuery(account=none_throws(self._account), keys_only=True).fetch()
         )
+
+    def add_favorite(model_key: str, model_type: ModelType) -> Optional[Favorite]:
+        """ Adds a Favorite for a model key/type. Returns None if the model already exists """
+        query = Favorite.query(
+            parent=user_account_key,
+            Favorite.model_key == fav.model_key,
+            Favorite.model_type == fav.model_type,
+            ancestor=ndb.Key(Account, fav.user_id)
+        )
+        if .count() == 0:
+            # Favorite doesn't exist, add it
+            fav.put()
+            # Send updates to user's other devices
+            NotificationHelper.send_favorite_update(fav.user_id, device_key)
+            return 200
+        else:
+            # Favorite already exists. Don't add it again
+            return 304
+
+    def remove_favorite() -> None:
+        pass
 
     @property
     def subscriptions(self) -> List[Subscription]:
