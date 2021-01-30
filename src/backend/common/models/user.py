@@ -1,6 +1,6 @@
 import random
 import string
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws, safe_cast
@@ -75,10 +75,10 @@ class User:
         return none_throws(self._account).key
 
     @property
-    def uid(self) -> Optional[Union[int, str]]:
+    def uid(self) -> Optional[str]:
         if self._account is None:
             return None
-        return none_throws(none_throws(self._account).key.id())
+        return none_throws(none_throws(self._account).key.string_id())
 
     @property
     def is_registered(self) -> bool:

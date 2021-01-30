@@ -78,7 +78,7 @@
                   {% endfor %}
                   </ul>
                 </td>
-                <td><a class="btn btn-primary" href="/account/mytba/team/{{team.team_number}}"><span class="glyphicon glyphicon-pencil"></span></a></td>
+                <td><a class="btn btn-primary" href="{{ url_for('account.mytba_team', team_number=team.team_number) }}"><span class="glyphicon glyphicon-pencil"></span></a></td>
               </tr>
               {% endfor %}
             </table>
