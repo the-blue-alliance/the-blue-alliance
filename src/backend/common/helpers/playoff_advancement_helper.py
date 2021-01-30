@@ -326,7 +326,10 @@ class PlayoffAdvancementHelper(object):
                             ):  # if >= 2 teams are the same, then the alliance is the same
                                 complete_alliance = complete_alliances[alliance_index]
                                 scores.append(match.alliances[color]["score"])
-                                advancement[comp_level][j]._replace(
+                                advancement[comp_level][j] = advancement[comp_level][
+                                    j
+                                ]._replace(
+                                    scores=scores,
                                     average_score=float(sum(scores)) / len(scores),
                                     num_played=len(scores),
                                 )
@@ -466,10 +469,16 @@ class PlayoffAdvancementHelper(object):
                                             match.alliances[color]["score"]
                                         )
                                         tiebreaker2.append(0)
-                                    advancement[comp_level][j]._replace(
-                                        champ_points=sum(champ_points),
-                                        tiebreaker1=sum(tiebreaker1),
-                                        tiebreaker2=sum(tiebreaker2),
+                                    advancement[comp_level][j] = advancement[
+                                        comp_level
+                                    ][j]._replace(
+                                        champ_points=champ_points,
+                                        sum_champ_points=sum(champ_points),
+                                        tiebreaker1=tiebreaker1,
+                                        sum_tiebreaker1=sum(tiebreaker1),
+                                        tiebreaker2=tiebreaker2,
+                                        sum_tiebreaker2=sum(tiebreaker2),
+                                        record=record,
                                     )
                                 break
                         else:
