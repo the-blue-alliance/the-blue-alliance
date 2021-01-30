@@ -28,7 +28,7 @@ class Subscription(MyTBAModel):
     def notification_names(self) -> List[str]:
         return [
             NOTIFICATION_RENDER_NAMES[NotificationType(index)]
-            for index in self.notification_types
+            for index in sorted(self.notification_types)
         ]
 
     # @classmethod
