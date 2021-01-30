@@ -1,3 +1,6 @@
+import json
+import os
+
 import pytest
 
 from backend.common.consts.event_type import EventType
@@ -27,6 +30,9 @@ def create_event(event_key: EventKey, playoff_type: PlayoffType) -> Event:
 
 def test_standard_bracket(test_data_importer) -> None:
     event = create_event("2019nyny", PlayoffType.BRACKET_8_TEAM)
+    test_data_importer.import_event_alliances(
+        __file__, "data/2019nyny_alliances.json", "2019nyny"
+    )
     matches = test_data_importer.parse_match_list(
         __file__, "data/2019nyny_matches.json"
     )
@@ -35,14 +41,19 @@ def test_standard_bracket(test_data_importer) -> None:
     advancement = PlayoffAdvancementHelper.generatePlayoffAdvancement(
         event, organized_matches
     )
-    assert advancement.bracket_table is not None
-    assert advancement.playoff_advancement is None
-    assert advancement.double_elim_matches is None
-    assert advancement.playoff_template is None
+    with open(
+        f"{os.path.dirname(__file__)}/data/expected_advancement_2019nyny.json", "r"
+    ) as f:
+        expected_advancement = json.load(f)
+
+    assert json.loads(json.dumps(advancement)) == expected_advancement
 
 
 def test_2015_event(test_data_importer) -> None:
     event = create_event("2015nyny", PlayoffType.AVG_SCORE_8_TEAM)
+    test_data_importer.import_event_alliances(
+        __file__, "data/2015nyny_alliances.json", "2015nyny"
+    )
     matches = test_data_importer.parse_match_list(
         __file__, "data/2015nyny_matches.json"
     )
@@ -51,14 +62,41 @@ def test_2015_event(test_data_importer) -> None:
     advancement = PlayoffAdvancementHelper.generatePlayoffAdvancement(
         event, organized_matches
     )
-    assert advancement.bracket_table is not None
-    assert advancement.playoff_advancement is not None
-    assert advancement.double_elim_matches is None
-    assert advancement.playoff_template == "playoff_table"
+    with open(
+        f"{os.path.dirname(__file__)}/data/expected_advancement_2015nyny.json", "r"
+    ) as f:
+        expected_advancement = json.load(f)
+
+    assert json.loads(json.dumps(advancement)) == expected_advancement
 
 
-def test_round_robin(test_data_importer) -> None:
+def test_round_robin_2018(test_data_importer) -> None:
+    event = create_event("2018cmptx", PlayoffType.ROUND_ROBIN_6_TEAM)
+    test_data_importer.import_event_alliances(
+        __file__, "data/2018cmptx_alliances.json", "2018cmptx"
+    )
+    matches = test_data_importer.parse_match_list(
+        __file__, "data/2018cmptx_matches.json"
+    )
+    organized_matches = MatchHelper.organized_matches(matches)[1]
+
+    advancement = PlayoffAdvancementHelper.generatePlayoffAdvancement(
+        event, organized_matches
+    )
+
+    with open(
+        f"{os.path.dirname(__file__)}/data/expected_advancement_2018cmptx.json", "r"
+    ) as f:
+        expected_advancement = json.load(f)
+
+    assert json.loads(json.dumps(advancement)) == expected_advancement
+
+
+def test_round_robin_2019(test_data_importer) -> None:
     event = create_event("2019cmptx", PlayoffType.ROUND_ROBIN_6_TEAM)
+    test_data_importer.import_event_alliances(
+        __file__, "data/2019cmptx_alliances.json", "2019cmptx"
+    )
     matches = test_data_importer.parse_match_list(
         __file__, "data/2019cmptx_matches.json"
     )
@@ -67,10 +105,13 @@ def test_round_robin(test_data_importer) -> None:
     advancement = PlayoffAdvancementHelper.generatePlayoffAdvancement(
         event, organized_matches
     )
-    assert advancement.bracket_table is not None
-    assert advancement.playoff_advancement is not None
-    assert advancement.double_elim_matches is None
-    assert advancement.playoff_template == "playoff_round_robin_6_team"
+
+    with open(
+        f"{os.path.dirname(__file__)}/data/expected_advancement_2019cmptx.json", "r"
+    ) as f:
+        expected_advancement = json.load(f)
+
+    assert json.loads(json.dumps(advancement)) == expected_advancement
 
 
 def test_best_of_3_finals(test_data_importer) -> None:
