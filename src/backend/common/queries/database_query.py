@@ -75,7 +75,7 @@ class CachedDatabaseQuery(DatabaseQuery, Generic[QueryReturn, DictQueryReturn]):
     CACHE_VERSION: int = 0
     DICT_CACHING_ENABLED: bool = True
     MODEL_CACHING_ENABLED: bool = True
-    CACHE_WRITES_ENABLED: bool = False
+    CACHE_WRITES_ENABLED: bool = True
     _cache_key: Optional[str] = None
 
     def __init__(self, *args, **kwargs) -> None:
