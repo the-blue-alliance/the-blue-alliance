@@ -15,6 +15,7 @@ class EventDetailsQuery(
 ):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "event_details_{event_key}"
+    MODEL_CACHING_ENABLED = False  # No need to cache a point query
     DICT_CONVERTER = EventDetailsConverter
 
     def __init__(self, event_key: EventKey) -> None:

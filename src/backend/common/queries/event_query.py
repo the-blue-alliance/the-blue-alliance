@@ -23,6 +23,7 @@ from backend.common.tasklets import typed_tasklet
 class EventQuery(CachedDatabaseQuery[Optional[Event], Optional[EventDict]]):
     CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "event_{event_key}"
+    MODEL_CACHING_ENABLED = False  # No need to cache a point query
     DICT_CONVERTER = EventConverter
 
     def __init__(self, event_key: EventKey) -> None:
