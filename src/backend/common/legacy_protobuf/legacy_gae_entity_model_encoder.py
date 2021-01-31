@@ -16,6 +16,7 @@
 import datetime
 from typing import Any, Optional
 
+import pytz
 from google.cloud import datastore
 from google.cloud import ndb
 from google.cloud.datastore.helpers import GeoPoint
@@ -255,6 +256,11 @@ class NdbModelEncoder:
                 "DatetimeProperty %s can only be set to datetime values; "
                 "received %r" % (self._name, value)
             )
+        if value.tzinfo == pytz.utc:
+            # There are differences between datastores about naive vs UTC timestamps
+            # So we just account for it here. See https://github.com/googleapis/python-ndb/pull/167
+            value = value.replace(tzinfo=None)  # pyre-ignore[6]
+
         if value.tzinfo is not None:
             raise NotImplementedError(
                 "DatetimeProperty %s can only support UTC. "

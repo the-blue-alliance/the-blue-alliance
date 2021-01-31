@@ -1,6 +1,7 @@
 import unittest
 
 import pytest
+from _pytest.monkeypatch import MonkeyPatch
 from google.cloud import ndb
 
 from backend.common.helpers.event_team_status_helper import EventTeamStatusHelper
@@ -10,6 +11,15 @@ from backend.common.models.event_team_status import EventTeamLevelStatus
 from backend.common.models.match import Match
 from backend.common.tests.event_simulator import EventSimulator
 from backend.common.tests.fixture_loader import load_fixture
+
+
+@pytest.fixture(autouse=True)
+def disable_db_query_cache(monkeypatch: MonkeyPatch):
+    # This test doesn't fully clear all the DB caches it needs to, s
+    # just disable writing cached query results for it
+    from backend.common.queries.database_query import CachedDatabaseQuery
+
+    monkeypatch.setattr(CachedDatabaseQuery, "CACHE_WRITES_ENABLED", False)
 
 
 @pytest.mark.usefixtures("ndb_context")
