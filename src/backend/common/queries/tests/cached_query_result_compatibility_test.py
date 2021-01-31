@@ -3,6 +3,7 @@ import datetime
 import json
 import pickle
 
+import pytest
 from google.cloud import ndb
 from google.cloud.datastore.helpers import GeoPoint
 
@@ -33,18 +34,29 @@ E       ModuleNotFoundError: No module named 'models'
 """
 
 
-class RawCachedQueryResult(ndb.Model):
-    result = ndb.Property()
+@pytest.fixture(autouse=True)
+def clean_up_global_state():
+    ndb.get_context().clear_cache()
+    yield
 
-    created = ndb.DateTimeProperty(auto_now_add=True)
-    updated = ndb.DateTimeProperty(auto_now=True)
-
-    @classmethod
-    def _get_kind(cls):
-        return "CachedQueryResult"
+    # These tests do some janky things with the inner kind map to
+    # better test round trip serialization, so we need to make
+    # sure we don't cause other tests to see RawCachedQueryResult
+    ndb.Model._kind_map["CachedQueryResult"] = CachedQueryResult
+    ndb.get_context().clear_cache()
 
 
 def _run_test(py2_b64_data, expected_result) -> None:
+    class RawCachedQueryResult(ndb.Model):
+        result = ndb.Property()
+
+        created = ndb.DateTimeProperty(auto_now_add=True)
+        updated = ndb.DateTimeProperty(auto_now=True)
+
+        @classmethod
+        def _get_kind(cls):
+            return "CachedQueryResult"
+
     raw_model = RawCachedQueryResult(
         id="py2_data",
         result=base64.b64decode(py2_b64_data),
