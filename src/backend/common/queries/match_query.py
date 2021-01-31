@@ -16,6 +16,7 @@ from backend.common.tasklets import typed_tasklet
 class MatchQuery(CachedDatabaseQuery[Optional[Match], Optional[MatchDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "match_{match_key}"
+    MODEL_CACHING_ENABLED = False  # No need to cache a point query
     DICT_CONVERTER = MatchConverter
 
     def __init__(self, match_key: MatchKey) -> None:

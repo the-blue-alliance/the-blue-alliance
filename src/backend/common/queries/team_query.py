@@ -23,6 +23,7 @@ def get_team_page_num(team_key: str) -> int:
 class TeamQuery(CachedDatabaseQuery[Optional[Team], Optional[TeamDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "team_{team_key}"
+    MODEL_CACHING_ENABLED = False  # No need to cache a point query
     DICT_CONVERTER = TeamConverter
 
     def __init__(self, team_key: TeamKey) -> None:

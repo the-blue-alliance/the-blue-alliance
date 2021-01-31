@@ -73,7 +73,8 @@ class CachedDatabaseQuery(DatabaseQuery, Generic[QueryReturn, DictQueryReturn]):
     )
     CACHE_KEY_FORMAT: str = ""
     CACHE_VERSION: int = 0
-    CACHING_ENABLED: bool = True
+    DICT_CACHING_ENABLED: bool = True
+    MODEL_CACHING_ENABLED: bool = True
     CACHE_WRITES_ENABLED: bool = False
     _cache_key: Optional[str] = None
 
@@ -115,7 +116,7 @@ class CachedDatabaseQuery(DatabaseQuery, Generic[QueryReturn, DictQueryReturn]):
 
     @ndb.tasklet
     def _do_query(self, *args, **kwargs) -> TypedFuture[QueryReturn]:
-        if not self.CACHING_ENABLED:
+        if not self.MODEL_CACHING_ENABLED:
             result = yield self._query_async(*args, **kwargs)
             return result  # pyre-ignore[7]
 
@@ -132,7 +133,7 @@ class CachedDatabaseQuery(DatabaseQuery, Generic[QueryReturn, DictQueryReturn]):
     def _do_dict_query(
         self, _dict_version: ApiMajorVersion, *args, **kwargs
     ) -> TypedFuture[DictQueryReturn]:
-        if not self.CACHING_ENABLED:
+        if not self.DICT_CACHING_ENABLED:
             result = yield self._query_async(*args, **kwargs)
             if result is None:
                 raise DoesNotExistException

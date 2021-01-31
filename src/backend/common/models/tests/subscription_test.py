@@ -12,11 +12,13 @@ def test_notification_names():
     ]
     shuffle(notification_types)
 
-    subscription = Subscription(
-        notification_types=notification_types
-    )
+    subscription = Subscription(notification_types=notification_types)
     # This order is important - these names should be in a sorted order
-    assert subscription.notification_names == ["Upcoming Match", "Match Score", "Final Results"]
+    assert subscription.notification_names == [
+        "Upcoming Match",
+        "Match Score",
+        "Final Results",
+    ]
 
 
 # def test_users_subscribed_to_event_year(self):
