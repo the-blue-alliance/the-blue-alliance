@@ -1,5 +1,7 @@
 import argparse
 
+import shell.lib as shell_lib
+
 from backend.common.models.event import Event
 
 parser = argparse.ArgumentParser()

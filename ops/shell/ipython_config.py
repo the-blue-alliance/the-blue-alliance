@@ -1,7 +1,7 @@
 import json
 import os
 
-c = get_config()
+c = get_config()  # pyre-ignore  # noqa: F821
 
 c.TerminalIPythonApp.display_banner = True
 c.InteractiveShell.autoindent = True
