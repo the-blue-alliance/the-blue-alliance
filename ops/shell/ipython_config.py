@@ -12,7 +12,7 @@ c.InteractiveShell.banner2 = """
 Welcome to the TBA Shell!
 
 Refer to documentation for how to use the shell at:
-https://github.com/the-blue-alliance/the-blue-alliance/wiki/local_shell
+https://github.com/the-blue-alliance/the-blue-alliance/wiki/local-shell
 """
 
 c.InteractiveShellApp.exec_lines = [
