@@ -12,4 +12,4 @@ shift  # the --
 
 ipython --config ops/shell/ipython_config.py \
     --TerminalIPythonApp.display_banner=False \
-    "ops/shell/user_scripts/$SCRIPT" $@
+    "ops/shell/user_scripts/$SCRIPT" "$@"

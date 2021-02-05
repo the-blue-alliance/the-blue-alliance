@@ -16,3 +16,4 @@ PyYAML==5.4.1
 redis==3.5.3
 rq-dashboard
 requests-mock
+shellcheck-py==0.7.1.1

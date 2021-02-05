@@ -29,7 +29,7 @@ while test $# -gt 0; do
           exit 0
           ;;
         --project*)
-            PROJECT=`echo $1 | sed -e 's/^[^=]*=//g'`
+            PROJECT="${1//[^=]*=/}"
             shift
             ;;
         --no-cleanup)
@@ -77,7 +77,7 @@ if [ "$vm_status" == "TERMINATED" ] ; then
 elif [ "$vm_status" != "RUNNING" ] ; then
     echo "UNKNOWN VM STATE $vm_status"
     cleanup_prod_resources
-    exit -1
+    exit 1
 fi
 
 # Load the IP Address of redis
