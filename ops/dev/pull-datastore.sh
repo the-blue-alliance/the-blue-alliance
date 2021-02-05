@@ -3,10 +3,10 @@
 # A script to pull the datastore out of the container
 
 if vagrant status default | grep -q 'running'; then
-  echo "Found running container to $1 datastore"
+    echo "Found running container to $1 datastore"
 else
-  echo "Vagrant container not running, skipping..."
-  exit 0
+    echo "Vagrant container not running, skipping..."
+    exit 0
 fi
 
 local_dir=dev-datastore
@@ -22,14 +22,14 @@ keyfile=$(echo -e "${config}" | grep IdentityFile | cut -d " " -f 4)
 touch $local_dir/.tba
 
 if [ "$1" == 'pull' ]; then
-  src="root@$host:/datastore/*"
-  dst="./$local_dir"
+    src="root@$host:/datastore/*"
+    dst="./$local_dir"
 
-  echo "Pulling updated index.yaml"
-  scp -v -P "$port" -i "$keyfile" -oStrictHostKeyChecking=no "root@$host:/tba/index.yaml" ./index.yaml
+    echo "Pulling updated index.yaml"
+    scp -v -P "$port" -i "$keyfile" -oStrictHostKeyChecking=no "root@$host:/tba/index.yaml" ./index.yaml
 else
-  dst="root@$host:/datastore"
-  src="./$local_dir/*"
+    dst="root@$host:/datastore"
+    src="./$local_dir/*"
 fi
 
 # We want this to fail if the ssh command fails

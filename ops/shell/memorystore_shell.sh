@@ -19,30 +19,30 @@ DO_CLEANUP="true"
 
 while test $# -gt 0; do
     case "$1" in
-        -h|--help)
-          echo "memorystore_shell.sh - a helpful wrapper script for connecting to Production Memorystore"
-          echo " "
-          echo "options:"
-          echo "-h, --help                show help and exit"
-          echo "--project=PROJECT         google cloud project to use, defaults to TBA prod"
-          echo "--no-cleanup              skip turning down prod cloud resources after running"
-          exit 0
-          ;;
-        --project*)
-            PROJECT="${1//[^=]*=/}"
-            shift
-            ;;
-        --no-cleanup)
-            DO_CLEANUP="false"
-            shift
-            ;;
-    esac 
+    -h | --help)
+        echo "memorystore_shell.sh - a helpful wrapper script for connecting to Production Memorystore"
+        echo " "
+        echo "options:"
+        echo "-h, --help                show help and exit"
+        echo "--project=PROJECT         google cloud project to use, defaults to TBA prod"
+        echo "--no-cleanup              skip turning down prod cloud resources after running"
+        exit 0
+        ;;
+    --project*)
+        PROJECT="${1//[^=]*=/}"
+        shift
+        ;;
+    --no-cleanup)
+        DO_CLEANUP="false"
+        shift
+        ;;
+    esac
 done
 
 cleanup_prod_resources() {
     echo ""
 
-    if [ "$DO_CLEANUP" != "true" ] ; then
+    if [ "$DO_CLEANUP" != "true" ]; then
         echo "Skipping resource cleanup, don't forget!"
         exit 0
     fi
@@ -61,7 +61,7 @@ trap 'cleanup_prod_resources' ERR
 # Make sure Firewall rule enabling SSH is enabled
 ssh_disabled=$(gcloud --project "$PROJECT" compute firewall-rules describe --format json "$FIREWALL_RULE" | jq -r .disabled)
 echo "SSH Firewall rule currently disabled?: $ssh_disabled"
-if [ "$ssh_disabled" == "true" ] ; then
+if [ "$ssh_disabled" == "true" ]; then
     echo "Enabling SSH firewall rule..."
     gcloud --project "$PROJECT" compute firewall-rules update "$FIREWALL_RULE" --no-disabled
 fi
@@ -69,12 +69,12 @@ fi
 # Make sure jump box VM is up and running
 vm_status=$(gcloud --project "$PROJECT" compute instances describe --format json "$VM_NAME" | jq -r .status)
 echo "Jump Box VM Status: $vm_status"
-if [ "$vm_status" == "TERMINATED" ] ; then
+if [ "$vm_status" == "TERMINATED" ]; then
     echo "Starting VM..."
     gcloud --project "$PROJECT" compute instances start "$VM_NAME"
     echo "Waiting 15 seconds for VM to finish starting before attempting ssh..."
     sleep 15
-elif [ "$vm_status" != "RUNNING" ] ; then
+elif [ "$vm_status" != "RUNNING" ]; then
     echo "UNKNOWN VM STATE $vm_status"
     cleanup_prod_resources
     exit 1

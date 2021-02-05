@@ -7,8 +7,8 @@
 SCRIPT="$1"
 
 # Shift past this script's args and the --
-shift  # script name
-shift  # the --
+shift # script name
+shift # the --
 
 ipython --config ops/shell/ipython_config.py \
     --TerminalIPythonApp.display_banner=False \
