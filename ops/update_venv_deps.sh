@@ -3,7 +3,7 @@ set -e
 
 if [[ -z "$VIRTUAL_ENV" ]]; then
     echo "No venv detected, exiting..."
-    exit 0;
+    exit 0
 fi
 
 pip install -r requirements.txt

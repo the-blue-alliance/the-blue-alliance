@@ -112,6 +112,34 @@ jobs:
         run: npm install
       - name: Run Tests
         run: ./ops/test_node.sh
+  bash-lint:
+    name: "[bash] Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install Shellcheck
+        run: |
+          python -m pip install --upgrade pip
+          pip install shellcheck-py
+      - name: Install shfmt
+        run: |
+          mkdir -p $HOME/.local/bin
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          wget "https://github.com/mvdan/sh/releases/download/v3.2.2/shfmt_v3.2.2_linux_amd64" -O $HOME/.local/bin/shfmt
+          chmod +x $HOME/.local/bin/shfmt
+      - name: Run Lint
+        run: ./ops/lint_bash.sh
+
   build-web:
     name: Build Web
     runs-on: ubuntu-latest

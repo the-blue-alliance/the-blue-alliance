@@ -7,6 +7,7 @@ Local Dependencies:
  - [docker](https://www.docker.com/)
  - [vagrant](https://www.vagrantup.com/)
  - *(optionally)* [watchman](https://facebook.github.io/watchman/)
+ - *(optionally)* [shfmt](https://github.com/mvdan/sh)
 
 You can start the container locally by running `vagrant up`. Once the setup is complete, TBA should be accessable in a web browser at `localhost:8080`.
 
@@ -128,6 +129,16 @@ Node linting runs using [ESLint](https://eslint.org/). Run using the `ops/lint_n
 $ ./ops/lint_node.sh
 # Fixing linter errors automatically
 $ ./ops/lint_node.sh --fix
+```
+
+### Running Lint (bash)
+Formatting bash requires [shfmt](https://github.com/mvdan/sh) to be install on the local system. Run using the `ops/lint_bash.sh` script. Using the `--fix` flag will automatically reformat code that doesn't meet the style.
+
+```bash
+# Check for errors
+$ ./ops_lint_bash.sh
+# Fix formatting errors automatically
+$ ./ops_lint_bash.sh --fix
 ```
 
 ## Using the local Dockerfile
