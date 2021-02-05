@@ -6,9 +6,9 @@
 
 SCRIPT="$1"
 
-# Account for the --
-shift
-shift
+# Shift past this script's args and the --
+shift  # script name
+shift  # the --
 
 ipython --config ops/shell/ipython_config.py \
     --TerminalIPythonApp.display_banner=False \
