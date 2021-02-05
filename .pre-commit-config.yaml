@@ -32,6 +32,13 @@ repos:
       entry: ./ops/test_node.sh
       language: script
       stages: [commit]
+    - id: bash-lint
+      name: "[bash] Formatting & Linting"
+      types: [file, shell]
+      entry: ./ops/lint_bash.sh
+      language: script
+      stages: [commit]
+
 
     # These run as post-checkout
     - id: py3-deps
