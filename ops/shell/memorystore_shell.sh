@@ -2,6 +2,12 @@
 set -eE
 
 # We need to connect to cloud memorystore using a jump compute VM
+# This script will handle configuring the prod Google Cloud Resources
+# (namely, starting the Compute Engine VM Jump Box and enabling the
+# firewall rule allowing SSH from the public internet), and drop the
+# user into a redis shell on the prod instance.
+#
+# Requirements to be installed locally: glcoud and jq
 
 PROJECT="tbatv-prod-hrd"
 FIREWALL_RULE="tba-memorystore-allow-ssh"
@@ -13,6 +19,19 @@ DO_CLEANUP="true"
 
 while test $# -gt 0; do
     case "$1" in
+        -h|--help)
+          echo "memorystore_shell.sh - a helpful wrapper script for connecting to Production Memorystore"
+          echo " "
+          echo "options:"
+          echo "-h, --help                show help and exit"
+          echo "--project=PROJECT         google cloud project to use, defaults to TBA prod"
+          echo "--no-cleanup              skip turning down prod cloud resources after running"
+          exit 0
+          ;;
+        --project*)
+            PROJECT=`echo $1 | sed -e 's/^[^=]*=//g'`
+            shift
+            ;;
         --no-cleanup)
             DO_CLEANUP="false"
             shift
@@ -53,7 +72,7 @@ echo "Jump Box VM Status: $vm_status"
 if [ "$vm_status" == "TERMINATED" ] ; then
     echo "Starting VM..."
     gcloud --project "$PROJECT" compute instances start "$VM_NAME"
-    echo "Waiting 15 seconds before attempting ssh..."
+    echo "Waiting 15 seconds for VM to finish starting before attempting ssh..."
     sleep 15
 elif [ "$vm_status" != "RUNNING" ] ; then
     echo "UNKNOWN VM STATE $vm_status"

@@ -10,6 +10,8 @@ Bumping the Python version requires that Google App Engine supports the new Pyth
 
 Currently there is no interfacing for clearing the Redis cache - it must be cleared manually. This involves SSHing in to a machine on the `tba-memorystore` network, connecting to the Redis instance via `redis-cli`, and clearing the cache.
 
+There is a convienence script located at `ops/shell/memorystore_shell.sh`, which will automate these steps and drop you into a `redis-cli` interface. It essentially does the steps below.
+
 First, enable SSH access on the [`tba-memorystore`](https://console.cloud.google.com/networking/networks/details/tba-memorystore) network. There is a pre-configured firewall rule that will allow traffic on port 22. Click `Firewall rules` -> `tba-memorystore-allow-ssh` -> `Edit`, and under `Enforcement` select `Enabled`. Click `Save` for the changes to go in to effect.
 
 In the [Compute Engine/VM Instances](https://console.cloud.google.com/compute/instances) section, there is a pre-configured VM instance called `redis-telnet-vm`. Start the VM instance. Once the instance is booted, click the `SSH` and select a method of connecting to the instance. Using the gcloud command is recommended, but any of the methods will work.
