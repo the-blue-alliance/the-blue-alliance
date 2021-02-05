@@ -15,7 +15,7 @@
 
 
 import datetime
-from typing import Any
+from typing import Any, cast
 
 from google.cloud import ndb
 from google.cloud.datastore.helpers import GeoPoint
@@ -131,11 +131,11 @@ class EntityProtoDecoder:
                 raise Exception("ENTITY_PROTO meaning implementation")
             elif meaning != ProtoProperty.BYTESTRING:
                 try:
-                    sval = sval.decode("ascii")
+                    sval = cast(bytes, sval).decode("ascii")
                     # If this passes, don't return unicode.
                 except UnicodeDecodeError:
                     try:
-                        sval = str(sval.decode("utf-8"))
+                        sval = str(cast(bytes, sval).decode("utf-8"))
                     except UnicodeDecodeError:
                         pass
             return sval
