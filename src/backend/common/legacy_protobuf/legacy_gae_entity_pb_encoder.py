@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-from typing import Any
+from typing import Any, cast
 
 from google.cloud.ndb._legacy_entity_pb import (
     EntityProto,
@@ -369,7 +369,13 @@ class EntityProtoByteSize:
         if self.has_booleanvalue_:
             n += 2
         if self.has_stringvalue_:
-            n += 1 + EntityProtoByteSize.lengthString(len(self.stringvalue_))
+            assert isinstance(self.stringvalue_, (str, bytes))
+            if isinstance(self.stringvalue_, str):
+                str_len = len(cast(str, self.stringvalue_).encode())
+            else:
+                str_len = len(self.stringvalue_)
+
+            n += 1 + EntityProtoByteSize.lengthString(str_len)
         if self.has_doublevalue_:
             n += 9
         if self.has_pointvalue_:

@@ -131,6 +131,19 @@ def test_round_trip_model_pickle_string() -> None:
     assert check == model
 
 
+def test_round_trip_model_pickle_string_non_unicode() -> None:
+    ModelWithString(
+        id="test_model",
+        str_prop="PrepaTec CEM&Instituto Tecnológico y de Estudios Superiores de Monterrey",
+    ).put()
+    model = ModelWithString.get_by_id("test_model")
+
+    pickled = pickle.dumps(model, protocol=2, fix_imports=True)
+    check = pickle.loads(pickled, fix_imports=True, encoding="bytes")
+
+    assert check == model
+
+
 class ModelWithKey(ndb.Model):
     key_prop = ndb.KeyProperty()
 
@@ -482,4 +495,104 @@ eJyVVMtu2zAQvOsrDB2aImgCUrb86L3H9tAe64DgS7EcSWRJKnUcpN/eXZGy4yQI4oNEkTszXO0OKaWx
         updated=datetime.datetime(2019, 8, 1, 1, 47, 53, 23002),
         year=2006,
     )
+    _run_test(py2_b64, expected_result)
+
+
+def test_cached_result_team_with_multibyte_characters() -> None:
+    # This team has accented characters in their name
+    # See https://github.com/the-blue-alliance/the-blue-alliance/issues/3368
+    py2_b64 = b"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"
+
+    expected_result = [
+        Team(
+            key=ndb.Key("Team", "frc3472", project="tbatv-prod-hrd"),
+            city="Atizapan de Zaragoza",
+            country="Mexico",
+            created=None,
+            first_tpid=1175368,
+            first_tpid_year=2021,
+            home_cmp="cmptx",
+            motto="Eleven minds, one spirit",
+            name="PrepaTec CEM&Instituto Tecnol\xf3gico y de Estudios Superiores de Monterrey",
+            nickname="PrepaTec - Buluk",
+            normalized_location=Location(
+                city="Ciudad L\xf3pez Mateos",
+                country="Mexico",
+                country_short="MX",
+                formatted_address="Jardines de Monterrey, 52926 Cd L\xf3pez Mateos, M\xe9x., Mexico",
+                lat_lng=GeoPoint(19.5892326, -99.2272939),
+                name=None,
+                place_details={
+                    "utc_offset": -360,
+                    "name": "52926",
+                    "reference": "CmRbAAAAYFL_HOxaM6ivLynSQigd85jtvSvIB7pOG0-eWafCSRNlNfbCqgXjXGCyOp79_82_fN8OVO2lVo-bTHpAsz1TYsRgOzgkS2puiflKjb_CEN9xce_HFJP_b711e6GvDbG-EhBhdvZqql2xJtoEMR_HxOiaGhRPGcFZVcnWU-q0lYAGz_Re74Rj6Q",
+                    "geometry": {
+                        "location": {"lat": 19.5892326, "lng": -99.2272939},
+                        "viewport": {
+                            "northeast": {"lat": 19.5933903, "lng": -99.22432839999999},
+                            "southwest": {"lat": 19.5851442, "lng": -99.2326973},
+                        },
+                    },
+                    "adr_address": '<span class="extended-address">Jardines de Monterrey</span>, <span class="postal-code">52926</span> <span class="locality">Cd López Mateos</span>, <span class="region">Méx.</span>, <span class="country-name">Mexico</span>',
+                    "place_id": "ChIJ3Tign7Yd0oURgBsbf93fBwg",
+                    "vicinity": "Jardines de Monterrey",
+                    "url": "https://maps.google.com/?q=52926&ftid=0x85d21db69fa038dd:0x807dfdd7f1b1b80",
+                    "scope": "GOOGLE",
+                    "address_components": [
+                        {
+                            "long_name": "52926",
+                            "types": ["postal_code"],
+                            "short_name": "52926",
+                        },
+                        {
+                            "long_name": "Jardines de Monterrey",
+                            "types": [
+                                "sublocality_level_1",
+                                "sublocality",
+                                "political",
+                            ],
+                            "short_name": "Jardines de Monterrey",
+                        },
+                        {
+                            "long_name": "Ciudad López Mateos",
+                            "types": ["locality", "political"],
+                            "short_name": "Cd López Mateos",
+                        },
+                        {
+                            "long_name": "Atizapán de Zaragoza",
+                            "types": ["administrative_area_level_2", "political"],
+                            "short_name": "Atizapán de Zaragoza",
+                        },
+                        {
+                            "long_name": "Estado de México",
+                            "types": ["administrative_area_level_1", "political"],
+                            "short_name": "Méx.",
+                        },
+                        {
+                            "long_name": "Mexico",
+                            "types": ["country", "political"],
+                            "short_name": "MX",
+                        },
+                    ],
+                    "formatted_address": "Jardines de Monterrey, 52926 Cd López Mateos, Méx., Mexico",
+                    "id": "b2fb7b8a694cd46fbd9e5f32158da26ed86b0586",
+                    "types": ["postal_code"],
+                    "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/geocode-71.png",
+                },
+                place_id="ChIJ3Tign7Yd0oURgBsbf93fBwg",
+                postal_code="52926",
+                state_prov="Estado de M\xe9xico",
+                state_prov_short="M\xe9x.",
+                street=None,
+                street_number=None,
+            ),
+            postalcode="52926",
+            rookie_year=2011,
+            school_name="Instituto Tecnol\xf3gico y de Estudios Superiores de Monterrey",
+            state_prov="Mexico",
+            team_number=3472,
+            updated=datetime.datetime(2020, 8, 8, 0, 32, 41, 429329),
+            website="https://www.facebook.com/buluk3472/",
+        )
+    ]
     _run_test(py2_b64, expected_result)
