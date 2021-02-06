@@ -37,7 +37,7 @@ if [ "$google_application_credentials" ]; then
     application="$project"
     env+=("--env_var=GOOGLE_APPLICATION_CREDENTIALS=$cred_file")
 else
-    application="--application test"
+    application="test"
 fi
 
 function assert_google_application_credentials {
