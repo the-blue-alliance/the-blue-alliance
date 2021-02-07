@@ -72,7 +72,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
     """
 
     @classmethod
-    def delete_keys(cls, model_keys):
+    def delete_keys(cls, model_keys: Iterable[ndb.Key]) -> None:
         models = [model_key.get() for model_key in model_keys]
         cls.delete(models)
 
@@ -88,11 +88,11 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
 
     @classmethod
     def delete(self, models) -> None:
-        models = filter(None, listify(models))
+        models = list(filter(None, listify(models)))
         keys = [model.key for model in models]
         ndb.delete_multi(keys)
         for model in models:
-            model.dirty = True
+            model._dirty = True
             self._computeAndSaveAffectedReferences(model)
         """
         TODO: Port hooks
