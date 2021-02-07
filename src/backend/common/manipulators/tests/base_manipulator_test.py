@@ -283,3 +283,44 @@ def test_cache_clearing(ndb_context, task_client: FakeTaskClient) -> None:
 
     # We should have cleared the cached result
     assert CachedQueryResult.get_by_id(query.cache_key) is None
+
+
+def test_delete_by_key(ndb_context) -> None:
+    model = DummyModel(id="test", int_prop=1337)
+    model.put()
+
+    DummyManipulator.delete_keys([model.key])
+
+    assert DummyModel.get_by_id("test") is None
+
+
+def test_delete_by_model(ndb_context) -> None:
+    model = DummyModel(id="test", int_prop=1337)
+    model.put()
+
+    DummyManipulator.delete([model])
+
+    assert DummyModel.get_by_id("test") is None
+
+
+def test_delete_clears_cache(ndb_context, task_client: FakeTaskClient) -> None:
+    model = DummyModel(id="test", int_prop=1337)
+    model.put()
+
+    # Do a query to populate CachedQueryResult
+    query = DummyCachedQuery(model_key="test")
+    query.fetch()
+
+    assert CachedQueryResult.get_by_id(query.cache_key) is not None
+    DummyManipulator.delete([model])
+
+    assert DummyModel.get_by_id("test") is None
+
+    # Ensure we've enqueued the cache clearing task to be run
+    assert task_client.pending_job_count("cache-clearing") == 1
+
+    # Run cache clearing manually
+    task_client.drain_pending_jobs("cache-clearing")
+
+    # We should have cleared the cached result
+    assert CachedQueryResult.get_by_id(query.cache_key) is None
