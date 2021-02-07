@@ -5,6 +5,7 @@ from typing import (
     Any,
     DefaultDict,
     Generic,
+    Iterable,
     List,
     Optional,
     overload,
@@ -65,6 +66,40 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
             model._dirty = False
 
         return delistify(existing_or_new)
+
+    """
+    delete_keys / delete are the main interfaces to delete models + clear associated cache
+    """
+
+    @classmethod
+    def delete_keys(cls, model_keys):
+        models = [model_key.get() for model_key in model_keys]
+        cls.delete(models)
+
+    @overload
+    @classmethod
+    def delete(self, models: TModel) -> None:
+        ...
+
+    @overload
+    @classmethod
+    def delete(self, models: List[TModel]) -> None:
+        ...
+
+    @classmethod
+    def delete(self, models) -> None:
+        models = filter(None, listify(models))
+        keys = [model.key for model in models]
+        ndb.delete_multi(keys)
+        for model in models:
+            model.dirty = True
+            self._computeAndSaveAffectedReferences(model)
+        """
+        TODO: Port hooks
+        if run_post_delete_hook:
+            self.runPostDeleteHook(models)
+        """
+        self._clearCache(models)
 
     """
     findOrSpawn will take either a singular model or a list of models and merge them
@@ -195,7 +230,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
     """
 
     @classmethod
-    def _clearCache(cls, models: List[TModel]) -> None:
+    def _clearCache(cls, models: Iterable[TModel]) -> None:
         """
         Make deferred calls to clear caches
         Needs to save _affected_references and the dirty flag
