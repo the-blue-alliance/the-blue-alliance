@@ -13,7 +13,7 @@ def track_call_after_response(
     Schedules a callback to Google Analytics to track an API call.
     """
     # Save |auth_owner_id| whiel we stil have access to the flask request context.
-    auth_owner_id = g.api_auth_access.owner.id() if g.api_auth_access.owner else None
+    auth_owner_id = g.auth_owner_id if g.auth_owner_id else None
     if model_type is not None:
         api_action += f"/{model_type}"
 

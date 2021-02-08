@@ -6,7 +6,7 @@ import werkzeug
 from flask import request
 from google.cloud import ndb
 
-import backend.web.auth as backend_auth
+import backend.common.auth as backend_auth
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.models.account import Account
 from backend.web.decorators import (

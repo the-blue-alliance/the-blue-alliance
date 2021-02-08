@@ -16,8 +16,8 @@ from backend.common.models.favorite import Favorite
 from backend.common.models.mobile_client import MobileClient
 from backend.common.models.subscription import Subscription
 from backend.common.models.suggestion import Suggestion
+from backend.common.models.user import User
 from backend.common.queries.account_query import AccountQuery
-from backend.web.models.user import User
 
 
 def test_init_no_email() -> None:

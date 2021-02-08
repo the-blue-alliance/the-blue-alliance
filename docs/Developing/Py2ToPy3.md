@@ -12,7 +12,7 @@ google.appengine.api.memcache => (TODO: Move)
 google.appengine.api.search => (TODO: Move)
 google.appengine.api.taskqueue => google.cloud.tasks_v2
 google.appengine.api.urlfetch => requests
-google.appengine.api.users => backend.web.auth
+google.appengine.api.users => backend.common.auth
 
 google.appengine.ext.ndb => google.cloud.ndb
 google.appengine.ext.deferred => backend.common.deferred

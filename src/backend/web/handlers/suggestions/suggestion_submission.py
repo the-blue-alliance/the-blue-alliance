@@ -2,6 +2,7 @@ from flask import abort, Blueprint, jsonify, redirect, request, url_for
 from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
 
+from backend.common.auth import current_user
 from backend.common.consts.auth_type import WRITE_TYPE_NAMES
 from backend.common.consts.media_type import MediaType
 from backend.common.helpers.media_helper import MediaHelper
@@ -19,7 +20,6 @@ from backend.common.suggestions.suggestion_creator import (
     SuggestionCreationStatus,
     SuggestionCreator,
 )
-from backend.web.auth import current_user
 from backend.web.decorators import enforce_login, require_login
 from backend.web.profiled_render import render_template
 

@@ -3,8 +3,8 @@ from typing import Callable, Set
 
 from flask import abort, redirect, request, Response, url_for
 
+from backend.common.auth import current_user
 from backend.common.consts.account_permission import AccountPermission
-from backend.web.auth import current_user
 
 
 def require_login_only(f: Callable) -> Response:

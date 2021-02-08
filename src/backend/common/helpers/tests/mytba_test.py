@@ -6,13 +6,13 @@ from google.cloud import ndb
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.consts.model_type import ModelType
+from backend.common.helpers.mytba import MyTBA
 from backend.common.models.event import Event
 from backend.common.models.favorite import Favorite
 from backend.common.models.match import Match
 from backend.common.models.mytba import MyTBAModel
 from backend.common.models.subscription import Subscription
 from backend.common.models.team import Team
-from backend.web.models.mytba import MyTBA
 
 
 def _create_one_of_each_mytba_model() -> List[MyTBAModel]:

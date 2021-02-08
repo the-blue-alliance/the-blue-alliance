@@ -10,7 +10,7 @@ from flask import Flask
 from flask.testing import FlaskClient
 
 import backend
-import backend.web.auth as backend_auth
+import backend.common.auth as backend_auth
 from backend.common.consts.auth_type import (
     AuthType,
     WRITE_TYPE_NAMES as AUTH_TYPE_WRITE_TYPE_NAMES,

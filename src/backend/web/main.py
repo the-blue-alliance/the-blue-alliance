@@ -1,11 +1,11 @@
 from flask import Flask
 from flask_wtf.csrf import CSRFProtect
 
+from backend.common.auth import _user_context_processor
 from backend.common.flask_cache import configure_flask_cache
 from backend.common.logging import configure_logging
 from backend.common.middleware import install_middleware
 from backend.common.url_converters import install_url_converters
-from backend.web.auth import _user_context_processor
 from backend.web.handlers.account import blueprint as account_blueprint
 from backend.web.handlers.district import district_detail
 from backend.web.handlers.error import handle_404, handle_500

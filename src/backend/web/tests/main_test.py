@@ -2,8 +2,8 @@ import importlib
 
 from google.cloud import ndb
 
+from backend.common.auth import _user_context_processor
 from backend.common.sitevars.flask_secrets import FlaskSecrets
-from backend.web.auth import _user_context_processor
 from backend.web.handlers.account import blueprint as account_blueprint
 
 
