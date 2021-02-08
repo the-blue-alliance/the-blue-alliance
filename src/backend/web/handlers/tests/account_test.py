@@ -12,12 +12,6 @@ from backend.web.handlers.conftest import CapturedTemplate
 from backend.web.handlers.tests.helpers import get_page_title
 
 
-def user_mock(registered: bool = True) -> Mock:
-    mock = Mock()
-    mock.is_registered = registered
-    return mock
-
-
 def test_register_logged_out(web_client: FlaskClient) -> None:
     response = web_client.get("/account/register")
     assert response.status_code == 302
@@ -29,13 +23,10 @@ def test_register_logged_out(web_client: FlaskClient) -> None:
 
 
 def test_register_unregistered(
-    captured_templates: List[CapturedTemplate], web_client: FlaskClient
+    login_user, captured_templates: List[CapturedTemplate], web_client: FlaskClient
 ) -> None:
-    mock = user_mock(registered=False)
-    with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get("/account/register")
+    login_user.is_registered = False
+    response = web_client.get("/account/register")
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
@@ -56,16 +47,14 @@ def test_register_unregistered(
     ],
 )
 def test_register_unregistered_next(
+    login_user,
     next_url: str,
     expected: str,
     captured_templates: List[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
-    mock = user_mock(registered=False)
-    with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get("/account/register?next={}".format(quote(next_url)))
+    login_user.is_registered = False
+    response = web_client.get("/account/register?next={}".format(quote(next_url)))
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
@@ -88,57 +77,43 @@ def test_register_unregistered_next(
     ],
 )
 def test_register_register(
-    next_url: str, expected: str, web_client: FlaskClient
+    login_user, next_url: str, expected: str, web_client: FlaskClient
 ) -> None:
-    mock = user_mock()
-    with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get("/account/register?next={}".format(quote(next_url)))
+    response = web_client.get("/account/register?next={}".format(quote(next_url)))
 
     assert response.status_code == 302
     parsed_response = urlparse(response.headers["Location"])
     assert parsed_response.path == (expected if expected else "/account")
 
 
-def test_register_register_no_account_id(web_client: FlaskClient) -> None:
-    mock = user_mock(registered=False)
-    mock.uid = "abc"
+def test_register_register_no_account_id(login_user, web_client: FlaskClient) -> None:
+    login_user.is_registered = False
 
-    with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.post("/account/register", data={"display_name": "Zach"})
+    response = web_client.post("/account/register", data={"display_name": "Zach"})
 
     assert response.status_code == 302
     parsed_response = urlparse(response.headers["Location"])
     assert parsed_response.path == "/"
 
 
-def test_register_register_no_display_name(web_client: FlaskClient) -> None:
-    mock = user_mock(registered=False)
-    mock.uid = "abc"
+def test_register_register_no_display_name(login_user, web_client: FlaskClient) -> None:
+    login_user.is_registered = False
 
-    with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.post("/account/register", data={"account_id": "abc"})
+    response = web_client.post("/account/register", data={"account_id": "abc"})
 
     assert response.status_code == 302
     parsed_response = urlparse(response.headers["Location"])
     assert parsed_response.path == "/"
 
 
-def test_register_register_account_id_mismatch(web_client: FlaskClient) -> None:
-    mock = user_mock(registered=False)
-    mock.uid = "abc"
+def test_register_register_account_id_mismatch(
+    login_user, web_client: FlaskClient
+) -> None:
+    login_user.is_registered = False
 
-    with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.post(
-            "/account/register", data={"account_id": "efg", "display_name": "Zach"}
-        )
+    response = web_client.post(
+        "/account/register", data={"account_id": "efg", "display_name": "Zach"}
+    )
 
     assert response.status_code == 302
     parsed_response = urlparse(response.headers["Location"])
@@ -156,21 +131,15 @@ def test_register_register_account_id_mismatch(web_client: FlaskClient) -> None:
     ],
 )
 def test_register_register_account(
-    next_url: str, expected: str, web_client: FlaskClient
+    login_user, next_url: str, expected: str, web_client: FlaskClient
 ) -> None:
-    mock = user_mock(registered=False)
-    mock.uid = "abc"
+    login_user.is_registered = False
+    login_user.uid = "abc"
 
-    with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(
-        backend.web.handlers.account, "current_user", return_value=mock
-    ), patch.object(
-        mock, "register"
-    ) as mock_register:
+    with patch.object(login_user, "register") as mock_register:
         response = web_client.post(
             "/account/register?next={}".format(quote(next_url)),
-            data={"account_id": "abc", "display_name": "Zach"},
+            data={"account_id": login_user.uid, "display_name": "Zach"},
         )
 
     mock_register.assert_called_with("Zach")
@@ -190,12 +159,10 @@ def test_edit_logged_out(web_client: FlaskClient) -> None:
     }
 
 
-def test_edit_unregistered(web_client: FlaskClient) -> None:
-    mock = user_mock(registered=False)
-    with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get("/account/edit")
+def test_edit_unregistered(login_user, web_client: FlaskClient) -> None:
+    login_user.is_registered = False
+
+    response = web_client.get("/account/edit")
 
     assert response.status_code == 302
     parsed_response = urlparse(response.headers["Location"])
@@ -206,13 +173,9 @@ def test_edit_unregistered(web_client: FlaskClient) -> None:
 
 
 def test_edit(
-    captured_templates: List[CapturedTemplate], web_client: FlaskClient
+    login_user, captured_templates: List[CapturedTemplate], web_client: FlaskClient
 ) -> None:
-    mock = user_mock()
-    with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get("/account/edit")
+    response = web_client.get("/account/edit")
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
@@ -224,13 +187,8 @@ def test_edit(
     assert context["status"] is None
 
 
-def test_edit_no_account_id(web_client: FlaskClient) -> None:
-    mock = user_mock()
-    with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(
-        backend.web.handlers.account, "current_user", return_value=mock
-    ), web_client:
+def test_edit_no_account_id(login_user, web_client: FlaskClient) -> None:
+    with web_client:
         response = web_client.post("/account/edit", data={})
         assert session.get("account_edit_status") == "account_edit_failure"
 
@@ -240,14 +198,9 @@ def test_edit_no_account_id(web_client: FlaskClient) -> None:
 
 
 def test_edit_no_account_id_follow_redirect(
-    captured_templates: List[CapturedTemplate], web_client: FlaskClient
+    login_user, captured_templates: List[CapturedTemplate], web_client: FlaskClient
 ) -> None:
-    mock = user_mock()
-    with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(
-        backend.web.handlers.account, "current_user", return_value=mock
-    ), web_client:
+    with web_client:
         response = web_client.post("/account/edit", follow_redirects=True, data={})
         assert session.get("account_edit_status") is None
 
@@ -260,15 +213,8 @@ def test_edit_no_account_id_follow_redirect(
     assert context["status"] == "account_edit_failure"
 
 
-def test_edit_mismatch_account_id(web_client: FlaskClient) -> None:
-    mock = user_mock()
-    mock.uid = "abc"
-
-    with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(
-        backend.web.handlers.account, "current_user", return_value=mock
-    ), web_client:
+def test_edit_mismatch_account_id(login_user, web_client: FlaskClient) -> None:
+    with web_client:
         response = web_client.post("/account/edit", data={"account_id": "def"})
         assert session.get("account_edit_status") == "account_edit_failure"
 
@@ -278,16 +224,9 @@ def test_edit_mismatch_account_id(web_client: FlaskClient) -> None:
 
 
 def test_edit_mismatch_account_id_follow_redirect(
-    captured_templates: List[CapturedTemplate], web_client: FlaskClient
+    login_user, captured_templates: List[CapturedTemplate], web_client: FlaskClient
 ) -> None:
-    mock = user_mock()
-    mock.uid = "abc"
-
-    with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(
-        backend.web.handlers.account, "current_user", return_value=mock
-    ), web_client:
+    with web_client:
         response = web_client.post(
             "/account/edit", follow_redirects=True, data={"account_id": "def"}
         )
@@ -302,16 +241,11 @@ def test_edit_mismatch_account_id_follow_redirect(
     assert context["status"] == "account_edit_failure"
 
 
-def test_edit_no_display_name(web_client: FlaskClient) -> None:
-    mock = user_mock()
-    mock.uid = "abc"
+def test_edit_no_display_name(login_user, web_client: FlaskClient) -> None:
+    login_user.uid = "abc"
 
-    with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(
-        backend.web.handlers.account, "current_user", return_value=mock
-    ), web_client:
-        response = web_client.post("/account/edit", data={"account_id": "abc"})
+    with web_client:
+        response = web_client.post("/account/edit", data={"account_id": login_user.uid})
         assert session.get("account_edit_status") == "account_edit_failure_name"
 
     assert response.status_code == 302
@@ -320,18 +254,13 @@ def test_edit_no_display_name(web_client: FlaskClient) -> None:
 
 
 def test_edit_no_display_name_follow_redirect(
-    captured_templates: List[CapturedTemplate], web_client: FlaskClient
+    login_user, captured_templates: List[CapturedTemplate], web_client: FlaskClient
 ) -> None:
-    mock = user_mock()
-    mock.uid = "abc"
+    login_user.uid = "abc"
 
-    with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(
-        backend.web.handlers.account, "current_user", return_value=mock
-    ), web_client:
+    with web_client:
         response = web_client.post(
-            "/account/edit", follow_redirects=True, data={"account_id": "abc"}
+            "/account/edit", follow_redirects=True, data={"account_id": login_user.uid}
         )
         assert session.get("account_edit_status") is None
 
@@ -344,19 +273,14 @@ def test_edit_no_display_name_follow_redirect(
     assert context["status"] == "account_edit_failure_name"
 
 
-def test_edit_success(web_client: FlaskClient) -> None:
-    mock = user_mock()
-    mock.uid = "abc"
+def test_edit_success(login_user, web_client: FlaskClient) -> None:
+    login_user.uid = "abc"
 
-    with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(
-        backend.web.handlers.account, "current_user", return_value=mock
-    ), web_client, patch.object(
-        mock, "update_display_name"
+    with web_client, patch.object(
+        login_user, "update_display_name"
     ) as mock_update_display_name:
         response = web_client.post(
-            "/account/edit", data={"account_id": "abc", "display_name": "Zach"}
+            "/account/edit", data={"account_id": login_user.uid, "display_name": "Zach"}
         )
         assert session.get("account_edit_status") is None
         assert session.get("account_status") == "account_edit_success"
@@ -389,14 +313,11 @@ def test_logout_logged_out(web_client: FlaskClient) -> None:
     ],
 )
 def test_logout_unregistered(
-    next_url: str, expected: str, web_client: FlaskClient
+    login_user, next_url: str, expected: str, web_client: FlaskClient
 ) -> None:
-    mock = user_mock(registered=False)
+    login_user.is_registered = False
+
     with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(
-        backend.web.handlers.account, "current_user", return_value=mock
-    ), patch.object(
         backend.web.handlers.account, "revoke_session_cookie"
     ) as mock_revoke_session_cookie:
         response = web_client.get("/account/logout?next={}".format(quote(next_url)))
@@ -418,13 +339,10 @@ def test_logout_unregistered(
         ("/mytba", "/mytba"),
     ],
 )
-def test_logout(next_url: str, expected: str, web_client: FlaskClient) -> None:
-    mock = user_mock()
+def test_logout(
+    login_user, next_url: str, expected: str, web_client: FlaskClient
+) -> None:
     with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(
-        backend.web.handlers.account, "current_user", return_value=mock
-    ), patch.object(
         backend.web.handlers.account, "revoke_session_cookie"
     ) as mock_revoke_session_cookie:
         response = web_client.get("/account/logout?next={}".format(quote(next_url)))
@@ -436,12 +354,8 @@ def test_logout(next_url: str, expected: str, web_client: FlaskClient) -> None:
     assert parsed_response.path == (expected if expected else "/")
 
 
-def test_login_logged_in(web_client: FlaskClient) -> None:
-    mock = user_mock()
-    with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get("/account/login")
+def test_login_logged_in(login_user, web_client: FlaskClient) -> None:
+    response = web_client.get("/account/login")
 
     assert response.status_code == 302
     parsed_response = urlparse(response.headers["Location"])
@@ -478,14 +392,9 @@ def test_login_success(web_client: FlaskClient) -> None:
     assert response.get_json() == {"status": "success"}
 
 
-def test_read_key_add_no_description(web_client: FlaskClient) -> None:
-    mock = user_mock()
+def test_read_key_add_no_description(login_user, web_client: FlaskClient) -> None:
     with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(
-        backend.web.handlers.account, "current_user", return_value=mock
-    ), patch.object(
-        mock, "add_api_read_key"
+        login_user, "add_api_read_key"
     ) as mock_add_api_read_key, web_client:
         response = web_client.post("/account/api/read_key_add")
         assert session.get("account_status") == "read_key_add_no_description"
@@ -496,14 +405,9 @@ def test_read_key_add_no_description(web_client: FlaskClient) -> None:
     assert parsed_response.path == "/account"
 
 
-def test_read_key_add_no_api_key(web_client: FlaskClient) -> None:
-    mock = user_mock()
+def test_read_key_add_no_api_key(login_user, web_client: FlaskClient) -> None:
     with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(
-        backend.web.handlers.account, "current_user", return_value=mock
-    ), patch.object(
-        mock, "add_api_read_key", side_effect=Exception()
+        login_user, "add_api_read_key", side_effect=Exception()
     ) as mock_add_api_read_key, web_client:
         response = web_client.post(
             "/account/api/read_key_add", data={"description": "Testing"}
@@ -516,14 +420,9 @@ def test_read_key_add_no_api_key(web_client: FlaskClient) -> None:
     assert parsed_response.path == "/account"
 
 
-def test_read_key_add(web_client: FlaskClient) -> None:
-    mock = user_mock()
+def test_read_key_add(login_user, web_client: FlaskClient) -> None:
     with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(
-        backend.web.handlers.account, "current_user", return_value=mock
-    ), patch.object(
-        mock, "add_api_read_key"
+        login_user, "add_api_read_key"
     ) as mock_add_api_read_key, web_client:
         response = web_client.post(
             "/account/api/read_key_add", data={"description": "Testing"}
@@ -536,15 +435,8 @@ def test_read_key_add(web_client: FlaskClient) -> None:
     assert parsed_response.path == "/account"
 
 
-def test_read_key_delete_no_key_id(web_client: FlaskClient) -> None:
-    mock = user_mock()
-    with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(
-        backend.web.handlers.account, "current_user", return_value=mock
-    ), patch.object(
-        mock, "delete_api_key"
-    ) as mock_delete_api_key, web_client:
+def test_read_key_delete_no_key_id(login_user, web_client: FlaskClient) -> None:
+    with patch.object(login_user, "delete_api_key") as mock_delete_api_key, web_client:
         response = web_client.post("/account/api/read_key_delete")
         assert session.get("account_status") == "read_key_delete_failure"
 
@@ -554,16 +446,11 @@ def test_read_key_delete_no_key_id(web_client: FlaskClient) -> None:
     assert parsed_response.path == "/account"
 
 
-def test_read_key_delete_no_api_key(web_client: FlaskClient) -> None:
-    mock = user_mock()
+def test_read_key_delete_no_api_key(login_user, web_client: FlaskClient) -> None:
     with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(
-        backend.web.handlers.account, "current_user", return_value=mock
-    ), patch.object(
-        mock, "delete_api_key"
+        login_user, "delete_api_key"
     ) as mock_delete_api_key, patch.object(
-        mock, "api_read_key", return_value=None
+        login_user, "api_read_key", return_value=None
     ), web_client:
         response = web_client.post(
             "/account/api/read_key_delete", data={"key_id": "abcd"}
@@ -576,17 +463,12 @@ def test_read_key_delete_no_api_key(web_client: FlaskClient) -> None:
     assert parsed_response.path == "/account"
 
 
-def test_read_key_delete(web_client: FlaskClient) -> None:
-    mock = user_mock()
+def test_read_key_delete(login_user, web_client: FlaskClient) -> None:
     mock_api_key = Mock()
     with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(
-        backend.web.handlers.account, "current_user", return_value=mock
-    ), patch.object(
-        mock, "delete_api_key"
+        login_user, "delete_api_key"
     ) as mock_delete_api_key, patch.object(
-        mock, "api_read_key", return_value=mock_api_key
+        login_user, "api_read_key", return_value=mock_api_key
     ), web_client:
         response = web_client.post(
             "/account/api/read_key_delete", data={"key_id": "abcd"}
@@ -600,7 +482,7 @@ def test_read_key_delete(web_client: FlaskClient) -> None:
 
 
 def test_mytba(
-    captured_templates: List[CapturedTemplate], web_client: FlaskClient
+    login_user, captured_templates: List[CapturedTemplate], web_client: FlaskClient
 ) -> None:
     mock_mytba = Mock()
 
@@ -622,8 +504,7 @@ def test_mytba(
     mock_event_matches = {mock_event_key: mock_matches}
     mock_mytba.event_matches = mock_event_matches
 
-    mock = user_mock()
-    mock.myTBA = mock_mytba
+    login_user.myTBA = mock_mytba
 
     mock_event_favorite = Mock()
     mock_event_subscription = Mock()
@@ -655,10 +536,6 @@ def test_mytba(
     mock_year = 2012
 
     with patch.object(
-        backend.web.decorators, "current_user", return_value=mock
-    ), patch.object(
-        backend.web.handlers.account, "current_user", return_value=mock
-    ), patch.object(
         backend.common.helpers.event_helper.EventHelper,
         "sorted_events",
         return_value=[mock_event_sorted],

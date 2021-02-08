@@ -16,16 +16,6 @@ def api_authenticated(func):
         auth_key = request.headers.get(
             "X-TBA-Auth-Key", request.args.get("X-TBA-Auth-Key")
         )
-        user = current_user()
-
-        unauthenticated_response = (
-            {
-                "Error": "X-TBA-Auth-Key is a required header or URL param. Please get an access key at http://www.thebluealliance.com/account."
-            },
-            401,
-        )
-        if not auth_key and not user:
-            return unauthenticated_response
 
         auth_owner_id = None
         auth_owner_mechanism = None
@@ -42,12 +32,18 @@ def api_authenticated(func):
                     },
                     401,
                 )
-        elif user:
-            auth_owner_id = user.account_key.id()
-            auth_owner_mechanism = "LOGGED IN"
         else:
-            # Should not happen but - handle just in case
-            return unauthenticated_response
+            user = current_user()
+            if user:
+                auth_owner_id = user.account_key.id()
+                auth_owner_mechanism = "LOGGED IN"
+            else:
+                return (
+                    {
+                        "Error": "X-TBA-Auth-Key is a required header or URL param. Please get an access key at http://www.thebluealliance.com/account."
+                    },
+                    401,
+                )
 
         logging.info(f"Auth owner: {auth_owner_id}, {auth_owner_mechanism}")
         # Set for our GA event tracking in `track_call_after_response`

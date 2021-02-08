@@ -6,7 +6,6 @@ __pycache__/
 .pytest_cache/
 .pyre/
 .vagrant/
-.watchmanconfig
 
 .coverage
 coverage.xml
