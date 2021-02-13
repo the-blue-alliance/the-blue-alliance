@@ -1,3 +1,27 @@
+`web` is the service responsible for serving static content for The Blue Alliance. Although `web` handles the majority of responsibility in The Blue Alliance's stack, it's responsibilities should be limited to serving web pages and read-only actions. Create or update actions should be delegate to other services.
+
+# Configuration
+
+## Setup Javascript Secrets
+
+Components in `web` (GameDay, login, etc.) make calls to Firebase and need to have Firebase keys set in order to work properly. Keys are referenced from a `tba_keys.js` file. This file is not checked in to source control, but an template of the file is. You can copy the template and add your own keys to the file.
+
+```
+$ cp src/backend/web/static/javascript/tba_js/tba_keys_template.js src/backend/web/static/javascript/tba_js/tba_keys.js
+```
+
+Edit the fields specified in the file and save. If you're using the development container, make sure to sync this file to the container. Finally, [rebuild web resources](https://github.com/the-blue-alliance/the-blue-alliance/wiki/Development-Runbook#rebuilding-web-resources-javascript-css-etc) to compile the secrets file with the Javascript.
+
+## Rebuilding Web Resources (JavaScript, CSS, etc.)
+
+If you make changes to JavaScript or CSS files for the `web` service, you will have to recompile the files in order for the changes to show up in your browser. After syncing changes from your local environment to the development container, run the `run_buildweb.sh` script from inside the development container.
+
+```
+$ ./ops/build/run_buildweb.sh
+```
+
+# Development
+
 ## Redirects
 
 Redirecting to a page via the `next` URL parameter is a pattern used in The Blue Alliance codebase. Since this `next` parameter can be modified by a user, caution should be taken to ensure the `next` parameter is redirecting back to The Blue Alliance as expected before redirecting the user. [`redirect`](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/web/redirect.py) offers some helpful commands for safely redirecting.
