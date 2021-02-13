@@ -1,4 +1,3 @@
-# Repo Setup
 A small amount of repo configuration can be done in order to streamline development. This step is optional as it is not required for working in The Blue Alliance repo, but it will be helpful for contributors that plan to do frequent work in the repo. This setup happens in your local environment, not in the development container.
 
 ## Install Dependencies
@@ -60,7 +59,3 @@ In the case that you want to bypass the pre-commit hook when committing code, yo
 ```bash
 $ git commit -m "Bypasing pre-commit hook" --no-verify
 ```
-
-## Configuring the Development Environment
-
-It is possible to change the way the local instance inside the dev container runs using a local configuration file. See the [[tba_dev_config.json|tba_dev_config]] documentation for more details.

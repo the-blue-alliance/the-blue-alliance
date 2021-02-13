@@ -1,3 +1,7 @@
+## Configuring the Development Environment
+
+It is possible to change the way the local instance inside the dev container runs using a local configuration file. See the [[tba_dev_config.json|tba_dev_config]] documentation for more details.
+
 ## Bootstrapping Data
 
 There are two ways to import data into a local development environment. You can either bootstrap the local db from the production site, or run the datafeeds locally to fetch data directly from FIRST.

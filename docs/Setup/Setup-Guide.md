@@ -41,4 +41,4 @@ $ vagrant ssh
 ```
 
 ## What’s Next?
-The [[development runbook|Development-Runbook]] has documentation for good next steps when working on The Blue Alliance, including bootstrapping data from production to your development environment, running tests, etc.
+The [[development runbook|Development-Runbook]] has documentation for good next steps when working on The Blue Alliance, including bootstrapping data from production to your development environment. Before submitting a PR, make sure to run the [[tests, lints, and type checks|Test-Lint-Check]] locally.

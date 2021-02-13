@@ -6,11 +6,21 @@ Bumping the Python version requires that Google App Engine supports the new Pyth
 2) Update the [`python-version`](https://docs.github.com/en/actions/guides/building-and-testing-python#specifying-a-python-version) in the GitHub Actions (`.github/workflows/*.yml`) files
 3) Update the [[Repo Setup|Repo-Setup]] docs to reflect the new Python version
 
-## Clearing Redis Cache Manually
+## Clearing Redis Cache
+
+### Automatically
+
+There is a convenience script which will drop you into a `redis-cli` interface. It essentially does the manual steps below.
+
+```bash
+> ./ops/shell/memorystore_shell.sh
+```
+
+When you're done, you can disconnect from the shell using a SIGINT (`Control` + `C`). Make sure the cleanup executes successfully! We're billed for the Compute Engine instance uptime, so making sure the Compute Engine instance is shut down is important.
+
+### Manually
 
 Currently there is no interfacing for clearing the Redis cache - it must be cleared manually. This involves SSHing in to a machine on the `tba-memorystore` network, connecting to the Redis instance via `redis-cli`, and clearing the cache.
-
-There is a convienence script located at `ops/shell/memorystore_shell.sh`, which will automate these steps and drop you into a `redis-cli` interface. It essentially does the steps below.
 
 First, enable SSH access on the [`tba-memorystore`](https://console.cloud.google.com/networking/networks/details/tba-memorystore) network. There is a pre-configured firewall rule that will allow traffic on port 22. Click `Firewall rules` -> `tba-memorystore-allow-ssh` -> `Edit`, and under `Enforcement` select `Enabled`. Click `Save` for the changes to go in to effect.
 
@@ -25,19 +35,19 @@ After connecting to the VM, connect to the Redis instance via `redis-cli`. The c
 Once connected, you can either search for a key to delete and delete the specified key, or delete the entire cache. To delete the entire cache, use the `FLUSHALL` command.
 
 ```
-> FLUSHALL
+$ FLUSHALL
 ```
 
 To find a specific key, use the `keys` command and wildcards in order to find the key name you're looking for.
 
 ```bash
-> keys *flask*
+$ keys *flask*
 ```
 
 After finding the key, delete the key using the `del` command.
 
 ```bash
-> del "{key}"
+$ del "{key}"
 ```
 
 Disconnect from the Redis instance and the VM. Afterwards, make sure to roll-back the setup done earlier -
@@ -56,3 +66,7 @@ $ ./ops/dev/docker/build-container-images.sh
 ```
 
 Images are published to `gcr.io/tbatv-prod-hrd/tba-py3-dev` and can be managed from the [cloud console](https://console.cloud.google.com/gcr).
+
+## Running One-Off Data Migrations/Cleanups
+
+See the [[Local Shell|Local-Shell]] documentation for running one-off cleanup or migration scripts against the production database. You will need a production service account key to run scripts against the production database. **Be extremely careful before running scripts against the production database.** After modifying the database, be sure to clear the Redis cache to remove any stale cached data.
