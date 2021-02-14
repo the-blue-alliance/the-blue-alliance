@@ -83,6 +83,10 @@ class DummyCachedQuery(CachedDatabaseQuery[DummyModel, None]):
 
 
 class DummyManipulator(ManipulatorBase[DummyModel]):
+
+    delete_calls = 0
+    update_calls = 0
+
     @classmethod
     def getCacheKeysAndQueries(
         cls, affected_refs: TAffectedReferences
@@ -104,6 +108,18 @@ class DummyManipulator(ManipulatorBase[DummyModel]):
     ) -> DummyModel:
         cls._update_attrs(new_model, old_model, auto_union)
         return old_model
+
+
+@DummyManipulator.register_post_delete_hook
+def post_delete_hook(models: List[DummyModel]) -> None:
+    DummyManipulator.delete_calls += 1
+
+
+@DummyManipulator.register_post_update_hook
+def post_update_hook(
+    models: List[DummyModel], updated_attrs: List[Set[str]], is_new: List[bool]
+) -> None:
+    DummyManipulator.update_calls += 1
 
 
 def test_create_new_model(ndb_context) -> None:
@@ -285,6 +301,24 @@ def test_cache_clearing(ndb_context, task_client: FakeTaskClient) -> None:
     assert CachedQueryResult.get_by_id(query.cache_key) is None
 
 
+def test_post_update_hook(ndb_context, task_client: FakeTaskClient) -> None:
+    model = DummyModel(id="test", int_prop=1337)
+    model.put()
+
+    update = DummyModel(id="test", int_prop=42)
+    DummyManipulator.createOrUpdate(update)
+
+    # Ensure we've enqueued the hook to run
+    assert DummyManipulator.update_calls == 0
+    assert task_client.pending_job_count("post-update-hooks") == 1
+
+    # Run the hooks manually
+    task_client.drain_pending_jobs("post-update-hooks")
+
+    # Make sure the hook ran
+    assert DummyManipulator.update_calls == 1
+
+
 def test_delete_by_key(ndb_context) -> None:
     model = DummyModel(id="test", int_prop=1337)
     model.put()
@@ -324,3 +358,20 @@ def test_delete_clears_cache(ndb_context, task_client: FakeTaskClient) -> None:
 
     # We should have cleared the cached result
     assert CachedQueryResult.get_by_id(query.cache_key) is None
+
+
+def test_delete_runs_hook(ndb_context, task_client: FakeTaskClient) -> None:
+    model = DummyModel(id="test", int_prop=1337)
+    model.put()
+
+    DummyManipulator.delete([model])
+
+    # Ensure we've enqueued the hook to run
+    assert DummyManipulator.delete_calls == 0
+    assert task_client.pending_job_count("post-update-hooks") == 1
+
+    # Run the hooks manually
+    task_client.drain_pending_jobs("post-update-hooks")
+
+    # Make sure the hook ran
+    assert DummyManipulator.delete_calls == 1

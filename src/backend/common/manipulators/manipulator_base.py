@@ -3,6 +3,7 @@ import json
 from collections import defaultdict
 from typing import (
     Any,
+    Callable,
     DefaultDict,
     Generic,
     Iterable,
@@ -27,6 +28,26 @@ TModel = TypeVar("TModel", bound=CachedModel)
 
 
 class ManipulatorBase(abc.ABC, Generic[TModel]):
+
+    _post_delete_hooks: List[Callable[[List[TModel]], None]] = []
+    _post_update_hooks: List[
+        Callable[[List[TModel], List[Set[str]], List[bool]], None]
+    ] = []
+
+    @classmethod
+    def register_post_delete_hook(
+        cls, func: Callable[[List[TModel]], None]
+    ) -> Callable[[List[TModel]], None]:
+        cls._post_delete_hooks.append(func)
+        return func
+
+    @classmethod
+    def register_post_update_hook(
+        cls, func: Callable[[List[TModel], List[Set[str]], List[bool]], None]
+    ) -> Callable[[List[TModel], List[Set[str]], List[bool]], None]:
+        cls._post_update_hooks.append(func)
+        return func
+
     @classmethod
     @abc.abstractmethod
     def updateMerge(
@@ -44,23 +65,36 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
 
     @overload
     @classmethod
-    def createOrUpdate(cls, new_models: TModel, auto_union: bool = True) -> TModel:
+    def createOrUpdate(
+        cls,
+        new_models: TModel,
+        auto_union: bool = True,
+        run_post_update_hook: bool = True,
+    ) -> TModel:
         ...
 
     @overload
     @classmethod
     def createOrUpdate(
-        cls, new_models: List[TModel], auto_union: bool = True
+        cls,
+        new_models: List[TModel],
+        auto_union: bool = True,
+        run_post_update_hook: bool = True,
     ) -> List[TModel]:
         ...
 
     @classmethod
-    def createOrUpdate(cls, new_models, auto_union=True) -> Any:
+    def createOrUpdate(
+        cls, new_models, auto_union=True, run_post_update_hook=True
+    ) -> Any:
         existing_or_new = listify(cls.findOrSpawn(new_models, auto_union))
 
         models_to_put = [model for model in existing_or_new if model._dirty]
         ndb.put_multi(models_to_put)
         cls._clearCache(existing_or_new)
+
+        if run_post_update_hook:
+            cls._run_post_update_hook(models_to_put)
 
         for model in existing_or_new:
             model._dirty = False
@@ -78,27 +112,24 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
 
     @overload
     @classmethod
-    def delete(self, models: TModel) -> None:
+    def delete(self, models: TModel, run_post_delete_hook=True) -> None:
         ...
 
     @overload
     @classmethod
-    def delete(self, models: List[TModel]) -> None:
+    def delete(self, models: List[TModel], run_post_delete_hook=True) -> None:
         ...
 
     @classmethod
-    def delete(self, models) -> None:
+    def delete(self, models, run_post_delete_hook=True) -> None:
         models = list(filter(None, listify(models)))
         keys = [model.key for model in models]
         ndb.delete_multi(keys)
         for model in models:
             model._dirty = True
             self._computeAndSaveAffectedReferences(model)
-        """
-        TODO: Port hooks
         if run_post_delete_hook:
-            self.runPostDeleteHook(models)
-        """
+            self._run_post_delete_hook(models)
         self._clearCache(models)
 
     """
@@ -163,6 +194,48 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
                 old_model._affected_references[attr] = old_model._affected_references[
                     attr
                 ].union(val)
+
+    @classmethod
+    def post_delete_hook(cls, models: List[TModel]):
+        pass
+
+    @classmethod
+    def _run_post_delete_hook(cls, models: List[TModel]) -> None:
+        """
+        Asynchronously runs the manipulator's post delete hooks if available.
+        """
+        if not models:
+            return
+
+        for hook in cls._post_delete_hooks:
+            defer(
+                hook,
+                models,
+                _queue="post-update-hooks",
+                _target="tasks-io",
+                _url="/_ah/queue/deferred_manipulator_runPostDeleteHook",
+            )
+
+    @classmethod
+    def _run_post_update_hook(cls, models: List[TModel]) -> None:
+        """
+        Asynchronously runs the manipulator's post update hooks if available.
+        """
+        if not models:
+            return
+
+        updated_attrs = [model._updated_attrs for model in models]
+        is_new = [model._is_new for model in models]
+        for hook in cls._post_update_hooks:
+            defer(
+                hook,
+                models,
+                updated_attrs,
+                is_new,
+                _queue="post-update-hooks",
+                _target="tasks-io",
+                _url="/_ah/queue/deferred_manipulator_runPostUpdateHook",
+            )
 
     """
     Helpers for subclasses
