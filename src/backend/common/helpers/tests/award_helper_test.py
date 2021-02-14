@@ -20,7 +20,7 @@ def test_organize_awards() -> None:
         award_type_enum=AwardType.WINNER,
         name_str="Winner",
     )
-    assert AwardHelper.organizeAwards([a1, a2, a3]) == [a2, a3, a1]
+    assert AwardHelper.organize_awards([a1, a2, a3]) == [a2, a3, a1]
 
 
 @pytest.mark.parametrize(

@@ -47,7 +47,7 @@ class EventDetails(CachedModel):
     rankings = ndb.JsonProperty()  # deprecated
     rankings2: List[EventRanking] = ndb.JsonProperty()
 
-    # Based on the output of PlayoffAdvancementHelper.generatePlayoffAdvancement
+    # Based on the output of PlayoffAdvancementHelper.generate_playoff_advancement
     # Dict with keys for: bracket, playoff_advancement
     playoff_advancement = ndb.JsonProperty()
 

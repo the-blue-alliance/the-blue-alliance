@@ -87,7 +87,7 @@ class MyTBALiveController(LoggedInHandler):
                     team,
                     event_team.status,
                     status_str,
-                    AwardHelper.organizeAwards(event_team_awards[event.key.id()][team.key.id()])
+                    AwardHelper.organize_awards(event_team_awards[event.key.id()][team.key.id()])
                 ))
             teams_and_statuses.sort(key=lambda x: x[0].team_number)
             past_events_with_teams.append((event, teams_and_statuses))

@@ -81,7 +81,7 @@ def event_detail(event_key: EventKey) -> Response:
         abort(404)
 
     event = none_throws(event)  # for pyre
-    event.prepAwardsMatchesTeams()
+    event.prep_awards_matches_teams()
     event.prep_details()
     medias_future = media_query.EventTeamsPreferredMediasQuery(event_key).fetch_async()
     district_future = (
@@ -105,11 +105,11 @@ def event_detail(event_key: EventKey) -> Response:
             none_throws(none_throws(event.parent_event).string_id())
         ).fetch_async()
 
-    awards = AwardHelper.organizeAwards(event.awards)
+    awards = AwardHelper.organize_awards(event.awards)
     cleaned_matches = event.matches
     # MatchHelper.delete_invalid_matches(event.matches, event)
     match_count, matches = MatchHelper.organized_matches(cleaned_matches)
-    teams = TeamHelper.sortTeams(event.teams)
+    teams = TeamHelper.sort_teams(event.teams)
 
     # Organize medias by team
     image_medias = MediaHelper.get_images(
@@ -146,8 +146,8 @@ def event_detail(event_key: EventKey) -> Response:
 
     bracket_table = event.playoff_bracket
     playoff_advancement = event.playoff_advancement
-    double_elim_matches = PlayoffAdvancementHelper.getDoubleElimMatches(event, matches)
-    playoff_template = PlayoffAdvancementHelper.getPlayoffTemplate(event)
+    double_elim_matches = PlayoffAdvancementHelper.double_elim_matches(event, matches)
+    playoff_template = PlayoffAdvancementHelper.playoff_template(event)
 
     # Lazy handle the case when we haven't backfilled the event details
     if not bracket_table or not playoff_advancement:
@@ -156,7 +156,7 @@ def event_detail(event_key: EventKey) -> Response:
             playoff_advancement2,
             _,
             _,
-        ) = PlayoffAdvancementHelper.generatePlayoffAdvancement(event, matches)
+        ) = PlayoffAdvancementHelper.generate_playoff_advancement(event, matches)
         bracket_table = bracket_table or bracket_table2
         playoff_advancement = playoff_advancement or playoff_advancement2
 

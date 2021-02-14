@@ -83,7 +83,7 @@ class DistrictDetail(CacheableHandler):
             valid_districts.add((dist.display_name, dist.abbreviation))
         valid_districts = sorted(valid_districts, key=lambda (name, _): name)
 
-        teams = TeamHelper.sortTeams(district_teams_future.get_result())
+        teams = TeamHelper.sort_teams(district_teams_future.get_result())
         team_keys = set([t.key.id() for t in teams])
 
         num_teams = len(teams)

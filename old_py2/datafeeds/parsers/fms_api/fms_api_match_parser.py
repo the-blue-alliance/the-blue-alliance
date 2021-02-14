@@ -212,7 +212,7 @@ class FMSAPIHybridScheduleParser(object):
             # Should only happen for sf and f matches
             organized_matches = MatchHelper.organized_matches(parsed_matches)
             for level in ['sf', 'f']:
-                playoff_advancement = PlayoffAdvancementHelper.generatePlayoffAdvancement2015(organized_matches)
+                playoff_advancement = PlayoffAdvancementHelper.generate_playoff_advancement_2015(organized_matches)
                 if playoff_advancement[LAST_LEVEL[level]] != []:
                     for match in organized_matches[level]:
                         if 'frcNone' in match.team_key_names:
