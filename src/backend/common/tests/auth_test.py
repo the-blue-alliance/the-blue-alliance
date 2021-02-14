@@ -4,15 +4,15 @@ from unittest.mock import ANY, Mock, patch
 from firebase_admin import auth
 from flask import Flask, session
 
-import backend.web.auth as backend_auth
-from backend.web.auth import (
+import backend.common.auth as backend_auth
+from backend.common.auth import (
     _decoded_claims,
     _user_context_processor,
     create_session_cookie,
     current_user,
     revoke_session_cookie,
 )
-from backend.web.models.user import User
+from backend.common.models.user import User
 
 
 def test_create_session_cookie(secret_app: Flask) -> None:

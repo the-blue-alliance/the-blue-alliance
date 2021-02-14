@@ -8,6 +8,7 @@ from pyre_extensions import none_throws, safe_cast
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.suggestion_state import SuggestionState
+from backend.common.helpers.mytba import MyTBA
 from backend.common.models.account import Account
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.favorite import Favorite
@@ -20,10 +21,11 @@ from backend.common.queries.favorite_query import FavoriteQuery
 from backend.common.queries.mobile_client_query import MobileClientQuery
 from backend.common.queries.subscription_query import SubscriptionQuery
 from backend.common.queries.suggestion_query import SuggestionQuery
-from backend.web.models.mytba import MyTBA
 
 
 class User:
+    """ Represents a TBA web user - for a TBA database account, see Account """
+
     def __init__(self, session_claims: Dict[str, Any]) -> None:
         self._session_claims = session_claims
         self._account: Optional[Account] = None

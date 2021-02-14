@@ -111,7 +111,7 @@ The currently logged in user can be obtained via the [`current_user` method](htt
 ```python
 from pyre_extensions import none_throws
 
-from backend.web.auth import current_user
+from backend.common.auth import current_user
 from backend.web.decorators import require_login
 
 @require_login

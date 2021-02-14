@@ -5,7 +5,7 @@ from firebase_admin import auth
 from flask import session
 
 from backend.common.firebase import app
-from backend.web.models.user import User
+from backend.common.models.user import User
 
 
 _SESSION_KEY = "session"

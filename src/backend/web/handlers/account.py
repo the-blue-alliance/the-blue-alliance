@@ -14,6 +14,11 @@ from flask import (
 from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
 
+from backend.common.auth import (
+    create_session_cookie,
+    current_user,
+    revoke_session_cookie,
+)
 from backend.common.consts.auth_type import (
     WRITE_TYPE_NAMES as AUTH_TYPE_WRITE_TYPE_NAMES,
 )
@@ -22,7 +27,6 @@ from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.sitevars.notifications_enable import NotificationsEnable
-from backend.web.auth import create_session_cookie, current_user, revoke_session_cookie
 from backend.web.decorators import enforce_login, require_login, require_login_only
 from backend.web.redirect import is_safe_url, safe_next_redirect
 
