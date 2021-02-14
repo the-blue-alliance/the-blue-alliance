@@ -39,8 +39,10 @@ def ndb_stub(monkeypatch: MonkeyPatch) -> datastore_stub.LocalDatastoreStub:
 
 
 @pytest.fixture()
-def task_client() -> FakeTaskClient:
-    return FakeTaskClient()
+def task_client():
+    client = FakeTaskClient()
+    client._redis.flushall()
+    yield client
 
 
 @pytest.fixture()

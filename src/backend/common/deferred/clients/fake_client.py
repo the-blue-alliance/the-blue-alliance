@@ -6,17 +6,19 @@ from backend.common.deferred.queues.fake_queue import FakeTaskQueue
 class FakeTaskClient(RQTaskClient):
 
     _instance = None
+    _redis = None
 
     def __new__(cls):
         if cls._instance is None:
+            from fakeredis import FakeRedis
+
             cls._instance = super(FakeTaskClient, cls).__new__(cls)
+            cls._redis = FakeRedis()
 
         return cls._instance
 
     def __init__(self) -> None:
-        from fakeredis import FakeRedis
-
-        super().__init__(default_service="test", redis_client=FakeRedis())
+        super().__init__(default_service="test", redis_client=self._redis)
 
     def pending_job_count(self, queue_name: str) -> int:
         return len(self.queue(queue_name).jobs())
