@@ -106,7 +106,7 @@ def route() -> str:
 
 ### Getting a User object
 
-The currently logged in user can be obtained via the [`current_user` method](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/web/auth.py) and returns a [`User`](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/web/models/user.py) object. The user is available in the HTML templates via the `user` property. If being used on a page that is not gated behind an authentication decorator, this property may be null. If the route is protected via the authentication decorators, the `current_user()` call can be wrapped in a `none_throws` call to ensure the object is not None.
+See the [[common|common]] page for details on how to obtain a user object through `current_user()`. The `User` object from `current_user()` is available in the HTML templates via the `user` property. If being used on a page that is not gated behind an authentication decorator, this property may be null. If the route is protected via the authentication decorators, the `current_user()` call can be wrapped in a `none_throws` call to ensure the object is not `None`.
 
 ```python
 from pyre_extensions import none_throws
@@ -132,6 +132,20 @@ def route() -> str:
 
 Requests that act on user data or on behalf of a user should be careful that the executing user has the proper permissions to perform the requested action. As previously mentioned, POST requests should pass a `csrf_token`. Required information should be fetched for only the currently logged in user. In some cases, a POST request might pass a user ID using the `user.uid` property in the template to ensure that the user is acting upon their own data when the request is made when relying on the currently logged in user is not enough validation (ex: editing account info).
 
-Ex: Consider deleting an API key. A form might POST the API key to delete. The query to fetch the API key to delete should fetch the API key for the passed API key identifier *for the currently logged in user*. Failing to query the API key scoped to the given user would allow any user to delete any API key, regardless of if they're the owner of the API key.
+Ex: Consider deleting an API key. A form might POST the API key to delete. The query to fetch the API key to delete should fetch the API key for the passed API key identifier **for the currently logged in user**. Failing to query the API key scoped to the given user would allow any user to delete any API key, regardless of if they're the owner of the API key.
 
 The `User` model exposes several methods and properties that fetch data scoped for the user, and are considered safe. These methods should be preferred as opposed to writing custom queries or logic.
+
+### Stubbing `current_user` + `User` in Tests
+
+A [`login_user`](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/web/handlers/conftest.py#L32) pytest fixture is available for stubbing the `current_user` function. `current_user` will return a `User` [Mock](https://docs.python.org/3/library/unittest.mock.html#unittest.mock.Mock) that can be used for verifying functionality.
+
+```python
+def test_register_account(login_user) -> None:
+    login_user.is_registered = False
+
+    with patch.object(login_user, "register") as mock_register:
+        ...
+
+    mock_register.assert_called_with("Zach")
+```
