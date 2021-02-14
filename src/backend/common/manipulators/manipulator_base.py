@@ -202,10 +202,6 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
                 ].union(val)
 
     @classmethod
-    def post_delete_hook(cls, models: List[TModel]):
-        pass
-
-    @classmethod
     def _run_post_delete_hook(cls, models: List[TModel]) -> None:
         """
         Asynchronously runs the manipulator's post delete hooks if available.
