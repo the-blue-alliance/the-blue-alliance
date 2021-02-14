@@ -117,7 +117,7 @@ class TeamRenderer(object):
         matches_upcoming = None
         for event in events_sorted:
             event_matches = matches_by_event_key.get(event.key, [])
-            event_awards = AwardHelper.organizeAwards(
+            event_awards = AwardHelper.organize_awards(
                 awards_by_event_key.get(event.key, [])
             )
             match_count, matches_organized = MatchHelper.organized_matches(
@@ -370,7 +370,7 @@ class TeamRenderer(object):
             """
 
             if event.key_name in awards_by_event:
-                sorted_awards = AwardHelper.organizeAwards(
+                sorted_awards = AwardHelper.organize_awards(
                     awards_by_event[event.key_name]
                 )
             else:

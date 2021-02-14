@@ -145,7 +145,7 @@ class EventDetail(CacheableHandler):
         if not event:
             self.abort(404)
 
-        event.prepAwardsMatchesTeams()
+        event.prep_awards_matches_teams()
         event.prep_details()
         medias_future = media_query.EventTeamsPreferredMediasQuery(event_key).fetch_async()
         district_future = DistrictQuery(event.district_key.id()).fetch_async() if event.district_key else None
@@ -161,10 +161,10 @@ class EventDetail(CacheableHandler):
             parent_event_future = event.parent_event.get_async()
             event_codivisions_future = EventDivisionsQuery(event.parent_event.id()).fetch_async()
 
-        awards = AwardHelper.organizeAwards(event.awards)
+        awards = AwardHelper.organize_awards(event.awards)
         cleaned_matches = MatchHelper.delete_invalid_matches(event.matches, event)
         matches = MatchHelper.organized_matches(cleaned_matches)
-        teams = TeamHelper.sortTeams(event.teams)
+        teams = TeamHelper.sort_teams(event.teams)
 
         # Organize medias by team
         image_medias = MediaHelper.get_images([media for media in medias_future.get_result()])
@@ -195,12 +195,12 @@ class EventDetail(CacheableHandler):
 
         bracket_table = event.playoff_bracket
         playoff_advancement = event.playoff_advancement
-        double_elim_matches = PlayoffAdvancementHelper.getDoubleElimMatches(event, matches)
-        playoff_template = PlayoffAdvancementHelper.getPlayoffTemplate(event)
+        double_elim_matches = PlayoffAdvancementHelper.double_elim_matches(event, matches)
+        playoff_template = PlayoffAdvancementHelper.playoff_template(event)
 
         # Lazy handle the case when we haven't backfilled the event details
         if not bracket_table or not playoff_advancement:
-            bracket_table2, playoff_advancement2, _, _ = PlayoffAdvancementHelper.generatePlayoffAdvancement(event, matches)
+            bracket_table2, playoff_advancement2, _, _ = PlayoffAdvancementHelper.generate_playoff_advancement(event, matches)
             bracket_table = bracket_table or bracket_table2
             playoff_advancement = playoff_advancement or playoff_advancement2
 

@@ -102,7 +102,7 @@ class ApiTeamEventAwardsController(ApiTeamControllerBase):
     def _render(self, team_key, event_key):
         awards = TeamEventAwardsQuery(self.team_key, self.event_key).fetch()
 
-        awards_dicts = [ModelToDict.awardConverter(award) for award in AwardHelper.organizeAwards(awards)]
+        awards_dicts = [ModelToDict.awardConverter(award) for award in AwardHelper.organize_awards(awards)]
 
         return json.dumps(awards_dicts, ensure_ascii=True)
 

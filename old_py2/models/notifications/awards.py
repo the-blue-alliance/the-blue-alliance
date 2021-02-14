@@ -60,8 +60,8 @@ class AwardsNotification(Notification):
         from helpers.award_helper import AwardHelper
         from helpers.model_to_dict import ModelToDict
         if self.team:
-            payload['awards'] = [ModelToDict.awardConverter(award) for award in AwardHelper.organizeAwards(self.team_awards)]
+            payload['awards'] = [ModelToDict.awardConverter(award) for award in AwardHelper.organize_awards(self.team_awards)]
         else:
-            payload['awards'] = [ModelToDict.awardConverter(award) for award in AwardHelper.organizeAwards(self.event.awards)]
+            payload['awards'] = [ModelToDict.awardConverter(award) for award in AwardHelper.organize_awards(self.event.awards)]
 
         return payload

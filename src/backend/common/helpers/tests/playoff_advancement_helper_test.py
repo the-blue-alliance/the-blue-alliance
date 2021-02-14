@@ -38,7 +38,7 @@ def test_standard_bracket(test_data_importer) -> None:
     )
     organized_matches = MatchHelper.organized_matches(matches)[1]
 
-    advancement = PlayoffAdvancementHelper.generatePlayoffAdvancement(
+    advancement = PlayoffAdvancementHelper.generate_playoff_advancement(
         event, organized_matches
     )
     with open(
@@ -59,7 +59,7 @@ def test_2015_event(test_data_importer) -> None:
     )
     organized_matches = MatchHelper.organized_matches(matches)[1]
 
-    advancement = PlayoffAdvancementHelper.generatePlayoffAdvancement(
+    advancement = PlayoffAdvancementHelper.generate_playoff_advancement(
         event, organized_matches
     )
     with open(
@@ -80,7 +80,7 @@ def test_round_robin_2018(test_data_importer) -> None:
     )
     organized_matches = MatchHelper.organized_matches(matches)[1]
 
-    advancement = PlayoffAdvancementHelper.generatePlayoffAdvancement(
+    advancement = PlayoffAdvancementHelper.generate_playoff_advancement(
         event, organized_matches
     )
 
@@ -102,7 +102,7 @@ def test_round_robin_2019(test_data_importer) -> None:
     )
     organized_matches = MatchHelper.organized_matches(matches)[1]
 
-    advancement = PlayoffAdvancementHelper.generatePlayoffAdvancement(
+    advancement = PlayoffAdvancementHelper.generate_playoff_advancement(
         event, organized_matches
     )
 
@@ -121,7 +121,7 @@ def test_best_of_3_finals(test_data_importer) -> None:
     )
     organized_matches = MatchHelper.organized_matches(matches)[1]
 
-    advancement = PlayoffAdvancementHelper.generatePlayoffAdvancement(
+    advancement = PlayoffAdvancementHelper.generate_playoff_advancement(
         event, organized_matches
     )
     assert advancement.bracket_table is not None
@@ -137,7 +137,7 @@ def test_best_of_5_finals(test_data_importer) -> None:
     )
     organized_matches = MatchHelper.organized_matches(matches)[1]
 
-    advancement = PlayoffAdvancementHelper.generatePlayoffAdvancement(
+    advancement = PlayoffAdvancementHelper.generate_playoff_advancement(
         event, organized_matches
     )
     assert advancement.bracket_table is not None

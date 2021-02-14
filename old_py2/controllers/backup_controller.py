@@ -363,7 +363,7 @@ class TbaCSVBackupEventDo(webapp.RequestHandler):
     def get(self, event_key):
         event = Event.get_by_id(event_key)
 
-        event.prepAwardsMatchesTeams()
+        event.prep_awards_matches_teams()
 
         if event.awards:
             with cloudstorage.open(self.AWARDS_FILENAME_PATTERN.format(event.year, event_key, event_key), 'w') as awards_file:

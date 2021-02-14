@@ -72,7 +72,7 @@ def district_detail(
         valid_districts.append((dist.display_name, dist.abbreviation))
     valid_districts = sorted(valid_districts, key=itemgetter(0))
 
-    teams = TeamHelper.sortTeams(district_teams_future.get_result())
+    teams = TeamHelper.sort_teams(district_teams_future.get_result())
     team_keys = set([t.key.id() for t in teams])
 
     num_teams = len(teams)

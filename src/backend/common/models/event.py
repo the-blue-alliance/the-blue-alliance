@@ -406,7 +406,7 @@ class Event(CachedModel):
         return none_throws(self._teams)
 
     @ndb.toplevel
-    def prepAwardsMatchesTeams(
+    def prep_awards_matches_teams(
         self,
     ) -> Generator[
         Tuple[

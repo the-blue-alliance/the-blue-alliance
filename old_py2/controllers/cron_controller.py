@@ -738,7 +738,7 @@ class RebuildPlayoffAdvancementDo(webapp.RequestHandler):
 
         cleaned_matches = MatchHelper.delete_invalid_matches(matches, event)
         matches = MatchHelper.organized_matches(cleaned_matches)
-        bracket_table, playoff_advancement, _, _ = PlayoffAdvancementHelper.generatePlayoffAdvancement(event, matches)
+        bracket_table, playoff_advancement, _, _ = PlayoffAdvancementHelper.generate_playoff_advancement(event, matches)
 
         event_details = EventDetails(
             id=event.key_name,
@@ -807,7 +807,7 @@ class RemapTeamsDo(webapp.RequestHandler):
         if not event.remap_teams:
             return
 
-        event.prepAwardsMatchesTeams()
+        event.prep_awards_matches_teams()
 
         # Remap matches
         EventHelper.remapteams_matches(event.matches, event.remap_teams)
