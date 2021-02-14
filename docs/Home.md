@@ -51,7 +51,11 @@ Running notes on how to migrate code from the Python 2 codebase to the new Pytho
 
 ## Services
 
-### [[Web|Web]]
+### [[common|common]]
+
+A shared set of code used across services.
+
+### [[web|web]]
 
 Notes for working effectively and safely in the `web` service.
 
