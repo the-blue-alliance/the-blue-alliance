@@ -1,6 +1,7 @@
 import abc
 import json
 from collections import defaultdict
+from dataclasses import dataclass
 from typing import (
     Any,
     Callable,
@@ -27,12 +28,17 @@ from backend.common.queries.database_query import CachedDatabaseQuery
 TModel = TypeVar("TModel", bound=CachedModel)
 
 
+@dataclass(frozen=True)
+class TUpdatedModel(Generic[TModel]):
+    model: TModel
+    updated_attrs: Set[str]
+    is_new: bool
+
+
 class ManipulatorBase(abc.ABC, Generic[TModel]):
 
     _post_delete_hooks: List[Callable[[List[TModel]], None]] = []
-    _post_update_hooks: List[
-        Callable[[List[TModel], List[Set[str]], List[bool]], None]
-    ] = []
+    _post_update_hooks: List[Callable[[List[TUpdatedModel[TModel]]], None]] = []
 
     @classmethod
     def register_post_delete_hook(
@@ -43,8 +49,8 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
 
     @classmethod
     def register_post_update_hook(
-        cls, func: Callable[[List[TModel], List[Set[str]], List[bool]], None]
-    ) -> Callable[[List[TModel], List[Set[str]], List[bool]], None]:
+        cls, func: Callable[[List[TUpdatedModel[TModel]]], None]
+    ) -> Callable[[List[TUpdatedModel[TModel]]], None]:
         cls._post_update_hooks.append(func)
         return func
 
@@ -224,14 +230,18 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
         if not models:
             return
 
-        updated_attrs = [model._updated_attrs for model in models]
-        is_new = [model._is_new for model in models]
+        updated_models = [
+            TUpdatedModel(
+                model=model,
+                updated_attrs=model._updated_attrs or set(),
+                is_new=model._is_new,
+            )
+            for model in models
+        ]
         for hook in cls._post_update_hooks:
             defer(
                 hook,
-                models,
-                updated_attrs,
-                is_new,
+                updated_models,
                 _queue="post-update-hooks",
                 _target="tasks-io",
                 _url="/_ah/queue/deferred_manipulator_runPostUpdateHook",

@@ -1,6 +1,7 @@
 import json
 from typing import Dict, List, Optional, Set
 
+import pytest
 from google.cloud import ndb
 from pyre_extensions import none_throws
 
@@ -8,7 +9,7 @@ from backend.common.cache_clearing.get_affected_queries import TCacheKeyAndQuery
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.deferred.clients.fake_client import FakeTaskClient
 from backend.common.futures import TypedFuture
-from backend.common.manipulators.manipulator_base import ManipulatorBase
+from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
 from backend.common.models.cached_model import CachedModel, TAffectedReferences
 from backend.common.models.cached_query_result import CachedQueryResult
 from backend.common.queries.database_query import CachedDatabaseQuery
@@ -116,10 +117,15 @@ def post_delete_hook(models: List[DummyModel]) -> None:
 
 
 @DummyManipulator.register_post_update_hook
-def post_update_hook(
-    models: List[DummyModel], updated_attrs: List[Set[str]], is_new: List[bool]
-) -> None:
+def post_update_hook(models: List[TUpdatedModel[DummyModel]]) -> None:
     DummyManipulator.update_calls += 1
+
+
+@pytest.fixture(autouse=True)
+def reset_hook_call_counts():
+    # This prevents counts from leaking between tests, since the classvar is static
+    DummyManipulator.delete_calls = 0
+    DummyManipulator.update_calls = 0
 
 
 def test_create_new_model(ndb_context) -> None:
@@ -319,6 +325,18 @@ def test_post_update_hook(ndb_context, task_client: FakeTaskClient) -> None:
     assert DummyManipulator.update_calls == 1
 
 
+def test_update_skip_hook(ndb_context, task_client: FakeTaskClient) -> None:
+    model = DummyModel(id="test", int_prop=1337)
+    model.put()
+
+    update = DummyModel(id="test", int_prop=42)
+    DummyManipulator.createOrUpdate(update, run_post_update_hook=False)
+
+    # Ensure we didn't enqueue the hook to run
+    assert DummyManipulator.update_calls == 0
+    assert task_client.pending_job_count("post-update-hooks") == 0
+
+
 def test_delete_by_key(ndb_context) -> None:
     model = DummyModel(id="test", int_prop=1337)
     model.put()
@@ -375,3 +393,14 @@ def test_delete_runs_hook(ndb_context, task_client: FakeTaskClient) -> None:
 
     # Make sure the hook ran
     assert DummyManipulator.delete_calls == 1
+
+
+def test_delete_skip_hook(ndb_context, task_client: FakeTaskClient) -> None:
+    model = DummyModel(id="test", int_prop=1337)
+    model.put()
+
+    DummyManipulator.delete([model], run_post_delete_hook=False)
+
+    # Ensure we didn't enqueue the hook to run
+    assert DummyManipulator.delete_calls == 0
+    assert task_client.pending_job_count("post-update-hooks") == 0
