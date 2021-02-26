@@ -1,5 +1,4 @@
-from collections import defaultdict
-from typing import cast, Dict, List, NewType
+from typing import Dict, List, NewType
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.event_details import EventDetails

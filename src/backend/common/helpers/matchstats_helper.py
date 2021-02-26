@@ -13,7 +13,6 @@ from typing import Callable, Dict, List
 from typing import Tuple
 
 import numpy as np
-from google.cloud import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import ALLIANCE_COLORS
@@ -26,9 +25,6 @@ from backend.common.models.event_matchstats import (
     TeamStatMap,
 )
 from backend.common.models.keys import TeamId
-from backend.common.consts.event_type import EventType
-from backend.common.memcache import MemcacheClient
-from backend.common.models.keys import TeamId, Year
 from backend.common.models.match import Match
 
 StatAccessor = Callable[[Match, AllianceColor], float]
@@ -175,7 +171,10 @@ class MatchstatsHelper:
 
     @classmethod
     def __build_m_inv_matrix(
-        cls, matches: List[Match], team_id_map: TTeamIdMap, played_only: bool = False,
+        cls,
+        matches: List[Match],
+        team_id_map: TTeamIdMap,
+        played_only: bool = False,
     ) -> "np.ndarray[float]":
         n = len(team_id_map.keys())
         m = np.zeros((n, n))
@@ -226,7 +225,11 @@ class MatchstatsHelper:
         m_inv: np.ndarray,
         point_accessor: Callable[[Match, AllianceColor], float],
     ):
-        s = cls.__build_s_matrix(matches, team_id_map, point_accessor,)
+        s = cls.__build_s_matrix(
+            matches,
+            team_id_map,
+            point_accessor,
+        )
         x = np.dot(m_inv, s)
 
         stat_dict = {}
