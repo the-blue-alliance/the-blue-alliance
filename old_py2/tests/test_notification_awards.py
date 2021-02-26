@@ -37,7 +37,7 @@ class TestAwardsNotification(unittest2.TestCase):
         expected['message_data'] = {}
         expected['message_data']['event_name'] = self.event.name
         expected['message_data']['event_key'] = self.event.key_name
-        expected['message_data']['awards'] = [ModelToDict.awardConverter(award) for award in AwardHelper.organizeAwards(self.event.awards)]
+        expected['message_data']['awards'] = [ModelToDict.awardConverter(award) for award in AwardHelper.organize_awards(self.event.awards)]
 
         data = self.notification._build_dict()
 

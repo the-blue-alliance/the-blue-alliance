@@ -8,7 +8,10 @@ from backend.common.queries.district_query import TeamDistrictsQuery
 
 
 def preseed_district_team(team_number: TeamNumber, district_key: DistrictKey) -> None:
-    District(id=district_key, year=int(district_key[:4]),).put()
+    District(
+        id=district_key,
+        year=int(district_key[:4]),
+    ).put()
 
     DistrictTeam(
         id=f"{district_key}_{team_number}",

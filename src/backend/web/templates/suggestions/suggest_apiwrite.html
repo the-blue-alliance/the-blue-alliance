@@ -10,7 +10,7 @@
             <div class="row">
                 <div class="col-xs-12 col-lg-8 col-lg-offset-2">
                     {% if status == 'success' %}
-                        <div class="alert alert-success">
+                        <div class="alert alert-success" id="success-alert">
                             <button type="button" class="close"
                                     data-dismiss="alert">&times;</button>
                             <h4>Thanks!</h4>
@@ -18,7 +18,7 @@
                             <p>We'll review your request and let you know soon!</p>
                         </div>
                     {% elif status == 'bad_event' %}
-                        <div class="alert alert-danger">
+                        <div class="alert alert-danger" id="bad_event-alert">
                             <button type="button" class="close"
                                     data-dismiss="alert">&times;</button>
                             <h4>Uh Oh!</h4>
@@ -28,7 +28,7 @@
                             to <a href="/suggest/offseason">suggest it</a>.</p>
                         </div>
                     {% elif status == 'no_affiliation' %}
-                        <div class="alert alert-danger">
+                        <div class="alert alert-danger" id="no_affiliation-alert">
                             <button type="button" class="close"
                                     data-dismiss="alert">&times;</button>
                             <h4>Uh Oh!</h4>
@@ -54,10 +54,10 @@
                         <ul>
                             <li>Your request will be reviewed by a moderator</li>
                             <li>After review, we will send you an email at the address associated
-                                with your TBA account, <strong>{{ user_bundle.user.email() }}</strong>.
+                                with your TBA account, <strong>{{  user.email  }}</strong>.
                                 You can also find auth tokens associated with your account on your
-                                <a href="/account">account overview</a>. You can also
-                                <a href="{{ user_bundle.logout_url }}">log in as a different
+                                <a href="{{ url_for('account.overview') }}"">account overview</a>. You can also
+                                <a href="{{ url_for('account.logout') }}">log in as a different
                                     user</a> if this is not correct.</li>
                             <li>You can only request tokens for offseason events, please
                                 <a href="/contact">contact us</a> you find errors with official
@@ -88,12 +88,13 @@
                                 <tr>
                                     <td>Auth Types Requested</td>
                                     <td>
-                                        {% for type,name in auth_types.iteritems() %}
+                                        {% for type,name in auth_types.items() %}
                                             <input type="checkbox" name="auth_types" value="{{ type }}"/> {{ name }} <br/>
                                         {% endfor %}
                                     </td>
                                 </tr>
                             </table>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             <button class="btn btn-success" type="submit"><span class="glyphicon glyphicon-plus-sign"></span> Request Tokens </button>
                         </form>
                     </div>

@@ -6,7 +6,7 @@ from backend.common.queries.database_query import DatabaseQuery
 from backend.common.tasklets import typed_tasklet
 
 
-class MobileClientQuery(DatabaseQuery[List[MobileClient]]):
+class MobileClientQuery(DatabaseQuery[List[MobileClient], None]):
     def __init__(
         self,
         user_ids: List[str],

@@ -1,5 +1,5 @@
 service: py3-web
-runtime: python37
+runtime: python38
 entrypoint: gunicorn -b :$PORT backend.web.main:app
 
 instance_class: F1
@@ -7,7 +7,7 @@ automatic_scaling:
   max_idle_instances: 1
 
 handlers:
-  - url: /css
+  - url: /py3_css
     static_dir: build/css
   - url: /favicon.ico
     static_files: backend/web/static/icons/favicon.ico
@@ -19,7 +19,7 @@ handlers:
   - url: /images
     static_dir: backend/web/static/images
     expiration: "1h"
-  - url: /javascript
+  - url: /py3_javascript
     static_dir: build/javascript
   - url: /manifest.json
     static_files: backend/web/static/manifest.json
@@ -28,6 +28,9 @@ handlers:
   - url: /robots.txt
     static_files: backend/web/static/robots.txt
     upload: backend/web/static/robots.txt
+  - url: /.well-known
+    static_dir: backend/web/static/well-known
+    mime_type: application/json
 
   - url: /.*
     script: auto

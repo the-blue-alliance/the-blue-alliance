@@ -1,6 +1,5 @@
 import json
 import logging
-import collections
 import datetime
 import re
 
@@ -53,10 +52,10 @@ class EventHelper(object):
         Given a team_key, and an event, find the team's Win Loss Tie.
         """
         match_keys = Match.query(Match.event == event.key, Match.team_key_names == team_key).fetch(500, keys_only=True)
-        return self.calculateTeamWLTFromMatches(team_key, ndb.get_multi(match_keys))
+        return self.calculate_wlt(team_key, ndb.get_multi(match_keys))
 
     @classmethod
-    def getWeekEvents(self):
+    def week_events(self):
         """
         Get events this week
         In general, if an event is currently going on, it shows up in this query
@@ -65,7 +64,7 @@ class EventHelper(object):
         OR
         b) The event.start_date is on or within 4 days after the closest Wednesday/Monday (pre-2020/post-2020)
         """
-        event_keys = memcache.get('EventHelper.getWeekEvents():event_keys')
+        event_keys = memcache.get('EventHelper.week_events():event_keys')
         if event_keys is not None:
             return ndb.get_multi(event_keys)
 
@@ -93,7 +92,7 @@ class EventHelper(object):
                     events.append(event)
 
         EventHelper.sort_events(events)
-        memcache.set('EventHelper.getWeekEvents():event_keys', [e.key for e in events], 60*60)
+        memcache.set('EventHelper.week_events():event_keys', [e.key for e in events], 60*60)
         return events
 
     @classmethod
@@ -102,7 +101,7 @@ class EventHelper(object):
         if event_keys is not None:
             return ndb.get_multi(event_keys)
 
-        events = filter(lambda e: e.within_a_day, self.getWeekEvents())
+        events = filter(lambda e: e.within_a_day, self.week_events())
         memcache.set('EventHelper.getEventsWithinADay():event_keys', [e.key for e in events], 60*60)
         return events
 
@@ -172,37 +171,6 @@ class EventHelper(object):
         return district if district != DistrictType.NO_DISTRICT else DistrictType.abbrevs.get(district_name_str, DistrictType.NO_DISTRICT)
 
     @classmethod
-    def getDistrictEnumFromEventName(cls, event_name):
-        for abbrev, district_type in DistrictType.abbrevs.items():
-            if '{} district'.format(abbrev) in event_name.lower():
-                return district_type
-
-        for district_name, district_type in DistrictType.elasticsearch_names.items():
-            if district_name in event_name:
-                return district_type
-
-        return DistrictType.NO_DISTRICT
-
-    @classmethod
-    def getDistrictKeyFromEventName(cls, event_name, year_districts_future):
-        year_districts = year_districts_future.get_result()
-        for district in year_districts:
-            if '{} district'.format(
-                    district.abbreviation) in event_name.lower():
-                return district.key
-            if district.display_name and '{} district'.format(
-                    district.display_name.lower()) in event_name.lower():
-                return district.key
-
-            if district.elasticsearch_name:
-                search_names = district.elasticsearch_name.split(",")
-                for s in search_names:
-                    if s and event_name.lower().startswith(s.lower()):
-                        return district.key
-
-        return None
-
-    @classmethod
     def parseEventType(self, event_type_str):
         """
         Given an event_type_str from USFIRST, return the proper event type
@@ -244,12 +212,6 @@ class EventHelper(object):
         # An event slipped through!
         logging.warn("Event type '{}' not recognized!".format(event_type_str))
         return EventType.UNLABLED
-
-    @classmethod
-    def is_2015_playoff(Cls, event_key):
-        year = event_key[:4]
-        event_short = event_key[4:]
-        return year == '2015' and event_short not in {'cc', 'cacc', 'mttd'}
 
     @classmethod
     def remapteams_matches(cls, matches, remap_teams):

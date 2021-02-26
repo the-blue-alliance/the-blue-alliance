@@ -16,7 +16,9 @@ class WebsiteBlacklist(SitevarBase[ContentType]):
 
     @staticmethod
     def default_value() -> ContentType:
-        return ContentType(websites=[],)
+        return ContentType(
+            websites=[],
+        )
 
     @classmethod
     def is_blacklisted(cls, website: str) -> bool:
@@ -30,5 +32,6 @@ class WebsiteBlacklist(SitevarBase[ContentType]):
             return data
 
         cls.update(
-            should_update=lambda v: website not in v["websites"], update_f=update_data,
+            should_update=lambda v: website not in v["websites"],
+            update_f=update_data,
         )

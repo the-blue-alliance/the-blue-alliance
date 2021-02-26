@@ -197,7 +197,10 @@ class Match(CachedModel):
         Lazy load score_breakdown_json
         """
         if self._score_breakdown is None and self.score_breakdown_json is not None:
-            score_breakdown = json.loads(none_throws(self.score_breakdown_json))
+            try:
+                score_breakdown = json.loads(none_throws(self.score_breakdown_json))
+            except json.decoder.JSONDecodeError:
+                return None
 
             if self.has_been_played:
                 # Add in RP calculations
@@ -296,7 +299,7 @@ class Match(CachedModel):
 
     @property
     def event_key_name(self) -> EventKey:
-        return self.event.id()
+        return none_throws(self.event.string_id())
 
     @property
     def team_keys(self) -> List[ndb.Key]:
@@ -310,7 +313,7 @@ class Match(CachedModel):
 
     @property
     def short_key(self) -> str:
-        return self.key.id().split("_")[1]
+        return none_throws(self.key.string_id()).split("_")[1]
 
     @property
     def has_been_played(self) -> bool:
@@ -329,7 +332,10 @@ class Match(CachedModel):
             or self.comp_level == "f"
             or EventHelper.is_2015_playoff(self.event_key_name)
         ):
-            return "%s %s" % (COMP_LEVELS_VERBOSE[self.comp_level], self.match_number,)
+            return "%s %s" % (
+                COMP_LEVELS_VERBOSE[self.comp_level],
+                self.match_number,
+            )
         else:
             return "%s %s Match %s" % (
                 COMP_LEVELS_VERBOSE[self.comp_level],

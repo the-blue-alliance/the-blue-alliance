@@ -1,27 +1,32 @@
-from typing import Dict, List
+from typing import Dict, List, NewType
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.team import Team
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 
+TeamDict = NewType("TeamDict", Dict)
+
 
 class TeamConverter(ConverterBase):
-    # SUBVERSIONS = {  # Increment every time a change to the dict is made
-    #     3: 4,
-    # }  # TODO: used for cache clearing
+    SUBVERSIONS = {  # Increment every time a change to the dict is made
+        ApiMajorVersion.API_V3: 4,
+    }
 
+    @classmethod
     def _convert_list(
-        self, model_list: List[Team], version: ApiMajorVersion
-    ) -> List[Dict]:
+        cls, model_list: List[Team], version: ApiMajorVersion
+    ) -> List[TeamDict]:
         CONVERTERS = {
-            ApiMajorVersion.API_V3: self.teamsConverter_v3,
+            ApiMajorVersion.API_V3: cls.teamsConverter_v3,
         }
         return CONVERTERS[version](model_list)
 
-    def teamsConverter_v3(self, teams: List[Team]) -> List[Dict]:
-        return list(map(self.teamConverter_v3, teams))
+    @classmethod
+    def teamsConverter_v3(cls, teams: List[Team]) -> List[TeamDict]:
+        return list(map(cls.teamConverter_v3, teams))
 
-    def teamConverter_v3(self, team: Team) -> Dict:
+    @classmethod
+    def teamConverter_v3(cls, team: Team) -> TeamDict:
         default_name = "Team {}".format(team.team_number)
         team_dict = {
             "key": team.key.id(),
@@ -34,8 +39,8 @@ class TeamConverter(ConverterBase):
             # "home_championship": team.championship_location,  # TODO: event not ported yet
             "school_name": team.school_name,
         }
-        team_dict.update(self.constructLocation_v3(team))
-        return team_dict
+        team_dict.update(cls.constructLocation_v3(team))
+        return TeamDict(team_dict)
 
     @staticmethod
     def dictToModel_v3(data: Dict) -> Team:

@@ -100,7 +100,7 @@
         {% if event.details and event.details.rankings_table %}<li><a href="#rankings" data-toggle="tab">Rankings</a></li>{% endif %}
         {% if awards %}<li><a href="#awards" data-toggle="tab">Awards</a></li>{% endif %}
         {% if district_points_sorted %}<li><a href="#district-points" data-toggle="tab">District Points</a></li>{% endif %}
-        <li class="{% if matches.num == 0 %}active{% endif %}"><a href="#teams" data-toggle="tab">Teams <span class="badge">{{num_teams}}</span></a></li>
+        <li class="{% if match_count == 0 %}active{% endif %}"><a href="#teams" data-toggle="tab">Teams <span class="badge">{{num_teams}}</span></a></li>
         {% if event_insights_qual or event_insights_playoff or matchstat_choices|length > 0 %}<li><a href="#event-insights" data-toggle="tab">Insights</a></li>{% endif %}
         <li><a href="#media" data-toggle="tab">Media <span class="badge">{{medias_by_slugname.youtube|length}}</span></a></li>
       </ul>
@@ -252,7 +252,7 @@
     </div>
     {% endif %}
 
-    <div class="tab-pane {% if matches.num == 0 %}active{% endif %}" id="teams">
+    <div class="tab-pane {% if match_count == 0 %}active{% endif %}" id="teams">
       <div class="row">
         {% if teams_a %}
         <div class="col-sm-6">

@@ -17,7 +17,7 @@ class PlatformType(enum.IntEnum):
 
     @staticmethod
     def validate(platform_type: PlatformType) -> None:
-        """ Validate that the platform_type is supported.
+        """Validate that the platform_type is supported.
 
         Raises:
             ValueError: If platform_type is an unsupported platform type.

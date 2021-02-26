@@ -31,5 +31,14 @@ To automatically sync changes from your local environment to the container, run 
 
 Connect to the container via `vagrant ssh`. Process in the container run connected to a [tmux](https://github.com/tmux/tmux/wiki) session. You can connect to the `tmux` session via `tmux a`. The first tab is a `bash` session `cd`’d to the project’s working directory, `/tba`. The second tab is the [`dev_appserver.py`](https://cloud.google.com/appengine/docs/standard/python3/testing-and-deploying-your-app#local-dev-server) output which contains Google App Engine logs. Other `tmux` tabs are labeled based on the foregrounded process running.
 
+```
+# Sync changes in one tab
+$ vagrant rsync-auto
+
+# ssh in to dev container in one tab
+$ vagrant ssh
+> tmux attach
+```
+
 ## What’s Next?
-The [[development runbook|Development-Runbook]] has documentation for good next steps when working on The Blue Alliance, including bootstrapping data from production to your development environment, running tests, etc.
+The [[development runbook|Development-Runbook]] has documentation for good next steps when working on The Blue Alliance, including bootstrapping data from production to your development environment. Before submitting a PR, make sure to run the [[tests, lints, and type checks|Test-Lint-Check]] locally.

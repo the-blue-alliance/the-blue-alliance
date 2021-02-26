@@ -27,6 +27,7 @@
       <input name="action" type="hidden" value="remove_media_reference" />
       <input name="team_number" type="hidden" value="{{team_link.team_number}}" />
       <input name="media_key_name" type="hidden" value="{{media.key_name}}" />
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
       <button class="btn btn-danger" type="submit">Remove media reference</button>
     </form>
 
@@ -36,6 +37,7 @@
           <input name="action" type="hidden" value="remove_media_preferred" />
           <input name="team_number" type="hidden" value="{{team_link.team_number}}" />
           <input name="media_key_name" type="hidden" value="{{media.key_name}}" />
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           <button class="btn btn-warning" type="submit">Remove Preferred</button>
         </form>
       {% else %}
@@ -43,6 +45,7 @@
         <input name="action" type="hidden" value="add_media_preferred" />
         <input name="team_number" type="hidden" value="{{team_link.team_number}}" />
         <input name="media_key_name" type="hidden" value="{{media.key_name}}" />
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <button class="btn btn-info" type="submit">Make Preferred</button>
       {% endif %}
     {% endif %}

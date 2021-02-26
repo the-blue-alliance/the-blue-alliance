@@ -13,7 +13,8 @@ RUN apt-get update && apt-get install -y \
   jq \
   tmux \
   vim \
-  openssh-server
+  openssh-server \
+  redis-server
 
 # Setup python environmenets
 # python3 should be the default, but gcloud currently depends on python2
@@ -53,6 +54,7 @@ EXPOSE 22
 # Expose ports for TBA
 EXPOSE 8000
 EXPOSE 8080-8089
+EXPOSE 9181
 
 # Start SSH server
 CMD ["/usr/sbin/sshd", "-D"]

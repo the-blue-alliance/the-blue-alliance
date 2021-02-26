@@ -324,8 +324,7 @@ class AdminCreateDistrictsDo(LoggedInHandler):
                 id=district_key,
                 year=year,
                 abbreviation=district_abbrev,
-                display_name=DistrictType.type_names[dcmp.event_district_enum],
-                elasticsearch_name=next((k for k, v in DistrictType.elasticsearch_names.iteritems() if v == dcmp.event_district_enum), None)
+                display_name=DistrictType.type_names[dcmp.event_district_enum]
             )
             districts_to_write.append(district)
 
@@ -377,7 +376,7 @@ class AdminPostEventTasksDo(LoggedInHandler):
         awards = []
         event = event_future.get_result()
         if event.event_type_enum in {EventType.OFFSEASON, EventType.FOC}:
-            matches = MatchHelper.organizeMatches(matches_future.get_result())
+            matches = MatchHelper.organized_matches(matches_future.get_result())
             bracket = PlayoffAdvancementHelper.generateBracket(matches, event, event.alliance_selections)
             if 'f' in bracket:
                 winning_alliance = '{}_alliance'.format(bracket['f']['f1']['winning_alliance'])

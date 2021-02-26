@@ -1,4 +1,8 @@
+from typing import List
+
+from backend.common.cache_clearing import get_affected_queries
 from backend.common.manipulators.manipulator_base import ManipulatorBase
+from backend.common.models.cached_model import TAffectedReferences
 from backend.common.models.event_details import EventDetails
 
 
@@ -7,11 +11,11 @@ class EventDetailsManipulator(ManipulatorBase[EventDetails]):
     Handle EventDetails database writes.
     """
 
-    """
     @classmethod
-    def getCacheKeysAndControllers(cls, affected_refs):
-        return CacheClearer.get_event_details_cache_keys_and_controllers(affected_refs)
-    """
+    def getCacheKeysAndQueries(
+        cls, affected_refs: TAffectedReferences
+    ) -> List[get_affected_queries.TCacheKeyAndQuery]:
+        return get_affected_queries.event_details_updated(affected_refs)
 
     """ndb
     @classmethod
@@ -60,9 +64,9 @@ class EventDetailsManipulator(ManipulatorBase[EventDetails]):
     @classmethod
     def updateMerge(
         cls,
-        new_event_details: EventDetails,
-        old_event_details: EventDetails,
+        new_model: EventDetails,
+        old_model: EventDetails,
         auto_union: bool = True,
     ) -> EventDetails:
-        cls._update_attrs(new_event_details, old_event_details, auto_union)
-        return old_event_details
+        cls._update_attrs(new_model, old_model, auto_union)
+        return old_model

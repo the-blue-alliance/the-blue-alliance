@@ -33,7 +33,8 @@ class Award(CachedModel):
         kind=Event, required=True
     )  # event at which the award was awarded
     event_type_enum = ndb.IntegerProperty(
-        required=True, choices=event_type.EVENT_TYPES,
+        required=True,
+        choices=event_type.EVENT_TYPES,
     )  # needed to query for awards from events of a certain event type
 
     team_list: List[ndb.Key] = ndb.KeyProperty(  # pyre-ignore[8]
@@ -144,7 +145,9 @@ class Award(CachedModel):
 
     @property
     def key_name(self) -> AwardKey:
-        return self.render_key_name(self.event.id(), self.award_type_enum)
+        return self.render_key_name(
+            none_throws(self.event.string_id()), self.award_type_enum
+        )
 
     @classmethod
     def render_key_name(

@@ -14,4 +14,6 @@ class Apiv3Key(SitevarBase[ContentType]):
 
     @staticmethod
     def default_value() -> ContentType:
-        return ContentType(apiv3_key="",)
+        return ContentType(
+            apiv3_key="",
+        )

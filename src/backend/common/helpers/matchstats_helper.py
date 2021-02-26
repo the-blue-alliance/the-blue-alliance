@@ -13,6 +13,7 @@ from typing import Callable, Dict, List
 from typing import Tuple
 
 import numpy as np
+from google.cloud import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import ALLIANCE_COLORS
@@ -25,6 +26,9 @@ from backend.common.models.event_matchstats import (
     TeamStatMap,
 )
 from backend.common.models.keys import TeamId
+from backend.common.consts.event_type import EventType
+from backend.common.memcache import MemcacheClient
+from backend.common.models.keys import TeamId, Year
 from backend.common.models.match import Match
 
 StatAccessor = Callable[[Match, AllianceColor], float]

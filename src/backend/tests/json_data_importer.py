@@ -90,6 +90,27 @@ class JsonDataImporter(object):
             detail.alliance_selections = data
             detail.put()
 
+    def import_event_teams(
+        self, base_path: str, path: str, event_key: EventKey
+    ) -> None:
+        with open(self._get_path(base_path, path), "r") as f:
+            data = json.load(f)
+
+        with self._maybe_with_context():
+            teams = [TeamConverter.dictToModel_v3(t) for t in data]
+            event_teams = [
+                EventTeam(
+                    id=f"{event_key}_{team.key_name}",
+                    event=ndb.Key(Event, event_key),
+                    team=ndb.Key(Team, team.key_name),
+                    year=int(event_key[:4]),
+                )
+                for team in teams
+            ]
+
+            ndb.put_multi(teams)
+            ndb.put_multi(event_teams)
+
     def import_match(self, base_path: str, path: str) -> None:
         with open(self._get_path(base_path, path), "r") as f:
             data = json.load(f)

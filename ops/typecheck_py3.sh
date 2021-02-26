@@ -1,3 +1,3 @@
 #!/bin/bash
 
-pyre check
+pyre

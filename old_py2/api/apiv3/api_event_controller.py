@@ -132,14 +132,14 @@ class ApiEventPlayoffAdvancementController(ApiBaseController):
         matches, matches_updated = matches_future.get_result()
         self._last_modified = max(event_updated, matches_updated)
 
-        cleaned_matches = MatchHelper.deleteInvalidMatches(matches, event)
-        matches = MatchHelper.organizeMatches(cleaned_matches)
+        cleaned_matches = MatchHelper.delete_invalid_matches(matches, event)
+        matches = MatchHelper.organized_matches(cleaned_matches)
         bracket_table = event.playoff_bracket
         playoff_advancement = event.playoff_advancement
 
         # Lazy handle the case when we haven't backfilled the event details
         if not bracket_table or not playoff_advancement:
-            bracket_table2, playoff_advancement2, _, _ = PlayoffAdvancementHelper.generatePlayoffAdvancement(event, matches)
+            bracket_table2, playoff_advancement2, _, _ = PlayoffAdvancementHelper.generate_playoff_advancement(event, matches)
             bracket_table = bracket_table or bracket_table2
             playoff_advancement = playoff_advancement or playoff_advancement2
 
@@ -148,11 +148,11 @@ class ApiEventPlayoffAdvancementController(ApiBaseController):
             level_ranks = []
             if playoff_advancement and playoff_advancement.get(level):
                 if event.playoff_type == PlayoffType.AVG_SCORE_8_TEAM:
-                    level_ranks = PlayoffAdvancementHelper.transform2015AdvancementLevelForApi(event, playoff_advancement, level)
+                    level_ranks = PlayoffAdvancementHelper.transform_2015_advancement_level_for_api(event, playoff_advancement, level)
                 else:
-                    level_ranks = PlayoffAdvancementHelper.transformRoundRobinAdvancementLevelForApi(event, playoff_advancement, level)
+                    level_ranks = PlayoffAdvancementHelper.transform_round_robin_advancement_level_for_api(event, playoff_advancement, level)
             elif bracket_table and bracket_table.get(level):
-                level_ranks = PlayoffAdvancementHelper.transformBracketLevelForApi(event, bracket_table, level)
+                level_ranks = PlayoffAdvancementHelper.transform_bracket_level_for_api(event, bracket_table, level)
             output.extend(level_ranks)
 
         return json.dumps(output, ensure_ascii=True, indent=2, sort_keys=True)

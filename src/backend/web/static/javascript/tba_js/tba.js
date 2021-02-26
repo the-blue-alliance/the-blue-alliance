@@ -163,13 +163,3 @@ $(document).ready(function(){
 //     $(".hidden-banner").removeClass('hidden');
 //   }
 });
-
-// Init Firebase
-var config = {
-  apiKey: firebaseApiKey,
-  authDomain: firebaseAuthDomain,
-  databaseURL: firebaseDatabaseURL,
-  storageBucket: firebaseStorageBucket,
-  messagingSenderId: firebaseMessagingSenderId,
-};
-firebase.initializeApp(config);

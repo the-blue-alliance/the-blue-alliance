@@ -32,7 +32,8 @@ class SitevarBase(abc.ABC, Generic[SVType]):
     @classmethod
     def put(cls, val: SVType) -> None:
         cls.update(
-            should_update=lambda _: True, update_f=lambda _: val,
+            should_update=lambda _: True,
+            update_f=lambda _: val,
         )
 
     @classmethod

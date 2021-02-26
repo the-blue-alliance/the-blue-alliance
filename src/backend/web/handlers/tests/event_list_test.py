@@ -20,7 +20,7 @@ def test_valid_years_dropdown(web_client: Client) -> None:
     year_dropdown = BeautifulSoup(resp.data, "html.parser").find(id="valid-years")
     assert year_dropdown is not None
 
-    expected_years = list(range(1992, datetime.datetime.now().year + 1))
+    expected_years = list(reversed(range(1992, datetime.datetime.now().year + 1)))
     assert [
         int(y.string) for y in year_dropdown.contents if y != "\n"
     ] == expected_years

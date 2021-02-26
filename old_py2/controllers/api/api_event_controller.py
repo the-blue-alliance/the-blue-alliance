@@ -156,7 +156,7 @@ class ApiEventAwardsController(ApiEventController):
     def _render(self,event_key):
         self._set_event(event_key)
 
-        award_dicts = [ModelToDict.awardConverter(award) for award in AwardHelper.organizeAwards(self.event.awards)]
+        award_dicts = [ModelToDict.awardConverter(award) for award in AwardHelper.organize_awards(self.event.awards)]
         return json.dumps(award_dicts, ensure_ascii=True)
 
 

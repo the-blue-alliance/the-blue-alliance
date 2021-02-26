@@ -86,7 +86,12 @@ function compile(watch, config) {
     debug: true, // Gives us sourcemapping
     cache: {},
     packageCache: {},
-  }).transform("babelify");
+  }).transform("babelify", {
+    presets: ["@babel/preset-env"],
+    sourceMaps: true,
+    global: true,
+    ignore: [],
+  });
 
   function rebundle() {
     bundler

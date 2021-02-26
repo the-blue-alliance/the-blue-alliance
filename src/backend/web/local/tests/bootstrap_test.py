@@ -86,10 +86,16 @@ def make_match(match_key: MatchKey) -> Match:
         alliances_json=json.dumps(
             {
                 AllianceColor.RED: MatchAlliance(
-                    teams=["frc1", "frc2", "frc3"], score=-1, surrogates=[], dqs=[],
+                    teams=["frc1", "frc2", "frc3"],
+                    score=-1,
+                    surrogates=[],
+                    dqs=[],
                 ),
                 AllianceColor.BLUE: MatchAlliance(
-                    teams=["frc4", "frc5", "frc6"], score=-1, surrogates=[], dqs=[],
+                    teams=["frc4", "frc5", "frc6"],
+                    score=-1,
+                    surrogates=[],
+                    dqs=[],
                 ),
             }
         ),
@@ -323,7 +329,10 @@ def test_bootstrap_event(ndb_context, requests_mock: RequestsMocker) -> None:
 def test_bootstrap_event_with_district(
     ndb_context, requests_mock: RequestsMocker
 ) -> None:
-    district = District(id="2020ne", abbreviation="ne",)
+    district = District(
+        id="2020ne",
+        abbreviation="ne",
+    )
     district.put()
     event = make_event("2020nyny")
     event.district_key = ndb.Key(District, "2020ne")

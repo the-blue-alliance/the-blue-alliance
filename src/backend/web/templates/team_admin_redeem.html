@@ -35,6 +35,7 @@
 
 <p>Only one account can be linked per team for each year and the administration access will expire at the end of the competition season. For additional support, please <a href="/contact">contact us</a>.</p>
 <form class="form-inline" acount="/mod/redeem" method="post" id="redeem">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
   <legend>Redeem</legend>
   <div class="input-group">
     <span class="input-group-addon">Team Number: </span>

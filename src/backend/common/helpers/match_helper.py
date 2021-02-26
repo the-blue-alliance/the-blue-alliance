@@ -18,14 +18,14 @@ class MatchHelper(object):
 
     """
     Helper to put matches into sub-dictionaries for the way we render match tables
-    Allows us to sort m atches by key name.
+    Allows us to sort matches by key name.
     Note: Matches within a comp_level (qual, qf, sf, f, etc.) will be in order,
     but the comp levels themselves may not be in order. Doesn't matter because
     XXX_match_table.html checks for comp_level when rendering the page
     """
 
     @classmethod
-    def natural_sort_matches(cls, matches: List[Match]) -> List[Match]:
+    def natural_sorted_matches(cls, matches: List[Match]) -> List[Match]:
         def convert(text):
             return int(text) if text.isdigit() else text.lower()
 
@@ -35,14 +35,16 @@ class MatchHelper(object):
         return sorted(matches, key=alphanum_key)
 
     @classmethod
-    def play_order_sort_matches(
+    def play_order_sorted_matches(
         cls, matches: List[Match], reverse: bool = False
     ) -> List[Match]:
         return sorted(matches, key=lambda m: m.play_order, reverse=reverse)
 
     @classmethod
-    def organizeMatches(cls, match_list: List[Match]) -> Tuple[int, TOrganizedMatches]:
-        match_list = cls.natural_sort_matches(match_list)
+    def organized_matches(
+        cls, match_list: List[Match]
+    ) -> Tuple[int, TOrganizedMatches]:
+        match_list = cls.natural_sorted_matches(match_list)
         matches = dict([(comp_level, list()) for comp_level in COMP_LEVELS])
         count = len(match_list)
         while len(match_list) > 0:
@@ -51,9 +53,9 @@ class MatchHelper(object):
 
         return count, matches
 
-    # Assumed that organizeMatches is called first
+    # Assumed that organized_matches is called first
     @classmethod
-    def organizeDoubleElimMatches(
+    def organized_double_elim_matches(
         cls, organized_matches: TOrganizedMatches
     ) -> TOrganizedDoubleElimMatches:
         matches = collections.defaultdict(lambda: collections.defaultdict(list))
@@ -69,14 +71,14 @@ class MatchHelper(object):
         return matches
 
     @classmethod
-    def recentMatches(cls, matches: List[Match], num: int = 3) -> List[Match]:
+    def recent_matches(cls, matches: List[Match], num: int = 3) -> List[Match]:
         matches = list(filter(lambda x: x.has_been_played, matches))
-        matches = cls.play_order_sort_matches(matches)
+        matches = cls.play_order_sorted_matches(matches)
         return matches[-num:]
 
     @classmethod
-    def upcomingMatches(cls, matches: List[Match], num: int = 3) -> List[Match]:
-        matches = cls.play_order_sort_matches(matches)
+    def upcoming_matches(cls, matches: List[Match], num: int = 3) -> List[Match]:
+        matches = cls.play_order_sorted_matches(matches)
 
         last_played_match_index = None
         for i, match in enumerate(reversed(matches)):
@@ -94,7 +96,7 @@ class MatchHelper(object):
 
     """
     @classmethod
-    def deleteInvalidMatches(cls, match_list: List[Match], event: Event) -> List[Match]:
+    def delete_invalid_matches(cls, match_list: List[Match], event: Event) -> List[Match]:
         \"""
         A match is invalid iff it is an elim match that has not been played
         and the same alliance already won in 2 match numbers in the same set.

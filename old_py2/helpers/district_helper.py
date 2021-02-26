@@ -211,7 +211,7 @@ class DistrictHelper(object):
                         num_played[level][team] += 1
 
         # qf and sf points
-        advancement = PlayoffAdvancementHelper.generatePlayoffAdvancement2015(matches)
+        advancement = PlayoffAdvancementHelper.generate_playoff_advancement_2015(matches)
         for last_level, level in [('qf', 'sf'), ('sf', 'f')]:
             for (teams, _, _, _) in advancement[last_level]:
                 teams = ['frc{}'.format(t) for t in teams]
@@ -300,7 +300,7 @@ class DistrictHelper(object):
         else:
             logging.info("Event {} has no rankings for qual_points calculations!".format(event.key.id()))
 
-        matches = MatchHelper.organizeMatches(matches)
+        matches = MatchHelper.organized_matches(matches)
 
         # qual match calculations. only used for tiebreaking
         for match in matches['qm']:

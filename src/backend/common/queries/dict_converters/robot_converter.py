@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, NewType
 
 from google.cloud import ndb
 
@@ -7,31 +7,37 @@ from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 
+RobotDict = NewType("RobotDict", Dict)
+
 
 class RobotConverter(ConverterBase):
-    # SUBVERSIONS = {  # Increment every time a change to the dict is made
-    #     3: 3,
-    # }
-    # TODO use for cache clearing
+    SUBVERSIONS = {  # Increment every time a change to the dict is made
+        ApiMajorVersion.API_V3: 3,
+    }
 
+    @classmethod
     def _convert_list(
-        self, model_list: List[Robot], version: ApiMajorVersion
-    ) -> List[Dict]:
+        cls, model_list: List[Robot], version: ApiMajorVersion
+    ) -> List[RobotDict]:
         ROBOT_CONVERTERS = {
-            ApiMajorVersion.API_V3: self.robotsConverter_v3,
+            ApiMajorVersion.API_V3: cls.robotsConverter_v3,
         }
         return ROBOT_CONVERTERS[version](model_list)
 
-    def robotsConverter_v3(self, robots: List[Robot]) -> List[Dict]:
-        return list(map(self.robotConverter_v3, robots))
+    @classmethod
+    def robotsConverter_v3(cls, robots: List[Robot]) -> List[RobotDict]:
+        return list(map(cls.robotConverter_v3, robots))
 
-    def robotConverter_v3(self, robot: Robot) -> Dict:
-        return {
-            "key": robot.key_name,
-            "team_key": robot.team.id(),
-            "year": robot.year,
-            "robot_name": robot.robot_name,
-        }
+    @classmethod
+    def robotConverter_v3(cls, robot: Robot) -> RobotDict:
+        return RobotDict(
+            {
+                "key": robot.key_name,
+                "team_key": robot.team.id(),
+                "year": robot.year,
+                "robot_name": robot.robot_name,
+            }
+        )
 
     @staticmethod
     def dictToModel_v3(data: Dict) -> Robot:

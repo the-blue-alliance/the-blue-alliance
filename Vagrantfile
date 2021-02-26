@@ -31,6 +31,10 @@ Vagrant.configure("2") do |config|
   ports.push("8000:8000")
   config.vm.network "forwarded_port", guest: 8000, host: 8000
 
+  # Forward RQ Dashboard
+  ports.push("9181:9181")
+  config.vm.network "forwarded_port", guest: 9181, host: 9181
+
   # Provision with docker
   config.vm.hostname = "tba-py3-docker"
   config.vm.provider "docker" do |d|
@@ -38,11 +42,15 @@ Vagrant.configure("2") do |config|
     d.ports = ports
     d.has_ssh = true
 
-    # By deafult, run with a prebuilt container image
-    d.image = "gcr.io/tbatv-prod-hrd/tba-py3-dev:latest"
+    if ENV['TBA_LOCAL_DOCKERFILE'] != nil
+      # We can build the docker container from the local Dockerfile
+      d.build_dir = "ops/dev/docker"
+    else
+      # But by deafult, run with a prebuilt container image because it's faster
+      d.image = "gcr.io/tbatv-prod-hrd/tba-py3-dev:latest"
+    end
 
-    # Or built it from the local checkout
-    # d.build_dir = "ops/dev/docker"
+
   end
 
   # Configure ssh into container

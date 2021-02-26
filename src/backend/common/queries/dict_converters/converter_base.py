@@ -4,16 +4,22 @@ from typing import Dict, Generic, List, Union
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.helpers.listify import delistify, listify
 from backend.common.profiler import Span
-from backend.common.queries.types import QueryReturn
+from backend.common.queries.types import DictQueryReturn, QueryReturn
 
 
-class ConverterBase(abc.ABC, Generic[QueryReturn]):
+class ConverterBase(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
+
+    # Used to version cached outputs
+    SUBVERSIONS: Dict[ApiMajorVersion, int]
+
     _query_return: QueryReturn
 
     def __init__(self, query_return: QueryReturn):
         self._query_return = query_return
 
-    def convert(self, version: ApiMajorVersion) -> Union[None, Dict, List[Dict]]:
+    def convert(
+        self, version: ApiMajorVersion
+    ) -> Union[None, DictQueryReturn, List[DictQueryReturn]]:
         with Span("{}.convert".format(self.__class__.__name__)):
             converted_query_return = self._convert_list(
                 listify(self._query_return), version
@@ -23,11 +29,15 @@ class ConverterBase(abc.ABC, Generic[QueryReturn]):
             else:
                 return delistify(converted_query_return)
 
+    @classmethod
     @abc.abstractmethod
-    def _convert_list(self, model_list: List, version: ApiMajorVersion) -> List[Dict]:
+    def _convert_list(
+        cls, model_list: List, version: ApiMajorVersion
+    ) -> List[DictQueryReturn]:
         return [{} for model in model_list]
 
-    def constructLocation_v3(self, model) -> Dict:
+    @classmethod
+    def constructLocation_v3(cls, model) -> Dict:
         """
         Works for teams and events
         """

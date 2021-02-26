@@ -8,7 +8,7 @@ from backend.common.profiler import send_traces, Span, trace_context
 
 def setup_app():
     app = Flask(__name__)
-    install_middleware(app)
+    install_middleware(app, configure_secret_key=False)
     return app
 
 

@@ -60,7 +60,6 @@ export default class SwapPositionPreviewCell extends React.Component {
   render() {
     const styles = getStyles(this.props, this.state);
 
-    /* eslint-disable jsx-a11y/no-static-element-interactions */
     return (
       <div
         style={styles}
@@ -69,6 +68,5 @@ export default class SwapPositionPreviewCell extends React.Component {
         onClick={() => this.onClick()}
       />
     );
-    /* eslint-enable jsx-a11y/no-static-element-interactions */
   }
 }

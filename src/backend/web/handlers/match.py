@@ -10,6 +10,9 @@ from backend.web.profiled_render import render_template
 
 @cached_public
 def match_detail(match_key: MatchKey) -> Response:
+    if not Match.validate_key_name(match_key):
+        abort(404)
+
     match_future = Match.get_by_id_async(match_key)
     event_future = Event.get_by_id_async(match_key.split("_")[0])
     match = match_future.get_result()
@@ -28,8 +31,8 @@ def match_detail(match_key: MatchKey) -> Response:
 
     match_breakdown_template = None
     if match.score_breakdown is not None and match.year >= 2015:
-        match_breakdown_template = "match_partials/match_breakdown/match_breakdown_{}.html".format(
-            match.year
+        match_breakdown_template = (
+            "match_partials/match_breakdown/match_breakdown_{}.html".format(match.year)
         )
 
     template_values = {

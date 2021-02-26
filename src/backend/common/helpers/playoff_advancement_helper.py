@@ -43,7 +43,11 @@ class PlayoffAdvancementRoundRobin(NamedTuple):
     sum_tiebreaker2: int
     alliance_name: str
     record: WLTRecord
-    complete: bool
+
+
+class PlayoffAdvancementRoundRobinLevels(TypedDict):
+    sf: List[PlayoffAdvancementRoundRobin]
+    sf_complete: bool
 
 
 class BracketItem(TypedDict):
@@ -79,41 +83,41 @@ class PlayoffAdvancementHelper(object):
     }
 
     @classmethod
-    def getPlayoffTemplate(cls, event: Event) -> Optional[str]:
+    def playoff_template(cls, event: Event) -> Optional[str]:
         return cls.PLAYOFF_TYPE_TO_TEMPLATE.get(event.playoff_type)
 
     @classmethod
-    def getDoubleElimMatches(
+    def double_elim_matches(
         cls, event: Event, matches: TOrganizedMatches
     ) -> Optional[TOrganizedDoubleElimMatches]:
         double_elim_matches = None
         if event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
-            double_elim_matches = MatchHelper.organizeDoubleElimMatches(matches)
+            double_elim_matches = MatchHelper.organized_double_elim_matches(matches)
         return double_elim_matches
 
     @classmethod
-    def generatePlayoffAdvancement(
+    def generate_playoff_advancement(
         cls, event: Event, matches: TOrganizedMatches
     ) -> PlayoffAdvancement:
-        bracket_table = cls._generateBracket(matches, event, event.alliance_selections)
+        bracket_table = cls._generate_bracket(matches, event, event.alliance_selections)
 
         playoff_advancement = None
 
-        playoff_template = cls.getPlayoffTemplate(event)
-        double_elim_matches = cls.getDoubleElimMatches(event, matches)
+        playoff_template = cls.playoff_template(event)
+        double_elim_matches = cls.double_elim_matches(event, matches)
 
         if event.playoff_type == PlayoffType.AVG_SCORE_8_TEAM:
-            playoff_advancement = cls.generatePlayoffAdvancement2015(
+            playoff_advancement = cls.generate_playoff_advancement_2015(
                 matches, event.alliance_selections
             )
             for comp_level in [CompLevel.QF, CompLevel.SF]:
                 if comp_level in bracket_table:
                     del bracket_table[comp_level]
         elif event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM:
-            playoff_advancement = cls.generatePlayoffAdvancementRoundRobin(
+            playoff_advancement = cls.generate_playoff_advancement_round_robin(
                 matches, event.year, event.alliance_selections
             )
-            comp_levels = bracket_table.keys()
+            comp_levels = list(bracket_table.keys())
             for comp_level in comp_levels:
                 if comp_level != CompLevel.F:
                     del bracket_table[comp_level]
@@ -121,21 +125,24 @@ class PlayoffAdvancementHelper(object):
             event.playoff_type == PlayoffType.BO3_FINALS
             or event.playoff_type == PlayoffType.BO5_FINALS
         ):
-            comp_levels = bracket_table.keys()
+            comp_levels = list(bracket_table.keys())
             for comp_level in comp_levels:
                 if comp_level != CompLevel.F:
                     del bracket_table[comp_level]
 
         return PlayoffAdvancement(
-            bracket_table, playoff_advancement, double_elim_matches, playoff_template,
+            bracket_table,
+            playoff_advancement,
+            double_elim_matches,
+            playoff_template,
         )
 
     """
     @classmethod
-    def generatePlayoffAdvancementFromCSV(cls, event, csv_advancement, comp_level):
+    def generate_playoff_advancement_from_csv(cls, event, csv_advancement, comp_level):
         \"""
         Generate properly formatted advancement info from the output of CSVAdvancementParser
-        The output will be of the same format as generatePlayoffAdvancementRoundRobin
+        The output will be of the same format as generate_playoff_advancement_round_robin
         \"""
         if event.playoff_type != PlayoffType.ROUND_ROBIN_6_TEAM:
             return {}
@@ -175,7 +182,7 @@ class PlayoffAdvancementHelper(object):
     """
 
     @classmethod
-    def _generateBracket(
+    def _generate_bracket(
         cls,
         matches: TOrganizedMatches,
         event: Event,
@@ -202,7 +209,7 @@ class PlayoffAdvancementHelper(object):
                     alliance = copy.copy(match.alliances[color]["teams"])
                     bracket_table[comp_level][set_key][
                         f"{color}_name"
-                    ] = cls._getAllianceName(alliance, alliance_selections)
+                    ] = cls._alliance_name(alliance, alliance_selections)
                     for i, complete_alliance in enumerate(
                         complete_alliances
                     ):  # search for alliance. could be more efficient
@@ -216,7 +223,7 @@ class PlayoffAdvancementHelper(object):
                                 i
                             ] += backups  # ensures that backup robots are listed last
 
-                            for team_num in cls.getOrderedAlliance(
+                            for team_num in cls.ordered_alliance(
                                 complete_alliances[i], alliance_selections
                             ):
                                 if (
@@ -269,7 +276,7 @@ class PlayoffAdvancementHelper(object):
         return bracket_table  # pyre-ignore[7]
 
     @classmethod
-    def generatePlayoffAdvancement2015(
+    def generate_playoff_advancement_2015(
         cls,
         matches: TOrganizedMatches,
         alliance_selections: Optional[List[EventAlliance]] = None,
@@ -283,7 +290,7 @@ class PlayoffAdvancementHelper(object):
                 if not match.has_been_played:
                     continue
                 for color in [AllianceColor.RED, AllianceColor.BLUE]:
-                    alliance = cls.getOrderedAlliance(
+                    alliance = cls.ordered_alliance(
                         match.alliances[color]["teams"], alliance_selections
                     )
                     alliance_index = None
@@ -319,7 +326,10 @@ class PlayoffAdvancementHelper(object):
                             ):  # if >= 2 teams are the same, then the alliance is the same
                                 complete_alliance = complete_alliances[alliance_index]
                                 scores.append(match.alliances[color]["score"])
-                                advancement[comp_level][j]._replace(
+                                advancement[comp_level][j] = advancement[comp_level][
+                                    j
+                                ]._replace(
+                                    scores=scores,
                                     average_score=float(sum(scores)) / len(scores),
                                     num_played=len(scores),
                                 )
@@ -346,12 +356,12 @@ class PlayoffAdvancementHelper(object):
         return advancement
 
     @classmethod
-    def generatePlayoffAdvancementRoundRobin(
+    def generate_playoff_advancement_round_robin(
         cls,
         matches: TOrganizedMatches,
         year: Year,
         alliance_selections: Optional[List[EventAlliance]] = None,
-    ) -> Mapping[CompLevel, List[PlayoffAdvancementRoundRobin]]:
+    ) -> PlayoffAdvancementRoundRobinLevels:
         complete_alliances: List[List[TeamNumber]] = []
         alliance_names: List[str] = []
         advancement: DefaultDict[
@@ -365,13 +375,15 @@ class PlayoffAdvancementHelper(object):
                 if not match.has_been_played:
                     any_unplayed = True
                 for color in [AllianceColor.RED, AllianceColor.BLUE]:
-                    alliance = cls.getOrderedAlliance(
+                    alliance = cls.ordered_alliance(
                         match.alliances[color]["teams"], alliance_selections
                     )
-                    alliance_name: str = cls.getAllianceName(
-                        match.alliances[color]["teams"], alliance_selections
-                    ) or ""
-                    breakdown = none_throws(match.score_breakdown)
+                    alliance_name: str = (
+                        cls.alliance_name(
+                            match.alliances[color]["teams"], alliance_selections
+                        )
+                        or ""
+                    )
                     for i, complete_alliance in enumerate(
                         complete_alliances
                     ):  # search for alliance. could be more efficient
@@ -405,7 +417,6 @@ class PlayoffAdvancementHelper(object):
                                 _,
                                 _,
                                 record,
-                                _,
                             ),
                         ) in enumerate(
                             advancement[comp_level]
@@ -431,14 +442,22 @@ class PlayoffAdvancementHelper(object):
                                     record["losses"] += 1
                                 if match.has_been_played:
                                     champ_points.append(cp)
-                                    if year == 2018:
+                                    if (
+                                        year == 2018
+                                        and match.score_breakdown is not None
+                                    ):
+                                        breakdown = none_throws(match.score_breakdown)
                                         tiebreaker1.append(
                                             breakdown[color]["endgamePoints"]
                                         )
                                         tiebreaker2.append(
                                             breakdown[color]["autoPoints"]
                                         )
-                                    elif year == 2019:
+                                    elif (
+                                        year == 2019
+                                        and match.score_breakdown is not None
+                                    ):
+                                        breakdown = none_throws(match.score_breakdown)
                                         tiebreaker1.append(
                                             breakdown[color]["cargoPoints"]
                                         )
@@ -450,16 +469,23 @@ class PlayoffAdvancementHelper(object):
                                             match.alliances[color]["score"]
                                         )
                                         tiebreaker2.append(0)
-                                    advancement[comp_level][j]._replace(
-                                        champ_points=sum(champ_points),
-                                        tiebreaker1=sum(tiebreaker1),
-                                        tiebreaker2=sum(tiebreaker2),
+                                    advancement[comp_level][j] = advancement[
+                                        comp_level
+                                    ][j]._replace(
+                                        champ_points=champ_points,
+                                        sum_champ_points=sum(champ_points),
+                                        tiebreaker1=tiebreaker1,
+                                        sum_tiebreaker1=sum(tiebreaker1),
+                                        tiebreaker2=tiebreaker2,
+                                        sum_tiebreaker2=sum(tiebreaker2),
+                                        record=record,
                                     )
                                 break
                         else:
                             is_new = True
 
-                    if year == 2018:
+                    if year == 2018 and match.score_breakdown is not None:
+                        breakdown = none_throws(match.score_breakdown)
                         tiebreaker1 = (
                             breakdown[color]["endgamePoints"]
                             if match.has_been_played
@@ -470,7 +496,8 @@ class PlayoffAdvancementHelper(object):
                             if match.has_been_played
                             else 0
                         )
-                    elif year == 2019:
+                    elif year == 2019 and match.score_breakdown is not None:
+                        breakdown = none_throws(match.score_breakdown)
                         tiebreaker1 = (
                             breakdown[color]["cargoPoints"]
                             if match.has_been_played
@@ -513,7 +540,6 @@ class PlayoffAdvancementHelper(object):
                                 tiebreaker2,
                                 alliance_name,
                                 record,
-                                any_unplayed,
                             )
                         )
                     elif is_new:
@@ -528,7 +554,6 @@ class PlayoffAdvancementHelper(object):
                                 tiebreaker2,
                                 alliance_names[i],
                                 record,
-                                any_unplayed,
                             )
                         )
 
@@ -542,13 +567,14 @@ class PlayoffAdvancementHelper(object):
                 advancement[comp_level], key=lambda x: -x.sum_champ_points
             )  # sort by championship points
 
-            for i in range(len(advancement[comp_level])):
-                advancement[comp_level][i]._replace(complete=not any_unplayed)
+            advancement[
+                "{}_complete".format(comp_level)  # pyre-ignore
+            ] = not any_unplayed
 
-        return advancement
+        return cast(PlayoffAdvancementRoundRobinLevels, advancement)
 
     @classmethod
-    def getOrderedAlliance(
+    def ordered_alliance(
         cls,
         team_keys: List[TeamKey],
         alliance_selections: Optional[List[EventAlliance]],
@@ -572,7 +598,7 @@ class PlayoffAdvancementHelper(object):
         return team_nums
 
     @classmethod
-    def _getAllianceName(
+    def _alliance_name(
         cls,
         team_keys: List[TeamKey],
         alliance_selections: Optional[List[EventAlliance]],
@@ -590,7 +616,7 @@ class PlayoffAdvancementHelper(object):
         return None
 
     @classmethod
-    def getAllianceName(
+    def alliance_name(
         cls,
         team_keys: List[TeamKey],
         alliance_selections: Optional[List[EventAlliance]],
@@ -609,7 +635,7 @@ class PlayoffAdvancementHelper(object):
 
     """
     @classmethod
-    def transformBracketLevelForApi(cls, event, bracket_table, comp_level):
+    def transform_bracket_level_for_api(cls, event, bracket_table, comp_level):
         level_ranks = []
         for series_level, set_bracket in bracket_table[comp_level].iteritems():
             series = int("".join(c for c in series_level if c.isdigit()))
@@ -624,7 +650,7 @@ class PlayoffAdvancementHelper(object):
             }
 
             alliances = [
-                cls._makeAllianceRankRow(c, set_bracket) for c in ["red", "blue"]
+                cls._make_alliance_rank_row(c, set_bracket) for c in ["red", "blue"]
             ]
             data["rankings"] = sorted(
                 alliances, key=lambda a: a["record"]["wins"], reverse=True
@@ -635,7 +661,7 @@ class PlayoffAdvancementHelper(object):
         return level_ranks
 
     @classmethod
-    def _makeAllianceRankRow(cls, color, bracket_set):
+    def _make_alliance_rank_row(cls, color, bracket_set):
         record = bracket_set["{}_record".format(color)]
         return {
             "team_keys": map(
@@ -650,7 +676,7 @@ class PlayoffAdvancementHelper(object):
         }
 
     @classmethod
-    def transform2015AdvancementLevelForApi(
+    def transform_2015_advancement_level_for_api(
         cls, event, playoff_advancement, comp_level
     ):
         level_order = Match.COMP_LEVELS_PLAY_ORDER[comp_level]
@@ -678,12 +704,12 @@ class PlayoffAdvancementHelper(object):
         for i, alliance in enumerate(playoff_advancement[comp_level]):
             rank = i + 1
             data["rankings"].append(
-                cls._make2015AllianceAdvancementRow(event, alliance, rank, comp_level)
+                cls._make_2015_alliance_advancement_row(event, alliance, rank, comp_level)
             )
         return [data]
 
     @classmethod
-    def transformRoundRobinAdvancementLevelForApi(
+    def transform_round_robin_advancement_level_for_api(
         cls, event, playoff_advancement, comp_level
     ):
         data = {
@@ -707,12 +733,12 @@ class PlayoffAdvancementHelper(object):
         for i, alliance in enumerate(playoff_advancement[comp_level]):
             rank = i + 1
             data["rankings"].append(
-                cls._makeAllianceAdvancementRow(event, alliance, rank)
+                cls._make_alliance_advancement_row(event, alliance, rank)
             )
         return [data]
 
     @classmethod
-    def _makeAllianceAdvancementRow(cls, event, alliance, rank):
+    def _make_alliance_advancement_row(cls, event, alliance, rank):
         record = alliance[8]
         row = {
             "team_keys": map(lambda t: "frc{}".format(t), alliance[0]),
@@ -727,11 +753,11 @@ class PlayoffAdvancementHelper(object):
         return row
 
     @classmethod
-    def _make2015AllianceAdvancementRow(cls, event, alliance, rank, comp_level):
+    def _make_2015_alliance_advancement_row(cls, event, alliance, rank, comp_level):
         team_keys = map(lambda t: "frc{}".format(t), alliance[0])
         row = {
             "team_keys": team_keys,
-            "alliance_name": cls._getAllianceName(team_keys, event.alliance_selections),
+            "alliance_name": cls._alliance_name(team_keys, event.alliance_selections),
             "rank": rank,
             "matches_played": alliance[3],
             "sort_orders": [alliance[2]],

@@ -15,7 +15,6 @@ from consts.media_type import MediaType
 from consts.media_tag import MediaTag
 
 from datafeeds.datafeed_fms_api import DatafeedFMSAPI
-from datafeeds.datafeed_first_elasticsearch import DatafeedFIRSTElasticSearch
 from datafeeds.datafeed_tba import DatafeedTba
 from datafeeds.datafeed_resource_library import DatafeedResourceLibrary
 from helpers.district_manipulator import DistrictManipulator
@@ -269,7 +268,7 @@ class FMSAPIMatchesGet(webapp.RequestHandler):
         df = DatafeedFMSAPI('v2.0', save_response=True)
         event = Event.get_by_id(event_key)
 
-        matches = MatchHelper.deleteInvalidMatches(
+        matches = MatchHelper.delete_invalid_matches(
             df.getMatches(event_key),
             Event.get_by_id(event_key)
         )
@@ -288,16 +287,46 @@ class FMSAPIMatchesGet(webapp.RequestHandler):
             self.response.out.write(template.render(path, template_values))
 
 
+class FMSAPITeamDetailsRollingEnqueue(webapp.RequestHandler):
+    """
+    Handles enqueing updates to individual teams
+    Enqueues a certain fraction of teams so that all teams will get updated
+    every PERIOD days.
+    """
+    PERIOD = 14  # a particular team will be updated every PERIOD days
+
+    def get(self):
+        now_epoch = time.mktime(datetime.datetime.now().timetuple())
+        bucket_num = int((now_epoch / (60 * 60 * 24)) % self.PERIOD)
+
+        highest_team_key = Team.query().order(-Team.team_number).fetch(1, keys_only=True)[0]
+        highest_team_num = int(highest_team_key.id()[3:])
+        bucket_size = int(highest_team_num / (self.PERIOD)) + 1
+
+        min_team = bucket_num * bucket_size
+        max_team = min_team + bucket_size
+        team_keys = Team.query(Team.team_number >= min_team, Team.team_number < max_team).fetch(1000, keys_only=True)
+
+        teams = ndb.get_multi(team_keys)
+        for team in teams:
+            taskqueue.add(
+                queue_name='datafeed',
+                url='/backend-tasks/get/team_details/' + team.key_name,
+                method='GET')
+
+        # FIXME omg we're just writing out? -fangeugene 2013 Nov 6
+        self.response.out.write("Bucket number {} out of {}<br>".format(bucket_num, self.PERIOD))
+        self.response.out.write("{} team gets have been enqueued in the interval [{}, {}).".format(len(teams), min_team, max_team))
+
+
 class TeamDetailsGet(webapp.RequestHandler):
     """
     Fetches team details
-    FMSAPI should be trusted over FIRSTElasticSearch
     """
     def get(self, key_name):
         existing_team = Team.get_by_id(key_name)
 
         fms_df = DatafeedFMSAPI('v2.0')
-        df2 = DatafeedFIRSTElasticSearch()
         year = datetime.date.today().year
         fms_details = fms_df.getTeamDetails(year, key_name)
 
@@ -307,11 +336,6 @@ class TeamDetailsGet(webapp.RequestHandler):
             team = None
             district_team = None
             robot = None
-
-        if team:
-            team = TeamManipulator.mergeModels(team, df2.getTeamDetails(existing_team))
-        else:
-            team = df2.getTeamDetails(existing_team)
 
         if team:
             team = TeamManipulator.createOrUpdate(team)
@@ -327,9 +351,6 @@ class TeamDetailsGet(webapp.RequestHandler):
                 keys_to_delete.add(dt_key)
         DistrictTeamManipulator.delete_keys(keys_to_delete)
 
-        if district_team:
-            district_team = DistrictTeamManipulator.createOrUpdate(district_team)
-
         if robot:
             robot = RobotManipulator.createOrUpdate(robot)
 
@@ -337,7 +358,6 @@ class TeamDetailsGet(webapp.RequestHandler):
             'key_name': key_name,
             'team': team,
             'success': team is not None,
-            'district': district_team,
             'robot': robot,
         }
 
@@ -349,7 +369,6 @@ class TeamDetailsGet(webapp.RequestHandler):
 class TeamAvatarGet(webapp.RequestHandler):
     """
     Fetches team avatar
-    Doesn't currently use FIRSTElasticSearch
     """
 
     def get(self, key_name):
@@ -424,15 +443,9 @@ class EventListGet(webapp.RequestHandler):
     Fetch all events for a given year via the FRC Events API.
     """
     def get(self, year):
-        df_config = Sitevar.get_or_insert('event_list_datafeed_config')
         df = DatafeedFMSAPI('v2.0')
-        df2 = DatafeedFIRSTElasticSearch()
 
         fmsapi_events, event_list_districts = df.getEventList(year)
-        if df_config.contents.get('enable_es') == True:
-            elasticsearch_events = df2.getEventList(year)
-        else:
-            elasticsearch_events = []
 
         # All regular-season events can be inserted without any work involved.
         # We need to de-duplicate offseason events from the FRC Events API with a different code than the TBA event code
@@ -452,11 +465,7 @@ class EventListGet(webapp.RequestHandler):
         # For all new offseason events we can't automatically match, create suggestions
         SuggestionCreator.createDummyOffseasonSuggestions(new_offseason_events)
 
-        merged_events = EventManipulator.mergeModels(
-            list(events_to_put),
-            elasticsearch_events) if elasticsearch_events else list(
-                events_to_put)
-        events = EventManipulator.createOrUpdate(merged_events) or []
+        events = EventManipulator.createOrUpdate(events_to_put) or []
 
         fmsapi_districts = df.getDistrictList(year)
         merged_districts = DistrictManipulator.mergeModels(fmsapi_districts, event_list_districts)
@@ -525,22 +534,15 @@ class EventDetailsEnqueue(webapp.RequestHandler):
 class EventDetailsGet(webapp.RequestHandler):
     """
     Fetch event details, event teams, and team details
-    FMSAPI should be trusted over FIRSTElasticSearch
     """
     def get(self, event_key):
         df = DatafeedFMSAPI('v2.0')
-        df2 = DatafeedFIRSTElasticSearch()
 
         event = Event.get_by_id(event_key)
 
         # Update event
         fmsapi_events, fmsapi_districts = df.getEventDetails(event_key)
-        elasticsearch_events = df2.getEventDetails(event)
-        updated_event = EventManipulator.mergeModels(
-            fmsapi_events,
-            elasticsearch_events)
-        if updated_event:
-            event = EventManipulator.createOrUpdate(updated_event)
+        event = EventManipulator.createOrUpdate(fmsapi_events)
         DistrictManipulator.createOrUpdate(fmsapi_districts)
 
         models = df.getEventTeams(event_key)
@@ -555,9 +557,6 @@ class EventDetailsGet(webapp.RequestHandler):
                 district_teams.append(group[1])
             if isinstance(group[2], Robot):
                 robots.append(group[2])
-
-        # Merge teams
-        teams = TeamManipulator.mergeModels(teams, df2.getEventTeams(event))
 
         # Write new models
         if teams and event.year == tba_config.MAX_YEAR:  # Only update from latest year
@@ -585,12 +584,22 @@ class EventDetailsGet(webapp.RequestHandler):
 
         # Delete eventteams of teams that are no longer registered
         if event_teams and not skip_eventteams:
-            existing_event_team_keys = set(EventTeam.query(EventTeam.event == event.key).fetch(1000, keys_only=True))
-            event_team_keys = set([et.key for et in event_teams])
-            et_keys_to_delete = existing_event_team_keys.difference(event_team_keys)
+            existing_event_teams = EventTeam.query(EventTeam.event == event.key).fetch()
+
+            # Don't delete EventTeam models for teams who won Awards at the Event, but who did not attend the Event
+            award_teams = set()
+            for award in event.awards:
+                for team in award.team_list:
+                    award_teams.add(team.id())
+            award_event_teams = {et.key for et in existing_event_teams if et.team.id() in award_teams}
+
+            event_team_keys = {et.key for et in event_teams}
+            existing_event_team_keys = {et.key for et in existing_event_teams}
+
+            et_keys_to_delete = existing_event_team_keys.difference(event_team_keys.union(award_event_teams))
             EventTeamManipulator.delete_keys(et_keys_to_delete)
 
-            event_teams = EventTeamManipulator.createOrUpdate(event_teams)
+        event_teams = EventTeamManipulator.createOrUpdate(event_teams)
         if type(event_teams) is not list:
             event_teams = [event_teams]
 

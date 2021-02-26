@@ -4,7 +4,11 @@ from backend.common.queries.district_query import DistrictHistoryQuery
 
 
 def preseed_district(year: Year, abbrev: DistrictAbbreviation) -> None:
-    d = District(id=f"{year}{abbrev}", year=year, abbreviation=abbrev,)
+    d = District(
+        id=f"{year}{abbrev}",
+        year=year,
+        abbreviation=abbrev,
+    )
     d.put()
 
 

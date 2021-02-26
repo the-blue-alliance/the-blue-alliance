@@ -11,7 +11,9 @@ def test_render_rankings_no_data() -> None:
     details = EventDetails(id="2019nyny")
     rankings = details.renderable_rankings
     assert rankings == RenderedRankings(
-        rankings=None, sort_order_info=RANKING_SORT_ORDERS[2019], extra_stats_info=[],
+        rankings=None,
+        sort_order_info=RANKING_SORT_ORDERS[2019],
+        extra_stats_info=[],
     )
 
 
@@ -19,7 +21,9 @@ def test_render_rankings_no_data_very_old() -> None:
     details = EventDetails(id="2000nyny")
     rankings = details.renderable_rankings
     assert rankings == RenderedRankings(
-        rankings=None, sort_order_info=None, extra_stats_info=[],
+        rankings=None,
+        sort_order_info=None,
+        extra_stats_info=[],
     )
 
 
@@ -30,7 +34,11 @@ def test_render_rankings_with_extra_stats() -> None:
             EventRanking(
                 rank=1,
                 team_key="frc254",
-                record=WLTRecord(wins=1, losses=0, ties=0,),
+                record=WLTRecord(
+                    wins=1,
+                    losses=0,
+                    ties=0,
+                ),
                 qual_average=None,
                 matches_played=1,
                 dq=0,
@@ -43,7 +51,10 @@ def test_render_rankings_with_extra_stats() -> None:
         rankings=details.rankings2,
         sort_order_info=RANKING_SORT_ORDERS[2019],
         extra_stats_info=[
-            RankingSortOrderInfo(name="Total Ranking Points", precision=0,)
+            RankingSortOrderInfo(
+                name="Total Ranking Points",
+                precision=0,
+            )
         ],
     )
 
@@ -55,7 +66,11 @@ def test_render_rankings_with_extra_stats_per_match() -> None:
             EventRanking(
                 rank=1,
                 team_key="frc254",
-                record=WLTRecord(wins=1, losses=0, ties=0,),
+                record=WLTRecord(
+                    wins=1,
+                    losses=0,
+                    ties=0,
+                ),
                 qual_average=None,
                 matches_played=1,
                 dq=0,
@@ -68,7 +83,10 @@ def test_render_rankings_with_extra_stats_per_match() -> None:
         rankings=details.rankings2,
         sort_order_info=RANKING_SORT_ORDERS[2016],
         extra_stats_info=[
-            RankingSortOrderInfo(name="Ranking Score/Match", precision=2,)
+            RankingSortOrderInfo(
+                name="Ranking Score/Match",
+                precision=2,
+            )
         ],
     )
 
@@ -80,7 +98,11 @@ def test_render_rankings_with_extra_stats_per_match_unplayed() -> None:
             EventRanking(
                 rank=1,
                 team_key="frc254",
-                record=WLTRecord(wins=0, losses=0, ties=0,),
+                record=WLTRecord(
+                    wins=0,
+                    losses=0,
+                    ties=0,
+                ),
                 qual_average=None,
                 matches_played=0,
                 dq=0,
@@ -93,7 +115,10 @@ def test_render_rankings_with_extra_stats_per_match_unplayed() -> None:
         rankings=details.rankings2,
         sort_order_info=RANKING_SORT_ORDERS[2016],
         extra_stats_info=[
-            RankingSortOrderInfo(name="Ranking Score/Match", precision=2,)
+            RankingSortOrderInfo(
+                name="Ranking Score/Match",
+                precision=2,
+            )
         ],
     )
 
@@ -105,7 +130,11 @@ def test_render_rankings_with_extra_stats_per_match_2015() -> None:
             EventRanking(
                 rank=1,
                 team_key="frc254",
-                record=WLTRecord(wins=1, losses=0, ties=0,),
+                record=WLTRecord(
+                    wins=1,
+                    losses=0,
+                    ties=0,
+                ),
                 qual_average=10,
                 matches_played=1,
                 dq=0,
@@ -123,7 +152,9 @@ def test_render_rankings_with_extra_stats_per_match_2015() -> None:
 
 def test_render_rankings_with_extra_stats_per_match_2015mttd() -> None:
     # 2015mttd played the 2014 game
-    details = EventDetails(id="2015mttd",)
+    details = EventDetails(
+        id="2015mttd",
+    )
     rankings = details.renderable_rankings
     assert rankings == RenderedRankings(
         rankings=details.rankings2,

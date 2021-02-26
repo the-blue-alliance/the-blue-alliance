@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.7
+      - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
-          python-version: 3.7
+          python-version: 3.8
       - name: Cache pip
         uses: actions/cache@v2
         with:
@@ -34,10 +34,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.7
+      - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
-          python-version: 3.7
+          python-version: 3.8
       - name: Cache pip
         uses: actions/cache@v2
         with:
@@ -57,10 +57,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.7
+      - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
-          python-version: 3.7
+          python-version: 3.8
       - name: Cache pip
         uses: actions/cache@v2
         with:
@@ -77,14 +77,14 @@ jobs:
         run: ./ops/test_py3.sh
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v1.0.12
+        uses: codecov/codecov-action@v1
   node-lint:
     name: "[node] Format & Lint"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Set up Node
-        uses: actions/setup-node@v2.1.1
+        uses: actions/setup-node@v2.1.2
         with:
           node-version: "10.x"
       - name: Cache node modules
@@ -104,7 +104,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Set up Node
-        uses: actions/setup-node@v2.1.1
+        uses: actions/setup-node@v2.1.2
         with:
           node-version: "10.x"
       - name: Cache node modules
@@ -118,18 +118,45 @@ jobs:
       - name: Run Tests
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/test_node.sh
+  bash-lint:
+    name: "[bash] Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install Shellcheck
+        run: |
+          python -m pip install --upgrade pip
+          pip install shellcheck-py
+      - name: Install shfmt
+        run: |
+          mkdir -p $HOME/.local/bin
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          wget "https://github.com/mvdan/sh/releases/download/v3.2.2/shfmt_v3.2.2_linux_amd64" -O $HOME/.local/bin/shfmt
+          chmod +x $HOME/.local/bin/shfmt
+      - name: Run Lint
+        run: ./ops/lint_bash.sh
 
   build-web:
     name: Build Web
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.7
+      - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
-          python-version: 3.7
+          python-version: 3.8
       - name: Set up Node
-        uses: actions/setup-node@v2.1.1
+        uses: actions/setup-node@v2.1.2
         with:
           node-version: "10.x"
       - name: Cache pip
@@ -152,45 +179,108 @@ jobs:
       - name: Install Node Dependencies
         run: npm install
       - name: Run Build
-        run: ./ops/build/run_buildweb.sh
+        run: ./ops/build/run_buildweb.sh --env
+        env:
+          GCLOUD_PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
+          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
       - name: Archive production artifacts
         uses: actions/upload-artifact@v2
         with:
           name: web-build
           path: src/build
 
-  deploy-web:
-    name: Deploy Web Service
+  deploy-queues:
+    name: Deploy Queues
     runs-on: ubuntu-latest
-    needs: [py3-type, py3-lint, py3-test, node-lint, node-test, build-web]
+    needs: [py3-type, py3-lint, py3-test]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r deploy_requirements.txt
+      - name: Setup Google Cloud Platform
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          version: "321.0.0"
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCLOUD_AUTH }}
+      - name: Deploy
+        run: python3 ops/deploy/deploy_queues.py src/queue.yaml
+  deploy-web:
+    name: Deploy Web Service
+    runs-on: ubuntu-latest
+    needs: [py3-type, py3-lint, py3-test, node-lint, node-test, build-web, deploy-queues]
+    if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
       - name: Download production artifacts
         uses: actions/download-artifact@v2
         with:
           name: web-build
           path: src/build
       - name: Setup Google Cloud Platform
-        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        uses: google-github-actions/setup-gcloud@master
         with:
-          version: "294.0.0"
+          version: "321.0.0"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
           service_account_key: ${{ secrets.GCLOUD_AUTH }}
       - name: Deploy
-        run: gcloud app deploy src/web.yaml --version 1 --quiet
+        env:
+          REDIS_CACHE_URL: ${{ secrets.REDIS_CACHE_URL }}
+          VPC_CONNECTOR_NAME: ${{ secrets.VPC_CONNECTOR_NAME }}
+        run: ./ops/deploy/deploy_module.sh src/web.yaml
   deploy-api:
     name: Deploy API Service
     runs-on: ubuntu-latest
-    needs: [py3-type, py3-lint, py3-test]
+    needs: [py3-type, py3-lint, py3-test, deploy-queues]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v2
-      - name: Setup Google Cloud Platform
-        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
         with:
-          version: "294.0.0"
+          python-version: 3.8
+      - name: Setup Google Cloud Platform
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          version: "321.0.0"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
           service_account_key: ${{ secrets.GCLOUD_AUTH }}
       - name: Deploy
-        run: gcloud app deploy src/api.yaml --version 1 --quiet
+        env:
+          REDIS_CACHE_URL: ${{ secrets.REDIS_CACHE_URL }}
+          VPC_CONNECTOR_NAME: ${{ secrets.VPC_CONNECTOR_NAME }}
+        run: ./ops/deploy/deploy_module.sh src/api.yaml
+  deploy-tasks-io:
+    name: Deploy Tasks IO Service
+    runs-on: ubuntu-latest
+    needs: [py3-type, py3-lint, py3-test, deploy-queues]
+    if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Setup Google Cloud Platform
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          version: "321.0.0"
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCLOUD_AUTH }}
+      - name: Deploy
+        env:
+          REDIS_CACHE_URL: ${{ secrets.REDIS_CACHE_URL }}
+          VPC_CONNECTOR_NAME: ${{ secrets.VPC_CONNECTOR_NAME }}
+        run: ./ops/deploy/deploy_module.sh src/tasks_io.yaml

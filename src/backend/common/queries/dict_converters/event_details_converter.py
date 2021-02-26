@@ -1,25 +1,32 @@
-from typing import Dict, List
+from collections import defaultdict
+from typing import cast, Dict, List, NewType
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.event_details import EventDetails
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 
+EventDetailsDict = NewType("EventDetailsDict", Dict)
+
 
 class EventDetailsConverter(ConverterBase):
-    # SUBVERSIONS = {  # Increment every time a change to the dict is made
-    #     3: 3,
-    # }
+    SUBVERSIONS = {  # Increment every time a change to the dict is made
+        ApiMajorVersion.API_V3: 3,
+    }
 
-    def _convert_list(self, model_list: List[EventDetails], version: ApiMajorVersion):
+    @classmethod
+    def _convert_list(cls, model_list: List[EventDetails], version: ApiMajorVersion):
         CONVERTERS = {
-            3: self.eventsDetailsConverter_v3,
+            3: cls.eventsDetailsConverter_v3,
         }
         return CONVERTERS[version](model_list)
 
-    def eventsDetailsConverter_v3(self, event_details: List[EventDetails]):
-        return list(map(self.eventDetailsConverter_v3, event_details))
+    @classmethod
+    def eventsDetailsConverter_v3(cls, event_details: List[EventDetails]):
+        return list(map(cls.eventDetailsConverter_v3, event_details))
 
-    def eventDetailsConverter_v3(self, event_details: EventDetails) -> Dict:
+    @classmethod
+    def eventDetailsConverter_v3(cls, event_details: EventDetails) -> EventDetailsDict:
+        rankings = {}
         if event_details:
             rankings = event_details.renderable_rankings
         else:
@@ -40,4 +47,4 @@ class EventDetailsConverter(ConverterBase):
             "rankings": rankings,
         }
 
-        return event_details_dict
+        return EventDetailsDict(event_details_dict)

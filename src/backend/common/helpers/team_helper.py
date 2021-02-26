@@ -5,7 +5,7 @@ from backend.common.models.team import Team
 
 class TeamHelper(object):
     @classmethod
-    def sortTeams(cls, team_list: List[Union[Team, None]]) -> List[Team]:
+    def sort_teams(cls, team_list: List[Union[Team, None]]) -> List[Team]:
         """
         Takes a list of Teams (not a Query object).
         """

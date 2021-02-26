@@ -45,10 +45,10 @@
       </div>
     </div>
   </div>
-  <div class="row">
+  <div class="row" id="review_apiwrite">
     <div class="col-xs-12">
       {% for suggestion_id, event, account, existing_users, suggestion in suggestions %}
-        <div class="well">
+        <div class="well" class="suggestion-item">
             <h3>{{ event.year }} {{ event.name }} [<a href="/event/{{ event.key_name }}">{{ event.event_short }}</a>]</h3>
             <p><strong>User:</strong> {{ account.display_name }}</p>
             <p><strong>Email:</strong> {{ account.email }}</p>
@@ -57,8 +57,8 @@
             <form action="/suggest/apiwrite/review" method="post" id="apiwrite_review_{{ suggestion_id }}">
             <h4>Requested Auth Types</h4>
                 <ul>
-                {% for type,name in auth_names.iteritems() %}
-                    <li><input {% if type in suggestion.contents.auth_types %} checked {% endif %} type="checkbox" name="auth_types" value="{{ type }}"/> {{ name }} </li>
+                {% for type,name in auth_names.items() %}
+                    <li><input {% if type in suggestion.contents.auth_types %} checked {% endif %} type="checkbox" name="auth_types" value="{{ type.value }}"/> {{ name }} </li>
                 {% endfor %}
                 </ul>
 
@@ -84,6 +84,7 @@
             <h4>Message for the User</h4>
             <p><textarea name="user_message" form="apiwrite_review_{{ suggestion_id }}">Thanks for helping make TBA better!</textarea></p>
 
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <input type="hidden" name="suggestion_id" value="{{ suggestion_id }}" />
             <button type="submit" class="btn btn-primary" name="verdict" value="accept"><span class="glyphicon glyphicon-thumbs-up"></span> Add Auth</button>
             <button type="submit" class="btn btn-danger" name="verdict" value="reject"><span class="glyphicon glyphicon-thumbs-down"></span> Reject</button>

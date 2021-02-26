@@ -33,7 +33,9 @@ class EventDetails(CachedModel):
 
     alliance_selections: List[
         EventAlliance
-    ] = ndb.JsonProperty()  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
+    ] = (
+        ndb.JsonProperty()
+    )  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
     district_points: EventDistrictPoints = safe_cast(
         EventDistrictPoints, ndb.JsonProperty()
     )
@@ -45,7 +47,7 @@ class EventDetails(CachedModel):
     rankings = ndb.JsonProperty()  # deprecated
     rankings2: List[EventRanking] = ndb.JsonProperty()
 
-    # Based on the output of PlayoffAdvancementHelper.generatePlayoffAdvancement
+    # Based on the output of PlayoffAdvancementHelper.generate_playoff_advancement
     # Dict with keys for: bracket, playoff_advancement
     playoff_advancement = ndb.JsonProperty()
 

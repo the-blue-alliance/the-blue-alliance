@@ -8,7 +8,7 @@ from backend.common.models.award import Award
 
 class AwardHelper(object):
     @classmethod
-    def organizeAwards(cls, award_list: List[Award]) -> List[Award]:
+    def organize_awards(cls, award_list: List[Award]) -> List[Award]:
         """
         Sorts awards first by sort_order and then alphabetically by name_str
         """

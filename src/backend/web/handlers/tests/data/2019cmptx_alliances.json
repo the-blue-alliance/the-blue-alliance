@@ -1,0 +1,158 @@
+[
+  {
+    "backup": null, 
+    "declines": [], 
+    "name": "Carver", 
+    "picks": [
+      "frc1678", 
+      "frc7179", 
+      "frc3132", 
+      "frc1939"
+    ], 
+    "status": {
+      "current_level_record": {
+        "losses": 3, 
+        "ties": 0, 
+        "wins": 2
+      }, 
+      "level": "sf", 
+      "playoff_average": null, 
+      "record": {
+        "losses": 3, 
+        "ties": 0, 
+        "wins": 2
+      }, 
+      "status": "won"
+    }
+  }, 
+  {
+    "backup": null, 
+    "declines": [], 
+    "name": "Turing", 
+    "picks": [
+      "frc254", 
+      "frc3310", 
+      "frc6986", 
+      "frc948"
+    ], 
+    "status": {
+      "current_level_record": {
+        "losses": 2, 
+        "ties": 0, 
+        "wins": 1
+      }, 
+      "level": "f", 
+      "playoff_average": null, 
+      "record": {
+        "losses": 2, 
+        "ties": 0, 
+        "wins": 6
+      }, 
+      "status": "eliminated"
+    }
+  }, 
+  {
+    "backup": null, 
+    "declines": [], 
+    "name": "Galileo", 
+    "picks": [
+      "frc971", 
+      "frc179", 
+      "frc3646", 
+      "frc498"
+    ], 
+    "status": {
+      "current_level_record": {
+        "losses": 3, 
+        "ties": 0, 
+        "wins": 2
+      }, 
+      "level": "sf", 
+      "playoff_average": null, 
+      "record": {
+        "losses": 3, 
+        "ties": 0, 
+        "wins": 2
+      }, 
+      "status": "won"
+    }
+  }, 
+  {
+    "backup": null, 
+    "declines": [], 
+    "name": "Roebling", 
+    "picks": [
+      "frc148", 
+      "frc3847", 
+      "frc6829", 
+      "frc2907"
+    ], 
+    "status": {
+      "current_level_record": {
+        "losses": 4, 
+        "ties": 0, 
+        "wins": 1
+      }, 
+      "level": "sf", 
+      "playoff_average": null, 
+      "record": {
+        "losses": 4, 
+        "ties": 0, 
+        "wins": 1
+      }, 
+      "status": "playing"
+    }
+  }, 
+  {
+    "backup": null, 
+    "declines": [], 
+    "name": "Hopper", 
+    "picks": [
+      "frc2122", 
+      "frc2046", 
+      "frc6485", 
+      "frc4192"
+    ], 
+    "status": {
+      "current_level_record": {
+        "losses": 4, 
+        "ties": 0, 
+        "wins": 1
+      }, 
+      "level": "sf", 
+      "playoff_average": null, 
+      "record": {
+        "losses": 4, 
+        "ties": 0, 
+        "wins": 1
+      }, 
+      "status": "playing"
+    }
+  }, 
+  {
+    "backup": null, 
+    "declines": [], 
+    "name": "Newton", 
+    "picks": [
+      "frc973", 
+      "frc1323", 
+      "frc5026", 
+      "frc4201"
+    ], 
+    "status": {
+      "current_level_record": {
+        "losses": 1, 
+        "ties": 0, 
+        "wins": 2
+      }, 
+      "level": "f", 
+      "playoff_average": null, 
+      "record": {
+        "losses": 2, 
+        "ties": 0, 
+        "wins": 6
+      }, 
+      "status": "won"
+    }
+  }
+]

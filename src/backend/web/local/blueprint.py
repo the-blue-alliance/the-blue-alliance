@@ -1,4 +1,5 @@
 from flask import abort, Blueprint, Flask, redirect, request, url_for
+from flask_wtf.csrf import CSRFProtect
 from werkzeug.wrappers import Response
 
 from backend.common.environment import Environment
@@ -50,6 +51,9 @@ def bootstrap_post() -> Response:
     )
 
 
-def maybe_register(app: Flask) -> None:
+def maybe_register(app: Flask, csrf: CSRFProtect) -> None:
     if Environment.is_dev():
         app.register_blueprint(local_routes)
+
+        # Since we only install this on devservers, CSRF isn't necessary
+        csrf.exempt(local_routes)

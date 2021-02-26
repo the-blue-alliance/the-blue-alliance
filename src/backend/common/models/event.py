@@ -76,9 +76,9 @@ class Event(CachedModel):
     )  # such as 'America/Los_Angeles' or 'Asia/Jerusalem'
     official: bool = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
     first_eid = ndb.StringProperty()  # from USFIRST
-    parent_event: Optional[ndb.Key] = (
-        ndb.KeyProperty()
-    )  # This is the division -> event champs relationship
+    parent_event: Optional[
+        ndb.Key
+    ] = ndb.KeyProperty()  # This is the division -> event champs relationship
     # event champs -> all divisions
     divisions: List[ndb.Key] = ndb.KeyProperty(repeated=True)  # pyre-ignore[8]
     facebook_eid = ndb.TextProperty(indexed=False)  # from Facebook
@@ -88,9 +88,9 @@ class Event(CachedModel):
         indexed=False
     )  # list of dicts, valid keys include 'type' and 'channel'
     enable_predictions = ndb.BooleanProperty(default=False)
-    remap_teams: Dict[str, str] = (
-        ndb.JsonProperty()
-    )  # Map of temporary team numbers to pre-rookie and B teams
+    remap_teams: Dict[
+        str, str
+    ] = ndb.JsonProperty()  # Map of temporary team numbers to pre-rookie and B teams
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
@@ -406,7 +406,7 @@ class Event(CachedModel):
         return none_throws(self._teams)
 
     @ndb.toplevel
-    def prepAwardsMatchesTeams(
+    def prep_awards_matches_teams(
         self,
     ) -> Generator[
         Tuple[
@@ -427,7 +427,9 @@ class Event(CachedModel):
     def prepTeamsMatches(
         self,
     ) -> Generator[
-        Tuple[TypedFuture[List["Match"]], TypedFuture[List["Team"]]], None, None,
+        Tuple[TypedFuture[List["Match"]], TypedFuture[List["Team"]]],
+        None,
+        None,
     ]:
         yield self.get_matches_async(), self.get_teams_async()
 
@@ -639,7 +641,7 @@ class Event(CachedModel):
 
     @classmethod
     def validate_key_name(cls, event_key: str) -> bool:
-        key_name_regex = re.compile(r"^[1-9]\d{3}[a-z]+[0-9]{0,2}$")
+        key_name_regex = re.compile(r"^[1-9]\d{3}(\d{2})?[a-z]+[0-9]{0,2}$")
         match = re.match(key_name_regex, event_key)
         return True if match else False
 
@@ -650,7 +652,7 @@ class Event(CachedModel):
         if self.district_key is None:
             return None
         district = DistrictQuery(
-            district_key=none_throws(self.district_key).id()
+            district_key=none_throws(none_throws(self.district_key).string_id())
         ).fetch()
         return district.display_name if district else None
 
@@ -659,14 +661,14 @@ class Event(CachedModel):
         if self.district_key is None:
             return None
         else:
-            return none_throws(self.district_key).id()[4:]
+            return none_throws(none_throws(self.district_key).string_id())[4:]
 
     @property
     def event_district_key(self) -> Optional[str]:
         if self.district_key is None:
             return None
         else:
-            return none_throws(self.district_key).id()
+            return none_throws(none_throws(self.district_key).string_id())
 
     @property
     def event_type_str(self) -> str:
@@ -718,7 +720,7 @@ class Event(CachedModel):
     @property
     def next_match(self):
         from helpers.match_helper import MatchHelper
-        upcoming_matches = MatchHelper.upcomingMatches(self.matches, 1)
+        upcoming_matches = MatchHelper.upcoming_matches(self.matches, 1)
         if upcoming_matches:
             return upcoming_matches[0]
         else:
@@ -727,7 +729,7 @@ class Event(CachedModel):
     @property
     def previous_match(self):
         from helpers.match_helper import MatchHelper
-        recent_matches = MatchHelper.recentMatches(self.matches, 1)[0]
+        recent_matches = MatchHelper.recent_matches(self.matches, 1)[0]
         if recent_matches:
             return recent_matches[0]
         else:

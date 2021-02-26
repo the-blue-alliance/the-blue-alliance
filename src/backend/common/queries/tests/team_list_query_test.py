@@ -9,7 +9,13 @@ from backend.common.queries.team_query import TeamListQuery
 def preseed_teams(start_team: int, end_team: Optional[int] = None) -> None:
     end_team = end_team or start_team
     stored = ndb.put_multi(
-        [Team(id=f"frc{i}", team_number=i,) for i in range(start_team, end_team + 1)]
+        [
+            Team(
+                id=f"frc{i}",
+                team_number=i,
+            )
+            for i in range(start_team, end_team + 1)
+        ]
     )
     assert len(stored) == (end_team - start_team + 1)
 

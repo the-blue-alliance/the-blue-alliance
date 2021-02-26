@@ -1,6 +1,7 @@
 <h3>Event Information</h3>
 <form action="/suggest/offseason/review" method="post" id="review_{{ suggestion_id }}">
     <input type="hidden" name="suggestion_id" value="{{ suggestion_id }}" />
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <table class="table table-striped table-hover table-condensed">
         <tr>
             <td>Event ID (used in key)</td>

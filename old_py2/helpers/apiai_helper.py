@@ -279,7 +279,7 @@ class APIAIHelper(object):
             for event in events:
                 if event.now:
                     matches = TeamEventMatchesQuery(team_key, event.key.id()).fetch()
-                    matches = MatchHelper.play_order_sort_matches(matches)
+                    matches = MatchHelper.play_order_sorted_matches(matches)
                     if matches:
                         next_match = None
                         for match in matches:

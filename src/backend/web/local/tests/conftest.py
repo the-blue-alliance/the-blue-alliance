@@ -24,4 +24,7 @@ def local_client(mock_dev_env) -> Client:
 
     importlib.reload(main)
 
+    # Disable CSRF protection for unit testing
+    main.app.config["WTF_CSRF_CHECK_DEFAULT"] = False
+
     return main.app.test_client()

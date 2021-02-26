@@ -1,11 +1,11 @@
 import collections
 import json
 import re
-from typing import List, Optional
+from typing import Optional
 
 from flask import abort, redirect, request
 from google.cloud import ndb
-from pyre_extensions import none_throws, safe_cast
+from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
 
 from backend.common.consts import playoff_type
@@ -19,7 +19,6 @@ from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.team_helper import TeamHelper
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, Year
-from backend.common.models.team import Team
 from backend.common.queries import district_query, event_query, media_query
 from backend.web.profiled_render import render_template
 
@@ -30,7 +29,7 @@ def event_list(year: Optional[Year] = None) -> Response:
     if year is None:
         year = SeasonHelper.get_current_season()
 
-    valid_years = SeasonHelper.get_valid_years()
+    valid_years = list(reversed(SeasonHelper.get_valid_years()))
     if year not in valid_years:
         abort(404)
 
@@ -46,13 +45,11 @@ def event_list(year: Optional[Year] = None) -> Response:
     else:
         events_future = all_events_future
 
-    events = events_future.get_result()
+    events = EventHelper.sorted_events(events_future.get_result())
     if state_prov == "" or (state_prov and not events):
         return redirect(request.path)
 
-    EventHelper.sort_events(events)
-
-    week_events = EventHelper.groupByWeek(events)
+    week_events = EventHelper.group_by_week(events)
 
     districts = []  # a tuple of (district abbrev, district name)
     for district in districts_future.get_result():
@@ -86,11 +83,13 @@ def event_detail(event_key: EventKey) -> Response:
         abort(404)
 
     event = none_throws(event)  # for pyre
-    event.prepAwardsMatchesTeams()
+    event.prep_awards_matches_teams()
     event.prep_details()
     medias_future = media_query.EventTeamsPreferredMediasQuery(event_key).fetch_async()
     district_future = (
-        district_query.DistrictQuery(none_throws(event.district_key).id()).fetch_async()
+        district_query.DistrictQuery(
+            none_throws(none_throws(event.district_key).string_id())
+        ).fetch_async()
         if event.district_key
         else None
     )
@@ -105,14 +104,14 @@ def event_detail(event_key: EventKey) -> Response:
     elif event.parent_event:
         parent_event_future = none_throws(event.parent_event).get_async()
         event_codivisions_future = event_query.EventDivisionsQuery(
-            none_throws(event.parent_event).id()
+            none_throws(none_throws(event.parent_event).string_id())
         ).fetch_async()
 
-    awards = AwardHelper.organizeAwards(event.awards)
+    awards = AwardHelper.organize_awards(event.awards)
     cleaned_matches = event.matches
-    # MatchHelper.deleteInvalidMatches(event.matches, event)
-    match_count, matches = MatchHelper.organizeMatches(cleaned_matches)
-    teams = TeamHelper.sortTeams(safe_cast(List[Optional[Team]], event.teams))
+    # MatchHelper.delete_invalid_matches(event.matches, event)
+    match_count, matches = MatchHelper.organized_matches(cleaned_matches)
+    teams = TeamHelper.sort_teams(event.teams)
 
     # Organize medias by team
     image_medias = MediaHelper.get_images(
@@ -158,16 +157,16 @@ def event_detail(event_key: EventKey) -> Response:
     }
 
     if event.now:
-        matches_recent = MatchHelper.recentMatches(cleaned_matches)
-        matches_upcoming = MatchHelper.upcomingMatches(cleaned_matches)
+        matches_recent = MatchHelper.recent_matches(cleaned_matches)
+        matches_upcoming = MatchHelper.upcoming_matches(cleaned_matches)
     else:
         matches_recent = None
         matches_upcoming = None
 
     bracket_table = event.playoff_bracket
     playoff_advancement = event.playoff_advancement
-    double_elim_matches = PlayoffAdvancementHelper.getDoubleElimMatches(event, matches)
-    playoff_template = PlayoffAdvancementHelper.getPlayoffTemplate(event)
+    double_elim_matches = PlayoffAdvancementHelper.double_elim_matches(event, matches)
+    playoff_template = PlayoffAdvancementHelper.playoff_template(event)
 
     # Lazy handle the case when we haven't backfilled the event details
     if not bracket_table or not playoff_advancement:
@@ -176,7 +175,7 @@ def event_detail(event_key: EventKey) -> Response:
             playoff_advancement2,
             _,
             _,
-        ) = PlayoffAdvancementHelper.generatePlayoffAdvancement(event, matches)
+        ) = PlayoffAdvancementHelper.generate_playoff_advancement(event, matches)
         bracket_table = bracket_table or bracket_table2
         playoff_advancement = playoff_advancement or playoff_advancement2
 
@@ -230,7 +229,9 @@ def event_detail(event_key: EventKey) -> Response:
         "bracket_table": bracket_table,
         "playoff_advancement": playoff_advancement,
         "playoff_template": playoff_template,
-        "playoff_advancement_tiebreakers": None,  # PlayoffAdvancementHelper.ROUND_ROBIN_TIEBREAKERS.get(event.year),
+        "playoff_advancement_tiebreakers": PlayoffAdvancementHelper.ROUND_ROBIN_TIEBREAKERS.get(
+            event.year
+        ),
         "district_points_sorted": district_points_sorted,
         "event_insights_qual": event_insights["qual"] if event_insights else None,
         "event_insights_playoff": event_insights["playoff"] if event_insights else None,
