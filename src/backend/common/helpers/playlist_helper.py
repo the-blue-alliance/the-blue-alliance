@@ -1,7 +1,7 @@
 from typing import List
-from backend.common.helpers.match_helper import TOrganizedMatches
+
 from backend.common.consts import comp_level
-from backend.common.models.match import Match
+from backend.common.helpers.match_helper import TOrganizedMatches
 
 
 class PlaylistHelper(object):

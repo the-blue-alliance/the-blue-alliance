@@ -1,5 +1,4 @@
 import collections
-from backend.common.consts import comp_level
 from typing import Optional
 
 from flask import abort, redirect, request
@@ -7,8 +6,7 @@ from google.cloud import ndb
 from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
 
-from backend.common.consts import playoff_type
-from backend.common.consts.comp_level import CompLevel
+from backend.common.consts import comp_level, playoff_type
 from backend.common.decorators import cached_public
 from backend.common.helpers.award_helper import AwardHelper
 from backend.common.helpers.event_helper import EventHelper
@@ -194,7 +192,7 @@ def event_detail(event_key: EventKey) -> Response:
     # status_sitevar = status_sitevar_future.get_result()
 
     qual_playlist = PlaylistHelper.generate_playlist_link(
-        matches_organized=matches, title="Quals", allow_levels=[CompLevel.QM]
+        matches_organized=matches, title="Quals", allow_levels=[comp_level.CompLevel.QM]
     )
     elim_playlist = PlaylistHelper.generate_playlist_link(
         matches_organized=matches, title="Quals", allow_levels=comp_level.ELIM_LEVELS
