@@ -45,7 +45,7 @@ def test_compute_matchstats(test_data_importer) -> None:
     ) as f:
         expected_stats = json.load(f)
 
-    stats = MatchstatsHelper.calculate_matchstats(matches, 2019, keyed=False)
+    stats = MatchstatsHelper.calculate_matchstats(matches, keyed=False)
     expected_stats = api_data_to_matchstats(expected_stats)
     assert_stats_equal(stats, expected_stats)
 
@@ -59,7 +59,7 @@ def test_compute_matchstats_with_b_teams(test_data_importer) -> None:
     ) as f:
         expected_stats = json.load(f)
 
-    stats = MatchstatsHelper.calculate_matchstats(matches, 2019, keyed=False)
+    stats = MatchstatsHelper.calculate_matchstats(matches, keyed=False)
     expected_stats = api_data_to_matchstats(expected_stats)
     assert_stats_equal(stats, expected_stats)
 
