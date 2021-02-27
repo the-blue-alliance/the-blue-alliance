@@ -90,6 +90,3 @@ def test_compute_matchstats_with_b_teams_skip_coprs(test_data_importer):
     stats = MatchstatsHelper.calculate_matchstats(matches)
     for stat in expected_stats.keys():
         assert expected_stats[stat] == pytest.approx(stats[stat])
-
-
-#
