@@ -7,7 +7,7 @@ from consts.event_type import EventType
 from datafeeds.parser_base import ParserBase
 
 
-class OffseasonSpreadsheetParser(ParserBase):
+class CSVOffseasonSpreadsheetParser(ParserBase):
 
     INDEX_TITLE = 1
     INDEX_VENUE = 3

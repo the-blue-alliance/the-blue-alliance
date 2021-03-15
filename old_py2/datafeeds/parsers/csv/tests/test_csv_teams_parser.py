@@ -1,6 +1,6 @@
 import unittest2
 
-from datafeeds.csv_teams_parser import CSVTeamsParser
+from datafeeds.parsers.csv.csv_teams_parser import CSVTeamsParser
 
 
 class TestCSVTeamsParser(unittest2.TestCase):

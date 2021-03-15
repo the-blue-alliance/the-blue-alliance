@@ -4,7 +4,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from helpers.match_helper import MatchHelper
-from datafeeds.offseason_matches_parser import OffseasonMatchesParser
+from datafeeds.parsers.csv.csv_offseason_matches_parser import CSVOffseasonMatchesParser
 from models.event import Event
 from models.match import Match
 
@@ -30,7 +30,7 @@ class TestMatchCleanup(unittest2.TestCase):
 
     def setupMatches(self, csv):
         with open(csv, 'r') as f:
-            parsed_matches, _ = OffseasonMatchesParser.parse(f.read())
+            parsed_matches, _ = CSVOffseasonMatchesParser.parse(f.read())
             matches = [Match(id=Match.renderKeyName(self.event.key.id(),
                                                     match.get("comp_level", None),
                                                     match.get("set_number", 0),
