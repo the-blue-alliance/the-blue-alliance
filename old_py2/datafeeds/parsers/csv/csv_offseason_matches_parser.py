@@ -7,7 +7,7 @@ import re
 from datafeeds.parser_base import ParserBase
 
 
-class OffseasonMatchesParser(ParserBase):
+class CSVOffseasonMatchesParser(ParserBase):
     @classmethod
     def parse(self, data):
         """

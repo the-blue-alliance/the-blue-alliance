@@ -1,12 +1,12 @@
 import unittest2
 
-from datafeeds.offseason_matches_parser import OffseasonMatchesParser
+from datafeeds.parsers.csv.csv_offseason_matches_parser import CSVOffseasonMatchesParser
 
 
-class TestOffseasonMatchesParser(unittest2.TestCase):
+class TestCSVOffseasonMatchesParser(unittest2.TestCase):
     def test_parse(self):
         with open('test_data/offseason_matches.csv', 'r') as f:
-            matches, _ = OffseasonMatchesParser.parse(f.read())
+            matches, _ = CSVOffseasonMatchesParser.parse(f.read())
 
         match = matches[0]
         self.assertEqual(match["comp_level"], "qm")

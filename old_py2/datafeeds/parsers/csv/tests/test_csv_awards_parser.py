@@ -2,7 +2,7 @@ import unittest2
 import json
 
 from consts.award_type import AwardType
-from datafeeds.csv_awards_parser import CSVAwardsParser
+from datafeeds.parsers.csv.csv_awards_parser import CSVAwardsParser
 
 
 def convert_to_comparable(data):
