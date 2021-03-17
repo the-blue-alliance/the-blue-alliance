@@ -7,11 +7,11 @@ from backend.common.datafeeds.parsers.parser_base import ParserBase
 
 
 @pytest.fixture
-def mock_parser():
+def mock_parser() -> Mock:
     return Mock(spec=ParserBase)
 
 
-def test_refer(mock_parser):
+def test_refer(mock_parser) -> None:
     df = DatafeedBase()
     url = "my.usfirst.org/myarea"
 
@@ -33,7 +33,7 @@ def test_refer(mock_parser):
 
 
 @pytest.mark.parametrize("session_key", [None, "test"])
-def test_cookie(mock_parser, session_key: str):
+def test_cookie(mock_parser, session_key: str) -> None:
     df = DatafeedBase()
     url = "thebluealliance.com"
 
@@ -57,7 +57,7 @@ def test_cookie(mock_parser, session_key: str):
     assert kwargs["headers"] == expected_headers
 
 
-def test_raises(mock_parser):
+def test_raises(mock_parser) -> None:
     df = DatafeedBase()
 
     with patch("requests.get", side_effect=Exception("Mock error")) as mock_get:
@@ -68,7 +68,7 @@ def test_raises(mock_parser):
 
 
 @pytest.mark.parametrize("status_code", [200, 500])
-def test_parse(mock_parser, status_code: int):
+def test_parse(mock_parser, status_code: int) -> None:
     df = DatafeedBase()
     content = "content"
     expected = ([], True)
