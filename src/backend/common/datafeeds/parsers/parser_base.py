@@ -1,4 +1,5 @@
 import abc
+
 # import re
 from typing import Generic, TypeVar
 
