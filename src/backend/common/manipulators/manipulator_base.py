@@ -37,8 +37,24 @@ class TUpdatedModel(Generic[TModel]):
 
 class ManipulatorBase(abc.ABC, Generic[TModel]):
 
-    _post_delete_hooks: List[Callable[[List[TModel]], None]] = []
-    _post_update_hooks: List[Callable[[List[TUpdatedModel[TModel]]], None]] = []
+    _post_delete_hooks: List[Callable[[List[TModel]], None]] = None  # pyre-ignore[8]
+    _post_update_hooks: List[  # pyre-ignore[8]
+        Callable[[List[TUpdatedModel[TModel]]], None]
+    ] = None
+
+    def __init_subclass__(cls, *args, **kwargs):
+        """
+        This is a bit of python magic - we can't just initialize the variables to [] in their
+        definitions above, because they simply get evaluated once at module import time. This
+        has the effect that all manipulators end up -sharing- their callbacks! Not what we want!
+
+        Instead, since we use python >= 3.6, we can use this __init_subclass__ hook, which
+        makes specifying this sort of thing easier without needing to implement a full metaclass
+        See: https://docs.python.org/3/reference/datamodel.html#object.__init_subclass__
+        """
+        super().__init_subclass__(*args, **kwargs)
+        cls._post_delete_hooks = []
+        cls._post_update_hooks = []
 
     @classmethod
     def register_post_delete_hook(
