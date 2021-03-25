@@ -1,10 +1,10 @@
 dispatch:
   # Start serving certain pages from py3
-  #- url: "www.thebluealliance.com/"  # Just the homepage
-  #  service: py3-web
+  - url: "www.thebluealliance.com/"  # Just the homepage
+    service: py3-web
 
-  #- url: "www.thebluealliance.com/about"
-  #  service: py3-web
+  - url: "www.thebluealliance.com/about"
+    service: py3-web
 
   #- url: "www.thebluealliance.com/event*"
   #  service: py3-web
