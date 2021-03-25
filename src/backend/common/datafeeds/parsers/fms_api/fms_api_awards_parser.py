@@ -11,7 +11,9 @@ from backend.common.models.team import Team
 
 
 class FMSAPIAwardsParser(ParserJSON[List[Award]]):
-    def __init__(self, event: Event, valid_team_nums: Optional[List[int]] = None):
+    def __init__(
+        self, event: Event, valid_team_nums: Optional[List[int]] = None
+    ) -> None:
         self.event = event
         self.valid_team_nums = valid_team_nums
 
