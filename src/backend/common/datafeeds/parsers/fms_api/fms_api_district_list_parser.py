@@ -1,10 +1,10 @@
 from typing import Any, Dict, List, Optional
 
-from backend.common.datafeeds.parsers.parser_json import ParserJSON
+from backend.common.datafeeds.parsers.json.parser_json import ParserJSON
 from backend.common.models.district import District
 
 
-class FMSAPIDistrictListParser(ParserJSON[Optional[List[District]]]):
+class FMSAPIDistrictListParser(ParserJSON[List[District]]):
     def __init__(self, season: int):
         self.season = season
 
