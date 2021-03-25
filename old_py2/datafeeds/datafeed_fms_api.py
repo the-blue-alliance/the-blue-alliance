@@ -379,6 +379,7 @@ class DatafeedFMSAPI(object):
 
         while more_pages:
             url = self.FMS_API_DISTRICT_RANKINGS_PATTERN % (year, district_short.upper(), page)
+            # NOTE: THIS API CHANGED and does no longer take an `advandement` dict. Do this updating in this method.
             result = self._parse(url, FMSAPIDistrictRankingsParser(advancement))
             if not result:
                 break

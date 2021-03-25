@@ -119,12 +119,16 @@ def index_offseason(template_values: Dict[str, Any]) -> str:
     # special_webcasts = FirebasePusher.get_special_webcasts()
     effective_season_year = SeasonHelper.effective_season_year()
 
-    template_values.update({
-        "events": EventHelper.week_events(),
-        "kickoff_datetime_utc": SeasonHelper.kickoff_datetime_utc(effective_season_year),
-        # "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
-        # "special_webcasts": special_webcasts,
-    })
+    template_values.update(
+        {
+            "events": EventHelper.week_events(),
+            "kickoff_datetime_utc": SeasonHelper.kickoff_datetime_utc(
+                effective_season_year
+            ),
+            # "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
+            # "special_webcasts": special_webcasts,
+        }
+    )
     return render_template("index/index_offseason.html", template_values)
 
 
