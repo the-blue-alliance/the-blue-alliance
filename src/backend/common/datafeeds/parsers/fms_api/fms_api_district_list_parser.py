@@ -5,7 +5,7 @@ from backend.common.models.district import District
 
 
 class FMSAPIDistrictListParser(ParserJSON[List[District]]):
-    def __init__(self, season: int):
+    def __init__(self, season: int) -> None:
         self.season = season
 
     def parse(self, response: Dict[str, Any]) -> Optional[List[District]]:
