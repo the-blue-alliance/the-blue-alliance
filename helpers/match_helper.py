@@ -266,6 +266,16 @@ class MatchHelper(object):
             'teleopCellsBottom', 'teleopCellsInner', 'teleopCellsOuter', 'teleopPoints',
             'totalPoints'
         ]),
+        2021: set([
+            'initLineRobot1', 'initLineRobot2', 'initLineRobot3', 'autoCellsBottom',
+            'autoCellsOuter', 'autoCellsInner', 'teleopCellsBottom', 'teleopCellsOuter',
+            'teleopCellsInner', 'stage1Activated', 'stage2Activated', 'stage3Activated',
+            'stage3TargetColor', 'endgameRobot1', 'endgameRobot2', 'endgameRobot3',
+            'endgameRungIsLevel', 'foulCount', 'techFoulCount', 'autoInitLinePoints',
+            'autoCellPoints', 'autoPoints', 'teleopCellPoints', 'controlPanelPoints',
+            'endgamePoints', 'teleopPoints', 'foulPoints', 'totalPoints',
+            'shieldEnergizedRankingPoint', 'shieldOperationalRankingPoint', 'rp'
+        ]),
     }
 
     @classmethod
