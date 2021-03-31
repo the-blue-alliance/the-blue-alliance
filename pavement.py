@@ -135,7 +135,6 @@ def make():
             }
     with open("version_info.json", "w") as f:
         f.write(json.dumps(data))
-    print(data)
 
 
 @task
