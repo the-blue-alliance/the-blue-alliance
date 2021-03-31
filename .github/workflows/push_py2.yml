@@ -1,0 +1,154 @@
+name: On push
+
+on:
+  push:
+    branches:
+      - py3
+
+jobs:
+  lint:
+    name: "Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 2.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 2.7
+      - uses: actions/checkout@v2
+      - name: Set up Node
+        uses: actions/setup-node@v2.1.2
+        with:
+          node-version: "8.x"
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r travis_requirements.txt
+          paver install_libs
+      - name: Install Node Dependencies
+        run: |
+          npm install
+          npm install -g gulp-cli uglify-es uglifycss less request tslib
+      - name: Install GAE
+        run: |
+          wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.66.zip -nv
+          unzip -q google_appengine_1.9.66.zip -d $HOME
+          rm google_appengine_1.9.66.zip
+          echo "PYTHONPATH=${PYTHONPATH}:${HOME}/google_appengine" >> $GITHUB_ENV
+          echo "PATH=${PATH}:${HOME}/google_appengine" >> $GITHUB_ENV
+      - name: Lint Python
+        run: paver lint --base ${{ github.head_ref }}
+      - name: Lint JS
+        run: npm run lint -s
+      - name: Validate Swagger
+        run: paver validate_swagger
+      - name: Validate Endpoints Configuration
+        run: paver make_endpoints_config
+  py2-test:
+    name: "[py2] Test"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 2.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 2.7
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r travis_requirements.txt
+          paver install_libs
+      - name: Install GAE
+        run: |
+          wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.66.zip -nv
+          unzip -q google_appengine_1.9.66.zip -d $HOME
+          rm google_appengine_1.9.66.zip
+          echo "PYTHONPATH=${PYTHONPATH}:${HOME}/google_appengine" >> $GITHUB_ENV
+          echo "PATH=${PATH}:${HOME}/google_appengine" >> $GITHUB_ENV
+      - name: Run Tests
+        run: paver test
+  node-test:
+    name: "[node] Test"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Node
+        uses: actions/setup-node@v2.1.2
+        with:
+          node-version: "8.x"
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+      - name: Install Dependencies
+        run: npm install
+      - name: Run Tests
+        run: npm test
+  make:
+    name: "Make"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 2.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 2.7
+      - uses: actions/checkout@v2
+      - name: Set up Node
+        uses: actions/setup-node@v2.1.2
+        with:
+          node-version: "8.x"
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r travis_requirements.txt
+          paver install_libs
+      - name: Install GAE
+        run: |
+          wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.66.zip -nv
+          unzip -q google_appengine_1.9.66.zip -d $HOME
+          rm google_appengine_1.9.66.zip
+          echo "PYTHONPATH=${PYTHONPATH}:${HOME}/google_appengine" >> $GITHUB_ENV
+          echo "PATH=${PATH}:${HOME}/google_appengine" >> $GITHUB_ENV
+      - name: Install Node Dependencies
+        run: |
+          npm install
+          npm install -g gulp-cli uglify-es uglifycss less request tslib
+      - name: Create tba_keys.js file
+        run: ./ops/create_tba_keys_js_file.sh
+      - name: Make
+        run: paver make
