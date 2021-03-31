@@ -37,6 +37,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r travis_requirements.txt
+          paver install_libs
       - name: Install Node Dependencies
         run: |
           npm install
