@@ -50,12 +50,16 @@ jobs:
           echo "PYTHONPATH=${PYTHONPATH}:${HOME}/google_appengine" >> $GITHUB_ENV
           echo "PATH=${PATH}:${HOME}/google_appengine" >> $GITHUB_ENV
       - name: Lint Python
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: paver lint --base ${{ github.head_ref }}
       - name: Lint JS
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm run lint -s
       - name: Validate Swagger
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: paver validate_swagger
       - name: Validate Endpoints Configuration
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: paver make_endpoints_config
   py2-test:
     name: "[py2] Test"
@@ -86,6 +90,7 @@ jobs:
           echo "PYTHONPATH=${PYTHONPATH}:${HOME}/google_appengine" >> $GITHUB_ENV
           echo "PATH=${PATH}:${HOME}/google_appengine" >> $GITHUB_ENV
       - name: Run Tests
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: paver test
   node-test:
     name: "[node] Test"
@@ -105,10 +110,13 @@ jobs:
       - name: Install Dependencies
         run: npm install
       - name: Run Tests
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm test
-  make:
-    name: "Make"
+  make-deploy:
+    name: "Make & Deploy"
     runs-on: ubuntu-latest
+    needs: [lint, py2-test, node-test]
+    if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python 2.7
@@ -120,6 +128,12 @@ jobs:
         uses: actions/setup-node@v2.1.2
         with:
           node-version: "8.x"
+      - name: Setup Google Cloud Platform
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          version: "321.0.0"
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCLOUD_AUTH }}
       - name: Cache pip
         uses: actions/cache@v2
         with:
@@ -152,3 +166,17 @@ jobs:
         run: ./ops/create_tba_keys_js_file.sh
       - name: Make
         run: paver make
+      - name: Deploy app.yaml
+        run: gcloud beta app deploy app.yaml --version prod-2 --quiet
+      - name: Deploy index.yaml
+        run: gcloud beta app deploy index.yaml --version prod-2 --quiet
+      - name: Deploy queue.yaml
+        run: gcloud beta app deploy queue.yaml --version prod-2 --quiet
+      - name: Overwrite YAMLs with skeleton deploy
+        run: |
+          mv -f ./ops/standalone/cron-skeleton.yaml ./cron.yaml
+          mv -f ./ops/standalone/dispatch-empty.yaml ./dispatch.yaml
+      - name: Deploy cron.yaml
+        run: gcloud beta app deploy cron.yaml --version prod-2 --quiet
+      - name: Deploy dispatch.yaml
+        run: gcloud beta app deploy dispatch.yaml --version prod-2 --quiet
