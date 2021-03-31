@@ -10,6 +10,7 @@ GoogleAppEngineCloudStorageClient
 firebase-admin==3.2.1 # DO NOT BUMP - 3.2.1 is the last version that supports Python 2
 
 # Cloud Endpoints Stuff
+rsa==3.4.2  # Pin version of rsa used by oauth2client that supports Python 2
 oauth2client==3.0.0
 google-auth
 google-endpoints
