@@ -47,7 +47,7 @@ jobs:
           wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.66.zip -nv
           unzip -q google_appengine_1.9.66.zip -d $HOME
           rm google_appengine_1.9.66.zip
-          echo "PYTHONPATH=${HOME}/google_appengine" >> $GITHUB_ENV
+          echo "PYTHONPATH=${PYTHONPATH}:${HOME}/google_appengine" >> $GITHUB_ENV
       - name: Lint Python
         run: paver lint --base ${{ github.head_ref }}
       - name: Lint JS
@@ -82,7 +82,7 @@ jobs:
           wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.66.zip -nv
           unzip -q google_appengine_1.9.66.zip -d $HOME
           rm google_appengine_1.9.66.zip
-          echo "PYTHONPATH=${HOME}/google_appengine" >> $GITHUB_ENV
+          echo "PYTHONPATH=${PYTHONPATH}:${HOME}/google_appengine" >> $GITHUB_ENV
       - name: Run Tests
         run: paver test
   node-test:
@@ -141,7 +141,7 @@ jobs:
           wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.66.zip -nv
           unzip -q google_appengine_1.9.66.zip -d $HOME
           rm google_appengine_1.9.66.zip
-          echo "PYTHONPATH=${HOME}/google_appengine" >> $GITHUB_ENV
+          echo "PYTHONPATH=${PYTHONPATH}:${HOME}/google_appengine" >> $GITHUB_ENV
       - name: Install Node Dependencies
         run: |
           npm install
