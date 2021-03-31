@@ -51,7 +51,7 @@ jobs:
           echo "PATH=${PATH}:${HOME}/google_appengine" >> $GITHUB_ENV
       - name: Lint Python
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: paver lint --base ${{ github.head_ref }}
+        run: paver lint
       - name: Lint JS
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm run lint -s
