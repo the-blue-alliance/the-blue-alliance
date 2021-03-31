@@ -1,4 +1,4 @@
-name: On pull request
+name: On pull request (py2)
 
 on:
   pull_request:
