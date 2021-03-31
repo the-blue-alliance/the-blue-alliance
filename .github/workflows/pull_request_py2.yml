@@ -98,5 +98,7 @@ jobs:
         run: |
           npm install
           npm install -g gulp-cli uglify-es uglifycss less request tslib
+      - name: Create tba_keys.js file
+        run: ./ops/create_tba_keys_js_file.sh
       - name: Make
         run: paver make
