@@ -37,3 +37,23 @@ jobs:
       - name: Run Tests
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: paver test
+  js-test:
+    name: "[js] test"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Node
+        uses: actions/setup-node@v2.1.2
+        with:
+          node-version: "8.x"
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+      - name: Install Dependencies
+        run: npm install
+      - name: Run Tests
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: npm test
