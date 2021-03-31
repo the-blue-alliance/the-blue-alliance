@@ -95,6 +95,8 @@ jobs:
       - name: Install Additional Libs
         run: paver install_libs
       - name: Install Node Dependencies
-        run: npm install
+        run: |
+          npm install
+          npm install -g gulp-cli uglify-es uglifycss less request tslib
       - name: Make
         run: paver make
