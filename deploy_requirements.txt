@@ -11,7 +11,7 @@ firebase-admin==3.2.1 # DO NOT BUMP - 3.2.1 is the last version that supports Py
 
 # Cloud Endpoints Stuff
 oauth2client==3.0.0
-google-auth
+google-auth==1.23
 google-endpoints
 google-endpoints-api-management
 requests-toolbelt
