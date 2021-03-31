@@ -37,7 +37,7 @@ jobs:
       - name: Run Tests
         run: paver test
   node-test:
-    name: "[node] test"
+    name: "[node] Test"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
