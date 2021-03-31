@@ -42,6 +42,12 @@ jobs:
         run: |
           npm install
           npm install -g gulp-cli uglify-es uglifycss less request tslib
+      - name: Install GAE
+        run: |
+          wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.66.zip -nv
+          unzip -q google_appengine_1.9.66.zip -d $HOME
+          rm google_appengine_1.9.66.zip
+          echo "PYTHONPATH=${HOME}/google_appengine" >> $GITHUB_ENV
       - name: Lint Python
         run: paver lint --base ${{ github.head_ref }}
       - name: Lint JS
