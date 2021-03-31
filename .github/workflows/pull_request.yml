@@ -31,6 +31,8 @@ jobs:
           unzip -q google_appengine_1.9.66.zip -d $HOME
           rm google_appengine_1.9.66.zip
           echo "PYTHONPATH=${HOME}/google_appengine" >> $GITHUB_ENV
+      - name: Install Libs
+        run: paver install_libs
       - name: Run Tests
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: paver test
