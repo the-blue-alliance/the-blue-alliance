@@ -1,0 +1,342 @@
+{% macro drawBottomGoalSVG() %}
+<svg width="16px" height="16px" style="display: inline-block; vertical-align: middle;" rel="tooltip" title="Bottom Goal">
+  <rect x="1" y="5" width="14" height="6" fill="none" stroke="black" stroke-width="2" />
+</svg>
+{% endmacro %}
+
+{% macro drawOuterGoalSVG() %}
+<svg width="16px" height="16px" style="display: inline-block; vertical-align: middle;" rel="tooltip" title="Outer Goal">
+  <path d="M 4.536 2 L 11.464 2 L 14.928 8 L 11.464 14 L 4.536 14 L 1.072 8 Z" fill="none" stroke="black" stroke-width="2"></path>
+</svg>
+{% endmacro %}
+
+{% macro drawInnerGoalSVG() %}
+<svg width="16px" height="16px" style="display: inline-block; vertical-align: middle;" rel="tooltip" title="Inner Goal">
+  <circle cx="8" cy="8" r="6" fill="none" stroke="black" stroke-width="2"/>
+</svg>
+{% endmacro %}
+
+<table class="match-table">
+  <tbody>
+    <!-- Autonomous -->
+    {% if "initLineRobot1" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {% if match.score_breakdown.red.initLineRobot1 == 'Exited' %}
+        <span class="glyphicon glyphicon-ok" rel="tooltip" title="{{match.alliances.red.teams.0|digits}}"></span>
+        {% else %}
+        <span class="glyphicon glyphicon-remove" rel="tooltip" title="{{match.alliances.red.teams.0|digits}}"></span>
+        {% endif %}
+        {% if match.score_breakdown.red.initLineRobot2 == 'Exited' %}
+        <span class="glyphicon glyphicon-ok" rel="tooltip" title="{{match.alliances.red.teams.1|digits}}"></span>
+        {% else %}
+        <span class="glyphicon glyphicon-remove" rel="tooltip" title="{{match.alliances.red.teams.1|digits}}"></span>
+        {% endif %}
+        {% if match.score_breakdown.red.initLineRobot3 == 'Exited' %}
+        <span class="glyphicon glyphicon-ok" rel="tooltip" title="{{match.alliances.red.teams.2|digits}}"></span>
+        {% else %}
+        <span class="glyphicon glyphicon-remove" rel="tooltip" title="{{match.alliances.red.teams.2|digits}}"></span>
+        {% endif %}
+        (+{{match.score_breakdown.red.autoInitLinePoints}})
+      </td>
+      <td>Initiation Line Exited</td>
+      <td class="blue" colspan="2">
+        {% if match.score_breakdown.blue.initLineRobot1 == 'Exited' %}
+        <span class="glyphicon glyphicon-ok" rel="tooltip" title="{{match.alliances.blue.teams.0|digits}}"></span>
+        {% else %}
+        <span class="glyphicon glyphicon-remove" rel="tooltip" title="{{match.alliances.blue.teams.0|digits}}"></span>
+        {% endif %}
+        {% if match.score_breakdown.blue.initLineRobot2 == 'Exited' %}
+        <span class="glyphicon glyphicon-ok" rel="tooltip" title="{{match.alliances.blue.teams.1|digits}}"></span>
+        {% else %}
+        <span class="glyphicon glyphicon-remove" rel="tooltip" title="{{match.alliances.blue.teams.1|digits}}"></span>
+        {% endif %}
+        {% if match.score_breakdown.blue.initLineRobot3 == 'Exited' %}
+        <span class="glyphicon glyphicon-ok" rel="tooltip" title="{{match.alliances.blue.teams.2|digits}}"></span>
+        {% else %}
+        <span class="glyphicon glyphicon-remove" rel="tooltip" title="{{match.alliances.blue.teams.2|digits}}"></span>
+        {% endif %}
+        (+{{match.score_breakdown.blue.autoInitLinePoints}})
+      </td>
+    </tr>
+    {% endif %}
+    {% if "autoCellsBottom" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{drawBottomGoalSVG()}}
+        {{match.score_breakdown.red.autoCellsBottom}}
+        {{drawOuterGoalSVG()}}
+        {{match.score_breakdown.red.autoCellsOuter}}
+        {{drawInnerGoalSVG()}}
+        {{match.score_breakdown.red.autoCellsInner}}
+      </td>
+      <td>Auto Power Cells</td>
+      <td class="blue" colspan="2">
+        {{drawBottomGoalSVG()}}
+        {{match.score_breakdown.blue.autoCellsBottom}}
+        {{drawOuterGoalSVG()}}
+        {{match.score_breakdown.blue.autoCellsOuter}}
+        {{drawInnerGoalSVG()}}
+        {{match.score_breakdown.blue.autoCellsInner}}
+      </td>
+    </tr>
+    {% endif %}
+    {% if "autoCellPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">
+        {{match.score_breakdown.red.autoCellPoints}}
+      </td>
+      <td>Auto Power Cell Points</td>
+      <td class="blueScore" colspan="2">
+        {{match.score_breakdown.blue.autoCellPoints}}
+      </td>
+    </tr>
+    {% endif %}
+    {% if "autoPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">
+        <b>{% if match.score_breakdown.red.autoPoints %}{{match.score_breakdown.red.autoPoints}}{%else%}0{%endif%}</b>
+      </td>
+      <th>Total Auto</th>
+      <td class="blueScore" colspan="2">
+        <b>{% if match.score_breakdown.blue.autoPoints %}{{match.score_breakdown.blue.autoPoints}}{%else%}0{%endif%}</b>
+      </td>
+    </tr>
+    {% endif %}
+
+    <!-- Teleop -->
+    {% if "teleopCellsBottom" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{drawBottomGoalSVG()}}
+        {{match.score_breakdown.red.teleopCellsBottom}}
+        {{drawOuterGoalSVG()}}
+        {{match.score_breakdown.red.teleopCellsOuter}}
+        {{drawInnerGoalSVG()}}
+        {{match.score_breakdown.red.teleopCellsInner}}
+      </td>
+      <td>Teleop Power Cells</td>
+      <td class="blue" colspan="2">
+        {{drawBottomGoalSVG()}}
+        {{match.score_breakdown.blue.teleopCellsBottom}}
+        {{drawOuterGoalSVG()}}
+        {{match.score_breakdown.blue.teleopCellsOuter}}
+        {{drawInnerGoalSVG()}}
+        {{match.score_breakdown.blue.teleopCellsInner}}
+      </td>
+    </tr>
+    {% endif %}
+    {% if "teleopCellPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">
+        {{match.score_breakdown.red.teleopCellPoints}}
+      </td>
+      <td>Teleop Power Cell Points</td>
+      <td class="blueScore" colspan="2">
+        {{match.score_breakdown.blue.teleopCellPoints}}
+      </td>
+    </tr>
+    {% endif %}
+    {% if "controlPanelPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">
+        {{match.score_breakdown.red.controlPanelPoints}}
+      </td>
+      <td>Control Panel Points</td>
+      <td class="blueScore" colspan="2">
+        {{match.score_breakdown.blue.controlPanelPoints}}
+      </td>
+    </tr>
+    {% endif %}
+
+    <!-- Robot 1 Endgame -->
+    {% if "endgameRobot1" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {% if match.score_breakdown.red.endgameRobot1 == 'Hang' %}
+          <span rel="tooltip" title="{{match.alliances.red.teams.0|digits}}">Hang (+25)</span>
+        {% elif match.score_breakdown.red.endgameRobot1 == 'Park' %}
+          <span rel="tooltip" title="{{match.alliances.red.teams.0|digits}}">Park (+5)</span>
+        {% else %}
+          <span rel="tooltip" title="{{match.alliances.red.teams.0|digits}}" class="glyphicon glyphicon-remove"></span>
+        {% endif %}
+      <td>Robot 1 Endgame</td>
+      <td class="blue" colspan="2">
+        {% if match.score_breakdown.blue.endgameRobot1 == 'Hang' %}
+          <span rel="tooltip" title="{{match.alliances.blue.teams.0|digits}}">Hang (+25)</span>
+        {% elif match.score_breakdown.blue.endgameRobot1 == 'Park' %}
+          <span rel="tooltip" title="{{match.alliances.blue.teams.0|digits}}">Park (+5)</span>
+        {% else %}
+          <span rel="tooltip" title="{{match.alliances.blue.teams.0|digits}}" class="glyphicon glyphicon-remove"></span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endif %}
+    <!-- Robot 2 Endgame -->
+    {% if "endgameRobot2" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {% if match.score_breakdown.red.endgameRobot2 == 'Hang' %}
+          <span rel="tooltip" title="{{match.alliances.red.teams.1|digits}}">Hang (+25)</span>
+        {% elif match.score_breakdown.red.endgameRobot2 == 'Park' %}
+          <span rel="tooltip" title="{{match.alliances.red.teams.1|digits}}">Park (+5)</span>
+        {% else %}
+          <span rel="tooltip" title="{{match.alliances.red.teams.1|digits}}" class="glyphicon glyphicon-remove"></span>
+        {% endif %}
+      <td>Robot 2 Endgame</td>
+      <td class="blue" colspan="2">
+        {% if match.score_breakdown.blue.endgameRobot2 == 'Hang' %}
+          <span rel="tooltip" title="{{match.alliances.blue.teams.1|digits}}">Hang (+25)</span>
+        {% elif match.score_breakdown.blue.endgameRobot2 == 'Park' %}
+          <span rel="tooltip" title="{{match.alliances.blue.teams.1|digits}}">Park (+5)</span>
+        {% else %}
+          <span rel="tooltip" title="{{match.alliances.blue.teams.1|digits}}" class="glyphicon glyphicon-remove"></span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endif %}
+    <!-- Robot 3 Endgame -->
+    {% if "endgameRobot3" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {% if match.score_breakdown.red.endgameRobot3 == 'Hang' %}
+          <span rel="tooltip" title="{{match.alliances.red.teams.2|digits}}">Hang (+25)</span>
+        {% elif match.score_breakdown.red.endgameRobot3 == 'Park' %}
+          <span rel="tooltip" title="{{match.alliances.red.teams.2|digits}}">Park (+5)</span>
+        {% else %}
+          <span rel="tooltip" title="{{match.alliances.red.teams.2|digits}}" class="glyphicon glyphicon-remove"></span>
+        {% endif %}
+      <td>Robot 3 Endgame</td>
+      <td class="blue" colspan="2">
+        {% if match.score_breakdown.blue.endgameRobot3 == 'Hang' %}
+          <span rel="tooltip" title="{{match.alliances.blue.teams.2|digits}}">Hang (+25)</span>
+        {% elif match.score_breakdown.blue.endgameRobot3 == 'Park' %}
+          <span rel="tooltip" title="{{match.alliances.blue.teams.2|digits}}">Park (+5)</span>
+        {% else %}
+          <span rel="tooltip" title="{{match.alliances.blue.teams.2|digits}}" class="glyphicon glyphicon-remove"></span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endif %}
+
+    {% if "endgameRungIsLevel" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {% if match.score_breakdown.red.endgameRungIsLevel == 'IsLevel' %}
+          <span class="glyphicon glyphicon-ok"></span> {% if "tba_numRobotsHanging" in match.score_breakdown.red and match.score_breakdown.red.tba_numRobotsHanging > 0 %}(+15){% endif %}
+        {% else %}
+          <span class="glyphicon glyphicon-remove"></span>
+        {% endif %}
+      <td>Shield Generator Switch Level</td>
+      <td class="blue" colspan="2">
+        {% if match.score_breakdown.blue.endgameRungIsLevel == 'IsLevel' %}
+          <span class="glyphicon glyphicon-ok"></span> {% if "tba_numRobotsHanging" in match.score_breakdown.blue and match.score_breakdown.blue.tba_numRobotsHanging > 0 %}(+15){% endif %}
+        {% else %}
+          <span class="glyphicon glyphicon-remove"></span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endif %}
+    {% if "endgamePoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">
+        {{match.score_breakdown.red.endgamePoints}}
+      </td>
+      <td>Endgame Points</td>
+      <td class="blueScore" colspan="2">
+        {{match.score_breakdown.blue.endgamePoints}}
+      </td>
+    </tr>
+    {% endif %}
+    {% if "teleopPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">
+        <b>{% if match.score_breakdown.red.teleopPoints %}{{match.score_breakdown.red.teleopPoints}}{%else%}0{%endif%}</b>
+      </td>
+      <th>Total Teleop</th>
+      <td class="blueScore" colspan="2">
+        <b>{% if match.score_breakdown.blue.teleopPoints %}{{match.score_breakdown.blue.teleopPoints}}{%else%}0{%endif%}</b>
+      </td>
+    </tr>
+    {% endif %}
+
+    <!-- Bonus RP -->
+    {% if "stage1Activated" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {% if match.score_breakdown.red.stage3Activated %}3 (+1 RP){% elif match.score_breakdown.red.stage2Activated %}2{% elif match.score_breakdown.red.stage1Activated %}1{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}
+      </td>
+      <td>Stage Activations</td>
+      <td class="blue" colspan="2">
+        {% if match.score_breakdown.blue.stage3Activated %}3 (+1 RP){% elif match.score_breakdown.blue.stage2Activated %}2{% elif match.score_breakdown.blue.stage1Activated %}1{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}
+
+      </td>
+    </tr>
+    {% endif %}
+    {% if "shieldOperationalRankingPoint" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {% if match.score_breakdown.red.shieldOperationalRankingPoint %}<span class="glyphicon glyphicon-ok"></span> (+1 RP){% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}
+      </td>
+      <td>Shield Generator Operational</td>
+      <td class="blue" colspan="2">
+        {% if match.score_breakdown.blue.shieldOperationalRankingPoint %}<span class="glyphicon glyphicon-ok"></span> (+1 RP){% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}
+      </td>
+    </tr>
+    {% endif %}
+
+    <!-- Fouls & Adjustments -->
+    {% if "foulCount" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">+{%if match.score_breakdown.blue.foulCount%}{{match.score_breakdown.blue.foulCount * 3}}{%else%}0{%endif%} / +{%if match.score_breakdown.blue.techFoulCount%}{{match.score_breakdown.blue.techFoulCount * 15}}{%else%}0{%endif%}{% if match.score_breakdown.red.tba_shieldEnergizedRankingPointFromFoul %} / +1 RP{% endif %}</td>
+      <td>Fouls / Tech Fouls</td>
+      <td class="blue" colspan="2">+{%if match.score_breakdown.red.foulCount%}{{match.score_breakdown.red.foulCount * 3}}{%else%}0{%endif%} / +{%if match.score_breakdown.red.techFoulCount%}{{match.score_breakdown.red.techFoulCount * 15}}{%else%}0{%endif%}{% if match.score_breakdown.blue.tba_shieldEnergizedRankingPointFromFoul %} / +1 RP{% endif %}</td>
+    </tr>
+    {% endif %}
+    {% if "adjustPoints" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.adjustPoints%}{{match.score_breakdown.red.adjustPoints}}{%else%}0{%endif%}</td>
+      <td>Adjustments</td>
+      <td class="blue" colspan="2">{%if match.score_breakdown.blue.adjustPoints%}{{match.score_breakdown.blue.adjustPoints}}{%else%}0{%endif%}</td>
+    </tr>
+    {% endif %}
+
+    <tr class="key">
+      <td class="redScore" colspan="2"><b>{%if match.score_breakdown.red.totalPoints%}{{match.score_breakdown.red.totalPoints}}{%else%}0{%endif%}</b></td>
+      <th>Total Score</th>
+      <td class="blueScore" colspan="2"><b>{%if match.score_breakdown.blue.totalPoints%}{{match.score_breakdown.blue.totalPoints}}{%else%}0{%endif%}</b></td>
+    </tr>
+
+    {% if 'rp' in match.score_breakdown.red and match.comp_level == 'qm' %}
+    <tr>
+      <td class="red" colspan="2">
+        {% if match.score_breakdown.red.shieldEnergizedRankingPoint %}
+        <svg class="top-left-dot" rel="tooltip" title="Shield Energized">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        {% if match.score_breakdown.red.shieldOperationalRankingPoint %}
+        <svg class="top-left-dot-2" rel="tooltip" title="Shield Operational">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        +{{match.score_breakdown.red.rp}} RP
+      </td>
+      <td>Ranking Points</td>
+      <td class="blue" colspan="2">
+        {% if match.score_breakdown.blue.shieldEnergizedRankingPoint %}
+        <svg class="top-left-dot" rel="tooltip" title="Shield Energized">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        {% if match.score_breakdown.blue.shieldOperationalRankingPoint %}
+        <svg class="top-left-dot-2" rel="tooltip" title="Shield Operational">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        +{{match.score_breakdown.blue.rp}} RP
+      </td>
+    </tr>
+    {% endif %}
+  </tbody>
+</table>
