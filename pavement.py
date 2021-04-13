@@ -69,8 +69,8 @@ def jinja2():
 def less():
     """Build and Combine CSS"""
     print("Building and Combining CSS")
-    sh("lessc static/css/less_css/tba_style.main.less static/css/less_css/tba_style.main.css")
-    sh("lessc static/css/less_css/tba_style.gameday.less static/css/less_css/tba_style.gameday.css")
+    sh("npx -p less@3.11.3 lessc static/css/less_css/tba_style.main.less static/css/less_css/tba_style.main.css")
+    sh("npx -p less@3.11.3 lessc static/css/less_css/tba_style.gameday.less static/css/less_css/tba_style.gameday.css")
     sh("python do_compress.py css")
 
 
