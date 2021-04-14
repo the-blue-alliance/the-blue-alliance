@@ -1,11 +1,14 @@
 from typing import Dict, List, Optional
 
 from backend.common.models.event_details import EventDetails
-from backend.common.models.event_ranking import RankingSortInfo
-from backend.common.models.keys import Year
+from backend.common.models.event_ranking import EventRanking, RankingSortInfo
+from backend.common.models.event_team_status import WLTRecord
+from backend.common.models.keys import TeamKey, Year
 
 
 class RankingsHelper:
+    # (zach, 2021) - Stop updating these every year. They're used for converting between rankings -> rankings2.
+    # We've been full rankings2 for a while now. We no longer need to keep updating these.
     SORT_ORDERS = {
         2020: [2, 3, 4, 5, 6],
         2019: [2, 3, 4, 5, 6],
@@ -121,7 +124,6 @@ class RankingsHelper:
 
     QUAL_AVERAGE_YEARS = {2015}
 
-    """
     @classmethod
     def build_ranking(
         cls,
@@ -134,11 +136,10 @@ class RankingsHelper:
         qual_average: Optional[float],
         matches_played: int,
         dq: int,
-        sort_orders: List,
+        sort_orders: List[float],
     ) -> EventRanking:
-        if year in cls.NO_RECORD_YEARS:
-            record = None
-        else:
+        record: Optional[WLTRecord] = None
+        if year not in cls.NO_RECORD_YEARS:
             record = {
                 "wins": int(wins),
                 "losses": int(losses),
@@ -147,14 +148,12 @@ class RankingsHelper:
 
         if year not in cls.QUAL_AVERAGE_YEARS:
             qual_average = None
-        else:
-            qual_average = float(qual_average)
 
         sort_orders_sanitized = []
         for so in sort_orders:
             try:
                 sort_orders_sanitized.append(float(so))
-            except:
+            except Exception:
                 sort_orders_sanitized.append(0.0)
 
         return {
@@ -166,7 +165,6 @@ class RankingsHelper:
             "dq": int(dq),
             "sort_orders": sort_orders_sanitized,
         }
-    """
 
     @classmethod
     def get_sort_order_info(

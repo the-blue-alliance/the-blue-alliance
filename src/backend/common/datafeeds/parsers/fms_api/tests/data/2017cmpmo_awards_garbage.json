@@ -1,0 +1,17 @@
+{
+    "Awards": [
+        {
+            "awardId": 73,
+            "teamId": 522169,
+            "eventId": 22465,
+            "eventDivisionId": null,
+            "eventCode": "CMPMO",
+            "name": "Churmans Award Not Really Tho",
+            "series": 1,
+            "teamNumber": 2614,
+            "schoolName": "MARS",
+            "fullTeamName": "NASA/NASA Robotics Alliance/United Way/West Virginia University/Mon County Board of Education/Aurora Flight Sciences/WV Space Grant Consortium/Mylan Pharmaceuticals & MARS",
+            "person": null
+        }
+    ]
+}

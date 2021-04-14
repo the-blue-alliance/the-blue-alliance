@@ -11,6 +11,15 @@
       {% include "index_partials/index_lhc_offseason.html" %}
     </div>
     <div class="col-xs-12 col-sm-7 col-lg-8">
+      <div class="btn-group game-manual">
+        <a class="btn btn-default" href="http://www.firstinspires.org/resource-library/frc/competition-manual-qa-system" target="_blank"><span class="glyphicon glyphicon-file"></span> {{game_name}} Game Manual and Materials</a>
+      </div>
+      <div>
+        <a class="btn btn-default" href="https://www.firstinspires.org/covid-19" target="_blank"><span class="glyphicon glyphicon-info-sign"></span> <i>FIRST</i> COVID-19 Resources</a>
+        <a class="btn btn-default" href="https://www.firstinspires.org/robotics/frc/game-and-season" target="_blank"><span class="glyphicon glyphicon-info-sign"></span> <i>FIRST</i> 2021 Game and Season Resources</a>
+        <a class="btn btn-default" href="https://www.firstinspires.org/sites/default/files/uploads/resource_library/frc/game-and-season-info/competition-manual/2021/2021-frc-season-details.pdf" target="_blank"><span class="glyphicon glyphicon-info-sign"></span> <i>FIRST</i> 2021 Season Details</a>
+      </div>
+
       {% include "media_partials/live_special_webcast_partial.html" %}
 
       {% if events and events|length > 0 %}
@@ -19,7 +28,7 @@
       <hr>
       {% endif %}
 
-      <h2>Only <span class="countdown-number countdown-days">--</span><span class="countdown-label day-label"> days</span> until {{kickoff_datetime_utc|strftime("%Y")}} Kickoff!</h2>
+      <!-- <h2>Only <span class="countdown-number countdown-days">--</span><span class="countdown-label day-label"> days</span> until {{kickoff_datetime_utc|strftime("%Y")}} Kickoff!</h2>
       <div id="countdown-finish-time">{{kickoff_datetime_utc|isoformat}}</div>
       <p>Watch the {{kickoff_datetime_utc|strftime("%Y")}} Kickoff LIVE on GameDay on The Blue Alliance on {{kickoff_datetime_utc|strftime("%B %-d%t")}}!</p>
 
@@ -32,7 +41,7 @@
       <div class="fitvids">
         <iframe width="560" height="315" src="https://www.youtube.com/embed/{{game_teaser_youtube_id}}" frameborder="0" allowfullscreen></iframe>
       </div>
-      {%endif%}
+      {%endif%} -->
     </div>
   </div>
 </div>

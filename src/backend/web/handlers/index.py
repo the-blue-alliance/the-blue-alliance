@@ -2,6 +2,7 @@ from typing import Any, Callable, cast, Dict
 
 from backend.common.consts.landing_type import LandingType
 from backend.common.decorators import cached_public
+from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.sitevars.landing_config import LandingConfig
 from backend.web.profiled_render import render_template
@@ -116,14 +117,18 @@ def index_champs(template_values: Dict[str, Any]) -> str:
 
 def index_offseason(template_values: Dict[str, Any]) -> str:
     # special_webcasts = FirebasePusher.get_special_webcasts()
-    # effective_season_year = SeasonHelper.effective_season_year()
-    #
-    # template_values.update({
-    #     "events": EventHelper.week_events(),
-    #     "kickoff_datetime_utc": SeasonHelper.kickoff_datetime_utc(effective_season_year),
-    #     "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
-    #     "special_webcasts": special_webcasts,
-    # })
+    effective_season_year = SeasonHelper.effective_season_year()
+
+    template_values.update(
+        {
+            "events": EventHelper.week_events(),
+            "kickoff_datetime_utc": SeasonHelper.kickoff_datetime_utc(
+                effective_season_year
+            ),
+            # "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
+            # "special_webcasts": special_webcasts,
+        }
+    )
     return render_template("index/index_offseason.html", template_values)
 
 
