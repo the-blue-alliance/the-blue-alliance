@@ -9,14 +9,16 @@
 # x is OPR and should be n x 1
 
 from collections import OrderedDict
-from typing import Callable, Dict, List
-from typing import Tuple
+from typing import Callable, Dict, List, Tuple
 
 import numpy as np
 from pyre_extensions import none_throws
 
-from backend.common.consts.alliance_color import ALLIANCE_COLORS
-from backend.common.consts.alliance_color import AllianceColor, OPPONENT
+from backend.common.consts.alliance_color import (
+    ALLIANCE_COLORS,
+    AllianceColor,
+    OPPONENT,
+)
 from backend.common.consts.comp_level import CompLevel
 from backend.common.models.event_matchstats import (
     Component,
@@ -135,12 +137,12 @@ class MatchstatsHelper:
         if not team_list:
             return {}
 
-        m_inv = cls.__build_m_inv_matrix(matches, team_id_map, played_only=True)
+        M_inv = cls.__build_M_inv_matrix(matches, team_id_map, played_only=True)
 
         return {
             f"frc{k}" if keyed else k: v
             for k, v in cls.__calc_stat(
-                matches, team_list, team_id_map, m_inv, point_accessor
+                matches, team_list, team_id_map, M_inv, point_accessor
             ).items()
         }
 
@@ -170,14 +172,14 @@ class MatchstatsHelper:
         return team_list, team_id_map
 
     @classmethod
-    def __build_m_inv_matrix(
+    def __build_M_inv_matrix(
         cls,
         matches: List[Match],
         team_id_map: TTeamIdMap,
         played_only: bool = False,
     ) -> "np.ndarray[float]":
         n = len(team_id_map.keys())
-        m = np.zeros((n, n))
+        M = np.zeros((n, n))
         for match in matches:
             if match.comp_level != CompLevel.QM:  # only consider quals matches
                 continue
@@ -188,9 +190,9 @@ class MatchstatsHelper:
                 for team1 in alliance_teams:
                     team1_id = team_id_map[team1[3:]]
                     for team2 in alliance_teams:
-                        m[team1_id, team_id_map[team2[3:]]] += 1
+                        M[team1_id, team_id_map[team2[3:]]] += 1
 
-        return np.linalg.pinv(m)
+        return np.linalg.pinv(M)
 
     @classmethod
     def __build_s_matrix(
@@ -222,7 +224,7 @@ class MatchstatsHelper:
         matches: List[Match],
         team_list: List[TeamId],
         team_id_map: TTeamIdMap,
-        m_inv: np.ndarray,
+        M_inv: np.ndarray,
         point_accessor: Callable[[Match, AllianceColor], float],
     ):
         s = cls.__build_s_matrix(
@@ -230,7 +232,7 @@ class MatchstatsHelper:
             team_id_map,
             point_accessor,
         )
-        x = np.dot(m_inv, s)
+        x = np.dot(M_inv, s)
 
         stat_dict = {}
         for team, stat in zip(team_list, x):

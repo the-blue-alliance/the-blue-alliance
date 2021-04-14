@@ -5,8 +5,8 @@ from typing import Dict
 import pytest
 
 from backend.common.helpers.matchstats_helper import MatchstatsHelper
-from backend.common.models.keys import TeamKey
 from backend.common.models.event_matchstats import EventMatchstats, StatType
+from backend.common.models.keys import TeamKey
 
 
 @pytest.fixture(autouse=True)
