@@ -14,6 +14,10 @@ def auto_add_ndb_context(ndb_context) -> None:
     pass
 
 
+def remove_team_keys(d: Dict) -> Dict:
+    return {key[3:]: stat for key, stat in d.items()}
+
+
 def api_data_to_matchstats(
     api_data: Dict[
         StatType, Union[Dict[str, Dict[TeamKey, float]], Dict[TeamKey, float]]
@@ -21,14 +25,14 @@ def api_data_to_matchstats(
 ) -> EventMatchstats:
     data: EventMatchstats = EventMatchstats(oprs={}, dprs={}, ccwms={}, coprs={})
 
-    nix_keys = lambda d: {key[3:]: stat for key, stat in d.items()}
-
     for stat_type in StatType:
         if stat_type == StatType.COPR:
             for copr_key in api_data[stat_type].keys():
-                data[stat_type][copr_key] = nix_keys(api_data[stat_type][copr_key])
+                data[stat_type][copr_key] = remove_team_keys(
+                    api_data[stat_type][copr_key]
+                )
         else:
-            data[stat_type] = nix_keys(api_data[stat_type])
+            data[stat_type] = remove_team_keys(api_data[stat_type])
 
     return data
 
