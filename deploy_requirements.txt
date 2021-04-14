@@ -1,6 +1,7 @@
 # Packages that are needed for deployment because
 # they are not included in App Engine
 iso8601==0.1.11
+rsa==3.4.2 # DO NOT BUMP - 4.0 is the last version that supports Python 2
 google-api-python-client==1.7.8
 google-cloud-bigquery==0.25.0
 beautifulsoup4
