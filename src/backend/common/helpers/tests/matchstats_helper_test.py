@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Dict, Union
+from typing import cast, Dict, Union
 
 import pytest
 
@@ -14,10 +14,6 @@ def auto_add_ndb_context(ndb_context) -> None:
     pass
 
 
-def remove_team_keys(d: Dict) -> Dict:
-    return {key[3:]: stat for key, stat in d.items()}
-
-
 def api_data_to_matchstats(
     api_data: Dict[
         StatType, Union[Dict[str, Dict[TeamKey, float]], Dict[TeamKey, float]]
@@ -25,14 +21,17 @@ def api_data_to_matchstats(
 ) -> EventMatchstats:
     data: EventMatchstats = EventMatchstats(oprs={}, dprs={}, ccwms={}, coprs={})
 
+    def remove_team_keys(d):
+        return {key[3:]: stat for key, stat in d.items()}
+
     for stat_type in StatType:
         if stat_type == StatType.COPR:
             for copr_key in api_data[stat_type].keys():
-                data[stat_type][copr_key] = remove_team_keys(
-                    api_data[stat_type][copr_key]
+                data[stat_type.value][copr_key] = remove_team_keys(
+                    api_data[stat_type.value][copr_key]
                 )
         else:
-            data[stat_type] = remove_team_keys(api_data[stat_type])
+            data[stat_type.value] = remove_team_keys(api_data[stat_type.value])
 
     return data
 
@@ -40,7 +39,8 @@ def api_data_to_matchstats(
 def assert_stats_equal(stats: EventMatchstats, expected_stats: EventMatchstats) -> None:
     assert stats.keys() == expected_stats.keys()
     for stat, team_stats in stats.items():
-        assert team_stats.keys() == expected_stats[stat].keys()
+        team_stats = cast(Dict, team_stats)
+        assert team_stats.keys() == expected_stats[stat].keys()  # type: ignore
 
 
 def test_compute_matchstats_no_matches() -> None:
