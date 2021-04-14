@@ -2,7 +2,7 @@ import datetime
 import logging
 
 from datafeeds.google_sheets_datafeed_base import GoogleSheetsDatafeedBase
-from datafeeds.parsers.csv.offseason_spreadsheet_parser import OffseasonSpreadsheetParser
+from datafeeds.parsers.csv.csv_offseason_spreadsheet_parser import CSVOffseasonSpreadsheetParser
 
 from models.event import Event
 
@@ -13,7 +13,7 @@ class DatafeedOffseasonSpreadsheet(GoogleSheetsDatafeedBase):
 
     def getEventList(self, key):
         url = self.SPREADSHEET_URL_BASE.format(key)
-        events, _ = self.parse(url, OffseasonSpreadsheetParser)
+        events, _ = self.parse(url, CSVOffseasonSpreadsheetParser)
 
         return [Event(
             event_type_enum=event.get("event_type_enum", None),

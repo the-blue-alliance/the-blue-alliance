@@ -11,9 +11,9 @@ from consts.event_type import EventType
 from consts.playoff_type import PlayoffType
 from controllers import event_controller
 from controllers.base_controller import LoggedInHandler
-from datafeeds.csv_advancement_parser import CSVAdvancementParser
-from datafeeds.csv_alliance_selections_parser import CSVAllianceSelectionsParser
-from datafeeds.csv_teams_parser import CSVTeamsParser
+from datafeeds.parsers.csv.csv_advancement_parser import CSVAdvancementParser
+from datafeeds.parsers.csv.csv_alliance_selections_parser import CSVAllianceSelectionsParser
+from datafeeds.parsers.csv.csv_teams_parser import CSVTeamsParser
 from helpers.award_manipulator import AwardManipulator
 from helpers.event.event_test_creator import EventTestCreator
 from helpers.event.event_webcast_adder import EventWebcastAdder

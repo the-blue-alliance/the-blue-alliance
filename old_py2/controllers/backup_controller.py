@@ -44,9 +44,9 @@ from models.media import Media
 from models.sitevar import Sitevar
 from models.team import Team
 
-from datafeeds.csv_alliance_selections_parser import CSVAllianceSelectionsParser
-from datafeeds.csv_awards_parser import CSVAwardsParser
-from datafeeds.offseason_matches_parser import OffseasonMatchesParser
+from datafeeds.parsers.csv.csv_alliance_selections_parser import CSVAllianceSelectionsParser
+from datafeeds.parsers.csv.csv_awards_parser import CSVAwardsParser
+from datafeeds.parsers.csv.csv_offseason_matches_parser import CSVOffseasonMatchesParser
 
 
 class MainBackupsEnqueue(webapp.RequestHandler):
@@ -505,7 +505,7 @@ class TbaCSVRestoreEventDo(webapp.RequestHandler):
             logging.warning('Unable to retreive url: ' + (self.MATCHES_URL.format(event.year, event_key, event_key)))
         else:
             data = result.content.replace('frc', '').replace('{}_'.format(event_key), '')
-            match_dicts, _ = OffseasonMatchesParser.parse(data)
+            match_dicts, _ = CSVOffseasonMatchesParser.parse(data)
             matches = [
                 Match(
                     id=Match.renderKeyName(

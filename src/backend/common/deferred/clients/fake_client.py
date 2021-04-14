@@ -20,6 +20,9 @@ class FakeTaskClient(RQTaskClient):
     def __init__(self) -> None:
         super().__init__(default_service="test", redis_client=self._redis)
 
+    def flush(self) -> None:
+        self._redis.flushall()
+
     def pending_job_count(self, queue_name: str) -> int:
         return len(self.queue(queue_name).jobs())
 

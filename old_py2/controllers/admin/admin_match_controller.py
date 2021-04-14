@@ -6,7 +6,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
-from datafeeds.offseason_matches_parser import OffseasonMatchesParser
+from datafeeds.parsers.csv.csv_offseason_matches_parser import CSVOffseasonMatchesParser
 from helpers.match_manipulator import MatchManipulator
 from models.event import Event
 from models.match import Match
@@ -111,7 +111,7 @@ class AdminMatchAdd(LoggedInHandler):
         self._require_admin()
         event_key = self.request.get('event_key')
         matches_csv = self.request.get('matches_csv')
-        matches, _ = OffseasonMatchesParser.parse(matches_csv)
+        matches, _ = CSVOffseasonMatchesParser.parse(matches_csv)
 
         event = Event.get_by_id(event_key)
         matches = [Match(
