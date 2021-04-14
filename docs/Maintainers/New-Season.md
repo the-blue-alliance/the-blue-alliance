@@ -1,3 +1,7 @@
+## Pre-Competition Season
+
+Within `src/backend/common/helpers/matchstats_helper.py`, add a new entry `2022: {}` (replace `2022` with the given upcoming year) to `COMPONENTS` for future custom component OPRs.
+
 ## Pre-Kickoff
 
 Each year, we've been generating "team media admin" keys to be distributed in the KOP. We generate one randomly for each team number, and then import them to TBA.

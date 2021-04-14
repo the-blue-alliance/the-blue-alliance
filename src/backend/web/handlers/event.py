@@ -1,7 +1,7 @@
 import collections
 import json
 import re
-from typing import Optional
+from typing import Dict, List, Optional, Tuple
 
 from flask import abort, redirect, request
 from google.cloud import ndb
@@ -18,7 +18,8 @@ from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancement
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.team_helper import TeamHelper
 from backend.common.models.event import Event
-from backend.common.models.keys import EventKey, Year
+from backend.common.models.event_matchstats import StatType
+from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.queries import district_query, event_query, media_query
 from backend.web.profiled_render import render_template
 
@@ -133,22 +134,26 @@ def event_detail(event_key: EventKey) -> Response:
 
     num_matchstats = 15
     matchstats = collections.OrderedDict()
-    if event.matchstats is not None:
-        matchstats["OPRs"] = sorted(
-            event.matchstats["oprs"].items(), key=lambda t: -t[1]
-        )[:num_matchstats]
-        matchstats["DPRs"] = sorted(
-            event.matchstats["dprs"].items(), key=lambda t: -t[1]
-        )[:num_matchstats]
-        matchstats["CCWMs"] = sorted(
-            event.matchstats["ccwms"].items(), key=lambda t: -t[1]
-        )[:num_matchstats]
 
-        if "coprs" in event.matchstats:
+    def sort_and_limit_stats(
+        stats_dict: Dict[TeamKey, float]
+    ) -> List[Tuple[TeamKey, float]]:
+        return sorted(stats_dict.items(), key=lambda t: -t[1])[:num_matchstats]
+
+    if event.matchstats is not None:
+        matchstats[StatType.OPR.value] = sort_and_limit_stats(
+            event.matchstats[StatType.OPR.value]
+        )
+        matchstats[StatType.DPR.value] = sort_and_limit_stats(
+            event.matchstats[StatType.DPR.value]
+        )
+        matchstats[StatType.CCWM.value] = sort_and_limit_stats(
+            event.matchstats[StatType.CCWM.value]
+        )
+
+        if StatType.COPR.value in event.matchstats:
             for component, copr_dict in event.matchstats["coprs"].items():
-                matchstats[component] = sorted(copr_dict.items(), key=lambda t: -t[1])[
-                    :num_matchstats
-                ]
+                matchstats[component] = sort_and_limit_stats(copr_dict)
 
     # Replace non-alphanumeric characters with underscores
     # in order to make sure that the html div IDs are valid

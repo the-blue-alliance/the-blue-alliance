@@ -1,39 +1,16 @@
 import json
 import os
-from typing import cast, Dict, Union
+from typing import cast, Dict
 
 import pytest
 
 from backend.common.helpers.matchstats_helper import MatchstatsHelper
-from backend.common.models.event_matchstats import EventMatchstats, StatType
-from backend.common.models.keys import TeamKey
+from backend.common.models.event_matchstats import EventMatchstats
 
 
 @pytest.fixture(autouse=True)
 def auto_add_ndb_context(ndb_context) -> None:
     pass
-
-
-def api_data_to_matchstats(
-    api_data: Dict[
-        StatType, Union[Dict[str, Dict[TeamKey, float]], Dict[TeamKey, float]]
-    ]
-) -> EventMatchstats:
-    data: EventMatchstats = EventMatchstats(oprs={}, dprs={}, ccwms={}, coprs={})
-
-    def remove_team_keys(d):
-        return {key[3:]: stat for key, stat in d.items()}
-
-    for stat_type in StatType:
-        if stat_type == StatType.COPR:
-            for copr_key in api_data[stat_type].keys():
-                data[stat_type.value][copr_key] = remove_team_keys(
-                    api_data[stat_type.value][copr_key]
-                )
-        else:
-            data[stat_type.value] = remove_team_keys(api_data[stat_type.value])
-
-    return data
 
 
 def assert_stats_equal(stats: EventMatchstats, expected_stats: EventMatchstats) -> None:
@@ -58,9 +35,8 @@ def test_compute_matchstats(test_data_importer) -> None:
     ) as f:
         expected_stats = json.load(f)
 
-    stats = MatchstatsHelper.calculate_matchstats(matches, keyed=False)
+    stats = MatchstatsHelper.calculate_matchstats(matches)
 
-    expected_stats = api_data_to_matchstats(expected_stats)
     assert_stats_equal(stats, expected_stats)
 
 
@@ -74,8 +50,7 @@ def test_compute_matchstats_with_b_teams(test_data_importer) -> None:
     ) as f:
         expected_stats = json.load(f)
 
-    stats = MatchstatsHelper.calculate_matchstats(matches, keyed=False)
-    expected_stats = api_data_to_matchstats(expected_stats)
+    stats = MatchstatsHelper.calculate_matchstats(matches)
     assert_stats_equal(stats, expected_stats)
 
 
@@ -88,8 +63,7 @@ def test_compute_matchstats_skip_coprs(test_data_importer):
     ) as f:
         expected_stats = json.load(f)
 
-    stats = MatchstatsHelper.calculate_matchstats(matches, skip_coprs=True, keyed=False)
-    expected_stats = api_data_to_matchstats(expected_stats)
+    stats = MatchstatsHelper.calculate_matchstats(matches, skip_coprs=True)
 
     for stat in expected_stats.keys():
         assert expected_stats[stat] == pytest.approx(stats[stat])

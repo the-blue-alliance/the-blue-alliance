@@ -56,11 +56,10 @@
             $("#dropdown_{{ component_id }}").click(function(e) {
                e.preventDefault();
                buildCoprTable("{{ component }}");
-               console.log("{{ component }}")
             });
         {% endfor %}
 
-        buildCoprTable("OPRs");
+        buildCoprTable("oprs");
     });
 </script>
 

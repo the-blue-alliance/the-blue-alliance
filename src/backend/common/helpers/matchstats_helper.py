@@ -42,7 +42,7 @@ class MatchstatsHelper:
         match.alliances[color]["score"] - match.alliances[OPPONENT[color]]["score"]
     )
     DEFAULT_COMPONENT_ACCESSOR: Callable[[Component], StatAccessor] = lambda comp: (
-        lambda match, color: match.score_breakdown[color].get(comp, 0)
+        lambda match, color: float(match.score_breakdown[color].get(comp, 0))
     )
 
     EVERGREEN: Dict[StatType, StatAccessor] = {
@@ -68,31 +68,29 @@ class MatchstatsHelper:
 
     @classmethod
     def calculate_matchstats(
-        cls, matches: List[Match], skip_coprs: bool = False, keyed: bool = True
+        cls, matches: List[Match], skip_coprs: bool = False
     ) -> EventMatchstats:
         return EventMatchstats(
-            oprs=cls.calculate_oprs(matches, keyed=keyed),
-            dprs=cls.calculate_dprs(matches, keyed=keyed),
-            ccwms=cls.calculate_ccwms(matches, keyed=keyed),
-            coprs={} if skip_coprs else cls.calculate_coprs(matches, keyed=keyed),
+            oprs=cls.calculate_oprs(matches),
+            dprs=cls.calculate_dprs(matches),
+            ccwms=cls.calculate_ccwms(matches),
+            coprs={} if skip_coprs else cls.calculate_coprs(matches),
         )
 
     @classmethod
-    def calculate_oprs(cls, matches: List[Match], keyed: bool = True) -> TeamStatMap:
-        return cls.calculate_stat(matches, cls.OPR_ACCESSOR, keyed=keyed)
+    def calculate_oprs(cls, matches: List[Match]) -> TeamStatMap:
+        return cls.calculate_stat(matches, cls.OPR_ACCESSOR)
 
     @classmethod
-    def calculate_dprs(cls, matches: List[Match], keyed: bool = True) -> TeamStatMap:
-        return cls.calculate_stat(matches, cls.DPR_ACCESSOR, keyed=keyed)
+    def calculate_dprs(cls, matches: List[Match]) -> TeamStatMap:
+        return cls.calculate_stat(matches, cls.DPR_ACCESSOR)
 
     @classmethod
-    def calculate_ccwms(cls, matches: List[Match], keyed: bool = True) -> TeamStatMap:
-        return cls.calculate_stat(matches, cls.CCWM_ACCESSOR, keyed=keyed)
+    def calculate_ccwms(cls, matches: List[Match]) -> TeamStatMap:
+        return cls.calculate_stat(matches, cls.CCWM_ACCESSOR)
 
     @classmethod
-    def calculate_coprs(
-        cls, matches: List[Match], keyed: bool = True
-    ) -> Dict[Component, TeamStatMap]:
+    def calculate_coprs(cls, matches: List[Match]) -> Dict[Component, TeamStatMap]:
         coprs = OrderedDict()
 
         # If there is not valid data for COPRs, skip
@@ -107,18 +105,21 @@ class MatchstatsHelper:
         year = matches[0].year
         if year in cls.COMPONENTS.keys():
             for title, accessor in cls.COMPONENTS[year].items():
-                coprs[title] = cls.calculate_stat(matches, accessor, keyed=keyed)
+                coprs[title] = cls.calculate_stat(matches, accessor)
 
         # for each string-like key in the score_breakdown object
         # (just take the red score_breakdown from match 0, it's an arbitrary selection)
         for component, value in none_throws(matches[0].score_breakdown)[
             AllianceColor.RED
         ].items():
-            # if the component is an int or a float, we can compute it easily
-            # (as opposed to, say, a string)
-            if isinstance(value, int) or isinstance(value, float):
+            try:
+                float(value)
+            except ValueError:
+                pass
+                # Can't convert the given score_breakdown value to a float, so we can't calculate a component OPR for it
+            else:
                 coprs[component] = cls.calculate_stat(
-                    matches, cls.DEFAULT_COMPONENT_ACCESSOR(component), keyed=keyed
+                    matches, cls.DEFAULT_COMPONENT_ACCESSOR(component)
                 )
 
         return coprs
@@ -127,27 +128,26 @@ class MatchstatsHelper:
     def calculate_stat(
         cls,
         matches: List[Match],
-        point_accessor: Callable[[Match, AllianceColor], float],
-        keyed: bool,
+        point_accessor: StatAccessor,
     ) -> TeamStatMap:
         if not matches:
             return {}
 
-        team_list, team_id_map = cls.__build_team_mapping(matches)
+        team_list, team_id_map = cls._build_team_mapping(matches)
         if not team_list:
             return {}
 
-        M_inv = cls.__build_M_inv_matrix(matches, team_id_map, played_only=True)
+        M_inv = cls._build_M_inv_matrix(matches, team_id_map, played_only=True)
 
         return {
-            f"frc{k}" if keyed else k: v
-            for k, v in cls.__calc_stat(
+            f"frc{k}": v
+            for k, v in cls._calc_stat(
                 matches, team_list, team_id_map, M_inv, point_accessor
             ).items()
         }
 
     @classmethod
-    def __build_team_mapping(
+    def _build_team_mapping(
         cls, matches: List[Match]
     ) -> Tuple[List[TeamId], TTeamIdMap]:
         """
@@ -156,15 +156,15 @@ class MatchstatsHelper:
         team_id_map: A dict of key: team_str, value: row index in x_matrix that corresponds to the team
         """
         # Build team list
-        team_list = set()
+        team_set = set()
         for match in matches:
             if match.comp_level != CompLevel.QM:  # only consider quals matches
                 continue
             for alliance_color in ALLIANCE_COLORS:
                 for team in match.alliances[alliance_color]["teams"]:
-                    team_list.add(team[3:])  # turns "frc254B" into "254B"
+                    team_set.add(team[3:])  # turns "frc254B" into "254B"
 
-        team_list = list(team_list)
+        team_list = list(team_set)  # Keep enumerate ordering by converting to list
         team_id_map = {}
         for i, team in enumerate(team_list):
             team_id_map[team] = i
@@ -172,7 +172,7 @@ class MatchstatsHelper:
         return team_list, team_id_map
 
     @classmethod
-    def __build_M_inv_matrix(
+    def _build_M_inv_matrix(
         cls,
         matches: List[Match],
         team_id_map: TTeamIdMap,
@@ -191,15 +191,14 @@ class MatchstatsHelper:
                     team1_id = team_id_map[team1[3:]]
                     for team2 in alliance_teams:
                         M[team1_id, team_id_map[team2[3:]]] += 1
-
         return np.linalg.pinv(M)
 
     @classmethod
-    def __build_s_matrix(
+    def _build_s_matrix(
         cls,
         matches: List[Match],
         team_id_map: TTeamIdMap,
-        point_accessor: Callable[[Match, AllianceColor], float],
+        point_accessor: StatAccessor,
     ) -> "np.ndarray[float]":
         n = len(team_id_map.keys())
         s = np.zeros((n, 1))
@@ -214,20 +213,20 @@ class MatchstatsHelper:
 
                 stat = point_accessor(match, alliance_color)
                 for team in alliance_teams:
-                    s[team_id_map[team]] += float(stat)
+                    s[team_id_map[team]] += stat
 
         return s
 
     @classmethod
-    def __calc_stat(
+    def _calc_stat(
         cls,
         matches: List[Match],
         team_list: List[TeamId],
         team_id_map: TTeamIdMap,
         M_inv: np.ndarray,
-        point_accessor: Callable[[Match, AllianceColor], float],
+        point_accessor: StatAccessor,
     ):
-        s = cls.__build_s_matrix(
+        s = cls._build_s_matrix(
             matches,
             team_id_map,
             point_accessor,
