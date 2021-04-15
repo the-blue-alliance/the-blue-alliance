@@ -54,14 +54,14 @@ class MatchstatsHelper:
     COMPONENTS = {
         2020: {
             "Total Power Cell Points": lambda match, color: (
-                match.score_breakdown[color].get("autoCellPoints")
-                + match.score_breakdown[color].get("teleopCellPoints")
+                match.score_breakdown[color].get("autoCellPoints", 0)
+                + match.score_breakdown[color].get("teleopCellPoints", 0)
             ),
         },
         2019: {
             "Cargo + Panel Points": lambda match, color: (
-                match.score_breakdown[color].get("cargoPoints")
-                + match.score_breakdown[color].get("hatchPanelPoints")
+                match.score_breakdown[color].get("cargoPoints", 0)
+                + match.score_breakdown[color].get("hatchPanelPoints", 0)
             )
         },
     }

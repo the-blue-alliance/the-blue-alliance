@@ -137,16 +137,8 @@ class LocalDataBootstrap:
         # event_oprs = cls.fetch_event_detail(key, "oprs", auth_token)
         # cls.store_eventdetail(event, "matchstats", event_oprs)
 
-        # Calculate insights locally
+        # Calculate insights locally, as prod does not have COPRs
         matchstats_dict = MatchstatsHelper.calculate_matchstats(event.matches)
-
-        # if any([v != {} for v in matchstats_dict.values()]):
-        #     pass
-        # else:
-        #     matchstats_dict = None
-        #     print("Convert the following to a warning!")
-        #     print(f"Matchstat calculation for {event.key} failed!")
-
         cls.store_eventdetail(event, "matchstats", matchstats_dict)
 
     @classmethod

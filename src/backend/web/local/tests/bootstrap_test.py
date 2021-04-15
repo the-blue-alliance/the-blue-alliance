@@ -99,7 +99,7 @@ def make_match(match_key: MatchKey) -> Match:
                 ),
             }
         ),
-        score_breakdown_json=None,
+        score_breakdown_json="""{"red": {}, "blue": {}}""",
         comp_level=CompLevel.QM,
         year=int(event_key[:4]),
         set_number=1,
@@ -109,14 +109,14 @@ def make_match(match_key: MatchKey) -> Match:
     )
 
 
-def make_team_stat_map() -> TeamStatMap:
+def make_team_stat_map(n: float) -> TeamStatMap:
     return {
-        "frc1": 0.0,
-        "frc2": 0.0,
-        "frc3": 0.0,
-        "frc4": 0.0,
-        "frc5": 0.0,
-        "frc6": 0.0,
+        "frc1": n,
+        "frc2": n,
+        "frc3": n,
+        "frc4": n,
+        "frc5": n,
+        "frc6": n,
     }
 
 
@@ -276,10 +276,10 @@ def test_bootstrap_event(ndb_context, requests_mock: RequestsMocker) -> None:
         team_list=[],
     )
     matchstats = EventMatchstats(
-        oprs=make_team_stat_map(),
-        dprs=make_team_stat_map(),
-        ccwms=make_team_stat_map(),
-        coprs={},
+        oprs=make_team_stat_map(0.0),
+        dprs=make_team_stat_map(0.0),
+        ccwms=make_team_stat_map(0.0),
+        coprs={"Total Power Cell Points": make_team_stat_map(0.0)},
     )
     mock_event_detail_url(requests_mock, event)
     mock_event_teams_url(requests_mock, event.key_name, [team1, team2])
@@ -320,6 +320,7 @@ def test_bootstrap_event(ndb_context, requests_mock: RequestsMocker) -> None:
         alliance_selections=alliances,
         matchstats=matchstats,
     )
+
     assert expected_details == remove_auto_add_properties(stored_details)
 
     stored_award = Award.get_by_id("2020nyny_0")
