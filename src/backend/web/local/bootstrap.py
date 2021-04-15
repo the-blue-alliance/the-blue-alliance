@@ -133,11 +133,7 @@ class LocalDataBootstrap:
         event_awards = cls.fetch_event_detail(key, "awards", auth_token)
         list(map(lambda t: cls.store_award(t, event), event_awards))
 
-        # Get insights from prod API
-        # event_oprs = cls.fetch_event_detail(key, "oprs", auth_token)
-        # cls.store_eventdetail(event, "matchstats", event_oprs)
-
-        # Calculate insights locally, as prod does not have COPRs
+        # Calculate insights locally
         matchstats_dict = MatchstatsHelper.calculate_matchstats(event.matches)
         cls.store_eventdetail(event, "matchstats", matchstats_dict)
 

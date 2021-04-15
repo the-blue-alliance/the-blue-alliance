@@ -141,13 +141,9 @@ def event_detail(event_key: EventKey) -> Response:
         return sorted(stats_dict.items(), key=lambda t: -t[1])[:num_matchstats]
 
     if event.matchstats is not None:
-        matchstats[StatType.OPR.value] = sort_and_limit_stats(
-            event.matchstats[StatType.OPR.value]
-        )
-        matchstats[StatType.DPR.value] = sort_and_limit_stats(
-            event.matchstats[StatType.DPR.value]
-        )
-        matchstats[StatType.CCWM.value] = sort_and_limit_stats(
+        matchstats["OPRs"] = sort_and_limit_stats(event.matchstats[StatType.OPR.value])
+        matchstats["DPRs"] = sort_and_limit_stats(event.matchstats[StatType.DPR.value])
+        matchstats["CCWMs"] = sort_and_limit_stats(
             event.matchstats[StatType.CCWM.value]
         )
 

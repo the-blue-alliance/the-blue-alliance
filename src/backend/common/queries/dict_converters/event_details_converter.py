@@ -35,13 +35,17 @@ class EventDetailsConverter(ConverterBase):
                 "sort_order_info": None,
             }
 
+        oprs = {}
+        if event_details.matchstats is not None:
+            oprs = event_details.matchstats
+
         event_details_dict = {
             "alliances": event_details.alliance_selections if event_details else [],
             "district_points": event_details.district_points if event_details else {},
             "insights": event_details.insights
             if event_details
             else {"qual": {}, "playoff": {}},
-            "oprs": event_details.matchstats,
+            "oprs": oprs,
             "predictions": event_details.predictions if event_details else {},
             "rankings": rankings,
         }

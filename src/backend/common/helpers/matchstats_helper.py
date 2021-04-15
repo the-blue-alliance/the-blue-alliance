@@ -23,7 +23,6 @@ from backend.common.consts.comp_level import CompLevel
 from backend.common.models.event_matchstats import (
     Component,
     EventMatchstats,
-    StatType,
     TeamStatMap,
 )
 from backend.common.models.keys import TeamId
@@ -45,12 +44,21 @@ class MatchstatsHelper:
         lambda match, color: float(match.score_breakdown[color].get(comp, 0))
     )
 
-    EVERGREEN: Dict[StatType, StatAccessor] = {
-        StatType.OPR: OPR_ACCESSOR,
-        StatType.DPR: DPR_ACCESSOR,
-        StatType.CCWM: CCWM_ACCESSOR,
-    }
-
+    # The dictionary of a given year's component OPRs is made up of key:value pairs that map
+    # strings to lambdas. The strings are human-readable keys that are displayed to the end
+    # user:
+    #
+    # (2019) https://i.imgur.com/ITrxcut.png
+    #
+    # The lambdas take in two arguments, match and color, corresponding to the match object
+    # and color of the alliance. Typically, these are simply used to get a field in the
+    # corresponding alliance's `score_breakdown`, but can be used along with `OPPOSITE` in
+    # order to calculate fields dependent on the opposing alliance's `score_breakdown`. For
+    # example, the lambda for CCWMs (OPR minus DPR) would be:
+    #
+    # lambda match, color: (
+    #   match.alliances[color]["score"] - match.alliances[OPPONENT[color]]["score"]
+    # )
     COMPONENTS = {
         2020: {
             "Total Power Cell Points": lambda match, color: (
@@ -94,22 +102,22 @@ class MatchstatsHelper:
         coprs = OrderedDict()
 
         # If there is not valid data for COPRs, skip
-        if not (
-            matches is not None
-            and len(matches) > 0
-            and matches[0].score_breakdown is not None
-        ):
+        if matches is None or len(matches) == 0:
+            return coprs
+
+        match = matches[0]
+        if match.score_breakdown is None:
             return coprs
 
         # Specific components specified in cls
-        year = matches[0].year
+        year = match.year
         if year in cls.COMPONENTS.keys():
             for title, accessor in cls.COMPONENTS[year].items():
                 coprs[title] = cls.calculate_stat(matches, accessor)
 
         # for each string-like key in the score_breakdown object
         # (just take the red score_breakdown from match 0, it's an arbitrary selection)
-        for component, value in none_throws(matches[0].score_breakdown)[
+        for component, value in none_throws(match.score_breakdown)[
             AllianceColor.RED
         ].items():
             try:
