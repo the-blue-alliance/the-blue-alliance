@@ -14,6 +14,7 @@
     {"site-package": "numpy"},
     {"site-package": "pytest"},
     {"site-package": "_pytest"},
+    {"site-package": "pyre_extensions"},
     {"site-package": "redis"},
     {"site-package": "requests_mock"},
     {"site-package": "rq"}
