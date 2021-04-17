@@ -4,6 +4,7 @@ import re
 from typing import cast, Dict, List, Optional, Set
 
 from google.cloud import ndb
+from google.cloud.datastore import key as datastore_key
 from pyre_extensions import none_throws, safe_cast
 
 from backend.common.consts import comp_level
@@ -155,6 +156,18 @@ class Match(CachedModel):
         self._youtube_videos: Optional[List[str]] = None
         self._updated_attrs = []  # Used in MatchManipulator to track what changed
         super(Match, self).__init__(*args, **kw)
+
+    @classmethod
+    def _global_cache_timeout(cls, key: datastore_key.Key) -> Optional[int]:
+        match_key = key.id_or_name
+        event_key = match_key.split("_")[0]
+        event: Optional[Event] = Event.get_by_id(event_key, use_global_cache=False)
+        if not event:
+            return None
+        if event.within_a_day:
+            return 61
+        else:
+            return 60 * 60 * 24  # one day in seconds
 
     @property
     def alliances(self) -> Dict[AllianceColor, MatchAlliance]:

@@ -51,7 +51,10 @@ def ndb_client(init_ndb_env_vars, ndb_stub) -> ndb.Client:
 
 
 @pytest.fixture()
-def ndb_context(ndb_client: ndb.Client):
+def ndb_context(request, ndb_client: ndb.Client):
+    if "no_auto_ndb_context" in request.keywords:
+        yield
+        return
     with ndb_client.context() as context:
         yield context
 

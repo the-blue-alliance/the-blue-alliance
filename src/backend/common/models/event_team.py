@@ -1,6 +1,7 @@
-from typing import Set
+from typing import Optional, Set
 
 from google.cloud import ndb
+from google.cloud.datastore import key as datastore_key
 from pyre_extensions import none_throws, safe_cast
 
 from backend.common.models.cached_model import CachedModel
@@ -40,6 +41,17 @@ class EventTeam(CachedModel):
             "year": set(),
         }
         super(EventTeam, self).__init__(*args, **kw)
+
+    @classmethod
+    def _global_cache_timeout(cls, key: datastore_key.Key) -> Optional[int]:
+        event_key = key.id_or_name.split("_")[0]
+        event: Optional[Event] = Event.get_by_id(event_key, use_global_cache=False)
+        if not event:
+            return None
+        if event.within_a_day:
+            return 61
+        else:
+            return 60 * 60 * 24  # one day in second
 
     @classmethod
     def validate_key_name(cls, key: str) -> bool:
