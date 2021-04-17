@@ -57,13 +57,13 @@ class EntityProtoDecoder:
     @classmethod
     def decode_protobuf(cls, model: ndb.Model, pb: EntityProto) -> None:
         deserialized_props = {}
-        if pb.key().path().element_list():
+        if pb.key().path.element_list():
             key_ref = pb.key()
-            app = key_ref.app().decode()
-            namespace = key_ref.name_space() if key_ref.has_name_space() else None
+            app = key_ref.app.decode()
+            namespace = key_ref.name_space if key_ref.has_name_space() else None
             pairs = [
-                (elem.type().decode(), elem.id() or elem.name().decode())
-                for elem in key_ref.path().element_list()
+                (elem.type, elem.id or elem.name.decode())
+                for elem in key_ref.path.element_list()
             ]
             deserialized_props["key"] = ndb.Key(
                 pairs=pairs, app=app, namespace=namespace
