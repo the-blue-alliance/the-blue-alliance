@@ -7,6 +7,7 @@ import typing
 from typing import Dict, Generator, List, Optional, Set, Tuple
 
 from google.cloud import ndb
+from google.cloud.datastore import key as datastore_key
 from pyre_extensions import none_throws, safe_cast
 
 from backend.common.consts import event_type
@@ -148,6 +149,17 @@ class Event(CachedModel):
         self._updated_attrs = []  # Used in EventManipulator to track what changed
         self._week = None
         super(Event, self).__init__(*args, **kw)
+
+    @classmethod
+    def _global_cache_timeout(cls, key: datastore_key.Key) -> Optional[int]:
+        print(f"TTL: {key.__module__} {key} {key.id_or_name}")
+        event: Optional[Event] = Event.get_by_id(key.id_or_name, use_global_cache=False)
+        if not event:
+            return None
+        if event.within_a_day:
+            return 61
+        else:
+            return 60 * 60 * 24  # one day in seconds
 
     @ndb.tasklet
     def get_awards_async(self) -> TypedFuture[List["Award"]]:
