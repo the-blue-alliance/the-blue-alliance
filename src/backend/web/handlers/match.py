@@ -31,8 +31,9 @@ def match_detail(match_key: MatchKey) -> Response:
 
     match_breakdown_template = None
     if match.score_breakdown is not None and match.year >= 2015:
+        game_year = 2020 if match.year == 2021 else match.year
         match_breakdown_template = (
-            "match_partials/match_breakdown/match_breakdown_{}.html".format(match.year)
+            "match_partials/match_breakdown/match_breakdown_{}.html".format(game_year)
         )
 
     template_values = {
