@@ -152,7 +152,6 @@ class Event(CachedModel):
 
     @classmethod
     def _global_cache_timeout(cls, key: datastore_key.Key) -> Optional[int]:
-        print(f"TTL: {key.__module__} {key} {key.id_or_name}")
         event: Optional[Event] = Event.get_by_id(key.id_or_name, use_global_cache=False)
         if not event:
             return None

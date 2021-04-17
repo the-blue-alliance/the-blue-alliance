@@ -2,6 +2,7 @@ import json
 from typing import Dict, List, Optional
 
 from google.cloud import ndb
+from google.cloud.datastore import key as datastore_key
 from pyre_extensions import none_throws, safe_cast
 
 from backend.common.consts import award_type, event_type
@@ -65,6 +66,17 @@ class Award(CachedModel):
         self._recipient_dict: Optional[Dict[Optional[int], List[AwardRecipient]]] = None
         self._recipient_list_json: Optional[str] = None
         super(Award, self).__init__(*args, **kw)
+
+    @classmethod
+    def _global_cache_timeout(cls, key: datastore_key.Key) -> Optional[int]:
+        event_key = key.id_or_name.split("_")[0]
+        event: Optional[Event] = Event.get_by_id(event_key, use_global_cache=False)
+        if not event:
+            return None
+        if event.within_a_day:
+            return 61
+        else:
+            return 60 * 60 * 24  # one day in second
 
     @property
     def is_blue_banner(self) -> bool:
