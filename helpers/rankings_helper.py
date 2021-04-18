@@ -162,7 +162,7 @@ class RankingsHelper(object):
              'precision': 0}],
     }
 
-    NO_RECORD_YEARS = {2010, 2015}
+    NO_RECORD_YEARS = {2010, 2015, 2021}
 
     QUAL_AVERAGE_YEARS = {2015}
 
