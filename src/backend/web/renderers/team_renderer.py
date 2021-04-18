@@ -91,9 +91,11 @@ class TeamRenderer(object):
         district_name = None
         district_abbrev = None
         team_district_points = None
+
         team_districts = team_districts_future.get_result()
         for district in team_districts:
-            if district and district.year == year:
+            # Do not show District Points information for 2021 pages
+            if district and district.year == year and district.year != 2021:
                 district_abbrev = district.abbreviation
                 district_name = district.display_name
                 if district.rankings:
