@@ -211,3 +211,75 @@ def test_render_rankings_game_year(
         sort_order_info=SORT_ORDER_INFO[expected_year],
         extra_stats_info=[],
     )
+
+
+def test_rankings_table_game_year_2021(ndb_context) -> None:
+    event_key = "2021miket"
+    _create_test_event(event_key)
+
+    details = EventDetails(
+        id=event_key,
+        rankings2=[
+            EventRanking(
+                rank=1,
+                team_key="frc254",
+                record=None,
+                qual_average=None,
+                matches_played=0,
+                dq=0,
+                sort_orders=[1, 2, 3, 4, 5, 6],
+            )
+        ],
+    )
+    assert details.rankings_table == [
+        [
+            "Rank",
+            "Team",
+            "Overall Score",
+            "Galactic Search",
+            "Auto-Nav",
+            "Hyperdrive",
+            "Interstellar Accuracy",
+            "Power Port",
+        ],
+        [1, "254", "1.00", "2.00", "3.00", "4.00", "5.00", "6.00"],
+    ]
+
+
+def test_rankings_table_game_year_2021_offseason(ndb_context) -> None:
+    event_key = "2021isoir1"
+    _create_test_event(event_key, EventType.OFFSEASON)
+
+    details = EventDetails(
+        id=event_key,
+        rankings2=[
+            EventRanking(
+                rank=1,
+                team_key="frc254",
+                record=WLTRecord(
+                    wins=1,
+                    losses=0,
+                    ties=0,
+                ),
+                qual_average=None,
+                matches_played=1,
+                dq=0,
+                sort_orders=[1, 2, 3, 4],
+            )
+        ],
+    )
+    assert details.rankings_table == [
+        [
+            "Rank",
+            "Team",
+            "Ranking Score",
+            "Auto",
+            "End Game",
+            "Teleop Cell + CPanel",
+            "Record (W-L-T)",
+            "DQ",
+            "Played",
+            "Total Ranking Points*",
+        ],
+        [1, "254", "1.00", "2", "3", "4", "1-0-0", 0, 1, "1"],
+    ]

@@ -198,6 +198,7 @@ class EventDetails(CachedModel):
             # Do not add DQ + Matches Played for 2021 - no matches played
             if self.game_year == 2021:
                 has_matches_played = False
+            else:
                 row.append(rank["dq"])
                 row.append(rank["matches_played"])
 
