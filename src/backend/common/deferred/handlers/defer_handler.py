@@ -4,6 +4,12 @@ from typing import Any
 
 from flask import abort, Flask, request, Response
 
+from backend.common.environment import Environment
+from backend.common.url_converters import (
+    has_regex_url_converter,
+    install_regex_url_converter,
+)
+
 
 class PermanentTaskFailure(Exception):
     """Indicates that a task failed, and will never succeed."""
@@ -26,7 +32,8 @@ def run(data: bytes) -> Any:
 
 
 def handle_defer(path: str) -> Response:
-    if "X-AppEngine-TaskName" not in request.headers:
+    # Ignore XSRF protection in dev env
+    if not Environment.is_dev() and "X-AppEngine-TaskName" not in request.headers:
         logging.error(
             'Detected an attempted XSRF attack. The header "X-AppEngine-TaskName" was not set.'
         )
@@ -37,6 +44,10 @@ def handle_defer(path: str) -> Response:
 
 
 def install_defer_routes(app: Flask) -> None:
+    # Requires regex URL converter
+    if not has_regex_url_converter(app):
+        install_regex_url_converter(app)
+
     app.add_url_rule(
         '/_ah/queue/<regex("deferred.*"):path>',
         view_func=handle_defer,
