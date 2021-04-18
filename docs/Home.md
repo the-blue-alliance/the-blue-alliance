@@ -11,6 +11,10 @@ A guide to understanding how TBA works internally.
 
 ## Setup
 
+### [[Contributing Guidelines|Contributing]]
+
+Start here! Guidelines for contributing to The Blue Alliance.
+
 ### [[Setup Guide|Setup-Guide]]
 
 A step-by-step guide for getting The Blue Alliance up and running locally. For new contributors, this should be your first stop.
