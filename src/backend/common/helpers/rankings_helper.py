@@ -28,7 +28,7 @@ class RankingsHelper:
         2007: [6, 7, 8],
     }
 
-    NO_RECORD_YEARS = {2010, 2015}
+    NO_RECORD_YEARS = {2010, 2015, 2021}
 
     QUAL_AVERAGE_YEARS = {2015}
 
