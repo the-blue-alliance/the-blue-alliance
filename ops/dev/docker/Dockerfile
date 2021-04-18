@@ -27,7 +27,7 @@ RUN echo 1 | update-alternatives --config python
 
 # Add gcloud repository and Cloud SDK dependencies
 RUN apt-get update && apt-get install -y apt-transport-https curl
-RUN echo "deb https://packages.cloud.google.com/apt cloud-sdk-xenial main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+RUN echo "deb https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
 RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 RUN apt-get update && apt-get install -y \
     google-cloud-sdk \
@@ -40,7 +40,7 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get install -y nodejs npm
 
 # Install pip2 for gcloud dependencies
-RUN curl https://bootstrap.pypa.io/get-pip.py | python2
+RUN curl https://bootstrap.pypa.io/pip/2.7/get-pip.py | python2
 
 # Configure ssh server
 RUN mkdir /var/run/sshd
