@@ -1,14 +1,16 @@
 import re
+from typing import List
 
+import pytest
 from bs4 import BeautifulSoup
 from freezegun import freeze_time
 from google.cloud import ndb
 from werkzeug.test import Client
 
-
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
+from backend.web.handlers.conftest import CapturedTemplate
 from backend.web.handlers.tests import helpers
 
 
@@ -177,3 +179,51 @@ def test_district_details_render_active_teams(
         "tr", id=re.compile(r"live-team-2019ctwat-frc\d{3}")
     )
     assert len(live_teams) == 41
+
+
+@pytest.mark.parametrize("year, expects_rankings", [(2020, True), (2021, False)])
+def test_district_detail_rankings(
+    year,
+    expects_rankings,
+    ndb_client: ndb.Client,
+    captured_templates: List[CapturedTemplate],
+    web_client: Client,
+):
+    district_key = f"{year}fim"
+
+    helpers.preseed_district(ndb_client, district_key)
+
+    rankings = [
+        {
+            "rank": 1,
+            "team_key": "frc7332",
+            "point_toal": 83,
+            "rookie_bonus": 0,
+            "event_points": {
+                "qual_points": 22,
+                "elim_points": 30,
+                "alliance_points": 16,
+                "award_points": 15,
+                "total": 83,
+            },
+        }
+    ]
+
+    with ndb_client.context():
+        district = District.get_by_id(district_key)
+        district.rankings = rankings
+        district.put()
+
+    response = web_client.get(f"/events/fim/{year}")
+
+    assert response.status_code == 200
+    assert len(captured_templates) == 1
+
+    template = captured_templates[0][0]
+    context = captured_templates[0][1]
+    assert template.name == "district_details.html"
+    with ndb_client.context():
+        if expects_rankings:
+            assert context["rankings"] == rankings
+        else:
+            assert context["rankings"] is None
