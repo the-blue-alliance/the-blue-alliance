@@ -15,7 +15,7 @@ from backend.common.models.event_insights import EventInsights
 from backend.common.models.event_matchstats import EventMatchstats
 from backend.common.models.event_predictions import EventPredictions
 from backend.common.models.event_ranking import EventRanking
-from backend.common.models.keys import EventKey
+from backend.common.models.keys import EventKey, Year
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
@@ -96,12 +96,39 @@ class EventDetails(CachedModel):
         return int(self.key_name[:4])
 
     @property
+    def game_year(self) -> Year:
+        """
+        Returns the year of the game the Event played. Some offseason events choose
+        to play games from different years. Ex: 2021 Offseason Events played the 2020 game.
+        """
+        # 2015 mttd played the 2014 game
+        if self.key_name == "2015mttd":
+            return 2014
+
+        from backend.common.models.event import Event
+
+        event = Event.get_by_id(self.key_name)
+        if not event:
+            return self.year
+
+        # 2021 offseason events played the 2020 game
+        if self.year == 2021 and event.is_offseason:
+            return 2020
+
+        return self.year
+
+    @property
     def renderable_rankings(self) -> RenderedRankings:
+        game_year = self.game_year
+
         has_extra_stats = False
         if self.rankings2:
             for rank in self.rankings2:
                 rank["extra_stats"] = []
-                if self.year in {2017, 2018, 2019, 2020}:
+                if game_year == 2021:
+                    # 2021 did not have matches played for rankings
+                    continue
+                elif game_year in {2017, 2018, 2019, 2020}:
                     rank["extra_stats"] = [
                         int(round(rank["sort_orders"][0] * rank["matches_played"])),
                     ]
@@ -114,13 +141,14 @@ class EventDetails(CachedModel):
                     ]
                     has_extra_stats = True
 
-        # 2015 mttd played the 2014 game
-        ranking_year = 2014 if self.key_name == "2015mttd" else self.year
-        sort_order_info = RANKING_SORT_ORDERS.get(ranking_year)
+        sort_order_info = RANKING_SORT_ORDERS.get(game_year)
 
         extra_stats_info: List[RankingSortOrderInfo] = []
         if has_extra_stats:
-            if self.year in {2017, 2018, 2019, 2020}:
+            if game_year == 2021:
+                # 2021 did not have matches played for rankings
+                pass
+            elif game_year in {2017, 2018, 2019, 2020}:
                 extra_stats_info = [{"name": "Total Ranking Points", "precision": 0}]
             elif sort_order_info is not None:
                 extra_stats_info = [

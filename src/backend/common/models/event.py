@@ -397,10 +397,6 @@ class Event(CachedModel):
             return "Week {}".format(0.5 if self.week == 0 else self.week)
         return "Week {}".format(none_throws(self.week) + 1)
 
-    @property
-    def is_season_event(self) -> bool:
-        return self.event_type_enum in event_type.SEASON_EVENT_TYPES
-
     @ndb.tasklet
     def get_teams_async(self) -> TypedFuture[List["Team"]]:
         from backend.common.queries import team_query

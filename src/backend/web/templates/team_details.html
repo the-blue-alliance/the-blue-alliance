@@ -84,7 +84,7 @@
             {{bbm.blue_banner({'year': year, 'normalized_name': 'Participation Award'}, {'normalized_name': 'Season'}, hidden=True)}}
 
             {% for comp in participation %}
-              {% if comp.event.is_season_event and comp.awards %}
+              {% if comp.event.is_in_season and comp.awards %}
                 {% for award in comp.awards %}
                   {% if award.is_blue_banner and award.count_banner %}
                     {% for team_number, _ in award.recipient_dict.items() %}

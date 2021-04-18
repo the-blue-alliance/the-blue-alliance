@@ -1,10 +1,28 @@
-from backend.common.consts.ranking_sort_orders import (
-    SORT_ORDER_INFO as RANKING_SORT_ORDERS,
-)
+from datetime import datetime
+
+import pytest
+
+from backend.common.consts.event_type import EventType
+from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
+from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails, RenderedRankings
 from backend.common.models.event_ranking import EventRanking
 from backend.common.models.event_team_status import WLTRecord
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
+
+
+def _create_test_event(event_key: str, event_type: EventType = EventType.REGIONAL):
+    year = int(event_key[:4])
+    short = event_key[4:]
+    e = Event(
+        id=event_key,
+        year=year,
+        event_type_enum=event_type,
+        official=True,
+        start_date=datetime(year, 3, 1),
+        event_short=short,
+    )
+    e.put()
 
 
 def test_render_rankings_no_data() -> None:
@@ -12,7 +30,7 @@ def test_render_rankings_no_data() -> None:
     rankings = details.renderable_rankings
     assert rankings == RenderedRankings(
         rankings=None,
-        sort_order_info=RANKING_SORT_ORDERS[2019],
+        sort_order_info=SORT_ORDER_INFO[2019],
         extra_stats_info=[],
     )
 
@@ -49,7 +67,7 @@ def test_render_rankings_with_extra_stats() -> None:
     rankings = details.renderable_rankings
     assert rankings == RenderedRankings(
         rankings=details.rankings2,
-        sort_order_info=RANKING_SORT_ORDERS[2019],
+        sort_order_info=SORT_ORDER_INFO[2019],
         extra_stats_info=[
             RankingSortOrderInfo(
                 name="Total Ranking Points",
@@ -81,7 +99,7 @@ def test_render_rankings_with_extra_stats_per_match() -> None:
     rankings = details.renderable_rankings
     assert rankings == RenderedRankings(
         rankings=details.rankings2,
-        sort_order_info=RANKING_SORT_ORDERS[2016],
+        sort_order_info=SORT_ORDER_INFO[2016],
         extra_stats_info=[
             RankingSortOrderInfo(
                 name="Ranking Score/Match",
@@ -113,7 +131,7 @@ def test_render_rankings_with_extra_stats_per_match_unplayed() -> None:
     rankings = details.renderable_rankings
     assert rankings == RenderedRankings(
         rankings=details.rankings2,
-        sort_order_info=RANKING_SORT_ORDERS[2016],
+        sort_order_info=SORT_ORDER_INFO[2016],
         extra_stats_info=[
             RankingSortOrderInfo(
                 name="Ranking Score/Match",
@@ -145,19 +163,51 @@ def test_render_rankings_with_extra_stats_per_match_2015() -> None:
     rankings = details.renderable_rankings
     assert rankings == RenderedRankings(
         rankings=details.rankings2,
-        sort_order_info=RANKING_SORT_ORDERS[2015],
+        sort_order_info=SORT_ORDER_INFO[2015],
         extra_stats_info=[],
     )
 
 
-def test_render_rankings_with_extra_stats_per_match_2015mttd() -> None:
-    # 2015mttd played the 2014 game
-    details = EventDetails(
-        id="2015mttd",
-    )
+@pytest.mark.parametrize(
+    "event_key, event_type, expected_year",
+    [
+        ("2015mttd", None, 2014),
+        ("2015miket", None, 2015),
+        ("2021irhag", None, 2021),
+        ("2021isoir1", EventType.OFFSEASON, 2020),
+    ],
+)
+def test_game_year(event_key, event_type, expected_year, ndb_context) -> None:
+    if event_type:
+        _create_test_event(event_key, event_type)
+    else:
+        _create_test_event(event_key)
+
+    details = EventDetails(id=event_key)
+    assert details.game_year == expected_year
+
+
+@pytest.mark.parametrize(
+    "event_key, event_type, expected_year",
+    [
+        ("2015mttd", None, 2014),
+        ("2015miket", None, 2015),
+        ("2021irhag", None, 2021),
+        ("2021isoir1", EventType.OFFSEASON, 2020),
+    ],
+)
+def test_render_rankings_game_year(
+    event_key, event_type, expected_year, ndb_context
+) -> None:
+    if event_type:
+        _create_test_event(event_key, event_type)
+    else:
+        _create_test_event(event_key)
+
+    details = EventDetails(id=event_key)
     rankings = details.renderable_rankings
     assert rankings == RenderedRankings(
         rankings=details.rankings2,
-        sort_order_info=RANKING_SORT_ORDERS[2014],
+        sort_order_info=SORT_ORDER_INFO[expected_year],
         extra_stats_info=[],
     )

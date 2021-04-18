@@ -90,7 +90,7 @@ class SeasonHelper(object):
         events = EventListQuery(year).fetch()
         earliest_start = None
         for event in events:
-            if event.is_season_event and (
+            if event.is_in_season and (
                 earliest_start is None or event.start_date < earliest_start
             ):
                 earliest_start = event.start_date
