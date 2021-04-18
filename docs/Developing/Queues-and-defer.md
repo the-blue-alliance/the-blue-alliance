@@ -42,7 +42,7 @@ install_defer_routes(app)
 Deferred tasks tend to be expensive tasks that can happen asynchronously in order to expedite serving a response for a request.
 
 ```python
-from from backend.common.deferred import defer
+from backend.common.deferred import defer
 
 def do_expensive_work(a, *, b):
     ...
