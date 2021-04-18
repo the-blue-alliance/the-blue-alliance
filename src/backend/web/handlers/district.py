@@ -133,6 +133,11 @@ def district_detail(
     valid_years = map(lambda d: d.year, district_history)
     valid_years = sorted(valid_years)
 
+    rankings = district.rankings
+    # Do not show district rankings for 2021
+    if district.year == 2021:
+        rankings = None
+
     template_values = {
         "explicit_year": explicit_year,
         "year": year,
@@ -142,7 +147,7 @@ def district_detail(
         "district_abbrev": district_abbrev,
         "week_events": week_events,
         "events_by_key": events_by_key,
-        "rankings": district.rankings,
+        "rankings": rankings,
         "advancement": district.advancement,
         "num_teams": num_teams,
         "teams_a": teams_a,
