@@ -180,6 +180,8 @@ class EventDetails(CachedModel):
 
         rankings_table = []
         has_record = False
+        has_matches_played = True
+
         for rank in self.rankings2:
             row = [rank["rank"], rank["team_key"][3:]]
             # for i, item in enumerate(rank['sort_orders']):
@@ -192,8 +194,12 @@ class EventDetails(CachedModel):
                 record = none_throws(rank["record"])
                 row.append(f"{record['wins']}-{record['losses']}-{record['ties']}")
                 has_record = True
-            row.append(rank["dq"])
-            row.append(rank["matches_played"])
+
+            # Do not add DQ + Matches Played for 2021 - no matches played
+            if self.game_year == 2021:
+                has_matches_played = False
+                row.append(rank["dq"])
+                row.append(rank["matches_played"])
 
             for i, precision in enumerate(extra_precisions):
                 row.append(
@@ -207,7 +213,8 @@ class EventDetails(CachedModel):
             title_row.append(item["name"])
         if has_record:
             title_row += ["Record (W-L-T)"]
-        title_row += ["DQ", "Played"]
+        if has_matches_played:
+            title_row += ["DQ", "Played"]
 
         for item in rankings["extra_stats_info"]:
             title_row.append("{}*".format(item["name"]))
