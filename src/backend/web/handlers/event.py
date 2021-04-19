@@ -192,10 +192,14 @@ def event_detail(event_key: EventKey) -> Response:
     # status_sitevar = status_sitevar_future.get_result()
 
     qual_playlist = PlaylistHelper.generate_playlist_link(
-        matches_organized=matches, title="Quals", allow_levels=[comp_level.CompLevel.QM]
+        matches_organized=matches,
+        title=f"{event.year} {event.name} Qualifications",
+        allow_levels=[comp_level.CompLevel.QM],
     )
     elim_playlist = PlaylistHelper.generate_playlist_link(
-        matches_organized=matches, title="Quals", allow_levels=comp_level.ELIM_LEVELS
+        matches_organized=matches,
+        title=f"{event.year} {event.name} Playoffs",
+        allow_levels=comp_level.ELIM_LEVELS,
     )
 
     template_values = {
