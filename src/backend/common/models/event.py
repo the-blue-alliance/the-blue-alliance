@@ -393,9 +393,23 @@ class Event(CachedModel):
     def week_str(self) -> Optional[str]:
         if self.week is None:
             return None
+
+        week = none_throws(self.week)
         if self.year == 2016:
-            return "Week {}".format(0.5 if self.week == 0 else self.week)
-        return "Week {}".format(none_throws(self.week) + 1)
+            return "Week {}".format(0.5 if week == 0 else week)
+        elif self.year == 2021:
+            # Group 2021 Events by their type - depends on both
+            if week == 0:
+                return "Participation"
+            elif week == 2:
+                return "FIRST Innovation Challenge"
+            elif week == 3:
+                return "INFINITE RECHARGE At Home Challenge"
+            elif week == 4:
+                return "Game Design Challenge"
+            else:
+                return "Awards"
+        return "Week {}".format(week + 1)
 
     @ndb.tasklet
     def get_teams_async(self) -> TypedFuture[List["Team"]]:
