@@ -99,6 +99,8 @@ See the [gcloud tasks queues create](https://cloud.google.com/sdk/gcloud/referen
 
 In development, `defer` use Redis + RQ as opposed to Google Cloud Tasks to execute deferred tasks. A Redis server, RQ worker, and dashboard are spun up when the development container is booted and can be seen when attaching to the container's tmux session. The RQ Dashboard can be found at [0.0.0.0:9181](http://0.0.0.0:9181/) be used to monitor failed tasks. Tasks that execute successfully will not show up in the RQ Dashboard, but they can be seen as successfully executed in the `rq-worker` tmux tab.
 
+Note: The rq worker must be invoked with a list of queues to execute tasks on. The current list of supported queues can be found in the [`start-devserver.sh`](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/ops/dev/vagrant/start-devserver.sh) script. If tasks are being deffered locally on an unsupported queue, add the queue to the list of queues the rq worker should monitor and restart the worker.
+
 ### Google Cloud Tasks + ngrok
 
 Sometimes, Google Cloud Tasks semantics are necessary when testing a feature. It is possible to enqueue a task from a local development instance to an upstream project's Google Cloud Tasks queue to be executed in the local development instance. This process leverages [ngrok](https://ngrok.com/) to expose a public URL that routes back to the host machine.
