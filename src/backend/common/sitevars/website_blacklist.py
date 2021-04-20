@@ -2,7 +2,7 @@ from typing import List
 
 from typing_extensions import TypedDict
 
-from backend.common.sitevars.base import SitevarBase
+from backend.common.sitevars.sitevar_base import SitevarBase
 
 
 class ContentType(TypedDict):
@@ -13,6 +13,10 @@ class WebsiteBlacklist(SitevarBase[ContentType]):
     @staticmethod
     def key() -> str:
         return "website_blacklist"
+
+    @staticmethod
+    def description() -> str:
+        return "For blacklisting sketchy websites from team pages"
 
     @staticmethod
     def default_value() -> ContentType:

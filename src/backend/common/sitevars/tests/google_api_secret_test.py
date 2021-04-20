@@ -1,7 +1,12 @@
-import json
+from backend.common.sitevars.google_api_secret import ContentType, GoogleApiSecret
 
-from backend.common.models.sitevar import Sitevar
-from backend.common.sitevars.google_api_secret import GoogleApiSecret
+
+def test_key():
+    assert GoogleApiSecret.key() == "google.secrets"
+
+
+def test_description():
+    assert GoogleApiSecret.description() == "For Google API Calls"
 
 
 def test_default_sitevar():
@@ -10,15 +15,14 @@ def test_default_sitevar():
 
     default_json = {"api_key": ""}
     assert default_sitevar.contents == default_json
+    assert default_sitevar.description == "For Google API Calls"
 
 
-def test_secret_key():
-    assert GoogleApiSecret.secret_key() == ""
+def test_secret_key_empty():
+    assert GoogleApiSecret.secret_key() is None
 
 
-def test_secrets_set():
+def test_secrets():
     secret_key = "abc"
-    Sitevar.get_or_insert(
-        "google.secrets", values_json=json.dumps({"api_key": secret_key})
-    )
+    GoogleApiSecret.put(ContentType(api_key=secret_key))
     assert GoogleApiSecret.secret_key() == secret_key

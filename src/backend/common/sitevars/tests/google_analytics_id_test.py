@@ -1,7 +1,15 @@
-import json
+from backend.common.sitevars.google_analytics_id import ContentType, GoogleAnalyticsID
 
-from backend.common.models.sitevar import Sitevar
-from backend.common.sitevars.google_analytics_id import GoogleAnalyticsID
+
+def test_key():
+    assert GoogleAnalyticsID.key() == "google_analytics.id"
+
+
+def test_description():
+    assert (
+        GoogleAnalyticsID.description()
+        == "Google Analytics ID for logging API requests"
+    )
 
 
 def test_default_sitevar():
@@ -10,15 +18,14 @@ def test_default_sitevar():
 
     default_json = {"GOOGLE_ANALYTICS_ID": ""}
     assert default_sitevar.contents == default_json
+    assert default_sitevar.description == "Google Analytics ID for logging API requests"
+
+
+def test_google_analytics_id_empty():
+    assert GoogleAnalyticsID.google_analytics_id() is None
 
 
 def test_google_analytics_id():
-    assert GoogleAnalyticsID.google_analytics_id() == ""
-
-
-def test_google_analytics_id_set():
     test_id = "abc"
-    Sitevar.get_or_insert(
-        "google_analytics.id", values_json=json.dumps({"GOOGLE_ANALYTICS_ID": test_id})
-    )
+    GoogleAnalyticsID.put(ContentType(GOOGLE_ANALYTICS_ID=test_id))
     assert GoogleAnalyticsID.google_analytics_id() == test_id

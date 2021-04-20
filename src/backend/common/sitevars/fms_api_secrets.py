@@ -3,7 +3,7 @@ from typing import Optional
 
 from typing_extensions import TypedDict
 
-from backend.common.sitevars.base import SitevarBase
+from backend.common.sitevars.sitevar_base import SitevarBase
 
 
 class ContentType(TypedDict):
@@ -11,7 +11,7 @@ class ContentType(TypedDict):
     authkey: str
 
 
-class FMSAPISecrets(SitevarBase[ContentType]):
+class FMSApiSecrets(SitevarBase[ContentType]):
     @staticmethod
     def key() -> str:
         return "fmsapi.secrets"
@@ -19,6 +19,10 @@ class FMSAPISecrets(SitevarBase[ContentType]):
     @staticmethod
     def default_value() -> ContentType:
         return ContentType(username="", authkey="")
+
+    @staticmethod
+    def description() -> str:
+        return "For accessing the FMS API"
 
     @classmethod
     def username(cls) -> Optional[str]:

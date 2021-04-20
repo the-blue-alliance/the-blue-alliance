@@ -24,9 +24,9 @@ def before_request() -> None:
 
 @local_routes.route("/bootstrap", methods=["GET"])
 def bootstrap() -> str:
-    apiv3_key = Apiv3Key.get()
+    apiv3_key = Apiv3Key.api_key()
     template_values = {
-        "apiv3_key": apiv3_key["apiv3_key"],
+        "apiv3_key": apiv3_key,
         "status": request.args.get("status"),
         "view_url": request.args.get("url"),
     }
@@ -36,7 +36,7 @@ def bootstrap() -> str:
 @local_routes.route("/bootstrap", methods=["POST"])
 def bootstrap_post() -> Response:
     key = request.form.get("bootstrap_key", "")
-    apiv3_key = request.form.get("apiv3_key") or Apiv3Key.get()["apiv3_key"]
+    apiv3_key = request.form.get("apiv3_key") or Apiv3Key.api_key()
 
     if not apiv3_key:
         return redirect(url_for(".bootstrap", status="bad_apiv3"))

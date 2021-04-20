@@ -53,11 +53,19 @@ Helpful commands when developing in The Blue Alliance codebase. This section inc
 
 Running notes on how to migrate code from the Python 2 codebase to the new Python 3 codebase.
 
+## common
+
+Details on the shared set of code used by services in The Blue Alliance. `common` generally contains code like database models, constants, sitevars, etc. that multiple services may need.
+
+### [Current User + User|Current-User]
+
+The `User` model and how to fetch the currently logged in user.
+
+### [Sitevars|Sitevars]
+
+Details on Sitevars - aka database backed configuration variables.
+
 ## Services
-
-### [[common|common]]
-
-A shared set of code used across services.
 
 ### [[web|web]]
 

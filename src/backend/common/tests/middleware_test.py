@@ -1,4 +1,3 @@
-import json
 from unittest.mock import Mock, patch
 
 import flask
@@ -17,9 +16,10 @@ from backend.common.middleware import (
     NdbMiddleware,
     TraceRequestMiddleware,
 )
-from backend.common.models.sitevar import Sitevar
 from backend.common.profiler import trace_context
 from backend.common.run_after_response import run_after_response
+from backend.common.sitevars import flask_secrets
+from backend.common.sitevars.flask_secrets import FlaskSecrets
 
 
 def test_NdbMiddleware_init(app: Flask) -> None:
@@ -91,9 +91,7 @@ def test_set_secret_key_default(ndb_context, app: Flask) -> None:
 
 def test_set_secret_key_not_default(ndb_context, app: Flask) -> None:
     secret_key = "some_new_secret_key"
-    Sitevar.get_or_insert(
-        "flask.secrets", values_json=json.dumps({"secret_key": secret_key})
-    )
+    FlaskSecrets.put(flask_secrets.ContentType(secret_key=secret_key))
 
     assert app.secret_key is None
     _set_secret_key(app)
@@ -101,11 +99,13 @@ def test_set_secret_key_not_default(ndb_context, app: Flask) -> None:
 
 
 def test_set_secret_key_empty_prod(ndb_context, app: Flask) -> None:
-    Sitevar.get_or_insert("flask.secrets", values_json=json.dumps({"secret_key": ""}))
+    FlaskSecrets.put(flask_secrets.ContentType(secret_key=""))
 
     assert app.secret_key is None
     with patch.object(Environment, "is_prod", return_value=True):
-        with pytest.raises(Exception, match="Secret key not set in production!"):
+        with pytest.raises(
+            Exception, match="Secret key may not be default in production!"
+        ):
             _set_secret_key(app)
 
 
@@ -120,9 +120,7 @@ def test_set_secret_key_default_prod(ndb_context, app: Flask) -> None:
 
 def test_set_secret_key_prod(ndb_context, app: Flask) -> None:
     secret_key = "some_new_secret_key"
-    Sitevar.get_or_insert(
-        "flask.secrets", values_json=json.dumps({"secret_key": secret_key})
-    )
+    FlaskSecrets.put(flask_secrets.ContentType(secret_key=secret_key))
 
     assert app.secret_key is None
     with patch.object(Environment, "is_prod", return_value=True):
