@@ -1,11 +1,13 @@
 import importlib
 import os
+from unittest.mock import Mock, patch
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from flask import Flask
 
 from backend.common.sitevars.flask_secrets import FlaskSecrets
+from backend.web.local.blueprint import local_routes, maybe_register
 
 
 @pytest.fixture(autouse=True)
@@ -26,6 +28,32 @@ def test_blueprint_not_installed_by_default() -> None:
     client = main.app.test_client()
     resp = client.get("/local/bootstrap")
     assert resp.status_code == 404
+
+
+def test_install_defer_routes_not_installed_in_prod(monkeypatch: MonkeyPatch) -> None:
+    assert os.environ.get("GAE_ENV") is None
+
+    app = Flask(__name__)
+
+    with patch(
+        "backend.common.deferred.install_defer_routes"
+    ) as mock_install_defer_routes:
+        maybe_register(app, Mock())
+
+    mock_install_defer_routes.assert_not_called()
+
+
+def test_install_defer_routes(mock_dev_env) -> None:
+    assert os.environ.get("GAE_ENV") == "localdev"
+
+    app = Flask(__name__)
+
+    with patch(
+        "backend.common.deferred.install_defer_routes"
+    ) as mock_install_defer_routes:
+        maybe_register(app, Mock())
+
+    mock_install_defer_routes.assert_called()
 
 
 def test_blueprint_not_installed_on_prod(monkeypatch: MonkeyPatch) -> None:
@@ -63,3 +91,25 @@ def test_fail_if_mistakenly_installed_on_prod() -> None:
     client = app.test_client()
     resp = client.get("/local/bootstrap")
     assert resp.status_code == 403
+
+
+def test_csrf_prod(monkeypatch: MonkeyPatch) -> None:
+    assert os.environ.get("GAE_ENV") is None
+
+    app = Flask(__name__)
+
+    mock_csrf = Mock()
+    maybe_register(app, mock_csrf)
+
+    mock_csrf.exempt.assert_not_called()
+
+
+def test_csrf_local(mock_dev_env) -> None:
+    assert os.environ.get("GAE_ENV") == "localdev"
+
+    app = Flask(__name__)
+
+    mock_csrf = Mock()
+    maybe_register(app, mock_csrf)
+
+    mock_csrf.exempt.assert_called_with(local_routes)

@@ -55,5 +55,9 @@ def maybe_register(app: Flask, csrf: CSRFProtect) -> None:
     if Environment.is_dev():
         app.register_blueprint(local_routes)
 
+        from backend.common.deferred import install_defer_routes
+
+        install_defer_routes(app)
+
         # Since we only install this on devservers, CSRF isn't necessary
         csrf.exempt(local_routes)

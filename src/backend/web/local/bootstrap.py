@@ -1,7 +1,8 @@
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 import requests
+from google.appengine.ext import deferred
 
 from backend.common.manipulators.award_manipulator import AwardManipulator
 from backend.common.manipulators.district_manipulator import DistrictManipulator
@@ -122,6 +123,11 @@ class LocalDataBootstrap:
         return cls.fetch_endpoint(f"event/{event_key}/{detail}", auth_token)
 
     @classmethod
+    def update_events(cls, keys: List[EventKey], auth_token: str) -> None:
+        for key in keys:
+            cls.update_event(key, auth_token)
+
+    @classmethod
     def update_event(cls, key: EventKey, auth_token: str) -> None:
         event_data = cls.fetch_event(key, auth_token)
         event = cls.store_event(event_data)
@@ -148,29 +154,36 @@ class LocalDataBootstrap:
         cls.store_eventdetail(event, "predictions", event_predictions)
 
     @classmethod
+    def update_team(cls, key: TeamKey, auth_token: str) -> None:
+        team_data = cls.fetch_team(key, auth_token)
+        cls.store_team(team_data)
+
+        year = datetime.now().year
+        for media in cls.fetch_team_media(key, year, auth_token):
+            cls.store_team_media(media, year, key)
+
+    @classmethod
+    def update_match(cls, key: MatchKey, auth_token: str) -> None:
+        match_data = cls.fetch_match(key, auth_token)
+        cls.store_match(match_data)
+
+    @classmethod
     def bootstrap_key(cls, key: str, apiv3_key: str) -> Optional[str]:
         if Match.validate_key_name(key):
-            match_data = cls.fetch_match(key, apiv3_key)
-            cls.store_match(match_data)
+            cls.update_match(key, apiv3_key)
             return f"/match/{key}"
         elif Event.validate_key_name(key):
             cls.update_event(key, apiv3_key)
             return f"/event/{key}"
         elif Team.validate_key_name(key):
-            team_data = cls.fetch_team(key, apiv3_key)
-            cls.store_team(team_data)
-
-            year = datetime.now().year
-            for media in cls.fetch_team_media(key, year, apiv3_key):
-                cls.store_team_media(media, year, key)
-
+            cls.update_team(key, apiv3_key)
             return f"/team/{key[3:]}"
         elif key.isdigit():
             event_keys = [
                 event["key"] for event in cls.fetch_endpoint(f"events/{key}", apiv3_key)
             ]
-            for event in event_keys:
-                cls.update_event(event, apiv3_key)
+            for event_key in event_keys:
+                deferred.defer(cls.update_event, event_key, apiv3_key)
             return f"/events/{key}"
         else:
             return None
