@@ -1,7 +1,7 @@
 from typing_extensions import TypedDict
 
 from backend.common.consts.landing_type import LandingType
-from backend.common.sitevars.base import SitevarBase
+from backend.common.sitevars.sitevar_base import SitevarBase
 
 
 class ContentType(TypedDict):
@@ -20,6 +20,10 @@ class LandingConfig(SitevarBase[ContentType]):
     @staticmethod
     def key() -> str:
         return "landing_config"
+
+    @staticmethod
+    def description() -> str:
+        return "Configuration data for the homepage"
 
     @staticmethod
     def default_value() -> ContentType:

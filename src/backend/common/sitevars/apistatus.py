@@ -3,7 +3,7 @@ from typing import Optional
 
 from typing_extensions import TypedDict
 
-from backend.common.sitevars.base import SitevarBase
+from backend.common.sitevars.sitevar_base import SitevarBase
 
 
 class WebConfig(TypedDict):
@@ -39,6 +39,10 @@ class ApiStatus(SitevarBase[ContentType]):
         return "apistatus"
 
     @staticmethod
+    def description() -> str:
+        return "For setting max year, min app versions, etc."
+
+    @staticmethod
     def default_value() -> ContentType:
         current_year = datetime.datetime.now().year
         return ContentType(
@@ -48,3 +52,7 @@ class ApiStatus(SitevarBase[ContentType]):
             android=None,
             ios=None,
         )
+
+    @classmethod
+    def status(cls) -> ContentType:
+        return cls.get()

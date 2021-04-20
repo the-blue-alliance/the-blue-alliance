@@ -18,10 +18,17 @@ class SitevarBase(abc.ABC, Generic[SVType]):
     def default_value() -> SVType:
         ...
 
+    @staticmethod
+    @abc.abstractmethod
+    def description() -> str:
+        ...
+
     @classmethod
     def _fetch_sitevar(cls) -> Sitevar:
         return Sitevar.get_or_insert(
-            cls.key(), values_json=json.dumps(cls.default_value())
+            cls.key(),
+            description=cls.description(),
+            values_json=json.dumps(cls.default_value()),
         )
 
     @classmethod
@@ -49,4 +56,5 @@ class SitevarBase(abc.ABC, Generic[SVType]):
 
         new_val = update_f(val)
         sitevar.contents = new_val
+        sitevar.description = cls.description()
         sitevar.put()
