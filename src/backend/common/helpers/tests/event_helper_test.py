@@ -320,6 +320,15 @@ def test_group_by_week_old_champs(ndb_context) -> None:
     }
 
 
+def test_group_by_week_2021_champs(ndb_context) -> None:
+    e1 = Event(event_type_enum=EventType.CMP_FINALS, year=2021, official=True)
+    e2 = Event(event_type_enum=EventType.CMP_FINALS, year=2021, official=True)
+    events = EventHelper.group_by_week([e1, e2])
+    assert events == {
+        "FIRST Championship": [e1, e2],
+    }
+
+
 def test_group_by_week_two_champs(ndb_context) -> None:
     e1 = Event(
         event_type_enum=EventType.CMP_DIVISION, year=2018, official=True, city="Detriot"
