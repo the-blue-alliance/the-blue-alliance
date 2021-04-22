@@ -35,7 +35,7 @@
     "reselect": "^4.0.0",
     "swagger-client": "3.13.2",
     "swagger-ui": "^3.47.1",
-    "underscore": "^1.13.0"
+    "underscore": "^1.13.1"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
