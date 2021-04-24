@@ -1,5 +1,3 @@
-from typing import Optional
-
 from typing_extensions import TypedDict
 
 from backend.common.sitevars.sitevar_base import SitevarBase
@@ -25,6 +23,5 @@ class Apiv3Key(SitevarBase[ContentType]):
         )
 
     @classmethod
-    def api_key(cls) -> Optional[str]:
-        api_key = cls.get().get("apiv3_key")
-        return api_key if api_key else None  # Drop empty strings
+    def api_key(cls) -> str:
+        return cls.get().get("apiv3_key", "")
