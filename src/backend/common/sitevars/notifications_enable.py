@@ -1,7 +1,7 @@
-from backend.common.sitevars.sitevar_base import SitevarBase
+from backend.common.sitevars.sitevar import Sitevar
 
 
-class NotificationsEnable(SitevarBase[bool]):
+class NotificationsEnable(Sitevar[bool]):
     @staticmethod
     def key() -> str:
         return "notifications.enable"

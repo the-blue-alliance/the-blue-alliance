@@ -3,7 +3,7 @@ from typing import Optional
 
 from typing_extensions import TypedDict
 
-from backend.common.sitevars.sitevar_base import SitevarBase
+from backend.common.sitevars.sitevar import Sitevar
 
 
 class WebConfig(TypedDict):
@@ -33,7 +33,7 @@ class ContentType(TypedDict):
     ios: Optional[IOSConfig]
 
 
-class ApiStatus(SitevarBase[ContentType]):
+class ApiStatus(Sitevar[ContentType]):
     @staticmethod
     def key() -> str:
         return "apistatus"

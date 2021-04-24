@@ -2,12 +2,12 @@ import abc
 import json
 from typing import Callable, Generic, TypeVar
 
-from backend.common.models.sitevar import Sitevar
+from backend.common.models import sitevar
 
 SVType = TypeVar("SVType")
 
 
-class SitevarBase(abc.ABC, Generic[SVType]):
+class Sitevar(abc.ABC, Generic[SVType]):
     @staticmethod
     @abc.abstractmethod
     def key() -> str:
@@ -24,8 +24,8 @@ class SitevarBase(abc.ABC, Generic[SVType]):
         ...
 
     @classmethod
-    def _fetch_sitevar(cls) -> Sitevar:
-        return Sitevar.get_or_insert(
+    def _fetch_sitevar(cls) -> sitevar.Sitevar:
+        return sitevar.Sitevar.get_or_insert(
             cls.key(),
             description=cls.description(),
             values_json=json.dumps(cls.default_value()),

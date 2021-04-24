@@ -6,21 +6,21 @@ As mentioned, a Sitevar is backed by a database model called [Sitevar](https://g
 
 ### Creating a Sitevar
 
-A Sitevar must extend `SitevarBase` and specify some generic content type. Generally this content type will be a typed dictionary, but may also be a simple data type, like an integer or a boolean. At minimum the Sitevar must define a `key` string, `description` string, and a `default_value` of the generic content type via static method overrides. Sitevars should also define class methods to access their data to allow for explicit, typed data access.
+A Sitevar must extend `Sitevar` and specify some generic content type. Generally this content type will be a typed dictionary, but may also be a simple data type, like an integer or a boolean. At minimum the Sitevar must define a `key` string, `description` string, and a `default_value` of the generic content type via static method overrides. Sitevars should also define class methods to access their data to allow for explicit, typed data access.
 
 #### (Example) Dictionary Sitevar
 
 ```python
 from typing_extensions import TypedDict
 
-from backend.common.sitevars.base import SitevarBase
+from backend.common.sitevars.base import Sitevar
 
 
 class ContentType(TypedDict):
     config_value: str
 
 
-class DictionaryConfig(SitevarBase[ContentType]):
+class DictionaryConfig(Sitevar[ContentType]):
     @staticmethod
     def key() -> str:
         return "dictionary_config"
@@ -43,10 +43,10 @@ class DictionaryConfig(SitevarBase[ContentType]):
 #### (Example) Boolean Sitevar
 
 ```python
-from backend.common.sitevars.base import SitevarBase
+from backend.common.sitevars.base import Sitevar
 
 
-class BooleanConfig(SitevarBase[bool]):
+class BooleanConfig(Sitevar[bool]):
     @staticmethod
     def key() -> str:
         return "boolean_config"
@@ -113,7 +113,7 @@ if notifications_enable.contents != should_enable_notifications:
     notifications_enable.put()
 ```
 
-The [`SitevarBase`](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/sitevars/sitevar_base.py) class is used to fix all of these issues. A Sitevar class that extends `SitevarBase` specifies a key local to the file. If the Sitevar key changes, this value only needs to change in one file, as opposed to everywhere in the codebase.
+The [`Sitevar`](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/sitevars/sitevar.py) class is used to fix all of these issues. A Sitevar class that extends `Sitevar` specifies a key local to the file. If the Sitevar key changes, this value only needs to change in one file, as opposed to everywhere in the codebase.
 
 A Sitevar class defines a `default_value`, which conforms to a typed `SVType`. The first upside to this approach is having a typed definition of what can exist in a Sitevar. The `SVType` might be a boolean, or an integer, or a typed dictionary. No matter the data, the type is known and able to be enforced by the type-checker. The second upside is defining a default value for a Sitevar allows interfacing with ndb using `get_or_insert` as opposed to `get_by_id`. This ensures that a Sitevar will never a `None` and will always exist in the database. This simplifies local development by automatically creating the necessary Sitevars in the database to be filled in by the user later.
 

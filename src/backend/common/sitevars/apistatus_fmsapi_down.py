@@ -1,7 +1,7 @@
-from backend.common.sitevars.sitevar_base import SitevarBase
+from backend.common.sitevars.sitevar import Sitevar
 
 
-class ApiStatusFMSApiDown(SitevarBase[bool]):
+class ApiStatusFMSApiDown(Sitevar[bool]):
     @staticmethod
     def key() -> str:
         return "apistatus.fmsapi_down"
