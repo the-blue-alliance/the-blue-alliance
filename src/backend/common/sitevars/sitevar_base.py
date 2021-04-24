@@ -29,6 +29,7 @@ class SitevarBase(abc.ABC, Generic[SVType]):
             cls.key(),
             description=cls.description(),
             values_json=json.dumps(cls.default_value()),
+            use_global_cache=False
         )
 
     @classmethod
