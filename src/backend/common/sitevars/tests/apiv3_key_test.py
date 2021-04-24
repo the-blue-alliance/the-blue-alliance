@@ -19,12 +19,12 @@ def test_default_sitevar():
 
 
 def test_apiv3_key_none():
-    assert Apiv3Key.api_key() is None
+    assert Apiv3Key.api_key() == ""
 
 
 def test_apiv3_key_empty():
     Apiv3Key.put(ContentType(apiv3_key=""))
-    assert Apiv3Key.api_key() is None
+    assert Apiv3Key.api_key() == ""
 
 
 def test_apiv3_key():
