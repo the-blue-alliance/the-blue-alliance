@@ -13,3 +13,10 @@ class ApiStatusFMSApiDown(SitevarBase[bool]):
     @staticmethod
     def default_value() -> bool:
         return False
+
+    @classmethod
+    def set_down(cls, down: bool) -> None:
+        cls.update(
+            should_update=lambda v: v is not down,
+            update_f=lambda _: down,
+        )
