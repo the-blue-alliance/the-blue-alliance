@@ -1,13 +1,13 @@
 from typing_extensions import TypedDict
 
-from backend.common.sitevars.sitevar_base import SitevarBase
+from backend.common.sitevars.sitevar import Sitevar
 
 
 class ContentType(TypedDict):
     apiv3_key: str
 
 
-class Apiv3Key(SitevarBase[ContentType]):
+class Apiv3Key(Sitevar[ContentType]):
     @staticmethod
     def key() -> str:
         return "apiv3_key"
