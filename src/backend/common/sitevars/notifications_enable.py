@@ -19,8 +19,8 @@ class NotificationsEnable(Sitevar[bool]):
         return cls.get()
 
     @classmethod
-    def enable_notifications(cls, enable: bool):
+    def enable_notifications(cls, enable: bool) -> None:
         cls.update(
-            should_update=lambda v: v != enable,
+            should_update=lambda v: v is not enable,
             update_f=lambda _: enable,
         )
