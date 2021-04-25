@@ -91,7 +91,9 @@ class Event(CachedModel):
     enable_predictions = ndb.BooleanProperty(default=False)
     remap_teams: Dict[
         str, str
-    ] = ndb.JsonProperty()  # Map of temporary team numbers to pre-rookie and B teams
+    ] = (
+        ndb.JsonProperty()
+    )  # Map of temporary team numbers to pre-rookie and B teams. key is the old team key, value is the new team key
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
