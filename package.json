@@ -2,7 +2,6 @@
   "name": "tba-react",
   "version": "0.0.0",
   "dependencies": {
-    "babel-polyfill": "^6.8.0",
     "classnames": "^2.3.1",
     "element-resize-event": "^3.0.3",
     "firebase": "^8.4.1",
@@ -11,6 +10,7 @@
     "less-loader": "^8.1.1",
     "material-ui": "^0.20.2",
     "prettier": "^2.2.1",
+    "process": "^0.11.10",
     "prop-types": "^15.5.10",
     "query-string": "^7.0.0",
     "react": "^15.7.0",

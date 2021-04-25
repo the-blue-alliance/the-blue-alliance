@@ -1,6 +1,5 @@
 import "./gameday2.less";
 
-import "babel-polyfill";
 import React from "react";
 import ReactGA from "react-ga";
 import { Provider } from "react-redux";

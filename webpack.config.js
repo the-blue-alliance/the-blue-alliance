@@ -1,4 +1,5 @@
 const path = require("path");
+const webpack = require("webpack");
 
 const dev = process.env.NODE_ENV !== "production"
 
@@ -33,4 +34,9 @@ module.exports = {
             },
         ],
     },
+    plugins: [
+        new webpack.ProvidePlugin({
+            process: "process/browser",
+        }),
+    ]
 };
