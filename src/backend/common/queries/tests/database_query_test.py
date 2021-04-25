@@ -1,7 +1,6 @@
-from typing import List
+from typing import List, TypedDict
 
 from google.cloud import ndb
-from typing_extensions import TypedDict
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.futures import TypedFuture

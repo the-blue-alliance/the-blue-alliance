@@ -1,7 +1,5 @@
 import base64
-from typing import Optional
-
-from typing_extensions import TypedDict
+from typing import Optional, TypedDict
 
 from backend.common.sitevars.sitevar import Sitevar
 

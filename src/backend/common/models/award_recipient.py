@@ -1,6 +1,4 @@
-from typing import Optional, Union
-
-from typing_extensions import TypedDict
+from typing import Optional, TypedDict, Union
 
 
 class AwardRecipient(TypedDict):

@@ -1,11 +1,10 @@
 import logging
 import re
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, TypedDict
 from urllib import parse as urlparse
 
 import requests
 from pyre_extensions import none_throws
-from typing_extensions import TypedDict
 
 from backend.common.sitevars.google_api_secret import GoogleApiSecret
 

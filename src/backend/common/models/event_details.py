@@ -1,9 +1,8 @@
-from typing import List, Optional, Set
+from typing import List, Optional, Set, TypedDict
 
 from google.cloud import ndb
 from google.cloud.datastore import key as datastore_key
 from pyre_extensions import none_throws, safe_cast
-from typing_extensions import TypedDict
 
 from backend.common.consts.ranking_sort_orders import (
     SORT_ORDER_INFO as RANKING_SORT_ORDERS,

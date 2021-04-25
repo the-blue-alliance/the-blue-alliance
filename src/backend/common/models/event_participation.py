@@ -1,6 +1,4 @@
-from typing import Dict, List, Optional
-
-from typing_extensions import TypedDict
+from typing import Dict, List, Optional, TypedDict
 
 from backend.common.models.event import Event
 

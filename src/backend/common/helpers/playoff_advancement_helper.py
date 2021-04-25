@@ -1,9 +1,18 @@
 import copy
 from collections import defaultdict
-from typing import Any, cast, DefaultDict, Dict, List, Mapping, NamedTuple, Optional
+from typing import (
+    Any,
+    cast,
+    DefaultDict,
+    Dict,
+    List,
+    Mapping,
+    NamedTuple,
+    Optional,
+    TypedDict,
+)
 
 from pyre_extensions import none_throws
-from typing_extensions import TypedDict
 
 from backend.common.consts.alliance_color import AllianceColor, OPPONENT, TMatchWinner
 from backend.common.consts.comp_level import CompLevel

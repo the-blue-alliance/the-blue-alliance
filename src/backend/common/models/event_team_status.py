@@ -1,7 +1,5 @@
 import enum
-from typing import List, Optional
-
-from typing_extensions import TypedDict
+from typing import List, Optional, TypedDict
 
 from backend.common.consts.comp_level import CompLevel
 from backend.common.models.alliance import EventAllianceBackup
