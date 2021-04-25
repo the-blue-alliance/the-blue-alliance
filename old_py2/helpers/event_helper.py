@@ -268,26 +268,3 @@ class EventHelper(object):
         for ranking in rankings2:
             if ranking['team_key'] in remap_teams:
                 ranking['team_key'] = remap_teams[ranking['team_key']]
-
-    @classmethod
-    def remapteams_awards(cls, awards, remap_teams):
-        """
-        Remaps teams in awards
-        Mutates in place
-        """
-        for award in awards:
-            new_recipient_json_list = []
-            new_team_list = []
-            # Compute new recipient list and team list
-            for recipient in award.recipient_list:
-                for old_team, new_team in remap_teams.items():
-                    if str(recipient['team_number']) == old_team[3:]:
-                        award.dirty = True
-                        recipient['team_number'] = new_team[3:]
-
-                new_recipient_json_list.append(json.dumps(recipient))
-                new_team_list.append(ndb.Key('Team', 'frc{}'.format(recipient['team_number'])))
-
-            # Update
-            award.recipient_json_list = new_recipient_json_list
-            award.team_list = new_team_list

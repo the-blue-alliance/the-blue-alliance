@@ -11,9 +11,11 @@ from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.helpers.event_helper import EventHelper, TeamAvgScore
 from backend.common.models.alliance import MatchAlliance
+from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.event_team_status import WLTRecord
 from backend.common.models.match import Match
+from backend.common.models.team import Team
 
 
 def test_calculate_avg_score_no_matches() -> None:
@@ -399,6 +401,35 @@ def test_group_by_week_preseason(ndb_context) -> None:
     }
 
 
+def test_group_by_week_foc(ndb_context) -> None:
+    e = Event(
+        event_type_enum=EventType.FOC,
+        year=2018,
+        official=True,
+    )
+    events = EventHelper.group_by_week([e])
+    assert events == {
+        "FIRST Festival of Champions": [e],
+    }
+
+
+def test_group_by_week_foc_multiple(ndb_context) -> None:
+    e1 = Event(
+        event_type_enum=EventType.FOC,
+        year=2018,
+        official=True,
+    )
+    e2 = Event(
+        event_type_enum=EventType.FOC,
+        year=2018,
+        official=True,
+    )
+    events = EventHelper.group_by_week([e1, e2])
+    assert events == {
+        "FIRST Festival of Champions": [e1, e2],
+    }
+
+
 @pytest.mark.parametrize(
     "current_date,expected_event_keys",
     [
@@ -453,3 +484,62 @@ def test_end_date_or_distant_future(
 ) -> None:
     e = Event(end_date=end_date)
     assert EventHelper.end_date_or_distant_future(e) == expected_date
+
+
+def test_remapteams_awards(ndb_context) -> None:
+    # Ensure we cast str `team_number` to int, when possible
+    a1 = Award(
+        team_list=[ndb.Key(Team, "frc1")],
+        recipient_json_list=[json.dumps({"team_number": "1", "awardee": None})],
+    )
+    # Ensure we can remap int `team_number` -> str `team_number`
+    a2 = Award(
+        team_list=[ndb.Key(Team, "frc200")],
+        recipient_json_list=[json.dumps({"team_number": 200, "awardee": None})],
+    )
+    # Ensure we can rempa str `team_number` -> int `team_number`
+    a3 = Award(
+        team_list=[ndb.Key(Team, "frc3B")],
+        recipient_json_list=[json.dumps({"team_number": "3B", "awardee": None})],
+    )
+    # Ensure we lave int `team_number` as-is if no reampping or casting
+    a4 = Award(
+        team_list=[ndb.Key(Team, "frc4")],
+        recipient_json_list=[json.dumps({"team_number": 4, "awardee": None})],
+    )
+    # Ensure we leave str `team_number` as-is if no remapping or casting
+    a5 = Award(
+        team_list=[ndb.Key(Team, "frc5B")],
+        recipient_json_list=[json.dumps({"team_number": "5B", "awardee": None})],
+    )
+
+    awards = [a1, a2, a3, a4, a5]
+    remap_teams = {
+        "frc200": "frc2B",
+        "frc3B": "frc3",
+    }
+    EventHelper.remapteams_awards(awards, remap_teams)
+
+    assert a1.recipient_json_list == [json.dumps({"team_number": 1, "awardee": None})]
+    assert a1.team_list == [ndb.Key(Team, "frc1")]
+    assert a1._dirty
+
+    assert a2.recipient_json_list == [
+        json.dumps({"team_number": "2B", "awardee": None})
+    ]
+    assert a2.team_list == [ndb.Key(Team, "frc2B")]
+    assert a2._dirty
+
+    assert a3.recipient_json_list == [json.dumps({"team_number": 3, "awardee": None})]
+    assert a3.team_list == [ndb.Key(Team, "frc3")]
+    assert a3._dirty
+
+    assert a4.recipient_json_list == [json.dumps({"team_number": 4, "awardee": None})]
+    assert a4.team_list == [ndb.Key(Team, "frc4")]
+    assert a4._dirty is False
+
+    assert a5.recipient_json_list == [
+        json.dumps({"team_number": "5B", "awardee": None})
+    ]
+    assert a5.team_list == [ndb.Key(Team, "frc5B")]
+    assert a5._dirty is False
