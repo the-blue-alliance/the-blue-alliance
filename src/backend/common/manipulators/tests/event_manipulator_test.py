@@ -1,10 +1,13 @@
 import datetime
 import json
 import unittest
+from unittest.mock import patch
 
 import pytest
 
 from backend.common.consts.event_type import EventType
+from backend.common.deferred.clients.fake_client import FakeTaskClient
+from backend.common.helpers.location_helper import LocationHelper
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.models.event import Event
 
@@ -12,6 +15,9 @@ from backend.common.models.event import Event
 @pytest.mark.usefixtures("ndb_context")
 class TestEventManipulator(unittest.TestCase):
     def setUp(self):
+        self.task_client = FakeTaskClient()
+        self.task_client.flush()
+
         self.old_event = Event(
             id="2011ct",
             end_date=datetime.datetime(2011, 4, 2, 0, 0),
@@ -87,3 +93,21 @@ class TestEventManipulator(unittest.TestCase):
         EventManipulator.createOrUpdate(self.new_event, auto_union=False)
         check = Event.get_by_id("2011ct")
         self.assertEqual(check.webcast, self.new_event.webcast)
+
+    @patch.object(LocationHelper, "update_event_location")
+    def test_update_location_on_update(self, update_location_mock) -> None:
+        self.old_event.city = "Hartford"
+        self.old_event.state_prov = "CT"
+        self.old_event.country = "USA"
+        assert self.old_event.timezone_id is None
+
+        EventManipulator.createOrUpdate(self.old_event)
+
+        def update_side_effect(event):
+            event.timezone_id = "America/New_York"
+            event.put()
+
+        update_location_mock.side_effect = update_side_effect
+
+        self.task_client.drain_pending_jobs("post-update-hooks")
+        assert Event.get_by_id("2011ct").timezone_id is not None
