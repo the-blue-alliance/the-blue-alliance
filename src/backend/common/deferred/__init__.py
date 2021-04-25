@@ -1,9 +1,8 @@
 import logging
-import os
 from typing import Any, Callable, Dict, Optional
 
 from backend.common.deferred.clients.task_client import TaskClient
-from backend.common.environment import Environment
+from backend.common.environment import Environment, EnvironmentMode
 from backend.common.redis import RedisClient
 
 
@@ -41,12 +40,11 @@ def defer(
 
 def _client_for_env() -> TaskClient:
     # If we're running in tests, always return a FakeTestClient
-    if os.environ.get("TBA_UNIT_TEST", None) == "true":
+    if Environment.is_unit_test():
         from backend.common.deferred.clients.fake_client import FakeTaskClient
 
         return FakeTaskClient()
 
-    from backend.common.environment import EnvironmentMode
     from backend.common.deferred.clients.gcloud_client import GCloudTaskClient
     from backend.common.deferred.clients.rq_client import RQTaskClient
     from backend.common.deferred.requests.gcloud_http_request import (

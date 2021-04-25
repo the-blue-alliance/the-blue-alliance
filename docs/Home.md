@@ -37,14 +37,6 @@ Documentation on configuration option for a local development container using th
 
 Documentation on running tests, lints, and type checks.
 
-### [[Queues and defer|Queues-and-defer]]
-
-Details on using the `defer` method to enqueue tasks to be executed asynchronously, along with notes on task queues in The Blue Alliance codebase.
-
-### [[Redis|Redis]]
-
-Details on how to cache data using `redis`.
-
 ### [[Development Runbook|Development-Runbook]]
 
 Helpful commands when developing in The Blue Alliance codebase. This section includes things like how to run tests, how to seed your development environment with production data, and more!
@@ -57,13 +49,25 @@ Running notes on how to migrate code from the Python 2 codebase to the new Pytho
 
 Details on the shared set of code used by services in The Blue Alliance. `common` generally contains code like database models, constants, sitevars, etc. that multiple services may need.
 
-### [Current User + User|Current-User]
+### [[Current User + User|Current-User]]
 
 The `User` model and how to fetch the currently logged in user.
 
-### [Sitevars|Sitevars]
+### [[Sitevars|Sitevars]]
 
 Details on Sitevars - aka database backed configuration variables.
+
+### [[Queues and defer|Queues-and-defer]]
+
+Details on using the `defer` method to enqueue tasks to be executed asynchronously, along with notes on task queues in The Blue Alliance codebase.
+
+### [[Storage|Storage]]
+
+Details on how to read/write files locally and upstream.
+
+### [[Redis|Redis]]
+
+Details on how to cache data using `redis`.
 
 ## Services
 

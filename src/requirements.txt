@@ -5,6 +5,7 @@ Flask-Caching==1.10.1
 Flask-WTF==0.14.3
 google-api-python-client==2.2.0
 google-cloud-ndb==1.8.0
+google-cloud-storage==1.38.0
 google-cloud-tasks==2.2.0
 grpcio==1.37.0
 numpy==1.20.2
