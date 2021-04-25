@@ -1,8 +1,8 @@
 from typing import Any, Dict, List, Optional
 
-from backend.common.datafeeds.parsers.json.parser_json import ParserJSON
 from backend.common.helpers.rankings_helper import RankingsHelper
 from backend.common.models.event_ranking import EventRanking
+from backend.tasks_io.datafeeds.parsers.json.parser_json import ParserJSON
 
 
 class FMSAPIEventRankingsParser(ParserJSON[List[EventRanking]]):

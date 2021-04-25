@@ -1,6 +1,6 @@
 import json
 
-from backend.common.datafeeds.parsers.fms_api.fms_api_event_alliances_parser import (
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_event_alliances_parser import (
     FMSAPIEventAlliancesParser,
 )
 

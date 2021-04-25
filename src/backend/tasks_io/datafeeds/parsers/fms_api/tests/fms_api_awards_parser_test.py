@@ -3,10 +3,10 @@ import json
 from google.cloud import ndb
 
 from backend.common.consts.event_type import EventType
-from backend.common.datafeeds.parsers.fms_api.fms_api_awards_parser import (
+from backend.common.models.event import Event
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_awards_parser import (
     FMSAPIAwardsParser,
 )
-from backend.common.models.event import Event
 
 
 def test_parse_awards(test_data_importer, ndb_client: ndb.Client) -> None:

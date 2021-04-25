@@ -5,11 +5,11 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 from google.cloud import ndb
 
 from backend.common.consts.media_type import MediaType
-from backend.common.datafeeds.parsers.json.parser_paginated_json import (
-    ParserPaginatedJSON,
-)
 from backend.common.models.media import Media
 from backend.common.models.team import Team
+from backend.tasks_io.datafeeds.parsers.json.parser_paginated_json import (
+    ParserPaginatedJSON,
+)
 
 
 class FMSAPITeamAvatarParser(ParserPaginatedJSON[Tuple[List[Media], Set[ndb.Key]]]):

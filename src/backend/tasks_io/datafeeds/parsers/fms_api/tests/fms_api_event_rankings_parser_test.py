@@ -2,7 +2,7 @@ import json
 
 from google.cloud import ndb
 
-from backend.common.datafeeds.parsers.fms_api.fms_api_event_rankings_parser import (
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_event_rankings_parser import (
     FMSAPIEventRankingsParser,
 )
 
