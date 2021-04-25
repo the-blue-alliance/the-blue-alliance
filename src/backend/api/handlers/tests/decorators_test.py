@@ -83,10 +83,11 @@ def test_authenticated_header(
 
         assert len(caplog.records) == 1
         record = caplog.records[0]
+        assert record.levelno == logging.INFO
         if account:
-            assert record.msg == "Auth owner: 1, X-TBA-Auth-Key: test_auth_key"
+            assert record.message == "Auth owner: 1, X-TBA-Auth-Key: test_auth_key"
         else:
-            assert record.msg == "Auth owner: None, X-TBA-Auth-Key: test_auth_key"
+            assert record.message == "Auth owner: None, X-TBA-Auth-Key: test_auth_key"
 
         if account:
             assert g.auth_owner_id == account.key.id()
@@ -116,10 +117,11 @@ def test_authenticated_urlparam(
 
         assert len(caplog.records) == 1
         record = caplog.records[0]
+        assert record.levelno == logging.INFO
         if account:
-            assert record.msg == "Auth owner: 1, X-TBA-Auth-Key: test_auth_key"
+            assert record.message == "Auth owner: 1, X-TBA-Auth-Key: test_auth_key"
         else:
-            assert record.msg == "Auth owner: None, X-TBA-Auth-Key: test_auth_key"
+            assert record.message == "Auth owner: None, X-TBA-Auth-Key: test_auth_key"
 
         if account:
             assert g.auth_owner_id == account.key.id()
@@ -145,7 +147,8 @@ def test_authenticated_user(ndb_client: ndb.Client, api_client: Client, caplog) 
 
         assert len(caplog.records) == 1
         record = caplog.records[0]
-        assert record.msg == "Auth owner: 1, LOGGED IN"
+        assert record.levelno == logging.INFO
+        assert record.message == "Auth owner: 1, LOGGED IN"
         assert g.auth_owner_id == account.key.id()
 
     assert resp.status_code == 200
