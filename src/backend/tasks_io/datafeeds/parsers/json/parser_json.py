@@ -1,7 +1,7 @@
 import abc
 from typing import Any, Dict, Optional, TypeVar
 
-from backend.common.datafeeds.parsers.parser_base import ParserBase
+from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
 TParsedResponse = TypeVar("TParsedResponse")

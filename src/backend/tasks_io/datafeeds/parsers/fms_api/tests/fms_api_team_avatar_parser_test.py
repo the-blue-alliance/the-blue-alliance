@@ -3,11 +3,11 @@ import json
 from google.cloud import ndb
 
 from backend.common.consts.media_type import MediaType
-from backend.common.datafeeds.parsers.fms_api.fms_api_team_avatar_parser import (
-    FMSAPITeamAvatarParser,
-)
 from backend.common.models.media import Media
 from backend.common.models.team import Team
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_team_avatar_parser import (
+    FMSAPITeamAvatarParser,
+)
 
 
 def test_parse_avatars_none(test_data_importer, ndb_client: ndb.Client):

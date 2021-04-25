@@ -1,9 +1,9 @@
 from typing import Any, Dict, Optional, Tuple
 
-from backend.common.datafeeds.parsers.json.parser_paginated_json import (
+from backend.common.models.district_advancement import DistrictAdvancement
+from backend.tasks_io.datafeeds.parsers.json.parser_paginated_json import (
     ParserPaginatedJSON,
 )
-from backend.common.models.district_advancement import DistrictAdvancement
 
 
 class FMSAPIDistrictRankingsParser(ParserPaginatedJSON[DistrictAdvancement]):

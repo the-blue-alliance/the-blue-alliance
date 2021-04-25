@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, Optional
 
-from backend.common.datafeeds.parsers.json.parser_json import ParserJSON
 from backend.common.models.district import District
+from backend.tasks_io.datafeeds.parsers.json.parser_json import ParserJSON
 
 
 class FMSAPIDistrictListParser(ParserJSON[List[District]]):

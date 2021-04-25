@@ -2,8 +2,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from backend.common.datafeeds.datafeed_base import DatafeedBase
-from backend.common.datafeeds.parsers.parser_base import ParserBase
+from backend.tasks_io.datafeeds.datafeed_base import DatafeedBase
+from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
 @pytest.fixture

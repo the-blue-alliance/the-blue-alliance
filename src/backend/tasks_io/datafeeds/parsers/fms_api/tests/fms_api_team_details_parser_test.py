@@ -4,11 +4,11 @@ from unittest.mock import patch
 import pytest
 from google.cloud import ndb
 
-from backend.common.datafeeds.parsers.fms_api.fms_api_team_details_parser import (
-    FMSAPITeamDetailsParser,
-)
 from backend.common.models.district import District
 from backend.common.sitevars.website_blacklist import WebsiteBlacklist
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_team_details_parser import (
+    FMSAPITeamDetailsParser,
+)
 
 
 def test_parse_team_with_district(test_data_importer, ndb_client: ndb.Client):

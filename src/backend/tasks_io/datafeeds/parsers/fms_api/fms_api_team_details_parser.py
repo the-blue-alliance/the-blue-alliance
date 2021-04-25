@@ -2,15 +2,15 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from google.cloud import ndb
 
-from backend.common.datafeeds.parsers.json.parser_paginated_json import (
-    ParserPaginatedJSON,
-)
 from backend.common.helpers.website_helper import WebsiteHelper
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 from backend.common.sitevars.website_blacklist import WebsiteBlacklist
+from backend.tasks_io.datafeeds.parsers.json.parser_paginated_json import (
+    ParserPaginatedJSON,
+)
 
 
 class FMSAPITeamDetailsParser(

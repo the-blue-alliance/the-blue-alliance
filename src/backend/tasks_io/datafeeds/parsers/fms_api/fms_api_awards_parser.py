@@ -3,11 +3,11 @@ from typing import Any, Dict, List, Optional
 
 from google.cloud import ndb
 
-from backend.common.datafeeds.parsers.json.parser_json import ParserJSON
 from backend.common.helpers.award_helper import AwardHelper
 from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.team import Team
+from backend.tasks_io.datafeeds.parsers.json.parser_json import ParserJSON
 
 
 class FMSAPIAwardsParser(ParserJSON[List[Award]]):
