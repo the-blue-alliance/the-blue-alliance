@@ -1,4 +1,5 @@
-import "babel-polyfill";
+import "./gameday2.less";
+
 import React from "react";
 import ReactGA from "react-ga";
 import { Provider } from "react-redux";

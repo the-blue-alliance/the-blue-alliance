@@ -11,7 +11,6 @@ pip install -r requirements.txt
 pip install -r src/requirements.txt
 
 # nodejs dependencies
-npm install uglify-js --silent
-npm install -g npx gulp-cli uglify-es uglifycss less tslib request swagger-cli --silent
+npm install
 
 ./ops/build/run_buildweb.sh
