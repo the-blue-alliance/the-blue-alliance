@@ -11,7 +11,7 @@ A Sitevar must extend `Sitevar` and specify some generic content type. Generally
 #### (Example) Dictionary Sitevar
 
 ```python
-from typing_extensions import TypedDict
+from typing import TypedDict
 
 from backend.common.sitevars.base import Sitevar
 

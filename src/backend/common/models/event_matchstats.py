@@ -1,6 +1,4 @@
-from typing import Dict
-
-from typing_extensions import TypedDict
+from typing import Dict, TypedDict
 
 from backend.common.models.keys import TeamKey
 
