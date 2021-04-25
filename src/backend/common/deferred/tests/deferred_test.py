@@ -118,8 +118,9 @@ def test_client_for_env_dev_remote_fallback_no_redis(
 
     assert len(caplog.records) == 1
     record = caplog.records[0]
+    assert record.levelno == logging.WARNING
     assert (
-        record.msg
+        record.message
         == "tasks_remote_config not set in tba_dev_configuration.json. Falling back to RQ task queue. See documentation for configuration instructions."
     )
 
@@ -132,8 +133,9 @@ def test_client_for_env_dev_remote_fallback(
 
     assert len(caplog.records) == 1
     record = caplog.records[0]
+    assert record.levelno == logging.WARNING
     assert (
-        record.msg
+        record.message
         == "tasks_remote_config not set in tba_dev_configuration.json. Falling back to RQ task queue. See documentation for configuration instructions."
     )
 
@@ -155,8 +157,9 @@ def test_client_for_env_dev_remote_fallback_service(
 
     assert len(caplog.records) == 1
     record = caplog.records[0]
+    assert record.levelno == logging.WARNING
     assert (
-        record.msg
+        record.message
         == "tasks_remote_config not set in tba_dev_configuration.json. Falling back to RQ task queue. See documentation for configuration instructions."
     )
 
