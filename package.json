@@ -54,7 +54,7 @@
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.23.2",
     "jest-cli": "^26.6.3",
-    "less": "3.13.0",
+    "less": "4.1.1",
     "md5": "^2.3.0",
     "postcss": "^8.2.12",
     "postcss-loader": "^5.2.0",
