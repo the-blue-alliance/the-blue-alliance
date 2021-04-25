@@ -492,31 +492,37 @@ def test_remapteams_awards(ndb_context) -> None:
         team_list=[ndb.Key(Team, "frc1")],
         recipient_json_list=[json.dumps({"team_number": "1", "awardee": None})],
     )
-    # Ensure we can remap int `team_number` -> str `team_number`
+    # Ensure remap int `team_number` -> str `team_number`
     a2 = Award(
         team_list=[ndb.Key(Team, "frc200")],
         recipient_json_list=[json.dumps({"team_number": 200, "awardee": None})],
     )
-    # Ensure we can rempa str `team_number` -> int `team_number`
+    # Ensure remap str `team_number` -> int `team_number`
     a3 = Award(
         team_list=[ndb.Key(Team, "frc3B")],
         recipient_json_list=[json.dumps({"team_number": "3B", "awardee": None})],
     )
-    # Ensure we lave int `team_number` as-is if no reampping or casting
+    # Ensure remap of `str` -> `int`
     a4 = Award(
         team_list=[ndb.Key(Team, "frc4")],
         recipient_json_list=[json.dumps({"team_number": 4, "awardee": None})],
     )
-    # Ensure we leave str `team_number` as-is if no remapping or casting
+    # Ensure int `team_number` as-is if no reampping or casting
     a5 = Award(
-        team_list=[ndb.Key(Team, "frc5B")],
-        recipient_json_list=[json.dumps({"team_number": "5B", "awardee": None})],
+        team_list=[ndb.Key(Team, "frc5")],
+        recipient_json_list=[json.dumps({"team_number": 5, "awardee": None})],
+    )
+    # Ensure str `team_number` as-is if no remapping or casting
+    a6 = Award(
+        team_list=[ndb.Key(Team, "frc6B")],
+        recipient_json_list=[json.dumps({"team_number": "6B", "awardee": None})],
     )
 
-    awards = [a1, a2, a3, a4, a5]
+    awards = [a1, a2, a3, a4, a5, a6]
     remap_teams = {
         "frc200": "frc2B",
         "frc3B": "frc3",
+        "frc4": "frc400",
     }
     EventHelper.remapteams_awards(awards, remap_teams)
 
@@ -534,12 +540,16 @@ def test_remapteams_awards(ndb_context) -> None:
     assert a3.team_list == [ndb.Key(Team, "frc3")]
     assert a3._dirty
 
-    assert a4.recipient_json_list == [json.dumps({"team_number": 4, "awardee": None})]
-    assert a4.team_list == [ndb.Key(Team, "frc4")]
-    assert a4._dirty is False
+    assert a4.recipient_json_list == [json.dumps({"team_number": 400, "awardee": None})]
+    assert a4.team_list == [ndb.Key(Team, "frc400")]
+    assert a4._dirty
 
-    assert a5.recipient_json_list == [
-        json.dumps({"team_number": "5B", "awardee": None})
-    ]
-    assert a5.team_list == [ndb.Key(Team, "frc5B")]
+    assert a5.recipient_json_list == [json.dumps({"team_number": 5, "awardee": None})]
+    assert a5.team_list == [ndb.Key(Team, "frc5")]
     assert a5._dirty is False
+
+    assert a6.recipient_json_list == [
+        json.dumps({"team_number": "6B", "awardee": None})
+    ]
+    assert a6.team_list == [ndb.Key(Team, "frc6B")]
+    assert a6._dirty is False
