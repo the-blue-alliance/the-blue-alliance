@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - py3
+      
+concurrency: deploy-${{ github.ref }}
 
 jobs:
   py3-type:
