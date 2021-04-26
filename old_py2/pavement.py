@@ -69,8 +69,8 @@ def jinja2():
 def less():
     """Build and Combine CSS"""
     print("Building and Combining CSS")
-    sh("lessc static/css/less_css/tba_style.main.less static/css/less_css/tba_style.main.css")
-    sh("lessc static/css/less_css/tba_style.gameday.less static/css/less_css/tba_style.gameday.css")
+    sh("npx -p less@3.11.3 lessc static/css/less_css/tba_style.main.less static/css/less_css/tba_style.main.css")
+    sh("npx -p less@3.11.3 lessc static/css/less_css/tba_style.gameday.less static/css/less_css/tba_style.gameday.css")
     sh("python do_compress.py css")
 
 
@@ -120,7 +120,7 @@ def make():
     jinja2()
 
     build_time = time.ctime()
-    travis_job = os.environ.get('TRAVIS_BUILD_ID', '')
+    travis_job = os.environ.get('GITHUB_RUN_ID', os.environ.get('TRAVIS_BUILD_ID', ''))
     try:
         git_branch_name = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
         git_last_commit = subprocess.check_output(["git", "log", "-1"])

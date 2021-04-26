@@ -4,7 +4,8 @@
 
 {% block content %}
 
-<p class="pull-right"><a class="btn btn-danger btn-small" href="/admin/event/delete/{{event.key_name}}"><span class="glyphicon glyphicon-trash"></span> Delete</a></p>
+<p class="pull-right"><a class="btn btn-danger btn-small" href="/admin/event/delete/{{event.key_name}}"><span
+            class="glyphicon glyphicon-trash"></span> Delete</a></p>
 
 <h1>Edit {{ event.key_name }}</h1>
 
@@ -18,7 +19,9 @@
         <tr>
             <td>Dates</td>
             <td>
-                <input type="text" name="start_date" value="{{ event.start_date|date:"Y-m-d" }}" placeholder="2012-04-04"/> to <input type="text" name="end_date" value="{{ event.end_date|date:"Y-m-d" }}" placeholder="2012-04-06" />
+                <input type="text" name="start_date" value="{{ event.start_date|date:" Y-m-d" }}"
+                    placeholder="2012-04-04" /> to <input type="text" name="end_date" value="{{ event.end_date|date:"
+                    Y-m-d" }}" placeholder="2012-04-06" />
             </td>
         </tr>
 
@@ -36,23 +39,27 @@
         </tr>
         <tr>
             <td>Year</td>
-            <td><input type="text" name="disabled_year" value="{{event.year}}" disabled="disabled" /><input type="hidden" name="year" value="{{event.year}}" /></td>
+            <td><input type="text" name="disabled_year" value="{{event.year}}" disabled="disabled" /><input
+                    type="hidden" name="year" value="{{event.year}}" /></td>
         </tr>
         <tr>
             <td>Event Short</td>
-            <td><input type="text" name="disabled_event_short" value="{{event.event_short}}" disabled="disabled" /><input type="hidden" name="event_short" value="{{event.event_short}}" /></td>
+            <td><input type="text" name="disabled_event_short" value="{{event.event_short}}"
+                    disabled="disabled" /><input type="hidden" name="event_short" value="{{event.event_short}}" /></td>
         </tr>
         <tr>
             <td>FIRST API Code</td>
-            <td><input type="text" name="first_code" placeholder="ct" {% if event.first_code %}value="{{ event.first_code }}"{% endif %}/></td>
+            <td><input type="text" name="first_code" placeholder="ct" {% if event.first_code
+                    %}value="{{ event.first_code }}" {% endif %} /></td>
         </tr>
         <tr>
             <td>Event Type</td>
             <td><select name="event_type">
-                {% for type, name in event_types.iteritems %}
-                  <option value="{{ type }}" {% if type == event.event_type_enum %}selected{% endif %}>{{ name }}</option>
-                {% endfor %}
-            </select></td>
+                    {% for type, name in event_types.iteritems %}
+                    <option value="{{ type }}" {% if type==event.event_type_enum %}selected{% endif %}>{{ name }}
+                    </option>
+                    {% endfor %}
+                </select></td>
         </tr>
         <tr>
             <td>Event District Key</td>
@@ -61,10 +68,10 @@
         <tr>
             <td>Playoff Type</td>
             <td><select name="playoff_type">
-                {% for type, name in playoff_types.iteritems %}
-                  <option value="{{ type }}" {% if type == event.playoff_type %}selected{% endif %}>{{ name }}</option>
-                {% endfor %}
-            </select></td>
+                    {% for type, name in playoff_types.iteritems %}
+                    <option value="{{ type }}" {% if type==event.playoff_type %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </select></td>
         </tr>
         <tr>
             <td>Event Venue</td>
@@ -72,7 +79,7 @@
         </tr>
         <tr>
             <td>Event Venue Address</td>
-            <td><textarea name="venue_address" />{{event.venue_address}}</td>
+            <td><textarea name="venue_address">{{event.venue_address}}</textarea></td>
         </tr>
         <tr>
             <td>Event City</td>
@@ -112,11 +119,12 @@
         </tr>
         <tr>
             <td>Parent Event</td>
-            <td><input type="text" name="parent_event" value="{% if event.parent_event %}{{ event.parent_event.id }}{% endif %}"/></td>
+            <td><input type="text" name="parent_event"
+                    value="{% if event.parent_event %}{{ event.parent_event.id }}{% endif %}" /></td>
         </tr>
         <tr>
             <td>Event Divisions</td>
-            <td><input type="text" name="divisions" value="{{ event.division_keys_json }}"</td>
+            <td><input type="text" name="divisions" value="{{ event.division_keys_json }}" </td>
         </tr>
         <tr>
             <td>Webcast JSON</td>
@@ -126,16 +134,18 @@
         </tr>
         <tr>
             <td>Alliances</td>
-            <td><textarea name="alliance_selections_json" >{{alliance_selections}}</textarea></td>
+            <td><textarea name="alliance_selections_json">{{alliance_selections}}</textarea></td>
         </tr>
         <tr>
             <td>Rankings</td>
-            <td><textarea name="rankings_json" >{{rankings}}</textarea></td>
+            <td><textarea name="rankings_json">{{rankings}}</textarea></td>
         </tr>
     </table>
 
-    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Save Event</button>
-    <a href="/admin/event/{{event.key_name}}" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-down"></span> Cancel Edit</a>
+    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Save
+        Event</button>
+    <a href="/admin/event/{{event.key_name}}" class="btn btn-default"><span
+            class="glyphicon glyphicon-thumbs-down"></span> Cancel Edit</a>
 </form>
 
 {% endblock %}
