@@ -10,6 +10,7 @@
     {"site-package": "freezegun"},
     {"site-package": "google/cloud/datastore_v1"},
     {"site-package": "google/cloud/tasks_v2/"},
+    {"site-package": "google/cloud/storage"},
     {"site-package": "InMemoryCloudDatastoreStub"},
     {"site-package": "numpy"},
     {"site-package": "pytest"},
