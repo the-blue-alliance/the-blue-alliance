@@ -56,7 +56,7 @@
     "jest-cli": "^26.6.3",
     "less": "4.1.1",
     "md5": "^2.3.0",
-    "postcss": "^8.2.12",
+    "postcss": "^8.2.13",
     "postcss-loader": "^5.2.0",
     "react-addons-test-utils": "^15.3.0",
     "react-test-renderer": "^15.7.0",
