@@ -86,7 +86,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Set up Node
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v2.1.5
         with:
           node-version: "10.x"
       - name: Cache node modules
@@ -106,7 +106,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Set up Node
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v2.1.5
         with:
           node-version: "10.x"
       - name: Cache node modules
@@ -158,7 +158,7 @@ jobs:
         with:
           python-version: 3.8
       - name: Set up Node
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v2.1.5
         with:
           node-version: "10.x"
       - name: Cache node modules
