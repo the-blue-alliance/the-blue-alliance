@@ -113,6 +113,7 @@ def mock_team_detail_url(m: RequestsMocker, team: Team) -> None:
         "GET",
         f"https://www.thebluealliance.com/api/v3/team/{team.key_name}",
         headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
         json=TeamConverter(team).convert(ApiMajorVersion.API_V3),
     )
 
@@ -122,6 +123,7 @@ def mock_match_detail_url(m: RequestsMocker, match: Match) -> None:
         "GET",
         f"https://www.thebluealliance.com/api/v3/match/{match.key_name}",
         headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
         json=MatchConverter(match).convert(ApiMajorVersion.API_V3),
     )
 
@@ -131,6 +133,7 @@ def mock_event_detail_url(m: RequestsMocker, event: Event) -> None:
         "GET",
         f"https://www.thebluealliance.com/api/v3/event/{event.key_name}",
         headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
         json=EventConverter(event).convert(ApiMajorVersion.API_V3),
     )
 
@@ -142,6 +145,7 @@ def mock_event_teams_url(
         "GET",
         f"https://www.thebluealliance.com/api/v3/event/{event_key}/teams",
         headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
         json=TeamConverter(teams).convert(ApiMajorVersion.API_V3),
     )
 
@@ -153,6 +157,7 @@ def mock_event_matches_url(
         "GET",
         f"https://www.thebluealliance.com/api/v3/event/{event_key}/matches",
         headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
         json=MatchConverter(matches).convert(ApiMajorVersion.API_V3),
     )
 
@@ -167,6 +172,7 @@ def mock_event_rankings_url(
         "GET",
         f"https://www.thebluealliance.com/api/v3/event/{event_key}/rankings",
         headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
         json=cast(Dict, details)["rankings"] if details else {},
     )
 
@@ -181,6 +187,7 @@ def mock_event_alliances_url(
         "GET",
         f"https://www.thebluealliance.com/api/v3/event/{event_key}/alliances",
         headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
         json=cast(Dict, details)["alliances"],
     )
 
@@ -192,6 +199,7 @@ def mock_event_awards_url(
         "GET",
         f"https://www.thebluealliance.com/api/v3/event/{event_key}/awards",
         headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
         json=AwardConverter(awards).convert(ApiMajorVersion.API_V3),
     )
 
