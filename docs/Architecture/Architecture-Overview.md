@@ -25,7 +25,7 @@ The frontend receives HTTP requests from users, reads data from the datastore, a
 
 The backend does not handle user-initiated requests. It instead servers requests triggered by App Engine's [cron service](https://cloud.google.com/appengine/docs/standard/python3/scheduling-jobs-with-cron-yaml). [Cron](https://en.wikipedia.org/wiki/Cron) is a means of schedulding tasks to run a predetermined time of day or a a preconfigured interval. We periodically run a job to fetch data from an upstream source (like FIRST's APIs), compute derived statistics based on data in the datastore, or do other noninteractive processing. In short, the backend will write data for the frontend to later read and display to users.
 
-[[/images/tba-design-overview.png]]
+[[/docs/images/tba-design-overview.png]]
 
 ### What Next
 
