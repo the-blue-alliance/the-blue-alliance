@@ -11,7 +11,7 @@ EST = timezone("EST")
 
 
 class SeasonHelper(object):
-    """ General season-information helper methods """
+    """General season-information helper methods"""
 
     MIN_YEAR: Year = 1992
 
@@ -66,7 +66,7 @@ class SeasonHelper(object):
 
     @staticmethod
     def kickoff_datetime_est(year: Year = datetime.now().year) -> datetime:
-        """ Computes the date of Kickoff for a given year. Kickoff is always the first Saturday in January after Jan 2nd. """
+        """Computes the date of Kickoff for a given year. Kickoff is always the first Saturday in January after Jan 2nd."""
         jan_2nd = datetime(year, 1, 2, 10, 30, 00, tzinfo=EST)
         # Since 2021, Kickoff starts at 12:00am EST
         if year >= 2021:
@@ -79,14 +79,14 @@ class SeasonHelper(object):
 
     @staticmethod
     def kickoff_datetime_utc(year: Year = datetime.now().year) -> datetime:
-        """ Converts kickoff_date to a UTC datetime """
+        """Converts kickoff_date to a UTC datetime"""
         return SeasonHelper.kickoff_datetime_est(year).astimezone(UTC)
 
     @staticmethod
     def first_event_datetime_utc(
         year: Year = datetime.now().year,
     ) -> Optional[datetime]:
-        """ Computes day the first in-season event begins """
+        """Computes day the first in-season event begins"""
         events = EventListQuery(year).fetch()
         earliest_start = None
         for event in events:

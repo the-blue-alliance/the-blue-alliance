@@ -51,7 +51,7 @@ class PlayoffTypeHelper:
 
     @classmethod
     def get_comp_level_octo(cls, match_number: int) -> CompLevel:
-        """ No 2015 support """
+        """No 2015 support"""
         if match_number <= 24:
             return CompLevel.EF
         elif match_number <= 36:
