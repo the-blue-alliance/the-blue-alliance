@@ -27,7 +27,7 @@ class EventInfoTab extends Component {
     this.removeTeamMap = this.removeTeamMap.bind(this);
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     if (newProps.selectedEvent === null) {
       this.setState({ eventInfo: null, buttonClass: "btn-primary" });
     } else if (newProps.selectedEvent !== this.props.selectedEvent) {

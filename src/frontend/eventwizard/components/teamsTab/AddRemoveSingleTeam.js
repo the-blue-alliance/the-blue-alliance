@@ -25,7 +25,7 @@ class AddRemoveSingleTeam extends Component {
       .then((json) => this.setState({ teamTypeaheadOptions: json }));
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (!nextProps.hasFetchedTeams) {
       this.setState({
         addButtonClass: "btn-primary",
