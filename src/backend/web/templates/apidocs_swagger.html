@@ -1,10 +1,6 @@
 {% extends "base.html" %}
 
 {% block title %}{{ title }} - The Blue Alliance{% endblock %}
-{% block main_style %}
-  <link rel="stylesheet" href="/css/tba_combined_style.main.min.css"/>
-{% endblock %}
-
 {% block content %}
   <div style="display: none;" id="swagger_url">{{ swagger_url }}</div>
   <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -50,5 +46,5 @@
 {% endblock %}
 
 {% block inline_javascript %}
-  <script type="text/javascript" src="/javascript/apidocs.min.js"></script>
+  <script type="text/javascript" src="/py3_javascript/apidocs.min.js"></script>
 {% endblock %}
