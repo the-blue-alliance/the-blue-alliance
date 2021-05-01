@@ -1,4 +1,5 @@
-import React, { PropTypes } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 import { Toolbar, ToolbarGroup } from "material-ui/Toolbar";
 import FlatButton from "material-ui/FlatButton";
 import IconButton from "material-ui/IconButton";
@@ -74,7 +75,7 @@ const VideoCellToolbar = (props) => {
       <IconButton
         tooltip="Swap position"
         tooltipPosition="top-center"
-        onTouchTap={() => props.onRequestSwapPosition()}
+        onClick={() => props.onRequestSwapPosition()}
         touch
       >
         <SwapIcon color={white} />
@@ -101,7 +102,7 @@ const VideoCellToolbar = (props) => {
         <IconButton
           tooltip="Change webcast"
           tooltipPosition="top-center"
-          onTouchTap={() => props.onRequestSelectWebcast()}
+          onClick={() => props.onRequestSelectWebcast()}
           touch
         >
           <VideocamIcon color={white} />
@@ -113,13 +114,13 @@ const VideoCellToolbar = (props) => {
               : "Switch to live scores view"
           }
           tooltipPosition="top-center"
-          onTouchTap={() => props.onRequestLiveScoresToggle()}
+          onClick={() => props.onRequestLiveScoresToggle()}
           touch
         >
           <EqualizerIcon color={props.livescoreOn ? green500 : white} />
         </IconButton>
         <IconButton
-          onTouchTap={() => props.removeWebcast(props.webcast.id)}
+          onClick={() => props.removeWebcast(props.webcast.id)}
           tooltip="Close webcast"
           tooltipPosition="top-left"
           touch
