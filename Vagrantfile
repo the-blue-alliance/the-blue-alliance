@@ -20,8 +20,15 @@ Vagrant.configure("2") do |config|
     ],
     rsync__auto: true
 
-  # Forward GAE modules
   ports = []
+
+  # Forward Firebase ports
+  for i in [4000, 4400, 4500, 9005, 9099]
+    ports.push("#{i}:#{i}")
+    config.vm.network "forwarded_port", guest: i, host: i
+  end
+
+  # Forward GAE modules
   for i in 8080..8089
     ports.push("#{i}:#{i}")
     config.vm.network "forwarded_port", guest: i, host: i

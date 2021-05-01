@@ -59,6 +59,13 @@ ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
 EXPOSE 22
 
+# Expose Firebase emulator
+EXPOSE 4000
+EXPOSE 4400
+EXPOSE 4500
+EXPOSE 9005
+EXPOSE 9099
+
 # Expose ports for TBA
 EXPOSE 8000
 EXPOSE 8080-8089

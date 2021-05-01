@@ -1,21 +1,9 @@
 #! /bin/bash
 set -e
 
-function get_config_prop {
-    local prop_name="$1"
-    local dev_config_file=""
-    if [ -f "tba_dev_config.local.json" ]; then
-        local dev_config_file="tba_dev_config.local.json"
-    fi
+source ops/dev/vagrant/config.sh
 
-    jq -c -r -s ".[0] * (.[1] // {}) | .$prop_name | select (.!=null)" tba_dev_config.json $dev_config_file
-}
-
-function get_project_from_key {
-    local key_path="$1"
-    jq -r '.project_id' "$key_path"
-}
-
+auth_use_prod=$(get_config_prop auth_use_prod)
 log_level=$(get_config_prop log_level)
 tba_log_level=$(get_config_prop tba_log_level)
 ndb_log_level=$(get_config_prop ndb_log_level)
@@ -112,6 +100,15 @@ else
     exit 1
 fi
 
+# Setup Firebase auth emulator
+if [ -z "$auth_use_prod" ]; then
+    echo "Running with Firebase auth emulator"
+    env+=("--env_var=FIREBASE_AUTH_EMULATOR_HOST=localhost:9099")
+else
+    echo "Using upstream authentication accounts"
+    assert_google_application_credentials
+fi
+
 set -x
 dev_appserver.py \
     --admin_host=0.0.0.0 \
@@ -125,5 +122,6 @@ dev_appserver.py \
     --env_var TASKS_MODE="$tasks_mode" \
     --env_var STORAGE_MODE="$storage_mode" \
     --env_var FLASK_RESPONE_CACHE_ENABLED="$flask_response_cache_enabled" \
+    --env_var GCLOUD_PROJECT="$application" \
     --dev_appserver_log_level="$log_level" \
     src/default.yaml src/web.yaml src/api.yaml src/tasks_io.yaml src/dispatch.yaml

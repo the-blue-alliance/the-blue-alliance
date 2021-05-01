@@ -29,3 +29,7 @@ ops/dev/storage/*
 !ops/dev/storage/.gitkeep
 src/backend/web/static/javascript/tba_js/tba_keys.js
 tba_dev_config.local.json
+
+# Ignore Firebase config modules
+.firebaserc
+ui-debug.log

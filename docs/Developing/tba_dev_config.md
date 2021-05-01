@@ -10,6 +10,7 @@ $ vagrant halt && vagrant up
 
 | Parameter | Description |
 | --- | --- |
+| `auth_use_prod` | Set to `true` (or any non-empty value) to use an upstream Firebase project for authentication. Requires `google_application_credentials` to be set. If unset, will use the Firebase emulator locally for authentication. |
 | `datastore_mode` | Can be either `local` or `remote`. By default this is set to `local` and will use the [Datastore emulator](https://cloud.google.com/datastore/docs/tools/datastore-emulator) bundled with the App Engine SDK. If instead you want to point your instance to a real Datatsore instance, set this to `remote` and also set the `google_application_credentials` property |
 | `tasks_mode` | Can be either `local` or `remote`. By default this is set to `local` and will use Redis + RQ locally to enqueue tasks. If instead you want to point your instance to a real Google Cloud Tasks queue, follow the setup instructions in the [Google Cloud Tasks + ngrok](https://github.com/the-blue-alliance/the-blue-alliance/wiki/Queues-and-defer#google-cloud-tasks--ngrok) setup section. |
 | `tasks_remote_config` | (Optional) A dictionary of configuration parameters for using a remote task queue. Only necessary if `tasks_mode` is set to `remote`. See setup instructions in the [Google Cloud Tasks + ngrok](https://github.com/the-blue-alliance/the-blue-alliance/wiki/Queues-and-defer#google-cloud-tasks--ngrok) setup section. |

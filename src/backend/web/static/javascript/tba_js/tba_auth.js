@@ -14,8 +14,7 @@ function signInWithApple(csrfToken) {
 
 function _signInWithProvider(provider, csrfToken) {
   // As httpOnly cookies are to be used, do not persist any state client side.
-  firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
-  firebase.auth().signInWithPopup(provider).then(function(userCredential) {
+  auth.signInWithPopup(provider).then(function(userCredential) {
     var user = userCredential.user;
     user.getIdToken().then(function(idToken) {
       if (!idToken) {
@@ -28,6 +27,9 @@ function _signInWithProvider(provider, csrfToken) {
         dataType: 'json',
         headers: {
           'X-CSRFToken': csrfToken
+        },
+        xhrFields: {
+           withCredentials: true
         },
         data: {'id_token': idToken},
         success: function(data, status) {
@@ -58,6 +60,6 @@ function _signInWithProvider(provider, csrfToken) {
 }
 
 function _showSignInError(error) {
-   alert("Error logging in - " + error);
+   alert("Error logging in - " + error.toString());
    console.error(error);
 }
