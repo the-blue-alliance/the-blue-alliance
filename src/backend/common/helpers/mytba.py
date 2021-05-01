@@ -16,7 +16,7 @@ from backend.common.models.team import Team
 
 @dataclass
 class MyTBA:
-    """ A wrapper object for a collection of myTBA models for a given user """
+    """A wrapper object for a collection of myTBA models for a given user"""
 
     def __init__(self, models: List[MyTBAModel]) -> None:
         self.models = models

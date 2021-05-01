@@ -1,8 +1,9 @@
 import io
 import pickle
-from typing import Any
+from typing import Any, Optional
 
 from google.cloud import ndb
+from google.cloud.datastore import key as datastore_key
 
 
 class ImportFixingUnpickler(pickle.Unpickler):
@@ -52,3 +53,9 @@ class CachedQueryResult(ndb.Model):
 
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
+
+    @classmethod
+    def _global_cache_timeout(cls, key: datastore_key.Key) -> Optional[int]:
+        # This isn't great for perf, but for as long as we have split cache
+        # pools, we need something like this
+        return 61

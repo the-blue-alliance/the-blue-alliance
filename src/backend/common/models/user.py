@@ -24,7 +24,7 @@ from backend.common.queries.suggestion_query import SuggestionQuery
 
 
 class User:
-    """ Represents a TBA web user - for a TBA database account, see Account """
+    """Represents a TBA web user - for a TBA database account, see Account"""
 
     def __init__(self, session_claims: Dict[str, Any]) -> None:
         self._session_claims = session_claims

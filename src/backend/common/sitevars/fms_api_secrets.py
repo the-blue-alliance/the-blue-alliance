@@ -34,7 +34,7 @@ class FMSApiSecrets(Sitevar[ContentType]):
 
     @classmethod
     def auth_token(cls) -> Optional[str]:
-        """ The base64 encoded username + auth key - used to authenticate with the FMS API """
+        """The base64 encoded username + auth key - used to authenticate with the FMS API"""
 
         username = cls.username()
         authkey = cls.authkey()
