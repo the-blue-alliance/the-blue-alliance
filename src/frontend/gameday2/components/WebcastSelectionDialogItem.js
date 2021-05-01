@@ -1,4 +1,5 @@
-import React, { PropTypes } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 import { ListItem } from "material-ui/List";
 
 export default class WebcastSelectionDialogItem extends React.Component {
@@ -18,7 +19,7 @@ export default class WebcastSelectionDialogItem extends React.Component {
       <ListItem
         primaryText={this.props.webcast.name}
         secondaryText={this.props.secondaryText}
-        onTouchTap={() => this.handleClick()}
+        onClick={() => this.handleClick()}
         rightIcon={this.props.rightIcon}
       />
     );

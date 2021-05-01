@@ -7,7 +7,6 @@ import thunk from "redux-thunk";
 import { createStore, applyMiddleware, compose } from "redux";
 import ReactDOM from "react-dom";
 import queryString from "query-string";
-import injectTapEventPlugin from "react-tap-event-plugin";
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import { indigo500, indigo700 } from "material-ui/styles/colors";
 import getMuiTheme from "material-ui/styles/getMuiTheme";
@@ -26,8 +25,6 @@ import {
 import { MAX_SUPPORTED_VIEWS } from "./constants/LayoutConstants";
 
 ReactGA.initialize("UA-1090782-9");
-
-injectTapEventPlugin();
 
 const webcastData = JSON.parse(
   document.getElementById("webcasts_json").innerHTML

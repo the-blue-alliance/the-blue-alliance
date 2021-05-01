@@ -1,4 +1,5 @@
-import React, { PropTypes } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 import Dialog from "material-ui/Dialog";
 import { green500, indigo500 } from "material-ui/styles/colors";
 import Divider from "material-ui/Divider";
@@ -182,7 +183,7 @@ export default class WebcastSelectionDialog extends React.Component {
     const actions = [
       <FlatButton
         label="Cancel"
-        onTouchTap={() => this.onRequestClose()}
+        onClick={() => this.onRequestClose()}
         primary
       />,
     ];
