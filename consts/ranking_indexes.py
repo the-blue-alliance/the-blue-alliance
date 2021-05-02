@@ -2,8 +2,8 @@ class RankingIndexes(object):
     TEAM_NUMBER = 1
 
     MATCHES_PLAYED = {
-        2021: 9,
-        2020: 9,
+        2021: 8,
+        2020: 8,
         2019: 9,
         2018: 9,
         2017: 10,
@@ -57,6 +57,6 @@ class RankingIndexes(object):
         2017: 8,
         2018: 7,
         2019: 7,
-        2020: 7,
-        2021: 7,
+        2020: 6,
+        2021: 6,
     }

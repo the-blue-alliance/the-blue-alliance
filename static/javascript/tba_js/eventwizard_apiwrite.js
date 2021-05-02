@@ -326,14 +326,19 @@ $('#rankings_file').change(function(){
         //var is_num = [true, true, true, true, true, false, true, true];
 
         // 2019 Headers
-        var headers = ['Rank', 'Team', 'RS', 'Cargo Pts', 'Panel Pts', 'HAB Pts', 'Sandstorm', 'W-L-T', 'DQ', 'Played'];
-        var display_headers = ['Rank', 'Team', 'Ranking Score', 'Cargo', 'Hatch Panel', 'HAB Climb', 'Sandstorm Bonus', 'Record (W-L-T)', 'DQ', 'Played'];
-        var is_num = [true, true, true, true, true, false, true, true];
+        //var headers = ['Rank', 'Team', 'RS', 'Cargo Pts', 'Panel Pts', 'HAB Pts', 'Sandstorm', 'W-L-T', 'DQ', 'Played'];
+        //var display_headers = ['Rank', 'Team', 'Ranking Score', 'Cargo', 'Hatch Panel', 'HAB Climb', 'Sandstorm Bonus', 'Record (W-L-T)', 'DQ', 'Played'];
+        //var is_num = [true, true, true, true, true, false, true, true];
+
+        // 2020/2021 Headers
+        var headers = ['Rank', 'Team', 'RS', 'Auto Pts', 'Endgame Pts', 'Teleop Cell+CPanel', 'W-L-T', 'DQ', 'Played'];
+        var display_headers = ['Rank', 'Team', 'Ranking Score', 'Auto', 'Endgame', 'Teleop', 'Record (W-L-T)', 'DQ', 'Played'];
+        var is_num = [true, true, true, true, false, true, true];
 
         $('#rankings_preview').empty();
         $('#rankings_preview').html("<tr><th>" + display_headers.join("</th><th>") + "</th></tr>");
 
-        request_body['breakdowns'] = display_headers.slice(2, 8);
+        request_body['breakdowns'] = display_headers.slice(2, 7);
         request_body['rankings'] = [];
 
         for(var i=0; i<rankings.length; i++){
