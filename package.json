@@ -47,7 +47,7 @@
     "md5": "^2.3.0",
     "process": "^0.11.10",
     "style-loader": "^2.0.0",
-    "webpack": "^5.36.1",
+    "webpack": "^5.36.2",
     "webpack-cli": "^4.6.0"
   },
   "scripts": {
