@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 const TwitchChatEmbed = (props) => {
   const id = `twich-chat-${props.channel}`;
-  const src = `https://twitch.tv/embed/${props.channel}/chat?parent=www.thebluealliance.com`;
+  const src = `https://twitch.tv/embed/${props.channel}/chat?parent=${document.location.hostname}`;
   const style = {
     display: props.visible ? null : "none",
     width: "100%",
