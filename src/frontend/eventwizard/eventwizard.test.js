@@ -6,20 +6,20 @@ import EventWizardFrame from "./components/EventWizardFrame";
 
 let container = null;
 beforeEach(() => {
-    // setup a DOM element as a render target
-    container = document.createElement("div");
-    document.body.appendChild(container);
+  // setup a DOM element as a render target
+  container = document.createElement("div");
+  document.body.appendChild(container);
 });
 
 afterEach(() => {
-    // cleanup on exiting
-    unmountComponentAtNode(container);
-    container.remove();
-    container = null;
+  // cleanup on exiting
+  unmountComponentAtNode(container);
+  container.remove();
+  container = null;
 });
 
 it("renders without crashing", () => {
-    act(() => {
-        render(<EventWizardFrame />, container);
-    });
+  act(() => {
+    render(<EventWizardFrame />, container);
+  });
 });
