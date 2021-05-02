@@ -49,10 +49,10 @@ def javascript():
 
 
 @task
-def gulp():
-    """Update all npm dependencies and run 'gulp build' task"""
-    print("Running 'gulp build'")
-    sh("npm update && gulp build --production")
+def webpack():
+    """Update all npm dependencies and run 'npm run build' task"""
+    print("Running 'npm run build'")
+    sh("npm update && npm run build")
 
 
 @task
@@ -115,7 +115,7 @@ def validate_swagger():
 @task
 def make():
     javascript()
-    gulp()
+    webpack()
     less()
     jinja2()
 
