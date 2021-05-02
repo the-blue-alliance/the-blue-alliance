@@ -22,7 +22,7 @@
     "react-event-listener": "^0.6.6",
     "react-file-input": "^0.2.5",
     "react-ga": "^3.3.0",
-    "react-redux": "^5.1.2",
+    "react-redux": "^7.2.4",
     "react-select": "^2.4.4",
     "redux": "^4.1.0",
     "redux-thunk": "^2.0.1",
