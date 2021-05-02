@@ -19,7 +19,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v2.1.2
         with:
-          node-version: "8.x"
+          node-version: "10.x"
       - name: Cache pip
         uses: actions/cache@v2
         with:
@@ -95,7 +95,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v2.1.2
         with:
-          node-version: "8.x"
+          node-version: "10.x"
       - name: Cache node modules
         uses: actions/cache@v2
         with:
@@ -119,7 +119,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v2.1.2
         with:
-          node-version: "8.x"
+          node-version: "10.x"
       - name: Cache pip
         uses: actions/cache@v2
         with:

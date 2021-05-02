@@ -6,6 +6,8 @@ import thunk from 'redux-thunk'
 import EventWizardFrame from './components/EventWizardFrame'
 import eventwizardReducer from './reducers'
 
+import './eventwizard.less'
+
 const store = createStore(eventwizardReducer, compose(
   applyMiddleware(thunk),
   window.devToolsExtension ? window.devToolsExtension() : (f) => f
