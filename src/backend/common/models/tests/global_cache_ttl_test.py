@@ -49,7 +49,7 @@ def do_test(model_class, global_cache, expected_ttl, **kwargs) -> None:
     assert ttl == expected_ttl
 
 
-@pytest.mark.no_auto_ndb_context  # pyre-ignore[56]
+@pytest.mark.no_auto_ndb_context
 def test_not_live_event_ttl(global_cache) -> None:
     do_test(
         Event,
@@ -65,7 +65,7 @@ def test_not_live_event_ttl(global_cache) -> None:
     )
 
 
-@pytest.mark.no_auto_ndb_context  # pyre-ignore[56]
+@pytest.mark.no_auto_ndb_context
 @freeze_time("2019-03-01")
 def test_live_event_ttl(global_cache) -> None:
     do_test(
@@ -82,7 +82,7 @@ def test_live_event_ttl(global_cache) -> None:
     )
 
 
-@pytest.mark.no_auto_ndb_context  # pyre-ignore[56]
+@pytest.mark.no_auto_ndb_context
 def test_not_live_event_match_ttl(global_cache) -> None:
     Event(
         id="2019test",
@@ -108,7 +108,7 @@ def test_not_live_event_match_ttl(global_cache) -> None:
     )
 
 
-@pytest.mark.no_auto_ndb_context  # pyre-ignore[56]
+@pytest.mark.no_auto_ndb_context
 @freeze_time("2019-03-01")
 def test_live_event_match_ttl(global_cache) -> None:
     Event(
@@ -135,7 +135,7 @@ def test_live_event_match_ttl(global_cache) -> None:
     )
 
 
-@pytest.mark.no_auto_ndb_context  # pyre-ignore[56]
+@pytest.mark.no_auto_ndb_context
 def test_not_live_event_event_detail_ttl(global_cache) -> None:
     Event(
         id="2019test",
@@ -155,7 +155,7 @@ def test_not_live_event_event_detail_ttl(global_cache) -> None:
     )
 
 
-@pytest.mark.no_auto_ndb_context  # pyre-ignore[56]
+@pytest.mark.no_auto_ndb_context
 @freeze_time("2019-03-01")
 def test_live_event_event_detail_ttl(global_cache) -> None:
     Event(
@@ -176,7 +176,7 @@ def test_live_event_event_detail_ttl(global_cache) -> None:
     )
 
 
-@pytest.mark.no_auto_ndb_context  # pyre-ignore[56]
+@pytest.mark.no_auto_ndb_context
 def test_not_live_event_event_team_ttl(global_cache) -> None:
     Event(
         id="2019test",
@@ -196,7 +196,7 @@ def test_not_live_event_event_team_ttl(global_cache) -> None:
     )
 
 
-@pytest.mark.no_auto_ndb_context  # pyre-ignore[56]
+@pytest.mark.no_auto_ndb_context
 @freeze_time("2019-03-01")
 def test_live_event_event_team_ttl(global_cache) -> None:
     Event(
@@ -217,7 +217,7 @@ def test_live_event_event_team_ttl(global_cache) -> None:
     )
 
 
-@pytest.mark.no_auto_ndb_context  # pyre-ignore[56]
+@pytest.mark.no_auto_ndb_context
 def test_not_live_event_award_ttl(global_cache) -> None:
     Event(
         id="2019test",
@@ -242,7 +242,7 @@ def test_not_live_event_award_ttl(global_cache) -> None:
     )
 
 
-@pytest.mark.no_auto_ndb_context  # pyre-ignore[56]
+@pytest.mark.no_auto_ndb_context
 @freeze_time("2019-03-01")
 def test_live_event_award_ttl(global_cache) -> None:
     Event(
