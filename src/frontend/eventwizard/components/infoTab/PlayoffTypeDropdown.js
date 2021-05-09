@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Select from "react-select";
+import AsyncSelect from "react-select/async";
 
 import EVENT_SHAPE from "../../constants/ApiEvent";
 
@@ -20,7 +20,7 @@ class PlayoffTypeDropdown extends Component {
           Playoff Type
         </label>
         <div className="col-sm-10">
-          <Select.Async
+          <AsyncSelect
             name="selectType"
             placeholder="Choose playoff type..."
             loadingPlaceholder="Loading playoff types..."
