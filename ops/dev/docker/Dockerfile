@@ -36,8 +36,14 @@ RUN apt-get update && apt-get install -y \
     google-cloud-sdk-datastore-emulator \
     google-cloud-sdk-pubsub-emulator
 
-# Install nodejs
-RUN apt-get install -y nodejs npm
+# Set up nvm and nodejs
+ENV NVM_DIR /nvm
+ENV NODE_VERSION 14
+RUN wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash \
+    && . $NVM_DIR/nvm.sh \
+    && nvm install $NODE_VERSION --silent \
+    && nvm alias default $NODE_VERSION \
+    && nvm use default --silent
 
 # Install pip2 for gcloud dependencies
 RUN curl https://bootstrap.pypa.io/pip/2.7/get-pip.py | python2
