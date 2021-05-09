@@ -19,7 +19,7 @@ fi
 echo "Starting devserver in new tmux session..."
 tmux new-session -d -s $session
 tmux new-window -t "$session:1" -n gae "./ops/dev/vagrant/dev_appserver.sh 2>&1 | tee /var/log/tba.log; read"
-tmux new-window -t "$session:2" -n webpack "npm run dev 2>&1 | tee /var/log/webpack.log; read"
+tmux new-window -t "$session:2" -n webpack "./ops/dev/vagrant/run_webpack.sh 2>&1 | tee /var/log/webpack.log; read"
 tmux new-window -t "$session:3" -n redis "redis-server 2>&1 | tee /var/log/redis.log; read"
 tmux new-window -t "$session:4" -n rq-worker "rq worker default cache-clearing post-update-hooks 2>&1 | tee /var/log/rq-worker.log; read"
 tmux new-window -t "$session:5" -n rq-dashboard "rq-dashboard 2>&1 | tee /var/log/rq-dashboard.log; read"

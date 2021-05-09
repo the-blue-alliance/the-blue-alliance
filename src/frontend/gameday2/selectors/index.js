@@ -32,8 +32,8 @@ export const getWebcastIdsInDisplayOrder = createSelector(
     const orderedWebcasts = webcastsArray.filter((webcast) =>
       ({}.hasOwnProperty.call(webcast, "sortOrder"))
     );
-    const sortedOrderedWebcasts = orderedWebcasts.sort(
-      (a, b) => a.sortOrder > b.sortOrder
+    const sortedOrderedWebcasts = orderedWebcasts.sort((a, b) =>
+      a.sortOrder > b.sortOrder ? 1 : -1
     );
     sortedOrderedWebcasts.forEach((webcast) =>
       displayOrderWebcastIds.push(webcast.id)

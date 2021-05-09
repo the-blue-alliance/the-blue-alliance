@@ -11,6 +11,10 @@ pip install -r requirements.txt
 pip install -r src/requirements.txt
 
 # nodejs dependencies
+NVM_DIR="/nvm"
+# shellcheck source=/dev/null
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+nvm use default
 npm install
 
 ./ops/build/run_buildweb.sh
