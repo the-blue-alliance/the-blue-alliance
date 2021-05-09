@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Dialog from "react-bootstrap-dialog";
 import TeamList from "./TeamList";
-import FileInput from "../FileInput"
+import FileInput from "../FileInput";
 
 class AddTeamsFMSReport extends Component {
   constructor(props) {
