@@ -5,7 +5,7 @@ import {
   SET_MANUAL_EVENT,
 } from "../constants/ActionTypes";
 
-const defaultState = {
+export const defaultState = {
   selectedEvent: "",
   manualEvent: false,
 };
