@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Typeahead } from "react-bootstrap-typeahead";
+import fetch from "cross-fetch";
 
 import TEAM_SHAPE from "../../constants/ApiTeam";
 
@@ -114,6 +115,7 @@ class AddRemoveSingleTeam extends Component {
           </p>
         )}
         <Typeahead
+          id="add-remove-team-typeahead"
           ref={(typeahead) => {
             this.teamTypeahead = typeahead;
           }}

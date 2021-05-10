@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "classnames": "^2.3.1",
+    "cross-fetch": "^3.1.4",
     "element-resize-event": "^3.0.3",
     "firebase": "^8.5.0",
     "firedux": "^1.1.0",
@@ -36,6 +37,8 @@
     "@babel/plugin-proposal-class-properties": "^7.13.0",
     "@babel/preset-env": "^7.14.1",
     "@babel/preset-react": "^7.13.13",
+    "@testing-library/jest-dom": "^5.12.0",
+    "@testing-library/react": "^11.2.6",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.2",
     "cross-env": "^7.0.3",
@@ -47,7 +50,9 @@
     "jest-cli": "^26.6.3",
     "less": "4.1.1",
     "md5": "^2.3.0",
+    "msw": "^0.28.2",
     "process": "^0.11.10",
+    "redux-mock-store": "^1.5.4",
     "style-loader": "^2.0.0",
     "webpack": "^5.36.2",
     "webpack-cli": "^4.7.0"

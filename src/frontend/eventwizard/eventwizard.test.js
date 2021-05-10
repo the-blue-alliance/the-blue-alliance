@@ -1,25 +1,40 @@
 import React from "react";
-import { render, unmountComponentAtNode } from "react-dom";
-import { act } from "react-dom/test-utils";
+import { render, screen } from "@testing-library/react";
+import { rest } from "msw";
+import { setupServer } from "msw/node";
+import { Provider } from "react-redux";
+import configureMockStore from "redux-mock-store";
+import "@testing-library/jest-dom/extend-expect";
 
+import { defaultState } from "./reducers/auth";
 import EventWizardFrame from "./components/EventWizardFrame";
 
-let container = null;
-beforeEach(() => {
-  // setup a DOM element as a render target
-  container = document.createElement("div");
-  document.body.appendChild(container);
-});
+const mockStore = configureMockStore();
 
-afterEach(() => {
-  // cleanup on exiting
-  unmountComponentAtNode(container);
-  container.remove();
-  container = null;
-});
+const server = setupServer(
+  // Mock out API requsts we require
+  rest.get("/_/typeahead/teams-all", (req, res, ctx) => {
+    return res(ctx.json([]));
+  })
+);
+
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
 
 it("renders without crashing", () => {
-  act(() => {
-    render(<EventWizardFrame />, container);
-  });
+  const initialState = {
+    auth: defaultState,
+  };
+  const store = mockStore(initialState);
+
+  render(
+    <Provider store={store}>
+      <EventWizardFrame />
+    </Provider>
+  );
+
+  expect(screen.getAllByRole("heading")[0]).toHaveTextContent(
+    /^TBA Event Wizard$/
+  );
 });

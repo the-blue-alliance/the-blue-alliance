@@ -14,7 +14,11 @@ const SyncCodeInput = (props) => (
         className="form-control"
         id="first_code"
         placeholder="IRI"
-        value={props.eventInfo && props.eventInfo.first_event_code}
+        value={
+          props.eventInfo && props.eventInfo.first_event_code
+            ? props.eventInfo.first_event_code
+            : ""
+        }
         disabled={props.eventInfo === null}
         onChange={props.setSyncCode}
       />
