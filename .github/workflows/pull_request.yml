@@ -112,6 +112,10 @@ jobs:
         run: npm install
       - name: Run Tests
         run: ./ops/test_node.sh
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          directory: ./.node_coverage/
   bash-lint:
     name: "[bash] Lint"
     runs-on: ubuntu-latest

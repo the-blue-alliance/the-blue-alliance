@@ -120,6 +120,11 @@ jobs:
       - name: Run Tests
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/test_node.sh
+      - name: Upload coverage to Codecov
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        uses: codecov/codecov-action@v1
+        with:
+          directory: ./.node_coverage/
   bash-lint:
     name: "[bash] Lint"
     runs-on: ubuntu-latest
