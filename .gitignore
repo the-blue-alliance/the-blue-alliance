@@ -9,6 +9,7 @@ __pycache__/
 
 .coverage
 coverage.xml
+.node_coverage/
 **.swp
 venv/
 .testmondata
