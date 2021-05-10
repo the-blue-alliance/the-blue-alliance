@@ -71,6 +71,8 @@
       "<rootDir>/node_modules/react-test-renderer/",
       "<rootDir>/node_modules/react-addons-test-utils/",
       "<rootDir>/node_modules/enzyme/"
-    ]
+    ],
+    "coverageDirectory": "./.node_coverage/",
+    "collectCoverage": true
   }
 }
