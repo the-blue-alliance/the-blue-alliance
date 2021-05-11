@@ -59,17 +59,18 @@ class EventInfoTab extends Component {
     })
       .then(ensureRequestSuccess)
       .then((response) => response.json())
-      .then((
-        data1 // Merge in remap_teams
-      ) =>
-        fetch(`/_/remap_teams/${newEventKey}`)
-          .then(ensureRequestSuccess)
-          .then((response) => response.json())
-          .then((data2) => {
-            const data = Object.assign({}, data1);
-            data.remap_teams = data2;
-            return data;
-          })
+      .then(
+        (
+          data1 // Merge in remap_teams
+        ) =>
+          fetch(`/_/remap_teams/${newEventKey}`)
+            .then(ensureRequestSuccess)
+            .then((response) => response.json())
+            .then((data2) => {
+              const data = Object.assign({}, data1);
+              data.remap_teams = data2;
+              return data;
+            })
       )
       .then((data) => this.setState({ eventInfo: data, status: "" }));
   }
