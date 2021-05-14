@@ -6,12 +6,13 @@ from google.cloud import ndb
 from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
 
-from backend.common.consts import playoff_type
+from backend.common.consts import comp_level, playoff_type
 from backend.common.decorators import cached_public
 from backend.common.helpers.award_helper import AwardHelper
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.media_helper import MediaHelper
+from backend.common.helpers.playlist_helper import PlaylistHelper
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.team_helper import TeamHelper
@@ -190,6 +191,17 @@ def event_detail(event_key: EventKey) -> Response:
 
     # status_sitevar = status_sitevar_future.get_result()
 
+    qual_playlist = PlaylistHelper.generate_playlist_link(
+        matches_organized=matches,
+        title=f"{event.year} {event.name} Qualifications",
+        allow_levels=[comp_level.CompLevel.QM],
+    )
+    elim_playlist = PlaylistHelper.generate_playlist_link(
+        matches_organized=matches,
+        title=f"{event.year} {event.name} Playoffs",
+        allow_levels=comp_level.ELIM_LEVELS,
+    )
+
     template_values = {
         "event": event,
         "event_down": False,  # status_sitevar and event_key in status_sitevar.contents,
@@ -222,6 +234,8 @@ def event_detail(event_key: EventKey) -> Response:
         else None,
         "double_elim_matches": double_elim_matches,
         "double_elim_playoff_types": playoff_type.DOUBLE_ELIM_TYPES,
+        "qual_playlist": qual_playlist,
+        "elim_playlist": elim_playlist,
     }
 
     return render_template("event_details.html", template_values)

@@ -11,6 +11,7 @@ from backend.common.helpers.award_helper import AwardHelper
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.media_helper import MediaHelper
+from backend.common.helpers.playlist_helper import PlaylistHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.award import Award
 from backend.common.models.event import Event
@@ -162,16 +163,11 @@ class TeamRenderer(object):
                         team_rank = ranking["rank"]
                         break
 
-            video_ids = []
-            playlist = ""
-            for level in comp_level.COMP_LEVELS:
-                matches = matches_organized[level]
-                for match in matches:
-                    video_ids += [video.split("?")[0] for video in match.youtube_videos]
-            if video_ids:
-                playlist_title = "{} (Team {})".format(event.name, team.team_number)
-                playlist = "https://www.youtube.com/watch_videos?video_ids={}&title={}"
-                playlist = playlist.format(",".join(video_ids), playlist_title)
+            playlist = PlaylistHelper.generate_playlist_link(
+                matches_organized=matches_organized,
+                title="{} (Team {})".format(event.name, team.team_number),
+                allow_levels=comp_level.COMP_LEVELS,
+            )
 
             district_points = None
             if team_district_points:
