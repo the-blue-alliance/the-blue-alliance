@@ -1,4 +1,7 @@
 #!/bin/bash
+# shellcheck disable=SC1004
+# Ignore Shellcheck error 1004
+# https://github.com/koalaman/shellcheck/wiki/SC1004
 
 vagrant plugin install vagrant-gatling-rsync
 
