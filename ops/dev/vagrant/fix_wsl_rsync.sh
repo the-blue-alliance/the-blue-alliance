@@ -13,4 +13,3 @@ sed -i 's/  # Forward GAE modules.*$/  if Vagrant.has_plugin?("vagrant-gatling-r
 \n&/' Vagrantfile
 
 sed -i 's/rsync-auto/gatling-rsync-auto/' ops/dev/host.sh
-
