@@ -91,3 +91,48 @@ Note that currently, TBA is porting a significant portion of code from Python 2 
 ### Run `vagrant up`
 
 Try running `vagrant up`. If you see an error regarding unable to find the directory `/tba`, try running `vagrant destroy && vagrant up`.
+
+
+### Troubleshooting rsync
+
+You may find that rsync is especially slow on WSL; currently, I/O speed is a problem for WSL. A simple workaround is to use [vagrant-gatling-rsync](https://github.com/smerrill/vagrant-gatling-rsync).
+
+Install with the following command:
+
+```
+$ vagrant plugin install vagrant-gatling-rsync
+```
+
+Modify `Vagrantfile` to contain the following:
+
+```
+  # This is the *existing* rsync config in Vagrantfile
+  config.vm.synced_folder "./", "/tba",
+    type: "rsync",
+    owner: "root",
+    group: "root",
+    rsync__rsync_path: "rsync",
+    rsync__exclude: [
+      ".git/",
+      "node_modules/",
+      "src/build/*",
+      "*__pycache__*",
+      "venv/*",
+      ".pyre/*",
+    ],
+    rsync__auto: true
+
+  # Add the following here:
+  if Vagrant.has_plugin?("vagrant-gatling-rsync")
+    config.gatling.latency = 2.5
+    config.gatling.time_format = "%H:%M:%S"
+  end
+  config.gatling.rsync_on_startup = false
+```
+
+Additionally, modify `ops/dev/host.sh` to run `vagrant-gatling-rsync` rather than `rsync`:
+
+```
+declare -a cmds=("vagrant gatling-rsync-auto" "./ops/dev/print-gae-logs.sh" "./ops/dev/print-webpack-logs.sh")
+# ...
+```
