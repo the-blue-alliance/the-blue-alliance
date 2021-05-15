@@ -56,7 +56,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-sm-8" style="padding-bottom: 0; margin-bottom: 0">
+    <div class="col-sm-8 bottomless">
       {% if district_name %}
         <span class="glyphicon glyphicon-globe"></span> <a href="/events/{{district_abbrev}}/{{event.year}}">{{district_name}} District</a> Event<br />
       {% endif %}
@@ -85,16 +85,16 @@
       {% endif %}
       {% if event.facebook_eid %}<br><span class="glyphicon glyphicon-thumbs-up"></span> <a href="{{ event.facebook_event_url }}" title="Facebook Event" target="_blank">RSVP on Facebook</a><br>{% endif %}
     </div>
-    <div class="col-sm-4" style="padding-bottom: 0; margin-bottom: 0">
+    <div class="col-sm-4 bottomless">
       <a class="btn btn-success pull-right hidden-xs" href="/suggest/event/video?event_key={{event.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add Match Videos!</a>
     </div>
   </div>
   <div class="row">
-      <div class="col-sm-7" style="padding-top: 0; margin-top: 0">
+      <div class="col-sm-7 topless">
         {% if event.website %}<span class="glyphicon glyphicon-link"></span> <a href="{{ event.website }}" title="{{ event.name }}" target="_blank">{{ event.website }}</a>{% endif %}
         {% if event.first_eid or event.official %}{% if not event.website %}<span class="glyphicon glyphicon-info-sign"></span>{% else %} - {% endif %} Details on <a href="{% if event.first_eid %}https://www.firstinspires.org/team-event-search/event?id={{event.first_eid}}{%elif event.official %}https://frc-events.firstinspires.org/{{event.year}}/{{event.first_api_code}}{%endif%}" target="_blank">firstinspires.org</a>{% endif %}
       </div>
-      <div class="col-sm-5" style="padding-top: 0; margin-top: 0">
+      <div class="col-sm-5 topless">
         {% if event.official and event.year >= 2006 %}
           <div class="pull-right-not-xs">
             <span class="glyphicon glyphicon-info-sign"></span> Data provided by the <a href="https://frc-events.firstinspires.org/services/API" target="_blank">FIRST Events API</a>
