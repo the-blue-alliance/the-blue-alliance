@@ -2,12 +2,13 @@
 import React from "react";
 import { webcastPropType } from "../../utils/webcastUtils";
 
-export default class EmbedHtml5 extends React.Component {
-  static propTypes = {
-    webcast: webcastPropType.isRequired,
-  };
+type Props = {
+  webcast: webcastPropType;
+};
 
+export default class EmbedHtml5 extends React.Component<Props> {
   componentDidMount() {
+    // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'videojs'.
     videojs(this.props.webcast.id, {
       width: "100%",
       height: "100%",

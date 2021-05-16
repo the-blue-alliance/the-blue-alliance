@@ -1,5 +1,6 @@
 import firebase from "firebase/app";
 import "firebase/database";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'fire... Remove this comment to see the full error message
 import Firedux from "firedux";
 import { combineReducers } from "redux";
 import { webcastsById, specialWebcastIds } from "./webcastsById";

@@ -2,7 +2,7 @@ import { connect } from "react-redux";
 import WebcastSelectionDialog from "../components/WebcastSelectionDialog";
 import { getWebcastIdsInDisplayOrder } from "../selectors";
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
   webcasts: getWebcastIdsInDisplayOrder(state),
   webcastsById: state.webcastsById,
   specialWebcastIds: state.specialWebcastIds,

@@ -3,6 +3,7 @@ import VideoCellToolbar from "../components/VideoCellToolbar";
 import { addWebcastAtPosition, swapWebcasts, removeWebcast } from "../actions";
 import { getTickerMatches, getWebcastIdsInDisplayOrder } from "../selectors";
 
+// @ts-expect-error ts-migrate(7006) FIXME: Parameter 'state' implicitly has an 'any' type.
 const mapStateToProps = (state, props) => ({
   matches: getTickerMatches(state, props),
   favoriteTeams: state.favoriteTeams,
@@ -13,11 +14,13 @@ const mapStateToProps = (state, props) => ({
   layoutId: state.videoGrid.layoutId,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-  removeWebcast: (id) => dispatch(removeWebcast(id)),
-  addWebcastAtPosition: (webcastId, position) =>
+const mapDispatchToProps = (dispatch: any) => ({
+  removeWebcast: (id: any) => dispatch(removeWebcast(id)),
+
+  addWebcastAtPosition: (webcastId: any, position: any) =>
     dispatch(addWebcastAtPosition(webcastId, position)),
-  swapWebcasts: (firstPosition, secondPosition) =>
+
+  swapWebcasts: (firstPosition: any, secondPosition: any) =>
     dispatch(swapWebcasts(firstPosition, secondPosition)),
 });
 

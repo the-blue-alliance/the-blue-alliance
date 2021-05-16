@@ -1,7 +1,11 @@
 import React from "react";
 import { webcastPropType } from "../../utils/webcastUtils";
 
-const EmbedTwitch = (props) => {
+type Props = {
+  webcast: webcastPropType;
+};
+
+const EmbedTwitch = (props: Props) => {
   const channel = props.webcast.channel;
   const iframeSrc = `https://player.twitch.tv/?channel=${channel}&parent=${document.location.hostname}`;
   return (
@@ -14,10 +18,6 @@ const EmbedTwitch = (props) => {
       allowFullScreen
     />
   );
-};
-
-EmbedTwitch.propTypes = {
-  webcast: webcastPropType.isRequired,
 };
 
 export default EmbedTwitch;

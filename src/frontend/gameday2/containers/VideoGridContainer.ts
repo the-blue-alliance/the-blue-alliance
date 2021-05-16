@@ -1,7 +1,7 @@
 import { connect } from "react-redux";
 import VideoGrid from "../components/VideoGrid";
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
   domOrder: state.videoGrid.domOrder,
   positionMap: state.videoGrid.positionMap,
   domOrderLivescoreOn: state.videoGrid.domOrderLivescoreOn,

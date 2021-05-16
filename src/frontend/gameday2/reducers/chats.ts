@@ -37,7 +37,7 @@ const defaultState = {
   defaultChat: "firstupdatesnow",
 };
 
-const setChatsFromWebcasts = (webcasts, state) => {
+const setChatsFromWebcasts = (webcasts: any, state: any) => {
   const newState = Object.assign({}, defaultState);
   newState.currentChat = state.currentChat;
   newState.renderedChats = state.renderedChats;
@@ -62,7 +62,7 @@ const setChatsFromWebcasts = (webcasts, state) => {
   return newState;
 };
 
-const setTwitchChat = (channel, state) => {
+const setTwitchChat = (channel: any, state: any) => {
   // Verify that the desired chat exists in the list of known chats
   if (state.chats[channel] === undefined) {
     // Chat does not exist
@@ -82,7 +82,7 @@ const setTwitchChat = (channel, state) => {
   });
 };
 
-const setDefaultTwitchChat = (channel, state) => {
+const setDefaultTwitchChat = (channel: any, state: any) => {
   // Verify that the desired chat exists in the list of known chats
   if (state.chats[channel] === undefined) {
     // Chat does not exist
@@ -94,7 +94,7 @@ const setDefaultTwitchChat = (channel, state) => {
   });
 };
 
-const chats = (state = defaultState, action) => {
+const chats = (state = defaultState, action: any) => {
   switch (action.type) {
     case WEBCASTS_UPDATED:
       return setChatsFromWebcasts(action.webcasts, state);

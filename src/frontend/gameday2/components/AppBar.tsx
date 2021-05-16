@@ -1,14 +1,32 @@
 import React from "react";
-import PropTypes from "prop-types";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import { Toolbar, ToolbarTitle, ToolbarGroup } from "material-ui/Toolbar";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import FlatButton from "material-ui/FlatButton";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import IconButton from "material-ui/IconButton";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import muiThemeable from "material-ui/styles/muiThemeable";
 import LayoutDrawer from "./LayoutDrawer";
 import { getLayoutSvgIcon } from "../utils/layoutUtils";
 import LampIcon from "./LampIcon";
 
-const AppBar = (props) => {
+type Props = {
+  webcasts: string[];
+  hashtagSidebarVisible: boolean;
+  chatSidebarVisible: boolean;
+  resetWebcasts: (...args: any[]) => any;
+  toggleHashtagSidebarVisibility: (...args: any[]) => any;
+  toggleChatSidebarVisibility: (...args: any[]) => any;
+  setLayout: (...args: any[]) => any;
+  layoutId: number;
+  layoutSet: boolean;
+  layoutDrawerVisible: boolean;
+  setLayoutDrawerVisibility: (...args: any[]) => any;
+  muiTheme: any;
+};
+
+const AppBar = (props: Props) => {
   const tbaBrandingButtonStyle = {
     padding: 0,
     marginLeft: 8,
@@ -115,21 +133,6 @@ const AppBar = (props) => {
       />
     </div>
   );
-};
-
-AppBar.propTypes = {
-  webcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
-  hashtagSidebarVisible: PropTypes.bool.isRequired,
-  chatSidebarVisible: PropTypes.bool.isRequired,
-  resetWebcasts: PropTypes.func.isRequired,
-  toggleHashtagSidebarVisibility: PropTypes.func.isRequired,
-  toggleChatSidebarVisibility: PropTypes.func.isRequired,
-  setLayout: PropTypes.func.isRequired,
-  layoutId: PropTypes.number.isRequired,
-  layoutSet: PropTypes.bool.isRequired,
-  layoutDrawerVisible: PropTypes.bool.isRequired,
-  setLayoutDrawerVisibility: PropTypes.func.isRequired,
-  muiTheme: PropTypes.object.isRequired,
 };
 
 export default muiThemeable()(AppBar);

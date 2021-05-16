@@ -1,7 +1,15 @@
 import React from "react";
-import PropTypes from "prop-types";
 
-const LampIcon = (props) => {
+type OwnProps = {
+  width?: string | number;
+  height?: string | number;
+};
+
+// @ts-expect-error ts-migrate(2456) FIXME: Type alias 'Props' circularly references itself.
+type Props = OwnProps & typeof LampIcon.defaultProps;
+
+// @ts-expect-error ts-migrate(7022) FIXME: 'LampIcon' implicitly has type 'any' because it do... Remove this comment to see the full error message
+const LampIcon = (props: Props) => {
   const { width, height } = props;
 
   return (
@@ -89,11 +97,6 @@ const LampIcon = (props) => {
       </g>
     </svg>
   );
-};
-
-LampIcon.propTypes = {
-  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 LampIcon.defaultProps = {

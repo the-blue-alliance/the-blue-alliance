@@ -8,19 +8,22 @@ import {
 } from "../actions";
 import { getWebcastIdsInDisplayOrder } from "../selectors";
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
   webcasts: getWebcastIdsInDisplayOrder(state),
   displayedWebcasts: state.videoGrid.displayed,
   layoutId: state.videoGrid.layoutId,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-  addWebcastAtPosition: (webcastId, position) =>
+const mapDispatchToProps = (dispatch: any) => ({
+  addWebcastAtPosition: (webcastId: any, position: any) =>
     dispatch(addWebcastAtPosition(webcastId, position)),
-  setLayout: (layoutId) => dispatch(setLayout(layoutId)),
-  swapWebcasts: (firstPosition, secondPosition) =>
+
+  setLayout: (layoutId: any) => dispatch(setLayout(layoutId)),
+
+  swapWebcasts: (firstPosition: any, secondPosition: any) =>
     dispatch(swapWebcasts(firstPosition, secondPosition)),
-  togglePositionLivescore: (position) =>
+
+  togglePositionLivescore: (position: any) =>
     dispatch(togglePositionLivescore(position)),
 });
 

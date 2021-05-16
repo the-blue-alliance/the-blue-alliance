@@ -17,7 +17,7 @@ const defaultState = {
   layoutDrawer: false,
 };
 
-const toggleChatSidebarVisibility = (state) => {
+const toggleChatSidebarVisibility = (state: any) => {
   const hasBeenVisible = state.chatSidebarHasBeenVisible || !state.chatSidebar;
   return Object.assign({}, state, {
     chatSidebar: !state.chatSidebar,
@@ -25,33 +25,33 @@ const toggleChatSidebarVisibility = (state) => {
   });
 };
 
-const setChatSidebarVisibility = (visibility, state) =>
+const setChatSidebarVisibility = (visibility: any, state: any) =>
   Object.assign({}, state, {
     chatSidebar: visibility,
     chatSidebarHasBeenVisible: state.chatSidebarHasBeenVisible || visibility,
   });
 
-const toggleHashtagSidebarVisibility = (state) =>
+const toggleHashtagSidebarVisibility = (state: any) =>
   Object.assign({}, state, {
     hashtagSidebar: !state.hashtagSidebar,
   });
 
-const setHashtagSidebarVisibility = (visibility, state) =>
+const setHashtagSidebarVisibility = (visibility: any, state: any) =>
   Object.assign({}, state, {
     hashtagSidebar: visibility,
   });
 
-const toggleLayoutDrawerVisibility = (state) =>
+const toggleLayoutDrawerVisibility = (state: any) =>
   Object.assign({}, state, {
     layoutDrawer: !state.layoutDrawer,
   });
 
-const setLayoutDrawerVisibility = (visibility, state) =>
+const setLayoutDrawerVisibility = (visibility: any, state: any) =>
   Object.assign({}, state, {
     layoutDrawer: !state.layoutDrawer,
   });
 
-const visibility = (state = defaultState, action) => {
+const visibility = (state = defaultState, action: any) => {
   switch (action.type) {
     case TOGGLE_CHAT_SIDEBAR_VISIBILITY:
       return toggleChatSidebarVisibility(state);

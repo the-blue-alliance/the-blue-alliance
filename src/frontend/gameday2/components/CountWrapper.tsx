@@ -1,9 +1,14 @@
 import React from "react";
-import PropTypes from "prop-types";
 import CountUp from "react-countup";
 
-class CountWrapper extends React.PureComponent {
-  constructor(props) {
+type Props = {
+  number: number;
+};
+
+type State = any;
+
+class CountWrapper extends React.PureComponent<Props, State> {
+  constructor(props: Props) {
     super(props);
     this.state = {
       start: props.number,
@@ -11,7 +16,7 @@ class CountWrapper extends React.PureComponent {
     };
   }
 
-  UNSAFE_componentWillUpdate(nextProps) {
+  UNSAFE_componentWillUpdate(nextProps: any) {
     this.setState({
       start: this.state.end,
       end: nextProps.number,
@@ -24,9 +29,5 @@ class CountWrapper extends React.PureComponent {
     );
   }
 }
-
-CountWrapper.propTypes = {
-  number: PropTypes.number.isRequired,
-};
 
 export default CountWrapper;

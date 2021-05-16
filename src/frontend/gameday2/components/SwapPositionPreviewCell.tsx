@@ -1,7 +1,6 @@
 import React from "react";
-import PropTypes from "prop-types";
 
-function getStyles(props, state) {
+function getStyles(props: any, state: any) {
   let backgroundColor;
   if (props.enabled) {
     if (state.hovered) {
@@ -23,16 +22,19 @@ function getStyles(props, state) {
   return Object.assign({}, style, props.style);
 }
 
-export default class SwapPositionPreviewCell extends React.Component {
-  static propTypes = {
-    /* eslint-disable react/no-unused-prop-types */
-    style: PropTypes.object.isRequired,
-    enabled: PropTypes.bool.isRequired,
-    /* eslint-enable react/no-unused-prop-types */
-    onClick: PropTypes.func.isRequired,
-  };
+type Props = {
+  style: any;
+  enabled: boolean;
+  onClick: (...args: any[]) => any;
+};
 
-  constructor(props) {
+type State = any;
+
+export default class SwapPositionPreviewCell extends React.Component<
+  Props,
+  State
+> {
+  constructor(props: Props) {
     super(props);
 
     this.state = {

@@ -1,8 +1,14 @@
 import React from "react";
-import PropTypes from "prop-types";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import { black, white } from "material-ui/styles/colors";
 
-const TickerMatch = (props) => {
+type Props = {
+  match?: any;
+  hasFavorite?: boolean;
+  isBlueZone?: boolean;
+};
+
+const TickerMatch = (props: Props) => {
   const matchStyle = {
     backgroundColor: black,
     height: "100%",
@@ -89,7 +95,9 @@ const TickerMatch = (props) => {
 
   return (
     <div style={matchStyle}>
+      {/* @ts-expect-error ts-migrate(2322) FIXME: Type '{ color: any; fontSize: number; width: strin... Remove this comment to see the full error message */}
       <div style={matchLabelStyle}>{matchLabel}</div>
+      {/* @ts-expect-error ts-migrate(2322) FIXME: Type '{ display: string; height: string; width: st... Remove this comment to see the full error message */}
       <div style={alliancesStyle}>
         <div style={redAllianceStyle}>
           {match.rt[0].substring(3)}, {match.rt[1].substring(3)},{" "}
@@ -104,12 +112,6 @@ const TickerMatch = (props) => {
       </div>
     </div>
   );
-};
-
-TickerMatch.propTypes = {
-  match: PropTypes.object,
-  hasFavorite: PropTypes.bool,
-  isBlueZone: PropTypes.bool,
 };
 
 export default TickerMatch;

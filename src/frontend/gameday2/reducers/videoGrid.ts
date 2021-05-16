@@ -25,7 +25,7 @@ const defaultState = {
 /**
  * Removes any extra webcasts when we switch to a layout with fewer available views
  */
-const trimToLayout = (state) => {
+const trimToLayout = (state: any) => {
   let { displayed, domOrder, positionMap, domOrderLivescoreOn } = state;
 
   const layoutId = state.layoutId;
@@ -83,10 +83,10 @@ const trimToLayout = (state) => {
 };
 
 const addWebcastAtPosition = (
-  state,
-  webcastId,
-  position,
-  maxSupportedViews
+  state: any,
+  webcastId: any,
+  position: any,
+  maxSupportedViews: any
 ) => {
   if (!state.layoutSet || position >= NUM_VIEWS_FOR_LAYOUT[state.layoutId]) {
     return state;
@@ -143,7 +143,7 @@ const addWebcastAtPosition = (
   );
 };
 
-const swapWebcasts = (state, firstPosition, secondPosition) => {
+const swapWebcasts = (state: any, firstPosition: any, secondPosition: any) => {
   let { positionMap } = state;
 
   positionMap = positionMap.slice(0);
@@ -164,7 +164,7 @@ const swapWebcasts = (state, firstPosition, secondPosition) => {
  * If the specified webcast ID exists in displayedWebcasts, this function
  * replaces it with null.
  */
-const removeWebcast = (state, webcastId) => {
+const removeWebcast = (state: any, webcastId: any) => {
   let { displayed, domOrder, positionMap, domOrderLivescoreOn } = state;
 
   displayed = displayed.slice(0);
@@ -203,7 +203,7 @@ const removeWebcast = (state, webcastId) => {
   });
 };
 
-const toggleLivescore = (state, position) => {
+const toggleLivescore = (state: any, position: any) => {
   let { domOrderLivescoreOn } = state;
 
   domOrderLivescoreOn = domOrderLivescoreOn.slice(0);
@@ -217,7 +217,7 @@ const toggleLivescore = (state, position) => {
   });
 };
 
-const videoGrid = (state = defaultState, action) => {
+const videoGrid = (state = defaultState, action: any) => {
   switch (action.type) {
     case types.SET_LAYOUT: {
       const newState = Object.assign({}, state, {

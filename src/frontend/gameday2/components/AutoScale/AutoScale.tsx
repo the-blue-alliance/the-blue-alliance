@@ -1,25 +1,32 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'elem... Remove this comment to see the full error message
 import ere from "element-resize-event";
 
-export default class AutoScale extends Component {
-  static propTypes = {
-    children: PropTypes.node,
-    wrapperClass: PropTypes.string,
-    containerClass: PropTypes.string,
-    contentClass: PropTypes.string,
-    maxHeight: PropTypes.number,
-    maxWidth: PropTypes.number,
-    maxScale: PropTypes.number,
-  };
+type OwnProps = {
+  wrapperClass?: string;
+  containerClass?: string;
+  contentClass?: string;
+  maxHeight?: number;
+  maxWidth?: number;
+  maxScale?: number;
+};
 
+type State = any;
+
+type Props = OwnProps & typeof AutoScale.defaultProps;
+
+export default class AutoScale extends Component<Props, State> {
   static defaultProps = {
     wrapperClass: "",
     containerClass: "",
     contentClass: "",
   };
 
+  content: any;
+  wrapper: any;
+
   constructor() {
+    // @ts-expect-error ts-migrate(2554) FIXME: Expected 1-2 arguments, but got 0.
     super();
 
     this.state = {
@@ -65,7 +72,7 @@ export default class AutoScale extends Component {
     });
   }
 
-  updateState(newState) {
+  updateState(newState: any) {
     const { maxHeight, maxWidth, maxScale } = this.props;
     const { wrapperSize, contentSize } = newState;
 

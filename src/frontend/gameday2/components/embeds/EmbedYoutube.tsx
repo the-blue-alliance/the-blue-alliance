@@ -1,7 +1,11 @@
 import React from "react";
 import { webcastPropType } from "../../utils/webcastUtils";
 
-const EmbedYoutube = (props) => {
+type Props = {
+  webcast: webcastPropType;
+};
+
+const EmbedYoutube = (props: Props) => {
   const src = `//www.youtube.com/embed/${props.webcast.channel}?autoplay=1`;
   return (
     <iframe
@@ -12,10 +16,6 @@ const EmbedYoutube = (props) => {
       allowFullScreen
     />
   );
-};
-
-EmbedYoutube.propTypes = {
-  webcast: webcastPropType.isRequired,
 };
 
 export default EmbedYoutube;

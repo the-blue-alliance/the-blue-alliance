@@ -1,7 +1,7 @@
 import { SET_WEBCASTS_RAW } from "../constants/ActionTypes";
 import { getWebcastId } from "../utils/webcastUtils";
 
-const getWebcastsFromRawWebcasts = (webcasts) => {
+const getWebcastsFromRawWebcasts = (webcasts: any) => {
   const webcastsById = {};
   const specialWebcasts = webcasts.special_webcasts;
   const specialWebcastIds = new Set();
@@ -11,8 +11,9 @@ const getWebcastsFromRawWebcasts = (webcasts) => {
   // Index will be used as sort order later if we ever have to reconstruct the
   // original ordering of the webcasts
   if (specialWebcasts) {
-    specialWebcasts.forEach((webcast, index) => {
+    specialWebcasts.forEach((webcast: any, index: any) => {
       const id = getWebcastId(webcast.key_name, 0);
+      // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       webcastsById[id] = {
         key: webcast.key_name,
         num: 0,
@@ -32,13 +33,14 @@ const getWebcastsFromRawWebcasts = (webcasts) => {
 
   // Now, process normal event webcasts
   if (eventsWithWebcasts) {
-    eventsWithWebcasts.forEach((event) => {
-      event.webcasts.forEach((webcast, index) => {
+    eventsWithWebcasts.forEach((event: any) => {
+      event.webcasts.forEach((webcast: any, index: any) => {
         let name = event.short_name ? event.short_name : event.name;
         if (event.webcasts.length > 1) {
           name = `${name} ${index + 1}`;
         }
         const id = getWebcastId(event.key, index);
+        // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         webcastsById[id] = {
           key: event.key,
           num: index,
@@ -63,7 +65,7 @@ const getWebcastsFromRawWebcasts = (webcasts) => {
   return allWebcasts;
 };
 
-export const webcastsById = (state = {}, action) => {
+export const webcastsById = (state = {}, action: any) => {
   switch (action.type) {
     case SET_WEBCASTS_RAW:
       return getWebcastsFromRawWebcasts(action.webcasts).webcastsById;
@@ -72,7 +74,7 @@ export const webcastsById = (state = {}, action) => {
   }
 };
 
-export const specialWebcastIds = (state = {}, action) => {
+export const specialWebcastIds = (state = {}, action: any) => {
   switch (action.type) {
     case SET_WEBCASTS_RAW:
       return getWebcastsFromRawWebcasts(action.webcasts).specialWebcastIds;

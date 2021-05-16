@@ -2,7 +2,11 @@
 import React from "react";
 import { webcastPropType } from "../../utils/webcastUtils";
 
-const EmbedIframe = (props) => {
+type Props = {
+  webcast: webcastPropType;
+};
+
+const EmbedIframe = (props: Props) => {
   const divStyle = {
     width: "100%",
     height: "100%",
@@ -18,10 +22,6 @@ const EmbedIframe = (props) => {
   const elem = <div style={divStyle} dangerouslySetInnerHTML={markup} />;
 
   return elem;
-};
-
-EmbedIframe.propTypes = {
-  webcast: webcastPropType.isRequired,
 };
 
 export default EmbedIframe;

@@ -1,20 +1,21 @@
 import React from "react";
-import PropTypes from "prop-types";
 import LayoutAnalyticsTracker from "./LayoutAnalyticsTracker";
 import VideoCellContainer from "../containers/VideoCellContainer";
 import { getNumViewsForLayout } from "../utils/layoutUtils";
 import { webcastPropType } from "../utils/webcastUtils";
 
-export default class VideoGrid extends React.Component {
-  static propTypes = {
-    domOrder: PropTypes.arrayOf(PropTypes.string).isRequired,
-    positionMap: PropTypes.arrayOf(PropTypes.number).isRequired,
-    domOrderLivescoreOn: PropTypes.arrayOf(PropTypes.bool).isRequired,
-    webcastsById: PropTypes.objectOf(webcastPropType).isRequired,
-    layoutId: PropTypes.number.isRequired,
+type Props = {
+  domOrder: string[];
+  positionMap: number[];
+  domOrderLivescoreOn: boolean[];
+  webcastsById: {
+    [key: string]: webcastPropType;
   };
+  layoutId: number;
+};
 
-  renderLayout(webcastCount) {
+export default class VideoGrid extends React.Component<Props> {
+  renderLayout(webcastCount: any) {
     const videoGridStyle = {
       width: "100%",
       height: "100%",
@@ -27,6 +28,7 @@ export default class VideoGrid extends React.Component {
     for (let i = 0; i < positionMap.length; i++) {
       const webcastId = domOrder[positionMap[i]];
       if (webcastId != null) {
+        // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         idPositionMap[webcastId] = i;
       }
     }
@@ -51,6 +53,7 @@ export default class VideoGrid extends React.Component {
         // There's a webcast to display here!
         webcast = this.props.webcastsById[domOrder[i]];
         id = webcast.id;
+        // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         position = idPositionMap[id];
         livescoreOn = domOrderLivescoreOn[i];
       } else if (emptyCellPositions.length > 0) {
@@ -83,6 +86,7 @@ export default class VideoGrid extends React.Component {
   render() {
     const selectedLayoutId = this.props.layoutId;
     const numViews = getNumViewsForLayout(selectedLayoutId);
+    // @ts-expect-error ts-migrate(2554) FIXME: Expected 1 arguments, but got 2.
     return this.renderLayout(numViews, selectedLayoutId);
   }
 }

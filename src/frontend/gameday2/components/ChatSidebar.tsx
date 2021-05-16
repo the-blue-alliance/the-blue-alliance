@@ -1,31 +1,39 @@
 import React from "react";
-import PropTypes from "prop-types";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import muiThemeable from "material-ui/styles/muiThemeable";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import IconButton from "material-ui/IconButton";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import ArrowDropUp from "material-ui/svg-icons/navigation/arrow-drop-up";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import { Toolbar, ToolbarGroup, ToolbarTitle } from "material-ui/Toolbar";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import { white } from "material-ui/styles/colors";
 import ChatAnalyticsTracker from "./ChatAnalyticsTracker";
 import TwitchChatEmbed from "./TwitchChatEmbed";
 import ChatSelector from "./ChatSelector";
 import { chatPropType } from "../utils/PropTypes";
 
-class ChatSidebar extends React.Component {
-  static propTypes = {
-    enabled: PropTypes.bool.isRequired,
-    hasBeenVisible: PropTypes.bool.isRequired,
-    chats: PropTypes.objectOf(chatPropType).isRequired,
-    displayOrderChats: PropTypes.arrayOf(chatPropType).isRequired,
-    renderedChats: PropTypes.arrayOf(PropTypes.string).isRequired,
-    currentChat: PropTypes.string.isRequired,
-    defaultChat: PropTypes.string.isRequired,
-    setTwitchChat: PropTypes.func.isRequired,
-    muiTheme: PropTypes.object.isRequired,
-    setChatSidebarVisibility: PropTypes.object.isRequired,
-    setHashtagSidebarVisibility: PropTypes.object.isRequired,
+type Props = {
+  enabled: boolean;
+  hasBeenVisible: boolean;
+  chats: {
+    [key: string]: chatPropType;
   };
+  displayOrderChats: chatPropType[];
+  renderedChats: string[];
+  currentChat: string;
+  defaultChat: string;
+  setTwitchChat: (...args: any[]) => any;
+  muiTheme: any;
+  setChatSidebarVisibility: any;
+  setHashtagSidebarVisibility: any;
+};
 
-  constructor(props) {
+type State = any;
+
+class ChatSidebar extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props);
 
     this.state = {
@@ -107,7 +115,7 @@ class ChatSidebar extends React.Component {
       height: metrics.switcherHeight - 16,
     };
 
-    const renderedChats = [];
+    const renderedChats: any = [];
     this.props.renderedChats.forEach((chat) => {
       const visible = chat === this.props.currentChat;
       renderedChats.push(
@@ -135,7 +143,9 @@ class ChatSidebar extends React.Component {
     let content;
     if (this.props.hasBeenVisible) {
       content = (
+        // @ts-expect-error ts-migrate(2322) FIXME: Type '{ position: string; top: any; right: number;... Remove this comment to see the full error message
         <div style={panelContainerStyle}>
+          {/* @ts-expect-error ts-migrate(2322) FIXME: Type '{ position: string; top: number; bottom: num... Remove this comment to see the full error message */}
           <div style={chatEmbedContainerStyle}>{renderedChats}</div>
           <Toolbar
             style={switcherToolbarStyle}

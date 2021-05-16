@@ -44,6 +44,7 @@ describe("chats reducer", () => {
       channel: "chat2",
     };
 
+    // @ts-expect-error ts-migrate(2345) FIXME: Argument of type '{ chats: { chat1: { name: string... Remove this comment to see the full error message
     expect(chats(initialState, action)).toEqual(expectedState);
   });
 
@@ -73,6 +74,7 @@ describe("chats reducer", () => {
       channel: "chat2",
     };
 
+    // @ts-expect-error ts-migrate(2345) FIXME: Argument of type '{ chats: { chat1: { name: string... Remove this comment to see the full error message
     expect(chats(initialState, action)).toEqual(expectedState);
   });
 });

@@ -1,7 +1,11 @@
 import React from "react";
-import PropTypes from "prop-types";
 
-const TwitchChatEmbed = (props) => {
+type Props = {
+  channel: string;
+  visible: boolean;
+};
+
+const TwitchChatEmbed = (props: Props) => {
   const id = `twich-chat-${props.channel}`;
   const src = `https://twitch.tv/embed/${props.channel}/chat?parent=${document.location.hostname}`;
   const style = {
@@ -11,6 +15,7 @@ const TwitchChatEmbed = (props) => {
   };
 
   return (
+    // @ts-expect-error ts-migrate(2322) FIXME: Type '{ display: string | null; width: string; hei... Remove this comment to see the full error message
     <div style={style}>
       <iframe
         frameBorder="0"
@@ -22,11 +27,6 @@ const TwitchChatEmbed = (props) => {
       />
     </div>
   );
-};
-
-TwitchChatEmbed.propTypes = {
-  channel: PropTypes.string.isRequired,
-  visible: PropTypes.bool.isRequired,
 };
 
 export default TwitchChatEmbed;

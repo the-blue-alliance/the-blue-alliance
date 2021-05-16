@@ -1,4 +1,5 @@
 import React from "react";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import SvgIcon from "material-ui/SvgIcon";
 import {
   NUM_VIEWS_FOR_LAYOUT,
@@ -7,14 +8,14 @@ import {
 
 // Convenience wrapper around NUM_VIEWS_FOR_LAYOUT that has bounds checking and
 // a sensible default.
-export function getNumViewsForLayout(layoutId) {
+export function getNumViewsForLayout(layoutId: any) {
   if (layoutId >= 0 && layoutId < NUM_VIEWS_FOR_LAYOUT.length) {
     return NUM_VIEWS_FOR_LAYOUT[layoutId];
   }
   return 1;
 }
 
-export function getLayoutSvgIcon(layoutId, color = "#757575") {
+export function getLayoutSvgIcon(layoutId: any, color = "#757575") {
   const pathData = LAYOUT_SVG_PATHS[layoutId];
   return (
     <SvgIcon color={color} viewBox="0 0 23 15">

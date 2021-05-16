@@ -1,7 +1,9 @@
 import React from "react";
-import PropTypes from "prop-types";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import Paper from "material-ui/Paper";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import { List, ListItem } from "material-ui/List";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'reac... Remove this comment to see the full error message
 import EventListener from "react-event-listener";
 import { getLayoutSvgIcon } from "../utils/layoutUtils";
 import {
@@ -10,12 +12,17 @@ import {
   NAME_FOR_LAYOUT,
 } from "../constants/LayoutConstants";
 
-export default class LayoutSelectionPanelMaterial extends React.Component {
-  static propTypes = {
-    setLayout: PropTypes.func.isRequired,
-  };
+type Props = {
+  setLayout: (...args: any[]) => any;
+};
 
-  constructor(props) {
+export default class LayoutSelectionPanelMaterial extends React.Component<Props> {
+  component: any;
+  layout: any;
+  list: any;
+  listContainer: any;
+
+  constructor(props: Props) {
     super(props);
 
     this.layout = {

@@ -1,13 +1,21 @@
 import React from "react";
-import PropTypes from "prop-types";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import muiThemeable from "material-ui/styles/muiThemeable";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import RaisedButton from "material-ui/RaisedButton";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import Drawer from "material-ui/Drawer";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import Divider from "material-ui/Divider";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import { List, ListItem } from "material-ui/List";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import Subheader from "material-ui/Subheader";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import Toggle from "material-ui/Toggle";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import { red500, fullWhite } from "material-ui/styles/colors";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import CheckmarkIcon from "material-ui/svg-icons/navigation/check";
 import { getLayoutSvgIcon } from "../utils/layoutUtils";
 import {
@@ -16,22 +24,22 @@ import {
   NAME_FOR_LAYOUT,
 } from "../constants/LayoutConstants";
 
-class LayoutDrawer extends React.Component {
-  static propTypes = {
-    setLayout: PropTypes.func.isRequired,
-    selectedLayout: PropTypes.number.isRequired,
-    layoutSet: PropTypes.bool.isRequired,
-    hashtagSidebarVisible: PropTypes.bool.isRequired,
-    chatSidebarVisible: PropTypes.bool.isRequired,
-    layoutDrawerVisible: PropTypes.bool.isRequired,
-    setLayoutDrawerVisibility: PropTypes.func.isRequired,
-    hasWebcasts: PropTypes.bool.isRequired,
-    toggleChatSidebarVisibility: PropTypes.func.isRequired,
-    toggleHashtagSidebarVisibility: PropTypes.func.isRequired,
-    resetWebcasts: PropTypes.func.isRequired,
-    muiTheme: PropTypes.object.isRequired,
-  };
+type Props = {
+  setLayout: (...args: any[]) => any;
+  selectedLayout: number;
+  layoutSet: boolean;
+  hashtagSidebarVisible: boolean;
+  chatSidebarVisible: boolean;
+  layoutDrawerVisible: boolean;
+  setLayoutDrawerVisibility: (...args: any[]) => any;
+  hasWebcasts: boolean;
+  toggleChatSidebarVisibility: (...args: any[]) => any;
+  toggleHashtagSidebarVisibility: (...args: any[]) => any;
+  resetWebcasts: (...args: any[]) => any;
+  muiTheme: any;
+};
 
+class LayoutDrawer extends React.Component<Props> {
   handleResetWebcasts() {
     this.props.resetWebcasts();
   }
@@ -88,7 +96,9 @@ class LayoutDrawer extends React.Component {
       <Drawer
         docked={false}
         open={this.props.layoutDrawerVisible}
-        onRequestChange={(open) => this.props.setLayoutDrawerVisibility(open)}
+        onRequestChange={(open: any) =>
+          this.props.setLayoutDrawerVisibility(open)
+        }
         openSecondary
         width={300}
       >

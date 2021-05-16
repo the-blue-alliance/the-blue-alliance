@@ -1,9 +1,18 @@
 import React from "react";
-import PropTypes from "prop-types";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import muiThemeable from "material-ui/styles/muiThemeable";
 import VideoGridContainer from "../containers/VideoGridContainer";
 import LayoutSelectionPanel from "./LayoutSelectionPanel";
 import NoWebcasts from "./NoWebcasts";
+
+type Props = {
+  webcasts: string[];
+  hashtagSidebarVisible: boolean;
+  chatSidebarVisible: boolean;
+  layoutSet: boolean;
+  setLayout: (...args: any[]) => any;
+  muiTheme: any;
+};
 
 /**
  * Acts as a high-level "controller" for the main content area. This component
@@ -17,7 +26,7 @@ import NoWebcasts from "./NoWebcasts";
  *
  * If webcasts are present and a layout is set, this displays the video grid.
  */
-const MainContent = (props) => {
+const MainContent = (props: Props) => {
   let child = null;
 
   if (props.webcasts.length === 0) {
@@ -45,16 +54,8 @@ const MainContent = (props) => {
       : 0,
   };
 
+  // @ts-expect-error ts-migrate(2322) FIXME: Type '{ position: string; top: any; left: number; ... Remove this comment to see the full error message
   return <div style={contentStyles}>{child}</div>;
-};
-
-MainContent.propTypes = {
-  webcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
-  hashtagSidebarVisible: PropTypes.bool.isRequired,
-  chatSidebarVisible: PropTypes.bool.isRequired,
-  layoutSet: PropTypes.bool.isRequired,
-  setLayout: PropTypes.func.isRequired,
-  muiTheme: PropTypes.object.isRequired,
 };
 
 export default muiThemeable()(MainContent);

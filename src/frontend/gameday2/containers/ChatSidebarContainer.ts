@@ -7,7 +7,7 @@ import {
 import ChatSidebar from "../components/ChatSidebar";
 import { getChatsInDisplayOrder } from "../selectors";
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
   enabled: state.visibility.chatSidebar,
   hasBeenVisible: state.visibility.chatSidebarHasBeenVisible,
   chats: state.chats.chats,
@@ -17,11 +17,11 @@ const mapStateToProps = (state) => ({
   defaultChat: state.chats.defaultChat,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-  setTwitchChat: (channel) => dispatch(setTwitchChat(channel)),
-  setChatSidebarVisibility: (visible) =>
+const mapDispatchToProps = (dispatch: any) => ({
+  setTwitchChat: (channel: any) => dispatch(setTwitchChat(channel)),
+  setChatSidebarVisibility: (visible: any) =>
     dispatch(setChatSidebarVisibility(visible)),
-  setHashtagSidebarVisibility: (visible) =>
+  setHashtagSidebarVisibility: (visible: any) =>
     dispatch(setHashtagSidebarVisibility(visible)),
 });
 

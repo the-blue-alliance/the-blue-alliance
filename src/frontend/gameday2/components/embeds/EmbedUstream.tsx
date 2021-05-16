@@ -1,7 +1,11 @@
 import React from "react";
 import { webcastPropType } from "../../utils/webcastUtils";
 
-const EmbedUstream = (props) => {
+type Props = {
+  webcast: webcastPropType;
+};
+
+const EmbedUstream = (props: Props) => {
   const channel = props.webcast.channel;
   const src = `https://www.ustream.tv/embed/${channel}?html5ui=1`;
   return (
@@ -15,10 +19,6 @@ const EmbedUstream = (props) => {
       style={{ border: "0 none transparent" }}
     />
   );
-};
-
-EmbedUstream.propTypes = {
-  webcast: webcastPropType.isRequired,
 };
 
 export default EmbedUstream;

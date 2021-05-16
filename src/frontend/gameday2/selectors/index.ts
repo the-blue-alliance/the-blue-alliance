@@ -1,12 +1,12 @@
 /* eslint-disable max-len */
 import { createSelector } from "reselect";
 
-const getWebcastsById = (state) => state.webcastsById;
+const getWebcastsById = (state: any) => state.webcastsById;
 
 export const getWebcastIds = createSelector(
   [getWebcastsById],
   (webcastsById) => {
-    const webcastIds = [];
+    const webcastIds: any = [];
     Object.keys(webcastsById)
       .filter((key) => ({}.hasOwnProperty.call(webcastsById, key)))
       .forEach((key) => webcastIds.push(key));
@@ -17,10 +17,10 @@ export const getWebcastIds = createSelector(
 export const getWebcastIdsInDisplayOrder = createSelector(
   [getWebcastsById],
   (webcastsById) => {
-    const displayOrderWebcastIds = [];
+    const displayOrderWebcastIds: any = [];
 
     // Flatten the map of id->webcast to an array of webcast objects
-    const webcastsArray = [];
+    const webcastsArray: any = [];
     Object.keys(webcastsById)
       .filter((key) => ({}.hasOwnProperty.call(webcastsById, key)))
       .forEach((key) => webcastsArray.push(webcastsById[key]));
@@ -29,12 +29,15 @@ export const getWebcastIdsInDisplayOrder = createSelector(
     // This is usually assigned for all special webcasts; we want to maintain
     // the order the server provides them in
 
+    // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'webcast' implicitly has an 'any' type.
     const orderedWebcasts = webcastsArray.filter((webcast) =>
       ({}.hasOwnProperty.call(webcast, "sortOrder"))
     );
+    // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'a' implicitly has an 'any' type.
     const sortedOrderedWebcasts = orderedWebcasts.sort((a, b) =>
       a.sortOrder > b.sortOrder ? 1 : -1
     );
+    // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'webcast' implicitly has an 'any' type.
     sortedOrderedWebcasts.forEach((webcast) =>
       displayOrderWebcastIds.push(webcast.id)
     );
@@ -43,11 +46,14 @@ export const getWebcastIdsInDisplayOrder = createSelector(
     // webcast name
 
     const unorderedWebcasts = webcastsArray.filter(
+      // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'webcast' implicitly has an 'any' type.
       (webcast) => !{}.hasOwnProperty.call(webcast, "sortOrder")
     );
+    // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'a' implicitly has an 'any' type.
     const sortedUnorderedWebcasts = unorderedWebcasts.sort((a, b) =>
       a.name.localeCompare(b.name)
     );
+    // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'webcast' implicitly has an 'any' type.
     sortedUnorderedWebcasts.forEach((webcast) =>
       displayOrderWebcastIds.push(webcast.id)
     );
@@ -56,20 +62,21 @@ export const getWebcastIdsInDisplayOrder = createSelector(
   }
 );
 
-export const getChats = (state) => state.chats;
+export const getChats = (state: any) => state.chats;
 
 export const getChatsInDisplayOrder = createSelector([getChats], (chats) => {
-  const displayOrderChats = [];
+  const displayOrderChats: any = [];
   Object.keys(chats.chats)
     .filter((key) => ({}.hasOwnProperty.call(chats.chats, key)))
     .forEach((key) => displayOrderChats.push(chats.chats[key]));
 
+  // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'a' implicitly has an 'any' type.
   return displayOrderChats.sort((a, b) => a.name.localeCompare(b.name));
 });
 
-export const getFireduxData = (state) => state.firedux.data;
+export const getFireduxData = (state: any) => state.firedux.data;
 
-export const getEventKey = (state, props) => props.webcast.key;
+export const getEventKey = (state: any, props: any) => props.webcast.key;
 
 export const getEventMatches = createSelector(
   [getFireduxData, getEventKey],
@@ -81,7 +88,7 @@ export const getEventMatches = createSelector(
       sf: 4,
       f: 5,
     };
-    function calculateOrder(match) {
+    function calculateOrder(match: any) {
       // let time = 9999999999
       // if (match.r !== -1 && match.b !== -1) {
       //   time = 0
@@ -89,10 +96,11 @@ export const getEventMatches = createSelector(
       // if (match.pt) {
       //   time = match.pt
       // }
+      // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       return compLevelsPlayOrder[match.c] * 100000 + match.m * 100 + match.s;
     }
 
-    const matches = [];
+    const matches: any = [];
     if (
       fireduxData &&
       fireduxData.e &&
@@ -107,6 +115,7 @@ export const getEventMatches = createSelector(
       });
 
       matches.sort(
+        // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'match1' implicitly has an 'any' type.
         (match1, match2) => calculateOrder(match1) - calculateOrder(match2)
       );
     }
@@ -118,7 +127,8 @@ export const getTickerMatches = createSelector(
   [getFireduxData, getEventMatches],
   (fireduxData, matches) => {
     let lastMatch = null;
-    let selectedMatches = [];
+    let selectedMatches: any = [];
+    // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'match' implicitly has an 'any' type.
     matches.forEach((match) => {
       if (match.r === -1 || match.b === -1) {
         selectedMatches.push(match);

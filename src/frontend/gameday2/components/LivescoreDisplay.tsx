@@ -1,10 +1,17 @@
 import React from "react";
-import PropTypes from "prop-types";
 import AutoScale from "./AutoScale/AutoScale";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module '../.... Remove this comment to see the full error message
 import PowerupCount from "../../liveevent/components/PowerupCount";
 import CountWrapper from "./CountWrapper";
 
-class LivescoreDisplay extends React.PureComponent {
+type Props = {
+  matches?: any; // TODO: PropTypes.list
+  matchState?: any;
+};
+
+type State = any;
+
+class LivescoreDisplay extends React.PureComponent<Props, State> {
   state = {
     currentTime: undefined,
   };
@@ -64,9 +71,9 @@ class LivescoreDisplay extends React.PureComponent {
       bfb: blueFaceTheBoss,
     } = matchState;
 
-    let match;
-    let nextMatch;
-    matches.forEach((m) => {
+    let match: any;
+    let nextMatch: any;
+    matches.forEach((m: any) => {
       // Find current match
       if (m.shortKey === matchState.mk) {
         match = m;
@@ -134,6 +141,7 @@ class LivescoreDisplay extends React.PureComponent {
       blueFaceTheBoss = false;
 
       if (this.state.currentTime && match.pt) {
+        // @ts-expect-error ts-migrate(2532) FIXME: Object is possibly 'undefined'.
         const etaMin = (match.pt - this.state.currentTime) / 60;
         if (etaMin < 2) {
           etaStr = " in <2 min";
@@ -244,7 +252,7 @@ class LivescoreDisplay extends React.PureComponent {
               </div>
               <div className="scoreContainer">
                 <div className="redAlliance">
-                  {match.rt.map((teamKey) => {
+                  {match.rt.map((teamKey: any) => {
                     const teamNum = teamKey.substring(3);
                     return <div key={teamKey}>{teamNum}</div>;
                   })}
@@ -253,7 +261,7 @@ class LivescoreDisplay extends React.PureComponent {
                   </div>
                 </div>
                 <div className="blueAlliance">
-                  {match.bt.map((teamKey) => {
+                  {match.bt.map((teamKey: any) => {
                     const teamNum = teamKey.substring(3);
                     return <div key={teamKey}>{teamNum}</div>;
                   })}
@@ -315,10 +323,5 @@ class LivescoreDisplay extends React.PureComponent {
     );
   }
 }
-
-LivescoreDisplay.propTypes = {
-  matches: PropTypes.list,
-  matchState: PropTypes.object,
-};
 
 export default LivescoreDisplay;

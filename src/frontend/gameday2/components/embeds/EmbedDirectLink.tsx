@@ -1,9 +1,15 @@
 import React from "react";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import { Card, CardActions, CardHeader, CardText } from "material-ui/Card";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import RaisedButton from "material-ui/RaisedButton";
 import { webcastPropType } from "../../utils/webcastUtils";
 
-const EmbedDirectLink = (props) => {
+type Props = {
+  webcast: webcastPropType;
+};
+
+const EmbedDirectLink = (props: Props) => {
   const directLink = props.webcast.channel;
   const style = {
     position: "absolute",
@@ -28,10 +34,6 @@ const EmbedDirectLink = (props) => {
       </CardActions>
     </Card>
   );
-};
-
-EmbedDirectLink.propTypes = {
-  webcast: webcastPropType.isRequired,
 };
 
 export default EmbedDirectLink;

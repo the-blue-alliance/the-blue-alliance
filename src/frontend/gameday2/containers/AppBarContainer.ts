@@ -3,7 +3,7 @@ import AppBar from "../components/AppBar";
 import * as actions from "../actions";
 import { getWebcastIdsInDisplayOrder } from "../selectors";
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
   webcasts: getWebcastIdsInDisplayOrder(state),
   layoutId: state.videoGrid.layoutId,
   layoutSet: state.videoGrid.layoutSet,
@@ -12,20 +12,25 @@ const mapStateToProps = (state) => ({
   layoutDrawerVisible: state.visibility.layoutDrawer,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
   toggleChatSidebarVisibility: () =>
     dispatch(actions.toggleChatSidebarVisibility()),
-  setChatSidebarVisibility: (visible) =>
+
+  setChatSidebarVisibility: (visible: any) =>
     dispatch(actions.setChatSidebarVisibility(visible)),
+
   toggleHashtagSidebarVisibility: () =>
     dispatch(actions.toggleHashtagSidebarVisibility()),
-  setHashtagSidebarVisibility: (visible) =>
+
+  setHashtagSidebarVisibility: (visible: any) =>
     dispatch(actions.setHashtagSidebarVisibility(visible)),
   resetWebcasts: () => dispatch(actions.resetWebcasts()),
-  setLayout: (layoutId) => dispatch(actions.setLayout(layoutId)),
+  setLayout: (layoutId: any) => dispatch(actions.setLayout(layoutId)),
+
   toggleLayoutDrawerVisibility: () =>
     dispatch(actions.toggleLayoutDrawerVisibility()),
-  setLayoutDrawerVisibility: (visible) =>
+
+  setLayoutDrawerVisibility: (visible: any) =>
     dispatch(actions.setLayoutDrawerVisibility(visible)),
 });
 

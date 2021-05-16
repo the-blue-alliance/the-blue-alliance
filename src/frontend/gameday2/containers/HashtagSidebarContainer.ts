@@ -1,7 +1,7 @@
 import { connect } from "react-redux";
 import HashtagSidebar from "../components/HashtagSidebar";
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
   enabled: state.visibility.hashtagSidebar,
 });
 

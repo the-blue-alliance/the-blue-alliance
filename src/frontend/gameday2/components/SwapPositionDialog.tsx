@@ -1,7 +1,9 @@
 import React from "react";
-import PropTypes from "prop-types";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import Dialog from "material-ui/Dialog";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import FlatButton from "material-ui/FlatButton";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'reac... Remove this comment to see the full error message
 import EventListener from "react-event-listener";
 import SwapPositionPreviewCell from "./SwapPositionPreviewCell";
 import {
@@ -9,14 +11,16 @@ import {
   LAYOUT_STYLES,
 } from "../constants/LayoutConstants";
 
-export default class SwapPositionDialog extends React.Component {
-  static propTypes = {
-    open: PropTypes.bool.isRequired,
-    position: PropTypes.number.isRequired,
-    layoutId: PropTypes.number.isRequired,
-    swapWebcasts: PropTypes.func.isRequired,
-    onRequestClose: PropTypes.func.isRequired,
-  };
+type Props = {
+  open: boolean;
+  position: number;
+  layoutId: number;
+  swapWebcasts: (...args: any[]) => any;
+  onRequestClose: (...args: any[]) => any;
+};
+
+export default class SwapPositionDialog extends React.Component<Props> {
+  container: any;
 
   componentDidMount() {
     this.updateSizing();
@@ -26,7 +30,7 @@ export default class SwapPositionDialog extends React.Component {
     this.updateSizing();
   }
 
-  onRequestSwap(targetPosition) {
+  onRequestSwap(targetPosition: any) {
     this.props.swapWebcasts(this.props.position, targetPosition);
     this.onRequestClose();
   }
@@ -97,6 +101,7 @@ export default class SwapPositionDialog extends React.Component {
       >
         <EventListener target="window" onResize={() => this.updateSizing()} />
         <div
+          // @ts-expect-error ts-migrate(2322) FIXME: Type '{ padding: string; position: string; }' is n... Remove this comment to see the full error message
           style={previewContainerStyle}
           ref={(e) => {
             this.container = e;

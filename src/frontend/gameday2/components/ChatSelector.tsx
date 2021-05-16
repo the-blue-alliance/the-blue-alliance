@@ -1,30 +1,34 @@
 import React from "react";
-import PropTypes from "prop-types";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'reac... Remove this comment to see the full error message
 import ReactTransitionGroup from "react-addons-transition-group";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import { List, ListItem } from "material-ui/List";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import Paper from "material-ui/Paper";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import ActionHome from "material-ui/svg-icons/action/home";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import CheckmarkIcon from "material-ui/svg-icons/navigation/check";
 import { chatPropType } from "../utils/PropTypes";
 import AnimatableContainer from "./AnimatableContainer";
 
-export default class ChatSelector extends React.Component {
-  static propTypes = {
-    chats: PropTypes.arrayOf(chatPropType).isRequired,
-    currentChat: PropTypes.string.isRequired,
-    defaultChat: PropTypes.string.isRequired,
-    setTwitchChat: PropTypes.func.isRequired,
-    open: PropTypes.bool.isRequired,
-    onRequestClose: PropTypes.func.isRequired,
-  };
+type Props = {
+  chats: chatPropType[];
+  currentChat: string;
+  defaultChat: string;
+  setTwitchChat: (...args: any[]) => any;
+  open: boolean;
+  onRequestClose: (...args: any[]) => any;
+};
 
-  setTwitchChat(e, channel) {
+export default class ChatSelector extends React.Component<Props> {
+  setTwitchChat(e: any, channel: any) {
     this.props.setTwitchChat(channel);
     this.props.onRequestClose();
   }
 
   render() {
-    const chatItems = [];
+    const chatItems: any = [];
     this.props.chats.forEach((chat) => {
       const isSelected = chat.channel === this.props.currentChat;
       const isDefault = chat.channel === this.props.defaultChat;
@@ -42,7 +46,7 @@ export default class ChatSelector extends React.Component {
           primaryText={chatName}
           leftIcon={isDefault ? <ActionHome /> : null}
           rightIcon={icon}
-          onClick={(e) => this.setTwitchChat(e, chat.channel)}
+          onClick={(e: any) => this.setTwitchChat(e, chat.channel)}
           key={chat.channel}
         />
       );
@@ -73,6 +77,7 @@ export default class ChatSelector extends React.Component {
           <AnimatableContainer
             key="overlay"
             style={overlayStyle}
+            // @ts-expect-error ts-migrate(2322) FIXME: Type '{ key: string; style: { width: string; heigh... Remove this comment to see the full error message
             onClick={() => this.props.onRequestClose()}
             beginStyle={{
               opacity: 0,
@@ -96,7 +101,7 @@ export default class ChatSelector extends React.Component {
             }}
           >
             <Paper zDepth={4}>
-              <List onClick={(e) => e.stopPropagation()}>{chatItems}</List>
+              <List onClick={(e: any) => e.stopPropagation()}>{chatItems}</List>
             </Paper>
           </AnimatableContainer>
         )}

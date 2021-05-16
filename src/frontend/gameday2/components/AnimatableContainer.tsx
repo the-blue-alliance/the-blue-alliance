@@ -1,15 +1,18 @@
 import React from "react";
-import PropTypes from "prop-types";
 
-export default class AnimatableContainer extends React.Component {
-  static propTypes = {
-    beginStyle: PropTypes.object.isRequired,
-    endStyle: PropTypes.object.isRequired,
-    style: PropTypes.object,
-    children: PropTypes.node,
-  };
+type Props = {
+  beginStyle: any;
+  endStyle: any;
+  style?: any;
+};
 
-  constructor(props) {
+type State = any;
+
+export default class AnimatableContainer extends React.Component<Props, State> {
+  enterTimeout: any;
+  leaveTimeout: any;
+
+  constructor(props: Props) {
     super(props);
 
     this.state = {
@@ -22,11 +25,11 @@ export default class AnimatableContainer extends React.Component {
     clearTimeout(this.leaveTimeout);
   }
 
-  componentWillEnter(callback) {
+  componentWillEnter(callback: any) {
     this.componentWillAppear(callback);
   }
 
-  componentWillAppear(callback) {
+  componentWillAppear(callback: any) {
     // Timeout needed so that the component can render with the original styles
     // before we apply the ones to transition to
     setTimeout(
@@ -40,7 +43,7 @@ export default class AnimatableContainer extends React.Component {
     this.enterTimeout = setTimeout(callback, 300);
   }
 
-  componentWillLeave(callback) {
+  componentWillLeave(callback: any) {
     this.setState({
       style: this.props.beginStyle,
     });

@@ -1,5 +1,5 @@
 import React from "react";
-import PropTypes from "prop-types";
+// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import RaisedButton from "material-ui/RaisedButton";
 import WebcastEmbed from "./WebcastEmbed";
 import VideoCellAnalyticsTracker from "./VideoCellAnalyticsTracker";
@@ -13,20 +13,22 @@ import {
   NUM_VIEWS_FOR_LAYOUT,
 } from "../constants/LayoutConstants";
 
-export default class VideoCell extends React.Component {
-  static propTypes = {
-    webcast: webcastPropType,
-    webcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
-    displayedWebcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
-    layoutId: PropTypes.number.isRequired,
-    position: PropTypes.number.isRequired,
-    livescoreOn: PropTypes.bool.isRequired,
-    addWebcastAtPosition: PropTypes.func.isRequired,
-    swapWebcasts: PropTypes.func.isRequired,
-    togglePositionLivescore: PropTypes.func.isRequired,
-  };
+type Props = {
+  webcast?: webcastPropType;
+  webcasts: string[];
+  displayedWebcasts: string[];
+  layoutId: number;
+  position: number;
+  livescoreOn: boolean;
+  addWebcastAtPosition: (...args: any[]) => any;
+  swapWebcasts: (...args: any[]) => any;
+  togglePositionLivescore: (...args: any[]) => any;
+};
 
-  constructor(props) {
+type State = any;
+
+export default class VideoCell extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props);
 
     this.state = {
@@ -61,7 +63,7 @@ export default class VideoCell extends React.Component {
     this.setState({ swapPositionDialogOpen: false });
   }
 
-  onWebcastSelected(webcastId) {
+  onWebcastSelected(webcastId: any) {
     this.props.addWebcastAtPosition(webcastId, this.props.position);
     this.onRequestCloseWebcastSelectionDialog();
   }
@@ -90,6 +92,7 @@ export default class VideoCell extends React.Component {
       };
 
       return (
+        // @ts-expect-error ts-migrate(2322) FIXME: Type '({ width: string; height: string; top: numbe... Remove this comment to see the full error message
         <div style={cellStyle}>
           {this.props.livescoreOn ? (
             <LivescoreDisplayContainer webcast={this.props.webcast} />
@@ -111,7 +114,9 @@ export default class VideoCell extends React.Component {
             open={this.state.webcastSelectionDialogOpen}
             webcast={this.props.webcast}
             onRequestClose={() => this.onRequestCloseWebcastSelectionDialog()}
-            onWebcastSelected={(webcastId) => this.onWebcastSelected(webcastId)}
+            onWebcastSelected={(webcastId: any) =>
+              this.onWebcastSelected(webcastId)
+            }
           />
           <SwapPositionDialogContainer
             open={this.state.swapPositionDialogOpen}
@@ -147,6 +152,7 @@ export default class VideoCell extends React.Component {
       : "No more webcasts available";
 
     return (
+      // @ts-expect-error ts-migrate(2322) FIXME: Type '({ width: string; height: string; top: numbe... Remove this comment to see the full error message
       <div style={cellStyle}>
         <div style={emptyContainerStyle}>
           <RaisedButton
@@ -160,7 +166,9 @@ export default class VideoCell extends React.Component {
           open={this.state.webcastSelectionDialogOpen}
           webcast={this.props.webcast}
           onRequestClose={() => this.onRequestCloseWebcastSelectionDialog()}
-          onWebcastSelected={(webcastId) => this.onWebcastSelected(webcastId)}
+          onWebcastSelected={(webcastId: any) =>
+            this.onWebcastSelected(webcastId)
+          }
         />
       </div>
     );
