@@ -88,7 +88,6 @@
         {% if event.website %}<br><span class="glyphicon glyphicon-link"></span> <a href="{{ event.website }}" title="{{ event.name }}" target="_blank">{{ event.website }}</a>{% endif %}
         {% if event.first_eid or event.official %}{% if not event.website %}<br><span class="glyphicon glyphicon-info-sign"></span>{% else %} - {% endif %} details on <a href="{% if event.first_eid %}https://www.firstinspires.org/team-event-search/event?id={{event.first_eid}}{%elif event.official %}https://frc-events.firstinspires.org/{{event.year}}/{{event.first_api_code}}{%endif%}" target="_blank">firstinspires.org</a>{% endif %}
         {% if event.facebook_eid %}<br><span class="glyphicon glyphicon-thumbs-up"></span> <a href="{{ event.facebook_event_url }}" title="Facebook Event" target="_blank">RSVP on Facebook</a><br>{% endif %}
-        {% if event.official and event.year >= 2006 %}<br><span class="glyphicon glyphicon-info-sign"></span> Data provided by the <a href="https://frc-events.firstinspires.org/services/API" target="_blank">FIRST Events API</a>{% endif %}
       </p>
     </div>
   </div>
@@ -447,6 +446,14 @@
       </div>
     </div>
 </div>
+{% endblock %}
+
+{% block footer_content %}
+{% if event.official and event.year >= 2006 %}
+<div class="pull-left">
+  <span class="glyphicon glyphicon-info-sign"></span> Data provided by the <a href="https://frc-events.firstinspires.org/services/API" target="_blank"><em>FIRST</em><sup>®</sup> Events API</a>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block inline_javascript %}
