@@ -7,11 +7,8 @@ import { createStore, applyMiddleware, compose } from "redux";
 // @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'reac... Remove this comment to see the full error message
 import ReactDOM from "react-dom";
 import queryString from "query-string";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import { indigo500, indigo700 } from "material-ui/styles/colors";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import getMuiTheme from "material-ui/styles/getMuiTheme";
 import GamedayFrame from "./components/GamedayFrame";
 import gamedayReducer, { firedux } from "./reducers";
@@ -29,6 +26,7 @@ const muiTheme = getMuiTheme({
         primary1Color: indigo500,
         primary2Color: indigo700,
     },
+    // @ts-expect-error ts-migrate(2345) FIXME: Argument of type '{ palette: { primary1Color: stri... Remove this comment to see the full error message
     layout: {
         appBarHeight: 36,
         socialPanelWidth: 300,

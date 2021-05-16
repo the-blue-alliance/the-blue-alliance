@@ -1,13 +1,8 @@
 import React from "react";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import muiThemeable from "material-ui/styles/muiThemeable";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import IconButton from "material-ui/IconButton";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import ArrowDropUp from "material-ui/svg-icons/navigation/arrow-drop-up";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import { Toolbar, ToolbarGroup, ToolbarTitle } from "material-ui/Toolbar";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import { white } from "material-ui/styles/colors";
 import ChatAnalyticsTracker from "./ChatAnalyticsTracker";
 import TwitchChatEmbed from "./TwitchChatEmbed";
@@ -148,6 +143,7 @@ class ChatSidebar extends React.Component<Props, State> {
           {/* @ts-expect-error ts-migrate(2322) FIXME: Type '{ position: string; top: number; bottom: num... Remove this comment to see the full error message */}
           <div style={chatEmbedContainerStyle}>{renderedChats}</div>
           <Toolbar
+            // @ts-expect-error ts-migrate(2769) FIXME: No overload matches this call.
             style={switcherToolbarStyle}
             onClick={() => this.onRequestOpenChatSelector()}
           >
@@ -184,4 +180,5 @@ class ChatSidebar extends React.Component<Props, State> {
   }
 }
 
+// @ts-expect-error ts-migrate(2345) FIXME: Argument of type 'typeof ChatSidebar' is not assig... Remove this comment to see the full error message
 export default muiThemeable()(ChatSidebar);

@@ -1,5 +1,4 @@
 import React from "react";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import { black, white } from "material-ui/styles/colors";
 
 type Props = {
@@ -95,7 +94,7 @@ const TickerMatch = (props: Props) => {
 
   return (
     <div style={matchStyle}>
-      {/* @ts-expect-error ts-migrate(2322) FIXME: Type '{ color: any; fontSize: number; width: strin... Remove this comment to see the full error message */}
+      {/* @ts-expect-error ts-migrate(2322) FIXME: Type '{ color: string; fontSize: number; width: st... Remove this comment to see the full error message */}
       <div style={matchLabelStyle}>{matchLabel}</div>
       {/* @ts-expect-error ts-migrate(2322) FIXME: Type '{ display: string; height: string; width: st... Remove this comment to see the full error message */}
       <div style={alliancesStyle}>

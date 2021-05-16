@@ -1,7 +1,5 @@
 import React from "react";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import { Card, CardActions, CardHeader, CardText } from "material-ui/Card";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import RaisedButton from "material-ui/RaisedButton";
 import { webcastPropType } from "../../utils/webcastUtils";
 
@@ -19,6 +17,7 @@ const EmbedDirectLink = (props: Props) => {
   };
 
   return (
+    // @ts-expect-error ts-migrate(2769) FIXME: No overload matches this call.
     <Card style={style}>
       <CardHeader title="Webcast could not be embedded" />
       <CardText>

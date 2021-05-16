@@ -1,5 +1,4 @@
 import React from "react";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import SvgIcon from "material-ui/SvgIcon";
 import {
   NUM_VIEWS_FOR_LAYOUT,

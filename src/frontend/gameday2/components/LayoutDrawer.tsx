@@ -1,21 +1,12 @@
 import React from "react";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import muiThemeable from "material-ui/styles/muiThemeable";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import RaisedButton from "material-ui/RaisedButton";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import Drawer from "material-ui/Drawer";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import Divider from "material-ui/Divider";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import { List, ListItem } from "material-ui/List";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import Subheader from "material-ui/Subheader";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import Toggle from "material-ui/Toggle";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import { red500, fullWhite } from "material-ui/styles/colors";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import CheckmarkIcon from "material-ui/svg-icons/navigation/check";
 import { getLayoutSvgIcon } from "../utils/layoutUtils";
 import {
@@ -61,6 +52,7 @@ class LayoutDrawer extends React.Component<Props> {
             insetChildren
             onClick={() => this.props.setLayout(layoutNum)}
             key={i.toString()}
+            // @ts-expect-error ts-migrate(2769) FIXME: No overload matches this call.
             rightIcon={icon}
             leftIcon={getLayoutSvgIcon(layoutNum)}
           />
@@ -136,4 +128,5 @@ class LayoutDrawer extends React.Component<Props> {
   }
 }
 
+// @ts-expect-error ts-migrate(2345) FIXME: Argument of type 'typeof LayoutDrawer' is not assi... Remove this comment to see the full error message
 export default muiThemeable()(LayoutDrawer);

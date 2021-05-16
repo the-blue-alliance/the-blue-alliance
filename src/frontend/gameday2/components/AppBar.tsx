@@ -1,11 +1,7 @@
 import React from "react";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import { Toolbar, ToolbarTitle, ToolbarGroup } from "material-ui/Toolbar";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import FlatButton from "material-ui/FlatButton";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import IconButton from "material-ui/IconButton";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import muiThemeable from "material-ui/styles/muiThemeable";
 import LayoutDrawer from "./LayoutDrawer";
 import { getLayoutSvgIcon } from "../utils/layoutUtils";
@@ -95,6 +91,7 @@ const AppBar = (props: Props) => {
 
   return (
     <div>
+      {/* @ts-expect-error ts-migrate(2769) FIXME: No overload matches this call. */}
       <Toolbar style={appBarStyle}>
         <ToolbarGroup firstChild>
           {tbaBrandingButton}
@@ -119,6 +116,7 @@ const AppBar = (props: Props) => {
         <ToolbarGroup lastChild>{configureLayoutButton}</ToolbarGroup>
       </Toolbar>
       <LayoutDrawer
+        // @ts-expect-error ts-migrate(2322) FIXME: Type '{ setLayout: (...args: any[]) => any; toggle... Remove this comment to see the full error message
         setLayout={props.setLayout}
         toggleChatSidebarVisibility={props.toggleChatSidebarVisibility}
         toggleHashtagSidebarVisibility={props.toggleHashtagSidebarVisibility}
@@ -135,4 +133,5 @@ const AppBar = (props: Props) => {
   );
 };
 
+// @ts-expect-error ts-migrate(2345) FIXME: Argument of type '(props: Props) => JSX.Element' i... Remove this comment to see the full error message
 export default muiThemeable()(AppBar);

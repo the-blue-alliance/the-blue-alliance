@@ -1,13 +1,9 @@
 import React from "react";
 // @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'reac... Remove this comment to see the full error message
 import ReactTransitionGroup from "react-addons-transition-group";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import { List, ListItem } from "material-ui/List";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import Paper from "material-ui/Paper";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import ActionHome from "material-ui/svg-icons/action/home";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import CheckmarkIcon from "material-ui/svg-icons/navigation/check";
 import { chatPropType } from "../utils/PropTypes";
 import AnimatableContainer from "./AnimatableContainer";
@@ -42,6 +38,7 @@ export default class ChatSelector extends React.Component<Props> {
       }
 
       chatItems.push(
+        // @ts-expect-error ts-migrate(2769) FIXME: No overload matches this call.
         <ListItem
           primaryText={chatName}
           leftIcon={isDefault ? <ActionHome /> : null}

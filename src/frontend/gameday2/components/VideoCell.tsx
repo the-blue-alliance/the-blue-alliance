@@ -1,5 +1,4 @@
 import React from "react";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import RaisedButton from "material-ui/RaisedButton";
 import WebcastEmbed from "./WebcastEmbed";
 import VideoCellAnalyticsTracker from "./VideoCellAnalyticsTracker";
@@ -157,6 +156,7 @@ export default class VideoCell extends React.Component<Props, State> {
         <div style={emptyContainerStyle}>
           <RaisedButton
             label={buttonLabel}
+            // @ts-expect-error ts-migrate(2769) FIXME: No overload matches this call.
             style={centerButtonStyle}
             disabled={!webcastsAreAvailable}
             onClick={() => this.onRequestOpenWebcastSelectionDialog()}

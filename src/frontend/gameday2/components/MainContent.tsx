@@ -1,5 +1,4 @@
 import React from "react";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import muiThemeable from "material-ui/styles/muiThemeable";
 import VideoGridContainer from "../containers/VideoGridContainer";
 import LayoutSelectionPanel from "./LayoutSelectionPanel";
@@ -58,4 +57,5 @@ const MainContent = (props: Props) => {
   return <div style={contentStyles}>{child}</div>;
 };
 
+// @ts-expect-error ts-migrate(2345) FIXME: Argument of type '(props: Props) => JSX.Element' i... Remove this comment to see the full error message
 export default muiThemeable()(MainContent);

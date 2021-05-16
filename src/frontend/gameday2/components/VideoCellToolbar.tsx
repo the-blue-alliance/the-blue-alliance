@@ -1,19 +1,11 @@
 import React from "react";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import { Toolbar, ToolbarGroup } from "material-ui/Toolbar";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import FlatButton from "material-ui/FlatButton";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import IconButton from "material-ui/IconButton";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import CloseIcon from "material-ui/svg-icons/navigation/close";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import SwapIcon from "material-ui/svg-icons/action/compare-arrows";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import VideocamIcon from "material-ui/svg-icons/av/videocam";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import EqualizerIcon from "material-ui/svg-icons/av/equalizer";
-// @ts-expect-error ts-migrate(7016) FIXME: Could not find a declaration file for module 'mate... Remove this comment to see the full error message
 import { white, green500, grey900 } from "material-ui/styles/colors";
 import TickerMatch from "./TickerMatch";
 import { NUM_VIEWS_FOR_LAYOUT } from "../constants/LayoutConstants";
@@ -84,10 +76,12 @@ const VideoCellToolbar = (props: Props) => {
       <ToolbarGroup>
         <FlatButton label={props.webcast.name} style={titleStyle} href={`/event/${props.webcast.key}`} target="_blank" disabled={props.specialWebcastIds.has(props.webcast.id)}/>
       </ToolbarGroup>
+      {/* @ts-expect-error ts-migrate(2769) FIXME: No overload matches this call. */}
       <ToolbarGroup style={matchTickerGroupStyle}>
         {/* @ts-expect-error ts-migrate(2322) FIXME: Type '{ overflow: string; whiteSpace: string; }' i... Remove this comment to see the full error message */}
         <div style={matchTickerStyle}>{tickerMatches}</div>
       </ToolbarGroup>
+      {/* @ts-expect-error ts-migrate(2769) FIXME: No overload matches this call. */}
       <ToolbarGroup lastChild style={controlsStyle}>
         {swapButton}
         <IconButton tooltip="Change webcast" tooltipPosition="top-center" onClick={() => props.onRequestSelectWebcast()} touch>
