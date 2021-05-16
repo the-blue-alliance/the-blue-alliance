@@ -273,6 +273,14 @@
 </div>
 {% endblock %}
 
+{% block footer_content %}
+{% if year and year >= 2015 %}
+<div class="pull-left">
+  <span class="glyphicon glyphicon-info-sign"></span> Data provided by the <a href="https://frc-events.firstinspires.org/services/API" target="_blank"><em>FIRST</em><sup>®</sup> Events API</a><br>
+</div>
+{% endif %}
+{% endblock %}
+
 {% block inline_javascript %}
 <script>
   $(".team-avatar").click(function(){

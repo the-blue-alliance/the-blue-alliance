@@ -31,10 +31,6 @@
       <span class="glyphicon glyphicon-link"></span> Details on <a href="https://frc-events.firstinspires.org/team/{{team.team_number}}">firstinspires.org</a><br>
       {% if team.championship_location and team.championship_location[year] %}<span class="glyphicon glyphicon-flag"></span> <span id="team-home-cmp">Home Championship: {{team.championship_location[year]}}</span><br>{% endif %}
       {% if hof.is_hof %}<span id="team-hof" class="hall-of-fame"><span class="glyphicon glyphicon-certificate"></span> Hall of Fame ({% for year in hof.years %}{{ year }}{{ ", " if not loop.last }}{% endfor %}){% if hof.media.video or hof.media.presentation or hof.media.essay %}:{% endif %}{% if hof.media.video %} <a href="{{hof.media.video}}">Video</a>{% endif %}{% if hof.media.presentation %}, <a href="{{hof.media.presentation}}">Presentation</a>{% endif %}{% if hof.media.essay %}, <a href="{{hof.media.essay}}">Essay</a>{% endif %}</span><br>{% endif %}
-      {% if year %}
-        {% if year >= 2015 %}<span class="glyphicon glyphicon-info-sign"></span> Data provided by the <a href="https://frc-events.firstinspires.org/services/API" target="_blank">FIRST Events API</a><br>{% endif %}
-      {% endif %}
-
       <hr>
       <span id="team-social-media">
         <a class="btn btn-xs btn-default{% if social_medias %} pull-right{% endif %}" href="/suggest/team/social_media?team_key={{team.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add Social Media!</a>
@@ -90,7 +86,6 @@
         {% endif %}
       {% endif %}
     </p>
-
     </div>
   {% endif %}
   </div>
