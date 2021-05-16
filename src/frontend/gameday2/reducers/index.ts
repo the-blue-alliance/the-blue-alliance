@@ -15,6 +15,7 @@ const firebaseApp = firebase.initializeApp({
   authDomain: "tbatv-prod-hrd.firebaseapp.com",
   databaseURL: "https://tbatv-prod-hrd.firebaseio.com",
 });
+// @ts-expect-error(TS2339)
 const ref = firebaseApp.database().ref();
 export const firedux = new Firedux({
   ref,

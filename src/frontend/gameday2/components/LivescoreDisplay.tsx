@@ -141,7 +141,6 @@ class LivescoreDisplay extends React.PureComponent<Props, State> {
       blueFaceTheBoss = false;
 
       if (this.state.currentTime && match.pt) {
-        // @ts-expect-error ts-migrate(2532) FIXME: Object is possibly 'undefined'.
         const etaMin = (match.pt - this.state.currentTime) / 60;
         if (etaMin < 2) {
           etaStr = " in <2 min";
