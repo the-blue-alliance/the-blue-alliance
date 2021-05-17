@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Dict, List
+from typing import Dict, List, NewType
 
 from google.cloud import ndb
 from pyre_extensions import none_throws
@@ -13,26 +13,31 @@ from backend.common.models.event import Event
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 from backend.common.queries.dict_converters.district_converter import DistrictConverter
 
+EventDict = NewType("EventDict", Dict)
+
 
 class EventConverter(ConverterBase):
     EVENT_DATE_FORMAT_STR = "%Y-%m-%d"
 
-    # SUBVERSIONS = {  # Increment every time a change to the dict is made
-    #     3: 6,
-    # }  TODO: used for cache clearing
+    SUBVERSIONS = {  # Increment every time a change to the dict is made
+        ApiMajorVersion.API_V3: 6,
+    }
 
+    @classmethod
     def _convert_list(
-        self, model_list: List[Event], version: ApiMajorVersion
-    ) -> List[Dict]:
+        cls, model_list: List[Event], version: ApiMajorVersion
+    ) -> List[EventDict]:
         CONVERTERS = {
-            ApiMajorVersion.API_V3: self.eventsConverter_v3,
+            ApiMajorVersion.API_V3: cls.eventsConverter_v3,
         }
         return CONVERTERS[version](model_list)
 
-    def eventsConverter_v3(self, events: List[Event]) -> List[Dict]:
-        return list(map(self.eventConverter_v3, events))
+    @classmethod
+    def eventsConverter_v3(cls, events: List[Event]) -> List[EventDict]:
+        return list(map(cls.eventConverter_v3, events))
 
-    def eventConverter_v3(self, event: Event) -> Dict:
+    @classmethod
+    def eventConverter_v3(cls, event: Event) -> EventDict:
         district_future = (
             none_throws(event.district_key).get_async() if event.district_key else None
         )
@@ -67,7 +72,7 @@ class EventConverter(ConverterBase):
             "week": event.week,
             "website": event.website,
         }
-        event_dict.update(self.constructLocation_v3(event))
+        event_dict.update(cls.constructLocation_v3(event))
 
         if event.start_date:
             event_dict["start_date"] = event.start_date.date().isoformat()
@@ -83,7 +88,7 @@ class EventConverter(ConverterBase):
         else:
             event_dict["webcasts"] = []
 
-        return event_dict
+        return EventDict(event_dict)
 
     @classmethod
     def dictToModel_v3(cls, data: Dict) -> Event:

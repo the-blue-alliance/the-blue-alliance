@@ -6,7 +6,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
-from datafeeds.csv_awards_parser import CSVAwardsParser
+from datafeeds.parsers.csv.csv_awards_parser import CSVAwardsParser
 from helpers.award_manipulator import AwardManipulator
 from models.award import Award
 from models.event import Event

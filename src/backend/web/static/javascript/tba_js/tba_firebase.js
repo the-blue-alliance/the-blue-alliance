@@ -9,3 +9,4 @@ var config = {
   appId: firebaseAppId
 };
 firebase.initializeApp(config);
+var perf = firebase.performance();

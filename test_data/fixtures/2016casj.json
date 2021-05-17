@@ -1,0 +1,2841 @@
+[
+  {
+    "event_district_enum": 0,
+    "updated": "2016-12-21T05:58:24",
+    "event_type_enum": 0,
+    "year": 2016,
+    "event_short": "casj",
+    "city": "San Jose",
+    "short_name": "Silicon Valley",
+    "venue_address": "San Jose State University - The Event Center\n290 South 7th Street\nSan Jose, CA 95112\nUSA",
+    "normalized_location": null,
+    "location": "San Jose, CA, USA",
+    "state_prov": "CA",
+    "start_date": "2016-04-06T00:00:00",
+    "__id__": "2016casj",
+    "website": "http://www.firstsv.org",
+    "__kind__": "Event",
+    "end_date": "2016-04-09T23:59:59",
+    "facebook_eid": "200003110337304",
+    "first_eid": "17339",
+    "postalcode": "95112",
+    "custom_hashtag": null,
+    "name": "Silicon Valley Regional presented by Google.org",
+    "webcast_url": null,
+    "created": "2015-09-10T09:06:09",
+    "timezone_id": "America/Los_Angeles",
+    "country": "USA",
+    "official": true,
+    "venue": "San Jose State University - The Event Center",
+    "webcast_json": "[{\"type\": \"youtube\", \"channel\": \"hBEgC-lZ36Q\"}, {\"type\": \"youtube\", \"channel\": \"QDtyONxuFZY\"}, {\"type\": \"youtube\", \"channel\": \"nMbcgqc7QnY\"}, {\"type\": \"youtube\", \"channel\": \"nnBQ3E167ig\"}, {\"type\": \"youtube\", \"channel\": \"xCdWi6Uhomo\"}, {\"type\": \"youtube\", \"channel\": \"cGe8wdbfl_E\"}]",
+    "district_key": null
+  },
+  {
+    "comp_level": "f",
+    "match_number": 1,
+    "updated": "2016-04-11T16:25:21",
+    "team_key_names": [
+      "frc254",
+      "frc1678",
+      "frc1662",
+      "frc368",
+      "frc971",
+      "frc3303"
+    ],
+    "created": "2016-04-09T22:34:03",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T23:09:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"score\": 159, \"teams\": [\"frc368\", \"frc971\", \"frc3303\"]}, \"red\": {\"score\": 160, \"teams\": [\"frc254\", \"frc1678\", \"frc1662\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_f1m1",
+    "year": 2016,
+    "push_sent": null,
+    "youtube_videos": [
+      "cGe8wdbfl_E?t=25202"
+    ],
+    "actual_time": "2016-04-09T22:48:53",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "f",
+    "match_number": 2,
+    "updated": "2016-04-12T00:59:57",
+    "team_key_names": [
+      "frc254",
+      "frc1678",
+      "frc1662",
+      "frc368",
+      "frc971",
+      "frc3303"
+    ],
+    "created": "2016-04-09T22:34:03",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T23:22:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"score\": 142, \"teams\": [\"frc368\", \"frc971\", \"frc3303\"]}, \"red\": {\"score\": 202, \"teams\": [\"frc254\", \"frc1678\", \"frc1662\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_f1m2",
+    "year": 2016,
+    "push_sent": null,
+    "youtube_videos": [
+      "cGe8wdbfl_E?t=25203",
+      "cGe8wdbfl_E?t=26106",
+      "euSq-3zxck8"
+    ],
+    "actual_time": "2016-04-09T23:03:57",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qf",
+    "match_number": 1,
+    "updated": "2016-04-12T00:59:57",
+    "team_key_names": [
+      "frc254",
+      "frc1678",
+      "frc1662",
+      "frc1868",
+      "frc852",
+      "frc6036"
+    ],
+    "created": "2016-04-09T19:37:10",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T20:30:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"score\": 88, \"teams\": [\"frc1868\", \"frc852\", \"frc6036\"]}, \"red\": {\"score\": 212, \"teams\": [\"frc254\", \"frc1678\", \"frc1662\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qf1m1",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "cGe8wdbfl_E?t=17699",
+      "uDzvR3MWIyA"
+    ],
+    "actual_time": "2016-04-09T20:40:14",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qf",
+    "match_number": 2,
+    "updated": "2016-04-11T16:25:21",
+    "team_key_names": [
+      "frc254",
+      "frc1678",
+      "frc1662",
+      "frc1868",
+      "frc852",
+      "frc6036"
+    ],
+    "created": "2016-04-09T19:37:10",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T21:01:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"score\": 90, \"teams\": [\"frc1868\", \"frc852\", \"frc6036\"]}, \"red\": {\"score\": 205, \"teams\": [\"frc254\", \"frc1678\", \"frc1662\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qf1m2",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "cGe8wdbfl_E?t=20094"
+    ],
+    "actual_time": "2016-04-09T21:21:13",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qf",
+    "match_number": 1,
+    "updated": "2016-04-12T00:59:57",
+    "team_key_names": [
+      "frc192",
+      "frc2489",
+      "frc5940",
+      "frc649",
+      "frc5924",
+      "frc3482"
+    ],
+    "created": "2016-04-09T19:37:10",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T20:37:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"score\": 139, \"teams\": [\"frc649\", \"frc5924\", \"frc3482\"]}, \"red\": {\"score\": 88, \"teams\": [\"frc192\", \"frc2489\", \"frc5940\"]}}",
+    "set_number": 2,
+    "__id__": "2016casj_qf2m1",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "cGe8wdbfl_E?t=18130",
+      "syY3Wv09HmY"
+    ],
+    "actual_time": "2016-04-09T20:47:25",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qf",
+    "match_number": 2,
+    "updated": "2016-04-11T16:25:21",
+    "team_key_names": [
+      "frc192",
+      "frc2489",
+      "frc5940",
+      "frc649",
+      "frc5924",
+      "frc3482"
+    ],
+    "created": "2016-04-09T19:37:10",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T21:08:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"score\": 154, \"teams\": [\"frc649\", \"frc5924\", \"frc3482\"]}, \"red\": {\"score\": 100, \"teams\": [\"frc192\", \"frc2489\", \"frc5940\"]}}",
+    "set_number": 2,
+    "__id__": "2016casj_qf2m2",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "cGe8wdbfl_E?t=20555"
+    ],
+    "actual_time": "2016-04-09T21:28:56",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qf",
+    "match_number": 1,
+    "updated": "2016-04-12T00:59:57",
+    "team_key_names": [
+      "frc368",
+      "frc971",
+      "frc3303",
+      "frc8",
+      "frc6039",
+      "frc846"
+    ],
+    "created": "2016-04-09T19:37:10",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T20:44:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"score\": 57, \"teams\": [\"frc8\", \"frc6039\", \"frc846\"]}, \"red\": {\"score\": 124, \"teams\": [\"frc368\", \"frc971\", \"frc3303\"]}}",
+    "set_number": 3,
+    "__id__": "2016casj_qf3m1",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "ZRuCmPTvlT0",
+      "cGe8wdbfl_E?t=18616"
+    ],
+    "actual_time": "2016-04-09T20:55:31",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qf",
+    "match_number": 2,
+    "updated": "2016-04-11T16:25:21",
+    "team_key_names": [
+      "frc368",
+      "frc971",
+      "frc3303",
+      "frc8",
+      "frc6039",
+      "frc846"
+    ],
+    "created": "2016-04-09T19:37:10",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T21:15:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"score\": 51, \"teams\": [\"frc8\", \"frc6039\", \"frc846\"]}, \"red\": {\"score\": 172, \"teams\": [\"frc368\", \"frc971\", \"frc3303\"]}}",
+    "set_number": 3,
+    "__id__": "2016casj_qf3m2",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "cGe8wdbfl_E?t=20969"
+    ],
+    "actual_time": "2016-04-09T21:35:51",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qf",
+    "match_number": 1,
+    "updated": "2016-04-11T16:25:21",
+    "team_key_names": [
+      "frc114",
+      "frc1280",
+      "frc5905",
+      "frc3256",
+      "frc5700",
+      "frc4904"
+    ],
+    "created": "2016-04-09T19:37:10",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T20:51:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"score\": 121, \"teams\": [\"frc3256\", \"frc5700\", \"frc4904\"]}, \"red\": {\"score\": 108, \"teams\": [\"frc114\", \"frc1280\", \"frc5905\"]}}",
+    "set_number": 4,
+    "__id__": "2016casj_qf4m1",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "cGe8wdbfl_E?t=19319"
+    ],
+    "actual_time": "2016-04-09T21:08:18",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qf",
+    "match_number": 2,
+    "updated": "2016-04-11T16:25:21",
+    "team_key_names": [
+      "frc114",
+      "frc1280",
+      "frc5905",
+      "frc3256",
+      "frc5700",
+      "frc4904"
+    ],
+    "created": "2016-04-09T19:37:10",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T21:22:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"score\": 177, \"teams\": [\"frc3256\", \"frc5700\", \"frc4904\"]}, \"red\": {\"score\": 106, \"teams\": [\"frc114\", \"frc1280\", \"frc5905\"]}}",
+    "set_number": 4,
+    "__id__": "2016casj_qf4m2",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "cGe8wdbfl_E?t=21453"
+    ],
+    "actual_time": "2016-04-09T21:43:54",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 1,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc2489",
+      "frc5677",
+      "frc1700",
+      "frc4171",
+      "frc256",
+      "frc1868"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T16:00:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 65, \"teams\": [\"frc4171\", \"frc256\", \"frc1868\"]}, \"red\": {\"surrogates\": [], \"score\": 63, \"teams\": [\"frc2489\", \"frc5677\", \"frc1700\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm1",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "cy3YyQo3DZg"
+    ],
+    "actual_time": "2016-04-08T16:13:58",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 10,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5737",
+      "frc604",
+      "frc766",
+      "frc4159",
+      "frc649",
+      "frc4255"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T17:06:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 66, \"teams\": [\"frc4159\", \"frc649\", \"frc4255\"]}, \"red\": {\"surrogates\": [], \"score\": 57, \"teams\": [\"frc5737\", \"frc604\", \"frc766\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm10",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "RwKlUmJJwpY"
+    ],
+    "actual_time": "2016-04-08T17:29:04",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 11,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc971",
+      "frc115",
+      "frc1868",
+      "frc751",
+      "frc3256",
+      "frc5700"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T17:13:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 62, \"teams\": [\"frc751\", \"frc3256\", \"frc5700\"]}, \"red\": {\"surrogates\": [], \"score\": 111, \"teams\": [\"frc971\", \"frc115\", \"frc1868\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm11",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "cDPsHmF7fm4"
+    ],
+    "actual_time": "2016-04-08T17:40:17",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 12,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc852",
+      "frc6039",
+      "frc5924",
+      "frc5089",
+      "frc5655",
+      "frc581"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T17:35:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 41, \"teams\": [\"frc5089\", \"frc5655\", \"frc581\"]}, \"red\": {\"surrogates\": [], \"score\": 72, \"teams\": [\"frc852\", \"frc6039\", \"frc5924\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm12",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "2Aab6Pp1nq4"
+    ],
+    "actual_time": "2016-04-08T17:47:34",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 13,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc2473",
+      "frc6036",
+      "frc3303",
+      "frc4186",
+      "frc5905",
+      "frc841"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T17:42:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 49, \"teams\": [\"frc4186\", \"frc5905\", \"frc841\"]}, \"red\": {\"surrogates\": [], \"score\": 85, \"teams\": [\"frc2473\", \"frc6036\", \"frc3303\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm13",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "ptfXoVbBX6M"
+    ],
+    "actual_time": "2016-04-08T17:59:57",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 14,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc846",
+      "frc100",
+      "frc2854",
+      "frc6059",
+      "frc1967",
+      "frc972"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T17:49:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 35, \"teams\": [\"frc6059\", \"frc1967\", \"frc972\"]}, \"red\": {\"surrogates\": [], \"score\": 67, \"teams\": [\"frc846\", \"frc100\", \"frc2854\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm14",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "9C61GlvrOr4"
+    ],
+    "actual_time": "2016-04-08T18:10:14",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 15,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5728",
+      "frc2643",
+      "frc649",
+      "frc1678",
+      "frc2813",
+      "frc8"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T17:56:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 104, \"teams\": [\"frc1678\", \"frc2813\", \"frc8\"]}, \"red\": {\"surrogates\": [], \"score\": 47, \"teams\": [\"frc5728\", \"frc2643\", \"frc649\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm15",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "8doHBCFz5iQ"
+    ],
+    "actual_time": "2016-04-08T18:18:48",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 16,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc1662",
+      "frc1700",
+      "frc5104",
+      "frc971",
+      "frc4255",
+      "frc254"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T18:03:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 147, \"teams\": [\"frc971\", \"frc4255\", \"frc254\"]}, \"red\": {\"surrogates\": [], \"score\": 76, \"teams\": [\"frc1662\", \"frc1700\", \"frc5104\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm16",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "DP72J6nbRd8",
+      "OycHuh8hE0Y"
+    ],
+    "actual_time": "2016-04-08T18:25:29",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 17,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc4643",
+      "frc766",
+      "frc256",
+      "frc5026",
+      "frc253",
+      "frc668"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T18:10:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 34, \"teams\": [\"frc5026\", \"frc253\", \"frc668\"]}, \"red\": {\"surrogates\": [], \"score\": 37, \"teams\": [\"frc4643\", \"frc766\", \"frc256\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm17",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "YLyMXixky5Y"
+    ],
+    "actual_time": "2016-04-08T18:33:32",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 18,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc192",
+      "frc2367",
+      "frc199",
+      "frc604",
+      "frc5940",
+      "frc3256"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T18:20:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 88, \"teams\": [\"frc604\", \"frc5940\", \"frc3256\"]}, \"red\": {\"surrogates\": [], \"score\": 81, \"teams\": [\"frc192\", \"frc2367\", \"frc199\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm18",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "wfACrvrAjME"
+    ],
+    "actual_time": "2016-04-08T18:43:36",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 19,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc115",
+      "frc5027",
+      "frc4171",
+      "frc3482",
+      "frc4904",
+      "frc4765"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T18:27:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 57, \"teams\": [\"frc3482\", \"frc4904\", \"frc4765\"]}, \"red\": {\"surrogates\": [], \"score\": 59, \"teams\": [\"frc115\", \"frc5027\", \"frc4171\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm19",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "QDOX4-PPWUo"
+    ],
+    "actual_time": "2016-04-08T18:50:27",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 2,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc254",
+      "frc852",
+      "frc4990",
+      "frc2035",
+      "frc2643",
+      "frc6036"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T16:07:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 63, \"teams\": [\"frc2035\", \"frc2643\", \"frc6036\"]}, \"red\": {\"surrogates\": [], \"score\": 80, \"teams\": [\"frc254\", \"frc852\", \"frc4990\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm2",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "JJYxqlLxP8s",
+      "VA7loCeHqOI"
+    ],
+    "actual_time": "2016-04-08T16:21:01",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 20,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5171",
+      "frc114",
+      "frc1280",
+      "frc4990",
+      "frc2489",
+      "frc751"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T18:34:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 54, \"teams\": [\"frc4990\", \"frc2489\", \"frc751\"]}, \"red\": {\"surrogates\": [], \"score\": 41, \"teams\": [\"frc5171\", \"frc114\", \"frc1280\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm20",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "HD_7wR8WoT0"
+    ],
+    "actual_time": "2016-04-08T18:57:43",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 21,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc2035",
+      "frc368",
+      "frc670",
+      "frc5677",
+      "frc5737",
+      "frc1351"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T18:41:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 66, \"teams\": [\"frc5677\", \"frc5737\", \"frc1351\"]}, \"red\": {\"surrogates\": [], \"score\": 96, \"teams\": [\"frc2035\", \"frc368\", \"frc670\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm21",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "1byiQCAHaWU"
+    ],
+    "actual_time": "2016-04-08T19:05:20",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 22,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc4159",
+      "frc2643",
+      "frc6039",
+      "frc2135",
+      "frc5924",
+      "frc4186"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T18:48:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 82, \"teams\": [\"frc2135\", \"frc5924\", \"frc4186\"]}, \"red\": {\"surrogates\": [], \"score\": 54, \"teams\": [\"frc4159\", \"frc2643\", \"frc6039\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm22",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "nhzTTG1zZ0A"
+    ],
+    "actual_time": "2016-04-08T19:17:29",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 23,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5089",
+      "frc100",
+      "frc649",
+      "frc254",
+      "frc199",
+      "frc1700"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T18:55:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [\"frc254\"], \"score\": 132, \"teams\": [\"frc254\", \"frc199\", \"frc1700\"]}, \"red\": {\"surrogates\": [\"frc5089\"], \"score\": 101, \"teams\": [\"frc5089\", \"frc100\", \"frc649\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm23",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "uY9pdMqwucg",
+      "m_InLlzuaIA"
+    ],
+    "actual_time": "2016-04-08T19:26:17",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 24,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5905",
+      "frc6059",
+      "frc6036",
+      "frc4904",
+      "frc971",
+      "frc1678"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T19:02:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [\"frc4904\"], \"score\": 170, \"teams\": [\"frc4904\", \"frc971\", \"frc1678\"]}, \"red\": {\"surrogates\": [\"frc5905\"], \"score\": 86, \"teams\": [\"frc5905\", \"frc6059\", \"frc6036\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm24",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "gZ2d-pEM6RQ"
+    ],
+    "actual_time": "2016-04-08T20:19:09",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 25,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc1868",
+      "frc114",
+      "frc3482",
+      "frc192",
+      "frc4255",
+      "frc3303"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T19:09:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 101, \"teams\": [\"frc192\", \"frc4255\", \"frc3303\"]}, \"red\": {\"surrogates\": [], \"score\": 101, \"teams\": [\"frc1868\", \"frc114\", \"frc3482\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm25",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "cuQXtjunu9U"
+    ],
+    "actual_time": "2016-04-08T20:26:00",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 26,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc1662",
+      "frc5027",
+      "frc766",
+      "frc2035",
+      "frc2854",
+      "frc5171"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T20:16:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 67, \"teams\": [\"frc2035\", \"frc2854\", \"frc5171\"]}, \"red\": {\"surrogates\": [], \"score\": 66, \"teams\": [\"frc1662\", \"frc5027\", \"frc766\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm26",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "CmvWFGDB1xk"
+    ],
+    "actual_time": "2016-04-08T20:32:33",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 27,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc2367",
+      "frc5655",
+      "frc2813",
+      "frc5700",
+      "frc5737",
+      "frc256"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T20:23:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 74, \"teams\": [\"frc5700\", \"frc5737\", \"frc256\"]}, \"red\": {\"surrogates\": [], \"score\": 31, \"teams\": [\"frc2367\", \"frc5655\", \"frc2813\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm27",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "xmzfEkfQ09E"
+    ],
+    "actual_time": "2016-04-08T20:39:11",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 28,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc4171",
+      "frc846",
+      "frc4990",
+      "frc368",
+      "frc2473",
+      "frc4159"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T20:33:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 117, \"teams\": [\"frc368\", \"frc2473\", \"frc4159\"]}, \"red\": {\"surrogates\": [], \"score\": 60, \"teams\": [\"frc4171\", \"frc846\", \"frc4990\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm28",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "EoY5xQhcSFs"
+    ],
+    "actual_time": "2016-04-08T20:48:54",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 29,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc1967",
+      "frc2135",
+      "frc3256",
+      "frc5677",
+      "frc668",
+      "frc852"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T20:40:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 68, \"teams\": [\"frc5677\", \"frc668\", \"frc852\"]}, \"red\": {\"surrogates\": [], \"score\": 61, \"teams\": [\"frc1967\", \"frc2135\", \"frc3256\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm29",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "UcUQEVP9wMQ"
+    ],
+    "actual_time": "2016-04-08T20:56:11",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 3,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5027",
+      "frc846",
+      "frc841",
+      "frc114",
+      "frc6039",
+      "frc5026"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T16:14:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 82, \"teams\": [\"frc114\", \"frc6039\", \"frc5026\"]}, \"red\": {\"surrogates\": [], \"score\": 74, \"teams\": [\"frc5027\", \"frc846\", \"frc841\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm3",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "RNOr3Pga0Ko"
+    ],
+    "actual_time": "2016-04-08T16:29:28",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 30,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5026",
+      "frc751",
+      "frc4765",
+      "frc604",
+      "frc8",
+      "frc2489"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T20:47:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 74, \"teams\": [\"frc604\", \"frc8\", \"frc2489\"]}, \"red\": {\"surrogates\": [], \"score\": 67, \"teams\": [\"frc5026\", \"frc751\", \"frc4765\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm30",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "eb0XzbIPF8Y"
+    ],
+    "actual_time": "2016-04-08T21:03:21",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 31,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc581",
+      "frc972",
+      "frc1351",
+      "frc5104",
+      "frc841",
+      "frc253"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T20:54:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 50, \"teams\": [\"frc5104\", \"frc841\", \"frc253\"]}, \"red\": {\"surrogates\": [], \"score\": 57, \"teams\": [\"frc581\", \"frc972\", \"frc1351\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm31",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "DwAGCXJT2Y8"
+    ],
+    "actual_time": "2016-04-08T21:10:10",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 32,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc670",
+      "frc115",
+      "frc1280",
+      "frc4643",
+      "frc5728",
+      "frc5940"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T21:01:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 48, \"teams\": [\"frc4643\", \"frc5728\", \"frc5940\"]}, \"red\": {\"surrogates\": [], \"score\": 64, \"teams\": [\"frc670\", \"frc115\", \"frc1280\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm32",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "jMZtkXKxnxM"
+    ],
+    "actual_time": "2016-04-08T21:16:44",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 33,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc846",
+      "frc4904",
+      "frc4255",
+      "frc2035",
+      "frc5655",
+      "frc4186"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T21:08:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 62, \"teams\": [\"frc2035\", \"frc5655\", \"frc4186\"]}, \"red\": {\"surrogates\": [], \"score\": 87, \"teams\": [\"frc846\", \"frc4904\", \"frc4255\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm33",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "qqyLrj9D7jU"
+    ],
+    "actual_time": "2016-04-08T21:25:31",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 34,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5089",
+      "frc1700",
+      "frc6039",
+      "frc2367",
+      "frc4990",
+      "frc668"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T21:15:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 42, \"teams\": [\"frc2367\", \"frc4990\", \"frc668\"]}, \"red\": {\"surrogates\": [], \"score\": 66, \"teams\": [\"frc5089\", \"frc1700\", \"frc6039\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm34",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "jgfx6pd73Ps"
+    ],
+    "actual_time": "2016-04-08T21:39:32",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 35,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc8",
+      "frc256",
+      "frc971",
+      "frc3303",
+      "frc100",
+      "frc4159"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T21:22:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 65, \"teams\": [\"frc3303\", \"frc100\", \"frc4159\"]}, \"red\": {\"surrogates\": [], \"score\": 107, \"teams\": [\"frc8\", \"frc256\", \"frc971\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm35",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "qJfmiuA8Vpo"
+    ],
+    "actual_time": "2016-04-08T21:46:10",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 36,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc114",
+      "frc5700",
+      "frc5104",
+      "frc5924",
+      "frc766",
+      "frc368"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T21:29:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 122, \"teams\": [\"frc5924\", \"frc766\", \"frc368\"]}, \"red\": {\"surrogates\": [], \"score\": 76, \"teams\": [\"frc114\", \"frc5700\", \"frc5104\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm36",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "XN7WOYqJ_50"
+    ],
+    "actual_time": "2016-04-08T21:53:54",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 37,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc972",
+      "frc1678",
+      "frc1280",
+      "frc115",
+      "frc604",
+      "frc5677"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T21:36:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 83, \"teams\": [\"frc115\", \"frc604\", \"frc5677\"]}, \"red\": {\"surrogates\": [], \"score\": 125, \"teams\": [\"frc972\", \"frc1678\", \"frc1280\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm37",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "YXhlJy3DNkQ"
+    ],
+    "actual_time": "2016-04-08T22:03:59",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 38,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5026",
+      "frc4171",
+      "frc192",
+      "frc1351",
+      "frc6036",
+      "frc649"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T21:46:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 78, \"teams\": [\"frc1351\", \"frc6036\", \"frc649\"]}, \"red\": {\"surrogates\": [], \"score\": 85, \"teams\": [\"frc5026\", \"frc4171\", \"frc192\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm38",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "V5wDPmxcy2I"
+    ],
+    "actual_time": "2016-04-08T22:10:09",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 39,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5027",
+      "frc751",
+      "frc253",
+      "frc2643",
+      "frc5905",
+      "frc670"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T21:53:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 60, \"teams\": [\"frc2643\", \"frc5905\", \"frc670\"]}, \"red\": {\"surrogates\": [], \"score\": 78, \"teams\": [\"frc5027\", \"frc751\", \"frc253\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm39",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "-glPZufVRcw"
+    ],
+    "actual_time": "2016-04-08T22:16:44",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 4,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc2473",
+      "frc5940",
+      "frc1678",
+      "frc5171",
+      "frc581",
+      "frc100"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T16:21:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 56, \"teams\": [\"frc5171\", \"frc581\", \"frc100\"]}, \"red\": {\"surrogates\": [], \"score\": 76, \"teams\": [\"frc2473\", \"frc5940\", \"frc1678\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm4",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "UTv3mLeOOoI"
+    ],
+    "actual_time": "2016-04-08T16:37:23",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 40,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5728",
+      "frc841",
+      "frc2473",
+      "frc2489",
+      "frc2854",
+      "frc3256"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T22:00:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 100, \"teams\": [\"frc2489\", \"frc2854\", \"frc3256\"]}, \"red\": {\"surrogates\": [], \"score\": 41, \"teams\": [\"frc5728\", \"frc841\", \"frc2473\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm40",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "Iwv8EZ0wXA4"
+    ],
+    "actual_time": "2016-04-08T22:41:59",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 41,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5737",
+      "frc4643",
+      "frc199",
+      "frc4765",
+      "frc581",
+      "frc2135"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T22:07:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 64, \"teams\": [\"frc4765\", \"frc581\", \"frc2135\"]}, \"red\": {\"surrogates\": [], \"score\": 45, \"teams\": [\"frc5737\", \"frc4643\", \"frc199\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm41",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "NB40sJm_NVU"
+    ],
+    "actual_time": "2016-04-08T22:49:25",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 42,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5940",
+      "frc852",
+      "frc1868",
+      "frc1662",
+      "frc6059",
+      "frc2813"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T22:14:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 67, \"teams\": [\"frc1662\", \"frc6059\", \"frc2813\"]}, \"red\": {\"surrogates\": [], \"score\": 93, \"teams\": [\"frc5940\", \"frc852\", \"frc1868\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm42",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "JNVM_E5_2ZE"
+    ],
+    "actual_time": "2016-04-08T22:55:49",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 43,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5171",
+      "frc3482",
+      "frc5026",
+      "frc1967",
+      "frc254",
+      "frc4186"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T22:21:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 149, \"teams\": [\"frc1967\", \"frc254\", \"frc4186\"]}, \"red\": {\"surrogates\": [], \"score\": 50, \"teams\": [\"frc5171\", \"frc3482\", \"frc5026\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm43",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "t-tMCwkep-Y",
+      "u_iy89MCw3s"
+    ],
+    "actual_time": "2016-04-08T23:06:16",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 44,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5677",
+      "frc4255",
+      "frc100",
+      "frc2367",
+      "frc253",
+      "frc6036"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T22:28:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 75, \"teams\": [\"frc2367\", \"frc253\", \"frc6036\"]}, \"red\": {\"surrogates\": [], \"score\": 68, \"teams\": [\"frc5677\", \"frc4255\", \"frc100\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm44",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "eA3CXU1PwpM"
+    ],
+    "actual_time": "2016-04-08T23:12:47",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 45,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5089",
+      "frc670",
+      "frc4159",
+      "frc115",
+      "frc2489",
+      "frc192"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T22:35:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 95, \"teams\": [\"frc115\", \"frc2489\", \"frc192\"]}, \"red\": {\"surrogates\": [], \"score\": 69, \"teams\": [\"frc5089\", \"frc670\", \"frc4159\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm45",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "-_aKAmewb_I"
+    ],
+    "actual_time": "2016-04-08T23:19:56",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 46,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc3256",
+      "frc5924",
+      "frc3303",
+      "frc4765",
+      "frc1700",
+      "frc846"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T22:42:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 77, \"teams\": [\"frc4765\", \"frc1700\", \"frc846\"]}, \"red\": {\"surrogates\": [], \"score\": 103, \"teams\": [\"frc3256\", \"frc5924\", \"frc3303\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm46",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "YFAC7_pQTCQ"
+    ],
+    "actual_time": "2016-04-08T23:26:15",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 47,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5737",
+      "frc972",
+      "frc852",
+      "frc971",
+      "frc5728",
+      "frc5027"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T22:49:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 109, \"teams\": [\"frc971\", \"frc5728\", \"frc5027\"]}, \"red\": {\"surrogates\": [], \"score\": 80, \"teams\": [\"frc5737\", \"frc972\", \"frc852\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm47",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "D8ipv8GW4FM"
+    ],
+    "actual_time": "2016-04-08T23:33:45",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 48,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5104",
+      "frc4990",
+      "frc2135",
+      "frc256",
+      "frc5940",
+      "frc3482"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T22:59:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 84, \"teams\": [\"frc256\", \"frc5940\", \"frc3482\"]}, \"red\": {\"surrogates\": [], \"score\": 76, \"teams\": [\"frc5104\", \"frc4990\", \"frc2135\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm48",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "xhrLmovKRfk"
+    ],
+    "actual_time": "2016-04-08T23:40:48",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 49,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc199",
+      "frc4904",
+      "frc2854",
+      "frc1351",
+      "frc2813",
+      "frc114"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T23:06:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 92, \"teams\": [\"frc1351\", \"frc2813\", \"frc114\"]}, \"red\": {\"surrogates\": [], \"score\": 50, \"teams\": [\"frc199\", \"frc4904\", \"frc2854\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm49",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "wLIcLZm9-wc"
+    ],
+    "actual_time": "2016-04-08T23:48:14",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 5,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc3303",
+      "frc1351",
+      "frc5089",
+      "frc5700",
+      "frc1967",
+      "frc1280"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T16:28:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 74, \"teams\": [\"frc5700\", \"frc1967\", \"frc1280\"]}, \"red\": {\"surrogates\": [], \"score\": 68, \"teams\": [\"frc3303\", \"frc1351\", \"frc5089\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm5",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "nIFBkfsRuQY"
+    ],
+    "actual_time": "2016-04-08T16:44:44",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 50,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc2643",
+      "frc766",
+      "frc254",
+      "frc581",
+      "frc841",
+      "frc1868"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T23:13:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 73, \"teams\": [\"frc581\", \"frc841\", \"frc1868\"]}, \"red\": {\"surrogates\": [], \"score\": 115, \"teams\": [\"frc2643\", \"frc766\", \"frc254\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm50",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "YBFwBJKQd00",
+      "wwUH_Yh_Gl8"
+    ],
+    "actual_time": "2016-04-08T23:54:39",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 51,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc604",
+      "frc6059",
+      "frc649",
+      "frc5171",
+      "frc668",
+      "frc368"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T23:20:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 82, \"teams\": [\"frc5171\", \"frc668\", \"frc368\"]}, \"red\": {\"surrogates\": [], \"score\": 80, \"teams\": [\"frc604\", \"frc6059\", \"frc649\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm51",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "dakeeO_QhZE"
+    ],
+    "actual_time": "2016-04-09T00:01:39",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 52,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc2473",
+      "frc1967",
+      "frc5655",
+      "frc1678",
+      "frc751",
+      "frc1662"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T23:27:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 125, \"teams\": [\"frc1678\", \"frc751\", \"frc1662\"]}, \"red\": {\"surrogates\": [], \"score\": 46, \"teams\": [\"frc2473\", \"frc1967\", \"frc5655\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm52",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "H8p_HEjpGC4"
+    ],
+    "actual_time": "2016-04-09T00:08:03",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 53,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc4171",
+      "frc2035",
+      "frc5700",
+      "frc4643",
+      "frc5905",
+      "frc6039"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T23:34:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 69, \"teams\": [\"frc4643\", \"frc5905\", \"frc6039\"]}, \"red\": {\"surrogates\": [], \"score\": 70, \"teams\": [\"frc4171\", \"frc2035\", \"frc5700\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm53",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "rybRjsydnEU"
+    ],
+    "actual_time": "2016-04-09T00:16:59",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 54,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc1280",
+      "frc2367",
+      "frc4186",
+      "frc8",
+      "frc5027",
+      "frc670"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T23:41:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 70, \"teams\": [\"frc8\", \"frc5027\", \"frc670\"]}, \"red\": {\"surrogates\": [], \"score\": 79, \"teams\": [\"frc1280\", \"frc2367\", \"frc4186\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm54",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "f-0ErRR7Nu8"
+    ],
+    "actual_time": "2016-04-09T00:24:18",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 55,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc3482",
+      "frc1351",
+      "frc2489",
+      "frc852",
+      "frc846",
+      "frc766"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T23:48:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 58, \"teams\": [\"frc852\", \"frc846\", \"frc766\"]}, \"red\": {\"surrogates\": [], \"score\": 60, \"teams\": [\"frc3482\", \"frc1351\", \"frc2489\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm55",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "7qD7Z2tKPv0"
+    ],
+    "actual_time": "2016-04-09T00:32:01",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 56,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc604",
+      "frc5924",
+      "frc253",
+      "frc4904",
+      "frc1868",
+      "frc5728"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T23:55:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 54, \"teams\": [\"frc4904\", \"frc1868\", \"frc5728\"]}, \"red\": {\"surrogates\": [], \"score\": 50, \"teams\": [\"frc604\", \"frc5924\", \"frc253\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm56",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "lXWAAOTeynQ"
+    ],
+    "actual_time": "2016-04-09T00:40:55",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 57,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc368",
+      "frc2813",
+      "frc2135",
+      "frc6036",
+      "frc1700",
+      "frc751"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T00:02:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 92, \"teams\": [\"frc6036\", \"frc1700\", \"frc751\"]}, \"red\": {\"surrogates\": [], \"score\": 89, \"teams\": [\"frc368\", \"frc2813\", \"frc2135\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm57",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "zNLPjwFRzTE"
+    ],
+    "actual_time": "2016-04-09T00:48:35",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 58,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc6039",
+      "frc192",
+      "frc972",
+      "frc199",
+      "frc256",
+      "frc2473"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T00:12:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 41, \"teams\": [\"frc199\", \"frc256\", \"frc2473\"]}, \"red\": {\"surrogates\": [], \"score\": 99, \"teams\": [\"frc6039\", \"frc192\", \"frc972\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm58",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "Q-9TmhUFTbI"
+    ],
+    "actual_time": "2016-04-09T00:55:35",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 59,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc2035",
+      "frc3256",
+      "frc5737",
+      "frc1280",
+      "frc5104",
+      "frc100"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T00:19:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 87, \"teams\": [\"frc1280\", \"frc5104\", \"frc100\"]}, \"red\": {\"surrogates\": [], \"score\": 51, \"teams\": [\"frc2035\", \"frc3256\", \"frc5737\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm59",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "YPgVoYYREWA"
+    ],
+    "actual_time": "2016-04-09T01:02:23",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 6,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc3482",
+      "frc6059",
+      "frc5655",
+      "frc670",
+      "frc253",
+      "frc199"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T16:35:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 60, \"teams\": [\"frc670\", \"frc253\", \"frc199\"]}, \"red\": {\"surrogates\": [], \"score\": 75, \"teams\": [\"frc3482\", \"frc6059\", \"frc5655\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm6",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "7N8rCMcioYM"
+    ],
+    "actual_time": "2016-04-08T16:55:18",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 60,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5905",
+      "frc1967",
+      "frc114",
+      "frc4765",
+      "frc649",
+      "frc5940"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T00:26:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 97, \"teams\": [\"frc4765\", \"frc649\", \"frc5940\"]}, \"red\": {\"surrogates\": [], \"score\": 67, \"teams\": [\"frc5905\", \"frc1967\", \"frc114\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm60",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "ElOwp-waYEQ",
+      "BaKD4vfIPrQ"
+    ],
+    "actual_time": "2016-04-09T01:10:46",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 61,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc2854",
+      "frc668",
+      "frc4159",
+      "frc5700",
+      "frc1678",
+      "frc254"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T00:33:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 162, \"teams\": [\"frc5700\", \"frc1678\", \"frc254\"]}, \"red\": {\"surrogates\": [], \"score\": 55, \"teams\": [\"frc2854\", \"frc668\", \"frc4159\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm61",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "XbLFjO_LHbw",
+      "cSOdFZY20VI",
+      "gDh06ZBUAA8"
+    ],
+    "actual_time": "2016-04-09T01:25:02",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 62,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc8",
+      "frc841",
+      "frc5171",
+      "frc115",
+      "frc4255",
+      "frc5655"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T16:00:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 37, \"teams\": [\"frc115\", \"frc4255\", \"frc5655\"]}, \"red\": {\"surrogates\": [], \"score\": 86, \"teams\": [\"frc8\", \"frc841\", \"frc5171\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm62",
+    "year": 2016,
+    "push_sent": null,
+    "youtube_videos": [
+      "E0NRE3zp_w4"
+    ],
+    "actual_time": "2016-04-09T15:47:09",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 63,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5677",
+      "frc3303",
+      "frc581",
+      "frc4990",
+      "frc6059",
+      "frc5026"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T16:07:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 62, \"teams\": [\"frc4990\", \"frc6059\", \"frc5026\"]}, \"red\": {\"surrogates\": [], \"score\": 71, \"teams\": [\"frc5677\", \"frc3303\", \"frc581\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm63",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "rXMTiRvmXEU"
+    ],
+    "actual_time": "2016-04-09T15:55:07",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 64,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc2643",
+      "frc971",
+      "frc1662",
+      "frc4643",
+      "frc5089",
+      "frc4171"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T16:14:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 73, \"teams\": [\"frc4643\", \"frc5089\", \"frc4171\"]}, \"red\": {\"surrogates\": [], \"score\": 116, \"teams\": [\"frc2643\", \"frc971\", \"frc1662\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm64",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "s8AHYPB9_ME"
+    ],
+    "actual_time": "2016-04-09T16:01:54",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 65,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc1967",
+      "frc4904",
+      "frc766",
+      "frc3256",
+      "frc6039",
+      "frc670"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T16:21:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 82, \"teams\": [\"frc3256\", \"frc6039\", \"frc670\"]}, \"red\": {\"surrogates\": [], \"score\": 94, \"teams\": [\"frc1967\", \"frc4904\", \"frc766\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm65",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "J8jFBkGvtGI"
+    ],
+    "actual_time": "2016-04-09T16:12:11",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 66,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc192",
+      "frc5700",
+      "frc5728",
+      "frc100",
+      "frc2135",
+      "frc5027"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T16:28:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 72, \"teams\": [\"frc100\", \"frc2135\", \"frc5027\"]}, \"red\": {\"surrogates\": [], \"score\": 89, \"teams\": [\"frc192\", \"frc5700\", \"frc5728\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm66",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "FzBUqm5I8lA"
+    ],
+    "actual_time": "2016-04-09T16:18:17",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 67,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc4765",
+      "frc4159",
+      "frc6036",
+      "frc5171",
+      "frc1351",
+      "frc1868"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T16:35:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 75, \"teams\": [\"frc5171\", \"frc1351\", \"frc1868\"]}, \"red\": {\"surrogates\": [], \"score\": 57, \"teams\": [\"frc4765\", \"frc4159\", \"frc6036\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm67",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "NRR3iTODTKA"
+    ],
+    "actual_time": "2016-04-09T16:24:16",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 68,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5026",
+      "frc4255",
+      "frc5905",
+      "frc368",
+      "frc852",
+      "frc1280"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T16:45:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 115, \"teams\": [\"frc368\", \"frc852\", \"frc1280\"]}, \"red\": {\"surrogates\": [], \"score\": 83, \"teams\": [\"frc5026\", \"frc4255\", \"frc5905\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm68",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "FELxRksSSCk"
+    ],
+    "actual_time": "2016-04-09T16:32:29",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 69,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc668",
+      "frc5655",
+      "frc5940",
+      "frc3303",
+      "frc2643",
+      "frc972"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T16:52:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 76, \"teams\": [\"frc3303\", \"frc2643\", \"frc972\"]}, \"red\": {\"surrogates\": [], \"score\": 65, \"teams\": [\"frc668\", \"frc5655\", \"frc5940\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm69",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "p0dyWdcDXTw"
+    ],
+    "actual_time": "2016-04-09T16:39:56",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 7,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc8",
+      "frc5924",
+      "frc4643",
+      "frc192",
+      "frc2854",
+      "frc5905"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T16:42:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 67, \"teams\": [\"frc192\", \"frc2854\", \"frc5905\"]}, \"red\": {\"surrogates\": [], \"score\": 88, \"teams\": [\"frc8\", \"frc5924\", \"frc4643\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm7",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "FerEJt7_beU"
+    ],
+    "actual_time": "2016-04-08T17:03:24",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 70,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc2854",
+      "frc4186",
+      "frc253",
+      "frc649",
+      "frc971",
+      "frc4990"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T16:59:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 110, \"teams\": [\"frc649\", \"frc971\", \"frc4990\"]}, \"red\": {\"surrogates\": [], \"score\": 48, \"teams\": [\"frc2854\", \"frc4186\", \"frc253\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm70",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "mbEqkQDb6K0",
+      "cGe8wdbfl_E?t=3967"
+    ],
+    "actual_time": "2016-04-09T16:51:21",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 71,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc1678",
+      "frc841",
+      "frc5089",
+      "frc5737",
+      "frc1700",
+      "frc3482"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T17:06:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 68, \"teams\": [\"frc5737\", \"frc1700\", \"frc3482\"]}, \"red\": {\"surrogates\": [], \"score\": 134, \"teams\": [\"frc1678\", \"frc841\", \"frc5089\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm71",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "Xs7e4aDa4HQ"
+    ],
+    "actual_time": "2016-04-09T16:59:09",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 72,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc604",
+      "frc4643",
+      "frc2813",
+      "frc254",
+      "frc5677",
+      "frc2473"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T17:13:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 131, \"teams\": [\"frc254\", \"frc5677\", \"frc2473\"]}, \"red\": {\"surrogates\": [], \"score\": 44, \"teams\": [\"frc604\", \"frc4643\", \"frc2813\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm72",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "GU17OWuhHGE"
+    ],
+    "actual_time": "2016-04-09T17:06:44",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 73,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc6059",
+      "frc2035",
+      "frc115",
+      "frc5924",
+      "frc2489",
+      "frc2367"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T17:20:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 77, \"teams\": [\"frc5924\", \"frc2489\", \"frc2367\"]}, \"red\": {\"surrogates\": [], \"score\": 57, \"teams\": [\"frc6059\", \"frc2035\", \"frc115\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm73",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "RTqE8mTtud4"
+    ],
+    "actual_time": "2016-04-09T17:13:56",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 74,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5104",
+      "frc846",
+      "frc199",
+      "frc4171",
+      "frc8",
+      "frc751"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T17:27:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 65, \"teams\": [\"frc4171\", \"frc8\", \"frc751\"]}, \"red\": {\"surrogates\": [], \"score\": 76, \"teams\": [\"frc5104\", \"frc846\", \"frc199\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm74",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "46k8FFlcX3E"
+    ],
+    "actual_time": "2016-04-09T17:24:51",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 75,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc1662",
+      "frc581",
+      "frc6036",
+      "frc256",
+      "frc114",
+      "frc3256"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T17:34:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 99, \"teams\": [\"frc256\", \"frc114\", \"frc3256\"]}, \"red\": {\"surrogates\": [], \"score\": 66, \"teams\": [\"frc1662\", \"frc581\", \"frc6036\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm75",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "sXx9d4_lCFo"
+    ],
+    "actual_time": "2016-04-09T17:31:13",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 76,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5700",
+      "frc1700",
+      "frc5171",
+      "frc4904",
+      "frc2643",
+      "frc5026"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T17:41:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 79, \"teams\": [\"frc4904\", \"frc2643\", \"frc5026\"]}, \"red\": {\"surrogates\": [], \"score\": 69, \"teams\": [\"frc5700\", \"frc1700\", \"frc5171\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm76",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "6KyHUcb0EjE"
+    ],
+    "actual_time": "2016-04-09T17:41:17",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 77,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5655",
+      "frc5677",
+      "frc971",
+      "frc192",
+      "frc4765",
+      "frc766"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T17:48:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 59, \"teams\": [\"frc192\", \"frc4765\", \"frc766\"]}, \"red\": {\"surrogates\": [], \"score\": 113, \"teams\": [\"frc5655\", \"frc5677\", \"frc971\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm77",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "FyruB5kf-3I",
+      "cGe8wdbfl_E?t=7990"
+    ],
+    "actual_time": "2016-04-09T17:58:23",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 78,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc100",
+      "frc5905",
+      "frc2813",
+      "frc1351",
+      "frc4990",
+      "frc115"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T17:58:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 80, \"teams\": [\"frc1351\", \"frc4990\", \"frc115\"]}, \"red\": {\"surrogates\": [], \"score\": 81, \"teams\": [\"frc100\", \"frc5905\", \"frc2813\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm78",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [],
+    "actual_time": "2016-04-09T11:04:19",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 79,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc6039",
+      "frc254",
+      "frc2489",
+      "frc253",
+      "frc5940",
+      "frc5737"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T18:05:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 65, \"teams\": [\"frc253\", \"frc5940\", \"frc5737\"]}, \"red\": {\"surrogates\": [], \"score\": 155, \"teams\": [\"frc6039\", \"frc254\", \"frc2489\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm79",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "xJpoMQArnH8"
+    ],
+    "actual_time": "2016-04-09T11:13:32",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 8,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc668",
+      "frc4765",
+      "frc4186",
+      "frc5728",
+      "frc5104",
+      "frc2813"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T16:52:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 38, \"teams\": [\"frc5728\", \"frc5104\", \"frc2813\"]}, \"red\": {\"surrogates\": [], \"score\": 73, \"teams\": [\"frc668\", \"frc4765\", \"frc4186\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm8",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "qWay1sP1nrU"
+    ],
+    "actual_time": "2016-04-08T17:11:08",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 80,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc2473",
+      "frc2135",
+      "frc8",
+      "frc6059",
+      "frc114",
+      "frc5089"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T18:12:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 104, \"teams\": [\"frc6059\", \"frc114\", \"frc5089\"]}, \"red\": {\"surrogates\": [], \"score\": 87, \"teams\": [\"frc2473\", \"frc2135\", \"frc8\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm80",
+    "year": 2016,
+    "push_sent": null,
+    "youtube_videos": [],
+    "actual_time": "2016-04-09T11:21:45",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 81,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc4171",
+      "frc5728",
+      "frc581",
+      "frc1967",
+      "frc4255",
+      "frc2367"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T18:19:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 89, \"teams\": [\"frc1967\", \"frc4255\", \"frc2367\"]}, \"red\": {\"surrogates\": [], \"score\": 65, \"teams\": [\"frc4171\", \"frc5728\", \"frc581\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm81",
+    "year": 2016,
+    "push_sent": null,
+    "youtube_videos": [],
+    "actual_time": "2016-04-09T11:28:31",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 82,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc5924",
+      "frc668",
+      "frc841",
+      "frc199",
+      "frc1662",
+      "frc1280"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T18:26:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 89, \"teams\": [\"frc199\", \"frc1662\", \"frc1280\"]}, \"red\": {\"surrogates\": [], \"score\": 86, \"teams\": [\"frc5924\", \"frc668\", \"frc841\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm82",
+    "year": 2016,
+    "push_sent": null,
+    "youtube_videos": [],
+    "actual_time": "2016-04-09T11:34:36",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 83,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc4643",
+      "frc1678",
+      "frc368",
+      "frc1868",
+      "frc5027",
+      "frc4186"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T18:33:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 56, \"teams\": [\"frc1868\", \"frc5027\", \"frc4186\"]}, \"red\": {\"surrogates\": [], \"score\": 100, \"teams\": [\"frc4643\", \"frc1678\", \"frc368\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm83",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "EtjWkKyqK3A"
+    ],
+    "actual_time": "2016-04-09T18:42:35",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 84,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc2035",
+      "frc751",
+      "frc649",
+      "frc4159",
+      "frc972",
+      "frc3482"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T18:40:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 63, \"teams\": [\"frc4159\", \"frc972\", \"frc3482\"]}, \"red\": {\"surrogates\": [], \"score\": 74, \"teams\": [\"frc2035\", \"frc751\", \"frc649\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm84",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "u5eoFNu9sp4"
+    ],
+    "actual_time": "2016-04-09T18:49:51",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 85,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc670",
+      "frc2854",
+      "frc3303",
+      "frc852",
+      "frc5104",
+      "frc604"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T18:47:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 72, \"teams\": [\"frc852\", \"frc5104\", \"frc604\"]}, \"red\": {\"surrogates\": [], \"score\": 71, \"teams\": [\"frc670\", \"frc2854\", \"frc3303\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm85",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "0uhLrxQov9U"
+    ],
+    "actual_time": "2016-04-09T18:56:21",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 86,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc256",
+      "frc254",
+      "frc4904",
+      "frc846",
+      "frc5089",
+      "frc5905"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T18:54:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 90, \"teams\": [\"frc846\", \"frc5089\", \"frc5905\"]}, \"red\": {\"surrogates\": [], \"score\": 115, \"teams\": [\"frc256\", \"frc254\", \"frc4904\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm86",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "Nw-c54d9D30",
+      "O3E-fJqSZkc"
+    ],
+    "actual_time": "2016-04-09T19:03:20",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "qm",
+    "match_number": 9,
+    "updated": "2017-01-26T00:31:50",
+    "team_key_names": [
+      "frc368",
+      "frc4904",
+      "frc2367",
+      "frc2135",
+      "frc972",
+      "frc1662"
+    ],
+    "created": "2016-04-08T02:11:06",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-08T16:59:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"surrogates\": [], \"score\": 60, \"teams\": [\"frc2135\", \"frc972\", \"frc1662\"]}, \"red\": {\"surrogates\": [], \"score\": 84, \"teams\": [\"frc368\", \"frc4904\", \"frc2367\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_qm9",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "mjQL5UoPq2A"
+    ],
+    "actual_time": "2016-04-08T17:19:06",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "sf",
+    "match_number": 1,
+    "updated": "2016-04-11T16:25:21",
+    "team_key_names": [
+      "frc254",
+      "frc1678",
+      "frc1662",
+      "frc649",
+      "frc5924",
+      "frc3482"
+    ],
+    "created": "2016-04-09T21:33:03",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T22:12:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"score\": 114, \"teams\": [\"frc649\", \"frc5924\", \"frc3482\"]}, \"red\": {\"score\": 195, \"teams\": [\"frc254\", \"frc1678\", \"frc1662\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_sf1m1",
+    "year": 2016,
+    "push_sent": null,
+    "youtube_videos": [
+      "cGe8wdbfl_E?t=22240"
+    ],
+    "actual_time": "2016-04-09T21:57:02",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "sf",
+    "match_number": 2,
+    "updated": "2016-04-11T16:25:21",
+    "team_key_names": [
+      "frc254",
+      "frc1678",
+      "frc1662",
+      "frc649",
+      "frc5924",
+      "frc3482"
+    ],
+    "created": "2016-04-09T21:33:03",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T22:26:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"score\": 115, \"teams\": [\"frc649\", \"frc5924\", \"frc3482\"]}, \"red\": {\"score\": 190, \"teams\": [\"frc254\", \"frc1678\", \"frc1662\"]}}",
+    "set_number": 1,
+    "__id__": "2016casj_sf1m2",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "cGe8wdbfl_E?t=23665"
+    ],
+    "actual_time": "2016-04-09T22:20:48",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "sf",
+    "match_number": 1,
+    "updated": "2016-04-11T16:25:21",
+    "team_key_names": [
+      "frc368",
+      "frc971",
+      "frc3303",
+      "frc3256",
+      "frc5700",
+      "frc4904"
+    ],
+    "created": "2016-04-09T21:48:03",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T22:19:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"score\": 120, \"teams\": [\"frc3256\", \"frc5700\", \"frc4904\"]}, \"red\": {\"score\": 158, \"teams\": [\"frc368\", \"frc971\", \"frc3303\"]}}",
+    "set_number": 2,
+    "__id__": "2016casj_sf2m1",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "cGe8wdbfl_E?t=22774"
+    ],
+    "actual_time": "2016-04-09T22:05:57",
+    "no_auto_update": false
+  },
+  {
+    "comp_level": "sf",
+    "match_number": 2,
+    "updated": "2016-04-11T16:25:21",
+    "team_key_names": [
+      "frc368",
+      "frc971",
+      "frc3303",
+      "frc3256",
+      "frc5700",
+      "frc4904"
+    ],
+    "created": "2016-04-09T21:48:03",
+    "tba_videos": [],
+    "event": "2016casj",
+    "time": "2016-04-09T22:33:00",
+    "__kind__": "Match",
+    "alliances_json": "{\"blue\": {\"score\": 100, \"teams\": [\"frc3256\", \"frc5700\", \"frc4904\"]}, \"red\": {\"score\": 137, \"teams\": [\"frc368\", \"frc971\", \"frc3303\"]}}",
+    "set_number": 2,
+    "__id__": "2016casj_sf2m2",
+    "year": 2016,
+    "push_sent": true,
+    "youtube_videos": [
+      "cGe8wdbfl_E?t=24223"
+    ],
+    "actual_time": "2016-04-09T22:30:05",
+    "no_auto_update": false
+  }
+]

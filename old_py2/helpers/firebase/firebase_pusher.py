@@ -259,7 +259,7 @@ class FirebasePusher(object):
     @classmethod
     @ndb.toplevel
     def _update_live_events_helper(cls):
-        week_events = EventHelper.getWeekEvents()
+        week_events = EventHelper.week_events()
         events_by_key = {}
         live_events = []
         for event in week_events:

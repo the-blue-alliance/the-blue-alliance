@@ -1,31 +1,22 @@
+import datetime
 from random import randint
 from typing import List
-from unittest.mock import Mock, patch
+from unittest.mock import ANY, Mock, patch
 from urllib.parse import parse_qsl, urlparse
 
 import bs4
 import pytest
 from flask import Flask
-from werkzeug.test import Client
+from flask.testing import FlaskClient
 
-import backend
-import backend.web.auth as backend_auth
 from backend.common.consts.auth_type import (
+    AuthType,
     WRITE_TYPE_NAMES as AUTH_TYPE_WRITE_TYPE_NAMES,
 )
 from backend.common.sitevars.notifications_enable import NotificationsEnable
 from backend.web.handlers.account import blueprint
 from backend.web.handlers.conftest import CapturedTemplate
 from backend.web.handlers.tests.helpers import assert_alert, get_page_title
-
-
-def user_mock(registered: bool = True) -> Mock:
-    mock = Mock()
-    mock.is_registered = registered
-    mock.api_read_keys = []
-    mock.api_write_keys = []
-    mock.mobile_clients = []
-    return mock
 
 
 def test_blueprint() -> None:
@@ -41,15 +32,18 @@ def test_blueprint() -> None:
 
     rules_map = {str(rule): rule.endpoint for rule in rules}
     assert rules_map == {
+        "/account/api/read_key_add": "account.read_key_add",
+        "/account/api/read_key_delete": "account.read_key_delete",
         "/account/register": "account.register",
         "/account/logout": "account.logout",
         "/account/login": "account.login",
         "/account/edit": "account.edit",
+        "/account/mytba": "account.mytba",
         "/account": "account.overview",
     }
 
 
-def test_overview_logged_out(web_client: Client) -> None:
+def test_overview_logged_out(web_client: FlaskClient) -> None:
     response = web_client.get("/account")
     assert response.status_code == 302
     parsed_response = urlparse(response.headers["Location"])
@@ -59,12 +53,10 @@ def test_overview_logged_out(web_client: Client) -> None:
     }
 
 
-def test_overview_unregistered(web_client: Client) -> None:
-    mock = user_mock(registered=False)
-    with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get("/account")
+def test_overview_unregistered(login_user, web_client: FlaskClient) -> None:
+    login_user.is_registered = False
+
+    response = web_client.get("/account")
 
     assert response.status_code == 302
     parsed_response = urlparse(response.headers["Location"])
@@ -75,14 +67,11 @@ def test_overview_unregistered(web_client: Client) -> None:
 
 
 def test_overview(
+    login_user,
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
-    mock = user_mock()
-    with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get("/account")
+    response = web_client.get("/account")
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
@@ -97,14 +86,6 @@ def test_overview(
         "webhook_verification_success",
         "ping_sent",
         "ping_enabled",
-        "num_favorites",
-        "num_subscriptions",
-        "submissions_pending",
-        "submissions_accepted",
-        "submissions_reviewed",
-        "review_permissions",
-        "api_read_keys",
-        "api_write_keys",
         "auth_write_type_names",
         "user",
     }
@@ -126,6 +107,11 @@ def test_overview(
             False,
         ),
         (
+            "read_key_add_failure",
+            "Unable to add a read API key. If this problem persists, please contact us.",
+            False,
+        ),
+        (
             "read_key_delete_success",
             "The selected read API key has been deleted.",
             True,
@@ -138,17 +124,17 @@ def test_overview(
     ],
 )
 def test_overview_status(
+    login_user,
     status: str,
     message: str,
     success: bool,
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
-    mock = user_mock()
-    with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get("/account?status={}".format(status))
+    with web_client:
+        with web_client.session_transaction() as session:  # pyre-ignore[16]
+            session["account_status"] = status
+        response = web_client.get("/account")
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
@@ -165,14 +151,11 @@ def test_overview_status(
 
 
 def test_overview_no_status(
+    login_user,
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
-    mock = user_mock()
-    with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get("/account")
+    response = web_client.get("/account")
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
@@ -188,20 +171,15 @@ def test_overview_no_status(
 
 
 def test_overview_webhook_verification_success(
+    login_user,
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     webhook_verification_success = "1"
 
-    mock = user_mock()
-    with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get(
-            "/account?webhook_verification_success={}".format(
-                webhook_verification_success
-            )
-        )
+    response = web_client.get(
+        "/account?webhook_verification_success={}".format(webhook_verification_success)
+    )
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
@@ -220,14 +198,11 @@ def test_overview_webhook_verification_success(
 
 
 def test_overview_no_webhook_verification_success(
+    login_user,
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
-    mock = user_mock()
-    with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get("/account")
+    response = web_client.get("/account")
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
@@ -244,16 +219,13 @@ def test_overview_no_webhook_verification_success(
 
 @pytest.mark.parametrize("ping_sent, success", [("1", True), ("0", False)])
 def test_overview_ping_sent(
+    login_user,
     ping_sent: str,
     success: bool,
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
-    mock = user_mock()
-    with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get("/account?ping_sent={}".format(ping_sent))
+    response = web_client.get("/account?ping_sent={}".format(ping_sent))
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
@@ -275,14 +247,11 @@ def test_overview_ping_sent(
 
 
 def test_overview_no_ping_sent(
+    login_user,
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
-    mock = user_mock()
-    with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get("/account")
+    response = web_client.get("/account")
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
@@ -298,31 +267,21 @@ def test_overview_no_ping_sent(
 
 
 def test_ping_enabled(
+    login_user,
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
-    mock = user_mock()
     # Add a dummy client so we have something to ping, to check that the ping rows are disabled
-    mock.mobile_clients = [Mock()]
+    login_user.mobile_clients = [Mock()]
 
-    with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
-    ), patch.object(
-        backend.web.handlers.account, "current_user", return_value=mock
-    ), patch.object(
-        backend_auth, "current_user", return_value=mock
-    ), patch.object(
-        NotificationsEnable, "notifications_enabled", return_value=True
-    ):
+    with patch.object(NotificationsEnable, "notifications_enabled", return_value=True):
         response = web_client.get("/account")
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
 
     template = captured_templates[0][0]
-    context = captured_templates[0][1]
     assert template.name == "account_overview.html"
-    assert context["ping_enabled"] == ""
 
     soup = bs4.BeautifulSoup(response.data, "html.parser")
     ping_button = soup.find("button", attrs={"class": "ping"})
@@ -330,31 +289,21 @@ def test_ping_enabled(
 
 
 def test_ping_disabled(
+    login_user,
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
-    mock = user_mock()
     # Add a dummy client so we have something to ping, to check that the ping rows are disabled
-    mock.mobile_clients = [Mock()]
+    login_user.mobile_clients = [Mock()]
 
-    with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
-    ), patch.object(
-        backend.web.handlers.account, "current_user", return_value=mock
-    ), patch.object(
-        backend_auth, "current_user", return_value=mock
-    ), patch.object(
-        NotificationsEnable, "notifications_enabled", return_value=False
-    ):
+    with patch.object(NotificationsEnable, "notifications_enabled", return_value=False):
         response = web_client.get("/account")
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
 
     template = captured_templates[0][0]
-    context = captured_templates[0][1]
     assert template.name == "account_overview.html"
-    assert context["ping_enabled"] == "disabled"
 
     soup = bs4.BeautifulSoup(response.data, "html.parser")
     ping_button_disabled = soup.find("button", attrs={"class": "ping", "disabled": ""})
@@ -362,145 +311,149 @@ def test_ping_disabled(
 
 
 def test_num_favorites(
+    login_user,
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     favorites_count = randint(1, 100)
 
-    mock = user_mock()
-    mock.favorites_count = favorites_count
+    login_user.favorites_count = favorites_count
 
-    with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
-    ), patch.object(
-        backend.web.handlers.account, "current_user", return_value=mock
-    ), patch.object(
-        backend_auth, "current_user", return_value=mock
-    ):
-        response = web_client.get("/account")
+    response = web_client.get("/account")
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
 
     template = captured_templates[0][0]
-    context = captured_templates[0][1]
     assert template.name == "account_overview.html"
-    assert context["num_favorites"] == favorites_count
+
+    soup = bs4.BeautifulSoup(response.data, "html.parser")
+    mytba_favorites_row = soup.find(id="mytba-favorites-count-row")
+
+    assert mytba_favorites_row is not None
+    assert mytba_favorites_row.text.strip() == "Favorites:\n{}".format(favorites_count)
 
 
 def test_num_subscriptions(
+    login_user,
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     subscriptions_count = randint(1, 100)
 
-    mock = user_mock()
-    mock.subscriptions_count = subscriptions_count
+    login_user.subscriptions_count = subscriptions_count
 
-    with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get("/account")
+    response = web_client.get("/account")
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
 
     template = captured_templates[0][0]
-    context = captured_templates[0][1]
     assert template.name == "account_overview.html"
-    assert context["num_subscriptions"] == subscriptions_count
+
+    soup = bs4.BeautifulSoup(response.data, "html.parser")
+    mytba_subscriptions_row = soup.find(id="mytba-subscriptions-count-row")
+
+    assert mytba_subscriptions_row is not None
+    assert mytba_subscriptions_row.text.strip() == "Subscriptions:\n{}".format(
+        subscriptions_count
+    )
 
 
 def test_submissions_pending(
+    login_user,
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     submissions_pending_count = randint(1, 100)
 
-    mock = user_mock()
-    mock.submissions_pending_count = submissions_pending_count
+    login_user.submissions_pending_count = submissions_pending_count
 
-    with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get("/account")
+    response = web_client.get("/account")
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
 
     template = captured_templates[0][0]
-    context = captured_templates[0][1]
     assert template.name == "account_overview.html"
-    assert context["submissions_pending"] == submissions_pending_count
+
+    soup = bs4.BeautifulSoup(response.data, "html.parser")
+    submissions_pending_row = soup.find(id="submissions-pending-count-row")
+
+    assert submissions_pending_row is not None
+    assert submissions_pending_row.text.strip() == "Pending:\n{}".format(
+        submissions_pending_count
+    )
 
 
 def test_submissions_accepted(
+    login_user,
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     submissions_accepted_count = randint(1, 100)
 
-    mock = user_mock()
-    mock.submissions_accepted_count = submissions_accepted_count
+    login_user.submissions_accepted_count = submissions_accepted_count
 
-    with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get("/account")
+    response = web_client.get("/account")
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
 
     template = captured_templates[0][0]
-    context = captured_templates[0][1]
     assert template.name == "account_overview.html"
-    assert context["submissions_accepted"] == submissions_accepted_count
+
+    soup = bs4.BeautifulSoup(response.data, "html.parser")
+    submissions_accepted_row = soup.find(id="submissions-accepted-count-row")
+
+    assert submissions_accepted_row is not None
+    assert submissions_accepted_row.text.strip() == "Accepted:\n{}".format(
+        submissions_accepted_count
+    )
 
 
 def test_submissions_reviewed(
+    login_user,
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
     submissions_reviewed_count = randint(1, 100)
 
-    mock = user_mock()
-    mock.submissions_reviewed_count = submissions_reviewed_count
+    login_user.submissions_reviewed_count = submissions_reviewed_count
 
-    with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get("/account")
+    response = web_client.get("/account")
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
 
     template = captured_templates[0][0]
-    context = captured_templates[0][1]
     assert template.name == "account_overview.html"
-    assert context["submissions_reviewed"] == submissions_reviewed_count
+
+    soup = bs4.BeautifulSoup(response.data, "html.parser")
+    submissions_reviewed_row = soup.find(id="submissions-reviewed-count-row")
+
+    assert submissions_reviewed_row is not None
+    assert submissions_reviewed_row.text.strip() == "Reviewed:\n{}".format(
+        submissions_reviewed_count
+    )
 
 
 @pytest.mark.parametrize("has_review_permissions", [(True), (False)])
 def test_has_review_permissions(
+    login_user,
     has_review_permissions: bool,
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
-    mock = user_mock()
-    mock.has_review_permissions = has_review_permissions
+    login_user.has_review_permissions = has_review_permissions
 
-    with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get("/account")
+    response = web_client.get("/account")
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
 
     template = captured_templates[0][0]
-    context = captured_templates[0][1]
     assert template.name == "account_overview.html"
-    assert context["review_permissions"] == has_review_permissions
 
     soup = bs4.BeautifulSoup(response.data, "html.parser")
     review_permissions_row = soup.find(id="review-permissions-row")
@@ -511,61 +464,148 @@ def test_has_review_permissions(
         assert review_permissions_row is None
 
 
+@pytest.mark.parametrize("setup_keys", [(True), (False)])
 def test_api_read_keys(
+    login_user,
+    setup_keys: bool,
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
-    api_read_keys = [Mock()]
+    api_key_id = "some_api_key"
+    api_key_created = datetime.datetime.now()
+    api_key_description = "Testing API Read Key"
 
-    mock = user_mock()
-    mock.api_read_keys = api_read_keys
+    api_read_key = Mock()
+    api_read_key.created = api_key_created
+    api_read_key.description = api_key_description
+    api_read_key.key.configure_mock(**{"id.return_value": api_key_id})
 
-    with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get("/account")
+    login_user.api_read_keys = [api_read_key] if setup_keys else []
+
+    response = web_client.get("/account")
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
 
     template = captured_templates[0][0]
-    context = captured_templates[0][1]
     assert template.name == "account_overview.html"
-    assert context["api_read_keys"] == api_read_keys
+
+    soup = bs4.BeautifulSoup(response.data, "html.parser")
+    api_read = soup.find_all("tr", attrs={"class": "api-read-key"})
+
+    if setup_keys:
+        assert len(api_read) == 1
+        api_read = api_read[0]
+        assert [td.text.strip() for td in api_read.find_all("td")] == [
+            "some_api_key",
+            api_key_created.strftime("%Y-%m-%d"),
+            api_key_description,
+            "Delete",
+        ]
+
+        # Last TD should be a form with proper delete information
+        delete_form = api_read.find("form")
+        assert delete_form is not None
+        assert delete_form.get("method") == "POST"
+        assert delete_form.get("action") == "/account/api/read_key_delete"
+
+        delete_form_input = delete_form.find_all("input")
+        assert set([input.get("type") for input in delete_form_input]) == {"hidden"}
+        assert [
+            (input.get("name"), input.get("value")) for input in delete_form_input
+        ] == [("key_id", "some_api_key"), ("csrf_token", ANY)]
+
+        delete_form_button = delete_form.find(
+            "button", attrs={"class": "btn btn-danger", "type": "submit"}
+        )
+        assert delete_form_button.text == " Delete"
+    else:
+        assert len(api_read) == 0
 
 
+@pytest.mark.parametrize(
+    "setup_keys, key_expires", [(True, False), (True, True), (False, False)]
+)
 def test_api_write_keys(
+    login_user,
+    setup_keys: bool,
+    key_expires: bool,
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
-    api_write_keys = [Mock(event_list=[], auth_types_enum=[])]
+    event = Mock()
+    event_id = "event_id"
+    event.configure_mock(**{"id.return_value": event_id})
 
-    mock = user_mock()
-    mock.api_write_keys = api_write_keys
+    api_key_id = "some_api_key"
+    api_key_secret = "some_api_key_secret"
+    api_write_key_expiration = datetime.datetime.now()
+    api_write_key = Mock(
+        event_list=[event],
+        auth_types_enum=[AuthType.MATCH_VIDEO, AuthType.ZEBRA_MOTIONWORKS],
+    )
+    if key_expires:
+        api_write_key.expiration = api_write_key_expiration
+    else:
+        api_write_key.expiration = None
+    api_write_key.secret = api_key_secret
+    api_write_key.key.configure_mock(**{"id.return_value": api_key_id})
 
-    with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get("/account")
+    login_user.api_write_keys = [api_write_key] if setup_keys else []
+
+    response = web_client.get("/account")
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
 
     template = captured_templates[0][0]
-    context = captured_templates[0][1]
     assert template.name == "account_overview.html"
-    assert context["api_write_keys"] == api_write_keys
+
+    soup = bs4.BeautifulSoup(response.data, "html.parser")
+    api_write = soup.find_all("tr", attrs={"class": "api-write-key"})
+
+    if setup_keys:
+        assert len(api_write) == 1
+        api_write = api_write[0]
+
+        api_write_tds = api_write.find_all("td")
+
+        # First TD is two links - one to the event + one to event wizard
+        api_write_event_links = api_write_tds[0].find_all("a")
+        assert [(link.get("href"), link.text) for link in api_write_event_links] == [
+            ("/event/event_id", "event_id"),
+            ("/eventwizard?event=event_id", "EventWizard"),
+        ]
+
+        # Second TD is a list of permissions for the key
+        assert [li.text for li in api_write_tds[1].find_all("li")] == [
+            "match video",
+            "zebra motionworks",
+        ]
+
+        # Third TD is the expiration for the key
+        if key_expires:
+            assert api_write_tds[2].text.strip() == api_write_key_expiration.strftime(
+                "%Y-%m-%d"
+            )
+        else:
+            assert api_write_tds[2].text.strip() == "--"
+
+        # Fourth TD is the key ID
+        assert api_write_tds[3].text.strip() == api_key_id
+
+        # Fifth TD is the key secret
+        assert api_write_tds[4].text.strip() == api_key_secret
+    else:
+        assert len(api_write) == 0
 
 
 def test_auth_write_type_names(
+    login_user,
     captured_templates: List[CapturedTemplate],
-    web_client: Client,
+    web_client: FlaskClient,
 ) -> None:
-    mock = user_mock()
-    with patch.object(
-        backend.web.handlers.decorators, "current_user", return_value=mock
-    ), patch.object(backend.web.handlers.account, "current_user", return_value=mock):
-        response = web_client.get("/account")
+    response = web_client.get("/account")
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
@@ -574,3 +614,53 @@ def test_auth_write_type_names(
     context = captured_templates[0][1]
     assert template.name == "account_overview.html"
     assert context["auth_write_type_names"] == AUTH_TYPE_WRITE_TYPE_NAMES
+
+
+def test_overview_api_read_add_form(
+    login_user, captured_templates: List[CapturedTemplate], web_client: FlaskClient
+) -> None:
+    response = web_client.get("/account")
+
+    assert response.status_code == 200
+    assert len(captured_templates) == 1
+
+    template = captured_templates[0][0]
+    assert template.name == "account_overview.html"
+
+    soup = bs4.BeautifulSoup(response.data, "html.parser")
+    api_read_key_form = soup.find("form", id="api-read-key-add")
+    assert api_read_key_form is not None
+    assert api_read_key_form.get("action") == "/account/api/read_key_add"
+    assert api_read_key_form.get("method") == "POST"
+
+    api_read_key_form_inputs = api_read_key_form.find_all("input")
+    assert [
+        (input.get("name"), input.get("value"), input.get("type"))
+        for input in api_read_key_form_inputs
+    ] == [("description", None, "text"), ("csrf_token", ANY, "hidden")]
+
+    api_read_key_form_button = api_read_key_form.find(
+        "button", attrs={"class": "btn btn-success", "type": "submit"}
+    )
+    assert api_read_key_form_button.text == " Add New Key"
+
+
+def test_overview_api_write_add_button(
+    login_user, captured_templates: List[CapturedTemplate], web_client: FlaskClient
+) -> None:
+    response = web_client.get("/account")
+
+    assert response.status_code == 200
+    assert len(captured_templates) == 1
+
+    template = captured_templates[0][0]
+    assert template.name == "account_overview.html"
+
+    soup = bs4.BeautifulSoup(response.data, "html.parser")
+    api_write_key_row = soup.find(
+        "div", attrs={"class": "row"}, id="api-write-keys-row"
+    )
+    api_write_key_row_button = api_write_key_row.find(
+        "a", attrs={"href": "request/apiwrite", "class": "btn btn-success pull-right"}
+    )
+    assert api_write_key_row_button.text == " Request Tokens"

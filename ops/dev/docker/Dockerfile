@@ -27,7 +27,7 @@ RUN echo 1 | update-alternatives --config python
 
 # Add gcloud repository and Cloud SDK dependencies
 RUN apt-get update && apt-get install -y apt-transport-https curl
-RUN echo "deb https://packages.cloud.google.com/apt cloud-sdk-xenial main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+RUN echo "deb https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
 RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 RUN apt-get update && apt-get install -y \
     google-cloud-sdk \
@@ -36,11 +36,18 @@ RUN apt-get update && apt-get install -y \
     google-cloud-sdk-datastore-emulator \
     google-cloud-sdk-pubsub-emulator
 
-# Install nodejs
-RUN apt-get install -y nodejs npm
+# Set up nvm and nodejs
+ENV NVM_DIR /nvm
+ENV NODE_VERSION 14
+RUN mkdir -p $NVM_DIR  \
+    && wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash \
+    && . $NVM_DIR/nvm.sh \
+    && nvm install $NODE_VERSION --silent \
+    && nvm alias default $NODE_VERSION \
+    && nvm use default --silent
 
 # Install pip2 for gcloud dependencies
-RUN curl https://bootstrap.pypa.io/get-pip.py | python2
+RUN curl https://bootstrap.pypa.io/pip/2.7/get-pip.py | python2
 
 # Configure ssh server
 RUN mkdir /var/run/sshd
@@ -54,6 +61,7 @@ EXPOSE 22
 # Expose ports for TBA
 EXPOSE 8000
 EXPOSE 8080-8089
+EXPOSE 9181
 
 # Start SSH server
 CMD ["/usr/sbin/sshd", "-D"]

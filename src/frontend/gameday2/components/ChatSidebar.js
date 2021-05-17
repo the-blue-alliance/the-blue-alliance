@@ -1,4 +1,5 @@
-import React, { PropTypes } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 import muiThemeable from "material-ui/styles/muiThemeable";
 import IconButton from "material-ui/IconButton";
 import ArrowDropUp from "material-ui/svg-icons/navigation/arrow-drop-up";
@@ -138,7 +139,7 @@ class ChatSidebar extends React.Component {
           <div style={chatEmbedContainerStyle}>{renderedChats}</div>
           <Toolbar
             style={switcherToolbarStyle}
-            onTouchTap={() => this.onRequestOpenChatSelector()}
+            onClick={() => this.onRequestOpenChatSelector()}
           >
             <ToolbarGroup>
               <ToolbarTitle text={currentChatName} style={toolbarTitleStyle} />

@@ -1,4 +1,8 @@
+from typing import List
+
+from backend.common.cache_clearing import get_affected_queries
 from backend.common.manipulators.manipulator_base import ManipulatorBase
+from backend.common.models.cached_model import TAffectedReferences
 from backend.common.models.district_team import DistrictTeam
 
 
@@ -7,11 +11,11 @@ class DistrictTeamManipulator(ManipulatorBase[DistrictTeam]):
     Handle DistrictTeam database writes.
     """
 
-    """
     @classmethod
-    def getCacheKeysAndControllers(cls, affected_refs):
-        return CacheClearer.get_districtteam_cache_keys_and_controllers(affected_refs)
-    """
+    def getCacheKeysAndQueries(
+        cls, affected_refs: TAffectedReferences
+    ) -> List[get_affected_queries.TCacheKeyAndQuery]:
+        return get_affected_queries.districtteam_updated(affected_refs)
 
     """
     @classmethod
@@ -33,12 +37,12 @@ class DistrictTeamManipulator(ManipulatorBase[DistrictTeam]):
     @classmethod
     def updateMerge(
         cls,
-        new_district_team: DistrictTeam,
-        old_district_team: DistrictTeam,
+        new_model: DistrictTeam,
+        old_model: DistrictTeam,
         auto_union: bool = True,
     ) -> DistrictTeam:
         """
         Update and return DistrictTeams
         """
-        cls._update_attrs(new_district_team, old_district_team, auto_union)
-        return old_district_team
+        cls._update_attrs(new_model, old_model, auto_union)
+        return old_model

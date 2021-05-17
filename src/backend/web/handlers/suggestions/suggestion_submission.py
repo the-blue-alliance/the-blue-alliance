@@ -2,6 +2,7 @@ from flask import abort, Blueprint, jsonify, redirect, request, url_for
 from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
 
+from backend.common.auth import current_user
 from backend.common.consts.auth_type import WRITE_TYPE_NAMES
 from backend.common.consts.media_type import MediaType
 from backend.common.helpers.media_helper import MediaHelper
@@ -19,8 +20,7 @@ from backend.common.suggestions.suggestion_creator import (
     SuggestionCreationStatus,
     SuggestionCreator,
 )
-from backend.web.auth import current_user
-from backend.web.handlers.decorators import enforce_login, require_login
+from backend.web.decorators import enforce_login, require_login
 from backend.web.profiled_render import render_template
 
 
@@ -69,9 +69,9 @@ def submit_webcast() -> Response:
             url_for(".suggest_webcast", event_key=event_key, status="invalid_url")
         )
 
-    user = current_user()
+    user = none_throws(current_user())
     status = SuggestionCreator.createEventWebcastSuggestion(
-        author_account_key=none_throws(none_throws(user).account_key),
+        author_account_key=none_throws(user.account_key),
         webcast_url=webcast_url,
         webcast_date=webcast_date,
         event_key=event_key,
@@ -121,9 +121,9 @@ def submit_match_video() -> Response:
             url_for(".suggest_match_video", match_key=match_key, status="invalid_url")
         )
 
-    user = current_user()
+    user = none_throws(current_user())
     status = SuggestionCreator.createMatchVideoYouTubeSuggestion(
-        author_account_key=none_throws(none_throws(user).account_key),
+        author_account_key=none_throws(user.account_key),
         youtube_id=youtube_id,
         match_key=match_key,
     )
@@ -189,9 +189,9 @@ def submit_match_video_playlist() -> Response:
         if match_key not in valid_match_keys:
             continue
 
-        user = current_user()
+        user = none_throws(current_user())
         status = SuggestionCreator.createMatchVideoYouTubeSuggestion(
-            author_account_key=none_throws(none_throws(user).account_key),
+            author_account_key=none_throws(user.account_key),
             youtube_id=yt_id,
             match_key=match_key,
         )
@@ -245,9 +245,9 @@ def submit_event_media() -> Response:
     if not event:
         abort(404)
 
-    user = current_user()
+    user = none_throws(current_user())
     status, suggestion = SuggestionCreator.createEventMediaSuggestion(
-        author_account_key=none_throws(none_throws(user).account_key),
+        author_account_key=none_throws(user.account_key),
         media_url=request.form.get("media_url", ""),
         event_key=event_key,
     )
@@ -306,9 +306,9 @@ def submit_team_media() -> Response:
     if not team:
         abort(404)
 
-    user = current_user()
+    user = none_throws(current_user())
     status, suggestion = SuggestionCreator.createTeamMediaSuggestion(
-        author_account_key=none_throws(none_throws(user).account_key),
+        author_account_key=none_throws(user.account_key),
         media_url=request.form.get("media_url", ""),
         team_key=team_key,
         year_str=year_str,
@@ -357,9 +357,9 @@ def submit_team_social_media() -> Response:
     if not team:
         abort(404)
 
-    user = current_user()
+    user = none_throws(current_user())
     status, suggestion = SuggestionCreator.createTeamMediaSuggestion(
-        author_account_key=none_throws(none_throws(user).account_key),
+        author_account_key=none_throws(user.account_key),
         media_url=request.form.get("media_url", ""),
         team_key=team_key,
         year_str=None,
@@ -390,9 +390,9 @@ def submit_apiwrite() -> Response:
     if not Event.validate_key_name(event_key):
         abort(404)
 
-    user = current_user()
+    user = none_throws(current_user())
     status = SuggestionCreator.createApiWriteSuggestion(
-        author_account_key=none_throws(none_throws(user).account_key),
+        author_account_key=none_throws(user.account_key),
         event_key=event_key,
         affiliation=role,
         auth_types=auth_types,
@@ -420,11 +420,11 @@ def suggest_offseason() -> Response:
 @blueprint.route("/suggest/offseason", methods=["POST"])
 @enforce_login
 def submit_offseason() -> Response:
-    user = current_user()
+    user = none_throws(current_user())
     event_name = request.form.get("name", None)
     website = WebsiteHelper.format_url(request.form.get("website", None))
     status, failures = SuggestionCreator.createOffseasonEventSuggestion(
-        author_account_key=none_throws(none_throws(user).account_key),
+        author_account_key=none_throws(user.account_key),
         name=event_name,
         start_date=request.form.get("start_date", None),
         end_date=request.form.get("end_date", None),

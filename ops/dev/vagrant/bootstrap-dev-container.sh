@@ -11,8 +11,10 @@ pip install -r requirements.txt
 pip install -r src/requirements.txt
 
 # nodejs dependencies
-npm install uglify-js --silent
-npm install -g npx gulp-cli uglify-es uglifycss less tslib request swagger-cli --silent
-
+NVM_DIR="/nvm"
+# shellcheck source=/dev/null
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+nvm use default
+npm install
 
 ./ops/build/run_buildweb.sh

@@ -27,6 +27,7 @@ class FMSAPIEventListParser(object):
         'championship': EventType.CMP_FINALS,
         'offseason': EventType.OFFSEASON,
         'offseasonwithazuresync': EventType.OFFSEASON,
+        'remote': EventType.REMOTE,
     }
 
     NON_OFFICIAL_EVENT_TYPES = ['offseason']
@@ -90,6 +91,7 @@ class FMSAPIEventListParser(object):
             short_name = EventHelper.getShortName(name, district_code=event['districtCode'])
             district_enum = EventHelper.parseDistrictName(event['districtCode'].lower()) if event['districtCode'] else DistrictType.NO_DISTRICT
             district_key = District.renderKeyName(self.season, event['districtCode'].lower()) if event['districtCode'] else None
+            address = event.get('address')
             venue = event['venue']
             city = event['city']
             state_prov = event['stateprov']
@@ -147,7 +149,7 @@ class FMSAPIEventListParser(object):
                 city=city,
                 state_prov=state_prov,
                 country=country,
-                venue_address=None,  # Even though FRC API provides address, ElasticSearch is more detailed
+                venue_address=address,
                 year=self.season,
                 event_district_enum=district_enum,
                 district_key=ndb.Key(District, district_key) if district_key else None,

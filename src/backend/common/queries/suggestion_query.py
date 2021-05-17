@@ -7,7 +7,7 @@ from backend.common.queries.database_query import DatabaseQuery
 from backend.common.tasklets import typed_tasklet
 
 
-class SuggestionQuery(DatabaseQuery[List[Suggestion]]):
+class SuggestionQuery(DatabaseQuery[List[Suggestion], None]):
     def __init__(
         self,
         review_state: SuggestionState,

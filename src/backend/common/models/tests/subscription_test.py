@@ -1,15 +1,24 @@
+from random import shuffle
+
 from backend.common.consts.notification_type import NotificationType
 from backend.common.models.subscription import Subscription
 
 
 def test_notification_names():
-    subscription = Subscription(
-        notification_types=[
-            NotificationType.UPCOMING_MATCH,
-            NotificationType.MATCH_SCORE,
-        ]
-    )
-    assert subscription.notification_names == ["upcoming_match", "match_score"]
+    notification_types = [
+        NotificationType.MATCH_SCORE,
+        NotificationType.UPCOMING_MATCH,
+        NotificationType.FINAL_RESULTS,
+    ]
+    shuffle(notification_types)
+
+    subscription = Subscription(notification_types=notification_types)
+    # This order is important - these names should be in a sorted order
+    assert subscription.notification_names == [
+        "Upcoming Match",
+        "Match Score",
+        "Final Results",
+    ]
 
 
 # def test_users_subscribed_to_event_year(self):

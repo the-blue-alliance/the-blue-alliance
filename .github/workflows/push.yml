@@ -4,19 +4,21 @@ on:
   push:
     branches:
       - py3
+      
+concurrency: deploy-${{ github.ref }}
 
 jobs:
   py3-type:
     name: "[py3] Type Check"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
       - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v2.2.2
         with:
           python-version: 3.8
       - name: Cache pip
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.5
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -33,13 +35,13 @@ jobs:
     name: "[py3] Format & Lint"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
       - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v2.2.2
         with:
           python-version: 3.8
       - name: Cache pip
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.5
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -56,13 +58,13 @@ jobs:
     name: "[py3] Test"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
       - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v2.2.2
         with:
           python-version: 3.8
       - name: Cache pip
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.5
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -77,18 +79,18 @@ jobs:
         run: ./ops/test_py3.sh
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v1.0.13
+        uses: codecov/codecov-action@v1.5.0
   node-lint:
     name: "[node] Format & Lint"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
       - name: Set up Node
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v2.1.5
         with:
-          node-version: "10.x"
+          node-version: "14"
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.5
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -102,13 +104,13 @@ jobs:
     name: "[node] Test"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
       - name: Set up Node
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v2.1.5
         with:
-          node-version: "10.x"
+          node-version: "14"
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.5
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -118,37 +120,58 @@ jobs:
       - name: Run Tests
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/test_node.sh
+      - name: Upload coverage to Codecov
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        uses: codecov/codecov-action@v1.5.0
+        with:
+          directory: ./.node_coverage/
+  bash-lint:
+    name: "[bash] Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2.2.2
+        with:
+          python-version: 3.8
+      - name: Cache pip
+        uses: actions/cache@v2.1.5
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install Shellcheck
+        run: |
+          python -m pip install --upgrade pip
+          pip install shellcheck-py
+      - name: Install shfmt
+        run: |
+          mkdir -p $HOME/.local/bin
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          wget "https://github.com/mvdan/sh/releases/download/v3.2.2/shfmt_v3.2.2_linux_amd64" -O $HOME/.local/bin/shfmt
+          chmod +x $HOME/.local/bin/shfmt
+      - name: Run Lint
+        run: ./ops/lint_bash.sh
 
   build-web:
     name: Build Web
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
       - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v2.2.2
         with:
           python-version: 3.8
       - name: Set up Node
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v2.1.5
         with:
-          node-version: "10.x"
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
+          node-version: "14"
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.5
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
-      - name: Install Python Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install -r src/requirements.txt
       - name: Install Node Dependencies
         run: npm install
       - name: Run Build
@@ -163,38 +186,97 @@ jobs:
           name: web-build
           path: src/build
 
+  deploy-queues:
+    name: Deploy Queues
+    runs-on: ubuntu-latest
+    needs: [py3-type, py3-lint, py3-test]
+    if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2.2.2
+        with:
+          python-version: 3.8
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r deploy_requirements.txt
+      - name: Setup Google Cloud Platform
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          version: "321.0.0"
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCLOUD_AUTH }}
+      - name: Deploy
+        run: python3 ops/deploy/deploy_queues.py src/queue.yaml
   deploy-web:
     name: Deploy Web Service
     runs-on: ubuntu-latest
-    needs: [py3-type, py3-lint, py3-test, node-lint, node-test, build-web]
+    needs: [py3-type, py3-lint, py3-test, node-lint, node-test, build-web, deploy-queues]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2.2.2
+        with:
+          python-version: 3.8
       - name: Download production artifacts
         uses: actions/download-artifact@v2
         with:
           name: web-build
           path: src/build
       - name: Setup Google Cloud Platform
-        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        uses: google-github-actions/setup-gcloud@master
         with:
-          version: "294.0.0"
+          version: "321.0.0"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
           service_account_key: ${{ secrets.GCLOUD_AUTH }}
       - name: Deploy
-        run: gcloud components install beta && gcloud beta app deploy src/web.yaml --version 1 --quiet
+        env:
+          REDIS_CACHE_URL: ${{ secrets.REDIS_CACHE_URL }}
+          VPC_CONNECTOR_NAME: ${{ secrets.VPC_CONNECTOR_NAME }}
+        run: ./ops/deploy/deploy_module.sh src/web.yaml
   deploy-api:
     name: Deploy API Service
     runs-on: ubuntu-latest
-    needs: [py3-type, py3-lint, py3-test]
+    needs: [py3-type, py3-lint, py3-test, deploy-queues]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup Google Cloud Platform
-        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      - uses: actions/checkout@v2.3.4
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2.2.2
         with:
-          version: "294.0.0"
+          python-version: 3.8
+      - name: Setup Google Cloud Platform
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          version: "321.0.0"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
           service_account_key: ${{ secrets.GCLOUD_AUTH }}
       - name: Deploy
-        run: gcloud components install beta && gcloud beta app deploy src/api.yaml --version 1 --quiet
+        env:
+          REDIS_CACHE_URL: ${{ secrets.REDIS_CACHE_URL }}
+          VPC_CONNECTOR_NAME: ${{ secrets.VPC_CONNECTOR_NAME }}
+        run: ./ops/deploy/deploy_module.sh src/api.yaml
+  deploy-tasks-io:
+    name: Deploy Tasks IO Service
+    runs-on: ubuntu-latest
+    needs: [py3-type, py3-lint, py3-test, deploy-queues]
+    if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2.2.2
+        with:
+          python-version: 3.8
+      - name: Setup Google Cloud Platform
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          version: "321.0.0"
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCLOUD_AUTH }}
+      - name: Deploy
+        env:
+          REDIS_CACHE_URL: ${{ secrets.REDIS_CACHE_URL }}
+          VPC_CONNECTOR_NAME: ${{ secrets.VPC_CONNECTOR_NAME }}
+        run: ./ops/deploy/deploy_module.sh src/tasks_io.yaml

@@ -11,6 +11,7 @@ from backend.common.helpers.award_helper import AwardHelper
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.media_helper import MediaHelper
+from backend.common.helpers.playlist_helper import PlaylistHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.award import Award
 from backend.common.models.event import Event
@@ -91,9 +92,11 @@ class TeamRenderer(object):
         district_name = None
         district_abbrev = None
         team_district_points = None
+
         team_districts = team_districts_future.get_result()
         for district in team_districts:
-            if district and district.year == year:
+            # Do not show District Points information for 2021 pages
+            if district and district.year == year and district.year != 2021:
                 district_abbrev = district.abbreviation
                 district_name = district.display_name
                 if district.rankings:
@@ -117,14 +120,16 @@ class TeamRenderer(object):
         matches_upcoming = None
         for event in events_sorted:
             event_matches = matches_by_event_key.get(event.key, [])
-            event_awards = AwardHelper.organizeAwards(
+            event_awards = AwardHelper.organize_awards(
                 awards_by_event_key.get(event.key, [])
             )
-            match_count, matches_organized = MatchHelper.organizeMatches(event_matches)
+            match_count, matches_organized = MatchHelper.organized_matches(
+                event_matches
+            )
 
             if event.now:
                 current_event = event
-                matches_upcoming = MatchHelper.upcomingMatches(event_matches)
+                matches_upcoming = MatchHelper.upcoming_matches(event_matches)
 
             """
             if event.within_a_day:
@@ -133,7 +138,7 @@ class TeamRenderer(object):
 
             if year == 2015:
                 display_wlt = None
-                match_avg = EventHelper.calculateTeamAvgScoreFromMatches(
+                match_avg = EventHelper.calculate_team_avg_score(
                     team.key_name, event_matches
                 )
                 year_match_avg_list.append(match_avg)
@@ -141,9 +146,7 @@ class TeamRenderer(object):
             else:
                 qual_avg = None
                 elim_avg = None
-                wlt = EventHelper.calculateTeamWLTFromMatches(
-                    team.key_name, event_matches
-                )
+                wlt = EventHelper.calculate_wlt(team.key_name, event_matches)
                 if event.event_type_enum in event_type.SEASON_EVENT_TYPES:
                     season_wlt_list.append(wlt)
                 else:
@@ -160,16 +163,11 @@ class TeamRenderer(object):
                         team_rank = ranking["rank"]
                         break
 
-            video_ids = []
-            playlist = ""
-            for level in comp_level.COMP_LEVELS:
-                matches = matches_organized[level]
-                for match in matches:
-                    video_ids += [video.split("?")[0] for video in match.youtube_videos]
-            if video_ids:
-                playlist_title = "{} (Team {})".format(event.name, team.team_number)
-                playlist = "https://www.youtube.com/watch_videos?video_ids={}&title={}"
-                playlist = playlist.format(",".join(video_ids), playlist_title)
+            playlist = PlaylistHelper.generate_playlist_link(
+                matches_organized=matches_organized,
+                title="{} (Team {})".format(event.name, team.team_number),
+                allow_levels=comp_level.COMP_LEVELS,
+            )
 
             district_points = None
             if team_district_points:
@@ -200,6 +198,8 @@ class TeamRenderer(object):
 
         season_wlt: Optional[WLTRecord] = None
         offseason_wlt: Optional[WLTRecord] = None
+        total_season_matches = 0
+        total_offseason_matches = 0
         if year == 2015:
             year_qual_scores = []
             year_elim_scores = []
@@ -360,7 +360,7 @@ class TeamRenderer(object):
                 matches = match_query.TeamEventMatchesQuery(
                     team.key_name, event.key_name
                 ).fetch()
-                matches_upcoming = MatchHelper.upcomingMatches(matches)
+                matches_upcoming = MatchHelper.upcoming_matches(matches)
 
             """
             if event.within_a_day:
@@ -368,7 +368,7 @@ class TeamRenderer(object):
             """
 
             if event.key_name in awards_by_event:
-                sorted_awards = AwardHelper.organizeAwards(
+                sorted_awards = AwardHelper.organize_awards(
                     awards_by_event[event.key_name]
                 )
             else:

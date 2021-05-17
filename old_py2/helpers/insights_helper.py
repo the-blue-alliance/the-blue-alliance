@@ -32,7 +32,7 @@ class InsightsHelper(object):
         """
         # Only fetch from DB once
         official_events = Event.query(Event.year == year).order(Event.start_date).fetch(1000)
-        events_by_week = EventHelper.groupByWeek(official_events)
+        events_by_week = EventHelper.group_by_week(official_events)
         week_event_matches = []  # Tuples of: (week, events) where events are tuples of (event, matches)
         for week, events in events_by_week.items():
             if week in {OFFSEASON_EVENTS_LABEL, PRESEASON_EVENTS_LABEL}:

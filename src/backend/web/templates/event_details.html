@@ -88,7 +88,6 @@
         {% if event.website %}<br><span class="glyphicon glyphicon-link"></span> <a href="{{ event.website }}" title="{{ event.name }}" target="_blank">{{ event.website }}</a>{% endif %}
         {% if event.first_eid or event.official %}{% if not event.website %}<br><span class="glyphicon glyphicon-info-sign"></span>{% else %} - {% endif %} details on <a href="{% if event.first_eid %}https://www.firstinspires.org/team-event-search/event?id={{event.first_eid}}{%elif event.official %}https://frc-events.firstinspires.org/{{event.year}}/{{event.first_api_code}}{%endif%}" target="_blank">firstinspires.org</a>{% endif %}
         {% if event.facebook_eid %}<br><span class="glyphicon glyphicon-thumbs-up"></span> <a href="{{ event.facebook_event_url }}" title="Facebook Event" target="_blank">RSVP on Facebook</a><br>{% endif %}
-        {% if event.official and event.year >= 2006 %}<br><span class="glyphicon glyphicon-info-sign"></span> Data provided by the <a href="https://frc-events.firstinspires.org/services/API" target="_blank">FIRST Events API</a>{% endif %}
       </p>
     </div>
   </div>
@@ -100,7 +99,7 @@
         {% if event.details and event.details.rankings_table %}<li><a href="#rankings" data-toggle="tab">Rankings</a></li>{% endif %}
         {% if awards %}<li><a href="#awards" data-toggle="tab">Awards</a></li>{% endif %}
         {% if district_points_sorted %}<li><a href="#district-points" data-toggle="tab">District Points</a></li>{% endif %}
-        <li class="{% if matches.num == 0 %}active{% endif %}"><a href="#teams" data-toggle="tab">Teams <span class="badge">{{num_teams}}</span></a></li>
+        <li class="{% if match_count == 0 %}active{% endif %}"><a href="#teams" data-toggle="tab">Teams <span class="badge">{{num_teams}}</span></a></li>
         {% if event_insights_qual or event_insights_playoff or oprs|length > 0 %}<li><a href="#event-insights" data-toggle="tab">Insights</a></li>{% endif %}
         <li><a href="#media" data-toggle="tab">Media <span class="badge">{{medias_by_slugname.youtube|length}}</span></a></li>
       </ul>
@@ -155,7 +154,7 @@
         {% if matches.qm %}
         <div class="col-sm-6">
           <h3>Qualification Results</h3>
-          {{mtm.qual_match_table(matches)}}
+          {{mtm.qual_match_table(matches, playlist=qual_playlist)}}
         </div>
         {% endif %}
 
@@ -167,9 +166,9 @@
 
           <h3>{% if event.year >= 2015 %}Playoff{% else %}Elimination{% endif %} Results</h3>
           {% if event.playoff_type in double_elim_playoff_types %}
-            {{ mtm.double_elim_table(double_elim_matches) }}
+            {{mtm.double_elim_table(double_elim_matches, playlist=elim_playlist)}}
           {% else %}
-            {{mtm.elim_match_table(matches)}}
+            {{mtm.elim_match_table(matches, playlist=elim_playlist)}}
           {% endif %}
 
           {% if matches.qm %}
@@ -252,7 +251,7 @@
     </div>
     {% endif %}
 
-    <div class="tab-pane {% if matches.num == 0 %}active{% endif %}" id="teams">
+    <div class="tab-pane {% if match_count == 0 %}active{% endif %}" id="teams">
       <div class="row">
         {% if teams_a %}
         <div class="col-sm-6">
@@ -449,8 +448,16 @@
 </div>
 {% endblock %}
 
+{% block footer_content %}
+{% if event.official and event.year >= 2006 %}
+<div class="pull-left">
+  <span class="glyphicon glyphicon-info-sign"></span> Data provided by the <a href="https://frc-events.firstinspires.org/services/API" target="_blank"><em>FIRST</em><sup>®</sup> Events API</a>
+</div>
+{% endif %}
+{% endblock %}
+
 {% block inline_javascript %}
 {% if event.now %}
-<script type="text/javascript" src="/javascript/liveevent.min.js"></script>
+<script type="text/javascript" src="/py3_javascript/liveevent.min.js"></script>
 {% endif %}
 {% endblock %}

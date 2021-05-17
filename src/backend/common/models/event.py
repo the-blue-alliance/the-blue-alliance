@@ -7,6 +7,7 @@ import typing
 from typing import Dict, Generator, List, Optional, Set, Tuple
 
 from google.cloud import ndb
+from google.cloud.datastore import key as datastore_key
 from pyre_extensions import none_throws, safe_cast
 
 from backend.common.consts import event_type
@@ -90,7 +91,9 @@ class Event(CachedModel):
     enable_predictions = ndb.BooleanProperty(default=False)
     remap_teams: Dict[
         str, str
-    ] = ndb.JsonProperty()  # Map of temporary team numbers to pre-rookie and B teams
+    ] = (
+        ndb.JsonProperty()
+    )  # Map of temporary team numbers to pre-rookie and B teams. key is the old team key, value is the new team key
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
@@ -148,6 +151,16 @@ class Event(CachedModel):
         self._updated_attrs = []  # Used in EventManipulator to track what changed
         self._week = None
         super(Event, self).__init__(*args, **kw)
+
+    @classmethod
+    def _global_cache_timeout(cls, key: datastore_key.Key) -> Optional[int]:
+        event: Optional[Event] = Event.get_by_id(key.id_or_name, use_global_cache=False)
+        if not event:
+            return None
+        if event.within_a_day:
+            return 61
+        else:
+            return 60 * 60 * 24  # one day in seconds
 
     @ndb.tasklet
     def get_awards_async(self) -> TypedFuture[List["Award"]]:
@@ -382,13 +395,23 @@ class Event(CachedModel):
     def week_str(self) -> Optional[str]:
         if self.week is None:
             return None
-        if self.year == 2016:
-            return "Week {}".format(0.5 if self.week == 0 else self.week)
-        return "Week {}".format(none_throws(self.week) + 1)
 
-    @property
-    def is_season_event(self) -> bool:
-        return self.event_type_enum in event_type.SEASON_EVENT_TYPES
+        week = none_throws(self.week)
+        if self.year == 2016:
+            return "Week {}".format(0.5 if week == 0 else week)
+        elif self.year == 2021:
+            # Group 2021 Events by their type - depends on both
+            if week == 0:
+                return "Participation"
+            elif week == 2:
+                return "FIRST Innovation Challenge"
+            elif week == 3:
+                return "INFINITE RECHARGE At Home Challenge"
+            elif week == 4:
+                return "Game Design Challenge"
+            else:
+                return "Awards"
+        return "Week {}".format(week + 1)
 
     @ndb.tasklet
     def get_teams_async(self) -> TypedFuture[List["Team"]]:
@@ -406,7 +429,7 @@ class Event(CachedModel):
         return none_throws(self._teams)
 
     @ndb.toplevel
-    def prepAwardsMatchesTeams(
+    def prep_awards_matches_teams(
         self,
     ) -> Generator[
         Tuple[
@@ -641,7 +664,7 @@ class Event(CachedModel):
 
     @classmethod
     def validate_key_name(cls, event_key: str) -> bool:
-        key_name_regex = re.compile(r"^[1-9]\d{3}[a-z]+[0-9]{0,2}$")
+        key_name_regex = re.compile(r"^[1-9]\d{3}(\d{2})?[a-z]+[0-9]{0,2}$")
         match = re.match(key_name_regex, event_key)
         return True if match else False
 
@@ -720,7 +743,7 @@ class Event(CachedModel):
     @property
     def next_match(self):
         from helpers.match_helper import MatchHelper
-        upcoming_matches = MatchHelper.upcomingMatches(self.matches, 1)
+        upcoming_matches = MatchHelper.upcoming_matches(self.matches, 1)
         if upcoming_matches:
             return upcoming_matches[0]
         else:
@@ -729,7 +752,7 @@ class Event(CachedModel):
     @property
     def previous_match(self):
         from helpers.match_helper import MatchHelper
-        recent_matches = MatchHelper.recentMatches(self.matches, 1)[0]
+        recent_matches = MatchHelper.recent_matches(self.matches, 1)[0]
         if recent_matches:
             return recent_matches[0]
         else:

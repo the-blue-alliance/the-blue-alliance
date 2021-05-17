@@ -26,7 +26,6 @@
         <th>Year</th>
         <th>Abbreviation</th>
         <th>Display Name</th>
-        <th>Elasticsearch Name</th>
         <th>Has Rankings</th>
         <th>Has Advancement</th>
     </thead>
@@ -37,7 +36,6 @@
         <td>{{ district.year }}</td>
         <td>{{ district.abbreviation }}</td>
         <td>{{ district.display_name }}</td>
-        <td>{{ district.elasticsearch_name }}</td>
         <td>{% if district.rankings %}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>
         <td><div class="row">
           {% if district.advancement%}<span class="glyphicon glyphicon-ok"><span>{% endif %}

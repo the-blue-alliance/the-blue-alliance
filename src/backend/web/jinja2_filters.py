@@ -3,32 +3,33 @@
 import re
 
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
+from backend.common.models.match import Match
 
 # import time
 # import urllib
 #
 # from models.match import Match
-#
-# defense_render_names_2016 = {
-#     'A_ChevalDeFrise': 'Cheval De Frise',
-#     'A_Portcullis': 'Portcullis',
-#     'B_Ramparts': 'Ramparts',
-#     'B_Moat': 'Moat',
-#     'C_SallyPort': 'Sally Port',
-#     'C_Drawbridge': 'Drawbridge',
-#     'D_RoughTerrain': 'Rough Terrain',
-#     'D_RockWall': 'Rock Wall'
-# }
-#
-#
+
+defense_render_names_2016 = {
+    "A_ChevalDeFrise": "Cheval De Frise",
+    "A_Portcullis": "Portcullis",
+    "B_Ramparts": "Ramparts",
+    "B_Moat": "Moat",
+    "C_SallyPort": "Sally Port",
+    "C_Drawbridge": "Drawbridge",
+    "D_RoughTerrain": "Rough Terrain",
+    "D_RockWall": "Rock Wall",
+}
+
+
 # def ceil(value):
 #     return int(math.ceil(value))
-#
-#
-# def defense_name(value):
-#     if value in defense_render_names_2016:
-#         return defense_render_names_2016[value]
-#     return value
+
+
+def defense_name(value):
+    if value in defense_render_names_2016:
+        return defense_render_names_2016[value]
+    return value
 
 
 def digits(s):
@@ -127,15 +128,13 @@ def yt_start(value):
     return value
 
 
-#
-#
-# def match_short(match_key):
-#     if not Match.validate_key_name(match_key):
-#         return ''
-#     match_id = match_key.split('_')[1]
-#     if match_id.startswith('qm'):
-#         return 'Q{}'.format(match_id[2:])
-#     return match_id.replace('m', '-').upper()
+def match_short(match_key):
+    if not Match.validate_key_name(match_key):
+        return ""
+    match_id = match_key.split("_")[1]
+    if match_id.startswith("qm"):
+        return "Q{}".format(match_id[2:])
+    return match_id.replace("m", "-").upper()
 
 
 _filters = {
@@ -147,6 +146,8 @@ _filters = {
     "slugify": slugify,
     "isoformat": isoformat,
     "yt_start": yt_start,
+    "defense_name": defense_name,
+    "match_short": match_short,
 }
 
 

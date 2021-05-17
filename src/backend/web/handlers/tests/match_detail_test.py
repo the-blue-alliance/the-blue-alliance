@@ -3,6 +3,11 @@ from werkzeug.test import Client
 
 
 def test_get_bad_match_key(web_client: Client) -> None:
+    resp = web_client.get("/match/asoudfhsakj")
+    assert resp.status_code == 404
+
+
+def test_get_bad_match_not_exist(web_client: Client) -> None:
     resp = web_client.get("/match/2020nyny_qm1")
     assert resp.status_code == 404
 

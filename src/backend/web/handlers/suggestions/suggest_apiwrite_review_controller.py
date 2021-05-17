@@ -9,6 +9,7 @@ from google.cloud import ndb
 from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
 
+from backend.common.auth import current_user
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.auth_type import AuthType, WRITE_TYPE_NAMES
 from backend.common.consts.suggestion_state import SuggestionState
@@ -17,7 +18,6 @@ from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey
 from backend.common.models.suggestion import Suggestion
-from backend.web.auth import current_user
 from backend.web.handlers.suggestions.suggestion_review_base import (
     SuggestionsReviewBase,
 )

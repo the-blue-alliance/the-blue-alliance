@@ -1,4 +1,8 @@
+from typing import List
+
+from backend.common.cache_clearing import get_affected_queries
 from backend.common.manipulators.manipulator_base import ManipulatorBase
+from backend.common.models.cached_model import TAffectedReferences
 from backend.common.models.match import Match
 
 
@@ -7,11 +11,11 @@ class MatchManipulator(ManipulatorBase[Match]):
     Handle Match database writes.
     """
 
-    """
     @classmethod
-    def getCacheKeysAndControllers(cls, affected_refs):
-        return CacheClearer.get_match_cache_keys_and_controllers(affected_refs)
-    """
+    def getCacheKeysAndQueries(
+        cls, affected_refs: TAffectedReferences
+    ) -> List[get_affected_queries.TCacheKeyAndQuery]:
+        return get_affected_queries.match_updated(affected_refs)
 
     """
     @classmethod
@@ -149,15 +153,15 @@ class MatchManipulator(ManipulatorBase[Match]):
 
     @classmethod
     def updateMerge(
-        cls, new_match: Match, old_match: Match, auto_union: bool = True
+        cls, new_model: Match, old_model: Match, auto_union: bool = True
     ) -> Match:
 
         # Lets postUpdateHook know if videos went from 0 to >0
-        added_video = not old_match.has_video and new_match.has_video
+        added_video = not old_model.has_video and new_model.has_video
 
-        cls._update_attrs(new_match, old_match, auto_union)
+        cls._update_attrs(new_model, old_model, auto_union)
 
         if added_video:
-            old_match._updated_attrs.add("_video_added")
+            old_model._updated_attrs.add("_video_added")
 
-        return old_match
+        return old_model

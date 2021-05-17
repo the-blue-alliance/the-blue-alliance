@@ -8,9 +8,9 @@ from flask import template_rendered
 from flask.testing import FlaskClient
 from jinja2 import Template
 
+from backend.common import auth
 from backend.common.models.account import Account
-from backend.web import auth
-from backend.web.models.user import User
+from backend.common.models.user import User
 
 
 @pytest.fixture(autouse=True)

@@ -6,7 +6,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
-from datafeeds.offseason_matches_parser import OffseasonMatchesParser
+from datafeeds.parsers.csv.csv_offseason_matches_parser import CSVOffseasonMatchesParser
 from helpers.match_manipulator import MatchManipulator
 from models.event import Event
 from models.match import Match
@@ -111,7 +111,7 @@ class AdminMatchAdd(LoggedInHandler):
         self._require_admin()
         event_key = self.request.get('event_key')
         matches_csv = self.request.get('matches_csv')
-        matches, _ = OffseasonMatchesParser.parse(matches_csv)
+        matches, _ = CSVOffseasonMatchesParser.parse(matches_csv)
 
         event = Event.get_by_id(event_key)
         matches = [Match(
@@ -153,6 +153,11 @@ class AdminMatchEdit(LoggedInHandler):
         self._require_admin()
         alliances_json = self.request.get("alliances_json")
         score_breakdown_json = self.request.get("score_breakdown_json")
+        # Ignore u'None' from form POST
+        score_breakdown_json = score_breakdown_json if score_breakdown_json != "None" else None
+        # Fake JSON load of the score breakdown to ensure the JSON is proper before attempting to save to the DB
+        if score_breakdown_json:
+            json.loads(score_breakdown_json)
         alliances = json.loads(alliances_json)
         tba_videos = json.loads(self.request.get("tba_videos")) if self.request.get("tba_videos") else []
         youtube_videos = json.loads(self.request.get("youtube_videos")) if self.request.get("youtube_videos") else []

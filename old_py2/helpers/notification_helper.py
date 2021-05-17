@@ -83,7 +83,7 @@ class NotificationHelper(object):
             matches = event.matches
             if not matches:
                 continue
-            last_matches = MatchHelper.recentMatches(matches, num=1)
+            last_matches = MatchHelper.recent_matches(matches, num=1)
             next_matches = MatchHelper.upcomingMatches(matches, num=2)
 
             # First, compare the difference between scheduled times of next/last match

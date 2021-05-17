@@ -1,10 +1,14 @@
 from flask import Flask
 from flask_wtf.csrf import CSRFProtect
 
+from backend.common.auth import _user_context_processor
+from backend.common.flask_cache import configure_flask_cache
 from backend.common.logging import configure_logging
 from backend.common.middleware import install_middleware
-from backend.web.auth import _user_context_processor
+from backend.common.url_converters import install_url_converters
 from backend.web.handlers.account import blueprint as account_blueprint
+from backend.web.handlers.apidocs import apidocs_trusted_v1, apidocs_v3
+from backend.web.handlers.district import district_detail
 from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.event import event_detail, event_list
 from backend.web.handlers.gameday import gameday
@@ -29,6 +33,8 @@ configure_logging()
 
 app = Flask(__name__)
 install_middleware(app)
+install_url_converters(app)
+configure_flask_cache(app)
 
 csrf = CSRFProtect()
 csrf.init_app(app)
@@ -37,10 +43,20 @@ app.url_map.strict_slashes = False
 
 app.add_url_rule("/", view_func=index)
 app.add_url_rule("/about", view_func=about)
+app.add_url_rule("/apidocs/trusted/v1", view_func=apidocs_trusted_v1)
+app.add_url_rule("/apidocs/v3", view_func=apidocs_v3)
 app.add_url_rule("/gameday", view_func=gameday)
 
 app.add_url_rule("/event/<event_key>", view_func=event_detail)
 app.add_url_rule("/events/<int:year>", view_func=event_list)
+app.add_url_rule(
+    '/events/<regex("[a-z]+"):district_abbrev>',
+    view_func=district_detail,
+    defaults={"year": None},
+)
+app.add_url_rule(
+    '/events/<regex("[a-z]+"):district_abbrev>/<int:year>', view_func=district_detail
+)
 app.add_url_rule("/events", view_func=event_list, defaults={"year": None})
 
 app.add_url_rule("/match/<match_key>", view_func=match_detail)

@@ -24,9 +24,10 @@ from backend.common.models.tests.util import (
     CITY_STATE_COUNTRY_PARAMETERS,
     LOCATION_PARAMETERS,
 )
+from backend.conftest import clear_cached_queries  # noqa: ETBA0
 
 
-@pytest.mark.parametrize("key", ["2010ct", "2014onto2"])
+@pytest.mark.parametrize("key", ["2010ct", "2014onto2", "202121fim"])
 def test_valid_key_names(key: str) -> None:
     assert Event.validate_key_name(key) is True
 
@@ -192,6 +193,12 @@ def test_past_future_start_end_today(
         (2016, EventType.REGIONAL, True, 1, 1, "Week 1"),
         (2020, EventType.OFFSEASON, False, 2, None, None),
         (2020, EventType.REGIONAL, False, 2, None, None),
+        (2021, EventType.REGIONAL, True, 0, 0, "Participation"),
+        (2021, EventType.DISTRICT, True, 0, 0, "Participation"),
+        (2021, EventType.REMOTE, True, 2, 2, "FIRST Innovation Challenge"),
+        (2021, EventType.REMOTE, True, 3, 3, "INFINITE RECHARGE At Home Challenge"),
+        (2021, EventType.REMOTE, True, 4, 4, "Game Design Challenge"),
+        (2021, EventType.REMOTE, True, 5, 5, "Awards"),
     ],
 )
 def test_week(
@@ -333,11 +340,13 @@ def test_get_awards() -> None:
     a.put()
 
     event._awards = None
+    clear_cached_queries()
     future = event.get_awards_async()
     assert future.get_result() == [a]
     assert event.awards == [a]
 
     event._awards = None
+    clear_cached_queries()
     assert event.awards == [a]
 
 
@@ -409,10 +418,12 @@ def test_matches() -> None:
     m.put()
 
     event._matches = None
+    clear_cached_queries()
     assert event.matches == [m]
     assert event.get_matches_async().get_result() == [m]
 
     event._matches = None
+    clear_cached_queries()
     event.prep_matches()
     assert event.get_matches_async().get_result() == [m]
     assert event.matches == [m]
@@ -435,5 +446,6 @@ def test_teams() -> None:
     t.put()
 
     event._teams = None
+    clear_cached_queries()
     assert event.teams == [t]
     assert event.get_teams_async().get_result() == [t]

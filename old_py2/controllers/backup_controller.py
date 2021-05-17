@@ -8,6 +8,7 @@ import logging
 import os
 import StringIO
 import time
+import traceback
 
 from google.appengine.api.app_identity import app_identity
 
@@ -26,8 +27,9 @@ from google.appengine.ext.webapp import template
 try:  # Tests fail on import. 2017-11-13
     from google.cloud import bigquery
     from google.cloud.bigquery.job import WriteDisposition
-except Exception:
-    logging.error("bigquery import failed")
+except Exception, e:
+    logging.error("bigquery import failed: {}".format(str(e)))
+    logging.error("Trace: {}".format(traceback.format_exc()))
 
 from helpers.award_manipulator import AwardManipulator
 from helpers.event_manipulator import EventManipulator
@@ -42,9 +44,9 @@ from models.media import Media
 from models.sitevar import Sitevar
 from models.team import Team
 
-from datafeeds.csv_alliance_selections_parser import CSVAllianceSelectionsParser
-from datafeeds.csv_awards_parser import CSVAwardsParser
-from datafeeds.offseason_matches_parser import OffseasonMatchesParser
+from datafeeds.parsers.csv.csv_alliance_selections_parser import CSVAllianceSelectionsParser
+from datafeeds.parsers.csv.csv_awards_parser import CSVAwardsParser
+from datafeeds.parsers.csv.csv_offseason_matches_parser import CSVOffseasonMatchesParser
 
 
 class MainBackupsEnqueue(webapp.RequestHandler):
@@ -361,7 +363,7 @@ class TbaCSVBackupEventDo(webapp.RequestHandler):
     def get(self, event_key):
         event = Event.get_by_id(event_key)
 
-        event.prepAwardsMatchesTeams()
+        event.prep_awards_matches_teams()
 
         if event.awards:
             with cloudstorage.open(self.AWARDS_FILENAME_PATTERN.format(event.year, event_key, event_key), 'w') as awards_file:
@@ -503,7 +505,7 @@ class TbaCSVRestoreEventDo(webapp.RequestHandler):
             logging.warning('Unable to retreive url: ' + (self.MATCHES_URL.format(event.year, event_key, event_key)))
         else:
             data = result.content.replace('frc', '').replace('{}_'.format(event_key), '')
-            match_dicts, _ = OffseasonMatchesParser.parse(data)
+            match_dicts, _ = CSVOffseasonMatchesParser.parse(data)
             matches = [
                 Match(
                     id=Match.renderKeyName(

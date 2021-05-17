@@ -136,5 +136,19 @@ AWARD_MATCHING_STRINGS: List[Tuple[AwardType, Tuple[List[str], List[str]]]] = [
     (AwardType.MOST_IMPROVED_TEAM, (["most improved team"], [])),
     (AwardType.WILDCARD, (["wildcard"], [])),
     (AwardType.AUTONOMOUS, (["autonomous"], [])),
+    (
+        AwardType.INNOVATION_CHALLENGE_SEMI_FINALIST,
+        (["innovation challenge semi-finalist"], []),
+    ),
+    (AwardType.ROOKIE_GAME_CHANGER, (["rookie game changer"], [])),
+    (
+        AwardType.SKILLS_COMPETITION_WINNER,
+        (["skills competition", "winner"], ["finalist"]),
+    ),
+    (AwardType.SKILLS_COMPETITION_FINALIST, (["skills competition", "finalist"], [])),
+    (AwardType.ROOKIE_DESIGN, (["rookie design"], [])),
+    (AwardType.ENGINEERING_DESIGN, (["engineering design"], [])),
+    (AwardType.DESIGNERS, (["designer's"], [])),
+    (AwardType.CONCEPT, (["concept"], [])),
     (AwardType.OTHER, (["other", "offseason award", "offseason event award"], [])),
 ]

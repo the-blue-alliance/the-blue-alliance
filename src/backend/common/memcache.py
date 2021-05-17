@@ -5,11 +5,10 @@ import enum
 import pickle
 import struct
 from dataclasses import dataclass, field as dataclass_field
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, TypedDict
 
 import redis
 from pyre_extensions import none_throws
-from typing_extensions import TypedDict
 
 from backend.common.redis import RedisClient
 

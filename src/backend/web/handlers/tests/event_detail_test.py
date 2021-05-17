@@ -43,3 +43,25 @@ def test_render_full_regional(web_client: Client, setup_full_event) -> None:
 
     alliances_table = soup.find(id="event-alliances")
     assert len(alliances_table.find_all("tr")) > 1
+
+
+def test_render_full_regional_round_robin(web_client: Client, setup_full_event) -> None:
+    setup_full_event("2019cmptx")
+
+    resp = web_client.get("/event/2019cmptx")
+    assert resp.status_code == 200
+
+    soup = BeautifulSoup(resp.data, "html.parser")
+    assert soup.find(id="event-name").string == "Einstein Field (Houston) 2019"
+    assert soup.find(itemprop="startDate").string == "April 20, 2019"
+    assert soup.find(itemprop="endDate") is None
+
+    qual_match_table = soup.find(id="qual-match-table")
+    assert qual_match_table is None
+
+    elim_match_table = soup.find(id="elim-match-table")
+    elim_matches = elim_match_table.find("tbody").find_all("tr")
+    assert len(elim_matches) > 1
+
+    alliances_table = soup.find(id="event-alliances")
+    assert len(alliances_table.find_all("tr")) > 1

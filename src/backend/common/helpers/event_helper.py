@@ -1,14 +1,20 @@
+import json
 from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import cast, Dict, List, NamedTuple, Optional
+
+from google.cloud import ndb
 
 from backend.common.consts import comp_level
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.event_type import EventType
+from backend.common.decorators import memoize
+from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.event_team_status import WLTRecord
 from backend.common.models.keys import EventKey, TeamKey
 from backend.common.models.match import Match
+from backend.common.models.team import Team
 
 
 CHAMPIONSHIP_EVENTS_LABEL = "FIRST Championship"
@@ -28,30 +34,41 @@ class TeamAvgScore(NamedTuple):
 
 class EventHelper(object):
     @classmethod
-    def sort_events(cls, events: List[Event]) -> None:
+    def sorted_events(cls, events: List[Event]) -> List[Event]:
         """
-        Sorts by start date then end date
-        Sort is stable
+        Sort events first by end date (ascending), and break ties by start date (ascending)
+        Ex:
+            e1 = Event(start_date=(2010, 3, 1), end_date=(2010, 3, 3))
+            e2 = Event(start_date=(2010, 3, 2), end_date=(2010, 3, 4))
+            e3 = Event(start_date=(2010, 3, 1), end_date=(2010, 3, 4))
+
+            EventHelper.sorted_events([e1, e2, e3])
+            > [e1, e3, e2]
         """
-        events.sort(key=cls._distantFutureIfNoStartDate)
-        events.sort(key=cls._distantFutureIfNoEndDate)
+        return sorted(
+            events,
+            key=lambda x: (
+                cls.end_date_or_distant_future(x),
+                cls.start_date_or_distant_future(x),
+            ),
+        )
 
     @classmethod
-    def _distantFutureIfNoStartDate(cls, event) -> datetime:
+    def start_date_or_distant_future(cls, event: Event) -> datetime:
         if not event.start_date:
             return datetime(2177, 1, 1, 1, 1, 1)
         else:
             return event.time_as_utc(event.start_date)
 
     @classmethod
-    def _distantFutureIfNoEndDate(cls, event) -> datetime:
+    def end_date_or_distant_future(cls, event: Event) -> datetime:
         if not event.end_date:
             return datetime(2177, 1, 1, 1, 1, 1)
         else:
             return event.end_date
 
     @classmethod
-    def groupByWeek(cls, events: List[Event]) -> Dict[str, List[Event]]:
+    def group_by_week(cls, events: List[Event]) -> Dict[str, List[Event]]:
         """
         Events should already be ordered by start_date
         """
@@ -65,7 +82,10 @@ class EventHelper(object):
                 EventType.CMP_DIVISION,
                 EventType.CMP_FINALS,
             }:
-                if event.year >= 2017:
+                if event.year == 2021:
+                    # 2021 had a remote CMP - so only a single CMP
+                    champs_label = CHAMPIONSHIP_EVENTS_LABEL
+                elif event.year >= 2017:
                     champs_label = TWO_CHAMPS_LABEL.format(event.city)
                 else:
                     champs_label = CHAMPIONSHIP_EVENTS_LABEL
@@ -78,6 +98,7 @@ class EventHelper(object):
                 EventType.DISTRICT,
                 EventType.DISTRICT_CMP_DIVISION,
                 EventType.DISTRICT_CMP,
+                EventType.REMOTE,
             }:
                 if event.start_date is None or (
                     event.start_date.month == 12 and event.start_date.day == 31
@@ -117,7 +138,7 @@ class EventHelper(object):
         return year == "2015" and event_short not in {"cc", "cacc", "mttd"}
 
     @staticmethod
-    def calculateTeamAvgScoreFromMatches(
+    def calculate_team_avg_score(
         team_key: TeamKey, matches: List[Match]
     ) -> TeamAvgScore:
         """
@@ -152,9 +173,7 @@ class EventHelper(object):
         )
 
     @staticmethod
-    def calculateTeamWLTFromMatches(
-        team_key: TeamKey, matches: List[Match]
-    ) -> WLTRecord:
+    def calculate_wlt(team_key: TeamKey, matches: List[Match]) -> WLTRecord:
         """
         Given a team_key and some matches, find the Win Loss Tie.
         """
@@ -174,3 +193,83 @@ class EventHelper(object):
                 else:
                     wlt["losses"] += 1
         return wlt
+
+    @classmethod
+    @memoize(timeout=3600)  # 1 hour
+    def week_events(cls) -> List[Event]:
+        """
+        Get events this week
+        In general, if an event is currently going on, it shows up in this query
+        An event shows up in this query iff:
+        a) The event is within_a_day
+        OR
+        b) The event.start_date is on or within 4 days after the closest Wednesday/Monday (pre-2020/post-2020)
+        """
+        today = datetime.today()
+
+        # Make sure all events to be returned are within range
+        two_weeks_of_events_keys_future = (
+            Event.query()
+            .filter(Event.start_date >= (today - timedelta(weeks=1)))
+            .filter(Event.start_date <= (today + timedelta(weeks=1)))
+            .order(Event.start_date)
+            .fetch_async(keys_only=True)
+        )
+
+        events = []
+
+        diff_from_week_start = 0 - today.weekday()
+        closest_start_monday = today + timedelta(days=diff_from_week_start)
+
+        two_weeks_of_event_futures = ndb.get_multi_async(
+            two_weeks_of_events_keys_future.get_result()
+        )
+        for event_future in two_weeks_of_event_futures:
+            event = event_future.get_result()
+            if event.within_a_day:
+                events.append(event)
+            else:
+                offset = event.start_date.date() - closest_start_monday.date()
+                if (offset == timedelta(0)) or (
+                    offset > timedelta(0) and offset < timedelta(weeks=1)
+                ):
+                    events.append(event)
+
+        return cls.sorted_events(events)
+
+    @classmethod
+    def remapteams_awards(
+        cls, awards: List[Award], remap_teams: Dict[str, str]
+    ) -> None:
+        """
+        Remaps teams in awards. Mutates in place.
+        In `remap_teams` dictionary, key is the old team key, value is the new team key
+        """
+        for award in awards:
+            new_recipient_json_list = []
+            new_team_list = []
+            # Compute new recipient list and team list
+            for recipient in award.recipient_list:
+                for old_team, new_team in remap_teams.items():
+                    # Convert recipient `team_number` to string for safe comparision
+                    if str(recipient["team_number"]) == old_team[3:]:
+                        award._dirty = True
+                        recipient["team_number"] = new_team[3:]
+
+                # Convert `team_number` down to an int, if possible
+                recipient_team_number = recipient["team_number"]
+                if (
+                    type(recipient_team_number) is str
+                    and recipient_team_number.isdigit()
+                ):
+                    award._dirty = True
+                    recipient["team_number"] = int(recipient_team_number)
+
+                new_recipient_json_list.append(json.dumps(recipient))
+                new_team_list.append(
+                    ndb.Key(Team, "frc{}".format(recipient["team_number"]))
+                )
+
+            # Update
+            award.recipient_json_list = new_recipient_json_list
+            award.team_list = new_team_list

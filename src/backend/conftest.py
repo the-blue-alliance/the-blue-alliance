@@ -5,6 +5,8 @@ from google.cloud.datastore_v1.proto import datastore_pb2_grpc
 from google.cloud.ndb import _datastore_api
 from InMemoryCloudDatastoreStub import datastore_stub
 
+from backend.common.deferred.clients.fake_client import FakeTaskClient
+from backend.common.models.cached_query_result import CachedQueryResult
 from backend.tests.json_data_importer import JsonDataImporter
 
 
@@ -37,12 +39,22 @@ def ndb_stub(monkeypatch: MonkeyPatch) -> datastore_stub.LocalDatastoreStub:
 
 
 @pytest.fixture()
+def task_client():
+    client = FakeTaskClient()
+    client._redis.flushall()
+    yield client
+
+
+@pytest.fixture()
 def ndb_client(init_ndb_env_vars, ndb_stub) -> ndb.Client:
     return ndb.Client()
 
 
 @pytest.fixture()
-def ndb_context(ndb_client: ndb.Client):
+def ndb_context(request, ndb_client: ndb.Client):
+    if "no_auto_ndb_context" in request.keywords:
+        yield
+        return
     with ndb_client.context() as context:
         yield context
 
@@ -50,3 +62,7 @@ def ndb_context(ndb_client: ndb.Client):
 @pytest.fixture()
 def test_data_importer(ndb_client) -> JsonDataImporter:
     return JsonDataImporter(ndb_client)
+
+
+def clear_cached_queries() -> None:
+    ndb.delete_multi(CachedQueryResult.query().fetch(keys_only=True))

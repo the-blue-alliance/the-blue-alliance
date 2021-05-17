@@ -1,4 +1,5 @@
-import React, { PropTypes } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 import muiThemeable from "material-ui/styles/muiThemeable";
 import RaisedButton from "material-ui/RaisedButton";
 import Drawer from "material-ui/Drawer";
@@ -50,7 +51,7 @@ class LayoutDrawer extends React.Component {
           <ListItem
             primaryText={NAME_FOR_LAYOUT[layoutNum]}
             insetChildren
-            onTouchTap={() => this.props.setLayout(layoutNum)}
+            onClick={() => this.props.setLayout(layoutNum)}
             key={i.toString()}
             rightIcon={icon}
             leftIcon={getLayoutSvgIcon(layoutNum)}
@@ -116,7 +117,7 @@ class LayoutDrawer extends React.Component {
               backgroundColor={red500}
               labelColor={fullWhite}
               fullWidth
-              onTouchTap={() => this.handleResetWebcasts()}
+              onClick={() => this.handleResetWebcasts()}
             />
           </div>
         </div>

@@ -1,14 +1,16 @@
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List, NamedTuple, Optional, Tuple
 
 import bs4
 from google.cloud import ndb
 
 from backend.common.consts.event_type import EventType
+from backend.common.models.district import District
+from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
-from backend.common.models.keys import EventKey, TeamNumber
+from backend.common.models.keys import DistrictKey, EventKey, TeamNumber
 from backend.common.models.team import Team
 
 
@@ -47,6 +49,14 @@ class TeamEventHistory(NamedTuple):
     awards: List[str]
 
 
+class ParsedTeam(NamedTuple):
+    team_number: TeamNumber
+    team_number_link: Optional[str]
+    team_name: str
+    team_name_link: Optional[str]
+    team_location: str
+
+
 def preseed_team(ndb_client: ndb.Client, team_number: TeamNumber) -> None:
     with ndb_client.context():
         Team(
@@ -73,6 +83,56 @@ def preseed_event(ndb_client: ndb.Client, event_key: EventKey) -> None:
             start_date=datetime(2020, 3, 1),
             end_date=datetime(2020, 3, 5),
         ).put()
+
+
+def preseed_district(ndb_client: ndb.Client, district_key: DistrictKey) -> None:
+    year = int(district_key[:4])
+    with ndb_client.context():
+        District(
+            id=district_key,
+            year=year,
+            abbreviation=district_key[4:],
+            display_name=district_key[4:].upper(),
+        ).put()
+
+        ndb.put_multi(
+            [
+                Event(
+                    id=f"{year}event{i}",
+                    event_short=f"event{i}",
+                    year=year,
+                    name=f"Event {i}",
+                    district_key=ndb.Key(District, district_key),
+                    event_type_enum=EventType.DISTRICT,
+                    official=True,
+                    start_date=datetime(year, 3, 1) + timedelta(days=7 * i),
+                    end_date=datetime(year, 3, 3) + timedelta(days=7 * i),
+                )
+                for i in range(1, 6)
+            ]
+        )
+        ndb.put_multi(
+            [
+                Team(
+                    id=f"frc{i}",
+                    team_number=i,
+                    nickname=f"The {i} Team",
+                    city=f"City {i}",
+                )
+                for i in range(1, 6)
+            ]
+        )
+        ndb.put_multi(
+            [
+                DistrictTeam(
+                    id=f"{district_key}_frc{i}",
+                    year=year,
+                    district_key=ndb.Key(District, district_key),
+                    team=ndb.Key(Team, f"frc{i}"),
+                )
+                for i in range(1, 6)
+            ]
+        )
 
 
 def preseed_event_for_team(
@@ -192,7 +252,6 @@ def get_page_title(resp_data: str) -> str:
 def get_years_participated_dropdown(resp_data: str) -> List[str]:
     soup = bs4.BeautifulSoup(resp_data, "html.parser")
     dropdown = soup.find("ul", id="team-year-dropdown")
-    print(f"{dropdown.contents}")
     return [li.string.strip() for li in dropdown.contents if li.name == "li"]
 
 
@@ -220,3 +279,35 @@ def assert_alert(div: bs4.element.Tag, title: str, message: str, success: bool) 
     alert_message = div.find("p")
     assert alert_message
     assert alert_message.text == message
+
+
+def find_teams_tables(resp_data: str) -> List[bs4.element.Tag]:
+    soup = bs4.BeautifulSoup(resp_data, "html.parser")
+    return soup.find_all(id=re.compile(r"^teams_[ab]$"))
+
+
+def get_teams_from_table(table: bs4.element.Tag) -> List[ParsedTeam]:
+    team_rows = table.find("tbody").find_all("tr")
+    parsed_teams = []
+    for t in team_rows:
+        team_number = t.find(id=re.compile(r"^team-\d+-number"))
+        team_name = t.find(id=re.compile(r"^team-\d+-name"))
+        team_location = t.find(id=re.compile(r"^team-\d+-location"))
+        parsed_teams.append(
+            ParsedTeam(
+                team_number=int(team_number.string),
+                team_number_link=team_number.get("href"),
+                team_name=team_name.string,
+                team_name_link=team_name.get("href"),
+                team_location=team_location.string,
+            )
+        )
+    return parsed_teams
+
+
+def get_all_teams(resp_data: str) -> List[ParsedTeam]:
+    tables = find_teams_tables(resp_data)
+    if len(tables) == 0:
+        return []
+    assert len(tables) == 2
+    return get_teams_from_table(tables[0]) + get_teams_from_table(tables[1])

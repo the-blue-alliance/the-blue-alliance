@@ -1,7 +1,10 @@
 import json
+from typing import List
 
+from backend.common.cache_clearing import get_affected_queries
 from backend.common.manipulators.manipulator_base import ManipulatorBase
 from backend.common.models.award import Award
+from backend.common.models.cached_model import TAffectedReferences
 
 
 class AwardManipulator(ManipulatorBase[Award]):
@@ -9,11 +12,11 @@ class AwardManipulator(ManipulatorBase[Award]):
     Handle Award database writes.
     """
 
-    """
     @classmethod
-    def getCacheKeysAndControllers(cls, affected_refs):
-        return CacheClearer.get_award_cache_keys_and_controllers(affected_refs)
-    """
+    def getCacheKeysAndQueries(
+        cls, affected_refs: TAffectedReferences
+    ) -> List[get_affected_queries.TCacheKeyAndQuery]:
+        return get_affected_queries.award_updated(affected_refs)
 
     """
     @classmethod
@@ -48,7 +51,7 @@ class AwardManipulator(ManipulatorBase[Award]):
 
     @classmethod
     def updateMerge(
-        cls, new_award: Award, old_award: Award, auto_union: bool = True
+        cls, new_model: Award, old_model: Award, auto_union: bool = True
     ) -> Award:
         auto_union_list_attrs = {
             "team_list",
@@ -57,22 +60,22 @@ class AwardManipulator(ManipulatorBase[Award]):
 
         json_list_attrs = {"recipient_json_list"}
 
-        cls._update_attrs(new_award, old_award, auto_union)
+        cls._update_attrs(new_model, old_model, auto_union)
 
         for attr in auto_union_list_attrs:
             # JSON equaltiy comparison is not deterministic
             if attr in json_list_attrs:
-                old_list = [json.loads(j) for j in getattr(old_award, attr)]
-                new_list = [json.loads(j) for j in getattr(new_award, attr)]
+                old_list = [json.loads(j) for j in getattr(old_model, attr)]
+                new_list = [json.loads(j) for j in getattr(new_model, attr)]
             else:
-                old_list = getattr(old_award, attr)
-                new_list = getattr(new_award, attr)
+                old_list = getattr(old_model, attr)
+                new_list = getattr(new_model, attr)
 
             if auto_union:
                 for item in new_list:
                     if item not in old_list:
                         old_list.append(item)
-                        old_award._dirty = True
+                        old_model._dirty = True
             else:
                 old_list = new_list
 
@@ -82,6 +85,6 @@ class AwardManipulator(ManipulatorBase[Award]):
             else:
                 merged_list = old_list
 
-            setattr(old_award, attr, merged_list)
+            setattr(old_model, attr, merged_list)
 
-        return old_award
+        return old_model

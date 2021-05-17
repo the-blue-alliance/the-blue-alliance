@@ -1,8 +1,9 @@
-import React, { PropTypes } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 
 const TwitchChatEmbed = (props) => {
   const id = `twich-chat-${props.channel}`;
-  const src = `https://twitch.tv/embed/${props.channel}/chat`;
+  const src = `https://twitch.tv/embed/${props.channel}/chat?parent=${document.location.hostname}`;
   const style = {
     display: props.visible ? null : "none",
     width: "100%",

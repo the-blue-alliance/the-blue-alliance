@@ -1,4 +1,3 @@
-# Setup Guide
 ## Install Tools
 Local development for The Blue Alliance uses a [Vagrant](https://www.vagrantup.com/) + [Docker](https://www.docker.com/) container setup. This allows for isolation of all dependencies and tools required to run The Blue Alliance locally to be installed in a self-contained instance.
 
@@ -41,4 +40,4 @@ $ vagrant ssh
 ```
 
 ## What’s Next?
-The [[development runbook|Development-Runbook]] has documentation for good next steps when working on The Blue Alliance, including bootstrapping data from production to your development environment, running tests, etc.
+The [[development runbook|Development-Runbook]] has documentation for good next steps when working on The Blue Alliance, including bootstrapping data from production to your development environment. Before submitting a PR, make sure to run the [[tests, lints, and type checks|Test-Lint-Check]] locally.

@@ -1,9 +1,7 @@
 import datetime
-from typing import Optional
+from typing import Optional, TypedDict
 
-from typing_extensions import TypedDict
-
-from backend.common.sitevars.base import SitevarBase
+from backend.common.sitevars.sitevar import Sitevar
 
 
 class WebConfig(TypedDict):
@@ -33,10 +31,14 @@ class ContentType(TypedDict):
     ios: Optional[IOSConfig]
 
 
-class ApiStatus(SitevarBase[ContentType]):
+class ApiStatus(Sitevar[ContentType]):
     @staticmethod
     def key() -> str:
         return "apistatus"
+
+    @staticmethod
+    def description() -> str:
+        return "For setting max year, min app versions, etc."
 
     @staticmethod
     def default_value() -> ContentType:
@@ -48,3 +50,7 @@ class ApiStatus(SitevarBase[ContentType]):
             android=None,
             ios=None,
         )
+
+    @classmethod
+    def status(cls) -> ContentType:
+        return cls.get()

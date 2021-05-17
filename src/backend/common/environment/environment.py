@@ -1,5 +1,7 @@
 import enum
 import os
+import tempfile
+from pathlib import Path
 from typing import Optional
 
 from backend.common.environment.tasks import TasksRemoteConfig
@@ -13,7 +15,11 @@ class EnvironmentMode(enum.Enum):
 
 # Mostly GAE env variables
 # See https://cloud.google.com/appengine/docs/standard/python3/runtime#environment_variables
-class Environment(object):
+class Environment:
+    @staticmethod
+    def is_unit_test() -> bool:
+        return os.environ.get("TBA_UNIT_TEST") == "true"
+
     @staticmethod
     def is_dev() -> bool:
         return os.environ.get("GAE_ENV") == "localdev"
@@ -26,12 +32,6 @@ class Environment(object):
     @staticmethod
     def service() -> Optional[str]:
         return os.environ.get("GAE_SERVICE", None)
-
-    @staticmethod
-    def service_for_current_service() -> str:
-        # Get current service - otherwise, fallback on default service
-        service = Environment.service()
-        return service if service else "default"
 
     @staticmethod
     def project() -> Optional[str]:
@@ -59,3 +59,16 @@ class Environment(object):
     @staticmethod
     def redis_url() -> Optional[str]:
         return os.environ.get("REDIS_CACHE_URL")
+
+    @staticmethod
+    def flask_response_cache_enabled() -> bool:
+        return bool(os.environ.get("FLASK_RESPONSE_CACHE_ENABLED", True))
+
+    @staticmethod
+    def storage_mode() -> EnvironmentMode:
+        return EnvironmentMode(os.environ.get("STORAGE_MODE", "local"))
+
+    @staticmethod
+    def storage_path() -> Path:
+        # Fallback to returning a tmp directory for a storage path
+        return Path(os.environ.get("STORAGE_PATH", tempfile.gettempdir()))

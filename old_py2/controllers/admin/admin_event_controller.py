@@ -11,9 +11,9 @@ from consts.event_type import EventType
 from consts.playoff_type import PlayoffType
 from controllers import event_controller
 from controllers.base_controller import LoggedInHandler
-from datafeeds.csv_advancement_parser import CSVAdvancementParser
-from datafeeds.csv_alliance_selections_parser import CSVAllianceSelectionsParser
-from datafeeds.csv_teams_parser import CSVTeamsParser
+from datafeeds.parsers.csv.csv_advancement_parser import CSVAdvancementParser
+from datafeeds.parsers.csv.csv_alliance_selections_parser import CSVAllianceSelectionsParser
+from datafeeds.parsers.csv.csv_teams_parser import CSVTeamsParser
 from helpers.award_manipulator import AwardManipulator
 from helpers.event.event_test_creator import EventTestCreator
 from helpers.event.event_webcast_adder import EventWebcastAdder
@@ -124,10 +124,10 @@ class AdminPlayoffAdvancementAddController(LoggedInHandler):
             self.redirect("/admin/event/" + event.key_name)
             return
         parsed_advancement = CSVAdvancementParser.parse(advancement_csv, matches_per_team)
-        advancement = PlayoffAdvancementHelper.generatePlayoffAdvancementFromCSV(event, parsed_advancement, comp_level)
+        advancement = PlayoffAdvancementHelper.generate_playoff_advancement_from_csv(event, parsed_advancement, comp_level)
 
-        cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches, event)
-        matches = MatchHelper.organizeMatches(cleaned_matches)
+        cleaned_matches = MatchHelper.delete_invalid_matches(event.matches, event)
+        matches = MatchHelper.organized_matches(cleaned_matches)
         bracket_table = PlayoffAdvancementHelper.generateBracket(matches, event, event.alliance_selections)
         comp_levels = bracket_table.keys()
         for comp_level in comp_levels:
@@ -409,7 +409,7 @@ class AdminEventDeleteMatches(LoggedInHandler):
         if not event:
             self.abort(404)
 
-        organized_matches = MatchHelper.organizeMatches(event.matches)
+        organized_matches = MatchHelper.organized_matches(event.matches)
         if comp_level not in organized_matches:
             self.abort(400)
             return
@@ -437,12 +437,12 @@ class AdminEventDetail(LoggedInHandler):
         event = Event.get_by_id(event_key)
         if not event:
             self.abort(404)
-        event.prepAwardsMatchesTeams()
+        event.prep_awards_matches_teams()
 
         reg_sitevar = Sitevar.get_by_id("cmp_registration_hacks")
         api_keys = ApiAuthAccess.query(ApiAuthAccess.event_list == ndb.Key(Event, event_key)).fetch()
         event_medias = Media.query(Media.references == event.key).fetch(500)
-        playoff_template = PlayoffAdvancementHelper.getPlayoffTemplate(event)
+        playoff_template = PlayoffAdvancementHelper.playoff_template(event)
         elim_bracket_html = jinja2_engine.render(
             "bracket_partials/bracket_table.html", {
                 "bracket_table": event.playoff_bracket,
@@ -456,7 +456,7 @@ class AdminEventDetail(LoggedInHandler):
                 "bracket_table": event.playoff_bracket
             }) if playoff_template else "None"
 
-        organized_matches = MatchHelper.organizeMatches(event.matches)
+        organized_matches = MatchHelper.organized_matches(event.matches)
         match_stats = []
         for comp_level in Match.COMP_LEVELS:
             level_matches = organized_matches[comp_level]

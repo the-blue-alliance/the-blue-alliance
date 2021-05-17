@@ -1,0 +1,2 @@
+# Packages that are needed by the deploy scripts
+PyYAML

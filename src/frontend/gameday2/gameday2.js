@@ -1,4 +1,5 @@
-import "babel-polyfill";
+import "./gameday2.less";
+
 import React from "react";
 import ReactGA from "react-ga";
 import { Provider } from "react-redux";
@@ -6,7 +7,6 @@ import thunk from "redux-thunk";
 import { createStore, applyMiddleware, compose } from "redux";
 import ReactDOM from "react-dom";
 import queryString from "query-string";
-import injectTapEventPlugin from "react-tap-event-plugin";
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import { indigo500, indigo700 } from "material-ui/styles/colors";
 import getMuiTheme from "material-ui/styles/getMuiTheme";
@@ -26,8 +26,6 @@ import { MAX_SUPPORTED_VIEWS } from "./constants/LayoutConstants";
 
 ReactGA.initialize("UA-1090782-9");
 
-injectTapEventPlugin();
-
 const webcastData = JSON.parse(
   document.getElementById("webcasts_json").innerHTML
 );
@@ -37,7 +35,7 @@ const store = createStore(
   gamedayReducer,
   compose(
     applyMiddleware(thunk),
-    window.devToolsExtension ? window.devToolsExtension() : (f) => f
+    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
   )
 );
 firedux.dispatch = store.dispatch;

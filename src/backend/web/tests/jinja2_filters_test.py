@@ -5,6 +5,19 @@ import pytest
 from flask import Flask
 
 from backend.web import jinja2_filters as filters
+from backend.web.jinja2_filters import defense_render_names_2016
+
+
+@pytest.mark.parametrize(
+    "key, name", [(k, v) for k, v in defense_render_names_2016.items()]
+)
+def test_defense_name(key: str, name: str) -> None:
+    assert filters.defense_name(key) == name
+
+
+def test_defense_name_invalid() -> None:
+    invalid_defense_name = "Z_NoDefenseName"
+    assert filters.defense_name(invalid_defense_name) == invalid_defense_name
 
 
 @pytest.mark.parametrize(
@@ -75,6 +88,18 @@ def test_slugify(input: str, output: str) -> None:
 )
 def test_yt_start(input: str, output: str) -> None:
     assert filters.yt_start(input) == output
+
+
+@pytest.mark.parametrize(
+    "input, output",
+    [
+        ("blah", ""),
+        ("2019nyny_qm12", "Q12"),
+        ("2019nyny_sf1m2", "SF1-2"),
+    ],
+)
+def test_match_short(input: str, output: str) -> None:
+    assert filters.match_short(input) == output
 
 
 def test_register_template_filters(empty_app: Flask) -> None:

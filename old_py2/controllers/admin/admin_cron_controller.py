@@ -219,41 +219,6 @@ class AdminRebuildDivisionsDo(LoggedInHandler):
         self.response.out.write(output)
 
 
-class AdminBackfillPlayoffTypeEnqueue(LoggedInHandler):
-    """
-    Enqueue a task to build past event parent/child relationships
-    """
-    def get(self, year):
-        self._require_admin()
-        taskqueue.add(
-            queue_name='admin',
-            target='backend-tasks',
-            url='/backend-tasks/do/backfill_playoff_type/{}'.format(year),
-            method='GET')
-
-
-class AdminBackfillPlayoffTypeDo(LoggedInHandler):
-    """
-    Set playoff types
-    """
-
-    # These offseasons played the 2014 game
-    EXCEPTIONS_2015 = ['2015cc', '2015cacc', '2015mttd']
-
-    def get(self, year):
-        self._require_admin()
-        year = int(year)
-        events = EventListQuery(year).fetch()
-        for event in events:
-            if not event.playoff_type:
-                if event.year == 2015 and event.key_name not in self.EXCEPTIONS_2015:
-                    event.playoff_type = PlayoffType.AVG_SCORE_8_TEAM
-                else:
-                    event.playoff_type = PlayoffType.BRACKET_8_TEAM
-            EventManipulator.createOrUpdate(event)
-        self.response.out.write("Update {} events".format(len(events)))
-
-
 class AdminClearEventTeamsDo(LoggedInHandler):
     """
     Remove all eventteams from an event
@@ -324,8 +289,7 @@ class AdminCreateDistrictsDo(LoggedInHandler):
                 id=district_key,
                 year=year,
                 abbreviation=district_abbrev,
-                display_name=DistrictType.type_names[dcmp.event_district_enum],
-                elasticsearch_name=next((k for k, v in DistrictType.elasticsearch_names.iteritems() if v == dcmp.event_district_enum), None)
+                display_name=DistrictType.type_names[dcmp.event_district_enum]
             )
             districts_to_write.append(district)
 
@@ -377,7 +341,7 @@ class AdminPostEventTasksDo(LoggedInHandler):
         awards = []
         event = event_future.get_result()
         if event.event_type_enum in {EventType.OFFSEASON, EventType.FOC}:
-            matches = MatchHelper.organizeMatches(matches_future.get_result())
+            matches = MatchHelper.organized_matches(matches_future.get_result())
             bracket = PlayoffAdvancementHelper.generateBracket(matches, event, event.alliance_selections)
             if 'f' in bracket:
                 winning_alliance = '{}_alliance'.format(bracket['f']['f1']['winning_alliance'])
