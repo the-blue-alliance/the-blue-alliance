@@ -6,22 +6,18 @@ describe("actions", () => {
     const getState = () => ({
       webcastsById: {},
     });
-    const dispatch = jasmine.createSpy();
+    const dispatch = jest.fn();
     const webcasts = {};
     actions.setWebcastsRaw(webcasts)(dispatch, getState);
-    expect(dispatch.calls.count()).toBe(2);
-    expect(dispatch.calls.argsFor(0)).toEqual([
-      {
-        type: types.SET_WEBCASTS_RAW,
-        webcasts,
-      },
-    ]);
-    expect(dispatch.calls.argsFor(1)).toEqual([
-      {
-        type: types.WEBCASTS_UPDATED,
-        webcasts: {},
-      },
-    ]);
+    expect(dispatch).toHaveBeenCalledTimes(2);
+    expect(dispatch).toHaveBeenNthCalledWith(1, {
+      type: types.SET_WEBCASTS_RAW,
+      webcasts,
+    });
+    expect(dispatch).toHaveBeenNthCalledWith(2, {
+      type: types.WEBCASTS_UPDATED,
+      webcasts: {},
+    });
   });
 
   it("should create an action to toggle the hashtag sidebar visibility", () => {
@@ -52,7 +48,7 @@ describe("actions", () => {
         [webcastId]: {},
       },
     });
-    const dispatch = jasmine.createSpy();
+    const dispatch = jest.fn();
     actions.addWebcast(webcastId)(dispatch, getState);
     expect(dispatch).toHaveBeenCalledWith({
       type: types.ADD_WEBCAST,
@@ -64,9 +60,9 @@ describe("actions", () => {
     const getState = () => ({
       webcastsById: {},
     });
-    const dispatch = jasmine.createSpy();
+    const dispatch = jest.fn();
     actions.addWebcast("a")(dispatch, getState);
-    expect(dispatch.calls.any()).toBe(false);
+    expect(dispatch).not.toHaveBeenCalled();
   });
 
   it("should create an action to add a webcast at a specific position if the webcast ID exists in webcastsById", () => {
@@ -77,7 +73,7 @@ describe("actions", () => {
         [webcastId]: {},
       },
     });
-    const dispatch = jasmine.createSpy();
+    const dispatch = jest.fn();
     actions.addWebcastAtPosition(webcastId, position)(dispatch, getState);
     expect(dispatch).toHaveBeenCalledWith({
       type: types.ADD_WEBCAST_AT_POSITION,
@@ -92,9 +88,9 @@ describe("actions", () => {
     const getState = () => ({
       webcastsById: {},
     });
-    const dispatch = jasmine.createSpy();
+    const dispatch = jest.fn();
     actions.addWebcastAtPosition(webcastId, position)(dispatch, getState);
-    expect(dispatch.calls.any()).toBe(false);
+    expect(dispatch).not.toHaveBeenCalled();
   });
 
   it("should create an action to swap two webcasts", () => {
