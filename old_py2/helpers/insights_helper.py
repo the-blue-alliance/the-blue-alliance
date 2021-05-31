@@ -72,7 +72,8 @@ class InsightsHelper(object):
                 EventType.DISTRICT_CMP,
                 EventType.CMP_DIVISION,
                 EventType.CMP_FINALS,
-                EventType.FOC})
+                EventType.FOC,
+                EventType.REMOTE})
         ).fetch_async(10000, keys_only=True)
         cmp_finalist_award_keys_future = Award.query(
             Award.year == year,
