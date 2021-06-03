@@ -1,5 +1,5 @@
 beautifulsoup4==4.9.3
-black==21.5b1
+black==21.5b2
 flake8==3.9.2
 flake8-import-order
 blinker==1.4
