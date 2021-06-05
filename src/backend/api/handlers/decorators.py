@@ -1,9 +1,12 @@
 import logging
 from functools import wraps
+from typing import Set
 
 from flask import g, request
 
+from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
 from backend.common.auth import current_user
+from backend.common.consts.auth_type import AuthType
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 from backend.common.models.team import Team
@@ -52,6 +55,21 @@ def api_authenticated(func):
         return func(*args, **kwargs)
 
     return decorated_function
+
+
+def require_write_auth(auth_types: Set[AuthType]):
+    def decorator(func):
+        @wraps(func)
+        def decorated_function(*args, **kwargs):
+            event_key = kwargs["event_key"]
+
+            # This will abort the request on failure
+            TrustedApiAuthHelper.do_trusted_api_auth(event_key, auth_types)
+            return func(*args, **kwargs)
+
+        return decorated_function
+
+    return decorator
 
 
 def validate_team_key(func):
