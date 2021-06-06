@@ -85,7 +85,7 @@ def test_not_authenticated(ndb_client: ndb.Client, api_client: Client) -> None:
     with api_client.application.test_request_context():
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
 
-    assert resp.status_code == 400
+    assert resp.status_code == 401
     assert (
         resp.json["Error"] == "Must provide a request header parameter 'X-TBA-Auth-Id'"
     )
@@ -101,7 +101,7 @@ def test_has_auth_id_but_no_sig(ndb_client: ndb.Client, api_client: Client) -> N
             headers={"X-TBA-Auth-Id": "auth_id"},
         )
 
-    assert resp.status_code == 400
+    assert resp.status_code == 401
     assert (
         resp.json["Error"] == "Must provide a request header parameter 'X-TBA-Auth-Sig'"
     )
@@ -143,7 +143,7 @@ def test_eventwizard_permission_not_offseason(
     with api_client.application.test_request_context():
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
 
-    assert resp.status_code == 400
+    assert resp.status_code == 401
     assert "Error" in resp.json
 
 
@@ -162,7 +162,7 @@ def test_eventwizard_permission_not_this_year(
     with api_client.application.test_request_context():
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
 
-    assert resp.status_code == 400
+    assert resp.status_code == 401
     assert "Error" in resp.json
 
 
@@ -205,7 +205,7 @@ def test_account_permission_logged_in_wrong_events(
     with api_client.application.test_request_context():
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
 
-    assert resp.status_code == 400
+    assert resp.status_code == 401
     assert "Error" in resp.json
 
 
@@ -227,7 +227,7 @@ def test_account_permission_logged_in_wrong_permissions(
     with api_client.application.test_request_context():
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
 
-    assert resp.status_code == 400
+    assert resp.status_code == 401
     assert "Error" in resp.json
 
 
@@ -252,7 +252,7 @@ def test_account_permission_logged_in_auth_expired(
     with api_client.application.test_request_context():
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
 
-    assert resp.status_code == 400
+    assert resp.status_code == 401
     assert "Error" in resp.json
 
 

@@ -72,7 +72,7 @@ class TrustedApiAuthHelper:
                             "Error": "Must provide a request header parameter 'X-TBA-Auth-Id'"
                         }
                     ),
-                    400,
+                    401,
                 ),
             )
 
@@ -85,7 +85,7 @@ class TrustedApiAuthHelper:
                             "Error": "Must provide a request header parameter 'X-TBA-Auth-Sig'"
                         }
                     ),
-                    400,
+                    401,
                 )
             )
 
