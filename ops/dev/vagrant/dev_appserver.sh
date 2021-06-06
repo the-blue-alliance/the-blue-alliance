@@ -27,7 +27,6 @@ flask_response_cache_enabled=$(get_config_prop flask_response_cache_enabled)
 storage_mode=$(get_config_prop storage_mode)
 storage_path=$(get_config_prop storage_path)
 application=""
-datastore_args=()
 tasks_args=()
 env=()
 
@@ -67,8 +66,6 @@ function assert_local_storage_path {
 if [ "$datastore_mode" == "local" ]; then
     echo "Starting with datastore emulator"
     emulator_port=8089
-    datastore_path="/datastore/tba.db"
-    datastore_args=("--support_datastore_emulator=true" "--datastore_emulator_port=$emulator_port" "--datastore_path=$datastore_path")
     env+=("--env_var=DATASTORE_EMULATOR_HOST=localhost:$emulator_port" "--env_var=DATASTORE_DATASET=test")
 elif [ "$datastore_mode" == "remote" ]; then
     echo "Starting with remote datastore"
@@ -121,7 +118,6 @@ dev_appserver.py \
     --host=0.0.0.0 \
     --runtime="python37" \
     --application="$application" \
-    "${datastore_args[@]}" \
     "${tasks_args[@]}" \
     "${env[@]}" \
     --env_var TBA_LOG_LEVEL="$tba_log_level" \
