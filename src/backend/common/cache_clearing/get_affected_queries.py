@@ -219,7 +219,8 @@ def team_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
         event_key = et_key.id().split("_")[0]
         page_num = team_query.get_team_page_num(et_key.id().split("_")[1])
         queries.append(team_query.TeamListYearQuery(year, page_num))
-        queries.append(team_query.EventTeamsQuery(event_key))
+        for page in range(team_query.EventTeamsPageQuery.page_count(event_key)):
+            queries.append(team_query.EventTeamsPageQuery(event_key, page))
         queries.append(team_query.EventEventTeamsQuery(event_key))
 
     for dt_key in district_team_keys_future.get_result():
@@ -245,7 +246,8 @@ def eventteam_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQu
             queries.append(team_query.TeamListYearQuery(year, page_num))
 
     for event_key in event_keys:
-        queries.append(team_query.EventTeamsQuery(event_key.id()))
+        for page in range(team_query.EventTeamsPageQuery.page_count(event_key)):
+            queries.append(team_query.EventTeamsPageQuery(event_key, page))
         queries.append(team_query.EventEventTeamsQuery(event_key.id()))
         queries.append(media_query.EventTeamsMediasQuery(event_key.id()))
         queries.append(media_query.EventTeamsPreferredMediasQuery(event_key.id()))

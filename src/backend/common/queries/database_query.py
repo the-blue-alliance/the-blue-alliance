@@ -13,7 +13,7 @@ from backend.common.models.cached_query_result import CachedQueryResult
 from backend.common.profiler import Span
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 from backend.common.queries.exceptions import DoesNotExistException
-from backend.common.queries.types import DictQueryReturn, QueryReturn
+from backend.common.queries.types import DictQueryReturn, QueryResult, QueryReturn
 
 
 class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
@@ -64,6 +64,35 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
         with Span("{}.fetch_dict_async".format(self.__class__.__name__)):
             query_result = yield self._do_dict_query(version, **self._query_args)
             return safe_cast(TypedFuture[DictQueryReturn], query_result)
+
+
+class PaginatedDatabaseQuery(DatabaseQuery, Generic[QueryResult, QueryReturn, DictQueryReturn]):
+    """ An uncached database query, powered by several paginated cached queries """
+    CACHE_KEY_FORMAT: str = ""
+    PAGE_SIZE: int = 500
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+    @abc.abstractmethod
+    def _build_query(self) -> ndb.query.Query:
+        ...
+
+    # TODO: memoize
+    def page_count(self) -> int:
+        # TODO: DRY this?
+        count = self._build_query(**self._query_args).count()
+        return math.ceil(count / cls.PAGE_SIZE)
+
+    def _query_async(self) -> TypedFuture[QueryReturn]:
+        pages = self.page_count()
+        queries = [
+            self._build_query(**self._query_args).fetch_async()
+            for page in range(pages)
+        ]
+        # TODO: Needs a yield ?
+        results = [query.get_result() for query in queries]
+        return list(itertools.chain.from_iterable(results))
 
 
 class CachedDatabaseQuery(DatabaseQuery, Generic[QueryReturn, DictQueryReturn]):

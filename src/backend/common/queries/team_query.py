@@ -1,3 +1,5 @@
+import itertools
+import math
 from typing import List, Optional, Set
 
 from google.cloud import ndb
@@ -8,7 +10,7 @@ from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
 from backend.common.models.team import Team
-from backend.common.queries.database_query import CachedDatabaseQuery
+from backend.common.queries.database_query import CachedDatabaseQuery, DatabaseQuery
 from backend.common.queries.dict_converters.team_converter import (
     TeamConverter,
     TeamDict,
@@ -82,6 +84,7 @@ class TeamListYearQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
         return list(teams)
 
 
+# TODO: Paginate
 class DistrictTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
     CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "district_teams_{district_key}"
@@ -100,19 +103,20 @@ class DistrictTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
         return list(teams)
 
 
-class EventTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
-    CACHE_VERSION = 2
-    CACHE_KEY_FORMAT = "event_teams_{event_key}"
-    DICT_CONVERTER = TeamConverter
+class EventTeamsQuery(PaginatedDatabaseQuery[List[ndb.Key], List[Team], List[TeamDict]]):
 
     def __init__(self, event_key: EventKey) -> None:
         super().__init__(event_key=event_key)
 
+    # # TODO: Do this with generics...
+    # def _build_query(self, event_key: EventKey) -> ndb.query.Query:
+    #     return EventTeam.query(
+    #         EventTeam.event == ndb.Key(Event, event_key)
+    #     )
+
     @typed_tasklet
-    def _query_async(self, event_key: EventKey) -> List[Team]:
-        event_team_keys = yield EventTeam.query(
-            EventTeam.event == ndb.Key(Event, event_key)
-        ).fetch_async(keys_only=True)
+    def _query_async(self, results: List[EventTeam]) -> List[Team]:
+        event_team_keys = yield query.fetch_async(limit=self.PAGE_SIZE, offset=offset, keys_only=True)
         team_keys = map(
             lambda event_team_key: ndb.Key(Team, event_team_key.id().split("_")[1]),
             event_team_keys,
@@ -121,6 +125,17 @@ class EventTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
         return list(teams)
 
 
+class _EventTeamsPageQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "event_teams_{event_key}_{page}"
+    DICT_CONVERTER = TeamConverter
+    PAGE_SIZE: int = 500
+
+    def __init__(self, event_key: EventKey, page: int) -> None:
+        super().__init__(event_key=event_key, page=page)
+
+
+# TODO: Paginate
 class EventEventTeamsQuery(CachedDatabaseQuery[List[EventTeam], List[TeamDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "event_event_teams_{event_key}"
