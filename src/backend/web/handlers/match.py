@@ -1,3 +1,5 @@
+import json
+
 from flask import abort
 from werkzeug.wrappers import Response
 
@@ -5,6 +7,7 @@ from backend.common.decorators import cached_public
 from backend.common.models.event import Event
 from backend.common.models.keys import MatchKey
 from backend.common.models.match import Match
+from backend.common.models.zebra_motionworks import ZebraMotionWorks
 from backend.web.profiled_render import render_template
 
 
@@ -21,8 +24,8 @@ def match_detail(match_key: MatchKey) -> Response:
     if not match:
         abort(404)
 
-    """
     zebra_data = ZebraMotionWorks.get_by_id(match_key)
+    """
     gdcv_data = MatchGdcvDataQuery(match_key).fetch()
     timeseries_data = None
     if gdcv_data and len(gdcv_data) >= 147 and len(gdcv_data) <= 150:  # Santiy checks on data
@@ -41,7 +44,7 @@ def match_detail(match_key: MatchKey) -> Response:
         "match": match,
         "match_breakdown_template": match_breakdown_template,
         "timeseries_data": None,  # timeseries_data,
-        "zebra_data": None,  # json.dumps(zebra_data.data) if zebra_data else None,
+        "zebra_data": json.dumps(zebra_data.data) if zebra_data else None,
     }
 
     return render_template("match_details.html", template_values)
