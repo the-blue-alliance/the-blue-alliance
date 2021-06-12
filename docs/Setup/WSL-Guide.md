@@ -91,3 +91,14 @@ Note that currently, TBA is porting a significant portion of code from Python 2 
 ### Run `vagrant up`
 
 Try running `vagrant up`. If you see an error regarding unable to find the directory `/tba`, try running `vagrant destroy && vagrant up`.
+
+
+### Troubleshooting rsync
+
+You may find that rsync is especially slow on WSL; currently, I/O speed is a problem for WSL. A simple workaround is to use [vagrant-gatling-rsync](https://github.com/smerrill/vagrant-gatling-rsync).
+
+A bash script exists that will install said plugin, modify `Vagrantfile`, and modify `ops/dev/host.sh` in order to improve rsync speed.
+
+```
+$ ./ops/dev/vagrant/fix_wsl_rsync.sh
+```
