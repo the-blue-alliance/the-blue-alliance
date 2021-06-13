@@ -8,7 +8,11 @@ from backend.api.handlers.error import handle_404
 from backend.api.handlers.event import event
 from backend.api.handlers.status import status
 from backend.api.handlers.team import team, team_list, team_list_all, team_list_year
-from backend.api.handlers.trusted import add_match_video, update_teams
+from backend.api.handlers.trusted import (
+    add_match_video,
+    update_event_info,
+    update_teams,
+)
 from backend.common.datafeed_parsers.exceptions import ParserInputException
 from backend.common.flask_cache import configure_flask_cache
 from backend.common.logging import configure_logging
@@ -58,16 +62,20 @@ CORS(
     methods=["OPTIONS", "POST"],
     allow_headers=["Content-Type", "X-TBA-Auth-Id", "X-TBA-Auth-Sig"],
 )
-
 trusted_api.add_url_rule(
-    "/event/<string:event_key>/team_list/update",
+    "/event/<string:event_key>/info/update",
     methods=["POST"],
-    view_func=update_teams,
-)
+    view_func=update_event_info,
+),
 trusted_api.add_url_rule(
     "/event/<string:event_key>/match_videos/add",
     methods=["POST"],
     view_func=add_match_video,
+)
+trusted_api.add_url_rule(
+    "/event/<string:event_key>/team_list/update",
+    methods=["POST"],
+    view_func=update_teams,
 )
 
 
