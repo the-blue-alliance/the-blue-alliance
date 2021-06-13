@@ -15,6 +15,7 @@ from backend.common.models.team import Team
 
 AUTH_ID = "tEsT_id_0"
 AUTH_SECRET = "321tEsTsEcReT"
+REQUEST_PATH = "/api/trusted/v1/event/2014casj/team_list/update"
 
 
 def setup_event() -> None:
@@ -65,6 +66,14 @@ def setup_teams() -> None:
     Team(id="frc100", team_number=100).put()
 
 
+def test_no_auth(ndb_client: ndb.Client, api_client: Client) -> None:
+    with ndb_client.context():
+        setup_event()
+
+    resp = api_client.post(REQUEST_PATH, data=json.dumps([]))
+    assert resp.status_code == 401
+
+
 def test_set_teams(ndb_client: ndb.Client, api_client: Client) -> None:
     with ndb_client.context():
         setup_event()
@@ -72,11 +81,10 @@ def test_set_teams(ndb_client: ndb.Client, api_client: Client) -> None:
         setup_auth(access_types=[AuthType.EVENT_TEAMS])
 
     request_body = json.dumps(["frc254", "frc971", "frc604"])
-    request_path = "/api/trusted/v1/event/2014casj/team_list/update"
 
     response = api_client.post(
-        request_path,
-        headers=get_auth_headers(request_path, request_body),
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
         data=request_body,
     )
     assert response.status_code == 200, response.data
@@ -102,11 +110,10 @@ def test_remove_teams(ndb_client: ndb.Client, api_client: Client) -> None:
         setup_auth(access_types=[AuthType.EVENT_TEAMS])
 
     request_body = json.dumps([])
-    request_path = "/api/trusted/v1/event/2014casj/team_list/update"
 
     response = api_client.post(
-        request_path,
-        headers=get_auth_headers(request_path, request_body),
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
         data=request_body,
     )
     assert response.status_code == 200, response.data
@@ -128,11 +135,10 @@ def test_update_teams(ndb_client: ndb.Client, api_client: Client) -> None:
         setup_auth(access_types=[AuthType.EVENT_TEAMS])
 
     request_body = json.dumps(["frc254", "frc100"])
-    request_path = "/api/trusted/v1/event/2014casj/team_list/update"
 
     response = api_client.post(
-        request_path,
-        headers=get_auth_headers(request_path, request_body),
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
         data=request_body,
     )
     assert response.status_code == 200, response.data
@@ -156,11 +162,10 @@ def test_unknown_teams_skipped(ndb_client: ndb.Client, api_client: Client) -> No
         setup_auth(access_types=[AuthType.EVENT_TEAMS])
 
     request_body = json.dumps(["frc254", "frc971", "frc148"])
-    request_path = "/api/trusted/v1/event/2014casj/team_list/update"
 
     response = api_client.post(
-        request_path,
-        headers=get_auth_headers(request_path, request_body),
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
         data=request_body,
     )
     assert response.status_code == 200, response.data
@@ -184,15 +189,21 @@ def test_bad_team_key(ndb_client: ndb.Client, api_client: Client) -> None:
         setup_auth(access_types=[AuthType.EVENT_TEAMS])
 
     request_body = json.dumps(["frc254", "asdf"])
-    request_path = "/api/trusted/v1/event/2014casj/team_list/update"
 
     response = api_client.post(
-        request_path,
-        headers=get_auth_headers(request_path, request_body),
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
         data=request_body,
     )
     assert response.status_code == 400, response.data
     assert response.json["Error"] == "Invalid team keys provided: ['asdf']"
+
+    with ndb_client.context():
+        db_eventteams = EventTeam.query(
+            EventTeam.event == ndb.Key(Event, "2014casj")
+        ).fetch(keys_only=True)
+
+        assert db_eventteams == []
 
 
 def test_bad_body_format(ndb_client: ndb.Client, api_client: Client) -> None:
@@ -202,11 +213,10 @@ def test_bad_body_format(ndb_client: ndb.Client, api_client: Client) -> None:
         setup_auth(access_types=[AuthType.EVENT_TEAMS])
 
     request_body = "[254]"
-    request_path = "/api/trusted/v1/event/2014casj/team_list/update"
 
     response = api_client.post(
-        request_path,
-        headers=get_auth_headers(request_path, request_body),
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
         data=request_body,
     )
     assert response.status_code == 400, response.data
