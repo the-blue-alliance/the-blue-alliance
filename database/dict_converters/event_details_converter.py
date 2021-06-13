@@ -37,7 +37,7 @@ class EventDetailsConverter(ConverterBase):
         else:
             rankings = {
                 "extra_stats_info": [],
-                "rankings": None,
+                "rankings": [],
                 "sort_order_info": None
             }
 
