@@ -221,7 +221,7 @@ def event_detail(event_key: EventKey) -> Response:
         "playoff_advancement": playoff_advancement,
         "playoff_template": playoff_template,
         "playoff_advancement_tiebreakers": PlayoffAdvancementHelper.ROUND_ROBIN_TIEBREAKERS.get(
-            event.year
+            event.year, []
         ),
         "district_points_sorted": district_points_sorted,
         "event_insights_qual": event_insights["qual"] if event_insights else None,

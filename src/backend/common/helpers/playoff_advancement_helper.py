@@ -77,6 +77,8 @@ class PlayoffAdvancementHelper(object):
         2017: ["Match Points"],
         2018: ["Park/Climb Points", "Auto Points"],
         2019: ["Cargo Points", "Hatch Panel Points"],
+        2020: [],
+        2021: [],
     }
 
     ADVANCEMENT_COUNT_2015: Dict[CompLevel, int] = {
