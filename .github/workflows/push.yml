@@ -79,7 +79,7 @@ jobs:
         run: ./ops/test_py3.sh
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v1.5.2
+        uses: codecov/codecov-action@v2.0.1
   node-lint:
     name: "[node] Format & Lint"
     runs-on: ubuntu-latest
@@ -122,7 +122,7 @@ jobs:
         run: ./ops/test_node.sh
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v1.5.2
+        uses: codecov/codecov-action@v2.0.1
         with:
           directory: ./.node_coverage/
   bash-lint:
