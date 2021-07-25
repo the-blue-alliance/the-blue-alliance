@@ -17,7 +17,7 @@ from backend.common.url_converters import install_regex_url_converter
 
 
 def test_install_defer_routes():
-    route = '/_ah/queue/<regex("deferred.*"):path>'
+    route = '/_ah/queue/<regex("deferred.*?"):path>'
     app = Flask(__name__)
     rules = [r for r in app.url_map.iter_rules() if str(r) == route]
     assert len(rules) == 0
