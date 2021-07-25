@@ -7,7 +7,7 @@
   "dependencies": {
     "classnames": "^2.3.1",
     "element-resize-event": "^3.0.6",
-    "firebase": "^8.6.8",
+    "firebase": "^8.8.0",
     "firedux": "^1.1.0",
     "heatmap.js": "^2.0.5",
     "less-loader": "^10.0.1",
