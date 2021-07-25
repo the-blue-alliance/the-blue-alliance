@@ -49,7 +49,7 @@ def install_defer_routes(app: Flask) -> None:
         install_regex_url_converter(app)
 
     app.add_url_rule(
-        '/_ah/queue/<regex("deferred.*"):path>',
+        '/_ah/queue/<regex("deferred.*?"):path>',
         view_func=handle_defer,
         methods=["POST"],
     )
