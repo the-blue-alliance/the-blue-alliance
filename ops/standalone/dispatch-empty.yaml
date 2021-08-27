@@ -44,6 +44,11 @@ dispatch:
   - url: "py2.thebluealliance.com/*"
     service: default
 
-  # Send everything to default module
+  # Make sure things that need B2 instances still get
+  # higher CPU/memory limits
+  - url: "*/backend-tasks-b2/*"
+    service: backend-tasks-b2
+
+  # Send everything else to default module
   - url: "*/"
     service: default
