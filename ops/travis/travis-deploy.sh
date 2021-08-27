@@ -57,6 +57,7 @@ deploy_single() {
 
 deploy_skeleton() {
   deploy_module app.yaml
+  deploy_module app-backend-tasks-b2.yaml
   deploy_module index.yaml
   deploy_module queue.yaml
 
