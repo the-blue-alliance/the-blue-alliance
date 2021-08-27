@@ -170,6 +170,8 @@ jobs:
         run: paver make
       - name: Deploy app.yaml
         run: gcloud app deploy app.yaml --version prod-2 --quiet
+      - name: Deploy app-backend-tasks-b2.yaml
+        run: gcloud app deploy app-backend-tasks-b2.yaml --version prod-2 --quiet
       - name: Deploy index.yaml
         run: gcloud app deploy index.yaml --version prod-2 --quiet
       - name: Deploy queue.yaml
