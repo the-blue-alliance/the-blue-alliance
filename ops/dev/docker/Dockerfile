@@ -21,7 +21,8 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get install -y \
     python3-pip \
     python3-venv \
-    python2
+    python2 \
+    python-dev
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 RUN echo 1 | update-alternatives --config python
 
