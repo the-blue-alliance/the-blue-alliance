@@ -4,8 +4,8 @@ iso8601==0.1.11
 rsa==3.4.2 # DO NOT BUMP - 4.0 is the last version that supports Python 2
 google-api-python-client==1.7.8
 google-cloud-bigquery==0.25.0
-beautifulsoup4
-GoogleAppEngineCloudStorageClient
+beautifulsoup4==4.9.3
+GoogleAppEngineCloudStorageClient==1.9.22.1
 
 # TBANS
 firebase-admin==3.2.1 # DO NOT BUMP - 3.2.1 is the last version that supports Python 2
@@ -13,9 +13,9 @@ firebase-admin==3.2.1 # DO NOT BUMP - 3.2.1 is the last version that supports Py
 # Cloud Endpoints Stuff
 rsa==3.4.2  # Pin version of rsa used by oauth2client that supports Python 2
 oauth2client==3.0.0
-google-auth
-google-endpoints
-google-endpoints-api-management
-requests-toolbelt
+google-auth==1.35.0
+google-endpoints==4.8.0
+google-endpoints-api-management=1.11.1
+requests-toolbelt==0.9.1
 # See https://github.com/urllib3/urllib3/issues/1456
 urllib3==1.24.2
