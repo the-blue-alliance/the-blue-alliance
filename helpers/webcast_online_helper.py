@@ -64,6 +64,7 @@ class WebcastOnlineHelper(object):
                 result = yield urlfetch.make_fetch_call(rpc, url, method='POST')
             except Exception, e:
                 logging.error("URLFetch failed for: {}".format(url))
+                logging.error(e)
                 raise ndb.Return(None)
 
             if result.status_code == 200:
@@ -84,6 +85,7 @@ class WebcastOnlineHelper(object):
                 })
             except Exception, e:
                 logging.error("URLFetch failed for: {}".format(url))
+                logging.error(e)
                 raise ndb.Return(None)
         else:
             logging.warning("Must have Twitch Client ID & Secret")
