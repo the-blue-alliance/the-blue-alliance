@@ -56,18 +56,37 @@ class WebcastOnlineHelper(object):
         client_id = None
         if twitch_secrets and twitch_secrets.contents:
             client_id = twitch_secrets.contents.get('client_id')
-        if client_id:
+            client_secret = twitch_secrets.contents.get('client_secret')
+        if client_id and client_secret:
+            # Get auth token
+            try:
+                url = 'https://id.twitch.tv/oauth2/token?client_id={}&client_secret={}grant_type=client_credentials'.format(client_id, client_secret)
+                result = yield urlfetch.make_fetch_call(rpc, url, method='POST')
+            except Exception, e:
+                logging.error("URLFetch failed for: {}".format(url))
+                raise ndb.Return(None)
+
+            if result.status_code == 200:
+                response = json.loads(result.content)
+                token = response['access_token']
+            else:
+                logging.warning("Twitch auth failed with status code: {}".format(result.status_code))
+                logging.warning(result.content)
+                raise ndb.Return(None)
+                
+            # Get webcast status
             try:
                 url = 'https://api.twitch.tv/helix/streams?user_login={}'.format(webcast['channel'])
                 rpc = urlfetch.create_rpc()
                 result = yield urlfetch.make_fetch_call(rpc, url, headers={
+                    'Authorization': 'Bearer {}'.format(token),
                     'Client-ID': client_id,
                 })
             except Exception, e:
                 logging.error("URLFetch failed for: {}".format(url))
                 raise ndb.Return(None)
         else:
-            logging.warning("Must have Twitch Client ID")
+            logging.warning("Must have Twitch Client ID & Secret")
             raise ndb.Return(None)
 
         if result.status_code == 200:
