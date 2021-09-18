@@ -61,6 +61,7 @@ class WebcastOnlineHelper(object):
             # Get auth token
             try:
                 url = 'https://id.twitch.tv/oauth2/token?client_id={}&client_secret={}&grant_type=client_credentials'.format(client_id, client_secret)
+                rpc = urlfetch.create_rpc()
                 result = yield urlfetch.make_fetch_call(rpc, url, method='POST')
             except Exception, e:
                 logging.error("URLFetch failed for: {}".format(url))
