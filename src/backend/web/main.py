@@ -1,7 +1,9 @@
-from flask import Flask
+import logging
+from flask import abort, Flask, request, jsonify
 from flask_wtf.csrf import CSRFProtect
 
 from backend.common.auth import _user_context_processor
+from backend.common.deferred import enqueue
 from backend.common.flask_cache import configure_flask_cache
 from backend.common.logging import configure_logging
 from backend.common.middleware import install_middleware
@@ -78,3 +80,9 @@ app.context_processor(_user_context_processor)
 
 register_template_filters(app)
 maybe_install_local_routes(app, csrf)
+
+
+@app.route('/test')
+def test():
+    enqueue(url='/tasks-io/test?test=123&test=345', target='py3-tasks-io', params={"abc": "efg", "abc": "hij"}, method="GET")
+    return "enqueued verified"

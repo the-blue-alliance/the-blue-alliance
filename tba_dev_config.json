@@ -7,5 +7,6 @@
     "ndb_log_level": "warning",
     "flask_response_cache_enabled": "false",
     "storage_mode": "local",
-    "storage_path": "ops/dev/storage"
+    "storage_path": "ops/dev/storage",
+    "google_application_credentials": "ops/dev/keys/test.json"
 }

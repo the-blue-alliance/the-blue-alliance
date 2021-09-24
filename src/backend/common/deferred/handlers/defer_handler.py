@@ -4,7 +4,6 @@ from typing import Any
 
 from flask import abort, Flask, request, Response
 
-from backend.common.environment import Environment
 from backend.common.url_converters import (
     has_regex_url_converter,
     install_regex_url_converter,
@@ -32,8 +31,7 @@ def run(data: bytes) -> Any:
 
 
 def handle_defer(path: str) -> Response:
-    # Ignore XSRF protection in dev env
-    if not Environment.is_dev() and "X-AppEngine-TaskName" not in request.headers:
+    if "X-AppEngine-TaskName" not in request.headers and "X-Google-TBA-RedisTask" not in request.headers:
         logging.error(
             'Detected an attempted XSRF attack. The header "X-AppEngine-TaskName" was not set.'
         )

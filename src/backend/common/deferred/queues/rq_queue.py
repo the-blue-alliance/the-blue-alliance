@@ -29,6 +29,13 @@ class RQTaskQueue(TaskQueue[RQTaskRequest]):
     def _enqueue(self, request: RQTaskRequest) -> None:
         import requests
 
+        # Add `X-Google-TBA-RedisTask` in dev to simulate auth mechanism
+        # If header is attempted to be added in prod to bypass auth, it will be
+        # dropped by App Engine.
+        # https://cloud.google.com/appengine/docs/standard/go/reference/request-response-headers#removed_headers
+        headers = request.headers
+        headers["X-Google-TBA-RedisTask"] = "true"
+
         self._queue.enqueue(
-            requests.post, url=request.url, data=request.body, headers=request.headers
+            requests.post, url=request.url, data=request.body, headers=headers
         )

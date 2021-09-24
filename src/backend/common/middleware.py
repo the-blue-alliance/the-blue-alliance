@@ -1,7 +1,10 @@
+import logging
 from typing import Any, Callable, Optional
 
-from flask import Flask
+from flask import abort, Flask, request
+from google.auth.transport import requests
 from google.cloud import ndb
+from google.oauth2 import id_token
 from werkzeug.wrappers import Request
 from werkzeug.wsgi import ClosingIterator
 
@@ -64,6 +67,50 @@ class AfterResponseMiddleware(NdbMiddleware):
         send_traces()
         with self.ndb_client.context(global_cache=self.global_cache):
             execute_callbacks()
+
+
+def install_backend_security(app: Flask) -> None:
+    @app.before_request
+    def _confirm_security_headers():
+        # Only allow signed requests from TBA services, cron job, or task queue
+        task_header = request.headers.get("X-AppEngine-TaskName")
+        task_header_dev = request.headers.get("X-Google-TBA-RedisTask")
+        cron_header = request.headers.get("X-Appengine-Cron")
+        auth_header = request.headers.get("Authorization")
+        if task_header or task_header_dev or cron_header:
+            return
+        elif auth_header:
+            # Verify that a request is coming from another TBA service
+            # https://cloud.google.com/appengine/docs/standard/python/migrate-to-python3/migrate-app-identity
+
+            # The auth_header must be in the form Authorization: Bearer token.
+            bearer, token = auth_header.split()
+            if bearer.lower() != 'bearer':
+                return abort(403)
+
+            try:
+                info = id_token.verify_oauth2_token(token, requests.Request())
+                service_account_email = info['email']
+                incoming_app_id, domain = service_account_email.split('@')
+                if domain != 'appspot.gserviceaccount.com':  # Not App Engine svc acct
+                    return abort(403)
+
+                project = Environment.project()
+                if not project:
+                    return abort(403)
+
+                if incoming_app_id != project:
+                    return abort(403)
+
+                # TODO: Need to verify things here...
+                print(f"Info: {info}")
+
+                return
+            except Exception as e:
+                logging.warning('Request has bad OAuth2 id token: {}'.format(e))
+                return abort(403)
+
+        return abort(401)
 
 
 def install_middleware(app: Flask, configure_secret_key: bool = True) -> None:

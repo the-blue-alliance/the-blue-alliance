@@ -1,13 +1,17 @@
 import logging
+
 from typing import Any, Callable, Dict, Optional
+from urllib.parse import urlparse
+
+from flask import request
+from google.auth.transport import requests as auth_requests
+from google.oauth2 import id_token
 
 from backend.common.deferred.clients.task_client import TaskClient
 from backend.common.environment import Environment, EnvironmentMode
 from backend.common.redis import RedisClient
 
 
-_TASKQUEUE_HEADERS = {"Content-Type": "application/octet-stream"}
-_DEFAULT_URL = "/_ah/queue/deferred"
 _DEFAULT_QUEUE = "default"
 _DEFAULT_SERVICE = "default"
 
@@ -17,13 +21,13 @@ def defer(
     *args: Any,
     _client: Optional[TaskClient] = None,
     _target: Optional[str] = None,
-    _url: str = _DEFAULT_URL,
-    _headers: Dict[Any, Any] = {},
+    _url: str = "/_ah/queue/deferred",
+    _headers: Dict[str, str] = {},
     _queue: str = _DEFAULT_QUEUE,
     **kwargs: Any,
 ) -> None:
     # TODO: Add support for `countdown`, `eta`, `name`, `retry_options`
-    headers = dict(_TASKQUEUE_HEADERS)
+    headers = dict({"Content-Type": "application/octet-stream"})
     headers.update(_headers)
 
     client = _client if _client else _client_for_env()
@@ -36,6 +40,67 @@ def defer(
     # Attempt to enqueue on the calling service - this mirrors the previous GAE defer functionality
     service = _target if _target else Environment.service()
     queue.enqueue(task, url=_url, headers=headers, service=service)
+
+
+def enqueue(
+    *,
+    url: str,
+    headers: Dict[str, str] = {},
+    method: Optional[str] = "POST",
+    params: Optional[Dict[Any, Any]] = None,
+    queue_name: Optional[str] = _DEFAULT_QUEUE,
+    target: Optional[str] = None
+):
+    # TODO: Add support for `name`, `countdown`, `eta`, `retry_options`
+    defer(_run_enqueue, url, method, params, _target=target, _headers=headers, _queue=queue_name)
+
+
+def _run_enqueue(
+    url: str,
+    method: str,
+    params: Optional[Dict[Any, Any]] = None
+):
+    o = urlparse(url)
+
+    # Do not allow hitting URLs outside of TBA services via enqueue
+    if o.netloc:
+        logging.error(
+            "Detected an attempt to reach an outside server via enqueued task."
+        )
+
+    netloc = request.headers.get("X-Appengine-Default-Version-Hostname")
+    if not netloc:
+        abort(403)
+
+    headers = {}
+
+    # POST requests only support HTTP body parameters
+    # GET requests do not support parameters - use a POST request instead
+    if method == "POST":
+        if params:
+            headers["Content-Type"] = "application/x-www-form-urlencoded"
+    elif method == "GET":
+        pass
+    else:
+        raise Exception("Unsupported enqueue method - only `GET` and `POST` supported.")
+
+    o = o._replace(scheme=request.scheme, netloc=netloc)
+
+    url = o.geturl()
+
+    # Add an auth header to support service-to-service requests
+    token = id_token.fetch_id_token(auth_requests.Request(), url)
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+
+    import requests as reqs
+
+    resp = reqs.request(method, url, headers=headers, data=params)
+    # Retry via taskqueue if non-200 status code from endpoint
+    # Note - errors for 400-range status codes will throw exceptions
+    # These can't really be "fixed" but should be monitored for
+    resp.raise_for_status()
 
 
 def _client_for_env() -> TaskClient:

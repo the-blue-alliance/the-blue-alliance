@@ -70,3 +70,22 @@ Images are published to `gcr.io/tbatv-prod-hrd/tba-py3-dev` and can be managed f
 ## Running One-Off Data Migrations/Cleanups
 
 See the [[Local Shell|Local-Shell]] documentation for running one-off cleanup or migration scripts against the production database. You will need a production service account key to run scripts against the production database. **Be extremely careful before running scripts against the production database.** After modifying the database, be sure to clear the Redis cache to remove any stale cached data.
+
+## Generating a new `google_application_credentials` development key
+
+To generate a new `google_application_credentials.private_key` for development along with a corresponding certificate, run the following commands (requires OpenSSL to be installed) -
+
+```bash
+$ openssl req -x509 -nodes -newkey rsa:2048 -keyout rsa_private.pem -out rsa_cert.pem -subj "/CN=test.appspot.gserviceaccount.com"
+$ openssl req -new -key rsa_private.pem -out rsa_x.csr -subj "/CN=test.appspot.gserviceaccount.com"
+$ openssl ca -selfsign -keyfile rsa_private.pem -enddate 99991231000000Z -in rsa_x.csr -out rsa_cert_exp.pem -rand_serial -subj "/CN=test.appspot.gserviceaccount.com"
+```
+
+`rsa_private.pem` is your new `private_key` for the `.json` key, and `rsa_cert_exp.pem` contains the new certificate for the private key. Make sure to replace the newlines with `\n` before adding them to the proper places.
+
+```
+$ awk '{printf "%s\\n", $0}' rsa_cert.pem
+$ sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' rsa_cert_exp.pem | awk '{printf "%s\\n", $0}'
+```
+
+The private key should replace the `private_key` in the `ops/dev/keys/test.json` file, while the certificate should replace the certificate stored for the `1` key in `certs` dictionary in the [`/local/certs` endpoint](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/web/local/blueprint.py).
