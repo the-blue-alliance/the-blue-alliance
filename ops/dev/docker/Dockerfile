@@ -1,4 +1,4 @@
-FROM --platform=linux/x86_64 ubuntu:latest
+FROM ubuntu:latest
 MAINTAINER The Blue Alliance
 
 # Set debconf to run non-interactively
