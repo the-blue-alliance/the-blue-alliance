@@ -1,11 +1,12 @@
 from functools import partial, wraps
+from typing import Callable, Optional
 
 from flask import current_app, has_request_context, make_response, request, Response
 
 from backend.common.environment import Environment
 
 
-def cached_public(func=None, timeout: int = 61):
+def cached_public(func: Optional[Callable] = None, timeout: int = 61):
     if func is None:  # Handle no-argument decorator
         return partial(cached_public, timeout=timeout)
 
@@ -36,7 +37,7 @@ def cached_public(func=None, timeout: int = 61):
     return decorated_function
 
 
-def memoize(func=None, timeout: int = 61):
+def memoize(func: Optional[Callable] = None, timeout: int = 61):
     if func is None:  # Handle no-argument decorator
         return partial(memoize, timeout=timeout)
 
