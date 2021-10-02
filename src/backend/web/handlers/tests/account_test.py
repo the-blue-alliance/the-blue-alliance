@@ -3,6 +3,7 @@ from unittest.mock import ANY, Mock, patch
 from urllib.parse import parse_qsl, quote, urlparse
 
 import pytest
+from _pytest.monkeypatch import MonkeyPatch
 from flask import session
 from flask.testing import FlaskClient
 
@@ -362,17 +363,34 @@ def test_login_logged_in(login_user, web_client: FlaskClient) -> None:
     assert parsed_response.path == "/account"
 
 
+@pytest.mark.parametrize(
+    "auth_emulator_host",
+    [
+        None,
+        "",
+        "localhost:9099",
+    ],
+)
 def test_login(
-    captured_templates: List[CapturedTemplate], web_client: FlaskClient
+    auth_emulator_host,
+    monkeypatch: MonkeyPatch,
+    captured_templates: List[CapturedTemplate],
+    web_client: FlaskClient,
 ) -> None:
+    if auth_emulator_host is not None:
+        monkeypatch.setenv("FIREBASE_AUTH_EMULATOR_HOST", auth_emulator_host)
+
     response = web_client.get("/account/login")
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
 
     template = captured_templates[0][0]
+    context = captured_templates[0][1]
     assert template.name == "account_login_required.html"
     assert get_page_title(response.data) == "The Blue Alliance - Login Required"
+
+    assert context["auth_emulator_host"] == auth_emulator_host
 
 
 def test_login_no_id_token(web_client: FlaskClient) -> None:

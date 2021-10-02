@@ -72,3 +72,7 @@ class Environment:
     def storage_path() -> Path:
         # Fallback to returning a tmp directory for a storage path
         return Path(os.environ.get("STORAGE_PATH", tempfile.gettempdir()))
+
+    @staticmethod
+    def auth_emulator_host() -> Optional[str]:
+        return os.environ.get("FIREBASE_AUTH_EMULATOR_HOST")

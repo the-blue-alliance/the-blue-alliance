@@ -15,6 +15,11 @@ def set_unit_test(monkeypatch: MonkeyPatch) -> None:
 
 
 @pytest.fixture
+def set_firebase_auth_emulator_host(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("FIREBASE_AUTH_EMULATOR_HOST", "localhost:9099")
+
+
+@pytest.fixture
 def set_dev(monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setenv("GAE_ENV", "localdev")
 
@@ -128,3 +133,11 @@ def test_storage_path(monkeypatch: MonkeyPatch) -> None:
     some_path = "some/path/here"
     monkeypatch.setenv("STORAGE_PATH", some_path)
     assert Environment.storage_path() == Path(some_path)
+
+
+def test_auth_emulator_host_none() -> None:
+    assert Environment.auth_emulator_host() is None
+
+
+def test_auth_emulator_host(set_firebase_auth_emulator_host) -> None:
+    assert Environment.auth_emulator_host() == "localhost:9099"

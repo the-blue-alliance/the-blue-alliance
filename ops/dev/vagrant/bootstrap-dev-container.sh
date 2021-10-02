@@ -17,4 +17,7 @@ NVM_DIR="/nvm"
 nvm use default
 npm install
 
+# Install the Firebase tools for the Firebase emulator
+npm install -g firebase-tools
+
 ./ops/build/run_buildweb.sh
