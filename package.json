@@ -30,7 +30,7 @@
     "redux": "^4.1.1",
     "redux-thunk": "^2.0.1",
     "reselect": "^4.0.0",
-    "swagger-ui": "^3.52.2"
+    "swagger-ui": "^3.52.3"
   },
   "devDependencies": {
     "@babel/core": "^7.15.5",
