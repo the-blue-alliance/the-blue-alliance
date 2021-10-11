@@ -7,7 +7,7 @@ Flask-WTF==0.15.1
 google-api-python-client==2.24.0
 google-cloud-ndb==1.10.0
 google-cloud-storage==1.42.3
-google-cloud-tasks==2.5.2
+google-cloud-tasks==2.6.0
 grpcio==1.41.0
 Jinja2==3.0.2
 numpy==1.21.2
