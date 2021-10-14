@@ -12,7 +12,7 @@ pytest
 pytest-cov
 pytest-custom_exit_code
 pytest-testmon
-PyYAML==5.4.1
+PyYAML==6.0
 redis==3.5.3
 rq-dashboard
 requests-mock
