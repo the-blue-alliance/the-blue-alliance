@@ -13,3 +13,7 @@ cron:
   url: /backend-tasks/backup/enqueue
   schedule: every monday 03:00
   timezone: America/Los_Angeles
+
+- description: Update live events (and bluezone)
+  url: /tasks/do/update_live_events
+  schedule: every 5 minutes
