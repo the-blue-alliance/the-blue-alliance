@@ -16,5 +16,5 @@ pyre-extensions==0.0.22
 requests==2.26.0
 rq==1.10.0
 typing-extensions==3.10.0.2
-PyYAML==5.4.1
+PyYAML==6.0
 Werkzeug==2.0.2
