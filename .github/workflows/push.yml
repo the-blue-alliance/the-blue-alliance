@@ -12,7 +12,7 @@ jobs:
     name: "[py3] Type Check"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.5
       - name: Set up Python 3.8
         uses: actions/setup-python@v2.2.2
         with:
@@ -35,7 +35,7 @@ jobs:
     name: "[py3] Format & Lint"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.5
       - name: Set up Python 3.8
         uses: actions/setup-python@v2.2.2
         with:
@@ -58,7 +58,7 @@ jobs:
     name: "[py3] Test"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.5
       - name: Set up Python 3.8
         uses: actions/setup-python@v2.2.2
         with:
@@ -84,7 +84,7 @@ jobs:
     name: "[node] Format & Lint"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.5
       - name: Set up Node
         uses: actions/setup-node@v2.4.1
         with:
@@ -104,7 +104,7 @@ jobs:
     name: "[node] Test"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.5
       - name: Set up Node
         uses: actions/setup-node@v2.4.1
         with:
@@ -129,7 +129,7 @@ jobs:
     name: "[bash] Lint"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.5
       - name: Set up Python 3.8
         uses: actions/setup-python@v2.2.2
         with:
@@ -157,7 +157,7 @@ jobs:
     name: Build Web
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.5
       - name: Set up Python 3.8
         uses: actions/setup-python@v2.2.2
         with:
@@ -192,7 +192,7 @@ jobs:
     needs: [py3-type, py3-lint, py3-test]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.5
       - name: Set up Python 3.8
         uses: actions/setup-python@v2.2.2
         with:
@@ -215,7 +215,7 @@ jobs:
     needs: [py3-type, py3-lint, py3-test, node-lint, node-test, build-web, deploy-queues]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.5
       - name: Set up Python 3.8
         uses: actions/setup-python@v2.2.2
         with:
@@ -242,7 +242,7 @@ jobs:
     needs: [py3-type, py3-lint, py3-test, deploy-queues]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.5
       - name: Set up Python 3.8
         uses: actions/setup-python@v2.2.2
         with:
@@ -264,7 +264,7 @@ jobs:
     needs: [py3-type, py3-lint, py3-test, deploy-queues]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.5
       - name: Set up Python 3.8
         uses: actions/setup-python@v2.2.2
         with:
