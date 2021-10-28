@@ -16,7 +16,7 @@
 
 {% macro match_name_td(match, show_event=False, compact=False, fake_matches=False) %}
 <td{% if compact %} rowspan="2"{% endif %}>
-  <div class="match-name-container
+  <div class="match-name-container">
     <div class="favorite-match-icon favorite-match-icon-{{match.key.id()}}">
         <span class="favorite-match-icon-spacer"></span>
         <span class="glyphicon glyphicon-star" rel="tooltip" title="A Favorited team is in this match!"></span>
