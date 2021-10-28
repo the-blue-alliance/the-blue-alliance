@@ -442,7 +442,7 @@ class PredictionHelper(object):
                     mu = mean_vars[color][stat]['mean'] - required_points
                     prob = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
                     prediction[color]['prob_hab_docking'] = prob
-                # 2020
+                # 2020/2021
                 if stat == 'power_cells_scored':
                     required_pieces = 49
 
@@ -522,7 +522,7 @@ class PredictionHelper(object):
                 ('rocket_pieces_scored', 1, 3**2),
                 ('hab_climb_points', 2, 3**2),
             ]
-        elif event.year == 2020:
+        elif event.year in {2020, 2021}:
             relevant_stats = [
                 ('score', 0, 50**2),
                 ('power_cells_scored', 0, 20**2),
@@ -677,7 +677,7 @@ class PredictionHelper(object):
                             sampled_rp1[alliance_color] = match.score_breakdown[alliance_color]['completeRocketRankingPoint']
                             sampled_rp2[alliance_color] = match.score_breakdown[alliance_color]['habDockingRankingPoint']
                             sampled_tiebreaker[alliance_color] = match.score_breakdown[alliance_color]['totalPoints']
-                        elif match.year == 2020:
+                        elif match.year in {2020, 2021}:
                             sampled_rp1[alliance_color] = match.score_breakdown[alliance_color]['shieldEnergizedRankingPoint']
                             sampled_rp2[alliance_color] = match.score_breakdown[alliance_color]['shieldOperationalRankingPoint']
                             sampled_tiebreaker[alliance_color] = match.score_breakdown[alliance_color]['totalPoints']
@@ -708,7 +708,7 @@ class PredictionHelper(object):
                             sampled_rp1[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_complete_rocket']
                             sampled_rp2[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_hab_docking']
                             sampled_tiebreaker[alliance_color] = prediction[alliance_color]['score']
-                        elif match.year == 2020:
+                        elif match.year in {2020, 2021}:
                             sampled_rp1[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_shield_energized']
                             sampled_rp2[alliance_color] = np.random.uniform(high=1) < prediction[alliance_color]['prob_shield_operational']
                             sampled_tiebreaker[alliance_color] = prediction[alliance_color]['score']
