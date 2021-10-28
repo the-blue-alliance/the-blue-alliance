@@ -16,7 +16,7 @@
 
 {% macro match_name_td(match, show_event=False, compact=False, fake_matches=False) %}
 <td{% if compact %} rowspan="2"{% endif %}>
-  <div class="match-name-container">
+  <div class="match-name-container
     <div class="favorite-match-icon favorite-match-icon-{{match.key.id()}}">
         <span class="favorite-match-icon-spacer"></span>
         <span class="glyphicon glyphicon-star" rel="tooltip" title="A Favorited team is in this match!"></span>
@@ -77,7 +77,7 @@
       or match.score_breakdown.get(alliance_color).autoQuestRankingPoint
       or match.score_breakdown.get(alliance_color).completeRocketRankingPoint
       or match.score_breakdown.get(alliance_color).shieldEnergizedRankingPoint %}
-    <svg class="top-left-dot" rel="tooltip" title="{% if match.year == 2016 %}Defenses Breached{% elif match.year == 2017 %}Pressure Reached{% elif match.year == 2018 %}Auto Quest{% elif match.year == 2019 %}Complete Rocket{% elif match.year in {2020, 2021} %}Shield Energized{% endif %}">
+    <svg class="top-left-dot" rel="tooltip" title="{% if match.year == 2016 %}Defenses Breached{% elif match.year == 2017 %}Pressure Reached{% elif match.year == 2018 %}Auto Quest{% elif match.year == 2019 %}Complete Rocket{% elif match.year == 2020 or match.year == 2021 %}Shield Energized{% endif %}">
       <circle cx="2" cy="2" r="2"/>
     </svg>
     {% endif %}
@@ -87,7 +87,7 @@
       or match.score_breakdown.get(alliance_color).faceTheBossRankingPoint
       or match.score_breakdown.get(alliance_color).habDockingRankingPoint
       or match.score_breakdown.get(alliance_color).shieldOperationalRankingPoint %}
-    <svg class="top-left-dot-2" rel="tooltip" title="{% if match.year == 2016 %}Tower Captured{% elif match.year == 2017 %}All Rotors Engaged{% elif match.year == 2018 %}Face The Boss{% elif match.year == 2019 %}HAB Docking{% elif match.year in {2020, 2021} %}Shield Operational{% endif %}">
+    <svg class="top-left-dot-2" rel="tooltip" title="{% if match.year == 2016 %}Tower Captured{% elif match.year == 2017 %}All Rotors Engaged{% elif match.year == 2018 %}Face The Boss{% elif match.year == 2019 %}HAB Docking{% elif match.year == 2020 or match.year == 2021 %}Shield Operational{% endif %}">
       <circle cx="2" cy="2" r="2"/>
     </svg>
     {% endif %}
@@ -134,7 +134,7 @@
       {% elif match.score_breakdown.get(alliance_color).get('habDockingRankingPoint') %}H
       {% else %}--{% endif %}
     {% endif %}
-  {% elif match.year in {2020, 2021} and match.has_been_played and match.score_breakdown %}
+  {% elif match.year == 2020 or match.year == 2021 and match.has_been_played and match.score_breakdown %}
     {% if match.score_breakdown.get(alliance_color).get('shieldEnergizedRankingPoint') and match.score_breakdown.get(alliance_color).get('shieldOperationalRankingPoint') %}
     E / O
     {% else %}
@@ -154,7 +154,7 @@
   <em>{{(predictions.get(match.key.id()).get(alliance_color).prob_auto_quest)|limit_prob}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_face_boss)|limit_prob}}%</em>
   {% elif match.year == 2019 %}
   <em>{{(predictions.get(match.key.id()).get(alliance_color).prob_complete_rocket)|limit_prob}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_hab_docking)|limit_prob}}%</em>
-  {% elif match.year in {2020, 2021} %}
+  {% elif match.year == 2020 or match.year == 2021 %}
   <em>{{(predictions.get(match.key.id()).get(alliance_color).prob_shield_energized)|limit_prob}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_shield_operational)|limit_prob}}%</em>
   {% endif %}
 </td>
