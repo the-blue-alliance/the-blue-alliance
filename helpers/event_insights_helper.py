@@ -14,6 +14,7 @@ class EventInsightsHelper(object):
             2018: cls.calculate_event_insights_2018,
             2019: cls.calculate_event_insights_2019,
             2020: cls.calculate_event_insights_2020,
+            2021: cls.calculate_event_insights_2020,
         }
 
         if year in INSIGHTS_MAP:
