@@ -370,7 +370,7 @@ class RedisCache(CacheIf):
             k: bytes(_RedisCacheItem.from_value(v)) for k, v in mapping.items()
         }
         pipeline = self.redis_client.pipeline()
-        pipeline.mset(mapping_to_set)
+        pipeline.mset(mapping_to_set)  # pyre-ignore[6]
         if time is not None:
             # Redis doesn't support mset + TTL, so we do it
             # ourselves manually in a transaction, if necessary

@@ -59,7 +59,7 @@ def get_suggestion_queue(web_client: Client) -> List[str]:
 def createSuggestion(logged_in_user, ndb_client: ndb.Client) -> str:
     with ndb_client.context():
         status = SuggestionCreator.createTeamMediaSuggestion(
-            logged_in_user.account_key, "http://imgur.com/foobar", "frc1124", 2016
+            logged_in_user.account_key, "http://imgur.com/foobar", "frc1124", "2016"
         )
         assert status[0] == SuggestionCreationStatus.SUCCESS
         return Suggestion.render_media_key_name(
