@@ -30,9 +30,9 @@ def do_test(model_class, global_cache, expected_ttl, **kwargs) -> None:
     context = ndb.get_context()
     assert context.global_cache is not None
 
-    # The first datastore put will not write to the global cache
+    # The first datastore put will write the object to the global cache
     cache_keys = global_cache.keys("*")
-    assert len(cache_keys) == 0
+    assert len(cache_keys) == 1
 
     # The event will get written to the cache as a side effect of the read
     # Clear the context cache in between so we do not read previously written values
@@ -92,7 +92,7 @@ def test_not_live_event_match_ttl(global_cache) -> None:
         start_date=datetime(2019, 3, 1),
         end_date=datetime(2019, 3, 2),
         event_short="test",
-    ).put()
+    ).put(use_global_cache=False)
 
     do_test(
         Match,
@@ -119,7 +119,7 @@ def test_live_event_match_ttl(global_cache) -> None:
         start_date=datetime(2019, 3, 1),
         end_date=datetime(2019, 3, 2),
         event_short="test",
-    ).put()
+    ).put(use_global_cache=False)
 
     do_test(
         Match,
@@ -145,7 +145,7 @@ def test_not_live_event_event_detail_ttl(global_cache) -> None:
         start_date=datetime(2019, 3, 1),
         end_date=datetime(2019, 3, 2),
         event_short="test",
-    ).put()
+    ).put(use_global_cache=False)
 
     do_test(
         EventDetails,
@@ -166,7 +166,7 @@ def test_live_event_event_detail_ttl(global_cache) -> None:
         start_date=datetime(2019, 3, 1),
         end_date=datetime(2019, 3, 2),
         event_short="test",
-    ).put()
+    ).put(use_global_cache=False)
 
     do_test(
         EventDetails,
@@ -186,7 +186,7 @@ def test_not_live_event_event_team_ttl(global_cache) -> None:
         start_date=datetime(2019, 3, 1),
         end_date=datetime(2019, 3, 2),
         event_short="test",
-    ).put()
+    ).put(use_global_cache=False)
 
     do_test(
         EventTeam,
@@ -207,7 +207,7 @@ def test_live_event_event_team_ttl(global_cache) -> None:
         start_date=datetime(2019, 3, 1),
         end_date=datetime(2019, 3, 2),
         event_short="test",
-    ).put()
+    ).put(use_global_cache=False)
 
     do_test(
         EventTeam,
@@ -227,7 +227,7 @@ def test_not_live_event_award_ttl(global_cache) -> None:
         start_date=datetime(2019, 3, 1),
         end_date=datetime(2019, 3, 2),
         event_short="test",
-    ).put()
+    ).put(use_global_cache=False)
 
     do_test(
         Award,
@@ -253,7 +253,7 @@ def test_live_event_award_ttl(global_cache) -> None:
         start_date=datetime(2019, 3, 1),
         end_date=datetime(2019, 3, 2),
         event_short="test",
-    ).put()
+    ).put(use_global_cache=False)
 
     do_test(
         Award,
