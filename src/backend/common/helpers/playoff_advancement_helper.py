@@ -395,6 +395,7 @@ class PlayoffAdvancementHelper(object):
                         )
                         or ""
                     )
+                    i: Optional[int] = None
                     for i, complete_alliance in enumerate(
                         complete_alliances
                     ):  # search for alliance. could be more efficient
@@ -580,7 +581,7 @@ class PlayoffAdvancementHelper(object):
 
             advancement[
                 "{}_complete".format(comp_level)  # pyre-ignore
-            ] = not any_unplayed
+            ] = not any_unplayed  # pyre-ignore[6]
 
         return cast(PlayoffAdvancementRoundRobinLevels, advancement)
 

@@ -16,7 +16,7 @@ def configure_logging() -> None:
 
         ndb_loggers = [
             logging.getLogger(name)
-            for name in logging.root.manager.loggerDict  # pyre-ignore[16]
+            for name in logging.root.manager.loggerDict
             if ndb.__name__ in name
         ]
         for logger in ndb_loggers:

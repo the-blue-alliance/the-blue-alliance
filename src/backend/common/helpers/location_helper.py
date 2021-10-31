@@ -524,7 +524,6 @@ class LocationHelper:
                                 search_type, query, lat_lng
                             )
                         )
-                        logging.warning(search_dict)
                 except Exception as e:
                     logging.warning(
                         "urlfetch for {} request failed with query: {}, lat_lng: {}".format(
