@@ -29,7 +29,7 @@
     "react-select": "^5.1.0",
     "redux": "^4.1.1",
     "redux-thunk": "^2.4.0",
-    "reselect": "^4.0.0",
+    "reselect": "^4.1.1",
     "swagger-ui": "^3.52.5"
   },
   "devDependencies": {
