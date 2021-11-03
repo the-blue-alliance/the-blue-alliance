@@ -1,4 +1,6 @@
 from collections import defaultdict
+import logging
+import os
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from helpers.cache_clearer import CacheClearer
@@ -106,6 +108,7 @@ class ManipulatorBase(object):
         existing models with the same key.
         Once inserted or updated, the model can be marked not dirty.
         """
+        logging.info(os.getenv('APPLICATION_ID'))
         models = self.listify(self.findOrSpawn(self.listify(new_models), auto_union=auto_union))
         models_to_put = [model for model in models if getattr(model, "dirty", False)]
         ndb.put_multi(models_to_put)
