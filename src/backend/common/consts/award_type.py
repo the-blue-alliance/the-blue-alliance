@@ -113,6 +113,7 @@ BLUE_BANNER_AWARDS: Set[AwardType] = {
     AwardType.WINNER,
     AwardType.WOODIE_FLOWERS,
     AwardType.SKILLS_COMPETITION_WINNER,
+    AwardType.DESIGNERS,
 }
 
 
