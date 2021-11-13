@@ -87,7 +87,7 @@
         {% endif %}
         {% if event.website %}<br><span class="glyphicon glyphicon-link"></span> <a href="{{ event.website }}" title="{{ event.name }}" target="_blank">{{ event.website }}</a>{% endif %}
         {% if event.first_eid or event.official %}{% if not event.website %}<br><span class="glyphicon glyphicon-info-sign"></span>{% else %} - {% endif %} details on <a href="{% if event.first_eid %}https://www.firstinspires.org/team-event-search/event?id={{event.first_eid}}{%elif event.official %}https://frc-events.firstinspires.org/{{event.year}}/{{event.first_api_code}}{%endif%}" target="_blank">firstinspires.org</a>{% endif %}
-        {% if event.year > 2021 %}{% if event.official %}<br><span class="glyphicon glyphicon-plus"></span><a href="https://www.firstinspires.org/sites/default/files/uploads/frc/{{event.year}}-events/2022_{{event.first_api_code}}_SiteInfo.pdf" target="_blank">COVID-19 Site Information</a>{% endif %}{% endif %}
+        {% if event.year > 2021 %}{% if event.official %}<br><span class="glyphicon glyphicon-plus"></span><a href="https://www.firstinspires.org/sites/default/files/uploads/frc/{{event.year}}-events/{{event.year}}_{{event.first_api_code}}_SiteInfo.pdf" target="_blank">COVID-19 Site Information</a>{% endif %}{% endif %}
         {% if event.facebook_eid %}<br><span class="glyphicon glyphicon-thumbs-up"></span> <a href="{{ event.facebook_event_url }}" title="Facebook Event" target="_blank">RSVP on Facebook</a><br>{% endif %}
       </p>
     </div>
