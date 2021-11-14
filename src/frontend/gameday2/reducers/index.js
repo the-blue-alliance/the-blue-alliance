@@ -1,5 +1,6 @@
-import firebase from "firebase/app";
-import "firebase/database";
+// TODO(eugene): Don't use compatibility package.
+import firebase from "firebase/compat/app";
+import "firebase/compat/database";
 import Firedux from "firedux";
 import { combineReducers } from "redux";
 import { webcastsById, specialWebcastIds } from "./webcastsById";
