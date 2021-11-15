@@ -13,7 +13,7 @@ pytest-cov
 pytest-custom_exit_code
 pytest-testmon
 PyYAML==6.0
-redis==3.5.3
+redis==4.0.0
 rq-dashboard
 requests-mock
 shellcheck-py
