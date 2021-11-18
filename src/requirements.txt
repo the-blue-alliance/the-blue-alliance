@@ -8,7 +8,7 @@ google-api-python-client==2.31.0
 google-cloud-ndb==1.11.1
 google-cloud-storage==1.42.3
 google-cloud-tasks==2.7.1
-grpcio==1.41.1
+grpcio==1.42.0
 Jinja2==3.0.3
 numpy==1.21.4
 oauth2client==4.1.3
