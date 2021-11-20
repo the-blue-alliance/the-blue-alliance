@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_wtf.csrf import CSRFProtect
+from google.appengine.api import wrap_wsgi_app
 
 from backend.common.auth import _user_context_processor
 from backend.common.flask_cache import configure_flask_cache
@@ -32,6 +33,7 @@ from backend.web.local.blueprint import maybe_register as maybe_install_local_ro
 configure_logging()
 
 app = Flask(__name__)
+app.wsgi_app = wrap_wsgi_app(app.wsgi_app, use_legacy_context_mode=False)
 install_middleware(app)
 install_url_converters(app)
 configure_flask_cache(app)

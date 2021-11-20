@@ -3,7 +3,7 @@ from werkzeug.test import Client
 
 
 @pytest.fixture
-def api_client() -> Client:
+def api_client(add_gae_builtin_testbed) -> Client:
     from backend.api.main import app
 
     return app.test_client()

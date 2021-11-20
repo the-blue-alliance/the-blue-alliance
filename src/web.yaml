@@ -1,6 +1,7 @@
 service: py3-web
 runtime: python38
 entrypoint: gunicorn -b :$PORT backend.web.main:app
+app_engine_apis: true
 
 instance_class: F1
 automatic_scaling:
