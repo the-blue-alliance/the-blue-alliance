@@ -37,7 +37,9 @@ def add_gae_builtin_testbed():
 
 
 @pytest.fixture()
-def ndb_stub(add_gae_builtin_testbed, monkeypatch: MonkeyPatch) -> datastore_stub.LocalDatastoreStub:
+def ndb_stub(
+    add_gae_builtin_testbed, monkeypatch: MonkeyPatch
+) -> datastore_stub.LocalDatastoreStub:
     stub = datastore_stub.LocalDatastoreStub()
 
     def mock_stub() -> datastore_pb2_grpc.DatastoreStub:
