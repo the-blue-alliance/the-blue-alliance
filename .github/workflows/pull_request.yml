@@ -167,3 +167,11 @@ jobs:
         run: npm install
       - name: Run Build
         run: ./ops/build/run_buildweb.sh --env
+
+  automerge:
+    needs: [py3-type, py3-lint, py3-test, node-lint, node-test, bash-lint, build-web]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: fastify/github-action-merge-dependabot@v2.1.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
