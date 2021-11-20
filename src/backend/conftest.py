@@ -1,5 +1,6 @@
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
+from google.appengine.ext import testbed
 from google.cloud import ndb
 from google.cloud.datastore_v1.proto import datastore_pb2_grpc
 from google.cloud.ndb import _datastore_api
@@ -28,7 +29,15 @@ def init_ndb_env_vars(monkeypatch: MonkeyPatch) -> None:
 
 
 @pytest.fixture()
-def ndb_stub(monkeypatch: MonkeyPatch) -> datastore_stub.LocalDatastoreStub:
+def add_gae_builtin_testbed():
+    tb = testbed.Testbed()
+    tb.activate()
+    yield
+    tb.deactivate()
+
+
+@pytest.fixture()
+def ndb_stub(add_gae_builtin_testbed, monkeypatch: MonkeyPatch) -> datastore_stub.LocalDatastoreStub:
     stub = datastore_stub.LocalDatastoreStub()
 
     def mock_stub() -> datastore_pb2_grpc.DatastoreStub:
