@@ -17,11 +17,9 @@ RUN apt-get update && apt-get install -y \
   redis-server
 
 # Setup python environmenets
-# python3 should be the default, but gcloud currently depends on python2
 RUN apt-get install -y \
     python3-pip \
     python3-venv \
-    python2 \
     python-dev
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 RUN echo 1 | update-alternatives --config python
@@ -46,9 +44,6 @@ RUN mkdir -p $NVM_DIR  \
     && nvm install $NODE_VERSION --silent \
     && nvm alias default $NODE_VERSION \
     && nvm use default --silent
-
-# Install pip2 for gcloud dependencies
-RUN curl https://bootstrap.pypa.io/pip/2.7/get-pip.py | python2
 
 # Configure ssh server
 RUN mkdir /var/run/sshd

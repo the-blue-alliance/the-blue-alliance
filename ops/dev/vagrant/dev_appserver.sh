@@ -111,6 +111,7 @@ fi
 
 set -x
 dev_appserver.py \
+    --runtime_python_path=/usr/bin/python3 \
     --admin_host=0.0.0.0 \
     --host=0.0.0.0 \
     --runtime="python37" \

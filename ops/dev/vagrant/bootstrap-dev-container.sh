@@ -5,7 +5,6 @@ set -e
 mkdir -p /datastore
 
 # The datastore emulator requires grpcio
-pip2 install grpcio==1.39.0
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 pip install -r src/requirements.txt
