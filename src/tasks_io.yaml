@@ -1,5 +1,5 @@
 service: py3-tasks-io
-runtime: python38
+runtime: python39
 entrypoint: gunicorn -b :$PORT backend.tasks_io.main:app
 app_engine_apis: true
 

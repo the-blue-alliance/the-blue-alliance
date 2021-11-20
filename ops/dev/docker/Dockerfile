@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:rolling
 MAINTAINER The Blue Alliance
 
 # Set debconf to run non-interactively
@@ -15,12 +15,14 @@ RUN apt-get update && apt-get install -y \
   vim \
   openssh-server
 
-# Setup python environmenets
+# Setup python environmenet
+ENV PYTHON_VERSION python3.9
 RUN apt-get install -y \
-    python3-pip \
-    python3-venv \
-    python-dev
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+    "$PYTHON_VERSION" \
+    "$PYTHON_VERSION-venv" \
+    "$PYTHON_VERSION-dev" \
+    python3-pip
+RUN update-alternatives --install /usr/bin/python python "/usr/bin/$PYTHON_VERSION" 1
 RUN echo 1 | update-alternatives --config python
 
 # Add gcloud repository and Cloud SDK dependencies
@@ -33,6 +35,10 @@ RUN apt-get update && apt-get install -y \
     google-cloud-sdk-app-engine-python-extras \
     google-cloud-sdk-datastore-emulator \
     google-cloud-sdk-pubsub-emulator
+
+# dev_appserver expects `python2` to exist
+RUN update-alternatives --install /usr/bin/python2 python2 /usr/bin/python2.7 1
+RUN echo 1 | update-alternatives --config python2
 
 # Set up nvm and nodejs
 ENV NVM_DIR /nvm

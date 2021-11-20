@@ -3,7 +3,7 @@ A small amount of repo configuration can be done in order to streamline developm
 ## Install Dependencies
 This optional tooling requires [Python 3](https://www.python.org/downloads/) and [`pip`](https://pip.pypa.io/en/stable/installing/) to install.
 
-1. Install [Python 3](https://www.python.org/downloads/) (3.8+)
+1. Install [Python 3](https://www.python.org/downloads/) (3.9+)
 2. Install [`pip`](https://pip.pypa.io/en/stable/installing/)
 3. *(optionally)* Install [watchman](https://facebook.github.io/watchman/)
 4. *(optionally)* Install [shfmt](https://github.com/mvdan/sh)
