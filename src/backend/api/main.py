@@ -2,6 +2,7 @@ from json import JSONDecodeError
 
 from flask import Blueprint, Flask, jsonify, make_response, Response
 from flask_cors import CORS
+from google.appengine.api import wrap_wsgi_app
 
 from backend.api.handlers.error import handle_404
 from backend.api.handlers.event import event
@@ -18,6 +19,7 @@ from backend.common.url_converters import install_url_converters
 configure_logging()
 
 app = Flask(__name__)
+app.wsgi_app = wrap_wsgi_app(app.wsgi_app)
 install_middleware(app)
 install_url_converters(app)
 configure_flask_cache(app)
