@@ -9,6 +9,6 @@ from backend.common.middleware import install_middleware
 configure_logging()
 
 app = Flask(__name__)
-app.wsgi_app = wrap_wsgi_app(app.wsgi_app, use_legacy_context_mode=False)
+app.wsgi_app = wrap_wsgi_app(app.wsgi_app)
 install_middleware(app)
 install_defer_routes(app)
