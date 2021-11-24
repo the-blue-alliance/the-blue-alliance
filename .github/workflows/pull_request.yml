@@ -168,8 +168,28 @@ jobs:
       - name: Run Build
         run: ./ops/build/run_buildweb.sh --env
 
+  fullstack-test:
+    name: Fullstack Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2.3.0
+        with:
+          python-version: 3.8
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+      - name: Install Vagrant
+        run: sudo apt-get install vagrant
+      - name: Start Container
+        run: vagrant up
+      - name: Test Fullstack
+        run: ./ops/test_fullstack.py
+
   automerge:
-    needs: [py3-type, py3-lint, py3-test, node-lint, node-test, bash-lint, build-web]
+    needs: [py3-type, py3-lint, py3-test, node-lint, node-test, bash-lint, build-web, fullstack-test]
     runs-on: ubuntu-latest
     steps:
       - uses: fastify/github-action-merge-dependabot@v2.6.0

@@ -29,7 +29,7 @@ Vagrant.configure("2") do |config|
   end
 
   # Forward GAE modules
-  for i in 8080..8089
+  for i in 8080..8083
     ports.push("#{i}:#{i}")
     config.vm.network "forwarded_port", guest: i, host: i
   end
