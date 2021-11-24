@@ -187,12 +187,32 @@ jobs:
         run: vagrant up
       - name: Test Fullstack
         run: ./ops/test_fullstack.py
-      - name: Save Screenshot
+      - name: Save Home Page Screenshot
         uses: swinton/screenshot-website@v1.x
+        id: screenshot_home
         with:
           source: http://localhost:8080
-          destination: screenshot.png
+          destination: screenshot_home.png
           full-page: true
+      - name: Save GameDay Screenshot
+        uses: swinton/screenshot-website@v1.x
+        id: screenshot_gameday
+        with:
+          source: http://localhost:8080/gameday
+          destination: screenshot_gameday.png
+          full-page: true
+      - name: Upload Home Page Screenshot
+        uses: edunad/actions-image@v1.0.1
+        with:
+            path: ${{ steps.screenshot_home.outputs.path }}
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            title: 'Home Page Screenshot'
+      - name: Upload GameDay Screenshot
+        uses: edunad/actions-image@v1.0.1
+        with:
+            path: ${{ steps.screenshot_gameday.outputs.path }}
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            title: 'GameDay Screenshot'
 
   automerge:
     needs: [py3-type, py3-lint, py3-test, node-lint, node-test, bash-lint, build-web, fullstack-test]
