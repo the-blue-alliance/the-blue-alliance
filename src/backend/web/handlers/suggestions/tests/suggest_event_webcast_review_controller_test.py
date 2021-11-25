@@ -133,7 +133,10 @@ def test_reject_all(
 
 
 def test_accept_with_default_details(
-    login_user_with_permission, web_client: Client, ndb_client: ndb.Client
+    login_user_with_permission,
+    web_client: Client,
+    ndb_client: ndb.Client,
+    taskqueue_stub,
 ) -> None:
     suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
     queue, form_fields = get_suggestion_queue_and_fields(
@@ -165,7 +168,10 @@ def test_accept_with_default_details(
 
 
 def test_accept_with_different_details(
-    login_user_with_permission, web_client: Client, ndb_client: ndb.Client
+    login_user_with_permission,
+    web_client: Client,
+    ndb_client: ndb.Client,
+    taskqueue_stub,
 ) -> None:
     suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
     queue, form_fields = get_suggestion_queue_and_fields(

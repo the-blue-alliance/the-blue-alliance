@@ -76,7 +76,7 @@ def test_no_auth(ndb_client: ndb.Client, api_client: Client) -> None:
     assert resp.status_code == 401
 
 
-def test_set_video(ndb_client: ndb.Client, api_client: Client) -> None:
+def test_set_video(ndb_client: ndb.Client, api_client: Client, taskqueue_stub) -> None:
     with ndb_client.context():
         setup_event()
         setup_auth(access_types=[AuthType.MATCH_VIDEO])

@@ -14,7 +14,7 @@ from backend.common.models.event_team_status import (
 from backend.common.models.team import Team
 
 
-@pytest.mark.usefixtures("ndb_context")
+@pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 class TestTeamManipulator(unittest.TestCase):
     def setUp(self):
         self.old_team = EventTeam(

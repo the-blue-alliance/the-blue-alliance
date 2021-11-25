@@ -84,7 +84,10 @@ def test_nothing_to_review(login_user_with_permission, web_client: Client) -> No
 
 
 def test_accept_suggestion(
-    login_user_with_permission, ndb_client: ndb.Client, web_client: Client
+    login_user_with_permission,
+    ndb_client: ndb.Client,
+    web_client: Client,
+    taskqueue_stub,
 ) -> None:
     suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
     queue = get_suggestion_queue(web_client)
@@ -114,7 +117,10 @@ def test_accept_suggestion(
 
 
 def test_accept_suggestion_change_year(
-    login_user_with_permission, ndb_client: ndb.Client, web_client: Client
+    login_user_with_permission,
+    ndb_client: ndb.Client,
+    web_client: Client,
+    taskqueue_stub,
 ) -> None:
     suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
     queue = get_suggestion_queue(web_client)
@@ -145,7 +151,10 @@ def test_accept_suggestion_change_year(
 
 
 def test_accept_suggestion_as_preferred(
-    login_user_with_permission, ndb_client: ndb.Client, web_client: Client
+    login_user_with_permission,
+    ndb_client: ndb.Client,
+    web_client: Client,
+    taskqueue_stub,
 ) -> None:
     suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
     queue = get_suggestion_queue(web_client)
@@ -176,7 +185,10 @@ def test_accept_suggestion_as_preferred(
 
 
 def test_accept_suggestion_as_preferred_and_replace(
-    login_user_with_permission, ndb_client: ndb.Client, web_client: Client
+    login_user_with_permission,
+    ndb_client: ndb.Client,
+    web_client: Client,
+    taskqueue_stub,
 ) -> None:
     with ndb_client.context():
         # Create an existing preferred media

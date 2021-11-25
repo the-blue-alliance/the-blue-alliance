@@ -12,7 +12,7 @@ from backend.common.models.event import Event
 from backend.common.models.team import Team
 
 
-@pytest.mark.usefixtures("ndb_context")
+@pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 class TestAwardManipulator(unittest.TestCase):
     def setUp(self):
         self.event = Event(

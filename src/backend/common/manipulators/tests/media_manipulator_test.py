@@ -9,7 +9,7 @@ from backend.common.models.media import Media
 from backend.common.models.team import Team
 
 
-@pytest.mark.usefixtures("ndb_context")
+@pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 class TestMediaManipulator(unittest.TestCase):
     def setUp(self):
         self.old_media = Media(

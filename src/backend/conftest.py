@@ -6,7 +6,6 @@ from google.cloud.datastore_v1.proto import datastore_pb2_grpc
 from google.cloud.ndb import _datastore_api
 from InMemoryCloudDatastoreStub import datastore_stub
 
-from backend.common.deferred.clients.fake_client import FakeTaskClient
 from backend.common.models.cached_query_result import CachedQueryResult
 from backend.tests.json_data_importer import JsonDataImporter
 
@@ -29,16 +28,16 @@ def init_ndb_env_vars(monkeypatch: MonkeyPatch) -> None:
 
 
 @pytest.fixture()
-def add_gae_builtin_testbed():
+def gae_testbed():
     tb = testbed.Testbed()
     tb.activate()
-    yield
+    yield tb
     tb.deactivate()
 
 
 @pytest.fixture()
 def ndb_stub(
-    add_gae_builtin_testbed, monkeypatch: MonkeyPatch
+    gae_testbed, monkeypatch: MonkeyPatch
 ) -> datastore_stub.LocalDatastoreStub:
     stub = datastore_stub.LocalDatastoreStub()
 
@@ -50,10 +49,9 @@ def ndb_stub(
 
 
 @pytest.fixture()
-def task_client():
-    client = FakeTaskClient()
-    client._redis.flushall()
-    yield client
+def taskqueue_stub(gae_testbed):
+    gae_testbed.init_taskqueue_stub(root_path="src/")
+    return gae_testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
 
 
 @pytest.fixture()

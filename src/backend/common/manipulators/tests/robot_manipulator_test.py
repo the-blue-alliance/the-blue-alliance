@@ -8,7 +8,7 @@ from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 
 
-@pytest.mark.usefixtures("ndb_context")
+@pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 class TestRobotManipulator(unittest.TestCase):
     def setUp(self):
         self.old_robot = Robot(

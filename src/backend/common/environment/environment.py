@@ -4,8 +4,6 @@ import tempfile
 from pathlib import Path
 from typing import Optional
 
-from backend.common.environment.tasks import TasksRemoteConfig
-
 
 @enum.unique
 class EnvironmentMode(enum.Enum):
@@ -40,17 +38,6 @@ class Environment:
     @staticmethod
     def log_level() -> Optional[str]:
         return os.environ.get("TBA_LOG_LEVEL")
-
-    @staticmethod
-    def tasks_mode() -> EnvironmentMode:
-        return EnvironmentMode(os.environ.get("TASKS_MODE", "local"))
-
-    @staticmethod
-    def tasks_remote_config() -> Optional[TasksRemoteConfig]:
-        remote_config_ngrok_url = os.environ.get("TASKS_REMOTE_CONFIG_NGROK_URL", None)
-        if not remote_config_ngrok_url:
-            return None
-        return TasksRemoteConfig(ngrok_url=remote_config_ngrok_url)
 
     @staticmethod
     def ndb_log_level() -> Optional[str]:

@@ -16,6 +16,5 @@ pytest-testmon
 PyYAML==6.0
 redis==3.5.3
 hiredis==2.0.0
-rq-dashboard
 requests-mock
 shellcheck-py

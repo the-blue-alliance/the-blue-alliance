@@ -82,7 +82,10 @@ def test_nothing_to_review(login_user_with_permission, web_client: Client) -> No
 
 
 def test_accept_suggestion(
-    login_user_with_permission, web_client: Client, ndb_client: ndb.Client
+    login_user_with_permission,
+    web_client: Client,
+    ndb_client: ndb.Client,
+    taskqueue_stub,
 ) -> None:
     suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
     queue, form_fields = get_suggestion_queue_and_fields(
