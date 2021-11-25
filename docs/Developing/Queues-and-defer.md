@@ -37,6 +37,21 @@ app = Flask(__name__)
 app.wsgi_app = wrap_wsgi_app(app.wsgi_app, use_deferred=True)
 ```
 
+Additionally, the service `yaml` file should be configured to only execute authenticated deferred tasks.
+
+```yaml
+service: service
+
+...
+
+handlers:
+  - url: /_ah/queue/deferred.*
+    script: auto
+    login: admin
+  - url: .*
+    script: auto
+```
+
 ### Using `deferred.defer`
 
 ```python
@@ -55,7 +70,26 @@ See the [`google.appengine.ext.deferred.deferred` module documentation](https://
 
 ### Using custom `deferred.defer` routes
 
-By default, tasks will dispatch to the `/_ah/queue/deferred` route via the `default` queue. A custom route can be used if an endpoint to handle the route is built and calls to `deferred.application`.
+By default, tasks will dispatch to the `/_ah/queue/deferred` route via the `default` queue. To use a vanity URL starting with `/_ah/queue/deferred` but having a custom suffix (ex: `/_ah/queue/deferred_manipulator_clearCache`), we can install a custom catch-all regex handler on the service.
+
+```python
+from flask import Flask
+from google.appengine.api import wrap_wsgi_app
+from google.appengine.ext import deferred
+
+from backend.common.deferred import install_defer_routes
+
+app = Flask(__name__)
+app.wsgi_app = wrap_wsgi_app(app.wsgi_app, use_deferred=True)
+install_defer_routes(app)
+
+@app.route("/do_later")
+def do_later():
+    deferred.defer(clear_the_cache, _url="/_ah/queue/deferred_manipulator_clearCache")
+    return "Done! deferred expensive work for later."
+```
+
+Custom URLs can be supported as well using a more manual process. A route must be created that calls to `deferred.application` to handle the original request. This is not recommended, but can be done.
 
 ```python
 @app.route("/do_the_thing")
