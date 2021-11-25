@@ -456,7 +456,17 @@ def test_rankings() -> None:
     event = Event(id="2019ct", year=2019, event_short="ct")
     assert event.rankings is None
 
-    rankings = [EventRanking(rank=1, team_key="frc1")]
+    rankings = [
+        EventRanking(
+            rank=1,
+            team_key="frc1",
+            record=None,
+            qual_average=None,
+            matches_played=1,
+            dq=0,
+            sort_orders=[],
+        )
+    ]
 
     EventDetails(id="2019ct", rankings2=rankings).put()
 
