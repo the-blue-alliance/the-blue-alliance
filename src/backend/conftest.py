@@ -1,3 +1,5 @@
+from typing import Generator
+
 import pytest
 from freezegun import api as freezegun_api
 from google.appengine.api import datastore_types
@@ -19,7 +21,7 @@ def clear_context_cache(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 @pytest.fixture()
-def gae_testbed():
+def gae_testbed() -> Generator[testbed.Testbed, None, None]:
     tb = testbed.Testbed()
     tb.activate()
     yield tb
