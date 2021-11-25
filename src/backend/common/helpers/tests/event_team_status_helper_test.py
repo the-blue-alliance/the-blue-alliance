@@ -22,7 +22,7 @@ def disable_db_query_cache(monkeypatch: MonkeyPatch):
     monkeypatch.setattr(CachedDatabaseQuery, "CACHE_WRITES_ENABLED", False)
 
 
-@pytest.mark.usefixtures("ndb_context")
+@pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 class TestSimulated2016nytrEventTeamStatusHelper(unittest.TestCase):
     def test_simulated_event(self):
         es = EventSimulator()

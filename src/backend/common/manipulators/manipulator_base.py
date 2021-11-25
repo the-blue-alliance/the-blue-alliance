@@ -16,10 +16,10 @@ from typing import (
     TypeVar,
 )
 
+from google.appengine.ext import deferred
 from google.cloud import ndb
 
 from backend.common.cache_clearing.get_affected_queries import TCacheKeyAndQuery
-from backend.common.deferred import defer
 from backend.common.helpers.listify import delistify, listify
 from backend.common.models.cached_model import CachedModel, TAffectedReferences
 from backend.common.queries.database_query import CachedDatabaseQuery
@@ -226,7 +226,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
             return
 
         for hook in cls._post_delete_hooks:
-            defer(
+            deferred.defer(
                 hook,
                 models,
                 _queue="post-update-hooks",
@@ -251,7 +251,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
             for model in models
         ]
         for hook in cls._post_update_hooks:
-            defer(
+            deferred.defer(
                 hook,
                 updated_models,
                 _queue="post-update-hooks",
@@ -336,7 +336,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
                 all_affected_references.append(model._affected_references)
 
         if all_affected_references:
-            defer(
+            deferred.defer(
                 cls._clearCacheDeferred,
                 all_affected_references,
                 _queue="cache-clearing",

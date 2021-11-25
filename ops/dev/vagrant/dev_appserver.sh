@@ -9,13 +9,10 @@ tba_log_level=$(get_config_prop tba_log_level)
 ndb_log_level=$(get_config_prop ndb_log_level)
 datastore_mode=$(get_config_prop datastore_mode)
 redis_cache_url=$(get_config_prop redis_cache_url)
-tasks_mode=$(get_config_prop tasks_mode)
-tasks_remote_config_ngrok_url=$(get_config_prop tasks_remote_config.ngrok_url)
 flask_response_cache_enabled=$(get_config_prop flask_response_cache_enabled)
 storage_mode=$(get_config_prop storage_mode)
 storage_path=$(get_config_prop storage_path)
 application=""
-tasks_args=()
 env=()
 
 # Setup Google Application Credentials, if available
@@ -32,13 +29,6 @@ fi
 function assert_google_application_credentials {
     if [ -z "$google_application_credentials" ]; then
         echo "google_application_credentials required to be set in tba_dev_config"
-        exit 1
-    fi
-}
-
-function assert_tasks_remote_config_ngrok_url {
-    if [ -z "$tasks_remote_config_ngrok_url" ]; then
-        echo "tasks_remote_config.ngrok_url required to be set in tba_dev_config"
         exit 1
     fi
 }
@@ -71,21 +61,6 @@ else
     env+=("--env_var=REDIS_CACHE_URL=$redis_cache_url")
 fi
 
-# Setup Google Cloud Tasks local/remote
-if [ "$tasks_mode" == "local" ]; then
-    echo "Using local tasks (rq + Redis)"
-elif [ "$tasks_mode" == "remote" ]; then
-    echo "Using remote tasks (Cloud Tasks + ngrok)"
-    assert_google_application_credentials
-    assert_tasks_remote_config_ngrok_url
-    # Need to disable host checking to allow for round-trip requests coming from ngrok
-    tasks_args=("--enable_host_checking=false")
-    env+=("--env_var=TASKS_REMOTE_CONFIG_NGROK_URL=$tasks_remote_config_ngrok_url")
-else
-    echo "Unknown tasks mode $tasks_mode! Must be one of [local, remote]"
-    exit 1
-fi
-
 # Setup Cloud Storage local/remote
 if [ "$storage_mode" == "local" ]; then
     echo "Starting with local storage"
@@ -116,11 +91,9 @@ dev_appserver.py \
     --host=0.0.0.0 \
     --runtime="python37" \
     --application="$application" \
-    "${tasks_args[@]}" \
     "${env[@]}" \
     --env_var TBA_LOG_LEVEL="$tba_log_level" \
     --env_var NDB_LOG_LEVEL="$ndb_log_level" \
-    --env_var TASKS_MODE="$tasks_mode" \
     --env_var STORAGE_MODE="$storage_mode" \
     --env_var FLASK_RESPONE_CACHE_ENABLED="$flask_response_cache_enabled" \
     --env_var GCLOUD_PROJECT="$application" \

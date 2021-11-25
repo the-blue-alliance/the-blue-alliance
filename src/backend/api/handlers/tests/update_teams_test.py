@@ -74,7 +74,7 @@ def test_no_auth(ndb_client: ndb.Client, api_client: Client) -> None:
     assert resp.status_code == 401
 
 
-def test_set_teams(ndb_client: ndb.Client, api_client: Client) -> None:
+def test_set_teams(ndb_client: ndb.Client, api_client: Client, taskqueue_stub) -> None:
     with ndb_client.context():
         setup_event()
         setup_teams()
@@ -102,7 +102,9 @@ def test_set_teams(ndb_client: ndb.Client, api_client: Client) -> None:
         ]
 
 
-def test_remove_teams(ndb_client: ndb.Client, api_client: Client) -> None:
+def test_remove_teams(
+    ndb_client: ndb.Client, api_client: Client, taskqueue_stub
+) -> None:
     with ndb_client.context():
         setup_event()
         setup_teams()
@@ -127,7 +129,9 @@ def test_remove_teams(ndb_client: ndb.Client, api_client: Client) -> None:
         assert db_eventteams == []
 
 
-def test_update_teams(ndb_client: ndb.Client, api_client: Client) -> None:
+def test_update_teams(
+    ndb_client: ndb.Client, api_client: Client, taskqueue_stub
+) -> None:
     with ndb_client.context():
         setup_event()
         setup_teams()
@@ -155,7 +159,9 @@ def test_update_teams(ndb_client: ndb.Client, api_client: Client) -> None:
         ]
 
 
-def test_unknown_teams_skipped(ndb_client: ndb.Client, api_client: Client) -> None:
+def test_unknown_teams_skipped(
+    ndb_client: ndb.Client, api_client: Client, taskqueue_stub
+) -> None:
     with ndb_client.context():
         setup_event()
         setup_teams()

@@ -85,7 +85,10 @@ def test_nothing_to_review(login_user_with_permission, web_client: Client) -> No
 
 
 def test_accept_suggestion(
-    login_user_with_permission, ndb_client: ndb.Client, web_client: Client
+    login_user_with_permission,
+    ndb_client: ndb.Client,
+    web_client: Client,
+    taskqueue_stub,
 ) -> None:
     suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
     queue = get_suggestion_queue(web_client)
@@ -144,7 +147,10 @@ def test_reject_suggestion(
 
 
 def test_fast_path_accept(
-    login_user_with_permission, ndb_client: ndb.Client, web_client: Client
+    login_user_with_permission,
+    ndb_client: ndb.Client,
+    web_client: Client,
+    taskqueue_stub,
 ):
     suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
 

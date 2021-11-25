@@ -1,12 +1,15 @@
 import datetime
 import json
 import unittest
+from typing import Optional
 from unittest.mock import patch
 
 import pytest
+from google.appengine.ext import deferred
+from google.appengine.ext import testbed
+from pyre_extensions import none_throws
 
 from backend.common.consts.event_type import EventType
-from backend.common.deferred.clients.fake_client import FakeTaskClient
 from backend.common.helpers.location_helper import LocationHelper
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.models.event import Event
@@ -14,10 +17,14 @@ from backend.common.models.event import Event
 
 @pytest.mark.usefixtures("ndb_context")
 class TestEventManipulator(unittest.TestCase):
-    def setUp(self):
-        self.task_client = FakeTaskClient()
-        self.task_client.flush()
 
+    taskqueue_stub: Optional[testbed.taskqueue_stub.TaskQueueServiceStub] = None
+
+    @pytest.fixture(autouse=True)
+    def store_taskqueue_stub(self, taskqueue_stub):
+        self.taskqueue_stub = taskqueue_stub
+
+    def setUp(self):
         self.old_event = Event(
             id="2011ct",
             end_date=datetime.datetime(2011, 4, 2, 0, 0),
@@ -109,5 +116,11 @@ class TestEventManipulator(unittest.TestCase):
 
         update_location_mock.side_effect = update_side_effect
 
-        self.task_client.drain_pending_jobs("post-update-hooks")
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        assert len(tasks) == 1
+        for task in tasks:
+            deferred.run(task.payload)
+
         assert Event.get_by_id("2011ct").timezone_id is not None

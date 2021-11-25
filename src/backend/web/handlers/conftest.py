@@ -19,7 +19,7 @@ def auto_add_ndb_stub(ndb_stub) -> None:
 
 
 @pytest.fixture
-def web_client(add_gae_builtin_testbed) -> FlaskClient:
+def web_client(gae_testbed) -> FlaskClient:
     from backend.web.main import app
 
     # Disable CSRF protection for unit testing
