@@ -13,8 +13,7 @@ RUN apt-get update && apt-get install -y \
   jq \
   tmux \
   vim \
-  openssh-server \
-  redis-server
+  openssh-server
 
 # Setup python environmenets
 RUN apt-get install -y \
