@@ -16,6 +16,6 @@ typing-extensions==4.0.0
 PyYAML==6.0
 Werkzeug==2.0.2
 appengine-python-standard==0.3.1
-redis==3.5.3
+redis==4.0.2
 requests==2.26.0
 requests-toolbelt==0.9.1
