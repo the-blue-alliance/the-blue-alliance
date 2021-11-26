@@ -12,7 +12,7 @@ from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor

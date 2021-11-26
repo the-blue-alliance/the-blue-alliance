@@ -2,7 +2,7 @@ import unittest
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.helpers.event_team_status_helper import EventTeamStatusHelper
 from backend.common.models.event import Event
@@ -22,7 +22,13 @@ def disable_db_query_cache(monkeypatch: MonkeyPatch):
     monkeypatch.setattr(CachedDatabaseQuery, "CACHE_WRITES_ENABLED", False)
 
 
-@pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
+@pytest.fixture(autouse=True)
+def auto_add_ndb_stub(ndb_stub) -> None:
+    # prevent global state from leaking
+    ndb.get_context().clear_cache()
+
+
+@pytest.mark.usefixtures("ndb_stub", "taskqueue_stub")
 class TestSimulated2016nytrEventTeamStatusHelper(unittest.TestCase):
     def test_simulated_event(self):
         es = EventSimulator()

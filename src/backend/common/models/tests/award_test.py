@@ -2,7 +2,8 @@ import json
 from datetime import datetime
 
 import pytest
-from google.cloud import ndb
+from google.appengine.api import datastore_errors
+from google.appengine.ext import ndb
 
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
@@ -37,7 +38,7 @@ def test_key_name() -> None:
 
 
 def test_award_type_validation() -> None:
-    with pytest.raises(ndb.exceptions.BadValueError):
+    with pytest.raises(datastore_errors.BadValueError):
         Award(
             id="2010ct_1",
             year=2010,
@@ -49,7 +50,7 @@ def test_award_type_validation() -> None:
 
 
 def test_event_type_validation() -> None:
-    with pytest.raises(ndb.exceptions.BadValueError):
+    with pytest.raises(datastore_errors.BadValueError):
         Award(
             id="2010ct_1",
             year=2010,

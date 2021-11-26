@@ -5,7 +5,6 @@ Flask-Caching==1.10.1
 Flask-Cors==3.0.10
 Flask-WTF==1.0.0
 google-api-python-client==2.31.0
-google-cloud-ndb==1.11.1
 google-cloud-storage==1.43.0
 grpcio==1.42.0
 Jinja2==3.0.3
@@ -17,3 +16,6 @@ typing-extensions==4.0.0
 PyYAML==6.0
 Werkzeug==2.0.2
 appengine-python-standard==0.3.1
+redis==3.5.3
+requests==2.26.0
+requests-toolbelt==0.9.1

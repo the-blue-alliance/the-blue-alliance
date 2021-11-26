@@ -4,7 +4,7 @@ import abc
 import logging
 from typing import Any, Dict, Generic, Optional, Set, Type
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws, safe_cast
 
 from backend.common.consts.api_version import ApiMajorVersion

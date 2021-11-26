@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
@@ -67,9 +67,8 @@ def _create_one_of_each_mytba_model() -> List[MyTBAModel]:
     return [ef, es, tf, ts, mf, ms]
 
 
-def test_event_models(ndb_client: ndb.Client) -> None:
-    with ndb_client.context():
-        models = _create_one_of_each_mytba_model()
+def test_event_models(ndb_stub) -> None:
+    models = _create_one_of_each_mytba_model()
 
     mytba = MyTBA(models)
     event_models = mytba.event_models
@@ -78,26 +77,20 @@ def test_event_models(ndb_client: ndb.Client) -> None:
     assert all([model.model_type == ModelType.EVENT for model in event_models])
 
 
-def test_events(ndb_client: ndb.Client) -> None:
-    with ndb_client.context():
-        models = _create_one_of_each_mytba_model()
-
+def test_events(ndb_stub) -> None:
+    models = _create_one_of_each_mytba_model()
     mytba = MyTBA(models)
-
-    with ndb_client.context():
-        events = mytba.events
+    events = mytba.events
 
     assert len(events) == 2
     assert all([type(event) is Event for event in events])
     assert {event.key.id() for event in events} == {"2020miket", "2020mitry"}
 
 
-def test_events_wildcard(ndb_client: ndb.Client) -> None:
+def test_events_wildcard(ndb_stub) -> None:
     wildcard = Subscription(model_key="2019*", model_type=ModelType.EVENT)
     mytba = MyTBA([wildcard])
-
-    with ndb_client.context():
-        events = mytba.events
+    events = mytba.events
 
     assert len(events) == 1
 
@@ -110,10 +103,8 @@ def test_events_wildcard(ndb_client: ndb.Client) -> None:
     assert wildcard_event.end_date == datetime(2019, 1, 1)
 
 
-def test_team_models(ndb_client: ndb.Client) -> None:
-    with ndb_client.context():
-        models = _create_one_of_each_mytba_model()
-
+def test_team_models(ndb_stub) -> None:
+    models = _create_one_of_each_mytba_model()
     mytba = MyTBA(models)
     team_models = mytba.team_models
 
@@ -121,24 +112,18 @@ def test_team_models(ndb_client: ndb.Client) -> None:
     assert all([model.model_type == ModelType.TEAM for model in team_models])
 
 
-def test_teams(ndb_client: ndb.Client) -> None:
-    with ndb_client.context():
-        models = _create_one_of_each_mytba_model()
-
+def test_teams(ndb_stub) -> None:
+    models = _create_one_of_each_mytba_model()
     mytba = MyTBA(models)
-
-    with ndb_client.context():
-        teams = mytba.teams
+    teams = mytba.teams
 
     assert len(teams) == 2
     assert all([type(team) is Team for team in teams])
     assert {team.key.id() for team in teams} == {"frc1", "frc2"}
 
 
-def test_match_models(ndb_client: ndb.Client) -> None:
-    with ndb_client.context():
-        models = _create_one_of_each_mytba_model()
-
+def test_match_models(ndb_stub) -> None:
+    models = _create_one_of_each_mytba_model()
     mytba = MyTBA(models)
     match_models = mytba.match_models
 
@@ -146,29 +131,21 @@ def test_match_models(ndb_client: ndb.Client) -> None:
     assert all([model.model_type == ModelType.MATCH for model in match_models])
 
 
-def test_matches(ndb_client: ndb.Client) -> None:
-    with ndb_client.context():
-        models = _create_one_of_each_mytba_model()
-
+def test_matches(ndb_stub) -> None:
+    models = _create_one_of_each_mytba_model()
     mytba = MyTBA(models)
-
-    with ndb_client.context():
-        matches = mytba.matches
+    matches = mytba.matches
 
     assert len(matches) == 2
     assert all([type(match) is Match for match in matches])
     assert {match.key.id() for match in matches} == {"2020miket_qm1", "2020miket_qm2"}
 
 
-def test_event_matches(ndb_client: ndb.Client) -> None:
-    with ndb_client.context():
-        models = _create_one_of_each_mytba_model()
-
+def test_event_matches(ndb_stub) -> None:
+    models = _create_one_of_each_mytba_model()
     mytba = MyTBA(models)
-
-    with ndb_client.context():
-        event_matches = mytba.event_matches
-        expected_key = ndb.Key(Event, "2020miket")
+    event_matches = mytba.event_matches
+    expected_key = ndb.Key(Event, "2020miket")
 
     keys = event_matches.keys()
     assert list(keys) == [expected_key]
@@ -178,12 +155,9 @@ def test_event_matches(ndb_client: ndb.Client) -> None:
     assert all([type(value) is Match for value in values])
 
 
-def test_favorite(ndb_client: ndb.Client):
-    with ndb_client.context():
-        models = _create_one_of_each_mytba_model()
-
+def test_favorite(ndb_stub):
+    models = _create_one_of_each_mytba_model()
     mytba = MyTBA(models)
-
     favorite = mytba.favorite(ModelType.TEAM, "frc2")
     assert favorite is None
 
@@ -191,12 +165,9 @@ def test_favorite(ndb_client: ndb.Client):
     assert favorite is not None
 
 
-def test_subscription(ndb_client: ndb.Client):
-    with ndb_client.context():
-        models = _create_one_of_each_mytba_model()
-
+def test_subscription(ndb_stub):
+    models = _create_one_of_each_mytba_model()
     mytba = MyTBA(models)
-
     subscription = mytba.subscription(ModelType.TEAM, "frc1")
     assert subscription is None
 

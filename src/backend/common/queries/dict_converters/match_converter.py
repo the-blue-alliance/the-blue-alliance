@@ -3,7 +3,7 @@ import json
 import time
 from typing import Dict, List, NewType
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.alliance_color import ALLIANCE_COLORS
 from backend.common.consts.api_version import ApiMajorVersion

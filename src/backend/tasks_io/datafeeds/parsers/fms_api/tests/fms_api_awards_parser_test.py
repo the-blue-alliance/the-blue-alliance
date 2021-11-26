@@ -1,7 +1,5 @@
 import json
 
-from google.cloud import ndb
-
 from backend.common.consts.event_type import EventType
 from backend.common.models.event import Event
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_awards_parser import (
@@ -9,18 +7,17 @@ from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_awards_parser import (
 )
 
 
-def test_parse_awards(test_data_importer, ndb_client: ndb.Client) -> None:
+def test_parse_awards(test_data_importer, ndb_stub) -> None:
     path = test_data_importer._get_path(__file__, "data/2017cmpmo_awards.json")
     with open(path, "r") as f:
         data = json.load(f)
 
-    with ndb_client.context():
-        event = Event(
-            event_short="cmpmo",
-            event_type_enum=EventType.CMP_FINALS,
-            year=2017,
-        )
-        awards = FMSAPIAwardsParser(event).parse(data)
+    event = Event(
+        event_short="cmpmo",
+        event_type_enum=EventType.CMP_FINALS,
+        year=2017,
+    )
+    awards = FMSAPIAwardsParser(event).parse(data)
 
     assert awards is not None
     assert len(awards) == 6
@@ -40,20 +37,17 @@ def test_parse_awards(test_data_importer, ndb_client: ndb.Client) -> None:
             assert not {"team_number": 2614, "awardee": None} in award.recipient_list
 
 
-def test_parse_awards_valid_team_nums(
-    test_data_importer, ndb_client: ndb.Client
-) -> None:
+def test_parse_awards_valid_team_nums(test_data_importer, ndb_stub) -> None:
     path = test_data_importer._get_path(__file__, "data/2017cmpmo_awards.json")
     with open(path, "r") as f:
         data = json.load(f)
 
-    with ndb_client.context():
-        event = Event(
-            event_short="cmpmo",
-            event_type_enum=EventType.CMP_FINALS,
-            year=2017,
-        )
-        awards = FMSAPIAwardsParser(event, valid_team_nums=[2169]).parse(data)
+    event = Event(
+        event_short="cmpmo",
+        event_type_enum=EventType.CMP_FINALS,
+        year=2017,
+    )
+    awards = FMSAPIAwardsParser(event, valid_team_nums=[2169]).parse(data)
 
     assert awards is not None
     assert len(awards) == 1
@@ -68,36 +62,32 @@ def test_parse_awards_valid_team_nums(
     assert not {"team_number": 2614, "awardee": None} in award.recipient_list
 
 
-def test_parse_awards_valid_award_type_enum(
-    test_data_importer, ndb_client: ndb.Client
-) -> None:
+def test_parse_awards_valid_award_type_enum(test_data_importer, ndb_stub) -> None:
     path = test_data_importer._get_path(__file__, "data/2017cmpmo_awards_garbage.json")
     with open(path, "r") as f:
         data = json.load(f)
 
-    with ndb_client.context():
-        event = Event(
-            event_short="cmpmo",
-            event_type_enum=EventType.CMP_FINALS,
-            year=2017,
-        )
-        awards = FMSAPIAwardsParser(event).parse(data)
+    event = Event(
+        event_short="cmpmo",
+        event_type_enum=EventType.CMP_FINALS,
+        year=2017,
+    )
+    awards = FMSAPIAwardsParser(event).parse(data)
 
-        assert awards is None
+    assert awards is None
 
 
-def test_parse_awards_awardee(test_data_importer, ndb_client: ndb.Client) -> None:
+def test_parse_awards_awardee(test_data_importer, ndb_stub) -> None:
     path = test_data_importer._get_path(__file__, "data/2015waamv_staging_awards.json")
     with open(path, "r") as f:
         data = json.load(f)
 
-    with ndb_client.context():
-        event = Event(
-            event_short="waamv",
-            event_type_enum=EventType.REGIONAL,
-            year=2015,
-        )
-        awards = FMSAPIAwardsParser(event).parse(data)
+    event = Event(
+        event_short="waamv",
+        event_type_enum=EventType.REGIONAL,
+        year=2015,
+    )
+    awards = FMSAPIAwardsParser(event).parse(data)
 
     assert awards is not None
     assert len(awards) == 5
@@ -124,14 +114,13 @@ def test_parse_awards_awardee(test_data_importer, ndb_client: ndb.Client) -> Non
             } in award.recipient_list
 
 
-def test_parse_awards_none(test_data_importer, ndb_client: ndb.Client) -> None:
+def test_parse_awards_none(test_data_importer, ndb_stub) -> None:
     event = Event()
 
     path = test_data_importer._get_path(__file__, "data/2017cmpmo_no_awards.json")
     with open(path, "r") as f:
         data = json.load(f)
 
-    with ndb_client.context():
-        awards = FMSAPIAwardsParser(event).parse(data)
+    awards = FMSAPIAwardsParser(event).parse(data)
 
     assert awards is None

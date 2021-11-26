@@ -1,7 +1,7 @@
 import json
 from typing import cast, Dict, List, Optional, Set
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws, safe_cast
 
 from backend.common.consts import media_tag, media_type

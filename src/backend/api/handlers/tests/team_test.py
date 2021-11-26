@@ -1,4 +1,4 @@
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from werkzeug.test import Client
 
 from backend.api.handlers.helpers.model_properties import simple_team_properties
@@ -16,13 +16,12 @@ def validate_simple_keys(team):
     assert set(team.keys()).difference(set(simple_team_properties)) == set()
 
 
-def test_team(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        ApiAuthAccess(
-            id="test_auth_key",
-            auth_types_enum=[AuthType.READ_API],
-        ).put()
-        Team(id="frc254", team_number=254).put()
+def test_team(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
 
     # Nominal response
     resp = api_client.get(
@@ -47,16 +46,15 @@ def test_team(ndb_client: ndb.Client, api_client: Client) -> None:
     assert resp.status_code == 404
 
 
-def test_team_list_all(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        ApiAuthAccess(
-            id="test_auth_key",
-            auth_types_enum=[AuthType.READ_API],
-        ).put()
-        Team(id="frc67", team_number=67).put()
-        Team(id="frc254", team_number=254).put()
-        Team(id="frc604", team_number=604).put()
-        Team(id="frc9999", team_number=9999).put()
+def test_team_list_all(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc67", team_number=67).put()
+    Team(id="frc254", team_number=254).put()
+    Team(id="frc604", team_number=604).put()
+    Team(id="frc9999", team_number=9999).put()
 
     # Nominal response
     resp = api_client.get(
@@ -96,16 +94,15 @@ def test_team_list_all(ndb_client: ndb.Client, api_client: Client) -> None:
     assert resp.json[3] == "frc9999"
 
 
-def test_team_list(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        ApiAuthAccess(
-            id="test_auth_key",
-            auth_types_enum=[AuthType.READ_API],
-        ).put()
-        Team(id="frc67", team_number=67).put()
-        Team(id="frc254", team_number=254).put()
-        Team(id="frc604", team_number=604).put()
-        Team(id="frc9999", team_number=9999).put()
+def test_team_list(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc67", team_number=67).put()
+    Team(id="frc254", team_number=254).put()
+    Team(id="frc604", team_number=604).put()
+    Team(id="frc9999", team_number=9999).put()
 
     # Nominal response
     resp = api_client.get(
@@ -182,26 +179,25 @@ def test_team_list(ndb_client: ndb.Client, api_client: Client) -> None:
     assert len(resp.json) == 0
 
 
-def test_team_list_year(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        ApiAuthAccess(
-            id="test_auth_key",
-            auth_types_enum=[AuthType.READ_API],
-        ).put()
-        Team(id="frc67", team_number=67).put()
-        Team(id="frc254", team_number=254).put()
-        EventTeam(
-            id="2020casj_frc67",
-            event=ndb.Key("Event", "2020casj"),
-            team=ndb.Key("Team", "frc67"),
-            year=2020,
-        ).put()
-        EventTeam(
-            id="2019casj_frc254",
-            event=ndb.Key("Event", "2019casj"),
-            team=ndb.Key("Team", "frc254"),
-            year=2019,
-        ).put()
+def test_team_list_year(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc67", team_number=67).put()
+    Team(id="frc254", team_number=254).put()
+    EventTeam(
+        id="2020casj_frc67",
+        event=ndb.Key("Event", "2020casj"),
+        team=ndb.Key("Team", "frc67"),
+        year=2020,
+    ).put()
+    EventTeam(
+        id="2019casj_frc254",
+        event=ndb.Key("Event", "2019casj"),
+        team=ndb.Key("Team", "frc254"),
+        year=2019,
+    ).put()
 
     # Nominal response
     resp = api_client.get(

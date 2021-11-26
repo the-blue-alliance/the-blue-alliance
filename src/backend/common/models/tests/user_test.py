@@ -1,7 +1,7 @@
 from typing import Callable
 
 import pytest
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.account_permission import AccountPermission

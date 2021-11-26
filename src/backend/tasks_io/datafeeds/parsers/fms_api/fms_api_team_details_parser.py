@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional, Tuple
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.helpers.website_helper import WebsiteHelper
 from backend.common.models.district import District

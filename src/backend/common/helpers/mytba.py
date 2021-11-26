@@ -3,7 +3,7 @@ from datetime import datetime
 from itertools import groupby
 from typing import Dict, List, Optional, Set, Type
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.model_type import ModelType
 from backend.common.models.event import Event

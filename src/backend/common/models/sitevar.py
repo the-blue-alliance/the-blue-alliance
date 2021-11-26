@@ -1,7 +1,7 @@
 import json
 from typing import Any
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 
 class Sitevar(ndb.Model):

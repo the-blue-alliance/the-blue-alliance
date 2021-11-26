@@ -3,7 +3,7 @@ from typing import Dict, List, Optional, Set
 
 import pytest
 from google.appengine.ext import deferred
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.cache_clearing.get_affected_queries import TCacheKeyAndQuery

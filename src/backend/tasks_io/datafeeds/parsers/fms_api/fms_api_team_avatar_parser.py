@@ -2,7 +2,7 @@ import json
 
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.media_type import MediaType
 from backend.common.models.media import Media

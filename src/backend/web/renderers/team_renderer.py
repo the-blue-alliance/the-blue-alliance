@@ -1,7 +1,7 @@
 import datetime
 from typing import cast, Dict, List, Optional, Tuple
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts import comp_level, event_type
 from backend.common.consts.award_type import AwardType

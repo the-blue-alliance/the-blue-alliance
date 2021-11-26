@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import cast, List
 
 import pytest
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.event_type import EventType
 from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO

@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 
 import pytest
 from bs4 import BeautifulSoup
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from werkzeug.test import Client
 
 from backend.common.consts.account_permission import AccountPermission
@@ -54,20 +54,19 @@ def get_suggestion_queue(web_client: Client) -> List[str]:
     return queue
 
 
-def createSuggestion(logged_in_user, ndb_client: ndb.Client) -> str:
-    with ndb_client.context():
-        status = SuggestionCreator.createTeamMediaSuggestion(
-            logged_in_user.account_key,
-            "http://twitter.com/frc1124",
-            "frc1124",
-            None,
-            None,
-            True,
-        )
-        assert status[0] == SuggestionCreationStatus.SUCCESS
-        return Suggestion.render_media_key_name(
-            None, "team", "frc1124", "twitter-profile", "frc1124"
-        )
+def createSuggestion(logged_in_user) -> str:
+    status = SuggestionCreator.createTeamMediaSuggestion(
+        logged_in_user.account_key,
+        "http://twitter.com/frc1124",
+        "frc1124",
+        None,
+        None,
+        True,
+    )
+    assert status[0] == SuggestionCreationStatus.SUCCESS
+    return Suggestion.render_media_key_name(
+        None, "team", "frc1124", "twitter-profile", "frc1124"
+    )
 
 
 def test_login_redirect(web_client: Client) -> None:
@@ -88,11 +87,11 @@ def test_nothing_to_review(login_user_with_permission, web_client: Client) -> No
 
 def test_accept_suggestion(
     login_user_with_permission,
-    ndb_client: ndb.Client,
+    ndb_stub,
     web_client: Client,
     taskqueue_stub,
 ) -> None:
-    suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
+    suggestion_id = createSuggestion(login_user_with_permission)
     queue = get_suggestion_queue(web_client)
     assert queue == [suggestion_id]
 
@@ -105,25 +104,22 @@ def test_accept_suggestion(
     )
     assert response.status_code == 200
 
-    with ndb_client.context():
-        suggestion = Suggestion.get_by_id(suggestion_id)
-        assert suggestion is not None
-        assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
 
-        media = Media.get_by_id(
-            Media.render_key_name(MediaType.TWITTER_PROFILE, "frc1124")
-        )
-        assert media is not None
-        assert media.foreign_key == "frc1124"
-        assert media.media_type_enum == MediaType.TWITTER_PROFILE
-        assert ndb.Key(Team, "frc1124") in media.references
-        assert media.preferred_references == []
+    media = Media.get_by_id(Media.render_key_name(MediaType.TWITTER_PROFILE, "frc1124"))
+    assert media is not None
+    assert media.foreign_key == "frc1124"
+    assert media.media_type_enum == MediaType.TWITTER_PROFILE
+    assert ndb.Key(Team, "frc1124") in media.references
+    assert media.preferred_references == []
 
 
 def test_reject_suggestion(
-    login_user_with_permission, ndb_client: ndb.Client, web_client: Client
+    login_user_with_permission, ndb_stub, web_client: Client
 ) -> None:
-    suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
+    suggestion_id = createSuggestion(login_user_with_permission)
     queue = get_suggestion_queue(web_client)
     assert queue == [suggestion_id]
 
@@ -136,10 +132,9 @@ def test_reject_suggestion(
     )
     assert response.status_code == 200
 
-    with ndb_client.context():
-        suggestion = Suggestion.get_by_id(suggestion_id)
-        assert suggestion is not None
-        assert suggestion.review_state == SuggestionState.REVIEW_REJECTED
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_REJECTED
 
-        medias = Media.query().fetch()
-        assert medias == []
+    medias = Media.query().fetch()
+    assert medias == []

@@ -6,7 +6,7 @@ from difflib import SequenceMatcher
 from typing import Dict, List, NamedTuple, Optional, Tuple, TypedDict
 
 import requests
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.memcache import MemcacheClient
 from backend.common.models.event import Event

@@ -1,7 +1,7 @@
 import datetime
 from typing import List, Optional
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.auth_type import AuthType
 from backend.common.models.account import Account

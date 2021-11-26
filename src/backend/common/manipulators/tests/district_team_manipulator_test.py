@@ -1,7 +1,7 @@
 import unittest
 
 import pytest
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.manipulators.district_team_manipulator import (
     DistrictTeamManipulator,

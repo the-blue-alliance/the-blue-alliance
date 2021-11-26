@@ -4,7 +4,7 @@ from operator import itemgetter
 from typing import List, Optional, Tuple
 
 from flask import abort
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from werkzeug.wrappers import Response
 
 from backend.common.decorators import cached_public
