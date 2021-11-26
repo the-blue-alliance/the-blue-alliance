@@ -18,7 +18,7 @@ from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
 class RenderedRankings(TypedDict):
-    rankings: Optional[List[EventRanking]]
+    rankings: List[EventRanking]
     sort_order_info: Optional[List[RankingSortOrderInfo]]
     extra_stats_info: List[RankingSortOrderInfo]
 
@@ -141,7 +141,7 @@ class EventDetails(CachedModel):
                 ]
 
         return {
-            "rankings": self.rankings2,
+            "rankings": self.rankings2 if self.rankings2 else [],
             "sort_order_info": sort_order_info,
             "extra_stats_info": extra_stats_info,
         }
