@@ -98,4 +98,5 @@ dev_appserver.py \
     --env_var FLASK_RESPONE_CACHE_ENABLED="$flask_response_cache_enabled" \
     --env_var GCLOUD_PROJECT="$application" \
     --dev_appserver_log_level="$log_level" \
+    --enable_task_running yes \
     src/default.yaml src/web.yaml src/api.yaml src/tasks_io.yaml src/dispatch.yaml
