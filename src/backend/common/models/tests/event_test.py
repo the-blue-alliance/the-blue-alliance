@@ -16,6 +16,7 @@ from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_district_points import EventDistrictPoints
+from backend.common.models.event_ranking import EventRanking
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import Year
 from backend.common.models.match import Match
@@ -449,3 +450,15 @@ def test_teams() -> None:
     clear_cached_queries()
     assert event.teams == [t]
     assert event.get_teams_async().get_result() == [t]
+
+
+def test_rankings() -> None:
+    event = Event(id="2019ct", year=2019, event_short="ct")
+    assert event.rankings is None
+
+    rankings = [EventRanking(rank=1, team_key="frc1")]
+
+    EventDetails(id="2019ct", rankings2=rankings).put()
+
+    event._details = None
+    assert event.rankings == rankings
