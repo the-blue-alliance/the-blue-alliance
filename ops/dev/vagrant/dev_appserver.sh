@@ -8,7 +8,6 @@ log_level=$(get_config_prop log_level)
 tba_log_level=$(get_config_prop tba_log_level)
 ndb_log_level=$(get_config_prop ndb_log_level)
 datastore_mode=$(get_config_prop datastore_mode)
-redis_cache_url=$(get_config_prop redis_cache_url)
 flask_response_cache_enabled=$(get_config_prop flask_response_cache_enabled)
 storage_mode=$(get_config_prop storage_mode)
 storage_path=$(get_config_prop storage_path)
@@ -51,14 +50,6 @@ elif [ "$datastore_mode" == "remote" ]; then
 else
     echo "Unknown datastore mode $datastore_mode! Must be one of [local, remote]"
     exit 1
-fi
-
-# Set up Cloud Datastore global redis cache
-if [ -z "$redis_cache_url" ]; then
-    echo "Running without redis cache"
-else
-    echo "Starting with redis cache at $redis_cache_url"
-    env+=("--env_var=REDIS_CACHE_URL=$redis_cache_url")
 fi
 
 # Setup Cloud Storage local/remote
