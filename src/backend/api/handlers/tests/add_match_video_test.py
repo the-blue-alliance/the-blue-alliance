@@ -1,7 +1,7 @@
 import json
 from typing import Dict, List
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from werkzeug.test import Client
 
 from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
@@ -68,19 +68,17 @@ def get_auth_headers(request_path: str, request_body) -> Dict[str, str]:
     }
 
 
-def test_no_auth(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        setup_event()
+def test_no_auth(ndb_stub, api_client: Client) -> None:
+    setup_event()
 
     resp = api_client.post(REQUEST_PATH, data=json.dumps({}))
     assert resp.status_code == 401
 
 
-def test_set_video(ndb_client: ndb.Client, api_client: Client, taskqueue_stub) -> None:
-    with ndb_client.context():
-        setup_event()
-        setup_auth(access_types=[AuthType.MATCH_VIDEO])
-        setup_matches()
+def test_set_video(ndb_stub, api_client: Client, taskqueue_stub) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.MATCH_VIDEO])
+    setup_matches()
 
     request_body = json.dumps({"qm1": "aFZy8iibMD0", "sf1m1": "RpSgUrsghv4"})
 
@@ -91,22 +89,19 @@ def test_set_video(ndb_client: ndb.Client, api_client: Client, taskqueue_stub) -
     )
     assert response.status_code == 200
 
-    with ndb_client.context():
-        assert set(Match.get_by_id("2014casj_qm1").youtube_videos) == {
-            "abcdef",
-            "aFZy8iibMD0",
-        }
-        assert set(Match.get_by_id("2014casj_sf1m1").youtube_videos) == {"RpSgUrsghv4"}
+    assert set(Match.get_by_id("2014casj_qm1").youtube_videos) == {
+        "abcdef",
+        "aFZy8iibMD0",
+    }
+    assert set(Match.get_by_id("2014casj_sf1m1").youtube_videos) == {"RpSgUrsghv4"}
 
 
-def test_bad_match_id(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        setup_event()
-        setup_auth(access_types=[AuthType.MATCH_VIDEO])
-        setup_matches()
+def test_bad_match_id(ndb_stub, api_client: Client) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.MATCH_VIDEO])
+    setup_matches()
 
     request_body = json.dumps({"qm1": "aFZy8iibMD0", "qm2": "abc123"})
-
     response = api_client.post(
         REQUEST_PATH,
         headers=get_auth_headers(REQUEST_PATH, request_body),
@@ -115,15 +110,15 @@ def test_bad_match_id(ndb_client: ndb.Client, api_client: Client) -> None:
     assert response.status_code == 404
 
     # make sure the valid match is unchnaged
-    with ndb_client.context():
-        assert set(Match.get_by_id("2014casj_qm1").youtube_videos) == {"abcdef"}
+    assert set(Match.get_by_id("2014casj_qm1", use_cache=False).youtube_videos) == {
+        "abcdef"
+    }
 
 
-def test_malformed_match_id(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        setup_event()
-        setup_auth(access_types=[AuthType.MATCH_VIDEO])
-        setup_matches()
+def test_malformed_match_id(ndb_stub, api_client: Client) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.MATCH_VIDEO])
+    setup_matches()
 
     request_body = json.dumps({"qm1": "aFZy8iibMD0", "zzz": "abc123"})
 
@@ -136,5 +131,4 @@ def test_malformed_match_id(ndb_client: ndb.Client, api_client: Client) -> None:
     assert response.json["Error"] == "Invalid match IDs provided: ['zzz']"
 
     # make sure the valid match is unchnaged
-    with ndb_client.context():
-        assert set(Match.get_by_id("2014casj_qm1").youtube_videos) == {"abcdef"}
+    assert set(Match.get_by_id("2014casj_qm1").youtube_videos) == {"abcdef"}

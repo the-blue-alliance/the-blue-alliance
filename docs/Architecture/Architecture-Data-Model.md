@@ -1,8 +1,8 @@
-TBA uses the [`google-cloud-ndb`](https://googleapis.dev/python/python-ndb/latest/) library to interface with the [Google Cloud Datastore](https://cloud.google.com/datastore)
+TBA uses the ndb library from the [Appengine Standard Runtime](https://github.com/GoogleCloudPlatform/appengine-python-standard) to interface with the [Google Cloud Datastore](https://cloud.google.com/datastore)
 
 Datastore is highly scalable document based NoSQL database. On top of the datastore itself, the NDB library acts as an [ORM](https://en.wikipedia.org/wiki/Object%E2%80%93relational_mapping) and provides interfaces to manage the data's schema and manipulate the data stored.
 
-[This page](https://cloud.google.com/appengine/docs/standard/python/ndb) describes an overview of the legacy NDB library - the python3 one we use is meant to be a drop-in replacement.
+[This page](https://cloud.google.com/appengine/docs/standard/python/ndb) describes an overview of the NDB library. We continue to use the legacy library to avoid breaking changes with the py2 runtime, as well as to continue using builtin memcache.
 
 The core models of the site are:
  - `Team`, which represents the most up to date info about a given FRC team. The primary key for these is of the format `frc<team number>`

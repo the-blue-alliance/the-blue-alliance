@@ -2,7 +2,7 @@ import json
 from unittest.mock import patch
 
 import pytest
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.models.district import District
 from backend.common.sitevars.website_blacklist import WebsiteBlacklist
@@ -11,13 +11,12 @@ from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_team_details_parser impo
 )
 
 
-def test_parse_team_with_district(test_data_importer, ndb_client: ndb.Client):
+def test_parse_team_with_district(test_data_importer, ndb_stub):
     path = test_data_importer._get_path(__file__, "data/2015_frc1124.json")
     with open(path, "r") as f:
         data = json.load(f)
 
-    with ndb_client.context():
-        team_details, more_results = FMSAPITeamDetailsParser(2015).parse(data)
+    team_details, more_results = FMSAPITeamDetailsParser(2015).parse(data)
 
     assert team_details is not None
     assert len(team_details) == 1
@@ -49,13 +48,12 @@ def test_parse_team_with_district(test_data_importer, ndb_client: ndb.Client):
     assert robot.robot_name == "Orion"
 
 
-def test_parse_team_with_no_district(test_data_importer, ndb_client: ndb.Client):
+def test_parse_team_with_no_district(test_data_importer, ndb_stub):
     path = test_data_importer._get_path(__file__, "data/2015_frc254.json")
     with open(path, "r") as f:
         data = json.load(f)
 
-    with ndb_client.context():
-        team_details, more_results = FMSAPITeamDetailsParser(2015).parse(data)
+    team_details, more_results = FMSAPITeamDetailsParser(2015).parse(data)
 
     assert team_details is not None
     assert len(team_details) == 1
@@ -84,13 +82,12 @@ def test_parse_team_with_no_district(test_data_importer, ndb_client: ndb.Client)
     assert robot.robot_name == "Deadlift"
 
 
-def test_parse_team_with_no_robot(test_data_importer, ndb_client: ndb.Client):
+def test_parse_team_with_no_robot(test_data_importer, ndb_stub):
     path = test_data_importer._get_path(__file__, "data/2015_frc2337.json")
     with open(path, "r") as f:
         data = json.load(f)
 
-    with ndb_client.context():
-        team_details, more_results = FMSAPITeamDetailsParser(2015).parse(data)
+    team_details, more_results = FMSAPITeamDetailsParser(2015).parse(data)
 
     assert team_details is not None
     assert len(team_details) == 1
@@ -119,15 +116,12 @@ def test_parse_team_with_no_robot(test_data_importer, ndb_client: ndb.Client):
     assert robot is None
 
 
-def test_parse_team_with_no_district_no_robot(
-    test_data_importer, ndb_client: ndb.Client
-):
+def test_parse_team_with_no_district_no_robot(test_data_importer, ndb_stub):
     path = test_data_importer._get_path(__file__, "data/2015_frc2337_stub.json")
     with open(path, "r") as f:
         data = json.load(f)
 
-    with ndb_client.context():
-        team_details, more_results = FMSAPITeamDetailsParser(2015).parse(data)
+    team_details, more_results = FMSAPITeamDetailsParser(2015).parse(data)
 
     assert team_details is not None
     assert len(team_details) == 1
@@ -180,9 +174,7 @@ def test_parse_team_with_no_district_no_robot(
         ],
     ),
 )
-def test_parse_team_websites(
-    website, expected_website, test_data_importer, ndb_client: ndb.Client
-):
+def test_parse_team_websites(website, expected_website, test_data_importer, ndb_stub):
     path = test_data_importer._get_path(__file__, "data/2015_frc1124.json")
     with open(path, "r") as f:
         data = json.load(f)
@@ -193,7 +185,7 @@ def test_parse_team_websites(
             return True
         return False
 
-    with ndb_client.context(), patch.object(
+    with patch.object(
         WebsiteBlacklist, "is_blacklisted", side_effect=blacklist_side_effect
     ):
         team_details, more_results = FMSAPITeamDetailsParser(2015).parse(data)
@@ -208,38 +200,35 @@ def test_parse_team_websites(
     assert team.website == expected_website
 
 
-def test_parse_2018_teams(test_data_importer, ndb_client: ndb.Client):
+def test_parse_2018_teams(test_data_importer, ndb_stub):
     path = test_data_importer._get_path(__file__, "data/2018_teams.json")
     with open(path, "r") as f:
         data = json.load(f)
 
-    with ndb_client.context():
-        team_details, more_results = FMSAPITeamDetailsParser(2018).parse(data)
+    team_details, more_results = FMSAPITeamDetailsParser(2018).parse(data)
 
     assert team_details is not None
     assert len(team_details) == 65
     assert more_results is True
 
 
-def test_parse_2018_teams_none(test_data_importer, ndb_client: ndb.Client):
+def test_parse_2018_teams_none(test_data_importer, ndb_stub):
     path = test_data_importer._get_path(__file__, "data/2018_teams_none.json")
     with open(path, "r") as f:
         data = json.load(f)
 
-    with ndb_client.context():
-        team_details, more_results = FMSAPITeamDetailsParser(2018).parse(data)
+    team_details, more_results = FMSAPITeamDetailsParser(2018).parse(data)
 
     assert team_details is None
     assert more_results is False
 
 
-def test_parse_2017_team(test_data_importer, ndb_client: ndb.Client):
+def test_parse_2017_team(test_data_importer, ndb_stub):
     path = test_data_importer._get_path(__file__, "data/2017_frc604.json")
     with open(path, "r") as f:
         data = json.load(f)
 
-    with ndb_client.context():
-        team_details, more_results = FMSAPITeamDetailsParser(2017).parse(data)
+    team_details, more_results = FMSAPITeamDetailsParser(2017).parse(data)
 
     assert team_details is not None
     assert len(team_details) == 1

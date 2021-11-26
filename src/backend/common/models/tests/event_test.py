@@ -4,7 +4,7 @@ from typing import Optional
 
 import pytest
 from freezegun import freeze_time
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.comp_level import CompLevel
@@ -234,9 +234,9 @@ def test_week_stored_in_context_cache() -> None:
 
     assert e.week == 0
 
-    context_cache = ndb.get_context().cache
-    assert "2019_season_start" in context_cache
-    assert context_cache["2019_season_start"] == datetime(2019, 3, 4, 0, 0)
+    from backend.common.context_cache import context_cache
+
+    assert context_cache.get("2019_season_start") == datetime(2019, 3, 4, 0, 0)
 
 
 @pytest.mark.parametrize(LOCATION_PARAMETERS[0], LOCATION_PARAMETERS[1])

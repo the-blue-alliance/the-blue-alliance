@@ -1,0 +1,3 @@
+from google.appengine.api import full_app_id as full_app_id
+
+def wrap_wsgi_app(app, use_legacy_context_mode: bool = ..., use_deferred: bool = ...): ...

@@ -1,6 +1,6 @@
 from typing import Dict, List, NewType
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.robot import Robot

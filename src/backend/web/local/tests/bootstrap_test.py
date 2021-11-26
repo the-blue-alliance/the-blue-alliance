@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from typing import cast, Dict, List
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from requests_mock.mocker import Mocker as RequestsMocker
 
 from backend.common.consts.alliance_color import AllianceColor

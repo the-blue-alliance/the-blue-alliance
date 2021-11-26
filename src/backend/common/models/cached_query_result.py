@@ -1,9 +1,11 @@
 import io
 import pickle
-from typing import Any, Optional
+import zlib
+from typing import Any
 
-from google.cloud import ndb
-from google.cloud.datastore import key as datastore_key
+from google.appengine.ext import ndb
+
+_ZLIB_COMPRESSION_MARKER = b"x\x9c"
 
 
 class ImportFixingUnpickler(pickle.Unpickler):
@@ -36,6 +38,12 @@ class ImportFixingPickleProperty(ndb.BlobProperty):
             Any: The unpickled ``value``.
         """
 
+        if getattr(self, "_compressed", False) and not isinstance(
+            value, ndb.model._CompressedValue
+        ):
+            if value.startswith(_ZLIB_COMPRESSION_MARKER):
+                value = zlib.decompress(value)
+
         file_obj = io.BytesIO(value)
         return ImportFixingUnpickler(
             file_obj, encoding="bytes", fix_imports=True
@@ -53,9 +61,3 @@ class CachedQueryResult(ndb.Model):
 
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
-
-    @classmethod
-    def _global_cache_timeout(cls, key: datastore_key.Key) -> Optional[int]:
-        # This isn't great for perf, but for as long as we have split cache
-        # pools, we need something like this
-        return 61

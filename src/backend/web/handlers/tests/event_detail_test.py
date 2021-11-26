@@ -1,5 +1,4 @@
 from bs4 import BeautifulSoup
-from google.cloud import ndb
 from werkzeug.test import Client
 
 from backend.web.handlers.tests import helpers
@@ -10,8 +9,8 @@ def test_get_bad_event_key(web_client: Client) -> None:
     assert resp.status_code == 404
 
 
-def test_render_event(ndb_client: ndb.Client, web_client: Client) -> None:
-    helpers.preseed_event(ndb_client, "2020nyny")
+def test_render_event(ndb_stub, web_client: Client) -> None:
+    helpers.preseed_event("2020nyny")
 
     resp = web_client.get("/event/2020nyny")
     assert resp.status_code == 200

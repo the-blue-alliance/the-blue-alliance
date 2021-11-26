@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.event_type import EventType, SEASON_EVENT_TYPES
 from backend.common.models.district import District

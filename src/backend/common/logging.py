@@ -12,7 +12,7 @@ def configure_logging() -> None:
 
     ndb_log_level = Environment.ndb_log_level()
     if ndb_log_level:
-        from google.cloud import ndb
+        from google.appengine.ext import ndb
 
         ndb_loggers = [
             logging.getLogger(name)

@@ -1,7 +1,7 @@
 import unittest
 
 import pytest
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.manipulators.robot_manipulator import RobotManipulator
 from backend.common.models.robot import Robot

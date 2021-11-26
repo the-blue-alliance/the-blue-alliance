@@ -17,7 +17,7 @@ from typing import (
 )
 
 from google.appengine.ext import deferred
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.cache_clearing.get_affected_queries import TCacheKeyAndQuery
 from backend.common.helpers.listify import delistify, listify
@@ -175,7 +175,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
     def findOrSpawn(cls, new_models, auto_union=True) -> Any:
         new_models = listify(new_models)
         old_models = ndb.get_multi(
-            [model.key for model in new_models], use_cache=False, use_global_cache=False
+            [model.key for model in new_models], use_cache=False, use_memcache=False
         )
         updated_models = [
             cls.updateMergeBase(new_model, old_model, auto_union)

@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.models.district import District

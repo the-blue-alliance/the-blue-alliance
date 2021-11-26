@@ -1,4 +1,4 @@
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.helpers.suggestion_fetcher import SuggestionFetcher

@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from flask import jsonify, make_response, request, Response
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.api.api_trusted_parsers.json_match_video_parser import JSONMatchVideoParser
 from backend.api.api_trusted_parsers.json_team_list_parser import (

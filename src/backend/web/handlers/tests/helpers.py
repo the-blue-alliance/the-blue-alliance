@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from typing import List, NamedTuple, Optional, Tuple
 
 import bs4
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.event_type import EventType
 from backend.common.models.district import District
@@ -57,103 +57,97 @@ class ParsedTeam(NamedTuple):
     team_location: str
 
 
-def preseed_team(ndb_client: ndb.Client, team_number: TeamNumber) -> None:
-    with ndb_client.context():
-        Team(
-            id=f"frc{team_number}",
-            team_number=team_number,
-            nickname=f"The {team_number} Team",
-            name="The Blue Alliance / Some High School",
-            city="New York",
-            state_prov="NY",
-            country="USA",
-            website="https://www.thebluealliance.com",
-            rookie_year=2008,
-        ).put()
+def preseed_team(team_number: TeamNumber) -> None:
+    Team(
+        id=f"frc{team_number}",
+        team_number=team_number,
+        nickname=f"The {team_number} Team",
+        name="The Blue Alliance / Some High School",
+        city="New York",
+        state_prov="NY",
+        country="USA",
+        website="https://www.thebluealliance.com",
+        rookie_year=2008,
+    ).put()
 
 
-def preseed_event(ndb_client: ndb.Client, event_key: EventKey) -> None:
-    with ndb_client.context():
-        Event(
-            id=event_key,
-            event_short=event_key[4:],
-            year=int(event_key[:4]),
-            name="Test Event",
-            event_type_enum=EventType.OFFSEASON,
-            start_date=datetime(2020, 3, 1),
-            end_date=datetime(2020, 3, 5),
-        ).put()
+def preseed_event(event_key: EventKey) -> None:
+    Event(
+        id=event_key,
+        event_short=event_key[4:],
+        year=int(event_key[:4]),
+        name="Test Event",
+        event_type_enum=EventType.OFFSEASON,
+        start_date=datetime(2020, 3, 1),
+        end_date=datetime(2020, 3, 5),
+    ).put()
 
 
-def preseed_district(ndb_client: ndb.Client, district_key: DistrictKey) -> None:
+def preseed_district(district_key: DistrictKey) -> None:
     year = int(district_key[:4])
-    with ndb_client.context():
-        District(
-            id=district_key,
-            year=year,
-            abbreviation=district_key[4:],
-            display_name=district_key[4:].upper(),
-        ).put()
+    District(
+        id=district_key,
+        year=year,
+        abbreviation=district_key[4:],
+        display_name=district_key[4:].upper(),
+    ).put()
 
-        ndb.put_multi(
-            [
-                Event(
-                    id=f"{year}event{i}",
-                    event_short=f"event{i}",
-                    year=year,
-                    name=f"Event {i}",
-                    district_key=ndb.Key(District, district_key),
-                    event_type_enum=EventType.DISTRICT,
-                    official=True,
-                    start_date=datetime(year, 3, 1) + timedelta(days=7 * i),
-                    end_date=datetime(year, 3, 3) + timedelta(days=7 * i),
-                )
-                for i in range(1, 6)
-            ]
-        )
-        ndb.put_multi(
-            [
-                Team(
-                    id=f"frc{i}",
-                    team_number=i,
-                    nickname=f"The {i} Team",
-                    city=f"City {i}",
-                )
-                for i in range(1, 6)
-            ]
-        )
-        ndb.put_multi(
-            [
-                DistrictTeam(
-                    id=f"{district_key}_frc{i}",
-                    year=year,
-                    district_key=ndb.Key(District, district_key),
-                    team=ndb.Key(Team, f"frc{i}"),
-                )
-                for i in range(1, 6)
-            ]
-        )
+    ndb.put_multi(
+        [
+            Event(
+                id=f"{year}event{i}",
+                event_short=f"event{i}",
+                year=year,
+                name=f"Event {i}",
+                district_key=ndb.Key(District, district_key),
+                event_type_enum=EventType.DISTRICT,
+                official=True,
+                start_date=datetime(year, 3, 1) + timedelta(days=7 * i),
+                end_date=datetime(year, 3, 3) + timedelta(days=7 * i),
+            )
+            for i in range(1, 6)
+        ]
+    )
+    ndb.put_multi(
+        [
+            Team(
+                id=f"frc{i}",
+                team_number=i,
+                nickname=f"The {i} Team",
+                city=f"City {i}",
+            )
+            for i in range(1, 6)
+        ]
+    )
+    ndb.put_multi(
+        [
+            DistrictTeam(
+                id=f"{district_key}_frc{i}",
+                year=year,
+                district_key=ndb.Key(District, district_key),
+                team=ndb.Key(Team, f"frc{i}"),
+            )
+            for i in range(1, 6)
+        ]
+    )
 
 
-def preseed_event_for_team(
-    ndb_client: ndb.Client, team_number: TeamNumber, event_key: EventKey
-) -> None:
-    with ndb_client.context():
-        Event(
-            id=event_key,
-            event_short=event_key[4:],
-            year=int(event_key[:4]),
-            name="Test Event",
-            event_type_enum=EventType.REGIONAL,
-            start_date=datetime(2020, 3, 1),
-            end_date=datetime(2020, 3, 5),
-        ).put()
-        EventTeam(
-            id=f"{event_key}_frc{team_number}",
-            event=ndb.Key(Event, event_key),
-            team=ndb.Key(Team, f"frc{team_number}"),
-            year=int(event_key[:4]),
-        ).put()
+def preseed_event_for_team(team_number: TeamNumber, event_key: EventKey) -> None:
+    Event(
+        id=event_key,
+        event_short=event_key[4:],
+        year=int(event_key[:4]),
+        name="Test Event",
+        event_type_enum=EventType.REGIONAL,
+        start_date=datetime(2020, 3, 1),
+        end_date=datetime(2020, 3, 5),
+    ).put()
+    EventTeam(
+        id=f"{event_key}_frc{team_number}",
+        event=ndb.Key(Event, event_key),
+        team=ndb.Key(Team, f"frc{team_number}"),
+        year=int(event_key[:4]),
+    ).put()
 
 
 def get_team_info(resp_data: str) -> TeamInfo:

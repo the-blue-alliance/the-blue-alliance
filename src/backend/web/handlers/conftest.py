@@ -6,6 +6,7 @@ from _pytest.monkeypatch import MonkeyPatch
 from bs4 import BeautifulSoup
 from flask import template_rendered
 from flask.testing import FlaskClient
+from google.appengine.ext import ndb
 from jinja2 import Template
 
 from backend.common import auth
@@ -15,7 +16,8 @@ from backend.common.models.user import User
 
 @pytest.fixture(autouse=True)
 def auto_add_ndb_stub(ndb_stub) -> None:
-    pass
+    # prevent global state from leaking
+    ndb.get_context().clear_cache()
 
 
 @pytest.fixture
@@ -29,13 +31,12 @@ def web_client(gae_testbed) -> FlaskClient:
 
 
 @pytest.fixture
-def login_user(ndb_client, monkeypatch: MonkeyPatch):
-    with ndb_client.context():
-        account = Account(
-            email="test@tba.com",
-            registered=True,
-        )
-        account_key = account.put()
+def login_user(ndb_stub, monkeypatch: MonkeyPatch):
+    account = Account(
+        email="test@tba.com",
+        registered=True,
+    )
+    account_key = account.put()
 
     mock_user = Mock(spec=User)
     mock_user.is_registered = True

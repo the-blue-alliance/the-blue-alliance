@@ -3,7 +3,7 @@ import datetime
 import json
 from collections import defaultdict
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor

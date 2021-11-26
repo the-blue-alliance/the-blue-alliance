@@ -1,7 +1,7 @@
 import unittest
 
 import pytest
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.media_type import MediaType
 from backend.common.manipulators.media_manipulator import MediaManipulator
