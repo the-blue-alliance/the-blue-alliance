@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from backend.tasks_io.datafeeds.datafeed_base import DatafeedBase
+from backend.tasks_io.datafeeds.datafeed_html import DatafeedHTML
 from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
@@ -13,7 +13,7 @@ def mock_parser() -> Mock:
 
 
 def test_refer(mock_parser) -> None:
-    df = DatafeedBase()
+    df = DatafeedHTML()
     url = "my.usfirst.org/myarea"
 
     with patch("requests.get") as mock_get:
@@ -35,7 +35,7 @@ def test_refer(mock_parser) -> None:
 
 @pytest.mark.parametrize("session_key", [None, "test"])
 def test_cookie(mock_parser, session_key: str) -> None:
-    df = DatafeedBase()
+    df = DatafeedHTML()
     url = "thebluealliance.com"
 
     with patch("requests.get") as mock_get:
@@ -59,7 +59,7 @@ def test_cookie(mock_parser, session_key: str) -> None:
 
 
 def test_raises(mock_parser, caplog) -> None:
-    df = DatafeedBase()
+    df = DatafeedHTML()
 
     with patch(
         "requests.get", side_effect=Exception("Mock error")
@@ -78,7 +78,7 @@ def test_raises(mock_parser, caplog) -> None:
 
 @pytest.mark.parametrize("status_code", [200, 500])
 def test_parse(mock_parser, status_code: int, caplog) -> None:
-    df = DatafeedBase()
+    df = DatafeedHTML()
     content = "content"
     expected = ([], True)
 

@@ -17,7 +17,7 @@ TModel = TypeVar("TModel")
 TParser = TypeVar("TParser", bound=ParserBase)
 
 
-class DatafeedBase(abc.ABC, Generic[TParser, TModel]):
+class DatafeedHTML(abc.ABC, Generic[TParser, TModel]):
     """
     Provides structure for fetching and parsing pages from websites.
     Other Datafeeds inherit from here.
