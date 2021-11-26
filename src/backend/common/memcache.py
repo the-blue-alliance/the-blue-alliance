@@ -2,12 +2,11 @@ from __future__ import annotations
 
 from typing import Optional
 
+from google.appengine.api import memcache
 from pyre_extensions import none_throws
 
 from backend.common.cache.cache_if import CacheIf
-from backend.common.cache.noop_cache import NoopCache
-from backend.common.cache.redis_cache import RedisCache
-from backend.common.redis import RedisClient
+from backend.common.cache.gae_builtin_cache import AppEngineBuiltinCache
 
 
 class MemcacheClient:
@@ -17,12 +16,7 @@ class MemcacheClient:
     @classmethod
     def get(cls) -> CacheIf:
         if cls._cache is None:
-            redis_client = RedisClient.get()
-            if redis_client is not None:
-                cls._cache = RedisCache(redis_client)
-            else:
-                cls._cache = NoopCache()
-
+            cls._cache = AppEngineBuiltinCache(memcache.Client())
         return none_throws(cls._cache)
 
     @classmethod

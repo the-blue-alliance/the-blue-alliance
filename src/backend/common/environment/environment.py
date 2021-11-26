@@ -44,10 +44,6 @@ class Environment:
         return os.environ.get("NDB_LOG_LEVEL")
 
     @staticmethod
-    def redis_url() -> Optional[str]:
-        return os.environ.get("REDIS_CACHE_URL")
-
-    @staticmethod
     def flask_response_cache_enabled() -> bool:
         return bool(os.environ.get("FLASK_RESPONSE_CACHE_ENABLED", True))
 
