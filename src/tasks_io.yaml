@@ -8,8 +8,6 @@ automatic_scaling:
   max_idle_instances: 1
 
 handlers:
-  - url: /_ah/queue/deferred.*
-    script: auto
-    login: admin
   - url: .*
     script: auto
+    login: admin
