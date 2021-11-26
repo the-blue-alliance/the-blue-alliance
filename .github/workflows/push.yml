@@ -209,7 +209,7 @@ jobs:
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
           service_account_key: ${{ secrets.GCLOUD_AUTH }}
       - name: Deploy
-        run: python3 ops/deploy/deploy_queues.py src/queue.yaml
+        run: gcloud app deploy src/queue.yaml
   deploy-web:
     name: Deploy Web Service
     runs-on: ubuntu-latest
