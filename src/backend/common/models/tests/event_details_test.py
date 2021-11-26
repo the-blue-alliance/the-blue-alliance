@@ -29,7 +29,7 @@ def test_render_rankings_no_data() -> None:
     details = EventDetails(id="2019nyny")
     rankings = details.renderable_rankings
     assert rankings == RenderedRankings(
-        rankings=None,
+        rankings=[],
         sort_order_info=SORT_ORDER_INFO[2019],
         extra_stats_info=[],
     )
@@ -39,7 +39,7 @@ def test_render_rankings_no_data_very_old() -> None:
     details = EventDetails(id="2000nyny")
     rankings = details.renderable_rankings
     assert rankings == RenderedRankings(
-        rankings=None,
+        rankings=[],
         sort_order_info=None,
         extra_stats_info=[],
     )
@@ -207,7 +207,7 @@ def test_render_rankings_game_year(
     details = EventDetails(id=event_key)
     rankings = details.renderable_rankings
     assert rankings == RenderedRankings(
-        rankings=details.rankings2,
+        rankings=[],
         sort_order_info=SORT_ORDER_INFO[expected_year],
         extra_stats_info=[],
     )
