@@ -468,7 +468,7 @@ class Event(CachedModel):
         if self.details is None:
             return None
         else:
-            return self.details.rankings
+            return self.details.rankings2
 
     @property
     def location(self) -> Optional[str]:
