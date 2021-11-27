@@ -8,7 +8,7 @@ from backend.common.sitevars.landing_config import LandingConfig
 from backend.web.profiled_render import render_template
 
 
-# @cached_public
+@cached_public
 def index() -> str:
     HANDLER_MAP: Dict[LandingType, Callable[[Dict[str, Any]], str]] = {
         LandingType.KICKOFF: index_kickoff,
