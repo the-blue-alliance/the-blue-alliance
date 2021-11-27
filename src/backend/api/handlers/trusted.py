@@ -2,7 +2,9 @@ from typing import List, Optional
 
 from flask import jsonify, make_response, request, Response
 from google.appengine.ext import ndb
+from google.appengine.ext.deferred import defer
 
+from backend.api.api_trusted_parsers.json_event_info_parser import JSONEventInfoParser
 from backend.api.api_trusted_parsers.json_match_video_parser import JSONMatchVideoParser
 from backend.api.api_trusted_parsers.json_team_list_parser import (
     JSONTeamListParser,
@@ -10,6 +12,9 @@ from backend.api.api_trusted_parsers.json_team_list_parser import (
 from backend.api.handlers.decorators import require_write_auth, validate_event_key
 from backend.common.consts.auth_type import AuthType
 from backend.common.futures import TypedFuture
+from backend.common.helpers.event_remapteams_helper import EventRemapTeamsHelper
+from backend.common.helpers.event_webcast_adder import EventWebcastAdder
+from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
 from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.models.event import Event
@@ -86,3 +91,35 @@ def add_match_video(event_key: EventKey) -> Response:
         MatchManipulator.createOrUpdate(matches_to_put)
 
     return jsonify({"Success": "Match videos successfully updated"})
+
+
+@require_write_auth({AuthType.EVENT_INFO})
+@validate_event_key
+def update_event_info(event_key: EventKey) -> Response:
+    parsed_info = JSONEventInfoParser.parse(request.data)
+    event: Optional[Event] = Event.get_by_id(event_key)
+    if not event:
+        return make_response(
+            jsonify({"Error": f"Event {event_key} does not exist!"}), 404
+        )
+
+    if "webcasts" in parsed_info:
+        EventWebcastAdder.add_webcast(
+            event,
+            parsed_info["webcasts"],
+            False,  # don't createOrUpdate yet
+        )
+
+    if "remap_teams" in parsed_info:
+        event.remap_teams = parsed_info["remap_teams"]
+        defer(EventRemapTeamsHelper.remap_teams, event_key, _queue="admin")
+
+    if "first_event_code" in parsed_info:
+        event.official = parsed_info["first_event_code"] is not None
+        event.first_code = parsed_info["first_event_code"]
+
+    if "playoff_type" in parsed_info:
+        event.playoff_type = parsed_info["playoff_type"]
+
+    EventManipulator.createOrUpdate(event)
+    return jsonify({"Success": f"Event {event_key} updated"})
