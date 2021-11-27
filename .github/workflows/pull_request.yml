@@ -187,20 +187,11 @@ jobs:
         run: vagrant up
       - name: Test Fullstack
         run: ./ops/test_fullstack.py
-      - name: Save Home Page Screenshot
-        uses: swinton/screenshot-website@v1.x
-        id: screenshot_home
+      - name: Comment Webpage Screenshot
+        uses: saadmk11/comment-webpage-screenshot@v0.5
         with:
-          source: http://localhost:8080
-          destination: screenshot_home.png
-          full-page: true
-      - name: Save GameDay Screenshot
-        uses: swinton/screenshot-website@v1.x
-        id: screenshot_gameday
-        with:
-          source: http://localhost:8080/gameday
-          destination: screenshot_gameday.png
-          full-page: true
+          upload_to: imgur
+          capture_urls: "http://localhost:8080, http://localhost:8080/gameday"
 
   automerge:
     needs: [py3-type, py3-lint, py3-test, node-lint, node-test, bash-lint, build-web, fullstack-test]
