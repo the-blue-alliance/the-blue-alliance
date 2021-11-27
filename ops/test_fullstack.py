@@ -49,7 +49,7 @@ if startup_success:
         r = requests.get(url)
         if r.status_code == 200:
             if "The Blue Alliance" in r.text:
-                print("Success!")
+                print("Success: Home page loaded")
                 sys.exit(0)
             else:
                 print("Fail: 200 with unexpected content")
