@@ -184,7 +184,7 @@ jobs:
       - name: Install Vagrant
         run: sudo apt-get install vagrant
       - name: Create keys file
-        run: cp tba_keys_template.js tba_keys.js
+        run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
       - name: Start Container
         run: vagrant up
       - name: Test Fullstack
