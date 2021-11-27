@@ -1,6 +1,6 @@
 from typing import List
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType

@@ -1,4 +1,3 @@
-from google.cloud import ndb
 from werkzeug.test import Client
 
 from backend.web.handlers.tests import helpers
@@ -9,14 +8,14 @@ def test_get_bad_team_num(web_client: Client) -> None:
     assert resp.status_code == 404
 
 
-def test_team_not_found(web_client: Client) -> None:
+def test_team_not_found(web_client: Client, ndb_stub) -> None:
     resp = web_client.get("/team/254/history")
     assert resp.status_code == 404
 
 
-def test_page_title(web_client: Client, ndb_client: ndb.Client) -> None:
-    helpers.preseed_team(ndb_client, 254)
-    helpers.preseed_event_for_team(ndb_client, 254, "2020test")
+def test_page_title(web_client: Client, ndb_stub) -> None:
+    helpers.preseed_team(254)
+    helpers.preseed_event_for_team(254, "2020test")
     resp = web_client.get("/team/254/history")
     assert resp.status_code == 200
     assert (

@@ -1,7 +1,7 @@
 import unittest
 
 import pytest
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.cache_clearing import get_affected_queries
 from backend.common.consts.award_type import AwardType

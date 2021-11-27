@@ -12,7 +12,7 @@
     "heatmap.js": "^2.0.5",
     "less-loader": "^10.2.0",
     "material-ui": "^0.20.2",
-    "prettier": "^2.4.1",
+    "prettier": "^2.5.0",
     "prop-types": "^15.5.10",
     "query-string": "^7.0.1",
     "react": "^17.0.2",
@@ -29,8 +29,8 @@
     "react-select": "^5.2.1",
     "redux": "^4.1.2",
     "redux-thunk": "^2.4.0",
-    "reselect": "^4.1.4",
-    "swagger-ui": "^4.1.0"
+    "reselect": "^4.1.5",
+    "swagger-ui": "^4.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.16.0",
@@ -50,7 +50,7 @@
     "md5": "^2.3.0",
     "process": "^0.11.10",
     "style-loader": "^3.3.1",
-    "webpack": "^5.64.2",
+    "webpack": "^5.64.4",
     "webpack-cli": "^4.9.1"
   },
   "scripts": {

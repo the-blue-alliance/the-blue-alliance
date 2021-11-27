@@ -3,7 +3,7 @@ from typing import Generic, List, Optional, TypeVar, Union
 
 from flask import redirect, request, url_for
 from flask.views import MethodView
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 from werkzeug.exceptions import abort, HTTPException
 from werkzeug.wrappers import Response

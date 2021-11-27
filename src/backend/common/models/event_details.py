@@ -1,7 +1,6 @@
 from typing import List, Optional, Set, TypedDict
 
-from google.cloud import ndb
-from google.cloud.datastore import key as datastore_key
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws, safe_cast
 
 from backend.common.consts.ranking_sort_orders import (
@@ -19,7 +18,7 @@ from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
 class RenderedRankings(TypedDict):
-    rankings: Optional[List[EventRanking]]
+    rankings: List[EventRanking]
     sort_order_info: Optional[List[RankingSortOrderInfo]]
     extra_stats_info: List[RankingSortOrderInfo]
 
@@ -72,19 +71,6 @@ class EventDetails(CachedModel):
             "key": set(),
         }
         super(EventDetails, self).__init__(*args, **kw)
-
-    @classmethod
-    def _global_cache_timeout(cls, key: datastore_key.Key) -> Optional[int]:
-        # Avoid import loop
-        from backend.common.models.event import Event
-
-        event: Optional[Event] = Event.get_by_id(key.id_or_name, use_global_cache=False)
-        if not event:
-            return None
-        if event.within_a_day:
-            return 61
-        else:
-            return 60 * 60 * 24  # one day in seconds
 
     @property
     def key_name(self) -> EventKey:
@@ -155,7 +141,7 @@ class EventDetails(CachedModel):
                 ]
 
         return {
-            "rankings": self.rankings2,
+            "rankings": self.rankings2 if self.rankings2 else [],
             "sort_order_info": sort_order_info,
             "extra_stats_info": extra_stats_info,
         }

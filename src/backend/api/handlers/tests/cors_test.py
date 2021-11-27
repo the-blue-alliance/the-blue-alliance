@@ -1,5 +1,4 @@
 import pytest
-from google.cloud import ndb
 from werkzeug.test import Client
 
 from backend.common.consts.event_type import EventType
@@ -7,14 +6,13 @@ from backend.common.models.event import Event
 
 
 @pytest.fixture(autouse=True)
-def setup_event(ndb_client: ndb.Client) -> None:
-    with ndb_client.context():
-        Event(
-            id="2019nyny",
-            year=2019,
-            event_short="nyny",
-            event_type_enum=EventType.OFFSEASON,
-        ).put()
+def setup_event(ndb_stub) -> None:
+    Event(
+        id="2019nyny",
+        year=2019,
+        event_short="nyny",
+        event_type_enum=EventType.OFFSEASON,
+    ).put()
 
 
 def test_api_trusted_options_expected_headers(api_client: Client) -> None:

@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam

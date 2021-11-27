@@ -8,7 +8,7 @@ from backend.common.manipulators.event_details_manipulator import (
 from backend.common.models.event_details import EventDetails
 
 
-@pytest.mark.usefixtures("ndb_context")
+@pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 class TestEventDetailsManipulator(unittest.TestCase):
     def setUp(self):
         self.old_alliance_selections = {

@@ -1,4 +1,4 @@
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from werkzeug.test import Client
 
 from backend.common.models.keys import TeamNumber
@@ -12,24 +12,22 @@ from backend.web.handlers.tests.helpers import (
 
 
 def preseed_teams(
-    ndb_client: ndb.Client,
     start_team: TeamNumber,
     end_team: TeamNumber,
     set_city: bool = False,
 ) -> None:
-    with ndb_client.context():
-        stored = ndb.put_multi(
-            [
-                Team(
-                    id=f"frc{i}",
-                    team_number=i,
-                    nickname=f"Team {i}",
-                    city=f"City {i}" if set_city else None,
-                )
-                for i in range(start_team, end_team + 1)
-            ]
-        )
-        assert len(stored) == (end_team - start_team + 1)
+    stored = ndb.put_multi(
+        [
+            Team(
+                id=f"frc{i}",
+                team_number=i,
+                nickname=f"Team {i}",
+                city=f"City {i}" if set_city else None,
+            )
+            for i in range(start_team, end_team + 1)
+        ]
+    )
+    assert len(stored) == (end_team - start_team + 1)
 
 
 def test_bad_page(web_client: Client) -> None:
@@ -57,10 +55,8 @@ def test_team_list_empty_with_page(web_client: Client) -> None:
     assert len(get_all_teams(resp.data)) == 0
 
 
-def test_team_list_sorted_by_team_num(
-    web_client: Client, ndb_client: ndb.Client
-) -> None:
-    preseed_teams(ndb_client, 1, 5)
+def test_team_list_sorted_by_team_num(web_client: Client, ndb_stub) -> None:
+    preseed_teams(1, 5)
 
     resp = web_client.get("/teams")
     assert resp.status_code == 200
@@ -71,10 +67,8 @@ def test_team_list_sorted_by_team_num(
         assert all_teams[i].team_number == all_teams[i - 1].team_number + 1
 
 
-def test_team_list_has_expected_data_no_location(
-    web_client: Client, ndb_client: ndb.Client
-) -> None:
-    preseed_teams(ndb_client, 1, 5)
+def test_team_list_has_expected_data_no_location(web_client: Client, ndb_stub) -> None:
+    preseed_teams(1, 5)
 
     resp = web_client.get("/teams")
     assert resp.status_code == 200
@@ -92,9 +86,9 @@ def test_team_list_has_expected_data_no_location(
 
 
 def test_team_list_has_expected_data_with_location(
-    web_client: Client, ndb_client: ndb.Client
+    web_client: Client, ndb_stub
 ) -> None:
-    preseed_teams(ndb_client, 1, 5, set_city=True)
+    preseed_teams(1, 5, set_city=True)
 
     resp = web_client.get("/teams")
     assert resp.status_code == 200
@@ -111,10 +105,8 @@ def test_team_list_has_expected_data_with_location(
         )
 
 
-def test_team_list_splits_teams_in_half(
-    web_client: Client, ndb_client: ndb.Client
-) -> None:
-    preseed_teams(ndb_client, 1, 5)
+def test_team_list_splits_teams_in_half(web_client: Client, ndb_stub) -> None:
+    preseed_teams(1, 5)
 
     resp = web_client.get("/teams")
     assert resp.status_code == 200
@@ -130,9 +122,9 @@ def test_team_list_splits_teams_in_half(
 
 
 def test_team_list_fetches_offset_from_page_no_data(
-    web_client: Client, ndb_client: ndb.Client
+    web_client: Client, ndb_stub
 ) -> None:
-    preseed_teams(ndb_client, 1, 5)
+    preseed_teams(1, 5)
 
     resp = web_client.get("/teams/2")
     assert resp.status_code == 200
@@ -142,10 +134,10 @@ def test_team_list_fetches_offset_from_page_no_data(
 
 
 def test_team_list_fetches_offset_from_page_with_data(
-    web_client: Client, ndb_client: ndb.Client
+    web_client: Client, ndb_stub
 ) -> None:
     # We should query for the [1000, 1004] slice
-    preseed_teams(ndb_client, 999, 1004)
+    preseed_teams(999, 1004)
 
     resp = web_client.get("/teams/2")
     assert resp.status_code == 200

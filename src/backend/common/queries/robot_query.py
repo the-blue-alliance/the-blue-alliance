@@ -1,6 +1,6 @@
 from typing import List
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.models.keys import TeamKey
 from backend.common.models.robot import Robot

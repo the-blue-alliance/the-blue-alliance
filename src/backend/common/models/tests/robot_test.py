@@ -1,6 +1,6 @@
 import pytest
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team

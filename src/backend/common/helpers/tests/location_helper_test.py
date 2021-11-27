@@ -4,7 +4,7 @@ import unittest
 from typing import Optional
 
 import pytest
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.helpers.location_helper import LocationHelper
 from backend.common.models.event import Event

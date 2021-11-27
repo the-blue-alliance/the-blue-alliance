@@ -4,8 +4,8 @@ import json
 import pickle
 
 import pytest
-from google.cloud import ndb
-from google.cloud.datastore.helpers import GeoPoint
+from google.appengine.api.datastore_types import GeoPt as GeoPoint
+from google.appengine.ext import ndb
 
 from backend.common.models.award import Award
 from backend.common.models.cached_query_result import CachedQueryResult
@@ -42,13 +42,32 @@ def clean_up_global_state():
     # These tests do some janky things with the inner kind map to
     # better test round trip serialization, so we need to make
     # sure we don't cause other tests to see RawCachedQueryResult
+    from backend.common.models.cached_query_result import CachedQueryResult
+
     ndb.Model._kind_map["CachedQueryResult"] = CachedQueryResult
     ndb.get_context().clear_cache()
 
 
+def _fix_deprecated_properties(model) -> None:
+    """
+    The legacy ndb library doesn't clean up properties that are
+    no longer defined on the model, so to make our assertions
+    cleaner, do that here
+    """
+    prop_names = model._properties.keys()
+    props_to_remote = []
+    cls = model.__class__
+    for prop in prop_names:
+        if not hasattr(cls, prop):
+            props_to_remote.append(prop)
+
+    for prop in props_to_remote:
+        model._properties.pop(prop)
+
+
 def _run_test(py2_b64_data, expected_result) -> None:
     class RawCachedQueryResult(ndb.Model):
-        result = ndb.Property()
+        result = ndb.BlobProperty(compressed=False)
 
         created = ndb.DateTimeProperty(auto_now_add=True)
         updated = ndb.DateTimeProperty(auto_now=True)
@@ -63,19 +82,22 @@ def _run_test(py2_b64_data, expected_result) -> None:
     )
 
     # Check that py3 can load an object written by py2
-    raw_entity = ndb.model._entity_to_ds_entity(raw_model)
-    query_result = ndb.model._entity_from_ds_entity(
-        raw_entity, model_class=CachedQueryResult
-    )
-    assert query_result.result == expected_result
+    raw_proto = raw_model._to_pb()
+    result_model = CachedQueryResult._from_pb(raw_proto)
+    result = result_model.result
+    if isinstance(result, list):
+        for r in result:
+            _fix_deprecated_properties(r)
+    else:
+        _fix_deprecated_properties(result)
+
+    assert result == expected_result
 
     # Check that py3 would write an equivalent object and that the round trip
     # returns the same data as the original
     check_query_result = CachedQueryResult(id="py3_data", result=expected_result)
-    check_entity = ndb.model._entity_to_ds_entity(check_query_result)
-    check_model = ndb.model._entity_from_ds_entity(
-        check_entity, model_class=CachedQueryResult
-    )
+    check_proto = check_query_result._to_pb()
+    check_model = CachedQueryResult._from_pb(check_proto)
 
     assert check_model.result == expected_result
 
@@ -169,7 +191,7 @@ def test_round_trip_model_pickle_media() -> None:
         media_type_enum=12,
         private_details_json=None,
         references=[
-            ndb.Key("Team", "frc999", project="tbatv-prod-hrd"),
+            ndb.Key("Team", "frc999", app="s~tbatv-prod-hrd"),
         ],
         year=2018,
     ).put()
@@ -204,7 +226,7 @@ eJy1VcuP5EYd3pmdMJNk0aIoKKQlJGtEpCW9M3612/aKi9ttt/vpfrjdDwWNyna57W6/Xe6HIxBEnBBH
             key=ndb.Key(
                 "Media",
                 "avatar_avatar_2018_frc999",
-                project="tbatv-prod-hrd",
+                app="s~tbatv-prod-hrd",
             ),
             created=datetime.datetime(2018, 2, 20, 10, 0, 48, 320900),
             details_json='{"base64Image": "iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOvwAADr8BOAVTJAAAABl0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC4yMfEgaZUAAAJESURBVFhHzZTBcepAEEQdhYvibCgC8ZHECIQgODoPTiQiq7f0VK3WGCP7sr/qeWZ7e3oH/P9/G4aha0qxJ0qxJ0qxJ0qxJ0qxJ0qxJ0oRxj/6Mbb1/X95Jb8Wp8Hr9dp4JWgL5F0ul1/zl4cYFOoFd8JnwO9f8fgbvMPdYmZupiEqAalxFj/N3m631b3IZTjnO6rzrIekMfsqUGihys99zqVXevaLBT3Eh8X5fG6Ve0c6fp9Jzc+uk+0ez14tyKBgWJWeEHx5RnvF67lUsVowRQYzgD4f5O9b6uqrX71qle2a7zOyDMUkjsfj3HsAfuELkkH1BdE8R+QbqloO//wrzhAfdHiUxYTP0nMW9/u9nVXRHL2VH159280XVBXVgtUHoXcqHY0PRRb4goKZ5tMPBjzQl3SP4FtU//X+OTw+PhazqtJ0x5k74XnPvr3mcXP+Y1F1Mz5B2OPxaGdfhl53/qiosnjL3589NO0wmQjMb1HV4XH8Vc/ZISu/vVyu+RaHyagqNOxLUiGX8Nm8A88in7tfF2zCKCkUs4dQ3ZdL0OcdM55Fnz5ncWjCNKAFWVJ4ID7h4dTUBTOeI3iHt+RzFodZHGWFM0SoL+i+XCx192fWs+XESmjiKPMAj0D6hHudZzNCHi2H132wEsCD8s7RfS7k5/Q7+J/5SnELPKCFDodDw5dN/1ZKcSssczqdFv8Vpe8vlOJf2O12bTmx3+9HqfZtpRR7ohR7ohR7ohR7ohR7ohR7ohR7ohR7ohR7ohT7YXj7BpL35FWepDMDAAAAAElFTkSuQmCC"}',
@@ -212,7 +234,7 @@ eJy1VcuP5EYd3pmdMJNk0aIoKKQlJGtEpCW9M3612/aKi9ttt/vpfrjdDwWNyna57W6/Xe6HIxBEnBBH
             media_type_enum=12,
             private_details_json=None,
             references=[
-                ndb.Key("Team", "frc999", project="tbatv-prod-hrd"),
+                ndb.Key("Team", "frc999", app="s~tbatv-prod-hrd"),
             ],
             updated=datetime.datetime(2018, 2, 20, 10, 0, 48, 320930),
             year=2018,
@@ -221,7 +243,7 @@ eJy1VcuP5EYd3pmdMJNk0aIoKKQlJGtEpCW9M3612/aKi9ttt/vpfrjdDwWNyna57W6/Xe6HIxBEnBBH
             key=ndb.Key(
                 "Media",
                 "grabcad_switchback-team-999-1",
-                project="tbatv-prod-hrd",
+                app="s~tbatv-prod-hrd",
             ),
             created=datetime.datetime(2020, 12, 30, 21, 58, 14, 901316),
             details_json='{"model_description": "Team 999 2018 robot called Switchback. The robot won the Industrial Design Award sponsored by General Motors at NE District Hartford Event. Also, the Team achieved to be Alliance 6 captain at the  Hartford Event.\\n\\nThe robot competed at NE District Waterbury Event, NE District Hartford Event, New England District Championship, CT FIRST State Robotics Championship, and BattleCry 19.", "model_image": "https://d2t1xqejof9utc.cloudfront.net/screenshots/pics/3579941eec849570fca523a00bf7d38b/card.jpg", "model_created": "2020-12-29T21:57:14Z", "model_name": "Switchback Team 999"}',
@@ -229,7 +251,7 @@ eJy1VcuP5EYd3pmdMJNk0aIoKKQlJGtEpCW9M3612/aKi9ttt/vpfrjdDwWNyna57W6/Xe6HIxBEnBBH
             media_type_enum=9,
             private_details_json=None,
             references=[
-                ndb.Key("Team", "frc999", project="tbatv-prod-hrd"),
+                ndb.Key("Team", "frc999", app="s~tbatv-prod-hrd"),
             ],
             updated=datetime.datetime(2020, 12, 30, 21, 58, 14, 901329),
             year=2018,
@@ -247,14 +269,14 @@ eJyVkLFKxEAURZO4kphdUMKCMtUiKriwK4iI1tZ228owm3mJEzOT5M1kISlE7fQL/AELCz/JT7C1NjuI
             key=ndb.Key(
                 "Media",
                 "instagram-profile_titaniumtigers4829",
-                project="tbatv-prod-hrd",
+                app="s~tbatv-prod-hrd",
             ),
             created=datetime.datetime(2020, 12, 20, 20, 3, 17, 962520),
             details_json=None,
             foreign_key="titaniumtigers4829",
             media_type_enum=7,
             private_details_json=None,
-            references=[ndb.Key("Team", "frc4829", project="tbatv-prod-hrd")],
+            references=[ndb.Key("Team", "frc4829", app="s~tbatv-prod-hrd")],
             updated=datetime.datetime(2020, 12, 20, 20, 3, 17, 962533),
             year=None,
         )
@@ -268,7 +290,7 @@ eJzVfEmMJFmaVnV19VR2VvdUd1fRM+3d02MdMF1TVeGRti/Zy4zv+777VMlky7PFzdzM3BZ3N28VapAQ
     """
     expected_result = [
         Event(
-            key=ndb.Key("Event", "2020arli", project="tbatv-prod-hrd"),
+            key=ndb.Key("Event", "2020arli", app="s~tbatv-prod-hrd"),
             city="Little Rock",
             country="USA",
             created=datetime.datetime(2019, 9, 4, 22, 59, 12, 341024),
@@ -317,7 +339,7 @@ eJzVfEmMJFmaVnV19VR2VvdUd1fRM+3d02MdMF1TVeGRti/Zy4zv+777VMlky7PFzdzM3BZ3N28VapAQ
             year=2020,
         ),
         Event(
-            key=ndb.Key("Event", "2020lake", project="tbatv-prod-hrd"),
+            key=ndb.Key("Event", "2020lake", app="s~tbatv-prod-hrd"),
             city="Kenner",
             country="USA",
             created=datetime.datetime(2019, 9, 4, 22, 59, 12, 343527),
@@ -374,7 +396,7 @@ def test_cached_result_district() -> None:
 eJzNmk1vG0UYx5NQEUMDRBWqKp/CnqByq52XfcuZIPVaekOVtba3dFt7naw3qZIoCLjzGfoZkCrBgQu3fgC+AFLFBXFFHNmZEHu0z2bn73WIevPL+Bn/5nmZ/8w+324MJ9NRMp7dH6WzIk+HxfufX7w4WP/su4ONR+u9tbVnnz7bnn1TDOLi6N5+Ph3de5qP8o9v3upcDHbe5S5302wrv93digeDPDlK4yKdZjtrd290N9Isv9vdKqfYH8fH/SyeJOXnd7q3v3jw8MtHOw+yURpn8c7D6WBapMNZ/kn3VjKOZ+p1EufDpxe/eK+7+d/Y/IPujePyu/LDdzpvPjp5vd35sHszHh3F2TCZJFlRfvFqu/vj9qnzJB96MpTO7qkzGk72nd0n8XiW9JzF67OeGsSEZx8TyMA6KPAju6XSEGBJetAgO1zImG+3xKLQOkgCKyAjDszmM7slX3rMOsiTLrcPcpkL/CdgwUMu7NPJS0KgyA/nI0L7HxIssK9k6NvdJmRoJxORsM/GPM8e3r4EQinkkX02l9ujW8oQyDgPiBIRAeFdDrJ7jkfAbKEPLGXA7SlQLrd9Oi6QQuEKu6HQt68SC7h9lZgv7RFX1lMkLF37MvHItYecYEAMlDuBMZ3K6rp6aveb69rzhHlAonAGTMdchpSKyB4nggHVS/pA8Wah/S9xFgG7Dg+AlPO8xrU8O7nT2exuDvMkLpKR0hydX//+84eXP7/ZOHm9V4qMTh5nz9Ps61n53U973Vd7X506+9M0K/rFtIjHzm4gek6RxJP+8+TY2b3Iu56THJWypK+Hzpzd8lfxeJwquTL/jPk9J34R56P5J175s3E6mb8Xbs+5EGp9k8CY+3ye88nPRdlgPC3nPziMx3NDnJ897jkKpZy2fDGdPk+T/mCaHZZfume9KhOrMunsviYohkK5Cyhuh/IJlNZbEJRXhXIrUNwC5fkoFFtAiSqUR6C8kHhKFcZ2UFVPWaFCEIqFCyhp95QkUFr0QlDS5ilmgZJoTrFoAeXZPSU94imlddpBVT1lhfJQKH8B5QOeIsVPS2oIyuYoW50QaPQFC6QA8BMpE0pvQ0Ri5dhDS5+ZUKHdTcKvMunN83qgBFr6mFhARW2gtEiDoNwqFKtSXRmUkVBqEisVySgtYRAqvuomJeDSZ2xSDNATghMoJboRqJVLn5p76fBjgJ6gUPq6CIo/UvyqVFcGZYYf0RM1UKT66csdBCoiOSWWhEKrn7HxMkBO8IgwqbsYhIkUv2WjT829fEoROYFA6TsYKPqsheLKoIytlwFyosZT15VROJNZJoiegBylbnhaZdT/xuQZTICe4EGVSR/rEaZwVaYAZZIGEyAnKJO+REeYiJoIl2NiKJNR+DjREqyGiUgkfQuPMAWr1ghYyhp+4kRLUH2uwKuFzwNl38qFzwWhDHnOASlBmfS9bKvYWzKfGIpklAhOhERN7DESe/rhRjt5vqSfGKrODXXEASXByBle34u28tOySPAJ3nQUICQok75/v5bYg5nMmz5ARzByiFLPnhAkcnu5rJvQI5ShjDigIhg9QUWgNFo58uCzhnHJzAEVUcOknlq+vUyAiqBM6sHgW4skgBsJRjcn9UScMC2Mkl28ZnugSl89GruOhUJFsSG2BLCHkzKqWz4aVgm53afyLfKabJI9DLGpHpQ32ETutslxQHVfXIczJehMQ2QKYAMhIa9bihoWCSjhxKbqQGowCVTQmr/Z7EugghGbuk3ocpsSKCHEpmwil8CNIrGoe1kabAIZTB2kWl8abAL3aZRc9a402ARUaA27rMm2hU1ABVKbqlelwWabJNJdKw022ySR7k1psNkmi3SXSoPNNlmkW1Eut+m1yaKg5ti7sNgmi3TrSYPNNlmkO1UabLbJIt3Y0mCzVRapPpgGm22ySHXENJhsk0S6N6bBZk0SPT5vcjncH82bXH757feXf/zz18b367VtvYP7/wLcN7ZC
     """
     expected_result = District(
-        key=ndb.Key("District", "2020in", project="tbatv-prod-hrd"),
+        key=ndb.Key("District", "2020in", app="s~tbatv-prod-hrd"),
         abbreviation="in",
         advancement=json.loads(
             '{"frc5484":{"dcmp":false,"cmp":false},"frc135":{"dcmp":false,"cmp":false},"frc1747":{"dcmp":false,"cmp":false},"frc7695":{"dcmp":false,"cmp":false},"frc7477":{"dcmp":false,"cmp":false},"frc7457":{"dcmp":false,"cmp":false},"frc7454":{"dcmp":false,"cmp":false},"frc8116":{"dcmp":false,"cmp":false},"frc7198":{"dcmp":false,"cmp":false},"frc447":{"dcmp":false,"cmp":false},"frc4926":{"dcmp":false,"cmp":false},"frc7617":{"dcmp":false,"cmp":false},"frc6451":{"dcmp":false,"cmp":false},"frc5402":{"dcmp":false,"cmp":false},"frc5010":{"dcmp":false,"cmp":false},"frc7657":{"dcmp":false,"cmp":false},"frc8232":{"dcmp":false,"cmp":false},"frc45":{"dcmp":false,"cmp":true},"frc4580":{"dcmp":false,"cmp":false},"frc3176":{"dcmp":false,"cmp":false},"frc868":{"dcmp":false,"cmp":false},"frc3487":{"dcmp":false,"cmp":false},"frc3936":{"dcmp":false,"cmp":false},"frc1555":{"dcmp":false,"cmp":false},"frc6498":{"dcmp":false,"cmp":false},"frc829":{"dcmp":false,"cmp":false},"frc1024":{"dcmp":false,"cmp":false},"frc4485":{"dcmp":false,"cmp":false},"frc7502":{"dcmp":false,"cmp":false},"frc3947":{"dcmp":false,"cmp":false},"frc3940":{"dcmp":false,"cmp":false},"frc292":{"dcmp":false,"cmp":false},"frc3865":{"dcmp":false,"cmp":false},"frc6721":{"dcmp":false,"cmp":false},"frc4982":{"dcmp":false,"cmp":false},"frc234":{"dcmp":false,"cmp":false},"frc8103":{"dcmp":false,"cmp":false},"frc2867":{"dcmp":false,"cmp":false},"frc1720":{"dcmp":false,"cmp":false},"frc1646":{"dcmp":false,"cmp":false},"frc6956":{"dcmp":false,"cmp":false},"frc1501":{"dcmp":false,"cmp":false},"frc2909":{"dcmp":false,"cmp":false},"frc3147":{"dcmp":false,"cmp":false},"frc1741":{"dcmp":true,"cmp":false},"frc71":{"dcmp":false,"cmp":false},"frc4008":{"dcmp":false,"cmp":false},"frc1529":{"dcmp":false,"cmp":false},"frc2171":{"dcmp":false,"cmp":false},"frc1018":{"dcmp":false,"cmp":false},"frc3494":{"dcmp":false,"cmp":false},"frc3180":{"dcmp":false,"cmp":false},"frc461":{"dcmp":false,"cmp":false},"frc5188":{"dcmp":false,"cmp":false},"frc2197":{"dcmp":false,"cmp":false},"frc4272":{"dcmp":false,"cmp":false},"frc3559":{"dcmp":false,"cmp":false}}'
@@ -397,10 +419,10 @@ eJzNlL1v00AYxmM3H06hChAk0AlVJlXbtKKRnZgWMREB/QNar8hy7INc6o/kfAlKEAg6lgFG+C8YmBgQ
     """
     expected_result = [
         Award(
-            key=ndb.Key("Award", "2003mi_10", project="tbatv-prod-hrd"),
+            key=ndb.Key("Award", "2003mi_10", app="s~tbatv-prod-hrd"),
             award_type_enum=10,
             created=datetime.datetime(2013, 11, 23, 21, 17, 57, 121480),
-            event=ndb.Key("Event", "2003mi", project="tbatv-prod-hrd"),
+            event=ndb.Key("Event", "2003mi", app="s~tbatv-prod-hrd"),
             event_type_enum=0,
             name_str="Rookie All Star Award Friday",
             recipient_json_list=[
@@ -408,17 +430,17 @@ eJzNlL1v00AYxmM3H06hChAk0AlVJlXbtKKRnZgWMREB/QNar8hy7INc6o/kfAlKEAg6lgFG+C8YmBgQ
                 '{"awardee": null, "team_number": 1000}',
             ],
             team_list=[
-                ndb.Key("Team", "frc1140", project="tbatv-prod-hrd"),
-                ndb.Key("Team", "frc1000", project="tbatv-prod-hrd"),
+                ndb.Key("Team", "frc1140", app="s~tbatv-prod-hrd"),
+                ndb.Key("Team", "frc1000", app="s~tbatv-prod-hrd"),
             ],
             updated=datetime.datetime(2013, 11, 23, 21, 17, 57, 121460),
             year=2003,
         ),
         Award(
-            key=ndb.Key("Award", "2004dt_2", project="tbatv-prod-hrd"),
+            key=ndb.Key("Award", "2004dt_2", app="s~tbatv-prod-hrd"),
             award_type_enum=2,
             created=datetime.datetime(2013, 11, 23, 21, 17, 20, 943970),
-            event=ndb.Key("Event", "2004dt", project="tbatv-prod-hrd"),
+            event=ndb.Key("Event", "2004dt", app="s~tbatv-prod-hrd"),
             event_type_enum=0,
             name_str="Regional Finalist",
             recipient_json_list=[
@@ -427,30 +449,30 @@ eJzNlL1v00AYxmM3H06hChAk0AlVJlXbtKKRnZgWMREB/QNar8hy7INc6o/kfAlKEAg6lgFG+C8YmBgQ
                 '{"awardee": null, "team_number": 1447}',
             ],
             team_list=[
-                ndb.Key("Team", "frc1216", project="tbatv-prod-hrd"),
-                ndb.Key("Team", "frc1000", project="tbatv-prod-hrd"),
-                ndb.Key("Team", "frc1447", project="tbatv-prod-hrd"),
+                ndb.Key("Team", "frc1216", app="s~tbatv-prod-hrd"),
+                ndb.Key("Team", "frc1000", app="s~tbatv-prod-hrd"),
+                ndb.Key("Team", "frc1447", app="s~tbatv-prod-hrd"),
             ],
             updated=datetime.datetime(2013, 11, 23, 21, 17, 20, 943960),
             year=2004,
         ),
         Award(
-            key=ndb.Key("Award", "2004dt_30", project="tbatv-prod-hrd"),
+            key=ndb.Key("Award", "2004dt_30", app="s~tbatv-prod-hrd"),
             award_type_enum=30,
             created=datetime.datetime(2013, 11, 23, 21, 17, 20, 947390),
-            event=ndb.Key("Event", "2004dt", project="tbatv-prod-hrd"),
+            event=ndb.Key("Event", "2004dt", app="s~tbatv-prod-hrd"),
             event_type_enum=0,
             name_str="DaimlerChrysler Team Spirit Award",
             recipient_json_list=['{"awardee": null, "team_number": 1000}'],
-            team_list=[ndb.Key("Team", "frc1000", project="tbatv-prod-hrd")],
+            team_list=[ndb.Key("Team", "frc1000", app="s~tbatv-prod-hrd")],
             updated=datetime.datetime(2013, 11, 23, 21, 17, 20, 947380),
             year=2004,
         ),
         Award(
-            key=ndb.Key("Award", "2007il_2", project="tbatv-prod-hrd"),
+            key=ndb.Key("Award", "2007il_2", app="s~tbatv-prod-hrd"),
             award_type_enum=2,
             created=datetime.datetime(2013, 11, 23, 21, 14, 55, 727100),
-            event=ndb.Key("Event", "2007il", project="tbatv-prod-hrd"),
+            event=ndb.Key("Event", "2007il", app="s~tbatv-prod-hrd"),
             event_type_enum=0,
             name_str="Regional Finalist",
             recipient_json_list=[
@@ -459,9 +481,9 @@ eJzNlL1v00AYxmM3H06hChAk0AlVJlXbtKKRnZgWMREB/QNar8hy7INc6o/kfAlKEAg6lgFG+C8YmBgQ
                 '{"awardee": null, "team_number": 447}',
             ],
             team_list=[
-                ndb.Key("Team", "frc1000", project="tbatv-prod-hrd"),
-                ndb.Key("Team", "frc648", project="tbatv-prod-hrd"),
-                ndb.Key("Team", "frc447", project="tbatv-prod-hrd"),
+                ndb.Key("Team", "frc1000", app="s~tbatv-prod-hrd"),
+                ndb.Key("Team", "frc648", app="s~tbatv-prod-hrd"),
+                ndb.Key("Team", "frc447", app="s~tbatv-prod-hrd"),
             ],
             updated=datetime.datetime(2013, 11, 23, 21, 14, 55, 727100),
             year=2007,
@@ -475,12 +497,12 @@ def test_cached_result_event_weird_timestamp() -> None:
 eJyVVMtu2zAQvOsrDB2aImgCUrb86L3H9tAe64DgS7EcSWRJKnUcpN/eXZGy4yQI4oNEkTszXO0OKaWxD8zp2wxe0nQ+uF4G4zJLss+yNUo3/rrlQW6y78Pb0kwyJvq6CXXHWGbEVsuQ2SL7Eew0+2ln2a+L7eV2vaPE/wuCh/sr64y62jjlYHG+3hEBYwFjOUjmuFIQMu82rKIthalEJHxQjjEuQ88bFupWT2BOLvGFiOmA6KRpLWv0vW4O4Wni0sqNMiUAuhARn+Sb+fk94r4hbr1bDnx45jG3MKaPapRY4wOUzPdNeCOzWdpUW6dVLYNWr0GkGkDB9n7D/CG3UUKOEkHzlt3pB9bxVnsEUQQtU3xeOTmlq3Mp5bw4l0IXc6SodykhRRdIKM5mlOf/CZ1OkZKWaBFqLZzmd2ywLZJPC7uIfLJIGrOTzogYXZL1roJHQe5Sr3cCRgXjcgXrkF1VYSpp3xO5RW8Vh4YnxRDDKwgJ4CkadSUYScOowakEOuHGZB40d89tjGSFh6YCc6oyeXJ5sA/UiDdNzTupPdt6041koSMWMQL/ij7moul1/nXymKs/HsbfN18mue+dM7eQ8XFFGoewgsAEGzBE8uizHNaifdIXuCK/eYJvcPrHtcvFS200yyhZHvaB5oL60/6tQkvo8utCl+8Vev/sbMroj65vhT6WvEi70P3xtBPdGcb7YFjs7XMwJTjZJ/PhMxv+kQ0eVOZvd9KVCC3ixeV1eHf7ww2IDmVwNdfd7VEIzFikFn/sUr3IbJmJ6/9Gkf/Z
     """
     expected_result = Match(
-        key=ndb.Key("Match", "2006nh_f1m1", project="tbatv-prod-hrd"),
+        key=ndb.Key("Match", "2006nh_f1m1", app="s~tbatv-prod-hrd"),
         actual_time=None,
         alliances_json='{"blue": {"dqs": [], "surrogates": [], "score": 20, "teams": ["frc319", "frc562", "frc176"]}, "red": {"dqs": [], "surrogates": [], "score": 57, "teams": ["frc1276", "frc1519", "frc133"]}}',
         comp_level="f",
         created=datetime.datetime(2019, 8, 1, 1, 47, 53, 22997),
-        event=ndb.Key("Event", "2006nh", project="tbatv-prod-hrd"),
+        event=ndb.Key("Event", "2006nh", app="s~tbatv-prod-hrd"),
         match_number=1,
         no_auto_update=False,
         post_result_time=None,
@@ -505,7 +527,7 @@ def test_cached_result_team_with_multibyte_characters() -> None:
 
     expected_result = [
         Team(
-            key=ndb.Key("Team", "frc3472", project="tbatv-prod-hrd"),
+            key=ndb.Key("Team", "frc3472", app="s~tbatv-prod-hrd"),
             city="Atizapan de Zaragoza",
             country="Mexico",
             created=None,

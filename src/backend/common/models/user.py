@@ -2,7 +2,7 @@ import random
 import string
 from typing import Any, Dict, List, Optional, Union
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws, safe_cast
 
 from backend.common.consts.account_permission import AccountPermission

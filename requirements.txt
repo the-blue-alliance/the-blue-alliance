@@ -4,9 +4,7 @@ flake8==4.0.1
 flake8-import-order
 flake8-tidy-imports
 blinker==1.4
-fakeredis
 freezegun==1.1.0
-InMemoryCloudDatastoreStub
 pre-commit
 pyre-check==0.9.8
 pytest
@@ -14,8 +12,5 @@ pytest-cov
 pytest-custom_exit_code
 pytest-testmon
 PyYAML==6.0
-redis==3.5.3
-hiredis==2.0.0
-rq-dashboard
 requests-mock
 shellcheck-py

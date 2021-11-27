@@ -1,7 +1,7 @@
 from typing import Optional
 
 from flask import redirect, request
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from werkzeug.wrappers import Response
 
 from backend.common.consts.account_permission import AccountPermission

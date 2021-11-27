@@ -6,8 +6,7 @@ import re
 import typing
 from typing import Dict, Generator, List, Optional, Set, Tuple
 
-from google.cloud import ndb
-from google.cloud.datastore import key as datastore_key
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws, safe_cast
 
 from backend.common.consts import event_type
@@ -152,16 +151,6 @@ class Event(CachedModel):
         self._week = None
         super(Event, self).__init__(*args, **kw)
 
-    @classmethod
-    def _global_cache_timeout(cls, key: datastore_key.Key) -> Optional[int]:
-        event: Optional[Event] = Event.get_by_id(key.id_or_name, use_global_cache=False)
-        if not event:
-            return None
-        if event.within_a_day:
-            return 61
-        else:
-            return 60 * 60 * 24  # one day in seconds
-
     @ndb.tasklet
     def get_awards_async(self) -> TypedFuture[List["Award"]]:
         if self._awards is None:
@@ -203,7 +192,7 @@ class Event(CachedModel):
             self.prep_details()
         if not none_throws(self._details).done():
             none_throws(self._details).wait()
-        return none_throws(self._details).result()
+        return none_throws(self._details).get_result()
 
     def prep_details(self) -> None:
         if self._details is None:
@@ -348,8 +337,8 @@ class Event(CachedModel):
             return self._week
 
         # Cache week_start for the same context
-        ndb_context = ndb.get_context()
-        context_cache = ndb_context.cache
+        from backend.common.context_cache import context_cache
+
         cache_key = "{}_season_start".format(self.year)
         season_start = context_cache.get(cache_key)
         if season_start is None:
@@ -382,7 +371,7 @@ class Event(CachedModel):
                 )
             else:
                 season_start = None
-            context_cache[cache_key] = season_start
+            context_cache.set(cache_key, season_start)
 
         if self._week is None and season_start is not None:
             # Round events that occur just before the official start-of-season to the closest week
@@ -468,7 +457,7 @@ class Event(CachedModel):
         if self.details is None:
             return None
         else:
-            return self.details.rankings
+            return self.details.rankings2
 
     @property
     def location(self) -> Optional[str]:

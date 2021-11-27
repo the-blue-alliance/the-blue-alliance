@@ -1,7 +1,7 @@
 import datetime
 from typing import List, Optional, TypedDict
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.models.event import Event
 from backend.common.models.keys import MatchKey, TeamKey

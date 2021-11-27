@@ -4,7 +4,7 @@ from random import shuffle
 
 import pytest
 from freezegun import freeze_time
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel

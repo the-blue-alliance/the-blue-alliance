@@ -6,7 +6,7 @@ from typing import List, Optional, Tuple
 from unittest.mock import Mock
 
 from freezegun import freeze_time
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 from pytest import MonkeyPatch
 from werkzeug.test import Client
@@ -78,9 +78,8 @@ def test_no_event(ndb_stub, api_client: Client) -> None:
     assert resp.json["Error"] == "Event 2019nyny not found"
 
 
-def test_not_authenticated(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        setup_event()
+def test_not_authenticated(ndb_stub, api_client: Client) -> None:
+    setup_event()
 
     with api_client.application.test_request_context():
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
@@ -91,9 +90,8 @@ def test_not_authenticated(ndb_client: ndb.Client, api_client: Client) -> None:
     )
 
 
-def test_has_auth_id_but_no_sig(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        setup_event()
+def test_has_auth_id_but_no_sig(ndb_stub, api_client: Client) -> None:
+    setup_event()
 
     with api_client.application.test_request_context():
         resp = api_client.post(
@@ -109,14 +107,13 @@ def test_has_auth_id_but_no_sig(ndb_client: ndb.Client, api_client: Client) -> N
 
 @freeze_time("2020-06-01")
 def test_admin_superpower(
-    monkeypatch: MonkeyPatch, ndb_client: ndb.Client, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
 ) -> None:
     """
     Admins can use the trusted API on anything, even official events in the past
     """
-    with ndb_client.context():
-        setup_event(event_type=EventType.REGIONAL)
-        setup_user(monkeypatch, is_admin=True)
+    setup_event(event_type=EventType.REGIONAL)
+    setup_user(monkeypatch, is_admin=True)
 
     with api_client.application.test_request_context():
         resp = api_client.post(
@@ -130,15 +127,14 @@ def test_admin_superpower(
 
 @freeze_time("2019-06-01")
 def test_eventwizard_permission_not_offseason(
-    monkeypatch: MonkeyPatch, ndb_client: ndb.Client, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
 ) -> None:
     """
     Users with the EventWizard account permission can only use it for current-year offseason events
     Here, making a request for an official event in the current year should fail
     """
-    with ndb_client.context():
-        setup_event(event_type=EventType.REGIONAL)
-        setup_user(monkeypatch, permissions=[AccountPermission.OFFSEASON_EVENTWIZARD])
+    setup_event(event_type=EventType.REGIONAL)
+    setup_user(monkeypatch, permissions=[AccountPermission.OFFSEASON_EVENTWIZARD])
 
     with api_client.application.test_request_context():
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
@@ -149,15 +145,14 @@ def test_eventwizard_permission_not_offseason(
 
 @freeze_time("2020-06-01")
 def test_eventwizard_permission_not_this_year(
-    monkeypatch: MonkeyPatch, ndb_client: ndb.Client, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
 ) -> None:
     """
     Users with the EventWizard account permission can only use it for current-year offseason events
     Here, making a request for an offseason event in the past should fail
     """
-    with ndb_client.context():
-        setup_event(event_type=EventType.OFFSEASON)
-        setup_user(monkeypatch, permissions=[AccountPermission.OFFSEASON_EVENTWIZARD])
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, permissions=[AccountPermission.OFFSEASON_EVENTWIZARD])
 
     with api_client.application.test_request_context():
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
@@ -168,15 +163,14 @@ def test_eventwizard_permission_not_this_year(
 
 @freeze_time("2019-06-01")
 def test_eventwizard_permission_passes(
-    monkeypatch: MonkeyPatch, ndb_client: ndb.Client, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
 ) -> None:
     """
     Users with the EventWizard account permission can only use it for current-year offseason events
     Here, making a request for an offseason event in the current year should succeed
     """
-    with ndb_client.context():
-        setup_event(event_type=EventType.OFFSEASON)
-        setup_user(monkeypatch, permissions=[AccountPermission.OFFSEASON_EVENTWIZARD])
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, permissions=[AccountPermission.OFFSEASON_EVENTWIZARD])
 
     with api_client.application.test_request_context():
         resp = api_client.post(
@@ -189,18 +183,15 @@ def test_eventwizard_permission_passes(
 
 @freeze_time("2019-06-01")
 def test_account_permission_logged_in_wrong_events(
-    monkeypatch: MonkeyPatch, ndb_client: ndb.Client, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
     Here, we expect failure if the user's linked auth points to a different event
     """
-    with ndb_client.context():
-        setup_event(event_type=EventType.OFFSEASON)
-        account_key = setup_user(monkeypatch, permissions=[])
-        setup_api_auth(
-            "2019other", auth_types=[AuthType.EVENT_TEAMS], owner=account_key
-        )
+    setup_event(event_type=EventType.OFFSEASON)
+    account_key = setup_user(monkeypatch, permissions=[])
+    setup_api_auth("2019other", auth_types=[AuthType.EVENT_TEAMS], owner=account_key)
 
     with api_client.application.test_request_context():
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
@@ -211,18 +202,15 @@ def test_account_permission_logged_in_wrong_events(
 
 @freeze_time("2019-06-01")
 def test_account_permission_logged_in_wrong_permissions(
-    monkeypatch: MonkeyPatch, ndb_client: ndb.Client, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
     Here, we expect failure if the linked auth points to the right event, but has the wrong permissions
     """
-    with ndb_client.context():
-        setup_event(event_type=EventType.OFFSEASON)
-        account_key = setup_user(monkeypatch, permissions=[])
-        setup_api_auth(
-            "2019nyny", auth_types=[AuthType.EVENT_RANKINGS], owner=account_key
-        )
+    setup_event(event_type=EventType.OFFSEASON)
+    account_key = setup_user(monkeypatch, permissions=[])
+    setup_api_auth("2019nyny", auth_types=[AuthType.EVENT_RANKINGS], owner=account_key)
 
     with api_client.application.test_request_context():
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
@@ -233,21 +221,20 @@ def test_account_permission_logged_in_wrong_permissions(
 
 @freeze_time("2019-06-01")
 def test_account_permission_logged_in_auth_expired(
-    monkeypatch: MonkeyPatch, ndb_client: ndb.Client, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
     Here, we expect failure if the linked auth is valid, but expired
     """
-    with ndb_client.context():
-        setup_event(event_type=EventType.OFFSEASON)
-        account_key = setup_user(monkeypatch, permissions=[])
-        setup_api_auth(
-            "2019nyny",
-            auth_types=[AuthType.EVENT_TEAMS],
-            owner=account_key,
-            expiration=datetime.datetime(2019, 1, 1),
-        )
+    setup_event(event_type=EventType.OFFSEASON)
+    account_key = setup_user(monkeypatch, permissions=[])
+    setup_api_auth(
+        "2019nyny",
+        auth_types=[AuthType.EVENT_TEAMS],
+        owner=account_key,
+        expiration=datetime.datetime(2019, 1, 1),
+    )
 
     with api_client.application.test_request_context():
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
@@ -258,21 +245,20 @@ def test_account_permission_logged_in_auth_expired(
 
 @freeze_time("2019-06-01")
 def test_account_permission_logged_in_good_forever(
-    monkeypatch: MonkeyPatch, ndb_client: ndb.Client, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
     Here, we expect success for a linked auth that never expires
     """
-    with ndb_client.context():
-        setup_event(event_type=EventType.OFFSEASON)
-        account_key = setup_user(monkeypatch, permissions=[])
-        setup_api_auth(
-            "2019nyny",
-            auth_types=[AuthType.EVENT_TEAMS],
-            owner=account_key,
-            expiration=None,
-        )
+    setup_event(event_type=EventType.OFFSEASON)
+    account_key = setup_user(monkeypatch, permissions=[])
+    setup_api_auth(
+        "2019nyny",
+        auth_types=[AuthType.EVENT_TEAMS],
+        owner=account_key,
+        expiration=None,
+    )
 
     with api_client.application.test_request_context():
         resp = api_client.post(
@@ -285,21 +271,20 @@ def test_account_permission_logged_in_good_forever(
 
 @freeze_time("2019-06-01")
 def test_account_permission_logged_in_not_expired_yet(
-    monkeypatch: MonkeyPatch, ndb_client: ndb.Client, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
     Here, we expect success for a linked auth that has an expiration which has not yet occurred
     """
-    with ndb_client.context():
-        setup_event(event_type=EventType.OFFSEASON)
-        account_key = setup_user(monkeypatch, permissions=[])
-        setup_api_auth(
-            "2019nyny",
-            auth_types=[AuthType.EVENT_TEAMS],
-            owner=account_key,
-            expiration=datetime.datetime(2019, 7, 1),
-        )
+    setup_event(event_type=EventType.OFFSEASON)
+    account_key = setup_user(monkeypatch, permissions=[])
+    setup_api_auth(
+        "2019nyny",
+        auth_types=[AuthType.EVENT_TEAMS],
+        owner=account_key,
+        expiration=datetime.datetime(2019, 7, 1),
+    )
 
     with api_client.application.test_request_context():
         resp = api_client.post(
@@ -312,18 +297,15 @@ def test_account_permission_logged_in_not_expired_yet(
 
 @freeze_time("2019-06-01")
 def test_explicit_auth_bad_id(
-    monkeypatch: MonkeyPatch, ndb_client: ndb.Client, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
     Here, we expect failure if we pass an auth_id that doesn't exist in the db
     """
-    with ndb_client.context():
-        setup_event(event_type=EventType.OFFSEASON)
-        setup_user(monkeypatch, permissions=[])
-        auth_id, auth_secret = setup_api_auth(
-            "2019nyny", auth_types=[AuthType.EVENT_TEAMS]
-        )
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth("2019nyny", auth_types=[AuthType.EVENT_TEAMS])
 
     with api_client.application.test_request_context():
         request_data = json.dumps([])
@@ -345,18 +327,15 @@ def test_explicit_auth_bad_id(
 
 @freeze_time("2019-06-01")
 def test_explicit_auth_bad_secret(
-    monkeypatch: MonkeyPatch, ndb_client: ndb.Client, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
     Here, we expect failure if we pass a correct auth_id, but incorrect signature
     """
-    with ndb_client.context():
-        setup_event(event_type=EventType.OFFSEASON)
-        setup_user(monkeypatch, permissions=[])
-        auth_id, auth_secret = setup_api_auth(
-            "2019nyny", auth_types=[AuthType.EVENT_TEAMS]
-        )
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth("2019nyny", auth_types=[AuthType.EVENT_TEAMS])
 
     with api_client.application.test_request_context():
         request_data = json.dumps([])
@@ -379,18 +358,17 @@ def test_explicit_auth_bad_secret(
 
 @freeze_time("2019-06-01")
 def test_explicit_auth_wrong_event(
-    monkeypatch: MonkeyPatch, ndb_client: ndb.Client, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
     Here, we expect failure if we pass a correct auth_id, but it is linked to the wrong event
     """
-    with ndb_client.context():
-        setup_event(event_type=EventType.OFFSEASON)
-        setup_user(monkeypatch, permissions=[])
-        auth_id, auth_secret = setup_api_auth(
-            "2019other", auth_types=[AuthType.EVENT_TEAMS]
-        )
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        "2019other", auth_types=[AuthType.EVENT_TEAMS]
+    )
 
     with api_client.application.test_request_context():
         request_data = json.dumps([])
@@ -412,18 +390,17 @@ def test_explicit_auth_wrong_event(
 
 @freeze_time("2019-06-01")
 def test_explicit_auth_wrong_permission(
-    monkeypatch: MonkeyPatch, ndb_client: ndb.Client, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
     Here, we expect failure if we pass a correct auth_id, but it does not have the right permissions
     """
-    with ndb_client.context():
-        setup_event(event_type=EventType.OFFSEASON)
-        setup_user(monkeypatch, permissions=[])
-        auth_id, auth_secret = setup_api_auth(
-            "2019nyny", auth_types=[AuthType.EVENT_RANKINGS]
-        )
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        "2019nyny", auth_types=[AuthType.EVENT_RANKINGS]
+    )
 
     with api_client.application.test_request_context():
         request_data = json.dumps([])
@@ -445,20 +422,19 @@ def test_explicit_auth_wrong_permission(
 
 @freeze_time("2019-06-01")
 def test_explicit_auth_expired(
-    monkeypatch: MonkeyPatch, ndb_client: ndb.Client, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
     Here, we expect failure if we pass a valid auth_id, but it is expired
     """
-    with ndb_client.context():
-        setup_event(event_type=EventType.OFFSEASON)
-        setup_user(monkeypatch, permissions=[])
-        auth_id, auth_secret = setup_api_auth(
-            "2019nyny",
-            auth_types=[AuthType.EVENT_TEAMS],
-            expiration=datetime.datetime(2019, 1, 1),
-        )
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        "2019nyny",
+        auth_types=[AuthType.EVENT_TEAMS],
+        expiration=datetime.datetime(2019, 1, 1),
+    )
 
     with api_client.application.test_request_context():
         request_data = json.dumps([])
@@ -480,20 +456,19 @@ def test_explicit_auth_expired(
 
 @freeze_time("2019-06-01")
 def test_explicit_auth_good_forever(
-    monkeypatch: MonkeyPatch, ndb_client: ndb.Client, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
     Here, we expect success if we pass a valid auth_id and it should never expire
     """
-    with ndb_client.context():
-        setup_event(event_type=EventType.OFFSEASON)
-        setup_user(monkeypatch, permissions=[])
-        auth_id, auth_secret = setup_api_auth(
-            "2019nyny",
-            auth_types=[AuthType.EVENT_TEAMS],
-            expiration=None,
-        )
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        "2019nyny",
+        auth_types=[AuthType.EVENT_TEAMS],
+        expiration=None,
+    )
 
     with api_client.application.test_request_context():
         request_data = json.dumps([])
@@ -515,20 +490,19 @@ def test_explicit_auth_good_forever(
 
 @freeze_time("2019-06-01")
 def test_explicit_auth_not_expired(
-    monkeypatch: MonkeyPatch, ndb_client: ndb.Client, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
     Here, we expect success if we pass a valid auth_id that has an expiration which has not yet occurred
     """
-    with ndb_client.context():
-        setup_event(event_type=EventType.OFFSEASON)
-        setup_user(monkeypatch, permissions=[])
-        auth_id, auth_secret = setup_api_auth(
-            "2019nyny",
-            auth_types=[AuthType.EVENT_TEAMS],
-            expiration=datetime.datetime(2019, 7, 1),
-        )
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        "2019nyny",
+        auth_types=[AuthType.EVENT_TEAMS],
+        expiration=datetime.datetime(2019, 7, 1),
+    )
 
     with api_client.application.test_request_context():
         request_data = json.dumps([])

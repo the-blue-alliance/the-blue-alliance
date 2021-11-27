@@ -1,6 +1,6 @@
 from typing import Callable, cast, TypeVar
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from pyre_extensions import ParameterSpecification
 
 from backend.common.futures import TypedFuture

@@ -1,40 +1,15 @@
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 from flask import Flask
-from google.cloud import ndb
 from werkzeug.wrappers import Request
 from werkzeug.wsgi import ClosingIterator
 
 from backend.common.environment import Environment
 from backend.common.profiler import send_traces, Span, trace_context
-from backend.common.redis import RedisClient
 from backend.common.run_after_response import execute_callbacks
 
 
-class NdbMiddleware(object):
-
-    """
-    A middleware that gives each request access to an ndb context
-    """
-
-    app: Callable[[Any, Any], Any]
-    ndb_client: ndb.Client
-    global_cache: Optional[ndb.GlobalCache]
-
-    def __init__(self, app: Callable[[Any, Any], Any]):
-        self.app = app
-        self.ndb_client = ndb.Client()
-        redis_client = RedisClient.get()
-        self.global_cache = ndb.RedisCache(redis_client) if redis_client else None
-
-    def __call__(self, environ: Any, start_response: Any):
-        with self.ndb_client.context(
-            global_cache=self.global_cache,
-        ):
-            return self.app(environ, start_response)
-
-
-class TraceRequestMiddleware(object):
+class TraceRequestMiddleware:
     """
     A middleware that gives trace_context access to the request
     """
@@ -49,11 +24,16 @@ class TraceRequestMiddleware(object):
         return self.app(environ, start_response)
 
 
-class AfterResponseMiddleware(NdbMiddleware):
+class AfterResponseMiddleware:
     """
     A middleware that handles tasks after handling the response.
     Inherits from NdbMiddleware to access the ndb context.
     """
+
+    app: Callable[[Any, Any], Any]
+
+    def __init__(self, app: Callable[[Any, Any], Any]):
+        self.app = app
 
     def __call__(self, environ: Any, start_response: Any):
         return ClosingIterator(self.app(environ, start_response), self._run_after)
@@ -62,8 +42,7 @@ class AfterResponseMiddleware(NdbMiddleware):
         with Span("Running AfterResponseMiddleware"):
             pass
         send_traces()
-        with self.ndb_client.context(global_cache=self.global_cache):
-            execute_callbacks()
+        execute_callbacks()
 
 
 def install_middleware(app: Flask, configure_secret_key: bool = True) -> None:
@@ -78,7 +57,6 @@ def install_middleware(app: Flask, configure_secret_key: bool = True) -> None:
     middlewares = [
         AfterResponseMiddleware,
         TraceRequestMiddleware,
-        NdbMiddleware,
     ]
     for middleware in middlewares:
         app.wsgi_app = middleware(app.wsgi_app)  # type: ignore[override]

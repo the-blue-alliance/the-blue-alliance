@@ -1,7 +1,7 @@
 import re
 from typing import List, Set
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from pyre_extensions import safe_cast
 
 from backend.common.models.cached_model import CachedModel

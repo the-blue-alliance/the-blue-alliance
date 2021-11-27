@@ -18,7 +18,13 @@ Updated to use Google Cloud NDB + Python3
 import json
 from datetime import date, datetime, time
 
-from google.cloud.ndb.model import DateProperty, DateTimeProperty, TimeProperty
+from google.appengine.ext import ndb
+from google.appengine.ext.ndb.model import (
+    DateProperty,
+    DateTimeProperty,
+    KeyProperty,
+    TimeProperty,
+)
 
 
 def _sensible_value(attribute_type, value):
@@ -33,6 +39,8 @@ def _sensible_value(attribute_type, value):
     elif type(attribute_type) is DateProperty:
         dt = datetime.strptime(value, "%Y-%m-%d")
         retval = date(dt.year, dt.month, dt.day)
+    elif type(attribute_type) is KeyProperty and value is not None:
+        retval = ndb.Key(attribute_type._kind, value)
     else:
         retval = value
 
@@ -73,7 +81,7 @@ def load_fixture(filename, kind, post_processor=None):
             attribute_value = _sensible_value(
                 attribute_type, presets.get(attribute_name, od.get(attribute_name))
             )
-            obj.__dict__["_values"][attribute_name] = attribute_value
+            attribute_type._set_value(obj, attribute_value)
 
         if post_processor:
             post_processor(obj)

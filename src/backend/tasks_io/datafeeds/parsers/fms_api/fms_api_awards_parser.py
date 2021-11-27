@@ -1,7 +1,7 @@
 import json
 from typing import Any, Dict, List, Optional
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.helpers.award_helper import AwardHelper
 from backend.common.models.award import Award

@@ -4,13 +4,13 @@ There are a number of layers of caching. Here is an over of each, from lowest to
 
 ## NDB Caching
 
-TBA uses the [`google-cloud-ndb`](https://googleapis.dev/python/python-ndb/latest/) library to interface with the datastore. This library has two caching mechanisms built in. [This page](https://cloud.google.com/appengine/docs/standard/python/ndb/cache) describes the caching behavior of the legacy python2.7 NDB library, which the new one emulates.
+[This page](https://cloud.google.com/appengine/docs/standard/python/ndb/cache) describes the caching behavior of the legacy builtin NDB library, which we use.
 
 ### Per-Request Context Cache
 
 Each HTTP request has its own "context" which is visible to only that request. Within the context, the NDB library stores every entity it sees in memory. On reads, the context cache is checked first, and if present, a value is returned. The result of reads is also written back to the context cache, for the benefit of future reads. Additionally, data being written is also duplicated in the context cache.
 
-### Global Redis Cache
+### Global Memcache
 
 The legacy NDB libray used legacy App Engine's hosted memcache as a layer after the context cache. Memcache is slower than the in-context cache, but still faster than reading from the datastore. The Cloud NDB library connects to a Redis instance running on [Google Cloud Memorystore](https://cloud.google.com/memorystore) and reads/writes to it with similar semantics to the context cache.
 

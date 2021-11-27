@@ -6,7 +6,7 @@ from backend.common.manipulators.team_manipulator import TeamManipulator
 from backend.common.models.team import Team
 
 
-@pytest.mark.usefixtures("ndb_context")
+@pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 class TestTeamManipulator(unittest.TestCase):
     def setUp(self):
         self.old_team = Team(

@@ -2,13 +2,12 @@ import itertools
 from unittest.mock import patch
 
 import pytest
-from google.cloud import ndb
 
 from backend.common.google_analytics import GoogleAnalytics
 
 
 @pytest.fixture(autouse=True)
-def auto_add_ndb_context(ndb_context: ndb.Context) -> None:
+def auto_add_ndb_stub(ndb_stub) -> None:
     pass
 
 

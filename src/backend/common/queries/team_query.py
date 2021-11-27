@@ -1,6 +1,6 @@
 from typing import List, Optional, Set
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam

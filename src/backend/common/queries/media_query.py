@@ -1,6 +1,6 @@
 from typing import cast, List
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.media_tag import MediaTag
 from backend.common.models.event import Event

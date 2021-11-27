@@ -1,30 +1,26 @@
 import json
 
-from google.cloud import ndb
-
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_event_rankings_parser import (
     FMSAPIEventRankingsParser,
 )
 
 
-def test_parse_event_rankings_none(test_data_importer, ndb_client: ndb.Client):
+def test_parse_event_rankings_none(test_data_importer, ndb_stub):
     path = test_data_importer._get_path(__file__, "data/2015miket_rankings_none.json")
     with open(path, "r") as f:
         data = json.load(f)
 
-    with ndb_client.context():
-        rankings = FMSAPIEventRankingsParser(2015).parse(data)
+    rankings = FMSAPIEventRankingsParser(2015).parse(data)
 
     assert rankings is None
 
 
-def test_parse_event_rankings_2015(test_data_importer, ndb_client: ndb.Client):
+def test_parse_event_rankings_2015(test_data_importer, ndb_stub):
     path = test_data_importer._get_path(__file__, "data/2015miket_rankings.json")
     with open(path, "r") as f:
         data = json.load(f)
 
-    with ndb_client.context():
-        rankings = FMSAPIEventRankingsParser(2015).parse(data)
+    rankings = FMSAPIEventRankingsParser(2015).parse(data)
 
     assert rankings is not None
     assert len(rankings) == 41
@@ -55,13 +51,12 @@ def test_parse_event_rankings_2015(test_data_importer, ndb_client: ndb.Client):
     }
 
 
-def test_parse_event_rankings_2016(test_data_importer, ndb_client: ndb.Client):
+def test_parse_event_rankings_2016(test_data_importer, ndb_stub):
     path = test_data_importer._get_path(__file__, "data/2016miket_rankings.json")
     with open(path, "r") as f:
         data = json.load(f)
 
-    with ndb_client.context():
-        rankings = FMSAPIEventRankingsParser(2016).parse(data)
+    rankings = FMSAPIEventRankingsParser(2016).parse(data)
 
     assert rankings is not None
     assert len(rankings) == 40
@@ -92,13 +87,12 @@ def test_parse_event_rankings_2016(test_data_importer, ndb_client: ndb.Client):
     }
 
 
-def test_parse_event_rankings_2017(test_data_importer, ndb_client: ndb.Client):
+def test_parse_event_rankings_2017(test_data_importer, ndb_stub):
     path = test_data_importer._get_path(__file__, "data/2017miket_rankings.json")
     with open(path, "r") as f:
         data = json.load(f)
 
-    with ndb_client.context():
-        rankings = FMSAPIEventRankingsParser(2017).parse(data)
+    rankings = FMSAPIEventRankingsParser(2017).parse(data)
 
     assert rankings is not None
     assert len(rankings) == 38
@@ -129,13 +123,12 @@ def test_parse_event_rankings_2017(test_data_importer, ndb_client: ndb.Client):
     }
 
 
-def test_parse_event_rankings_2020(test_data_importer, ndb_client: ndb.Client):
+def test_parse_event_rankings_2020(test_data_importer, ndb_stub):
     path = test_data_importer._get_path(__file__, "data/2020miket_rankings.json")
     with open(path, "r") as f:
         data = json.load(f)
 
-    with ndb_client.context():
-        rankings = FMSAPIEventRankingsParser(2020).parse(data)
+    rankings = FMSAPIEventRankingsParser(2020).parse(data)
 
     assert rankings is not None
     assert len(rankings) == 40

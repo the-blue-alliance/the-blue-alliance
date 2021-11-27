@@ -1,5 +1,4 @@
 import pytest
-from google.cloud import ndb
 from werkzeug.test import Client
 
 from backend.common.consts.auth_type import AuthType
@@ -10,19 +9,18 @@ from backend.common.sitevars.apistatus_fmsapi_down import ApiStatusFMSApiDown
 
 
 @pytest.mark.parametrize("fmsapi_down", [True, False])
-def test_status(fmsapi_down, ndb_client: ndb.Client, api_client: Client) -> None:
+def test_status(fmsapi_down, ndb_stub, api_client: Client) -> None:
     status = apistatus.ContentType(
         current_season=2019, max_season=2020, web=None, android=None, ios=None
     )
 
-    with ndb_client.context():
-        ApiAuthAccess(
-            id="test_auth_key",
-            auth_types_enum=[AuthType.READ_API],
-        ).put()
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
 
-        ApiStatus.put(status)
-        ApiStatusFMSApiDown.put(fmsapi_down)
+    ApiStatus.put(status)
+    ApiStatusFMSApiDown.put(fmsapi_down)
 
     resp = api_client.get("/api/v3/status", headers={"X-TBA-Auth-Key": "test_auth_key"})
     assert resp.status_code == 200

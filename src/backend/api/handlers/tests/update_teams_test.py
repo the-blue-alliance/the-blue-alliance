@@ -1,7 +1,7 @@
 import json
 from typing import Dict, List
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from werkzeug.test import Client
 
 from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
@@ -66,19 +66,16 @@ def setup_teams() -> None:
     Team(id="frc100", team_number=100).put()
 
 
-def test_no_auth(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        setup_event()
-
+def test_no_auth(ndb_stub, api_client: Client) -> None:
+    setup_event()
     resp = api_client.post(REQUEST_PATH, data=json.dumps([]))
     assert resp.status_code == 401
 
 
-def test_set_teams(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        setup_event()
-        setup_teams()
-        setup_auth(access_types=[AuthType.EVENT_TEAMS])
+def test_set_teams(ndb_stub, api_client: Client, taskqueue_stub) -> None:
+    setup_event()
+    setup_teams()
+    setup_auth(access_types=[AuthType.EVENT_TEAMS])
 
     request_body = json.dumps(["frc254", "frc971", "frc604"])
 
@@ -90,24 +87,22 @@ def test_set_teams(ndb_client: ndb.Client, api_client: Client) -> None:
     assert response.status_code == 200, response.data
     assert "Success" in response.json
 
-    with ndb_client.context():
-        db_eventteams = EventTeam.query(
-            EventTeam.event == ndb.Key(Event, "2014casj")
-        ).fetch(keys_only=True)
+    db_eventteams = EventTeam.query(
+        EventTeam.event == ndb.Key(Event, "2014casj")
+    ).fetch(keys_only=True)
 
-        assert db_eventteams == [
-            ndb.Key(EventTeam, "2014casj_frc254"),
-            ndb.Key(EventTeam, "2014casj_frc971"),
-            ndb.Key(EventTeam, "2014casj_frc604"),
-        ]
+    assert db_eventteams == [
+        ndb.Key(EventTeam, "2014casj_frc254"),
+        ndb.Key(EventTeam, "2014casj_frc604"),
+        ndb.Key(EventTeam, "2014casj_frc971"),
+    ]
 
 
-def test_remove_teams(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        setup_event()
-        setup_teams()
-        setup_eventteams(["frc254", "frc971", "frc604"])
-        setup_auth(access_types=[AuthType.EVENT_TEAMS])
+def test_remove_teams(ndb_stub, api_client: Client, taskqueue_stub) -> None:
+    setup_event()
+    setup_teams()
+    setup_eventteams(["frc254", "frc971", "frc604"])
+    setup_auth(access_types=[AuthType.EVENT_TEAMS])
 
     request_body = json.dumps([])
 
@@ -119,20 +114,18 @@ def test_remove_teams(ndb_client: ndb.Client, api_client: Client) -> None:
     assert response.status_code == 200, response.data
     assert "Success" in response.json
 
-    with ndb_client.context():
-        db_eventteams = EventTeam.query(
-            EventTeam.event == ndb.Key(Event, "2014casj")
-        ).fetch(keys_only=True)
+    db_eventteams = EventTeam.query(
+        EventTeam.event == ndb.Key(Event, "2014casj")
+    ).fetch(keys_only=True)
 
-        assert db_eventteams == []
+    assert db_eventteams == []
 
 
-def test_update_teams(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        setup_event()
-        setup_teams()
-        setup_eventteams(["frc254", "frc971", "frc604"])
-        setup_auth(access_types=[AuthType.EVENT_TEAMS])
+def test_update_teams(ndb_stub, api_client: Client, taskqueue_stub) -> None:
+    setup_event()
+    setup_teams()
+    setup_eventteams(["frc254", "frc971", "frc604"])
+    setup_auth(access_types=[AuthType.EVENT_TEAMS])
 
     request_body = json.dumps(["frc254", "frc100"])
 
@@ -144,22 +137,20 @@ def test_update_teams(ndb_client: ndb.Client, api_client: Client) -> None:
     assert response.status_code == 200, response.data
     assert "Success" in response.json
 
-    with ndb_client.context():
-        db_eventteams = EventTeam.query(
-            EventTeam.event == ndb.Key(Event, "2014casj")
-        ).fetch(keys_only=True)
+    db_eventteams = EventTeam.query(
+        EventTeam.event == ndb.Key(Event, "2014casj")
+    ).fetch(keys_only=True)
 
-        assert db_eventteams == [
-            ndb.Key(EventTeam, "2014casj_frc254"),
-            ndb.Key(EventTeam, "2014casj_frc100"),
-        ]
+    assert db_eventteams == [
+        ndb.Key(EventTeam, "2014casj_frc100"),
+        ndb.Key(EventTeam, "2014casj_frc254"),
+    ]
 
 
-def test_unknown_teams_skipped(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        setup_event()
-        setup_teams()
-        setup_auth(access_types=[AuthType.EVENT_TEAMS])
+def test_unknown_teams_skipped(ndb_stub, api_client: Client, taskqueue_stub) -> None:
+    setup_event()
+    setup_teams()
+    setup_auth(access_types=[AuthType.EVENT_TEAMS])
 
     request_body = json.dumps(["frc254", "frc971", "frc148"])
 
@@ -171,22 +162,20 @@ def test_unknown_teams_skipped(ndb_client: ndb.Client, api_client: Client) -> No
     assert response.status_code == 200, response.data
     assert "Success" in response.json
 
-    with ndb_client.context():
-        db_eventteams = EventTeam.query(
-            EventTeam.event == ndb.Key(Event, "2014casj")
-        ).fetch(keys_only=True)
+    db_eventteams = EventTeam.query(
+        EventTeam.event == ndb.Key(Event, "2014casj")
+    ).fetch(keys_only=True)
 
-        assert db_eventteams == [
-            ndb.Key(EventTeam, "2014casj_frc254"),
-            ndb.Key(EventTeam, "2014casj_frc971"),
-        ]
+    assert db_eventteams == [
+        ndb.Key(EventTeam, "2014casj_frc254"),
+        ndb.Key(EventTeam, "2014casj_frc971"),
+    ]
 
 
-def test_bad_team_key(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        setup_event()
-        setup_teams()
-        setup_auth(access_types=[AuthType.EVENT_TEAMS])
+def test_bad_team_key(ndb_stub, api_client: Client) -> None:
+    setup_event()
+    setup_teams()
+    setup_auth(access_types=[AuthType.EVENT_TEAMS])
 
     request_body = json.dumps(["frc254", "asdf"])
 
@@ -198,19 +187,17 @@ def test_bad_team_key(ndb_client: ndb.Client, api_client: Client) -> None:
     assert response.status_code == 400, response.data
     assert response.json["Error"] == "Invalid team keys provided: ['asdf']"
 
-    with ndb_client.context():
-        db_eventteams = EventTeam.query(
-            EventTeam.event == ndb.Key(Event, "2014casj")
-        ).fetch(keys_only=True)
+    db_eventteams = EventTeam.query(
+        EventTeam.event == ndb.Key(Event, "2014casj")
+    ).fetch(keys_only=True)
 
-        assert db_eventteams == []
+    assert db_eventteams == []
 
 
-def test_bad_body_format(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        setup_event()
-        setup_teams()
-        setup_auth(access_types=[AuthType.EVENT_TEAMS])
+def test_bad_body_format(ndb_stub, api_client: Client) -> None:
+    setup_event()
+    setup_teams()
+    setup_auth(access_types=[AuthType.EVENT_TEAMS])
 
     request_body = "[254]"
 

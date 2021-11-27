@@ -3,7 +3,6 @@ from unittest.mock import patch
 
 import pytest
 from flask import g
-from google.cloud import ndb
 from werkzeug.test import Client
 
 from backend.common import auth
@@ -15,13 +14,12 @@ from backend.common.models.event import Event
 from backend.common.models.team import Team
 
 
-def test_not_authenticated(ndb_client: ndb.Client, api_client: Client, caplog) -> None:
-    with ndb_client.context():
-        ApiAuthAccess(
-            id="test_auth_key",
-            auth_types_enum=[AuthType.READ_API],
-        ).put()
-        Team(id="frc254", team_number=254).put()
+def test_not_authenticated(ndb_stub, api_client: Client, caplog) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
 
     with api_client.application.test_request_context():
         assert g.get("auth_owner_id", None) is None
@@ -36,13 +34,12 @@ def test_not_authenticated(ndb_client: ndb.Client, api_client: Client, caplog) -
     assert "required" in resp.json["Error"]
 
 
-def test_bad_auth(ndb_client: ndb.Client, api_client: Client, caplog) -> None:
-    with ndb_client.context():
-        account = Account()
-        ApiAuthAccess(
-            id="test_auth_key", auth_types_enum=[AuthType.READ_API], owner=account.key
-        ).put()
-        Team(id="frc254", team_number=254).put()
+def test_bad_auth(ndb_stub, api_client: Client, caplog) -> None:
+    account = Account()
+    ApiAuthAccess(
+        id="test_auth_key", auth_types_enum=[AuthType.READ_API], owner=account.key
+    ).put()
+    Team(id="frc254", team_number=254).put()
 
     with api_client.application.test_request_context():
         assert g.get("auth_owner_id", None) is None
@@ -61,17 +58,16 @@ def test_bad_auth(ndb_client: ndb.Client, api_client: Client, caplog) -> None:
 
 @pytest.mark.parametrize("account", [None, Account()])
 def test_authenticated_header(
-    ndb_client: ndb.Client, api_client: Client, account: Account, caplog
+    ndb_stub, api_client: Client, account: Account, caplog
 ) -> None:
-    with ndb_client.context():
-        if account:
-            account.put()
-        ApiAuthAccess(
-            id="test_auth_key",
-            auth_types_enum=[AuthType.READ_API],
-            owner=account.key if account else None,
-        ).put()
-        Team(id="frc254", team_number=254).put()
+    if account:
+        account.put()
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+        owner=account.key if account else None,
+    ).put()
+    Team(id="frc254", team_number=254).put()
 
     with api_client.application.test_request_context():
         assert g.get("auth_owner_id", None) is None
@@ -97,17 +93,16 @@ def test_authenticated_header(
 
 @pytest.mark.parametrize("account", [None, Account()])
 def test_authenticated_urlparam(
-    ndb_client: ndb.Client, api_client: Client, account: Account, caplog
+    ndb_stub, api_client: Client, account: Account, caplog
 ) -> None:
-    with ndb_client.context():
-        if account:
-            account.put()
-        ApiAuthAccess(
-            id="test_auth_key",
-            auth_types_enum=[AuthType.READ_API],
-            owner=account.key if account else None,
-        ).put()
-        Team(id="frc254", team_number=254).put()
+    if account:
+        account.put()
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+        owner=account.key if account else None,
+    ).put()
+    Team(id="frc254", team_number=254).put()
 
     with api_client.application.test_request_context():
         assert g.get("auth_owner_id", None) is None
@@ -129,13 +124,12 @@ def test_authenticated_urlparam(
     assert resp.status_code == 200
 
 
-def test_authenticated_user(ndb_client: ndb.Client, api_client: Client, caplog) -> None:
+def test_authenticated_user(ndb_stub, api_client: Client, caplog) -> None:
     email = "zach@thebluealliance.com"
     account = Account(email=email)
 
-    with ndb_client.context():
-        Team(id="frc254", team_number=254).put()
-        account.put()
+    Team(id="frc254", team_number=254).put()
+    account.put()
 
     with api_client.application.test_request_context():
         assert g.get("auth_owner_id", None) is None
@@ -154,9 +148,8 @@ def test_authenticated_user(ndb_client: ndb.Client, api_client: Client, caplog) 
     assert resp.status_code == 200
 
 
-def test_team_key_invalid(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        Team(id="frc254", team_number=254).put()
+def test_team_key_invalid(ndb_stub, api_client: Client) -> None:
+    Team(id="frc254", team_number=254).put()
     resp = api_client.get(
         "/api/v3/team/254", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
@@ -164,13 +157,12 @@ def test_team_key_invalid(ndb_client: ndb.Client, api_client: Client) -> None:
     assert resp.json["Error"] == "254 is not a valid team key"
 
 
-def test_team_key_does_not_exist(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        ApiAuthAccess(
-            id="test_auth_key",
-            auth_types_enum=[AuthType.READ_API],
-        ).put()
-        Team(id="frc254", team_number=254).put()
+def test_team_key_does_not_exist(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
     resp = api_client.get(
         "/api/v3/team/frc604", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
@@ -178,14 +170,13 @@ def test_team_key_does_not_exist(ndb_client: ndb.Client, api_client: Client) -> 
     assert resp.json["Error"] == "team key: frc604 does not exist"
 
 
-def test_event_key_invalid(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        Event(
-            id="2019casj",
-            year=2019,
-            event_short="casj",
-            event_type_enum=EventType.REGIONAL,
-        ).put()
+def test_event_key_invalid(ndb_stub, api_client: Client) -> None:
+    Event(
+        id="2019casj",
+        year=2019,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
     resp = api_client.get(
         "/api/v3/event/casj", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
@@ -193,18 +184,17 @@ def test_event_key_invalid(ndb_client: ndb.Client, api_client: Client) -> None:
     assert resp.json["Error"] == "casj is not a valid event key"
 
 
-def test_event_key_does_not_exist(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        ApiAuthAccess(
-            id="test_auth_key",
-            auth_types_enum=[AuthType.READ_API],
-        ).put()
-        Event(
-            id="2019casj",
-            year=2019,
-            event_short="casj",
-            event_type_enum=EventType.REGIONAL,
-        ).put()
+def test_event_key_does_not_exist(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2019casj",
+        year=2019,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
     resp = api_client.get(
         "/api/v3/event/2019casf", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )

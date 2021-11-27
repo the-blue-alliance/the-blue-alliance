@@ -4,7 +4,7 @@ from typing import List
 import pytest
 from bs4 import BeautifulSoup
 from freezegun import freeze_time
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from werkzeug.test import Client
 
 from backend.common.models.district import District
@@ -19,14 +19,14 @@ def test_get_bad_district_key(web_client: Client) -> None:
     assert resp.status_code == 404
 
 
-def test_get_bad_year(ndb_client: ndb.Client, web_client: Client) -> None:
-    helpers.preseed_district(ndb_client, "2020ne")
+def test_get_bad_year(ndb_stub, web_client: Client) -> None:
+    helpers.preseed_district("2020ne")
     resp = web_client.get("/events/ne/2222")
     assert resp.status_code == 404
 
 
-def test_render_district(ndb_client: ndb.Client, web_client: Client) -> None:
-    helpers.preseed_district(ndb_client, "2020ne")
+def test_render_district(ndb_stub, web_client: Client) -> None:
+    helpers.preseed_district("2020ne")
     resp = web_client.get("/events/ne/2020")
     assert resp.status_code == 200
 
@@ -36,8 +36,8 @@ def test_render_district(ndb_client: ndb.Client, web_client: Client) -> None:
     assert "".join(district_name.contents) == "2020 NE District"
 
 
-def test_valid_years_dropdown(ndb_client: ndb.Client, web_client: Client) -> None:
-    [helpers.preseed_district(ndb_client, f"{year}ne") for year in range(2014, 2021)]
+def test_valid_years_dropdown(ndb_stub, web_client: Client) -> None:
+    [helpers.preseed_district(f"{year}ne") for year in range(2014, 2021)]
 
     resp = web_client.get("/events/ne/2020")
     assert resp.status_code == 200
@@ -51,11 +51,8 @@ def test_valid_years_dropdown(ndb_client: ndb.Client, web_client: Client) -> Non
     ] == expected_years
 
 
-def test_valid_districts_dropdown(ndb_client: ndb.Client, web_client: Client) -> None:
-    [
-        helpers.preseed_district(ndb_client, f"2020{district}")
-        for district in ["ne", "fim", "mar"]
-    ]
+def test_valid_districts_dropdown(ndb_stub, web_client: Client) -> None:
+    [helpers.preseed_district(f"2020{district}") for district in ["ne", "fim", "mar"]]
 
     resp = web_client.get("/events/ne/2020")
     assert resp.status_code == 200
@@ -71,10 +68,8 @@ def test_valid_districts_dropdown(ndb_client: ndb.Client, web_client: Client) ->
     ] == expected_districts
 
 
-def test_district_detail_render_teams_sorted(
-    ndb_client: ndb.Client, web_client: Client
-) -> None:
-    helpers.preseed_district(ndb_client, "2020ne")
+def test_district_detail_render_teams_sorted(ndb_stub, web_client: Client) -> None:
+    helpers.preseed_district("2020ne")
     resp = web_client.get("/events/ne/2020")
     assert resp.status_code == 200
 
@@ -87,9 +82,9 @@ def test_district_detail_render_teams_sorted(
 
 
 def test_district_detail_team_list_has_expected_data_with_location(
-    web_client: Client, ndb_client: ndb.Client
+    web_client: Client, ndb_stub
 ) -> None:
-    helpers.preseed_district(ndb_client, "2020ne")
+    helpers.preseed_district("2020ne")
 
     resp = web_client.get("/events/ne/2020")
     assert resp.status_code == 200
@@ -107,9 +102,9 @@ def test_district_detail_team_list_has_expected_data_with_location(
 
 
 def test_district_detail_team_list_splits_teams_in_half(
-    web_client: Client, ndb_client: ndb.Client
+    web_client: Client, ndb_stub
 ) -> None:
-    helpers.preseed_district(ndb_client, "2020ne")
+    helpers.preseed_district("2020ne")
 
     resp = web_client.get("/events/ne/2020")
     assert resp.status_code == 200
@@ -124,10 +119,8 @@ def test_district_detail_team_list_splits_teams_in_half(
     assert len(teams2) == 2
 
 
-def test_district_details_render_events(
-    web_client: Client, ndb_client: ndb.Client
-) -> None:
-    helpers.preseed_district(ndb_client, "2020ne")
+def test_district_details_render_events(web_client: Client, ndb_stub) -> None:
+    helpers.preseed_district("2020ne")
 
     resp = web_client.get("/events/ne/2020")
     assert resp.status_code == 200
@@ -146,24 +139,23 @@ def test_district_details_render_events(
 
 @freeze_time("2019-03-09")
 def test_district_details_render_active_teams(
-    web_client: Client, ndb_client: ndb.Client, setup_full_event
+    web_client: Client, ndb_stub, setup_full_event
 ) -> None:
-    helpers.preseed_district(ndb_client, "2019ne")
+    helpers.preseed_district("2019ne")
     setup_full_event("2019ctwat")
 
     # Make sure we have DistrictTeam links for all the teams
-    with ndb_client.context():
-        event = Event.get_by_id("2019ctwat")
-        district_teams = [
-            DistrictTeam(
-                id=f"2019ne_{team.key_name}",
-                year=2019,
-                district_key=ndb.Key(District, "2019ne"),
-                team=team.key,
-            )
-            for team in event.teams
-        ]
-        ndb.put_multi(district_teams)
+    event = Event.get_by_id("2019ctwat")
+    district_teams = [
+        DistrictTeam(
+            id=f"2019ne_{team.key_name}",
+            year=2019,
+            district_key=ndb.Key(District, "2019ne"),
+            team=team.key,
+        )
+        for team in event.teams
+    ]
+    ndb.put_multi(district_teams)
 
     resp = web_client.get("/events/ne/2019")
     assert resp.status_code == 200
@@ -185,13 +177,13 @@ def test_district_details_render_active_teams(
 def test_district_detail_rankings(
     year,
     expects_rankings,
-    ndb_client: ndb.Client,
+    ndb_stub,
     captured_templates: List[CapturedTemplate],
     web_client: Client,
 ):
     district_key = f"{year}fim"
 
-    helpers.preseed_district(ndb_client, district_key)
+    helpers.preseed_district(district_key)
 
     rankings = [
         {
@@ -209,10 +201,9 @@ def test_district_detail_rankings(
         }
     ]
 
-    with ndb_client.context():
-        district = District.get_by_id(district_key)
-        district.rankings = rankings
-        district.put()
+    district = District.get_by_id(district_key)
+    district.rankings = rankings
+    district.put()
 
     response = web_client.get(f"/events/fim/{year}")
 
@@ -222,8 +213,7 @@ def test_district_detail_rankings(
     template = captured_templates[0][0]
     context = captured_templates[0][1]
     assert template.name == "district_details.html"
-    with ndb_client.context():
-        if expects_rankings:
-            assert context["rankings"] == rankings
-        else:
-            assert context["rankings"] is None
+    if expects_rankings:
+        assert context["rankings"] == rankings
+    else:
+        assert context["rankings"] is None

@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 
 import pytest
-from google.cloud import ndb
 from pytz import timezone, UTC
 
 from backend.common.consts.event_type import EventType
@@ -55,119 +54,112 @@ def test_is_kickoff_at_least_one_day_away(date, expected) -> None:
     assert at_least_one_day_away == expected
 
 
-def test_effective_season_year_no_events(ndb_client: ndb.Client) -> None:
+def test_effective_season_year_no_events(ndb_stub) -> None:
     now = datetime.now()
-    with ndb_client.context():
-        effective_season_year = SeasonHelper.effective_season_year()
+    effective_season_year = SeasonHelper.effective_season_year()
 
     assert effective_season_year == now.year
 
 
-def test_effective_season_year_this_year(ndb_client: ndb.Client) -> None:
+def test_effective_season_year_this_year(ndb_stub) -> None:
     # Effective season should be this year
     today = datetime.today()
-    with ndb_client.context():
-        Event(
-            id="{}testendstomorrow".format(today.year),
-            event_short="Ends Tomorrow",
-            start_date=today,
-            end_date=today + timedelta(days=1),
-            event_type_enum=EventType.REGIONAL,
-            year=today.year,
-        ).put()
-        effective_season_year = SeasonHelper.effective_season_year()
+    Event(
+        id="{}testendstomorrow".format(today.year),
+        event_short="Ends Tomorrow",
+        start_date=today,
+        end_date=today + timedelta(days=1),
+        event_type_enum=EventType.REGIONAL,
+        year=today.year,
+    ).put()
+    effective_season_year = SeasonHelper.effective_season_year()
 
     assert effective_season_year == today.year
 
 
-def test_effective_season_year_next_year(ndb_client: ndb.Client) -> None:
+def test_effective_season_year_next_year(ndb_stub) -> None:
     # Effective season should be next year
     today = datetime.today()
-    with ndb_client.context():
-        Event(
-            id="{}testended".format(today.year),
-            event_short="Test Ended",
-            start_date=today - timedelta(days=2),
-            end_date=today - timedelta(days=1),
-            event_type_enum=EventType.REGIONAL,
-            year=today.year,
-        ).put()
-        effective_season_year = SeasonHelper.effective_season_year()
+    Event(
+        id="{}testended".format(today.year),
+        event_short="Test Ended",
+        start_date=today - timedelta(days=2),
+        end_date=today - timedelta(days=1),
+        event_type_enum=EventType.REGIONAL,
+        year=today.year,
+    ).put()
+    effective_season_year = SeasonHelper.effective_season_year()
 
     assert effective_season_year == today.year + 1
 
 
 def test_effective_season_year_next_year_ignore_non_official(
-    ndb_client: ndb.Client,
+    ndb_stub,
 ) -> None:
     # Effective season should be next year
     today = datetime.today()
     # Insert an event that has already happened - otherwise we'll default to the current season
     # This is to simulate offseason
-    with ndb_client.context():
-        Event(
-            id="{}testended".format(today.year),
-            event_short="Test Ended",
-            start_date=today - timedelta(days=2),
-            end_date=today - timedelta(days=1),
-            event_type_enum=EventType.REGIONAL,
-            year=today.year,
-        ).put()
-        Event(
-            id="{}testendstomorrow".format(today.year),
-            event_short="testendstomorrow",
-            start_date=today,
-            end_date=today + timedelta(days=1),
-            event_type_enum=EventType.OFFSEASON,
-            year=today.year,
-        ).put()
-        effective_season_year = SeasonHelper.effective_season_year()
+    Event(
+        id="{}testended".format(today.year),
+        event_short="Test Ended",
+        start_date=today - timedelta(days=2),
+        end_date=today - timedelta(days=1),
+        event_type_enum=EventType.REGIONAL,
+        year=today.year,
+    ).put()
+    Event(
+        id="{}testendstomorrow".format(today.year),
+        event_short="testendstomorrow",
+        start_date=today,
+        end_date=today + timedelta(days=1),
+        event_type_enum=EventType.OFFSEASON,
+        year=today.year,
+    ).put()
+    effective_season_year = SeasonHelper.effective_season_year()
 
     assert effective_season_year == today.year + 1
 
 
-def test_first_event_datetime_no_events(ndb_client: ndb.Client) -> None:
-    with ndb_client.context():
-        first_event_datetime = SeasonHelper.first_event_datetime_utc()
+def test_first_event_datetime_no_events(ndb_stub) -> None:
+    first_event_datetime = SeasonHelper.first_event_datetime_utc()
 
     assert first_event_datetime is None
 
 
-def test_first_event_datetime_one_event(ndb_client: ndb.Client) -> None:
+def test_first_event_datetime_one_event(ndb_stub) -> None:
     start_date = datetime(2020, 3, 1)
-    with ndb_client.context():
-        Event(
-            id="{}testfirst".format(start_date.year),
-            event_short="First Event",
-            start_date=start_date,
-            end_date=start_date + timedelta(days=1),
-            event_type_enum=EventType.REGIONAL,
-            year=start_date.year,
-        ).put()
-        first_event_datetime = SeasonHelper.first_event_datetime_utc(start_date.year)
+    Event(
+        id="{}testfirst".format(start_date.year),
+        event_short="First Event",
+        start_date=start_date,
+        end_date=start_date + timedelta(days=1),
+        event_type_enum=EventType.REGIONAL,
+        year=start_date.year,
+    ).put()
+    first_event_datetime = SeasonHelper.first_event_datetime_utc(start_date.year)
 
     assert first_event_datetime == start_date
 
 
-def test_first_event_datetime_multiple_events(ndb_client: ndb.Client) -> None:
+def test_first_event_datetime_multiple_events(ndb_stub) -> None:
     start_date = datetime(2020, 3, 1)
-    with ndb_client.context():
-        Event(
-            id="{}testfirst".format(start_date.year),
-            event_short="First Event",
-            start_date=start_date,
-            end_date=start_date + timedelta(days=1),
-            event_type_enum=EventType.REGIONAL,
-            year=start_date.year,
-        ).put()
-        Event(
-            id="{}testsecond".format(start_date.year),
-            event_short="Second Event",
-            start_date=start_date + timedelta(days=1),
-            end_date=start_date + timedelta(days=2),
-            event_type_enum=EventType.REGIONAL,
-            year=start_date.year,
-        ).put()
-        first_event_datetime = SeasonHelper.first_event_datetime_utc(start_date.year)
+    Event(
+        id="{}testfirst".format(start_date.year),
+        event_short="First Event",
+        start_date=start_date,
+        end_date=start_date + timedelta(days=1),
+        event_type_enum=EventType.REGIONAL,
+        year=start_date.year,
+    ).put()
+    Event(
+        id="{}testsecond".format(start_date.year),
+        event_short="Second Event",
+        start_date=start_date + timedelta(days=1),
+        end_date=start_date + timedelta(days=2),
+        event_type_enum=EventType.REGIONAL,
+        year=start_date.year,
+    ).put()
+    first_event_datetime = SeasonHelper.first_event_datetime_utc(start_date.year)
 
     assert first_event_datetime == start_date

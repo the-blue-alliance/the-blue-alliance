@@ -1,0 +1,59 @@
+from google.appengine.api.blobstore import blobstore
+from google.appengine.ext.blobstore import blobstore as ext_blobstore
+from google.appengine.ext.ndb import model
+from typing import Any
+
+Error = blobstore.Error
+InternalError = blobstore.InternalError
+BlobFetchSizeTooLargeError = blobstore.BlobFetchSizeTooLargeError
+BlobNotFoundError = blobstore.BlobNotFoundError
+DataIndexOutOfRangeError = blobstore.DataIndexOutOfRangeError
+PermissionDeniedError = blobstore.PermissionDeniedError
+BlobInfoParseError = ext_blobstore.BlobInfoParseError
+BlobKey: Any
+BLOB_INFO_KIND: Any
+BLOB_MIGRATION_KIND: Any
+BLOB_KEY_HEADER: Any
+BLOB_RANGE_HEADER: Any
+MAX_BLOB_FETCH_SIZE: Any
+UPLOAD_INFO_CREATION_HEADER: Any
+BlobKeyProperty = model.BlobKeyProperty
+
+class BlobInfo(model.Model):
+    content_type: Any
+    creation: Any
+    filename: Any
+    size: Any
+    md5_hash: Any
+    @classmethod
+    def get(cls, blob_key, **ctx_options): ...
+    @classmethod
+    def get_async(cls, blob_key, **ctx_options): ...
+    @classmethod
+    def get_multi(cls, blob_keys, **ctx_options): ...
+    @classmethod
+    def get_multi_async(cls, blob_keys, **ctx_options): ...
+    put_async: Any
+    def key(self): ...
+    def delete(self, **options) -> None: ...
+    def delete_async(self, **options): ...
+    def open(self, *args, **kwds): ...
+
+get: Any
+get_async: Any
+get_multi: Any
+get_multi_async: Any
+
+def delete(blob_key, **options): ...
+def delete_async(blob_key, **options) -> None: ...
+def delete_multi(blob_keys, **options) -> None: ...
+def delete_multi_async(blob_keys, **options) -> None: ...
+def create_upload_url(success_path, max_bytes_per_blob: Any | None = ..., max_bytes_total: Any | None = ..., **options): ...
+def create_upload_url_async(success_path, max_bytes_per_blob: Any | None = ..., max_bytes_total: Any | None = ..., **options) -> None: ...
+def parse_blob_info(field_storage): ...
+def fetch_data(blob, start_index, end_index, **options): ...
+def fetch_data_async(blob, start_index, end_index, **options) -> None: ...
+
+class BlobReader(ext_blobstore.BlobReader):
+    @property
+    def blob_info(self): ...
