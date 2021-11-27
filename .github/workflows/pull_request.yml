@@ -201,18 +201,6 @@ jobs:
           source: http://localhost:8080/gameday
           destination: screenshot_gameday.png
           full-page: true
-      - name: Upload Home Page Screenshot
-        uses: edunad/actions-image@v1.0.1
-        with:
-            path: ${{ steps.screenshot_home.outputs.path }}
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            title: 'Home Page Screenshot'
-      - name: Upload GameDay Screenshot
-        uses: edunad/actions-image@v1.0.1
-        with:
-            path: ${{ steps.screenshot_gameday.outputs.path }}
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            title: 'GameDay Screenshot'
 
   automerge:
     needs: [py3-type, py3-lint, py3-test, node-lint, node-test, bash-lint, build-web, fullstack-test]
