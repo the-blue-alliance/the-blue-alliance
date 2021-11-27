@@ -191,7 +191,7 @@ jobs:
         uses: saadmk11/comment-webpage-screenshot@v0.5
         with:
           upload_to: imgur
-          capture_urls: "http://localhost:8080, http://localhost:8080/gameday"
+          capture_urls: "http://172.17.0.1:8080, http://172.17.0.1:8080/gameday"
 
   automerge:
     needs: [py3-type, py3-lint, py3-test, node-lint, node-test, bash-lint, build-web, fullstack-test]
