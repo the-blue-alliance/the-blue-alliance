@@ -69,7 +69,7 @@ app.add_url_rule("/team/<int:team_number>/history", view_func=team_history)
 app.add_url_rule("/teams/<int:page>", view_func=team_list)
 app.add_url_rule("/teams", view_func=team_list, defaults={"page": 1})
 
-app.register_blueprint(account_blueprint, url_prefix="/account")
+app.register_blueprint(account_blueprint)
 app.register_blueprint(suggestion_blueprint)
 app.register_blueprint(suggestion_review_blueprint)
 
