@@ -1,11 +1,15 @@
+import datetime
 import time
+from datetime import timedelta
 
-from flask import Flask, make_response
+from flask import Flask, make_response, Response
 from flask_caching import CachedResponse
+from freezegun import freeze_time
 
 from backend.common.cache.flask_response_cache import MemcacheFlaskResponseCache
 from backend.common.decorators import cached_public, memoize
-from backend.common.flask_cache import configure_flask_cache
+from backend.common.flask_cache import configure_flask_cache, make_cached_response
+from backend.common.sitevars.turbo_mode import ContentType as TurboCfg, TurboMode
 
 
 def test_no_cached_public(app: Flask) -> None:
@@ -57,6 +61,42 @@ def test_cached_public_timeout_dynamic(app: Flask) -> None:
         return CachedResponse(make_response("Hello!"), 600)
 
     resp = app.test_client().get("/")
+    assert resp.headers.get("Cache-Control") == "public, max-age=600, s-maxage=600"
+
+
+@freeze_time("2020-01-01")
+def test_cached_public_turbo_mode(app: Flask) -> None:
+    @app.route("/turbo")
+    @cached_public(ttl=3600)
+    def view() -> Response:
+        return make_cached_response(make_response("Hello!"), ttl=timedelta(minutes=10))
+
+    TurboMode.put(
+        TurboCfg(
+            regex=r".*turbo.*",
+            valid_until=datetime.datetime(2020, 1, 2).timestamp(),
+            cache_length=61,
+        )
+    )
+    resp = app.test_client().get("/turbo")
+    assert resp.headers.get("Cache-Control") == "public, max-age=61, s-maxage=61"
+
+
+@freeze_time("2020-01-03")
+def test_cached_public_turbo_mode_expired(app: Flask) -> None:
+    @app.route("/turbo")
+    @cached_public(ttl=3600)
+    def view() -> Response:
+        return make_cached_response(make_response("Hello!"), ttl=timedelta(minutes=10))
+
+    TurboMode.put(
+        TurboCfg(
+            regex=r".*turbo.*",
+            valid_until=datetime.datetime(2020, 1, 2).timestamp(),
+            cache_length=61,
+        )
+    )
+    resp = app.test_client().get("/turbo")
     assert resp.headers.get("Cache-Control") == "public, max-age=600, s-maxage=600"
 
 
