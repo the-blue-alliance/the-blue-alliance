@@ -34,6 +34,13 @@ dispatch:
 - url: "*/clientapi/*"
   service: clientapi
 
+# Mirgated py3 tasks
+- url: "*/tasks/tasks/enqueue/fmsapi_awards/*"
+  service: py3-tasks-io
+
+- url: "*/tasks/tasks/get/fmsapi_awards/*"
+  service: py3-tasks-io
+
 # Handles latency-insensive tasks
 - url: "*/tasks/*"
   service: tasks
