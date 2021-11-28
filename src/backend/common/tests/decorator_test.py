@@ -1,4 +1,7 @@
-from flask import Flask
+import time
+
+from flask import Flask, make_response
+from flask_caching import CachedResponse
 
 from backend.common.cache.flask_response_cache import MemcacheFlaskResponseCache
 from backend.common.decorators import cached_public, memoize
@@ -46,6 +49,17 @@ def test_cached_public_timeout(app: Flask) -> None:
     assert resp.headers.get("Cache-Control") == "public, max-age=3600, s-maxage=3600"
 
 
+def test_cached_public_timeout_dynamic(app: Flask) -> None:
+    @app.route("/")
+    @cached_public(timeout=3600)
+    def view():
+        # This should take precedence over the static timeout
+        return CachedResponse(make_response("Hello!"), 600)
+
+    resp = app.test_client().get("/")
+    assert resp.headers.get("Cache-Control") == "public, max-age=600, s-maxage=600"
+
+
 def test_cached_public_etag(app: Flask) -> None:
     @app.route("/")
     @cached_public
@@ -82,6 +96,51 @@ def test_flask_cache_with_memcache(app: Flask, memcache_stub) -> None:
     assert resp.status_code == 200
 
     assert app.cache.get("view//") == resp.data.decode()
+
+
+def test_flask_cache_with_memcache_static_timeout(app: Flask, memcache_stub) -> None:
+    configure_flask_cache(app)
+
+    @app.route("/")
+    @cached_public(timeout=1)
+    def view():
+        return "Hello!"
+
+    assert hasattr(app, "cache")
+    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)
+
+    resp = app.test_client().get("/")
+    assert resp.status_code == 200
+
+    assert app.cache.get("view//") == resp.data.decode()
+    time.sleep(1)
+    # cache is expired by now
+    assert app.cache.get("view//") is None
+
+
+def test_flask_cache_with_memcache_dynamic_timeout(app: Flask, memcache_stub) -> None:
+    configure_flask_cache(app)
+
+    @app.route("/")
+    @cached_public(timeout=1)
+    def view():
+        return CachedResponse(make_response("Hello!"), 2)
+
+    assert hasattr(app, "cache")
+    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)
+
+    resp = app.test_client().get("/")
+    assert resp.status_code == 200
+
+    assert app.cache.get("view//") is not None
+
+    # cache shouldn't be expired yet
+    time.sleep(1)
+    assert app.cache.get("view//") is not None
+
+    # but now it should
+    time.sleep(1)
+    assert app.cache.get("view//") is None
 
 
 def test_flask_cache_with_memcache_skips_errors(app: Flask, memcache_stub) -> None:
