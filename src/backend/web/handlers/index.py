@@ -1,7 +1,10 @@
-from typing import Any, Callable, cast, Dict
+from typing import Any, Callable, cast, Dict, Tuple
+
+from flask import Response
 
 from backend.common.consts.landing_type import LandingType
 from backend.common.decorators import cached_public
+from backend.common.flask_cache import make_cached_response
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.sitevars.landing_config import LandingConfig
@@ -9,19 +12,25 @@ from backend.web.profiled_render import render_template
 
 
 @cached_public
-def index() -> str:
-    HANDLER_MAP: Dict[LandingType, Callable[[Dict[str, Any]], str]] = {
-        LandingType.KICKOFF: index_kickoff,
-        LandingType.BUILDSEASON: index_buildseason,
-        LandingType.COMPETITIONSEASON: index_competitionseason,
-        LandingType.CHAMPS: index_champs,
-        LandingType.OFFSEASON: index_offseason,
-        LandingType.INSIGHTS: index_insights,
+def index() -> Response:
+    HANDLER_MAP: Dict[LandingType, Tuple[Callable[[Dict[str, Any]], str], int]] = {
+        # map landing type -> (handler function, cache ttl)
+        LandingType.KICKOFF: (index_kickoff, 60 * 60 * 24),  # cache for one day
+        LandingType.BUILDSEASON: (index_buildseason, 60 * 5),  # cache for 5 minutes
+        LandingType.COMPETITIONSEASON: (
+            index_competitionseason,
+            60 * 5,
+        ),  # cache for 5 minutes
+        LandingType.CHAMPS: (index_champs, 60 * 5),  # cache for 5 minutes
+        LandingType.OFFSEASON: (index_offseason, 60 * 60 * 24),  # cache for one day
+        LandingType.INSIGHTS: (index_insights, 60 * 5),  # cache for 5 minutes
     }
     landing_type = LandingConfig.current_landing_type()
-    landing_type_handler = HANDLER_MAP[landing_type]
+    landing_type_handler, cache_ttl = HANDLER_MAP[landing_type]
     template_values = cast(Dict[str, Any], LandingConfig.get())
-    return landing_type_handler(template_values)
+    return make_cached_response(
+        landing_type_handler(template_values), timeout=cache_ttl
+    )
 
 
 def index_kickoff(template_values: Dict[str, Any]) -> str:

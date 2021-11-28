@@ -24,7 +24,7 @@ from backend.common.queries.team_query import DistrictTeamsQuery, EventTeamsQuer
 from backend.web.profiled_render import render_template
 
 
-@cached_public
+@cached_public(timeout=60 * 15)
 def district_detail(
     district_abbrev: DistrictAbbreviation, year: Optional[Year]
 ) -> Response:

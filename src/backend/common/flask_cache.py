@@ -1,8 +1,8 @@
 import logging
-from typing import Dict
+from typing import Any, Dict
 
-from flask import Flask
-from flask_caching import BaseCache, Cache
+from flask import Flask, make_response, Response
+from flask_caching import BaseCache, Cache, CachedResponse
 from google.appengine.api import memcache
 
 from backend.common.cache.flask_response_cache import MemcacheFlaskResponseCache
@@ -20,3 +20,8 @@ def configure_flask_cache(app: Flask) -> None:
     cache = Cache(config=config)
     cache.init_app(app)
     app.cache = cache
+
+
+def make_cached_response(*args: Any, timeout: int) -> Response:
+    resp = make_response(*args)
+    return CachedResponse(response=resp, timeout=timeout)

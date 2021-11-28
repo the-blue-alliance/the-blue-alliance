@@ -1,9 +1,11 @@
 import json
+from typing import Optional
 
 from flask import abort
 from werkzeug.wrappers import Response
 
 from backend.common.decorators import cached_public
+from backend.common.flask_cache import make_cached_response
 from backend.common.models.event import Event
 from backend.common.models.keys import MatchKey
 from backend.common.models.match import Match
@@ -18,10 +20,10 @@ def match_detail(match_key: MatchKey) -> Response:
 
     match_future = Match.get_by_id_async(match_key)
     event_future = Event.get_by_id_async(match_key.split("_")[0])
-    match = match_future.get_result()
-    event = event_future.get_result()
+    match: Optional[Match] = match_future.get_result()
+    event: Optional[Event] = event_future.get_result()
 
-    if not match:
+    if not match or not event:
         abort(404)
 
     zebra_data = ZebraMotionWorks.get_by_id(match_key)
@@ -47,4 +49,7 @@ def match_detail(match_key: MatchKey) -> Response:
         "zebra_data": json.dumps(zebra_data.data) if zebra_data else None,
     }
 
-    return render_template("match_details.html", template_values)
+    return make_cached_response(
+        render_template("match_details.html", template_values),
+        timeout=61 if event.within_a_day else 60 * 60 * 24,
+    )
