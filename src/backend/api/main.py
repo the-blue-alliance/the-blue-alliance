@@ -10,6 +10,7 @@ from backend.api.handlers.status import status
 from backend.api.handlers.team import team, team_list, team_list_all, team_list_year
 from backend.api.handlers.trusted import (
     add_match_video,
+    update_event_alliances,
     update_event_info,
     update_teams,
 )
@@ -62,6 +63,11 @@ CORS(
     methods=["OPTIONS", "POST"],
     allow_headers=["Content-Type", "X-TBA-Auth-Id", "X-TBA-Auth-Sig"],
 )
+trusted_api.add_url_rule(
+    "/event/<string:event_key>/alliance_selections/update",
+    methods=["POST"],
+    view_func=update_event_alliances,
+),
 trusted_api.add_url_rule(
     "/event/<string:event_key>/info/update",
     methods=["POST"],

@@ -3,7 +3,11 @@ from typing import List, Optional
 from flask import jsonify, make_response, request, Response
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import defer
+from pyre_extensions import none_throws
 
+from backend.api.api_trusted_parsers.json_alliance_selections_parser import (
+    JSONAllianceSelectionsParser,
+)
 from backend.api.api_trusted_parsers.json_event_info_parser import JSONEventInfoParser
 from backend.api.api_trusted_parsers.json_match_video_parser import JSONMatchVideoParser
 from backend.api.api_trusted_parsers.json_team_list_parser import (
@@ -14,10 +18,14 @@ from backend.common.consts.auth_type import AuthType
 from backend.common.futures import TypedFuture
 from backend.common.helpers.event_remapteams_helper import EventRemapTeamsHelper
 from backend.common.helpers.event_webcast_adder import EventWebcastAdder
+from backend.common.manipulators.event_details_manipulator import (
+    EventDetailsManipulator,
+)
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
 from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.models.event import Event
+from backend.common.models.event import EventDetails
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey
 from backend.common.models.match import Match
@@ -97,11 +105,7 @@ def add_match_video(event_key: EventKey) -> Response:
 @validate_event_key
 def update_event_info(event_key: EventKey) -> Response:
     parsed_info = JSONEventInfoParser.parse(request.data)
-    event: Optional[Event] = Event.get_by_id(event_key)
-    if not event:
-        return make_response(
-            jsonify({"Error": f"Event {event_key} does not exist!"}), 404
-        )
+    event: Event = none_throws(Event.get_by_id(event_key))
 
     if "webcasts" in parsed_info:
         EventWebcastAdder.add_webcast(
@@ -123,3 +127,20 @@ def update_event_info(event_key: EventKey) -> Response:
 
     EventManipulator.createOrUpdate(event)
     return jsonify({"Success": f"Event {event_key} updated"})
+
+
+@require_write_auth({AuthType.EVENT_ALLIANCES})
+@validate_event_key
+def update_event_alliances(event_key: EventKey) -> Response:
+    alliance_selections = JSONAllianceSelectionsParser.parse(request.data)
+    event: Event = none_throws(Event.get_by_id(event_key))
+
+    event_details = EventDetails(id=event_key, alliance_selections=alliance_selections)
+
+    if event.remap_teams:
+        EventRemapTeamsHelper.remapteams_alliances(
+            event_details.alliance_selections, event.remap_teams
+        )
+    EventDetailsManipulator.createOrUpdate(event_details)
+
+    return jsonify({"Success": "Alliance selections successfully updated"})
