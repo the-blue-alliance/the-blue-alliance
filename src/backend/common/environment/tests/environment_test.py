@@ -37,6 +37,11 @@ def set_service(monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setenv("GAE_SERVICE", "default")
 
 
+@pytest.fixture
+def set_save_frc_api_response(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("SAVE_FRC_API_RESPONSE", "true")
+
+
 def test_unit_tests() -> None:
     assert Environment.is_unit_test() is True
 
@@ -94,3 +99,15 @@ def test_auth_emulator_host_none() -> None:
 
 def test_auth_emulator_host(set_firebase_auth_emulator_host) -> None:
     assert Environment.auth_emulator_host() == "localhost:9099"
+
+
+def test_save_frc_api_response_default() -> None:
+    assert Environment.save_frc_api_response() is False
+
+
+def test_save_frc_api_response(set_save_frc_api_response) -> None:
+    assert Environment.save_frc_api_response()
+
+
+def test_save_frc_api_response_prod(set_prod) -> None:
+    assert Environment.save_frc_api_response()
