@@ -4,6 +4,7 @@
     "tba_log_level": "debug",
     "ndb_log_level": "warning",
     "flask_response_cache_enabled": "false",
+    "cache_control_header_enabled": "false",
     "storage_mode": "local",
     "storage_path": "ops/dev/storage"
 }

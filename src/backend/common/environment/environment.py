@@ -1,6 +1,7 @@
 import enum
 import os
 import tempfile
+from distutils.util import strtobool
 from pathlib import Path
 from typing import Optional
 
@@ -45,7 +46,11 @@ class Environment:
 
     @staticmethod
     def flask_response_cache_enabled() -> bool:
-        return bool(os.environ.get("FLASK_RESPONSE_CACHE_ENABLED", True))
+        return bool(strtobool(os.environ.get("FLASK_RESPONSE_CACHE_ENABLED", "true")))
+
+    @staticmethod
+    def cache_control_header_enabled() -> bool:
+        return bool(strtobool(os.environ.get("CACHE_CONTROL_HEADER_ENABLED", "true")))
 
     @staticmethod
     def storage_mode() -> EnvironmentMode:

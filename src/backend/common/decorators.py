@@ -21,7 +21,8 @@ def cached_public(func: Optional[Callable] = None, timeout: int = 61):
             resp = make_response(cached(func)(*args, **kwargs))
         else:
             resp = make_response(func(*args, **kwargs))
-        if resp.status_code == 200:  # Only set cache headers for OK responses
+        if resp.status_code == 200 and Environment.cache_control_header_enabled():
+            # Only set cache headers for OK responses
             browser_timeout = timeout
             if isinstance(resp, CachedResponse):
                 browser_timeout = resp.timeout
