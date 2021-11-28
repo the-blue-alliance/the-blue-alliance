@@ -2,6 +2,7 @@ from functools import partial, wraps
 from typing import Callable, Optional
 
 from flask import current_app, has_request_context, make_response, request, Response
+from flask_caching import CachedResponse
 
 from backend.common.environment import Environment
 
@@ -21,9 +22,12 @@ def cached_public(func: Optional[Callable] = None, timeout: int = 61):
         else:
             resp = make_response(func(*args, **kwargs))
         if resp.status_code == 200:  # Only set cache headers for OK responses
+            browser_timeout = timeout
+            if isinstance(resp, CachedResponse):
+                browser_timeout = resp.timeout
             resp.headers["Cache-Control"] = "public, max-age={0}, s-maxage={0}".format(
                 max(
-                    timeout, 61
+                    browser_timeout, 61
                 )  # needs to be at least 61 seconds to work with Google Frontend cache
             )
             resp.add_etag()
