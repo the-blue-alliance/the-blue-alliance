@@ -31,6 +31,7 @@ def test_page_title(web_client: Client, ndb_stub) -> None:
     helpers.preseed_event_for_team(254, "2020test")
     resp = web_client.get("/team/254/2020")
     assert resp.status_code == 200
+    assert "max-age=86400" in resp.headers["Cache-Control"]
     assert (
         helpers.get_page_title(resp.data)
         == "The 254 Team - Team 254 (2020) - The Blue Alliance"
@@ -70,6 +71,7 @@ def test_team_info_live_event_no_upcoming_matches(
 ) -> None:
     resp = web_client.get("/team/148/2019")
     assert resp.status_code == 200
+    assert "max-age=61" in resp.headers["Cache-Control"]
 
     team_info = helpers.get_team_info(resp.data)
     assert team_info.header == "Team 148 - Robowranglers"

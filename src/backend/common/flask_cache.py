@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 from typing import Any, Dict
 
 from flask import Flask, make_response, Response
@@ -22,6 +23,6 @@ def configure_flask_cache(app: Flask) -> None:
     app.cache = cache
 
 
-def make_cached_response(*args: Any, timeout: int) -> Response:
+def make_cached_response(*args: Any, ttl: timedelta) -> Response:
     resp = make_response(*args)
-    return CachedResponse(response=resp, timeout=timeout)
+    return CachedResponse(response=resp, timeout=int(ttl.total_seconds()))

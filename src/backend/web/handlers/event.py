@@ -1,5 +1,5 @@
 import collections
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 from flask import abort, redirect, request
@@ -75,7 +75,7 @@ def event_list(year: Optional[Year] = None) -> Response:
     }
     return make_cached_response(
         render_template("event_list.html", template_values),
-        timeout=60 * 5 if year == datetime.now().year else 60 * 60 * 24,
+        ttl=timedelta(minutes=5) if year == datetime.now().year else timedelta(days=1),
     )
 
 
@@ -244,5 +244,5 @@ def event_detail(event_key: EventKey) -> Response:
 
     return make_cached_response(
         render_template("event_details.html", template_values),
-        timeout=61 if event.within_a_day else 60 * 60 * 24,
+        ttl=timedelta(seconds=61) if event.within_a_day else timedelta(days=1),
     )

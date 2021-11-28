@@ -2,6 +2,7 @@ import datetime
 import re
 
 from bs4 import BeautifulSoup
+from freezegun import freeze_time
 from werkzeug.test import Client
 
 from backend.web.handlers.tests import helpers
@@ -25,11 +26,21 @@ def test_valid_years_dropdown(ndb_stub, web_client: Client) -> None:
     ] == expected_years
 
 
+@freeze_time("2020-04-02")
+def test_render_event_short_cache(ndb_stub, web_client: Client) -> None:
+    helpers.preseed_event("2020nyny")
+
+    resp = web_client.get("/events/2020")
+    assert resp.status_code == 200
+    assert "max-age=300" in resp.headers["Cache-Control"]
+
+
 def test_render_event(ndb_stub, web_client: Client) -> None:
     helpers.preseed_event("2020nyny")
 
     resp = web_client.get("/events/2020")
     assert resp.status_code == 200
+    assert "max-age=86400" in resp.headers["Cache-Control"]
 
     event_types = BeautifulSoup(resp.data, "html.parser").find_all(
         id=re.compile(r"event_label_container_.*")

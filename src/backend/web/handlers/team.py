@@ -1,4 +1,5 @@
 import datetime
+from datetime import timedelta
 
 from flask import abort, Response
 
@@ -45,7 +46,7 @@ def team_detail(
         abort(404)
     return make_cached_response(
         render_template("team_details.html", template_values),
-        timeout=61 if short_cache else 60 * 60 * 24,
+        ttl=timedelta(seconds=61) if short_cache else timedelta(days=1),
     )
 
 
@@ -62,7 +63,7 @@ def team_history(team_number: TeamNumber, is_canonical: bool = False) -> Respons
     template_values, short_cache = TeamRenderer.render_team_history(team, is_canonical)
     return make_cached_response(
         render_template("team_history.html", template_values),
-        timeout=60 * 5 if short_cache else 60 * 60 * 24,
+        ttl=timedelta(minutes=5) if short_cache else timedelta(days=1),
     )
 
 
@@ -84,7 +85,7 @@ def team_canonical(team_number: TeamNumber) -> Response:
     return team_detail(team_number, current_year, is_canonical=True)
 
 
-@cached_public(timeout=60 * 60 * 24 * 7)
+@cached_public(ttl=timedelta(days=7))
 def team_list(page: int) -> str:
     page_labels = []
     cur_page_label = ""

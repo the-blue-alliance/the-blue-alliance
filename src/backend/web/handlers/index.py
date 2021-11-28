@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import Any, Callable, cast, Dict, Tuple
 
 from flask import Response
@@ -13,24 +14,24 @@ from backend.web.profiled_render import render_template
 
 @cached_public
 def index() -> Response:
-    HANDLER_MAP: Dict[LandingType, Tuple[Callable[[Dict[str, Any]], str], int]] = {
+    HANDLER_MAP: Dict[
+        LandingType, Tuple[Callable[[Dict[str, Any]], str], timedelta]
+    ] = {
         # map landing type -> (handler function, cache ttl)
-        LandingType.KICKOFF: (index_kickoff, 60 * 60 * 24),  # cache for one day
-        LandingType.BUILDSEASON: (index_buildseason, 60 * 5),  # cache for 5 minutes
+        LandingType.KICKOFF: (index_kickoff, timedelta(days=1)),
+        LandingType.BUILDSEASON: (index_buildseason, timedelta(minutes=5)),
         LandingType.COMPETITIONSEASON: (
             index_competitionseason,
-            60 * 5,
-        ),  # cache for 5 minutes
-        LandingType.CHAMPS: (index_champs, 60 * 5),  # cache for 5 minutes
-        LandingType.OFFSEASON: (index_offseason, 60 * 60 * 24),  # cache for one day
-        LandingType.INSIGHTS: (index_insights, 60 * 5),  # cache for 5 minutes
+            timedelta(minutes=5),
+        ),
+        LandingType.CHAMPS: (index_champs, timedelta(minutes=5)),
+        LandingType.OFFSEASON: (index_offseason, timedelta(days=1)),
+        LandingType.INSIGHTS: (index_insights, timedelta(minutes=5)),
     }
     landing_type = LandingConfig.current_landing_type()
     landing_type_handler, cache_ttl = HANDLER_MAP[landing_type]
     template_values = cast(Dict[str, Any], LandingConfig.get())
-    return make_cached_response(
-        landing_type_handler(template_values), timeout=cache_ttl
-    )
+    return make_cached_response(landing_type_handler(template_values), ttl=cache_ttl)
 
 
 def index_kickoff(template_values: Dict[str, Any]) -> str:

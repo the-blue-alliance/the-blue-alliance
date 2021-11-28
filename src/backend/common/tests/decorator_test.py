@@ -41,7 +41,7 @@ def test_cached_public_default(app: Flask) -> None:
 
 def test_cached_public_timeout(app: Flask) -> None:
     @app.route("/")
-    @cached_public(timeout=3600)
+    @cached_public(ttl=3600)
     def view():
         return "Hello!"
 
@@ -51,7 +51,7 @@ def test_cached_public_timeout(app: Flask) -> None:
 
 def test_cached_public_timeout_dynamic(app: Flask) -> None:
     @app.route("/")
-    @cached_public(timeout=3600)
+    @cached_public(ttl=3600)
     def view():
         # This should take precedence over the static timeout
         return CachedResponse(make_response("Hello!"), 600)
@@ -102,7 +102,7 @@ def test_flask_cache_with_memcache_static_timeout(app: Flask, memcache_stub) -> 
     configure_flask_cache(app)
 
     @app.route("/")
-    @cached_public(timeout=1)
+    @cached_public(ttl=1)
     def view():
         return "Hello!"
 
@@ -122,7 +122,7 @@ def test_flask_cache_with_memcache_dynamic_timeout(app: Flask, memcache_stub) ->
     configure_flask_cache(app)
 
     @app.route("/")
-    @cached_public(timeout=1)
+    @cached_public(ttl=1)
     def view():
         return CachedResponse(make_response("Hello!"), 2)
 

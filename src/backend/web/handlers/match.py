@@ -1,4 +1,5 @@
 import json
+from datetime import timedelta
 from typing import Optional
 
 from flask import abort
@@ -51,5 +52,5 @@ def match_detail(match_key: MatchKey) -> Response:
 
     return make_cached_response(
         render_template("match_details.html", template_values),
-        timeout=61 if event.within_a_day else 60 * 60 * 24,
+        ttl=timedelta(seconds=61) if event.within_a_day else timedelta(days=1),
     )

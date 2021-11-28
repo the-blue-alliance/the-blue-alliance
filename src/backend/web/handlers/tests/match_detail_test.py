@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+from freezegun import freeze_time
 from werkzeug.test import Client
 
 
@@ -17,6 +18,7 @@ def test_render_match(web_client: Client, setup_full_match) -> None:
 
     resp = web_client.get("/match/2019nyny_qm1")
     assert resp.status_code == 200
+    assert "max-age=86400" in resp.headers["Cache-Control"]
 
     soup = BeautifulSoup(resp.data, "html.parser")
     assert (
@@ -26,3 +28,12 @@ def test_render_match(web_client: Client, setup_full_match) -> None:
     assert soup.find(id="match-table-2019nyny_qm1") is not None
     assert soup.find(id="match-breakdown") is not None
     assert soup.find(id="youtube_ooI6fkKfzLc") is not None
+
+
+@freeze_time("2019-04-04")
+def test_render_match_short_cache(web_client: Client, setup_full_match) -> None:
+    setup_full_match("2019nyny_qm1")
+
+    resp = web_client.get("/match/2019nyny_qm1")
+    assert resp.status_code == 200
+    assert "max-age=61" in resp.headers["Cache-Control"]
