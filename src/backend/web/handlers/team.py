@@ -51,9 +51,6 @@ def team_history(team_number: TeamNumber, is_canonical: bool = False) -> str:
     if not team:
         abort(404)
 
-    teams = Team.query().fetch()
-    print(f"all teams: {teams}")
-
     template_values = TeamRenderer.render_team_history(team, is_canonical)
     return render_template("team_history.html", template_values)
 
