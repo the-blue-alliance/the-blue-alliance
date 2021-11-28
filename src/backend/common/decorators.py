@@ -1,5 +1,6 @@
+from datetime import timedelta
 from functools import partial, wraps
-from typing import Callable, Optional
+from typing import Callable, Optional, Union
 
 from flask import current_app, has_request_context, make_response, request, Response
 from flask_caching import CachedResponse
@@ -7,9 +8,10 @@ from flask_caching import CachedResponse
 from backend.common.environment import Environment
 
 
-def cached_public(func: Optional[Callable] = None, timeout: int = 61):
+def cached_public(func: Optional[Callable] = None, ttl: Union[int, timedelta] = 61):
+    timeout = ttl if isinstance(ttl, int) else ttl.total_seconds()
     if func is None:  # Handle no-argument decorator
-        return partial(cached_public, timeout=timeout)
+        return partial(cached_public, ttl=ttl)
 
     @wraps(func)
     def decorated_function(*args, **kwargs):
