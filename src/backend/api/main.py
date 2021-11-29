@@ -11,6 +11,7 @@ from backend.api.handlers.team import team, team_list, team_list_all, team_list_
 from backend.api.handlers.trusted import (
     add_match_video,
     update_event_alliances,
+    update_event_awards,
     update_event_info,
     update_teams,
 )
@@ -67,6 +68,11 @@ trusted_api.add_url_rule(
     "/event/<string:event_key>/alliance_selections/update",
     methods=["POST"],
     view_func=update_event_alliances,
+),
+trusted_api.add_url_rule(
+    "/event/<string:event_key>/awards/update",
+    methods=["POST"],
+    view_func=update_event_awards,
 ),
 trusted_api.add_url_rule(
     "/event/<string:event_key>/info/update",

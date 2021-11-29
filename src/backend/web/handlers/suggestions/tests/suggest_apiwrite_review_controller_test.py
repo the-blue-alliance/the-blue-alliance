@@ -90,7 +90,7 @@ def createSuggestion(logged_in_user) -> int:
     return none_throws(
         Suggestion.query(Suggestion.target_key == "2016necmp")
         .fetch(keys_only=True)[0]
-        .id()
+        .integer_id()
     )
 
 

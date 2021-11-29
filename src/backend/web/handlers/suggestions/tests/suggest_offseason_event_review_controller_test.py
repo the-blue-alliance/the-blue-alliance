@@ -60,7 +60,7 @@ def createSuggestion(logged_in_user) -> int:
         "USA",
     )
     assert status[0] == SuggestionCreationStatus.SUCCESS
-    return none_throws(Suggestion.query().fetch(keys_only=True)[0].id())
+    return none_throws(Suggestion.query().fetch(keys_only=True)[0].integer_id())
 
 
 def test_login_redirect(web_client: Client) -> None:
