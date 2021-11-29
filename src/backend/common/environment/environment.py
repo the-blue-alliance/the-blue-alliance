@@ -64,3 +64,10 @@ class Environment:
     @staticmethod
     def auth_emulator_host() -> Optional[str]:
         return os.environ.get("FIREBASE_AUTH_EMULATOR_HOST")
+
+    @staticmethod
+    def save_frc_api_response() -> bool:
+        # Should always be True in production
+        if Environment.is_prod():
+            return True
+        return bool(os.environ.get("SAVE_FRC_API_RESPONSE", False))
