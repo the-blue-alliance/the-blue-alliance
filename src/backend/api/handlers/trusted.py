@@ -1,3 +1,4 @@
+import json
 from typing import List, Optional
 
 from flask import jsonify, make_response, request, Response
@@ -8,6 +9,7 @@ from pyre_extensions import none_throws
 from backend.api.api_trusted_parsers.json_alliance_selections_parser import (
     JSONAllianceSelectionsParser,
 )
+from backend.api.api_trusted_parsers.json_awards_parser import JSONAwardsParser
 from backend.api.api_trusted_parsers.json_event_info_parser import JSONEventInfoParser
 from backend.api.api_trusted_parsers.json_match_video_parser import JSONMatchVideoParser
 from backend.api.api_trusted_parsers.json_team_list_parser import (
@@ -18,12 +20,14 @@ from backend.common.consts.auth_type import AuthType
 from backend.common.futures import TypedFuture
 from backend.common.helpers.event_remapteams_helper import EventRemapTeamsHelper
 from backend.common.helpers.event_webcast_adder import EventWebcastAdder
+from backend.common.manipulators.award_manipulator import AwardManipulator
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
 )
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
 from backend.common.manipulators.match_manipulator import MatchManipulator
+from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.event import EventDetails
 from backend.common.models.event_team import EventTeam
@@ -144,3 +148,37 @@ def update_event_alliances(event_key: EventKey) -> Response:
     EventDetailsManipulator.createOrUpdate(event_details)
 
     return jsonify({"Success": "Alliance selections successfully updated"})
+
+
+@require_write_auth({AuthType.EVENT_AWARDS})
+@validate_event_key
+def update_event_awards(event_key: EventKey) -> Response:
+    awards = JSONAwardsParser.parse(request.data, event_key)
+    event: Event = none_throws(Event.get_by_id(event_key))
+
+    awards_to_put: List[Award] = []
+    for award in awards:
+        awards_to_put.append(
+            Award(
+                id=Award.render_key_name(event.key_name, award["award_type_enum"]),
+                name_str=award["name_str"],
+                award_type_enum=award["award_type_enum"],
+                year=event.year,
+                event=event.key,
+                event_type_enum=event.event_type_enum,
+                team_list=[
+                    ndb.Key(Team, team_key) for team_key in award["team_key_list"]
+                ],
+                recipient_json_list=[json.dumps(a) for a in award["recipient_list"]],
+            )
+        )
+
+    # it's easier to clear all awards and add new ones than try to find the difference
+    old_award_keys = Award.query(Award.event == event.key).fetch(keys_only=True)
+    AwardManipulator.delete_keys(old_award_keys)
+
+    if event.remap_teams:
+        EventRemapTeamsHelper.remapteams_awards(awards_to_put, event.remap_teams)
+    AwardManipulator.createOrUpdate(awards_to_put)
+
+    return jsonify({"Success": "Awards successfully updated"})
