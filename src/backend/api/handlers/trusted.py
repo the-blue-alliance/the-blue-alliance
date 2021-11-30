@@ -1,4 +1,5 @@
 import json
+import logging
 from typing import List, Optional
 
 from flask import jsonify, make_response, request, Response
@@ -12,6 +13,7 @@ from backend.api.api_trusted_parsers.json_alliance_selections_parser import (
 from backend.api.api_trusted_parsers.json_awards_parser import JSONAwardsParser
 from backend.api.api_trusted_parsers.json_event_info_parser import JSONEventInfoParser
 from backend.api.api_trusted_parsers.json_match_video_parser import JSONMatchVideoParser
+from backend.api.api_trusted_parsers.json_matches_parser import JSONMatchesParser
 from backend.api.api_trusted_parsers.json_team_list_parser import (
     JSONTeamListParser,
 )
@@ -20,6 +22,7 @@ from backend.common.consts.auth_type import AuthType
 from backend.common.futures import TypedFuture
 from backend.common.helpers.event_remapteams_helper import EventRemapTeamsHelper
 from backend.common.helpers.event_webcast_adder import EventWebcastAdder
+from backend.common.helpers.match_helper import MatchHelper
 from backend.common.manipulators.award_manipulator import AwardManipulator
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
@@ -182,3 +185,49 @@ def update_event_awards(event_key: EventKey) -> Response:
     AwardManipulator.createOrUpdate(awards_to_put)
 
     return jsonify({"Success": "Awards successfully updated"})
+
+
+@require_write_auth({AuthType.EVENT_MATCHES})
+@validate_event_key
+def update_event_matches(event_key: EventKey) -> Response:
+    event: Event = none_throws(Event.get_by_id(event_key))
+    parsed_matches = JSONMatchesParser.parse(request.data, event.year)
+
+    matches: List[Match] = []
+    needs_time: List[Match] = []
+    for match in parsed_matches:
+        match = Match(
+            id=Match.renderKeyName(
+                event.key_name,
+                match["comp_level"],
+                match["set_number"],
+                match["match_number"],
+            ),
+            event=event.key,
+            year=event.year,
+            set_number=match["set_number"],
+            match_number=match["match_number"],
+            comp_level=match["comp_level"],
+            team_key_names=match["team_key_names"],
+            alliances_json=match["alliances_json"],
+            score_breakdown_json=match["score_breakdown_json"],
+            time_string=match["time_string"],
+            time=match["time"],
+        )
+
+        if (not match.time or match.time == "") and match.time_string:
+            # We can calculate the real time from the time string
+            needs_time.append(match)
+        matches.append(match)
+
+    if needs_time:
+        try:
+            MatchHelper.add_match_times(event, needs_time)
+        except Exception:
+            logging.exception("Failed to calculate match times")
+
+    if event.remap_teams:
+        EventRemapTeamsHelper.remapteams_matches(matches, event.remap_teams)
+    MatchManipulator.createOrUpdate(matches)
+
+    return jsonify({"Success": "Matches successfully updated"})
