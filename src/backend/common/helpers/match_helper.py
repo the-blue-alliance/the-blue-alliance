@@ -1,10 +1,16 @@
 import collections
+import datetime
+import logging
 import re
-from typing import Dict, List, Mapping, Tuple
+from typing import Dict, List, Mapping, MutableSequence, Sequence, Tuple
+
+import pytz
+from pyre_extensions import none_throws
 
 from backend.common.consts.comp_level import COMP_LEVELS, CompLevel
 from backend.common.consts.playoff_type import DoubleElimBracket
 from backend.common.helpers.playoff_type_helper import PlayoffTypeHelper
+from backend.common.models.event import Event
 from backend.common.models.match import Match
 
 
@@ -36,7 +42,7 @@ class MatchHelper(object):
 
     @classmethod
     def play_order_sorted_matches(
-        cls, matches: List[Match], reverse: bool = False
+        cls, matches: Sequence[Match], reverse: bool = False
     ) -> List[Match]:
         return sorted(matches, key=lambda m: m.play_order, reverse=reverse)
 
@@ -93,6 +99,56 @@ class MatchHelper(object):
             if not match.has_been_played:
                 upcoming_matches.append(match)
         return upcoming_matches
+
+    @classmethod
+    def add_match_times(cls, event: Event, matches: MutableSequence[Match]) -> None:
+        """
+        Calculates and adds match times given an event and match time strings (from USFIRST)
+        Assumes the last match is played on the last day of comeptition and
+        works backwards from there.
+        """
+        if (
+            event.timezone_id is None
+        ):  # Can only calculate match times if event timezone is known
+            logging.warning(
+                "Cannot compute match time for event with no timezone_id: {}".format(
+                    event.key_name
+                )
+            )
+            return
+
+        matches_reversed = cls.play_order_sorted_matches(matches, reverse=True)
+        tz = pytz.timezone(event.timezone_id)
+
+        last_match_time = None
+        cur_date = event.end_date + datetime.timedelta(
+            hours=23, minutes=59, seconds=59
+        )  # end_date is specified at midnight of the last day
+        for match in matches_reversed:
+            r = none_throws(
+                re.search(r"(\d+):(\d+) (am|pm)", match.time_string.lower())
+            )
+            hour = int(r.group(1))
+            minute = int(r.group(2))
+            if hour == 12:
+                hour = 0
+            if r.group(3) == "pm":
+                hour += 12
+
+            match_time = datetime.datetime(
+                cur_date.year, cur_date.month, cur_date.day, hour, minute
+            )
+            if (
+                last_match_time is not None
+                and last_match_time + datetime.timedelta(hours=6) < match_time
+            ):
+                cur_date = cur_date - datetime.timedelta(days=1)
+                match_time = datetime.datetime(
+                    cur_date.year, cur_date.month, cur_date.day, hour, minute
+                )
+            last_match_time = match_time
+
+            match.time = match_time - tz.utcoffset(match_time)
 
     """
     @classmethod

@@ -13,6 +13,7 @@ from backend.api.handlers.trusted import (
     update_event_alliances,
     update_event_awards,
     update_event_info,
+    update_event_matches,
     update_teams,
 )
 from backend.common.datafeed_parsers.exceptions import ParserInputException
@@ -79,6 +80,11 @@ trusted_api.add_url_rule(
     methods=["POST"],
     view_func=update_event_info,
 ),
+trusted_api.add_url_rule(
+    "/event/<string:event_key>/matches/update",
+    methods=["POST"],
+    view_func=update_event_matches,
+)
 trusted_api.add_url_rule(
     "/event/<string:event_key>/match_videos/add",
     methods=["POST"],
