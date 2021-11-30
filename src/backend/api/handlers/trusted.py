@@ -1,11 +1,11 @@
 import json
 import logging
-from typing import List, Optional
+from typing import List, Optional, Set
 
 from flask import jsonify, make_response, request, Response
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import defer
-from pyre_extensions import none_throws
+from pyre_extensions import none_throws, safe_json
 
 from backend.api.api_trusted_parsers.json_alliance_selections_parser import (
     JSONAllianceSelectionsParser,
@@ -231,3 +231,51 @@ def update_event_matches(event_key: EventKey) -> Response:
     MatchManipulator.createOrUpdate(matches)
 
     return jsonify({"Success": "Matches successfully updated"})
+
+
+@require_write_auth({AuthType.EVENT_MATCHES})
+@validate_event_key
+def delete_event_matches(event_key: EventKey) -> Response:
+    keys_to_delete: Set[ndb.Key] = set()
+    try:
+        match_keys = safe_json.loads(request.data, List[str])
+    except Exception:
+        return make_response(
+            jsonify({"Error": "'keys_to_delete' could not be parsed"}), 400
+        )
+
+    for match_key in match_keys:
+        key_name = f"{event_key}_{match_key}"
+        if Match.validate_key_name(key_name):
+            keys_to_delete.add(ndb.Key(Match, key_name))
+
+    MatchManipulator.delete_keys(keys_to_delete)
+
+    return jsonify(
+        {
+            "keys_deleted": [
+                none_throws(key.string_id()).split("_")[1] for key in keys_to_delete
+            ]
+        }
+    )
+
+
+@require_write_auth({AuthType.EVENT_MATCHES})
+@validate_event_key
+def delete_all_event_matches(event_key: EventKey) -> Response:
+    if request.data.decode() != event_key:
+        return make_response(
+            jsonify(
+                {
+                    "Error": "To delete all matches for this event, the body of the request must be the event key."
+                }
+            ),
+            400,
+        )
+
+    keys_to_delete = Match.query(Match.event == ndb.Key(Event, event_key)).fetch(
+        keys_only=True
+    )
+    MatchManipulator.delete_keys(keys_to_delete)
+
+    return jsonify({"Success": "All matches for {} deleted".format(event_key)})
