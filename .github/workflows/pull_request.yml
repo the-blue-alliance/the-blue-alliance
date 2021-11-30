@@ -172,6 +172,6 @@ jobs:
     needs: [py3-type, py3-lint, py3-test, node-lint, node-test, bash-lint, build-web]
     runs-on: ubuntu-latest
     steps:
-      - uses: fastify/github-action-merge-dependabot@v2.6.0
+      - uses: fastify/github-action-merge-dependabot@v2.7.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
