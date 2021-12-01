@@ -19,6 +19,7 @@ def cached_public(func: Optional[Callable] = None, ttl: Union[int, timedelta] = 
             cached = current_app.cache.cached(
                 timeout=timeout,
                 response_filter=lambda resp: make_response(resp).status_code == 200,
+                query_string=True,
             )
             resp = make_response(cached(func)(*args, **kwargs))
         else:
