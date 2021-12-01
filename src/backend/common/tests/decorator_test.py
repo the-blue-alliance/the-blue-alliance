@@ -135,7 +135,7 @@ def test_flask_cache_with_memcache(app: Flask, memcache_stub) -> None:
     resp = app.test_client().get("/")
     assert resp.status_code == 200
 
-    assert app.cache.get("view//") == resp.data.decode()
+    assert app.cache.get("/bcd8b0c2eb1fce714eab6cef0d771acc") == resp.data.decode()
 
 
 def test_flask_cache_with_memcache_static_timeout(app: Flask, memcache_stub) -> None:
@@ -152,10 +152,10 @@ def test_flask_cache_with_memcache_static_timeout(app: Flask, memcache_stub) -> 
     resp = app.test_client().get("/")
     assert resp.status_code == 200
 
-    assert app.cache.get("view//") == resp.data.decode()
+    assert app.cache.get("/bcd8b0c2eb1fce714eab6cef0d771acc") == resp.data.decode()
     time.sleep(1)
     # cache is expired by now
-    assert app.cache.get("view//") is None
+    assert app.cache.get("/bcd8b0c2eb1fce714eab6cef0d771acc") is None
 
 
 def test_flask_cache_with_memcache_dynamic_timeout(app: Flask, memcache_stub) -> None:
@@ -172,15 +172,45 @@ def test_flask_cache_with_memcache_dynamic_timeout(app: Flask, memcache_stub) ->
     resp = app.test_client().get("/")
     assert resp.status_code == 200
 
-    assert app.cache.get("view//") is not None
+    assert app.cache.get("/bcd8b0c2eb1fce714eab6cef0d771acc") is not None
 
     # cache shouldn't be expired yet
     time.sleep(1)
-    assert app.cache.get("view//") is not None
+    assert app.cache.get("/bcd8b0c2eb1fce714eab6cef0d771acc") is not None
 
     # but now it should
     time.sleep(1)
-    assert app.cache.get("view//") is None
+    assert app.cache.get("/bcd8b0c2eb1fce714eab6cef0d771acc") is None
+
+
+def test_flask_cache_with_query_string(app: Flask, memcache_stub) -> None:
+    configure_flask_cache(app)
+
+    @app.route("/")
+    @cached_public
+    def view():
+        return "Hello!"
+
+    assert hasattr(app, "cache")
+    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)
+
+    resp = app.test_client().get("/")
+    assert resp.status_code == 200
+
+    # Make sure the query string version has a different cache key
+    assert app.cache.get("/bcd8b0c2eb1fce714eab6cef0d771acc") is not None
+    assert app.cache.get("/556df1cd959b2932289548d8810cc66e") is None
+
+    assert app.cache.get("/bcd8b0c2eb1fce714eab6cef0d771acc") == resp.data.decode()
+
+    resp_query = app.test_client().get("/?query_string=TBA")
+    assert resp_query.status_code == 200
+
+    assert app.cache.get("/bcd8b0c2eb1fce714eab6cef0d771acc") is not None
+    assert app.cache.get("/556df1cd959b2932289548d8810cc66e") is not None
+
+    assert app.cache.get("/bcd8b0c2eb1fce714eab6cef0d771acc") == resp.data.decode()
+    assert app.cache.get("/556df1cd959b2932289548d8810cc66e") == resp_query.data.decode()
 
 
 def test_flask_cache_with_memcache_skips_errors(app: Flask, memcache_stub) -> None:
