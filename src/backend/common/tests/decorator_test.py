@@ -210,7 +210,9 @@ def test_flask_cache_with_query_string(app: Flask, memcache_stub) -> None:
     assert app.cache.get("/556df1cd959b2932289548d8810cc66e") is not None
 
     assert app.cache.get("/bcd8b0c2eb1fce714eab6cef0d771acc") == resp.data.decode()
-    assert app.cache.get("/556df1cd959b2932289548d8810cc66e") == resp_query.data.decode()
+    assert (
+        app.cache.get("/556df1cd959b2932289548d8810cc66e") == resp_query.data.decode()
+    )
 
 
 def test_flask_cache_with_memcache_skips_errors(app: Flask, memcache_stub) -> None:

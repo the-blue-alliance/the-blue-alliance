@@ -39,9 +39,7 @@ class EventRemapTeamsHelper:
             )
         # Remap rankings
         if event.rankings:
-            cls.remapteams_rankings(event.rankings, event.remap_teams)
-        if event.details and event.details.rankings2:
-            cls.remapteams_rankings2(event.details.rankings2, event.remap_teams)
+            cls.remapteams_rankings2(event.rankings, event.remap_teams)
         EventDetailsManipulator.createOrUpdate(event.details)
 
         # Remap awards
@@ -129,19 +127,6 @@ class EventRemapTeamsHelper:
                     for i, key in enumerate(row[choice]):  # pyre-ignore[26]
                         if key == old_team:
                             row[choice][i] = new_team  # pyre-ignore[26,6]
-
-    @classmethod
-    def remapteams_rankings(
-        cls, rankings: List[Dict], remap_teams: Dict[str, str]
-    ) -> None:
-        """
-        Remaps teams in rankings
-        Mutates in place
-        """
-        for row in rankings:
-            for old_team, new_team in remap_teams.items():
-                if str(row[1]) == old_team[3:]:
-                    row[1] = new_team[3:]
 
     @classmethod
     def remapteams_rankings2(
