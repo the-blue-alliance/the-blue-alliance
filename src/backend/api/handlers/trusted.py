@@ -20,6 +20,7 @@ from backend.api.api_trusted_parsers.json_team_list_parser import (
 )
 from backend.api.handlers.decorators import require_write_auth, validate_event_key
 from backend.common.consts.auth_type import AuthType
+from backend.common.consts.media_type import MediaType
 from backend.common.futures import TypedFuture
 from backend.common.helpers.event_remapteams_helper import EventRemapTeamsHelper
 from backend.common.helpers.event_webcast_adder import EventWebcastAdder
@@ -31,12 +32,14 @@ from backend.common.manipulators.event_details_manipulator import (
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
 from backend.common.manipulators.match_manipulator import MatchManipulator
+from backend.common.manipulators.media_manipulator import MediaManipulator
 from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.event import EventDetails
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey
 from backend.common.models.match import Match
+from backend.common.models.media import Media
 from backend.common.models.team import Team
 
 
@@ -298,3 +301,28 @@ def update_event_rankings(event_key: EventKey) -> Response:
     EventDetailsManipulator.createOrUpdate(event_details)
 
     return jsonify({"Success": "Rankings successfully updated"})
+
+
+@require_write_auth({AuthType.MATCH_VIDEO})
+@validate_event_key
+def add_event_media(event_key: EventKey) -> Response:
+    event: Event = none_throws(Event.get_by_id(event_key))
+
+    video_list = safe_json.loads(request.data, List[str])
+    media_to_put: List[Media] = []
+    event_reference = Media.create_reference("event", event.key_name)
+    for youtube_id in video_list:
+        media = Media(
+            id=Media.render_key_name(MediaType.YOUTUBE_VIDEO, youtube_id),
+            foreign_key=youtube_id,
+            media_type_enum=MediaType.YOUTUBE_VIDEO,
+            details_json=None,
+            private_details_json=None,
+            year=event.year,
+            references=[event_reference],
+            preferred_references=[],
+        )
+        media_to_put.append(media)
+
+    MediaManipulator.createOrUpdate(media_to_put)
+    return jsonify({"Success": "Media successfully added"})

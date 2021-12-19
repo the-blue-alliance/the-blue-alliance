@@ -9,6 +9,7 @@ from backend.api.handlers.event import event
 from backend.api.handlers.status import status
 from backend.api.handlers.team import team, team_list, team_list_all, team_list_year
 from backend.api.handlers.trusted import (
+    add_event_media,
     add_match_video,
     delete_all_event_matches,
     delete_event_matches,
@@ -102,6 +103,11 @@ trusted_api.add_url_rule(
     "/event/<string:event_key>/match_videos/add",
     methods=["POST"],
     view_func=add_match_video,
+)
+trusted_api.add_url_rule(
+    "/event/<string:event_key>/media/add",
+    methods=["POST"],
+    view_func=add_event_media,
 )
 trusted_api.add_url_rule(
     "/event/<string:event_key>/rankings/update",
