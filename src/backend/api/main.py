@@ -11,6 +11,7 @@ from backend.api.handlers.team import team, team_list, team_list_all, team_list_
 from backend.api.handlers.trusted import (
     add_event_media,
     add_match_video,
+    add_match_zebra_motionworks_info,
     delete_all_event_matches,
     delete_event_matches,
     update_event_alliances,
@@ -118,6 +119,11 @@ trusted_api.add_url_rule(
     "/event/<string:event_key>/team_list/update",
     methods=["POST"],
     view_func=update_teams,
+)
+trusted_api.add_url_rule(
+    "/event/<string:event_key>/zebra_motionworks/add",
+    methods=["POST"],
+    view_func=add_match_zebra_motionworks_info,
 )
 
 

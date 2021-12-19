@@ -18,7 +18,11 @@ from backend.api.api_trusted_parsers.json_rankings_parser import JSONRankingsPar
 from backend.api.api_trusted_parsers.json_team_list_parser import (
     JSONTeamListParser,
 )
+from backend.api.api_trusted_parsers.json_zebra_motionworks_parser import (
+    JSONZebraMotionWorksParser,
+)
 from backend.api.handlers.decorators import require_write_auth, validate_event_key
+from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.media_type import MediaType
 from backend.common.futures import TypedFuture
@@ -41,6 +45,7 @@ from backend.common.models.keys import EventKey
 from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.team import Team
+from backend.common.models.zebra_motionworks import ZebraMotionWorks
 
 
 @require_write_auth({AuthType.EVENT_TEAMS})
@@ -325,4 +330,51 @@ def add_event_media(event_key: EventKey) -> Response:
         media_to_put.append(media)
 
     MediaManipulator.createOrUpdate(media_to_put)
+    return jsonify({"Success": "Media successfully added"})
+
+
+@require_write_auth({AuthType.ZEBRA_MOTIONWORKS})
+@validate_event_key
+def add_match_zebra_motionworks_info(event_key: EventKey) -> Response:
+    to_put: List[ZebraMotionWorks] = []
+    for zebra_data in JSONZebraMotionWorksParser.parse(request.data):
+        match_key = zebra_data["key"]
+
+        # Check that match_key matches event_key
+        if match_key.split("_")[0] != event_key:
+            return make_response(
+                jsonify(
+                    {
+                        "Error": f"Match key {match_key} does not match Event key {event_key}!"
+                    }
+                ),
+                400,
+            )
+
+        # Check that match exists
+        match: Optional[Match] = Match.get_by_id(match_key)
+        if match is None:
+            return make_response(
+                jsonify({"Error": f"Match {match_key} does not exist!"}), 400
+            )
+
+        # Check that teams in Zebra data and teams in Match are the same
+        for color in ALLIANCE_COLORS:
+            match_teams = match.alliances[AllianceColor(color)]["teams"]
+            zebra_teams = [
+                team["team_key"]
+                for team in zebra_data["alliances"][color]  # pyre-ignore
+            ]
+            if match_teams != zebra_teams:
+                return make_response(
+                    jsonify({"Error": f"Match {match_key} teams are not valid!"}), 400
+                )
+
+        to_put.append(
+            ZebraMotionWorks(
+                id=match_key, event=ndb.Key(Event, event_key), data=zebra_data
+            )
+        )
+
+    ndb.put_multi(to_put)
     return jsonify({"Success": "Media successfully added"})
