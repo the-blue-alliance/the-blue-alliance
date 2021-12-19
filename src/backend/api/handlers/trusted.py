@@ -14,6 +14,7 @@ from backend.api.api_trusted_parsers.json_awards_parser import JSONAwardsParser
 from backend.api.api_trusted_parsers.json_event_info_parser import JSONEventInfoParser
 from backend.api.api_trusted_parsers.json_match_video_parser import JSONMatchVideoParser
 from backend.api.api_trusted_parsers.json_matches_parser import JSONMatchesParser
+from backend.api.api_trusted_parsers.json_rankings_parser import JSONRankingsParser
 from backend.api.api_trusted_parsers.json_team_list_parser import (
     JSONTeamListParser,
 )
@@ -279,3 +280,21 @@ def delete_all_event_matches(event_key: EventKey) -> Response:
     MatchManipulator.delete_keys(keys_to_delete)
 
     return jsonify({"Success": "All matches for {} deleted".format(event_key)})
+
+
+@require_write_auth({AuthType.EVENT_RANKINGS})
+@validate_event_key
+def update_event_rankings(event_key: EventKey) -> Response:
+    event: Event = none_throws(Event.get_by_id(event_key))
+    rankings = JSONRankingsParser.parse(event.year, request.data)
+
+    event_details = EventDetails(id=event_key, rankings2=rankings)
+
+    if event.remap_teams:
+        EventRemapTeamsHelper.remapteams_rankings2(
+            event_details.rankings2, event.remap_teams
+        )
+
+    EventDetailsManipulator.createOrUpdate(event_details)
+
+    return jsonify({"Success": "Rankings successfully updated"})

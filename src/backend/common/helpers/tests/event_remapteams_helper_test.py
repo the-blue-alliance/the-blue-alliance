@@ -161,25 +161,6 @@ def test_remap_alliances(ndb_context):
     assert alliances[3]["picks"] == ["frc604", "frc200", "frc7308"]
 
 
-def test_remap_rankings(ndb_context):
-    rankings = [
-        [1, "254", 1],
-        [2, "9001", 2],
-        [3, "2", 3],
-    ]
-
-    EventRemapTeamsHelper.remapteams_rankings(
-        rankings,
-        {
-            "frc9001": "frc1B",
-            "frc2": "frc200",
-        },
-    )
-    assert rankings[0][1] == "254"
-    assert rankings[1][1] == "1B"
-    assert rankings[2][1] == "200"
-
-
 def test_remap_rankings2(ndb_context):
     rankings: List[EventRanking] = [
         EventRanking(

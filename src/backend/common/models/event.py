@@ -18,6 +18,7 @@ from backend.common.models.cached_model import CachedModel
 from backend.common.models.district import District
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_district_points import EventDistrictPoints
+from backend.common.models.event_ranking import EventRanking
 from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.location import Location
 from backend.common.models.webcast import Webcast
@@ -453,7 +454,7 @@ class Event(CachedModel):
             return self.details.matchstats
 
     @property
-    def rankings(self):
+    def rankings(self) -> Optional[List[EventRanking]]:
         if self.details is None:
             return None
         else:
