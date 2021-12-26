@@ -186,7 +186,7 @@ jobs:
       - name: Create keys file
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
       - name: Start Container
-        run: vagrant up
+        run: ENV='CI' vagrant up
       - name: Test Fullstack
         run: ./ops/test_fullstack.py
       - name: Comment Webpage Screenshot

@@ -208,7 +208,7 @@ jobs:
         run: cp tba_keys_template.js tba_keys.js
       - name: Start Container
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: vagrant up
+        run: ENV='CI' vagrant up
       - name: Test Fullstack
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/test_fullstack.py
