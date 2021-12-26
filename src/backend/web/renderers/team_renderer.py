@@ -30,11 +30,11 @@ from backend.common.queries import (
 )
 
 
-class TeamRenderer(object):
+class TeamRenderer:
     @classmethod
     def render_team_details(
         cls, team: Team, year: Year, is_canonical: bool
-    ) -> Optional[Dict]:
+    ) -> Tuple[Optional[Dict], bool]:
         hof_award_future = award_query.TeamEventTypeAwardsQuery(
             team_key=team.key_name,
             event_type=EventType.CMP_FINALS,
@@ -87,7 +87,7 @@ class TeamRenderer(object):
             valid_years,
         ) = cls._fetch_data(team, year, return_valid_years=True)
         if not events_sorted:
-            return None
+            return None, False
 
         district_name = None
         district_abbrev = None
@@ -118,6 +118,7 @@ class TeamRenderer(object):
 
         current_event = None
         matches_upcoming = None
+        short_cache = False
         for event in events_sorted:
             event_matches = matches_by_event_key.get(event.key, [])
             event_awards = AwardHelper.organize_awards(
@@ -131,10 +132,8 @@ class TeamRenderer(object):
                 current_event = event
                 matches_upcoming = MatchHelper.upcoming_matches(event_matches)
 
-            """
             if event.within_a_day:
                 short_cache = True
-            """
 
             if year == 2015:
                 display_wlt = None
@@ -289,14 +288,10 @@ class TeamRenderer(object):
             "team_district_points": team_district_points,
         }
 
-        """
-        if short_cache:
-            handler._cache_expiration = handler.SHORT_CACHE_EXPIRATION
-        """
-        return template_values
+        return template_values, short_cache
 
     @classmethod
-    def render_team_history(cls, team: Team, is_canonical: bool) -> Dict:
+    def render_team_history(cls, team: Team, is_canonical: bool) -> Tuple[Dict, bool]:
         hof_award_future = award_query.TeamEventTypeAwardsQuery(
             team_key=team.key_name,
             event_type=EventType.CMP_FINALS,
@@ -351,7 +346,7 @@ class TeamRenderer(object):
         event_awards = []
         current_event = None
         matches_upcoming = None
-        # short_cache = False
+        short_cache = False
         years = set()
         for event in event_futures.get_result():
             years.add(event.year)
@@ -362,10 +357,8 @@ class TeamRenderer(object):
                 ).fetch()
                 matches_upcoming = MatchHelper.upcoming_matches(matches)
 
-            """
             if event.within_a_day:
                 short_cache = True
-            """
 
             if event.key_name in awards_by_event:
                 sorted_awards = AwardHelper.organize_awards(
@@ -405,11 +398,7 @@ class TeamRenderer(object):
             "hof": hall_of_fame,
         }
 
-        """
-        if short_cache:
-            handler._cache_expiration = handler.SHORT_CACHE_EXPIRATION
-        """
-        return template_values
+        return template_values, short_cache
 
     @classmethod
     def _fetch_data(

@@ -29,6 +29,7 @@ def test_render_district(ndb_stub, web_client: Client) -> None:
     helpers.preseed_district("2020ne")
     resp = web_client.get("/events/ne/2020")
     assert resp.status_code == 200
+    assert "max-age=86400" in resp.headers["Cache-Control"]
 
     soup = BeautifulSoup(resp.data, "html.parser")
 
@@ -159,6 +160,7 @@ def test_district_details_render_active_teams(
 
     resp = web_client.get("/events/ne/2019")
     assert resp.status_code == 200
+    assert "max-age=900" in resp.headers["Cache-Control"]
 
     soup = BeautifulSoup(resp.data, "html.parser")
     active_teams = soup.find(id="active-teams")
@@ -173,10 +175,14 @@ def test_district_details_render_active_teams(
     assert len(live_teams) == 41
 
 
-@pytest.mark.parametrize("year, expects_rankings", [(2020, True), (2021, False)])
+@freeze_time("2021-06-01")
+@pytest.mark.parametrize(
+    "year, expects_rankings, cache_ttl", [(2020, True, 86400), (2021, False, 900)]
+)
 def test_district_detail_rankings(
     year,
     expects_rankings,
+    cache_ttl,
     ndb_stub,
     captured_templates: List[CapturedTemplate],
     web_client: Client,
@@ -208,6 +214,7 @@ def test_district_detail_rankings(
     response = web_client.get(f"/events/fim/{year}")
 
     assert response.status_code == 200
+    assert f"max-age={cache_ttl}" in response.headers["Cache-Control"]
     assert len(captured_templates) == 1
 
     template = captured_templates[0][0]

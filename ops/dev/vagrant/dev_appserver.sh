@@ -9,8 +9,10 @@ tba_log_level=$(get_config_prop tba_log_level)
 ndb_log_level=$(get_config_prop ndb_log_level)
 datastore_mode=$(get_config_prop datastore_mode)
 flask_response_cache_enabled=$(get_config_prop flask_response_cache_enabled)
+cache_control_header_enabled=$(get_config_prop cache_control_header_enabled)
 storage_mode=$(get_config_prop storage_mode)
 storage_path=$(get_config_prop storage_path)
+save_frc_api_response=$(get_config_prop save_frc_api_response)
 application=""
 env=()
 
@@ -86,8 +88,10 @@ dev_appserver.py \
     --env_var TBA_LOG_LEVEL="$tba_log_level" \
     --env_var NDB_LOG_LEVEL="$ndb_log_level" \
     --env_var STORAGE_MODE="$storage_mode" \
-    --env_var FLASK_RESPONE_CACHE_ENABLED="$flask_response_cache_enabled" \
+    --env_var FLASK_RESPONSE_CACHE_ENABLED="$flask_response_cache_enabled" \
+    --env_var CACHE_CONTROL_HEADER_ENABLED="$cache_control_header_enabled" \
     --env_var GCLOUD_PROJECT="$application" \
+    --env_var SAVE_FRC_API_RESPONSE="$save_frc_api_response" \
     --dev_appserver_log_level="$log_level" \
     --enable_task_running yes \
     src/default.yaml src/web.yaml src/api.yaml src/tasks_io.yaml src/dispatch.yaml

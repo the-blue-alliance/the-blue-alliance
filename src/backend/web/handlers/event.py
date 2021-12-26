@@ -1,4 +1,5 @@
 import collections
+from datetime import datetime, timedelta
 from typing import Optional
 
 from flask import abort, redirect, request
@@ -8,6 +9,7 @@ from werkzeug.wrappers import Response
 
 from backend.common.consts import comp_level, playoff_type
 from backend.common.decorators import cached_public
+from backend.common.flask_cache import make_cached_response
 from backend.common.helpers.award_helper import AwardHelper
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.match_helper import MatchHelper
@@ -71,17 +73,19 @@ def event_list(year: Optional[Year] = None) -> Response:
         "state_prov": state_prov,
         "valid_state_provs": valid_state_provs,
     }
-    return render_template("event_list.html", template_values)
+    return make_cached_response(
+        render_template("event_list.html", template_values),
+        ttl=timedelta(minutes=5) if year == datetime.now().year else timedelta(days=1),
+    )
 
 
 @cached_public
 def event_detail(event_key: EventKey) -> Response:
-    event = event_query.EventQuery(event_key).fetch()
+    event: Optional[Event] = event_query.EventQuery(event_key).fetch()
 
     if not event:
         abort(404)
 
-    event = none_throws(event)  # for pyre
     event.prep_awards_matches_teams()
     event.prep_details()
     medias_future = media_query.EventTeamsPreferredMediasQuery(event_key).fetch_async()
@@ -110,7 +114,7 @@ def event_detail(event_key: EventKey) -> Response:
     cleaned_matches = event.matches
     # MatchHelper.delete_invalid_matches(event.matches, event)
     match_count, matches = MatchHelper.organized_matches(cleaned_matches)
-    teams = TeamHelper.sort_teams(event.teams)
+    teams = TeamHelper.sort_teams(event.teams)  # pyre-ignore[6]
 
     # Organize medias by team
     image_medias = MediaHelper.get_images(
@@ -238,4 +242,7 @@ def event_detail(event_key: EventKey) -> Response:
         "elim_playlist": elim_playlist,
     }
 
-    return render_template("event_details.html", template_values)
+    return make_cached_response(
+        render_template("event_details.html", template_values),
+        ttl=timedelta(seconds=61) if event.within_a_day else timedelta(days=1),
+    )

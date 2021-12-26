@@ -1,6 +1,7 @@
 import enum
 import os
 import tempfile
+from distutils.util import strtobool
 from pathlib import Path
 from typing import Optional
 
@@ -45,7 +46,11 @@ class Environment:
 
     @staticmethod
     def flask_response_cache_enabled() -> bool:
-        return bool(os.environ.get("FLASK_RESPONSE_CACHE_ENABLED", True))
+        return bool(strtobool(os.environ.get("FLASK_RESPONSE_CACHE_ENABLED", "true")))
+
+    @staticmethod
+    def cache_control_header_enabled() -> bool:
+        return bool(strtobool(os.environ.get("CACHE_CONTROL_HEADER_ENABLED", "true")))
 
     @staticmethod
     def storage_mode() -> EnvironmentMode:
@@ -59,3 +64,10 @@ class Environment:
     @staticmethod
     def auth_emulator_host() -> Optional[str]:
         return os.environ.get("FIREBASE_AUTH_EMULATOR_HOST")
+
+    @staticmethod
+    def save_frc_api_response() -> bool:
+        # Should always be True in production
+        if Environment.is_prod():
+            return True
+        return bool(os.environ.get("SAVE_FRC_API_RESPONSE", False))

@@ -1,4 +1,3 @@
-import json
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from typing import cast, Dict, List, NamedTuple, Optional
@@ -9,12 +8,10 @@ from backend.common.consts import comp_level
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.event_type import EventType
 from backend.common.decorators import memoize
-from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.event_team_status import WLTRecord
 from backend.common.models.keys import EventKey, TeamKey
 from backend.common.models.match import Match
-from backend.common.models.team import Team
 
 
 CHAMPIONSHIP_EVENTS_LABEL = "FIRST Championship"
@@ -236,40 +233,3 @@ class EventHelper(object):
                     events.append(event)
 
         return cls.sorted_events(events)
-
-    @classmethod
-    def remapteams_awards(
-        cls, awards: List[Award], remap_teams: Dict[str, str]
-    ) -> None:
-        """
-        Remaps teams in awards. Mutates in place.
-        In `remap_teams` dictionary, key is the old team key, value is the new team key
-        """
-        for award in awards:
-            new_recipient_json_list = []
-            new_team_list = []
-            # Compute new recipient list and team list
-            for recipient in award.recipient_list:
-                for old_team, new_team in remap_teams.items():
-                    # Convert recipient `team_number` to string for safe comparision
-                    if str(recipient["team_number"]) == old_team[3:]:
-                        award._dirty = True
-                        recipient["team_number"] = new_team[3:]
-
-                # Convert `team_number` down to an int, if possible
-                recipient_team_number = recipient["team_number"]
-                if (
-                    type(recipient_team_number) is str
-                    and recipient_team_number.isdigit()
-                ):
-                    award._dirty = True
-                    recipient["team_number"] = int(recipient_team_number)
-
-                new_recipient_json_list.append(json.dumps(recipient))
-                new_team_list.append(
-                    ndb.Key(Team, "frc{}".format(recipient["team_number"]))
-                )
-
-            # Update
-            award.recipient_json_list = new_recipient_json_list
-            award.team_list = new_team_list
