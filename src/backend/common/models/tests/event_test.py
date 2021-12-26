@@ -28,7 +28,7 @@ from backend.common.models.tests.util import (
 from backend.conftest import clear_cached_queries  # noqa: ETBA0
 
 
-@pytest.mark.parametrize("key", ["2010ct", "2014onto2", "202121fim"])
+@pytest.mark.parametrize("key", ["2010ct", "2014onto2", "202121fim", "2022dc305"])
 def test_valid_key_names(key: str) -> None:
     assert Event.validate_key_name(key) is True
 
