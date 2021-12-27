@@ -197,6 +197,9 @@ jobs:
   automerge:
     needs: [py3-type, py3-lint, py3-test, node-lint, node-test, bash-lint, build-web, fullstack-test]
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
     steps:
       - uses: fastify/github-action-merge-dependabot@v3.0.2
         with:
