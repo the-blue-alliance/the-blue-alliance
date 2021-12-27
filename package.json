@@ -46,9 +46,11 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.28.0",
     "jest-cli": "^27.4.5",
+    "jest-puppeteer": "^6.0.3",
     "less": "4.1.2",
     "md5": "^2.3.0",
     "process": "^0.11.10",
+    "puppeteer": "^13.0.1",
     "style-loader": "^3.3.1",
     "webpack": "^5.65.0",
     "webpack-cli": "^4.9.1"
@@ -56,13 +58,15 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack --watch",
     "build": "cross-env NODE_ENV=production webpack",
-    "test": "jest",
+    "test": "jest -- ./src/",
+    "testops": "jest -- ./ops/",
     "lint": "eslint .",
     "lintfix": "eslint --fix ."
   },
   "jest": {
     "automock": false,
     "roots": [
+      "<rootDir>/ops",
       "<rootDir>/src/frontend"
     ],
     "unmockedModulePathPatterns": [
@@ -73,6 +77,7 @@
       "<rootDir>/node_modules/enzyme/"
     ],
     "coverageDirectory": "./.node_coverage/",
-    "collectCoverage": true
+    "collectCoverage": true,
+    "preset": "jest-puppeteer"
   }
 }
