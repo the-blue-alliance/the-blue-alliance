@@ -4,13 +4,14 @@ import subprocess
 import sys
 import time
 
+import requests
+
 TIME_LIMIT = 10 * 60  # seconds
 MODULE_NAMES = {"default", "py3-web", "py3-api", "py3-tasks-io"}
 
 # Wait up to |TIME_LIMIT| for all modules to start and webpack to build
-startup_success = False
 start_time = time.time()
-while time.time() - start_time < TIME_LIMIT and not startup_success:
+while time.time() - start_time < TIME_LIMIT:
     # Check for started modules
     result = subprocess.run(
         ["vagrant", "ssh", "--", "-t", "cat /var/log/tba.log"], stdout=subprocess.PIPE
@@ -38,11 +39,14 @@ while time.time() - start_time < TIME_LIMIT and not startup_success:
         time.sleep(5)
         continue
     print(m.group(0))
-    startup_success = True
 
-if startup_success:
-    result = subprocess.run(["npm", "run", "testops"])
-    sys.exit(result.returncode)
+    # Check that homepage returns a 200
+    url = "http://localhost:8080"
+    r = requests.get(url)
+    print(r.status_code)
+    if r.status_code == 200:
+        print("Startup successful!")
+        sys.exit(0)
 
 print("Fail: Didn't start up in time")
 sys.exit(1)

@@ -187,8 +187,8 @@ jobs:
           name: web-build
           path: src/build
 
-  fullstack-test:
-    name: Fullstack Test
+  ops-test:
+    name: Ops Fullstack Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2.4.0
@@ -209,9 +209,12 @@ jobs:
       - name: Start Container
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ENV='CI' vagrant up
-      - name: Test Fullstack
+      - name: Test Vagrant Startup
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: ./ops/test_fullstack.py
+        run: ./ops/test_vagrant_startup.py
+      - name: Test Ops Fullstack
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: ./ops/test_ops.sh
 
   deploy-queues:
     name: Deploy Queues
@@ -235,7 +238,7 @@ jobs:
   deploy-web:
     name: Deploy Web Service
     runs-on: ubuntu-latest
-    needs: [py3-type, py3-lint, py3-test, node-lint, node-test, build-web, fullstack-test, deploy-queues]
+    needs: [py3-type, py3-lint, py3-test, node-lint, node-test, build-web, ops-test, deploy-queues]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v2.4.0
@@ -259,7 +262,7 @@ jobs:
   deploy-api:
     name: Deploy API Service
     runs-on: ubuntu-latest
-    needs: [py3-type, py3-lint, py3-test, fullstack-test, deploy-queues]
+    needs: [py3-type, py3-lint, py3-test, ops-test, deploy-queues]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v2.4.0
@@ -278,7 +281,7 @@ jobs:
   deploy-tasks-io:
     name: Deploy Tasks IO Service
     runs-on: ubuntu-latest
-    needs: [py3-type, py3-lint, py3-test, fullstack-test, deploy-queues]
+    needs: [py3-type, py3-lint, py3-test, ops-test, deploy-queues]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v2.4.0
