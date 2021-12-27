@@ -24,6 +24,6 @@ describe("GameDay", () => {
   });
 
   it('should render "Select a layout"', async () => {
-    await expect(page).toMatch("Select a layout2");
+    await expect(page).toMatch("Select a layout");
   });
 });
