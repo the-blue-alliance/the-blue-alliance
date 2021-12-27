@@ -43,7 +43,7 @@ while time.time() - start_time < TIME_LIMIT:
     # Check that homepage returns a 200
     url = "http://localhost:8080"
     r = requests.get(url)
-    print(r.status_code)
+    print(f"Status code: {r.status_code}")
     if r.status_code == 200:
         print("Startup successful!")
         sys.exit(0)
