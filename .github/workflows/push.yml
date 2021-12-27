@@ -196,10 +196,22 @@ jobs:
         uses: actions/setup-python@v2.3.0
         with:
           python-version: 3.8
-      - name: Install Dependencies
+      - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install requests
+      - name: Set up Node
+        uses: actions/setup-node@v2.5.0
+        with:
+          node-version: "14"
+      - name: Cache node modules
+        uses: actions/cache@v2.1.7
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+      - name: Install Node Dependencies
+        run: npm install
       - name: Install Vagrant
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: sudo apt-get install vagrant
