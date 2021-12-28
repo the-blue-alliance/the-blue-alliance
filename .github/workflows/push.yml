@@ -96,7 +96,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
       - name: Run Format & Lint
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/lint_node.sh
@@ -116,7 +116,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
       - name: Run Tests
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/test_node.sh
@@ -173,7 +173,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
       - name: Install Node Dependencies
-        run: npm install
+        run: npm ci
       - name: Run Build
         run: ./ops/build/run_buildweb.sh --env
         env:
@@ -211,7 +211,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
       - name: Install Node Dependencies
-        run: npm install
+        run: npm ci
       - name: Install Vagrant
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: sudo apt-get install vagrant
