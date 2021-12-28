@@ -41,3 +41,7 @@ class GamedaySpecialWebcasts(Sitevar[ContentType]):
     @classmethod
     def webcasts(cls) -> List[WebcastType]:
         return cls.get().get("webcasts")
+
+    @classmethod
+    def get_alias(cls, alias) -> str:
+        return cls.get().get("aliases").get(alias)
