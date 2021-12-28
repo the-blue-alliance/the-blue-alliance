@@ -8,6 +8,7 @@ from pyre_extensions import none_throws
 from werkzeug.test import Client
 
 from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
+from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_type import EventType
 from backend.common.models.api_auth_access import ApiAuthAccess
@@ -313,15 +314,19 @@ def test_matches_update(api_client: Client) -> None:
     assert match is not None
     assert match.time == datetime.datetime(2014, 8, 31, 17, 0)
     assert match.time_string == "10:00 AM"
-    assert match.alliances["red"]["teams"] == ["frc1", "frc2", "frc3"]
-    assert match.alliances["red"]["score"] == 250
-    assert match.alliances["red"]["surrogates"] == ["frc1"]
-    assert match.alliances["red"]["dqs"] == ["frc1", "frc2", "frc3"]
-    assert match.score_breakdown["red"]["truss+catch"] == 20
-    assert match.alliances["blue"]["teams"] == ["frc4", "frc5", "frc6"]
-    assert match.alliances["blue"]["score"] == 260
-    assert match.alliances["blue"]["surrogates"] == []
-    assert match.alliances["blue"]["dqs"] == []
+    assert match.alliances[AllianceColor.RED]["teams"] == ["frc1", "frc2", "frc3"]
+    assert match.alliances[AllianceColor.RED]["score"] == 250
+    assert match.alliances[AllianceColor.RED]["surrogates"] == ["frc1"]
+    assert match.alliances[AllianceColor.RED]["dqs"] == ["frc1", "frc2", "frc3"]
+
+    breakdown = match.score_breakdown
+    assert breakdown is not None
+    assert breakdown[AllianceColor.RED]["truss+catch"] == 20
+
+    assert match.alliances[AllianceColor.BLUE]["teams"] == ["frc4", "frc5", "frc6"]
+    assert match.alliances[AllianceColor.BLUE]["score"] == 260
+    assert match.alliances[AllianceColor.BLUE]["surrogates"] == []
+    assert match.alliances[AllianceColor.BLUE]["dqs"] == []
 
 
 def test_calculate_match_time(api_client: Client) -> None:
@@ -502,6 +507,7 @@ def test_add_match_remapteams(api_client: Client) -> None:
 
     # verify match data
     match = Match.get_by_id("2014casj_qm1")
-    assert match.alliances["red"]["teams"] == ["frc1", "frc2", "frc3"]
-    assert match.alliances["blue"]["teams"] == ["frc4", "frc5", "frc254B"]
+    assert match is not None
+    assert match.alliances[AllianceColor.RED]["teams"] == ["frc1", "frc2", "frc3"]
+    assert match.alliances[AllianceColor.BLUE]["teams"] == ["frc4", "frc5", "frc254B"]
     assert match.team_key_names == ["frc1", "frc2", "frc3", "frc4", "frc5", "frc254B"]

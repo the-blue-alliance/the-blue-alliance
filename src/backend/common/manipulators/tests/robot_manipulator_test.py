@@ -2,6 +2,7 @@ import unittest
 
 import pytest
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 
 from backend.common.manipulators.robot_manipulator import RobotManipulator
 from backend.common.models.robot import Robot
@@ -34,9 +35,9 @@ class TestRobotManipulator(unittest.TestCase):
 
     def test_createOrUpdate(self) -> None:
         RobotManipulator.createOrUpdate(self.old_robot)
-        self.assertOldRobot(Robot.get_by_id("frc177_2012"))
+        self.assertOldRobot(none_throws(Robot.get_by_id("frc177_2012")))
         RobotManipulator.createOrUpdate(self.new_robot)
-        self.assertMergedRobot(Robot.get_by_id("frc177_2012"))
+        self.assertMergedRobot(none_throws(Robot.get_by_id("frc177_2012")))
 
     def test_findOrSpawn(self) -> None:
         self.old_robot.put()

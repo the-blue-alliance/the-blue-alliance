@@ -1,4 +1,4 @@
-from typing import Dict, List, TypedDict
+from typing import Dict, List, Optional, TypedDict
 
 from backend.common.sitevars.sitevar import Sitevar
 
@@ -36,12 +36,12 @@ class GamedaySpecialWebcasts(Sitevar[ContentType]):
 
     @classmethod
     def default_chat(cls) -> str:
-        return cls.get().get("default_chat")
+        return cls.get()["default_chat"]
 
     @classmethod
     def webcasts(cls) -> List[WebcastType]:
-        return cls.get().get("webcasts")
+        return cls.get()["webcasts"]
 
     @classmethod
-    def get_alias(cls, alias) -> str:
-        return cls.get().get("aliases").get(alias)
+    def get_alias(cls, alias) -> Optional[str]:
+        return cls.get()["aliases"].get(alias)

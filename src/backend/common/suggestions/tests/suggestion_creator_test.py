@@ -56,7 +56,8 @@ class TestTeamMediaSuggestionCreator(SuggestionCreatorTest):
         self.assertEqual(suggestion.author, self.account.key)
         self.assertEqual(suggestion.target_model, "media")
         self.assertEqual(
-            dict(suggestion.contents, **none_throws(expected_dict)), suggestion.contents
+            dict(suggestion.contents, **none_throws(expected_dict)),  # pyre-ignore[6]
+            suggestion.contents,
         )
 
     def test_create_suggestion_banned(self) -> None:
@@ -78,7 +79,8 @@ class TestTeamMediaSuggestionCreator(SuggestionCreatorTest):
         self.assertEqual(suggestion.author, self.account_banned.key)
         self.assertEqual(suggestion.target_model, "media")
         self.assertEqual(
-            dict(suggestion.contents, **none_throws(expected_dict)), suggestion.contents
+            dict(suggestion.contents, **none_throws(expected_dict)),  # pyre-ignore[6]
+            suggestion.contents,
         )
 
     def test_create_suggestion_with_url_params(self) -> None:
@@ -103,7 +105,8 @@ class TestTeamMediaSuggestionCreator(SuggestionCreatorTest):
         self.assertEqual(suggestion.author, self.account.key)
         self.assertEqual(suggestion.target_model, "media")
         self.assertEqual(
-            dict(suggestion.contents, **none_throws(expected_dict)), suggestion.contents
+            dict(suggestion.contents, **none_throws(expected_dict)),  # pyre-ignore[6]
+            suggestion.contents,
         )
 
     def test_clean_url(self) -> None:
@@ -202,7 +205,8 @@ class TestEventMediaSuggestionCreator(SuggestionCreatorTest):
         self.assertEqual(suggestion.author, self.account.key)
         self.assertEqual(suggestion.target_model, "event_media")
         self.assertEqual(
-            dict(suggestion.contents, **none_throws(expected_dict)), suggestion.contents
+            dict(suggestion.contents, **none_throws(expected_dict)),  # pyre-ignore[6]
+            suggestion.contents,
         )
 
     def test_create_suggestion_banned(self) -> None:
@@ -226,7 +230,8 @@ class TestEventMediaSuggestionCreator(SuggestionCreatorTest):
         self.assertEqual(suggestion.author, self.account_banned.key)
         self.assertEqual(suggestion.target_model, "event_media")
         self.assertEqual(
-            dict(suggestion.contents, **none_throws(expected_dict)), suggestion.contents
+            dict(suggestion.contents, **none_throws(expected_dict)),  # pyre-ignore[6]
+            suggestion.contents,
         )
 
     def test_create_non_video_suggestion(self) -> None:
@@ -870,8 +875,10 @@ class TestSuggestMatchVideoYouTube(SuggestionCreatorTest):
         self.assertEqual(suggestion.target_model, "match")
         self.assertIsNotNone(suggestion.contents)
         self.assertIsNotNone(suggestion.contents.get("youtube_videos"))
-        self.assertEqual(len(suggestion.contents.get("youtube_videos")), 1)
-        self.assertEqual(suggestion.contents.get("youtube_videos")[0], "37F5tbrFqJQ")
+        self.assertEqual(len(suggestion.contents.get("youtube_videos", [])), 1)
+        self.assertEqual(
+            suggestion.contents.get("youtube_videos", [])[0], "37F5tbrFqJQ"
+        )
 
     def test_create_suggestion_banned(self) -> None:
         status = SuggestionCreator.createMatchVideoYouTubeSuggestion(
@@ -888,8 +895,10 @@ class TestSuggestMatchVideoYouTube(SuggestionCreatorTest):
         self.assertEqual(suggestion.target_model, "match")
         self.assertIsNotNone(suggestion.contents)
         self.assertIsNotNone(suggestion.contents.get("youtube_videos"))
-        self.assertEqual(len(suggestion.contents.get("youtube_videos")), 1)
-        self.assertEqual(suggestion.contents.get("youtube_videos")[0], "37F5tbrFqJQ")
+        self.assertEqual(len(suggestion.contents.get("youtube_videos", [])), 1)
+        self.assertEqual(
+            suggestion.contents.get("youtube_videos", [])[0], "37F5tbrFqJQ"
+        )
         self.assertEqual(suggestion.review_state, SuggestionState.REVIEW_AUTOREJECTED)
 
     def test_existing_video(self) -> None:

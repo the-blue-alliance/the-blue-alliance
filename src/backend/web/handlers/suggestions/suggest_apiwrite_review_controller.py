@@ -44,7 +44,7 @@ class SuggestApiWriteReviewController(SuggestionsReviewBase[ApiWriteTargetModel]
         message = request.args.get("user_message")
         event_key = suggestion.contents["event_key"]
         user = suggestion.author.get()
-        event = Event.get_by_id(event_key)
+        event = none_throws(Event.get_by_id(event_key))
 
         auth_id = "".join(
             random.choice(
@@ -153,7 +153,7 @@ View the key: https://www.thebluealliance.com/admin/api_auth/edit/{}
             suggestion: Suggestion = none_throws(Suggestion.get_by_id(suggestion_id))
             event_key = suggestion.contents["event_key"]
             user = suggestion.author.get()
-            event = Event.get_by_id(event_key)
+            event = none_throws(Event.get_by_id(event_key))
             self._process_rejected([none_throws(suggestion.key.id())])
 
             status = "reject"

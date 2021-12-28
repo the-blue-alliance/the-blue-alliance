@@ -3,6 +3,7 @@ import os
 from typing import List, Optional
 
 from google.appengine.ext import ndb
+from pyre_extensions.refinement import none_throws
 
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
@@ -140,7 +141,9 @@ class JsonDataImporter(object):
             data = json.load(f)
 
         [
-            AwardConverter.dictToModel_v3(a, Event.get_by_id(a["event_key"])).put()
+            AwardConverter.dictToModel_v3(
+                a, none_throws(Event.get_by_id(a["event_key"]))
+            ).put()
             for a in data
         ]
 

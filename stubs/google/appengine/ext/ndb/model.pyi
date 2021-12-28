@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import datetime
+from typing import Any, Optional, TypeVar, Type, Union
 
 from google.appengine.api import datastore_errors
 from google.appengine.datastore import datastore_rpc
-from google.appengine.ext.ndb import Query, Key
-from typing import Any, Optional
+from google.appengine.ext.ndb import Future, Key, Query
 
 Key: Any
 BlobKey: Any
@@ -150,6 +152,8 @@ class ComputedProperty(GenericProperty):
 class MetaModel(type):
     def __init__(cls, name, bases, classdict) -> None: ...
 
+BoundModel = TypeVar("BoundModel", bound="Model")
+
 class Model:
     key: Key
     def __init__(*args, **kwds) -> None: ...
@@ -166,26 +170,26 @@ class Model:
     def put(self, **kwargs) -> Key:
         ...
 
-    def put_async(self, **kwargs) -> "TypedFuture[Key]":
+    def put_async(self, **kwargs) -> Future[Key]:
         ...
 
     def id(self) -> int:
         ...
 
-    @staticmethod
-    def get_by_id(id: Union[int, str], **kwargs) -> Optional[Any]:
+    @classmethod
+    def get_by_id(cls: Type[BoundModel], id: Union[int, str], **kwargs) -> Optional[BoundModel]:
         ...
 
-    @staticmethod
-    def get_by_id_async(id: Union[int, str], **kwargs) -> "TypedFuture[Optional[Any]]":
+    @classmethod
+    def get_by_id_async(cls: Type[BoundModel], id: Union[int, str], **kwargs) -> Future[Optional[BoundModel]]:
         ...
 
-    @staticmethod
-    def get_or_insert(name: str, **kwargs) -> Any:
+    @classmethod
+    def get_or_insert(cls: Type[BoundModel], name: str, **kwargs) -> BoundModel:
         ...
 
-    @staticmethod
-    def get_or_insert_async(name: str, **kwargs) -> "TypedFuture[Any]":
+    @classmethod
+    def get_or_insert_async(cls: Type[BoundModel], name: str, **kwargs) -> Future[BoundModel]:
         ...
 
     allocate_ids: Any

@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, Generator, List
 
 from google.appengine.ext import ndb
 
@@ -22,6 +22,6 @@ class TeamRobotsQuery(CachedDatabaseQuery[List[Robot], List[RobotDict]]):
         super().__init__(team_key=team_key)
 
     @typed_tasklet
-    def _query_async(self, team_key: TeamKey) -> List[Robot]:
+    def _query_async(self, team_key: TeamKey) -> Generator[Any, Any, List[Robot]]:
         robots = yield Robot.query(Robot.team == ndb.Key(Team, team_key)).fetch_async()
         return robots
