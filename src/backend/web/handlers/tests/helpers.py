@@ -1,3 +1,4 @@
+import json
 import re
 from datetime import datetime, timedelta
 from typing import List, NamedTuple, Optional, Tuple
@@ -80,6 +81,12 @@ def preseed_event(event_key: EventKey) -> None:
         event_type_enum=EventType.OFFSEASON,
         start_date=datetime(2020, 3, 1),
         end_date=datetime(2020, 3, 5),
+        webcast_json=json.dumps(
+            [
+                {"type": "twitch", "channel": "robosportsnetwork"},
+                {"type": "twitch", "channel": "firstinspires"},
+            ]
+        ),
     ).put()
 
 
@@ -141,6 +148,12 @@ def preseed_event_for_team(team_number: TeamNumber, event_key: EventKey) -> None
         event_type_enum=EventType.REGIONAL,
         start_date=datetime(2020, 3, 1),
         end_date=datetime(2020, 3, 5),
+        webcast_json=json.dumps(
+            [
+                {"type": "twitch", "channel": "robosportsnetwork"},
+                {"type": "twitch", "channel": "firstinspires"},
+            ]
+        ),
     ).put()
     EventTeam(
         id=f"{event_key}_frc{team_number}",

@@ -12,7 +12,7 @@ from backend.web.handlers.apidocs import apidocs_trusted_v1, apidocs_v3
 from backend.web.handlers.district import district_detail
 from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.event import event_detail, event_list
-from backend.web.handlers.gameday import gameday
+from backend.web.handlers.gameday import gameday, gameday_redirect
 from backend.web.handlers.index import about, index
 from backend.web.handlers.match import match_detail
 from backend.web.handlers.suggestions.suggestion_review import (
@@ -47,6 +47,9 @@ app.add_url_rule("/", view_func=index)
 app.add_url_rule("/about", view_func=about)
 app.add_url_rule("/apidocs/trusted/v1", view_func=apidocs_trusted_v1)
 app.add_url_rule("/apidocs/v3", view_func=apidocs_v3)
+
+app.add_url_rule("/watch/<alias>", view_func=gameday_redirect)
+app.add_url_rule("/gameday/<alias>", view_func=gameday_redirect)
 app.add_url_rule("/gameday", view_func=gameday)
 
 app.add_url_rule("/event/<event_key>", view_func=event_detail)
