@@ -17,6 +17,12 @@ dispatch:
 
   - url: "www.thebluealliance.com/event/*"
     service: py3-web
+    
+  - url: "www.thebluealliance.com/gameday"
+    service: py3-web
+    
+  - url: "www.thebluealliance.com/gameday/*"
+    service: py3-web
 
   - url: "www.thebluealliance.com/team*"
     service: py3-web
@@ -28,6 +34,9 @@ dispatch:
     service: py3-web
 
   - url: "www.thebluealliance.com/py3_javascript/*"
+    service: py3-web
+    
+  - url: "www.thebluealliance.com/watch/*"
     service: py3-web
 
   # Python 3 Migration
