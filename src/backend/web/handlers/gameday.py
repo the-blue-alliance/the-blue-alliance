@@ -39,14 +39,14 @@ def get_param_string_for_event(event):
 def gameday_redirect(alias):
     params = GamedaySpecialWebcasts.get_alias(alias)
     if params is not None:
-        return redirect("/gameday{}".format(params))
+        return redirect(f"/gameday{params}")
 
     # Allow an alias to be an event key
     if Event.validate_key_name(alias):
         event = Event.get_by_id(alias)
         if event:
             params = get_param_string_for_event(event)
-            return redirect("/gameday{}".format(params))
+            return redirect(f"/gameday{params}")
 
     # Allow an alias to be a team number
     team_key = "frc{}".format(alias)
@@ -61,7 +61,7 @@ def gameday_redirect(alias):
             # Should only matter for things like MICMP and CMP.
             if event and event.within_a_day:
                 params = get_param_string_for_event(event)
-                return redirect("/gameday{}".format(params))
+                return redirect(f"/gameday{params}")
 
     # No matching alias. Redirect to GameDay.
     return redirect("/gameday")

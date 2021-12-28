@@ -61,8 +61,8 @@ def test_render_event(ndb_stub, web_client: Client) -> None:
     # Event Name
     assert "".join(event_row.find_all("td")[0].stripped_strings) == "Test Event"
 
-    # Event Webcast (none set)
-    assert "".join(event_row.find_all("td")[1].stripped_strings) == ""
+    # Event Webcast
+    assert "".join(event_row.find_all("td")[1].stripped_strings) == "Offline"
 
     # Event Dates
     assert "".join(event_row.find_all("td")[2].strings) == "Mar 1st to Mar 5th, 2020"
