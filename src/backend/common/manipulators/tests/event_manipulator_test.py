@@ -1,16 +1,29 @@
 import datetime
 import json
 import unittest
+from typing import Optional
+from unittest.mock import patch
 
 import pytest
+from google.appengine.ext import deferred
+from google.appengine.ext import testbed
+from pyre_extensions import none_throws
 
 from backend.common.consts.event_type import EventType
+from backend.common.helpers.location_helper import LocationHelper
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.models.event import Event
 
 
 @pytest.mark.usefixtures("ndb_context")
 class TestEventManipulator(unittest.TestCase):
+
+    taskqueue_stub: Optional[testbed.taskqueue_stub.TaskQueueServiceStub] = None
+
+    @pytest.fixture(autouse=True)
+    def store_taskqueue_stub(self, taskqueue_stub):
+        self.taskqueue_stub = taskqueue_stub
+
     def setUp(self):
         self.old_event = Event(
             id="2011ct",
@@ -87,3 +100,27 @@ class TestEventManipulator(unittest.TestCase):
         EventManipulator.createOrUpdate(self.new_event, auto_union=False)
         check = Event.get_by_id("2011ct")
         self.assertEqual(check.webcast, self.new_event.webcast)
+
+    @patch.object(LocationHelper, "update_event_location")
+    def test_update_location_on_update(self, update_location_mock) -> None:
+        self.old_event.city = "Hartford"
+        self.old_event.state_prov = "CT"
+        self.old_event.country = "USA"
+        assert self.old_event.timezone_id is None
+
+        EventManipulator.createOrUpdate(self.old_event)
+
+        def update_side_effect(event):
+            event.timezone_id = "America/New_York"
+            event.put()
+
+        update_location_mock.side_effect = update_side_effect
+
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        assert len(tasks) == 1
+        for task in tasks:
+            deferred.run(task.payload)
+
+        assert Event.get_by_id("2011ct").timezone_id is not None

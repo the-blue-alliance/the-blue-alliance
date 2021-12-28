@@ -1,8 +1,9 @@
 import enum
 import os
+import tempfile
+from distutils.util import strtobool
+from pathlib import Path
 from typing import Optional
-
-from backend.common.environment.tasks import TasksRemoteConfig
 
 
 @enum.unique
@@ -13,7 +14,11 @@ class EnvironmentMode(enum.Enum):
 
 # Mostly GAE env variables
 # See https://cloud.google.com/appengine/docs/standard/python3/runtime#environment_variables
-class Environment(object):
+class Environment:
+    @staticmethod
+    def is_unit_test() -> bool:
+        return os.environ.get("TBA_UNIT_TEST") == "true"
+
     @staticmethod
     def is_dev() -> bool:
         return os.environ.get("GAE_ENV") == "localdev"
@@ -36,24 +41,33 @@ class Environment(object):
         return os.environ.get("TBA_LOG_LEVEL")
 
     @staticmethod
-    def tasks_mode() -> EnvironmentMode:
-        return EnvironmentMode(os.environ.get("TASKS_MODE", "local"))
-
-    @staticmethod
-    def tasks_remote_config() -> Optional[TasksRemoteConfig]:
-        remote_config_ngrok_url = os.environ.get("TASKS_REMOTE_CONFIG_NGROK_URL", None)
-        if not remote_config_ngrok_url:
-            return None
-        return TasksRemoteConfig(ngrok_url=remote_config_ngrok_url)
-
-    @staticmethod
     def ndb_log_level() -> Optional[str]:
         return os.environ.get("NDB_LOG_LEVEL")
 
     @staticmethod
-    def redis_url() -> Optional[str]:
-        return os.environ.get("REDIS_CACHE_URL")
+    def flask_response_cache_enabled() -> bool:
+        return bool(strtobool(os.environ.get("FLASK_RESPONSE_CACHE_ENABLED", "true")))
 
     @staticmethod
-    def flask_response_cache_enabled() -> bool:
-        return bool(os.environ.get("FLASK_RESPONSE_CACHE_ENABLED", True))
+    def cache_control_header_enabled() -> bool:
+        return bool(strtobool(os.environ.get("CACHE_CONTROL_HEADER_ENABLED", "true")))
+
+    @staticmethod
+    def storage_mode() -> EnvironmentMode:
+        return EnvironmentMode(os.environ.get("STORAGE_MODE", "local"))
+
+    @staticmethod
+    def storage_path() -> Path:
+        # Fallback to returning a tmp directory for a storage path
+        return Path(os.environ.get("STORAGE_PATH", tempfile.gettempdir()))
+
+    @staticmethod
+    def auth_emulator_host() -> Optional[str]:
+        return os.environ.get("FIREBASE_AUTH_EMULATOR_HOST")
+
+    @staticmethod
+    def save_frc_api_response() -> bool:
+        # Should always be True in production
+        if Environment.is_prod():
+            return True
+        return bool(os.environ.get("SAVE_FRC_API_RESPONSE", False))

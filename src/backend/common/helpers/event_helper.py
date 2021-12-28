@@ -2,7 +2,7 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 from typing import cast, Dict, List, NamedTuple, Optional
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts import comp_level
 from backend.common.consts.alliance_color import AllianceColor

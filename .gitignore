@@ -9,6 +9,7 @@ __pycache__/
 
 .coverage
 coverage.xml
+.node_coverage/
 **.swp
 venv/
 .testmondata
@@ -23,5 +24,12 @@ src/backend/web/static/javascript/tba_js/tba_keys.js
 node_modules/
 
 ops/dev/keys/
+# Check in empty storage folder, ignore everythign in folder
+ops/dev/storage/*
+!ops/dev/storage/.gitkeep
 src/backend/web/static/javascript/tba_js/tba_keys.js
 tba_dev_config.local.json
+
+# Ignore Firebase config modules
+.firebaserc
+ui-debug.log

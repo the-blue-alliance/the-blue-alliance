@@ -15,7 +15,6 @@ google.appengine.api.urlfetch => requests
 google.appengine.api.users => backend.common.auth
 
 google.appengine.ext.ndb => google.cloud.ndb
-google.appengine.ext.deferred => backend.common.deferred
 google.appengine.ext.testbed => (Removed)
 ```
 

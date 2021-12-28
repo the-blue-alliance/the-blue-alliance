@@ -2,7 +2,7 @@ import random
 import string
 from typing import Any, Dict, List, Optional, Union
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws, safe_cast
 
 from backend.common.consts.account_permission import AccountPermission
@@ -24,7 +24,7 @@ from backend.common.queries.suggestion_query import SuggestionQuery
 
 
 class User:
-    """ Represents a TBA web user - for a TBA database account, see Account """
+    """Represents a TBA web user - for a TBA database account, see Account"""
 
     def __init__(self, session_claims: Dict[str, Any]) -> None:
         self._session_claims = session_claims

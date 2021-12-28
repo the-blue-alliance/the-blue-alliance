@@ -1,6 +1,4 @@
-from typing import List, Optional
-
-from typing_extensions import TypedDict
+from typing import List, Optional, TypedDict
 
 from backend.common.models.event_team_status import WLTRecord
 from backend.common.models.keys import TeamKey

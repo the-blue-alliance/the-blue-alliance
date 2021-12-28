@@ -1,6 +1,7 @@
 service: py3-web
 runtime: python38
 entrypoint: gunicorn -b :$PORT backend.web.main:app
+app_engine_apis: true
 
 instance_class: F1
 automatic_scaling:
@@ -28,6 +29,9 @@ handlers:
   - url: /robots.txt
     static_files: backend/web/static/robots.txt
     upload: backend/web/static/robots.txt
+  - url: /swagger
+    static_dir: backend/web/static/swagger
+    expiration: "1h"
   - url: /.well-known
     static_dir: backend/web/static/well-known
     mime_type: application/json

@@ -1,0 +1,34 @@
+from typing import Any
+
+DESCRIPTOR: Any
+Transaction: Any
+Query: Any
+RegionPoint: Any
+CircleRegion: Any
+RectangleRegion: Any
+GeoRegion: Any
+CompiledQuery: Any
+CompiledCursor: Any
+Cursor: Any
+Error: Any
+Cost: Any
+GetRequest: Any
+GetResponse: Any
+PutRequest: Any
+PutResponse: Any
+TouchRequest: Any
+TouchResponse: Any
+DeleteRequest: Any
+DeleteResponse: Any
+NextRequest: Any
+QueryResult: Any
+AllocateIdsRequest: Any
+AllocateIdsResponse: Any
+CompositeIndices: Any
+AddActionsRequest: Any
+AddActionsResponse: Any
+BeginTransactionRequest: Any
+CommitResponse: Any
+GetIndicesRequest: Any
+UpdateIndexResponse: Any
+DatastoreService_3: Any

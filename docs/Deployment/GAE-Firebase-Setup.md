@@ -29,6 +29,7 @@ The [`push.yml` GitHub Action](https://github.com/the-blue-alliance/the-blue-all
 1. Deploy the default service and any other necessary services for testing.
 
 ```bash
+$ gcloud app deploy src/queue.yaml
 $ gcloud app deploy src/default.yaml -v 1
 $ gcloud app deploy src/{service}.yaml -v 1
 ```
@@ -46,24 +47,6 @@ $ gcloud app deploy src/dispatch.yaml
 ## Configuring Flask Secrets
 
 The [`SECRET_KEY`](https://flask.palletsprojects.com/en/1.1.x/config/#SECRET_KEY) for Flask apps is in the `flask.secrets` sitevar and configured for Flask apps during runtime. The default `secret_key` value must be changed when deploying to an upstream Google App Engine instance - there is validation in place to ensure the default key checked in to code/used for development is not the same key used in production. At the time of writing, the Admin interface is not supported in the py3 codebase, so there is no GUI for editing sitevars. Sitevars can be edited directly [in the Datastore interface](https://console.cloud.google.com/datastore/entities;kind=Sitevar) online when selecing `Sitevar` from the `Kind` dropdown, editing the `flask.secrets`, and updating the JSON accordingly.
-
-## Task Queues
-
-The `deploy_queues.py` script can be run to create/update queues via the `gcloud` command based on the `queue.yaml` configuration.
-
-```bash
-$ python3 ops/deploy/deploy_queues.py src/queue.yaml
-```
-
-Queues can be created in Google App Engine [using the gcloud command](https://cloud.google.com/tasks/docs/creating-queues). The linked document should be the source of truth for creating queues.
-
-## Memorystore (redis)
-
-Roughly, the setup is outlined in [this page](https://cloud.google.com/appengine/docs/standard/python/migrate-to-python3/migrate-to-cloud-ndb#caching). We need the following steps:
- 1. Create a [VPC Network](https://cloud.google.com/vpc/docs/vpc)
- 2. Create a [VPC Access Connector](https://cloud.google.com/vpc/docs/configure-serverless-vpc-access#creating_a_connector)
- 3. Create a [Redis Instance](https://cloud.google.com/memorystore/docs/redis/creating-managing-instances#creating_redis_instances) using the network
- 4. Make note of the `REDIS_CACHE_URL` and VPC Connector name to set as deploy secrets, or locally in the `env_variables` and `vpc_access_connector` section of [a service's yaml configuration](https://cloud.google.com/appengine/docs/standard/python3/config/appref) when deploying.
 
 # Firebase Setup
 

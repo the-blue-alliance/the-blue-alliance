@@ -1,7 +1,7 @@
 import unittest
 
 import pytest
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.manipulators.district_team_manipulator import (
     DistrictTeamManipulator,
@@ -11,7 +11,7 @@ from backend.common.models.district_team import DistrictTeam
 from backend.common.models.team import Team
 
 
-@pytest.mark.usefixtures("ndb_context")
+@pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 class TestDistrictManipulator(unittest.TestCase):
     def setUp(self):
         self.old_district_team = DistrictTeam(

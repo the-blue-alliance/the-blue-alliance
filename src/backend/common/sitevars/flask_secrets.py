@@ -1,13 +1,13 @@
-from typing_extensions import TypedDict
+from typing import TypedDict
 
-from backend.common.sitevars.sitevar_base import SitevarBase
+from backend.common.sitevars.sitevar import Sitevar
 
 
 class ContentType(TypedDict):
     secret_key: str
 
 
-class FlaskSecrets(SitevarBase[ContentType]):
+class FlaskSecrets(Sitevar[ContentType]):
     DEFAULT_SECRET_KEY: str = "thebluealliance"
 
     @staticmethod

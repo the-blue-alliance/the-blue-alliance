@@ -4,7 +4,7 @@ from random import shuffle
 
 import pytest
 from freezegun import freeze_time
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
@@ -396,6 +396,35 @@ def test_group_by_week_preseason(ndb_context) -> None:
     events = EventHelper.group_by_week([e])
     assert events == {
         "Preseason": [e],
+    }
+
+
+def test_group_by_week_foc(ndb_context) -> None:
+    e = Event(
+        event_type_enum=EventType.FOC,
+        year=2018,
+        official=True,
+    )
+    events = EventHelper.group_by_week([e])
+    assert events == {
+        "FIRST Festival of Champions": [e],
+    }
+
+
+def test_group_by_week_foc_multiple(ndb_context) -> None:
+    e1 = Event(
+        event_type_enum=EventType.FOC,
+        year=2018,
+        official=True,
+    )
+    e2 = Event(
+        event_type_enum=EventType.FOC,
+        year=2018,
+        official=True,
+    )
+    events = EventHelper.group_by_week([e1, e2])
+    assert events == {
+        "FIRST Festival of Champions": [e1, e2],
     }
 
 

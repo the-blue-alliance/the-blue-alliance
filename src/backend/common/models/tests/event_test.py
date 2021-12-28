@@ -4,7 +4,7 @@ from typing import Optional
 
 import pytest
 from freezegun import freeze_time
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.comp_level import CompLevel
@@ -16,6 +16,7 @@ from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_district_points import EventDistrictPoints
+from backend.common.models.event_ranking import EventRanking
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import Year
 from backend.common.models.match import Match
@@ -27,7 +28,7 @@ from backend.common.models.tests.util import (
 from backend.conftest import clear_cached_queries  # noqa: ETBA0
 
 
-@pytest.mark.parametrize("key", ["2010ct", "2014onto2", "202121fim"])
+@pytest.mark.parametrize("key", ["2010ct", "2014onto2", "202121fim", "2022dc305"])
 def test_valid_key_names(key: str) -> None:
     assert Event.validate_key_name(key) is True
 
@@ -233,9 +234,9 @@ def test_week_stored_in_context_cache() -> None:
 
     assert e.week == 0
 
-    context_cache = ndb.get_context().cache
-    assert "2019_season_start" in context_cache
-    assert context_cache["2019_season_start"] == datetime(2019, 3, 4, 0, 0)
+    from backend.common.context_cache import context_cache
+
+    assert context_cache.get("2019_season_start") == datetime(2019, 3, 4, 0, 0)
 
 
 @pytest.mark.parametrize(LOCATION_PARAMETERS[0], LOCATION_PARAMETERS[1])
@@ -449,3 +450,25 @@ def test_teams() -> None:
     clear_cached_queries()
     assert event.teams == [t]
     assert event.get_teams_async().get_result() == [t]
+
+
+def test_rankings() -> None:
+    event = Event(id="2019ct", year=2019, event_short="ct")
+    assert event.rankings is None
+
+    rankings = [
+        EventRanking(
+            rank=1,
+            team_key="frc1",
+            record=None,
+            qual_average=None,
+            matches_played=1,
+            dq=0,
+            sort_orders=[],
+        )
+    ]
+
+    EventDetails(id="2019ct", rankings2=rankings).put()
+
+    event._details = None
+    assert event.rankings == rankings

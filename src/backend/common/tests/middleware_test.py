@@ -3,7 +3,6 @@ from unittest.mock import Mock, patch
 import flask
 import pytest
 from flask import Flask
-from google.cloud.ndb import context as context_module
 from werkzeug.test import create_environ, run_wsgi_app
 from werkzeug.wrappers import Request
 
@@ -13,29 +12,12 @@ from backend.common.middleware import (
     _set_secret_key,
     AfterResponseMiddleware,
     install_middleware,
-    NdbMiddleware,
     TraceRequestMiddleware,
 )
 from backend.common.profiler import trace_context
 from backend.common.run_after_response import run_after_response
 from backend.common.sitevars import flask_secrets
 from backend.common.sitevars.flask_secrets import FlaskSecrets
-
-
-def test_NdbMiddleware_init(app: Flask) -> None:
-    middleware = NdbMiddleware(app)
-    assert middleware.app is app
-
-
-def test_NdbMiddleware_callable(app: Flask) -> None:
-    middleware = NdbMiddleware(app)
-
-    def start_response(status, headers):
-        context = context_module.get_context()
-        assert context.client is middleware.ndb_client
-
-    with app.test_request_context("/"):
-        middleware(flask.request.environ, start_response)
 
 
 def test_TraceRequestMiddleware_init(app: Flask) -> None:
@@ -72,7 +54,7 @@ def test_AfterResponseMiddleware_callable(app: Flask) -> None:
 
 
 def test_install_middleware(app: Flask) -> None:
-    assert not type(app.wsgi_app) is NdbMiddleware
+    assert not type(app.wsgi_app) is TraceRequestMiddleware
     with patch.object(
         backend.common.middleware, "_set_secret_key"
     ) as mock_set_secret_key:
@@ -80,7 +62,7 @@ def test_install_middleware(app: Flask) -> None:
         assert len(app.before_first_request_funcs) > 0
         app.try_trigger_before_first_request_functions()
     mock_set_secret_key.assert_called_with(app)
-    assert type(app.wsgi_app) is NdbMiddleware
+    assert type(app.wsgi_app) is TraceRequestMiddleware
 
 
 def test_set_secret_key_default(ndb_context, app: Flask) -> None:

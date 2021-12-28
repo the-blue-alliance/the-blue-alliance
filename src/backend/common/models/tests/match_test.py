@@ -4,7 +4,7 @@ from typing import Optional
 
 import pytest
 from freezegun import freeze_time
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts import comp_level
 from backend.common.consts.alliance_color import AllianceColor

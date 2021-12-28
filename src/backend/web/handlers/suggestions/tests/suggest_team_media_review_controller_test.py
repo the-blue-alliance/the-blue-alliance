@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 
 import pytest
 from bs4 import BeautifulSoup
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from werkzeug.test import Client
 
 from backend.common.consts.account_permission import AccountPermission
@@ -56,15 +56,12 @@ def get_suggestion_queue(web_client: Client) -> List[str]:
     return queue
 
 
-def createSuggestion(logged_in_user, ndb_client: ndb.Client) -> str:
-    with ndb_client.context():
-        status = SuggestionCreator.createTeamMediaSuggestion(
-            logged_in_user.account_key, "http://imgur.com/foobar", "frc1124", 2016
-        )
-        assert status[0] == SuggestionCreationStatus.SUCCESS
-        return Suggestion.render_media_key_name(
-            2016, "team", "frc1124", "imgur", "foobar"
-        )
+def createSuggestion(logged_in_user) -> str:
+    status = SuggestionCreator.createTeamMediaSuggestion(
+        logged_in_user.account_key, "http://imgur.com/foobar", "frc1124", "2016"
+    )
+    assert status[0] == SuggestionCreationStatus.SUCCESS
+    return Suggestion.render_media_key_name(2016, "team", "frc1124", "imgur", "foobar")
 
 
 def test_login_redirect(web_client: Client) -> None:
@@ -84,9 +81,12 @@ def test_nothing_to_review(login_user_with_permission, web_client: Client) -> No
 
 
 def test_accept_suggestion(
-    login_user_with_permission, ndb_client: ndb.Client, web_client: Client
+    login_user_with_permission,
+    ndb_stub,
+    web_client: Client,
+    taskqueue_stub,
 ) -> None:
-    suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
+    suggestion_id = createSuggestion(login_user_with_permission)
     queue = get_suggestion_queue(web_client)
     assert queue == [suggestion_id]
 
@@ -99,24 +99,26 @@ def test_accept_suggestion(
     )
     assert response.status_code == 200
 
-    with ndb_client.context():
-        suggestion = Suggestion.get_by_id(suggestion_id)
-        assert suggestion is not None
-        assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
 
-        media = Media.get_by_id(Media.render_key_name(MediaType.IMGUR, "foobar"))
-        assert media is not None
-        assert media.year == 2016
-        assert media.foreign_key == "foobar"
-        assert media.media_type_enum == MediaType.IMGUR
-        assert ndb.Key(Team, "frc1124") in media.references
-        assert media.preferred_references == []
+    media = Media.get_by_id(Media.render_key_name(MediaType.IMGUR, "foobar"))
+    assert media is not None
+    assert media.year == 2016
+    assert media.foreign_key == "foobar"
+    assert media.media_type_enum == MediaType.IMGUR
+    assert ndb.Key(Team, "frc1124") in media.references
+    assert media.preferred_references == []
 
 
 def test_accept_suggestion_change_year(
-    login_user_with_permission, ndb_client: ndb.Client, web_client: Client
+    login_user_with_permission,
+    ndb_stub,
+    web_client: Client,
+    taskqueue_stub,
 ) -> None:
-    suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
+    suggestion_id = createSuggestion(login_user_with_permission)
     queue = get_suggestion_queue(web_client)
     assert queue == [suggestion_id]
 
@@ -130,24 +132,26 @@ def test_accept_suggestion_change_year(
     )
     assert response.status_code == 200
 
-    with ndb_client.context():
-        suggestion = Suggestion.get_by_id(suggestion_id)
-        assert suggestion is not None
-        assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
 
-        media = Media.get_by_id(Media.render_key_name(MediaType.IMGUR, "foobar"))
-        assert media is not None
-        assert media.year == 2017
-        assert media.foreign_key == "foobar"
-        assert media.media_type_enum == MediaType.IMGUR
-        assert ndb.Key(Team, "frc1124") in media.references
-        assert media.preferred_references == []
+    media = Media.get_by_id(Media.render_key_name(MediaType.IMGUR, "foobar"))
+    assert media is not None
+    assert media.year == 2017
+    assert media.foreign_key == "foobar"
+    assert media.media_type_enum == MediaType.IMGUR
+    assert ndb.Key(Team, "frc1124") in media.references
+    assert media.preferred_references == []
 
 
 def test_accept_suggestion_as_preferred(
-    login_user_with_permission, ndb_client: ndb.Client, web_client: Client
+    login_user_with_permission,
+    ndb_stub,
+    web_client: Client,
+    taskqueue_stub,
 ) -> None:
-    suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
+    suggestion_id = createSuggestion(login_user_with_permission)
     queue = get_suggestion_queue(web_client)
     assert queue == [suggestion_id]
 
@@ -161,35 +165,36 @@ def test_accept_suggestion_as_preferred(
     )
     assert response.status_code == 200
 
-    with ndb_client.context():
-        suggestion = Suggestion.get_by_id(suggestion_id)
-        assert suggestion is not None
-        assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
 
-        media = Media.get_by_id(Media.render_key_name(MediaType.IMGUR, "foobar"))
-        assert media is not None
-        assert media.year == 2016
-        assert media.foreign_key == "foobar"
-        assert media.media_type_enum == MediaType.IMGUR
-        assert ndb.Key(Team, "frc1124") in media.references
-        assert ndb.Key(Team, "frc1124") in media.preferred_references
+    media = Media.get_by_id(Media.render_key_name(MediaType.IMGUR, "foobar"))
+    assert media is not None
+    assert media.year == 2016
+    assert media.foreign_key == "foobar"
+    assert media.media_type_enum == MediaType.IMGUR
+    assert ndb.Key(Team, "frc1124") in media.references
+    assert ndb.Key(Team, "frc1124") in media.preferred_references
 
 
 def test_accept_suggestion_as_preferred_and_replace(
-    login_user_with_permission, ndb_client: ndb.Client, web_client: Client
+    login_user_with_permission,
+    ndb_stub,
+    web_client: Client,
+    taskqueue_stub,
 ) -> None:
-    with ndb_client.context():
-        # Create an existing preferred media
-        existing_preferred = Media(
-            id=Media.render_key_name(MediaType.IMGUR, "baz"),
-            foreign_key="baz",
-            media_type_enum=MediaType.IMGUR,
-            year=2016,
-            preferred_references=[ndb.Key(Team, "frc1124")],
-        )
-        existing_preferred.put()
+    # Create an existing preferred media
+    existing_preferred = Media(
+        id=Media.render_key_name(MediaType.IMGUR, "baz"),
+        foreign_key="baz",
+        media_type_enum=MediaType.IMGUR,
+        year=2016,
+        preferred_references=[ndb.Key(Team, "frc1124")],
+    )
+    existing_preferred.put()
 
-    suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
+    suggestion_id = createSuggestion(login_user_with_permission)
     queue = get_suggestion_queue(web_client)
     assert queue == [suggestion_id]
 
@@ -204,28 +209,27 @@ def test_accept_suggestion_as_preferred_and_replace(
     )
     assert response.status_code == 200
 
-    with ndb_client.context():
-        suggestion = Suggestion.get_by_id(suggestion_id)
-        assert suggestion is not None
-        assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
 
-        media = Media.get_by_id(Media.render_key_name(MediaType.IMGUR, "foobar"))
-        assert media is not None
-        assert media.year == 2016
-        assert media.foreign_key == "foobar"
-        assert media.media_type_enum == MediaType.IMGUR
-        assert ndb.Key(Team, "frc1124") in media.references
-        assert ndb.Key(Team, "frc1124") in media.preferred_references
+    media = Media.get_by_id(Media.render_key_name(MediaType.IMGUR, "foobar"))
+    assert media is not None
+    assert media.year == 2016
+    assert media.foreign_key == "foobar"
+    assert media.media_type_enum == MediaType.IMGUR
+    assert ndb.Key(Team, "frc1124") in media.references
+    assert ndb.Key(Team, "frc1124") in media.preferred_references
 
-        old_preferred_media = Media.get_by_id(existing_preferred.key_name)
-        assert old_preferred_media is not None
-        assert ndb.Key(Team, "frc1124") not in old_preferred_media.preferred_references
+    old_preferred_media = Media.get_by_id(existing_preferred.key_name)
+    assert old_preferred_media is not None
+    assert ndb.Key(Team, "frc1124") not in old_preferred_media.preferred_references
 
 
 def test_reject_suggestion(
-    login_user_with_permission, ndb_client: ndb.Client, web_client: Client
+    login_user_with_permission, ndb_stub, web_client: Client
 ) -> None:
-    suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
+    suggestion_id = createSuggestion(login_user_with_permission)
     queue = get_suggestion_queue(web_client)
     assert queue == [suggestion_id]
 
@@ -238,11 +242,10 @@ def test_reject_suggestion(
     )
     assert response.status_code == 200
 
-    with ndb_client.context():
-        suggestion = Suggestion.get_by_id(suggestion_id)
-        assert suggestion is not None
-        assert suggestion.review_state == SuggestionState.REVIEW_REJECTED
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_REJECTED
 
-        # Verify no medias are created
-        medias = Media.query().fetch()
-        assert medias == []
+    # Verify no medias are created
+    medias = Media.query().fetch()
+    assert medias == []

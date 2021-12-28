@@ -1,41 +1,45 @@
 queue:
 - name: default
-  max_dispatches_per_second: 10
-  max_attempts: 0
+  rate: 10/s
+  retry_parameters:
+    task_retry_limit: 0
 
 - name: cache-clearing
-  max_dispatches_per_second: 5
+  rate: 5/s
 
 - name: api-track-call
-  max_dispatches_per_second: 500
-  max_attempts: 0
+  rate: 500/s
+  retry_parameters:
+    task_retry_limit: 0
 
 - name: datafeed
-  max_dispatches_per_second: 5
-  max_retry_duration_seconds: 3600  # 1h
+  rate: 5/s
+  retry_parameters:
+    task_age_limit: 1h
 
 - name: firebase
-  max_dispatches_per_second: 50
+  rate: 50/s
 
 - name: post-update-hooks
-  max_dispatches_per_second: 5
+  rate: 5/s
 
 - name: push-notifications
-  max_dispatches_per_second: 100
-  max_retry_duration_seconds: 180  # 3m
-  min_backoff_seconds: 10
-  max_backoff_seconds: 30
+  rate: 100/s
+  retry_parameters:
+    task_age_limit: 3m
+    min_backoff_seconds: 10
+    max_backoff_seconds: 30
 
 - name: search-index-update
-  max_dispatches_per_second: 10
+  rate: 10/s
 
 - name: admin
-  max_dispatches_per_second: 5
+  rate: 5/s
 
 - name: run-in-order
-  max_dispatches_per_second: 5
-  max_concurrent_dispatches: 1
+  rate: 5/s
+  max_concurrent_requests: 1
 
 - name: backups
-  max_dispatches_per_second: 0.1  # 6/m
-  max_concurrent_dispatches: 1
+  rate: 6/m
+  max_concurrent_requests: 1

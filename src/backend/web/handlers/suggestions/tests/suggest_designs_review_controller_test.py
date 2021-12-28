@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 
 import pytest
 from bs4 import BeautifulSoup
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from werkzeug.test import Client
 
 from backend.common.consts.account_permission import AccountPermission
@@ -54,18 +54,17 @@ def get_suggestion_queue(web_client: Client) -> List[str]:
     return queue
 
 
-def createSuggestion(logged_in_user, ndb_client: ndb.Client) -> str:
-    with ndb_client.context():
-        status = SuggestionCreator.createTeamMediaSuggestion(
-            logged_in_user.account_key,
-            "https://grabcad.com/library/2016-148-robowranglers-1",
-            "frc1124",
-            "2016",
-        )
-        assert status[0] == SuggestionCreationStatus.SUCCESS
-        return Suggestion.render_media_key_name(
-            2016, "team", "frc1124", "grabcad", "2016-148-robowranglers-1"
-        )
+def createSuggestion(logged_in_user) -> str:
+    status = SuggestionCreator.createTeamMediaSuggestion(
+        logged_in_user.account_key,
+        "https://grabcad.com/library/2016-148-robowranglers-1",
+        "frc1124",
+        "2016",
+    )
+    assert status[0] == SuggestionCreationStatus.SUCCESS
+    return Suggestion.render_media_key_name(
+        2016, "team", "frc1124", "grabcad", "2016-148-robowranglers-1"
+    )
 
 
 def test_login_redirect(web_client: Client) -> None:
@@ -85,9 +84,12 @@ def test_nothing_to_review(login_user_with_permission, web_client: Client) -> No
 
 
 def test_accept_suggestion(
-    login_user_with_permission, ndb_client: ndb.Client, web_client: Client
+    login_user_with_permission,
+    ndb_stub,
+    web_client: Client,
+    taskqueue_stub,
 ) -> None:
-    suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
+    suggestion_id = createSuggestion(login_user_with_permission)
     queue = get_suggestion_queue(web_client)
     assert queue == [suggestion_id]
 
@@ -101,25 +103,24 @@ def test_accept_suggestion(
     assert response.status_code == 200
 
     # Make sure the Media object gets created
-    with ndb_client.context():
-        media = Media.get_by_id(
-            Media.render_key_name(MediaType.GRABCAD, "2016-148-robowranglers-1")
-        )
-        assert media is not None
-        assert media.media_type_enum == MediaType.GRABCAD
-        assert media.year == 2016
-        assert ndb.Key(Team, "frc1124") in media.references
+    media = Media.get_by_id(
+        Media.render_key_name(MediaType.GRABCAD, "2016-148-robowranglers-1")
+    )
+    assert media is not None
+    assert media.media_type_enum == MediaType.GRABCAD
+    assert media.year == 2016
+    assert ndb.Key(Team, "frc1124") in media.references
 
-        # Make sure we mark the Suggestion as REVIEWED
-        suggestion = Suggestion.get_by_id(suggestion_id)
-        assert suggestion is not None
-        assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
+    # Make sure we mark the Suggestion as REVIEWED
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
 
 
 def test_reject_suggestion(
-    login_user_with_permission, ndb_client: ndb.Client, web_client: Client
+    login_user_with_permission, ndb_stub, web_client: Client
 ) -> None:
-    suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
+    suggestion_id = createSuggestion(login_user_with_permission)
     queue = get_suggestion_queue(web_client)
     assert queue == [suggestion_id]
 
@@ -133,20 +134,22 @@ def test_reject_suggestion(
     assert response.status_code == 200
 
     # Make sure the Media object doesn't get created
-    with ndb_client.context():
-        medias = Media.query().fetch(keys_only=True)
-        assert medias == []
+    medias = Media.query().fetch(keys_only=True)
+    assert medias == []
 
-        # Make sure we mark the Suggestion as REVIEWED
-        suggestion = Suggestion.get_by_id(suggestion_id)
-        assert suggestion is not None
-        assert suggestion.review_state == SuggestionState.REVIEW_REJECTED
+    # Make sure we mark the Suggestion as REVIEWED
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_REJECTED
 
 
 def test_fast_path_accept(
-    login_user_with_permission, ndb_client: ndb.Client, web_client: Client
+    login_user_with_permission,
+    ndb_stub,
+    web_client: Client,
+    taskqueue_stub,
 ):
-    suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
+    suggestion_id = createSuggestion(login_user_with_permission)
 
     response = web_client.get(
         f"/suggest/cad/review?action=accept&id={suggestion_id}",
@@ -155,24 +158,23 @@ def test_fast_path_accept(
     assert response.status_code == 200
 
     # Make sure the Media object gets created
-    with ndb_client.context():
-        media = Media.get_by_id(
-            Media.render_key_name(MediaType.GRABCAD, "2016-148-robowranglers-1")
-        )
-        assert media is not None
-        assert media.media_type_enum == MediaType.GRABCAD
-        assert media.year == 2016
-        assert ndb.Key(Team, "frc1124") in media.references
+    media = Media.get_by_id(
+        Media.render_key_name(MediaType.GRABCAD, "2016-148-robowranglers-1")
+    )
+    assert media is not None
+    assert media.media_type_enum == MediaType.GRABCAD
+    assert media.year == 2016
+    assert ndb.Key(Team, "frc1124") in media.references
 
-        suggestion = Suggestion.get_by_id(suggestion_id)
-        assert suggestion is not None
-        assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
 
 
 def test_fast_path_reject(
-    login_user_with_permission, ndb_client: ndb.Client, web_client: Client
+    login_user_with_permission, ndb_stub, web_client: Client
 ) -> None:
-    suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
+    suggestion_id = createSuggestion(login_user_with_permission)
 
     response = web_client.get(
         f"/suggest/cad/review?action=reject&id={suggestion_id}",
@@ -181,26 +183,24 @@ def test_fast_path_reject(
     assert response.status_code == 200
 
     # Make sure the Media object gets created
-    with ndb_client.context():
-        media = Media.get_by_id(
-            Media.render_key_name(MediaType.GRABCAD, "2016-148-robowranglers-1")
-        )
-        assert media is None
+    media = Media.get_by_id(
+        Media.render_key_name(MediaType.GRABCAD, "2016-148-robowranglers-1")
+    )
+    assert media is None
 
-        suggestion = Suggestion.get_by_id(suggestion_id)
-        assert suggestion is not None
-        assert suggestion.review_state == SuggestionState.REVIEW_REJECTED
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_REJECTED
 
 
 def test_fast_path_already_reviewed(
-    login_user_with_permission, ndb_client: ndb.Client, web_client: Client
+    login_user_with_permission, ndb_stub, web_client: Client
 ) -> None:
-    suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
-    with ndb_client.context():
-        suggestion = Suggestion.get_by_id(suggestion_id)
-        assert suggestion is not None
-        suggestion.review_state = SuggestionState.REVIEW_ACCEPTED
-        suggestion.put()
+    suggestion_id = createSuggestion(login_user_with_permission)
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    suggestion.review_state = SuggestionState.REVIEW_ACCEPTED
+    suggestion.put()
 
     response = web_client.get(
         f"/suggest/cad/review?action=accept&id={suggestion_id}",

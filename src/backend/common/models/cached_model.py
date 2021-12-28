@@ -1,20 +1,7 @@
 from typing import Any, Dict, Optional, Set
 
-from google.cloud import ndb
-from google.cloud.ndb._legacy_entity_pb import (
-    EntityProto,
-)
+from google.appengine.ext import ndb
 
-from backend.common.legacy_protobuf.legacy_gae_entity_model_decoder import (
-    EntityProtoDecoder,
-)
-from backend.common.legacy_protobuf.legacy_gae_entity_model_encoder import (
-    NdbModelEncoder,
-)
-from backend.common.legacy_protobuf.legacy_gae_entity_pb_encoder import (
-    EntityProtoEncoder,
-)
-from backend.common.legacy_protobuf.legacy_gae_protobuf import Encoder as ProtoEncoder
 
 TAffectedReferences = Dict[str, Set[Any]]
 
@@ -56,34 +43,3 @@ class CachedModel(ndb.Model):
         # The initialization path is different for models vs those created via
         # constructors, so make sure we have a common set of properties defined
         self._fix_up_properties()
-
-    """
-    From the legacy NDB model implementation:
-    https://github.com/GoogleCloudPlatform/datastore-ndb-python/blob/cf4cab3f1f69cd04e1a9229871be466b53729f3f/ndb/model.py#L2964-L2970
-
-    ```
-    def __getstate__(self):
-        return self._to_pb().Encode()
-
-    def __setstate__(self, serialized_pb):
-        pb = entity_pb.EntityProto(serialized_pb)
-        self.__init__()
-        self.__class__._from_pb(pb, set_key=False, ent=self)
-    ```
-
-    See https://github.com/googleapis/python-ndb/issues/587 about fixing upstream
-    """
-
-    def __getstate__(self) -> bytes:
-        pb = NdbModelEncoder.model_to_proto(self)
-        encoder = ProtoEncoder()
-        EntityProtoEncoder.OutputUnchecked(pb, encoder)
-        b = encoder.buffer().tobytes()
-        return b
-
-    def __setstate__(self, state: Any) -> None:
-        pb = EntityProto()
-        pb.MergePartialFromString(state)
-
-        self.__init__()
-        EntityProtoDecoder.decode_protobuf(self, pb)

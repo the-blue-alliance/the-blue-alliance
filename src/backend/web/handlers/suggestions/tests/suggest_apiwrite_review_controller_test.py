@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 
 import pytest
 from bs4 import BeautifulSoup
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 from werkzeug.test import Client
 
@@ -24,28 +24,27 @@ from backend.web.handlers.conftest import get_inputs_from_form
 
 
 @pytest.fixture(autouse=True)
-def storeEvent(ndb_client: ndb.Client):
-    with ndb_client.context():
-        event = Event(
-            id="2016necmp",
-            name="New England District Championship",
-            event_type_enum=EventType.OFFSEASON,
-            short_name="New England",
-            event_short="necmp",
-            year=2016,
-            end_date=datetime(2016, 3, 27),
-            official=False,
-            city="Hartford",
-            state_prov="CT",
-            country="USA",
-            venue="Some Venue",
-            venue_address="Some Venue, Hartford, CT, USA",
-            timezone_id="America/New_York",
-            start_date=datetime(2016, 3, 24),
-            webcast_json='[{"type": "twitch", "channel": "frcgamesense"}]',
-            website="http://www.firstsv.org",
-        )
-        event.put()
+def storeEvent(ndb_stub):
+    event = Event(
+        id="2016necmp",
+        name="New England District Championship",
+        event_type_enum=EventType.OFFSEASON,
+        short_name="New England",
+        event_short="necmp",
+        year=2016,
+        end_date=datetime(2016, 3, 27),
+        official=False,
+        city="Hartford",
+        state_prov="CT",
+        country="USA",
+        venue="Some Venue",
+        venue_address="Some Venue, Hartford, CT, USA",
+        timezone_id="America/New_York",
+        start_date=datetime(2016, 3, 24),
+        webcast_json='[{"type": "twitch", "channel": "frcgamesense"}]',
+        website="http://www.firstsv.org",
+    )
+    event.put()
 
 
 @pytest.fixture
@@ -83,17 +82,16 @@ def get_suggestion_queue_and_fields(
     return queue, (inputs or {})
 
 
-def createSuggestion(logged_in_user, ndb_client: ndb.Client) -> int:
-    with ndb_client.context():
-        status = SuggestionCreator.createApiWriteSuggestion(
-            logged_in_user.account_key, "2016necmp", "Test", [AuthType.EVENT_MATCHES]
-        )
-        assert status == SuggestionCreationStatus.SUCCESS
-        return none_throws(
-            Suggestion.query(Suggestion.target_key == "2016necmp")
-            .fetch(keys_only=True)[0]
-            .id()
-        )
+def createSuggestion(logged_in_user) -> int:
+    status = SuggestionCreator.createApiWriteSuggestion(
+        logged_in_user.account_key, "2016necmp", "Test", [AuthType.EVENT_MATCHES]
+    )
+    assert status == SuggestionCreationStatus.SUCCESS
+    return none_throws(
+        Suggestion.query(Suggestion.target_key == "2016necmp")
+        .fetch(keys_only=True)[0]
+        .integer_id()
+    )
 
 
 def test_login_redirect(web_client: Client) -> None:
@@ -113,9 +111,9 @@ def test_nothing_to_review(login_user_with_permission, web_client: Client) -> No
 
 
 def test_accespt_suggestion(
-    login_user_with_permission, ndb_client: ndb.Client, web_client: Client
+    login_user_with_permission, ndb_stub, web_client: Client
 ) -> None:
-    suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
+    suggestion_id = createSuggestion(login_user_with_permission)
     queue, form_fields = get_suggestion_queue_and_fields(web_client, suggestion_id)
     assert queue == [suggestion_id]
     assert form_fields is not {}
@@ -128,26 +126,25 @@ def test_accespt_suggestion(
     )
     assert response.status_code == 200
 
-    with ndb_client.context():
-        # Make sure the ApiWrite object gets created
-        auth = cast(ApiAuthAccess, ApiAuthAccess.query().fetch()[0])
-        assert auth is not None
-        assert auth.owner == login_user_with_permission.account_key
-        assert auth.event_list == [ndb.Key(Event, "2016necmp")]
-        assert auth.auth_types_enum == [AuthType.EVENT_MATCHES]
-        assert auth.secret is not None
-        assert auth.expiration is not None
+    # Make sure the ApiWrite object gets created
+    auth = cast(ApiAuthAccess, ApiAuthAccess.query().fetch()[0])
+    assert auth is not None
+    assert auth.owner == login_user_with_permission.account_key
+    assert auth.event_list == [ndb.Key(Event, "2016necmp")]
+    assert auth.auth_types_enum == [AuthType.EVENT_MATCHES]
+    assert auth.secret is not None
+    assert auth.expiration is not None
 
-        # Make sure we mark the Suggestion as REVIEWED
-        suggestion = Suggestion.get_by_id(suggestion_id)
-        assert suggestion is not None
-        assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
+    # Make sure we mark the Suggestion as REVIEWED
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
 
 
 def test_reject_suggestion(
-    login_user_with_permission, ndb_client: ndb.Client, web_client: Client
+    login_user_with_permission, ndb_stub, web_client: Client
 ) -> None:
-    suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
+    suggestion_id = createSuggestion(login_user_with_permission)
     queue, form_fields = get_suggestion_queue_and_fields(web_client, suggestion_id)
     assert queue == [suggestion_id]
     assert form_fields is not {}
@@ -160,30 +157,28 @@ def test_reject_suggestion(
     )
     assert response.status_code == 200
 
-    with ndb_client.context():
-        auths = ApiAuthAccess.query().fetch()
-        assert auths == []
+    auths = ApiAuthAccess.query().fetch()
+    assert auths == []
 
-        # Make sure we mark the Suggestion as REJECTED
-        suggestion = Suggestion.get_by_id(suggestion_id)
-        assert suggestion is not None
-        assert suggestion.review_state == SuggestionState.REVIEW_REJECTED
+    # Make sure we mark the Suggestion as REJECTED
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_REJECTED
 
 
 def test_existing_auth_keys(
-    login_user_with_permission, ndb_client: ndb.Client, web_client: Client
+    login_user_with_permission, ndb_stub, web_client: Client
 ) -> None:
-    with ndb_client.context():
-        existing_auth = ApiAuthAccess(
-            id="tEsT_id_0",
-            secret="321tEsTsEcReT",
-            description="test",
-            event_list=[ndb.Key(Event, "2016necmp")],
-            auth_types_enum=[AuthType.EVENT_TEAMS],
-        )
-        existing_auth.put()
+    existing_auth = ApiAuthAccess(
+        id="tEsT_id_0",
+        secret="321tEsTsEcReT",
+        description="test",
+        event_list=[ndb.Key(Event, "2016necmp")],
+        auth_types_enum=[AuthType.EVENT_TEAMS],
+    )
+    existing_auth.put()
 
-    suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
+    suggestion_id = createSuggestion(login_user_with_permission)
     queue, form_fields = get_suggestion_queue_and_fields(web_client, suggestion_id)
     assert queue == [suggestion_id]
     assert form_fields is not {}
@@ -196,15 +191,14 @@ def test_existing_auth_keys(
     )
     assert response.status_code == 200
 
-    with ndb_client.context():
-        auths = ApiAuthAccess.query().fetch()
-        assert len(auths) == 2
+    auths = ApiAuthAccess.query().fetch()
+    assert len(auths) == 2
 
 
 def test_accept_suggestion_with_different_auth_types(
-    login_user_with_permission, ndb_client: ndb.Client, web_client: Client
+    login_user_with_permission, ndb_stub, web_client: Client
 ) -> None:
-    suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
+    suggestion_id = createSuggestion(login_user_with_permission)
     queue, form_fields = get_suggestion_queue_and_fields(web_client, suggestion_id)
     assert queue == [suggestion_id]
     assert form_fields is not {}
@@ -218,15 +212,14 @@ def test_accept_suggestion_with_different_auth_types(
     )
     assert response.status_code == 200
 
-    with ndb_client.context():
-        # Make sure the ApiWrite object gets created
-        auth = cast(ApiAuthAccess, ApiAuthAccess.query().fetch()[0])
-        assert auth is not None
-        assert auth.owner == login_user_with_permission.account_key
-        assert auth.event_list == [ndb.Key(Event, "2016necmp")]
-        assert set(auth.auth_types_enum) == {
-            AuthType.EVENT_TEAMS.value,
-            AuthType.MATCH_VIDEO.value,
-        }
-        assert auth.secret is not None
-        assert auth.expiration is not None
+    # Make sure the ApiWrite object gets created
+    auth = cast(ApiAuthAccess, ApiAuthAccess.query().fetch()[0])
+    assert auth is not None
+    assert auth.owner == login_user_with_permission.account_key
+    assert auth.event_list == [ndb.Key(Event, "2016necmp")]
+    assert set(auth.auth_types_enum) == {
+        AuthType.EVENT_TEAMS.value,
+        AuthType.MATCH_VIDEO.value,
+    }
+    assert auth.secret is not None
+    assert auth.expiration is not None

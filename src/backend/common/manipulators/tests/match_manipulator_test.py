@@ -10,7 +10,7 @@ from backend.common.models.event import Event
 from backend.common.models.match import Match
 
 
-@pytest.mark.usefixtures("ndb_context")
+@pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 class TestMatchManipulator(unittest.TestCase):
     def setUp(self):
         self.event = Event(id="2012ct", event_short="ct", year=2012)

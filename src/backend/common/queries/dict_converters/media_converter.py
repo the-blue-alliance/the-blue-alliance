@@ -1,7 +1,7 @@
 import json
 from typing import Dict, List, NewType, Optional
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.consts.media_type import SLUG_NAME_TO_TYPE

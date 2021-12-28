@@ -5,7 +5,6 @@ from urllib.parse import urlparse
 
 import pytest
 from bs4 import BeautifulSoup
-from google.cloud import ndb
 from werkzeug.test import Client
 
 from backend.common.consts.account_permission import AccountPermission
@@ -22,28 +21,27 @@ from backend.web.handlers.conftest import get_inputs_from_form
 
 
 @pytest.fixture(autouse=True)
-def create_event(ndb_client: ndb.Client) -> None:
-    with ndb_client.context():
-        event = Event(
-            id="2016necmp",
-            name="New England District Championship",
-            event_type_enum=EventType.OFFSEASON,
-            short_name="New England",
-            event_short="necmp",
-            year=2016,
-            end_date=datetime(2016, 3, 27),
-            official=False,
-            city="Hartford",
-            state_prov="CT",
-            country="USA",
-            venue="Some Venue",
-            venue_address="Some Venue, Hartford, CT, USA",
-            timezone_id="America/New_York",
-            start_date=datetime(2016, 3, 24),
-            webcast_json="",
-            website="http://www.firstsv.org",
-        )
-        event.put()
+def create_event(ndb_stub) -> None:
+    event = Event(
+        id="2016necmp",
+        name="New England District Championship",
+        event_type_enum=EventType.OFFSEASON,
+        short_name="New England",
+        event_short="necmp",
+        year=2016,
+        end_date=datetime(2016, 3, 27),
+        official=False,
+        city="Hartford",
+        state_prov="CT",
+        country="USA",
+        venue="Some Venue",
+        venue_address="Some Venue, Hartford, CT, USA",
+        timezone_id="America/New_York",
+        start_date=datetime(2016, 3, 24),
+        webcast_json="",
+        website="http://www.firstsv.org",
+    )
+    event.put()
 
 
 @pytest.fixture
@@ -74,16 +72,15 @@ def get_suggestion_queue_and_fields(
     return queue, (inputs or {})
 
 
-def createSuggestion(logged_in_user, ndb_client: ndb.Client) -> str:
-    with ndb_client.context():
-        status = SuggestionCreator.createEventWebcastSuggestion(
-            logged_in_user.account_key,
-            "https://twitch.tv/frcgamesense",
-            "",
-            "2016necmp",
-        )
-        assert status == SuggestionCreationStatus.SUCCESS
-        return "webcast_2016necmp_twitch_frcgamesense_None"
+def createSuggestion(logged_in_user) -> str:
+    status = SuggestionCreator.createEventWebcastSuggestion(
+        logged_in_user.account_key,
+        "https://twitch.tv/frcgamesense",
+        "",
+        "2016necmp",
+    )
+    assert status == SuggestionCreationStatus.SUCCESS
+    return "webcast_2016necmp_twitch_frcgamesense_None"
 
 
 def test_login_redirect(web_client: Client) -> None:
@@ -102,10 +99,8 @@ def test_nothing_to_review(login_user_with_permission, web_client: Client) -> No
     assert queue == []
 
 
-def test_reject_all(
-    login_user_with_permission, web_client: Client, ndb_client: ndb.Client
-) -> None:
-    suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
+def test_reject_all(login_user_with_permission, web_client: Client, ndb_stub) -> None:
+    suggestion_id = createSuggestion(login_user_with_permission)
     queue, reject_fields = get_suggestion_queue_and_fields(
         web_client, "reject_all_2016necmp"
     )
@@ -120,22 +115,24 @@ def test_reject_all(
     )
     assert response.status_code == 200
 
-    with ndb_client.context():
-        # Make sure we mark the Suggestion as REVIEWED
-        suggestion = Suggestion.get_by_id(suggestion_id)
-        assert suggestion is not None
-        assert suggestion.review_state == SuggestionState.REVIEW_REJECTED
+    # Make sure we mark the Suggestion as REVIEWED
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_REJECTED
 
-        # Make sure the Event has no webcasts
-        event = Event.get_by_id("2016necmp")
-        assert event is not None
-        assert event.webcast == []
+    # Make sure the Event has no webcasts
+    event = Event.get_by_id("2016necmp")
+    assert event is not None
+    assert event.webcast == []
 
 
 def test_accept_with_default_details(
-    login_user_with_permission, web_client: Client, ndb_client: ndb.Client
+    login_user_with_permission,
+    web_client: Client,
+    ndb_stub,
+    taskqueue_stub,
 ) -> None:
-    suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
+    suggestion_id = createSuggestion(login_user_with_permission)
     queue, form_fields = get_suggestion_queue_and_fields(
         web_client, f"review_{suggestion_id}"
     )
@@ -150,24 +147,24 @@ def test_accept_with_default_details(
     )
     assert response.status_code == 200
 
-    with ndb_client.context():
-        # Make sure we mark the Suggestion as REVIEWED
-        suggestion = Suggestion.get_by_id(suggestion_id)
-        assert suggestion is not None
-        assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
+    # Make sure we mark the Suggestion as REVIEWED
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
 
-        # Make sure the Event has a webcast
-        event = Event.get_by_id("2016necmp")
-        assert event is not None
-        assert event.webcast == [
-            Webcast(type=WebcastType.TWITCH, channel="frcgamesense")
-        ]
+    # Make sure the Event has a webcast
+    event = Event.get_by_id("2016necmp")
+    assert event is not None
+    assert event.webcast == [Webcast(type=WebcastType.TWITCH, channel="frcgamesense")]
 
 
 def test_accept_with_different_details(
-    login_user_with_permission, web_client: Client, ndb_client: ndb.Client
+    login_user_with_permission,
+    web_client: Client,
+    ndb_stub,
+    taskqueue_stub,
 ) -> None:
-    suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
+    suggestion_id = createSuggestion(login_user_with_permission)
     queue, form_fields = get_suggestion_queue_and_fields(
         web_client, f"review_{suggestion_id}"
     )
@@ -187,28 +184,27 @@ def test_accept_with_different_details(
     )
     assert response.status_code == 200
 
-    with ndb_client.context():
-        # Make sure we mark the Suggestion as REVIEWED
-        suggestion = Suggestion.get_by_id(suggestion_id)
-        assert suggestion is not None
-        assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
+    # Make sure we mark the Suggestion as REVIEWED
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
 
-        # Make sure the Event has a webcast
-        event = Event.get_by_id("2016necmp")
-        assert event is not None
-        assert event.webcast == [
-            Webcast(
-                type=WebcastType.YOUTUBE,
-                channel="foobar",
-                file="meow",
-            )
-        ]
+    # Make sure the Event has a webcast
+    event = Event.get_by_id("2016necmp")
+    assert event is not None
+    assert event.webcast == [
+        Webcast(
+            type=WebcastType.YOUTUBE,
+            channel="foobar",
+            file="meow",
+        )
+    ]
 
 
 def test_reject_single_webcast(
-    login_user_with_permission, web_client: Client, ndb_client: ndb.Client
+    login_user_with_permission, web_client: Client, ndb_stub
 ) -> None:
-    suggestion_id = createSuggestion(login_user_with_permission, ndb_client)
+    suggestion_id = createSuggestion(login_user_with_permission)
     queue, form_fields = get_suggestion_queue_and_fields(
         web_client, f"review_{suggestion_id}"
     )
@@ -223,13 +219,12 @@ def test_reject_single_webcast(
     )
     assert response.status_code == 200
 
-    with ndb_client.context():
-        # Make sure we mark the Suggestion as REVIEWED
-        suggestion = Suggestion.get_by_id(suggestion_id)
-        assert suggestion is not None
-        assert suggestion.review_state == SuggestionState.REVIEW_REJECTED
+    # Make sure we mark the Suggestion as REVIEWED
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_REJECTED
 
-        # Make sure the Event has no webcasts
-        event = Event.get_by_id("2016necmp")
-        assert event is not None
-        assert event.webcast == []
+    # Make sure the Event has no webcasts
+    event = Event.get_by_id("2016necmp")
+    assert event is not None
+    assert event.webcast == []

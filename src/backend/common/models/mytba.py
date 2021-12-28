@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from pyre_extensions import safe_cast
 
 from backend.common.consts.model_type import ModelType

@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from pyre_extensions import safe_cast
 
 from backend.common.consts.account_permission import AccountPermission

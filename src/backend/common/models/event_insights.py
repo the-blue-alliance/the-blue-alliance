@@ -1,6 +1,4 @@
-from typing import Dict
-
-from typing_extensions import TypedDict
+from typing import Dict, TypedDict
 
 
 class EventInsights(TypedDict):

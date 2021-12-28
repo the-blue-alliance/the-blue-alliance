@@ -1,4 +1,4 @@
-from typing_extensions import TypedDict
+from typing import TypedDict
 
 from backend.common.consts.media_type import VideoType
 

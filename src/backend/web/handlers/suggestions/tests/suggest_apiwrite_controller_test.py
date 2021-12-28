@@ -4,7 +4,6 @@ from urllib.parse import urlparse
 
 import pytest
 from bs4 import BeautifulSoup
-from google.cloud import ndb
 from werkzeug.test import Client
 
 from backend.common.consts.auth_type import AuthType, WRITE_TYPE_NAMES
@@ -17,28 +16,27 @@ from backend.web.handlers.conftest import CapturedTemplate
 
 
 @pytest.fixture(autouse=True)
-def createEvent(ndb_client: ndb.Client) -> None:
-    with ndb_client.context():
-        event = Event(
-            id="2016necmp",
-            name="New England District Championship",
-            event_type_enum=EventType.OFFSEASON,
-            short_name="New England",
-            event_short="necmp",
-            year=2016,
-            end_date=datetime(2016, 3, 27),
-            official=False,
-            city="Hartford",
-            state_prov="CT",
-            country="USA",
-            venue="Some Venue",
-            venue_address="Some Venue, Hartford, CT, USA",
-            timezone_id="America/New_York",
-            start_date=datetime(2016, 3, 24),
-            webcast_json='[{"type": "twitch", "channel": "frcgamesense"}]',
-            website="http://www.firstsv.org",
-        )
-        event.put()
+def createEvent(ndb_stub) -> None:
+    event = Event(
+        id="2016necmp",
+        name="New England District Championship",
+        event_type_enum=EventType.OFFSEASON,
+        short_name="New England",
+        event_short="necmp",
+        year=2016,
+        end_date=datetime(2016, 3, 27),
+        official=False,
+        city="Hartford",
+        state_prov="CT",
+        country="USA",
+        venue="Some Venue",
+        venue_address="Some Venue, Hartford, CT, USA",
+        timezone_id="America/New_York",
+        start_date=datetime(2016, 3, 24),
+        webcast_json='[{"type": "twitch", "channel": "frcgamesense"}]',
+        website="http://www.firstsv.org",
+    )
+    event.put()
 
 
 def assert_template_status(
@@ -76,14 +74,14 @@ def test_get_form(login_user, web_client: Client) -> None:
     assert len(form.find_all(attrs={"name": "auth_types"})) == len(WRITE_TYPE_NAMES)
 
 
-def test_submit_no_data(login_user, ndb_client: ndb.Client, web_client: Client) -> None:
+def test_submit_no_data(login_user, ndb_stub, web_client: Client) -> None:
     resp = web_client.post("/request/apiwrite", data={}, follow_redirects=True)
     assert resp.status_code == 404
 
 
 def test_submit_empty_form(
     login_user,
-    ndb_client: ndb.Client,
+    ndb_stub,
     web_client: Client,
     captured_templates: List[CapturedTemplate],
 ) -> None:
@@ -98,13 +96,12 @@ def test_submit_empty_form(
     assert soup.find(id="no_affiliation-alert") is not None
 
     # Assert no suggestions were written
-    with ndb_client.context():
-        assert Suggestion.query().fetch() == []
+    assert Suggestion.query().fetch() == []
 
 
 def test_submit_bad_event(
     login_user,
-    ndb_client: ndb.Client,
+    ndb_stub,
     web_client: Client,
     captured_templates: List[CapturedTemplate],
 ) -> None:
@@ -121,13 +118,12 @@ def test_submit_bad_event(
     assert soup.find(id="bad_event-alert") is not None
 
     # Assert no suggestions were written
-    with ndb_client.context():
-        assert Suggestion.query().fetch() == []
+    assert Suggestion.query().fetch() == []
 
 
 def test_suggest_api_write(
     login_user,
-    ndb_client: ndb.Client,
+    ndb_stub,
     web_client: Client,
     captured_templates: List[CapturedTemplate],
 ):
@@ -148,14 +144,13 @@ def test_suggest_api_write(
     assert soup.find(id="success-alert") is not None
 
     # Make sure the Suggestion gets created
-    with ndb_client.context():
-        suggestion = cast(Suggestion, Suggestion.query().fetch()[0])
-        assert suggestion is not None
-        assert suggestion.review_state == SuggestionState.REVIEW_PENDING
-        assert suggestion.target_key == "2016necmp"
-        assert suggestion.target_model == "api_auth_access"
-        assert suggestion.contents == SuggestionDict(
-            event_key="2016necmp",
-            affiliation="Test Code",
-            auth_types=[AuthType.MATCH_VIDEO, AuthType.EVENT_TEAMS],
-        )
+    suggestion = cast(Suggestion, Suggestion.query().fetch()[0])
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_PENDING
+    assert suggestion.target_key == "2016necmp"
+    assert suggestion.target_model == "api_auth_access"
+    assert suggestion.contents == SuggestionDict(
+        event_key="2016necmp",
+        affiliation="Test Code",
+        auth_types=[AuthType.MATCH_VIDEO, AuthType.EVENT_TEAMS],
+    )

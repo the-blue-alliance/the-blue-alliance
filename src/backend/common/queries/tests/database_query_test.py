@@ -1,7 +1,6 @@
-from typing import List
+from typing import List, TypedDict
 
-from google.cloud import ndb
-from typing_extensions import TypedDict
+from google.appengine.ext import ndb
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.futures import TypedFuture
@@ -93,7 +92,7 @@ def test_point_query_exists_async() -> None:
     query = DummyModelPointQuery(model_key="test")
     result_future = query.fetch_async()
 
-    result = result_future.result()
+    result = result_future.get_result()
     assert result == m
 
 
@@ -101,7 +100,7 @@ def test_point_query_not_exists_async() -> None:
     query = DummyModelPointQuery(model_key="test")
     result_future = query.fetch_async()
 
-    result = result_future.result()
+    result = result_future.get_result()
     assert result is None
 
 
@@ -115,7 +114,7 @@ def test_range_query_empty_sync() -> None:
 def test_range_query_empty_async() -> None:
     query = DummyModelRangeQuery(min=0, max=10)
     result_future = query.fetch_async()
-    result = result_future.result()
+    result = result_future.get_result()
 
     assert result == []
 
@@ -135,7 +134,7 @@ def test_range_query_with_data_async() -> None:
 
     query = DummyModelRangeQuery(min=0, max=2)
     result_future = query.fetch_async()
-    result = result_future.result()
+    result = result_future.get_result()
     assert len(result) == 3
 
 

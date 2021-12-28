@@ -21,7 +21,7 @@ class TeamListTab extends Component {
     this.updateTeamList = this.updateTeamList.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.selectedEvent !== nextProps.selectedEvent) {
       this.clearTeams();
     }

@@ -1,7 +1,7 @@
 import unittest
 
 import pytest
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
@@ -14,7 +14,7 @@ from backend.common.models.event_team_status import (
 from backend.common.models.team import Team
 
 
-@pytest.mark.usefixtures("ndb_context")
+@pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 class TestTeamManipulator(unittest.TestCase):
     def setUp(self):
         self.old_team = EventTeam(

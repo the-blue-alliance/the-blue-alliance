@@ -1,8 +1,11 @@
 import io
 import pickle
+import zlib
 from typing import Any
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
+
+_ZLIB_COMPRESSION_MARKER = b"x\x9c"
 
 
 class ImportFixingUnpickler(pickle.Unpickler):
@@ -34,6 +37,12 @@ class ImportFixingPickleProperty(ndb.BlobProperty):
         Returns:
             Any: The unpickled ``value``.
         """
+
+        if getattr(self, "_compressed", False) and not isinstance(
+            value, ndb.model._CompressedValue
+        ):
+            if value.startswith(_ZLIB_COMPRESSION_MARKER):
+                value = zlib.decompress(value)
 
         file_obj = io.BytesIO(value)
         return ImportFixingUnpickler(

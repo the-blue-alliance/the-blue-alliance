@@ -1,4 +1,5 @@
-import React, { PropTypes } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 import Dialog from "material-ui/Dialog";
 import FlatButton from "material-ui/FlatButton";
 import EventListener from "react-event-listener";
@@ -71,7 +72,7 @@ export default class SwapPositionDialog extends React.Component {
       <FlatButton
         label="Cancel"
         primary
-        onTouchTap={() => this.onRequestClose()}
+        onClick={() => this.onRequestClose()}
       />,
     ];
 

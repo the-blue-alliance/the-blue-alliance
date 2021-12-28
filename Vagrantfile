@@ -20,9 +20,24 @@ Vagrant.configure("2") do |config|
     ],
     rsync__auto: true
 
-  # Forward GAE modules
   ports = []
-  for i in 8080..8089
+
+  # Forward Firebase ports
+  for i in [4000, 4400, 4500, 9005, 9099]
+    ports.push("#{i}:#{i}")
+    config.vm.network "forwarded_port", guest: i, host: i
+  end
+
+  # Forward GAE modules
+  # Only forward 8080 on CI since some others conflict with GH Actions
+  # and are not needed for testing.
+  if ENV['ENV'] == 'CI'
+    gae_module_ports = [8080]
+  else
+    gae_module_ports = 8080..8089
+  end
+
+  for i in gae_module_ports
     ports.push("#{i}:#{i}")
     config.vm.network "forwarded_port", guest: i, host: i
   end

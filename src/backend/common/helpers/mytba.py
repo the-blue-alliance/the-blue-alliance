@@ -3,7 +3,7 @@ from datetime import datetime
 from itertools import groupby
 from typing import Dict, List, Optional, Set, Type
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.model_type import ModelType
 from backend.common.models.event import Event
@@ -16,7 +16,7 @@ from backend.common.models.team import Team
 
 @dataclass
 class MyTBA:
-    """ A wrapper object for a collection of myTBA models for a given user """
+    """A wrapper object for a collection of myTBA models for a given user"""
 
     def __init__(self, models: List[MyTBAModel]) -> None:
         self.models = models

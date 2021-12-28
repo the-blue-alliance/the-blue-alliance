@@ -23,6 +23,7 @@ from backend.common.consts.auth_type import (
     WRITE_TYPE_NAMES as AUTH_TYPE_WRITE_TYPE_NAMES,
 )
 from backend.common.consts.model_type import ModelType
+from backend.common.environment import Environment
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.season_helper import SeasonHelper
@@ -123,7 +124,15 @@ def login() -> Response:
     else:
         if current_user():
             return redirect(url_for("account.overview"))
-        return make_response(render_template("account_login_required.html", next=next))
+
+        auth_emulator_host = Environment.auth_emulator_host()
+        return make_response(
+            render_template(
+                "account_login_required.html",
+                next=next,
+                auth_emulator_host=auth_emulator_host,
+            )
+        )
 
 
 @blueprint.route("/logout")

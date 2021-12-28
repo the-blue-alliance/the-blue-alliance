@@ -1,0 +1,13 @@
+from google.appengine.api import apiproxy_stub as apiproxy_stub
+from typing import Any
+
+IsEnabledRequest: Any
+IsEnabledResponse: Any
+CapabilityConfig: Any
+
+class CapabilityServiceStub(apiproxy_stub.APIProxyStub):
+    THREADSAFE: bool
+    def __init__(self, service_name: str = ...) -> None: ...
+    def SetPackageEnabled(self, package, enabled) -> None: ...
+    def SetCapabilityStatus(self, package, capability, status) -> None: ...
+    def Clear(self) -> None: ...
