@@ -1,8 +1,9 @@
 import threading
+from typing import Any, Callable, Generic, Generator, TypeVar
 
 from google.appengine.api import apiproxy_stub
 from google.appengine.ext.ndb.context import Context
-from typing import Any, Generic, Generator, TypeVar
+from pyre_extensions import ParameterSpecification
 
 class _State(threading.local):
     current_context: Any
@@ -81,7 +82,13 @@ class ReducingFuture(Future):
 class Return(Exception): ...
 
 def get_return_value(err): ...
-def tasklet(func): ...
+
+
+TReturn = TypeVar("TReturn")
+
+def tasklet(func: Callable[..., Generator[Any, Any, TReturn]]) -> "TypedFuture[TReturn]":
+    ...
+
 def synctasklet(func): ...
 def toplevel(func): ...
 def get_context() -> Context: ...
