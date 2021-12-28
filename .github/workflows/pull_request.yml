@@ -90,7 +90,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
       - name: Run Format & Lint
         run: ./ops/lint_node.sh
   node-test:
@@ -109,7 +109,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
       - name: Run Tests
         run: ./ops/test_node.sh
       - name: Upload coverage to Codecov
@@ -164,7 +164,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
       - name: Install Node Dependencies
-        run: npm install
+        run: npm ci
       - name: Run Build
         run: ./ops/build/run_buildweb.sh --env
 
@@ -192,7 +192,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
       - name: Install Node Dependencies
-        run: npm install
+        run: npm ci
       - name: Install Vagrant
         run: sudo apt-get install vagrant
       - name: Create keys file
