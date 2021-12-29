@@ -5,6 +5,10 @@ on:
     branches:
       - py3
 
+concurrency:
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
   py3-type:
     name: "[py3] Type Check"
@@ -193,16 +197,16 @@ jobs:
           restore-keys: ${{ runner.os }}-node-
       - name: Install Node Dependencies
         run: npm ci
-      - name: Install Vagrant
-        run: sudo apt-get install vagrant
-      - name: Create keys file
-        run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
-      - name: Start Container
-        run: ENV='CI' vagrant up
-      - name: Test Vagrant Startup
-        run: ./ops/test_vagrant_startup.py
-      - name: Test Ops Fullstack
-        run: ./ops/test_ops.sh
+      # - name: Install Vagrant
+      #   run: sudo apt-get install vagrant
+      # - name: Create keys file
+      #   run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
+      # - name: Start Container
+      #   run: ENV='CI' vagrant up
+      # - name: Test Vagrant Startup
+      #   run: ./ops/test_vagrant_startup.py
+      # - name: Test Ops Fullstack
+      #   run: ./ops/test_ops.sh
       - name: Generate screenshots
         id: generate_screenshots
         run: |

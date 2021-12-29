@@ -5,8 +5,9 @@ from typing import List
 
 
 CAPTURE_URLS = [
-    "http://localhost:8080",
-    "http://localhost:8080/gameday",
+    # "http://localhost:8080",
+    # "http://localhost:8080/gameday",
+    "https://www.thebluealliance.com/gameday",
 ]
 SAVE_DIR = "ci_screenshots"
 MESSAGE_FILENAME = "message.md"
