@@ -11,8 +11,8 @@ import requests
 
 
 CAPTURE_URLS = [
-    ("Homepage", "https://www.thebluealliance.com"),
-    ("GameDay", "https://www.thebluealliance.com/gameday"),
+    ("Homepage", "http://localhost:8080"),
+    ("GameDay", "http://localhost:8080/gameday"),
 ]  # (name, url)
 MESSAGE_FILENAME = "ci_screenshots_message.md"
 GITHUB_REF = os.environ.get("GITHUB_REF", "")
