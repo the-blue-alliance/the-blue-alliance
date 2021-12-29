@@ -20,6 +20,7 @@ def reset_directory() -> None:
 def capture_screenshots(urls: List[str]) -> List[str]:
     file_names = []
     for i, url in enumerate(urls):
+        print(f"Screenshotting: {url}")
         file_name = f"{SAVE_DIR}/out_{i}.png"
         try:
             cmd = [
@@ -40,6 +41,7 @@ def capture_screenshots(urls: List[str]) -> List[str]:
 
 
 def generate_message(file_names: List[str]):
+    print("Generating message")
     with open(f"{SAVE_DIR}/{MESSAGE_FILENAME}", "w") as file:
         file.write("HELLO THIS IS A TEST")
 
