@@ -215,7 +215,7 @@ jobs:
       - name: Comment screenshots on PR
         uses: phulsechinmay/rewritable-pr-comment@v0.2.1
         with:
-          message: ${{ steps.generate_screenshots.output.message }}
+          message: ${{ steps.generate_screenshots.outputs.message }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COMMENT_IDENTIFIER: "screenshots-comment-rewritable-action"
 
