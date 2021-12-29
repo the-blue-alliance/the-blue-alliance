@@ -3,14 +3,13 @@
 import os
 import shutil
 import subprocess
-from typing import List
+from typing import List, Tuple
 
 
 CAPTURE_URLS = [
-    # "http://localhost:8080",
-    # "http://localhost:8080/gameday",
-    "https://www.thebluealliance.com/gameday",
-]
+    ("Homepage", "https://www.thebluealliance.com"),
+    ("GameDay", "https://www.thebluealliance.com/gameday"),
+]  # (name, url)
 SAVE_DIR = "ci_screenshots"
 MESSAGE_FILENAME = "message.md"
 
@@ -21,10 +20,10 @@ def reset_directory() -> None:
     os.mkdir(SAVE_DIR)
 
 
-def capture_screenshots(urls: List[str]) -> List[str]:
-    file_names = []
-    for i, url in enumerate(urls):
-        print(f"Screenshotting: {url}")
+def capture_screenshots(urls: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
+    screenshots = []
+    for i, (name, url) in enumerate(urls):
+        print(f"Screenshotting {name}: {url}")
         file_name = f"{SAVE_DIR}/out_{i}.png"
         try:
             cmd = [
@@ -38,16 +37,19 @@ def capture_screenshots(urls: List[str]) -> List[str]:
                 file_name,
             ]
             subprocess.check_output(cmd)
-            file_names.append(file_name)
+            screenshots.append((name, file_name))
         except subprocess.CalledProcessError as e:
             print(f"Error: {e}")
-    return file_names
+    return screenshots
 
 
-def generate_message(file_names: List[str]):
+def generate_message(screenshots: List[Tuple[str, str]]):
     print("Generating message")
+    message = "## Screenshots"
+    for name, filename in screenshots:
+        message += f"\n\n### {name}"
     with open(f"{SAVE_DIR}/{MESSAGE_FILENAME}", "w") as file:
-        file.write("HELLO THIS IS A TEST")
+        file.write(message)
 
 
 if __name__ == "__main__":
