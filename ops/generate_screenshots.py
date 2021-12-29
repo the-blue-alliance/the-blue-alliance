@@ -43,6 +43,27 @@ def capture_screenshots(urls: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
     return screenshots
 
 
+def upload_screenshots(screenshots: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
+    GITHUB_API_URL = "https://api.github.com"
+    BRANCH_NAME = "ci-screenshots"
+    AUTHOR_NAME = "github-actions[bot]"
+    AUTHOR_EMAIL = "github-actions[bot]@users.noreply.github.com"
+
+    subprocess.run(["git", "config", "user.name", AUTHOR_NAME])
+    subprocess.run(["git", "config", "user.email", AUTHOR_EMAIL])
+    subprocess.run(
+        ["git", "fetch", "origin", "--prune", "--unshallow"],
+    )
+    remote_branches = subprocess.check_output(
+        ["git", "branch", "-r"],
+    )
+    if BRANCH_NAME not in str(remote_branches):
+        subprocess.run(["git", "checkout", "--orphan", BRANCH_NAME])
+        subprocess.run(["git", "push", "-u", "origin", BRANCH_NAME])
+    else:
+        print(f'Branch "{BRANCH_NAME}" Already Exists')
+
+
 def generate_message(screenshots: List[Tuple[str, str]]):
     print("Generating message")
     message = "## Screenshots"
@@ -55,4 +76,6 @@ def generate_message(screenshots: List[Tuple[str, str]]):
 if __name__ == "__main__":
     reset_directory()
     screenshots = capture_screenshots(CAPTURE_URLS)
-    generate_message(screenshots)
+    if os.environ.get("CI"):
+        image_urls = upload_screenshots(screenshots)
+        # generate_message(image_urls)
