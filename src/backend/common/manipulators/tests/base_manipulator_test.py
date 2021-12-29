@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List, Optional, Set
+from typing import Any, Dict, Generator, List, Optional, Set
 
 import pytest
 from google.appengine.ext import deferred
@@ -8,7 +8,6 @@ from pyre_extensions import none_throws
 
 from backend.common.cache_clearing.get_affected_queries import TCacheKeyAndQuery
 from backend.common.consts.api_version import ApiMajorVersion
-from backend.common.futures import TypedFuture
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
 from backend.common.models.cached_model import CachedModel, TAffectedReferences
 from backend.common.models.cached_query_result import CachedQueryResult
@@ -78,7 +77,7 @@ class DummyCachedQuery(CachedDatabaseQuery[DummyModel, None]):
     DICT_CONVERTER = DummyConverter
 
     @ndb.tasklet
-    def _query_async(self, model_key: str) -> TypedFuture[DummyModel]:
+    def _query_async(self, model_key: str) -> Generator[Any, Any, DummyModel]:
         model = yield DummyModel.get_by_id_async(model_key)
         return model
 
@@ -185,6 +184,7 @@ def test_update_model_leaves_unknown_attrs(ndb_context, taskqueue_stub) -> None:
     expected.put()
 
     model = DummyModel.get_by_id("test")
+    assert model is not None
     assert model == expected
 
     model.str_prop = "asdf"
@@ -203,6 +203,7 @@ def test_does_not_assign_none(ndb_context, taskqueue_stub) -> None:
     DummyManipulator.createOrUpdate(update)
 
     check = DummyModel.get_by_id("test")
+    assert check is not None
     assert check.int_prop == 42
 
 
@@ -214,6 +215,7 @@ def test_allow_none(ndb_context, taskqueue_stub) -> None:
     DummyManipulator.createOrUpdate(update)
 
     check = DummyModel.get_by_id("test")
+    assert check is not None
     assert check.int_prop is None
 
 
@@ -225,6 +227,7 @@ def test_stringified_none(ndb_context, taskqueue_stub) -> None:
     DummyManipulator.createOrUpdate(update)
 
     check = DummyModel.get_by_id("test")
+    assert check is not None
     assert check.mutable_str_prop is None
 
 
@@ -236,6 +239,7 @@ def test_update_lists(ndb_context, taskqueue_stub) -> None:
     DummyManipulator.createOrUpdate(update)
 
     check = DummyModel.get_by_id("test")
+    assert check is not None
     assert check.repeated_prop == [4, 5, 6]
 
 
@@ -247,6 +251,7 @@ def test_update_lists_empty_keeps_old(ndb_context, taskqueue_stub) -> None:
     DummyManipulator.createOrUpdate(update)
 
     check = DummyModel.get_by_id("test")
+    assert check is not None
     assert check.repeated_prop == [1, 2, 3]
 
 
@@ -258,6 +263,7 @@ def test_update_json_attrs(ndb_context, taskqueue_stub) -> None:
     DummyManipulator.createOrUpdate(update)
 
     check = DummyModel.get_by_id("test")
+    assert check is not None
     assert check.prop_json == json.dumps({"foo": "baz"})
     assert check.prop == {"foo": "baz"}
 
@@ -270,6 +276,7 @@ def test_update_auto_union(ndb_context, taskqueue_stub) -> None:
     DummyManipulator.createOrUpdate(update, auto_union=True)
 
     check = DummyModel.get_by_id("test")
+    assert check is not None
     assert check.union_prop == [1, 2, 3, 4, 5, 6]
 
 
@@ -281,6 +288,7 @@ def test_update_auto_union_false(ndb_context, taskqueue_stub) -> None:
     DummyManipulator.createOrUpdate(update, auto_union=False)
 
     check = DummyModel.get_by_id("test")
+    assert check is not None
     assert check.union_prop == [4, 5, 6]
 
 
@@ -292,6 +300,7 @@ def test_update_auto_union_false_can_set_empty(ndb_context, taskqueue_stub) -> N
     DummyManipulator.createOrUpdate(update, auto_union=False)
 
     check = DummyModel.get_by_id("test")
+    assert check is not None
     assert check.union_prop == []
 
 

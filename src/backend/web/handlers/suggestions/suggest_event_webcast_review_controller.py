@@ -1,4 +1,5 @@
 from flask import redirect, request
+from pyre_extensions.refinement import none_throws
 from werkzeug.wrappers import Response
 
 from backend.common.consts.account_permission import AccountPermission
@@ -29,7 +30,7 @@ class SuggestEventWebcastReviewController(SuggestionsReviewBase[Event]):
         if request.form.get("webcast_date"):
             webcast["date"] = request.form.get("webcast_date")
 
-        event = Event.get_by_id(request.form.get("event_key"))
+        event = none_throws(Event.get_by_id(request.form.get("event_key")))
 
         # This used to defer?
         EventWebcastAdder.add_webcast(event, webcast)

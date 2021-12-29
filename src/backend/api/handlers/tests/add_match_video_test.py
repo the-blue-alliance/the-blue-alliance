@@ -2,6 +2,7 @@ import json
 from typing import Dict, List
 
 from google.appengine.ext import ndb
+from pyre_extensions.refinement import none_throws
 from werkzeug.test import Client
 
 from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
@@ -89,11 +90,13 @@ def test_set_video(ndb_stub, api_client: Client, taskqueue_stub) -> None:
     )
     assert response.status_code == 200
 
-    assert set(Match.get_by_id("2014casj_qm1").youtube_videos) == {
+    assert set(none_throws(Match.get_by_id("2014casj_qm1")).youtube_videos) == {
         "abcdef",
         "aFZy8iibMD0",
     }
-    assert set(Match.get_by_id("2014casj_sf1m1").youtube_videos) == {"RpSgUrsghv4"}
+    assert set(none_throws(Match.get_by_id("2014casj_sf1m1")).youtube_videos) == {
+        "RpSgUrsghv4"
+    }
 
 
 def test_bad_match_id(ndb_stub, api_client: Client) -> None:
@@ -110,9 +113,9 @@ def test_bad_match_id(ndb_stub, api_client: Client) -> None:
     assert response.status_code == 404
 
     # make sure the valid match is unchnaged
-    assert set(Match.get_by_id("2014casj_qm1", use_cache=False).youtube_videos) == {
-        "abcdef"
-    }
+    assert set(
+        none_throws(Match.get_by_id("2014casj_qm1", use_cache=False)).youtube_videos
+    ) == {"abcdef"}
 
 
 def test_malformed_match_id(ndb_stub, api_client: Client) -> None:
@@ -131,4 +134,6 @@ def test_malformed_match_id(ndb_stub, api_client: Client) -> None:
     assert response.json["Error"] == "Invalid match IDs provided: ['zzz']"
 
     # make sure the valid match is unchnaged
-    assert set(Match.get_by_id("2014casj_qm1").youtube_videos) == {"abcdef"}
+    assert set(none_throws(Match.get_by_id("2014casj_qm1")).youtube_videos) == {
+        "abcdef"
+    }

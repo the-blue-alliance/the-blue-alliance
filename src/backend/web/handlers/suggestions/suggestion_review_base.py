@@ -106,7 +106,7 @@ class SuggestionsReviewBase(Generic[TTargetModel], MethodView):
         suggestion_future = Suggestion.get_by_id_async(accept_key)
 
         # Resolve async Futures
-        suggestion = suggestion_future.get_result()
+        suggestion = none_throws(suggestion_future.get_result())
         self.verify_write_permissions(suggestion)
 
         # Make sure Suggestion hasn't been processed (by another thread)
@@ -133,7 +133,7 @@ class SuggestionsReviewBase(Generic[TTargetModel], MethodView):
             Suggestion.get_by_id_async(key) for key in reject_keys
         ]
         rejected_suggestions = map(
-            lambda a: a.get_result(), rejected_suggestion_futures
+            lambda a: none_throws(a.get_result()), rejected_suggestion_futures
         )
 
         for suggestion in rejected_suggestions:

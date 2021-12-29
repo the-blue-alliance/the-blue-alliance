@@ -30,7 +30,7 @@ class LocationInfo(TypedDict, total=False):
     country_short: str
     postal_code: int
     formatted_address: str
-    place_details: str
+    place_details: Dict
 
 
 class LatLng(NamedTuple):
@@ -456,7 +456,6 @@ class LocationHelper:
         return location_info
 
     @classmethod
-    @ndb.tasklet
     def google_maps_placesearch(
         cls, query: str, lat_lng: LatLng, textsearch: bool = False
     ) -> List[Dict]:
@@ -537,7 +536,6 @@ class LocationHelper:
         return results or []
 
     @classmethod
-    @ndb.tasklet
     def google_maps_place_details(cls, place_id: str) -> Optional[Dict]:
         """
         https://developers.google.com/places/web-service/details#PlaceDetailsRequests

@@ -4,7 +4,7 @@ import datetime
 import json
 import re
 import typing
-from typing import Dict, Generator, List, Optional, Set, Tuple
+from typing import Any, Dict, Generator, List, Optional, Set, Tuple
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws, safe_cast
@@ -153,7 +153,7 @@ class Event(CachedModel):
         super(Event, self).__init__(*args, **kw)
 
     @ndb.tasklet
-    def get_awards_async(self) -> TypedFuture[List["Award"]]:
+    def get_awards_async(self) -> Generator[Any, Any, List["Award"]]:
         if self._awards is None:
             from backend.common.queries import award_query
 
@@ -229,7 +229,7 @@ class Event(CachedModel):
             )
 
     @ndb.tasklet
-    def get_matches_async(self) -> TypedFuture[List["Match"]]:
+    def get_matches_async(self) -> Generator[Any, Any, List["Match"]]:
         if self._matches is None:
             from backend.common.queries import match_query
 

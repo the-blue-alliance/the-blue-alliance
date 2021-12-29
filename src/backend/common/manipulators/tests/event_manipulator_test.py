@@ -123,4 +123,4 @@ class TestEventManipulator(unittest.TestCase):
         for task in tasks:
             deferred.run(task.payload)
 
-        assert Event.get_by_id("2011ct").timezone_id is not None
+        assert none_throws(Event.get_by_id("2011ct")).timezone_id is not None

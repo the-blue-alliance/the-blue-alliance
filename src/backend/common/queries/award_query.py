@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, Generator, List
 
 from google.appengine.ext import ndb
 
@@ -25,7 +25,7 @@ class EventAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
         super().__init__(event_key=event_key)
 
     @typed_tasklet
-    def _query_async(self, event_key: EventKey) -> List[Award]:
+    def _query_async(self, event_key: EventKey) -> Generator[Any, Any, List[Award]]:
         awards = yield Award.query(
             Award.event == ndb.Key(Event, event_key)
         ).fetch_async()
@@ -41,7 +41,7 @@ class TeamAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
         super().__init__(team_key=team_key)
 
     @typed_tasklet
-    def _query_async(self, team_key: TeamKey) -> List[Award]:
+    def _query_async(self, team_key: TeamKey) -> Generator[Any, Any, List[Award]]:
         awards = yield Award.query(
             Award.team_list == ndb.Key(Team, team_key)
         ).fetch_async()
@@ -57,7 +57,9 @@ class TeamYearAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
         super().__init__(team_key=team_key, year=year)
 
     @typed_tasklet
-    def _query_async(self, team_key: TeamKey, year: Year) -> List[Award]:
+    def _query_async(
+        self, team_key: TeamKey, year: Year
+    ) -> Generator[Any, Any, List[Award]]:
         awards = yield Award.query(
             Award.team_list == ndb.Key(Team, team_key), Award.year == year
         ).fetch_async()
@@ -73,7 +75,9 @@ class TeamEventAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
         super().__init__(team_key=team_key, event_key=event_key)
 
     @typed_tasklet
-    def _query_async(self, team_key: TeamKey, event_key: EventKey) -> List[Award]:
+    def _query_async(
+        self, team_key: TeamKey, event_key: EventKey
+    ) -> Generator[Any, Any, List[Award]]:
         awards = yield Award.query(
             Award.team_list == ndb.Key(Team, team_key),
             Award.event == ndb.Key(Event, event_key),
@@ -98,7 +102,7 @@ class TeamEventTypeAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]
     @typed_tasklet
     def _query_async(
         self, team_key: TeamKey, event_type: EventType, award_type: AwardType
-    ) -> List[Award]:
+    ) -> Generator[Any, Any, List[Award]]:
         awards = yield Award.query(
             Award.team_list == ndb.Key(Team, team_key),
             Award.event_type_enum == event_type,

@@ -11,7 +11,9 @@ def test_gameday(web_client: Client) -> None:
 
 
 def test_alias_redirect(web_client: Client) -> None:
-    GamedaySpecialWebcasts.put({"aliases": {"kickoff": "#params"}})
+    GamedaySpecialWebcasts.put(
+        {"aliases": {"kickoff": "#params"}, "webcasts": [], "default_chat": ""}
+    )
 
     resp = web_client.get("/watch/kickoff")
     assert resp.status_code == 302
@@ -20,7 +22,9 @@ def test_alias_redirect(web_client: Client) -> None:
 
 @freeze_time("2020-03-01")
 def test_event_redirect(web_client: Client) -> None:
-    GamedaySpecialWebcasts.put({"aliases": {"kickoff": "#params"}})
+    GamedaySpecialWebcasts.put(
+        {"aliases": {"kickoff": "#params"}, "webcasts": [], "default_chat": ""}
+    )
 
     event_key = "2020casj"
     helpers.preseed_event(event_key)
@@ -35,7 +39,9 @@ def test_event_redirect(web_client: Client) -> None:
 
 @freeze_time("2020-04-01")
 def test_event_redirect_wrong_time(web_client: Client) -> None:
-    GamedaySpecialWebcasts.put({"aliases": {"kickoff": "#params"}})
+    GamedaySpecialWebcasts.put(
+        {"aliases": {"kickoff": "#params"}, "webcasts": [], "default_chat": ""}
+    )
 
     event_key = "2020casj"
     helpers.preseed_event(event_key)
@@ -47,7 +53,9 @@ def test_event_redirect_wrong_time(web_client: Client) -> None:
 
 @freeze_time("2020-03-01")
 def test_team_redirect(web_client: Client) -> None:
-    GamedaySpecialWebcasts.put({"aliases": {"kickoff": "#params"}})
+    GamedaySpecialWebcasts.put(
+        {"aliases": {"kickoff": "#params"}, "webcasts": [], "default_chat": ""}
+    )
 
     team_num = 604
     event_key = "2020casj"
@@ -64,7 +72,9 @@ def test_team_redirect(web_client: Client) -> None:
 
 @freeze_time("2020-04-01")
 def test_team_redirect_wrong_time(web_client: Client) -> None:
-    GamedaySpecialWebcasts.put({"aliases": {"kickoff": "#params"}})
+    GamedaySpecialWebcasts.put(
+        {"aliases": {"kickoff": "#params"}, "webcasts": [], "default_chat": ""}
+    )
 
     team_num = 604
     event_key = "2020casj"
@@ -77,7 +87,9 @@ def test_team_redirect_wrong_time(web_client: Client) -> None:
 
 
 def test_bad_redirect(web_client: Client) -> None:
-    GamedaySpecialWebcasts.put({"aliases": {"kickoff": "#params"}})
+    GamedaySpecialWebcasts.put(
+        {"aliases": {"kickoff": "#params"}, "webcasts": [], "default_chat": ""}
+    )
 
     resp = web_client.get("/watch/foo")
     assert resp.status_code == 302

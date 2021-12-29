@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, Generator, List
 
 from backend.common.consts.client_type import ClientType
 from backend.common.models.mobile_client import MobileClient
@@ -23,7 +23,7 @@ class MobileClientQuery(DatabaseQuery[List[MobileClient], None]):
         user_ids: List[str],
         client_types: List[ClientType] = list(ClientType),
         only_verified: bool = True,
-    ) -> List[MobileClient]:
+    ) -> Generator[Any, Any, List[MobileClient]]:
         if not user_ids or not client_types:
             return []
 

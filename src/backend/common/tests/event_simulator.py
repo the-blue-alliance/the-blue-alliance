@@ -147,7 +147,7 @@ class EventSimulator:
         """
         Generates and saves fake rankings
         """
-        event = Event.get_by_id("2016nytr")
+        event = none_throws(Event.get_by_id("2016nytr"))
 
         team_wins = defaultdict(int)
         team_losses = defaultdict(int)
@@ -251,12 +251,14 @@ class EventSimulator:
                 }
                 for i in range(new_match.match_number):
                     win_counts[
-                        Match.get_by_id(
-                            Match.renderKeyName(
-                                none_throws(new_match.event.string_id()),
-                                new_match.comp_level,
-                                new_match.set_number,
-                                i + 1,
+                        none_throws(  # pyre-ignore[6]
+                            Match.get_by_id(
+                                Match.renderKeyName(
+                                    none_throws(new_match.event.string_id()),
+                                    new_match.comp_level,
+                                    new_match.set_number,
+                                    i + 1,
+                                )
                             )
                         ).winning_alliance
                     ] += 1
@@ -322,12 +324,14 @@ class EventSimulator:
                 }
                 for i in range(new_match.match_number):
                     win_counts[
-                        Match.get_by_id(
-                            Match.renderKeyName(
-                                none_throws(new_match.event.string_id()),
-                                new_match.comp_level,
-                                new_match.set_number,
-                                i + 1,
+                        none_throws(  # pyre-ignore[6]
+                            Match.get_by_id(
+                                Match.renderKeyName(
+                                    none_throws(new_match.event.string_id()),
+                                    new_match.comp_level,
+                                    new_match.set_number,
+                                    i + 1,
+                                )
                             )
                         ).winning_alliance
                     ] += 1

@@ -37,9 +37,9 @@ class TestDistrictManipulator(unittest.TestCase):
 
     def test_createOrUpdate(self) -> None:
         DistrictManipulator.createOrUpdate(self.old_district)
-        self.assertOldDistrict(District.get_by_id("2014ne"))
+        self.assertOldDistrict(none_throws(District.get_by_id("2014ne")))
         DistrictManipulator.createOrUpdate(self.new_district)
-        self.assertMergedDistrict(District.get_by_id("2014ne"))
+        self.assertMergedDistrict(none_throws(District.get_by_id("2014ne")))
 
     def test_findOrSpawn(self) -> None:
         self.old_district.put()

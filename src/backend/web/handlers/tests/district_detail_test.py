@@ -5,11 +5,14 @@ import pytest
 from bs4 import BeautifulSoup
 from freezegun import freeze_time
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 from werkzeug.test import Client
 
 from backend.common.models.district import District
+from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
+from backend.common.models.event_district_points import TeamAtEventDistrictPoints
 from backend.web.handlers.conftest import CapturedTemplate
 from backend.web.handlers.tests import helpers
 
@@ -146,7 +149,7 @@ def test_district_details_render_active_teams(
     setup_full_event("2019ctwat")
 
     # Make sure we have DistrictTeam links for all the teams
-    event = Event.get_by_id("2019ctwat")
+    event: Event = none_throws(Event.get_by_id("2019ctwat"))
     district_teams = [
         DistrictTeam(
             id=f"2019ne_{team.key_name}",
@@ -191,23 +194,26 @@ def test_district_detail_rankings(
 
     helpers.preseed_district(district_key)
 
-    rankings = [
-        {
-            "rank": 1,
-            "team_key": "frc7332",
-            "point_toal": 83,
-            "rookie_bonus": 0,
-            "event_points": {
-                "qual_points": 22,
-                "elim_points": 30,
-                "alliance_points": 16,
-                "award_points": 15,
-                "total": 83,
-            },
-        }
+    rankings: List[DistrictRanking] = [
+        DistrictRanking(
+            rank=1,
+            team_key="frc7332",
+            point_toal=83,
+            rookie_bonus=0,
+            event_points=[
+                TeamAtEventDistrictPoints(
+                    event_key=f"{year}event1",
+                    qual_points=22,
+                    elim_points=30,
+                    alliance_points=16,
+                    award_points=15,
+                    total=83,
+                )
+            ],
+        ),
     ]
 
-    district = District.get_by_id(district_key)
+    district = none_throws(District.get_by_id(district_key))
     district.rankings = rankings
     district.put()
 

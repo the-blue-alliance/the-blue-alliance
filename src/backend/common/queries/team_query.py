@@ -1,4 +1,4 @@
-from typing import List, Optional, Set
+from typing import Any, Generator, List, Optional, Set
 
 from google.appengine.ext import ndb
 
@@ -30,7 +30,7 @@ class TeamQuery(CachedDatabaseQuery[Optional[Team], Optional[TeamDict]]):
         super().__init__(team_key=team_key)
 
     @typed_tasklet
-    def _query_async(self, team_key: TeamKey) -> Optional[Team]:
+    def _query_async(self, team_key: TeamKey) -> Generator[Any, Any, Optional[Team]]:
         team = yield Team.get_by_id_async(team_key)
         return team
 
@@ -45,7 +45,7 @@ class TeamListQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
         super().__init__(page=page)
 
     @typed_tasklet
-    def _query_async(self, page: int) -> List[Team]:
+    def _query_async(self, page: int) -> Generator[Any, Any, List[Team]]:
         start = self.PAGE_SIZE * page
         end = start + self.PAGE_SIZE
         teams = (
@@ -91,7 +91,9 @@ class DistrictTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
         super().__init__(district_key=district_key)
 
     @typed_tasklet
-    def _query_async(self, district_key: DistrictKey) -> List[Team]:
+    def _query_async(
+        self, district_key: DistrictKey
+    ) -> Generator[Any, Any, List[Team]]:
         district_teams = yield DistrictTeam.query(
             DistrictTeam.district_key == ndb.Key(District, district_key)
         ).fetch_async()
@@ -109,7 +111,7 @@ class EventTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
         super().__init__(event_key=event_key)
 
     @typed_tasklet
-    def _query_async(self, event_key: EventKey) -> List[Team]:
+    def _query_async(self, event_key: EventKey) -> Generator[Any, Any, List[Team]]:
         event_team_keys = yield EventTeam.query(
             EventTeam.event == ndb.Key(Event, event_key)
         ).fetch_async(keys_only=True)
@@ -130,14 +132,14 @@ class EventEventTeamsQuery(CachedDatabaseQuery[List[EventTeam], List[TeamDict]])
         super().__init__(event_key=event_key)
 
     @typed_tasklet
-    def _query_async(self, event_key: EventKey) -> List[EventTeam]:
+    def _query_async(self, event_key: EventKey) -> Generator[Any, Any, List[EventTeam]]:
         event_teams = yield EventTeam.query(
             EventTeam.event == ndb.Key(Event, event_key)
         ).fetch_async()
         return event_teams
 
 
-class TeamParticipationQuery(CachedDatabaseQuery[Set[int], None]):
+class TeamParticipationQuery(CachedDatabaseQuery[Set[Year], None]):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "team_participation_{team_key}"
 
@@ -145,7 +147,7 @@ class TeamParticipationQuery(CachedDatabaseQuery[Set[int], None]):
         super().__init__(team_key=team_key)
 
     @typed_tasklet
-    def _query_async(self, team_key: TeamKey) -> Set[int]:
+    def _query_async(self, team_key: TeamKey) -> Generator[Any, Any, Set[Year]]:
         event_teams = yield EventTeam.query(
             EventTeam.team == ndb.Key(Team, team_key)
         ).fetch_async(keys_only=True)

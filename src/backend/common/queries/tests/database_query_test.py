@@ -1,9 +1,8 @@
-from typing import List, TypedDict
+from typing import Any, Generator, Iterable, List, TypedDict
 
 from google.appengine.ext import ndb
 
 from backend.common.consts.api_version import ApiMajorVersion
-from backend.common.futures import TypedFuture
 from backend.common.models.cached_query_result import CachedQueryResult
 from backend.common.queries.database_query import CachedDatabaseQuery, DatabaseQuery
 from backend.common.queries.dict_converters.converter_base import ConverterBase
@@ -39,8 +38,8 @@ class DummyModelPointQuery(DatabaseQuery[DummyModel, DummyDict]):
     DICT_CONVERTER = DummyConverter
 
     @ndb.tasklet
-    def _query_async(self, model_key: str) -> TypedFuture[DummyModel]:
-        model = yield DummyModel.get_by_id_async(model_key)
+    def _query_async(self, model_key: str) -> Generator[Any, Any, DummyModel]:
+        model: DummyModel = yield DummyModel.get_by_id_async(model_key)
         return model
 
 
@@ -48,11 +47,11 @@ class DummyModelRangeQuery(DatabaseQuery[List[DummyModel], List[DummyDict]]):
     DICT_CONVERTER = DummyConverter
 
     @ndb.tasklet
-    def _query_async(self, min: int, max: int) -> TypedFuture[List[DummyModel]]:
-        models = yield DummyModel.query(
+    def _query_async(self, min: int, max: int) -> Generator[Any, Any, List[DummyModel]]:
+        models: Iterable[DummyModel] = yield DummyModel.query(
             DummyModel.int_prop >= min, DummyModel.int_prop <= max
         ).fetch_async()
-        return models
+        return list(models)
 
 
 class CachedDummyModelRangeQuery(
@@ -63,11 +62,11 @@ class CachedDummyModelRangeQuery(
     CACHE_WRITES_ENABLED = True
 
     @ndb.tasklet
-    def _query_async(self, min: int, max: int) -> TypedFuture[List[DummyModel]]:
-        models = yield DummyModel.query(
+    def _query_async(self, min: int, max: int) -> Generator[Any, Any, List[DummyModel]]:
+        models: Iterable[DummyModel] = yield DummyModel.query(
             DummyModel.int_prop >= min, DummyModel.int_prop <= max
         ).fetch_async()
-        return models
+        return list(models)
 
 
 def test_point_query_exists_sync() -> None:
