@@ -40,7 +40,10 @@ class FMSApiSecrets(Sitevar[ContentType]):
         authkey = cls.authkey()
         if not username or not authkey:
             return None
+        return FMSApiSecrets.generate_auth_token(username, authkey)
 
+    @staticmethod
+    def generate_auth_token(username: str, authkey: str) -> str:
         # py3 needs byte-strings for b64 - will convert back/forth from ascii for strings
         return base64.b64encode(
             "{}:{}".format(username, authkey).encode("ascii")
