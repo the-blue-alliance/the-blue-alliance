@@ -7,7 +7,7 @@ on:
     branches: [ py3 ]
 
 concurrency:
-  group: ${{ github.head_ref }}
+  group: codeql-${{ github.head_ref }}
   cancel-in-progress: true
 
 jobs:
