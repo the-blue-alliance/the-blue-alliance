@@ -16,7 +16,8 @@ MESSAGE_FILENAME = "message.md"
 
 
 def reset_directory() -> None:
-    shutil.rmtree(SAVE_DIR)
+    if os.path.isdir(SAVE_DIR):
+        shutil.rmtree(SAVE_DIR)
     os.mkdir(SAVE_DIR)
 
 
