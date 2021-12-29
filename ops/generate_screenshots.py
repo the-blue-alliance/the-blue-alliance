@@ -28,6 +28,8 @@ def capture_screenshots(urls: List[str]) -> List[str]:
         file_name = f"{SAVE_DIR}/out_{i}.png"
         try:
             cmd = [
+                "npm",
+                "run",
                 "capture-website",
                 url,
                 "--width",

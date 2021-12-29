@@ -62,7 +62,8 @@
     "test": "jest -- ./src/",
     "testops": "jest -- ./ops/",
     "lint": "eslint .",
-    "lintfix": "eslint --fix ."
+    "lintfix": "eslint --fix .",
+    "capture-website": "capture-website"
   },
   "jest": {
     "automock": false,
