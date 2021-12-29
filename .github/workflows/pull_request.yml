@@ -202,7 +202,9 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
       - name: Install Node Dependencies
-        run: npm ci
+        run: |
+          npm ci
+          npm install -g capture-website-cli
       # - name: Install Vagrant
       #   run: sudo apt-get install vagrant
       # - name: Create keys file

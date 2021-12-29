@@ -39,7 +39,6 @@
     "@babel/preset-env": "^7.16.5",
     "@babel/preset-react": "^7.16.5",
     "babel-loader": "^8.2.3",
-    "capture-website-cli": "^2.1.0",
     "cross-env": "^7.0.3",
     "css-loader": "^6.5.1",
     "eslint": "^8.5.0",
@@ -62,8 +61,7 @@
     "test": "jest -- ./src/",
     "testops": "jest -- ./ops/",
     "lint": "eslint .",
-    "lintfix": "eslint --fix .",
-    "capture-website": "capture-website"
+    "lintfix": "eslint --fix ."
   },
   "jest": {
     "automock": false,
