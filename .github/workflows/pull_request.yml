@@ -181,10 +181,16 @@ jobs:
         uses: actions/setup-python@v2.3.0
         with:
           python-version: 3.8
+      - name: Cache pip
+        uses: actions/cache@v2.1.7
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests
+          pip install -r requirements.txt
       - name: Set up Node
         uses: actions/setup-node@v2.5.1
         with:
