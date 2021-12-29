@@ -1,4 +1,4 @@
-from typing import Any, Generator, Iterable, List
+from typing import Any, Generator, List
 
 from backend.common.consts.client_type import ClientType
 from backend.common.models.mobile_client import MobileClient
@@ -34,7 +34,7 @@ class MobileClientQuery(DatabaseQuery[List[MobileClient], None]):
             mobile_clients_query = mobile_clients_query.filter(
                 MobileClient.verified == True  # noqa: E712
             )
-        clients: Iterable[MobileClient] = yield mobile_clients_query.fetch_async()
+        clients = yield mobile_clients_query.fetch_async()
         return list(clients)
 
     # @staticmethod
