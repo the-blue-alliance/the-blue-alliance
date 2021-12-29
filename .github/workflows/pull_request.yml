@@ -219,7 +219,7 @@ jobs:
         id: generate_screenshots
         run: |
           ./ops/generate_screenshots.py $ {{ secrets.GITHUB_TOKEN }}
-          MESSAGE=$(cat ci_screenshots/message.md)
+          MESSAGE=$(cat ci_screenshots_message.md)
           MESSAGE="${MESSAGE//'%'/'%25'}"
           MESSAGE="${MESSAGE//$'\n'/'%0A'}"
           MESSAGE="${MESSAGE//$'\r'/'%0D'}"

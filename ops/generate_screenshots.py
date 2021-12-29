@@ -68,6 +68,7 @@ def upload_screenshots(
     # Create branch if it does not yet exist
     if BRANCH_NAME not in str(remote_branches):
         subprocess.run(["git", "checkout", "--orphan", BRANCH_NAME])
+        subprocess.run(["git", "reset"])
         subprocess.run(
             ["git", "commit", "--allow-empty", "-m", "Initial commit on empty branch"]
         )
@@ -98,6 +99,7 @@ def upload_screenshots(
             return link
         else:
             print(f'Error uploading "{filename}"')
+            print(response.content)
             return None
 
     image_urls = []  # (name, image_url)
