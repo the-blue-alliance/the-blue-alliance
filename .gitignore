@@ -7,7 +7,7 @@ __pycache__/
 .pyre/
 .vagrant/
 
-ci_screenshots/
+ci_screenshots_message.md
 .coverage
 coverage.xml
 .node_coverage/
