@@ -203,10 +203,16 @@ jobs:
         run: ./ops/test_vagrant_startup.py
       - name: Test Ops Fullstack
         run: ./ops/test_ops.sh
-      - name: Comment Webpage Screenshot
-        uses: saadmk11/comment-webpage-screenshot@v0.5
+      - name: Generate screenshots
+        id: generate_screenshots
+        run: |
+          ./ops/generate_screenshots.sh
+          echo "::set-output message=$(cat ci_screenshots/message.md)"
+      - uses: phulsechinmay/rewritable-pr-comment@v0.2.1
         with:
-          capture_urls: "http://172.17.0.1:8080, http://172.17.0.1:8080/gameday"
+          message: ${{ steps.generate_screenshots.output.message }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMENT_IDENTIFIER: "screenshots-comment-rewritable-action"
 
   automerge:
     needs: [py3-type, py3-lint, py3-test, node-lint, node-test, bash-lint, build-web, ops-test]
