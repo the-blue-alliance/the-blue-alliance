@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ py3 ]
 
+concurrency:
+  group: codeql-${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
   analyze:
     name: Analyze
