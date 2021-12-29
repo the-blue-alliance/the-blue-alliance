@@ -2,12 +2,12 @@
 
 import base64
 import os
-import requests
-import shutil
 import subprocess
 import sys
 import time
-from typing import List, Tuple
+from typing import List, Optional, Tuple
+
+import requests
 
 
 CAPTURE_URLS = [
@@ -21,7 +21,7 @@ GITHUB_PULL_REQUEST_NUMBER = (
 )
 
 
-def capture_screenshots(urls: List[Tuple[str, str, str]]) -> List[Tuple[str, str]]:
+def capture_screenshots(urls: List[Tuple[str, str]]) -> List[Tuple[str, str, str]]:
     screenshots = []  # (name, filename, base64encode image)
     for name, url in urls:
         print(f"Screenshotting {name}: {url}")
@@ -49,7 +49,7 @@ def capture_screenshots(urls: List[Tuple[str, str, str]]) -> List[Tuple[str, str
 
 def upload_screenshots(
     screenshots: List[Tuple[str, str, str]], GITHUB_TOKEN: str
-) -> List[Tuple[str, str]]:
+) -> List[Tuple[str, Optional[str]]]:
     GITHUB_API_URL = "https://api.github.com"
     GITHUB_REPOSITORY = os.environ.get("GITHUB_REPOSITORY")
     BRANCH_NAME = "ci-screenshots"
@@ -69,13 +69,13 @@ def upload_screenshots(
     if BRANCH_NAME not in str(remote_branches):
         subprocess.run(["git", "checkout", "--orphan", BRANCH_NAME])
         subprocess.run(
-            ["git", "commit", "--allow-emtpy", "-m", "Initial commit on empty branch"]
+            ["git", "commit", "--allow-empty", "-m", "Initial commit on empty branch"]
         )
         subprocess.run(["git", "push", "-u", "origin", BRANCH_NAME])
     else:
         print(f'Branch "{BRANCH_NAME}" Already Exists')
 
-    def upload_single_screenshot(filename: str, image: str) -> str:
+    def upload_single_screenshot(filename: str, image: str) -> Optional[str]:
         url = f"{GITHUB_API_URL}/repos/{GITHUB_REPOSITORY}/contents/{filename}"
         data = {
             "message": f"[CI] Added Screenshots for PR #{GITHUB_PULL_REQUEST_NUMBER}",
@@ -107,7 +107,7 @@ def upload_screenshots(
     return image_urls
 
 
-def generate_message(image_urls: List[Tuple[str, str]]):
+def generate_message(image_urls: List[Tuple[str, Optional[str]]]):
     print("Generating message")
     message = "## Screenshots"
     for name, image_url in image_urls:
