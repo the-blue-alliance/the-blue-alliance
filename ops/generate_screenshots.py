@@ -54,5 +54,5 @@ def generate_message(screenshots: List[Tuple[str, str]]):
 
 if __name__ == "__main__":
     reset_directory()
-    files = capture_screenshots(CAPTURE_URLS)
-    generate_message(files)
+    screenshots = capture_screenshots(CAPTURE_URLS)
+    generate_message(screenshots)

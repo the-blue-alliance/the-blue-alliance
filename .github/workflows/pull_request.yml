@@ -219,7 +219,11 @@ jobs:
         id: generate_screenshots
         run: |
           ./ops/generate_screenshots.py
-          echo "::set-output name=message::$(cat ci_screenshots/message.md)"
+          MESSAGE=$(cat ci_screenshots/message.md)
+          MESSAGE="${MESSAGE//'%'/'%25'}"
+          MESSAGE="${MESSAGE//$'\n'/'%0A'}"
+          MESSAGE="${MESSAGE//$'\r'/'%0D'}"
+          echo "::set-output name=message::$MESSAGE"
       - name: Comment screenshots on PR
         uses: phulsechinmay/rewritable-pr-comment@v0.2.1
         with:
