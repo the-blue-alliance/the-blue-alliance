@@ -175,6 +175,9 @@ jobs:
   ops-test:
     name: Ops Fullstack Test
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Set up Python 3.8
