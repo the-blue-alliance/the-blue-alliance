@@ -94,6 +94,8 @@ if __name__ == "__main__":
             artifact_data = ArtifactData(pickle.load(open(ARTIFACT_FILENAME, "rb")))
             image_urls = upload_screenshots(artifact_data, sys.argv[1])
             generate_message(image_urls)
+            # Set PR number as output
+            subprocess.run(["echo", f"::set-output name=pr::{artifact_data['pr']}"])
         else:
             print(f"{ARTIFACT_FILENAME} not found.")
     else:
