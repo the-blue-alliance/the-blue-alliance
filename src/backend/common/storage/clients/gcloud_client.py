@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 
 from google.cloud import storage
 
@@ -7,8 +7,8 @@ from backend.common.storage.clients.storage_client import StorageClient
 
 class GCloudStorageClient(StorageClient):
     def __init__(self, project: str) -> None:
-        client = storage.Client(project=project)
-        self.bucket = client.get_bucket(f"{project}.appspot.com")
+        self.client = storage.Client(project=project)
+        self.bucket = self.client.get_bucket(f"{project}.appspot.com")
 
     def write(self, file_name: str, content: str) -> None:
         blob = self.bucket.blob(file_name)
@@ -21,3 +21,11 @@ class GCloudStorageClient(StorageClient):
                 return f.read()
 
         return None
+
+    def get_files(self, path: Optional[str] = None) -> List[str]:
+        return [
+            blob.name
+            for blob in self.client.list_blobs(
+                self.bucket, prefix=path, delimiter="/" if path else None
+            )
+        ]

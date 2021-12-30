@@ -1,7 +1,8 @@
-from typing import Optional
+from typing import List, Optional
 
 from backend.common.environment import Environment, EnvironmentMode
 from backend.common.storage.clients.gcloud_client import GCloudStorageClient
+from backend.common.storage.clients.in_memory_client import InMemoryClient
 from backend.common.storage.clients.local_client import LocalStorageClient
 from backend.common.storage.clients.storage_client import StorageClient
 
@@ -10,7 +11,7 @@ def _client_for_env() -> StorageClient:
     storage_path = Environment.storage_path()
 
     if Environment.is_unit_test():
-        return LocalStorageClient(storage_path)
+        return InMemoryClient.get()
 
     storage_mode = Environment.storage_mode()
     if Environment.is_dev() and storage_mode == EnvironmentMode.LOCAL:
@@ -36,3 +37,8 @@ def write(file_name: str, content: str) -> None:
 def read(file_name: str) -> Optional[str]:
     client = _client_for_env()
     return client.read(file_name)
+
+
+def get_files(path: Optional[str] = None) -> List[str]:
+    client = _client_for_env()
+    return client.get_files(path)

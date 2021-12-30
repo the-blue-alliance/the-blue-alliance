@@ -1,54 +1,21 @@
 #!/usr/bin/env python3
 
-import base64
 import os
+import pickle
 import subprocess
 import sys
-import time
 from typing import List, Optional, Tuple
 
 import requests
 
+from artifact_data import ARTIFACT_FILENAME, ArtifactData
 
-CAPTURE_URLS = [
-    ("Homepage", "http://localhost:8080"),
-    ("GameDay", "http://localhost:8080/gameday"),
-]  # (name, url)
+
 MESSAGE_FILENAME = "ci_screenshots_message.md"
-GITHUB_REF = os.environ.get("GITHUB_REF", "")
-GITHUB_PULL_REQUEST_NUMBER = (
-    int(GITHUB_REF.split("/")[2]) if "refs/pull/" in GITHUB_REF else None
-)
-
-
-def capture_screenshots(urls: List[Tuple[str, str]]) -> List[Tuple[str, str, str]]:
-    screenshots = []  # (name, filename, base64encode image)
-    for name, url in urls:
-        print(f"Screenshotting {name}: {url}")
-        try:
-            cmd = [
-                "capture-website",
-                url,
-                "--width",
-                "1920",
-                "--height",
-                "1080",
-            ]
-            image_data = subprocess.check_output(cmd)
-            image = base64.b64encode(image_data).decode("utf-8")
-            filename = (
-                f"pr-{GITHUB_PULL_REQUEST_NUMBER}-{url}-{int(time.time())}.png".replace(
-                    "/", "-"
-                ).replace(" ", "")
-            )
-            screenshots.append((name, filename, image))
-        except subprocess.CalledProcessError as e:
-            print(f"Error: {e}")
-    return screenshots
 
 
 def upload_screenshots(
-    screenshots: List[Tuple[str, str, str]], GITHUB_TOKEN: str
+    artifact_data: ArtifactData, GITHUB_TOKEN: str
 ) -> List[Tuple[str, Optional[str]]]:
     GITHUB_API_URL = "https://api.github.com"
     GITHUB_REPOSITORY = os.environ.get("GITHUB_REPOSITORY")
@@ -79,7 +46,7 @@ def upload_screenshots(
     def upload_single_screenshot(filename: str, image: str) -> Optional[str]:
         url = f"{GITHUB_API_URL}/repos/{GITHUB_REPOSITORY}/contents/{filename}"
         data = {
-            "message": f"[CI] Added Screenshots for PR #{GITHUB_PULL_REQUEST_NUMBER}",
+            "message": f"[CI] Added Screenshots for PR #{artifact_data['pr']}",
             "content": image,
             "branch": BRANCH_NAME,
             "author": {"name": AUTHOR_NAME, "email": AUTHOR_EMAIL},
@@ -103,7 +70,7 @@ def upload_screenshots(
             return None
 
     image_urls = []  # (name, image_url)
-    for name, filename, image in screenshots:
+    for name, filename, image in artifact_data["screenshots"]:
         image_url = upload_single_screenshot(filename, image)
         image_urls.append((name, image_url))
     return image_urls
@@ -123,8 +90,11 @@ def generate_message(image_urls: List[Tuple[str, Optional[str]]]):
 
 if __name__ == "__main__":
     if os.environ.get("CI"):
-        screenshots = capture_screenshots(CAPTURE_URLS)
-        image_urls = upload_screenshots(screenshots, sys.argv[1])
-        generate_message(image_urls)
+        if os.path.exists(ARTIFACT_FILENAME):
+            artifact_data = ArtifactData(pickle.load(open(ARTIFACT_FILENAME, "rb")))
+            image_urls = upload_screenshots(artifact_data, sys.argv[1])
+            generate_message(image_urls)
+        else:
+            print(f"{ARTIFACT_FILENAME} not found.")
     else:
         print("Only runnable in CI.")
