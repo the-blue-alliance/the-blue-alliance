@@ -66,3 +66,29 @@ def test_read(tmp_path):
     assert client.read(file_name) is None
     client.write(file_name, file_content)
     assert client.read(file_name) == file_content
+
+
+def test_get_files(tmp_path):
+    tmp_path = Path(tmp_path)
+    file_name = "some_file.json"
+    file_content = "some_content"
+
+    client = LocalStorageClient(tmp_path)
+    assert client.get_files() == []
+    client.write(file_name, file_content)
+    assert client.get_files() == ["some_file.json"]
+    # Add a directory - make sure we get only files
+    (tmp_path / "some_dir").mkdir()
+    assert client.get_files() == ["some_file.json"]
+
+
+def test_get_files_prefix(tmp_path):
+    tmp_path = Path(tmp_path)
+    file_name = "some_file.json"
+    file_content = "some_content"
+
+    client = LocalStorageClient(tmp_path)
+    assert client.get_files() == []
+    client.write(file_name, file_content)
+    assert client.get_files("foo") == []
+    assert client.get_files("some") == ["some_file.json"]

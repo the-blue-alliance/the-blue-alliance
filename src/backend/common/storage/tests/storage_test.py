@@ -8,6 +8,7 @@ from _pytest.monkeypatch import MonkeyPatch
 
 from backend.common import storage
 from backend.common.storage.clients.gcloud_client import GCloudStorageClient
+from backend.common.storage.clients.in_memory_client import InMemoryClient
 from backend.common.storage.clients.local_client import LocalStorageClient
 
 
@@ -43,14 +44,12 @@ def set_storage_path(monkeypatch: MonkeyPatch) -> None:
 
 def test_client_for_env_unit_test():
     client = storage._client_for_env()
-    assert type(client) is LocalStorageClient
-    assert client.base_path == Path(tempfile.gettempdir())
+    assert type(client) is InMemoryClient
 
 
 def test_client_for_env_unit_test_remote(set_storage_mode_remote):
     client = storage._client_for_env()
-    assert type(client) is LocalStorageClient
-    assert client.base_path == Path(tempfile.gettempdir())
+    assert type(client) is InMemoryClient
 
 
 def test_client_for_env_dev(set_override_tba_test, set_dev):
@@ -128,3 +127,13 @@ def test_read():
         storage.read(file_name)
 
     client.read.assert_called_with(file_name)
+
+
+def test_get_files():
+    path = "abc/"
+
+    client = Mock()
+    with patch.object(storage, "_client_for_env", return_value=client):
+        storage.get_files(path)
+
+    client.get_files.assert_called_with(path)
