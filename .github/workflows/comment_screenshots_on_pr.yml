@@ -37,6 +37,7 @@ jobs:
       - name: Unzip artifact
         run: unzip ci_screenshots.zip
       - name: Upload screenshots and generate message
+        id: upload_screenshots
         run: |
           ./ops/pr_screenshots/generate_screenshots_message.py ${{ secrets.GITHUB_TOKEN }}
           MESSAGE=$(cat ci_screenshots_message.md)
@@ -47,6 +48,6 @@ jobs:
       - name: Comment screenshots message on PR
         uses: phulsechinmay/rewritable-pr-comment@v0.2.1
         with:
-          message: ${{ steps.generate_screenshots.outputs.message }}
+          message: ${{ steps.upload_screenshots.outputs.message }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COMMENT_IDENTIFIER: "screenshots-comment-rewritable-action"
