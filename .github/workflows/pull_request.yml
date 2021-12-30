@@ -227,13 +227,11 @@ jobs:
           path: ci_screenshots.pickle
 
   automerge:
+    name: Automerge Dependabot PRs
     needs: [py3-type, py3-lint, py3-test, node-lint, node-test, bash-lint, build-web, ops-test]
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-      contents: write
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
     steps:
       - uses: fastify/github-action-merge-dependabot@v3.0.2
-        if: ${{ secrets.PROTECTED_BRANCH_PUSH }} != ""
         with:
           github-token: ${{ secrets.PROTECTED_BRANCH_PUSH }}
