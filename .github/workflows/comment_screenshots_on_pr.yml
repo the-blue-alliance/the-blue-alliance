@@ -66,3 +66,4 @@ jobs:
           message: ${{ steps.upload_screenshots.outputs.message }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COMMENT_IDENTIFIER: "screenshots-comment-rewritable-action"
+          ISSUE_ID: ${{ steps.upload_screenshots.outputs.pr }}
