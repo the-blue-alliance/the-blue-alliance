@@ -193,6 +193,11 @@ class EventHelper(object):
 
     @classmethod
     @memoize(timeout=3600)  # 1 hour
+    def events_within_a_day(cls) -> List[Event]:
+        return list(filter(lambda e: e.within_a_day, cls.week_events()))
+
+    @classmethod
+    @memoize(timeout=3600)  # 1 hour
     def week_events(cls) -> List[Event]:
         """
         Get events this week
