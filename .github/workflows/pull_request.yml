@@ -208,31 +208,28 @@ jobs:
         run: |
           npm ci
           npm install -g capture-website-cli
-      - name: Install Vagrant
-        run: sudo apt-get install vagrant
-      - name: Create keys file
-        run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
-      - name: Start Container
-        run: ENV='CI' vagrant up
-      - name: Test Vagrant Startup
-        run: ./ops/test_vagrant_startup.py
-      - name: Test Ops Fullstack
-        run: ./ops/test_ops.sh
-      - name: Generate screenshots
-        id: generate_screenshots
-        run: |
-          ./ops/generate_screenshots.py ${{ secrets.GITHUB_TOKEN }}
-          MESSAGE=$(cat ci_screenshots_message.md)
-          MESSAGE="${MESSAGE//'%'/'%25'}"
-          MESSAGE="${MESSAGE//$'\n'/'%0A'}"
-          MESSAGE="${MESSAGE//$'\r'/'%0D'}"
-          echo "::set-output name=message::$MESSAGE"
-      - name: Comment screenshots on PR
-        uses: phulsechinmay/rewritable-pr-comment@v0.2.1
+      # - name: Install Vagrant
+      #   run: sudo apt-get install vagrant
+      # - name: Create keys file
+      #   run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
+      # - name: Start Container
+      #   run: ENV='CI' vagrant up
+      # - name: Test Vagrant Startup
+      #   run: ./ops/test_vagrant_startup.py
+      # - name: Test Ops Fullstack
+      #   run: ./ops/test_ops.sh
+      - name: Capture screenshots
+        run: ./ops/capture_screenshots.py
+      - uses: actions/upload-artifact@v2
         with:
-          message: ${{ steps.generate_screenshots.outputs.message }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COMMENT_IDENTIFIER: "screenshots-comment-rewritable-action"
+          name: ci_screenshots
+          path: ci_screenshots.pickle
+      # - name: Comment screenshots on PR
+      #   uses: phulsechinmay/rewritable-pr-comment@v0.2.1
+      #   with:
+      #     message: ${{ steps.generate_screenshots.outputs.message }}
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     COMMENT_IDENTIFIER: "screenshots-comment-rewritable-action"
 
   automerge:
     needs: [py3-type, py3-lint, py3-test, node-lint, node-test, bash-lint, build-web, ops-test]
