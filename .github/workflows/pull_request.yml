@@ -208,16 +208,16 @@ jobs:
         run: |
           npm ci
           npm install -g capture-website-cli
-      # - name: Install Vagrant
-      #   run: sudo apt-get install vagrant
-      # - name: Create keys file
-      #   run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
-      # - name: Start Container
-      #   run: ENV='CI' vagrant up
-      # - name: Test Vagrant Startup
-      #   run: ./ops/test_vagrant_startup.py
-      # - name: Test Ops Fullstack
-      #   run: ./ops/test_ops.sh
+      - name: Install Vagrant
+        run: sudo apt-get install vagrant
+      - name: Create keys file
+        run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
+      - name: Start Container
+        run: ENV='CI' vagrant up
+      - name: Test Vagrant Startup
+        run: ./ops/test_vagrant_startup.py
+      - name: Test Ops Fullstack
+        run: ./ops/test_ops.sh
       - name: Capture screenshots
         run: ./ops/pr_screenshots/capture_screenshots.py
       - name: Upload screenshots artifact
