@@ -24,7 +24,7 @@ import {
 } from "./actions";
 import { MAX_SUPPORTED_VIEWS } from "./constants/LayoutConstants";
 
-ReactGA.initialize("UA-1090782-9")
+ReactGA.initialize("UA-1090782-9");
 
 const webcastData = JSON.parse(
   document.getElementById("webcasts_json").innerHTML
