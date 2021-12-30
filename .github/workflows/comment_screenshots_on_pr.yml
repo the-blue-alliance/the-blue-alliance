@@ -1,0 +1,52 @@
+name: Comment screenshots on PR
+
+on:
+  workflow_run:
+    workflows: ["On pull request"]
+    types:
+      - completed
+
+jobs:
+  upload_and_comment:
+    name: "Upload and Comment on PR"
+    runs-on: ubuntu-latest
+    if: >
+      ${{ github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Download artifact
+        uses: actions/github-script@v5.0.0
+        with:
+          script: |
+            var artifacts = await github.actions.listWorkflowRunArtifacts({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               run_id: ${{ github.event.workflow_run.id }},
+            });
+            var matchArtifact = artifacts.data.artifacts.filter((artifact) => {
+              return artifact.name == "ci_screenshots"
+            })[0];
+            var download = await github.actions.downloadArtifact({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               artifact_id: matchArtifact.id,
+               archive_format: 'zip',
+            });
+            var fs = require('fs');
+            fs.writeFileSync('${{ github.workspace }}/ci_screenshots.zip', Buffer.from(download.data));
+      - name: Unzip artifact
+        run: unzip ci_screenshots.zip
+      - name: Upload screenshots and generate message
+        run: |
+          ./ops/pr_screenshots/generate_screenshots_message.py ${{ secrets.GITHUB_TOKEN }}
+          MESSAGE=$(cat ci_screenshots_message.md)
+          MESSAGE="${MESSAGE//'%'/'%25'}"
+          MESSAGE="${MESSAGE//$'\n'/'%0A'}"
+          MESSAGE="${MESSAGE//$'\r'/'%0D'}"
+          echo "::set-output name=message::$MESSAGE"
+      - name: Comment screenshots message on PR
+        uses: phulsechinmay/rewritable-pr-comment@v0.2.1
+        with:
+          message: ${{ steps.generate_screenshots.outputs.message }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMENT_IDENTIFIER: "screenshots-comment-rewritable-action"

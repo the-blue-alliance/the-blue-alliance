@@ -219,17 +219,12 @@ jobs:
       # - name: Test Ops Fullstack
       #   run: ./ops/test_ops.sh
       - name: Capture screenshots
-        run: ./ops/capture_screenshots.py
-      - uses: actions/upload-artifact@v2
+        run: ./ops/pr_screenshots/capture_screenshots.py
+      - name: Upload screenshots artifact
+        uses: actions/upload-artifact@v2
         with:
           name: ci_screenshots
           path: ci_screenshots.pickle
-      # - name: Comment screenshots on PR
-      #   uses: phulsechinmay/rewritable-pr-comment@v0.2.1
-      #   with:
-      #     message: ${{ steps.generate_screenshots.outputs.message }}
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     COMMENT_IDENTIFIER: "screenshots-comment-rewritable-action"
 
   automerge:
     needs: [py3-type, py3-lint, py3-test, node-lint, node-test, bash-lint, build-web, ops-test]

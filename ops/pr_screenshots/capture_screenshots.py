@@ -7,6 +7,8 @@ import subprocess
 import time
 from typing import List, Tuple
 
+from artifact_data import ARTIFACT_FILENAME, ArtifactData
+
 
 CAPTURE_URLS = [
     ("Homepage", "https://www.thebluealliance.com"),
@@ -16,7 +18,6 @@ GITHUB_REF = os.environ.get("GITHUB_REF", "")
 GITHUB_PULL_REQUEST_NUMBER = (
     int(GITHUB_REF.split("/")[2]) if "refs/pull/" in GITHUB_REF else None
 )
-OUTPUT_FILE = "ci_screenshots.pickle"
 
 
 def capture_screenshots(urls: List[Tuple[str, str]]) -> List[Tuple[str, str, str]]:
@@ -48,6 +49,9 @@ def capture_screenshots(urls: List[Tuple[str, str]]) -> List[Tuple[str, str, str
 if __name__ == "__main__":
     if os.environ.get("CI"):
         screenshots = capture_screenshots(CAPTURE_URLS)
-        pickle.dump(screenshots, open(OUTPUT_FILE, "wb"))
+        pickle.dump(
+            ArtifactData(screenshots=screenshots, pr=GITHUB_PULL_REQUEST_NUMBER),
+            open(ARTIFACT_FILENAME, "wb"),
+        )
     else:
         print("Only runnable in CI.")
