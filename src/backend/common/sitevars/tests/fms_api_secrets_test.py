@@ -55,3 +55,8 @@ def test_username_authkey(username, authkey, expected_username, expected_authkey
 def test_auth_token(username, authkey, auth_token):
     FMSApiSecrets.put(ContentType(username=username, authkey=authkey))
     assert FMSApiSecrets.auth_token() == auth_token
+
+
+def test_generate_auth_token():
+    auth_token = FMSApiSecrets.generate_auth_token("zach", "authkey")
+    assert auth_token == "emFjaDphdXRoa2V5"
