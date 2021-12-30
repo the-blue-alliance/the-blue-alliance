@@ -32,6 +32,8 @@ def capture_screenshots(urls: List[Tuple[str, str]]) -> List[Tuple[str, str, str
                 "1920",
                 "--height",
                 "1080",
+                "--scale-factor",
+                "1",
             ]
             image_data = subprocess.check_output(cmd)
             image = base64.b64encode(image_data).decode("utf-8")
