@@ -4,6 +4,7 @@
     "src"
   ],
   "search_path": [
+    "ops/pr_screenshots",
     "stubs",
     {"site-package": "fakeredis"},
     {"site-package": "flask_caching"},

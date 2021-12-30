@@ -1,9 +1,9 @@
-from typing import List, Tuple, TypedDict
+from typing import List, Optional, Tuple, TypedDict
 
 
 ARTIFACT_FILENAME = "ci_screenshots.pickle"
 
 
 class ArtifactData(TypedDict):
-    pr: int
+    pr: Optional[int]
     screenshots: List[Tuple[str, str, str]]  # (name, filename, base64encode image)
