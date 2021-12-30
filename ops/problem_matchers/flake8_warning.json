@@ -1,0 +1,17 @@
+{
+    "problemMatcher": [
+        {
+            "owner": "flake8-warning",
+            "severity": "warning",
+            "pattern": [
+                {
+                    "regexp": "^([^:]+):(\\d+):(\\d+):\\s+([CFNW]\\d+\\s+.+)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "message": 4
+                }
+            ]
+        }
+    ]
+}
