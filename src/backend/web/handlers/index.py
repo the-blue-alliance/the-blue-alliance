@@ -34,7 +34,7 @@ def index() -> Response:
     return make_cached_response(landing_type_handler(template_values), ttl=cache_ttl)
 
 
-def index_kickoff(template_values: Dict[str, Any]) -> str:
+def index_kickoff(template_values: Dict[str, Any]) -> int:
     # special_webcasts = FirebasePusher.get_special_webcasts()
     effective_season_year = SeasonHelper.effective_season_year()
     template_values.update(
@@ -140,7 +140,6 @@ def index_offseason(template_values: Dict[str, Any]) -> str:
         }
     )
     return render_template("index/index_offseason.html", template_values)
-
 
 def index_insights(template_values: Dict[str, Any]) -> str:
     # week_events = EventHelper.week_events()
