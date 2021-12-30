@@ -7,13 +7,14 @@ from backend.common.consts.landing_type import LandingType
 from backend.common.decorators import cached_public
 from backend.common.flask_cache import make_cached_response
 from backend.common.helpers.event_helper import EventHelper
+
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.sitevars.landing_config import LandingConfig
 from backend.web.profiled_render import render_template
 
 
 @cached_public
-def index() -> Response:
+def index() -> int:
     HANDLER_MAP: Dict[
         LandingType, Tuple[Callable[[Dict[str, Any]], str], timedelta]
     ] = {
@@ -71,7 +72,6 @@ def index_buildseason(template_values: Dict[str, Any]) -> str:
     # "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
     # "special_webcasts": special_webcasts,
     return render_template("index/index_buildseason.html", template_values)
-
 
 def index_competitionseason(template_values: Dict[str, Any]) -> str:
     # week_events = EventHelper.week_events()
@@ -161,5 +161,5 @@ def index_insights(template_values: Dict[str, Any]) -> str:
 
 
 @cached_public
-def about() -> str:
+def about() -> int:
     return render_template("about.html")
