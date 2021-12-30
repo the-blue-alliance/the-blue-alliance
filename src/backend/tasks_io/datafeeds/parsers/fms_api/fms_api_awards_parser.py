@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set
 
 from google.appengine.ext import ndb
 
@@ -12,7 +12,7 @@ from backend.tasks_io.datafeeds.parsers.json.parser_json import ParserJSON
 
 class FMSAPIAwardsParser(ParserJSON[List[Award]]):
     def __init__(
-        self, event: Event, valid_team_nums: Optional[List[int]] = None
+        self, event: Event, valid_team_nums: Optional[Set[int]] = None
     ) -> None:
         self.event = event
         self.valid_team_nums = valid_team_nums
@@ -39,6 +39,12 @@ class FMSAPIAwardsParser(ParserJSON[List[Award]]):
 
             if award_type_enum in awards_by_type:
                 if team_number is not None:
+                    if (
+                        team_number
+                        in awards_by_type[award_type_enum]["team_number_list"]
+                    ):
+                        continue
+
                     awards_by_type[award_type_enum]["team_number_list"].append(
                         team_number
                     )

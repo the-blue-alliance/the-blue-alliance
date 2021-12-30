@@ -52,6 +52,39 @@ def test_root():
     mock_get.assert_called_once_with("/")
 
 
+def test_awards_no_event_code_no_team_number():
+    api = FRCAPI("zach")
+    with pytest.raises(
+        FRCAPI.ValidationError,
+        match="awards expects either an event_code, team_number, or both",
+    ):
+        api.awards(2020)
+
+
+def test_awards_event_code():
+    api = FRCAPI("zach")
+    with patch.object(FRCAPI, "_get") as mock_get:
+        api.awards(2020, event_code="MIKET")
+
+    mock_get.assert_called_once_with("/2020/awards/MIKET/0")
+
+
+def test_awards_team_number():
+    api = FRCAPI("zach")
+    with patch.object(FRCAPI, "_get") as mock_get:
+        api.awards(2020, team_number=2337)
+
+    mock_get.assert_called_once_with("/2020/awards/2337")
+
+
+def test_awards_event_code_team_number():
+    api = FRCAPI("zach")
+    with patch.object(FRCAPI, "_get") as mock_get:
+        api.awards(2020, event_code="MIKET", team_number=2337)
+
+    mock_get.assert_called_once_with("/2020/awards/MIKET/2337")
+
+
 @pytest.mark.parametrize(
     "endpoint", ["/2020/awards/MIKET", "2020/awards/MIKET", "///2020/awards/MIKET"]
 )

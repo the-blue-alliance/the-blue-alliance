@@ -47,7 +47,7 @@ def test_parse_awards_valid_team_nums(test_data_importer, ndb_stub) -> None:
         event_type_enum=EventType.CMP_FINALS,
         year=2017,
     )
-    awards = FMSAPIAwardsParser(event, valid_team_nums=[2169]).parse(data)
+    awards = FMSAPIAwardsParser(event, valid_team_nums={2169}).parse(data)
 
     assert awards is not None
     assert len(awards) == 1
@@ -124,3 +124,29 @@ def test_parse_awards_none(test_data_importer, ndb_stub) -> None:
     awards = FMSAPIAwardsParser(event).parse(data)
 
     assert awards is None
+
+
+def test_parse_awards_duplicate_teams(test_data_importer, ndb_stub) -> None:
+    path = test_data_importer._get_path(__file__, "data/2021fimaw_awards.json")
+    with open(path, "r") as f:
+        data = json.load(f)
+
+    event = Event(
+        event_short="fimwa",
+        event_type_enum=EventType.REMOTE,
+        year=2021,
+    )
+    awards = FMSAPIAwardsParser(event).parse(data)
+
+    # Expected outcome is Chairman's Awards should be de-duped but only a single
+    # team should exist in the recipient_json
+
+    assert awards is not None
+    assert len(awards) == 2
+
+    award = awards[0]
+    assert award is not None
+
+    assert award.name_str == "Regional Chairman's Award"
+    assert award.award_type_enum == 0
+    assert award.recipient_list == [{"awardee": None, "team_number": 503}]

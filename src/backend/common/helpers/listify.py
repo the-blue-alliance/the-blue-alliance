@@ -14,7 +14,9 @@ def listify(thing: TThing) -> List[TThing]:
 
 
 def listify(thing: Union[TThing, List[TThing]]) -> List[TThing]:
-    if not isinstance(thing, list):
+    if thing is None:
+        return []
+    elif not isinstance(thing, list):
         return [thing]
     else:
         return thing

@@ -1,13 +1,19 @@
 import datetime
 import logging
-from typing import Optional
+from typing import List, Optional
 
 import requests
 
+from backend.common.consts.event_type import EventType
 from backend.common.environment import Environment
 from backend.common.frc_api import FRCAPI
+from backend.common.models.award import Award
 from backend.common.models.event import Event
+from backend.common.models.event_team import EventTeam
 from backend.common.sitevars.apistatus_fmsapi_down import ApiStatusFMSApiDown
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_awards_parser import (
+    FMSAPIAwardsParser,
+)
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_root_parser import (
     FMSAPIRootParser,
     RootInfo,
@@ -73,6 +79,41 @@ class DatafeedFMSAPI:
     def get_root_info(self) -> Optional[RootInfo]:
         root_response = self.api.root()
         return self._parse(root_response, FMSAPIRootParser())
+
+    def get_awards(self, event: Event) -> List[Award]:
+        awards = []
+
+        # 8 subdivisions from 2015+ have awards listed under 4 divisions
+        if event.event_type_enum == EventType.CMP_DIVISION and event.year >= 2015:
+            event_team_keys = EventTeam.query(EventTeam.event == event.key).fetch(
+                keys_only=True
+            )
+            valid_team_nums = {
+                int(etk.id().split("_")[1][3:]) for etk in event_team_keys
+            }
+
+            if event.year >= 2017:
+                division = self.SUBDIV_TO_DIV_2017[event.event_short]
+            else:
+                division = self.SUBDIV_TO_DIV[event.event_short]
+
+            api_awards_response = self.api.awards(
+                event.year, event_code=DatafeedFMSAPI._get_event_short(division)
+            )
+            awards += (
+                self._parse(
+                    api_awards_response, FMSAPIAwardsParser(event, valid_team_nums)
+                )
+                or []
+            )
+
+        api_awards_response = self.api.awards(
+            event.year,
+            event_code=DatafeedFMSAPI._get_event_short(event.event_short, event),
+        )
+        awards += self._parse(api_awards_response, FMSAPIAwardsParser(event)) or []
+
+        return awards
 
     @classmethod
     def _get_event_short(self, event_short: str, event: Optional[Event] = None) -> str:

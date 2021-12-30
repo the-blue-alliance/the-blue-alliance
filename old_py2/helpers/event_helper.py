@@ -96,16 +96,6 @@ class EventHelper(object):
         return events
 
     @classmethod
-    def getEventsWithinADay(self):
-        event_keys = memcache.get('EventHelper.getEventsWithinADay():event_keys')
-        if event_keys is not None:
-            return ndb.get_multi(event_keys)
-
-        events = filter(lambda e: e.within_a_day, self.week_events())
-        memcache.set('EventHelper.getEventsWithinADay():event_keys', [e.key for e in events], 60*60)
-        return events
-
-    @classmethod
     def getShortName(self, name_str, district_code=None):
         """
         Extracts a short name like "Silicon Valley" from an event name like
