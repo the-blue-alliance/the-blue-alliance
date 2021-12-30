@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 from backend.common.storage.clients.storage_client import StorageClient
 
@@ -22,3 +22,11 @@ class LocalStorageClient(StorageClient):
                 return f.read()
 
         return None
+
+    def get_files(self, path: Optional[str] = None) -> List[str]:
+        return [
+            p.name
+            for p in self.base_path.iterdir()
+            if p.is_file()
+            if path is None or p.name.startswith(path)
+        ]

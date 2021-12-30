@@ -1,5 +1,5 @@
 import abc
-from typing import Optional
+from typing import List, Optional
 
 
 class StorageClient(abc.ABC):
@@ -9,4 +9,8 @@ class StorageClient(abc.ABC):
 
     @abc.abstractmethod
     def read(self, file_name: str) -> Optional[str]:
+        ...
+
+    @abc.abstractmethod
+    def get_files(self, path: Optional[str]) -> List[str]:
         ...

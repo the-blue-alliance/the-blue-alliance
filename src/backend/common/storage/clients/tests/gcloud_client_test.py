@@ -1,13 +1,15 @@
 from unittest.mock import Mock, patch
 
 from google.cloud import storage
+from google.cloud.storage.blob import Blob
+from google.cloud.storage.bucket import Bucket
 
 from backend.common.storage.clients.gcloud_client import GCloudStorageClient
 
 
 def test_init():
     project = "tba-unit-tests"
-    mock_bucket = Mock()
+    mock_bucket = Mock(spec=Bucket)
 
     with patch.object(
         storage.Client, "__init__", return_value=None
@@ -23,7 +25,8 @@ def test_init():
 
 def test_write():
     mock_blob = Mock()
-    mock_bucket = Mock()
+
+    mock_bucket = Mock(spec=Bucket)
     mock_bucket.configure_mock(**{"blob.return_value": mock_blob})
 
     file_name = "some_file.json"
@@ -42,7 +45,7 @@ def test_write():
 def test_read_none():
     file_name = "some_file.json"
 
-    mock_bucket = Mock()
+    mock_bucket = Mock(spec=Bucket)
     mock_bucket.configure_mock(**{"get_blob.return_value": None})
 
     with patch.object(storage.Client, "__init__", return_value=None), patch.object(
@@ -68,7 +71,7 @@ def test_read():
     mock_blob = Mock()
     mock_blob.configure_mock(**{"open.return_value": mock_context})
 
-    mock_bucket = Mock()
+    mock_bucket = Mock(spec=Bucket)
     mock_bucket.configure_mock(**{"get_blob.return_value": mock_blob})
 
     with patch.object(storage.Client, "__init__", return_value=None), patch.object(
@@ -79,3 +82,25 @@ def test_read():
     assert client.read("some_file.json") == mock_content
     mock_bucket.get_blob.assert_called_with(file_name)
     mock_blob.open.assert_called_with("r")
+
+
+def test_get_files():
+    file_name = "some_file.json"
+
+    mock_blob = Mock(spec=Blob)
+    mock_blob.name = file_name
+
+    mock_bucket = Mock(spec=Bucket)
+
+    with patch.object(storage.Client, "__init__", return_value=None), patch.object(
+        storage.Client, "get_bucket", return_value=mock_bucket
+    ):
+        client = GCloudStorageClient("tba-unit-tests")
+
+    with patch.object(
+        client.client, "list_blobs", return_value=[mock_blob]
+    ) as mock_list_blobs:
+        files = client.get_files()
+
+    assert files == [file_name]
+    assert mock_list_blobs.called_once_with(mock_bucket)
