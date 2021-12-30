@@ -11,8 +11,8 @@ from artifact_data import ARTIFACT_FILENAME, ArtifactData
 
 
 CAPTURE_URLS = [
-    ("Homepage", "https://www.thebluealliance.com"),
-    ("GameDay", "https://www.thebluealliance.com/gameday"),
+    ("Homepage", "http://localhost:8080"),
+    ("GameDay", "http://localhost:8080/gameday"),
 ]  # (name, url)
 GITHUB_REF = os.environ.get("GITHUB_REF", "")
 GITHUB_PULL_REQUEST_NUMBER = (
