@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 from flask import g
-from google.cloud import ndb
+from google.appengine.ext.ndb import ndb
 from werkzeug.test import Client
 
 from backend.common import auth
@@ -169,10 +169,6 @@ def test_team_key_invalid(ndb_stub, api_client: Client) -> None:
         auth_types_enum=[AuthType.READ_API],
     ).put()
     Team(id="frc254", team_number=254).put()
-
-
-def test_team_key_invalid(ndb_stub, api_client: Client) -> None:
-    Team(id="frc254", team_number=254).put()
     resp = api_client.get(
         "/api/v3/team/254", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
@@ -215,15 +211,6 @@ def test_event_key_invalid(ndb_stub, api_client: Client) -> None:
         id="test_auth_key",
         auth_types_enum=[AuthType.READ_API],
     ).put()
-    Event(
-        id="2019casj",
-        year=2019,
-        event_short="casj",
-        event_type_enum=EventType.REGIONAL,
-    ).put()
-
-
-def test_event_key_invalid(ndb_stub, api_client: Client) -> None:
     Event(
         id="2019casj",
         year=2019,
