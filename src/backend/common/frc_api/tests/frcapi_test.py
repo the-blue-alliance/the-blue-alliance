@@ -52,6 +52,34 @@ def test_root():
     mock_get.assert_called_once_with("/")
 
 
+def test_event_list():
+    api = FRCAPI("zach")
+    with patch.object(FRCAPI, "_get") as mock_get:
+        api.event_list(2020)
+    mock_get.assert_called_once_with("/2020/events")
+
+
+def test_event_info():
+    api = FRCAPI("zach")
+    with patch.object(FRCAPI, "_get") as mock_get:
+        api.event_info(2020, "MIKET")
+    mock_get.assert_called_once_with("/2020/events?eventCode=MIKET")
+
+
+def test_event_teams():
+    api = FRCAPI("zach")
+    with patch.object(FRCAPI, "_get") as mock_get:
+        api.event_teams(2020, "MIKET", 1)
+    mock_get.assert_called_once_with("/2020/teams?eventCode=MIKET&page=1")
+
+
+def test_event_team_avatars():
+    api = FRCAPI("zach")
+    with patch.object(FRCAPI, "_get") as mock_get:
+        api.event_team_avatars(2020, "MIKET", 1)
+    mock_get.assert_called_once_with("/2020/avatars?eventCode=MIKET&page=1")
+
+
 def test_awards_no_event_code_no_team_number():
     api = FRCAPI("zach")
     with pytest.raises(
@@ -83,6 +111,13 @@ def test_awards_event_code_team_number():
         api.awards(2020, event_code="MIKET", team_number=2337)
 
     mock_get.assert_called_once_with("/2020/awards/MIKET/2337")
+
+
+def test_district_list():
+    api = FRCAPI("zach")
+    with patch.object(FRCAPI, "_get") as mock_get:
+        api.district_list(2020)
+    mock_get.assert_called_once_with("/2020/districts")
 
 
 @pytest.mark.parametrize(

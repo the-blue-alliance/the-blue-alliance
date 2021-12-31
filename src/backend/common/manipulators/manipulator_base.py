@@ -202,6 +202,42 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
         return cls.updateMerge(new_model, old_model, auto_union)
 
     @classmethod
+    def mergeModels(
+        self,
+        new_models: List[TModel],
+        old_models: List[TModel],
+        auto_union: bool = True,
+    ) -> List[TModel]:
+        """
+        Returns a list of models containing the union of new_models and old_models.
+        If a model with the same key is in both input lists, the new_model is merged with the old_model.
+        """
+        old_models_by_key = {}
+        untouched_old_keys = set()
+        for model in old_models:
+            model_key = model.key.id()
+            old_models_by_key[model_key] = model
+            untouched_old_keys.add(model_key)
+
+        merged_models: List[TModel] = []
+        for model in new_models:
+            model_key = model.key.id()
+            if model_key in old_models_by_key:
+                merged_models.append(
+                    self.updateMergeBase(
+                        model, old_models_by_key[model_key], auto_union=auto_union
+                    )
+                )
+                untouched_old_keys.remove(model_key)
+            else:
+                merged_models.append(model)
+
+        for untouched_key in untouched_old_keys:
+            merged_models.append(old_models_by_key[untouched_key])
+
+        return merged_models
+
+    @classmethod
     def _computeAndSaveAffectedReferences(
         cls, old_model: TModel, new_model: Optional[TModel] = None
     ) -> None:

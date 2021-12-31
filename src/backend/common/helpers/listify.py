@@ -24,7 +24,7 @@ def listify(thing: Union[TThing, List[TThing]]) -> List[TThing]:
 
 def delistify(things: List[TThing]) -> Union[None, TThing, List[TThing]]:
     if len(things) == 0:
-        return None
+        return []
     if len(things) == 1:
         return things.pop()
     else:

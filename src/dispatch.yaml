@@ -5,5 +5,8 @@ dispatch:
   - url: "*/tasks/*"
     service: py3-tasks-io
 
+  - url: "*/backend-tasks/*"
+    service: py3-tasks-io
+
   - url: "*/*"
     service: py3-web

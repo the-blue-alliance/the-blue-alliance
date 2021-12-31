@@ -54,6 +54,34 @@ def test_parse_regional_event(test_data_importer):
     assert event.district_key is None
 
 
+def test_parse_regional_event_code_override(test_data_importer):
+    path = test_data_importer._get_path(__file__, "data/2015_event_list.json")
+    with open(path, "r") as f:
+        data = json.load(f)
+
+    events, _ = FMSAPIEventListParser(2015, short="nyc").parse(data)
+    event = events[0]
+
+    assert event.key_name == "2015nyc"
+    assert event.name == "New York City Regional"
+    assert event.short_name == "New York City"
+    assert event.event_short == "nyc"
+    assert event.official is True
+    assert event.start_date == datetime.datetime(
+        year=2015, month=3, day=12, hour=0, minute=0, second=0
+    )
+    assert event.end_date == datetime.datetime(
+        year=2015, month=3, day=15, hour=23, minute=59, second=59
+    )
+    assert event.venue == "Jacob K. Javits Convention Center"
+    assert event.city == "New York"
+    assert event.state_prov == "NY"
+    assert event.country == "USA"
+    assert event.year == 2015
+    assert event.event_type_enum == EventType.REGIONAL
+    assert event.district_key is None
+
+
 def test_parse_district_event(test_data_importer):
     path = test_data_importer._get_path(__file__, "data/2015_event_list.json")
     with open(path, "r") as f:
