@@ -71,56 +71,56 @@ api_v3.add_url_rule("/status", view_func=status)
 # Event
 api_v3.add_url_rule("/event/<string:event_key>", view_func=event)
 api_v3.add_url_rule(
-    "event/<string:event_key>/<simple_model_type:model_type>", view_func=event
+    "/event/<string:event_key>/<simple_model_type:model_type>", view_func=event
 )
 api_v3.add_url_rule(
-    "event/<string:event_key>/<event_detail_type:detail_type>",
+    "/event/<string:event_key>/<event_detail_type:detail_type>",
     view_func=event_detail,
 )
 api_v3.add_url_rule("event/<string:event_key>/teams", view_func=event_teams)
 api_v3.add_url_rule(
-    "event/<string:event_key>/teams/<model_type:model_type>",
+    "/event/<string:event_key>/teams/<model_type:model_type>",
     view_func=event_teams,
 )
 # api_v3.add_url_rule(
-#     "event/<string:event_key>/teams/statuses", view_func=event_teams_statuses
+#     "/event/<string:event_key>/teams/statuses", view_func=event_teams_statuses
 # )
 api_v3.add_url_rule("event/<string:event_key>/matches", view_func=event_matches)
 api_v3.add_url_rule(
-    "event/<string:event_key>/matches/<model_type:model_type>",
+    "/event/<string:event_key>/matches/<model_type:model_type>",
     view_func=event_matches,
 )
 # api_v3.add_url_rule(
-#     "event/<string:event_key>/playoff_advancement",
+#     "/event/<string:event_key>/playoff_advancement",
 #     view_func=event_playoff_advancement,
 # )
 api_v3.add_url_rule("event/<string:event_key>/awards", view_func=event_awards)
 
 # Event List
-api_v3.add_url_rule("events/all", view_func=event_list_all)
-api_v3.add_url_rule("events/all/<model_type:model_type>", view_func=event_list_all)
-api_v3.add_url_rule("events/<int:year>", view_func=event_list_year)
+api_v3.add_url_rule("/events/all", view_func=event_list_all)
+api_v3.add_url_rule("/events/all/<model_type:model_type>", view_func=event_list_all)
+api_v3.add_url_rule("/events/<int:year>", view_func=event_list_year)
 api_v3.add_url_rule(
-    "events/<int:year>/<model_type:model_type>", view_func=event_list_year
+    "/events/<int:year>/<model_type:model_type>", view_func=event_list_year
 )
 # Match
-api_v3.add_url_rule("match/<string:match_key>", view_func=match)
+api_v3.add_url_rule("/match/<string:match_key>", view_func=match)
 api_v3.add_url_rule(
-    "match/<string:match_key>/<simple_model_type:model_type>", view_func=match
+    "/match/<string:match_key>/<simple_model_type:model_type>", view_func=match
 )
 # Team
 api_v3.add_url_rule("/team/<string:team_key>", view_func=team)
 api_v3.add_url_rule(
-    "team/<string:team_key>/<simple_model_type:model_type>", view_func=team
+    "/team/<string:team_key>/<simple_model_type:model_type>", view_func=team
 )
 # Team List
-api_v3.add_url_rule("teams/all", view_func=team_list_all)
-api_v3.add_url_rule("teams/all/<model_type:model_type>", view_func=team_list_all)
-api_v3.add_url_rule("teams/<int:page_num>", view_func=team_list)
-api_v3.add_url_rule("teams/<int:page_num>/<model_type:model_type>", view_func=team_list)
-api_v3.add_url_rule("teams/<int:year>/<int:page_num>", view_func=team_list_year)
+api_v3.add_url_rule("/teams/all", view_func=team_list_all)
+api_v3.add_url_rule("/teams/all/<model_type:model_type>", view_func=team_list_all)
+api_v3.add_url_rule("/teams/<int:page_num>", view_func=team_list)
+api_v3.add_url_rule("/teams/<int:page_num>/<model_type:model_type>", view_func=team_list)
+api_v3.add_url_rule("/teams/<int:year>/<int:page_num>", view_func=team_list_year)
 api_v3.add_url_rule(
-    "teams/<int:year>/<int:page_num>/<model_type:model_type>",
+    "/teams/<int:year>/<int:page_num>/<model_type:model_type>",
     view_func=team_list_year,
 )
 
