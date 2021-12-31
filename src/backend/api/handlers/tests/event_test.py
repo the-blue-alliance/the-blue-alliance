@@ -1,9 +1,12 @@
+import json
+
 from google.appengine.ext import ndb
 from werkzeug.test import Client
 
 from backend.api.handlers.helpers.add_alliance_status import add_alliance_status
 from backend.api.handlers.helpers.model_properties import (
     simple_event_properties,
+    simple_match_properties,
     simple_team_properties,
 )
 from backend.common.consts.auth_type import AuthType
@@ -17,6 +20,7 @@ from backend.common.models.event_district_points import (
     TeamAtEventDistrictPoints,
 )
 from backend.common.models.event_team import EventTeam
+from backend.common.models.match import Match
 from backend.common.models.team import Team
 
 
@@ -26,6 +30,14 @@ def validate_nominal_event_keys(event):
 
 def validate_simple_event_keys(event):
     assert set(event.keys()).difference(set(simple_event_properties)) == set()
+
+
+def validate_nominal_match_keys(match):
+    assert set(match.keys()).difference(set(simple_match_properties)) != set()
+
+
+def validate_simple_match_keys(match):
+    assert set(match.keys()).difference(set(simple_match_properties)) == set()
 
 
 def validate_nominal_team_keys(team):
@@ -314,3 +326,78 @@ def test_event_teams(ndb_stub, api_client: Client) -> None:
     assert len(resp.json) == 2
     assert "frc254" in keys
     assert "frc604" in keys
+
+
+def test_event_matches(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2019casj",
+        year=2019,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    Match(
+        id="2019casj_qm1",
+        comp_level="qm",
+        match_number=1,
+        year=2019,
+        set_number=1,
+        event=ndb.Key("Event", "2019casj"),
+        alliances_json=json.dumps(
+            {
+                "red": {"score": 0, "teams": []},
+                "blue": {"score": 0, "teams": []},
+            }
+        ),
+    ).put()
+    Match(
+        id="2019casj_qm2",
+        comp_level="qm",
+        match_number=2,
+        year=2019,
+        set_number=1,
+        event=ndb.Key("Event", "2019casj"),
+        alliances_json=json.dumps(
+            {
+                "red": {"score": 0, "teams": []},
+                "blue": {"score": 0, "teams": []},
+            }
+        ),
+    ).put()
+
+    # Nominal response
+    resp = api_client.get(
+        "/api/v3/event/2019casj/matches", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    for match in resp.json:
+        validate_nominal_match_keys(match)
+    keys = set([match["key"] for match in resp.json])
+    assert "2019casj_qm1" in keys
+    assert "2019casj_qm2" in keys
+
+    # Simple response
+    resp = api_client.get(
+        "/api/v3/event/2019casj/matches/simple",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    for match in resp.json:
+        validate_simple_match_keys(match)
+    keys = set([match["key"] for match in resp.json])
+    assert "2019casj_qm1" in keys
+    assert "2019casj_qm2" in keys
+
+    # Keys response
+    resp = api_client.get(
+        "/api/v3/event/2019casj/matches/keys",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert len(resp.json) == 2
+    assert "2019casj_qm1" in keys
+    assert "2019casj_qm2" in keys
