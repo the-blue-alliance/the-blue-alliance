@@ -2,6 +2,7 @@ from typing import Optional
 
 import requests
 
+from backend.common.models.keys import Year
 from backend.common.sitevars.fms_api_secrets import FMSApiSecrets
 
 
@@ -30,6 +31,24 @@ class FRCAPI:
     def root(self) -> requests.Response:
         return self._get("/")
 
+    def event_list(self, year: Year) -> requests.Response:
+        endpoint = f"/{year}/events"
+        return self._get(endpoint)
+
+    def event_info(self, year: Year, event_short: str) -> requests.Response:
+        endpoint = f"/{year}/events?eventCode={event_short}"
+        return self._get(endpoint)
+
+    def event_teams(self, year: Year, event_short: str, page: int) -> requests.Response:
+        endpoint = f"/{year}/teams?eventCode={event_short}&page={page}"
+        return self._get(endpoint)
+
+    def event_team_avatars(
+        self, year: Year, event_short: str, page: int
+    ) -> requests.Response:
+        endpoint = f"/{year}/avatars?eventCode={event_short}&page={page}"
+        return self._get(endpoint)
+
     def awards(
         self,
         year: int,
@@ -52,6 +71,10 @@ class FRCAPI:
         else:
             endpoint = f"/{year}/awards/{event_code or team_number}"
 
+        return self._get(endpoint)
+
+    def district_list(self, year: Year) -> requests.Response:
+        endpoint = f"/{year}/districts"
         return self._get(endpoint)
 
     """ Attempt to fetch the endpoint from the FRC API

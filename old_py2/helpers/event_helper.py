@@ -96,64 +96,6 @@ class EventHelper(object):
         return events
 
     @classmethod
-    def getShortName(self, name_str, district_code=None):
-        """
-        Extracts a short name like "Silicon Valley" from an event name like
-        "Silicon Valley Regional sponsored by Google.org".
-
-        See https://github.com/the-blue-alliance/the-blue-alliance-android/blob/master/android/src/test/java/com/thebluealliance/androidclient/test/helpers/EventHelperTest.java
-        """
-        district_keys = memcache.get('EventHelper.getShortName():district_keys')
-        if not district_keys:
-            codes = set([d.id()[4:].upper() for d in District.query().fetch(keys_only=True)])
-            if district_code:
-                codes.add(district_code.upper())
-            if 'MAR' in codes:  # MAR renamed to FMA in 2019
-                codes.add('FMA')
-            if 'TX' in codes:  # TX and FIT used interchangeably
-                codes.add('FIT')
-            if 'IN' in codes:  # IN and FIN used interchangeably
-                codes.add('FIN')
-            district_keys = '|'.join(codes)
-        memcache.set('EventHelper.getShortName():district_keys', district_keys, 60*60)
-
-        # Account for 2020 suspensions
-        if name_str.startswith("***SUSPENDED***"):
-            name_str = name_str.replace("***SUSPENDED***", "")
-
-        # 2015+ districts
-        # Numbered events with no name
-        re_string = '({}) District Event (#\d+)'.format(district_keys)
-        match = re.match(re_string, name_str)
-        if match:
-            return '{} {}'.format(match.group(1).strip(), match.group(2).strip())
-        # The rest
-        re_string = '(?:{}) District -?(.+)'.format(district_keys)
-        match = re.match(re_string, name_str)
-        if match:
-            partial = match.group(1).strip()
-            match2 = re.sub(r'(?<=[\w\s])Event\s*(?:[\w\s]*$)?', '', partial)
-            return match2.strip()
-
-        # 2014- districts
-        # district championships, other districts, and regionals
-        name_str = re.sub(r'\s?Event','', name_str)
-        match = re.match(r'\s*(?:MAR |PNW |)(?:FIRST Robotics|FRC|)(.+)(?:District|Regional|Region|Provincial|State|Tournament|FRC|Field)(?:\b)(?:[\w\s]+?(#\d*)*)?', name_str)
-
-        if match:
-            short = ''.join(match.groups(''))
-            match = re.match(r'(.+)(?:FIRST Robotics|FRC)', short)
-            if match:
-                result = match.group(1).strip()
-            else:
-                result = short.strip()
-            if result.startswith('FIRST'):
-                result = result[5:]
-            return result.strip()
-
-        return name_str.strip()
-
-    @classmethod
     def parseDistrictName(cls, district_name_str):
         district = DistrictType.names.get(district_name_str, DistrictType.NO_DISTRICT)
 

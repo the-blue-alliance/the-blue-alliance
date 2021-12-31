@@ -7,16 +7,10 @@ from controllers.admin.admin_cron_controller import AdminPostEventTasksDo, Admin
     AdminRebuildDivisionsDo, AdminRebuildDivisionsEnqueue
 from controllers.backup_controller import DatastoreBackupFull, BigQueryImportEnqueue, \
     BigQueryImportEntity, MainBackupsEnqueue, DatastoreBackupArchive, DatastoreBackupArchiveFile
-from controllers.datafeed_controller import EventListEnqueue, EventDetailsEnqueue
-from controllers.datafeed_controller import EventListGet, EventDetailsGet, TeamDetailsGet, TeamAvatarGet, DistrictListGet, DistrictRankingsGet, TeamBlacklistWebsiteDo, EventListCurrentEnqueue
+from controllers.datafeed_controller import TeamDetailsGet, TeamAvatarGet, DistrictListGet, DistrictRankingsGet, TeamBlacklistWebsiteDo
 
 
-app = webapp2.WSGIApplication([('/backend-tasks/enqueue/event_list/([0-9]*)', EventListEnqueue),
-                               ('/backend-tasks/enqueue/event_list/current', EventListCurrentEnqueue),
-                               ('/backend-tasks/enqueue/event_details/(.*)', EventDetailsEnqueue),
-                               ('/backend-tasks/get/event_list/([0-9]*)', EventListGet),
-                               ('/backend-tasks/get/district_list/([0-9]*)', DistrictListGet),
-                               ('/backend-tasks/get/event_details/(.*)', EventDetailsGet),
+app = webapp2.WSGIApplication([('/backend-tasks/get/district_list/([0-9]*)', DistrictListGet),
                                ('/backend-tasks/get/team_details/(.*)', TeamDetailsGet),
                                ('/backend-tasks/get/team_avatar/(.*)', TeamAvatarGet),
                                ('/backend-tasks/do/team_blacklist_website/(.*)', TeamBlacklistWebsiteDo),
