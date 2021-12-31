@@ -22,6 +22,5 @@ banned-modules =
 [flake8:local-plugins]
 extension =
   E = service_import_checker:ServiceImportChecker
-  E = api_authenticated_decorator_checker:APIAuthenticatedDecoratorCheker
 paths =
   ./flake8_plugins
