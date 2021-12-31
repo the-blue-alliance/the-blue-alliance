@@ -14,8 +14,8 @@ from backend.common.models.keys import MatchKey
 from backend.common.queries.match_query import MatchQuery
 
 
-@validate_match_key
 @api_authenticated
+@validate_match_key
 @cached_public
 def match(match_key: MatchKey, model_type: Optional[ModelType] = None) -> Response:
     """

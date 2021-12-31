@@ -164,6 +164,11 @@ def test_team_key_valid(ndb_stub, api_client: Client) -> None:
 
 
 def test_team_key_invalid(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
     resp = api_client.get(
         "/api/v3/team/254", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
@@ -202,6 +207,16 @@ def test_event_key_valid(ndb_stub, api_client: Client) -> None:
 
 
 def test_event_key_invalid(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2019casj",
+        year=2019,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
     resp = api_client.get(
         "/api/v3/event/casj", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
@@ -253,6 +268,24 @@ def test_match_key_valid(ndb_stub, api_client: Client) -> None:
 
 
 def test_match_key_invalid(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Match(
+        id="2020casj_qm1",
+        year=2020,
+        event=ndb.Key("Event", "2020casj"),
+        comp_level="qm",
+        match_number=1,
+        set_number=1,
+        alliances_json=json.dumps(
+            {
+                "red": {"score": 0, "teams": []},
+                "blue": {"score": 0, "teams": []},
+            }
+        ),
+    ).put()
     resp = api_client.get(
         "/api/v3/match/2020casj_qm", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )

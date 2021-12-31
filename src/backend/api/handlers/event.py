@@ -25,8 +25,8 @@ from backend.common.queries.match_query import EventMatchesQuery
 from backend.common.queries.team_query import EventTeamsQuery
 
 
-@validate_event_key
 @api_authenticated
+@validate_event_key
 @cached_public
 def event(event_key: EventKey, model_type: Optional[ModelType] = None) -> Response:
     """
@@ -79,8 +79,8 @@ def event_list_year(year: int, model_type: Optional[ModelType] = None) -> Respon
     return jsonify(events)
 
 
-@validate_event_key
 @api_authenticated
+@validate_event_key
 @cached_public
 def event_detail(event_key: EventKey, detail_type: str) -> Response:
     """
@@ -98,8 +98,8 @@ def event_detail(event_key: EventKey, detail_type: str) -> Response:
     return jsonify(detail)
 
 
-@validate_event_key
 @api_authenticated
+@validate_event_key
 @cached_public
 def event_teams(
     event_key: EventKey, model_type: Optional[ModelType] = None
@@ -115,8 +115,8 @@ def event_teams(
     return jsonify(teams)
 
 
-@validate_event_key
 @api_authenticated
+@validate_event_key
 @cached_public
 def event_matches(
     event_key: EventKey, model_type: Optional[ModelType] = None
@@ -132,8 +132,8 @@ def event_matches(
     return jsonify(matches)
 
 
-@validate_event_key
 @api_authenticated
+@validate_event_key
 @cached_public
 def event_awards(event_key: EventKey) -> Response:
     """
