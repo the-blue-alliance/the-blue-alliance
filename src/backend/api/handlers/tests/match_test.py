@@ -17,26 +17,25 @@ def validate_simple_keys(team):
     assert set(team.keys()).difference(set(simple_match_properties)) == set()
 
 
-def test_match(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        ApiAuthAccess(
-            id="test_auth_key",
-            auth_types_enum=[AuthType.READ_API],
-        ).put()
-        Match(
-            id="2020casj_qm1",
-            year=2020,
-            event=ndb.Key("Event", "2020casj"),
-            comp_level="qm",
-            match_number=1,
-            set_number=1,
-            alliances_json=json.dumps(
-                {
-                    "red": {"score": 0, "teams": []},
-                    "blue": {"score": 0, "teams": []},
-                }
-            ),
-        ).put()
+def test_match(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Match(
+        id="2020casj_qm1",
+        year=2020,
+        event=ndb.Key("Event", "2020casj"),
+        comp_level="qm",
+        match_number=1,
+        set_number=1,
+        alliances_json=json.dumps(
+            {
+                "red": {"score": 0, "teams": []},
+                "blue": {"score": 0, "teams": []},
+            }
+        ),
+    ).put()
 
     # Nominal response
     resp = api_client.get(
