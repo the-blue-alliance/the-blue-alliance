@@ -137,6 +137,10 @@ def match_short(match_key):
     return match_id.replace("m", "-").upper()
 
 
+def sort_by(values, prop):
+    return sorted(values, key=lambda item: getattr(item, prop))
+
+
 _filters = {
     "strftime": strftime,
     "floatformat": floatformat,
@@ -148,6 +152,7 @@ _filters = {
     "yt_start": yt_start,
     "defense_name": defense_name,
     "match_short": match_short,
+    "sort_by": sort_by,
 }
 
 

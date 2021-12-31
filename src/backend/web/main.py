@@ -8,6 +8,7 @@ from backend.common.logging import configure_logging
 from backend.common.middleware import install_middleware
 from backend.common.url_converters import install_url_converters
 from backend.web.handlers.account import blueprint as account_blueprint
+from backend.web.handlers.admin.blueprint import admin_routes as admin_blueprint
 from backend.web.handlers.apidocs import apidocs_trusted_v1, apidocs_v3
 from backend.web.handlers.district import district_detail
 from backend.web.handlers.error import handle_404, handle_500
@@ -72,6 +73,7 @@ app.add_url_rule("/team/<int:team_number>/history", view_func=team_history)
 app.add_url_rule("/teams/<int:page>", view_func=team_list)
 app.add_url_rule("/teams", view_func=team_list, defaults={"page": 1})
 
+app.register_blueprint(admin_blueprint)
 app.register_blueprint(account_blueprint)
 app.register_blueprint(suggestion_blueprint)
 app.register_blueprint(suggestion_review_blueprint)

@@ -36,5 +36,8 @@ handlers:
     static_dir: backend/web/static/well-known
     mime_type: application/json
 
+  - url: /admin/.*
+    login: admin
+    script: auto
   - url: /.*
     script: auto

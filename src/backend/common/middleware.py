@@ -1,6 +1,7 @@
 from typing import Any, Callable
 
 from flask import Flask
+from google.appengine.ext import ndb
 from werkzeug.wrappers import Request
 from werkzeug.wsgi import ClosingIterator
 
@@ -34,6 +35,7 @@ class AfterResponseMiddleware:
     def __init__(self, app: Callable[[Any, Any], Any]):
         self.app = app
 
+    @ndb.toplevel
     def __call__(self, environ: Any, start_response: Any):
         local_context.request = Request(environ)
         return ClosingIterator(self.app(environ, start_response), self._run_after)

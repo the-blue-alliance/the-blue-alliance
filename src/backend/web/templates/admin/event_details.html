@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 
 {% block title %}{{event.key_name}}{% endblock %}
 
@@ -51,7 +51,7 @@
     </tr>
     <tr>
         <td>Dates</td>
-        <td>{{ event.start_date|date:"M d, Y" }} to {{ event.end_date|date:"M d, Y" }}</td>
+        <td>{{ event.start_date|strftime("%b %d, %Y") }} to {{ event.end_date|strftime("%b %d, %Y") }}</td>
     </tr>
     <tr>
         <td>Short Name</td>
@@ -83,7 +83,7 @@
     </tr>
     <tr>
         <td>Playoff Type</td>
-        <td>{{ playoff_types|get_item:event.playoff_type }}</td>
+        <td>{{ playoff_types.get(event.playoff_type) }}</td>
     </tr>
     <tr>
         <td>Event Venue</td>
@@ -91,7 +91,7 @@
     </tr>
     <tr>
         <td>Event Venue Address</td>
-        <td><a href="http://maps.google.com/maps?q={{ event.venue_address|urlencode }}">{{ event.venue_address|linebreaksbr }}</a></td>
+        <td><a href="http://maps.google.com/maps?q={{ event.venue_address|urlencode }}">{{ event.venue_address|escape|replace("\n", "<br/>") }}</a></td>
     </tr>
     <tr>
         <td>Event City</td>
@@ -341,7 +341,7 @@
 <p>Issue a key <a href="/admin/api_auth/add">here</a></p>
 
 <p>Currently Issued Keys</p>
-{% include "partials/api_write_table.html" %}
+{% include "admin/partials/api_write_table.html" %}
 </div>
 </div>
 
@@ -357,15 +357,15 @@
           <input type="hidden" name="type" value="{{ webcast.type }}" />
           <input type="hidden" name="channel" value="{{ webcast.channel }}" />
           <input type="hidden" name="file" value="{{ webcast.file }}" />
-          <input type="hidden" name="index" value="{{ forloop.counter }}" />
+          <input type="hidden" name="index" value="{{ loop.index }}" />
         </form>
-  {% empty %}
+  {% else %}
     <p>No webcasts found</p>
   {% endfor %}
 </ul>
-{% include "partials/webcast_add_instructions_partial.html" %}
+{% include "suggestions/partials/webcast_add_instructions_partial.html" %}
 <form action="/admin/event/add_webcast/{{event.key_name}}" method="post">
-    {% include "partials/webcast_add_form_partial.html" %}
+    {% include "suggestions/partials/webcast_add_form_partial.html" %}
     <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Add Webcast</button>
 </form>
 </div>
@@ -376,9 +376,9 @@
 <h2>Rankings</h2>
 {% if event.details %}
 <table class="table table-striped table-condensed table-center">
-  {% for row in event.details.rankings_table %}
+  {% for row in event.details.rankings_table or [] %}
       <tr>
-      {% if forloop.first %}
+      {% if loop.first %}
             {% for element in row %}
                 <th>{{ element }}</th>
             {% endfor %}
@@ -388,10 +388,12 @@
         {% endfor %}
     {% endif %}
     </tr>
-  {% empty %}
+  {% else %}
       <p>No ranking data yet</p>
   {% endfor %}
 </table>
+{% else %}
+  <p>No ranking data yet</p>
 {% endif %}
 </div>
 </div>
@@ -425,14 +427,14 @@
 <div class="row">
 <h2>Alliances</h2>
 <table class="table table-striped table-condensed">
-{% for alliance in event.alliance_selections %}
+{% for alliance in event.alliance_selections or [] %}
     <tr>
-        <td>{{forloop.counter}}</td>
+        <td>{{loop.index}}</td>
         {% for team in alliance.picks %}
             <td>{{ team }}{% if alliance.backup and alliance.backup.out == team %} ({{alliance.backup.in}}){% endif %}</td>
         {% endfor %}
     </tr>
-{% empty %}
+{% else %}
     <p>No alliance data yet</p>
 {% endfor %}
 </table>
@@ -450,7 +452,7 @@
         <td><a href="/admin/award/edit/{{award.key_name}}">{{award.name_str}}</a></td>
         <td>{{award.award_type_enum}}</td>
       <td>
-        {% for team in award.recipient_dict.keys %}
+        {% for team in award.recipient_dict.keys() %}
           {% if team %}
             {{ team }}
           {% else %}
@@ -460,7 +462,7 @@
         {% endfor %}
       </td>
       <td>
-        {% for awardees in award.recipient_dict.values %}
+        {% for awardees in award.recipient_dict.values() %}
           {% for awardee in awardees %}
             {% if awardee %}
               {{ awardee }}
@@ -518,15 +520,15 @@
         <th>Alliances JSON</th>
         <th>Score Breakdown JSON</th>
     </thead>
-    {% for match in event.matches|sort_by:"play_order" %}
+    {% for match in event.matches|sort_by("play_order") %}
     <tr>
         <td><a href="/admin/match/{{match.key_name}}">{{ match.verbose_name }}</a></td>
-        <td>{{ match.time|local_time:event.timezone_id}}</td>
-        <td>{{ match.predicted_time|local_time:event.timezone_id}}
+        <td><time class="tba-match-time-utc" datetime="{{match.time.isoformat()}}+00:00">{{match.time|strftime("%a %I:%M%p UTC")}}</time></td>
+        <td>{% if match.predicted_time %}<time class="tba-match-time-utc" datetime="{{match.predicted_time.isoformat()}}+00:00">{{match.time|strftime("%a %I:%M%p UTC")}}</time>{% endif %}
             {% if match.prediction_error_str %}<br>({{ match.prediction_error_str}}){% endif %}</td>
-        <td>{{ match.actual_time|local_time:event.timezone_id}}
+        <td>{% if match.actual_time %}<time class="tba-match-time-utc" datetime="{{match.actual_time.isoformat()}}+00:00">{{match.time|strftime("%a %I:%M%p UTC")}}</time>{% endif %}
             {% if match.schedule_error_str%}<br>({{ match.schedule_error_str}}){% endif %}</td>
-        <td>{{ match.post_result_time|local_time:event.timezone_id}}</td>
+        <td>{% if match.post_result_time %}<time class="tba-match-time-utc" datetime="{{match.post_result_time.isoformat()}}+00:00">{{match.time|strftime("%a %I:%M%p UTC")}}</time>{% endif %}</td>
         <td>{% if match.alliances_json %}
             <button data-toggle="collapse" data-target="#alliances_{{ match.key_name }}" class="btn btn-info">Show</button>
             <div id="alliances_{{ match.key_name }}" class="collapse">{{ match.alliances_json }}</div>
@@ -548,7 +550,7 @@
   <tr><th>Media</th><th>Details</th><th>Tags</th></tr>
   {% for media in medias %}
     {% include "partials/admin_media_display.html" %}
-  {% empty %}
+  {% else %}
     <tr>No media found</tr>
   {% endfor %}
   </table>

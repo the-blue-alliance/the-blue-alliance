@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 
 {% block title %}Sitevar List{% endblock %}
 
@@ -16,7 +16,7 @@
 
     {% for sitevar in sitevars %}
     <tr>
-        <td><a href="/admin/sitevar/edit/{{sitevar.key.id}}">{{ sitevar.key.id }}</a></td>
+        <td><a href="/admin/sitevar/edit/{{sitevar.key.id()}}">{{ sitevar.key.id() }}</a></td>
         <td>{{ sitevar.description }}</td>
         <td>{{ sitevar.updated }}</td>
     </tr>
