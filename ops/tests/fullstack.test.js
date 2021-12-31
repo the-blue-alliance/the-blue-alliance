@@ -3,6 +3,7 @@ import "regenerator-runtime/runtime";
 describe("Homepage", () => {
   beforeAll(async () => {
     await page.goto("http://localhost:8080");
+    await page.waitForSelector(".navbar");
   });
 
   it('should be titled "The Blue Alliance"', async () => {
@@ -17,6 +18,7 @@ describe("Homepage", () => {
 describe("GameDay", () => {
   beforeAll(async () => {
     await page.goto("http://localhost:8080/gameday");
+    await page.waitForSelector(".gameday");
   });
 
   it('should be titled "GameDay - The Blue Alliance"', async () => {
