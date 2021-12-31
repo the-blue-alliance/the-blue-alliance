@@ -1,10 +1,13 @@
 from werkzeug.test import Client
 
+from backend.api.handlers.helpers.add_alliance_status import add_alliance_status
 from backend.api.handlers.helpers.model_properties import simple_event_properties
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_type import EventType
+from backend.common.models.alliance import EventAlliance
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
+from backend.common.models.event_details import EventDetails
 
 
 def validate_nominal_event_keys(team):
@@ -182,3 +185,34 @@ def test_event_list_year(ndb_stub, api_client: Client) -> None:
     assert len(resp.json) == 2
     assert "2020casf" in resp.json
     assert "2020casj" in resp.json
+
+
+def test_event_alliances(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2019casj",
+        year=2019,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    alliances = [
+        EventAlliance(picks=["frc1", "frc2", "frc3"]),
+        EventAlliance(picks=["frc4", "frc5", "frc6"]),
+        EventAlliance(picks=["frc7", "frc8", "frc9"]),
+        EventAlliance(picks=["frc10", "frc11", "frc12"]),
+    ]
+    EventDetails(
+        id="2019casj",
+        alliance_selections=alliances,
+    ).put()
+
+    # Nominal response
+    resp = api_client.get(
+        "/api/v3/event/2019casj/alliances", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+    add_alliance_status("2019casj", alliances)
+    assert resp.json == alliances
