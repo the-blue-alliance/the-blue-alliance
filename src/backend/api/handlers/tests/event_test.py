@@ -1,7 +1,11 @@
+from google.appengine.ext import ndb
 from werkzeug.test import Client
 
 from backend.api.handlers.helpers.add_alliance_status import add_alliance_status
-from backend.api.handlers.helpers.model_properties import simple_event_properties
+from backend.api.handlers.helpers.model_properties import (
+    simple_event_properties,
+    simple_team_properties,
+)
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_type import EventType
 from backend.common.models.alliance import EventAlliance
@@ -12,14 +16,24 @@ from backend.common.models.event_district_points import (
     EventDistrictPoints,
     TeamAtEventDistrictPoints,
 )
+from backend.common.models.event_team import EventTeam
+from backend.common.models.team import Team
 
 
-def validate_nominal_event_keys(team):
-    assert set(team.keys()).difference(set(simple_event_properties)) != set()
+def validate_nominal_event_keys(event):
+    assert set(event.keys()).difference(set(simple_event_properties)) != set()
 
 
-def validate_simple_event_keys(team):
-    assert set(team.keys()).difference(set(simple_event_properties)) == set()
+def validate_simple_event_keys(event):
+    assert set(event.keys()).difference(set(simple_event_properties)) == set()
+
+
+def validate_nominal_team_keys(team):
+    assert set(team.keys()).difference(set(simple_team_properties)) != set()
+
+
+def validate_simple_team_keys(team):
+    assert set(team.keys()).difference(set(simple_team_properties)) == set()
 
 
 def test_event(ndb_stub, api_client: Client) -> None:
@@ -242,3 +256,61 @@ def test_event_details(ndb_stub, api_client: Client) -> None:
     )
     assert district_points_resp.status_code == 200
     assert district_points_resp.json == district_points
+
+
+def test_event_teams(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2019casj",
+        year=2019,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    Team(id="frc604", team_number=604).put()
+    EventTeam(
+        id="2019casj_frc254",
+        event=ndb.Key("Event", "2019casj"),
+        team=ndb.Key("Team", "frc254"),
+    ).put()
+    EventTeam(
+        id="2019casj_frc604",
+        event=ndb.Key("Event", "2019casj"),
+        team=ndb.Key("Team", "frc604"),
+    ).put()
+
+    # Nominal response
+    resp = api_client.get(
+        "/api/v3/event/2019casj/teams", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    for team in resp.json:
+        validate_nominal_team_keys(team)
+    keys = set([team["key"] for team in resp.json])
+    assert "frc254" in keys
+    assert "frc604" in keys
+
+    # Simple response
+    resp = api_client.get(
+        "/api/v3/event/2019casj/teams/simple",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    for team in resp.json:
+        validate_simple_team_keys(team)
+    keys = set([team["key"] for team in resp.json])
+    assert "frc254" in keys
+    assert "frc604" in keys
+
+    # Keys response
+    resp = api_client.get(
+        "/api/v3/event/2019casj/teams/keys", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert len(resp.json) == 2
+    assert "frc254" in keys
+    assert "frc604" in keys
