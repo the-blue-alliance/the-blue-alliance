@@ -117,7 +117,9 @@ api_v3.add_url_rule(
 api_v3.add_url_rule("/teams/all", view_func=team_list_all)
 api_v3.add_url_rule("/teams/all/<model_type:model_type>", view_func=team_list_all)
 api_v3.add_url_rule("/teams/<int:page_num>", view_func=team_list)
-api_v3.add_url_rule("/teams/<int:page_num>/<model_type:model_type>", view_func=team_list)
+api_v3.add_url_rule(
+    "/teams/<int:page_num>/<model_type:model_type>", view_func=team_list
+)
 api_v3.add_url_rule("/teams/<int:year>/<int:page_num>", view_func=team_list_year)
 api_v3.add_url_rule(
     "/teams/<int:year>/<int:page_num>/<model_type:model_type>",

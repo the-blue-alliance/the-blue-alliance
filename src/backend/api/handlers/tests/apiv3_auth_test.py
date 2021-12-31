@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 from flask import g
-from google.appengine.ext.ndb import ndb
+from google.appengine.ext import ndb
 from werkzeug.test import Client
 
 from backend.common import auth

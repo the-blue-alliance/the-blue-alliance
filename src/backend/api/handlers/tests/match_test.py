@@ -1,6 +1,6 @@
 import json
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from werkzeug.test import Client
 
 from backend.api.handlers.helpers.model_properties import simple_match_properties
