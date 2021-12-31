@@ -1,0 +1,25 @@
+<title>FmsEventListGet</title>
+
+<h4>Got {{events|length}} events in {{ districts|length }} districts</h4>
+<table>
+    <thead>
+        <th>first_eid</th>
+        <th>name</th>
+        <th>city</th>
+        <th>state_prov</th>
+        <th>country</th>
+        <th>start_date</th>
+        <th>district</th>
+    </thead>
+    {% for event in events %}
+    <tr>
+        <td>{{event.first_eid}}</td>
+        <td>{{event.name}}</td>
+        <td>{{event.city}}</td>
+        <td>{{event.state_prov}}</td>
+        <td>{{event.country}}</td>
+        <td>{{event.start_date}}</td>
+        <td>{{event.district_key}}</td>
+    </tr>
+    {% endfor %}
+</table>

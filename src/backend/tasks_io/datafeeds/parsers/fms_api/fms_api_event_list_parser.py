@@ -1,7 +1,7 @@
 import datetime
 import json
 import logging
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from google.appengine.ext import ndb
 
@@ -58,8 +58,9 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
     EINSTEIN_NAME_DEFAULT = "Einstein Field"
     EINSTEIN_CODES = {"cmp", "cmpmi", "cmpmo", "cmptx"}
 
-    def __init__(self, season: Year):
+    def __init__(self, season: Year, short: Optional[str] = None) -> None:
         self.season = season
+        self.event_short = short
 
     def parse(self, response: Dict[str, Any]) -> Tuple[List[Event], List[District]]:
         events: List[Event] = []
@@ -79,7 +80,7 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
                 if code == "week0"
                 else self.EVENT_TYPES.get(api_event_type, None)
             )
-            if event_type is None:
+            if event_type is None and not self.event_short:
                 logging.warning(
                     "Event type '{}' not recognized!".format(api_event_type)
                 )
@@ -141,6 +142,8 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
                         short_name = short_name.format(override[0]["short_name"])
                 else:  # Divisions
                     name = "{} Division".format(short_name)
+            elif self.event_short:
+                code = self.event_short
 
             event_key = "{}{}".format(self.season, code)
             if event_key in divisions_to_skip:

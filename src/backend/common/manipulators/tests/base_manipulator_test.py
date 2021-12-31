@@ -519,3 +519,15 @@ def test_delete_hook_non_existent(ndb_context, taskqueue_stub) -> None:
     # Ensure we didn't enqueue the hook to run
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="cache-clearing")
     assert len(tasks) == 0
+
+
+def test_merge_models() -> None:
+    l1 = [DummyModel(id="k1", int_prop=42), DummyModel(id="k2")]
+    l2 = [DummyModel(id="k1", int_prop=1337), DummyModel(id="k3")]
+
+    merged = DummyManipulator.mergeModels(l1, l2)
+    assert merged == [
+        DummyModel(id="k1", int_prop=42),
+        DummyModel(id="k2"),
+        DummyModel(id="k3"),
+    ]

@@ -1,33 +1,48 @@
 import datetime
 import logging
-from typing import List, Optional
+from typing import List, Optional, Set, Tuple
 
 import requests
+from google.appengine.ext import ndb
 
 from backend.common.consts.event_type import EventType
 from backend.common.environment import Environment
 from backend.common.frc_api import FRCAPI
 from backend.common.models.award import Award
+from backend.common.models.district import District
+from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
+from backend.common.models.keys import EventKey, Year
+from backend.common.models.media import Media
+from backend.common.models.robot import Robot
+from backend.common.models.team import Team
 from backend.common.sitevars.apistatus_fmsapi_down import ApiStatusFMSApiDown
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_awards_parser import (
     FMSAPIAwardsParser,
+)
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_district_list_parser import (
+    FMSAPIDistrictListParser,
+)
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_event_list_parser import (
+    FMSAPIEventListParser,
 )
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_root_parser import (
     FMSAPIRootParser,
     RootInfo,
 )
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_team_avatar_parser import (
+    FMSAPITeamAvatarParser,
+)
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_team_details_parser import (
+    FMSAPITeamDetailsParser,
+)
 from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase, TParsedResponse
 
-# from parsers.fms_api.fms_api_district_list_parser import FMSAPIDistrictListParser
 # from parsers.fms_api.fms_api_district_rankings_parser import FMSAPIDistrictRankingsParser
 # from parsers.fms_api.fms_api_event_alliances_parser import FMSAPIEventAlliancesParser
-# from parsers.fms_api.fms_api_event_list_parser import FMSAPIEventListParser
 # from parsers.fms_api.fms_api_event_rankings_parser import FMSAPIEventRankingsParser, FMSAPIEventRankings2Parser
 # from parsers.fms_api.fms_api_match_parser import FMSAPIHybridScheduleParser, FMSAPIMatchDetailsParser
-# from parsers.fms_api.fms_api_team_details_parser import FMSAPITeamDetailsParser
-# from parsers.fms_api.fms_api_team_avatar_parser import FMSAPITeamAvatarParser
 
 
 class DatafeedFMSAPI:
@@ -80,6 +95,53 @@ class DatafeedFMSAPI:
         root_response = self.api.root()
         return self._parse(root_response, FMSAPIRootParser())
 
+    # Returns a tuple: (list(Event), list(District))
+    def get_event_list(self, year: Year) -> Tuple[List[Event], List[District]]:
+        event_list_response = self.api.event_list(year)
+        result = self._parse(event_list_response, FMSAPIEventListParser(year))
+        return result or ([], [])
+
+    # Returns a tuple: (list(Event), list(District))
+    def get_event_details(
+        self, event_key: EventKey
+    ) -> Tuple[List[Event], List[District]]:
+        year = int(event_key[:4])
+        event_short = event_key[4:]
+
+        event = Event.get_by_id(event_key)
+        api_event_short = self._get_event_short(event_short, event)
+        event_info_response = self.api.event_info(year, api_event_short)
+        result = self._parse(
+            event_info_response, FMSAPIEventListParser(year, short=event_short)
+        )
+        return result or ([], [])
+
+    # Returns list of tuples (team, districtteam, robot)
+    def get_event_teams(
+        self, event_key: EventKey
+    ) -> List[Tuple[Team, Optional[DistrictTeam], Optional[Robot]]]:
+        year = int(event_key[:4])
+        event_code = self._get_event_short(event_key[4:])
+
+        parser = FMSAPITeamDetailsParser(year)
+        models: List[Tuple[Team, Optional[DistrictTeam], Optional[Robot]]] = []
+
+        more_pages = True
+        page = 1
+
+        while more_pages:
+            page_response = self.api.event_teams(year, event_code, page)
+            result = self._parse(page_response, parser)
+            if result is None:
+                break
+
+            partial_models, more_pages = result
+            models.extend(partial_models)
+
+            page = page + 1
+
+        return models
+
     def get_awards(self, event: Event) -> List[Award]:
         awards = []
 
@@ -114,6 +176,41 @@ class DatafeedFMSAPI:
         awards += self._parse(api_awards_response, FMSAPIAwardsParser(event)) or []
 
         return awards
+
+    def get_event_team_avatars(
+        self, event_key: EventKey
+    ) -> Tuple[List[Media], Set[ndb.Key]]:
+        year = int(event_key[:4])
+        event_short = event_key[4:]
+
+        event = Event.get_by_id(event_key)
+        parser = FMSAPITeamAvatarParser(year)
+        api_event_short = DatafeedFMSAPI._get_event_short(event_short, event)
+        avatars: List[Media] = []
+        keys_to_delete: Set[ndb.Key] = set()
+
+        more_pages = True
+        page = 1
+
+        while more_pages:
+            avatar_result = self.api.event_team_avatars(year, api_event_short, page)
+            result = self._parse(avatar_result, parser)
+            if result is None:
+                break
+
+            (partial_avatars, partial_keys_to_delete), more_pages = result
+            avatars.extend(partial_avatars)
+            keys_to_delete = keys_to_delete.union(partial_keys_to_delete)
+
+            page = page + 1
+
+        return avatars, keys_to_delete
+
+    # Returns a list of districts
+    def get_district_list(self, year: Year) -> List[District]:
+        district_list_response = self.api.district_list(year)
+        result = self._parse(district_list_response, FMSAPIDistrictListParser(year))
+        return result or []
 
     @classmethod
     def _get_event_short(self, event_short: str, event: Optional[Event] = None) -> str:
@@ -251,20 +348,6 @@ class DatafeedFMSAPI:
         else:
             return None, keys_to_delete
 
-    # Returns a tuple: (list(Event), list(District))
-    def getEventList(self, year):
-        result = self._parse(self.FMS_API_EVENT_LIST_URL_PATTERN % (year), FMSAPIEventListParser(year))
-        if result:
-            return result
-        else:
-            return [], []
-
-    # Returns a list of districts
-    def getDistrictList(self, year):
-        result = self._parse(self.FMS_API_DISTRICT_LIST_URL_PATTERN % (year),
-                             FMSAPIDistrictListParser(year))
-        return result
-
     def getDistrictRankings(self, district_key):
         district = District.get_by_id(district_key)
         if not district:
@@ -290,70 +373,4 @@ class DatafeedFMSAPI:
 
         district.advancement = advancement
         return [district]
-
-    # Returns a tuple: (list(Event), list(District))
-    def getEventDetails(self, event_key):
-        year = int(event_key[:4])
-        event_short = event_key[4:]
-
-        event = Event.get_by_id(event_key)
-        api_event_short = DatafeedFMSAPI._get_event_short(event_short, event)
-        result = self._parse(self.FMS_API_EVENT_DETAILS_URL_PATTERN % (year, api_event_short), FMSAPIEventListParser(year, short=event_short))
-        if result:
-            return result
-        else:
-            return [], []
-
-    # Returns a list(Media)
-    def getEventTeamAvatars(self, event_key):
-        year = int(event_key[:4])
-        event_short = event_key[4:]
-
-        event = Event.get_by_id(event_key)
-        parser = FMSAPITeamAvatarParser(year, short=event_short)
-        api_event_short = DatafeedFMSAPI._get_event_short(event_short, event)
-        avatars = []
-        keys_to_delete = set()
-
-        more_pages = True
-        page = 1
-
-        while more_pages:
-            url = self.FMS_API_EVENT_AVATAR_URL_PATTERN % (year, api_event_short, page)
-            result = self._parse(url, parser)
-            if result is None:
-                break
-
-            partial_avatars, partial_keys_to_delete, more_pages = result
-            avatars.extend(partial_avatars)
-            keys_to_delete = keys_to_delete.union(partial_keys_to_delete)
-
-            page = page + 1
-
-        return avatars, keys_to_delete
-
-    # Returns list of tuples (team, districtteam, robot)
-    def getEventTeams(self, event_key):
-        year = int(event_key[:4])
-        event_code = DatafeedFMSAPI._get_event_short(event_key[4:])
-
-        event = Event.get_by_id(event_key)
-        parser = FMSAPITeamDetailsParser(year)
-        models = []  # will be list of tuples (team, districtteam, robot) model
-
-        more_pages = True
-        page = 1
-
-        while more_pages:
-            url = self.FMS_API_EVENTTEAM_LIST_URL_PATTERN % (year, DatafeedFMSAPI._get_event_short(event_code, event), page)
-            result = self._parse(url, parser)
-            if result is None:
-                break
-
-            partial_models, more_pages = result
-            models.extend(partial_models)
-
-            page = page + 1
-
-        return models
     """
