@@ -1,4 +1,3 @@
-from google.cloud import ndb
 from werkzeug.test import Client
 
 from backend.api.handlers.helpers.model_properties import simple_event_properties
@@ -16,18 +15,17 @@ def validate_simple_event_keys(team):
     assert set(team.keys()).difference(set(simple_event_properties)) == set()
 
 
-def test_event(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        ApiAuthAccess(
-            id="test_auth_key",
-            auth_types_enum=[AuthType.READ_API],
-        ).put()
-        Event(
-            id="2019casj",
-            year=2019,
-            event_short="casj",
-            event_type_enum=EventType.REGIONAL,
-        ).put()
+def test_event(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2019casj",
+        year=2019,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
 
     # Nominal response
     resp = api_client.get(
@@ -52,24 +50,23 @@ def test_event(ndb_client: ndb.Client, api_client: Client) -> None:
     assert resp.status_code == 404
 
 
-def test_event_list_all(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        ApiAuthAccess(
-            id="test_auth_key",
-            auth_types_enum=[AuthType.READ_API],
-        ).put()
-        Event(
-            id="2019casj",
-            year=2019,
-            event_short="casj",
-            event_type_enum=EventType.REGIONAL,
-        ).put()
-        Event(
-            id="2020casj",
-            year=2020,
-            event_short="casj",
-            event_type_enum=EventType.REGIONAL,
-        ).put()
+def test_event_list_all(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2019casj",
+        year=2019,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    Event(
+        id="2020casj",
+        year=2020,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
 
     # Nominal response
     resp = api_client.get(
@@ -104,30 +101,29 @@ def test_event_list_all(ndb_client: ndb.Client, api_client: Client) -> None:
     assert "2020casj" in resp.json
 
 
-def test_event_list_year(ndb_client: ndb.Client, api_client: Client) -> None:
-    with ndb_client.context():
-        ApiAuthAccess(
-            id="test_auth_key",
-            auth_types_enum=[AuthType.READ_API],
-        ).put()
-        Event(
-            id="2019casj",
-            year=2019,
-            event_short="casj",
-            event_type_enum=EventType.REGIONAL,
-        ).put()
-        Event(
-            id="2020casj",
-            year=2020,
-            event_short="casj",
-            event_type_enum=EventType.REGIONAL,
-        ).put()
-        Event(
-            id="2020casf",
-            year=2020,
-            event_short="casf",
-            event_type_enum=EventType.REGIONAL,
-        ).put()
+def test_event_list_year(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2019casj",
+        year=2019,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    Event(
+        id="2020casj",
+        year=2020,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    Event(
+        id="2020casf",
+        year=2020,
+        event_short="casf",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
 
     # Nominal response
     resp = api_client.get(

@@ -10,7 +10,7 @@ from backend.common.models.event import Event
 from backend.common.models.match import Match
 
 
-@pytest.mark.usefixtures("ndb_context")
+@pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 class TestMatchManipulator(unittest.TestCase):
     def setUp(self):
         self.event = Event(id="2012ct", event_short="ct", year=2012)
@@ -123,10 +123,12 @@ class TestMatchManipulator(unittest.TestCase):
             match.alliances_json,
             """{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""",
         )
-        self.assertEqual(match.score_breakdown[AllianceColor.RED]["auto"], 20)
+        self.assertEqual(
+            none_throws(match.score_breakdown)[AllianceColor.RED]["auto"], 20
+        )
 
         MatchManipulator.createOrUpdate(self.new_match)
-        self.assertMergedMatch(Match.get_by_id("2012ct_qm1"), True)
+        self.assertMergedMatch(none_throws(Match.get_by_id("2012ct_qm1")), True)
 
     def test_findOrSpawn(self) -> None:
         self.old_match.put()
@@ -145,14 +147,14 @@ class TestMatchManipulator(unittest.TestCase):
     def test_createOrUpdate_no_auto_union(self) -> None:
         MatchManipulator.createOrUpdate(self.old_match)
 
-        self.assertOldMatch(Match.get_by_id("2012ct_qm1"))
+        self.assertOldMatch(none_throws(Match.get_by_id("2012ct_qm1")))
         self.assertEqual(
-            Match.get_by_id("2012ct_qm1").alliances_json,
+            none_throws(Match.get_by_id("2012ct_qm1")).alliances_json,
             """{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""",
         )
 
         MatchManipulator.createOrUpdate(self.new_match, auto_union=False)
-        self.assertMergedMatch(Match.get_by_id("2012ct_qm1"), False)
+        self.assertMergedMatch(none_throws(Match.get_by_id("2012ct_qm1")), False)
 
     def test_findOrSpawn_no_auto_union(self) -> None:
         self.old_match.put()

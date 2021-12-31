@@ -14,6 +14,10 @@ exclude =
 
 application_import_names = backend
 import-order-style = edited
+banned-modules =
+    google.cloud.datastore = Use google.appengine.api.datastore
+    google.cloud.ndb = Use google.appengine.ext.ndb
+    redis = Use google.appengine.api.memcache
 
 [flake8:local-plugins]
 extension =

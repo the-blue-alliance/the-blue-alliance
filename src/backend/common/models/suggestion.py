@@ -1,7 +1,7 @@
 import json
 from typing import Optional
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.suggestion_state import SuggestionState
@@ -70,10 +70,10 @@ class Suggestion(ndb.Model):
         )
         return MediaCreator.create_media_model(self, team_reference)
 
-    # @property
-    # def youtube_video(self):
-    #     if "youtube_videos" in self.contents:
-    #         return self.contents["youtube_videos"][0]
+    @property
+    def youtube_video(self):
+        if "youtube_videos" in self.contents:
+            return self.contents["youtube_videos"][0]
 
     @classmethod
     def render_media_key_name(

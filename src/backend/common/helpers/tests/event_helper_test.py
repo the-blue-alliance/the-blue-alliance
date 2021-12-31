@@ -4,7 +4,7 @@ from random import shuffle
 
 import pytest
 from freezegun import freeze_time
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
@@ -320,6 +320,15 @@ def test_group_by_week_old_champs(ndb_context) -> None:
     }
 
 
+def test_group_by_week_2021_champs(ndb_context) -> None:
+    e1 = Event(event_type_enum=EventType.CMP_FINALS, year=2021, official=True)
+    e2 = Event(event_type_enum=EventType.CMP_FINALS, year=2021, official=True)
+    events = EventHelper.group_by_week([e1, e2])
+    assert events == {
+        "FIRST Championship": [e1, e2],
+    }
+
+
 def test_group_by_week_two_champs(ndb_context) -> None:
     e1 = Event(
         event_type_enum=EventType.CMP_DIVISION, year=2018, official=True, city="Detriot"
@@ -346,7 +355,7 @@ def test_group_by_week_in_season(ndb_context) -> None:
         start_date=datetime.datetime(2018, 3, 1),
         official=True,
     )
-    e1._week = 1  # Remmeber, these are 0-indexed
+    e1._week = 1  # Remember, these are 0-indexed
     e2._week = 1
     events = EventHelper.group_by_week([e1, e2])
     assert events == {
@@ -387,6 +396,35 @@ def test_group_by_week_preseason(ndb_context) -> None:
     events = EventHelper.group_by_week([e])
     assert events == {
         "Preseason": [e],
+    }
+
+
+def test_group_by_week_foc(ndb_context) -> None:
+    e = Event(
+        event_type_enum=EventType.FOC,
+        year=2018,
+        official=True,
+    )
+    events = EventHelper.group_by_week([e])
+    assert events == {
+        "FIRST Festival of Champions": [e],
+    }
+
+
+def test_group_by_week_foc_multiple(ndb_context) -> None:
+    e1 = Event(
+        event_type_enum=EventType.FOC,
+        year=2018,
+        official=True,
+    )
+    e2 = Event(
+        event_type_enum=EventType.FOC,
+        year=2018,
+        official=True,
+    )
+    events = EventHelper.group_by_week([e1, e2])
+    assert events == {
+        "FIRST Festival of Champions": [e1, e2],
     }
 
 
@@ -444,3 +482,31 @@ def test_end_date_or_distant_future(
 ) -> None:
     e = Event(end_date=end_date)
     assert EventHelper.end_date_or_distant_future(e) == expected_date
+
+
+@pytest.mark.parametrize(
+    "current_date,expected_event_keys",
+    [
+        (datetime.datetime(2019, 3, 1), [f"event_{i}" for i in range(1, 3)]),
+        (datetime.datetime(2019, 3, 4), [f"event_{i}" for i in range(3, 6)]),
+        (datetime.datetime(2019, 3, 6), [f"event_{i}" for i in range(5, 8)]),
+    ],
+)
+def test_within_a_day(ndb_context, current_date, expected_event_keys):
+    # Seed a month of events
+    [
+        Event(
+            id=f"2019event_{day}",
+            event_short=f"event_{day}",
+            year=2019,
+            event_type_enum=EventType.OFFSEASON,
+            start_date=datetime.datetime(2019, 3, day),
+            end_date=datetime.datetime(2019, 3, day),
+        ).put()
+        for day in range(1, 30)
+    ]
+
+    with freeze_time(current_date):
+        events = EventHelper.events_within_a_day()
+        event_keys = [e.event_short for e in events]
+        assert event_keys == expected_event_keys

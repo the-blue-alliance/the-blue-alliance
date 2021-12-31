@@ -27,7 +27,7 @@ class EventInfoTab extends Component {
     this.removeTeamMap = this.removeTeamMap.bind(this);
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     if (newProps.selectedEvent === null) {
       this.setState({ eventInfo: null, buttonClass: "btn-primary" });
     } else if (newProps.selectedEvent !== this.props.selectedEvent) {
@@ -59,17 +59,18 @@ class EventInfoTab extends Component {
     })
       .then(ensureRequestSuccess)
       .then((response) => response.json())
-      .then((
-        data1 // Merge in remap_teams
-      ) =>
-        fetch(`/_/remap_teams/${newEventKey}`)
-          .then(ensureRequestSuccess)
-          .then((response) => response.json())
-          .then((data2) => {
-            const data = Object.assign({}, data1);
-            data.remap_teams = data2;
-            return data;
-          })
+      .then(
+        (
+          data1 // Merge in remap_teams
+        ) =>
+          fetch(`/_/remap_teams/${newEventKey}`)
+            .then(ensureRequestSuccess)
+            .then((response) => response.json())
+            .then((data2) => {
+              const data = Object.assign({}, data1);
+              data.remap_teams = data2;
+              return data;
+            })
       )
       .then((data) => this.setState({ eventInfo: data, status: "" }));
   }

@@ -1,8 +1,10 @@
 import datetime
+from datetime import timedelta
 
-from flask import abort
+from flask import abort, Response
 
 from backend.common.decorators import cached_public
+from backend.common.flask_cache import make_cached_response
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.keys import TeamNumber, Year
 from backend.common.models.team import Team
@@ -24,7 +26,9 @@ VALID_PAGES = range(
 
 
 @cached_public
-def team_detail(team_number: TeamNumber, year: Year, is_canonical: bool = False) -> str:
+def team_detail(
+    team_number: TeamNumber, year: Year, is_canonical: bool = False
+) -> Response:
     team_key = f"frc{team_number}"
     if not Team.validate_key_name(team_key):
         abort(404)
@@ -35,14 +39,19 @@ def team_detail(team_number: TeamNumber, year: Year, is_canonical: bool = False)
     if not team:
         abort(404)
 
-    template_values = TeamRenderer.render_team_details(team, year, is_canonical)
+    template_values, short_cache = TeamRenderer.render_team_details(
+        team, year, is_canonical
+    )
     if template_values is None:
         abort(404)
-    return render_template("team_details.html", template_values)
+    return make_cached_response(
+        render_template("team_details.html", template_values),
+        ttl=timedelta(seconds=61) if short_cache else timedelta(days=1),
+    )
 
 
 @cached_public
-def team_history(team_number: TeamNumber, is_canonical: bool = False) -> str:
+def team_history(team_number: TeamNumber, is_canonical: bool = False) -> Response:
     team_key = f"frc{team_number}"
     if not Team.validate_key_name(team_key):
         abort(404)
@@ -51,12 +60,15 @@ def team_history(team_number: TeamNumber, is_canonical: bool = False) -> str:
     if not team:
         abort(404)
 
-    template_values = TeamRenderer.render_team_history(team, is_canonical)
-    return render_template("team_history.html", template_values)
+    template_values, short_cache = TeamRenderer.render_team_history(team, is_canonical)
+    return make_cached_response(
+        render_template("team_history.html", template_values),
+        ttl=timedelta(minutes=5) if short_cache else timedelta(days=1),
+    )
 
 
 @cached_public
-def team_canonical(team_number: TeamNumber) -> str:
+def team_canonical(team_number: TeamNumber) -> Response:
     team_future = TeamQuery(team_key=f"frc{team_number}").fetch_async()
     team = team_future.get_result()
     if not team:
@@ -73,7 +85,7 @@ def team_canonical(team_number: TeamNumber) -> str:
     return team_detail(team_number, current_year, is_canonical=True)
 
 
-@cached_public
+@cached_public(ttl=timedelta(days=7))
 def team_list(page: int) -> str:
     page_labels = []
     cur_page_label = ""

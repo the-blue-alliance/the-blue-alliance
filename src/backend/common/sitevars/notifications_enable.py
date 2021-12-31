@@ -1,10 +1,14 @@
-from backend.common.sitevars.base import SitevarBase
+from backend.common.sitevars.sitevar import Sitevar
 
 
-class NotificationsEnable(SitevarBase[bool]):
+class NotificationsEnable(Sitevar[bool]):
     @staticmethod
     def key() -> str:
         return "notifications.enable"
+
+    @staticmethod
+    def description() -> str:
+        return "For enabling/disabling all notifications"
 
     @staticmethod
     def default_value() -> bool:
@@ -15,8 +19,8 @@ class NotificationsEnable(SitevarBase[bool]):
         return cls.get()
 
     @classmethod
-    def enable_notifications(cls, enable: bool):
+    def enable_notifications(cls, enable: bool) -> None:
         cls.update(
-            should_update=lambda v: v != enable,
+            should_update=lambda v: v is not enable,
             update_f=lambda _: enable,
         )

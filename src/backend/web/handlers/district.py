@@ -1,13 +1,15 @@
 import datetime
 import logging
+from datetime import timedelta
 from operator import itemgetter
 from typing import List, Optional, Tuple
 
 from flask import abort
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from werkzeug.wrappers import Response
 
 from backend.common.decorators import cached_public
+from backend.common.flask_cache import make_cached_response
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.event_team_status_helper import EventTeamStatusHelper
 from backend.common.helpers.season_helper import SeasonHelper
@@ -55,7 +57,9 @@ def district_detail(
     live_events = []
     live_eventteams_futures = []
 
+    current_year = False
     if year == datetime.datetime.now().year:  # Only show active teams for current year
+        current_year = True
         live_events = EventHelper.week_events()
     for event in live_events:
         live_eventteams_futures.append(EventTeamsQuery(event.key_name).fetch_async())
@@ -133,6 +137,11 @@ def district_detail(
     valid_years = map(lambda d: d.year, district_history)
     valid_years = sorted(valid_years)
 
+    rankings = district.rankings
+    # Do not show district rankings for 2021
+    if district.year == 2021:
+        rankings = None
+
     template_values = {
         "explicit_year": explicit_year,
         "year": year,
@@ -142,7 +151,7 @@ def district_detail(
         "district_abbrev": district_abbrev,
         "week_events": week_events,
         "events_by_key": events_by_key,
-        "rankings": district.rankings,
+        "rankings": rankings,
         "advancement": district.advancement,
         "num_teams": num_teams,
         "teams_a": teams_a,
@@ -150,4 +159,7 @@ def district_detail(
         "live_events_with_teams": live_events_with_teams,
     }
 
-    return render_template("district_details.html", template_values)
+    return make_cached_response(
+        render_template("district_details.html", template_values),
+        ttl=timedelta(minutes=15) if current_year else timedelta(days=1),
+    )

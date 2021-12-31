@@ -1,6 +1,6 @@
-from typing import cast, List
+from typing import Any, cast, Generator, List
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.media_tag import MediaTag
 from backend.common.models.event import Event
@@ -25,7 +25,7 @@ class TeamSocialMediaQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
         super().__init__(team_key=team_key)
 
     @typed_tasklet
-    def _query_async(self, team_key: TeamKey) -> List[Media]:
+    def _query_async(self, team_key: TeamKey) -> Generator[Any, Any, List[Media]]:
         medias = yield Media.query(
             Media.references == ndb.Key(Team, team_key),
             Media.year == None,  # noqa: E711
@@ -42,7 +42,7 @@ class TeamMediaQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
         super().__init__(team_key=team_key)
 
     @typed_tasklet
-    def _query_async(self, team_key: TeamKey) -> List[Media]:
+    def _query_async(self, team_key: TeamKey) -> Generator[Any, Any, List[Media]]:
         medias = yield Media.query(
             Media.references == ndb.Key(Team, team_key)
         ).fetch_async()
@@ -58,7 +58,9 @@ class TeamYearMediaQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
         super().__init__(team_key=team_key, year=year)
 
     @typed_tasklet
-    def _query_async(self, team_key: TeamKey, year: Year) -> List[Media]:
+    def _query_async(
+        self, team_key: TeamKey, year: Year
+    ) -> Generator[Any, Any, List[Media]]:
         medias = yield Media.query(
             Media.references == ndb.Key(Team, team_key), Media.year == year
         ).fetch_async()
@@ -74,7 +76,7 @@ class EventTeamsMediasQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
         super().__init__(event_key=event_key)
 
     @typed_tasklet
-    def _query_async(self, event_key: EventKey) -> List[Media]:
+    def _query_async(self, event_key: EventKey) -> Generator[Any, Any, List[Media]]:
         year = int(event_key[:4])
         event_team_keys = yield EventTeam.query(
             EventTeam.event == ndb.Key(Event, event_key)
@@ -102,7 +104,7 @@ class EventTeamsPreferredMediasQuery(CachedDatabaseQuery[List[Media], List[Media
         super().__init__(event_key=event_key)
 
     @typed_tasklet
-    def _query_async(self, event_key: EventKey) -> List[Media]:
+    def _query_async(self, event_key: EventKey) -> Generator[Any, Any, List[Media]]:
         year = int(event_key[:4])
         event_team_keys = yield EventTeam.query(
             EventTeam.event == ndb.Key(Event, event_key)
@@ -131,7 +133,7 @@ class EventMediasQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
         super().__init__(event_key=event_key)
 
     @typed_tasklet
-    def _query_async(self, event_key: EventKey) -> List[Media]:
+    def _query_async(self, event_key: EventKey) -> Generator[Any, Any, List[Media]]:
         medias = yield Media.query(
             Media.references == ndb.Key(Event, event_key)
         ).fetch_async()
@@ -147,7 +149,9 @@ class TeamTagMediasQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
         super().__init__(team_key=team_key, media_tag=media_tag)
 
     @typed_tasklet
-    def _query_async(self, team_key: TeamKey, media_tag: MediaTag) -> List[Media]:
+    def _query_async(
+        self, team_key: TeamKey, media_tag: MediaTag
+    ) -> Generator[Any, Any, List[Media]]:
         medias = yield Media.query(
             Media.references == ndb.Key(Team, team_key),
             Media.media_tag_enum == media_tag,
@@ -166,7 +170,7 @@ class TeamYearTagMediasQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
     @typed_tasklet
     def _query_async(
         self, team_key: TeamKey, year: Year, media_tag: MediaTag
-    ) -> List[Media]:
+    ) -> Generator[Any, Any, List[Media]]:
         team_ndb_key = ndb.Key(Team, team_key)
         medias = yield Media.query(
             Media.references == team_ndb_key,

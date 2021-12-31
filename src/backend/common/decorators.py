@@ -1,13 +1,17 @@
+from datetime import timedelta
 from functools import partial, wraps
+from typing import Callable, Optional, Union
 
 from flask import current_app, has_request_context, make_response, request, Response
+from flask_caching import CachedResponse
 
 from backend.common.environment import Environment
 
 
-def cached_public(func=None, timeout: int = 61):
+def cached_public(func: Optional[Callable] = None, ttl: Union[int, timedelta] = 61):
+    timeout = ttl if isinstance(ttl, int) else ttl.total_seconds()
     if func is None:  # Handle no-argument decorator
-        return partial(cached_public, timeout=timeout)
+        return partial(cached_public, ttl=ttl)
 
     @wraps(func)
     def decorated_function(*args, **kwargs):
@@ -15,14 +19,19 @@ def cached_public(func=None, timeout: int = 61):
             cached = current_app.cache.cached(
                 timeout=timeout,
                 response_filter=lambda resp: make_response(resp).status_code == 200,
+                query_string=True,
             )
             resp = make_response(cached(func)(*args, **kwargs))
         else:
             resp = make_response(func(*args, **kwargs))
-        if resp.status_code == 200:  # Only set cache headers for OK responses
+        if resp.status_code == 200 and Environment.cache_control_header_enabled():
+            # Only set cache headers for OK responses
+            browser_timeout = timeout
+            if isinstance(resp, CachedResponse):
+                browser_timeout = resp.timeout
             resp.headers["Cache-Control"] = "public, max-age={0}, s-maxage={0}".format(
                 max(
-                    timeout, 61
+                    browser_timeout, 61
                 )  # needs to be at least 61 seconds to work with Google Frontend cache
             )
             resp.add_etag()
@@ -36,7 +45,7 @@ def cached_public(func=None, timeout: int = 61):
     return decorated_function
 
 
-def memoize(func=None, timeout: int = 61):
+def memoize(func: Optional[Callable] = None, timeout: int = 61):
     if func is None:  # Handle no-argument decorator
         return partial(memoize, timeout=timeout)
 

@@ -1,9 +1,9 @@
 import json
 import os
-from contextlib import contextmanager
-from typing import Generator, List, Optional
+from typing import List, Optional
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
+from pyre_extensions.refinement import none_throws
 
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
@@ -24,33 +24,17 @@ from backend.common.queries.dict_converters.team_converter import TeamConverter
 
 
 class JsonDataImporter(object):
-
-    ndb_client: ndb.Client
-
-    def __init__(self, ndb_client: ndb.Client) -> None:
-        self.ndb_client = ndb_client
-
     @staticmethod
     def _get_path(base_path: str, path: str) -> str:
         base_dir = os.path.dirname(base_path)
         return os.path.join(base_dir, f"{path}")
 
-    @contextmanager
-    def _maybe_with_context(self) -> Generator[ndb.Context, None, None]:
-        context = ndb.context.get_context(raise_context_error=False)
-        if context:
-            yield context
-            return
-        with self.ndb_client.context() as c:
-            yield c  # pyre-ignore
-
     def import_team(self, base_path: str, path: str) -> None:
         with open(self._get_path(base_path, path), "r") as f:
             data = json.load(f)
 
-        with self._maybe_with_context():
-            team = TeamConverter.dictToModel_v3(data)
-            team.put()
+        team = TeamConverter.dictToModel_v3(data)
+        team.put()
 
     def import_event_list(
         self, base_path: str, path: str, team_key: Optional[TeamKey] = None
@@ -58,26 +42,24 @@ class JsonDataImporter(object):
         with open(self._get_path(base_path, path), "r") as f:
             data = json.load(f)
 
-        with self._maybe_with_context():
-            [EventConverter.dictToModel_v3(e).put() for e in data]
-            if team_key:
-                [
-                    EventTeam(
-                        id=f"{e['key']}_{team_key}",
-                        event=ndb.Key(Event, e["key"]),
-                        team=ndb.Key(Team, team_key),
-                        year=e["year"],
-                    ).put()
-                    for e in data
-                ]
+        [EventConverter.dictToModel_v3(e).put() for e in data]
+        if team_key:
+            [
+                EventTeam(
+                    id=f"{e['key']}_{team_key}",
+                    event=ndb.Key(Event, e["key"]),
+                    team=ndb.Key(Team, team_key),
+                    year=e["year"],
+                ).put()
+                for e in data
+            ]
 
     def import_event(self, base_path: str, path: str) -> None:
         with open(self._get_path(base_path, path), "r") as f:
             data = json.load(f)
 
-        with self._maybe_with_context():
-            event = EventConverter.dictToModel_v3(data)
-            event.put()
+        event = EventConverter.dictToModel_v3(data)
+        event.put()
 
     def import_event_alliances(
         self, base_path: str, path: str, event_key: EventKey
@@ -85,10 +67,9 @@ class JsonDataImporter(object):
         with open(self._get_path(base_path, path), "r") as f:
             data = json.load(f)
 
-        with self._maybe_with_context():
-            detail = EventDetails.get_or_insert(event_key)
-            detail.alliance_selections = data
-            detail.put()
+        detail = EventDetails.get_or_insert(event_key)
+        detail.alliance_selections = data
+        detail.put()
 
     def import_event_teams(
         self, base_path: str, path: str, event_key: EventKey
@@ -96,35 +77,32 @@ class JsonDataImporter(object):
         with open(self._get_path(base_path, path), "r") as f:
             data = json.load(f)
 
-        with self._maybe_with_context():
-            teams = [TeamConverter.dictToModel_v3(t) for t in data]
-            event_teams = [
-                EventTeam(
-                    id=f"{event_key}_{team.key_name}",
-                    event=ndb.Key(Event, event_key),
-                    team=ndb.Key(Team, team.key_name),
-                    year=int(event_key[:4]),
-                )
-                for team in teams
-            ]
+        teams = [TeamConverter.dictToModel_v3(t) for t in data]
+        event_teams = [
+            EventTeam(
+                id=f"{event_key}_{team.key_name}",
+                event=ndb.Key(Event, event_key),
+                team=ndb.Key(Team, team.key_name),
+                year=int(event_key[:4]),
+            )
+            for team in teams
+        ]
 
-            ndb.put_multi(teams)
-            ndb.put_multi(event_teams)
+        ndb.put_multi(teams)
+        ndb.put_multi(event_teams)
 
     def import_match(self, base_path: str, path: str) -> None:
         with open(self._get_path(base_path, path), "r") as f:
             data = json.load(f)
 
-        with self._maybe_with_context():
-            match = MatchConverter.dictToModel_v3(data)
-            match.put()
+        match = MatchConverter.dictToModel_v3(data)
+        match.put()
 
     def import_match_list(self, base_path: str, path: str) -> None:
         with open(self._get_path(base_path, path), "r") as f:
             data = json.load(f)
 
-        with self._maybe_with_context():
-            [MatchConverter.dictToModel_v3(m).put() for m in data]
+        [MatchConverter.dictToModel_v3(m).put() for m in data]
 
     def parse_match_list(self, base_path: str, path: str) -> List[Match]:
         with open(self._get_path(base_path, path), "r") as f:
@@ -143,9 +121,8 @@ class JsonDataImporter(object):
         with open(self._get_path(base_path, path), "r") as f:
             data = json.load(f)
 
-        with self._maybe_with_context():
-            medias = [MediaConverter.dictToModel_v3(m, year, team_key) for m in data]
-            return medias
+        medias = [MediaConverter.dictToModel_v3(m, year, team_key) for m in data]
+        return medias
 
     def import_media_list(
         self,
@@ -157,18 +134,18 @@ class JsonDataImporter(object):
         with open(self._get_path(base_path, path), "r") as f:
             data = json.load(f)
 
-        with self._maybe_with_context():
-            [MediaConverter.dictToModel_v3(m, year, team_key).put() for m in data]
+        [MediaConverter.dictToModel_v3(m, year, team_key).put() for m in data]
 
     def import_award_list(self, base_path: str, path: str) -> None:
         with open(self._get_path(base_path, path), "r") as f:
             data = json.load(f)
 
-        with self._maybe_with_context():
-            [
-                AwardConverter.dictToModel_v3(a, Event.get_by_id(a["event_key"])).put()
-                for a in data
-            ]
+        [
+            AwardConverter.dictToModel_v3(
+                a, none_throws(Event.get_by_id(a["event_key"]))
+            ).put()
+            for a in data
+        ]
 
     def import_district_list(
         self, base_path: str, path: str, team_key: TeamKey
@@ -176,21 +153,19 @@ class JsonDataImporter(object):
         with open(self._get_path(base_path, path), "r") as f:
             data = json.load(f)
 
-        with self._maybe_with_context():
-            [DistrictConverter.dictToModel_v3(d).put() for d in data]
-            [
-                DistrictTeam(
-                    id=DistrictTeam.renderKeyName(d["key"], team_key),
-                    team=ndb.Key(Team, team_key),
-                    district_key=ndb.Key(District, d["key"]),
-                    year=d["year"],
-                ).put()
-                for d in data
-            ]
+        [DistrictConverter.dictToModel_v3(d).put() for d in data]
+        [
+            DistrictTeam(
+                id=DistrictTeam.renderKeyName(d["key"], team_key),
+                team=ndb.Key(Team, team_key),
+                district_key=ndb.Key(District, d["key"]),
+                year=d["year"],
+            ).put()
+            for d in data
+        ]
 
     def import_robot_list(self, base_path: str, path: str) -> None:
         with open(self._get_path(base_path, path), "r") as f:
             data = json.load(f)
 
-        with self._maybe_with_context():
-            [RobotConverter.dictToModel_v3(d).put() for d in data]
+        [RobotConverter.dictToModel_v3(d).put() for d in data]

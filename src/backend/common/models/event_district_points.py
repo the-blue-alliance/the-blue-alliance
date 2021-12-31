@@ -1,11 +1,10 @@
-from typing import Dict, List
+from typing import Dict, List, TypedDict
 
-from typing_extensions import TypedDict
-
-from backend.common.models.keys import TeamKey
+from backend.common.models.keys import EventKey, TeamKey
 
 
 class TeamAtEventDistrictPoints(TypedDict):
+    event_key: EventKey
     qual_points: int
     elim_points: int
     alliance_points: int

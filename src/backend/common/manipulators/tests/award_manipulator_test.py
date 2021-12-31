@@ -2,7 +2,7 @@ import json
 import unittest
 
 import pytest
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
@@ -12,7 +12,7 @@ from backend.common.models.event import Event
 from backend.common.models.team import Team
 
 
-@pytest.mark.usefixtures("ndb_context")
+@pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 class TestAwardManipulator(unittest.TestCase):
     def setUp(self):
         self.event = Event(

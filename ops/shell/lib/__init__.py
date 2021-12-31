@@ -1,7 +1,7 @@
 import contextlib
 import os
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 
 @contextlib.contextmanager

@@ -1,4 +1,5 @@
-import React, { PropTypes } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 import RaisedButton from "material-ui/RaisedButton";
 import WebcastEmbed from "./WebcastEmbed";
 import VideoCellAnalyticsTracker from "./VideoCellAnalyticsTracker";
@@ -152,7 +153,7 @@ export default class VideoCell extends React.Component {
             label={buttonLabel}
             style={centerButtonStyle}
             disabled={!webcastsAreAvailable}
-            onTouchTap={() => this.onRequestOpenWebcastSelectionDialog()}
+            onClick={() => this.onRequestOpenWebcastSelectionDialog()}
           />
         </div>
         <WebcastSelectionDialogContainer

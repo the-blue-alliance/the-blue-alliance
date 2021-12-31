@@ -5,18 +5,22 @@ on:
     branches:
       - py3
 
+concurrency:
+  group: ci-${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
   py3-type:
     name: "[py3] Type Check"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.4.0
       - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v2.3.1
         with:
           python-version: 3.8
       - name: Cache pip
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.7
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -32,13 +36,13 @@ jobs:
     name: "[py3] Format & Lint"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.4.0
       - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v2.3.1
         with:
           python-version: 3.8
       - name: Cache pip
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.7
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -54,13 +58,13 @@ jobs:
     name: "[py3] Test"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.4.0
       - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v2.3.1
         with:
           python-version: 3.8
       - name: Cache pip
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.7
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -73,56 +77,60 @@ jobs:
       - name: Run Tests
         run: ./ops/test_py3.sh
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2.1.0
   node-lint:
     name: "[node] Format & Lint"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.4.0
       - name: Set up Node
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v2.5.1
         with:
-          node-version: "10.x"
+          node-version: "14"
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.7
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
       - name: Run Format & Lint
         run: ./ops/lint_node.sh
   node-test:
     name: "[node] Test"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.4.0
       - name: Set up Node
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v2.5.1
         with:
-          node-version: "10.x"
+          node-version: "14"
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.7
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
       - name: Run Tests
         run: ./ops/test_node.sh
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2.1.0
+        with:
+          directory: ./.node_coverage/
   bash-lint:
     name: "[bash] Lint"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.4.0
       - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v2.3.1
         with:
           python-version: 3.8
       - name: Cache pip
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.7
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -144,33 +152,86 @@ jobs:
     name: Build Web
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.4.0
       - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v2.3.1
         with:
           python-version: 3.8
       - name: Set up Node
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v2.5.1
         with:
-          node-version: "10.x"
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
+          node-version: "14"
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.7
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
+      - name: Install Node Dependencies
+        run: npm ci
+      - name: Run Build
+        run: ./ops/build/run_buildweb.sh --env
+
+  ops-test:
+    name: Ops Fullstack Test
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2.3.0
+        with:
+          python-version: 3.8
+      - name: Cache pip
+        uses: actions/cache@v2.1.7
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install -r src/requirements.txt
+      - name: Set up Node
+        uses: actions/setup-node@v2.5.1
+        with:
+          node-version: "14"
+      - name: Cache node modules
+        uses: actions/cache@v2.1.7
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
       - name: Install Node Dependencies
-        run: npm install
-      - name: Run Build
-        run: ./ops/build/run_buildweb.sh --env
+        run: |
+          npm ci
+          npm install -g capture-website-cli
+      - name: Install Vagrant
+        run: sudo apt-get install vagrant
+      - name: Create keys file
+        run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
+      - name: Start Container
+        run: ENV='CI' vagrant up
+      - name: Test Vagrant Startup
+        run: ./ops/test_vagrant_startup.py
+      - name: Test Ops Fullstack
+        run: ./ops/test_ops.sh
+      - name: Capture screenshots
+        run: ./ops/pr_screenshots/capture_screenshots.py
+      - name: Upload screenshots artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ci_screenshots
+          path: ci_screenshots.pickle
+
+  automerge:
+    name: Automerge Dependabot PRs
+    needs: [py3-type, py3-lint, py3-test, node-lint, node-test, bash-lint, build-web, ops-test]
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    steps:
+      - uses: fastify/github-action-merge-dependabot@v3.0.2
+        with:
+          github-token: ${{ secrets.PROTECTED_BRANCH_PUSH }}

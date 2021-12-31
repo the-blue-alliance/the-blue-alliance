@@ -1,13 +1,21 @@
-import json
-
-from backend.common.models.sitevar import Sitevar
 from backend.common.sitevars.notifications_enable import NotificationsEnable
+
+
+def test_key():
+    assert NotificationsEnable.key() == "notifications.enable"
+
+
+def test_description():
+    assert (
+        NotificationsEnable.description() == "For enabling/disabling all notifications"
+    )
 
 
 def test_default_sitevar():
     default_sitevar = NotificationsEnable._fetch_sitevar()
     assert default_sitevar is not None
     assert default_sitevar.contents is True
+    assert default_sitevar.description == "For enabling/disabling all notifications"
 
 
 def test_notifications_enabled_insert():
@@ -15,7 +23,7 @@ def test_notifications_enabled_insert():
 
 
 def test_notifications_enabled_get():
-    Sitevar.get_or_insert("notifications.enable", values_json=json.dumps(False))
+    NotificationsEnable.put(False)
     assert not NotificationsEnable.notifications_enabled()
 
 

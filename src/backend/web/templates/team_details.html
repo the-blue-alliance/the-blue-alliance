@@ -182,7 +182,7 @@
               </div>
               <div class="col-sm-8" style="margin-top: 1em">
                 {% if comp.match_count > 0 %}
-                  {{mtm.full_match_table(comp.matches, cur_team_key=team.key.id())}}
+                  {{mtm.full_match_table(comp.matches, cur_team_key=team.key.id(), playlist=comp.playlist)}}
                 {% else %}
                   {% if comp.event.past %}
                     <p class="muted">No matches played.</p>
@@ -271,6 +271,14 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block footer_content %}
+{% if year and year >= 2015 %}
+<div class="text-left col-xs-12 col-sm-offset-3 col-lg-offset-2" style="margin-bottom: 2rem;">
+  <span class="glyphicon glyphicon-info-sign"></span> Data provided by the <a href="https://frc-events.firstinspires.org/services/API" target="_blank"><em>FIRST</em><sup>®</sup> Events API</a><br>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block inline_javascript %}

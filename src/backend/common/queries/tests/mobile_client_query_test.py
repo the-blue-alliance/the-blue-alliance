@@ -1,7 +1,7 @@
 from typing import Callable, List, Optional
 
 import pytest
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.client_type import ClientType
 from backend.common.models.account import Account
@@ -89,7 +89,7 @@ def test_mobile_client_list_only_verified() -> None:
     assert [verified] == MobileClientQuery(
         user_ids=[user_id], only_verified=True
     ).fetch()
-    assert [verified, unverified] == MobileClientQuery(
+    assert [unverified, verified] == MobileClientQuery(
         user_ids=[user_id], only_verified=False
     ).fetch()
 

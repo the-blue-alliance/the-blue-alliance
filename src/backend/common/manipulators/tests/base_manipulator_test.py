@@ -1,14 +1,13 @@
 import json
-from typing import Dict, List, Optional, Set
+from typing import Any, Dict, Generator, List, Optional, Set
 
 import pytest
-from google.cloud import ndb
+from google.appengine.ext import deferred
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.cache_clearing.get_affected_queries import TCacheKeyAndQuery
 from backend.common.consts.api_version import ApiMajorVersion
-from backend.common.deferred.clients.fake_client import FakeTaskClient
-from backend.common.futures import TypedFuture
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
 from backend.common.models.cached_model import CachedModel, TAffectedReferences
 from backend.common.models.cached_query_result import CachedQueryResult
@@ -78,7 +77,7 @@ class DummyCachedQuery(CachedDatabaseQuery[DummyModel, None]):
     DICT_CONVERTER = DummyConverter
 
     @ndb.tasklet
-    def _query_async(self, model_key: str) -> TypedFuture[DummyModel]:
+    def _query_async(self, model_key: str) -> Generator[Any, Any, DummyModel]:
         model = yield DummyModel.get_by_id_async(model_key)
         return model
 
@@ -139,7 +138,7 @@ def reset_hook_call_counts():
     DummyManipulator.update_hook_extra = None
 
 
-def test_create_new_model(ndb_context) -> None:
+def test_create_new_model(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", int_prop=42)
     put = DummyManipulator.createOrUpdate(model)
     assert put == model
@@ -149,7 +148,7 @@ def test_create_new_model(ndb_context) -> None:
     assert check == model
 
 
-def test_create_new_model_list(ndb_context) -> None:
+def test_create_new_model_list(ndb_context, taskqueue_stub) -> None:
     model1 = DummyModel(id="test1", int_prop=42)
     model2 = DummyModel(id="test2", int_prop=1337)
     put = DummyManipulator.createOrUpdate([model1, model2])
@@ -161,7 +160,7 @@ def test_create_new_model_list(ndb_context) -> None:
     assert [check1, check2] == [model1, model2]
 
 
-def test_update_model(ndb_context) -> None:
+def test_update_model(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", int_prop=42)
     model.put()
 
@@ -177,7 +176,7 @@ def test_update_model(ndb_context) -> None:
     assert check == expected
 
 
-def test_update_model_leaves_unknown_attrs(ndb_context) -> None:
+def test_update_model_leaves_unknown_attrs(ndb_context, taskqueue_stub) -> None:
     expected = DummyModel(
         id="test",
         int_prop=42,
@@ -185,6 +184,7 @@ def test_update_model_leaves_unknown_attrs(ndb_context) -> None:
     expected.put()
 
     model = DummyModel.get_by_id("test")
+    assert model is not None
     assert model == expected
 
     model.str_prop = "asdf"
@@ -195,7 +195,7 @@ def test_update_model_leaves_unknown_attrs(ndb_context) -> None:
     assert check == expected
 
 
-def test_does_not_assign_none(ndb_context) -> None:
+def test_does_not_assign_none(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", int_prop=42)
     model.put()
 
@@ -203,10 +203,11 @@ def test_does_not_assign_none(ndb_context) -> None:
     DummyManipulator.createOrUpdate(update)
 
     check = DummyModel.get_by_id("test")
+    assert check is not None
     assert check.int_prop == 42
 
 
-def test_allow_none(ndb_context) -> None:
+def test_allow_none(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", can_be_none=42)
     model.put()
 
@@ -214,10 +215,11 @@ def test_allow_none(ndb_context) -> None:
     DummyManipulator.createOrUpdate(update)
 
     check = DummyModel.get_by_id("test")
+    assert check is not None
     assert check.int_prop is None
 
 
-def test_stringified_none(ndb_context) -> None:
+def test_stringified_none(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", mutable_str_prop="asdf")
     model.put()
 
@@ -225,10 +227,11 @@ def test_stringified_none(ndb_context) -> None:
     DummyManipulator.createOrUpdate(update)
 
     check = DummyModel.get_by_id("test")
+    assert check is not None
     assert check.mutable_str_prop is None
 
 
-def test_update_lists(ndb_context) -> None:
+def test_update_lists(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", repeated_prop=[1, 2, 3])
     model.put()
 
@@ -236,10 +239,11 @@ def test_update_lists(ndb_context) -> None:
     DummyManipulator.createOrUpdate(update)
 
     check = DummyModel.get_by_id("test")
+    assert check is not None
     assert check.repeated_prop == [4, 5, 6]
 
 
-def test_update_lists_empty_keeps_old(ndb_context) -> None:
+def test_update_lists_empty_keeps_old(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", repeated_prop=[1, 2, 3])
     model.put()
 
@@ -247,10 +251,11 @@ def test_update_lists_empty_keeps_old(ndb_context) -> None:
     DummyManipulator.createOrUpdate(update)
 
     check = DummyModel.get_by_id("test")
+    assert check is not None
     assert check.repeated_prop == [1, 2, 3]
 
 
-def test_update_json_attrs(ndb_context) -> None:
+def test_update_json_attrs(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", prop_json=json.dumps({"foo": "bar"}))
     model.put()
 
@@ -258,11 +263,12 @@ def test_update_json_attrs(ndb_context) -> None:
     DummyManipulator.createOrUpdate(update)
 
     check = DummyModel.get_by_id("test")
+    assert check is not None
     assert check.prop_json == json.dumps({"foo": "baz"})
     assert check.prop == {"foo": "baz"}
 
 
-def test_update_auto_union(ndb_context) -> None:
+def test_update_auto_union(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", union_prop=[1, 2, 3])
     model.put()
 
@@ -270,10 +276,11 @@ def test_update_auto_union(ndb_context) -> None:
     DummyManipulator.createOrUpdate(update, auto_union=True)
 
     check = DummyModel.get_by_id("test")
+    assert check is not None
     assert check.union_prop == [1, 2, 3, 4, 5, 6]
 
 
-def test_update_auto_union_false(ndb_context) -> None:
+def test_update_auto_union_false(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", union_prop=[1, 2, 3])
     model.put()
 
@@ -281,10 +288,11 @@ def test_update_auto_union_false(ndb_context) -> None:
     DummyManipulator.createOrUpdate(update, auto_union=False)
 
     check = DummyModel.get_by_id("test")
+    assert check is not None
     assert check.union_prop == [4, 5, 6]
 
 
-def test_update_auto_union_false_can_set_empty(ndb_context) -> None:
+def test_update_auto_union_false_can_set_empty(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", union_prop=[1, 2, 3])
     model.put()
 
@@ -292,10 +300,11 @@ def test_update_auto_union_false_can_set_empty(ndb_context) -> None:
     DummyManipulator.createOrUpdate(update, auto_union=False)
 
     check = DummyModel.get_by_id("test")
+    assert check is not None
     assert check.union_prop == []
 
 
-def test_cache_clearing(ndb_context, task_client: FakeTaskClient) -> None:
+def test_cache_clearing(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", int_prop=1337)
     model.put()
 
@@ -309,16 +318,17 @@ def test_cache_clearing(ndb_context, task_client: FakeTaskClient) -> None:
     DummyManipulator.createOrUpdate(update)
 
     # Ensure we've enqueued the cache clearing task to be run
-    assert task_client.pending_job_count("cache-clearing") == 1
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="cache-clearing")
+    assert len(tasks) == 1
 
     # Run cache clearing manually
-    task_client.drain_pending_jobs("cache-clearing")
+    deferred.run(tasks[0].payload)
 
     # We should have cleared the cached result
     assert CachedQueryResult.get_by_id(query.cache_key) is None
 
 
-def test_post_update_hook(ndb_context, task_client: FakeTaskClient) -> None:
+def test_post_update_hook(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", int_prop=1337)
     model.put()
 
@@ -327,16 +337,17 @@ def test_post_update_hook(ndb_context, task_client: FakeTaskClient) -> None:
 
     # Ensure we've enqueued the hook to run
     assert DummyManipulator.update_calls == 0
-    assert task_client.pending_job_count("post-update-hooks") == 1
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
 
     # Run the hooks manually
-    task_client.drain_pending_jobs("post-update-hooks")
+    deferred.run(tasks[0].payload)
 
     # Make sure the hook ran
     assert DummyManipulator.update_calls == 1
 
 
-def test_update_hook_right_args(ndb_context, task_client: FakeTaskClient) -> None:
+def test_update_hook_right_args(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", int_prop=1337)
     model.put()
 
@@ -356,16 +367,17 @@ def test_update_hook_right_args(ndb_context, task_client: FakeTaskClient) -> Non
 
     # Ensure we've enqueued the hook to run
     assert DummyManipulator.update_calls == 0
-    assert task_client.pending_job_count("post-update-hooks") == 1
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
 
     # Run the hooks manually
-    task_client.drain_pending_jobs("post-update-hooks")
+    deferred.run(tasks[0].payload)
 
     # Make sure the hook ran
     assert DummyManipulator.update_calls == 1
 
 
-def test_update_hook_creation(ndb_context, task_client: FakeTaskClient) -> None:
+def test_update_hook_creation(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", int_prop=1337)
 
     def update_hook_extra(models: List[TUpdatedModel[DummyModel]]) -> None:
@@ -382,16 +394,17 @@ def test_update_hook_creation(ndb_context, task_client: FakeTaskClient) -> None:
 
     # Ensure we've enqueued the hook to run
     assert DummyManipulator.update_calls == 0
-    assert task_client.pending_job_count("post-update-hooks") == 1
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
 
     # Run the hooks manually
-    task_client.drain_pending_jobs("post-update-hooks")
+    deferred.run(tasks[0].payload)
 
     # Make sure the hook ran
     assert DummyManipulator.update_calls == 1
 
 
-def test_update_skip_hook(ndb_context, task_client: FakeTaskClient) -> None:
+def test_update_skip_hook(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", int_prop=1337)
     model.put()
 
@@ -400,10 +413,11 @@ def test_update_skip_hook(ndb_context, task_client: FakeTaskClient) -> None:
 
     # Ensure we didn't enqueue the hook to run
     assert DummyManipulator.update_calls == 0
-    assert task_client.pending_job_count("post-update-hooks") == 0
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 0
 
 
-def test_delete_by_key(ndb_context) -> None:
+def test_delete_by_key(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", int_prop=1337)
     model.put()
 
@@ -412,7 +426,7 @@ def test_delete_by_key(ndb_context) -> None:
     assert DummyModel.get_by_id("test") is None
 
 
-def test_delete_by_model(ndb_context) -> None:
+def test_delete_by_model(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", int_prop=1337)
     model.put()
 
@@ -421,7 +435,7 @@ def test_delete_by_model(ndb_context) -> None:
     assert DummyModel.get_by_id("test") is None
 
 
-def test_delete_clears_cache(ndb_context, task_client: FakeTaskClient) -> None:
+def test_delete_clears_cache(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", int_prop=1337)
     model.put()
 
@@ -435,16 +449,17 @@ def test_delete_clears_cache(ndb_context, task_client: FakeTaskClient) -> None:
     assert DummyModel.get_by_id("test") is None
 
     # Ensure we've enqueued the cache clearing task to be run
-    assert task_client.pending_job_count("cache-clearing") == 1
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="cache-clearing")
+    assert len(tasks) == 1
 
     # Run cache clearing manually
-    task_client.drain_pending_jobs("cache-clearing")
+    deferred.run(tasks[0].payload)
 
     # We should have cleared the cached result
     assert CachedQueryResult.get_by_id(query.cache_key) is None
 
 
-def test_delete_runs_hook(ndb_context, task_client: FakeTaskClient) -> None:
+def test_delete_runs_hook(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", int_prop=1337)
     model.put()
 
@@ -452,16 +467,17 @@ def test_delete_runs_hook(ndb_context, task_client: FakeTaskClient) -> None:
 
     # Ensure we've enqueued the hook to run
     assert DummyManipulator.delete_calls == 0
-    assert task_client.pending_job_count("post-update-hooks") == 1
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
 
     # Run the hooks manually
-    task_client.drain_pending_jobs("post-update-hooks")
+    deferred.run(tasks[0].payload)
 
     # Make sure the hook ran
     assert DummyManipulator.delete_calls == 1
 
 
-def test_delete_skip_hook(ndb_context, task_client: FakeTaskClient) -> None:
+def test_delete_skip_hook(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", int_prop=1337)
     model.put()
 
@@ -469,10 +485,11 @@ def test_delete_skip_hook(ndb_context, task_client: FakeTaskClient) -> None:
 
     # Ensure we didn't enqueue the hook to run
     assert DummyManipulator.delete_calls == 0
-    assert task_client.pending_job_count("post-update-hooks") == 0
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 0
 
 
-def test_delete_hook_right_args(ndb_context, task_client: FakeTaskClient) -> None:
+def test_delete_hook_right_args(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", int_prop=1337)
     model.put()
 
@@ -485,18 +502,20 @@ def test_delete_hook_right_args(ndb_context, task_client: FakeTaskClient) -> Non
 
     # Ensure we've enqueued the hook to run
     assert DummyManipulator.delete_calls == 0
-    assert task_client.pending_job_count("post-update-hooks") == 1
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
 
     # Run the hooks manually
-    task_client.drain_pending_jobs("post-update-hooks")
+    deferred.run(tasks[0].payload)
 
     # Make sure the hook ran
     assert DummyManipulator.delete_calls == 1
 
 
-def test_delete_hook_non_existent(ndb_context, task_client: FakeTaskClient) -> None:
+def test_delete_hook_non_existent(ndb_context, taskqueue_stub) -> None:
     assert DummyModel.get_by_id("test") is None
     DummyManipulator.delete_keys([ndb.Key(DummyModel, "test")])
 
     # Ensure we didn't enqueue the hook to run
-    assert task_client.pending_job_count("post-update-hooks") == 0
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="cache-clearing")
+    assert len(tasks) == 0

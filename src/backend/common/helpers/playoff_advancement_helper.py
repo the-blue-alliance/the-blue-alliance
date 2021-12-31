@@ -1,9 +1,18 @@
 import copy
 from collections import defaultdict
-from typing import Any, cast, DefaultDict, Dict, List, Mapping, NamedTuple, Optional
+from typing import (
+    Any,
+    cast,
+    DefaultDict,
+    Dict,
+    List,
+    Mapping,
+    NamedTuple,
+    Optional,
+    TypedDict,
+)
 
 from pyre_extensions import none_throws
-from typing_extensions import TypedDict
 
 from backend.common.consts.alliance_color import AllianceColor, OPPONENT, TMatchWinner
 from backend.common.consts.comp_level import CompLevel
@@ -68,6 +77,8 @@ class PlayoffAdvancementHelper(object):
         2017: ["Match Points"],
         2018: ["Park/Climb Points", "Auto Points"],
         2019: ["Cargo Points", "Hatch Panel Points"],
+        2020: [],
+        2021: [],
     }
 
     ADVANCEMENT_COUNT_2015: Dict[CompLevel, int] = {
@@ -384,6 +395,7 @@ class PlayoffAdvancementHelper(object):
                         )
                         or ""
                     )
+                    i: Optional[int] = None
                     for i, complete_alliance in enumerate(
                         complete_alliances
                     ):  # search for alliance. could be more efficient
@@ -569,7 +581,7 @@ class PlayoffAdvancementHelper(object):
 
             advancement[
                 "{}_complete".format(comp_level)  # pyre-ignore
-            ] = not any_unplayed
+            ] = not any_unplayed  # pyre-ignore[6]
 
         return cast(PlayoffAdvancementRoundRobinLevels, advancement)
 

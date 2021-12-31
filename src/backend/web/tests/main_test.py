@@ -1,13 +1,11 @@
 import importlib
 
-from google.cloud import ndb
-
 from backend.common.auth import _user_context_processor
 from backend.common.sitevars.flask_secrets import FlaskSecrets
 from backend.web.handlers.account import blueprint as account_blueprint
 
 
-def test_app_secret_key(ndb_context: ndb.Context) -> None:
+def test_app_secret_key(ndb_stub) -> None:
     from backend.web import main
 
     # Other tests might have run a request which dirties the previously

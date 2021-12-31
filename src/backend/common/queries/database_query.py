@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import abc
 import logging
-from typing import Any, Dict, Generic, Optional, Set, Type
+from typing import Any, Dict, Generator, Generic, Optional, Set, Type
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws, safe_cast
 
 from backend.common.consts.api_version import ApiMajorVersion
@@ -49,10 +49,10 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
         return self.fetch_async().get_result()
 
     @ndb.tasklet
-    def fetch_async(self) -> TypedFuture[QueryReturn]:
+    def fetch_async(self) -> Generator[Any, Any, QueryReturn]:
         with Span("{}.fetch_async".format(self.__class__.__name__)):
             query_result = yield self._do_query(**self._query_args)
-            return safe_cast(TypedFuture[QueryReturn], query_result)
+            return query_result
 
     def fetch_dict(self, version: ApiMajorVersion) -> DictQueryReturn:
         return self.fetch_dict_async(version).get_result()
@@ -60,10 +60,10 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
     @ndb.tasklet
     def fetch_dict_async(
         self, version: ApiMajorVersion
-    ) -> TypedFuture[DictQueryReturn]:
+    ) -> Generator[Any, Any, DictQueryReturn]:
         with Span("{}.fetch_dict_async".format(self.__class__.__name__)):
             query_result = yield self._do_dict_query(version, **self._query_args)
-            return safe_cast(TypedFuture[DictQueryReturn], query_result)
+            return query_result
 
 
 class CachedDatabaseQuery(DatabaseQuery, Generic[QueryReturn, DictQueryReturn]):
@@ -115,10 +115,10 @@ class CachedDatabaseQuery(DatabaseQuery, Generic[QueryReturn, DictQueryReturn]):
         )
 
     @ndb.tasklet
-    def _do_query(self, *args, **kwargs) -> TypedFuture[QueryReturn]:
+    def _do_query(self, *args, **kwargs) -> Generator[Any, Any, QueryReturn]:
         if not self.MODEL_CACHING_ENABLED:
             result = yield self._query_async(*args, **kwargs)
-            return result  # pyre-ignore[7]
+            return result
 
         cache_key = self.cache_key
         cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
@@ -126,18 +126,18 @@ class CachedDatabaseQuery(DatabaseQuery, Generic[QueryReturn, DictQueryReturn]):
             query_result = yield self._query_async(*args, **kwargs)
             if self.CACHE_WRITES_ENABLED:
                 yield CachedQueryResult(id=cache_key, result=query_result).put_async()
-            return query_result  # pyre-ignore[7]
+            return query_result
         return cached_query_result.result
 
     @ndb.tasklet
     def _do_dict_query(
         self, _dict_version: ApiMajorVersion, *args, **kwargs
-    ) -> TypedFuture[DictQueryReturn]:
+    ) -> Generator[Any, Any, DictQueryReturn]:
         if not self.DICT_CACHING_ENABLED:
             result = yield self._query_async(*args, **kwargs)
             if result is None:
                 raise DoesNotExistException
-            return result  # pyre-ignore[7]
+            return result
 
         cache_key = self.dict_cache_key(_dict_version)
         cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
@@ -148,7 +148,7 @@ class CachedDatabaseQuery(DatabaseQuery, Generic[QueryReturn, DictQueryReturn]):
 
             # See https://github.com/facebook/pyre-check/issues/267
             converted_result = self.DICT_CONVERTER(  # pyre-ignore[45]
-                safe_cast(QueryReturn, query_result)
+                query_result
             ).convert(_dict_version)
 
             if self.CACHE_WRITES_ENABLED:

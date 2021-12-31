@@ -1,7 +1,8 @@
 import unittest
 
 import pytest
-from google.cloud import ndb
+from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 
 from backend.common.manipulators.district_team_manipulator import (
     DistrictTeamManipulator,
@@ -11,7 +12,7 @@ from backend.common.models.district_team import DistrictTeam
 from backend.common.models.team import Team
 
 
-@pytest.mark.usefixtures("ndb_context")
+@pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 class TestDistrictManipulator(unittest.TestCase):
     def setUp(self):
         self.old_district_team = DistrictTeam(
@@ -37,9 +38,11 @@ class TestDistrictManipulator(unittest.TestCase):
 
     def test_createOrUpdate(self) -> None:
         DistrictTeamManipulator.createOrUpdate(self.old_district_team)
-        self.assertOldDistrictTeam(DistrictTeam.get_by_id("2015ne_frc177"))
+        self.assertOldDistrictTeam(none_throws(DistrictTeam.get_by_id("2015ne_frc177")))
         DistrictTeamManipulator.createOrUpdate(self.new_district_team)
-        self.assertMergedDistrictTeam(DistrictTeam.get_by_id("2015ne_frc177"))
+        self.assertMergedDistrictTeam(
+            none_throws(DistrictTeam.get_by_id("2015ne_frc177"))
+        )
 
     def test_findOrSpawn(self) -> None:
         self.old_district_team.put()

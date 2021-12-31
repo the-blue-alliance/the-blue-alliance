@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, Generator, List
 
 from backend.common.models.account import Account
 from backend.common.models.subscription import Subscription
@@ -13,6 +13,6 @@ class SubscriptionQuery(DatabaseQuery[List[Subscription], None]):
     @typed_tasklet
     def _query_async(
         self, account: Account, keys_only: bool = False
-    ) -> List[Subscription]:
+    ) -> Generator[Any, Any, List[Subscription]]:
         subscription_query = Subscription.query(ancestor=account.key)
         return (yield (subscription_query.fetch_async(keys_only=keys_only)))

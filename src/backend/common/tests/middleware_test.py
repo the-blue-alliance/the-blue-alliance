@@ -1,10 +1,8 @@
-import json
 from unittest.mock import Mock, patch
 
 import flask
 import pytest
 from flask import Flask
-from google.cloud.ndb import context as context_module
 from werkzeug.test import create_environ, run_wsgi_app
 from werkzeug.wrappers import Request
 
@@ -14,28 +12,12 @@ from backend.common.middleware import (
     _set_secret_key,
     AfterResponseMiddleware,
     install_middleware,
-    NdbMiddleware,
     TraceRequestMiddleware,
 )
-from backend.common.models.sitevar import Sitevar
 from backend.common.profiler import trace_context
 from backend.common.run_after_response import run_after_response
-
-
-def test_NdbMiddleware_init(app: Flask) -> None:
-    middleware = NdbMiddleware(app)
-    assert middleware.app is app
-
-
-def test_NdbMiddleware_callable(app: Flask) -> None:
-    middleware = NdbMiddleware(app)
-
-    def start_response(status, headers):
-        context = context_module.get_context()
-        assert context.client is middleware.ndb_client
-
-    with app.test_request_context("/"):
-        middleware(flask.request.environ, start_response)
+from backend.common.sitevars import flask_secrets
+from backend.common.sitevars.flask_secrets import FlaskSecrets
 
 
 def test_TraceRequestMiddleware_init(app: Flask) -> None:
@@ -72,7 +54,7 @@ def test_AfterResponseMiddleware_callable(app: Flask) -> None:
 
 
 def test_install_middleware(app: Flask) -> None:
-    assert not type(app.wsgi_app) is NdbMiddleware
+    assert not type(app.wsgi_app) is TraceRequestMiddleware
     with patch.object(
         backend.common.middleware, "_set_secret_key"
     ) as mock_set_secret_key:
@@ -80,7 +62,7 @@ def test_install_middleware(app: Flask) -> None:
         assert len(app.before_first_request_funcs) > 0
         app.try_trigger_before_first_request_functions()
     mock_set_secret_key.assert_called_with(app)
-    assert type(app.wsgi_app) is NdbMiddleware
+    assert type(app.wsgi_app) is TraceRequestMiddleware
 
 
 def test_set_secret_key_default(ndb_context, app: Flask) -> None:
@@ -91,9 +73,7 @@ def test_set_secret_key_default(ndb_context, app: Flask) -> None:
 
 def test_set_secret_key_not_default(ndb_context, app: Flask) -> None:
     secret_key = "some_new_secret_key"
-    Sitevar.get_or_insert(
-        "flask.secrets", values_json=json.dumps({"secret_key": secret_key})
-    )
+    FlaskSecrets.put(flask_secrets.ContentType(secret_key=secret_key))
 
     assert app.secret_key is None
     _set_secret_key(app)
@@ -101,11 +81,13 @@ def test_set_secret_key_not_default(ndb_context, app: Flask) -> None:
 
 
 def test_set_secret_key_empty_prod(ndb_context, app: Flask) -> None:
-    Sitevar.get_or_insert("flask.secrets", values_json=json.dumps({"secret_key": ""}))
+    FlaskSecrets.put(flask_secrets.ContentType(secret_key=""))
 
     assert app.secret_key is None
     with patch.object(Environment, "is_prod", return_value=True):
-        with pytest.raises(Exception, match="Secret key not set in production!"):
+        with pytest.raises(
+            Exception, match="Secret key may not be default in production!"
+        ):
             _set_secret_key(app)
 
 
@@ -120,9 +102,7 @@ def test_set_secret_key_default_prod(ndb_context, app: Flask) -> None:
 
 def test_set_secret_key_prod(ndb_context, app: Flask) -> None:
     secret_key = "some_new_secret_key"
-    Sitevar.get_or_insert(
-        "flask.secrets", values_json=json.dumps({"secret_key": secret_key})
-    )
+    FlaskSecrets.put(flask_secrets.ContentType(secret_key=secret_key))
 
     assert app.secret_key is None
     with patch.object(Environment, "is_prod", return_value=True):

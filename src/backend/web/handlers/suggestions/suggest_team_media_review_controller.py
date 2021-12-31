@@ -2,7 +2,8 @@ import json
 from typing import Optional
 
 from flask import redirect, request
-from google.cloud import ndb
+from google.appengine.ext import ndb
+from pyre_extensions.refinement import none_throws
 from werkzeug.wrappers import Response
 
 from backend.common.consts.account_permission import AccountPermission
@@ -118,7 +119,7 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBase[Media]):
             suggestion.contents["reference_type"], suggestion.contents["reference_key"]
         )
         if to_replace_id:
-            to_replace = Media.get_by_id(to_replace_id)
+            to_replace = none_throws(Media.get_by_id(to_replace_id))
             if team_reference not in to_replace.preferred_references:
                 # Preferred reference must have been edited earlier. Skip this Suggestion for now.
                 return None

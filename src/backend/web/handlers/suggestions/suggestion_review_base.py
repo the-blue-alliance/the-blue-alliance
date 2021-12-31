@@ -3,12 +3,13 @@ from typing import Generic, List, Optional, TypeVar, Union
 
 from flask import redirect, request, url_for
 from flask.views import MethodView
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 from werkzeug.exceptions import abort, HTTPException
 from werkzeug.wrappers import Response
 
 from backend.common.auth import current_user
+from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.models.suggestion import Suggestion
 
@@ -69,8 +70,9 @@ class SuggestionsReviewBase(Generic[TTargetModel], MethodView):
             raise HTTPException(
                 response=redirect(url_for("account.login", next=request.url))
             )
+        user_permissions: List[AccountPermission] = none_throws(user).permissions or []
         for permission in self.REQUIRED_PERMISSIONS:
-            if permission not in (none_throws(user).permissions or []):
+            if permission not in user_permissions:
                 abort(401)
 
     def get(self) -> Optional[Response]:
@@ -104,7 +106,7 @@ class SuggestionsReviewBase(Generic[TTargetModel], MethodView):
         suggestion_future = Suggestion.get_by_id_async(accept_key)
 
         # Resolve async Futures
-        suggestion = suggestion_future.get_result()
+        suggestion = none_throws(suggestion_future.get_result())
         self.verify_write_permissions(suggestion)
 
         # Make sure Suggestion hasn't been processed (by another thread)
@@ -131,7 +133,7 @@ class SuggestionsReviewBase(Generic[TTargetModel], MethodView):
             Suggestion.get_by_id_async(key) for key in reject_keys
         ]
         rejected_suggestions = map(
-            lambda a: a.get_result(), rejected_suggestion_futures
+            lambda a: none_throws(a.get_result()), rejected_suggestion_futures
         )
 
         for suggestion in rejected_suggestions:

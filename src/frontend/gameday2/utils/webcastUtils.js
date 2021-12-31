@@ -1,4 +1,4 @@
-import { PropTypes } from "react";
+import PropTypes from "prop-types";
 
 export function getWebcastId(name, num) {
   return `${name}-${num}`;

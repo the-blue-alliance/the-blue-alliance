@@ -1,6 +1,4 @@
-from typing import List, Optional
-
-from typing_extensions import TypedDict
+from typing import List, Optional, TypedDict
 
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.media_type import MediaType

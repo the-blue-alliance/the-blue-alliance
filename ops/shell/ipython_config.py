@@ -25,15 +25,24 @@ c.InteractiveShellApp.exec_lines = [
 ]
 
 # Set up Google Application Credentials
+dev_config = {}
+if os.path.isfile("tba_dev_config.json"):
+    with open("tba_dev_config.json") as f:
+        default_config = json.load(f)
+        dev_config.update(default_config)
+
 if os.path.isfile("tba_dev_config.local.json"):
     with open("tba_dev_config.local.json") as f:
         local_config = json.load(f)
-        if "google_application_credentials" in local_config:
-            os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = local_config[
-                "google_application_credentials"
-            ]
+        dev_config.update(local_config)
 
-        if local_config.get("datastore_mode") == "local":
-            # These match the defaults used in the dev_appserver invocation
-            os.environ["DATASTORE_EMULATOR_HOST"] = "localhost:8089"
-            os.environ["DATASTORE_DATASET"] = "test"
+
+if "google_application_credentials" in dev_config:
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = dev_config[
+        "google_application_credentials"
+    ]
+
+if dev_config.get("datastore_mode") == "local":
+    # These match the defaults used in the dev_appserver invocation
+    os.environ["DATASTORE_EMULATOR_HOST"] = "localhost:8089"
+    os.environ["DATASTORE_DATASET"] = "test"

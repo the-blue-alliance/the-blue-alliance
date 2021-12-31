@@ -1,7 +1,7 @@
-from typing_extensions import TypedDict
+from typing import TypedDict
 
 from backend.common.consts.landing_type import LandingType
-from backend.common.sitevars.base import SitevarBase
+from backend.common.sitevars.sitevar import Sitevar
 
 
 class ContentType(TypedDict):
@@ -16,10 +16,14 @@ class ContentType(TypedDict):
     build_handler_show_ri3d: bool
 
 
-class LandingConfig(SitevarBase[ContentType]):
+class LandingConfig(Sitevar[ContentType]):
     @staticmethod
     def key() -> str:
         return "landing_config"
+
+    @staticmethod
+    def description() -> str:
+        return "Configuration data for the homepage"
 
     @staticmethod
     def default_value() -> ContentType:

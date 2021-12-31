@@ -1,6 +1,6 @@
 from typing import Any, List, Set, Tuple, Type
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.models.cached_model import TAffectedReferences
 from backend.common.models.district_team import DistrictTeam

@@ -2,7 +2,6 @@ from typing import Any, cast, Dict, List, Optional
 from urllib.parse import urlparse
 
 from bs4 import BeautifulSoup
-from google.cloud import ndb
 from werkzeug.test import Client
 
 from backend.common.consts.suggestion_state import SuggestionState
@@ -56,7 +55,7 @@ def test_get_form(login_user, web_client: Client) -> None:
 
 def test_submit_empty_form(
     login_user,
-    ndb_client: ndb.Client,
+    ndb_stub,
     web_client: Client,
     captured_templates: List[CapturedTemplate],
 ) -> None:
@@ -81,13 +80,12 @@ def test_submit_empty_form(
     assert soup.find(id="validation_failure-alert") is not None
 
     # Assert no suggestions were written
-    with ndb_client.context():
-        assert Suggestion.query().fetch() == []
+    assert Suggestion.query().fetch() == []
 
 
 def test_suggest_event(
     login_user,
-    ndb_client: ndb.Client,
+    ndb_stub,
     web_client: Client,
     captured_templates: List[CapturedTemplate],
 ) -> None:
@@ -111,21 +109,20 @@ def test_suggest_event(
     assert soup.find(id="success-alert") is not None
 
     # Make sure the Suggestion gets created
-    with ndb_client.context():
-        suggestion = cast(Suggestion, Suggestion.query().fetch()[0])
-        assert suggestion is not None
-        assert suggestion.review_state == SuggestionState.REVIEW_PENDING
-        assert suggestion.target_key is None
-        assert suggestion.target_model == "offseason-event"
-        assert suggestion.contents == SuggestionDict(
-            name="Test Event",
-            start_date="2012-04-04",
-            end_date="2012-04-06",
-            website="http://foo.com/bar",
-            address="123 Fake St",
-            city="New York",
-            state="NY",
-            country="USA",
-            venue_name="This is a Venue",
-            first_code=None,
-        )
+    suggestion = cast(Suggestion, Suggestion.query().fetch()[0])
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_PENDING
+    assert suggestion.target_key is None
+    assert suggestion.target_model == "offseason-event"
+    assert suggestion.contents == SuggestionDict(
+        name="Test Event",
+        start_date="2012-04-04",
+        end_date="2012-04-06",
+        website="http://foo.com/bar",
+        address="123 Fake St",
+        city="New York",
+        state="NY",
+        country="USA",
+        venue_name="This is a Venue",
+        first_code=None,
+    )

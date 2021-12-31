@@ -1,6 +1,6 @@
-from typing import List, Optional
+from typing import Any, Generator, List, Optional
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.event_type import EventType, SEASON_EVENT_TYPES
 from backend.common.models.district import District
@@ -30,7 +30,7 @@ class EventQuery(CachedDatabaseQuery[Optional[Event], Optional[EventDict]]):
         super().__init__(event_key=event_key)
 
     @typed_tasklet
-    def _query_async(self, event_key: EventKey) -> Optional[Event]:
+    def _query_async(self, event_key: EventKey) -> Generator[Any, Any, Optional[Event]]:
         event = yield Event.get_by_id_async(event_key)
         return event
 
@@ -44,7 +44,7 @@ class EventListQuery(CachedDatabaseQuery[List[Event], List[EventDict]]):
         super().__init__(year=year)
 
     @typed_tasklet
-    def _query_async(self, year: Year) -> List[Event]:
+    def _query_async(self, year: Year) -> Generator[Any, Any, List[Event]]:
         events = yield Event.query(Event.year == year).fetch_async()
         return events
 
@@ -57,7 +57,9 @@ class DistrictEventsQuery(CachedDatabaseQuery[List[Event], List[EventDict]]):
         super().__init__(district_key=district_key)
 
     @typed_tasklet
-    def _query_async(self, district_key: DistrictKey) -> List[Event]:
+    def _query_async(
+        self, district_key: DistrictKey
+    ) -> Generator[Any, Any, List[Event]]:
         events = yield Event.query(
             Event.district_key == ndb.Key(District, district_key)
         ).fetch_async()
@@ -73,7 +75,7 @@ class DistrictChampsInYearQuery(CachedDatabaseQuery[List[Event], List[EventDict]
         super().__init__(year=year)
 
     @typed_tasklet
-    def _query_async(self, year: Year) -> List[Event]:
+    def _query_async(self, year: Year) -> Generator[Any, Any, List[Event]]:
         all_cmp_event_keys = yield Event.query(
             Event.year == year, Event.event_type_enum == EventType.DISTRICT_CMP
         ).fetch_async(keys_only=True)
@@ -90,7 +92,7 @@ class TeamEventsQuery(CachedDatabaseQuery[List[Event], List[EventDict]]):
         super().__init__(team_key=team_key)
 
     @typed_tasklet
-    def _query_async(self, team_key: TeamKey) -> List[Event]:
+    def _query_async(self, team_key: TeamKey) -> Generator[Any, Any, List[Event]]:
         event_teams = yield EventTeam.query(
             EventTeam.team == ndb.Key(Team, team_key)
         ).fetch_async()
@@ -108,7 +110,9 @@ class TeamYearEventsQuery(CachedDatabaseQuery[List[Event], List[EventDict]]):
         super().__init__(team_key=team_key, year=year)
 
     @typed_tasklet
-    def _query_async(self, team_key: TeamKey, year: Year) -> List[Event]:
+    def _query_async(
+        self, team_key: TeamKey, year: Year
+    ) -> Generator[Any, Any, List[Event]]:
         event_teams = yield EventTeam.query(
             EventTeam.team == ndb.Key(Team, team_key), EventTeam.year == year
         ).fetch_async()
@@ -126,7 +130,9 @@ class TeamYearEventTeamsQuery(CachedDatabaseQuery[List[EventTeam], List[TeamDict
         super().__init__(team_key=team_key, year=year)
 
     @typed_tasklet
-    def _query_async(self, team_key: TeamKey, year: Year) -> List[EventTeam]:
+    def _query_async(
+        self, team_key: TeamKey, year: Year
+    ) -> Generator[Any, Any, List[EventTeam]]:
         event_teams = yield EventTeam.query(
             EventTeam.team == ndb.Key(Team, team_key), EventTeam.year == year
         ).fetch_async()
@@ -142,7 +148,7 @@ class EventDivisionsQuery(CachedDatabaseQuery[List[Event], List[EventDict]]):
         super().__init__(event_key=event_key)
 
     @typed_tasklet
-    def _query_async(self, event_key: EventKey) -> List[Event]:
+    def _query_async(self, event_key: EventKey) -> Generator[Any, Any, List[Event]]:
         event = yield Event.get_by_id_async(event_key)
         if event is None:
             return []
@@ -159,7 +165,7 @@ class LastSeasonEventQuery(CachedDatabaseQuery[Optional[Event], Optional[EventDi
         super().__init__(year=year)
 
     @typed_tasklet
-    def _query_async(self, year: Year) -> Optional[Event]:
+    def _query_async(self, year: Year) -> Generator[Any, Any, Optional[Event]]:
         events = (
             yield Event.query(
                 Event.year == year, Event.event_type_enum.IN(SEASON_EVENT_TYPES)

@@ -13,15 +13,13 @@ RUN apt-get update && apt-get install -y \
   jq \
   tmux \
   vim \
-  openssh-server \
-  redis-server
+  openssh-server
 
 # Setup python environmenets
-# python3 should be the default, but gcloud currently depends on python2
 RUN apt-get install -y \
     python3-pip \
     python3-venv \
-    python2
+    python-dev
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 RUN echo 1 | update-alternatives --config python
 
@@ -36,11 +34,15 @@ RUN apt-get update && apt-get install -y \
     google-cloud-sdk-datastore-emulator \
     google-cloud-sdk-pubsub-emulator
 
-# Install nodejs
-RUN apt-get install -y nodejs npm
-
-# Install pip2 for gcloud dependencies
-RUN curl https://bootstrap.pypa.io/pip/2.7/get-pip.py | python2
+# Set up nvm and nodejs
+ENV NVM_DIR /nvm
+ENV NODE_VERSION 14
+RUN mkdir -p $NVM_DIR  \
+    && wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash \
+    && . $NVM_DIR/nvm.sh \
+    && nvm install $NODE_VERSION --silent \
+    && nvm alias default $NODE_VERSION \
+    && nvm use default --silent
 
 # Configure ssh server
 RUN mkdir /var/run/sshd
@@ -50,6 +52,13 @@ RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so
 ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
 EXPOSE 22
+
+# Expose Firebase emulator
+EXPOSE 4000
+EXPOSE 4400
+EXPOSE 4500
+EXPOSE 9005
+EXPOSE 9099
 
 # Expose ports for TBA
 EXPOSE 8000

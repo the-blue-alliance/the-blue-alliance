@@ -1,6 +1,6 @@
-from typing import List, Optional
+from typing import Any, Generator, List, Optional
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.models.district import District
@@ -24,7 +24,9 @@ class DistrictQuery(CachedDatabaseQuery[Optional[District], Optional[DistrictDic
         super().__init__(district_key=district_key)
 
     @typed_tasklet
-    def _query_async(self, district_key: DistrictKey) -> Optional[District]:
+    def _query_async(
+        self, district_key: DistrictKey
+    ) -> Generator[Any, Any, Optional[District]]:
         # Fetch all equivalent keys
         keys = RenamedDistricts.get_equivalent_keys(district_key)
         districts = yield ndb.get_multi_async([ndb.Key(District, key) for key in keys])
@@ -44,7 +46,7 @@ class DistrictsInYearQuery(CachedDatabaseQuery[List[District], List[DistrictDict
         super().__init__(year=year)
 
     @typed_tasklet
-    def _query_async(self, year: Year) -> List[District]:
+    def _query_async(self, year: Year) -> Generator[Any, Any, List[District]]:
         district_keys = yield District.query(District.year == year).fetch_async(
             keys_only=True
         )
@@ -61,7 +63,9 @@ class DistrictHistoryQuery(CachedDatabaseQuery[List[District], List[DistrictDict
         super().__init__(abbreviation=abbreviation)
 
     @typed_tasklet
-    def _query_async(self, abbreviation: DistrictAbbreviation) -> List[District]:
+    def _query_async(
+        self, abbreviation: DistrictAbbreviation
+    ) -> Generator[Any, Any, List[District]]:
         district_keys = yield District.query(
             District.abbreviation.IN(
                 RenamedDistricts.get_equivalent_codes(abbreviation)
@@ -80,7 +84,7 @@ class TeamDistrictsQuery(CachedDatabaseQuery[List[District], List[DistrictDict]]
         super().__init__(team_key=team_key)
 
     @typed_tasklet
-    def _query_async(self, team_key: TeamKey) -> List[District]:
+    def _query_async(self, team_key: TeamKey) -> Generator[Any, Any, List[District]]:
         district_team_keys = yield DistrictTeam.query(
             DistrictTeam.team == ndb.Key(Team, team_key)
         ).fetch_async(keys_only=True)

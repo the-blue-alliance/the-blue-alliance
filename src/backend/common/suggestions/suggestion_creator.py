@@ -3,7 +3,7 @@ import logging
 from datetime import datetime
 from typing import cast, Dict, List, Optional, Tuple
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.auth_type import AuthType, WRITE_TYPE_NAMES
 from backend.common.consts.event_type import SEASON_EVENT_TYPES

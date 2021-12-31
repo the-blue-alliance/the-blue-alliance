@@ -1,8 +1,13 @@
-import json
-
 from backend.common.consts.landing_type import LandingType
-from backend.common.models.sitevar import Sitevar
-from backend.common.sitevars.landing_config import LandingConfig
+from backend.common.sitevars.landing_config import ContentType, LandingConfig
+
+
+def test_key():
+    assert LandingConfig.key() == "landing_config"
+
+
+def test_description():
+    assert LandingConfig.description() == "Configuration data for the homepage"
 
 
 def test_default_sitevar():
@@ -21,6 +26,7 @@ def test_default_sitevar():
         "build_handler_show_ri3d": False,
     }
     assert default_sitevar.contents == default_json
+    assert default_sitevar.description == "Configuration data for the homepage"
 
 
 def test_current_landing_type_default():
@@ -28,8 +34,5 @@ def test_current_landing_type_default():
 
 
 def test_current_landing_type():
-    Sitevar.get_or_insert(
-        "landing_config",
-        values_json=json.dumps({"current_landing": int(LandingType.OFFSEASON)}),
-    )
+    LandingConfig.put(ContentType(current_landing=int(LandingType.OFFSEASON)))
     assert LandingConfig.current_landing_type() == LandingType.OFFSEASON

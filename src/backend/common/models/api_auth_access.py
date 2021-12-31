@@ -1,6 +1,7 @@
-from typing import List
+import datetime
+from typing import List, Optional
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.auth_type import AuthType
 from backend.common.models.account import Account
@@ -17,22 +18,22 @@ class ApiAuthAccess(ndb.Model):
     """
 
     # For both read and write:
-    description = ndb.TextProperty(indexed=False)  # human-readable description
+    description: str = ndb.TextProperty(indexed=False)  # human-readable description
     auth_types_enum: List[AuthType] = ndb.IntegerProperty(  # pyre-ignore[8]
         choices=list(AuthType), repeated=True
     )  # read and write types should never be mixed
-    owner = ndb.KeyProperty(kind=Account)
+    owner: Optional[ndb.Key] = ndb.KeyProperty(kind=Account)
     allow_admin = ndb.BooleanProperty(default=False)  # Allow access to admin APIv3
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True)
 
     # Write only:
-    secret = ndb.TextProperty(indexed=False)
-    event_list = ndb.KeyProperty(
+    secret: Optional[str] = ndb.TextProperty(indexed=False)
+    event_list: List[ndb.Key] = ndb.KeyProperty(  # pyre-ignore[8]
         kind=Event, repeated=True
     )  # events for which auth is granted
-    expiration = ndb.DateTimeProperty()
+    expiration: Optional[datetime.datetime] = ndb.DateTimeProperty()
 
     def put(self, *args, **kwargs):
         # Validation for making sure that we never mix the READ_API and other write types together

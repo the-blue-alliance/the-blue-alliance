@@ -1,27 +1,37 @@
-from typing import Any, Callable, cast, Dict
+from datetime import timedelta
+from typing import Any, Callable, cast, Dict, Tuple
+
+from flask import Response
 
 from backend.common.consts.landing_type import LandingType
 from backend.common.decorators import cached_public
+from backend.common.flask_cache import make_cached_response
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.sitevars.landing_config import LandingConfig
 from backend.web.profiled_render import render_template
 
 
-# @cached_public
-def index() -> str:
-    HANDLER_MAP: Dict[LandingType, Callable[[Dict[str, Any]], str]] = {
-        LandingType.KICKOFF: index_kickoff,
-        LandingType.BUILDSEASON: index_buildseason,
-        LandingType.COMPETITIONSEASON: index_competitionseason,
-        LandingType.CHAMPS: index_champs,
-        LandingType.OFFSEASON: index_offseason,
-        LandingType.INSIGHTS: index_insights,
+@cached_public
+def index() -> Response:
+    HANDLER_MAP: Dict[
+        LandingType, Tuple[Callable[[Dict[str, Any]], str], timedelta]
+    ] = {
+        # map landing type -> (handler function, cache ttl)
+        LandingType.KICKOFF: (index_kickoff, timedelta(days=1)),
+        LandingType.BUILDSEASON: (index_buildseason, timedelta(minutes=5)),
+        LandingType.COMPETITIONSEASON: (
+            index_competitionseason,
+            timedelta(minutes=5),
+        ),
+        LandingType.CHAMPS: (index_champs, timedelta(minutes=5)),
+        LandingType.OFFSEASON: (index_offseason, timedelta(days=1)),
+        LandingType.INSIGHTS: (index_insights, timedelta(minutes=5)),
     }
     landing_type = LandingConfig.current_landing_type()
-    landing_type_handler = HANDLER_MAP[landing_type]
+    landing_type_handler, cache_ttl = HANDLER_MAP[landing_type]
     template_values = cast(Dict[str, Any], LandingConfig.get())
-    return landing_type_handler(template_values)
+    return make_cached_response(landing_type_handler(template_values), ttl=cache_ttl)
 
 
 def index_kickoff(template_values: Dict[str, Any]) -> str:

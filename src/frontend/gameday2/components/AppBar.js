@@ -1,4 +1,5 @@
-import React, { PropTypes } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 import { Toolbar, ToolbarTitle, ToolbarGroup } from "material-ui/Toolbar";
 import FlatButton from "material-ui/FlatButton";
 import IconButton from "material-ui/IconButton";
@@ -70,7 +71,7 @@ const AppBar = (props) => {
       labelPosition="before"
       style={configureLayoutButtonStyle}
       icon={getLayoutSvgIcon(props.layoutId, "#ffffff")}
-      onTouchTap={() => props.setLayoutDrawerVisibility(true)}
+      onClick={() => props.setLayoutDrawerVisibility(true)}
     />
   );
 

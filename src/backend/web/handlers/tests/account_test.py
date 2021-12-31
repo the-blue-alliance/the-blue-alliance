@@ -3,7 +3,7 @@ from unittest.mock import ANY, Mock, patch
 from urllib.parse import parse_qsl, quote, urlparse
 
 import pytest
-from flask import session
+from _pytest.monkeypatch import MonkeyPatch
 from flask.testing import FlaskClient
 
 import backend
@@ -190,6 +190,8 @@ def test_edit(
 def test_edit_no_account_id(login_user, web_client: FlaskClient) -> None:
     with web_client:
         response = web_client.post("/account/edit", data={})
+
+    with web_client.session_transaction() as session:  # pyre-ignore[16]
         assert session.get("account_edit_status") == "account_edit_failure"
 
     assert response.status_code == 302
@@ -202,6 +204,7 @@ def test_edit_no_account_id_follow_redirect(
 ) -> None:
     with web_client:
         response = web_client.post("/account/edit", follow_redirects=True, data={})
+    with web_client.session_transaction() as session:  # pyre-ignore[16]
         assert session.get("account_edit_status") is None
 
     assert response.status_code == 200
@@ -216,6 +219,7 @@ def test_edit_no_account_id_follow_redirect(
 def test_edit_mismatch_account_id(login_user, web_client: FlaskClient) -> None:
     with web_client:
         response = web_client.post("/account/edit", data={"account_id": "def"})
+    with web_client.session_transaction() as session:  # pyre-ignore[16]
         assert session.get("account_edit_status") == "account_edit_failure"
 
     assert response.status_code == 302
@@ -230,6 +234,7 @@ def test_edit_mismatch_account_id_follow_redirect(
         response = web_client.post(
             "/account/edit", follow_redirects=True, data={"account_id": "def"}
         )
+    with web_client.session_transaction() as session:  # pyre-ignore[16]
         assert session.get("account_edit_status") is None
 
     assert response.status_code == 200
@@ -246,6 +251,7 @@ def test_edit_no_display_name(login_user, web_client: FlaskClient) -> None:
 
     with web_client:
         response = web_client.post("/account/edit", data={"account_id": login_user.uid})
+    with web_client.session_transaction() as session:  # pyre-ignore[16]
         assert session.get("account_edit_status") == "account_edit_failure_name"
 
     assert response.status_code == 302
@@ -262,6 +268,7 @@ def test_edit_no_display_name_follow_redirect(
         response = web_client.post(
             "/account/edit", follow_redirects=True, data={"account_id": login_user.uid}
         )
+    with web_client.session_transaction() as session:  # pyre-ignore[16]
         assert session.get("account_edit_status") is None
 
     assert response.status_code == 200
@@ -282,6 +289,7 @@ def test_edit_success(login_user, web_client: FlaskClient) -> None:
         response = web_client.post(
             "/account/edit", data={"account_id": login_user.uid, "display_name": "Zach"}
         )
+    with web_client.session_transaction() as session:  # pyre-ignore[16]
         assert session.get("account_edit_status") is None
         assert session.get("account_status") == "account_edit_success"
 
@@ -362,17 +370,39 @@ def test_login_logged_in(login_user, web_client: FlaskClient) -> None:
     assert parsed_response.path == "/account"
 
 
+@pytest.mark.parametrize(
+    "auth_emulator_host",
+    [
+        None,
+        "",
+        "localhost:9099",
+    ],
+)
 def test_login(
-    captured_templates: List[CapturedTemplate], web_client: FlaskClient
+    auth_emulator_host,
+    monkeypatch: MonkeyPatch,
+    captured_templates: List[CapturedTemplate],
+    web_client: FlaskClient,
 ) -> None:
+    if auth_emulator_host is not None:
+        monkeypatch.setenv("FIREBASE_AUTH_EMULATOR_HOST", auth_emulator_host)
+
     response = web_client.get("/account/login")
 
     assert response.status_code == 200
     assert len(captured_templates) == 1
 
     template = captured_templates[0][0]
+    # context = captured_templates[0][1]
     assert template.name == "account_login_required.html"
     assert get_page_title(response.data) == "The Blue Alliance - Login Required"
+
+    # NOTE: Google App Engine is dropping our monkeypatch'd variable during
+    # our request context. It's really unclear why. Going to comment this out
+    # and attempt to fix this test at some other point - especially since
+    # the auth_emulator_host is just for testing in dev.
+    # ~Zach
+    # assert context["auth_emulator_host"] == auth_emulator_host
 
 
 def test_login_no_id_token(web_client: FlaskClient) -> None:
@@ -397,6 +427,7 @@ def test_read_key_add_no_description(login_user, web_client: FlaskClient) -> Non
         login_user, "add_api_read_key"
     ) as mock_add_api_read_key, web_client:
         response = web_client.post("/account/api/read_key_add")
+    with web_client.session_transaction() as session:  # pyre-ignore[16]
         assert session.get("account_status") == "read_key_add_no_description"
 
     mock_add_api_read_key.assert_not_called()
@@ -412,6 +443,7 @@ def test_read_key_add_no_api_key(login_user, web_client: FlaskClient) -> None:
         response = web_client.post(
             "/account/api/read_key_add", data={"description": "Testing"}
         )
+    with web_client.session_transaction() as session:  # pyre-ignore[16]
         assert session.get("account_status") == "read_key_add_failure"
 
     mock_add_api_read_key.assert_called_with("Testing")
@@ -427,6 +459,7 @@ def test_read_key_add(login_user, web_client: FlaskClient) -> None:
         response = web_client.post(
             "/account/api/read_key_add", data={"description": "Testing"}
         )
+    with web_client.session_transaction() as session:  # pyre-ignore[16]
         assert session.get("account_status") == "read_key_add_success"
 
     mock_add_api_read_key.assert_called_with("Testing")
@@ -438,6 +471,7 @@ def test_read_key_add(login_user, web_client: FlaskClient) -> None:
 def test_read_key_delete_no_key_id(login_user, web_client: FlaskClient) -> None:
     with patch.object(login_user, "delete_api_key") as mock_delete_api_key, web_client:
         response = web_client.post("/account/api/read_key_delete")
+    with web_client.session_transaction() as session:  # pyre-ignore[16]
         assert session.get("account_status") == "read_key_delete_failure"
 
     mock_delete_api_key.assert_not_called()
@@ -455,6 +489,7 @@ def test_read_key_delete_no_api_key(login_user, web_client: FlaskClient) -> None
         response = web_client.post(
             "/account/api/read_key_delete", data={"key_id": "abcd"}
         )
+    with web_client.session_transaction() as session:  # pyre-ignore[16]
         assert session.get("account_status") == "read_key_delete_failure"
 
     mock_delete_api_key.assert_not_called()
@@ -473,6 +508,7 @@ def test_read_key_delete(login_user, web_client: FlaskClient) -> None:
         response = web_client.post(
             "/account/api/read_key_delete", data={"key_id": "abcd"}
         )
+    with web_client.session_transaction() as session:  # pyre-ignore[16]
         assert session.get("account_status") == "read_key_delete_success"
 
     mock_delete_api_key.assert_called_with(mock_api_key)

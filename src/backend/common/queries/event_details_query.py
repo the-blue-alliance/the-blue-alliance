@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Generator, Optional
 
 from backend.common.models.event_details import EventDetails
 from backend.common.models.keys import EventKey
@@ -22,6 +22,8 @@ class EventDetailsQuery(
         super().__init__(event_key=event_key)
 
     @typed_tasklet
-    def _query_async(self, event_key: EventKey) -> Optional[EventDetails]:
+    def _query_async(
+        self, event_key: EventKey
+    ) -> Generator[Any, Any, Optional[EventDetails]]:
         event_details = yield EventDetails.get_by_id_async(event_key)
         return event_details

@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, Generator, List
 
 from backend.common.models.account import Account
 from backend.common.models.api_auth_access import ApiAuthAccess
@@ -11,7 +11,7 @@ class ApiAuthAccessQuery(DatabaseQuery[List[ApiAuthAccess], None]):
         super().__init__(owner=owner)
 
     @typed_tasklet
-    def _query_async(self, owner: Account) -> List[ApiAuthAccess]:
+    def _query_async(self, owner: Account) -> Generator[Any, Any, List[ApiAuthAccess]]:
         return (
             yield (ApiAuthAccess.query(ApiAuthAccess.owner == owner.key).fetch_async())
         )

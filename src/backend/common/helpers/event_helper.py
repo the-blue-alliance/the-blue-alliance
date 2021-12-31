@@ -2,7 +2,7 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 from typing import cast, Dict, List, NamedTuple, Optional
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts import comp_level
 from backend.common.consts.alliance_color import AllianceColor
@@ -79,7 +79,10 @@ class EventHelper(object):
                 EventType.CMP_DIVISION,
                 EventType.CMP_FINALS,
             }:
-                if event.year >= 2017:
+                if event.year == 2021:
+                    # 2021 had a remote CMP - so only a single CMP
+                    champs_label = CHAMPIONSHIP_EVENTS_LABEL
+                elif event.year >= 2017:
                     champs_label = TWO_CHAMPS_LABEL.format(event.city)
                 else:
                     champs_label = CHAMPIONSHIP_EVENTS_LABEL
@@ -92,6 +95,7 @@ class EventHelper(object):
                 EventType.DISTRICT,
                 EventType.DISTRICT_CMP_DIVISION,
                 EventType.DISTRICT_CMP,
+                EventType.REMOTE,
             }:
                 if event.start_date is None or (
                     event.start_date.month == 12 and event.start_date.day == 31
@@ -186,6 +190,11 @@ class EventHelper(object):
                 else:
                     wlt["losses"] += 1
         return wlt
+
+    @classmethod
+    @memoize(timeout=3600)  # 1 hour
+    def events_within_a_day(cls) -> List[Event]:
+        return list(filter(lambda e: e.within_a_day, cls.week_events()))
 
     @classmethod
     @memoize(timeout=3600)  # 1 hour
