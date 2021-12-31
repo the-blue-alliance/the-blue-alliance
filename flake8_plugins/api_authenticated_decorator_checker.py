@@ -13,7 +13,9 @@ class APIAuthenticatedDecoratorCheker:
     def run(self):
         for node in ast.walk(self.tree):
             if isinstance(node, ast.FunctionDef):
-                decorator_names = [d.id if hasattr(d, "id") else None for d in node.decorator_list]
+                decorator_names = [
+                    d.id if hasattr(d, "id") else None for d in node.decorator_list
+                ]
                 for i, name in enumerate(decorator_names):
                     if name == "api_authenticated" and i != 0:
                         yield (
