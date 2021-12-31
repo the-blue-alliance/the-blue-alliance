@@ -8,6 +8,10 @@ from backend.common.models.alliance import EventAlliance
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
+from backend.common.models.event_district_points import (
+    EventDistrictPoints,
+    TeamAtEventDistrictPoints,
+)
 
 
 def validate_nominal_event_keys(team):
@@ -187,7 +191,7 @@ def test_event_list_year(ndb_stub, api_client: Client) -> None:
     assert "2020casj" in resp.json
 
 
-def test_event_alliances(ndb_stub, api_client: Client) -> None:
+def test_event_details(ndb_stub, api_client: Client) -> None:
     ApiAuthAccess(
         id="test_auth_key",
         auth_types_enum=[AuthType.READ_API],
@@ -204,15 +208,37 @@ def test_event_alliances(ndb_stub, api_client: Client) -> None:
         EventAlliance(picks=["frc7", "frc8", "frc9"]),
         EventAlliance(picks=["frc10", "frc11", "frc12"]),
     ]
+    district_points = EventDistrictPoints(
+        points={
+            "frc254": TeamAtEventDistrictPoints(
+                event_key="2019casj",
+                qual_points=10,
+                elim_points=20,
+                alliance_points=10,
+                award_points=5,
+                total=45,
+            )
+        },
+        tiebreakers={},
+    )
     EventDetails(
         id="2019casj",
         alliance_selections=alliances,
+        district_points=district_points,
     ).put()
 
-    # Nominal response
-    resp = api_client.get(
+    # Alliances response
+    alliances_resp = api_client.get(
         "/api/v3/event/2019casj/alliances", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
-    assert resp.status_code == 200
+    assert alliances_resp.status_code == 200
     add_alliance_status("2019casj", alliances)
-    assert resp.json == alliances
+    assert alliances_resp.json == alliances
+
+    # District points response
+    district_points_resp = api_client.get(
+        "/api/v3/event/2019casj/district_points",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert district_points_resp.status_code == 200
+    assert district_points_resp.json == district_points
