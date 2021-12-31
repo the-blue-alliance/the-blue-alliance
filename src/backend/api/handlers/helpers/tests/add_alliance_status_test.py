@@ -23,8 +23,16 @@ def update_event_team(
         event=ndb.Key("Event", event_key),
         team=ndb.Key("Team", team_number),
         status=EventTeamStatus(
-            alliance=EventTeamStatusAlliance(number=alliance_number, pick=0),
+            qual=None,
             playoff=playoff_status,
+            alliance=EventTeamStatusAlliance(
+                name=None,
+                number=alliance_number,
+                pick=0,
+                backup=None,
+            ),
+            last_match_key=None,
+            next_match_key=None,
         ),
     ).put()
 
