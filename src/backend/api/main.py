@@ -3,9 +3,19 @@ from json import JSONDecodeError
 from flask import Blueprint, Flask, jsonify, make_response, Response
 from flask_cors import CORS
 from google.appengine.api import wrap_wsgi_app
+from werkzeug.routing import BaseConverter
 
 from backend.api.handlers.error import handle_404
-from backend.api.handlers.event import event
+from backend.api.handlers.event import (
+    event,
+    event_awards,
+    event_detail,
+    event_list_all,
+    event_list_year,
+    event_matches,
+    event_teams,
+)
+from backend.api.handlers.match import match
 from backend.api.handlers.status import status
 from backend.api.handlers.team import team, team_list, team_list_all, team_list_year
 from backend.api.handlers.trusted import (
@@ -28,6 +38,18 @@ from backend.common.middleware import install_middleware
 from backend.common.url_converters import install_url_converters
 
 
+class SimpleModelTypeConverter(BaseConverter):
+    regex = r"simple"
+
+
+class ModelTypeConverter(BaseConverter):
+    regex = r"simple|keys"
+
+
+class EventDetailTypeConverter(BaseConverter):
+    regex = r"alliances|district_points|insights|oprs|predictions|rankings"
+
+
 configure_logging()
 
 app = Flask(__name__)
@@ -37,28 +59,117 @@ install_url_converters(app)
 configure_flask_cache(app)
 
 app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
-
-SIMPLE_MODEL_TYPE = "<any('simple'):model_type>"
-ANY_MODEL_TYPE = "<any('simple','keys'):model_type>"
+app.url_map.converters["simple_model_type"] = SimpleModelTypeConverter
+app.url_map.converters["model_type"] = ModelTypeConverter
+app.url_map.converters["event_detail_type"] = EventDetailTypeConverter
 
 api_v3 = Blueprint("apiv3", __name__, url_prefix="/api/v3")
 CORS(api_v3, origins="*", methods=["OPTIONS", "GET"], allow_headers=["X-TBA-Auth-Key"])
 
 # Overall Status
 api_v3.add_url_rule("/status", view_func=status)
+
+# District
+# api_v3.add_url_rule("/district/<string:district_key>/events", view_func=TODO)
+# api_v3.add_url_rule("/district/<string:district_key>/events/<model_type:model_type>", view_func=TODO)
+# api_v3.add_url_rule("/district/<string:district_key>/teams", view_func=TODO)
+# api_v3.add_url_rule("/district/<string:district_key>/teams/<model_type:model_type>", view_func=TODO)
+# api_v3.add_url_rule("/district/<string:district_key>/rankings", view_func=TODO)
+
+# District List
+# api_v3.add_url_rule("/districts/<int:year>", view_func=TODO)
+
 # Event
 api_v3.add_url_rule("/event/<string:event_key>", view_func=event)
+api_v3.add_url_rule(
+    "/event/<string:event_key>/<simple_model_type:model_type>", view_func=event
+)
+api_v3.add_url_rule(
+    "/event/<string:event_key>/<event_detail_type:detail_type>",
+    view_func=event_detail,
+)
+api_v3.add_url_rule("event/<string:event_key>/teams", view_func=event_teams)
+api_v3.add_url_rule(
+    "/event/<string:event_key>/teams/<model_type:model_type>",
+    view_func=event_teams,
+)
+api_v3.add_url_rule("event/<string:event_key>/matches", view_func=event_matches)
+# api_v3.add_url_rule("event/<string:event_key>/matches/timeseries", view_func=TODO)
+api_v3.add_url_rule(
+    "/event/<string:event_key>/matches/<model_type:model_type>",
+    view_func=event_matches,
+)
+# api_v3.add_url_rule("/event/<string:event_key>/playoff_advancement", view_func=TODO)
+api_v3.add_url_rule("event/<string:event_key>/awards", view_func=event_awards)
+# api_v3.add_url_rule("/event/<string:event_key>/teams/statuses", view_func=TODO)
+
+# Event List
+api_v3.add_url_rule("/events/all", view_func=event_list_all)
+api_v3.add_url_rule("/events/all/<model_type:model_type>", view_func=event_list_all)
+api_v3.add_url_rule("/events/<int:year>", view_func=event_list_year)
+api_v3.add_url_rule(
+    "/events/<int:year>/<model_type:model_type>", view_func=event_list_year
+)
+
+# Match
+api_v3.add_url_rule("/match/<string:match_key>", view_func=match)
+api_v3.add_url_rule(
+    "/match/<string:match_key>/<simple_model_type:model_type>", view_func=match
+)
+# api_v3.add_url_rule("/match/<string:match_key>/timeseries", view_func=TODO)
+# api_v3.add_url_rule("/match/<string:match_key>/zebra_motionworks", view_func=TODO)
+
+# Media
+# api_v3.add_url_rule("/media/tags", view_func=TODO)
+
 # Team
 api_v3.add_url_rule("/team/<string:team_key>", view_func=team)
-api_v3.add_url_rule(f"/team/<string:team_key>/{SIMPLE_MODEL_TYPE}", view_func=team)
+api_v3.add_url_rule(
+    "/team/<string:team_key>/<simple_model_type:model_type>", view_func=team
+)
+
+# Team History
+# api_v3.add_url_rule("/team/<string:team_key>/years_participated", view_func=TODO)
+# api_v3.add_url_rule("/team/<string:team_key>/districts", view_func=TODO)
+# api_v3.add_url_rule("/team/<string:team_key>/robots", view_func=TODO)
+# api_v3.add_url_rule("/team/<string:team_key>/social_media", view_func=TODO)
+
+# Team Events
+# api_v3.add_url_rule("/team/<string:team_key>/events", view_func=TODO)
+# api_v3.add_url_rule("/team/<string:team_key>/events/<model_type:model_type>", view_func=TODO)
+# api_v3.add_url_rule("/team/<string:team_key>/events/<int:year>", view_func=TODO)
+# api_v3.add_url_rule("/team/<string:team_key>/events/<int:year>/<model_type:model_type>", view_func=TODO)
+# api_v3.add_url_rule("/team/<string:team_key>/events/<int:year>/statuses", view_func=TODO)
+
+# Team @ Event
+# api_v3.add_url_rule("/team/<string:team_key>/event/<string:event_key>/matches", view_func=TODO)
+# api_v3.add_url_rule("/team/<string:team_key>/event/<string:event_key>/matches/<model_type:model_type>", view_func=TODO)
+# api_v3.add_url_rule("/team/<string:team_key>/event/<string:event_key>/awards", view_func=TODO)
+# api_v3.add_url_rule("/team/<string:team_key>/event/<string:event_key>/status", view_func=TODO)
+
+# Team Awards
+# api_v3.add_url_rule("/team/<string:team_key>/awards", view_func=TODO)
+# api_v3.add_url_rule("/team/<string:team_key>/awards/<int:year>", view_func=TODO)
+
+# Team Matches
+# api_v3.add_url_rule("/team/<string:team_key>/matches/<int:year>", view_func=TODO)
+# api_v3.add_url_rule("/team/<string:team_key>/matches/<int:year>/<model_type:model_type>", view_func=TODO)
+
+# Team Media
+# api_v3.add_url_rule("/team/<string:team_key>/media/<int:year>", view_func=TODO)
+# api_v3.add_url_rule("/team/<string:team_key>/media/tag/<string:tag>", view_func=TODO)
+# api_v3.add_url_rule("/team/<string:team_key>/media/tag/<string:tag>/<int:year>", view_func=TODO)
+
 # Team List
 api_v3.add_url_rule("/teams/all", view_func=team_list_all)
-api_v3.add_url_rule(f"/teams/all/{ANY_MODEL_TYPE}", view_func=team_list_all)
+api_v3.add_url_rule("/teams/all/<model_type:model_type>", view_func=team_list_all)
 api_v3.add_url_rule("/teams/<int:page_num>", view_func=team_list)
-api_v3.add_url_rule(f"/teams/<int:page_num>/{ANY_MODEL_TYPE}", view_func=team_list)
+api_v3.add_url_rule(
+    "/teams/<int:page_num>/<model_type:model_type>", view_func=team_list
+)
 api_v3.add_url_rule("/teams/<int:year>/<int:page_num>", view_func=team_list_year)
 api_v3.add_url_rule(
-    f"/teams/<int:year>/<int:page_num>/{ANY_MODEL_TYPE}",
+    "/teams/<int:year>/<int:page_num>/<model_type:model_type>",
     view_func=team_list_year,
 )
 
