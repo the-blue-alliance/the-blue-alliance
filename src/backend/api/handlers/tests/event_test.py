@@ -10,9 +10,11 @@ from backend.api.handlers.helpers.model_properties import (
     simple_team_properties,
 )
 from backend.common.consts.auth_type import AuthType
+from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
 from backend.common.models.alliance import EventAlliance
 from backend.common.models.api_auth_access import ApiAuthAccess
+from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_district_points import (
@@ -401,3 +403,42 @@ def test_event_matches(ndb_stub, api_client: Client) -> None:
     assert len(resp.json) == 2
     assert "2019casj_qm1" in keys
     assert "2019casj_qm2" in keys
+
+
+def test_event_awards(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2019casj",
+        year=2019,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    Award(
+        id="2019casj_1",
+        year=2019,
+        award_type_enum=AwardType.WINNER,
+        event_type_enum=EventType.REGIONAL,
+        event=ndb.Key(Event, "2019casj"),
+        name_str="Winner",
+    ).put()
+    Award(
+        id="2019casj_2",
+        year=2019,
+        award_type_enum=AwardType.FINALIST,
+        event_type_enum=EventType.REGIONAL,
+        event=ndb.Key(Event, "2019casj"),
+        name_str="Finalist",
+    ).put()
+
+    # Nominal response
+    resp = api_client.get(
+        "/api/v3/event/2019casj/awards", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    names = set([award["name"] for award in resp.json])
+    assert "Winner" in names
+    assert "Finalist" in names
