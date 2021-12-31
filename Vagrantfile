@@ -31,7 +31,7 @@ Vagrant.configure("2") do |config|
   # Forward GAE modules
   # Only forward 8080 on CI since some others conflict with GH Actions
   # and are not needed for testing.
-  if ENV['ENV'] == 'CI'
+  if ENV['CI'] != ''
     gae_module_ports = [8080]
   else
     gae_module_ports = 8080..8089
