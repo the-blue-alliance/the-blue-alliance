@@ -172,56 +172,56 @@ jobs:
       - name: Run Build
         run: ./ops/build/run_buildweb.sh --env
 
-  # ops-test:
-  #   name: Ops Fullstack Test
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     pull-requests: write
-  #     contents: write
-  #   steps:
-  #     - uses: actions/checkout@v2.4.0
-  #     - name: Set up Python 3.8
-  #       uses: actions/setup-python@v2.3.0
-  #       with:
-  #         python-version: 3.8
-  #     - name: Cache pip
-  #       uses: actions/cache@v2.1.7
-  #       with:
-  #         path: ~/.cache/pip
-  #         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-  #         restore-keys: ${{ runner.os }}-pip-
-  #     - name: Install Python Dependencies
-  #       run: |
-  #         python -m pip install --upgrade pip
-  #         pip install -r requirements.txt
-  #     - name: Set up Node
-  #       uses: actions/setup-node@v2.5.1
-  #       with:
-  #         node-version: "14"
-  #     - name: Cache node modules
-  #       uses: actions/cache@v2.1.7
-  #       with:
-  #         path: ~/.npm
-  #         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-  #         restore-keys: ${{ runner.os }}-node-
-  #     - name: Install Node Dependencies
-  #       run: |
-  #         npm ci
-  #         npm install -g capture-website-cli
-  #     - name: Install Vagrant
-  #       run: sudo apt-get install vagrant
-  #     - name: Create keys file
-  #       run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
-  #     - name: Start Container
-  #       run: vagrant up
-  #     - name: Test Vagrant Startup
-  #       run: ./ops/test_vagrant_startup.py
-  #     - name: Test Ops Fullstack
-  #       run: ./ops/test_ops.sh
-  #     - name: Capture screenshots
-  #       run: ./ops/pr_screenshots/capture_screenshots.py
-  #     - name: Upload screenshots artifact
-  #       uses: actions/upload-artifact@v2
-  #       with:
-  #         name: ci_screenshots
-  #         path: ci_screenshots.pickle
+  ops-test:
+    name: Ops Fullstack Test
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2.3.0
+        with:
+          python-version: 3.8
+      - name: Cache pip
+        uses: actions/cache@v2.1.7
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Set up Node
+        uses: actions/setup-node@v2.5.1
+        with:
+          node-version: "14"
+      - name: Cache node modules
+        uses: actions/cache@v2.1.7
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+      - name: Install Node Dependencies
+        run: |
+          npm ci
+          npm install -g capture-website-cli
+      - name: Install Vagrant
+        run: sudo apt-get install vagrant
+      - name: Create keys file
+        run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
+      - name: Start Container
+        run: vagrant up
+      - name: Test Vagrant Startup
+        run: ./ops/test_vagrant_startup.py
+      - name: Test Ops Fullstack
+        run: ./ops/test_ops.sh
+      - name: Capture screenshots
+        run: ./ops/pr_screenshots/capture_screenshots.py
+      - name: Upload screenshots artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ci_screenshots
+          path: ci_screenshots.pickle
