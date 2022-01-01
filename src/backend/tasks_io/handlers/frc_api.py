@@ -60,7 +60,7 @@ def enqueue_event_list(year: Optional[Year]) -> Response:
     for year_to_fetch in years:
         taskqueue.add(
             queue_name="datafeed",
-            target="backend-tasks",
+            target="py3-tasks-io",
             url=url_for("frc_api.event_list", year=year_to_fetch),
             method="GET",
         )
@@ -118,7 +118,7 @@ def event_list(year: Year) -> Response:
     for event in events:
         taskqueue.add(
             queue_name="datafeed",
-            target="backend-tasks",
+            target="py3-tasks-io",
             url=url_for("frc_api.event_details", event_key=event.key_name),
             method="GET",
         )
@@ -145,7 +145,7 @@ def enqueue_event_details(event_key: EventKey) -> Response:
 
     taskqueue.add(
         queue_name="datafeed",
-        target="backend-tasks",
+        target="py3-tasks-io",
         url=url_for("frc_api.event_details", event_key=event_key),
         method="GET",
     )
@@ -298,6 +298,7 @@ def awards_year(year: Optional[int]) -> Response:
     for event in events:
         taskqueue.add(
             queue_name="datafeed",
+            target="py3-tasks-io",
             url=url_for("frc_api.awards_event", event_key=event.key_name),
             method="GET",
         )
