@@ -6,6 +6,9 @@ from backend.common.tasklets import typed_tasklet
 
 
 class AccountQuery(DatabaseQuery[Optional[Account], None]):
+
+    DICT_CONVERTER = None
+
     @typed_tasklet
     def _query_async(self, email: str) -> Generator[Any, Any, Optional[Account]]:
         if not email:

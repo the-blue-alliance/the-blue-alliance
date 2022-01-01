@@ -142,6 +142,7 @@ class EventEventTeamsQuery(CachedDatabaseQuery[List[EventTeam], List[TeamDict]])
 class TeamParticipationQuery(CachedDatabaseQuery[Set[Year], None]):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "team_participation_{team_key}"
+    DICT_CONVERTER = None
 
     def __init__(self, team_key: TeamKey) -> None:
         super().__init__(team_key=team_key)

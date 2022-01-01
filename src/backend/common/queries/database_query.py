@@ -18,7 +18,7 @@ from backend.common.queries.types import DictQueryReturn, QueryReturn
 
 class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
     _query_args: Dict[str, Any]
-    DICT_CONVERTER: Type[ConverterBase[QueryReturn, DictQueryReturn]] = ConverterBase
+    DICT_CONVERTER: Optional[Type[ConverterBase[QueryReturn, DictQueryReturn]]]
 
     def __init__(self, *args, **kwargs) -> None:
         self._query_args = kwargs
@@ -38,6 +38,11 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
         res = self._query_async(*args, **kwargs)
         if res is None:
             raise DoesNotExistException()
+
+        if self.DICT_CONVERTER is None:
+            raise Exception(
+                f"{self.__class__.__name__} does not provide a Dict converter!"
+            )
 
         # See https://github.com/facebook/pyre-check/issues/267
         dict_res = self.DICT_CONVERTER(  # pyre-ignore[45]
@@ -66,7 +71,9 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
             return query_result
 
 
-class CachedDatabaseQuery(DatabaseQuery, Generic[QueryReturn, DictQueryReturn]):
+class CachedDatabaseQuery(
+    DatabaseQuery, Generic[QueryReturn, DictQueryReturn], metaclass=abc.ABCMeta
+):
     DATABASE_QUERY_VERSION = 4
     BASE_CACHE_KEY_FORMAT: str = (
         "{}:{}:{}"  # (partial_cache_key, cache_version, database_query_version)
@@ -96,7 +103,7 @@ class CachedDatabaseQuery(DatabaseQuery, Generic[QueryReturn, DictQueryReturn]):
 
     @classmethod
     def _dict_cache_key(cls, cache_key: str, dict_version: ApiMajorVersion) -> str:
-        subvserion = cls.DICT_CONVERTER.SUBVERSIONS[dict_version]
+        subvserion = none_throws(cls.DICT_CONVERTER).SUBVERSIONS[dict_version]
         return f"{cache_key}~dictv{dict_version}.{subvserion}"
 
     @classmethod
@@ -147,7 +154,7 @@ class CachedDatabaseQuery(DatabaseQuery, Generic[QueryReturn, DictQueryReturn]):
                 raise DoesNotExistException
 
             # See https://github.com/facebook/pyre-check/issues/267
-            converted_result = self.DICT_CONVERTER(  # pyre-ignore[45]
+            converted_result = none_throws(self.DICT_CONVERTER)(  # pyre-ignore[45]
                 query_result
             ).convert(_dict_version)
 

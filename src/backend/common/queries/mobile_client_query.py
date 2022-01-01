@@ -7,6 +7,9 @@ from backend.common.tasklets import typed_tasklet
 
 
 class MobileClientQuery(DatabaseQuery[List[MobileClient], None]):
+
+    DICT_CONVERTER = None
+
     def __init__(
         self,
         user_ids: List[str],

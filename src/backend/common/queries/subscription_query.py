@@ -7,6 +7,9 @@ from backend.common.tasklets import typed_tasklet
 
 
 class SubscriptionQuery(DatabaseQuery[List[Subscription], None]):
+
+    DICT_CONVERTER = None
+
     def __init__(self, account: Account, keys_only: bool = False) -> None:
         super().__init__(account=account, keys_only=keys_only)
 

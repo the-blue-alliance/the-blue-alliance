@@ -52,6 +52,7 @@ class EventListQuery(CachedDatabaseQuery[List[Event], List[EventDict]]):
 class DistrictEventsQuery(CachedDatabaseQuery[List[Event], List[EventDict]]):
     CACHE_VERSION = 5
     CACHE_KEY_FORMAT = "district_events_{district_key}"
+    DICT_CONVERTER = EventConverter
 
     def __init__(self, district_key: DistrictKey) -> None:
         super().__init__(district_key=district_key)

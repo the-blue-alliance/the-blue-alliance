@@ -8,6 +8,9 @@ from backend.common.tasklets import typed_tasklet
 
 
 class SuggestionQuery(DatabaseQuery[List[Suggestion], None]):
+
+    DICT_CONVERTER = None
+
     def __init__(
         self,
         review_state: SuggestionState,
