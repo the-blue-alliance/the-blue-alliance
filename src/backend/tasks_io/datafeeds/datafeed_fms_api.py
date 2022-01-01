@@ -136,7 +136,7 @@ class DatafeedFMSAPI:
                 break
 
             partial_models, more_pages = result
-            models.extend(partial_models)
+            models.extend(partial_models or [])
 
             page = page + 1
 
@@ -198,7 +198,8 @@ class DatafeedFMSAPI:
             if result is None:
                 break
 
-            (partial_avatars, partial_keys_to_delete), more_pages = result
+            parser_result, more_pages = result
+            (partial_avatars, partial_keys_to_delete) = parser_result or ([], {})
             avatars.extend(partial_avatars)
             keys_to_delete = keys_to_delete.union(partial_keys_to_delete)
 

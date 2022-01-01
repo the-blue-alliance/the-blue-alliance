@@ -2,6 +2,7 @@ import json
 from typing import Any, Dict, Generator, List, Optional, Set
 
 import pytest
+import six
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -320,6 +321,10 @@ def test_cache_clearing(ndb_context, taskqueue_stub) -> None:
     # Ensure we've enqueued the cache clearing task to be run
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="cache-clearing")
     assert len(tasks) == 1
+
+    # This lets us ensure that the devserver can run our task
+    # See https://github.com/GoogleCloudPlatform/appengine-python-standard/issues/45
+    six.ensure_text(tasks[0].payload)
 
     # Run cache clearing manually
     deferred.run(tasks[0].payload)

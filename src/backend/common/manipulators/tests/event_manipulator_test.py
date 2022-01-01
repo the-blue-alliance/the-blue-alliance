@@ -5,6 +5,7 @@ from typing import Optional
 from unittest.mock import patch
 
 import pytest
+import six
 from google.appengine.ext import deferred
 from google.appengine.ext import testbed
 from pyre_extensions import none_throws
@@ -121,6 +122,9 @@ class TestEventManipulator(unittest.TestCase):
         )
         assert len(tasks) == 1
         for task in tasks:
+            # This lets us ensure that the devserver can run our task
+            # See https://github.com/GoogleCloudPlatform/appengine-python-standard/issues/45
+            six.ensure_text(task.payload)
             deferred.run(task.payload)
 
         assert none_throws(Event.get_by_id("2011ct")).timezone_id is not None

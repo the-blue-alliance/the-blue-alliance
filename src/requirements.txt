@@ -14,4 +14,4 @@ pyre-extensions==0.0.27
 requests==2.26.0
 typing-extensions==4.0.1
 Werkzeug==2.0.2
-appengine-python-standard==0.3.1
+appengine-python-standard-tbafork==0.4.0dev2
