@@ -13,7 +13,7 @@ from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
-from backend.common.models.keys import EventKey, Year
+from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.media import Media
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
@@ -94,6 +94,30 @@ class DatafeedFMSAPI:
     def get_root_info(self) -> Optional[RootInfo]:
         root_response = self.api.root()
         return self._parse(root_response, FMSAPIRootParser())
+
+    def get_team_details(
+        self, year: Year, team_key: TeamKey
+    ) -> Optional[Tuple[Team, Optional[DistrictTeam], Optional[Robot]]]:
+        team_number = int(team_key[3:])  # everything after 'frc'
+        api_response = self.api.team_details(year, team_number)
+        result = self._parse(api_response, FMSAPITeamDetailsParser(year))
+        if result:
+            models, _ = result
+            return next(iter(models), None)
+        else:
+            return None
+
+    def get_team_avatar(
+        self, year: Year, team_key: TeamKey
+    ) -> Tuple[List[Media], Set[ndb.Key]]:
+        team_number = int(team_key[3:])  # everything after 'frc'
+        api_response = self.api.team_avatar(year, team_number)
+        result = self._parse(api_response, FMSAPITeamAvatarParser(year))
+        if result:
+            (avatars, keys_to_delete), _ = result
+            return (avatars, keys_to_delete)
+        else:
+            return [], set()
 
     # Returns a tuple: (list(Event), list(District))
     def get_event_list(self, year: Year) -> Tuple[List[Event], List[District]]:
@@ -330,24 +354,6 @@ class DatafeedFMSAPI:
             return result
         else:
             return None, None
-
-    def getTeamDetails(self, year, team_key):
-        team_number = team_key[3:]  # everything after 'frc'
-
-        result = self._parse(self.FMS_API_TEAM_DETAILS_URL_PATTERN % (year, team_number), FMSAPITeamDetailsParser(year))
-        if result:
-            return result[0]
-        else:
-            return None
-
-    def getTeamAvatar(self, year, team_key):
-        team_number = team_key[3:]  # everything after 'frc'
-
-        avatars, keys_to_delete, _ = self._parse(self.FMS_API_TEAM_AVATAR_URL_PATTERN % (year, team_number), FMSAPITeamAvatarParser(year))
-        if avatars:
-            return avatars[0], keys_to_delete
-        else:
-            return None, keys_to_delete
 
     def getDistrictRankings(self, district_key):
         district = District.get_by_id(district_key)

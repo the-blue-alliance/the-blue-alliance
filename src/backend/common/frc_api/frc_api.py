@@ -31,6 +31,14 @@ class FRCAPI:
     def root(self) -> requests.Response:
         return self._get("/")
 
+    def team_details(self, year: Year, team_number: int) -> requests.Response:
+        endpoint = f"/{year}/teams?teamNumber={team_number}"
+        return self._get(endpoint)
+
+    def team_avatar(self, year: Year, team_number: int) -> requests.Response:
+        endpoint = f"/{year}/avatars?teamNumber={team_number}"
+        return self._get(endpoint)
+
     def event_list(self, year: Year) -> requests.Response:
         endpoint = f"/{year}/events"
         return self._get(endpoint)
