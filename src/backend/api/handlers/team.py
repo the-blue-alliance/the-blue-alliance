@@ -30,7 +30,10 @@ from backend.common.queries.event_query import (
     TeamYearEventsQuery,
     TeamYearEventTeamsQuery,
 )
-from backend.common.queries.match_query import TeamEventMatchesQuery
+from backend.common.queries.match_query import (
+    TeamEventMatchesQuery,
+    TeamYearMatchesQuery,
+)
 from backend.common.queries.media_query import TeamSocialMediaQuery
 from backend.common.queries.robot_query import TeamRobotsQuery
 from backend.common.queries.team_query import (
@@ -256,6 +259,28 @@ def team_awards(
             ApiMajorVersion.API_V3
         )
     return jsonify(awards)
+
+
+@api_authenticated
+@validate_team_key
+@cached_public
+def team_matches(
+    team_key: TeamKey,
+    year: int,
+    model_type: Optional[ModelType] = None,
+) -> Response:
+    """
+    Returns a list of matches associated with the given Team in a given year.
+    """
+    track_call_after_response("team/year/matches", f"{team_key}/{year}", model_type)
+
+    matches = TeamYearMatchesQuery(team_key=team_key, year=year).fetch_dict(
+        ApiMajorVersion.API_V3
+    )
+
+    if model_type is not None:
+        matches = filter_match_properties(matches, model_type)
+    return jsonify(matches)
 
 
 @api_authenticated

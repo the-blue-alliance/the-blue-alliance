@@ -564,6 +564,82 @@ def test_team_awards(ndb_stub, api_client: Client) -> None:
     assert len(resp.json) == 2
 
 
+def test_team_year_matches(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    Match(
+        id="2020casj_qm1",
+        year=2020,
+        event=ndb.Key("Event", "2020casj"),
+        comp_level="qm",
+        match_number=1,
+        set_number=1,
+        alliances_json=json.dumps(
+            {
+                "red": {"score": 0, "teams": []},
+                "blue": {"score": 0, "teams": []},
+            }
+        ),
+        team_key_names=["frc254"],
+    ).put()
+    Match(
+        id="2020casj_qm2",
+        year=2020,
+        event=ndb.Key("Event", "2020casj"),
+        comp_level="qm",
+        match_number=2,
+        set_number=1,
+        alliances_json=json.dumps(
+            {
+                "red": {"score": 0, "teams": []},
+                "blue": {"score": 0, "teams": []},
+            }
+        ),
+        team_key_names=["frc254"],
+    ).put()
+
+    # Null response
+    resp = api_client.get(
+        "/api/v3/team/frc254/matches/2019",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 0
+
+    # Nominal response
+    resp = api_client.get(
+        "/api/v3/team/frc254/matches/2020",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    for match in resp.json:
+        validate_nominal_match_keys(match)
+
+    # Simple response
+    resp = api_client.get(
+        "/api/v3/team/frc254/matches/2020/simple",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    for match in resp.json:
+        validate_simple_match_keys(match)
+
+    # Keys response
+    resp = api_client.get(
+        "/api/v3/team/frc254/matches/2020/keys",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    assert "2020casj_qm1" in resp.json
+    assert "2020casj_qm2" in resp.json
+
+
 def test_team_list_all(ndb_stub, api_client: Client) -> None:
     ApiAuthAccess(
         id="test_auth_key",

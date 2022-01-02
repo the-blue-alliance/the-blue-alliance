@@ -29,6 +29,7 @@ from backend.api.handlers.team import (
     team_history_robots,
     team_list,
     team_list_all,
+    team_matches,
     team_social_media,
     team_years_participated,
 )
@@ -190,8 +191,13 @@ api_v3.add_url_rule("/team/<string:team_key>/awards", view_func=team_awards)
 api_v3.add_url_rule("/team/<string:team_key>/awards/<int:year>", view_func=team_awards)
 
 # Team Matches
-# api_v3.add_url_rule("/team/<string:team_key>/matches/<int:year>", view_func=TODO)
-# api_v3.add_url_rule("/team/<string:team_key>/matches/<int:year>/<model_type:model_type>", view_func=TODO)
+api_v3.add_url_rule(
+    "/team/<string:team_key>/matches/<int:year>", view_func=team_matches
+)
+api_v3.add_url_rule(
+    "/team/<string:team_key>/matches/<int:year>/<model_type:model_type>",
+    view_func=team_matches,
+)
 
 # Team Media
 # api_v3.add_url_rule("/team/<string:team_key>/media/<int:year>", view_func=TODO)
