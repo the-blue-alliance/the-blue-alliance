@@ -15,6 +15,7 @@ from backend.common.models.team import Team
 from backend.common.queries.team_query import (
     TeamListQuery,
     TeamListYearQuery,
+    TeamParticipationQuery,
     TeamQuery,
 )
 
@@ -32,6 +33,20 @@ def team(team_key: TeamKey, model_type: Optional[ModelType] = None) -> Response:
     if model_type is not None:
         team = filter_team_properties([team], model_type)[0]
     return jsonify(team)
+
+
+@api_authenticated
+@validate_team_key
+@cached_public
+def team_years_participated(team_key: TeamKey) -> Response:
+    """
+    Returns details about one team, specified by |team_key|.
+    """
+    track_call_after_response("team/years_participated", team_key)
+
+    years_participated = TeamParticipationQuery(team_key=team_key).fetch()
+    years_participated = sorted(years_participated)
+    return jsonify(years_participated)
 
 
 @api_authenticated

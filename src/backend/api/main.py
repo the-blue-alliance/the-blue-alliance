@@ -17,7 +17,13 @@ from backend.api.handlers.event import (
 )
 from backend.api.handlers.match import match
 from backend.api.handlers.status import status
-from backend.api.handlers.team import team, team_list, team_list_all, team_list_year
+from backend.api.handlers.team import (
+    team,
+    team_list,
+    team_list_all,
+    team_list_year,
+    team_years_participated,
+)
 from backend.api.handlers.trusted import (
     add_event_media,
     add_match_video,
@@ -129,7 +135,9 @@ api_v3.add_url_rule(
 )
 
 # Team History
-# api_v3.add_url_rule("/team/<string:team_key>/years_participated", view_func=TODO)
+api_v3.add_url_rule(
+    "/team/<string:team_key>/years_participated", view_func=team_years_participated
+)
 # api_v3.add_url_rule("/team/<string:team_key>/districts", view_func=TODO)
 # api_v3.add_url_rule("/team/<string:team_key>/robots", view_func=TODO)
 # api_v3.add_url_rule("/team/<string:team_key>/social_media", view_func=TODO)

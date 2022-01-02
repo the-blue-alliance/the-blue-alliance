@@ -46,6 +46,39 @@ def test_team(ndb_stub, api_client: Client) -> None:
     assert resp.status_code == 404
 
 
+def test_team_years_participated(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    EventTeam(
+        id="1992casj_frc254",
+        event=ndb.Key("Event", "1992casj"),
+        team=ndb.Key("Team", "frc254"),
+        year=1992,
+    ).put()
+    EventTeam(
+        id="2010casj_frc254",
+        event=ndb.Key("Event", "2010casj"),
+        team=ndb.Key("Team", "frc254"),
+        year=2010,
+    ).put()
+    EventTeam(
+        id="2020casj_frc254",
+        event=ndb.Key("Event", "2020casj"),
+        team=ndb.Key("Team", "frc254"),
+        year=2020,
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/team/frc254/years_participated",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json == [1992, 2010, 2020]
+
+
 def test_team_list_all(ndb_stub, api_client: Client) -> None:
     ApiAuthAccess(
         id="test_auth_key",
