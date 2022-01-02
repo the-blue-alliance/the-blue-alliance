@@ -19,11 +19,13 @@ class MediaConverter(ConverterBase):
     }
 
     @classmethod
-    def _convert(cls, medias: List[Media], version: ApiMajorVersion) -> List[MediaDict]:
+    def _convert_list(
+        cls, model_list: List[Media], version: ApiMajorVersion
+    ) -> List[MediaDict]:
         MEDIA_CONVERTERS = {
             ApiMajorVersion.API_V3: cls.mediasConverter_v3,
         }
-        return MEDIA_CONVERTERS[version](medias)
+        return MEDIA_CONVERTERS[version](model_list)
 
     @classmethod
     def mediasConverter_v3(cls, medias: List[Media]) -> List[MediaDict]:

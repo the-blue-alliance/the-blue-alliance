@@ -13,6 +13,7 @@ from backend.common.decorators import cached_public
 from backend.common.models.keys import TeamKey
 from backend.common.models.team import Team
 from backend.common.queries.district_query import TeamDistrictsQuery
+from backend.common.queries.media_query import TeamSocialMediaQuery
 from backend.common.queries.robot_query import TeamRobotsQuery
 from backend.common.queries.team_query import (
     TeamListQuery,
@@ -56,7 +57,7 @@ def team_years_participated(team_key: TeamKey) -> Response:
 @cached_public
 def team_history_districts(team_key: TeamKey) -> Response:
     """
-    Returns a JSON list of all DistrictTeam models associated with the given Team.
+    Returns a list of all DistrictTeam models associated with the given Team.
     """
     track_call_after_response("team/history/districts", team_key)
 
@@ -71,14 +72,27 @@ def team_history_districts(team_key: TeamKey) -> Response:
 @cached_public
 def team_history_robots(team_key: TeamKey) -> Response:
     """
-    Returns a JSON list of all Robot models associated with the given Team.
+    Returns a list of all Robot models associated with the given Team.
     """
     track_call_after_response("team/history/robots", team_key)
 
-    team_districts = TeamRobotsQuery(team_key=team_key).fetch_dict(
+    team_robots = TeamRobotsQuery(team_key=team_key).fetch_dict(ApiMajorVersion.API_V3)
+    return jsonify(team_robots)
+
+
+@api_authenticated
+@validate_team_key
+@cached_public
+def team_social_media(team_key: TeamKey) -> Response:
+    """
+    Returns a list of all social media models associated with the given Team.
+    """
+    track_call_after_response("team/social_media", team_key)
+
+    team_social_media = TeamSocialMediaQuery(team_key=team_key).fetch_dict(
         ApiMajorVersion.API_V3
     )
-    return jsonify(team_districts)
+    return jsonify(team_social_media)
 
 
 @api_authenticated

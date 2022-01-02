@@ -24,6 +24,7 @@ from backend.api.handlers.team import (
     team_list,
     team_list_all,
     team_list_year,
+    team_social_media,
     team_years_participated,
 )
 from backend.api.handlers.trusted import (
@@ -144,7 +145,7 @@ api_v3.add_url_rule(
     "/team/<string:team_key>/districts", view_func=team_history_districts
 )
 api_v3.add_url_rule("/team/<string:team_key>/robots", view_func=team_history_robots)
-# api_v3.add_url_rule("/team/<string:team_key>/social_media", view_func=TODO)
+api_v3.add_url_rule("/team/<string:team_key>/social_media", view_func=team_social_media)
 
 # Team Events
 # api_v3.add_url_rule("/team/<string:team_key>/events", view_func=TODO)

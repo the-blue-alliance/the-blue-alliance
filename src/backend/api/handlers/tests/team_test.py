@@ -3,10 +3,12 @@ from werkzeug.test import Client
 
 from backend.api.handlers.helpers.model_properties import simple_team_properties
 from backend.common.consts.auth_type import AuthType
+from backend.common.consts.media_type import MediaType
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event_team import EventTeam
+from backend.common.models.media import Media
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 
@@ -148,6 +150,35 @@ def test_team_history_robots(ndb_stub, api_client: Client) -> None:
     robot_keys = set([d["key"] for d in resp.json])
     assert "frc254_2010" in robot_keys
     assert "frc254_2020" in robot_keys
+
+
+def test_team_social_media(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    Media(
+        references=[ndb.Key("Team", "frc254")],
+        year=None,
+        media_type_enum=MediaType.FACEBOOK_PROFILE,
+        foreign_key="test",
+        details_json="{}",
+    ).put()
+    Media(
+        references=[ndb.Key("Team", "frc254")],
+        year=None,
+        media_type_enum=MediaType.GITHUB_PROFILE,
+        foreign_key="test",
+        details_json="{}",
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/team/frc254/social_media",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
 
 
 def test_team_list_all(ndb_stub, api_client: Client) -> None:
