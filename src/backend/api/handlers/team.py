@@ -15,6 +15,7 @@ from backend.api.handlers.helpers.model_properties import (
 )
 from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.api_version import ApiMajorVersion
+from backend.common.consts.media_tag import get_enum_from_url
 from backend.common.decorators import cached_public
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey, TeamKey
@@ -34,7 +35,12 @@ from backend.common.queries.match_query import (
     TeamEventMatchesQuery,
     TeamYearMatchesQuery,
 )
-from backend.common.queries.media_query import TeamSocialMediaQuery
+from backend.common.queries.media_query import (
+    TeamSocialMediaQuery,
+    TeamTagMediasQuery,
+    TeamYearMediaQuery,
+    TeamYearTagMediasQuery,
+)
 from backend.common.queries.robot_query import TeamRobotsQuery
 from backend.common.queries.team_query import (
     TeamListQuery,
@@ -281,6 +287,48 @@ def team_matches(
     if model_type is not None:
         matches = filter_match_properties(matches, model_type)
     return jsonify(matches)
+
+
+@api_authenticated
+@validate_team_key
+@cached_public
+def team_media_year(team_key: TeamKey, year: int) -> Response:
+    """
+    Returns a list of media associated with the given Team in a given year.
+    """
+    track_call_after_response("team/media", f"{team_key}/{year}")
+
+    media = TeamYearMediaQuery(team_key=team_key, year=year).fetch_dict(
+        ApiMajorVersion.API_V3
+    )
+    return jsonify(media)
+
+
+@api_authenticated
+@validate_team_key
+@cached_public
+def team_media_tag(
+    team_key: TeamKey, media_tag: str, year: Optional[int] = None
+) -> Response:
+    """
+    Returns a list of media associated with the given Team with a given tag.
+    Optionally filters by year.
+    """
+    api_label = f"{team_key}/{media_tag}"
+    if year is not None:
+        api_label += f"/{year}"
+    track_call_after_response("team/media/tag", api_label)
+
+    tag_enum = get_enum_from_url(media_tag)
+    if year is None:
+        media = TeamTagMediasQuery(team_key=team_key, media_tag=tag_enum).fetch_dict(
+            ApiMajorVersion.API_V3
+        )
+    else:
+        media = TeamYearTagMediasQuery(
+            team_key=team_key, media_tag=tag_enum, year=year
+        ).fetch_dict(ApiMajorVersion.API_V3)
+    return jsonify(media)
 
 
 @api_authenticated

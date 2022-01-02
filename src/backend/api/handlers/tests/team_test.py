@@ -14,6 +14,7 @@ from backend.api.handlers.tests.helpers import (
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
+from backend.common.consts.media_tag import MediaTag
 from backend.common.consts.media_type import MediaType
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.award import Award
@@ -638,6 +639,92 @@ def test_team_year_matches(ndb_stub, api_client: Client) -> None:
     assert len(resp.json) == 2
     assert "2020casj_qm1" in resp.json
     assert "2020casj_qm2" in resp.json
+
+
+def test_team_media_year(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    Media(
+        references=[ndb.Key("Team", "frc254")],
+        year=2020,
+        media_type_enum=MediaType.YOUTUBE_VIDEO,
+        foreign_key="test1",
+        details_json="{}",
+    ).put()
+    Media(
+        references=[ndb.Key("Team", "frc254")],
+        year=2020,
+        media_type_enum=MediaType.YOUTUBE_VIDEO,
+        foreign_key="test2",
+        details_json="{}",
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/team/frc254/media/2020",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+
+
+def test_team_media_tag(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    Media(
+        references=[ndb.Key("Team", "frc254")],
+        year=2019,
+        media_type_enum=MediaType.YOUTUBE_VIDEO,
+        media_tag_enum=[MediaTag.CHAIRMANS_VIDEO],
+        foreign_key="test1",
+        details_json="{}",
+    ).put()
+    Media(
+        references=[ndb.Key("Team", "frc254")],
+        year=2020,
+        media_type_enum=MediaType.YOUTUBE_VIDEO,
+        media_tag_enum=[MediaTag.CHAIRMANS_VIDEO],
+        foreign_key="test2",
+        details_json="{}",
+    ).put()
+    Media(
+        references=[ndb.Key("Team", "frc254")],
+        year=2020,
+        media_type_enum=MediaType.YOUTUBE_VIDEO,
+        media_tag_enum=[MediaTag.CHAIRMANS_PRESENTATION],
+        foreign_key="test3",
+        details_json="{}",
+    ).put()
+
+    # All years
+    resp = api_client.get(
+        "/api/v3/team/frc254/media/tag/chairmans_video",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+
+    # Single year
+    resp = api_client.get(
+        "/api/v3/team/frc254/media/tag/chairmans_video/2020",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 1
+    assert resp.json[0]["foreign_key"] == "test2"
+
+    resp = api_client.get(
+        "/api/v3/team/frc254/media/tag/chairmans_presentation/2020",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 1
+    assert resp.json[0]["foreign_key"] == "test3"
 
 
 def test_team_list_all(ndb_stub, api_client: Client) -> None:
