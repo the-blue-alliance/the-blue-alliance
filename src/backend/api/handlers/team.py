@@ -12,6 +12,7 @@ from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.decorators import cached_public
 from backend.common.models.keys import TeamKey
 from backend.common.models.team import Team
+from backend.common.queries.district_query import TeamDistrictsQuery
 from backend.common.queries.team_query import (
     TeamListQuery,
     TeamListYearQuery,
@@ -40,13 +41,28 @@ def team(team_key: TeamKey, model_type: Optional[ModelType] = None) -> Response:
 @cached_public
 def team_years_participated(team_key: TeamKey) -> Response:
     """
-    Returns details about one team, specified by |team_key|.
+    Returns a list of years the given Team participated in an event.
     """
     track_call_after_response("team/years_participated", team_key)
 
     years_participated = TeamParticipationQuery(team_key=team_key).fetch()
     years_participated = sorted(years_participated)
     return jsonify(years_participated)
+
+
+@api_authenticated
+@validate_team_key
+@cached_public
+def team_history_districts(team_key: TeamKey) -> Response:
+    """
+    Returns a JSON list of all DistrictTeam models associated with a Team
+    """
+    track_call_after_response("team/history/districts", team_key)
+
+    team_districts = TeamDistrictsQuery(team_key=team_key).fetch_dict(
+        ApiMajorVersion.API_V3
+    )
+    return jsonify(team_districts)
 
 
 @api_authenticated

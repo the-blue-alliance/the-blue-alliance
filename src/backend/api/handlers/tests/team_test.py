@@ -4,6 +4,8 @@ from werkzeug.test import Client
 from backend.api.handlers.helpers.model_properties import simple_team_properties
 from backend.common.consts.auth_type import AuthType
 from backend.common.models.api_auth_access import ApiAuthAccess
+from backend.common.models.district import District
+from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event_team import EventTeam
 from backend.common.models.team import Team
 
@@ -77,6 +79,46 @@ def test_team_years_participated(ndb_stub, api_client: Client) -> None:
     )
     assert resp.status_code == 200
     assert resp.json == [1992, 2010, 2020]
+
+
+def test_team_history_districts(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    District(
+        id="2015fim",
+        year=2015,
+        abbreviation="fim",
+    ).put()
+    District(
+        id="2020fim",
+        year=2020,
+        abbreviation="fim",
+    ).put()
+    DistrictTeam(
+        id="2015fim_frc254",
+        district_key=ndb.Key(District, "2015fim"),
+        team=ndb.Key(Team, "frc254"),
+        year=2015,
+    ).put()
+    DistrictTeam(
+        id="2020fim_frc254",
+        district_key=ndb.Key(District, "2020fim"),
+        team=ndb.Key(Team, "frc254"),
+        year=2020,
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/team/frc254/districts",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    district_keys = set([d["key"] for d in resp.json])
+    assert "2015fim" in district_keys
+    assert "2020fim" in district_keys
 
 
 def test_team_list_all(ndb_stub, api_client: Client) -> None:
