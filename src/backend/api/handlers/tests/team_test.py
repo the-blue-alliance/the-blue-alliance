@@ -1,24 +1,23 @@
 from google.appengine.ext import ndb
 from werkzeug.test import Client
 
-from backend.api.handlers.helpers.model_properties import simple_team_properties
+from backend.api.handlers.tests.helpers import (
+    validate_nominal_event_keys,
+    validate_nominal_team_keys,
+    validate_simple_event_keys,
+    validate_simple_team_keys,
+)
 from backend.common.consts.auth_type import AuthType
+from backend.common.consts.event_type import EventType
 from backend.common.consts.media_type import MediaType
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
+from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.media import Media
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
-
-
-def validate_nominal_keys(team):
-    assert set(team.keys()).difference(set(simple_team_properties)) != set()
-
-
-def validate_simple_keys(team):
-    assert set(team.keys()).difference(set(simple_team_properties)) == set()
 
 
 def test_team(ndb_stub, api_client: Client) -> None:
@@ -34,7 +33,7 @@ def test_team(ndb_stub, api_client: Client) -> None:
     )
     assert resp.status_code == 200
     assert resp.json["key"] == "frc254"
-    validate_nominal_keys(resp.json)
+    validate_nominal_team_keys(resp.json)
 
     # Simple response
     resp = api_client.get(
@@ -42,7 +41,7 @@ def test_team(ndb_stub, api_client: Client) -> None:
     )
     assert resp.status_code == 200
     assert resp.json["key"] == "frc254"
-    validate_simple_keys(resp.json)
+    validate_simple_team_keys(resp.json)
 
     # Keys response
     resp = api_client.get(
@@ -181,6 +180,61 @@ def test_team_social_media(ndb_stub, api_client: Client) -> None:
     assert len(resp.json) == 2
 
 
+def test_team_events(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    Event(
+        id="2019casj",
+        year=2019,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    Event(
+        id="2019casf",
+        year=2019,
+        event_short="casf",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    EventTeam(
+        id="2019casj_frc254",
+        event=ndb.Key("Event", "2019casj"),
+        team=ndb.Key("Team", "frc254"),
+    ).put()
+    EventTeam(
+        id="2019casf_frc254",
+        event=ndb.Key("Event", "2019casf"),
+        team=ndb.Key("Team", "frc254"),
+    ).put()
+
+    # Nominal response
+    resp = api_client.get(
+        "/api/v3/team/frc254/events", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    for event in resp.json:
+        validate_nominal_event_keys(event)
+
+    # Simple response
+    resp = api_client.get(
+        "/api/v3/team/frc254/events/simple", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    for event in resp.json:
+        validate_simple_event_keys(event)
+
+    # Keys response
+    resp = api_client.get(
+        "/api/v3/team/frc254/events/keys", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+
+
 def test_team_list_all(ndb_stub, api_client: Client) -> None:
     ApiAuthAccess(
         id="test_auth_key",
@@ -198,7 +252,7 @@ def test_team_list_all(ndb_stub, api_client: Client) -> None:
     assert resp.status_code == 200
     assert len(resp.json) == 4
     for team in resp.json:
-        validate_nominal_keys(team)
+        validate_nominal_team_keys(team)
     assert resp.json[0]["key"] == "frc67"
     assert resp.json[1]["key"] == "frc254"
     assert resp.json[2]["key"] == "frc604"
@@ -211,7 +265,7 @@ def test_team_list_all(ndb_stub, api_client: Client) -> None:
     assert resp.status_code == 200
     assert len(resp.json) == 4
     for team in resp.json:
-        validate_simple_keys(team)
+        validate_simple_team_keys(team)
     assert resp.json[0]["key"] == "frc67"
     assert resp.json[1]["key"] == "frc254"
     assert resp.json[2]["key"] == "frc604"
@@ -246,7 +300,7 @@ def test_team_list(ndb_stub, api_client: Client) -> None:
     assert resp.status_code == 200
     assert len(resp.json) == 2
     for team in resp.json:
-        validate_nominal_keys(team)
+        validate_nominal_team_keys(team)
     assert resp.json[0]["key"] == "frc67"
     assert resp.json[1]["key"] == "frc254"
 
@@ -256,7 +310,7 @@ def test_team_list(ndb_stub, api_client: Client) -> None:
     assert resp.status_code == 200
     assert len(resp.json) == 1
     for team in resp.json:
-        validate_nominal_keys(team)
+        validate_nominal_team_keys(team)
     assert resp.json[0]["key"] == "frc604"
 
     resp = api_client.get(
@@ -272,7 +326,7 @@ def test_team_list(ndb_stub, api_client: Client) -> None:
     assert resp.status_code == 200
     assert len(resp.json) == 2
     for team in resp.json:
-        validate_simple_keys(team)
+        validate_simple_team_keys(team)
     assert resp.json[0]["key"] == "frc67"
     assert resp.json[1]["key"] == "frc254"
 
@@ -282,7 +336,7 @@ def test_team_list(ndb_stub, api_client: Client) -> None:
     assert resp.status_code == 200
     assert len(resp.json) == 1
     for team in resp.json:
-        validate_simple_keys(team)
+        validate_simple_team_keys(team)
     assert resp.json[0]["key"] == "frc604"
 
     resp = api_client.get(
@@ -341,7 +395,7 @@ def test_team_list_year(ndb_stub, api_client: Client) -> None:
     assert resp.status_code == 200
     assert len(resp.json) == 1
     for team in resp.json:
-        validate_nominal_keys(team)
+        validate_nominal_team_keys(team)
     assert resp.json[0]["key"] == "frc67"
 
     resp = api_client.get(
@@ -350,7 +404,7 @@ def test_team_list_year(ndb_stub, api_client: Client) -> None:
     assert resp.status_code == 200
     assert len(resp.json) == 1
     for team in resp.json:
-        validate_nominal_keys(team)
+        validate_nominal_team_keys(team)
     assert resp.json[0]["key"] == "frc254"
 
     resp = api_client.get(
@@ -366,7 +420,7 @@ def test_team_list_year(ndb_stub, api_client: Client) -> None:
     assert resp.status_code == 200
     assert len(resp.json) == 1
     for team in resp.json:
-        validate_simple_keys(team)
+        validate_simple_team_keys(team)
     assert resp.json[0]["key"] == "frc67"
 
     resp = api_client.get(
@@ -375,7 +429,7 @@ def test_team_list_year(ndb_stub, api_client: Client) -> None:
     assert resp.status_code == 200
     assert len(resp.json) == 1
     for team in resp.json:
-        validate_simple_keys(team)
+        validate_simple_team_keys(team)
     assert resp.json[0]["key"] == "frc254"
 
     resp = api_client.get(

@@ -4,10 +4,13 @@ from google.appengine.ext import ndb
 from werkzeug.test import Client
 
 from backend.api.handlers.helpers.add_alliance_status import add_alliance_status
-from backend.api.handlers.helpers.model_properties import (
-    simple_event_properties,
-    simple_match_properties,
-    simple_team_properties,
+from backend.api.handlers.tests.helpers import (
+    validate_nominal_event_keys,
+    validate_nominal_match_keys,
+    validate_nominal_team_keys,
+    validate_simple_event_keys,
+    validate_simple_match_keys,
+    validate_simple_team_keys,
 )
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.award_type import AwardType
@@ -24,30 +27,6 @@ from backend.common.models.event_district_points import (
 from backend.common.models.event_team import EventTeam
 from backend.common.models.match import Match
 from backend.common.models.team import Team
-
-
-def validate_nominal_event_keys(event):
-    assert set(event.keys()).difference(set(simple_event_properties)) != set()
-
-
-def validate_simple_event_keys(event):
-    assert set(event.keys()).difference(set(simple_event_properties)) == set()
-
-
-def validate_nominal_match_keys(match):
-    assert set(match.keys()).difference(set(simple_match_properties)) != set()
-
-
-def validate_simple_match_keys(match):
-    assert set(match.keys()).difference(set(simple_match_properties)) == set()
-
-
-def validate_nominal_team_keys(team):
-    assert set(team.keys()).difference(set(simple_team_properties)) != set()
-
-
-def validate_simple_team_keys(team):
-    assert set(team.keys()).difference(set(simple_team_properties)) == set()
 
 
 def test_event(ndb_stub, api_client: Client) -> None:

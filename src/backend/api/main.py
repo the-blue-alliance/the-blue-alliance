@@ -19,6 +19,7 @@ from backend.api.handlers.match import match
 from backend.api.handlers.status import status
 from backend.api.handlers.team import (
     team,
+    team_events,
     team_history_districts,
     team_history_robots,
     team_list,
@@ -148,8 +149,10 @@ api_v3.add_url_rule("/team/<string:team_key>/robots", view_func=team_history_rob
 api_v3.add_url_rule("/team/<string:team_key>/social_media", view_func=team_social_media)
 
 # Team Events
-# api_v3.add_url_rule("/team/<string:team_key>/events", view_func=TODO)
-# api_v3.add_url_rule("/team/<string:team_key>/events/<model_type:model_type>", view_func=TODO)
+api_v3.add_url_rule("/team/<string:team_key>/events", view_func=team_events)
+api_v3.add_url_rule(
+    "/team/<string:team_key>/events/<model_type:model_type>", view_func=team_events
+)
 # api_v3.add_url_rule("/team/<string:team_key>/events/<int:year>", view_func=TODO)
 # api_v3.add_url_rule("/team/<string:team_key>/events/<int:year>/<model_type:model_type>", view_func=TODO)
 # api_v3.add_url_rule("/team/<string:team_key>/events/<int:year>/statuses", view_func=TODO)
