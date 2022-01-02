@@ -14,7 +14,11 @@ from backend.common.decorators import cached_public
 from backend.common.models.keys import TeamKey
 from backend.common.models.team import Team
 from backend.common.queries.district_query import TeamDistrictsQuery
-from backend.common.queries.event_query import TeamEventsQuery, TeamYearEventsQuery
+from backend.common.queries.event_query import (
+    TeamEventsQuery,
+    TeamYearEventsQuery,
+    TeamYearEventTeamsQuery,
+)
 from backend.common.queries.media_query import TeamSocialMediaQuery
 from backend.common.queries.robot_query import TeamRobotsQuery
 from backend.common.queries.team_query import (
@@ -126,6 +130,32 @@ def team_events(
     if model_type is not None:
         team_events = filter_event_properties(team_events, model_type)
     return jsonify(team_events)
+
+
+@api_authenticated
+@validate_team_key
+@cached_public
+def team_events_statuses_year(team_key: TeamKey, year: int) -> Response:
+    """
+    TODO
+    """
+    track_call_after_response("team/events/statuses", f"{team_key}/{year}")
+
+    event_teams = TeamYearEventTeamsQuery(team_key=team_key, year=year).fetch()
+    statuses = {}
+    for event_team in event_teams:
+        status = event_team.status
+        if status is not None:
+            status_strings = event_team.status_strings
+            status.update(
+                {
+                    "alliance_status_str": status_strings["alliance"],
+                    "playoff_status_str": status_strings["playoff"],
+                    "overall_status_str": status_strings["overall"],
+                }
+            )
+        statuses[event_team.event.id()] = status
+    return jsonify(statuses)
 
 
 @api_authenticated

@@ -237,6 +237,41 @@ def test_team_events(ndb_stub, api_client: Client) -> None:
     assert len(resp.json) == 2
 
 
+def test_team_events_statuses_year(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    EventTeam(
+        id="2020casj_frc254",
+        event=ndb.Key("Event", "2020casj"),
+        team=ndb.Key("Team", "frc254"),
+        year=2020,
+    ).put()
+    EventTeam(
+        id="2020casf_frc254",
+        event=ndb.Key("Event", "2020casf"),
+        team=ndb.Key("Team", "frc254"),
+        year=2020,
+        status={},
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/team/frc254/events/2020/statuses",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    assert resp.json.get("2020casj") is None
+    casf_status = resp.json.get("2020casf")
+    assert casf_status is not None
+    assert (
+        casf_status["overall_status_str"]
+        == "Team 254 is waiting for the event to begin."
+    )
+
+
 def test_team_events_year(ndb_stub, api_client: Client) -> None:
     ApiAuthAccess(
         id="test_auth_key",
