@@ -21,6 +21,7 @@ from backend.api.handlers.team import (
     team,
     team_event_awards,
     team_event_matches,
+    team_event_status,
     team_events,
     team_events_statuses_year,
     team_history_districts,
@@ -178,7 +179,10 @@ api_v3.add_url_rule(
     "/team/<string:team_key>/event/<string:event_key>/awards",
     view_func=team_event_awards,
 )
-# api_v3.add_url_rule("/team/<string:team_key>/event/<string:event_key>/status", view_func=TODO)
+api_v3.add_url_rule(
+    "/team/<string:team_key>/event/<string:event_key>/status",
+    view_func=team_event_status,
+)
 
 # Team Awards
 # api_v3.add_url_rule("/team/<string:team_key>/awards", view_func=TODO)

@@ -16,6 +16,7 @@ from backend.api.handlers.helpers.model_properties import (
 from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.decorators import cached_public
+from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey, TeamKey
 from backend.common.models.team import Team
 from backend.common.queries.award_query import TeamEventAwardsQuery
@@ -176,7 +177,7 @@ def team_event_matches(
     Returns a list of matches for a team at an event.
     """
     track_call_after_response(
-        "team/events/matches", f"{team_key}/{event_key}", model_type
+        "team/event/matches", f"{team_key}/{event_key}", model_type
     )
 
     matches = TeamEventMatchesQuery(team_key=team_key, event_key=event_key).fetch_dict(
@@ -196,12 +197,39 @@ def team_event_awards(team_key: TeamKey, event_key: EventKey) -> Response:
     """
     Returns a list of awards for a team at an event.
     """
-    track_call_after_response("team/events/awards", f"{team_key}/{event_key}")
+    track_call_after_response("team/event/awards", f"{team_key}/{event_key}")
 
     awards = TeamEventAwardsQuery(team_key=team_key, event_key=event_key).fetch_dict(
         ApiMajorVersion.API_V3
     )
     return jsonify(awards)
+
+
+@api_authenticated
+@validate_team_key
+@validate_event_key
+@cached_public
+def team_event_status(team_key: TeamKey, event_key: EventKey) -> Response:
+    """
+    Return the status for a team at an event.
+    """
+    track_call_after_response("team/event/status", f"{team_key}/{event_key}")
+
+    event_team = EventTeam.get_by_id("{}_{}".format(event_key, team_key))
+
+    status = None
+    if event_team is not None:
+        status = event_team.status
+    if status is not None:
+        status_strings = event_team.status_strings
+        status.update(
+            {
+                "alliance_status_str": status_strings["alliance"],
+                "playoff_status_str": status_strings["playoff"],
+                "overall_status_str": status_strings["overall"],
+            }
+        )
+    return jsonify(status)
 
 
 @api_authenticated

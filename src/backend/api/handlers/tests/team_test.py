@@ -481,6 +481,30 @@ def test_team_event_awards(ndb_stub, api_client: Client) -> None:
     assert "Finalist" in award_names
 
 
+def test_team_event_status(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    EventTeam(
+        id="2020casj_frc254",
+        event=ndb.Key("Event", "2020casj"),
+        team=ndb.Key("Team", "frc254"),
+        year=2020,
+        status={},
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/team/frc254/event/2020casj/status",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert (
+        resp.json["overall_status_str"] == "Team 254 is waiting for the event to begin."
+    )
+
+
 def test_team_list_all(ndb_stub, api_client: Client) -> None:
     ApiAuthAccess(
         id="test_auth_key",
