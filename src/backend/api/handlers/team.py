@@ -233,15 +233,15 @@ def team_event_status(team_key: TeamKey, event_key: EventKey) -> Response:
     status = None
     if event_team is not None:
         status = event_team.status
-    if status is not None:
-        status_strings = event_team.status_strings
-        status.update(
-            {
-                "alliance_status_str": status_strings["alliance"],
-                "playoff_status_str": status_strings["playoff"],
-                "overall_status_str": status_strings["overall"],
-            }
-        )
+        if status is not None:
+            status_strings = event_team.status_strings
+            status.update(
+                {  # pyre-ignore[55]
+                    "alliance_status_str": status_strings["alliance"],
+                    "playoff_status_str": status_strings["playoff"],
+                    "overall_status_str": status_strings["overall"],
+                }
+            )
     return jsonify(status)
 
 
@@ -320,6 +320,9 @@ def team_media_tag(
     track_call_after_response("team/media/tag", api_label)
 
     tag_enum = get_enum_from_url(media_tag)
+    if tag_enum is None:
+        return jsonify([])
+
     if year is None:
         media = TeamTagMediasQuery(team_key=team_key, media_tag=tag_enum).fetch_dict(
             ApiMajorVersion.API_V3
