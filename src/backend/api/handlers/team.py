@@ -13,6 +13,7 @@ from backend.common.decorators import cached_public
 from backend.common.models.keys import TeamKey
 from backend.common.models.team import Team
 from backend.common.queries.district_query import TeamDistrictsQuery
+from backend.common.queries.robot_query import TeamRobotsQuery
 from backend.common.queries.team_query import (
     TeamListQuery,
     TeamListYearQuery,
@@ -55,11 +56,26 @@ def team_years_participated(team_key: TeamKey) -> Response:
 @cached_public
 def team_history_districts(team_key: TeamKey) -> Response:
     """
-    Returns a JSON list of all DistrictTeam models associated with a Team
+    Returns a JSON list of all DistrictTeam models associated with the given Team.
     """
     track_call_after_response("team/history/districts", team_key)
 
     team_districts = TeamDistrictsQuery(team_key=team_key).fetch_dict(
+        ApiMajorVersion.API_V3
+    )
+    return jsonify(team_districts)
+
+
+@api_authenticated
+@validate_team_key
+@cached_public
+def team_history_robots(team_key: TeamKey) -> Response:
+    """
+    Returns a JSON list of all Robot models associated with the given Team.
+    """
+    track_call_after_response("team/history/robots", team_key)
+
+    team_districts = TeamRobotsQuery(team_key=team_key).fetch_dict(
         ApiMajorVersion.API_V3
     )
     return jsonify(team_districts)

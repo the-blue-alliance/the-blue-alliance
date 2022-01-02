@@ -20,6 +20,7 @@ from backend.api.handlers.status import status
 from backend.api.handlers.team import (
     team,
     team_history_districts,
+    team_history_robots,
     team_list,
     team_list_all,
     team_list_year,
@@ -142,7 +143,7 @@ api_v3.add_url_rule(
 api_v3.add_url_rule(
     "/team/<string:team_key>/districts", view_func=team_history_districts
 )
-# api_v3.add_url_rule("/team/<string:team_key>/robots", view_func=TODO)
+api_v3.add_url_rule("/team/<string:team_key>/robots", view_func=team_history_robots)
 # api_v3.add_url_rule("/team/<string:team_key>/social_media", view_func=TODO)
 
 # Team Events

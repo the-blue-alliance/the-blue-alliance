@@ -7,6 +7,7 @@ from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event_team import EventTeam
+from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 
 
@@ -119,6 +120,34 @@ def test_team_history_districts(ndb_stub, api_client: Client) -> None:
     district_keys = set([d["key"] for d in resp.json])
     assert "2015fim" in district_keys
     assert "2020fim" in district_keys
+
+
+def test_team_history_robots(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    Robot(
+        id="frc254_2010",
+        team=ndb.Key("Team", "frc254"),
+        year=2010,
+    ).put()
+    Robot(
+        id="frc254_2020",
+        team=ndb.Key("Team", "frc254"),
+        year=2020,
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/team/frc254/robots",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    robot_keys = set([d["key"] for d in resp.json])
+    assert "frc254_2010" in robot_keys
+    assert "frc254_2020" in robot_keys
 
 
 def test_team_list_all(ndb_stub, api_client: Client) -> None:
