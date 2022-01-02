@@ -19,7 +19,11 @@ from backend.common.decorators import cached_public
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey, TeamKey
 from backend.common.models.team import Team
-from backend.common.queries.award_query import TeamEventAwardsQuery
+from backend.common.queries.award_query import (
+    TeamAwardsQuery,
+    TeamEventAwardsQuery,
+    TeamYearAwardsQuery,
+)
 from backend.common.queries.district_query import TeamDistrictsQuery
 from backend.common.queries.event_query import (
     TeamEventsQuery,
@@ -230,6 +234,28 @@ def team_event_status(team_key: TeamKey, event_key: EventKey) -> Response:
             }
         )
     return jsonify(status)
+
+
+@api_authenticated
+@validate_team_key
+@cached_public
+def team_awards(
+    team_key: TeamKey,
+    year: Optional[int] = None,
+) -> Response:
+    """
+    Returns a list of awards associated with the given Team.
+    Optionally only returns events from the specified year.
+    """
+    if year is None:
+        track_call_after_response("team/history/awards", team_key)
+        awards = TeamAwardsQuery(team_key=team_key).fetch_dict(ApiMajorVersion.API_V3)
+    else:
+        track_call_after_response("team/year/awards", f"{team_key}/{year}")
+        awards = TeamYearAwardsQuery(team_key=team_key, year=year).fetch_dict(
+            ApiMajorVersion.API_V3
+        )
+    return jsonify(awards)
 
 
 @api_authenticated

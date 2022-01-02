@@ -19,6 +19,7 @@ from backend.api.handlers.match import match
 from backend.api.handlers.status import status
 from backend.api.handlers.team import (
     team,
+    team_awards,
     team_event_awards,
     team_event_matches,
     team_event_status,
@@ -185,8 +186,8 @@ api_v3.add_url_rule(
 )
 
 # Team Awards
-# api_v3.add_url_rule("/team/<string:team_key>/awards", view_func=TODO)
-# api_v3.add_url_rule("/team/<string:team_key>/awards/<int:year>", view_func=TODO)
+api_v3.add_url_rule("/team/<string:team_key>/awards", view_func=team_awards)
+api_v3.add_url_rule("/team/<string:team_key>/awards/<int:year>", view_func=team_awards)
 
 # Team Matches
 # api_v3.add_url_rule("/team/<string:team_key>/matches/<int:year>", view_func=TODO)
