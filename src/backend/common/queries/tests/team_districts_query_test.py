@@ -11,6 +11,7 @@ def preseed_district_team(team_number: TeamNumber, district_key: DistrictKey) ->
     District(
         id=district_key,
         year=int(district_key[:4]),
+        abbreviation=district_key[4:],
     ).put()
 
     DistrictTeam(

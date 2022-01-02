@@ -105,7 +105,7 @@ def test_get_event_details_writes_teams(
         (
             Team(id="frc254", team_number=254),
             DistrictTeam(id="2019fim_frc254"),
-            Robot(id="frc254_2019"),
+            Robot(id="frc254_2019", team=ndb.Key(Team, "frc254"), year=2019),
         ),
     ]
     avatars_mock.return_value = (
@@ -143,11 +143,13 @@ def test_get_event_details_clears_eventteams(
         id="2019casj_frc900",
         event=ndb.Key(Event, "2019casj"),
         team=ndb.Key(Team, "frc9000"),
+        year=2019,
     ).put()
     EventTeam(
         id="2019casj_frc9001",
         event=ndb.Key(Event, "2019casj"),
         team=ndb.Key(Team, "frc9001"),
+        year=2019,
     ).put()
     Award(
         id="2019casj_0",

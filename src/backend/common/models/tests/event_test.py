@@ -301,6 +301,8 @@ def test_linked_district() -> None:
     District(
         id="2019ne",
         display_name="New England",
+        year=2019,
+        abbreviation="ne",
     ).put()
     event = Event(
         district_key=ndb.Key(District, "2019ne"),

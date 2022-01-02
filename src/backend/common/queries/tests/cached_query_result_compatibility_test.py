@@ -208,6 +208,7 @@ def test_round_trip_model_pickle_event_team() -> None:
         id="2020test_frc254",
         team=ndb.Key(Team, "frc254"),
         event=ndb.Key(Event, "2020test"),
+        year=2020,
     ).put()
     model = k.get()
 
