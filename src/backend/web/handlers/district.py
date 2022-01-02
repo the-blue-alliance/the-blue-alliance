@@ -11,7 +11,6 @@ from werkzeug.wrappers import Response
 from backend.common.decorators import cached_public
 from backend.common.flask_cache import make_cached_response
 from backend.common.helpers.event_helper import EventHelper
-from backend.common.helpers.event_team_status_helper import EventTeamStatusHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.team_helper import TeamHelper
 from backend.common.models.event_team import EventTeam
@@ -111,15 +110,9 @@ def district_detail(
                         "No EventTeam for {}_{}".format(event.key.id(), team.key.id())
                     )
                     continue
-                status_str = {
-                    "alliance": EventTeamStatusHelper.generate_team_at_event_alliance_status_string(
-                        team.key.id(), event_team.status
-                    ),
-                    "playoff": EventTeamStatusHelper.generate_team_at_event_playoff_status_string(
-                        team.key.id(), event_team.status
-                    ),
-                }
-                teams_and_statuses.append((team, event_team.status, status_str))
+                teams_and_statuses.append(
+                    (team, event_team.status, event_team.status_strings)
+                )
         if has_teams:
             teams_and_statuses.sort(key=lambda x: x[0].team_number)
             live_events_with_teams.append((event, teams_and_statuses))

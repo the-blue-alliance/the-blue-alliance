@@ -3,9 +3,13 @@ from typing import Set
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws, safe_cast
 
+from backend.common.helpers.event_team_status_helper import EventTeamStatusHelper
 from backend.common.models.cached_model import CachedModel
 from backend.common.models.event import Event
-from backend.common.models.event_team_status import EventTeamStatus
+from backend.common.models.event_team_status import (
+    EventTeamStatus,
+    EventTeamStatusStrings,
+)
 from backend.common.models.keys import EventTeamKey, Year
 from backend.common.models.team import Team
 
@@ -56,4 +60,19 @@ class EventTeam(CachedModel):
             none_throws(self.event.string_id())
             + "_"
             + none_throws(self.team.string_id())
+        )
+
+    @property
+    def status_strings(self) -> EventTeamStatusStrings:
+        team_key = none_throws(self.team.string_id())
+        return EventTeamStatusStrings(
+            alliance=EventTeamStatusHelper.generate_team_at_event_alliance_status_string(
+                team_key, self.status
+            ),
+            playoff=EventTeamStatusHelper.generate_team_at_event_playoff_status_string(
+                team_key, self.status
+            ),
+            overall=EventTeamStatusHelper.generate_team_at_event_status_string(
+                team_key, self.status
+            ),
         )
