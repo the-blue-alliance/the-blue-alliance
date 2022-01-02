@@ -16,8 +16,8 @@ class District(CachedModel):
     (like district rankings)
     """
 
-    year: Year = ndb.IntegerProperty()
-    abbreviation = ndb.StringProperty()
+    year: Year = ndb.IntegerProperty(required=True)
+    abbreviation = ndb.StringProperty(required=True)
     # This is what we'll show on the TBA site
     display_name = ndb.StringProperty()
     # These names are in the event's name as returned by FRC Elasticsearch

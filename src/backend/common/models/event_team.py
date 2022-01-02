@@ -17,9 +17,9 @@ class EventTeam(CachedModel):
     key_name is like 2010cmp_frc177 or 2007ct_frc195
     """
 
-    event: ndb.Key = ndb.KeyProperty(kind=Event)
-    team: ndb.Key = ndb.KeyProperty(kind=Team)
-    year: Year = ndb.IntegerProperty()
+    event: ndb.Key = ndb.KeyProperty(kind=Event, required=True)
+    team: ndb.Key = ndb.KeyProperty(kind=Team, required=True)
+    year: Year = ndb.IntegerProperty(required=True)
 
     status: EventTeamStatus = safe_cast(EventTeamStatus, ndb.JsonProperty())
 
