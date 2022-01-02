@@ -13,10 +13,6 @@ from backend.common.queries.dict_converters.event_converter import (
     EventConverter,
     EventDict,
 )
-from backend.common.queries.dict_converters.team_converter import (
-    TeamConverter,
-    TeamDict,
-)
 from backend.common.tasklets import typed_tasklet
 
 
@@ -122,10 +118,10 @@ class TeamYearEventsQuery(CachedDatabaseQuery[List[Event], List[EventDict]]):
         return list(events)
 
 
-class TeamYearEventTeamsQuery(CachedDatabaseQuery[List[EventTeam], List[TeamDict]]):
+class TeamYearEventTeamsQuery(CachedDatabaseQuery[List[EventTeam], None]):
     CACHE_VERSION = 4
     CACHE_KEY_FORMAT = "team_year_eventteams_{team_key}_{year}"
-    DICT_CONVERTER = TeamConverter
+    DICT_CONVERTER = None
 
     def __init__(self, team_key: TeamKey, year: Year) -> None:
         super().__init__(team_key=team_key, year=year)

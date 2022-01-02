@@ -123,10 +123,10 @@ class EventTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
         return list(teams)
 
 
-class EventEventTeamsQuery(CachedDatabaseQuery[List[EventTeam], List[TeamDict]]):
+class EventEventTeamsQuery(CachedDatabaseQuery[List[EventTeam], None]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "event_event_teams_{event_key}"
-    DICT_CONVERTER = TeamConverter
+    DICT_CONVERTER = None
 
     def __init__(self, event_key: EventKey) -> None:
         super().__init__(event_key=event_key)
