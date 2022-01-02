@@ -701,6 +701,14 @@ def test_team_media_tag(ndb_stub, api_client: Client) -> None:
         details_json="{}",
     ).put()
 
+    # Bad tag
+    resp = api_client.get(
+        "/api/v3/team/frc254/media/tag/bad_tag",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 0
+
     # All years
     resp = api_client.get(
         "/api/v3/team/frc254/media/tag/chairmans_video",
