@@ -12,9 +12,11 @@ from backend.api.handlers.tests.helpers import (
     validate_simple_team_keys,
 )
 from backend.common.consts.auth_type import AuthType
+from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
 from backend.common.consts.media_type import MediaType
 from backend.common.models.api_auth_access import ApiAuthAccess
+from backend.common.models.award import Award
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
@@ -441,6 +443,42 @@ def test_team_event_matches(ndb_stub, api_client: Client) -> None:
     assert len(resp.json) == 2
     assert "2020casj_qm1" in resp.json
     assert "2020casj_qm2" in resp.json
+
+
+def test_team_event_awards(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    Award(
+        id="2020casj_1",
+        year=2020,
+        award_type_enum=AwardType.WINNER,
+        event_type_enum=EventType.REGIONAL,
+        event=ndb.Key(Event, "2020casj"),
+        name_str="Winner",
+        team_list=[ndb.Key(Team, "frc254")],
+    ).put()
+    Award(
+        id="2020casj_2",
+        year=2020,
+        award_type_enum=AwardType.FINALIST,
+        event_type_enum=EventType.REGIONAL,
+        event=ndb.Key(Event, "2020casj"),
+        name_str="Finalist",
+        team_list=[ndb.Key(Team, "frc254")],
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/team/frc254/event/2020casj/awards",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    award_names = set([a["name"] for a in resp.json])
+    assert "Winner" in award_names
+    assert "Finalist" in award_names
 
 
 def test_team_list_all(ndb_stub, api_client: Client) -> None:

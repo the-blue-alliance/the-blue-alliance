@@ -18,6 +18,7 @@ from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.decorators import cached_public
 from backend.common.models.keys import EventKey, TeamKey
 from backend.common.models.team import Team
+from backend.common.queries.award_query import TeamEventAwardsQuery
 from backend.common.queries.district_query import TeamDistrictsQuery
 from backend.common.queries.event_query import (
     TeamEventsQuery,
@@ -185,6 +186,22 @@ def team_event_matches(
     if model_type is not None:
         matches = filter_match_properties(matches, model_type)
     return jsonify(matches)
+
+
+@api_authenticated
+@validate_team_key
+@validate_event_key
+@cached_public
+def team_event_awards(team_key: TeamKey, event_key: EventKey) -> Response:
+    """
+    Returns a list of awards for a team at an event.
+    """
+    track_call_after_response("team/events/awards", f"{team_key}/{event_key}")
+
+    awards = TeamEventAwardsQuery(team_key=team_key, event_key=event_key).fetch_dict(
+        ApiMajorVersion.API_V3
+    )
+    return jsonify(awards)
 
 
 @api_authenticated
