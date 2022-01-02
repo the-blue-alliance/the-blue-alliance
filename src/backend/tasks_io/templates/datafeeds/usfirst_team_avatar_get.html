@@ -1,0 +1,10 @@
+<div class="row">
+    {% if success %}
+        <h4>Got team {{team.team_number}}'s Avatar</h4>
+        <h2>Team {{team.team_number}}</h2>
+        <br>
+    {% else %}
+        <h4>Team Avatar Fetch Failed.</h4>
+        <p>{{key_name}} may lack a TPID, thus don't know how to scrape FIRST</p>
+    {% endif %}
+</div>

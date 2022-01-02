@@ -11,11 +11,13 @@ def test_get_districts() -> None:
     d = District(
         id="2019ne",
         year=2019,
+        abbreviation="ne",
     )
     d.put()
     d2 = District(
         id="2018ne",
         year=2018,
+        abbreviation="ne",
     )
     d2.put()
 

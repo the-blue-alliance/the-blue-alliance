@@ -1,3 +1,4 @@
+import datetime
 import re
 from typing import List, Optional, Set
 
@@ -42,6 +43,140 @@ from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 
 
 blueprint = Blueprint("frc_api", __name__)
+
+
+@blueprint.route("/tasks/enqueue/fmsapi_team_details_rolling")
+def enqueue_rolling_team_details() -> Response:
+    """
+    Handles enqueing updates to individual teams
+    Enqueues a certain fraction of teams so that all teams will get updated
+    every PERIOD days.
+    """
+    PERIOD = 14  # a particular team will be updated every PERIOD days
+    day_of_year = datetime.datetime.now().timetuple().tm_yday
+    bucket_num = int(day_of_year % PERIOD)
+
+    highest_team_key = Team.query().order(-Team.team_number).fetch(1, keys_only=True)[0]
+    highest_team_num = int(highest_team_key.id()[3:])
+    bucket_size = int(highest_team_num // PERIOD) + 1
+
+    min_team = bucket_num * bucket_size
+    max_team = min_team + bucket_size
+    team_keys = Team.query(
+        Team.team_number >= min_team, Team.team_number < max_team
+    ).fetch(1000, keys_only=True)
+
+    teams = ndb.get_multi(team_keys)
+    for team in teams:
+        taskqueue.add(
+            queue_name="datafeed",
+            target="py3-tasks-io",
+            url=url_for("frc_api.team_details", team_key=team.key_name),
+            method="GET",
+        )
+
+    template_values = {
+        "bucket_num": bucket_num,
+        "period": PERIOD,
+        "team_count": len(teams),
+        "min_team": min_team,
+        "max_team": max_team,
+    }
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(
+            render_template(
+                "datafeeds/rolling_team_details_enqueue.html", **template_values
+            )
+        )
+
+    return make_response("")
+
+
+@blueprint.route("/backend-tasks/get/team_details/<team_key>")
+def team_details(team_key: TeamKey) -> Response:
+    if not Team.validate_key_name(team_key):
+        return make_response(f"Bad team key: {escape(team_key)}", 400)
+
+    fms_df = DatafeedFMSAPI()
+    year = datetime.date.today().year
+    fms_details = fms_df.get_team_details(year, team_key)
+
+    team, district_team, robot = fms_details or (None, None, None)
+
+    if team:
+        team = TeamManipulator.createOrUpdate(team)
+
+    if district_team:
+        district_team = DistrictTeamManipulator.createOrUpdate(district_team)
+
+    # Clean up junk district teams
+    # https://www.facebook.com/groups/moardata/permalink/1310068625680096/
+    if team:
+        dt_keys = DistrictTeam.query(
+            DistrictTeam.team == team.key, DistrictTeam.year == year
+        ).fetch(keys_only=True)
+        keys_to_delete = set()
+        for dt_key in dt_keys:
+            if not district_team or dt_key.id() != district_team.key.id():
+                keys_to_delete.add(dt_key)
+        DistrictTeamManipulator.delete_keys(keys_to_delete)
+
+    if robot:
+        robot = RobotManipulator.createOrUpdate(robot)
+
+    template_values = {
+        "key_name": team_key,
+        "team": team,
+        "success": team is not None,
+        "robot": robot,
+        "district_team": district_team,
+    }
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(
+            render_template(
+                "datafeeds/usfirst_team_details_get.html", **template_values
+            )
+        )
+
+    return make_response("")
+
+
+@blueprint.route("/backend-tasks/get/team_avatar/<team_key>")
+def team_avatar(team_key: TeamKey) -> Response:
+    if not Team.validate_key_name(team_key):
+        return make_response(f"Bad team key: {escape(team_key)}", 400)
+    team = Team.get_by_id(team_key)
+
+    fms_df = DatafeedFMSAPI()
+    year = datetime.date.today().year
+
+    avatar, keys_to_delete = fms_df.get_team_avatar(year, team_key)
+
+    if avatar:
+        MediaManipulator.createOrUpdate(avatar)
+
+    MediaManipulator.delete_keys(keys_to_delete)
+
+    template_values = {
+        "key_name": team_key,
+        "team": team,
+        "success": avatar is not None,
+    }
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(
+            render_template("datafeeds/usfirst_team_avatar_get.html", **template_values)
+        )
+
+    return make_response("")
 
 
 @blueprint.route("/backend-tasks/enqueue/event_list/current", defaults={"year": None})

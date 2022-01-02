@@ -120,6 +120,20 @@ def test_district_list():
     mock_get.assert_called_once_with("/2020/districts")
 
 
+def test_team_details():
+    api = FRCAPI("zach")
+    with patch.object(FRCAPI, "_get") as mock_get:
+        api.team_details(2020, 254)
+    mock_get.assert_called_once_with("/2020/teams?teamNumber=254")
+
+
+def test_team_avatars():
+    api = FRCAPI("zach")
+    with patch.object(FRCAPI, "_get") as mock_get:
+        api.team_avatar(2020, 254)
+    mock_get.assert_called_once_with("/2020/avatars?teamNumber=254")
+
+
 @pytest.mark.parametrize(
     "endpoint", ["/2020/awards/MIKET", "2020/awards/MIKET", "///2020/awards/MIKET"]
 )

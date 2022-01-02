@@ -13,8 +13,8 @@ class Robot(CachedModel):
     key_name is like <team_key>_<year> (e.g. frc1124_2015)
     """
 
-    team = ndb.KeyProperty(kind=Team)
-    year = ndb.IntegerProperty()
+    team = ndb.KeyProperty(kind=Team, required=True)
+    year = ndb.IntegerProperty(required=True)
     robot_name = ndb.StringProperty()
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)

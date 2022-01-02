@@ -305,6 +305,7 @@ def test_bootstrap_event_with_district(
 ) -> None:
     district = District(
         id="2020ne",
+        year=2020,
         abbreviation="ne",
     )
     district.put()
