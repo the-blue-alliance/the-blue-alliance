@@ -137,7 +137,7 @@ def team_events(
 @cached_public
 def team_events_statuses_year(team_key: TeamKey, year: int) -> Response:
     """
-    TODO
+    Returns a dict of { event_key: status_dict } for all events in the given year for the associated team.
     """
     track_call_after_response("team/events/statuses", f"{team_key}/{year}")
 
