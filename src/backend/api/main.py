@@ -24,7 +24,6 @@ from backend.api.handlers.team import (
     team_history_robots,
     team_list,
     team_list_all,
-    team_list_year,
     team_social_media,
     team_years_participated,
 )
@@ -183,10 +182,10 @@ api_v3.add_url_rule("/teams/<int:page_num>", view_func=team_list)
 api_v3.add_url_rule(
     "/teams/<int:page_num>/<model_type:model_type>", view_func=team_list
 )
-api_v3.add_url_rule("/teams/<int:year>/<int:page_num>", view_func=team_list_year)
+api_v3.add_url_rule("/teams/<int:year>/<int:page_num>", view_func=team_list)
 api_v3.add_url_rule(
     "/teams/<int:year>/<int:page_num>/<model_type:model_type>",
-    view_func=team_list_year,
+    view_func=team_list,
 )
 
 # Trusted API
