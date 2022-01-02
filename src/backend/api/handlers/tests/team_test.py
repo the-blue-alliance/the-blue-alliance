@@ -193,20 +193,22 @@ def test_team_events(ndb_stub, api_client: Client) -> None:
         event_type_enum=EventType.REGIONAL,
     ).put()
     Event(
-        id="2019casf",
-        year=2019,
-        event_short="casf",
+        id="2020casj",
+        year=2020,
+        event_short="casj",
         event_type_enum=EventType.REGIONAL,
     ).put()
     EventTeam(
         id="2019casj_frc254",
         event=ndb.Key("Event", "2019casj"),
         team=ndb.Key("Team", "frc254"),
+        year=2019,
     ).put()
     EventTeam(
-        id="2019casf_frc254",
-        event=ndb.Key("Event", "2019casf"),
+        id="2020casj_frc254",
+        event=ndb.Key("Event", "2020casj"),
         team=ndb.Key("Team", "frc254"),
+        year=2020,
     ).put()
 
     # Nominal response
@@ -233,6 +235,104 @@ def test_team_events(ndb_stub, api_client: Client) -> None:
     )
     assert resp.status_code == 200
     assert len(resp.json) == 2
+
+
+def test_team_events_year(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    Event(
+        id="2019casj",
+        year=2019,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    Event(
+        id="2020casj",
+        year=2020,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    Event(
+        id="2020casf",
+        year=2020,
+        event_short="casf",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    EventTeam(
+        id="2019casj_frc254",
+        event=ndb.Key("Event", "2019casj"),
+        team=ndb.Key("Team", "frc254"),
+        year=2019,
+    ).put()
+    EventTeam(
+        id="2020casj_frc254",
+        event=ndb.Key("Event", "2020casj"),
+        team=ndb.Key("Team", "frc254"),
+        year=2020,
+    ).put()
+    EventTeam(
+        id="2020casf_frc254",
+        event=ndb.Key("Event", "2020casf"),
+        team=ndb.Key("Team", "frc254"),
+        year=2020,
+    ).put()
+
+    # Nominal response
+    resp = api_client.get(
+        "/api/v3/team/frc254/events/2019", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 1
+    for event in resp.json:
+        validate_nominal_event_keys(event)
+
+    resp = api_client.get(
+        "/api/v3/team/frc254/events/2020", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    for event in resp.json:
+        validate_nominal_event_keys(event)
+
+    # Simple response
+    resp = api_client.get(
+        "/api/v3/team/frc254/events/2019/simple",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 1
+    for event in resp.json:
+        validate_simple_event_keys(event)
+
+    resp = api_client.get(
+        "/api/v3/team/frc254/events/2020/simple",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    for event in resp.json:
+        validate_simple_event_keys(event)
+
+    # Keys response
+    resp = api_client.get(
+        "/api/v3/team/frc254/events/2019/keys",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 1
+    assert resp.json[0] == "2019casj"
+
+    resp = api_client.get(
+        "/api/v3/team/frc254/events/2020/keys",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    assert "2020casj" in resp.json
+    assert "2020casf" in resp.json
 
 
 def test_team_list_all(ndb_stub, api_client: Client) -> None:

@@ -14,7 +14,7 @@ from backend.common.decorators import cached_public
 from backend.common.models.keys import TeamKey
 from backend.common.models.team import Team
 from backend.common.queries.district_query import TeamDistrictsQuery
-from backend.common.queries.event_query import TeamEventsQuery
+from backend.common.queries.event_query import TeamEventsQuery, TeamYearEventsQuery
 from backend.common.queries.media_query import TeamSocialMediaQuery
 from backend.common.queries.robot_query import TeamRobotsQuery
 from backend.common.queries.team_query import (
@@ -100,13 +100,29 @@ def team_social_media(team_key: TeamKey) -> Response:
 @api_authenticated
 @validate_team_key
 @cached_public
-def team_events(team_key: TeamKey, model_type: Optional[ModelType] = None) -> Response:
+def team_events(
+    team_key: TeamKey,
+    year: Optional[int] = None,
+    model_type: Optional[ModelType] = None,
+) -> Response:
     """
     Returns a list of all event models associated with the given Team.
+    Optionally only returns events from the specified year.
     """
-    track_call_after_response("team/events", team_key, model_type)
+    api_action = "team/events"
+    if year is not None:
+        api_action += f"/{year}"
+    track_call_after_response(api_action, team_key, model_type)
 
-    team_events = TeamEventsQuery(team_key=team_key).fetch_dict(ApiMajorVersion.API_V3)
+    if year is None:
+        team_events = TeamEventsQuery(team_key=team_key).fetch_dict(
+            ApiMajorVersion.API_V3
+        )
+    else:
+        team_events = TeamYearEventsQuery(team_key=team_key, year=year).fetch_dict(
+            ApiMajorVersion.API_V3
+        )
+
     if model_type is not None:
         team_events = filter_event_properties(team_events, model_type)
     return jsonify(team_events)
@@ -164,6 +180,7 @@ def team_list(
         team_list = TeamListYearQuery(year=year, page=page_num).fetch_dict(
             ApiMajorVersion.API_V3
         )
+
     if model_type is not None:
         team_list = filter_team_properties(team_list, model_type)
     return jsonify(team_list)

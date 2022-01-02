@@ -152,8 +152,11 @@ api_v3.add_url_rule("/team/<string:team_key>/events", view_func=team_events)
 api_v3.add_url_rule(
     "/team/<string:team_key>/events/<model_type:model_type>", view_func=team_events
 )
-# api_v3.add_url_rule("/team/<string:team_key>/events/<int:year>", view_func=TODO)
-# api_v3.add_url_rule("/team/<string:team_key>/events/<int:year>/<model_type:model_type>", view_func=TODO)
+api_v3.add_url_rule("/team/<string:team_key>/events/<int:year>", view_func=team_events)
+api_v3.add_url_rule(
+    "/team/<string:team_key>/events/<int:year>/<model_type:model_type>",
+    view_func=team_events,
+)
 # api_v3.add_url_rule("/team/<string:team_key>/events/<int:year>/statuses", view_func=TODO)
 
 # Team @ Event
