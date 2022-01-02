@@ -3,18 +3,13 @@ import json
 from google.appengine.ext import ndb
 from werkzeug.test import Client
 
-from backend.api.handlers.helpers.model_properties import simple_match_properties
+from backend.api.handlers.tests.helpers import (
+    validate_nominal_match_keys,
+    validate_simple_match_keys,
+)
 from backend.common.consts.auth_type import AuthType
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.match import Match
-
-
-def validate_nominal_keys(team):
-    assert set(team.keys()).difference(set(simple_match_properties)) != set()
-
-
-def validate_simple_keys(team):
-    assert set(team.keys()).difference(set(simple_match_properties)) == set()
 
 
 def test_match(ndb_stub, api_client: Client) -> None:
@@ -43,7 +38,7 @@ def test_match(ndb_stub, api_client: Client) -> None:
     )
     assert resp.status_code == 200
     assert resp.json["key"] == "2020casj_qm1"
-    validate_nominal_keys(resp.json)
+    validate_nominal_match_keys(resp.json)
 
     # Simple response
     resp = api_client.get(
@@ -51,7 +46,7 @@ def test_match(ndb_stub, api_client: Client) -> None:
     )
     assert resp.status_code == 200
     assert resp.json["key"] == "2020casj_qm1"
-    validate_simple_keys(resp.json)
+    validate_simple_match_keys(resp.json)
 
     # Keys response
     resp = api_client.get(

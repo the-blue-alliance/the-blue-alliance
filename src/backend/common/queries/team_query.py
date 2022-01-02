@@ -123,10 +123,10 @@ class EventTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
         return list(teams)
 
 
-class EventEventTeamsQuery(CachedDatabaseQuery[List[EventTeam], List[TeamDict]]):
+class EventEventTeamsQuery(CachedDatabaseQuery[List[EventTeam], None]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "event_event_teams_{event_key}"
-    DICT_CONVERTER = TeamConverter
+    DICT_CONVERTER = None
 
     def __init__(self, event_key: EventKey) -> None:
         super().__init__(event_key=event_key)
@@ -154,18 +154,3 @@ class TeamParticipationQuery(CachedDatabaseQuery[Set[Year], None]):
         ).fetch_async(keys_only=True)
         years = map(lambda event_team: int(event_team.id()[:4]), event_teams)
         return set(years)
-
-
-"""
-class TeamDistrictsQuery(CachedDatabaseQuery[List[District], List[TeamDict]]):
-    CACHE_VERSION = 2
-    CACHE_KEY_FORMAT = 'team_districts_{}'  # (team_key)
-    DICT_CONVERTER = DistrictConverter
-
-    @ndb.tasklet
-    def _query_async(self, team_key: str) -> List[District]:
-        team_key = self._query_args[0]
-        district_team_keys = yield DistrictTeam.query(DistrictTeam.team == ndb.Key(Team, team_key)).fetch_async(keys_only=True)
-        districts = yield ndb.get_multi_async([ndb.Key(District, dtk.id().split('_')[0]) for dtk in district_team_keys])
-        return filter(lambda x: x is not None, districts)
-"""

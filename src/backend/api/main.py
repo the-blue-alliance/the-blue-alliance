@@ -17,7 +17,24 @@ from backend.api.handlers.event import (
 )
 from backend.api.handlers.match import match
 from backend.api.handlers.status import status
-from backend.api.handlers.team import team, team_list, team_list_all, team_list_year
+from backend.api.handlers.team import (
+    team,
+    team_awards,
+    team_event_awards,
+    team_event_matches,
+    team_event_status,
+    team_events,
+    team_events_statuses_year,
+    team_history_districts,
+    team_history_robots,
+    team_list,
+    team_list_all,
+    team_matches,
+    team_media_tag,
+    team_media_year,
+    team_social_media,
+    team_years_participated,
+)
 from backend.api.handlers.trusted import (
     add_event_media,
     add_match_video,
@@ -129,36 +146,72 @@ api_v3.add_url_rule(
 )
 
 # Team History
-# api_v3.add_url_rule("/team/<string:team_key>/years_participated", view_func=TODO)
-# api_v3.add_url_rule("/team/<string:team_key>/districts", view_func=TODO)
-# api_v3.add_url_rule("/team/<string:team_key>/robots", view_func=TODO)
-# api_v3.add_url_rule("/team/<string:team_key>/social_media", view_func=TODO)
+api_v3.add_url_rule(
+    "/team/<string:team_key>/years_participated", view_func=team_years_participated
+)
+api_v3.add_url_rule(
+    "/team/<string:team_key>/districts", view_func=team_history_districts
+)
+api_v3.add_url_rule("/team/<string:team_key>/robots", view_func=team_history_robots)
+api_v3.add_url_rule("/team/<string:team_key>/social_media", view_func=team_social_media)
 
 # Team Events
-# api_v3.add_url_rule("/team/<string:team_key>/events", view_func=TODO)
-# api_v3.add_url_rule("/team/<string:team_key>/events/<model_type:model_type>", view_func=TODO)
-# api_v3.add_url_rule("/team/<string:team_key>/events/<int:year>", view_func=TODO)
-# api_v3.add_url_rule("/team/<string:team_key>/events/<int:year>/<model_type:model_type>", view_func=TODO)
-# api_v3.add_url_rule("/team/<string:team_key>/events/<int:year>/statuses", view_func=TODO)
+api_v3.add_url_rule("/team/<string:team_key>/events", view_func=team_events)
+api_v3.add_url_rule(
+    "/team/<string:team_key>/events/<model_type:model_type>", view_func=team_events
+)
+api_v3.add_url_rule("/team/<string:team_key>/events/<int:year>", view_func=team_events)
+api_v3.add_url_rule(
+    "/team/<string:team_key>/events/<int:year>/<model_type:model_type>",
+    view_func=team_events,
+)
+api_v3.add_url_rule(
+    "/team/<string:team_key>/events/<int:year>/statuses",
+    view_func=team_events_statuses_year,
+)
 
 # Team @ Event
-# api_v3.add_url_rule("/team/<string:team_key>/event/<string:event_key>/matches", view_func=TODO)
-# api_v3.add_url_rule("/team/<string:team_key>/event/<string:event_key>/matches/<model_type:model_type>", view_func=TODO)
-# api_v3.add_url_rule("/team/<string:team_key>/event/<string:event_key>/awards", view_func=TODO)
-# api_v3.add_url_rule("/team/<string:team_key>/event/<string:event_key>/status", view_func=TODO)
+api_v3.add_url_rule(
+    "/team/<string:team_key>/event/<string:event_key>/matches",
+    view_func=team_event_matches,
+)
+api_v3.add_url_rule(
+    "/team/<string:team_key>/event/<string:event_key>/matches/<model_type:model_type>",
+    view_func=team_event_matches,
+)
+api_v3.add_url_rule(
+    "/team/<string:team_key>/event/<string:event_key>/awards",
+    view_func=team_event_awards,
+)
+api_v3.add_url_rule(
+    "/team/<string:team_key>/event/<string:event_key>/status",
+    view_func=team_event_status,
+)
 
 # Team Awards
-# api_v3.add_url_rule("/team/<string:team_key>/awards", view_func=TODO)
-# api_v3.add_url_rule("/team/<string:team_key>/awards/<int:year>", view_func=TODO)
+api_v3.add_url_rule("/team/<string:team_key>/awards", view_func=team_awards)
+api_v3.add_url_rule("/team/<string:team_key>/awards/<int:year>", view_func=team_awards)
 
 # Team Matches
-# api_v3.add_url_rule("/team/<string:team_key>/matches/<int:year>", view_func=TODO)
-# api_v3.add_url_rule("/team/<string:team_key>/matches/<int:year>/<model_type:model_type>", view_func=TODO)
+api_v3.add_url_rule(
+    "/team/<string:team_key>/matches/<int:year>", view_func=team_matches
+)
+api_v3.add_url_rule(
+    "/team/<string:team_key>/matches/<int:year>/<model_type:model_type>",
+    view_func=team_matches,
+)
 
 # Team Media
-# api_v3.add_url_rule("/team/<string:team_key>/media/<int:year>", view_func=TODO)
-# api_v3.add_url_rule("/team/<string:team_key>/media/tag/<string:tag>", view_func=TODO)
-# api_v3.add_url_rule("/team/<string:team_key>/media/tag/<string:tag>/<int:year>", view_func=TODO)
+api_v3.add_url_rule(
+    "/team/<string:team_key>/media/<int:year>", view_func=team_media_year
+)
+api_v3.add_url_rule(
+    "/team/<string:team_key>/media/tag/<string:media_tag>", view_func=team_media_tag
+)
+api_v3.add_url_rule(
+    "/team/<string:team_key>/media/tag/<string:media_tag>/<int:year>",
+    view_func=team_media_tag,
+)
 
 # Team List
 api_v3.add_url_rule("/teams/all", view_func=team_list_all)
@@ -167,10 +220,10 @@ api_v3.add_url_rule("/teams/<int:page_num>", view_func=team_list)
 api_v3.add_url_rule(
     "/teams/<int:page_num>/<model_type:model_type>", view_func=team_list
 )
-api_v3.add_url_rule("/teams/<int:year>/<int:page_num>", view_func=team_list_year)
+api_v3.add_url_rule("/teams/<int:year>/<int:page_num>", view_func=team_list)
 api_v3.add_url_rule(
     "/teams/<int:year>/<int:page_num>/<model_type:model_type>",
-    view_func=team_list_year,
+    view_func=team_list,
 )
 
 # Trusted API
