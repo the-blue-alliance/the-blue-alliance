@@ -1,4 +1,7 @@
+import { setDefaultOptions } from "expect-puppeteer";
 import "regenerator-runtime/runtime";
+
+setDefaultOptions({ timeout: 5000 });
 
 describe("Homepage", () => {
   beforeAll(async () => {
