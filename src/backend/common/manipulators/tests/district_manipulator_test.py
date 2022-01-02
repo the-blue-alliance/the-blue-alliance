@@ -20,12 +20,15 @@ class TestDistrictManipulator(unittest.TestCase):
         self.taskqueue_stub = taskqueue_stub
 
     def setUp(self):
-        self.old_district = District(id="2014ne", year=2014, display_name="")
+        self.old_district = District(
+            id="2014ne", year=2014, display_name="", abbreviation="ne"
+        )
 
         self.new_district = District(
             id="2014ne",
             year=2014,
             display_name="New England",
+            abbreviation="ne",
         )
 
     def assertMergedDistrict(self, district: District) -> None:
