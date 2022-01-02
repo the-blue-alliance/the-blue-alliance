@@ -18,6 +18,7 @@ from pyre_extensions import none_throws, safe_cast
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.event_remapteams_helper import EventRemapTeamsHelper
 from backend.common.helpers.listify import listify
+from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.offseason_event_helper import OffseasonEventHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.award_manipulator import AwardManipulator
@@ -25,13 +26,18 @@ from backend.common.manipulators.district_manipulator import DistrictManipulator
 from backend.common.manipulators.district_team_manipulator import (
     DistrictTeamManipulator,
 )
+from backend.common.manipulators.event_details_manipulator import (
+    EventDetailsManipulator,
+)
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
+from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.manipulators.media_manipulator import MediaManipulator
 from backend.common.manipulators.robot_manipulator import RobotManipulator
 from backend.common.manipulators.team_manipulator import TeamManipulator
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
+from backend.common.models.event_details import EventDetails
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.robot import Robot
@@ -407,6 +413,226 @@ def event_details(event_key: EventKey) -> Response:
             render_template(
                 "datafeeds/usfirst_event_details_get.html", **template_values
             )
+        )
+
+    return make_response("")
+
+
+@blueprint.route(
+    "/tasks/enqueue/fmsapi_event_alliances/last_day_only",
+    defaults={"year": None, "when": "last_day_only"},
+)
+@blueprint.route(
+    "/tasks/enqueue/fmsapi_event_alliances/now", defaults={"year": None, "when": "now"}
+)
+@blueprint.route("/tasks/enqueue/fmsapi_event_alliances/<int:year>")
+def enqueue_event_alliances(
+    year: Optional[Year], when: Optional[str] = None
+) -> Response:
+    events: List[Event]
+    if when == "now":
+        events = EventHelper.events_within_a_day()
+        events = list(filter(lambda e: e.official, events))
+    elif when == "last_day_only":
+        events = EventHelper.events_within_a_day()
+        events = list(filter(lambda e: e.official and e.ends_today, events))
+    else:
+        event_keys = (
+            Event.query(Event.official == True)  # noqa: E712
+            .filter(Event.year == year)
+            .fetch(500, keys_only=True)
+        )
+        events = ndb.get_multi(event_keys)
+
+    for event in events:
+        taskqueue.add(
+            queue_name="datafeed",
+            target="py3-tasks-io",
+            url=url_for("frc_api.event_alliances", event_key=event.key_name),
+            method="GET",
+        )
+
+    template_values = {"events": events}
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(
+            render_template(
+                "datafeeds/usfirst_event_alliances_enqueue.html", **template_values
+            )
+        )
+
+    return make_response("")
+
+
+@blueprint.route("/tasks/get/fmsapi_event_alliances/<event_key>")
+def event_alliances(event_key: EventKey) -> Response:
+    df = DatafeedFMSAPI()
+    event = Event.get_by_id(event_key) if Event.validate_key_name(event_key) else None
+    if not event:
+        return make_response(f"No Event for key: {escape(event_key)}", 404)
+
+    alliance_selections = df.get_event_alliances(event_key)
+
+    if event and event.remap_teams:
+        EventRemapTeamsHelper.remapteams_alliances(
+            alliance_selections, event.remap_teams
+        )
+
+    event_details = EventDetails(id=event_key, alliance_selections=alliance_selections)
+    EventDetailsManipulator.createOrUpdate(event_details)
+
+    template_values = {
+        "alliance_selections": alliance_selections,
+        "event_name": event_details.key.id(),
+    }
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(
+            render_template(
+                "datafeeds/usfirst_event_alliances_get.html", **template_values
+            )
+        )
+    return make_response("")
+
+
+@blueprint.route("/tasks/enqueue/fmsapi_event_rankings/now", defaults={"year": None})
+@blueprint.route("/tasks/enqueue/fmsapi_event_rankings/<int:year>")
+def enqueue_event_rankings(year: Optional[Year]) -> Response:
+    events: List[Event] = []
+    if year is None:
+        events = EventHelper.events_within_a_day()
+        events = list(filter(lambda e: e.official, events))
+    else:
+        event_keys = (
+            Event.query(Event.official == True)  # noqa: 712
+            .filter(Event.year == year)
+            .fetch(500, keys_only=True)
+        )
+        events = ndb.get_multi(event_keys)
+
+    for event in events:
+        taskqueue.add(
+            queue_name="datafeed",
+            target="py3-tasks-io",
+            url=url_for("frc_api.event_rankings", event_key=event.key_name),
+            method="GET",
+        )
+
+    template_values = {
+        "events": events,
+    }
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(
+            render_template(
+                "datafeeds/usfirst_event_rankings_enqueue.html", **template_values
+            )
+        )
+
+    return make_response("")
+
+
+@blueprint.route("/tasks/get/fmsapi_event_rankings/<event_key>")
+def event_rankings(event_key: EventKey) -> Response:
+    df = DatafeedFMSAPI()
+    event = Event.get_by_id(event_key) if Event.validate_key_name(event_key) else None
+    if event is None:
+        return make_response(f"No Event for key: {escape(event_key)}", 404)
+
+    rankings2 = df.get_event_rankings(event_key)
+
+    if event and event.remap_teams:
+        EventRemapTeamsHelper.remapteams_rankings2(rankings2, event.remap_teams)
+
+    event_details = EventDetails(id=event_key, rankings2=rankings2)
+    EventDetailsManipulator.createOrUpdate(event_details)
+
+    template_values = {"rankings": rankings2, "event_name": event_details.key.id()}
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(
+            render_template(
+                "datafeeds/usfirst_event_rankings_get.html", **template_values
+            )
+        )
+
+    return make_response("")
+
+
+@blueprint.route("/tasks/enqueue/fmsapi_matches/now", defaults={"year": None})
+@blueprint.route("/tasks/enqueue/fmsapi_matches/<int:year>")
+def enqueue_event_matches(year: Optional[Year]) -> Response:
+    events: List[Event]
+    if year is None:
+        events = EventHelper.events_within_a_day()
+        events = list(filter(lambda e: e.official, events))
+    else:
+        event_keys = (
+            Event.query(Event.official == True)  # noqa: E712
+            .filter(Event.year == year)
+            .fetch(500, keys_only=True)
+        )
+        events = ndb.get_multi(event_keys)
+
+    for event in events:
+        taskqueue.add(
+            queue_name="datafeed",
+            target="py3-tasks-io",
+            url=url_for("frc_api.event_matches", event_key=event.key_name),
+            method="GET",
+        )
+
+    template_values = {
+        "events": events,
+    }
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(
+            render_template("datafeeds/usfirst_matches_enqueue.html", **template_values)
+        )
+
+    return make_response("")
+
+
+@blueprint.route("/tasks/get/fmsapi_matches/<event_key>")
+def event_matches(event_key: EventKey) -> Response:
+    event = Event.get_by_id(event_key) if Event.validate_key_name(event_key) else None
+    if event is None:
+        return make_response(f"No Event for key: {escape(event_key)}", 404)
+
+    df = DatafeedFMSAPI()
+    matches = df.get_event_matches(event_key)
+    matches, keys_to_delete = MatchHelper.delete_invalid_matches(
+        matches,
+        event,
+    )
+    matches = listify(matches)
+
+    if event and event.remap_teams:
+        EventRemapTeamsHelper.remapteams_matches(matches, event.remap_teams)
+
+    MatchManipulator.delete_keys(keys_to_delete)
+    new_matches = listify(MatchManipulator.createOrUpdate(matches))
+
+    template_values = {
+        "matches": new_matches,
+    }
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(
+            render_template("datafeeds/usfirst_matches_get.html", **template_values)
         )
 
     return make_response("")

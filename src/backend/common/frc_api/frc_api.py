@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Literal, Optional
 
 import requests
 
@@ -57,9 +57,34 @@ class FRCAPI:
         endpoint = f"/{year}/avatars?eventCode={event_short}&page={page}"
         return self._get(endpoint)
 
+    def alliances(self, year: Year, event_short: str) -> requests.Response:
+        endpoint = f"/{year}/alliances/{event_short}"
+        return self._get(endpoint)
+
+    def rankings(self, year: Year, event_short: str) -> requests.Response:
+        endpoint = f"/{year}/rankings/{event_short}"
+        return self._get(endpoint)
+
+    def matches_hybrid(
+        self, year: Year, event_short: str, level: Literal["qual", "playoff"]
+    ) -> requests.Response:
+        endpoint = f"/{year}/schedule/{event_short}/{level}/hybrid"
+
+        # hybrid schedule requires v2.0 because it doesn't exist in v3.0
+        # https://usfirst.collab.net/sf/go/artf6030
+        return self._get(endpoint, version="v2.0")
+
+    def match_scores(
+        self, year: Year, event_short: str, level: Literal["qual", "playoff"]
+    ) -> requests.Response:
+        # technically "qual"/"playoff" are invalid tournament levels as per the docs,
+        # but they seem to work?
+        endpoint = f"/{year}/scores/{event_short}/{level}"
+        return self._get(endpoint)
+
     def awards(
         self,
-        year: int,
+        year: Year,
         event_code: Optional[str] = None,
         team_number: Optional[int] = None,
     ) -> requests.Response:
@@ -91,11 +116,11 @@ class FRCAPI:
             The Flask response object - should be used by the consumer.
     """
 
-    def _get(self, endpoint: str) -> requests.Response:
+    def _get(self, endpoint: str, version: str = "v3.0") -> requests.Response:
         # Remove any leading / - we'll add it later (safer then adding a slash)
         endpoint = endpoint.lstrip("/")
 
-        url = f"https://frc-api.firstinspires.org/v3.0/{endpoint}"
+        url = f"https://frc-api.firstinspires.org/{version}/{endpoint}"
         headers = {
             "Accept": "application/json",
             "Cache-Control": "no-cache, max-age=10",

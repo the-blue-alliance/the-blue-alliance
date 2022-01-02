@@ -2,11 +2,15 @@ import json
 import random
 
 import pytest
+from google.appengine.ext import ndb
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import DoubleElimBracket
 from backend.common.helpers.match_helper import MatchHelper
+from backend.common.models.event import Event
+from backend.common.models.match import Match
 
 
 @pytest.fixture(autouse=True)
@@ -167,3 +171,40 @@ def test_upcoming_matches_all_played(test_data_importer) -> None:
 
     upcoming_matches = MatchHelper.upcoming_matches(quals, num=3)
     assert upcoming_matches == []
+
+
+def test_cleanup_matches(ndb_stub, test_data_importer):
+    event = Event(
+        id="2013test",
+        event_short="test",
+        year=2013,
+        event_type_enum=EventType.REGIONAL,
+    )
+    event.put()
+
+    played = [
+        {"red": {"score": 5}, "blue": {"score": 0}},
+        {"red": {"score": 5}, "blue": {"score": 20}},
+        {"red": {"score": 5}, "blue": {"score": 0}},
+    ]
+    unplayed = {"red": {"score": -1}, "blue": {"score": -1}}
+
+    matches = [
+        Match(
+            id=f"2013test_qf1m{i}",
+            comp_level=CompLevel.QF,
+            set_number=1,
+            match_number=i,
+            event=ndb.Key(Event, "2013test"),
+            alliances_json=json.dumps(played[i - 1] if i < 4 else unplayed),
+        )
+        for i in range(1, 6)
+    ]
+
+    cleaned_matches, keys_to_delete = MatchHelper.delete_invalid_matches(matches, event)
+    assert [m.key_name for m in cleaned_matches] == [
+        "2013test_qf1m1",
+        "2013test_qf1m2",
+        "2013test_qf1m3",
+    ]
+    assert [k.id() for k in keys_to_delete] == ["2013test_qf1m4", "2013test_qf1m5"]

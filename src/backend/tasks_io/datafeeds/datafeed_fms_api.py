@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 from typing import List, Optional, Set, Tuple
 
@@ -8,12 +9,15 @@ from google.appengine.ext import ndb
 from backend.common.consts.event_type import EventType
 from backend.common.environment import Environment
 from backend.common.frc_api import FRCAPI
+from backend.common.models.alliance import EventAlliance
 from backend.common.models.award import Award
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
+from backend.common.models.event_ranking import EventRanking
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey, TeamKey, Year
+from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
@@ -24,8 +28,18 @@ from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_awards_parser import (
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_district_list_parser import (
     FMSAPIDistrictListParser,
 )
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_event_alliances_parser import (
+    FMSAPIEventAlliancesParser,
+)
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_event_list_parser import (
     FMSAPIEventListParser,
+)
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_event_rankings_parser import (
+    FMSAPIEventRankingsParser,
+)
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_match_parser import (
+    FMSAPIHybridScheduleParser,
+    FMSAPIMatchDetailsParser,
 )
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_root_parser import (
     FMSAPIRootParser,
@@ -40,9 +54,6 @@ from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_team_details_parser impo
 from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase, TParsedResponse
 
 # from parsers.fms_api.fms_api_district_rankings_parser import FMSAPIDistrictRankingsParser
-# from parsers.fms_api.fms_api_event_alliances_parser import FMSAPIEventAlliancesParser
-# from parsers.fms_api.fms_api_event_rankings_parser import FMSAPIEventRankingsParser, FMSAPIEventRankings2Parser
-# from parsers.fms_api.fms_api_match_parser import FMSAPIHybridScheduleParser, FMSAPIMatchDetailsParser
 
 
 class DatafeedFMSAPI:
@@ -201,6 +212,76 @@ class DatafeedFMSAPI:
 
         return awards
 
+    def get_event_alliances(self, event_key: EventKey) -> List[EventAlliance]:
+        year = int(event_key[:4])
+        event_short = event_key[4:]
+
+        event = Event.get_by_id(event_key)
+        api_event_short = self._get_event_short(event_short, event)
+        api_response = self.api.alliances(year, api_event_short)
+        alliances = self._parse(api_response, FMSAPIEventAlliancesParser())
+        return alliances or []
+
+    def get_event_rankings(self, event_key: EventKey) -> List[EventRanking]:
+        year = int(event_key[:4])
+        event_short = event_key[4:]
+
+        event = Event.get_by_id(event_key)
+        api_event_short = self._get_event_short(event_short, event)
+        api_response = self.api.rankings(year, api_event_short)
+        result = self._parse(api_response, FMSAPIEventRankingsParser(year))
+        return result or []
+
+    def get_event_matches(self, event_key: EventKey) -> List[Match]:
+        year = int(event_key[:4])
+        event_short = event_key[4:]
+
+        event = Event.get_by_id(event_key)
+        hs_parser = FMSAPIHybridScheduleParser(year, event_short)
+        detail_parser = FMSAPIMatchDetailsParser(year, event_short)
+
+        api_event_short = DatafeedFMSAPI._get_event_short(event_short, event)
+
+        # TODO do we make all these sequentually, or go back to GAE urlfetch
+        # we can run in parallel?
+        qual_match_result = self.api.matches_hybrid(year, api_event_short, "qual")
+        playoff_match_result = self.api.matches_hybrid(year, api_event_short, "playoff")
+
+        qual_scores_result = self.api.match_scores(year, api_event_short, "qual")
+        playoff_scores_result = self.api.match_scores(year, api_event_short, "playoff")
+
+        # Organize matches by key
+        matches_by_key = {}
+        qual_matches = self._parse(qual_match_result, hs_parser)
+        if qual_matches:
+            for match in qual_matches[0]:
+                matches_by_key[match.key.id()] = match
+
+        playoff_matches = self._parse(playoff_match_result, hs_parser)
+        remapped_playoff_matches = {}
+        if playoff_matches:
+            for match in playoff_matches[0]:
+                matches_by_key[match.key.id()] = match
+            remapped_playoff_matches = playoff_matches[1]
+
+        # Add details to matches based on key
+        qual_details = self._parse(qual_scores_result, detail_parser) or {}
+        playoff_details = self._parse(playoff_scores_result, detail_parser) or {}
+        for match_key, match_details in {**qual_details, **playoff_details}.items():
+            # Deal with remapped playoff matches, defaulting to the original match key
+            match_key = remapped_playoff_matches.get(match_key, match_key)
+            if match_key in matches_by_key:
+                matches_by_key[match_key].score_breakdown_json = json.dumps(
+                    match_details
+                )
+
+        return list(
+            filter(
+                lambda m: not FMSAPIHybridScheduleParser.is_blank_match(m),
+                matches_by_key.values(),
+            )
+        )
+
     def get_event_team_avatars(
         self, event_key: EventKey
     ) -> Tuple[List[Media], Set[ndb.Key]]:
@@ -294,67 +375,6 @@ class DatafeedFMSAPI:
             logging.exception("Error saving API response for: {}".format(url))
 
     """
-    def getEventAlliances(self, event_key):
-        year = int(event_key[:4])
-        event_short = event_key[4:]
-
-        event = Event.get_by_id(event_key)
-        alliances = self._parse(self.FMS_API_EVENT_ALLIANCES_URL_PATTERN % (year, DatafeedFMSAPI._get_event_short(event_short, event)), FMSAPIEventAlliancesParser())
-        return alliances
-
-    def getMatches(self, event_key):
-        year = int(event_key[:4])
-        event_short = event_key[4:]
-
-        event = Event.get_by_id(event_key)
-        hs_parser = FMSAPIHybridScheduleParser(year, event_short)
-        detail_parser = FMSAPIMatchDetailsParser(year, event_short)
-        qual_matches_future = self._parse_async(self.FMS_API_HYBRID_SCHEDULE_QUAL_URL_PATTERN % (year, DatafeedFMSAPI._get_event_short(event_short, event)), hs_parser)
-        playoff_matches_future = self._parse_async(self.FMS_API_HYBRID_SCHEDULE_PLAYOFF_URL_PATTERN % (year, DatafeedFMSAPI._get_event_short(event_short, event)), hs_parser)
-        qual_details_future = self._parse_async(self.FMS_API_MATCH_DETAILS_QUAL_URL_PATTERN % (year, DatafeedFMSAPI._get_event_short(event_short, event)), detail_parser)
-        playoff_details_future = self._parse_async(self.FMS_API_MATCH_DETAILS_PLAYOFF_URL_PATTERN % (year, DatafeedFMSAPI._get_event_short(event_short, event)), detail_parser)
-
-        # Organize matches by key
-        matches_by_key = {}
-        qual_matches = qual_matches_future.get_result()
-        if qual_matches is not None:
-            for match in qual_matches[0]:
-                matches_by_key[match.key.id()] = match
-        playoff_matches = playoff_matches_future.get_result()
-        remapped_playoff_matches = {}
-        if playoff_matches is not None:
-            for match in playoff_matches[0]:
-                matches_by_key[match.key.id()] = match
-            remapped_playoff_matches = playoff_matches[1]
-
-        # Add details to matches based on key
-        qual_details = qual_details_future.get_result()
-        qual_details_items = qual_details.items() if qual_details is not None else []
-        playoff_details = playoff_details_future.get_result()
-        playoff_details_items = playoff_details.items() if playoff_details is not None else []
-        for match_key, match_details in qual_details_items + playoff_details_items:
-            # Deal with remapped playoff matches, defaulting to the original match key
-            match_key = remapped_playoff_matches.get(match_key, match_key)
-            if match_key in matches_by_key:
-                matches_by_key[match_key].score_breakdown_json = json.dumps(match_details)
-
-        return filter(
-            lambda m: not FMSAPIHybridScheduleParser.is_blank_match(m),
-            matches_by_key.values())
-
-    def getEventRankings(self, event_key):
-        year = int(event_key[:4])
-        event_short = event_key[4:]
-
-        event = Event.get_by_id(event_key)
-        result = self._parse(
-            self.FMS_API_EVENT_RANKINGS_URL_PATTERN % (year, DatafeedFMSAPI._get_event_short(event_short, event)),
-            [FMSAPIEventRankingsParser(year), FMSAPIEventRankings2Parser(year)])
-        if result:
-            return result
-        else:
-            return None, None
-
     def getDistrictRankings(self, district_key):
         district = District.get_by_id(district_key)
         if not district:

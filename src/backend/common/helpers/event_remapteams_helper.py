@@ -97,7 +97,7 @@ class EventRemapTeamsHelper:
                 for color in ALLIANCE_COLORS:
                     for attr in ["teams", "surrogates", "dqs"]:
                         for i, key in enumerate(
-                            match.alliances[color][attr]  # pyre-ignore[26]
+                            match.alliances[color].get(attr, [])  # pyre-ignore[26]
                         ):
                             if key == old_team:
                                 match._dirty = True
@@ -124,7 +124,7 @@ class EventRemapTeamsHelper:
         for row in alliance_selections:
             for choice in ["picks", "declines"]:
                 for old_team, new_team in remap_teams.items():
-                    for i, key in enumerate(row[choice]):  # pyre-ignore[26]
+                    for i, key in enumerate(row.get(choice, [])):  # pyre-ignore[26]
                         if key == old_team:
                             row[choice][i] = new_team  # pyre-ignore[26,6]
 
