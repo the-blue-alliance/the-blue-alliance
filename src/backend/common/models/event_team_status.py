@@ -69,3 +69,9 @@ class EventTeamStatus(TypedDict):
     alliance: Optional[EventTeamStatusAlliance]
     last_match_key: Optional[str]
     next_match_key: Optional[str]
+
+
+class EventTeamStatusStrings(TypedDict):
+    alliance: Optional[str]
+    playoff: Optional[str]
+    overall: Optional[str]
