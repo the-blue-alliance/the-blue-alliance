@@ -2,16 +2,21 @@ from typing import Optional
 
 from flask import jsonify, Response
 
-from backend.api.handlers.decorators import api_authenticated, validate_team_key
+from backend.api.handlers.decorators import (
+    api_authenticated,
+    validate_event_key,
+    validate_team_key,
+)
 from backend.api.handlers.helpers.model_properties import (
     filter_event_properties,
+    filter_match_properties,
     filter_team_properties,
     ModelType,
 )
 from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.decorators import cached_public
-from backend.common.models.keys import TeamKey
+from backend.common.models.keys import EventKey, TeamKey
 from backend.common.models.team import Team
 from backend.common.queries.district_query import TeamDistrictsQuery
 from backend.common.queries.event_query import (
@@ -19,6 +24,7 @@ from backend.common.queries.event_query import (
     TeamYearEventsQuery,
     TeamYearEventTeamsQuery,
 )
+from backend.common.queries.match_query import TeamEventMatchesQuery
 from backend.common.queries.media_query import TeamSocialMediaQuery
 from backend.common.queries.robot_query import TeamRobotsQuery
 from backend.common.queries.team_query import (
@@ -156,6 +162,29 @@ def team_events_statuses_year(team_key: TeamKey, year: int) -> Response:
             )
         statuses[event_team.event.id()] = status
     return jsonify(statuses)
+
+
+@api_authenticated
+@validate_team_key
+@validate_event_key
+@cached_public
+def team_event_matches(
+    team_key: TeamKey, event_key: EventKey, model_type: Optional[ModelType] = None
+) -> Response:
+    """
+    Returns a list of matches for a team at an event.
+    """
+    track_call_after_response(
+        "team/events/matches", f"{team_key}/{event_key}", model_type
+    )
+
+    matches = TeamEventMatchesQuery(team_key=team_key, event_key=event_key).fetch_dict(
+        ApiMajorVersion.API_V3
+    )
+
+    if model_type is not None:
+        matches = filter_match_properties(matches, model_type)
+    return jsonify(matches)
 
 
 @api_authenticated

@@ -1,10 +1,14 @@
+import json
+
 from google.appengine.ext import ndb
 from werkzeug.test import Client
 
 from backend.api.handlers.tests.helpers import (
     validate_nominal_event_keys,
+    validate_nominal_match_keys,
     validate_nominal_team_keys,
     validate_simple_event_keys,
+    validate_simple_match_keys,
     validate_simple_team_keys,
 )
 from backend.common.consts.auth_type import AuthType
@@ -15,6 +19,7 @@ from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
+from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
@@ -368,6 +373,74 @@ def test_team_events_year(ndb_stub, api_client: Client) -> None:
     assert len(resp.json) == 2
     assert "2020casj" in resp.json
     assert "2020casf" in resp.json
+
+
+def test_team_event_matches(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    Match(
+        id="2020casj_qm1",
+        year=2020,
+        event=ndb.Key("Event", "2020casj"),
+        comp_level="qm",
+        match_number=1,
+        set_number=1,
+        alliances_json=json.dumps(
+            {
+                "red": {"score": 0, "teams": []},
+                "blue": {"score": 0, "teams": []},
+            }
+        ),
+        team_key_names=["frc254"],
+    ).put()
+    Match(
+        id="2020casj_qm2",
+        year=2020,
+        event=ndb.Key("Event", "2020casj"),
+        comp_level="qm",
+        match_number=2,
+        set_number=1,
+        alliances_json=json.dumps(
+            {
+                "red": {"score": 0, "teams": []},
+                "blue": {"score": 0, "teams": []},
+            }
+        ),
+        team_key_names=["frc254"],
+    ).put()
+
+    # Nominal response
+    resp = api_client.get(
+        "/api/v3/team/frc254/event/2020casj/matches",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    for match in resp.json:
+        validate_nominal_match_keys(match)
+
+    # Simple response
+    resp = api_client.get(
+        "/api/v3/team/frc254/event/2020casj/matches/simple",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    for match in resp.json:
+        validate_simple_match_keys(match)
+
+    # Keys response
+    resp = api_client.get(
+        "/api/v3/team/frc254/event/2020casj/matches/keys",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    assert "2020casj_qm1" in resp.json
+    assert "2020casj_qm2" in resp.json
 
 
 def test_team_list_all(ndb_stub, api_client: Client) -> None:
