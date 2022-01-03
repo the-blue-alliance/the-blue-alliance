@@ -4,6 +4,7 @@ from unittest.mock import patch
 import pytest
 
 from backend.common.google_analytics import GoogleAnalytics
+from backend.common.run_after_response import execute_callbacks
 
 
 @pytest.fixture(autouse=True)
@@ -19,8 +20,10 @@ def test_GoogleAnalytics_track_event_missing_sitevar() -> None:
         )
 
 
-@pytest.mark.parametrize("el,ev", itertools.product([None, "test"], [None, 123]))
-def test_GoogleAnalytics_track_event(el, ev) -> None:
+@pytest.mark.parametrize(
+    "run_after,el,ev", itertools.product([False, True], [None, "test"], [None, 123])
+)
+def test_GoogleAnalytics_track_event(run_after, el, ev) -> None:
     from backend.common.sitevars.google_analytics_id import GoogleAnalyticsID
 
     sitevar = GoogleAnalyticsID._fetch_sitevar()
@@ -28,8 +31,16 @@ def test_GoogleAnalytics_track_event(el, ev) -> None:
 
     with patch("requests.get") as mock_get:
         GoogleAnalytics.track_event(
-            "testbed", "test", "test", event_label=el, event_value=ev
+            "testbed",
+            "test",
+            "test",
+            event_label=el,
+            event_value=ev,
+            run_after=run_after,
         )
+        if run_after:
+            mock_get.assert_not_called()
+        execute_callbacks()
 
     mock_get.assert_called()
     args, kwargs = mock_get.call_args

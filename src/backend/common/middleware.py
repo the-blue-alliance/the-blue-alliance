@@ -27,7 +27,6 @@ class TraceRequestMiddleware:
 class AfterResponseMiddleware:
     """
     A middleware that handles tasks after handling the response.
-    Inherits from NdbMiddleware to access the ndb context.
     """
 
     app: Callable[[Any, Any], Any]
