@@ -80,7 +80,7 @@ def test_authenticated_header(
                 "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
             )
 
-        assert len(caplog.records) == 1
+        assert len(caplog.records) == 2
         record = caplog.records[0]
         assert record.levelno == logging.INFO
         if account:
@@ -113,7 +113,7 @@ def test_authenticated_urlparam(
         with caplog.at_level(logging.INFO):
             resp = api_client.get("/api/v3/team/frc254?X-TBA-Auth-Key=test_auth_key")
 
-        assert len(caplog.records) == 1
+        assert len(caplog.records) == 2
         record = caplog.records[0]
         assert record.levelno == logging.INFO
         if account:
@@ -142,7 +142,7 @@ def test_authenticated_user(ndb_stub, api_client: Client, caplog) -> None:
         ), caplog.at_level(logging.INFO):
             resp = api_client.get("/api/v3/team/frc254")
 
-        assert len(caplog.records) == 1
+        assert len(caplog.records) == 2
         record = caplog.records[0]
         assert record.levelno == logging.INFO
         assert record.message == "Auth owner: 1, LOGGED IN"
