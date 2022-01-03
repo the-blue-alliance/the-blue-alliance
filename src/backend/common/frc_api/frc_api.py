@@ -124,6 +124,14 @@ class FRCAPI:
         endpoint = f"/{year}/districts"
         return self._get(endpoint)
 
+    def district_rankings(
+        self, year: Year, district_short: str, page: int
+    ) -> requests.Response:
+        endpoint = (
+            f"/{year}/rankings/district?districtCode={district_short}&page={page}"
+        )
+        return self._get(endpoint)
+
     """ Attempt to fetch the endpoint from the FRC API
 
         Returns:

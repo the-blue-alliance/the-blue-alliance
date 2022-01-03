@@ -148,6 +148,13 @@ def test_district_list() -> None:
     mock_get.assert_called_once_with("/2020/districts")
 
 
+def test_district_rankings() -> None:
+    api = FRCAPI("zach")
+    with patch.object(FRCAPI, "_get") as mock_get:
+        api.district_rankings(2020, "ne", 1)
+    mock_get.assert_called_once_with("/2020/rankings/district?districtCode=ne&page=1")
+
+
 def test_team_details() -> None:
     api = FRCAPI("zach")
     with patch.object(FRCAPI, "_get") as mock_get:
