@@ -1,13 +1,14 @@
-import json
 import logging
+from typing import Any, Dict, List, Optional
 
-from google.appengine.api import mail
+import requests
 
-import tba_config
+from backend.common.environment import Environment
 
 
 class OutgoingNotificationHelper(object):
 
+    """
     @classmethod
     def send_admin_alert_email(cls, subject, email_body):
         # Send an email to contact@ telling them to review this
@@ -29,26 +30,24 @@ class OutgoingNotificationHelper(object):
                        cc="contact@thebluealliance.com",
                        subject=subject,
                        body=email_body)
+    """
 
     @classmethod
-    def send_slack_alert(cls, webhook_url, body_text, attachment_list=None):
-        # Send an alert to a specified slack channel
-        # Only do this on prod
-        import urllib
-        import urllib2
-
-        if tba_config.DEBUG or not webhook_url:
+    def send_slack_alert(
+        cls, webhook_url: str, body_text: str, attachment_list: Optional[List] = None
+    ) -> None:
+        if not Environment.is_prod():
             return
-
-        post_dict = {
-            'text': body_text,
+        post_dict: Dict[str, Any] = {
+            "text": body_text,
         }
         if attachment_list:
-            post_dict.update({
-                'attachments': attachment_list,
-            })
+            post_dict.update(
+                {
+                    "attachments": attachment_list,
+                }
+            )
 
-        post_data = urllib.urlencode({"payload": json.dumps(post_dict)})
-        request = urllib2.Request(webhook_url, post_data)
-        response = urllib2.urlopen(request)
-        logging.info("Response from slack webhook {}".format(response.read()))
+        response = requests.post(webhook_url, data={"payload": post_dict})
+        response.raise_for_status()
+        logging.info("Response from slack webhook {}".format(response.text))
