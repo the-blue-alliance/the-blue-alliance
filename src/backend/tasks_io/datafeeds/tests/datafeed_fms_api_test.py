@@ -30,7 +30,7 @@ def test_init(ndb_stub):
     with pytest.raises(
         Exception, match="Missing FRC API auth token. Setup fmsapi.secrets sitevar."
     ):
-        DatafeedFMSAPI()
+        DatafeedFMSAPI(save_response=True)
 
 
 @pytest.mark.parametrize(
@@ -67,7 +67,7 @@ def test_get_root(fms_api_secrets):
     response.json.return_value = content
     response.content = json.dumps(content).encode()
 
-    df = DatafeedFMSAPI()
+    df = DatafeedFMSAPI(save_response=True)
     with patch.object(FRCAPI, "root", return_value=response) as mock_root:
         df.get_root_info() is None
 
@@ -82,7 +82,7 @@ def test_get_root_failure(fms_api_secrets):
     response.json.return_value = content
     response.content = json.dumps(content).encode()
 
-    df = DatafeedFMSAPI()
+    df = DatafeedFMSAPI(save_response=True)
     with patch.object(FRCAPI, "root", return_value=response) as mock_root:
         assert df.get_root_info() is None
 
@@ -100,7 +100,7 @@ def test_mark_api_down(fms_api_secrets):
     response2.json.return_value = {}
     response2.content = b"{}"
 
-    df = DatafeedFMSAPI()
+    df = DatafeedFMSAPI(save_response=True)
     with patch.object(FRCAPI, "root", return_value=response1):
         assert df.get_root_info() is None
         assert ApiStatusFMSApiDown.get() is True
@@ -125,7 +125,7 @@ def test_save_response(fms_api_secrets, monkeypatch: pytest.MonkeyPatch):
     response.json.return_value = content
     response.content = json.dumps(content).encode()
 
-    df = DatafeedFMSAPI()
+    df = DatafeedFMSAPI(save_response=True)
     with patch.object(FRCAPI, "root", return_value=response):
         df.get_root_info()
 
@@ -153,7 +153,7 @@ def test_save_response_unchanged(fms_api_secrets, monkeypatch: pytest.MonkeyPatc
     response.json.return_value = content
     response.content = json.dumps(content).encode()
 
-    df = DatafeedFMSAPI()
+    df = DatafeedFMSAPI(save_response=True)
     with patch.object(FRCAPI, "root", return_value=response):
         df.get_root_info()
 
@@ -184,7 +184,7 @@ def test_save_response_updated(fms_api_secrets, monkeypatch: pytest.MonkeyPatch)
     response.json.return_value = content
     response.content = json.dumps(content).encode()
 
-    df = DatafeedFMSAPI()
+    df = DatafeedFMSAPI(save_response=True)
     with patch.object(FRCAPI, "root", return_value=response):
         df.get_root_info()
 

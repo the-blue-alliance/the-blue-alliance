@@ -1,3 +1,6 @@
+import datetime
+import json
+import logging
 from typing import Literal, Optional
 
 import requests
@@ -7,6 +10,10 @@ from backend.common.sitevars.fms_api_secrets import FMSApiSecrets
 
 
 class FRCAPI:
+
+    STORAGE_BUCKET_PATH = "tbatv-prod-hrd.appspot.com"
+    STORAGE_BUCKET_BASE_DIR = "frc-api-response"
+
     class ValidationError(Exception):
         pass
 
@@ -15,7 +22,12 @@ class FRCAPI:
         auth_token = FMSApiSecrets.generate_auth_token(username, authkey)
         return cls(auth_token)
 
-    def __init__(self, auth_token: Optional[str] = None):
+    def __init__(
+        self,
+        auth_token: Optional[str] = None,
+        sim_time: Optional[datetime.datetime] = None,
+        sim_api_version: Optional[str] = None,
+    ):
         # Load auth_token from Sitevar if not specified
         if not auth_token:
             auth_token = FMSApiSecrets.auth_token()
@@ -27,6 +39,8 @@ class FRCAPI:
 
         self.session = requests.Session()
         self.session.headers.update({"Authorization": f"Basic {auth_token}"})
+        self._sim_time = sim_time
+        self._sim_api_version = sim_api_version
 
     def root(self) -> requests.Response:
         return self._get("/")
@@ -118,9 +132,11 @@ class FRCAPI:
 
     def _get(self, endpoint: str, version: str = "v3.0") -> requests.Response:
         # Remove any leading / - we'll add it later (safer then adding a slash)
-        endpoint = endpoint.lstrip("/")
+        versioned_endpoint = f"{version}/{endpoint.lstrip('/')}"
+        if self._sim_time is not None:
+            return self._get_simulated(endpoint, self._sim_api_version or version)
 
-        url = f"https://frc-api.firstinspires.org/{version}/{endpoint}"
+        url = f"https://frc-api.firstinspires.org/{versioned_endpoint}"
         headers = {
             "Accept": "application/json",
             "Cache-Control": "no-cache, max-age=10",
@@ -128,3 +144,53 @@ class FRCAPI:
         }
 
         return self.session.get(url, headers=headers)
+
+    def _get_simulated(self, endpoint: str, version: str) -> requests.Response:
+        from unittest.mock import Mock
+        from backend.common.storage import (
+            get_files as cloud_storage_get_files,
+            read as cloud_storage_read,
+        )
+
+        # Get list of responses
+        try:
+            gcs_dir_name = (
+                f"{self.STORAGE_BUCKET_BASE_DIR}/{version}/{endpoint.lstrip('/')}/"
+            )
+            gcs_files = cloud_storage_get_files(gcs_dir_name)
+
+            # Find appropriate timed response
+            last_file_name = None
+            for filename in gcs_files:
+                time_str = (
+                    filename.replace(gcs_dir_name, "").replace(".json", "").strip()
+                )
+                file_time = datetime.datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S.%f")
+                if file_time <= self._sim_time:
+                    last_file_name = filename
+                else:
+                    break
+
+            # Fetch response
+            content: Optional[str] = None
+            if last_file_name:
+                content = cloud_storage_read(last_file_name)
+
+            if content is None:
+                empty_response = Mock(spec=requests.Response)
+                empty_response.status_code = 200
+                empty_response.json.return_value = {}
+                empty_response.url = ""
+                return empty_response
+
+            full_response = Mock(spec=requests.Response)
+            full_response.status_code = 200
+            full_response.json.return_value = json.loads(content)
+            full_response.url = ""
+            return full_response
+        except Exception:
+            logging.exception("Error fetching sim frc api")
+            error_response = Mock(spec=requests.Response)
+            error_response.status_code = 500
+            error_response.url = ""
+            return error_response

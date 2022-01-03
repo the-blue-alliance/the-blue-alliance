@@ -43,7 +43,7 @@ class FMSAPIHybridScheduleParser(
         """
         Detect junk playoff matches like in 2017scmb
         """
-        if match.comp_level == "qm" or not match.score_breakdown:
+        if match.comp_level == CompLevel.QM or not match.score_breakdown:
             return False
         for color in ALLIANCE_COLORS:
             if match.alliances[color]["score"] != 0:
@@ -86,7 +86,7 @@ class FMSAPIHybridScheduleParser(
                 event.playoff_type, comp_level, match["matchNumber"]
             )
             key_name = Match.renderKeyName(
-                event_key, comp_level, set_number, match_number
+                event_key, comp_level.value, set_number, match_number
             )
             match_identifiers.append((key_name, comp_level, set_number, match_number))
 
@@ -236,7 +236,7 @@ class FMSAPIHybridScheduleParser(
 
                 match_number = match_count + 1
                 new_key_name = Match.renderKeyName(
-                    event_key, comp_level, set_number, match_number
+                    event_key, comp_level.value, set_number, match_number
                 )
                 remapped_matches[key_name] = new_key_name
                 key_name = new_key_name

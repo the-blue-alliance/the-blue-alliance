@@ -99,8 +99,14 @@ class DatafeedFMSAPI:
         "tur": "hotu",
     }
 
-    def __init__(self) -> None:
-        self.api = FRCAPI()
+    def __init__(
+        self,
+        sim_time: Optional[datetime.datetime] = None,
+        sim_api_version: Optional[str] = None,
+        save_response: bool = False,
+    ) -> None:
+        self._save_response = save_response and sim_time is None
+        self.api = FRCAPI(sim_time=sim_time, sim_api_version=sim_api_version)
 
     def get_root_info(self) -> Optional[RootInfo]:
         root_response = self.api.root()
@@ -344,11 +350,11 @@ class DatafeedFMSAPI:
         return None
 
     def _maybe_save_response(self, url: str, content: str) -> None:
-        if not Environment.save_frc_api_response():
+        if not Environment.save_frc_api_response() or not self._save_response:
             return
 
         endpoint = url.replace("https://frc-api.firstinspires.org/", "")
-        gcs_dir_name = f"/tbatv-prod-hrd.appspot.com/frc-api-response/{endpoint}/"
+        gcs_dir_name = f"{FRCAPI.STORAGE_BUCKET_BASE_DIR}/{endpoint}/"
 
         from backend.common.storage import (
             get_files as cloud_storage_get_files,
