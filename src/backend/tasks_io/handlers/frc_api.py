@@ -35,11 +35,12 @@ from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.manipulators.media_manipulator import MediaManipulator
 from backend.common.manipulators.robot_manipulator import RobotManipulator
 from backend.common.manipulators.team_manipulator import TeamManipulator
+from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_team import EventTeam
-from backend.common.models.keys import EventKey, TeamKey, Year
+from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 from backend.common.sitevars.apistatus import ApiStatus
@@ -723,6 +724,56 @@ def awards_event(event_key: EventKey) -> Response:
     if "X-Appengine-Taskname" not in request.headers:
         return make_response(
             render_template("datafeeds/fmsapi_awards_get.html", awards=new_awards)
+        )
+
+    return make_response("")
+
+
+@blueprint.route("/backend-tasks/get/district_list/<int:year>")
+def district_list(year: Year) -> Response:
+    df = DatafeedFMSAPI()
+    fmsapi_districts = df.get_district_list(year)
+    districts = DistrictManipulator.createOrUpdate(fmsapi_districts)
+
+    template_values = {
+        "districts": listify(districts),
+    }
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(
+            render_template("datafeeds/fms_district_list_get.html", **template_values)
+        )
+
+    return make_response("")
+
+
+@blueprint.route("/backend-tasks/get/district_rankings/<district_key>")
+def district_rankings(district_key: DistrictKey) -> Response:
+    district = (
+        District.get_by_id(district_key)
+        if District.validate_key_name(district_key)
+        else None
+    )
+    if district is None:
+        return make_response(f"No District for key: {escape(district_key)}", 404)
+
+    df = DatafeedFMSAPI()
+    advancement = df.get_district_rankings(district_key)
+    if advancement:
+        district.advancement = advancement
+        district = DistrictManipulator.createOrUpdate(district)
+
+    template_values = {
+        "districts": listify(district),
+    }
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(
+            render_template("datafeeds/fms_district_list_get.html", **template_values)
         )
 
     return make_response("")

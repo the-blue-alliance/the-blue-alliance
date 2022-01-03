@@ -43,24 +43,7 @@ from models.team import Team
 
 from sitevars.website_blacklist import WebsiteBlacklist
 
-
-class DistrictListGet(webapp.RequestHandler):
-    """
-    Fetch one year of districts only from FMS API
-    """
-    def get(self, year):
-        df = DatafeedFMSAPI('v2.0')
-        fmsapi_districts = df.getDistrictList(year)
-        districts = DistrictManipulator.createOrUpdate(fmsapi_districts)
-
-        template_values = {
-            "districts": districts,
-        }
-
-        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
-            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fms_district_list_get.html')
-            self.response.out.write(template.render(path, template_values))
-
+        
 
 class DistrictRankingsGet(webapp.RequestHandler):
     """
@@ -69,21 +52,7 @@ class DistrictRankingsGet(webapp.RequestHandler):
     things like CMP advancement
     """
     def get(self, district_key):
-        df = DatafeedFMSAPI('v2.0')
-
-        district_with_rankings = df.getDistrictRankings(district_key)
-        districts = []
-        if district_with_rankings:
-            districts = DistrictManipulator.createOrUpdate(district_with_rankings)
-
-        template_values = {
-            "districts": [districts],
-        }
-
-        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
-            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fms_district_list_get.html')
-            self.response.out.write(template.render(path, template_values))
-
+       
 
 class TbaVideosEnqueue(webapp.RequestHandler):
     """

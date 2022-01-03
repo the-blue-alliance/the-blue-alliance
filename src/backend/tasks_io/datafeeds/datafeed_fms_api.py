@@ -12,11 +12,12 @@ from backend.common.frc_api import FRCAPI
 from backend.common.models.alliance import EventAlliance
 from backend.common.models.award import Award
 from backend.common.models.district import District
+from backend.common.models.district_advancement import DistrictAdvancement
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_ranking import EventRanking
 from backend.common.models.event_team import EventTeam
-from backend.common.models.keys import EventKey, TeamKey, Year
+from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
 from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.robot import Robot
@@ -27,6 +28,9 @@ from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_awards_parser import (
 )
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_district_list_parser import (
     FMSAPIDistrictListParser,
+)
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_district_rankings_parser import (
+    FMSAPIDistrictRankingsParser,
 )
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_event_alliances_parser import (
     FMSAPIEventAlliancesParser,
@@ -52,8 +56,6 @@ from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_team_details_parser impo
     FMSAPITeamDetailsParser,
 )
 from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase, TParsedResponse
-
-# from parsers.fms_api.fms_api_district_rankings_parser import FMSAPIDistrictRankingsParser
 
 
 class DatafeedFMSAPI:
@@ -324,6 +326,27 @@ class DatafeedFMSAPI:
         result = self._parse(district_list_response, FMSAPIDistrictListParser(year))
         return result or []
 
+    def get_district_rankings(self, district_key: DistrictKey) -> DistrictAdvancement:
+        year = int(district_key[:4])
+        district_short = district_key[4:]
+        advancement: DistrictAdvancement = {}
+
+        more_pages = True
+        page = 1
+
+        parser = FMSAPIDistrictRankingsParser()
+        while more_pages:
+            api_result = self.api.district_rankings(year, district_short, page)
+            result = self._parse(api_result, parser)
+            if not result:
+                break
+
+            advancement_page, more_pages = result
+            advancement.update(advancement_page)
+            page = page + 1
+
+        return advancement
+
     @classmethod
     def _get_event_short(self, event_short: str, event: Optional[Event] = None) -> str:
         # First, check if we've manually set the FRC API key
@@ -379,31 +402,3 @@ class DatafeedFMSAPI:
                 cloud_storage_write(file_name, content)
         except Exception:
             logging.exception("Error saving API response for: {}".format(url))
-
-    """
-    def getDistrictRankings(self, district_key):
-        district = District.get_by_id(district_key)
-        if not district:
-            return None
-
-        year = int(district_key[:4])
-        district_short = district_key[4:]
-        advancement = {}
-
-        more_pages = True
-        page = 1
-
-        while more_pages:
-            url = self.FMS_API_DISTRICT_RANKINGS_PATTERN % (year, district_short.upper(), page)
-            # NOTE: THIS API CHANGED and does no longer take an `advandement` dict. Do this updating in this method.
-            result = self._parse(url, FMSAPIDistrictRankingsParser(advancement))
-            if not result:
-                break
-
-            advancement, more_pages = result
-
-            page = page + 1
-
-        district.advancement = advancement
-        return [district]
-    """
