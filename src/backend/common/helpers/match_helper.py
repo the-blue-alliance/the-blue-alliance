@@ -5,12 +5,15 @@ import re
 from typing import Dict, List, Mapping, MutableSequence, Sequence, Tuple
 
 import pytz
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
-from backend.common.consts.comp_level import COMP_LEVELS, CompLevel
-from backend.common.consts.playoff_type import DoubleElimBracket
+from backend.common.consts.alliance_color import AllianceColor
+from backend.common.consts.comp_level import COMP_LEVELS, CompLevel, ELIM_LEVELS
+from backend.common.consts.playoff_type import DoubleElimBracket, PlayoffType
 from backend.common.helpers.playoff_type_helper import PlayoffTypeHelper
 from backend.common.models.event import Event
+from backend.common.models.keys import MatchKey
 from backend.common.models.match import Match
 
 
@@ -18,6 +21,7 @@ TOrganizedMatches = Dict[CompLevel, List[Match]]
 TOrganizedDoubleElimMatches = Mapping[
     DoubleElimBracket, Mapping[CompLevel, List[Match]]
 ]
+TOrganizedKeys = Dict[CompLevel, List[MatchKey]]
 
 
 class MatchHelper(object):
@@ -45,6 +49,18 @@ class MatchHelper(object):
         cls, matches: Sequence[Match], reverse: bool = False
     ) -> List[Match]:
         return sorted(matches, key=lambda m: m.play_order, reverse=reverse)
+
+    @classmethod
+    def organized_keys(cls, match_keys: List[MatchKey]) -> Tuple[int, TOrganizedKeys]:
+        matches = dict([(comp_level, list()) for comp_level in COMP_LEVELS])
+        while len(match_keys) > 0:
+            match_key = match_keys.pop(0)
+            match_id = match_key.split("_")[1]
+            for comp_level in COMP_LEVELS:
+                if match_id.startswith(comp_level):
+                    matches[comp_level].append(match_key)
+
+        return len(match_keys), matches
 
     @classmethod
     def organized_matches(
@@ -150,43 +166,38 @@ class MatchHelper(object):
 
             match.time = match_time - tz.utcoffset(match_time)
 
-    """
     @classmethod
-    def delete_invalid_matches(cls, match_list: List[Match], event: Event) -> List[Match]:
-        \"""
+    def delete_invalid_matches(
+        cls, match_list: List[Match], event: Event
+    ) -> Tuple[List[Match], List[ndb.Key]]:
+        """
         A match is invalid iff it is an elim match that has not been played
         and the same alliance already won in 2 match numbers in the same set.
-        \"""
+        returns a list of filtered matches and a list of keys to delete
+        """
         red_win_counts = collections.defaultdict(int)  # key: <comp_level><set_number>
         blue_win_counts = collections.defaultdict(int)  # key: <comp_level><set_number>
         for match in match_list:
             if match.has_been_played and match.comp_level in ELIM_LEVELS:
                 key = "{}{}".format(match.comp_level, match.set_number)
-                if match.winning_alliance == "red":
+                if match.winning_alliance == AllianceColor.RED:
                     red_win_counts[key] += 1
-                elif match.winning_alliance == "blue":
+                elif match.winning_alliance == AllianceColor.BLUE:
                     blue_win_counts[key] += 1
 
-        return_list = []
+        return_list: List[Match] = []
+        keys_to_delete: List[ndb.Key] = []
         for match in match_list:
             if match.comp_level in ELIM_LEVELS and not match.has_been_played:
                 if (
                     event.playoff_type != PlayoffType.ROUND_ROBIN_6_TEAM
-                    or match.comp_level == "f"
+                    or match.comp_level == CompLevel.F
                 ):  # Don't delete round robin semifinal matches
                     key = "{}{}".format(match.comp_level, match.set_number)
                     n = 3 if event.playoff_type == PlayoffType.BO5_FINALS else 2
                     if red_win_counts[key] == n or blue_win_counts[key] == n:
-                        try:
-                            MatchManipulator.delete(match)
-                            logging.warning("Deleting invalid match: %s" % match.key_name)
-                        except Exception:
-                            logging.warning(
-                                "Tried to delete invalid match, but failed: %s"
-                                % match.key_name
-                            )
+                        keys_to_delete.append(match.key)
                         continue
             return_list.append(match)
 
-        return return_list
-    """
+        return return_list, keys_to_delete
