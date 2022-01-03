@@ -4,6 +4,7 @@ set -e
 source ops/dev/vagrant/config.sh
 
 auth_use_prod=$(get_config_prop auth_use_prod)
+firebase_db_use_prod=$(get_config_prop firebase_db_use_prod)
 log_level=$(get_config_prop log_level)
 tba_log_level=$(get_config_prop tba_log_level)
 ndb_log_level=$(get_config_prop ndb_log_level)
@@ -72,6 +73,15 @@ fi
 if [ -z "$auth_use_prod" ]; then
     echo "Running with Firebase auth emulator"
     env+=("--env_var=FIREBASE_AUTH_EMULATOR_HOST=localhost:9099")
+else
+    echo "Using upstream authentication accounts"
+    assert_google_application_credentials
+fi
+
+# Setup Firebase realtime db emulator
+if [ -z "$firebase_db_use_prod" ]; then
+    echo "Running with Firebase realtime db emulator"
+    env+=("--env_var=FIREBASE_DATABASE_EMULATOR_HOST=localhost:9000")
 else
     echo "Using upstream authentication accounts"
     assert_google_application_credentials

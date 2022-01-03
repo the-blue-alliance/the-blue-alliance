@@ -1,13 +1,10 @@
 from typing import Dict, List, Optional, TypedDict
 
+from backend.common.models.webcast import Webcast
 from backend.common.sitevars.sitevar import Sitevar
 
 
-class WebcastType(TypedDict):
-    key_name: str
-    type: str
-    file: str
-    channel: str
+class WebcastType(Webcast):
     name: str
 
 

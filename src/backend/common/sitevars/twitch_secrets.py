@@ -20,3 +20,7 @@ class TwitchSecrets(Sitevar[ContentType]):
     @staticmethod
     def default_value() -> ContentType:
         return ContentType(client_id="", client_secret="")
+
+    @classmethod
+    def client_id(cls) -> str:
+        return cls.get()["client_id"]
