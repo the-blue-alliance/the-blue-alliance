@@ -106,7 +106,7 @@ def team_details(team_key: TeamKey) -> Response:
     if not Team.validate_key_name(team_key):
         return make_response(f"Bad team key: {escape(team_key)}", 400)
 
-    fms_df = DatafeedFMSAPI()
+    fms_df = DatafeedFMSAPI(save_response=True)
     year = datetime.date.today().year
     fms_details = fms_df.get_team_details(year, team_key)
 
@@ -159,7 +159,7 @@ def team_avatar(team_key: TeamKey) -> Response:
         return make_response(f"Bad team key: {escape(team_key)}", 400)
     team = Team.get_by_id(team_key)
 
-    fms_df = DatafeedFMSAPI()
+    fms_df = DatafeedFMSAPI(save_response=True)
     year = datetime.date.today().year
 
     avatar, keys_to_delete = fms_df.get_team_avatar(year, team_key)
@@ -222,7 +222,7 @@ def enqueue_event_list(year: Optional[Year]) -> Response:
 
 @blueprint.route("/backend-tasks/get/event_list/<int:year>")
 def event_list(year: Year) -> Response:
-    df = DatafeedFMSAPI()
+    df = DatafeedFMSAPI(save_response=True)
 
     fmsapi_events, event_list_districts = df.get_event_list(year)
 
@@ -310,7 +310,7 @@ def event_details(event_key: EventKey) -> Response:
     if not Event.validate_key_name(event_key):
         return make_response(f"Bad event key: {escape(event_key)}", 400)
 
-    df = DatafeedFMSAPI()
+    df = DatafeedFMSAPI(save_response=True)
 
     # Update event
     fmsapi_events, fmsapi_districts = df.get_event_details(event_key)
@@ -468,7 +468,7 @@ def enqueue_event_alliances(
 
 @blueprint.route("/tasks/get/fmsapi_event_alliances/<event_key>")
 def event_alliances(event_key: EventKey) -> Response:
-    df = DatafeedFMSAPI()
+    df = DatafeedFMSAPI(save_response=True)
     event = Event.get_by_id(event_key) if Event.validate_key_name(event_key) else None
     if not event:
         return make_response(f"No Event for key: {escape(event_key)}", 404)
@@ -540,7 +540,7 @@ def enqueue_event_rankings(year: Optional[Year]) -> Response:
 
 @blueprint.route("/tasks/get/fmsapi_event_rankings/<event_key>")
 def event_rankings(event_key: EventKey) -> Response:
-    df = DatafeedFMSAPI()
+    df = DatafeedFMSAPI(save_response=True)
     event = Event.get_by_id(event_key) if Event.validate_key_name(event_key) else None
     if event is None:
         return make_response(f"No Event for key: {escape(event_key)}", 404)
@@ -610,7 +610,7 @@ def event_matches(event_key: EventKey) -> Response:
     if event is None:
         return make_response(f"No Event for key: {escape(event_key)}", 404)
 
-    df = DatafeedFMSAPI()
+    df = DatafeedFMSAPI(save_response=True)
     matches = df.get_event_matches(event_key)
     matches, keys_to_delete = MatchHelper.delete_invalid_matches(
         matches,
@@ -681,7 +681,7 @@ def awards_event(event_key: EventKey) -> Response:
     if event is None:
         return make_response(f"No Event for key: {escape(event_key)}", 404)
 
-    datafeed = DatafeedFMSAPI()
+    datafeed = DatafeedFMSAPI(save_response=True)
     awards = datafeed.get_awards(event)
 
     if event.remap_teams:

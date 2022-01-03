@@ -18,7 +18,7 @@ def test_init():
     ) as mock_get_bucket:
         client = GCloudStorageClient(project)
 
-    mock_client_init.assert_called_with(project=project)
+    mock_client_init.assert_called_with(project=project, credentials=None)
     mock_get_bucket.assert_called_with("tba-unit-tests.appspot.com")
     assert client.bucket == mock_bucket
 
