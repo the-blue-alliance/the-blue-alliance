@@ -4,8 +4,7 @@ from typing import Callable
 from werkzeug.local import Local
 
 
-local = Local()
-local.callbacks = []
+local_context = Local()
 
 
 def run_after_response(callback: Callable[[], None]) -> None:
@@ -23,11 +22,13 @@ def run_after_response(callback: Callable[[], None]) -> None:
     def function_to_run():
         ...
     """
-    local.callbacks.append(callback)
+    if not hasattr(local_context.request, "callbacks"):
+        local_context.request.callbacks = []
+    local_context.request.callbacks.append(callback)
 
 
 def execute_callbacks() -> None:
-    for callback in local.callbacks:
+    for callback in local_context.request.callbacks:
         logging.info(
             f"Running callack after response: {callback.__name__ if hasattr(callback, '__name__') else None}"
         )
@@ -35,4 +36,3 @@ def execute_callbacks() -> None:
             callback()
         except Exception as e:
             logging.info(f"Callback failed: {e}")
-    local.callbacks = []

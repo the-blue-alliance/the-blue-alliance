@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 import flask
 import pytest
 from flask import Flask
-from werkzeug.test import create_environ, run_wsgi_app
+from werkzeug.test import run_wsgi_app
 from werkzeug.wrappers import Request
 
 import backend
@@ -44,19 +44,31 @@ def test_AfterResponseMiddleware_init(app: Flask) -> None:
 
 def test_AfterResponseMiddleware_callable(app: Flask) -> None:
     middleware = AfterResponseMiddleware(app)
-
     callback1 = Mock()
-    run_after_response(callback1)
+    callback2 = Mock()
+
+    @app.route("/1")
+    def test_handler1():
+        run_after_response(callback1)
+        return "Hello!"
+
+    @app.route("/2")
+    def test_handler2():
+        run_after_response(callback2)
+        return "Hello!"
 
     callback1.assert_not_called()
-    run_wsgi_app(middleware, create_environ(), buffered=True)
+    callback2.assert_not_called()
+    with app.test_request_context("/1"):
+        run_wsgi_app(middleware, flask.request.environ, buffered=True)
     callback1.assert_called_once()
+    callback2.assert_not_called()
 
-    # Ensure a second call doesn't call callback1 again.
-    callback2 = Mock()
-    run_after_response(callback2)
-
-    run_wsgi_app(middleware, create_environ(), buffered=True)
+    # Ensure a second call doesn't call the first callback again.
+    callback1.assert_called_once()
+    callback2.assert_not_called()
+    with app.test_request_context("/2"):
+        run_wsgi_app(middleware, flask.request.environ, buffered=True)
     callback1.assert_called_once()
     callback2.assert_called_once()
 
