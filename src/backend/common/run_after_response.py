@@ -33,7 +33,7 @@ def execute_callbacks() -> None:
 
     for callback in local_context.request.callbacks:
         logging.info(
-            f"Running callack after response: {callback.__name__ if hasattr(callback, '__name__') else None}"
+            f"Running callback after response: {callback.__name__ if hasattr(callback, '__name__') else None}"
         )
         try:
             callback()
