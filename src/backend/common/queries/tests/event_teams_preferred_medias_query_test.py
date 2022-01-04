@@ -15,10 +15,8 @@ def test_no_data() -> None:
 
 def test_exclude_media_no_year() -> None:
     et = EventTeam(
-        id="2010ct_frc254",
         event=ndb.Key(Event, "2010ct"),
         team=ndb.Key(Team, "frc254"),
-        year=2010,
     )
     et.put()
 
@@ -37,10 +35,8 @@ def test_exclude_media_no_year() -> None:
 
 def test_exclude_media_non_preferred() -> None:
     et = EventTeam(
-        id="2010ct_frc254",
         event=ndb.Key(Event, "2010ct"),
         team=ndb.Key(Team, "frc254"),
-        year=2010,
     )
     et.put()
 
@@ -59,10 +55,8 @@ def test_exclude_media_non_preferred() -> None:
 
 def test_exclude_media_other_team() -> None:
     et = EventTeam(
-        id="2010ct_frc254",
         event=ndb.Key(Event, "2010ct"),
         team=ndb.Key(Team, "frc254"),
-        year=2010,
     )
     et.put()
 
@@ -81,10 +75,8 @@ def test_exclude_media_other_team() -> None:
 
 def test_fetch_medias() -> None:
     et = EventTeam(
-        id="2010ct_frc254",
         event=ndb.Key(Event, "2010ct"),
         team=ndb.Key(Team, "frc254"),
-        year=2010,
     )
     et.put()
 

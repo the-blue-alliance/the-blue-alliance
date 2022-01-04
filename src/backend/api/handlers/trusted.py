@@ -65,10 +65,8 @@ def update_teams(event_key: EventKey) -> Response:
         if team:
             event_teams.append(
                 EventTeam(
-                    id=f"{event_key}_{team.key_name}",
                     event=ndb.Key(Event, event_key),
                     team=team.key,
-                    year=int(event_key[:4]),
                 )
             )
 

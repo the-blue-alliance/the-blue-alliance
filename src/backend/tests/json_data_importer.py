@@ -46,10 +46,8 @@ class JsonDataImporter(object):
         if team_key:
             [
                 EventTeam(
-                    id=f"{e['key']}_{team_key}",
                     event=ndb.Key(Event, e["key"]),
                     team=ndb.Key(Team, team_key),
-                    year=e["year"],
                 ).put()
                 for e in data
             ]
@@ -80,10 +78,8 @@ class JsonDataImporter(object):
         teams = [TeamConverter.dictToModel_v3(t) for t in data]
         event_teams = [
             EventTeam(
-                id=f"{event_key}_{team.key_name}",
                 event=ndb.Key(Event, event_key),
                 team=ndb.Key(Team, team.key_name),
-                year=int(event_key[:4]),
             )
             for team in teams
         ]

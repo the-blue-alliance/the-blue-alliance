@@ -70,10 +70,8 @@ def make_event(event_key: EventKey) -> Event:
 
 def make_eventteam(event_key: EventKey, team_key: TeamKey) -> EventTeam:
     return EventTeam(
-        id=f"{event_key}_{team_key}",
         event=ndb.Key(Event, event_key),
         team=ndb.Key(Team, team_key),
-        year=int(event_key[:4]),
     )
 
 

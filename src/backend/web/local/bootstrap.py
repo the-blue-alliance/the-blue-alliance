@@ -55,10 +55,10 @@ class LocalDataBootstrap:
 
     @staticmethod
     def store_eventteam(team: Team, event: Event) -> EventTeam:
-        eventteam = EventTeam(id="{}_{}".format(event.key_name, team.key_name))
-        eventteam.event = event.key
-        eventteam.team = team.key
-        eventteam.year = event.year
+        eventteam = EventTeam(
+            event=event.key,
+            team=team.key,
+        )
 
         # return EventTeamManipulator.createOrUpdate(eventteam)
         eventteam.put()

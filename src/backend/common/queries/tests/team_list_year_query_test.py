@@ -27,10 +27,8 @@ def preseed_teams(start_team: int, end_team: Optional[int] = None) -> List[ndb.K
 def preseed_event_teams(team_keys: List[ndb.Key], event_year: Year) -> None:
     event_teams = [
         EventTeam(
-            id=f"{event_year}ct_{t.id()}",
             event=ndb.Key(Event, f"{event_year}ct"),
             team=t,
-            year=event_year,
         )
         for t in team_keys
     ]

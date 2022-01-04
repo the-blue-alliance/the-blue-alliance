@@ -1,4 +1,4 @@
-from typing import Set
+from typing import Optional, Set
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws, safe_cast
@@ -35,7 +35,9 @@ class EventTeam(CachedModel):
         "year",  # technically immutable, but corruptable and needs repair. See github issue #409
     }
 
-    def __init__(self, event: ndb.Key, team: ndb.Key, status: EventTeamStatus = None):
+    def __init__(
+        self, event: ndb.Key, team: ndb.Key, status: Optional[EventTeamStatus] = None
+    ):
         # store set of affected references referenced keys for cache clearing
         # keys must be model properties
         self._affected_references = {
@@ -44,15 +46,17 @@ class EventTeam(CachedModel):
             "year": set(),
         }
 
-        if not Event.validate_key_name(event.id()):
-            raise Exception(f"{event.id()} is not a valid Event key.")
-        if not Team.validate_key_name(team.id()):
-            raise Exception(f"{team.id()} is not a valid Team key.")
+        event_key_name = EventKey(event.id())
+        team_key_name = TeamKey(team.id())
+        if not Event.validate_key_name(event_key_name):
+            raise Exception(f"{event_key_name} is not a valid Event key.")
+        if not Team.validate_key_name(team_key_name):
+            raise Exception(f"{team_key_name} is not a valid Team key.")
         super(EventTeam, self).__init__(
-            id=self.render_key_name(event.id(), team.id()),
+            id=self.render_key_name(event_key_name, team_key_name),
             event=event,
             team=team,
-            year=int(event.id()[:4]),
+            year=int(event_key_name[:4]),
             status=status,
         )
 

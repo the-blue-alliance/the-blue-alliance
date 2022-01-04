@@ -18,9 +18,7 @@ def test_invalid_key_name(key: str) -> None:
 
 def test_key_name() -> None:
     et = EventTeam(
-        id="2010ct_frc177",
         event=ndb.Key(Event, "2010ct"),
         team=ndb.Key(Team, "frc177"),
-        year=2010,
     )
     assert et.key_name == "2010ct_frc177"

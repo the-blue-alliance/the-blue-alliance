@@ -30,31 +30,23 @@ from backend.common.queries import (
 class TestDatabaseCacheClearer(unittest.TestCase):
     def setUp(self) -> None:
         eventteam_2015casj_frc254 = EventTeam(
-            id="2015casj_frc254",
             event=ndb.Key(Event, "2015casj"),
             team=ndb.Key(Team, "frc254"),
-            year=2015,
         )
 
         eventteam_2015cama_frc604 = EventTeam(
-            id="2015cama_frc604",
             event=ndb.Key(Event, "2015cama"),
             team=ndb.Key(Team, "frc604"),
-            year=2015,
         )
 
         eventteam_2010cama_frc604 = EventTeam(
-            id="2010cama_frc604",
             event=ndb.Key(Event, "2010cama"),
             team=ndb.Key(Team, "frc604"),
-            year=2010,
         )
 
         eventteam_2016necmp_frc125 = EventTeam(
-            id="2016necmp_frc125",
             event=ndb.Key(Event, "2016necmp"),
             team=ndb.Key(Team, "frc125"),
-            year=2016,
         )
 
         eventteam_2015casj_frc254.put()

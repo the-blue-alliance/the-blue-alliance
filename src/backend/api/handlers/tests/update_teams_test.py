@@ -30,8 +30,6 @@ def setup_event() -> None:
 def setup_eventteams(team_keys: List[TeamKey]) -> None:
     eventteams = [
         EventTeam(
-            id=f"2014casj_{team_key}",
-            year=2014,
             event=ndb.Key(Event, "2014casj"),
             team=ndb.Key(Team, team_key),
         )
