@@ -28,6 +28,9 @@ def run_after_response(callback: Callable[[], None]) -> None:
 
 
 def execute_callbacks() -> None:
+    if not hasattr(local_context.request, "callbacks"):
+        return
+
     for callback in local_context.request.callbacks:
         logging.info(
             f"Running callack after response: {callback.__name__ if hasattr(callback, '__name__') else None}"

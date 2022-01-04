@@ -47,6 +47,10 @@ def test_AfterResponseMiddleware_callable(app: Flask) -> None:
     callback1 = Mock()
     callback2 = Mock()
 
+    @app.route("/0")
+    def test_handler0():
+        return "Hello!"
+
     @app.route("/1")
     def test_handler1():
         run_after_response(callback1)
@@ -57,6 +61,15 @@ def test_AfterResponseMiddleware_callable(app: Flask) -> None:
         run_after_response(callback2)
         return "Hello!"
 
+    # Test no callback.
+    callback1.assert_not_called()
+    callback2.assert_not_called()
+    with app.test_request_context("/0"):
+        run_wsgi_app(middleware, flask.request.environ, buffered=True)
+    callback1.assert_not_called()
+    callback2.assert_not_called()
+
+    # Test first callback.
     callback1.assert_not_called()
     callback2.assert_not_called()
     with app.test_request_context("/1"):
