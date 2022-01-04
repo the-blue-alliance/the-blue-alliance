@@ -140,16 +140,12 @@ def test_get_event_details_clears_eventteams(
     ]
 
     EventTeam(
-        id="2019casj_frc900",
         event=ndb.Key(Event, "2019casj"),
         team=ndb.Key(Team, "frc9000"),
-        year=2019,
     ).put()
     EventTeam(
-        id="2019casj_frc9001",
         event=ndb.Key(Event, "2019casj"),
         team=ndb.Key(Team, "frc9001"),
-        year=2019,
     ).put()
     Award(
         id="2019casj_0",

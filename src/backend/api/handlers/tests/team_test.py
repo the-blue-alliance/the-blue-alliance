@@ -22,6 +22,7 @@ from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
+from backend.common.models.event_team_status import EventTeamStatus
 from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.robot import Robot
@@ -65,22 +66,16 @@ def test_team_years_participated(ndb_stub, api_client: Client) -> None:
     ).put()
     Team(id="frc254", team_number=254).put()
     EventTeam(
-        id="1992casj_frc254",
         event=ndb.Key("Event", "1992casj"),
         team=ndb.Key("Team", "frc254"),
-        year=1992,
     ).put()
     EventTeam(
-        id="2010casj_frc254",
         event=ndb.Key("Event", "2010casj"),
         team=ndb.Key("Team", "frc254"),
-        year=2010,
     ).put()
     EventTeam(
-        id="2020casj_frc254",
         event=ndb.Key("Event", "2020casj"),
         team=ndb.Key("Team", "frc254"),
-        year=2020,
     ).put()
 
     resp = api_client.get(
@@ -207,16 +202,12 @@ def test_team_events(ndb_stub, api_client: Client) -> None:
         event_type_enum=EventType.REGIONAL,
     ).put()
     EventTeam(
-        id="2019casj_frc254",
         event=ndb.Key("Event", "2019casj"),
         team=ndb.Key("Team", "frc254"),
-        year=2019,
     ).put()
     EventTeam(
-        id="2020casj_frc254",
         event=ndb.Key("Event", "2020casj"),
         team=ndb.Key("Team", "frc254"),
-        year=2020,
     ).put()
 
     # Nominal response
@@ -252,17 +243,19 @@ def test_team_events_statuses_year(ndb_stub, api_client: Client) -> None:
     ).put()
     Team(id="frc254", team_number=254).put()
     EventTeam(
-        id="2020casj_frc254",
         event=ndb.Key("Event", "2020casj"),
         team=ndb.Key("Team", "frc254"),
-        year=2020,
     ).put()
     EventTeam(
-        id="2020casf_frc254",
         event=ndb.Key("Event", "2020casf"),
         team=ndb.Key("Team", "frc254"),
-        year=2020,
-        status={},
+        status=EventTeamStatus(
+            qual=None,
+            playoff=None,
+            alliance=None,
+            last_match_key=None,
+            next_match_key=None,
+        ),
     ).put()
 
     resp = api_client.get(
@@ -305,22 +298,16 @@ def test_team_events_year(ndb_stub, api_client: Client) -> None:
         event_type_enum=EventType.REGIONAL,
     ).put()
     EventTeam(
-        id="2019casj_frc254",
         event=ndb.Key("Event", "2019casj"),
         team=ndb.Key("Team", "frc254"),
-        year=2019,
     ).put()
     EventTeam(
-        id="2020casj_frc254",
         event=ndb.Key("Event", "2020casj"),
         team=ndb.Key("Team", "frc254"),
-        year=2020,
     ).put()
     EventTeam(
-        id="2020casf_frc254",
         event=ndb.Key("Event", "2020casf"),
         team=ndb.Key("Team", "frc254"),
-        year=2020,
     ).put()
 
     # Nominal response
@@ -489,11 +476,15 @@ def test_team_event_status(ndb_stub, api_client: Client) -> None:
     ).put()
     Team(id="frc254", team_number=254).put()
     EventTeam(
-        id="2020casj_frc254",
         event=ndb.Key("Event", "2020casj"),
         team=ndb.Key("Team", "frc254"),
-        year=2020,
-        status={},
+        status=EventTeamStatus(
+            qual=None,
+            playoff=None,
+            alliance=None,
+            last_match_key=None,
+            next_match_key=None,
+        ),
     ).put()
 
     resp = api_client.get(
@@ -876,16 +867,12 @@ def test_team_list_year(ndb_stub, api_client: Client) -> None:
     Team(id="frc67", team_number=67).put()
     Team(id="frc254", team_number=254).put()
     EventTeam(
-        id="2020casj_frc67",
         event=ndb.Key("Event", "2020casj"),
         team=ndb.Key("Team", "frc67"),
-        year=2020,
     ).put()
     EventTeam(
-        id="2019casj_frc254",
         event=ndb.Key("Event", "2019casj"),
         team=ndb.Key("Team", "frc254"),
-        year=2019,
     ).put()
 
     # Nominal response

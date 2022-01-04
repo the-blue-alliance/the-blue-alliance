@@ -437,10 +437,8 @@ def test_teams() -> None:
     assert event.teams == []
 
     EventTeam(
-        id="2019ct_frc1",
         event=ndb.Key(Event, "2019ct"),
         team=ndb.Key(Team, "frc1"),
-        year=2019,
     ).put()
     t = Team(
         id="frc1",

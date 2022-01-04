@@ -156,10 +156,8 @@ def preseed_event_for_team(team_number: TeamNumber, event_key: EventKey) -> None
         ),
     ).put()
     EventTeam(
-        id=f"{event_key}_frc{team_number}",
         event=ndb.Key(Event, event_key),
         team=ndb.Key(Team, f"frc{team_number}"),
-        year=int(event_key[:4]),
     ).put()
 
 

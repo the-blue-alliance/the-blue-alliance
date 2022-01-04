@@ -265,16 +265,12 @@ def test_event_teams(ndb_stub, api_client: Client) -> None:
     Team(id="frc254", team_number=254).put()
     Team(id="frc604", team_number=604).put()
     EventTeam(
-        id="2019casj_frc254",
         event=ndb.Key("Event", "2019casj"),
         team=ndb.Key("Team", "frc254"),
-        year=2019,
     ).put()
     EventTeam(
-        id="2019casj_frc604",
         event=ndb.Key("Event", "2019casj"),
         team=ndb.Key("Team", "frc604"),
-        year=2019,
     ).put()
 
     # Nominal response

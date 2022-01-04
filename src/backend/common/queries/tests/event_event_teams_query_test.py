@@ -10,10 +10,8 @@ from backend.common.queries.team_query import EventEventTeamsQuery
 def preseed_event_teams(start_team: int, end_team: int, event_key: EventKey) -> None:
     event_teams = [
         EventTeam(
-            id=f"{event_key}_frc{t}",
             event=ndb.Key(Event, event_key),
             team=ndb.Key(Team, f"frc{t}"),
-            year=int(event_key[:4]),
         )
         for t in range(start_team, end_team + 1)
     ]

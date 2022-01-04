@@ -19,10 +19,8 @@ def update_event_team(
     playoff_status: EventTeamStatusPlayoff,
 ) -> None:
     EventTeam(
-        id=f"{event_key}_frc{team_number}",
         event=ndb.Key("Event", event_key),
         team=ndb.Key("Team", f"frc{team_number}"),
-        year=int(event_key[:4]),
         status=EventTeamStatus(
             qual=None,
             playoff=playoff_status,

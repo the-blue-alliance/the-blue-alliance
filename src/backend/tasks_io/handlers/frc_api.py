@@ -360,10 +360,8 @@ def event_details(event_key: EventKey) -> Response:
     event_teams = (
         [
             EventTeam(
-                id=event.key_name + "_" + team.key_name,
                 event=event.key,
                 team=team.key,
-                year=event.year,
             )
             for team in teams
         ]
@@ -711,10 +709,8 @@ def awards_event(event_key: EventKey) -> Response:
         EventTeamManipulator.createOrUpdate(
             [
                 EventTeam(
-                    id=event_key + "_" + team.key_name,
                     event=event.key,
                     team=team.key,
-                    year=event.year,
                 )
                 for team in teams
             ]

@@ -1,4 +1,4 @@
-from typing import Set
+from typing import Optional, Set
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws, safe_cast
@@ -10,7 +10,7 @@ from backend.common.models.event_team_status import (
     EventTeamStatus,
     EventTeamStatusStrings,
 )
-from backend.common.models.keys import EventTeamKey, Year
+from backend.common.models.keys import EventKey, EventTeamKey, TeamKey, Year
 from backend.common.models.team import Team
 
 
@@ -35,7 +35,9 @@ class EventTeam(CachedModel):
         "year",  # technically immutable, but corruptable and needs repair. See github issue #409
     }
 
-    def __init__(self, *args, **kw):
+    def __init__(
+        self, event: ndb.Key, team: ndb.Key, status: Optional[EventTeamStatus] = None
+    ):
         # store set of affected references referenced keys for cache clearing
         # keys must be model properties
         self._affected_references = {
@@ -43,7 +45,26 @@ class EventTeam(CachedModel):
             "team": set(),
             "year": set(),
         }
-        super(EventTeam, self).__init__(*args, **kw)
+
+        event_key_name = EventKey(event.id())
+        team_key_name = TeamKey(team.id())
+        if not Event.validate_key_name(event_key_name):
+            raise Exception(f"{event_key_name} is not a valid Event key.")
+        if not Team.validate_key_name(team_key_name):
+            raise Exception(f"{team_key_name} is not a valid Team key.")
+        super(EventTeam, self).__init__(
+            id=self.render_key_name(event_key_name, team_key_name),
+            event=event,
+            team=team,
+            year=int(event_key_name[:4]),
+            status=status,
+        )
+
+    @classmethod
+    def render_key_name(
+        cls, event_key_name: EventKey, team_key_name: TeamKey
+    ) -> EventTeamKey:
+        return f"{event_key_name}_{team_key_name}"
 
     @classmethod
     def validate_key_name(cls, key: str) -> bool:
