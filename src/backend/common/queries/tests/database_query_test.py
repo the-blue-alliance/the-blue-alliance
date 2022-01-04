@@ -1,6 +1,7 @@
 from typing import Any, Generator, Iterable, List, TypedDict
 
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.cached_query_result import CachedQueryResult
@@ -146,7 +147,12 @@ def test_cached_query() -> None:
     assert len(result) == 3
 
     # Now, verify the cached response exists
-    assert CachedQueryResult.get_by_id(query.cache_key) is not None
+    cached_result = CachedQueryResult.get_by_id(query.cache_key)
+    assert cached_result is not None
+
+    # Verify the correct fields are written
+    assert cached_result.result is not None
+    assert cached_result.result_dict is None
 
     # And if we delete the underlying data out without clearing the cache, we should
     # still read a stale value
@@ -169,7 +175,11 @@ def test_cached_dict_query() -> None:
 
     # Now, verify the cached response exists
     cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
-    assert CachedQueryResult.get_by_id(cache_key) is not None
+    cached_result = CachedQueryResult.get_by_id(cache_key)
+
+    # Verify the correct fields are written
+    assert none_throws(cached_result).result is None
+    assert none_throws(cached_result).result_dict is not None
 
     # And if we delete the underlying data out without clearing the cache, we should
     # still read a stale value

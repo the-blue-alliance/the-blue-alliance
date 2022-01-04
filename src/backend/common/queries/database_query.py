@@ -160,7 +160,7 @@ class CachedDatabaseQuery(
 
             if self.CACHE_WRITES_ENABLED:
                 yield CachedQueryResult(
-                    id=cache_key, result=converted_result
+                    id=cache_key, result_dict=converted_result
                 ).put_async()
             return converted_result
-        return cached_query_result.result
+        return cached_query_result.result_dict
