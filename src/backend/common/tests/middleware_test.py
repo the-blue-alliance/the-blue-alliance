@@ -45,12 +45,20 @@ def test_AfterResponseMiddleware_init(app: Flask) -> None:
 def test_AfterResponseMiddleware_callable(app: Flask) -> None:
     middleware = AfterResponseMiddleware(app)
 
-    callback = Mock()
-    run_after_response(callback)
+    callback1 = Mock()
+    run_after_response(callback1)
 
-    callback.assert_not_called()
+    callback1.assert_not_called()
     run_wsgi_app(middleware, create_environ(), buffered=True)
-    callback.assert_called_once()
+    callback1.assert_called_once()
+
+    # Ensure a second call doesn't call callback1 again.
+    callback2 = Mock()
+    run_after_response(callback2)
+
+    run_wsgi_app(middleware, create_environ(), buffered=True)
+    callback1.assert_called_once()
+    callback2.assert_called_once()
 
 
 def test_install_middleware(app: Flask) -> None:

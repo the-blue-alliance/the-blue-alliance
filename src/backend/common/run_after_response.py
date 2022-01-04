@@ -31,4 +31,8 @@ def execute_callbacks() -> None:
         logging.info(
             f"Running callack after response: {callback.__name__ if hasattr(callback, '__name__') else None}"
         )
-        callback()
+        try:
+            callback()
+        except Exception as e:
+            logging.info(f"Callback failed: {e}")
+    local.callbacks = []
