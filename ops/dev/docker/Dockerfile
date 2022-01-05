@@ -37,7 +37,6 @@ RUN apt-get update && apt-get install -y \
 # Set up nvm and nodejs
 ENV NVM_DIR /nvm
 ENV NODE_VERSION 14
-RUN ls
 RUN mkdir -p $NVM_DIR  \
     && wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash \
     && . $NVM_DIR/nvm.sh \
