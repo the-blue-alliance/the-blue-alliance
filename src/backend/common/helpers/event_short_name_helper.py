@@ -61,7 +61,7 @@ class EventShortNameHelper:
         # district championships, other districts, and regionals
         name_str = re.sub(r"\s?Event", "", name_str)
         match = re.match(
-            r"\s*(?:MAR |PNW |)(?:FIRST Robotics|FRC|)(.+)(?:District|Regional|Region|Provincial|State|Tournament|FRC|Field)(?:\b)(?:[\w\s]+?(#\d*)*)?",
+            r"\s*(?:MAR |PNW |)(?:FIRST Robotics|FRC|)(.+)(?:District|Regional|Region|Provincial|State|Tournament|FRC|Field)(?:\b)(?:[\w\s]+?(#\d*)*)?(Day \d+)?",
             name_str,
         )
 

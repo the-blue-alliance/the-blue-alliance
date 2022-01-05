@@ -916,3 +916,12 @@ def test_event_get_short_name():
         EventShortNameHelper.get_short_name("***SUSPENDED*** Silicon Valley Regional")
         == "Silicon Valley"
     )
+    # 2022 edge cases
+    assert (
+        EventShortNameHelper.get_short_name("Festival de Robotique Regional Day 1")
+        == "Festival de Robotique Day 1"
+    )
+    assert (
+        EventShortNameHelper.get_short_name("Festival de Robotique Regional Day 23")
+        == "Festival de Robotique Day 23"
+    )
