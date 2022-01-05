@@ -220,7 +220,7 @@ jobs:
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
       - name: Start Container
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: TBA_LOCAL_DOCKERFILE=true vagrant up
+        run: vagrant up
       - name: Test Vagrant Startup
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/test_vagrant_startup.py

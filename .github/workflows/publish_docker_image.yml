@@ -1,0 +1,27 @@
+name: Publish Docker Image
+
+on:
+  push:
+    branches: [ py3 ]
+
+concurrency: docker-publish-${{ github.ref }}
+
+jobs:
+  build_and_push:
+    name: Build and Push 
+    runs-on: ubuntu-latest
+    if: contains(github.event.commits[0].message, '[dockerpublish]') == true
+    steps:
+    - uses: actions/checkout@v2
+    - name: Log in to the Container registry
+      uses: docker/login-action@v1.12.0
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v2.7.0
+      with:
+        context: ./ops/dev/docker
+        push: true
+        tags: ghcr.io/${{ github.repository }}/tba-py3-dev:latest

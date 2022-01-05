@@ -36,7 +36,7 @@ The Vagrant container may be out of date as well. In this situation, destroy and
 ```
 $ vagrant halt
 $ vagrant destroy
-$ docker pull gcr.io/tbatv-prod-hrd/tba-py3-dev:latest
+$ docker pull ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
 $ vagrant up
 ```
 

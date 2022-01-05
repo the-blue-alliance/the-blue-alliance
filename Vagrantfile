@@ -62,7 +62,7 @@ Vagrant.configure("2") do |config|
       d.build_dir = "ops/dev/docker"
     else
       # But by deafult, run with a prebuilt container image because it's faster
-      d.image = "gcr.io/tbatv-prod-hrd/tba-py3-dev:latest"
+      d.image = "ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest"
     end
 
 
