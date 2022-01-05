@@ -58,6 +58,9 @@ Vagrant.configure("2") do |config|
     d.has_ssh = true
 
     if ENV['CI'] != nil
+      # On CI, we use the locally prebuilt image
+      d.image = "local/tba-py3-dev:latest"
+    else
       if ENV['TBA_LOCAL_DOCKERFILE'] != nil
         # We can build the docker container from the local Dockerfile
         d.build_dir = "ops/dev/docker"
@@ -65,9 +68,6 @@ Vagrant.configure("2") do |config|
         # But by deafult, run with a prebuilt container image because it's faster
         d.image = "ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest"
       end
-    else
-      # On CI, we use the locally prebuilt image
-      d.image = "local/tba-py3-dev:latest"
     end
 
 
