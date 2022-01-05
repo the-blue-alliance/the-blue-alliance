@@ -3,8 +3,6 @@ name: Publish Docker Image
 on:
   push:
     branches: [ py3 ]
-  pull_request:  # TODO: Remove before merge
-    branches: [ py3 ]
 
 concurrency: docker-publish-${{ github.ref }}
 
@@ -12,7 +10,7 @@ jobs:
   build_and_push:
     name: Build and Push 
     runs-on: ubuntu-latest
-    # if: contains(github.event.commits[0].message, '[dockerpublish]') == true
+    if: contains(github.event.commits[0].message, '[dockerpublish]') == true
     steps:
     - uses: actions/checkout@v2
     - name: Log in to the Container registry
