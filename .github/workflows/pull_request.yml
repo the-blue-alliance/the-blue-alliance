@@ -233,16 +233,16 @@ jobs:
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
-      - name: Start Container
-        run: vagrant up
-      - name: Test Vagrant Startup
-        run: ./ops/test_vagrant_startup.py
-      - name: Test Ops Fullstack
-        run: ./ops/test_ops.sh
-      - name: Capture screenshots
-        run: ./ops/pr_screenshots/capture_screenshots.py
-      - name: Upload screenshots artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: ci_screenshots
-          path: ci_screenshots.pickle
+      # - name: Start Container
+      #   run: vagrant up
+      # - name: Test Vagrant Startup
+      #   run: ./ops/test_vagrant_startup.py
+      # - name: Test Ops Fullstack
+      #   run: ./ops/test_ops.sh
+      # - name: Capture screenshots
+      #   run: ./ops/pr_screenshots/capture_screenshots.py
+      # - name: Upload screenshots artifact
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: ci_screenshots
+      #     path: ci_screenshots.pickle
