@@ -8,10 +8,6 @@ on:
 
 concurrency: docker-publish-${{ github.ref }}
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/tba-py3-dev
-
 jobs:
   build_and_push:
     name: Build and Push 
@@ -22,18 +18,12 @@ jobs:
     - name: Log in to the Container registry
       uses: docker/login-action@v1.12.0
       with:
-        registry: ${{ env.REGISTRY }}
+        registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    - name: Extract metadata (tags, labels) for Docker
-      id: meta
-      uses: docker/metadata-action@v3.6.2
-      with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
     - name: Build and push Docker image
       uses: docker/build-push-action@v2.7.0
       with:
         context: ./ops/dev/docker
         push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+        tags: ${{ github.repository }}/tba-py3-dev:latest
