@@ -228,7 +228,7 @@ jobs:
           context: ./ops/dev/docker
           tags: local/tba-py3-dev:latest
           cache-from: type=gha
-          cache-to: type=gha
+          cache-to: type=gha,mode=max
       # - name: Move Docker Cache  # This is necessary to prevent cache from growing forever.
       #   run: |
       #     rm -rf /tmp/.buildx-cache
