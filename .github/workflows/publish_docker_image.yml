@@ -29,7 +29,7 @@ jobs:
         context: ./ops/dev/docker
         push: true
         tags: ghcr.io/${{ github.repository }}/tba-py3-dev:latest
-          cache-from: |
-            type=gha
-            ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
-          cache-to: type=gha,mode=max
+        cache-from: |
+          type=gha
+          ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
+        cache-to: type=gha,mode=max
