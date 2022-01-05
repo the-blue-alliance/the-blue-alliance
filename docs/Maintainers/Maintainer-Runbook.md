@@ -9,14 +9,9 @@ Bumping the Python version requires that Google App Engine supports the new Pyth
 
 ## Building a New Development Container Version
 
-We host built container images with [Google Cloud Build](https://cloud.google.com/cloud-build). The build config and `Dockerfile` are [in the repo](https://github.com/the-blue-alliance/the-blue-alliance/tree/py3/ops/dev/docker). After the `Dockerfile` is updated, we'll need to rebuild + push the image:
+We host built container images with [GitHub Container Registry](https://github.com/features/packages). The `Dockerfile` is defined [here](https://github.com/the-blue-alliance/the-blue-alliance/tree/py3/ops/dev/docker). After the `Dockerfile` is updated, we'll need to trigger a rebuild + push by including `[dockerpublish]` in the commit message.
 
-```bash
-# Locally, you need gcloud and docker installed
-$ ./ops/dev/docker/build-container-images.sh
-```
-
-Images are published to `gcr.io/tbatv-prod-hrd/tba-py3-dev` and can be managed from the [cloud console](https://console.cloud.google.com/gcr).
+Images are published to `ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest` and can be managed from the [on GitHub](https://github.com/the-blue-alliance/the-blue-alliance/pkgs/container/the-blue-alliance%2Ftba-py3-dev).
 
 ## Running One-Off Data Migrations/Cleanups
 
