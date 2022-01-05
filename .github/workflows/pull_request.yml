@@ -211,7 +211,9 @@ jobs:
           npm ci
           npm install -g capture-website-cli
       - name: Install Vagrant
-        run: sudo apt-get install vagrant
+        run: |
+          sudo apt-get update
+          sudo apt-get install vagrant
       - name: Create keys file
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
       - name: Set up Docker Buildx

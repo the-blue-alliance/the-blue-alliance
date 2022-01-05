@@ -219,7 +219,9 @@ jobs:
         run: npm ci
       - name: Install Vagrant
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: sudo apt-get install vagrant
+        run: |
+          sudo apt-get update
+          sudo apt-get install vagrant
       - name: Create keys file
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
