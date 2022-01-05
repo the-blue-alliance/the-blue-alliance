@@ -258,7 +258,7 @@ class EventHelper(object):
         # 2014- districts
         # district championships, other districts, and regionals
         name_str = re.sub(r'\s?Event','', name_str)
-        match = re.match(r'\s*(?:MAR |PNW |)(?:FIRST Robotics|FRC|)(.+)(?:District|Regional|Region|Provincial|State|Tournament|FRC|Field)(?:\b)(?:[\w\s]+?(#\d*)*)?', name_str)
+        match = re.match(r'\s*(?:MAR |PNW |)(?:FIRST Robotics|FRC|)(.+)(?:District|Regional|Region|Provincial|State|Tournament|FRC|Field)(?:\b)(?:[\w\s]+?(#\d*)*)?(Day \d+)?', name_str)
 
         if match:
             short = ''.join(match.groups(''))
