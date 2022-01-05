@@ -31,7 +31,7 @@ Vagrant.configure("2") do |config|
   # Forward GAE modules
   # Only forward 8080 on CI since some others conflict with GH Actions
   # and are not needed for testing.
-  if ENV['CI'] != ''
+  if ENV['CI'] != nil
     gae_module_ports = [8080]
   else
     gae_module_ports = 8080..8089
@@ -57,12 +57,17 @@ Vagrant.configure("2") do |config|
     d.ports = ports
     d.has_ssh = true
 
-    if ENV['TBA_LOCAL_DOCKERFILE'] != nil
-      # We can build the docker container from the local Dockerfile
-      d.build_dir = "ops/dev/docker"
+    if ENV['CI'] != nil
+      if ENV['TBA_LOCAL_DOCKERFILE'] != nil
+        # We can build the docker container from the local Dockerfile
+        d.build_dir = "ops/dev/docker"
+      else
+        # But by deafult, run with a prebuilt container image because it's faster
+        d.image = "ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest"
+      end
     else
-      # But by deafult, run with a prebuilt container image because it's faster
-      d.image = "ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest"
+      # On CI, we use the locally prebuilt image
+      d.image = "local/tba-py3-dev:latest"
     end
 
 
