@@ -6,6 +6,7 @@ from backend.common.logging import configure_logging
 from backend.common.middleware import install_middleware
 from backend.tasks_io.handlers.cron_misc import blueprint as cron_misc_blueprint
 from backend.tasks_io.handlers.frc_api import blueprint as frc_api_blueprint
+from backend.tasks_io.handlers.tasks import blueprint as tasks_blueprint
 
 
 configure_logging()
@@ -17,3 +18,4 @@ install_defer_routes(app)
 
 app.register_blueprint(cron_misc_blueprint)
 app.register_blueprint(frc_api_blueprint)
+app.register_blueprint(tasks_blueprint)
