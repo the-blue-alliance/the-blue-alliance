@@ -227,6 +227,8 @@ jobs:
         id: buildx
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         uses: docker/setup-buildx-action@v1
+        with:
+          driver-opts: network=host
       - name: Build Docker Image
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         uses: docker/build-push-action@v2
