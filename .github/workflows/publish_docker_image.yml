@@ -26,4 +26,4 @@ jobs:
       with:
         context: ./ops/dev/docker
         push: true
-        tags: ${{ github.repository }}/tba-py3-dev:latest
+        tags: ghcr.io/${{ github.repository }}/tba-py3-dev:latest
