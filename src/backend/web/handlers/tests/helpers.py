@@ -1,7 +1,7 @@
 import json
 import re
 from datetime import datetime, timedelta
-from typing import List, NamedTuple, Optional, Tuple
+from typing import Generator, List, NamedTuple, Optional, Tuple
 
 import bs4
 from google.appengine.ext import ndb
@@ -58,8 +58,9 @@ class ParsedTeam(NamedTuple):
     team_location: str
 
 
-def preseed_team(team_number: TeamNumber) -> None:
-    Team(
+@ndb.synctasklet
+def preseed_team(team_number: TeamNumber) -> Generator:
+    yield Team(
         id=f"frc{team_number}",
         team_number=team_number,
         nickname=f"The {team_number} Team",
@@ -69,37 +70,40 @@ def preseed_team(team_number: TeamNumber) -> None:
         country="USA",
         website="https://www.thebluealliance.com",
         rookie_year=2008,
-    ).put()
+    ).put_async()
 
 
-def preseed_event(event_key: EventKey) -> None:
-    Event(
+@ndb.synctasklet
+def preseed_event(event_key: EventKey) -> Generator:
+    year = int(event_key[:4])
+    yield Event(
         id=event_key,
         event_short=event_key[4:],
-        year=int(event_key[:4]),
+        year=year,
         name="Test Event",
         event_type_enum=EventType.OFFSEASON,
-        start_date=datetime(2020, 3, 1),
-        end_date=datetime(2020, 3, 5),
+        start_date=datetime(year, 3, 1),
+        end_date=datetime(year, 3, 5),
         webcast_json=json.dumps(
             [
                 {"type": "twitch", "channel": "robosportsnetwork"},
                 {"type": "twitch", "channel": "firstinspires"},
             ]
         ),
-    ).put()
+    ).put_async()
 
 
-def preseed_district(district_key: DistrictKey) -> None:
+@ndb.synctasklet
+def preseed_district(district_key: DistrictKey) -> Generator:
     year = int(district_key[:4])
-    District(
+    yield District(
         id=district_key,
         year=year,
         abbreviation=district_key[4:],
         display_name=district_key[4:].upper(),
-    ).put()
+    ).put_async()
 
-    ndb.put_multi(
+    yield ndb.put_multi_async(
         [
             Event(
                 id=f"{year}event{i}",
@@ -115,7 +119,7 @@ def preseed_district(district_key: DistrictKey) -> None:
             for i in range(1, 6)
         ]
     )
-    ndb.put_multi(
+    yield ndb.put_multi_async(
         [
             Team(
                 id=f"frc{i}",
@@ -126,7 +130,7 @@ def preseed_district(district_key: DistrictKey) -> None:
             for i in range(1, 6)
         ]
     )
-    ndb.put_multi(
+    yield ndb.put_multi_async(
         [
             DistrictTeam(
                 id=f"{district_key}_frc{i}",
@@ -139,8 +143,9 @@ def preseed_district(district_key: DistrictKey) -> None:
     )
 
 
-def preseed_event_for_team(team_number: TeamNumber, event_key: EventKey) -> None:
-    Event(
+@ndb.synctasklet
+def preseed_event_for_team(team_number: TeamNumber, event_key: EventKey) -> Generator:
+    yield Event(
         id=event_key,
         event_short=event_key[4:],
         year=int(event_key[:4]),
@@ -154,13 +159,13 @@ def preseed_event_for_team(team_number: TeamNumber, event_key: EventKey) -> None
                 {"type": "twitch", "channel": "firstinspires"},
             ]
         ),
-    ).put()
-    EventTeam(
+    ).put_async()
+    yield EventTeam(
         id=f"{event_key}_frc{team_number}",
         event=ndb.Key(Event, event_key),
         team=ndb.Key(Team, f"frc{team_number}"),
         year=int(event_key[:4]),
-    ).put()
+    ).put_async()
 
 
 def get_team_info(resp_data: str) -> TeamInfo:

@@ -1,6 +1,6 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 
-{% block title %}Event List{% endblock %}
+{% block title %}Event List ({{selected_year}}){% endblock %}
 
 {% block content %}
 
@@ -12,7 +12,7 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu tba-dropdown-menu-limited">
-    {% for year in valid_years reversed %}
+    {% for year in valid_years|reverse %}
       <li><a href="/admin/events/{{year}}">{{year}}</a></li>
     {% endfor %}
   </ul>

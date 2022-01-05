@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any, List, NamedTuple, Optional
 
 import pytest
 from flask import Flask
@@ -100,6 +100,42 @@ def test_yt_start(input: str, output: str) -> None:
 )
 def test_match_short(input: str, output: str) -> None:
     assert filters.match_short(input) == output
+
+
+class ExampleObject(NamedTuple):
+    field1: int
+    field2: str
+
+
+@pytest.mark.parametrize(
+    "input, field, output",
+    [
+        (
+            [
+                ExampleObject(field1=10, field2="foo"),
+                ExampleObject(field1=5, field2="zzz"),
+            ],
+            "field1",
+            [
+                ExampleObject(field1=5, field2="zzz"),
+                ExampleObject(field1=10, field2="foo"),
+            ],
+        ),
+        (
+            [
+                ExampleObject(field1=10, field2="foo"),
+                ExampleObject(field1=20, field2="bar"),
+            ],
+            "field2",
+            [
+                ExampleObject(field1=20, field2="bar"),
+                ExampleObject(field1=10, field2="foo"),
+            ],
+        ),
+    ],
+)
+def test_sort_by(input: List, field: str, output: List) -> None:
+    assert filters.sort_by(input, field) == output
 
 
 def test_register_template_filters(empty_app: Flask) -> None:

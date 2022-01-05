@@ -6,14 +6,13 @@ import tba_config
 
 from controllers.admin.admin_api_controller import AdminApiAuthAdd, AdminApiAuthDelete, AdminApiAuthEdit, AdminApiAuthManage
 from controllers.admin.admin_apistatus_controller import AdminApiStatus
-from controllers.admin.admin_authkeys_controller import AdminAuthKeys
 from controllers.admin.admin_contbuild_controller import AdminContbuildController
 from controllers.admin.admin_district_controller import AdminDistrictList, AdminDistrictEdit, \
     AdminDistrictCreate
-from controllers.admin.admin_event_controller import AdminEventAddAllianceSelections, AdminEventDeleteTeams, AdminEventAddTeams, AdminEventRemapTeams, AdminEventAddWebcast, AdminEventCreate, AdminEventCreateTest, AdminEventDelete, AdminEventDetail, AdminEventEdit, AdminEventList, \
+from controllers.admin.admin_event_controller import AdminEventAddAllianceSelections, AdminEventDeleteTeams, AdminEventAddTeams, AdminEventRemapTeams, AdminEventAddWebcast, AdminEventCreate, AdminEventCreateTest, AdminEventDelete, AdminEventDetail, AdminEventEdit, \
     AdminAddAllianceBackup, AdminEventRemoveWebcast, AdminRefetchEventLocation, AdminPlayoffAdvancementAddController, AdminPlayoffAdvancementPurgeController, AdminEventDeleteMatches
 from controllers.admin.admin_gameday_controller import AdminGamedayDashboard
-from controllers.admin.admin_main_controller import AdminDebugHandler, AdminMain, AdminTasksHandler
+from controllers.admin.admin_main_controller import AdminDebugHandler, AdminMain,
 from controllers.admin.admin_award_controller import AdminAwardDashboard, AdminAwardEdit, AdminAwardAdd, \
     AdminAwardDelete, AdminAwardAddWithEvent
 from controllers.admin.admin_match_controller import AdminVideosAdd, AdminMatchCleanup, AdminMatchDashboard, AdminMatchDelete, AdminMatchDetail, AdminMatchAdd, AdminMatchEdit
@@ -27,7 +26,6 @@ from controllers.admin.admin_migration_controller import AdminMigration, \
 from controllers.admin.admin_mobile_controller import AdminMobile, AdminBroadcast, AdminMobileWebhooks
 from controllers.admin.admin_offseason_scraper_controller import AdminOffseasonScraperController
 from controllers.admin.admin_offseason_spreadsheet_controller import AdminOffseasonSpreadsheetController
-from controllers.admin.admin_sitevar_controller import AdminSitevarCreate, AdminSitevarEdit, AdminSitevarList
 from controllers.admin.admin_suggestion_controller import AdminCreateTestSuggestions
 from controllers.admin.admin_tbans_controller import AdminTBANS
 from controllers.admin.admin_team_controller import AdminTeamCreateTest, AdminTeamDetail, AdminTeamList, \
@@ -39,21 +37,18 @@ from controllers.admin.admin_main_landing_controller import AdminMainLandingEdit
 from google.appengine.ext.webapp import template
 template.register_template_library('common.my_filters')
 
-app = webapp2.WSGIApplication([('/admin/', AdminMain),
+app = webapp2.WSGIApplication([('/admin/', AdminMain), 
                                ('/admin/api_auth/add', AdminApiAuthAdd),
                                ('/admin/api_auth/delete/(.*)', AdminApiAuthDelete),
                                ('/admin/api_auth/edit/(.*)', AdminApiAuthEdit),
                                ('/admin/api_auth/manage', AdminApiAuthManage),
                                ('/admin/apistatus', AdminApiStatus),
-                               ('/admin/authkeys', AdminAuthKeys),
                                ('/admin/contbuild/(.*)', AdminContbuildController),
                                ('/admin/debug', AdminDebugHandler),
                                ('/admin/districts', AdminDistrictList),
                                ('/admin/districts/([0-9]*)', AdminDistrictList),
                                ('/admin/district/edit/(.*)', AdminDistrictEdit),
                                ('/admin/district/create', AdminDistrictCreate),
-                               ('/admin/events', AdminEventList),
-                               ('/admin/events/([0-9]*)', AdminEventList),
                                ('/admin/event/add_alliance_backup/(.*)', AdminAddAllianceBackup),
                                ('/admin/event/add_alliance_selections/(.*)', AdminEventAddAllianceSelections),
                                ('/admin/event/add_teams/(.*)', AdminEventAddTeams),
@@ -67,7 +62,6 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/event/delete/(.*)', AdminEventDelete),
                                ('/admin/event/edit/(.*)', AdminEventEdit),
                                ('/admin/event/delete_matches/(.*)/(.*)/(.*)', AdminEventDeleteMatches),
-                               ('/admin/event/(.*)', AdminEventDetail),
                                ('/admin/gameday', AdminGamedayDashboard),
                                ('/admin/awards', AdminAwardDashboard),
                                ('/admin/award/add', AdminAwardAdd),
@@ -105,11 +99,7 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/offseasons/spreadsheet', AdminOffseasonSpreadsheetController),
                                ('/admin/playoff_advancement/add', AdminPlayoffAdvancementAddController),
                                ('/admin/playoff_advancement/purge/(.*)', AdminPlayoffAdvancementPurgeController),
-                               ('/admin/sitevars', AdminSitevarList),
-                               ('/admin/sitevar/create', AdminSitevarCreate),
-                               ('/admin/sitevar/edit/(.*)', AdminSitevarEdit),
                                ('/admin/suggestions/create/test', AdminCreateTestSuggestions),
-                               ('/admin/tasks', AdminTasksHandler),
                                ('/admin/teams/([0-9]*)', AdminTeamList),
                                ('/admin/teams', AdminTeamList),
                                ('/admin/team/create/test', AdminTeamCreateTest),

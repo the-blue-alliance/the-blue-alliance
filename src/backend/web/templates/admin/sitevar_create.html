@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 
 {% block title %}Create Sitevar{% endblock %}
 
@@ -13,11 +13,11 @@
         </tr>
         <tr>
             <td>Description</td>
-            <td><textarea name="description" value="{{ sitevar.description }}"></textarea></td>
+            <td><textarea name="description"></textarea></td>
         </tr>
         <tr>
             <td>Values <small>(must be json dict)</small></td>
-            <td><textarea name="values_json" value="{{ sitevar.values_json }}"></textarea></td>
+            <td><textarea name="values_json"></textarea></td>
         </tr>
     </table>
 

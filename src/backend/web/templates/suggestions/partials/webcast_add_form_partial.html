@@ -24,6 +24,6 @@
     </tr>
     <tr>
         <td>Date</td>
-        <td><input type="text" name="webcast_date" value="{% if suggestion.contents.webcast_date%}{{suggestion.contents.webcast_date}}{% endif %}" /></td>
+        <td><input type="text" name="webcast_date" value="{% if suggestion and suggestion.contents.webcast_date%}{{suggestion.contents.webcast_date}}{% endif %}" /></td>
     </tr>
 </table>

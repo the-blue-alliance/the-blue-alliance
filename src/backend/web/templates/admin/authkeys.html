@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 
 {% block title %}API Keys{% endblock %}
 
@@ -8,6 +8,7 @@
 <p>Here you can manage all of the tokens for third party APIs used by TBA</p>
 
 <form method="post">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 <table class="table table-striped">
   <tr><th>Google</th></tr>
   <tr><td>API Key</td><td><input name="google_secret" value="{{google_secret}}" class="form-control"/></td></tr>
