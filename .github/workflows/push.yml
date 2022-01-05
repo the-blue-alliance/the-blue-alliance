@@ -190,6 +190,11 @@ jobs:
   ops-test:
     name: Ops Fullstack Test
     runs-on: ubuntu-latest
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Set up Python 3.8
@@ -218,6 +223,24 @@ jobs:
       - name: Create keys file
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
+      - name: Set up Docker Buildx
+        id: buildx
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        uses: docker/setup-buildx-action@v1
+        with:
+          driver-opts: network=host
+      - name: Build Docker Image
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        uses: docker/build-push-action@v2
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          context: ./ops/dev/docker
+          push: true
+          tags: localhost:5000/tba-py3-dev:latest
+          cache-from: |
+            type=gha
+            ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
+          cache-to: type=gha,mode=max
       - name: Start Container
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: vagrant up
