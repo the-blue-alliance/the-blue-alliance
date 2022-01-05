@@ -13,7 +13,7 @@
     "less-loader": "^10.2.0",
     "material-ui": "^0.20.2",
     "prettier": "^2.5.1",
-    "prop-types": "^15.8.0",
+    "prop-types": "^15.8.1",
     "query-string": "^7.0.1",
     "react": "^17.0.2",
     "react-addons-transition-group": "^15.4.1",
