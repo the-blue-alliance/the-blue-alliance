@@ -59,7 +59,7 @@ Vagrant.configure("2") do |config|
 
     if ENV['CI'] != nil
       # On CI, we use the locally prebuilt image
-      d.image = "local/tba-py3-dev:latest"
+      d.image = "localhost:5000/tba-py3-dev:latest"
     else
       if ENV['TBA_LOCAL_DOCKERFILE'] != nil
         # We can build the docker container from the local Dockerfile

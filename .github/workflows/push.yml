@@ -190,6 +190,11 @@ jobs:
   ops-test:
     name: Ops Fullstack Test
     runs-on: ubuntu-latest
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Set up Python 3.8
@@ -228,7 +233,8 @@ jobs:
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: ./ops/dev/docker
-          tags: local/tba-py3-dev:latest
+          push: true
+          tags: localhost:5000/tba-py3-dev:latest
           cache-from: |
             type=gha
             ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
