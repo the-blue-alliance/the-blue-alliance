@@ -30,7 +30,9 @@ def test_blacklist_website_team(tasks_client: Client):
 
     assert team.website == website
 
-    with patch.object(WebsiteBlacklist, "blacklist") as mock_blacklist, patch.object(TeamManipulator, "createOrUpdate") as mock_update:
+    with patch.object(WebsiteBlacklist, "blacklist") as mock_blacklist, patch.object(
+        TeamManipulator, "createOrUpdate"
+    ) as mock_update:
         resp = tasks_client.get("/backend-tasks/do/team_blacklist_website/frc7332")
 
     assert resp.status_code == 302
