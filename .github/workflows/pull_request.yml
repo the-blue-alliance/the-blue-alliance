@@ -215,24 +215,24 @@ jobs:
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v1
-      - name: Cache Docker Layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ hashFiles('./ops/dev/docker/Dockerfile') }}
-          restore-keys: ${{ runner.os }}-buildx-
+      # - name: Cache Docker Layers
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: /tmp/.buildx-cache
+      #     key: ${{ runner.os }}-buildx-${{ hashFiles('./ops/dev/docker/Dockerfile') }}
+      #     restore-keys: ${{ runner.os }}-buildx-
       - name: Build Docker Image
         uses: docker/build-push-action@v2
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: ./ops/dev/docker
           tags: local/tba-py3-dev:latest
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new
-      - name: Move Docker Cache  # This is necessary to prevent cache from growing forever.
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+          cache-from: type=gha
+          cache-to: type=gha
+      # - name: Move Docker Cache  # This is necessary to prevent cache from growing forever.
+      #   run: |
+      #     rm -rf /tmp/.buildx-cache
+      #     mv /tmp/.buildx-cache-new /tmp/.buildx-cache
       # - name: Start Container
       #   run: vagrant up
       # - name: Test Vagrant Startup
