@@ -1,6 +1,7 @@
-from flask import jsonify, Response
+from flask import Response
 
 from backend.api.handlers.decorators import api_authenticated
+from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.decorators import cached_public
 from backend.common.models.sitevar import Sitevar
@@ -25,4 +26,4 @@ def status() -> Response:
     status["is_datafeed_down"] = ApiStatusFMSApiDown.get()
     status["down_events"] = down_events_list if down_events_list is not None else []
 
-    return jsonify(status)
+    return profiled_jsonify(status)

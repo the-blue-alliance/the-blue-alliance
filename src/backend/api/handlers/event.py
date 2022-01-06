@@ -1,6 +1,6 @@
 from typing import Optional
 
-from flask import jsonify, Response
+from flask import Response
 
 from backend.api.handlers.decorators import api_authenticated, validate_event_key
 from backend.api.handlers.helpers.add_alliance_status import add_alliance_status
@@ -10,6 +10,7 @@ from backend.api.handlers.helpers.model_properties import (
     filter_team_properties,
     ModelType,
 )
+from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.decorators import cached_public
@@ -37,7 +38,7 @@ def event(event_key: EventKey, model_type: Optional[ModelType] = None) -> Respon
     event = EventQuery(event_key=event_key).fetch_dict(ApiMajorVersion.API_V3)
     if model_type is not None:
         event = filter_event_properties([event], model_type)[0]
-    return jsonify(event)
+    return profiled_jsonify(event)
 
 
 @api_authenticated
@@ -61,7 +62,7 @@ def event_list_all(model_type: Optional[ModelType] = None) -> Response:
 
     if model_type is not None:
         events = filter_event_properties(events, model_type)
-    return jsonify(events)
+    return profiled_jsonify(events)
 
 
 @api_authenticated
@@ -76,7 +77,7 @@ def event_list_year(year: int, model_type: Optional[ModelType] = None) -> Respon
 
     if model_type is not None:
         events = filter_event_properties(events, model_type)
-    return jsonify(events)
+    return profiled_jsonify(events)
 
 
 @api_authenticated
@@ -95,7 +96,7 @@ def event_detail(event_key: EventKey, detail_type: str) -> Response:
     if detail_type == "alliances" and detail:
         add_alliance_status(event_key, detail)
 
-    return jsonify(detail)
+    return profiled_jsonify(detail)
 
 
 @api_authenticated
@@ -112,7 +113,7 @@ def event_teams(
     teams = EventTeamsQuery(event_key=event_key).fetch_dict(ApiMajorVersion.API_V3)
     if model_type is not None:
         teams = filter_team_properties(teams, model_type)
-    return jsonify(teams)
+    return profiled_jsonify(teams)
 
 
 @api_authenticated
@@ -129,7 +130,7 @@ def event_matches(
     matches = EventMatchesQuery(event_key=event_key).fetch_dict(ApiMajorVersion.API_V3)
     if model_type is not None:
         matches = filter_match_properties(matches, model_type)
-    return jsonify(matches)
+    return profiled_jsonify(matches)
 
 
 @api_authenticated
@@ -142,4 +143,4 @@ def event_awards(event_key: EventKey) -> Response:
     track_call_after_response("event/awards", event_key)
 
     awards = EventAwardsQuery(event_key=event_key).fetch_dict(ApiMajorVersion.API_V3)
-    return jsonify(awards)
+    return profiled_jsonify(awards)

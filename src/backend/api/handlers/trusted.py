@@ -2,7 +2,7 @@ import json
 import logging
 from typing import List, Optional, Set
 
-from flask import jsonify, make_response, request, Response
+from flask import make_response, request, Response
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import defer
 from pyre_extensions import none_throws, safe_json
@@ -22,6 +22,7 @@ from backend.api.api_trusted_parsers.json_zebra_motionworks_parser import (
     JSONZebraMotionWorksParser,
 )
 from backend.api.handlers.decorators import require_write_auth, validate_event_key
+from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.media_type import MediaType
@@ -82,7 +83,7 @@ def update_teams(event_key: EventKey) -> Response:
     if event_teams:
         EventTeamManipulator.createOrUpdate(event_teams)
 
-    return jsonify({"Success": "Event teams successfully updated"})
+    return profiled_jsonify({"Success": "Event teams successfully updated"})
 
 
 @require_write_auth({AuthType.MATCH_VIDEO})
@@ -108,13 +109,14 @@ def add_match_video(event_key: EventKey) -> Response:
 
     if nonexistent_matches:
         return make_response(
-            jsonify({"Error": f"Matches {nonexistent_matches} do not exist!"}), 404
+            profiled_jsonify({"Error": f"Matches {nonexistent_matches} do not exist!"}),
+            404,
         )
 
     if matches_to_put:
         MatchManipulator.createOrUpdate(matches_to_put)
 
-    return jsonify({"Success": "Match videos successfully updated"})
+    return profiled_jsonify({"Success": "Match videos successfully updated"})
 
 
 @require_write_auth({AuthType.EVENT_INFO})
@@ -142,7 +144,7 @@ def update_event_info(event_key: EventKey) -> Response:
         event.playoff_type = parsed_info["playoff_type"]
 
     EventManipulator.createOrUpdate(event)
-    return jsonify({"Success": f"Event {event_key} updated"})
+    return profiled_jsonify({"Success": f"Event {event_key} updated"})
 
 
 @require_write_auth({AuthType.EVENT_ALLIANCES})
@@ -159,7 +161,7 @@ def update_event_alliances(event_key: EventKey) -> Response:
         )
     EventDetailsManipulator.createOrUpdate(event_details)
 
-    return jsonify({"Success": "Alliance selections successfully updated"})
+    return profiled_jsonify({"Success": "Alliance selections successfully updated"})
 
 
 @require_write_auth({AuthType.EVENT_AWARDS})
@@ -193,7 +195,7 @@ def update_event_awards(event_key: EventKey) -> Response:
         EventRemapTeamsHelper.remapteams_awards(awards_to_put, event.remap_teams)
     AwardManipulator.createOrUpdate(awards_to_put)
 
-    return jsonify({"Success": "Awards successfully updated"})
+    return profiled_jsonify({"Success": "Awards successfully updated"})
 
 
 @require_write_auth({AuthType.EVENT_MATCHES})
@@ -239,7 +241,7 @@ def update_event_matches(event_key: EventKey) -> Response:
         EventRemapTeamsHelper.remapteams_matches(matches, event.remap_teams)
     MatchManipulator.createOrUpdate(matches)
 
-    return jsonify({"Success": "Matches successfully updated"})
+    return profiled_jsonify({"Success": "Matches successfully updated"})
 
 
 @require_write_auth({AuthType.EVENT_MATCHES})
@@ -250,7 +252,7 @@ def delete_event_matches(event_key: EventKey) -> Response:
         match_keys = safe_json.loads(request.data, List[str])
     except Exception:
         return make_response(
-            jsonify({"Error": "'keys_to_delete' could not be parsed"}), 400
+            profiled_jsonify({"Error": "'keys_to_delete' could not be parsed"}), 400
         )
 
     for match_key in match_keys:
@@ -260,7 +262,7 @@ def delete_event_matches(event_key: EventKey) -> Response:
 
     MatchManipulator.delete_keys(keys_to_delete)
 
-    return jsonify(
+    return profiled_jsonify(
         {
             "keys_deleted": [
                 none_throws(key.string_id()).split("_")[1] for key in keys_to_delete
@@ -274,7 +276,7 @@ def delete_event_matches(event_key: EventKey) -> Response:
 def delete_all_event_matches(event_key: EventKey) -> Response:
     if request.data.decode() != event_key:
         return make_response(
-            jsonify(
+            profiled_jsonify(
                 {
                     "Error": "To delete all matches for this event, the body of the request must be the event key."
                 }
@@ -287,7 +289,7 @@ def delete_all_event_matches(event_key: EventKey) -> Response:
     )
     MatchManipulator.delete_keys(keys_to_delete)
 
-    return jsonify({"Success": "All matches for {} deleted".format(event_key)})
+    return profiled_jsonify({"Success": "All matches for {} deleted".format(event_key)})
 
 
 @require_write_auth({AuthType.EVENT_RANKINGS})
@@ -305,7 +307,7 @@ def update_event_rankings(event_key: EventKey) -> Response:
 
     EventDetailsManipulator.createOrUpdate(event_details)
 
-    return jsonify({"Success": "Rankings successfully updated"})
+    return profiled_jsonify({"Success": "Rankings successfully updated"})
 
 
 @require_write_auth({AuthType.MATCH_VIDEO})
@@ -330,7 +332,7 @@ def add_event_media(event_key: EventKey) -> Response:
         media_to_put.append(media)
 
     MediaManipulator.createOrUpdate(media_to_put)
-    return jsonify({"Success": "Media successfully added"})
+    return profiled_jsonify({"Success": "Media successfully added"})
 
 
 @require_write_auth({AuthType.ZEBRA_MOTIONWORKS})
@@ -343,7 +345,7 @@ def add_match_zebra_motionworks_info(event_key: EventKey) -> Response:
         # Check that match_key matches event_key
         if match_key.split("_")[0] != event_key:
             return make_response(
-                jsonify(
+                profiled_jsonify(
                     {
                         "Error": f"Match key {match_key} does not match Event key {event_key}!"
                     }
@@ -355,7 +357,7 @@ def add_match_zebra_motionworks_info(event_key: EventKey) -> Response:
         match: Optional[Match] = Match.get_by_id(match_key)
         if match is None:
             return make_response(
-                jsonify({"Error": f"Match {match_key} does not exist!"}), 400
+                profiled_jsonify({"Error": f"Match {match_key} does not exist!"}), 400
             )
 
         # Check that teams in Zebra data and teams in Match are the same
@@ -367,7 +369,10 @@ def add_match_zebra_motionworks_info(event_key: EventKey) -> Response:
             ]
             if match_teams != zebra_teams:
                 return make_response(
-                    jsonify({"Error": f"Match {match_key} teams are not valid!"}), 400
+                    profiled_jsonify(
+                        {"Error": f"Match {match_key} teams are not valid!"}
+                    ),
+                    400,
                 )
 
         to_put.append(
@@ -377,4 +382,4 @@ def add_match_zebra_motionworks_info(event_key: EventKey) -> Response:
         )
 
     ndb.put_multi(to_put)
-    return jsonify({"Success": "Media successfully added"})
+    return profiled_jsonify({"Success": "Media successfully added"})
