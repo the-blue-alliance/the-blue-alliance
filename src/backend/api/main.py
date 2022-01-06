@@ -22,7 +22,7 @@ from backend.api.handlers.event import (
     event_teams,
 )
 from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
-from backend.api.handlers.match import match
+from backend.api.handlers.match import match, zebra_motionworks
 from backend.api.handlers.status import status
 from backend.api.handlers.team import (
     team,
@@ -149,7 +149,9 @@ api_v3.add_url_rule(
     "/match/<string:match_key>/<simple_model_type:model_type>", view_func=match
 )
 # api_v3.add_url_rule("/match/<string:match_key>/timeseries", view_func=TODO)
-# api_v3.add_url_rule("/match/<string:match_key>/zebra_motionworks", view_func=TODO)
+api_v3.add_url_rule(
+    "/match/<string:match_key>/zebra_motionworks", view_func=zebra_motionworks
+)
 
 # Media
 # api_v3.add_url_rule("/media/tags", view_func=TODO)
