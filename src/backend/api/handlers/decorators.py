@@ -126,10 +126,6 @@ def validate_district_key(func):
         if not District.validate_key_name(district_key):
             return {"Error": f"{district_key} is not a valid district key"}, 404
 
-        # TODO: Use this instead of DoesNotExistException for all validators.
-        if not District.get_by_id(district_key):
-            return {"Error": f"district key: {district_key} does not exist"}, 404
-
         try:
             return func(*args, **kwargs)
         except DoesNotExistException:

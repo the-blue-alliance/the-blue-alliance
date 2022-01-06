@@ -353,6 +353,9 @@ def test_district_key_invalid(ndb_stub, api_client: Client) -> None:
     assert resp.json["Error"] == "fim is not a valid district key"
 
 
+# TODO: This is currently broken and tricky because district abbreviations have changed
+# over the years and we accept all of them. -fangeugene 2021-01-05
+@pytest.mark.skip
 def test_district_key_does_not_exist(ndb_stub, api_client: Client) -> None:
     ApiAuthAccess(
         id="test_auth_key",
