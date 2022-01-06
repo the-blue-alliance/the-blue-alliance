@@ -1,12 +1,13 @@
 from typing import Optional
 
-from flask import jsonify, Response
+from flask import Response
 
 from backend.api.handlers.decorators import api_authenticated, validate_keys
 from backend.api.handlers.helpers.model_properties import (
     filter_match_properties,
     ModelType,
 )
+from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.decorators import cached_public
@@ -26,4 +27,4 @@ def match(match_key: MatchKey, model_type: Optional[ModelType] = None) -> Respon
     match = MatchQuery(match_key=match_key).fetch_dict(ApiMajorVersion.API_V3)
     if model_type is not None:
         match = filter_match_properties([match], model_type)[0]
-    return jsonify(match)
+    return profiled_jsonify(match)

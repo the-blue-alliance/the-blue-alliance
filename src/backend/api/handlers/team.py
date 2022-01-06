@@ -1,6 +1,6 @@
 from typing import Optional
 
-from flask import jsonify, Response
+from flask import Response
 
 from backend.api.handlers.decorators import (
     api_authenticated,
@@ -12,6 +12,7 @@ from backend.api.handlers.helpers.model_properties import (
     filter_team_properties,
     ModelType,
 )
+from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.consts.media_tag import get_enum_from_url
@@ -61,7 +62,7 @@ def team(team_key: TeamKey, model_type: Optional[ModelType] = None) -> Response:
     team = TeamQuery(team_key=team_key).fetch_dict(ApiMajorVersion.API_V3)
     if model_type is not None:
         team = filter_team_properties([team], model_type)[0]
-    return jsonify(team)
+    return profiled_jsonify(team)
 
 
 @api_authenticated
@@ -75,7 +76,7 @@ def team_years_participated(team_key: TeamKey) -> Response:
 
     years_participated = TeamParticipationQuery(team_key=team_key).fetch()
     years_participated = sorted(years_participated)
-    return jsonify(years_participated)
+    return profiled_jsonify(years_participated)
 
 
 @api_authenticated
@@ -90,7 +91,7 @@ def team_history_districts(team_key: TeamKey) -> Response:
     team_districts = TeamDistrictsQuery(team_key=team_key).fetch_dict(
         ApiMajorVersion.API_V3
     )
-    return jsonify(team_districts)
+    return profiled_jsonify(team_districts)
 
 
 @api_authenticated
@@ -103,7 +104,7 @@ def team_history_robots(team_key: TeamKey) -> Response:
     track_call_after_response("team/history/robots", team_key)
 
     team_robots = TeamRobotsQuery(team_key=team_key).fetch_dict(ApiMajorVersion.API_V3)
-    return jsonify(team_robots)
+    return profiled_jsonify(team_robots)
 
 
 @api_authenticated
@@ -118,7 +119,7 @@ def team_social_media(team_key: TeamKey) -> Response:
     team_social_media = TeamSocialMediaQuery(team_key=team_key).fetch_dict(
         ApiMajorVersion.API_V3
     )
-    return jsonify(team_social_media)
+    return profiled_jsonify(team_social_media)
 
 
 @api_authenticated
@@ -149,7 +150,7 @@ def team_events(
 
     if model_type is not None:
         team_events = filter_event_properties(team_events, model_type)
-    return jsonify(team_events)
+    return profiled_jsonify(team_events)
 
 
 @api_authenticated
@@ -175,7 +176,7 @@ def team_events_statuses_year(team_key: TeamKey, year: int) -> Response:
                 }
             )
         statuses[event_team.event.id()] = status
-    return jsonify(statuses)
+    return profiled_jsonify(statuses)
 
 
 @api_authenticated
@@ -197,7 +198,7 @@ def team_event_matches(
 
     if model_type is not None:
         matches = filter_match_properties(matches, model_type)
-    return jsonify(matches)
+    return profiled_jsonify(matches)
 
 
 @api_authenticated
@@ -212,7 +213,7 @@ def team_event_awards(team_key: TeamKey, event_key: EventKey) -> Response:
     awards = TeamEventAwardsQuery(team_key=team_key, event_key=event_key).fetch_dict(
         ApiMajorVersion.API_V3
     )
-    return jsonify(awards)
+    return profiled_jsonify(awards)
 
 
 @api_authenticated
@@ -238,7 +239,7 @@ def team_event_status(team_key: TeamKey, event_key: EventKey) -> Response:
                     "overall_status_str": status_strings["overall"],
                 }
             )
-    return jsonify(status)
+    return profiled_jsonify(status)
 
 
 @api_authenticated
@@ -260,7 +261,7 @@ def team_awards(
         awards = TeamYearAwardsQuery(team_key=team_key, year=year).fetch_dict(
             ApiMajorVersion.API_V3
         )
-    return jsonify(awards)
+    return profiled_jsonify(awards)
 
 
 @api_authenticated
@@ -282,7 +283,7 @@ def team_matches(
 
     if model_type is not None:
         matches = filter_match_properties(matches, model_type)
-    return jsonify(matches)
+    return profiled_jsonify(matches)
 
 
 @api_authenticated
@@ -297,7 +298,7 @@ def team_media_year(team_key: TeamKey, year: int) -> Response:
     media = TeamYearMediaQuery(team_key=team_key, year=year).fetch_dict(
         ApiMajorVersion.API_V3
     )
-    return jsonify(media)
+    return profiled_jsonify(media)
 
 
 @api_authenticated
@@ -317,7 +318,7 @@ def team_media_tag(
 
     tag_enum = get_enum_from_url(media_tag)
     if tag_enum is None:
-        return jsonify([])
+        return profiled_jsonify([])
 
     if year is None:
         media = TeamTagMediasQuery(team_key=team_key, media_tag=tag_enum).fetch_dict(
@@ -327,7 +328,7 @@ def team_media_tag(
         media = TeamYearTagMediasQuery(
             team_key=team_key, media_tag=tag_enum, year=year
         ).fetch_dict(ApiMajorVersion.API_V3)
-    return jsonify(media)
+    return profiled_jsonify(media)
 
 
 @api_authenticated
@@ -355,7 +356,7 @@ def team_list_all(model_type: Optional[ModelType] = None) -> Response:
 
     if model_type is not None:
         team_list = filter_team_properties(team_list, model_type)
-    return jsonify(team_list)
+    return profiled_jsonify(team_list)
 
 
 @api_authenticated
@@ -385,4 +386,4 @@ def team_list(
 
     if model_type is not None:
         team_list = filter_team_properties(team_list, model_type)
-    return jsonify(team_list)
+    return profiled_jsonify(team_list)

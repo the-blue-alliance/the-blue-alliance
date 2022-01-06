@@ -1,6 +1,6 @@
 from typing import Optional
 
-from flask import jsonify, Response
+from flask import Response
 
 from backend.api.handlers.decorators import api_authenticated, validate_keys
 from backend.api.handlers.helpers.model_properties import (
@@ -8,6 +8,7 @@ from backend.api.handlers.helpers.model_properties import (
     filter_team_properties,
     ModelType,
 )
+from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.decorators import cached_public
@@ -33,7 +34,7 @@ def district_events(
     )
     if model_type is not None:
         events = filter_event_properties(events, model_type)
-    return jsonify(events)
+    return profiled_jsonify(events)
 
 
 @api_authenticated
@@ -52,7 +53,7 @@ def district_teams(
     )
     if model_type is not None:
         teams = filter_team_properties(teams, model_type)
-    return jsonify(teams)
+    return profiled_jsonify(teams)
 
 
 @api_authenticated
@@ -65,7 +66,7 @@ def district_rankings(district_key: DistrictKey) -> Response:
     track_call_after_response("district/rankings", district_key)
 
     district = DistrictQuery(district_key=district_key).fetch()
-    return jsonify(district.rankings)
+    return profiled_jsonify(district.rankings)
 
 
 @api_authenticated
@@ -77,4 +78,4 @@ def district_list_year(year: int) -> Response:
     track_call_after_response("district/list", str(year))
 
     district = DistrictsInYearQuery(year=year).fetch_dict(ApiMajorVersion.API_V3)
-    return jsonify(district)
+    return profiled_jsonify(district)
