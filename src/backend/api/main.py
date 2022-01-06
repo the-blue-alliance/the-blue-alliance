@@ -8,6 +8,7 @@ from werkzeug.routing import BaseConverter
 from backend.api.handlers.district import (
     district_events,
     district_list_year,
+    district_teams,
 )
 from backend.api.handlers.error import handle_404
 from backend.api.handlers.event import (
@@ -96,8 +97,11 @@ api_v3.add_url_rule(
     "/district/<string:district_key>/events/<model_type:model_type>",
     view_func=district_events,
 )
-# api_v3.add_url_rule("/district/<string:district_key>/teams", view_func=TODO)
-# api_v3.add_url_rule("/district/<string:district_key>/teams/<model_type:model_type>", view_func=TODO)
+api_v3.add_url_rule("/district/<string:district_key>/teams", view_func=district_teams)
+api_v3.add_url_rule(
+    "/district/<string:district_key>/teams/<model_type:model_type>",
+    view_func=district_teams,
+)
 # api_v3.add_url_rule("/district/<string:district_key>/rankings", view_func=TODO)
 
 # District List
