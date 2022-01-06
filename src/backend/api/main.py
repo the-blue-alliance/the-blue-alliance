@@ -5,6 +5,12 @@ from flask_cors import CORS
 from google.appengine.api import wrap_wsgi_app
 from werkzeug.routing import BaseConverter
 
+from backend.api.handlers.district import (
+    district_events,
+    district_list_year,
+    district_rankings,
+    district_teams,
+)
 from backend.api.handlers.error import handle_404
 from backend.api.handlers.event import (
     event,
@@ -87,14 +93,22 @@ CORS(api_v3, origins="*", methods=["OPTIONS", "GET"], allow_headers=["X-TBA-Auth
 api_v3.add_url_rule("/status", view_func=status)
 
 # District
-# api_v3.add_url_rule("/district/<string:district_key>/events", view_func=TODO)
-# api_v3.add_url_rule("/district/<string:district_key>/events/<model_type:model_type>", view_func=TODO)
-# api_v3.add_url_rule("/district/<string:district_key>/teams", view_func=TODO)
-# api_v3.add_url_rule("/district/<string:district_key>/teams/<model_type:model_type>", view_func=TODO)
-# api_v3.add_url_rule("/district/<string:district_key>/rankings", view_func=TODO)
+api_v3.add_url_rule("/district/<string:district_key>/events", view_func=district_events)
+api_v3.add_url_rule(
+    "/district/<string:district_key>/events/<model_type:model_type>",
+    view_func=district_events,
+)
+api_v3.add_url_rule("/district/<string:district_key>/teams", view_func=district_teams)
+api_v3.add_url_rule(
+    "/district/<string:district_key>/teams/<model_type:model_type>",
+    view_func=district_teams,
+)
+api_v3.add_url_rule(
+    "/district/<string:district_key>/rankings", view_func=district_rankings
+)
 
 # District List
-# api_v3.add_url_rule("/districts/<int:year>", view_func=TODO)
+api_v3.add_url_rule("/districts/<int:year>", view_func=district_list_year)
 
 # Event
 api_v3.add_url_rule("/event/<string:event_key>", view_func=event)

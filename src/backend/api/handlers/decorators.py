@@ -8,6 +8,7 @@ from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
 from backend.common.auth import current_user
 from backend.common.consts.auth_type import AuthType
 from backend.common.models.api_auth_access import ApiAuthAccess
+from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.common.models.team import Team
@@ -114,5 +115,20 @@ def validate_match_key(func):
             return func(*args, **kwargs)
         except DoesNotExistException:
             return {"Error": f"match key: {match_key} does not exist"}, 404
+
+    return decorated_function
+
+
+def validate_district_key(func):
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        district_key = kwargs["district_key"]
+        if not District.validate_key_name(district_key):
+            return {"Error": f"{district_key} is not a valid district key"}, 404
+
+        try:
+            return func(*args, **kwargs)
+        except DoesNotExistException:
+            return {"Error": f"district key: {district_key} does not exist"}, 404
 
     return decorated_function

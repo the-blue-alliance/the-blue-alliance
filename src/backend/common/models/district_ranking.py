@@ -7,6 +7,6 @@ from backend.common.models.keys import TeamKey
 class DistrictRanking(TypedDict):
     rank: int
     team_key: TeamKey
-    point_toal: int
+    point_total: int
     rookie_bonus: int
     event_points: List[TeamAtEventDistrictPoints]
