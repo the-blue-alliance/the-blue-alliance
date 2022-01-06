@@ -1,0 +1,5 @@
+name: "CodeQL config"
+ 
+paths-ignore: 
+  - ./old_py2
+  - ./subtrees
