@@ -23,7 +23,7 @@ from backend.common.queries.event_query import (
     EventQuery,
 )
 from backend.common.queries.match_query import EventMatchesQuery
-from backend.common.queries.team_query import EventTeamsQuery
+from backend.common.queries.team_query import EventEventTeamsQuery, EventTeamsQuery
 
 
 @api_authenticated
@@ -114,6 +114,32 @@ def event_teams(
     if model_type is not None:
         teams = filter_team_properties(teams, model_type)
     return profiled_jsonify(teams)
+
+
+@api_authenticated
+@validate_keys
+@cached_public
+def event_teams_statuses(event_key: EventKey) -> Response:
+    """
+    Returns a dict of team_key: status for teams at a given event.
+    """
+    track_call_after_response("event/teams/statuses", event_key)
+
+    event_teams = EventEventTeamsQuery(event_key=event_key).fetch()
+    statuses = {}
+    for event_team in event_teams:
+        status = event_team.status
+        if status is not None:
+            status_strings = event_team.status_strings
+            status.update(
+                {
+                    "alliance_status_str": status_strings["alliance"],
+                    "playoff_status_str": status_strings["playoff"],
+                    "overall_status_str": status_strings["overall"],
+                }
+            )
+        statuses[event_team.team.id()] = status
+    return profiled_jsonify(statuses)
 
 
 @api_authenticated

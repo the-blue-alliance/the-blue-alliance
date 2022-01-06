@@ -20,6 +20,7 @@ from backend.api.handlers.event import (
     event_list_year,
     event_matches,
     event_teams,
+    event_teams_statuses,
 )
 from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.api.handlers.match import match, zebra_motionworks
@@ -121,11 +122,15 @@ api_v3.add_url_rule(
     "/event/<string:event_key>/<event_detail_type:detail_type>",
     view_func=event_detail,
 )
-api_v3.add_url_rule("event/<string:event_key>/teams", view_func=event_teams)
+api_v3.add_url_rule("/event/<string:event_key>/teams", view_func=event_teams)
 api_v3.add_url_rule(
     "/event/<string:event_key>/teams/<model_type:model_type>",
     view_func=event_teams,
 )
+api_v3.add_url_rule(
+    "/event/<string:event_key>/teams/statuses", view_func=event_teams_statuses
+)
+
 api_v3.add_url_rule("event/<string:event_key>/matches", view_func=event_matches)
 # api_v3.add_url_rule("event/<string:event_key>/matches/timeseries", view_func=TODO)
 api_v3.add_url_rule(
@@ -133,8 +138,7 @@ api_v3.add_url_rule(
     view_func=event_matches,
 )
 # api_v3.add_url_rule("/event/<string:event_key>/playoff_advancement", view_func=TODO)
-api_v3.add_url_rule("event/<string:event_key>/awards", view_func=event_awards)
-# api_v3.add_url_rule("/event/<string:event_key>/teams/statuses", view_func=TODO)
+api_v3.add_url_rule("/event/<string:event_key>/awards", view_func=event_awards)
 
 # Event List
 api_v3.add_url_rule("/events/all", view_func=event_list_all)
