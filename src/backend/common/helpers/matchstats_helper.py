@@ -12,6 +12,7 @@ from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
+import numpy.typing as npt
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
@@ -57,7 +58,7 @@ class MatchstatsHelper(object):
     @classmethod
     def build_Minv_matrix(
         cls, matches: List[Match], team_id_map: TTeamIdMap, played_only: bool = False
-    ) -> "np.ndarray[int]":
+    ) -> npt.NDArray[np.float64]:
 
         n = len(team_id_map.keys())
         M = np.zeros((n, n))
@@ -83,7 +84,7 @@ class MatchstatsHelper(object):
         init_stats: Optional[Dict[StatType, Dict[TeamId, int]]] = None,
         init_stats_default: int = 0,
         limit_matches: Optional[int] = None,
-    ) -> "np.ndarray[int]":
+    ) -> npt.NDArray[np.float64]:
         n = len(team_id_map.keys())
         s = np.zeros((n, 1))
         for match in matches:
