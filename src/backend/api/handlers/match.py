@@ -2,7 +2,7 @@ from typing import Optional
 
 from flask import jsonify, Response
 
-from backend.api.handlers.decorators import api_authenticated, validate_match_key
+from backend.api.handlers.decorators import api_authenticated, validate_keys
 from backend.api.handlers.helpers.model_properties import (
     filter_match_properties,
     ModelType,
@@ -15,7 +15,7 @@ from backend.common.queries.match_query import MatchQuery
 
 
 @api_authenticated
-@validate_match_key
+@validate_keys
 @cached_public
 def match(match_key: MatchKey, model_type: Optional[ModelType] = None) -> Response:
     """

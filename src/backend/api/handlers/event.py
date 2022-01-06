@@ -2,7 +2,7 @@ from typing import Optional
 
 from flask import jsonify, Response
 
-from backend.api.handlers.decorators import api_authenticated, validate_event_key
+from backend.api.handlers.decorators import api_authenticated, validate_keys
 from backend.api.handlers.helpers.add_alliance_status import add_alliance_status
 from backend.api.handlers.helpers.model_properties import (
     filter_event_properties,
@@ -26,7 +26,7 @@ from backend.common.queries.team_query import EventTeamsQuery
 
 
 @api_authenticated
-@validate_event_key
+@validate_keys
 @cached_public
 def event(event_key: EventKey, model_type: Optional[ModelType] = None) -> Response:
     """
@@ -80,7 +80,7 @@ def event_list_year(year: int, model_type: Optional[ModelType] = None) -> Respon
 
 
 @api_authenticated
-@validate_event_key
+@validate_keys
 @cached_public
 def event_detail(event_key: EventKey, detail_type: str) -> Response:
     """
@@ -99,7 +99,7 @@ def event_detail(event_key: EventKey, detail_type: str) -> Response:
 
 
 @api_authenticated
-@validate_event_key
+@validate_keys
 @cached_public
 def event_teams(
     event_key: EventKey, model_type: Optional[ModelType] = None
@@ -116,7 +116,7 @@ def event_teams(
 
 
 @api_authenticated
-@validate_event_key
+@validate_keys
 @cached_public
 def event_matches(
     event_key: EventKey, model_type: Optional[ModelType] = None
@@ -133,7 +133,7 @@ def event_matches(
 
 
 @api_authenticated
-@validate_event_key
+@validate_keys
 @cached_public
 def event_awards(event_key: EventKey) -> Response:
     """
