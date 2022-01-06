@@ -157,7 +157,7 @@ $(document).ready(function(){
 //     // var urls = ['http://i.imgur.com/hGmvG8L.jpg', 'http://i.imgur.com/bC3gvxa.jpg', 'http://i.imgur.com/8lLN9jB.jpg', 'http://i.imgur.com/qiRHQtB.jpg', 'http://i.imgur.com/zWyyZ2N.jpg', 'http://i.imgur.com/ZUcX3Hw.jpg'];
 //     // var randInt = Math.floor(Math.random() * 6);
 //     // var url = urls[randInt];
-//     // $("#robot-image").html('<div class="thumbnail carousel team-media-carousel"><a href="' + url + '" target="_blank"><img src="' + url + '" alt="April Fools!"></a></div>');
+//     // $("#robot-image").html('<div class="thumbnail carousel team-media-carousel"><a href="' + url + '" target="_blank" rel="noopener noreferrer"><img src="' + url + '" alt="April Fools!"></a></div>');
 
 //     // For 2017
 //     $(".hidden-banner").removeClass('hidden');

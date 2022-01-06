@@ -4,13 +4,13 @@
             <a href="/event/{{ live_event.key_name }}"><h3>{{ live_event.name }}</h3></a>
             {% if live_event.now and live_event.webcast %}
                 {% if live_event.webcast_status == 'offline' %}
-                    <a class="btn btn-default btn-small pull-right" href="{{live_event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Offline</a>
+                    <a class="btn btn-default btn-small pull-right" href="{{live_event.gameday_url}}" target="_blank" rel="noopener noreferrer"><span class="glyphicon glyphicon-facetime-video"></span> Offline</a>
                 {% else %}
-                    <a class="btn btn-success btn-small pull-right" href="{{live_event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
+                    <a class="btn btn-success btn-small pull-right" href="{{live_event.gameday_url}}" target="_blank" rel="noopener noreferrer"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
                 {% endif %}
             {% endif %}
             <p>
-                {% if live_event.location %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ live_event.location }}" target="_blank">{{ live_event.location }}</a><br />{% endif %}
+                {% if live_event.location %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ live_event.location }}" target="_blank" rel="noopener noreferrer">{{ live_event.location }}</a><br />{% endif %}
                 {% if live_event.start_date %}<span class="glyphicon glyphicon-calendar"></span> {{ live_event.start_date|strftime("%b %d") }}{% if live_event.start_date|strftime("%b %d") != live_event.end_date|strftime("%b %d") %} - {{ live_event.end_date|strftime("%b %d") }}{% endif %}{{ live_event.end_date|strftime(", %Y") }}{% endif %}
             </p>
 
