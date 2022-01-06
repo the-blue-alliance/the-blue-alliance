@@ -14,7 +14,7 @@
     "material-ui": "^0.20.2",
     "prettier": "^2.5.1",
     "prop-types": "^15.8.1",
-    "query-string": "^7.0.1",
+    "query-string": "^7.1.0",
     "react": "^17.0.2",
     "react-addons-transition-group": "^15.4.1",
     "react-bootstrap": "^2.1.0",
