@@ -1,5 +1,6 @@
 from typing import Dict, List
 
+from google.appengine.ext import ndb
 
 from backend.common.models.keys import DistrictAbbreviation, DistrictKey
 
@@ -32,3 +33,9 @@ class RenamedDistricts(object):
             "{}{}".format(year, equiv_code)
             for equiv_code in cls.get_equivalent_codes(code)
         ]
+
+    @classmethod
+    def district_exists(cls, district_key: DistrictKey) -> bool:
+        keys = [ndb.Key("District", k) for k in cls.get_equivalent_keys(district_key)]
+        districts = list(filter(lambda d: d is not None, ndb.get_multi(keys)))
+        return len(districts) > 0

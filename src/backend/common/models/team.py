@@ -131,7 +131,7 @@ class Team(CachedModel):
         return "frc%s" % self.team_number
 
     @classmethod
-    def validate_key_name(self, team_key):
+    def validate_key_name(self, team_key: str) -> bool:
         key_name_regex = re.compile(r"^frc[1-9]\d*$")
         match = re.match(key_name_regex, team_key)
         return True if match else False

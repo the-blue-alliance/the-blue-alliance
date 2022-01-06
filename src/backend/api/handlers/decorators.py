@@ -7,52 +7,54 @@ from flask import g, request
 from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
 from backend.common.auth import current_user
 from backend.common.consts.auth_type import AuthType
+from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.common.models.team import Team
-from backend.common.queries.exceptions import DoesNotExistException
+from backend.common.profiler import Span
 
 
 def api_authenticated(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        auth_key = request.headers.get(
-            "X-TBA-Auth-Key", request.args.get("X-TBA-Auth-Key")
-        )
+        with Span("api_authenticated"):
+            auth_key = request.headers.get(
+                "X-TBA-Auth-Key", request.args.get("X-TBA-Auth-Key")
+            )
 
-        auth_owner_id = None
-        auth_owner_mechanism = None
+            auth_owner_id = None
+            auth_owner_mechanism = None
 
-        if auth_key:
-            auth = ApiAuthAccess.get_by_id(auth_key)
-            if auth and auth.is_read_key:
-                auth_owner_id = auth.owner.id() if auth.owner else None
-                auth_owner_mechanism = f"X-TBA-Auth-Key: {auth_key}"
+            if auth_key:
+                auth = ApiAuthAccess.get_by_id(auth_key)
+                if auth and auth.is_read_key:
+                    auth_owner_id = auth.owner.id() if auth.owner else None
+                    auth_owner_mechanism = f"X-TBA-Auth-Key: {auth_key}"
+                else:
+                    return (
+                        {
+                            "Error": "X-TBA-Auth-Key is invalid. Please get an access key at http://www.thebluealliance.com/account."
+                        },
+                        401,
+                    )
             else:
-                return (
-                    {
-                        "Error": "X-TBA-Auth-Key is invalid. Please get an access key at http://www.thebluealliance.com/account."
-                    },
-                    401,
-                )
-        else:
-            user = current_user()
-            if user:
-                auth_owner_id = user.account_key.id()
-                auth_owner_mechanism = "LOGGED IN"
-            else:
-                return (
-                    {
-                        "Error": "X-TBA-Auth-Key is a required header or URL param. Please get an access key at http://www.thebluealliance.com/account."
-                    },
-                    401,
-                )
+                user = current_user()
+                if user:
+                    auth_owner_id = user.account_key.id()
+                    auth_owner_mechanism = "LOGGED IN"
+                else:
+                    return (
+                        {
+                            "Error": "X-TBA-Auth-Key is a required header or URL param. Please get an access key at http://www.thebluealliance.com/account."
+                        },
+                        401,
+                    )
 
-        logging.info(f"Auth owner: {auth_owner_id}, {auth_owner_mechanism}")
-        # Set for our GA event tracking in `track_call_after_response`
-        g.auth_owner_id = auth_owner_id
+            logging.info(f"Auth owner: {auth_owner_id}, {auth_owner_mechanism}")
+            # Set for our GA event tracking in `track_call_after_response`
+            g.auth_owner_id = auth_owner_id
 
         return func(*args, **kwargs)
 
@@ -63,10 +65,11 @@ def require_write_auth(auth_types: Set[AuthType]):
     def decorator(func):
         @wraps(func)
         def decorated_function(*args, **kwargs):
-            event_key = kwargs["event_key"]
+            with Span("require_write_auth"):
+                event_key = kwargs["event_key"]
 
-            # This will abort the request on failure
-            TrustedApiAuthHelper.do_trusted_api_auth(event_key, auth_types)
+                # This will abort the request on failure
+                TrustedApiAuthHelper.do_trusted_api_auth(event_key, auth_types)
             return func(*args, **kwargs)
 
         return decorated_function
@@ -77,14 +80,15 @@ def require_write_auth(auth_types: Set[AuthType]):
 def validate_team_key(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        team_key = kwargs["team_key"]
-        if not Team.validate_key_name(team_key):
-            return {"Error": f"{team_key} is not a valid team key"}, 404
+        with Span("validate_team_key"):
+            team_key = kwargs["team_key"]
+            if not Team.validate_key_name(team_key):
+                return {"Error": f"{team_key} is not a valid team key"}, 404
 
-        try:
-            return func(*args, **kwargs)
-        except DoesNotExistException:
-            return {"Error": f"team key: {team_key} does not exist"}, 404
+            if Team.get_by_id(team_key) is None:
+                return {"Error": f"team key: {team_key} does not exist"}, 404
+
+        return func(*args, **kwargs)
 
     return decorated_function
 
@@ -92,14 +96,15 @@ def validate_team_key(func):
 def validate_event_key(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        event_key = kwargs["event_key"]
-        if not Event.validate_key_name(event_key):
-            return {"Error": f"{event_key} is not a valid event key"}, 404
+        with Span("validate_event_key"):
+            event_key = kwargs["event_key"]
+            if not Event.validate_key_name(event_key):
+                return {"Error": f"{event_key} is not a valid event key"}, 404
 
-        try:
-            return func(*args, **kwargs)
-        except DoesNotExistException:
-            return {"Error": f"event key: {event_key} does not exist"}, 404
+            if Event.get_by_id(event_key) is None:
+                return {"Error": f"event key: {event_key} does not exist"}, 404
+
+        return func(*args, **kwargs)
 
     return decorated_function
 
@@ -107,14 +112,15 @@ def validate_event_key(func):
 def validate_match_key(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        match_key = kwargs["match_key"]
-        if not Match.validate_key_name(match_key):
-            return {"Error": f"{match_key} is not a valid match key"}, 404
+        with Span("validate_match_key"):
+            match_key = kwargs["match_key"]
+            if not Match.validate_key_name(match_key):
+                return {"Error": f"{match_key} is not a valid match key"}, 404
 
-        try:
-            return func(*args, **kwargs)
-        except DoesNotExistException:
-            return {"Error": f"match key: {match_key} does not exist"}, 404
+            if Match.get_by_id(match_key) is None:
+                return {"Error": f"match key: {match_key} does not exist"}, 404
+
+        return func(*args, **kwargs)
 
     return decorated_function
 
@@ -122,13 +128,14 @@ def validate_match_key(func):
 def validate_district_key(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        district_key = kwargs["district_key"]
-        if not District.validate_key_name(district_key):
-            return {"Error": f"{district_key} is not a valid district key"}, 404
+        with Span("validate_district_key"):
+            district_key = kwargs["district_key"]
+            if not District.validate_key_name(district_key):
+                return {"Error": f"{district_key} is not a valid district key"}, 404
 
-        try:
-            return func(*args, **kwargs)
-        except DoesNotExistException:
-            return {"Error": f"district key: {district_key} does not exist"}, 404
+            if not RenamedDistricts.district_exists(district_key):
+                return {"Error": f"district key: {district_key} does not exist"}, 404
+
+        return func(*args, **kwargs)
 
     return decorated_function
