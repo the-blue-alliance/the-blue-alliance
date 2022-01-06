@@ -58,15 +58,15 @@
         <p>Help others out by searching YouTube and adding videos!</p>
       {% endif %}
       <p>
-        <a class="btn btn-success" href="/suggest/match/video?match_key={{match.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add videos</a>
-        <a class="btn btn-primary" href="https://www.youtube.com/results?search_query={{match.short_name|urlencode}}+{{event.year}}+{{event.name|urlencode}}" target="_blank"><span class="glyphicon glyphicon-search"></span> Search YouTube</a>
+        <a class="btn btn-success" href="/suggest/match/video?match_key={{match.key_name}}" target="_blank" rel="noopener noreferrer"><span class="glyphicon glyphicon-plus"></span> Add videos</a>
+        <a class="btn btn-primary" href="https://www.youtube.com/results?search_query={{match.short_name|urlencode}}+{{event.year}}+{{event.name|urlencode}}" target="_blank" rel="noopener noreferrer"><span class="glyphicon glyphicon-search"></span> Search YouTube</a>
       </p>
     </div>
   </div>
   {% if zebra_data %}
   <div class="row">
     <div class="col-xs-12">
-      <h3>Zebra MotionWorks&trade; (<a href="https://www.zebra.com/us/en/blog/posts/2020/enabling-first-robotics-students-to-explore-their-edge.html" target="_blank">?</a>)</h3>
+      <h3>Zebra MotionWorks&trade; (<a href="https://www.zebra.com/us/en/blog/posts/2020/enabling-first-robotics-students-to-explore-their-edge.html" target="_blank" rel="noopener noreferrer">?</a>)</h3>
       <div class="zebramotionworks-content" data-zebramotionworks="{{zebra_data}}" data-year="{{match.year}}"></div>
     </div>
   </div>

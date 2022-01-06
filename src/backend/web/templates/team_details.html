@@ -103,7 +103,7 @@
               <div class="col-sm-4">
                 <h3><a href="/event/{{ comp.event.key_name }}">{{ comp.event.name }}</a></h3>
                 <p>
-                  {% if comp.event.location %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ comp.event.location }}" target="_blank">{{ comp.event.location }}</a><br />{% endif %}
+                  {% if comp.event.location %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ comp.event.location }}" target="_blank" rel="noopener noreferrer">{{ comp.event.location }}</a><br />{% endif %}
                   {{ em.showEventDates(comp.event) }}
                 </p>
 
@@ -142,7 +142,7 @@
                   {% endif %}
                 </p>
                 {% if comp.playlist %}
-                <a class="btn btn-default" href="{{comp.playlist}}" target="_blank">
+                <a class="btn btn-default" href="{{comp.playlist}}" target="_blank" rel="noopener noreferrer">
                   <span class="glyphicon glyphicon-play-circle"></span> Watch All Matches</a>
                 {% endif %}
                 {% endif %}
@@ -200,7 +200,7 @@
       <div class="row">
         <div class="col-xs-12">
           <hr>
-          <a class="btn btn-success pull-right" href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add Media!</a>
+          <a class="btn btn-success pull-right" href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank" rel="noopener noreferrer"><span class="glyphicon glyphicon-plus"></span> Add Media!</a>
           <h2 id="media">Photos &amp; Videos</h2>
           {% if image_medias or medias_by_slugname.youtube %}
             <div class="row">
@@ -212,7 +212,7 @@
                     </div>
                   {% endfor %}
                 {% else %}
-                  <p>No photos for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add one</a>?</p>
+                  <p>No photos for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank" rel="noopener noreferrer">Why not add one</a>?</p>
                 {% endif %}
               </div>
             </div>
@@ -226,12 +226,12 @@
                     </div>
                   {% endfor %}
                 {% else %}
-                  <p>No videos for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add one</a>?</p>
+                  <p>No videos for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank" rel="noopener noreferrer">Why not add one</a>?</p>
                 {% endif %}
               </div>
             </div>
           {% else %}
-            <p>No photos or videos for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add one</a>?</p>
+            <p>No photos or videos for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank" rel="noopener noreferrer">Why not add one</a>?</p>
           {% endif %}
         </div>
       </div>
@@ -239,7 +239,7 @@
     <div class="row">
         <div class="col-xs-12">
           <hr>
-          <a class="btn btn-success pull-right" href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add CAD Model!</a>
+          <a class="btn btn-success pull-right" href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank" rel="noopener noreferrer"><span class="glyphicon glyphicon-plus"></span> Add CAD Model!</a>
           <h2 id="robot-profile">Robot Profile</h2>
           {% if robot %}Robot Name: <strong>{{robot.robot_name}}</strong><br>{% endif %}
 
@@ -262,7 +262,7 @@
                   {% endfor %}
                 {% endif %}
               {% else %}
-                  <p>No CAD for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add some</a>?</p>
+                  <p>No CAD for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank" rel="noopener noreferrer">Why not add some</a>?</p>
               {% endif %}
             </div>
           </div>
@@ -276,7 +276,7 @@
 {% block footer_content %}
 {% if year and year >= 2015 %}
 <div class="text-left col-xs-12 col-sm-offset-3 col-lg-offset-2" style="margin-bottom: 2rem;">
-  <span class="glyphicon glyphicon-info-sign"></span> Data provided by the <a href="https://frc-events.firstinspires.org/services/API" target="_blank"><em>FIRST</em><sup>®</sup> Events API</a><br>
+  <span class="glyphicon glyphicon-info-sign"></span> Data provided by the <a href="https://frc-events.firstinspires.org/services/API" target="_blank" rel="noopener noreferrer"><em>FIRST</em><sup>®</sup> Events API</a><br>
 </div>
 {% endif %}
 {% endblock %}

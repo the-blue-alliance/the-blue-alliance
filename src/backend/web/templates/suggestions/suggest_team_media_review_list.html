@@ -79,7 +79,7 @@
                     <input type="text" class="form-control" name="year-{{suggestion.key.id()}}" placeholder="Year" value="{{suggestion.contents.year}}">
                   </div>
                   <div class="col-xs-5 fitvids">
-                      <p><strong><a href="/team/{{reference.team_number}}/{{suggestion.contents.year}}" target="_blank">Team {{reference.team_number}}{% if reference.nickname %} - {{reference.nickname}}{% endif %} ({{suggestion.contents.year}})</a></strong></p>
+                      <p><strong><a href="/team/{{reference.team_number}}/{{suggestion.contents.year}}" target="_blank" rel="noopener noreferrer">Team {{reference.team_number}}{% if reference.nickname %} - {{reference.nickname}}{% endif %} ({{suggestion.contents.year}})</a></strong></p>
                       {% set media = suggestion.candidate_media -%}
                       {% include "media_partials/media_display_partial.html" %}
                   </div>

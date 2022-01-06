@@ -91,6 +91,7 @@ const VideoCellToolbar = (props) => {
           style={titleStyle}
           href={`/event/${props.webcast.key}`}
           target="_blank"
+          rel="noopener noreferrer"
           disabled={props.specialWebcastIds.has(props.webcast.id)}
         />
       </ToolbarGroup>

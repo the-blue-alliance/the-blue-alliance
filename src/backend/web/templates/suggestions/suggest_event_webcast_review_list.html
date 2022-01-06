@@ -70,7 +70,7 @@
                             <li class="list-group-item">
                                 <div class="row">
                                     <div class="col-xs-6">
-                                        <p><strong><a href="{{suggestion.contents.webcast_url}}" target="_blank">{{suggestion.contents.webcast_url}}</a></strong></p>
+                                        <p><strong><a href="{{suggestion.contents.webcast_url}}" target="_blank" rel="noopener noreferrer">{{suggestion.contents.webcast_url}}</a></strong></p>
                                         <form action="/suggest/event/webcast/review" method="post" id="review_{{ suggestion.key.id() }}">
                                             {% if suggestion.webcast_template %}
                                                 {% set webcast = suggestion.contents['webcast_dict'] %}

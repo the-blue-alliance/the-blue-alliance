@@ -21,7 +21,7 @@ from backend.api.api_trusted_parsers.json_team_list_parser import (
 from backend.api.api_trusted_parsers.json_zebra_motionworks_parser import (
     JSONZebraMotionWorksParser,
 )
-from backend.api.handlers.decorators import require_write_auth, validate_event_key
+from backend.api.handlers.decorators import require_write_auth, validate_keys
 from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.auth_type import AuthType
@@ -50,7 +50,7 @@ from backend.common.models.zebra_motionworks import ZebraMotionWorks
 
 
 @require_write_auth({AuthType.EVENT_TEAMS})
-@validate_event_key
+@validate_keys
 def update_teams(event_key: EventKey) -> Response:
     team_key_names = JSONTeamListParser.parse(request.data)
     team_keys = [ndb.Key(Team, key_name) for key_name in team_key_names]
@@ -87,7 +87,7 @@ def update_teams(event_key: EventKey) -> Response:
 
 
 @require_write_auth({AuthType.MATCH_VIDEO})
-@validate_event_key
+@validate_keys
 def add_match_video(event_key: EventKey) -> Response:
     match_key_to_video = JSONMatchVideoParser.parse(event_key, request.data)
     match_keys = [ndb.Key(Match, k) for k in match_key_to_video.keys()]
@@ -120,7 +120,7 @@ def add_match_video(event_key: EventKey) -> Response:
 
 
 @require_write_auth({AuthType.EVENT_INFO})
-@validate_event_key
+@validate_keys
 def update_event_info(event_key: EventKey) -> Response:
     parsed_info = JSONEventInfoParser.parse(request.data)
     event: Event = none_throws(Event.get_by_id(event_key))
@@ -148,7 +148,7 @@ def update_event_info(event_key: EventKey) -> Response:
 
 
 @require_write_auth({AuthType.EVENT_ALLIANCES})
-@validate_event_key
+@validate_keys
 def update_event_alliances(event_key: EventKey) -> Response:
     alliance_selections = JSONAllianceSelectionsParser.parse(request.data)
     event: Event = none_throws(Event.get_by_id(event_key))
@@ -165,7 +165,7 @@ def update_event_alliances(event_key: EventKey) -> Response:
 
 
 @require_write_auth({AuthType.EVENT_AWARDS})
-@validate_event_key
+@validate_keys
 def update_event_awards(event_key: EventKey) -> Response:
     awards = JSONAwardsParser.parse(request.data, event_key)
     event: Event = none_throws(Event.get_by_id(event_key))
@@ -199,7 +199,7 @@ def update_event_awards(event_key: EventKey) -> Response:
 
 
 @require_write_auth({AuthType.EVENT_MATCHES})
-@validate_event_key
+@validate_keys
 def update_event_matches(event_key: EventKey) -> Response:
     event: Event = none_throws(Event.get_by_id(event_key))
     parsed_matches = JSONMatchesParser.parse(request.data, event.year)
@@ -245,7 +245,7 @@ def update_event_matches(event_key: EventKey) -> Response:
 
 
 @require_write_auth({AuthType.EVENT_MATCHES})
-@validate_event_key
+@validate_keys
 def delete_event_matches(event_key: EventKey) -> Response:
     keys_to_delete: Set[ndb.Key] = set()
     try:
@@ -272,7 +272,7 @@ def delete_event_matches(event_key: EventKey) -> Response:
 
 
 @require_write_auth({AuthType.EVENT_MATCHES})
-@validate_event_key
+@validate_keys
 def delete_all_event_matches(event_key: EventKey) -> Response:
     if request.data.decode() != event_key:
         return make_response(
@@ -293,7 +293,7 @@ def delete_all_event_matches(event_key: EventKey) -> Response:
 
 
 @require_write_auth({AuthType.EVENT_RANKINGS})
-@validate_event_key
+@validate_keys
 def update_event_rankings(event_key: EventKey) -> Response:
     event: Event = none_throws(Event.get_by_id(event_key))
     rankings = JSONRankingsParser.parse(event.year, request.data)
@@ -311,7 +311,7 @@ def update_event_rankings(event_key: EventKey) -> Response:
 
 
 @require_write_auth({AuthType.MATCH_VIDEO})
-@validate_event_key
+@validate_keys
 def add_event_media(event_key: EventKey) -> Response:
     event: Event = none_throws(Event.get_by_id(event_key))
 
@@ -336,7 +336,7 @@ def add_event_media(event_key: EventKey) -> Response:
 
 
 @require_write_auth({AuthType.ZEBRA_MOTIONWORKS})
-@validate_event_key
+@validate_keys
 def add_match_zebra_motionworks_info(event_key: EventKey) -> Response:
     to_put: List[ZebraMotionWorks] = []
     for zebra_data in JSONZebraMotionWorksParser.parse(request.data):
