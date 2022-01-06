@@ -23,6 +23,7 @@ from backend.api.handlers.event import (
 )
 from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.api.handlers.match import match, zebra_motionworks
+from backend.api.handlers.media import media_tags
 from backend.api.handlers.status import status
 from backend.api.handlers.team import (
     team,
@@ -154,7 +155,7 @@ api_v3.add_url_rule(
 )
 
 # Media
-# api_v3.add_url_rule("/media/tags", view_func=TODO)
+api_v3.add_url_rule("/media/tags", view_func=media_tags)
 
 # Team
 api_v3.add_url_rule("/team/<string:team_key>", view_func=team)
