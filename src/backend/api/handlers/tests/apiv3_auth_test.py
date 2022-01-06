@@ -378,20 +378,30 @@ def test_district_key_valid(ndb_stub, api_client: Client) -> None:
         auth_types_enum=[AuthType.READ_API],
     ).put()
     District(
-        id="2020fim",
+        id="2020mar",
         year=2020,
-        abbreviation="fim",
+        abbreviation="mar",
     ).put()
 
     # Test model return
     resp = api_client.get(
-        "/api/v3/district/2020fim/rankings", headers={"X-TBA-Auth-Key": "test_auth_key"}
+        "/api/v3/district/2020mar/rankings", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+    # We allow both old/new keys
+    resp = api_client.get(
+        "/api/v3/district/2020fma/rankings", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
 
     # Test different model return
     resp = api_client.get(
-        "/api/v3/district/2020fim/events", headers={"X-TBA-Auth-Key": "test_auth_key"}
+        "/api/v3/district/2020mar/events", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+    # We allow both old/new keys
+    resp = api_client.get(
+        "/api/v3/district/2020fma/events", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
 
@@ -402,24 +412,24 @@ def test_district_key_invalid(ndb_stub, api_client: Client) -> None:
         auth_types_enum=[AuthType.READ_API],
     ).put()
     District(
-        id="2020fim",
+        id="2020mar",
         year=2020,
-        abbreviation="fim",
+        abbreviation="mar",
     ).put()
 
     # Test model return
     resp = api_client.get(
-        "/api/v3/district/fim/rankings", headers={"X-TBA-Auth-Key": "test_auth_key"}
+        "/api/v3/district/mar/rankings", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 404
-    assert resp.json["Error"] == "fim is not a valid district key"
+    assert resp.json["Error"] == "mar is not a valid district key"
 
     # Test different model return
     resp = api_client.get(
-        "/api/v3/district/fim/events", headers={"X-TBA-Auth-Key": "test_auth_key"}
+        "/api/v3/district/mar/events", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 404
-    assert resp.json["Error"] == "fim is not a valid district key"
+    assert resp.json["Error"] == "mar is not a valid district key"
 
 
 def test_district_key_does_not_exist(ndb_stub, api_client: Client) -> None:
@@ -428,9 +438,9 @@ def test_district_key_does_not_exist(ndb_stub, api_client: Client) -> None:
         auth_types_enum=[AuthType.READ_API],
     ).put()
     District(
-        id="2020fim",
+        id="2020mar",
         year=2020,
-        abbreviation="fim",
+        abbreviation="mar",
     ).put()
 
     # Test model return

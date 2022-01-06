@@ -384,6 +384,12 @@ def test_team_event_matches(ndb_stub, api_client: Client) -> None:
         auth_types_enum=[AuthType.READ_API],
     ).put()
     Team(id="frc254", team_number=254).put()
+    Event(
+        id="2020casj",
+        year=2020,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
     Match(
         id="2020casj_qm1",
         year=2020,
@@ -452,6 +458,12 @@ def test_team_event_awards(ndb_stub, api_client: Client) -> None:
         auth_types_enum=[AuthType.READ_API],
     ).put()
     Team(id="frc254", team_number=254).put()
+    Event(
+        id="2020casj",
+        year=2020,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
     Award(
         id="2020casj_1",
         year=2020,
@@ -488,6 +500,12 @@ def test_team_event_status(ndb_stub, api_client: Client) -> None:
         auth_types_enum=[AuthType.READ_API],
     ).put()
     Team(id="frc254", team_number=254).put()
+    Event(
+        id="2020casj",
+        year=2020,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
     EventTeam(
         id="2020casj_frc254",
         event=ndb.Key("Event", "2020casj"),

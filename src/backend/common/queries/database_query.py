@@ -12,7 +12,6 @@ from backend.common.futures import TypedFuture
 from backend.common.models.cached_query_result import CachedQueryResult
 from backend.common.profiler import Span
 from backend.common.queries.dict_converters.converter_base import ConverterBase
-from backend.common.queries.exceptions import DoesNotExistException
 from backend.common.queries.types import DictQueryReturn, QueryReturn
 
 
@@ -36,8 +35,6 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
     ) -> TypedFuture[DictQueryReturn]:
         # This gives CachedDatabaseQuery a place to hook into
         res = self._query_async(*args, **kwargs)
-        if res is None:
-            raise DoesNotExistException()
 
         if self.DICT_CONVERTER is None:
             raise Exception(
@@ -142,16 +139,12 @@ class CachedDatabaseQuery(
     ) -> Generator[Any, Any, DictQueryReturn]:
         if not self.DICT_CACHING_ENABLED:
             result = yield self._query_async(*args, **kwargs)
-            if result is None:
-                raise DoesNotExistException
             return result
 
         cache_key = self.dict_cache_key(_dict_version)
         cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
         if cached_query_result is None:
             query_result = yield self._query_async(*args, **kwargs)
-            if query_result is None:
-                raise DoesNotExistException
 
             # See https://github.com/facebook/pyre-check/issues/267
             converted_result = none_throws(self.DICT_CONVERTER)(  # pyre-ignore[45]
