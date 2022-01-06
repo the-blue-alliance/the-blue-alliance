@@ -12,6 +12,7 @@ from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.decorators import cached_public
 from backend.common.models.keys import MatchKey
+from backend.common.models.zebra_motionworks import ZebraMotionWorks
 from backend.common.queries.match_query import MatchQuery
 
 
@@ -28,3 +29,17 @@ def match(match_key: MatchKey, model_type: Optional[ModelType] = None) -> Respon
     if model_type is not None:
         match = filter_match_properties([match], model_type)[0]
     return profiled_jsonify(match)
+
+
+@api_authenticated
+@validate_keys
+@cached_public
+def zebra_motionworks(match_key: MatchKey) -> Response:
+    """
+    Returns Zebra Motionworks data for a given match.
+    """
+    track_call_after_response("zebra_motionworks_match", match_key)
+
+    zebra_data = ZebraMotionWorks.get_by_id(match_key)
+    data = zebra_data.data if zebra_data is not None else None
+    return profiled_jsonify(data)
