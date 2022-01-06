@@ -4,8 +4,7 @@ from flask import jsonify, Response
 
 from backend.api.handlers.decorators import (
     api_authenticated,
-    validate_event_key,
-    validate_team_key,
+    validate_keys,
 )
 from backend.api.handlers.helpers.model_properties import (
     filter_event_properties,
@@ -51,7 +50,7 @@ from backend.common.queries.team_query import (
 
 
 @api_authenticated
-@validate_team_key
+@validate_keys
 @cached_public
 def team(team_key: TeamKey, model_type: Optional[ModelType] = None) -> Response:
     """
@@ -66,7 +65,7 @@ def team(team_key: TeamKey, model_type: Optional[ModelType] = None) -> Response:
 
 
 @api_authenticated
-@validate_team_key
+@validate_keys
 @cached_public
 def team_years_participated(team_key: TeamKey) -> Response:
     """
@@ -80,7 +79,7 @@ def team_years_participated(team_key: TeamKey) -> Response:
 
 
 @api_authenticated
-@validate_team_key
+@validate_keys
 @cached_public
 def team_history_districts(team_key: TeamKey) -> Response:
     """
@@ -95,7 +94,7 @@ def team_history_districts(team_key: TeamKey) -> Response:
 
 
 @api_authenticated
-@validate_team_key
+@validate_keys
 @cached_public
 def team_history_robots(team_key: TeamKey) -> Response:
     """
@@ -108,7 +107,7 @@ def team_history_robots(team_key: TeamKey) -> Response:
 
 
 @api_authenticated
-@validate_team_key
+@validate_keys
 @cached_public
 def team_social_media(team_key: TeamKey) -> Response:
     """
@@ -123,7 +122,7 @@ def team_social_media(team_key: TeamKey) -> Response:
 
 
 @api_authenticated
-@validate_team_key
+@validate_keys
 @cached_public
 def team_events(
     team_key: TeamKey,
@@ -154,7 +153,7 @@ def team_events(
 
 
 @api_authenticated
-@validate_team_key
+@validate_keys
 @cached_public
 def team_events_statuses_year(team_key: TeamKey, year: int) -> Response:
     """
@@ -180,8 +179,7 @@ def team_events_statuses_year(team_key: TeamKey, year: int) -> Response:
 
 
 @api_authenticated
-@validate_team_key
-@validate_event_key
+@validate_keys
 @cached_public
 def team_event_matches(
     team_key: TeamKey, event_key: EventKey, model_type: Optional[ModelType] = None
@@ -203,8 +201,7 @@ def team_event_matches(
 
 
 @api_authenticated
-@validate_team_key
-@validate_event_key
+@validate_keys
 @cached_public
 def team_event_awards(team_key: TeamKey, event_key: EventKey) -> Response:
     """
@@ -219,8 +216,7 @@ def team_event_awards(team_key: TeamKey, event_key: EventKey) -> Response:
 
 
 @api_authenticated
-@validate_team_key
-@validate_event_key
+@validate_keys
 @cached_public
 def team_event_status(team_key: TeamKey, event_key: EventKey) -> Response:
     """
@@ -246,7 +242,7 @@ def team_event_status(team_key: TeamKey, event_key: EventKey) -> Response:
 
 
 @api_authenticated
-@validate_team_key
+@validate_keys
 @cached_public
 def team_awards(
     team_key: TeamKey,
@@ -268,7 +264,7 @@ def team_awards(
 
 
 @api_authenticated
-@validate_team_key
+@validate_keys
 @cached_public
 def team_matches(
     team_key: TeamKey,
@@ -290,7 +286,7 @@ def team_matches(
 
 
 @api_authenticated
-@validate_team_key
+@validate_keys
 @cached_public
 def team_media_year(team_key: TeamKey, year: int) -> Response:
     """
@@ -305,7 +301,7 @@ def team_media_year(team_key: TeamKey, year: int) -> Response:
 
 
 @api_authenticated
-@validate_team_key
+@validate_keys
 @cached_public
 def team_media_tag(
     team_key: TeamKey, media_tag: str, year: Optional[int] = None

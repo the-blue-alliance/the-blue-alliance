@@ -2,7 +2,7 @@ from typing import Optional
 
 from flask import jsonify, Response
 
-from backend.api.handlers.decorators import api_authenticated, validate_district_key
+from backend.api.handlers.decorators import api_authenticated, validate_keys
 from backend.api.handlers.helpers.model_properties import (
     filter_event_properties,
     filter_team_properties,
@@ -18,7 +18,7 @@ from backend.common.queries.team_query import DistrictTeamsQuery
 
 
 @api_authenticated
-@validate_district_key
+@validate_keys
 @cached_public
 def district_events(
     district_key: DistrictKey, model_type: Optional[ModelType] = None
@@ -37,7 +37,7 @@ def district_events(
 
 
 @api_authenticated
-@validate_district_key
+@validate_keys
 @cached_public
 def district_teams(
     district_key: DistrictKey, model_type: Optional[ModelType] = None
@@ -56,7 +56,7 @@ def district_teams(
 
 
 @api_authenticated
-@validate_district_key
+@validate_keys
 @cached_public
 def district_rankings(district_key: DistrictKey) -> Response:
     """

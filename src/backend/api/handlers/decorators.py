@@ -77,63 +77,59 @@ def require_write_auth(auth_types: Set[AuthType]):
     return decorator
 
 
-def validate_team_key(func):
+def validate_keys(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        with Span("validate_team_key"):
-            team_key = kwargs["team_key"]
-            if not Team.validate_key_name(team_key):
+        with Span("validate_keys"):
+            # Check key format
+            team_key = kwargs.get("team_key")
+            if team_key and not Team.validate_key_name(team_key):
                 return {"Error": f"{team_key} is not a valid team key"}, 404
 
-            if Team.get_by_id(team_key) is None:
-                return {"Error": f"team key: {team_key} does not exist"}, 404
-
-        return func(*args, **kwargs)
-
-    return decorated_function
-
-
-def validate_event_key(func):
-    @wraps(func)
-    def decorated_function(*args, **kwargs):
-        with Span("validate_event_key"):
-            event_key = kwargs["event_key"]
-            if not Event.validate_key_name(event_key):
+            event_key = kwargs.get("event_key")
+            if event_key and not Event.validate_key_name(event_key):
                 return {"Error": f"{event_key} is not a valid event key"}, 404
 
-            if Event.get_by_id(event_key) is None:
-                return {"Error": f"event key: {event_key} does not exist"}, 404
-
-        return func(*args, **kwargs)
-
-    return decorated_function
-
-
-def validate_match_key(func):
-    @wraps(func)
-    def decorated_function(*args, **kwargs):
-        with Span("validate_match_key"):
-            match_key = kwargs["match_key"]
-            if not Match.validate_key_name(match_key):
+            match_key = kwargs.get("match_key")
+            if match_key and not Match.validate_key_name(match_key):
                 return {"Error": f"{match_key} is not a valid match key"}, 404
 
-            if Match.get_by_id(match_key) is None:
-                return {"Error": f"match key: {match_key} does not exist"}, 404
-
-        return func(*args, **kwargs)
-
-    return decorated_function
-
-
-def validate_district_key(func):
-    @wraps(func)
-    def decorated_function(*args, **kwargs):
-        with Span("validate_district_key"):
-            district_key = kwargs["district_key"]
-            if not District.validate_key_name(district_key):
+            district_key = kwargs.get("district_key")
+            if district_key and not District.validate_key_name(district_key):
                 return {"Error": f"{district_key} is not a valid district key"}, 404
 
-            if not RenamedDistricts.district_exists(district_key):
+            # Check key existence
+            team_future = None
+            if team_key:
+                team_future = Team.get_by_id_async(team_key)
+
+            event_future = None
+            if event_key:
+                event_future = Event.get_by_id_async(event_key)
+
+            match_future = None
+            if match_key:
+                match_future = Match.get_by_id_async(match_key)
+
+            district_exists_future = None
+            if district_key:
+                district_exists_future = RenamedDistricts.district_exists_async(
+                    district_key
+                )
+
+            if team_future is not None and not team_future.get_result():
+                return {"Error": f"team key: {team_key} does not exist"}, 404
+
+            if event_future is not None and not event_future.get_result():
+                return {"Error": f"event key: {event_key} does not exist"}, 404
+
+            if match_future is not None and not match_future.get_result():
+                return {"Error": f"match key: {match_key} does not exist"}, 404
+
+            if (
+                district_exists_future is not None
+                and not district_exists_future.get_result()
+            ):
                 return {"Error": f"district key: {district_key} does not exist"}, 404
 
         return func(*args, **kwargs)

@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Any, Dict, Generator, List
 
 from google.appengine.ext import ndb
 
@@ -35,7 +35,11 @@ class RenamedDistricts(object):
         ]
 
     @classmethod
-    def district_exists(cls, district_key: DistrictKey) -> bool:
+    @ndb.tasklet
+    def district_exists_async(
+        cls, district_key: DistrictKey
+    ) -> Generator[Any, Any, bool]:
         keys = [ndb.Key("District", k) for k in cls.get_equivalent_keys(district_key)]
-        districts = list(filter(lambda d: d is not None, ndb.get_multi(keys)))
+        districts = yield ndb.get_multi_async(keys)
+        districts = list(filter(lambda d: d is not None, districts))
         return len(districts) > 0
