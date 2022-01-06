@@ -60,7 +60,7 @@
                     </label>
                   </div>
                   <div class="col-xs-5 fitvids">
-                      <p><strong><a href="/event/{{reference.key_name}}" target="_blank">{{ reference.year }} {{ reference.name }}</a></strong></p>
+                      <p><strong><a href="/event/{{reference.key_name}}" target="_blank" rel="noopener noreferrer">{{ reference.year }} {{ reference.name }}</a></strong></p>
                       {% set media = suggestion.candidate_media -%}
                       {% include "media_partials/media_display_partial.html" %}
                   </div>

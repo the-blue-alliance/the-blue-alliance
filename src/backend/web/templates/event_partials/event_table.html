@@ -25,12 +25,12 @@
           {% if event.webcast %}
             {% if event.now %}
               {% if event.webcast_status == 'offline' %}
-                <a class="btn btn-default btn-small" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Offline</a>
+                <a class="btn btn-default btn-small" href="{{event.gameday_url}}" target="_blank" rel="noopener noreferrer"><span class="glyphicon glyphicon-facetime-video"></span> Offline</a>
               {% else %}
                 {% if event.webcast_status == 'online' %}
-                  <a class="btn btn-success btn-small" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
+                  <a class="btn btn-success btn-small" href="{{event.gameday_url}}" target="_blank" rel="noopener noreferrer"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
                 {% else %}
-                  <a class="btn btn-info btn-small" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-question-sign"></span> Watch Now</a>
+                  <a class="btn btn-info btn-small" href="{{event.gameday_url}}" target="_blank" rel="noopener noreferrer"><span class="glyphicon glyphicon-question-sign"></span> Watch Now</a>
                 {% endif %}
               {% endif %}
             {% else %}
@@ -38,7 +38,7 @@
             {% endif %}
           {% else %}
             {% if event.future or event.within_a_day %}
-              <a href="/suggest/event/webcast?event_key={{event.key_name}}" target="_blank">Add webcast</a>
+              <a href="/suggest/event/webcast?event_key={{event.key_name}}" target="_blank" rel="noopener noreferrer">Add webcast</a>
             {% endif %}
           {% endif %}
         </td>

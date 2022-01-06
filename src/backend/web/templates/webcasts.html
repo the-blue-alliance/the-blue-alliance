@@ -25,9 +25,9 @@
             <td>{{ event.start_date|strftime("%b %d, %Y") }}</td>
             <td>
               {% if event.webcast_json %}
-                <a href="/suggest/event/webcast?event_key={{event.key_name}}" target="_blank">Add webcast</a>
+                <a href="/suggest/event/webcast?event_key={{event.key_name}}" target="_blank" rel="noopener noreferrer">Add webcast</a>
               {% else %}
-                <a href="/suggest/event/webcast?event_key={{event.key_name}}" target="_blank" class="btn btn-primary btn-xs">Add webcast</a>
+                <a href="/suggest/event/webcast?event_key={{event.key_name}}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-xs">Add webcast</a>
               {% endif %}
             </td>
             <td>{{ event.webcast_json }}</td>
