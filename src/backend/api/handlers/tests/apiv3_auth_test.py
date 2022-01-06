@@ -12,6 +12,7 @@ from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_type import EventType
 from backend.common.models.account import Account
 from backend.common.models.api_auth_access import ApiAuthAccess
+from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.common.models.team import Team
@@ -317,3 +318,53 @@ def test_match_key_does_not_exist(ndb_stub, api_client: Client) -> None:
     )
     assert resp.status_code == 404
     assert resp.json["Error"] == "match key: 2020casj_qm2 does not exist"
+
+
+def test_district_key_valid(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    District(
+        id="2020fim",
+        year=2020,
+        abbreviation="fim",
+    ).put()
+    resp = api_client.get(
+        "/api/v3/district/2020fim/events", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+
+
+def test_district_key_invalid(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    District(
+        id="2020fim",
+        year=2020,
+        abbreviation="fim",
+    ).put()
+    resp = api_client.get(
+        "/api/v3/district/fim/events", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 404
+    assert resp.json["Error"] == "fim is not a valid district key"
+
+
+def test_district_key_does_not_exist(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    District(
+        id="2020fim",
+        year=2020,
+        abbreviation="fim",
+    ).put()
+    resp = api_client.get(
+        "/api/v3/district/2020tx/events", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 404
+    assert resp.json["Error"] == "district key: 2020tx does not exist"
