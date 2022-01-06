@@ -23,7 +23,7 @@ Vagrant.configure("2") do |config|
   ports = []
 
   # Forward Firebase ports
-  for i in [4000, 4400, 4500, 9005, 9099]
+  for i in [4000, 4400, 4500, 9005, 9000, 9099]
     ports.push("#{i}:#{i}")
     config.vm.network "forwarded_port", guest: i, host: i
   end

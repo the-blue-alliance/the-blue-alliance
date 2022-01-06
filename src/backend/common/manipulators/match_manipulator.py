@@ -17,20 +17,54 @@ class MatchManipulator(ManipulatorBase[Match]):
     ) -> List[get_affected_queries.TCacheKeyAndQuery]:
         return get_affected_queries.match_updated(affected_refs)
 
-    """
     @classmethod
-    def postDeleteHook(cls, matches):
-        '''
-        To run after the match has been deleted.
-        '''
-        for match in matches:
-            try:
-                FirebasePusher.delete_match(match)
-            except Exception:
-                logging.warning("Firebase delete_match failed!")
-    """
+    def updateMerge(
+        cls, new_model: Match, old_model: Match, auto_union: bool = True
+    ) -> Match:
 
-    """
+        # Lets postUpdateHook know if videos went from 0 to >0
+        added_video = not old_model.has_video and new_model.has_video
+
+        cls._update_attrs(new_model, old_model, auto_union)
+
+        if added_video:
+            old_model._updated_attrs.add("_video_added")
+
+        return old_model
+
+
+"""
+@MatchManipulator.register_post_delete_hook
+def match_post_delete_hook(deleted_models: List[Match]) -> None:
+    for match in deleted_models:
+        try:
+            FirebasePusher.delete_match(match)
+        except Exception:
+            logging.warning("Firebase delete_match failed!")
+
+
+@MatchManipulator.register_post_update_hook
+def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
+    for updated_model in updated_models:
+        MatchPostUpdateHooks.firebase_update(updated_model)
+
+
+class MatchPostUpdateHooks:
+    \"""
+    Since there are so many match update hooks, we can port them individually here
+    and do a better job of batching so we don't have to iterate the same list a bunch
+    \"""
+
+    @staticmethod
+    def firebase_update(model: TUpdatedModel[Match]) -> None:
+        \"""
+        Enqueue firebase push
+        \"""
+        try:
+            FirebasePusher.update_match(model.model, model.updated_attrs)
+        except Exception:
+            logging.exception("Firebase update_match failed!")
+
     @classmethod
     def postUpdateHook(cls, matches, updated_attr_list, is_new_list):
         '''
@@ -106,11 +140,6 @@ class MatchManipulator(ManipulatorBase[Match]):
             # Only attrs that affect stats
             if is_new or set(['alliances_json', 'score_breakdown_json']).intersection(set(updated_attrs)) != set():
                 affected_stats_event_keys.add(match.event.id())
-            try:
-                FirebasePusher.update_match(match, updated_attrs)
-            except Exception:
-                logging.warning("Firebase update_match failed!")
-                logging.warning(traceback.format_exc())
 
         # Enqueue statistics
         for event_key in affected_stats_event_keys:
@@ -150,18 +179,3 @@ class MatchManipulator(ManipulatorBase[Match]):
                 logging.error("Error enqueuing advancement update for {}".format(event_key))
                 logging.error(traceback.format_exc())
     """
-
-    @classmethod
-    def updateMerge(
-        cls, new_model: Match, old_model: Match, auto_union: bool = True
-    ) -> Match:
-
-        # Lets postUpdateHook know if videos went from 0 to >0
-        added_video = not old_model.has_video and new_model.has_video
-
-        cls._update_attrs(new_model, old_model, auto_union)
-
-        if added_video:
-            old_model._updated_attrs.add("_video_added")
-
-        return old_model

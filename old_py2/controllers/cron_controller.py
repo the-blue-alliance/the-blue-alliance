@@ -618,14 +618,6 @@ class UpcomingNotificationDo(webapp.RequestHandler):
         NotificationHelper.send_upcoming_matches(live_events)
 
 
-class UpdateLiveEventsDo(webapp.RequestHandler):
-    """
-    Updates live events
-    """
-    def get(self):
-        FirebasePusher.update_live_events()
-
-
 class MatchTimePredictionsEnqueue(webapp.RequestHandler):
     """
     Enqueue match time predictions for all current events

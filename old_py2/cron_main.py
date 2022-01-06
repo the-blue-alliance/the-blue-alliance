@@ -73,7 +73,6 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/enqueue/update_all_team_search_index', AdminUpdateAllTeamSearchIndexEnqueue),
                                ('/tasks/do/update_all_team_search_index', AdminUpdateAllTeamSearchIndexDo),
                                ('/tasks/do/update_team_search_index/(.*)', AdminUpdateTeamSearchIndexDo),
-                               ('/tasks/do/update_live_events', UpdateLiveEventsDo),
                                ('/tasks/do/remap_teams/(.*)', RemapTeamsDo),
                                ],
                               debug=tba_config.DEBUG)
