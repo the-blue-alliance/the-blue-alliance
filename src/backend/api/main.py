@@ -5,6 +5,7 @@ from flask_cors import CORS
 from google.appengine.api import wrap_wsgi_app
 from werkzeug.routing import BaseConverter
 
+from backend.api.handlers.district import district_list_year
 from backend.api.handlers.error import handle_404
 from backend.api.handlers.event import (
     event,
@@ -94,7 +95,7 @@ api_v3.add_url_rule("/status", view_func=status)
 # api_v3.add_url_rule("/district/<string:district_key>/rankings", view_func=TODO)
 
 # District List
-# api_v3.add_url_rule("/districts/<int:year>", view_func=TODO)
+api_v3.add_url_rule("/districts/<int:year>", view_func=district_list_year)
 
 # Event
 api_v3.add_url_rule("/event/<string:event_key>", view_func=event)
