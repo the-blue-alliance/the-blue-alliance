@@ -198,7 +198,7 @@ def test_district_detail_rankings(
         DistrictRanking(
             rank=1,
             team_key="frc7332",
-            point_toal=83,
+            point_total=83,
             rookie_bonus=0,
             event_points=[
                 TeamAtEventDistrictPoints(

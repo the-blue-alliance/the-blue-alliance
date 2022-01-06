@@ -11,6 +11,7 @@ from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_type import EventType
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.district import District
+from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.team import Team
@@ -174,6 +175,47 @@ def test_district_teams(ndb_stub, api_client: Client) -> None:
     assert len(resp.json) == 2
     assert "frc254" in keys
     assert "frc604" in keys
+
+
+def test_district_rankings(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    District(
+        id="2020ne",
+        year=2020,
+        abbreviation="ne",
+    ).put()
+    rankings = [
+        DistrictRanking(
+            rank=13,
+            team_key="frc604",
+            point_total=50,
+            rookie_bonus=5,
+            event_points=[],
+        )
+    ]
+    District(
+        id="2020fim",
+        year=2020,
+        abbreviation="fim",
+        rankings=rankings,
+    ).put()
+
+    # Test empty rankings
+    resp = api_client.get(
+        "/api/v3/district/2020ne/rankings", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+    assert resp.json is None
+
+    # Test non-empty rankings
+    resp = api_client.get(
+        "/api/v3/district/2020fim/rankings", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+    assert resp.json == rankings
 
 
 def test_district_list_year(ndb_stub, api_client: Client) -> None:

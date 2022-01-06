@@ -12,7 +12,7 @@ from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.decorators import cached_public
 from backend.common.models.keys import DistrictKey
-from backend.common.queries.district_query import DistrictsInYearQuery
+from backend.common.queries.district_query import DistrictQuery, DistrictsInYearQuery
 from backend.common.queries.event_query import DistrictEventsQuery
 from backend.common.queries.team_query import DistrictTeamsQuery
 
@@ -53,6 +53,19 @@ def district_teams(
     if model_type is not None:
         teams = filter_team_properties(teams, model_type)
     return jsonify(teams)
+
+
+@api_authenticated
+@validate_district_key
+@cached_public
+def district_rankings(district_key: DistrictKey) -> Response:
+    """
+    Returns the rankings a given DistrictKey.
+    """
+    track_call_after_response("district/rankings", district_key)
+
+    district = DistrictQuery(district_key=district_key).fetch()
+    return jsonify(district.rankings)
 
 
 @api_authenticated
