@@ -158,8 +158,16 @@ def test_team_key_valid(ndb_stub, api_client: Client) -> None:
         auth_types_enum=[AuthType.READ_API],
     ).put()
     Team(id="frc254", team_number=254).put()
+
+    # Test model return
     resp = api_client.get(
         "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+
+    # Test different model return
+    resp = api_client.get(
+        "/api/v3/team/frc254/events", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
 
@@ -170,8 +178,17 @@ def test_team_key_invalid(ndb_stub, api_client: Client) -> None:
         auth_types_enum=[AuthType.READ_API],
     ).put()
     Team(id="frc254", team_number=254).put()
+
+    # Test model return
     resp = api_client.get(
         "/api/v3/team/254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 404
+    assert resp.json["Error"] == "254 is not a valid team key"
+
+    # Test different model return
+    resp = api_client.get(
+        "/api/v3/team/254/events", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 404
     assert resp.json["Error"] == "254 is not a valid team key"
@@ -183,8 +200,17 @@ def test_team_key_does_not_exist(ndb_stub, api_client: Client) -> None:
         auth_types_enum=[AuthType.READ_API],
     ).put()
     Team(id="frc254", team_number=254).put()
+
+    # Test model return
     resp = api_client.get(
         "/api/v3/team/frc604", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 404
+    assert resp.json["Error"] == "team key: frc604 does not exist"
+
+    # Test different model return
+    resp = api_client.get(
+        "/api/v3/team/frc604/events", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 404
     assert resp.json["Error"] == "team key: frc604 does not exist"
@@ -201,8 +227,16 @@ def test_event_key_valid(ndb_stub, api_client: Client) -> None:
         event_short="casj",
         event_type_enum=EventType.REGIONAL,
     ).put()
+
+    # Test model return
     resp = api_client.get(
         "/api/v3/event/2019casj", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+
+    # Test different model return
+    resp = api_client.get(
+        "/api/v3/event/2019casj/teams", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
 
@@ -218,8 +252,17 @@ def test_event_key_invalid(ndb_stub, api_client: Client) -> None:
         event_short="casj",
         event_type_enum=EventType.REGIONAL,
     ).put()
+
+    # Test model return
     resp = api_client.get(
         "/api/v3/event/casj", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 404
+    assert resp.json["Error"] == "casj is not a valid event key"
+
+    # Test different model return
+    resp = api_client.get(
+        "/api/v3/event/casj/teams", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 404
     assert resp.json["Error"] == "casj is not a valid event key"
@@ -236,8 +279,17 @@ def test_event_key_does_not_exist(ndb_stub, api_client: Client) -> None:
         event_short="casj",
         event_type_enum=EventType.REGIONAL,
     ).put()
+
+    # Test model return
     resp = api_client.get(
         "/api/v3/event/2019casf", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 404
+    assert resp.json["Error"] == "event key: 2019casf does not exist"
+
+    # Test different model return
+    resp = api_client.get(
+        "/api/v3/event/2019casf/teams", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 404
     assert resp.json["Error"] == "event key: 2019casf does not exist"
@@ -330,6 +382,14 @@ def test_district_key_valid(ndb_stub, api_client: Client) -> None:
         year=2020,
         abbreviation="fim",
     ).put()
+
+    # Test model return
+    resp = api_client.get(
+        "/api/v3/district/2020fim/rankings", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+
+    # Test different model return
     resp = api_client.get(
         "/api/v3/district/2020fim/events", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
@@ -346,6 +406,15 @@ def test_district_key_invalid(ndb_stub, api_client: Client) -> None:
         year=2020,
         abbreviation="fim",
     ).put()
+
+    # Test model return
+    resp = api_client.get(
+        "/api/v3/district/fim/rankings", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 404
+    assert resp.json["Error"] == "fim is not a valid district key"
+
+    # Test different model return
     resp = api_client.get(
         "/api/v3/district/fim/events", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
@@ -353,9 +422,6 @@ def test_district_key_invalid(ndb_stub, api_client: Client) -> None:
     assert resp.json["Error"] == "fim is not a valid district key"
 
 
-# TODO: This is currently broken and tricky because district abbreviations have changed
-# over the years and we accept all of them. -fangeugene 2021-01-05
-@pytest.mark.skip
 def test_district_key_does_not_exist(ndb_stub, api_client: Client) -> None:
     ApiAuthAccess(
         id="test_auth_key",
@@ -366,6 +432,15 @@ def test_district_key_does_not_exist(ndb_stub, api_client: Client) -> None:
         year=2020,
         abbreviation="fim",
     ).put()
+
+    # Test model return
+    resp = api_client.get(
+        "/api/v3/district/2020tx/rankings", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 404
+    assert resp.json["Error"] == "district key: 2020tx does not exist"
+
+    # Test different model return
     resp = api_client.get(
         "/api/v3/district/2020tx/events", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
