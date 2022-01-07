@@ -1,4 +1,7 @@
+from concurrent import futures
 from typing import Any
+
+_THREAD_POOL: futures.ThreadPoolExecutor
 
 class RPC:
     IDLE: int

@@ -3,11 +3,22 @@ from typing import Generator
 import pytest
 from freezegun import api as freezegun_api
 from google.appengine.api import datastore_types
+from google.appengine.api.apiproxy_rpc import _THREAD_POOL
 from google.appengine.ext import ndb, testbed
 
 from backend.common.context_cache import context_cache
 from backend.common.models.cached_query_result import CachedQueryResult
 from backend.tests.json_data_importer import JsonDataImporter
+
+
+@pytest.fixture(autouse=True, scope="session")
+def drain_gae_rpc_thread_pool() -> Generator:
+    yield
+
+    # This thread pool can leave work dangling after the test session
+    # is done, which can cause pytest to hang.
+    # So we add this fixture to manually shut it down
+    _THREAD_POOL.shutdown()
 
 
 @pytest.fixture(autouse=True)
@@ -63,8 +74,6 @@ def memcache_stub(
     gae_testbed: testbed.Testbed,
     monkeypatch: pytest.MonkeyPatch,
 ) -> testbed.memcache_stub.MemcacheServiceStub:
-    # for some reason, tests hang forever with a dangling thread if we don't set this
-    monkeypatch.setattr(testbed.memcache_stub.MemcacheServiceStub, "THREADSAFE", False)
     gae_testbed.init_memcache_stub()
     stub = gae_testbed.get_stub(testbed.MEMCACHE_SERVICE_NAME)
     return stub
