@@ -13,10 +13,10 @@ jobs:
     if: ${{ github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v2.4.0
-      - name: Set up Python 3.8
+      - name: Set up Python 3.9
         uses: actions/setup-python@v2.3.1
         with:
-          python-version: 3.8
+          python-version: 3.9
       - name: Cache pip
         uses: actions/cache@v2.1.7
         with:

@@ -1,4 +1,4 @@
-runtime: python38
+runtime: python39
 entrypoint: gunicorn -b :$PORT backend.default.main:app
 
 instance_class: F1

@@ -92,7 +92,7 @@ dev_appserver.py \
     --runtime_python_path=/usr/bin/python3 \
     --admin_host=0.0.0.0 \
     --host=0.0.0.0 \
-    --runtime="python37" \
+    --runtime="python39" \
     --application="$application" \
     "${env[@]}" \
     --env_var TBA_LOG_LEVEL="$tba_log_level" \

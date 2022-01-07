@@ -15,10 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2.4.0
-      - name: Set up Python 3.8
+      - name: Set up Python 3.9
         uses: actions/setup-python@v2.3.1
         with:
-          python-version: 3.8
+          python-version: 3.9
       - name: Cache pip
         uses: actions/cache@v2.1.7
         with:
@@ -37,10 +37,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2.4.0
-      - name: Set up Python 3.8
+      - name: Set up Python 3.9
         uses: actions/setup-python@v2.3.1
         with:
-          python-version: 3.8
+          python-version: 3.9
       - name: Cache pip
         uses: actions/cache@v2.1.7
         with:
@@ -59,10 +59,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2.4.0
-      - name: Set up Python 3.8
+      - name: Set up Python 3.9
         uses: actions/setup-python@v2.3.1
         with:
-          python-version: 3.8
+          python-version: 3.9
       - name: Cache pip
         uses: actions/cache@v2.1.7
         with:
@@ -125,10 +125,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2.4.0
-      - name: Set up Python 3.8
+      - name: Set up Python 3.9
         uses: actions/setup-python@v2.3.1
         with:
-          python-version: 3.8
+          python-version: 3.9
       - name: Cache pip
         uses: actions/cache@v2.1.7
         with:
@@ -153,10 +153,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2.4.0
-      - name: Set up Python 3.8
+      - name: Set up Python 3.9
         uses: actions/setup-python@v2.3.1
         with:
-          python-version: 3.8
+          python-version: 3.9
       - name: Set up Node
         uses: actions/setup-node@v2.5.1
         with:
@@ -182,10 +182,10 @@ jobs:
           - 5000:5000
     steps:
       - uses: actions/checkout@v2.4.0
-      - name: Set up Python 3.8
+      - name: Set up Python 3.9
         uses: actions/setup-python@v2.3.0
         with:
-          python-version: 3.8
+          python-version: 3.9
       - name: Cache pip
         uses: actions/cache@v2.1.7
         with:
