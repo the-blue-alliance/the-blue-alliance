@@ -6,7 +6,7 @@ from backend.common.google_analytics import GoogleAnalytics
 
 
 def track_call_after_response(
-    api_action: str, api_label: str, model_type: Optional[str] = None
+    api_action: str, api_label: Optional[str] = None, model_type: Optional[str] = None
 ) -> None:
     """
     Schedules a callback to Google Analytics to track an API call.
