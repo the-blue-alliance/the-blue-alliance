@@ -18,7 +18,7 @@ def index() -> Response:
         LandingType, Tuple[Callable[[Dict[str, Any]], str], timedelta]
     ] = {
         # map landing type -> (handler function, cache ttl)
-        LandingType.KICKOFF: (index_kickoff, timedelta(days=1)),
+        LandingType.KICKOFF: (index_kickoff, timedelta(minutes=5)),
         LandingType.BUILDSEASON: (index_buildseason, timedelta(minutes=5)),
         LandingType.COMPETITIONSEASON: (
             index_competitionseason,
