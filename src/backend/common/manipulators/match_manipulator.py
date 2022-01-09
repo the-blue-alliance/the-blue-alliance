@@ -1,7 +1,9 @@
+import logging
 from typing import List
 
 from backend.common.cache_clearing import get_affected_queries
-from backend.common.manipulators.manipulator_base import ManipulatorBase
+from backend.common.helpers.firebase_pusher import FirebasePusher
+from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
 from backend.common.models.cached_model import TAffectedReferences
 from backend.common.models.match import Match
 
@@ -33,7 +35,6 @@ class MatchManipulator(ManipulatorBase[Match]):
         return old_model
 
 
-"""
 @MatchManipulator.register_post_delete_hook
 def match_post_delete_hook(deleted_models: List[Match]) -> None:
     for match in deleted_models:
@@ -50,21 +51,23 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
 
 
 class MatchPostUpdateHooks:
-    \"""
+    """
     Since there are so many match update hooks, we can port them individually here
     and do a better job of batching so we don't have to iterate the same list a bunch
-    \"""
+    """
 
     @staticmethod
     def firebase_update(model: TUpdatedModel[Match]) -> None:
-        \"""
+        """
         Enqueue firebase push
-        \"""
+        """
         try:
             FirebasePusher.update_match(model.model, model.updated_attrs)
         except Exception:
             logging.exception("Firebase update_match failed!")
 
+
+"""
     @classmethod
     def postUpdateHook(cls, matches, updated_attr_list, is_new_list):
         '''
