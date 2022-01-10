@@ -1,10 +1,13 @@
 import json
 import unittest
+from unittest import mock
 
 import pytest
+from google.appengine.ext import deferred, ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import AllianceColor
+from backend.common.helpers.firebase_pusher import FirebasePusher
 from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.models.event import Event
 from backend.common.models.match import Match
@@ -169,3 +172,85 @@ class TestMatchManipulator(unittest.TestCase):
             ),
             False,
         )
+
+
+@mock.patch.object(FirebasePusher, "update_match")
+def test_updateHook(mock_firebase, ndb_context, taskqueue_stub) -> None:
+    test_match = Match(
+        id="2012ct_qm1",
+        alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2012ct"),
+        year=2012,
+        set_number=1,
+        match_number=1,
+    )
+    MatchManipulator._run_post_update_hook([test_match])
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
+    for task in tasks:
+        deferred.run(task.payload)
+
+    mock_firebase.assert_called_once_with(test_match, set())
+
+
+@mock.patch.object(FirebasePusher, "update_match")
+def test_updateHook_firebaseThrows(mock_firebase, ndb_context, taskqueue_stub) -> None:
+    test_match = Match(
+        id="2012ct_qm1",
+        alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2012ct"),
+        year=2012,
+        set_number=1,
+        match_number=1,
+    )
+    mock_firebase.side_effect = Exception
+    MatchManipulator._run_post_update_hook([test_match])
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
+    for task in tasks:
+        deferred.run(task.payload)
+
+
+@mock.patch.object(FirebasePusher, "delete_match")
+def test_deleteHook(mock_firebase, ndb_context, taskqueue_stub) -> None:
+    test_match = Match(
+        id="2012ct_qm1",
+        alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2012ct"),
+        year=2012,
+        set_number=1,
+        match_number=1,
+    )
+    MatchManipulator._run_post_delete_hook([test_match])
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
+    for task in tasks:
+        deferred.run(task.payload)
+
+    mock_firebase.assert_called_once_with(test_match)
+
+
+@mock.patch.object(FirebasePusher, "delete_match")
+def test_deleteHook_firebaseThrows(mock_firebase, ndb_context, taskqueue_stub) -> None:
+    test_match = Match(
+        id="2012ct_qm1",
+        alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2012ct"),
+        year=2012,
+        set_number=1,
+        match_number=1,
+    )
+    mock_firebase.side_effect = Exception
+    MatchManipulator._run_post_delete_hook([test_match])
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
+    for task in tasks:
+        deferred.run(task.payload)

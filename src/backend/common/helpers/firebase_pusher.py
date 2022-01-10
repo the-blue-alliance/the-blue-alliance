@@ -1,5 +1,4 @@
-import json
-from typing import Dict, List
+from typing import Dict, List, Set
 
 from firebase_admin import db as firebase_db
 from google.appengine.ext import deferred
@@ -11,8 +10,13 @@ from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.webcast_online_helper import WebcastOnlineHelper
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey
+from backend.common.models.match import Match
 from backend.common.models.webcast import Webcast
 from backend.common.queries.dict_converters.event_converter import EventConverter
+from backend.common.queries.dict_converters.match_converter import (
+    MatchConverter,
+    MatchDict,
+)
 from backend.common.sitevars.forced_live_events import ForcedLiveEvents
 from backend.common.sitevars.gameday_special_webcasts import GamedaySpecialWebcasts
 
@@ -26,31 +30,29 @@ class FirebasePusher:
         url = cls.DB_URL.format(project=Environment.project())
         return firebase_db.reference(key, app=get_firebase_app(), url=url)
 
-    """
     @classmethod
     def _delete_data(cls, key: str) -> None:
-        \"""
+        """
         Remove data from the specified Firebase database reference.
-        \"""
+        """
         ref = cls._get_reference(key)
         ref.delete()
 
     @classmethod
-    def _patch_data(cls, key: str, data_json: str) -> None:
-        \"""
+    def _patch_data(cls, key: str, data: Dict) -> None:
+        """
         Write or replace data to a defined path, like messages/users/user1/<data>
-        \"""
+        """
         ref = cls._get_reference(key)
-        ref.update(data_json)
-    """
+        ref.update(data)
 
     @classmethod
-    def _put_data(cls, key: str, data_json: str) -> None:
+    def _put_data(cls, key: str, data: Dict) -> None:
         """
         Write or replace data to a defined path, like messages/users/user1/<data>
         """
         ref = cls._get_reference(key)
-        ref.set(data_json)
+        ref.set(data)
 
     """
     @classmethod
@@ -61,12 +63,13 @@ class FirebasePusher:
         \"""
         ref = cls._get_reference(key)
         ref.push(data_json)
+    """
 
     @classmethod
     def delete_match(cls, match: Match) -> None:
-        \"""
+        """
         Deletes a match from an event and event_team
-        \"""
+        """
         deferred.defer(
             cls._delete_data,
             f"e/{match.event_key_name}/m/{match.short_key}",
@@ -83,9 +86,9 @@ class FirebasePusher:
 
     @classmethod
     def _construct_match_dict(cls, match: MatchDict) -> Dict:
-        \"""
+        """
         Minimal amount needed to render
-        \"""
+        """
         match_dict = {
             "c": match["comp_level"],
             "s": match["set_number"],
@@ -100,6 +103,7 @@ class FirebasePusher:
         }
         return match_dict
 
+    """
     @classmethod
     def replace_event_matches(cls, event_key: EventKey, matches: List[Match]) -> None:
         \"""
@@ -119,12 +123,13 @@ class FirebasePusher:
             _target="py3-tasks-io",
             _url="/_ah/queue/deferred_firebase_replace_event_matches",
         )
+    """
 
     @classmethod
     def update_match(cls, match: Match, updated_attrs: Set[str]) -> None:
-        \"""
+        """
         Updates a match in an event and event/team
-        \"""
+        """
         if match.year < 2017:
             return
 
@@ -141,17 +146,11 @@ class FirebasePusher:
         deferred.defer(
             cls._patch_data,
             "e/{}/m/{}".format(match.event.id(), match.short_key),
-            json.dumps(match_dict),
+            match_dict,
             _queue="firebase",
             _target="py3-tasks-io",
             _url="/_ah/queue/deferred_firebase_update_match",
         )
-
-        try:
-            if match.event.get().event_type_enum in CMP_EVENT_TYPES:
-                cls.update_champ_numbers()
-        except Exception:
-            logging.exception("Update champ numbers failed")
 
         # for team_key_name in match.team_key_names:
         #     deferred.defer(
@@ -160,6 +159,7 @@ class FirebasePusher:
         #         match_data_json,
         #         _queue="firebase")
 
+    """
     @classmethod
     def update_event_details(cls, event_details: EventDetails) -> None:
         \"""
@@ -230,7 +230,7 @@ class FirebasePusher:
         deferred.defer(
             cls._put_data,
             "live_events",
-            json.dumps(events_by_key),
+            events_by_key,
             _queue="firebase",
             _target="py3-tasks-io",
             _url="/_ah/queue/deferred_firebase_update_live_events",
@@ -239,7 +239,7 @@ class FirebasePusher:
         deferred.defer(
             cls._put_data,
             "special_webcasts",
-            json.dumps(cls.get_special_webcasts()),
+            cls.get_special_webcasts(),
             _queue="firebase",
             _target="py3-tasks-io",
             _url="/_ah/queue/deferred_firebase_update_special_webcasts",
@@ -310,51 +310,5 @@ class FirebasePusher:
             _queue="firebase",
             _target="py3-tasks-io",
             _url="/_ah/queue/deferred_firebase_update_event",
-        )
-
-    @classmethod
-    def update_champ_numbers(cls) -> None:
-        events = Event.query(
-            Event.year == 2017,
-            Event.event_type_enum.IN([EventType.CMP_DIVISION, EventType.CMP_FINALS]),
-        ).fetch()
-        matches_futures = []
-        for event in events:
-            matches_futures.append(EventMatchesQuery(event.key.id()).fetch_async())
-
-        pressure = 0
-        rotors = 0
-        climbs = 0
-        for matches_future in matches_futures:
-            for match in matches_future.get_result():
-                if not match.has_been_played:
-                    continue
-                for color in ["red", "blue"]:
-                    pressure += (
-                        match.score_breakdown[color]["autoFuelPoints"]
-                        + match.score_breakdown[color]["teleopFuelPoints"]
-                    )
-                    if match.score_breakdown[color]["rotor4Engaged"]:
-                        rotors += 4
-                    elif match.score_breakdown[color]["rotor3Engaged"]:
-                        rotors += 3
-                    elif match.score_breakdown[color]["rotor2Engaged"]:
-                        rotors += 2
-                    elif match.score_breakdown[color]["rotor1Engaged"]:
-                        rotors += 1
-                    climbs += match.score_breakdown[color]["teleopTakeoffPoints"] / 50
-
-        deferred.defer(
-            cls._patch_data,
-            "champ_numbers",
-            json.dumps(
-                {
-                    "kpa_accumulated": pressure,
-                    "rotors_engaged": rotors,
-                    "ready_for_takeoff": climbs,
-                }
-            ),
-            _target="py3-tasks-io",
-            _queue="firebase",
         )
     """

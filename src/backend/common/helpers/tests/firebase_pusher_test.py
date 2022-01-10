@@ -7,6 +7,7 @@ import pytest
 import requests
 import requests_mock
 import six
+from firebase_admin import exceptions as firebase_exceptions
 from freezegun import freeze_time
 from google.appengine.ext import deferred, ndb, testbed
 from pyre_extensions import none_throws
@@ -17,6 +18,7 @@ from backend.common.consts.webcast_type import WebcastType
 from backend.common.helpers.firebase_pusher import FirebasePusher
 from backend.common.models.district import District
 from backend.common.models.event import Event
+from backend.common.models.match import Match
 from backend.common.models.webcast import Webcast
 from backend.common.sitevars.forced_live_events import ForcedLiveEvents
 from backend.common.sitevars.gameday_special_webcasts import (
@@ -50,6 +52,15 @@ class InMemoryRealtimeDb:
             body = six.ensure_binary(none_throws(request.body))
             self.data[url_parts.path] = body
             return self._make_response(200, body)
+        elif request.method == "PATCH":
+            body = six.ensure_binary(none_throws(request.body))
+            existing_data = json.loads(self.data.get(url_parts.path, "{}"))
+            existing_data.update(json.loads(body))
+            self.data[url_parts.path] = json.dumps(existing_data).encode()
+            return self._make_response(200, body)
+        elif request.method == "DELETE":
+            self.data.pop(url_parts.path, None)
+            return self._make_response(200, b"null")
 
         return self._make_response(400, f"not implemented {request.method}".encode())
 
@@ -81,8 +92,8 @@ def test_update_live_events_none(
     FirebasePusher.update_live_events()
     drain_deferred(taskqueue_stub)
 
-    assert FirebasePusher._get_reference("live_events").get() == "{}"
-    assert FirebasePusher._get_reference("special_webcasts").get() == "[]"
+    assert FirebasePusher._get_reference("live_events").get() == {}
+    assert FirebasePusher._get_reference("special_webcasts").get() == []
 
 
 @freeze_time("2020-04-01")
@@ -111,7 +122,7 @@ def test_update_live_event(
             "webcasts": [],
         }
     }
-    assert json.loads(FirebasePusher._get_reference("live_events").get()) == expected
+    assert FirebasePusher._get_reference("live_events").get() == expected
 
 
 @freeze_time("2020-04-01")
@@ -151,7 +162,7 @@ def test_update_live_event_with_webcast(
             ],
         }
     }
-    assert json.loads(FirebasePusher._get_reference("live_events").get()) == expected
+    assert FirebasePusher._get_reference("live_events").get() == expected
 
 
 @freeze_time("2020-04-01")
@@ -181,7 +192,7 @@ def test_update_live_district_event(
             "webcasts": [],
         }
     }
-    assert json.loads(FirebasePusher._get_reference("live_events").get()) == expected
+    assert FirebasePusher._get_reference("live_events").get() == expected
 
 
 @freeze_time("2020-04-01")
@@ -212,7 +223,7 @@ def test_update_live_event_forced(
             "webcasts": [],
         }
     }
-    assert json.loads(FirebasePusher._get_reference("live_events").get()) == expected
+    assert FirebasePusher._get_reference("live_events").get() == expected
 
 
 @freeze_time("2020-04-01")
@@ -254,7 +265,7 @@ def test_update_live_event_forced_with_webcast(
             ],
         }
     }
-    assert json.loads(FirebasePusher._get_reference("live_events").get()) == expected
+    assert FirebasePusher._get_reference("live_events").get() == expected
 
 
 def test_update_special_webcast(
@@ -286,6 +297,115 @@ def test_update_special_webcast(
             viewer_count=None,
         )
     ]
-    assert (
-        json.loads(FirebasePusher._get_reference("special_webcasts").get()) == expected
+    assert FirebasePusher._get_reference("special_webcasts").get() == expected
+
+
+def test_update_match(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    match = Match(
+        id="2018ct_qm1",
+        alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2018ct"),
+        year=2018,
+        set_number=1,
+        match_number=1,
     )
+
+    FirebasePusher.update_match(match, set())
+    drain_deferred(taskqueue_stub)
+
+    expected = {
+        "c": "qm",
+        "s": 1,
+        "m": 1,
+        "r": 74,
+        "rt": ["frc69", "frc571", "frc176"],
+        "b": 57,
+        "bt": ["frc3464", "frc20", "frc1073"],
+        "t": None,
+        "pt": None,
+        "w": "red",
+    }
+    assert FirebasePusher._get_reference("e/2018ct/m/qm1").get() == expected
+
+
+def test_update_match_skips_pre_2017(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    match = Match(
+        id="2016ct_qm1",
+        alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2016ct"),
+        year=2016,
+        set_number=1,
+        match_number=1,
+    )
+
+    FirebasePusher.update_match(match, set())
+    drain_deferred(taskqueue_stub)
+
+    with pytest.raises(firebase_exceptions.NotFoundError):
+        FirebasePusher._get_reference("e/2016ct/m/qm1").get()
+
+
+def test_update_match_merges_predicted_time(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    match = Match(
+        id="2018ct_qm1",
+        alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2018ct"),
+        year=2018,
+        set_number=1,
+        match_number=1,
+    )
+
+    FirebasePusher.update_match(match, set())
+    drain_deferred(taskqueue_stub)
+
+    # Make a change to the alliance dict, so that the test will fail we it not for the hack
+    predicted_time = datetime.datetime(2018, 4, 1, 10, 0, 0)
+    match.predicted_time = predicted_time
+    match.alliances_json = """{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}"""
+    match._alliances = None
+    FirebasePusher.update_match(match, {"predicted_time"})
+    drain_deferred(taskqueue_stub)
+
+    expected = {
+        "c": "qm",
+        "s": 1,
+        "m": 1,
+        "r": 74,
+        "rt": ["frc69", "frc571", "frc176"],
+        "b": 57,
+        "bt": ["frc3464", "frc20", "frc1073"],
+        "t": None,
+        "pt": predicted_time.timestamp(),
+        "w": "red",
+    }
+    assert FirebasePusher._get_reference("e/2018ct/m/qm1").get() == expected
+
+
+def test_delete_match(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    match = Match(
+        id="2018ct_qm1",
+        alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2018ct"),
+        year=2018,
+        set_number=1,
+        match_number=1,
+    )
+
+    FirebasePusher._get_reference("e/2018ct/m/qm1").set("foo")
+    FirebasePusher.delete_match(match)
+    drain_deferred(taskqueue_stub)
+
+    with pytest.raises(firebase_exceptions.NotFoundError):
+        FirebasePusher._get_reference("e/2018ct/m/qm1").get()
