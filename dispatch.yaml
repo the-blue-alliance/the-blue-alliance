@@ -37,7 +37,7 @@ dispatch:
   service: py3-web
     
 - url: "www.thebluealliance.com/watch/*"
- service: py3-web
+  service: py3-web
 
 # Send low-frequency long-running tasks to backend module
 - url: "*/backend-tasks/*"
