@@ -1,0 +1,178 @@
+[
+  {
+    "award_type": 0, 
+    "event_key": "2019micmp", 
+    "name": "Regional Chairman's Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc226"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc66"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc4776"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc1718"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc503"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 1, 
+    "event_key": "2019micmp", 
+    "name": "District Championship Winner", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc4362"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc3604"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc862"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 10, 
+    "event_key": "2019micmp", 
+    "name": "District Championship Rookie All Star Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc7656"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc7598"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 2, 
+    "event_key": "2019micmp", 
+    "name": "District Championship Finalist", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc5460"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc3538"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc314"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 3, 
+    "event_key": "2019micmp", 
+    "name": "Woodie Flowers Finalist Award", 
+    "recipient_list": [
+      {
+        "awardee": "Joe Horth", 
+        "team_key": "frc280"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 4, 
+    "event_key": "2019micmp", 
+    "name": "FIRST Dean's List Finalist Award", 
+    "recipient_list": [
+      {
+        "awardee": "Katie Armstrong", 
+        "team_key": "frc3618"
+      }, 
+      {
+        "awardee": "Alyssa Hagan", 
+        "team_key": "frc67"
+      }, 
+      {
+        "awardee": "Sarah Carlson", 
+        "team_key": "frc5436"
+      }, 
+      {
+        "awardee": "Allison Hajec", 
+        "team_key": "frc5114"
+      }, 
+      {
+        "awardee": "Morgan Carstensen", 
+        "team_key": "frc4776"
+      }, 
+      {
+        "awardee": "Maxton Herst", 
+        "team_key": "frc3770"
+      }, 
+      {
+        "awardee": "Evie Clare", 
+        "team_key": "frc2959"
+      }, 
+      {
+        "awardee": "Carly Lindquist", 
+        "team_key": "frc6112"
+      }, 
+      {
+        "awardee": "Tanvi Doshi", 
+        "team_key": "frc548"
+      }, 
+      {
+        "awardee": "Khushi Mann", 
+        "team_key": "frc818"
+      }, 
+      {
+        "awardee": "Paige Drob", 
+        "team_key": "frc1718"
+      }, 
+      {
+        "awardee": "Anna Nachazel", 
+        "team_key": "frc33"
+      }, 
+      {
+        "awardee": "Lydia Festian", 
+        "team_key": "frc3357"
+      }, 
+      {
+        "awardee": "Shelby Woods", 
+        "team_key": "frc5860"
+      }, 
+      {
+        "awardee": "Ankith Udupa", 
+        "team_key": "frc503"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 9, 
+    "event_key": "2019micmp", 
+    "name": "Regional Engineering Inspiration Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc3618"
+      }
+    ], 
+    "year": 2019
+  }
+]

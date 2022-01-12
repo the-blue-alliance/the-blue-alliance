@@ -9,10 +9,9 @@ from controllers.backup_controller import TbaCSVBackupTeamsEnqueue
 from controllers.datafeed_controller import TbaVideosGet, TbaVideosEnqueue
 from controllers.datafeed_controller import HallOfFameTeamsGet
 
-from controllers.cron_controller import DistrictPointsCalcEnqueue, DistrictPointsCalcDo, \
+from controllers.cron_controller import \
     MatchTimePredictionsEnqueue, MatchTimePredictionsDo, BlueZoneUpdateDo, SuggestionQueueDailyNag, RemapTeamsDo, \
     RebuildPlayoffAdvancementEnqueue, RebuildPlayoffAdvancementDo
-from controllers.cron_controller import DistrictRankingsCalcEnqueue, DistrictRankingsCalcDo
 from controllers.cron_controller import EventTeamStatusCalcEnqueue, EventTeamStatusCalcDo
 from controllers.cron_controller import EventShortNameCalcEnqueue, EventShortNameCalcDo
 from controllers.cron_controller import EventTeamRepairDo, EventTeamUpdate, EventTeamUpdateEnqueue
@@ -39,10 +38,6 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
                                ('/tasks/get/tba_videos/(.*)', TbaVideosGet),
                                ('/tasks/get/hof_teams', HallOfFameTeamsGet),
-                               ('/tasks/math/enqueue/district_points_calc/([0-9]*)', DistrictPointsCalcEnqueue),
-                               ('/tasks/math/do/district_points_calc/(.*)', DistrictPointsCalcDo),
-                               ('/tasks/math/enqueue/district_rankings_calc/([0-9]*)', DistrictRankingsCalcEnqueue),
-                               ('/tasks/math/do/district_rankings_calc/(.*)', DistrictRankingsCalcDo),
                                ('/tasks/math/enqueue/event_team_status/([0-9]*)', EventTeamStatusCalcEnqueue),
                                ('/tasks/math/do/event_team_status/(.*)', EventTeamStatusCalcDo),
                                ('/tasks/math/enqueue/event_short_name_calc_enqueue/([0-9]*)', EventShortNameCalcEnqueue),

@@ -1,0 +1,306 @@
+[
+  {
+    "award_type": 0, 
+    "event_key": "2019nyny", 
+    "name": "Regional Chairman's Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc1660"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 1, 
+    "event_key": "2019nyny", 
+    "name": "Regional Winners", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc1796"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc694"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc2265"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 10, 
+    "event_key": "2019nyny", 
+    "name": "Rookie All Star Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc7458"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 11, 
+    "event_key": "2019nyny", 
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc4571"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 13, 
+    "event_key": "2019nyny", 
+    "name": "Judges' Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc6873"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 14, 
+    "event_key": "2019nyny", 
+    "name": "Highest Rookie Seed", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc7522"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 15, 
+    "event_key": "2019nyny", 
+    "name": "Rookie Inspiration Award sponsored by National Instruments", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc7522"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 16, 
+    "event_key": "2019nyny", 
+    "name": "Industrial Design Award sponsored by General Motors", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc4122"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 17, 
+    "event_key": "2019nyny", 
+    "name": "Quality Award sponsored by Motorola Solutions Foundation", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc333"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 18, 
+    "event_key": "2019nyny", 
+    "name": "Safety Award sponsored by Underwriters Laboratories", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc4571"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 2, 
+    "event_key": "2019nyny", 
+    "name": "Regional Finalists", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc4122"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc1155"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc2869"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 20, 
+    "event_key": "2019nyny", 
+    "name": "Creativity Award sponsored by Xerox", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc694"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 21, 
+    "event_key": "2019nyny", 
+    "name": "Excellence in Engineering Award sponsored by Delphi", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc334"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 22, 
+    "event_key": "2019nyny", 
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc2265"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 27, 
+    "event_key": "2019nyny", 
+    "name": "Imagery Award in honor of Jack Kamen", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc3204"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 29, 
+    "event_key": "2019nyny", 
+    "name": "Innovation in Control Award sponsored by Rockwell Automation", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc3419"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 3, 
+    "event_key": "2019nyny", 
+    "name": "Woodie Flowers Finalist Award", 
+    "recipient_list": [
+      {
+        "awardee": "Gary Israel", 
+        "team_key": "frc395"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 30, 
+    "event_key": "2019nyny", 
+    "name": "Team Spirit Award sponsored by FCA Foundation", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc1155"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 4, 
+    "event_key": "2019nyny", 
+    "name": "FIRST Dean's List Finalist Award", 
+    "recipient_list": [
+      {
+        "awardee": "Jayer Yang", 
+        "team_key": "frc5806"
+      }, 
+      {
+        "awardee": "Nazifa Prapti", 
+        "team_key": "frc5599"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 5, 
+    "event_key": "2019nyny", 
+    "name": "Volunteer of the Year", 
+    "recipient_list": [
+      {
+        "awardee": "Mark  McLeod", 
+        "team_key": null
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 68, 
+    "event_key": "2019nyny", 
+    "name": "Wildcard", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc4122"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc1155"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc2869"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 71, 
+    "event_key": "2019nyny", 
+    "name": "Autonomous Award sponsored by Ford", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc395"
+      }
+    ], 
+    "year": 2019
+  }, 
+  {
+    "award_type": 9, 
+    "event_key": "2019nyny", 
+    "name": "Regional Engineering Inspiration Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc1796"
+      }
+    ], 
+    "year": 2019
+  }
+]

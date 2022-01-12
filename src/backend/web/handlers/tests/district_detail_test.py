@@ -203,6 +203,7 @@ def test_district_detail_rankings(
             event_points=[
                 TeamAtEventDistrictPoints(
                     event_key=f"{year}event1",
+                    district_cmp=False,
                     qual_points=22,
                     elim_points=30,
                     alliance_points=16,
