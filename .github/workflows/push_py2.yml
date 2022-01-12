@@ -176,10 +176,6 @@ jobs:
         run: gcloud app deploy index.yaml --version prod-2 --quiet
       - name: Deploy queue.yaml
         run: gcloud app deploy queue.yaml --version prod-2 --quiet
-      - name: Overwrite YAMLs with skeleton deploy
-        run: |
-          mv -f ./ops/standalone/cron-skeleton.yaml ./cron.yaml
-          mv -f ./ops/standalone/dispatch-empty.yaml ./dispatch.yaml
       - name: Deploy cron.yaml
         run: gcloud app deploy cron.yaml --version prod-2 --quiet
       - name: Deploy dispatch.yaml
