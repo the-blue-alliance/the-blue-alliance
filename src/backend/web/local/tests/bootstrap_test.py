@@ -16,6 +16,7 @@ from backend.common.models.award import Award
 from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
+from backend.common.models.event_predictions import EventPredictions
 from backend.common.models.event_ranking import EventRanking
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey, MatchKey, TeamKey, TeamNumber
@@ -204,6 +205,18 @@ def mock_event_awards_url(
     )
 
 
+def mock_event_predictions_url(
+    m: RequestsMocker, event_key: EventKey, predictions: EventPredictions
+) -> None:
+    m.register_uri(
+        "GET",
+        f"https://www.thebluealliance.com/api/v3/event/{event_key}/predictions",
+        headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
+        json=predictions,
+    )
+
+
 def test_bootstrap_unknown_key() -> None:
     resp = LocalDataBootstrap.bootstrap_key("asdf", "asdf")
     assert resp is None
@@ -263,6 +276,7 @@ def test_bootstrap_event(ndb_context, requests_mock: RequestsMocker) -> None:
     mock_event_rankings_url(requests_mock, event.key_name, rankings)
     mock_event_alliances_url(requests_mock, event.key_name, alliances)
     mock_event_awards_url(requests_mock, event.key_name, [award])
+    mock_event_predictions_url(requests_mock, event.key_name, {})
 
     resp = LocalDataBootstrap.bootstrap_key("2020nyny", "test_apiv3")
     assert resp == "/event/2020nyny"
@@ -293,6 +307,7 @@ def test_bootstrap_event(ndb_context, requests_mock: RequestsMocker) -> None:
         id="2020nyny",
         rankings2=rankings,
         alliance_selections=alliances,
+        predictions={},
     )
     assert expected_details == remove_auto_add_properties(stored_details)
 
@@ -318,6 +333,7 @@ def test_bootstrap_event_with_district(
     mock_event_rankings_url(requests_mock, event.key_name, [])
     mock_event_alliances_url(requests_mock, event.key_name, [])
     mock_event_awards_url(requests_mock, event.key_name, [])
+    mock_event_predictions_url(requests_mock, event.key_name, {})
 
     resp = LocalDataBootstrap.bootstrap_key("2020nyny", "test_apiv3")
     assert resp == "/event/2020nyny"

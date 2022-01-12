@@ -174,6 +174,18 @@ def setup_full_event(test_data_importer):
 
 
 @pytest.fixture
+def setup_event_preductions(test_data_importer):
+    # So we can import different event keys, return a function
+
+    def import_event(event_key) -> None:
+        test_data_importer.import_event_predictions(
+            __file__, f"tests/data/{event_key}_predictions.json", event_key
+        )
+
+    return import_event
+
+
+@pytest.fixture
 def setup_full_match(test_data_importer):
     def import_match(match_key) -> None:
         event_key = match_key.split("_")[0]

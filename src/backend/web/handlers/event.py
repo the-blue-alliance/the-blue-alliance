@@ -1,4 +1,5 @@
 import collections
+import json
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -8,6 +9,8 @@ from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
 
 from backend.common.consts import comp_level, playoff_type
+from backend.common.consts.alliance_color import AllianceColor
+from backend.common.consts.comp_level import COMP_LEVELS, CompLevel
 from backend.common.decorators import cached_public
 from backend.common.flask_cache import make_cached_response
 from backend.common.helpers.award_helper import AwardHelper
@@ -20,6 +23,7 @@ from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.team_helper import TeamHelper
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, Year
+from backend.common.models.match import Match
 from backend.common.queries import district_query, event_query, media_query
 from backend.web.profiled_render import render_template
 
@@ -244,5 +248,102 @@ def event_detail(event_key: EventKey) -> Response:
 
     return make_cached_response(
         render_template("event_details.html", template_values),
+        ttl=timedelta(seconds=61) if event.within_a_day else timedelta(days=1),
+    )
+
+
+@cached_public
+def event_insights(event_key: EventKey) -> Response:
+    event: Optional[Event] = event_query.EventQuery(event_key).fetch()
+
+    if not event or event.year < 2016:
+        abort(404)
+
+    event.get_matches_async()
+
+    event_details = event.details
+    event_predictions = event_details.predictions if event_details else None
+    if not event_details or not event_predictions:
+        abort(404)
+
+    match_predictions = event_predictions.get("match_predictions", None)
+    match_prediction_stats = event_predictions.get("match_prediction_stats", None)
+
+    ranking_predictions = event_predictions.get("ranking_predictions", None)
+    ranking_prediction_stats = event_predictions.get("ranking_prediction_stats", None)
+
+    cleaned_matches, _keys_to_delete = MatchHelper.delete_invalid_matches(
+        event.matches, event
+    )
+    _count, matches = MatchHelper.organized_matches(cleaned_matches)
+
+    # If no matches but there are match predictions, create fake matches
+    # For cases where FIRST doesn't allow posting of match schedule
+    fake_matches = False
+    if match_predictions and (not matches[CompLevel.QM] and match_predictions["qual"]):
+        fake_matches = True
+        for i in range(len(match_predictions["qual"].keys())):
+            match_number = i + 1
+            alliances = {
+                "red": {"score": -1, "teams": ["frc?", "frc?", "frc?"]},
+                "blue": {"score": -1, "teams": ["frc?", "frc?", "frc?"]},
+            }
+            matches[CompLevel.QM].append(
+                Match(
+                    id=Match.renderKeyName(event_key, CompLevel.QM, 1, match_number),
+                    event=event.key,
+                    year=event.year,
+                    set_number=1,
+                    match_number=match_number,
+                    comp_level=CompLevel.QM,
+                    alliances_json=json.dumps(alliances),
+                )
+            )
+
+    # Add actual scores to predictions
+    distribution_info = {}
+    for cmp_level in COMP_LEVELS:
+        level = "qual" if cmp_level == CompLevel.QM else "playoff"
+        for match in matches[cmp_level]:
+            distribution_info[match.key_name] = {
+                "level": level,
+                "red_actual_score": match.alliances[AllianceColor.RED]["score"],
+                "blue_actual_score": match.alliances[AllianceColor.BLUE]["score"],
+                "red_mean": match_predictions[level][match.key_name]["red"]["score"]
+                if match_predictions
+                else 0,
+                "blue_mean": match_predictions[level][match.key_name]["blue"]["score"]
+                if match_predictions
+                else 0,
+                "red_var": match_predictions[level][match.key_name]["red"]["score_var"]
+                if match_predictions
+                else 0,
+                "blue_var": match_predictions[level][match.key_name]["blue"][
+                    "score_var"
+                ]
+                if match_predictions
+                else 0,
+            }
+
+    last_played_match_num = None
+    if ranking_prediction_stats:
+        last_played_match_key = ranking_prediction_stats.get("last_played_match", None)
+        if last_played_match_key:
+            last_played_match_num = last_played_match_key.split("_qm")[1]
+
+    template_values = {
+        "event": event,
+        "matches": matches,
+        "fake_matches": fake_matches,
+        "match_predictions": match_predictions,
+        "distribution_info_json": json.dumps(distribution_info),
+        "match_prediction_stats": match_prediction_stats,
+        "ranking_predictions": ranking_predictions,
+        "ranking_prediction_stats": ranking_prediction_stats,
+        "last_played_match_num": last_played_match_num,
+    }
+
+    return make_cached_response(
+        render_template("event_insights.html", template_values),
         ttl=timedelta(seconds=61) if event.within_a_day else timedelta(days=1),
     )
