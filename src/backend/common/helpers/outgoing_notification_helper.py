@@ -48,6 +48,6 @@ class OutgoingNotificationHelper(object):
                 }
             )
 
-        response = requests.post(webhook_url, data={"payload": post_dict})
+        response = requests.post(webhook_url, data=post_dict)
         response.raise_for_status()
         logging.info("Response from slack webhook {}".format(response.text))
