@@ -11,7 +11,7 @@
       {% include "index_partials/index_lhc.html" %}
     </div>
     <div class="col-sm-7 col-lg-8">
-      <!-- {% if seasonstart_datetime_utc %}
+      {% if seasonstart_datetime_utc %}
       <h2>
         <div id="countdown-finish-time">{{seasonstart_datetime_utc|isoformat}}</div>
         <span class="countdown-number countdown-days">--</span><span class="countdown-label day-label"> Days </span>
@@ -19,7 +19,7 @@
        <br>
        <small>Official events start on {{seasonstart_datetime_utc|strftime("%B %-d%t")}}</small>
      </h2>
-     {% endif %} -->
+     {% endif %}
       <div class="btn-group game-manual">
         <a class="btn btn-default" href="http://www.firstinspires.org/resource-library/frc/competition-manual-qa-system" target="_blank" rel="noopener noreferrer"><span class="glyphicon glyphicon-file"></span> {{game_name}} Game Manual and Materials</a>
       </div>
