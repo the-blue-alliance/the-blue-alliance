@@ -37,17 +37,27 @@ def event_details_post_update_hook(
 ) -> None:
     for updated_model in updated_models:
         # Enqueue task to calculate district points
+        event_key = updated_model.model.key_name
         try:
             taskqueue.add(
-                url=f"/tasks/math/do/district_points_calc/{updated_model.model.key_name}",
+                url=f"/tasks/math/do/district_points_calc/{event_key}",
                 method="GET",
                 target="py3-tasks-io",
                 queue_name="default",
             )
         except Exception:
-            logging.exception(
-                f"Error enqueuing district_points_calc for {updated_model.model.key_name}"
+            logging.exception(f"Error enqueuing district_points_calc for {event_key}")
+
+        # Enqueue task to calculate event team status
+        try:
+            taskqueue.add(
+                url=f"/tasks/math/do/event_team_status/{event_key}",
+                method="GET",
+                target="py3-tasks-io",
+                queue_name="default",
             )
+        except Exception:
+            logging.exception(f"Error enqueuing event_team_status for {event_key}")
 
 
 """ndb
@@ -69,15 +79,6 @@ def event_details_post_update_hook(
                 except Exception:
                     logging.error("Error sending alliance update notification for {}".format(event.key_name))
                     logging.error(traceback.format_exc())
-
-            # Enqueue task to calculate event team status
-            try:
-                taskqueue.add(
-                    url='/tasks/math/do/event_team_status/{}'.format(event.key.id()),
-                    method='GET')
-            except Exception:
-                logging.error("Error enqueuing event_team_status for {}".format(event.key.id()))
-                logging.error(traceback.format_exc())
 
             try:
                 FirebasePusher.update_event_details(event_details)

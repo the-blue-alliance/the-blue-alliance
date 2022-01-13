@@ -72,17 +72,27 @@ class MatchPostUpdateHooks:
     @staticmethod
     def enqueue_stats(model: TUpdatedModel[Match]) -> None:
         # Enqueue task to calculate district points
+        event_key = model.model.key_name
         try:
             taskqueue.add(
-                url=f"/tasks/math/do/district_points_calc/{model.model.key_name}",
+                url=f"/tasks/math/do/district_points_calc/{event_key}",
                 method="GET",
                 target="py3-tasks-io",
                 queue_name="default",
             )
         except Exception:
-            logging.exception(
-                f"Error enqueuing district_points_calc for {model.model.key_name}"
+            logging.exception(f"Error enqueuing district_points_calc for {event_key}")
+
+        # Enqueue task to calculate event team status
+        try:
+            taskqueue.add(
+                url=f"/tasks/math/do/event_team_status/{event_key}",
+                method="GET",
+                target="py3-tasks-io",
+                queue_name="default",
             )
+        except Exception:
+            logging.exception(f"Error enqueuing event_team_status for {event_key}")
 
 
 """
@@ -171,15 +181,6 @@ class MatchPostUpdateHooks:
                     method='GET')
             except Exception:
                 logging.error("Error enqueuing event_matchstats for {}".format(event_key))
-                logging.error(traceback.format_exc())
-
-            # Enqueue task to calculate event team status
-            try:
-                taskqueue.add(
-                    url='/tasks/math/do/event_team_status/{}'.format(event_key),
-                    method='GET')
-            except Exception:
-                logging.error("Error enqueuing event_team_status for {}".format(event_key))
                 logging.error(traceback.format_exc())
 
             # Enqueue updating playoff advancement
