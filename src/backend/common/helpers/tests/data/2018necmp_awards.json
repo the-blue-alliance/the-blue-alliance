@@ -1,0 +1,306 @@
+[
+  {
+    "award_type": 0, 
+    "event_key": "2018necmp", 
+    "name": "Regional Chairman's Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc78"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc125"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc467"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc5962"
+      }
+    ], 
+    "year": 2018
+  }, 
+  {
+    "award_type": 1, 
+    "event_key": "2018necmp", 
+    "name": "District Championship Winner", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc195"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc319"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc5846"
+      }
+    ], 
+    "year": 2018
+  }, 
+  {
+    "award_type": 10, 
+    "event_key": "2018necmp", 
+    "name": "District Championship Rookie All Star Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc7127"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc7153"
+      }
+    ], 
+    "year": 2018
+  }, 
+  {
+    "award_type": 11, 
+    "event_key": "2018necmp", 
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc1058"
+      }
+    ], 
+    "year": 2018
+  }, 
+  {
+    "award_type": 13, 
+    "event_key": "2018necmp", 
+    "name": "Judges' Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc6328"
+      }
+    ], 
+    "year": 2018
+  }, 
+  {
+    "award_type": 14, 
+    "event_key": "2018necmp", 
+    "name": "Highest Rookie Seed", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc7127"
+      }
+    ], 
+    "year": 2018
+  }, 
+  {
+    "award_type": 15, 
+    "event_key": "2018necmp", 
+    "name": "Rookie Inspiration Award sponsored by National Instruments", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc6933"
+      }
+    ], 
+    "year": 2018
+  }, 
+  {
+    "award_type": 16, 
+    "event_key": "2018necmp", 
+    "name": "Industrial Design Award sponsored by General Motors", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc195"
+      }
+    ], 
+    "year": 2018
+  }, 
+  {
+    "award_type": 17, 
+    "event_key": "2018necmp", 
+    "name": "Quality Award sponsored by Motorola Solutions Foundation", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc319"
+      }
+    ], 
+    "year": 2018
+  }, 
+  {
+    "award_type": 18, 
+    "event_key": "2018necmp", 
+    "name": "Safety Award sponsored by Underwriters Laboratories", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc1073"
+      }
+    ], 
+    "year": 2018
+  }, 
+  {
+    "award_type": 2, 
+    "event_key": "2018necmp", 
+    "name": "District Championship Finalist", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc177"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc176"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc78"
+      }
+    ], 
+    "year": 2018
+  }, 
+  {
+    "award_type": 20, 
+    "event_key": "2018necmp", 
+    "name": "Creativity Award sponsored by Xerox", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc1519"
+      }
+    ], 
+    "year": 2018
+  }, 
+  {
+    "award_type": 21, 
+    "event_key": "2018necmp", 
+    "name": "Excellence in Engineering Award sponsored by Delphi", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc61"
+      }
+    ], 
+    "year": 2018
+  }, 
+  {
+    "award_type": 22, 
+    "event_key": "2018necmp", 
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc558"
+      }
+    ], 
+    "year": 2018
+  }, 
+  {
+    "award_type": 27, 
+    "event_key": "2018necmp", 
+    "name": "Imagery Award in honor of Jack Kamen", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc4557"
+      }
+    ], 
+    "year": 2018
+  }, 
+  {
+    "award_type": 29, 
+    "event_key": "2018necmp", 
+    "name": "Innovation in Control Award sponsored by Rockwell Automation", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc230"
+      }
+    ], 
+    "year": 2018
+  }, 
+  {
+    "award_type": 3, 
+    "event_key": "2018necmp", 
+    "name": "Woodie Flowers Finalist Award", 
+    "recipient_list": [
+      {
+        "awardee": "Diane van der Grinten", 
+        "team_key": "frc2067"
+      }
+    ], 
+    "year": 2018
+  }, 
+  {
+    "award_type": 30, 
+    "event_key": "2018necmp", 
+    "name": "Team Spirit Award sponsored by FCA Foundation", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc1071"
+      }
+    ], 
+    "year": 2018
+  }, 
+  {
+    "award_type": 4, 
+    "event_key": "2018necmp", 
+    "name": "FIRST Dean's List Finalist Award", 
+    "recipient_list": [
+      {
+        "awardee": "David Walsh", 
+        "team_key": "frc5494"
+      }, 
+      {
+        "awardee": "Lawrence Tseng", 
+        "team_key": "frc1757"
+      }, 
+      {
+        "awardee": "Neal Miller", 
+        "team_key": "frc1831"
+      }, 
+      {
+        "awardee": "Nealkanth Patel", 
+        "team_key": "frc3719"
+      }, 
+      {
+        "awardee": "Zoe Vittum", 
+        "team_key": "frc4564"
+      }
+    ], 
+    "year": 2018
+  }, 
+  {
+    "award_type": 5, 
+    "event_key": "2018necmp", 
+    "name": "Volunteer of the Year", 
+    "recipient_list": [
+      {
+        "awardee": "Kyle Henry", 
+        "team_key": null
+      }
+    ], 
+    "year": 2018
+  }, 
+  {
+    "award_type": 9, 
+    "event_key": "2018necmp", 
+    "name": "Regional Engineering Inspiration Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc5422"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc2067"
+      }
+    ], 
+    "year": 2018
+  }
+]

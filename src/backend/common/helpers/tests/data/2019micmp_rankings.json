@@ -1,0 +1,26 @@
+{
+  "extra_stats_info": [], 
+  "rankings": [], 
+  "sort_order_info": [
+    {
+      "name": "Ranking Score", 
+      "precision": 2
+    }, 
+    {
+      "name": "Cargo", 
+      "precision": 0
+    }, 
+    {
+      "name": "Hatch Panel", 
+      "precision": 0
+    }, 
+    {
+      "name": "HAB Climb", 
+      "precision": 0
+    }, 
+    {
+      "name": "Sandstorm Bonus", 
+      "precision": 0
+    }
+  ]
+}

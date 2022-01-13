@@ -81,6 +81,26 @@ class JsonDataImporter(object):
         detail.predictions = data
         detail.put()
 
+    def import_event_district_points(
+        self, base_path: str, path: str, event_key: EventKey
+    ) -> None:
+        with open(self._get_path(base_path, path), "r") as f:
+            data = json.load(f)
+
+        detail = EventDetails.get_or_insert(event_key)
+        detail.district_points = data
+        detail.put()
+
+    def import_event_rankings(
+        self, base_path: str, path: str, event_key: EventKey
+    ) -> None:
+        with open(self._get_path(base_path, path), "r") as f:
+            data = json.load(f)
+
+        detail = EventDetails.get_or_insert(event_key)
+        detail.rankings2 = data["rankings"]
+        detail.put()
+
     def import_event_teams(
         self, base_path: str, path: str, event_key: EventKey
     ) -> None:

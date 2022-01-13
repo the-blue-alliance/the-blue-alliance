@@ -1,0 +1,294 @@
+[
+  {
+    "award_type": 0, 
+    "event_key": "2015micmp", 
+    "name": "Regional Chairman's Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc68"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc503"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc2137"
+      }
+    ], 
+    "year": 2015
+  }, 
+  {
+    "award_type": 1, 
+    "event_key": "2015micmp", 
+    "name": "District Championship Winner", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc1023"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc548"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc1711"
+      }
+    ], 
+    "year": 2015
+  }, 
+  {
+    "award_type": 10, 
+    "event_key": "2015micmp", 
+    "name": "District Championship Rookie All Star Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc5498"
+      }
+    ], 
+    "year": 2015
+  }, 
+  {
+    "award_type": 11, 
+    "event_key": "2015micmp", 
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc5046"
+      }
+    ], 
+    "year": 2015
+  }, 
+  {
+    "award_type": 13, 
+    "event_key": "2015micmp", 
+    "name": "Judges' Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc4130"
+      }
+    ], 
+    "year": 2015
+  }, 
+  {
+    "award_type": 14, 
+    "event_key": "2015micmp", 
+    "name": "Highest Rookie Seed", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc5603"
+      }
+    ], 
+    "year": 2015
+  }, 
+  {
+    "award_type": 15, 
+    "event_key": "2015micmp", 
+    "name": "Rookie Inspiration Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc5460"
+      }
+    ], 
+    "year": 2015
+  }, 
+  {
+    "award_type": 16, 
+    "event_key": "2015micmp", 
+    "name": "Industrial Design Award sponsored by General Motors", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc2337"
+      }
+    ], 
+    "year": 2015
+  }, 
+  {
+    "award_type": 17, 
+    "event_key": "2015micmp", 
+    "name": "Quality Award sponsored by Motorola", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc4384"
+      }
+    ], 
+    "year": 2015
+  }, 
+  {
+    "award_type": 18, 
+    "event_key": "2015micmp", 
+    "name": "Industrial Safety Award sponsored by Underwriters Laboratories", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc5114"
+      }
+    ], 
+    "year": 2015
+  }, 
+  {
+    "award_type": 2, 
+    "event_key": "2015micmp", 
+    "name": "District Championship Finalist", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc573"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc27"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc3098"
+      }
+    ], 
+    "year": 2015
+  }, 
+  {
+    "award_type": 20, 
+    "event_key": "2015micmp", 
+    "name": "Creativity Award sponsored by Xerox", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc2834"
+      }
+    ], 
+    "year": 2015
+  }, 
+  {
+    "award_type": 21, 
+    "event_key": "2015micmp", 
+    "name": "Excellence in Engineering Award sponsored by Delphi", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc548"
+      }
+    ], 
+    "year": 2015
+  }, 
+  {
+    "award_type": 22, 
+    "event_key": "2015micmp", 
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc27"
+      }
+    ], 
+    "year": 2015
+  }, 
+  {
+    "award_type": 27, 
+    "event_key": "2015micmp", 
+    "name": "Imagery Award in honor of Jack Kamen", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc2767"
+      }
+    ], 
+    "year": 2015
+  }, 
+  {
+    "award_type": 29, 
+    "event_key": "2015micmp", 
+    "name": "Innovation in Control Award sponsored by Rockwell Automation", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc123"
+      }
+    ], 
+    "year": 2015
+  }, 
+  {
+    "award_type": 3, 
+    "event_key": "2015micmp", 
+    "name": "Woodie Flowers Finalist Award", 
+    "recipient_list": [
+      {
+        "awardee": "Bob Bonczyk", 
+        "team_key": "frc107"
+      }
+    ], 
+    "year": 2015
+  }, 
+  {
+    "award_type": 30, 
+    "event_key": "2015micmp", 
+    "name": "Team Spirit Award sponsored by Chrysler", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc217"
+      }
+    ], 
+    "year": 2015
+  }, 
+  {
+    "award_type": 4, 
+    "event_key": "2015micmp", 
+    "name": "FIRST Dean's List Finalist Award", 
+    "recipient_list": [
+      {
+        "awardee": "Diana Marsala", 
+        "team_key": "frc27"
+      }, 
+      {
+        "awardee": "David Earle", 
+        "team_key": "frc830"
+      }, 
+      {
+        "awardee": "Alyssa Garcia", 
+        "team_key": "frc1684"
+      }, 
+      {
+        "awardee": "Natalie Wieber", 
+        "team_key": "frc1718"
+      }, 
+      {
+        "awardee": "Kirsten Ewald", 
+        "team_key": "frc2137"
+      }, 
+      {
+        "awardee": "Michelle Lester", 
+        "team_key": "frc2959"
+      }, 
+      {
+        "awardee": "Ethan Novilla", 
+        "team_key": "frc3641"
+      }, 
+      {
+        "awardee": "Rae Peterson", 
+        "team_key": "frc4779"
+      }
+    ], 
+    "year": 2015
+  }, 
+  {
+    "award_type": 9, 
+    "event_key": "2015micmp", 
+    "name": "Regional Engineering Inspiration Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc1718"
+      }
+    ], 
+    "year": 2015
+  }
+]

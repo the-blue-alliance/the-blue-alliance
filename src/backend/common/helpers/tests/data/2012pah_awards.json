@@ -1,0 +1,258 @@
+[
+  {
+    "award_type": 0, 
+    "event_key": "2012pah", 
+    "name": "Regional Chairman's Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc1218"
+      }
+    ], 
+    "year": 2012
+  }, 
+  {
+    "award_type": 1, 
+    "event_key": "2012pah", 
+    "name": "Regional Winners", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc1218"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc341"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc1640"
+      }
+    ], 
+    "year": 2012
+  }, 
+  {
+    "award_type": 10, 
+    "event_key": "2012pah", 
+    "name": "Rookie All Star Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc4342"
+      }
+    ], 
+    "year": 2012
+  }, 
+  {
+    "award_type": 11, 
+    "event_key": "2012pah", 
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc714"
+      }
+    ], 
+    "year": 2012
+  }, 
+  {
+    "award_type": 12, 
+    "event_key": "2012pah", 
+    "name": "Coopertition Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc4342"
+      }
+    ], 
+    "year": 2012
+  }, 
+  {
+    "award_type": 13, 
+    "event_key": "2012pah", 
+    "name": "Judges' Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc4361"
+      }
+    ], 
+    "year": 2012
+  }, 
+  {
+    "award_type": 14, 
+    "event_key": "2012pah", 
+    "name": "Highest Rookie Seed", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc4373"
+      }
+    ], 
+    "year": 2012
+  }, 
+  {
+    "award_type": 15, 
+    "event_key": "2012pah", 
+    "name": "Rookie Inspiration Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc4285"
+      }
+    ], 
+    "year": 2012
+  }, 
+  {
+    "award_type": 16, 
+    "event_key": "2012pah", 
+    "name": "Industrial Design Award sponsored by General Motors", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc341"
+      }
+    ], 
+    "year": 2012
+  }, 
+  {
+    "award_type": 17, 
+    "event_key": "2012pah", 
+    "name": "Quality Award sponsored by Motorola", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc2016"
+      }
+    ], 
+    "year": 2012
+  }, 
+  {
+    "award_type": 18, 
+    "event_key": "2012pah", 
+    "name": "Industrial Safety Award sponsored by Underwriters Laboratories", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc709"
+      }
+    ], 
+    "year": 2012
+  }, 
+  {
+    "award_type": 2, 
+    "event_key": "2012pah", 
+    "name": "Regional Finalists", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc357"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc2016"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc708"
+      }
+    ], 
+    "year": 2012
+  }, 
+  {
+    "award_type": 20, 
+    "event_key": "2012pah", 
+    "name": "Creativity Award sponsored by Xerox", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc869"
+      }
+    ], 
+    "year": 2012
+  }, 
+  {
+    "award_type": 21, 
+    "event_key": "2012pah", 
+    "name": "Engineering Excellence Award sponsored by Delphi", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc1218"
+      }
+    ], 
+    "year": 2012
+  }, 
+  {
+    "award_type": 22, 
+    "event_key": "2012pah", 
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc2590"
+      }
+    ], 
+    "year": 2012
+  }, 
+  {
+    "award_type": 27, 
+    "event_key": "2012pah", 
+    "name": "Imagery Award in honor of Jack Kamen", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc357"
+      }
+    ], 
+    "year": 2012
+  }, 
+  {
+    "award_type": 29, 
+    "event_key": "2012pah", 
+    "name": "Innovation in Control Award sponsored by Rockwell Automation", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc1647"
+      }
+    ], 
+    "year": 2012
+  }, 
+  {
+    "award_type": 30, 
+    "event_key": "2012pah", 
+    "name": "Team Spirit Award sponsored by Chrysler", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc1811"
+      }
+    ], 
+    "year": 2012
+  }, 
+  {
+    "award_type": 31, 
+    "event_key": "2012pah", 
+    "name": "Website Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc708"
+      }
+    ], 
+    "year": 2012
+  }, 
+  {
+    "award_type": 9, 
+    "event_key": "2012pah", 
+    "name": "Engineering Inspiration Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc1923"
+      }
+    ], 
+    "year": 2012
+  }
+]

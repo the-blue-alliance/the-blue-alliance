@@ -219,6 +219,7 @@ def test_event_details(ndb_stub, api_client: Client) -> None:
         points={
             "frc254": TeamAtEventDistrictPoints(
                 event_key="2019casj",
+                district_cmp=False,
                 qual_points=10,
                 elim_points=20,
                 alliance_points=10,
