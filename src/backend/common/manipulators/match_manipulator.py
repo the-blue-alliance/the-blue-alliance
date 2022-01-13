@@ -1,6 +1,8 @@
 import logging
 from typing import List
 
+from google.appengine.api import taskqueue
+
 from backend.common.cache_clearing import get_affected_queries
 from backend.common.helpers.firebase_pusher import FirebasePusher
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
@@ -48,6 +50,7 @@ def match_post_delete_hook(deleted_models: List[Match]) -> None:
 def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
     for updated_model in updated_models:
         MatchPostUpdateHooks.firebase_update(updated_model)
+        MatchPostUpdateHooks.enqueue_stats(updated_model)
 
 
 class MatchPostUpdateHooks:
@@ -65,6 +68,21 @@ class MatchPostUpdateHooks:
             FirebasePusher.update_match(model.model, model.updated_attrs)
         except Exception:
             logging.exception("Firebase update_match failed!")
+
+    @staticmethod
+    def enqueue_stats(model: TUpdatedModel[Match]) -> None:
+        # Enqueue task to calculate district points
+        try:
+            taskqueue.add(
+                url=f"/tasks/math/do/district_points_calc/{model.model.key_name}",
+                method="GET",
+                target="py3-tasks-io",
+                queue_name="default",
+            )
+        except Exception:
+            logging.exception(
+                f"Error enqueuing district_points_calc for {model.model.key_name}"
+            )
 
 
 """
@@ -153,15 +171,6 @@ class MatchPostUpdateHooks:
                     method='GET')
             except Exception:
                 logging.error("Error enqueuing event_matchstats for {}".format(event_key))
-                logging.error(traceback.format_exc())
-
-            # Enqueue task to calculate district points
-            try:
-                taskqueue.add(
-                    url='/tasks/math/do/district_points_calc/{}'.format(event_key),
-                    method='GET')
-            except Exception:
-                logging.error("Error enqueuing district_points_calc for {}".format(event_key))
                 logging.error(traceback.format_exc())
 
             # Enqueue task to calculate event team status
