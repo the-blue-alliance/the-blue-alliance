@@ -15,7 +15,7 @@ from controllers.apiai_controller import APIAIHandler
 from controllers.apidocs_controller import AddDataHandler, ApiV3DocumentationHandler, \
       ApiV2DocumentationHandler, ApiTrustedDocumentationHandler, WebhookDocumentationHandler, \
       ApiDocumentationOverviewHandler
-from controllers.event_controller import EventList, EventDetail, EventInsights, EventRss, \
+from controllers.event_controller import EventList, EventDetail, EventRss, \
       EventNextMatchHandler
 from controllers.event_wizard_controller import EventWizardHandler, ReactEventWizardHandler
 from controllers.gameday_controller import Gameday2Controller, GamedayHandler, GamedayRedirectHandler
@@ -91,7 +91,6 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/brand', BrandHandler, 'brand', strict_slash=True),
       RedirectRoute(r'/contact', ContactHandler, 'contact', strict_slash=True),
       RedirectRoute(r'/event/<event_key>', EventDetail, 'event-detail', strict_slash=True),
-      RedirectRoute(r'/event/<event_key>/insights', EventInsights, 'event-insights', strict_slash=True),
       RedirectRoute(r'/event/<event_key>/feed', EventRss, 'event-rss', strict_slash=True),
       RedirectRoute(r'/event/<event_key>/nextmatch', EventNextMatchHandler, 'nextmatch', strict_slash=True),
       RedirectRoute(r'/events/<year:[0-9]+>', EventList, 'event-list-year', strict_slash=True),

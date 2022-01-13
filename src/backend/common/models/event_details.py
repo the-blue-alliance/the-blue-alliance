@@ -42,7 +42,9 @@ class EventDetails(CachedModel):
         EventMatchstats, ndb.JsonProperty()
     )  # for OPR, DPR, CCWM, etc.
     insights: EventInsights = safe_cast(EventInsights, ndb.JsonProperty())
-    predictions: EventPredictions = safe_cast(EventPredictions, ndb.JsonProperty())
+    predictions: Optional[EventPredictions] = safe_cast(
+        EventPredictions, ndb.JsonProperty()
+    )
     rankings = ndb.JsonProperty()  # deprecated
     rankings2: List[EventRanking] = ndb.JsonProperty()
 
