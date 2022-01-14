@@ -17,7 +17,7 @@
     "query-string": "^7.1.0",
     "react": "^17.0.2",
     "react-addons-transition-group": "^15.4.1",
-    "react-bootstrap": "^2.1.0",
+    "react-bootstrap": "^2.1.1",
     "react-bootstrap-dialog": "^0.13.0",
     "react-bootstrap-typeahead": "^5.2.1",
     "react-countup": "^6.1.0",
