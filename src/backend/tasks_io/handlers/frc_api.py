@@ -207,7 +207,7 @@ def enqueue_event_list(year: Optional[Year]) -> Response:
             method="GET",
         )
 
-    template_values = {"year": year, "event_count": year}
+    template_values = {"years": years}
 
     if (
         "X-Appengine-Taskname" not in request.headers
