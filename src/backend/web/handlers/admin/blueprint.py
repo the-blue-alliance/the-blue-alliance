@@ -9,6 +9,11 @@ from backend.web.handlers.admin.sitevars import (
     sitevar_edit_post,
     sitevars_list,
 )
+from backend.web.handlers.admin.team import (
+    team_detail,
+    team_list,
+    team_robot_name_update,
+)
 from backend.web.profiled_render import render_template
 
 
@@ -47,3 +52,10 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/sitevar/edit/<sitevar_key>", view_func=sitevar_edit_post, methods=["POST"]
 )
+admin_routes.add_url_rule("/teams", view_func=team_list)
+admin_routes.add_url_rule("/teams/<int:page_num>", view_func=team_list)
+admin_routes.add_url_rule("/team/<int:team_number>", view_func=team_detail)
+admin_routes.add_url_rule(
+    "/team/set_robot_name", view_func=team_robot_name_update, methods=["POST"]
+)
+# admin_routes.add_url_rule("/team/<int:team_number>", view_func=team_detail)

@@ -141,6 +141,10 @@ def sort_by(values, prop):
     return sorted(values, key=lambda item: getattr(item, prop))
 
 
+def get_item(dictionary, key):
+    return dictionary.get(key)
+
+
 _filters = {
     "strftime": strftime,
     "floatformat": floatformat,
@@ -153,6 +157,7 @@ _filters = {
     "defense_name": defense_name,
     "match_short": match_short,
     "sort_by": sort_by,
+    "get_item": get_item,
 }
 
 
