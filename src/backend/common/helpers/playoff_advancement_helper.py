@@ -29,6 +29,10 @@ from backend.common.models.keys import TeamKey, TeamNumber, Year
 
 
 class PlayoffAdvancement(NamedTuple):
+    """
+    This is the output of this file's computation
+    """
+
     bracket_table: Any
     playoff_advancement: Any
     double_elim_matches: Optional[TOrganizedDoubleElimMatches]

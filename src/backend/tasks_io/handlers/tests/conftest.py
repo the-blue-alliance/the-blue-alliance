@@ -9,14 +9,22 @@ from backend.common.sitevars.fms_api_secrets import (
 
 
 @pytest.fixture(autouse=True)
-def always_drain_taskqueue(taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub):
+def always_drain_taskqueue(
+    tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+):
     yield
-    queues = ["datafeed", "cache-clearing", "post-update-hooks"]
-    for queue in queues:
+    deferred_queues = ["datafeed", "cache-clearing", "post-update-hooks"]
+    for queue in deferred_queues:
         tasks = taskqueue_stub.get_filtered_tasks(queue_names=queue)
         for task in tasks:
             if task.payload:
                 deferred.run(task.payload)
+
+    get_queues = ["default"]
+    for queue in get_queues:
+        tasks = taskqueue_stub.get_filtered_tasks(queue_names=queue)
+        for task in tasks:
+            tasks_client.get(task.url)
 
 
 @pytest.fixture

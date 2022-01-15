@@ -561,53 +561,6 @@ class MatchTimePredictionsDo(webapp.RequestHandler):
         ApiStatusController.clear_cache_if_needed(old_status, new_status)
 
 
-class RebuildPlayoffAdvancementEnqueue(webapp.RequestHandler):
-    """
-    Enqueue rebuilding playoff advancement details for an event
-    """
-    def get(self, event_key):
-        event = Event.get_by_id(event_key)
-        if not event:
-            self.abort(404)
-            return
-
-        taskqueue.add(url='/tasks/math/do/playoff_advancement_update/{}'.format(event.key_name),
-                      method='GET')
-
-        self.response.out.write("Enqueued time prediction for {}".format(event.key_name))
-
-
-class RebuildPlayoffAdvancementDo(webapp.RequestHandler):
-    """
-    Rebuilds playoff advancement for a given event
-    """
-    def get(self, event_key):
-        event = Event.get_by_id(event_key)
-        if not event:
-            self.abort(404)
-
-        event_future = EventQuery(event_key).fetch_async(return_updated=True)
-        matches_future = EventMatchesQuery(event_key).fetch_async(return_updated=True)
-
-        event, _ = event_future.get_result()
-        matches, _ = matches_future.get_result()
-
-        cleaned_matches = MatchHelper.delete_invalid_matches(matches, event)
-        matches = MatchHelper.organized_matches(cleaned_matches)
-        bracket_table, playoff_advancement, _, _ = PlayoffAdvancementHelper.generate_playoff_advancement(event, matches)
-
-        event_details = EventDetails(
-            id=event.key_name,
-            playoff_advancement={
-                'advancement': playoff_advancement,
-                'bracket': bracket_table,
-            },
-        )
-        EventDetailsManipulator.createOrUpdate(event_details)
-
-        self.response.out.write("New playoff advancement for {}\n{}".format(event.key_name, json.dumps(event_details.playoff_advancement, indent=2, sort_keys=True)))
-
-
 class BlueZoneUpdateDo(webapp.RequestHandler):
     """
     Update the current "best match"
