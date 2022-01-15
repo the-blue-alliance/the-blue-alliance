@@ -19,6 +19,7 @@ from backend.api.handlers.event import (
     event_list_all,
     event_list_year,
     event_matches,
+    event_playoff_advancement,
     event_teams,
     event_teams_statuses,
 )
@@ -137,8 +138,10 @@ api_v3.add_url_rule(
     "/event/<string:event_key>/matches/<model_type:model_type>",
     view_func=event_matches,
 )
-# api_v3.add_url_rule("/event/<string:event_key>/playoff_advancement", view_func=TODO)
 api_v3.add_url_rule("/event/<string:event_key>/awards", view_func=event_awards)
+api_v3.add_url_rule(
+    "/event/<string:event_key>/playoff_advancement", view_func=event_playoff_advancement
+)
 
 # Event List
 api_v3.add_url_rule("/events/all", view_func=event_list_all)

@@ -1,0 +1,232 @@
+[
+  {
+    "extra_stats_info": [
+      {
+        "name": "Advance to Finals", 
+        "precision": 0, 
+        "type": "bool"
+      }
+    ], 
+    "level": "sf", 
+    "level_name": "Round Robin Semifinals", 
+    "rankings": [
+      {
+        "alliance_name": "Turing", 
+        "extra_stats": [
+          1
+        ], 
+        "matches_played": 5, 
+        "rank": 1, 
+        "record": {
+          "losses": 0, 
+          "ties": 0, 
+          "wins": 5
+        }, 
+        "sort_orders": [
+          10, 
+          228, 
+          148
+        ], 
+        "team_keys": [
+          "frc254", 
+          "frc3310", 
+          "frc6986", 
+          "frc948"
+        ]
+      }, 
+      {
+        "alliance_name": "Newton", 
+        "extra_stats": [
+          1
+        ], 
+        "matches_played": 5, 
+        "rank": 2, 
+        "record": {
+          "losses": 1, 
+          "ties": 0, 
+          "wins": 4
+        }, 
+        "sort_orders": [
+          8, 
+          252, 
+          126
+        ], 
+        "team_keys": [
+          "frc973", 
+          "frc1323", 
+          "frc5026", 
+          "frc4201"
+        ]
+      }, 
+      {
+        "alliance_name": "Carver", 
+        "extra_stats": [
+          0
+        ], 
+        "matches_played": 5, 
+        "rank": 3, 
+        "record": {
+          "losses": 3, 
+          "ties": 0, 
+          "wins": 2
+        }, 
+        "sort_orders": [
+          4, 
+          213, 
+          104
+        ], 
+        "team_keys": [
+          "frc1678", 
+          "frc7179", 
+          "frc3132", 
+          "frc1939"
+        ]
+      }, 
+      {
+        "alliance_name": "Galileo", 
+        "extra_stats": [
+          0
+        ], 
+        "matches_played": 5, 
+        "rank": 4, 
+        "record": {
+          "losses": 3, 
+          "ties": 0, 
+          "wins": 2
+        }, 
+        "sort_orders": [
+          4, 
+          207, 
+          120
+        ], 
+        "team_keys": [
+          "frc971", 
+          "frc179", 
+          "frc3646", 
+          "frc498"
+        ]
+      }, 
+      {
+        "alliance_name": "Hopper", 
+        "extra_stats": [
+          0
+        ], 
+        "matches_played": 5, 
+        "rank": 5, 
+        "record": {
+          "losses": 4, 
+          "ties": 0, 
+          "wins": 1
+        }, 
+        "sort_orders": [
+          2, 
+          204, 
+          120
+        ], 
+        "team_keys": [
+          "frc2122", 
+          "frc2046", 
+          "frc6485", 
+          "frc4192"
+        ]
+      }, 
+      {
+        "alliance_name": "Roebling", 
+        "extra_stats": [
+          0
+        ], 
+        "matches_played": 5, 
+        "rank": 6, 
+        "record": {
+          "losses": 4, 
+          "ties": 0, 
+          "wins": 1
+        }, 
+        "sort_orders": [
+          2, 
+          159, 
+          108
+        ], 
+        "team_keys": [
+          "frc148", 
+          "frc3847", 
+          "frc6829", 
+          "frc2907"
+        ]
+      }
+    ], 
+    "sort_order_info": [
+      {
+        "name": "Champ Points", 
+        "precision": 0, 
+        "type": "int"
+      }, 
+      {
+        "name": "Cargo Points", 
+        "precision": 0, 
+        "type": "int"
+      }, 
+      {
+        "name": "Hatch Panel Points", 
+        "precision": 0, 
+        "type": "int"
+      }
+    ], 
+    "type": "round_robin"
+  }, 
+  {
+    "extra_stats_info": [], 
+    "level": "f1", 
+    "level_name": "Finals", 
+    "rankings": [
+      {
+        "alliance_color": "blue", 
+        "alliance_name": "Newton", 
+        "extra_stats": [], 
+        "matches_played": 3, 
+        "record": {
+          "losses": 1, 
+          "ties": 0, 
+          "wins": 2
+        }, 
+        "sort_orders": [
+          2
+        ], 
+        "team_keys": [
+          "frc973", 
+          "frc1323", 
+          "frc5026", 
+          "frc4201"
+        ]
+      }, 
+      {
+        "alliance_color": "red", 
+        "alliance_name": "Turing", 
+        "extra_stats": [], 
+        "matches_played": 3, 
+        "record": {
+          "losses": 2, 
+          "ties": 0, 
+          "wins": 1
+        }, 
+        "sort_orders": [
+          1
+        ], 
+        "team_keys": [
+          "frc254", 
+          "frc3310", 
+          "frc6986", 
+          "frc948"
+        ]
+      }
+    ], 
+    "sort_order_info": [
+      {
+        "name": "Wins", 
+        "precision": 0, 
+        "type": "int"
+      }
+    ], 
+    "type": "best_of_3"
+  }
+]

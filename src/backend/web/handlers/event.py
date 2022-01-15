@@ -159,6 +159,7 @@ def event_detail(event_key: EventKey) -> Response:
     playoff_template = PlayoffAdvancementHelper.playoff_template(event)
 
     # Lazy handle the case when we haven't backfilled the event details
+    # TODO: Unify with API handler
     if not bracket_table or not playoff_advancement:
         (
             bracket_table2,
@@ -272,6 +273,7 @@ def event_insights(event_key: EventKey) -> Response:
     ranking_predictions = event_predictions.get("ranking_predictions", None)
     ranking_prediction_stats = event_predictions.get("ranking_prediction_stats", None)
 
+    # TODO: Unify with API handler
     cleaned_matches, _keys_to_delete = MatchHelper.delete_invalid_matches(
         event.matches, event
     )

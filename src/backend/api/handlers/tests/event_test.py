@@ -1,4 +1,5 @@
 import json
+import os
 
 from google.appengine.ext import ndb
 from werkzeug.test import Client
@@ -15,6 +16,7 @@ from backend.api.handlers.tests.helpers import (
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
+from backend.common.consts.playoff_type import PlayoffType
 from backend.common.models.alliance import EventAlliance
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.award import Award
@@ -462,3 +464,38 @@ def test_event_awards(ndb_stub, api_client: Client) -> None:
     names = set([award["name"] for award in resp.json])
     assert "Winner" in names
     assert "Finalist" in names
+
+
+def test_event_playoff_advancement(
+    ndb_stub, api_client: Client, test_data_importer
+) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2019nyny",
+        year=2019,
+        event_short="nyny",
+        event_type_enum=EventType.REGIONAL,
+        playoff_type=PlayoffType.BRACKET_8_TEAM,
+    ).put()
+    test_data_importer.import_event_alliances(
+        __file__, "data/2019nyny_alliances.json", "2019nyny"
+    )
+    test_data_importer.import_match_list(__file__, "data/2019nyny_matches.json")
+
+    # Nominal response
+    resp = api_client.get(
+        "/api/v3/event/2019nyny/playoff_advancement",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    with open(
+        os.path.join(
+            os.path.dirname(__file__), "data/expected_2019nyny_playoff_advancement.json"
+        ),
+        "r",
+    ) as f:
+        expected_response = json.load(f)
+    assert resp.json == expected_response

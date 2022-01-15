@@ -1,0 +1,289 @@
+[
+  {
+    "extra_stats_info": [
+      {
+        "name": "Advance to Semis", 
+        "precision": 0, 
+        "type": "bool"
+      }
+    ], 
+    "level": "qf", 
+    "level_name": "Quarterfinals", 
+    "rankings": [
+      {
+        "alliance_name": null, 
+        "extra_stats": [
+          1
+        ], 
+        "matches_played": 2, 
+        "rank": 1, 
+        "sort_orders": [
+          106.5
+        ], 
+        "team_keys": [
+          "frc3419", 
+          "frc3171", 
+          "frc4571"
+        ]
+      }, 
+      {
+        "alliance_name": null, 
+        "extra_stats": [
+          1
+        ], 
+        "matches_played": 2, 
+        "rank": 2, 
+        "sort_orders": [
+          96.5
+        ], 
+        "team_keys": [
+          "frc694", 
+          "frc354", 
+          "frc271"
+        ]
+      }, 
+      {
+        "alliance_name": null, 
+        "extra_stats": [
+          1
+        ], 
+        "matches_played": 2, 
+        "rank": 3, 
+        "sort_orders": [
+          75.0
+        ], 
+        "team_keys": [
+          "frc1884", 
+          "frc2344", 
+          "frc1796"
+        ]
+      }, 
+      {
+        "alliance_name": null, 
+        "extra_stats": [
+          1
+        ], 
+        "matches_played": 2, 
+        "rank": 4, 
+        "sort_orders": [
+          58.5
+        ], 
+        "team_keys": [
+          "frc743", 
+          "frc1660", 
+          "frc4856"
+        ]
+      }, 
+      {
+        "alliance_name": null, 
+        "extra_stats": [
+          0
+        ], 
+        "matches_played": 2, 
+        "rank": 5, 
+        "sort_orders": [
+          50.5
+        ], 
+        "team_keys": [
+          "frc2579", 
+          "frc806", 
+          "frc4122"
+        ]
+      }, 
+      {
+        "alliance_name": null, 
+        "extra_stats": [
+          0
+        ], 
+        "matches_played": 2, 
+        "rank": 6, 
+        "sort_orders": [
+          40.0
+        ], 
+        "team_keys": [
+          "frc5308", 
+          "frc1546", 
+          "frc358"
+        ]
+      }, 
+      {
+        "alliance_name": null, 
+        "extra_stats": [
+          0
+        ], 
+        "matches_played": 2, 
+        "rank": 7, 
+        "sort_orders": [
+          25.0
+        ], 
+        "team_keys": [
+          "frc1396", 
+          "frc5773", 
+          "frc229"
+        ]
+      }, 
+      {
+        "alliance_name": null, 
+        "extra_stats": [
+          0
+        ], 
+        "matches_played": 2, 
+        "rank": 8, 
+        "sort_orders": [
+          23.0
+        ], 
+        "team_keys": [
+          "frc1635", 
+          "frc1860", 
+          "frc334"
+        ]
+      }
+    ], 
+    "sort_order_info": [
+      {
+        "name": "Average Score", 
+        "precision": 2, 
+        "type": "int"
+      }
+    ], 
+    "type": "average_score"
+  }, 
+  {
+    "extra_stats_info": [
+      {
+        "name": "Advance to Finals", 
+        "precision": 0, 
+        "type": "bool"
+      }
+    ], 
+    "level": "sf", 
+    "level_name": "Semifinals", 
+    "rankings": [
+      {
+        "alliance_name": null, 
+        "extra_stats": [
+          1
+        ], 
+        "matches_played": 3, 
+        "rank": 1, 
+        "sort_orders": [
+          95.0
+        ], 
+        "team_keys": [
+          "frc1884", 
+          "frc2344", 
+          "frc1796"
+        ]
+      }, 
+      {
+        "alliance_name": null, 
+        "extra_stats": [
+          1
+        ], 
+        "matches_played": 3, 
+        "rank": 2, 
+        "sort_orders": [
+          93.33333333333333
+        ], 
+        "team_keys": [
+          "frc694", 
+          "frc354", 
+          "frc271"
+        ]
+      }, 
+      {
+        "alliance_name": null, 
+        "extra_stats": [
+          0
+        ], 
+        "matches_played": 3, 
+        "rank": 3, 
+        "sort_orders": [
+          86.33333333333333
+        ], 
+        "team_keys": [
+          "frc3419", 
+          "frc3171", 
+          "frc4571"
+        ]
+      }, 
+      {
+        "alliance_name": null, 
+        "extra_stats": [
+          0
+        ], 
+        "matches_played": 3, 
+        "rank": 4, 
+        "sort_orders": [
+          36.666666666666664
+        ], 
+        "team_keys": [
+          "frc743", 
+          "frc1660", 
+          "frc4856"
+        ]
+      }
+    ], 
+    "sort_order_info": [
+      {
+        "name": "Average Score", 
+        "precision": 2, 
+        "type": "int"
+      }
+    ], 
+    "type": "average_score"
+  }, 
+  {
+    "extra_stats_info": [], 
+    "level": "f1", 
+    "level_name": "Finals", 
+    "rankings": [
+      {
+        "alliance_color": "red", 
+        "alliance_name": null, 
+        "extra_stats": [], 
+        "matches_played": 2, 
+        "record": {
+          "losses": 0, 
+          "ties": 0, 
+          "wins": 2
+        }, 
+        "sort_orders": [
+          2
+        ], 
+        "team_keys": [
+          "frc1884", 
+          "frc2344", 
+          "frc1796"
+        ]
+      }, 
+      {
+        "alliance_color": "blue", 
+        "alliance_name": null, 
+        "extra_stats": [], 
+        "matches_played": 2, 
+        "record": {
+          "losses": 2, 
+          "ties": 0, 
+          "wins": 0
+        }, 
+        "sort_orders": [
+          0
+        ], 
+        "team_keys": [
+          "frc694", 
+          "frc354", 
+          "frc271"
+        ]
+      }
+    ], 
+    "sort_order_info": [
+      {
+        "name": "Wins", 
+        "precision": 0, 
+        "type": "int"
+      }
+    ], 
+    "type": "best_of_3"
+  }
+]

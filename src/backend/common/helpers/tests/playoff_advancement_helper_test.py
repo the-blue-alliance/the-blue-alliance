@@ -48,6 +48,18 @@ def test_standard_bracket(test_data_importer) -> None:
 
     assert json.loads(json.dumps(advancement)) == expected_advancement
 
+    apiv3_response = (
+        PlayoffAdvancementHelper.create_playoff_advancement_response_for_apiv3(
+            event, advancement.playoff_advancement, advancement.bracket_table
+        )
+    )
+    with open(
+        f"{os.path.dirname(__file__)}/data/expected_advancement_apiv3_2019nyny.json",
+        "r",
+    ) as f:
+        expected_advancement_apiv3 = json.load(f)
+    assert apiv3_response == expected_advancement_apiv3
+
 
 def test_2015_event(test_data_importer) -> None:
     event = create_event("2015nyny", PlayoffType.AVG_SCORE_8_TEAM)
@@ -68,6 +80,18 @@ def test_2015_event(test_data_importer) -> None:
         expected_advancement = json.load(f)
 
     assert json.loads(json.dumps(advancement)) == expected_advancement
+
+    apiv3_response = (
+        PlayoffAdvancementHelper.create_playoff_advancement_response_for_apiv3(
+            event, advancement.playoff_advancement, advancement.bracket_table
+        )
+    )
+    with open(
+        f"{os.path.dirname(__file__)}/data/expected_advancement_apiv3_2015nyny.json",
+        "r",
+    ) as f:
+        expected_advancement_apiv3 = json.load(f)
+    assert apiv3_response == expected_advancement_apiv3
 
 
 def test_round_robin_2018(test_data_importer) -> None:
@@ -91,6 +115,18 @@ def test_round_robin_2018(test_data_importer) -> None:
 
     assert json.loads(json.dumps(advancement)) == expected_advancement
 
+    apiv3_response = (
+        PlayoffAdvancementHelper.create_playoff_advancement_response_for_apiv3(
+            event, advancement.playoff_advancement, advancement.bracket_table
+        )
+    )
+    with open(
+        f"{os.path.dirname(__file__)}/data/expected_advancement_apiv3_2018cmptx.json",
+        "r",
+    ) as f:
+        expected_advancement_apiv3 = json.load(f)
+    assert apiv3_response == expected_advancement_apiv3
+
 
 def test_round_robin_2019(test_data_importer) -> None:
     event = create_event("2019cmptx", PlayoffType.ROUND_ROBIN_6_TEAM)
@@ -112,6 +148,18 @@ def test_round_robin_2019(test_data_importer) -> None:
         expected_advancement = json.load(f)
 
     assert json.loads(json.dumps(advancement)) == expected_advancement
+
+    apiv3_response = (
+        PlayoffAdvancementHelper.create_playoff_advancement_response_for_apiv3(
+            event, advancement.playoff_advancement, advancement.bracket_table
+        )
+    )
+    with open(
+        f"{os.path.dirname(__file__)}/data/expected_advancement_apiv3_2019cmptx.json",
+        "r",
+    ) as f:
+        expected_advancement_apiv3 = json.load(f)
+    assert apiv3_response == expected_advancement_apiv3
 
 
 def test_best_of_3_finals(test_data_importer) -> None:
