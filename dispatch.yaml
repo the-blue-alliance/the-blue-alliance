@@ -28,10 +28,7 @@ dispatch:
   service: py3-web
   
 # APIv3 on py3
-- url: "www.thebluealliance.com/api/v3/status"
-  service: py3-api
-  
-- url: "www.thebluealliance.com/api/v3/team*"
+- url: "www.thebluealliance.com/api/v3/*"
   service: py3-api
 
 # Send low-frequency long-running tasks to backend module
