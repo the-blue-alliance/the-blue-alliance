@@ -3,6 +3,7 @@ import unittest
 from unittest import mock
 
 import pytest
+from google.appengine.api import taskqueue
 from google.appengine.ext import deferred, ndb
 from pyre_extensions import none_throws
 
@@ -213,6 +214,49 @@ def test_updateHook_firebaseThrows(mock_firebase, ndb_context, taskqueue_stub) -
     assert len(tasks) == 1
     for task in tasks:
         deferred.run(task.payload)
+
+
+@mock.patch.object(taskqueue, "add")
+def test_updateHook_taskqueueThrows(
+    mock_taskqueue, ndb_context, taskqueue_stub
+) -> None:
+    test_match = Match(
+        id="2012ct_qm1",
+        alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2012ct"),
+        year=2012,
+        set_number=1,
+        match_number=1,
+    )
+    mock_taskqueue.side_effect = Exception
+    MatchManipulator._run_post_update_hook([test_match])
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
+    for task in tasks:
+        deferred.run(task.payload)
+
+
+def test_updateHook_enqueueStats(ndb_context, taskqueue_stub) -> None:
+    test_match = Match(
+        id="2012ct_qm1",
+        alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2012ct"),
+        year=2012,
+        set_number=1,
+        match_number=1,
+    )
+    MatchManipulator._run_post_update_hook([test_match])
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
+    for task in tasks:
+        deferred.run(task.payload)
+
+    stats_tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(stats_tasks) > 0
 
 
 @mock.patch.object(FirebasePusher, "delete_match")

@@ -11,6 +11,7 @@ from backend.common.models.cached_model import CachedModel
 from backend.common.models.event_district_points import EventDistrictPoints
 from backend.common.models.event_insights import EventInsights
 from backend.common.models.event_matchstats import EventMatchstats
+from backend.common.models.event_playoff_advancement import EventPlayoffAdvancement
 from backend.common.models.event_predictions import EventPredictions
 from backend.common.models.event_ranking import EventRanking
 from backend.common.models.keys import EventKey, Year
@@ -48,9 +49,9 @@ class EventDetails(CachedModel):
     rankings = ndb.JsonProperty()  # deprecated
     rankings2: List[EventRanking] = ndb.JsonProperty()
 
-    # Based on the output of PlayoffAdvancementHelper.generate_playoff_advancement
-    # Dict with keys for: bracket, playoff_advancement
-    playoff_advancement = ndb.JsonProperty()
+    playoff_advancement: EventPlayoffAdvancement = safe_cast(
+        EventPlayoffAdvancement, ndb.JsonProperty()
+    )
 
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)

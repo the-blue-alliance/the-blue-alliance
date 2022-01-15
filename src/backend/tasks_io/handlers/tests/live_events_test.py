@@ -6,7 +6,13 @@ from werkzeug.test import Client
 from backend.common.consts.event_type import EventType
 from backend.common.helpers.event_team_status_helper import EventTeamStatusHelper
 from backend.common.helpers.firebase_pusher import FirebasePusher
+from backend.common.helpers.playoff_advancement_helper import (
+    PlayoffAdvancement,
+    PlayoffAdvancementHelper,
+)
 from backend.common.models.event import Event
+from backend.common.models.event_details import EventDetails
+from backend.common.models.event_playoff_advancement import EventPlayoffAdvancement
 from backend.common.models.event_team import EventTeam
 from backend.common.models.event_team_status import EventTeamStatus
 from backend.common.models.team import Team
@@ -113,3 +119,63 @@ def test_do_eventteam_status(
     et = EventTeam.get_by_id("2020test_frc254")
     assert et is not None
     assert et.status == status
+
+
+def test_enqueue_playoff_advancement_no_event(
+    tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    resp = tasks_client.get("/tasks/math/enqueue/playoff_advancement_update/asdf")
+    assert resp.status_code == 404
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 0
+
+
+def test_enqueue_playoff_advancement(
+    tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    Event(
+        id="2020test",
+        year=2020,
+        event_short="test",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    resp = tasks_client.get("/tasks/math/enqueue/playoff_advancement_update/2020test")
+    assert resp.status_code == 200
+    assert resp.data == b"Enqueued playoff advancement calc for 2020test"
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 1
+
+
+def test_calc_playoff_advancement_no_event(tasks_client: Client) -> None:
+    resp = tasks_client.get("/tasks/math/do/playoff_advancement_update/asdf")
+    assert resp.status_code == 404
+
+
+@mock.patch.object(PlayoffAdvancementHelper, "generate_playoff_advancement")
+def test_calc_playoff_advancement(calc_mock: mock.Mock, tasks_client: Client) -> None:
+    Event(
+        id="2020test",
+        year=2020,
+        event_short="test",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    advancement = PlayoffAdvancement(
+        bracket_table={},
+        playoff_advancement={},
+        double_elim_matches={},
+        playoff_template=None,
+    )
+    calc_mock.return_value = advancement
+    resp = tasks_client.get("/tasks/math/do/playoff_advancement_update/2020test")
+    assert resp.status_code == 200
+    assert len(resp.data) > 0
+
+    # Make sure we set the EventDetails
+    ed = EventDetails.get_by_id("2020test")
+    assert ed is not None
+    assert ed.playoff_advancement == EventPlayoffAdvancement(
+        advancement={},
+        bracket={},
+    )

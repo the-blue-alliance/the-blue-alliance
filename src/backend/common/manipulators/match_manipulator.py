@@ -94,6 +94,17 @@ class MatchPostUpdateHooks:
         except Exception:
             logging.exception(f"Error enqueuing event_team_status for {event_key}")
 
+        # Enqueue updating playoff advancement
+        try:
+            taskqueue.add(
+                url=f"/tasks/math/do/playoff_advancement_update/{event_key}",
+                method="GET",
+                target="py3-tasks-io",
+                queue_name="default",
+            )
+        except Exception:
+            logging.exception(f"Error enqueuing advancement update for {event_key}")
+
 
 """
     @classmethod
@@ -181,14 +192,5 @@ class MatchPostUpdateHooks:
                     method='GET')
             except Exception:
                 logging.error("Error enqueuing event_matchstats for {}".format(event_key))
-                logging.error(traceback.format_exc())
-
-            # Enqueue updating playoff advancement
-            try:
-                taskqueue.add(
-                    url='/tasks/math/do/playoff_advancement_update/{}'.format(event_key),
-                    method='GET')
-            except Exception:
-                logging.error("Error enqueuing advancement update for {}".format(event_key))
                 logging.error(traceback.format_exc())
     """
