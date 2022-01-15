@@ -14,6 +14,8 @@ from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.decorators import cached_public
+from backend.common.helpers.match_helper import MatchHelper
+from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.keys import EventKey
 from backend.common.queries.award_query import EventAwardsQuery
@@ -170,3 +172,44 @@ def event_awards(event_key: EventKey) -> Response:
 
     awards = EventAwardsQuery(event_key=event_key).fetch_dict(ApiMajorVersion.API_V3)
     return profiled_jsonify(awards)
+
+
+@api_authenticated
+@validate_keys
+@cached_public
+def event_playoff_advancement(event_key: EventKey) -> Response:
+    """
+    Returns the playoff advancement for a given event.
+    """
+    track_call_after_response("event/playoff_advancement", event_key)
+
+    # Fetch data
+    event_future = EventQuery(event_key).fetch_async()
+    matches_future = EventMatchesQuery(event_key).fetch_async()
+    event = event_future.get_result()
+    event.prep_details()
+    matches = matches_future.get_result()
+
+    # Clean matches
+    # TODO: Unify with web handler
+    cleaned_matches, _ = MatchHelper.delete_invalid_matches(matches, event)
+    _, matches = MatchHelper.organized_matches(cleaned_matches)
+
+    # Lazy handle the case when we haven't backfilled the event details
+    # TODO: Unify with web handler
+    bracket_table = event.playoff_bracket
+    playoff_advancement = event.playoff_advancement
+    if not bracket_table or not playoff_advancement:
+        (
+            bracket_table2,
+            playoff_advancement2,
+            _,
+            _,
+        ) = PlayoffAdvancementHelper.generate_playoff_advancement(event, matches)
+        bracket_table = bracket_table or bracket_table2
+        playoff_advancement = playoff_advancement or playoff_advancement2
+
+    output = PlayoffAdvancementHelper.create_playoff_advancement_response_for_apiv3(
+        event, playoff_advancement, bracket_table
+    )
+    return profiled_jsonify(output)

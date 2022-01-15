@@ -15,7 +15,13 @@ from typing import (
 from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import AllianceColor, OPPONENT, TMatchWinner
-from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.comp_level import (
+    COMP_LEVELS_PLAY_ORDER,
+    COMP_LEVELS_VERBOSE,
+    COMP_LEVELS_VERBOSE_FULL,
+    CompLevel,
+    ELIM_LEVELS,
+)
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.helpers.match_helper import (
     MatchHelper,
@@ -169,7 +175,7 @@ class PlayoffAdvancementHelper(object):
             ]
             advancement.append(
                 [
-                    map(lambda p: int(p[3:]), alliance["picks"]),
+                    list(map(lambda p: int(p[3:]), alliance["picks"])),
                     alliance_advancement["cmp_points_matches"],
                     sum(alliance_advancement["cmp_points_matches"]),
                     alliance_advancement["tiebreak1_matches"],
@@ -649,15 +655,39 @@ class PlayoffAdvancementHelper(object):
 
         return ""
 
-    """
     @classmethod
-    def transform_bracket_level_for_api(cls, event, bracket_table, comp_level):
+    def create_playoff_advancement_response_for_apiv3(
+        cls, event, playoff_advancement, bracket_table
+    ):
+        output = []
+        for level in ELIM_LEVELS:
+            level_ranks = []
+            if playoff_advancement and playoff_advancement.get(level):
+                if event.playoff_type == PlayoffType.AVG_SCORE_8_TEAM:
+                    level_ranks = PlayoffAdvancementHelper.transform_2015_advancement_level_for_apiv3(
+                        event, playoff_advancement, level
+                    )
+                else:
+                    level_ranks = PlayoffAdvancementHelper.transform_round_robin_advancement_level_for_apiv3(
+                        event, playoff_advancement, level
+                    )
+            elif bracket_table and bracket_table.get(level):
+                level_ranks = (
+                    PlayoffAdvancementHelper.transform_bracket_level_for_apiv3(
+                        event, bracket_table, level
+                    )
+                )
+            output.extend(level_ranks)
+        return output
+
+    @classmethod
+    def transform_bracket_level_for_apiv3(cls, event, bracket_table, comp_level):
         level_ranks = []
-        for series_level, set_bracket in bracket_table[comp_level].iteritems():
+        for series_level, set_bracket in bracket_table[comp_level].items():
             series = int("".join(c for c in series_level if c.isdigit()))
             data = {
                 "level": "{}{}".format(comp_level, series),
-                "level_name": Match.COMP_LEVELS_VERBOSE_FULL[comp_level]
+                "level_name": COMP_LEVELS_VERBOSE_FULL[comp_level]
                 + (" %d" % series if comp_level != "f" else ""),
                 "rankings": None,
                 "type": "best_of_3",  # TODO handle other playoff types
@@ -666,7 +696,8 @@ class PlayoffAdvancementHelper(object):
             }
 
             alliances = [
-                cls._make_alliance_rank_row(c, set_bracket) for c in ["red", "blue"]
+                cls._make_alliance_rank_row_for_apiv3(c, set_bracket)
+                for c in ["red", "blue"]
             ]
             data["rankings"] = sorted(
                 alliances, key=lambda a: a["record"]["wins"], reverse=True
@@ -677,11 +708,14 @@ class PlayoffAdvancementHelper(object):
         return level_ranks
 
     @classmethod
-    def _make_alliance_rank_row(cls, color, bracket_set):
+    def _make_alliance_rank_row_for_apiv3(cls, color, bracket_set):
         record = bracket_set["{}_record".format(color)]
         return {
-            "team_keys": map(
-                lambda t: "frc{}".format(t), bracket_set["{}_alliance".format(color)]
+            "team_keys": list(
+                map(
+                    lambda t: "frc{}".format(t),
+                    bracket_set["{}_alliance".format(color)],
+                )
             ),
             "alliance_name": bracket_set["{}_name".format(color)],
             "alliance_color": color,
@@ -692,16 +726,16 @@ class PlayoffAdvancementHelper(object):
         }
 
     @classmethod
-    def transform_2015_advancement_level_for_api(
+    def transform_2015_advancement_level_for_apiv3(
         cls, event, playoff_advancement, comp_level
     ):
-        level_order = Match.COMP_LEVELS_PLAY_ORDER[comp_level]
-        next_level = Match.COMP_LEVELS_PLAY_ORDER.keys()[
-            Match.COMP_LEVELS_PLAY_ORDER.values().index(level_order + 1)
+        level_order = COMP_LEVELS_PLAY_ORDER[comp_level]
+        next_level = COMP_LEVELS_PLAY_ORDER.keys()[
+            COMP_LEVELS_PLAY_ORDER.values().index(level_order + 1)
         ]
         data = {
             "level": comp_level,
-            "level_name": Match.COMP_LEVELS_VERBOSE_FULL[comp_level],
+            "level_name": COMP_LEVELS_VERBOSE_FULL[comp_level],
             "rankings": [],
             "type": "average_score",
             "sort_order_info": [
@@ -709,9 +743,7 @@ class PlayoffAdvancementHelper(object):
             ],
             "extra_stats_info": [
                 {
-                    "name": "Advance to {}".format(
-                        Match.COMP_LEVELS_VERBOSE[next_level]
-                    ),
+                    "name": "Advance to {}".format(COMP_LEVELS_VERBOSE[next_level]),
                     "type": "bool",
                     "precision": 0,
                 },
@@ -720,17 +752,19 @@ class PlayoffAdvancementHelper(object):
         for i, alliance in enumerate(playoff_advancement[comp_level]):
             rank = i + 1
             data["rankings"].append(
-                cls._make_2015_alliance_advancement_row(event, alliance, rank, comp_level)
+                cls._make_2015_alliance_advancement_row_for_apiv3_for_apiv3(
+                    event, alliance, rank, comp_level
+                )
             )
         return [data]
 
     @classmethod
-    def transform_round_robin_advancement_level_for_api(
+    def transform_round_robin_advancement_level_for_apiv3(
         cls, event, playoff_advancement, comp_level
     ):
         data = {
             "level": comp_level,
-            "level_name": "Round Robin " + Match.COMP_LEVELS_VERBOSE_FULL[comp_level],
+            "level_name": "Round Robin " + COMP_LEVELS_VERBOSE_FULL[comp_level],
             "rankings": [],
             "type": "round_robin",
             "sort_order_info": [
@@ -749,15 +783,15 @@ class PlayoffAdvancementHelper(object):
         for i, alliance in enumerate(playoff_advancement[comp_level]):
             rank = i + 1
             data["rankings"].append(
-                cls._make_alliance_advancement_row(event, alliance, rank)
+                cls._make_alliance_advancement_row_for_apiv3(event, alliance, rank)
             )
         return [data]
 
     @classmethod
-    def _make_alliance_advancement_row(cls, event, alliance, rank):
+    def _make_alliance_advancement_row_for_apiv3(cls, event, alliance, rank):
         record = alliance[8]
         row = {
-            "team_keys": map(lambda t: "frc{}".format(t), alliance[0]),
+            "team_keys": list(map(lambda t: "frc{}".format(t), alliance[0])),
             "alliance_name": alliance[7],  # alliance name
             "record": record,
             "matches_played": record["wins"] + record["losses"] + record["ties"],
@@ -769,8 +803,10 @@ class PlayoffAdvancementHelper(object):
         return row
 
     @classmethod
-    def _make_2015_alliance_advancement_row(cls, event, alliance, rank, comp_level):
-        team_keys = map(lambda t: "frc{}".format(t), alliance[0])
+    def _make_2015_alliance_advancement_row_for_apiv3(
+        cls, event, alliance, rank, comp_level
+    ):
+        team_keys = list(map(lambda t: "frc{}".format(t), alliance[0]))
         row = {
             "team_keys": team_keys,
             "alliance_name": cls._alliance_name(team_keys, event.alliance_selections),
@@ -781,4 +817,3 @@ class PlayoffAdvancementHelper(object):
         }
 
         return row
-    """
